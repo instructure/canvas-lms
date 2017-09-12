@@ -307,7 +307,7 @@ class GradeSummaryPresenter
   end
 
   def grading_periods
-    @all_grading_periods ||= GradingPeriod.for(@context).to_a
+    @all_grading_periods ||= GradingPeriod.for(@context).order(:start_date).to_a
   end
 
   private

@@ -37,9 +37,12 @@ class Assignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
 
-  ALLOWED_GRADING_TYPES = %w(
-    pass_fail percent letter_grade gpa_scale points not_graded
-  ).freeze
+  POINTED_GRADING_TYPES = %w(percent letter_grade gpa_scale points).freeze
+  NON_POINTED_GRADING_TYPES = %w(pass_fail not_graded).freeze
+  ALLOWED_GRADING_TYPES = (POINTED_GRADING_TYPES + NON_POINTED_GRADING_TYPES).freeze
+
+  OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
+  SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
 
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
@@ -74,7 +77,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
-  validate :due_date_ok?, :unless => :has_active_assignment_overrides?
+  validate :due_date_ok?, :unless => :active_assignment_overrides?
   validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
@@ -160,10 +163,13 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.lti_context_id = nil
+    result.turnitin_id = nil
     result.discussion_topic = nil
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
-
+    # Default to the last position of all active assignments in the group.  Clients can still
+    # override later.  Just helps to avoid duplicate positions.
+    result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
     result.title =
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
 
@@ -351,6 +357,7 @@ class Assignment < ActiveRecord::Base
               :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
+              :apply_late_policy,
               :touch_submissions_if_muted_changed
 
   has_a_broadcast_policy
@@ -2038,7 +2045,7 @@ class Assignment < ActiveRecord::Base
 
   scope :include_submittables, -> { preload(:quiz, :discussion_topic, :wiki_page) }
 
-  SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
+  scope :submittable, -> { where.not(submission_types: [nil, *OFFLINE_SUBMISSION_TYPES]) }
   scope :no_submittables, -> { where.not(submission_types: SUBMITTABLE_TYPES) }
 
   scope :with_submissions, -> { preload(:submissions) }
@@ -2053,6 +2060,10 @@ class Assignment < ActiveRecord::Base
 
   scope :having_submissions_for_user, lambda { |user|
     with_submissions_for_user(user).merge(Submission.having_submission)
+  }
+
+  scope :by_assignment_group_id, lambda { |group_id|
+    where('assignment_group_id = ?', group_id.to_s)
   }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
@@ -2344,9 +2355,20 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
-      DueDateCacher.recompute(self)
-    end
+    return unless update_cached_due_dates?
+
+    DueDateCacher.recompute(self)
+  end
+
+  def update_cached_due_dates?
+    due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
+  end
+
+  def apply_late_policy
+    return if update_cached_due_dates? # DueDateCacher already re-applies late policy so we shouldn't
+    return unless grading_type_changed?
+
+    LatePolicyApplicator.for_assignment(self)
   end
 
   def gradeable?
@@ -2507,6 +2529,15 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def validate_overrides_for_sis(overrides)
+    unless AssignmentUtil.sis_integration_settings_enabled?(context) && AssignmentUtil.due_date_required_for_account?(context)
+      @skip_due_date_validation = true
+      return
+    end
+    raise ActiveRecord::RecordInvalid unless assignment_overrides_due_date_ok?(overrides)
+    @skip_due_date_validation = true
+  end
+
   private
 
   def due_date_ok?
@@ -2515,16 +2546,25 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def assignment_overrides_due_date_ok?
+  def assignment_overrides_due_date_ok?(overrides={})
     if AssignmentUtil.due_date_required?(self)
-      if active_assignment_overrides.where(due_at: nil).count > 0
+      overrides = gather_override_data(overrides)
+      if overrides.select{|o| o['due_at'].nil?}.length > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
+        return false
       end
     end
+    true
   end
 
-  def has_active_assignment_overrides?
-    active_assignment_overrides.count > 0
+  def gather_override_data(overrides)
+    return self.assignment_overrides unless self.assignment_overrides.empty?
+    return overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
+    overrides
+  end
+
+  def active_assignment_overrides?
+    @skip_due_date_validation || self.assignment_overrides.length > 0
   end
 
   def assignment_name_length_ok?

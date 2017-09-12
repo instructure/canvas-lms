@@ -260,7 +260,7 @@ describe Api do
     end
 
     it "should not hit the database if no valid conditions were found" do
-      collection = mock()
+      collection = double()
       allow(collection).to receive(:table_name).and_return("courses")
       expect(collection).to receive(:none).once
       relation = @api.api_find_all(collection, ["sis_invalid:1"])
@@ -355,9 +355,9 @@ describe Api do
     end
 
     it 'should try and make params when non-ar_id columns have returned with ar_id columns' do
-      collection = mock()
+      collection = double()
       pluck_result = ["thing2", "thing3"]
-      relation_result = mock(eager_load_values: nil, pluck: pluck_result)
+      relation_result = double(eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
       expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
           and_return({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
@@ -366,9 +366,9 @@ describe Api do
     end
 
     it 'should try and make params when non-ar_id columns have returned without ar_id columns' do
-      collection = mock()
+      collection = double()
       pluck_result = ["thing2", "thing3"]
-      relation_result = mock(eager_load_values: nil, pluck: pluck_result)
+      relation_result = double(eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
       expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
           and_return({"other-lookup" => ["thing2", "thing3"]})
@@ -377,7 +377,7 @@ describe Api do
     end
 
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
-      collection = mock()
+      collection = double()
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
       expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
           and_return({"test-lookup" => ["thing1", "thing2"]})
@@ -386,9 +386,9 @@ describe Api do
     end
 
     it 'should not try and make params when no non-ar_id columns have returned without ar_id columns' do
-      collection = mock()
-      object1 = mock()
-      object2 = mock()
+      collection = double()
+      object1 = double()
+      object2 = double()
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({:lookups => {"id" => "test-lookup"}})
       expect(Api).to receive(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
           and_return({})

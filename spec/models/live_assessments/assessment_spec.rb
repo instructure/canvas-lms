@@ -82,8 +82,8 @@ describe LiveAssessments::Assessment do
     it "creates outcome results for each alignment" do
       alignment1 = outcome.align(assessment, assessment_context, mastery_type: 'none', mastery_score: 0.6)
       alignment2 = another_outcome.align(assessment, assessment_context, mastery_type: 'none', mastery_score: 0.5)
-      LiveAssessments::Submission.any_instance.expects(:create_outcome_result).with(alignment1)
-      LiveAssessments::Submission.any_instance.expects(:create_outcome_result).with(alignment2)
+      expect_any_instance_of(LiveAssessments::Submission).to receive(:create_outcome_result).with(alignment1)
+      expect_any_instance_of(LiveAssessments::Submission).to receive(:create_outcome_result).with(alignment2)
       assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user])
     end

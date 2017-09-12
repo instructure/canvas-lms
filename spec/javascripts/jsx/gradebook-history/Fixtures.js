@@ -35,7 +35,7 @@ function historyEvent () {
       page_view: null,
       student: idCounter
     }
-  }
+  };
 }
 
 function historyEventArray () {
@@ -46,13 +46,26 @@ function user () {
   return {
     id: `${++idCounter}`,
     name: `User #${idCounter}`
-  }
+  };
 }
 
 function userArray () {
   return [
     user(), user(), user()
-  ]
+  ];
+}
+
+function assignment () {
+  return {
+    id: `${++idCounter}`,
+    name: `Assignment #${idCounter}`
+  };
+}
+
+function assignmentArray () {
+  return [
+    assignment(), assignment(), assignment()
+  ];
 }
 
 function userMap () {
@@ -67,20 +80,12 @@ function userMap () {
   return map;
 }
 
-function payload () {
-  return {
-    events: historyEventArray(),
-    users: userArray(),
-    link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"'
-  }
-}
-
-function response () {
+function historyResponse () {
   return {
     data: {
       events: historyEventArray(),
       linked: {
-        assignments: [],
+        assignments: assignmentArray(),
         courses: [],
         page_views: [],
         users: userArray()
@@ -90,10 +95,10 @@ function response () {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       date: 'Thu, 01 Jun 2017 00:09:21 GMT',
-      link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"',
+      link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"',
       status: '304 Not Modified'
     }
-  }
+  };
 }
 
 function timeFrame () {
@@ -106,9 +111,10 @@ function timeFrame () {
 export default {
   historyEvent,
   historyEventArray,
-  payload,
-  response,
+  historyResponse,
   timeFrame,
+  assignment,
+  assignmentArray,
   user,
   userArray,
   userMap

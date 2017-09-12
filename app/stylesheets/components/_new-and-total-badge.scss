@@ -61,7 +61,7 @@ $new-total-border-radius: 3px;
     color: white;
   }
   .new-items {
-    background-color: $ic-brand-primary;
+    background-color: var(--ic-brand-primary);
     margin-right: -$new-total-border-radius;
     padding-right: $new-total-padding + $new-total-border-radius;
   }

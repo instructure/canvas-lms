@@ -22,7 +22,7 @@ describe DataFixup::PopulateStreamItemNotificationCategory do
     course_with_student(:active_all => true)
     category = "TestImmediately"
     Notification.create(:name => 'Assignment Due Date Changed', :category => category)
-    Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+    allow_any_instance_of(Assignment).to receive(:created_at).and_return(4.hours.ago)
     assignment_model(:course => @course)
     @assignment.update_attribute(:due_at, 1.week.from_now)
 

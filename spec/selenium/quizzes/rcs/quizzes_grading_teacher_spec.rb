@@ -34,10 +34,6 @@ describe 'Grading quizzes' do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     context 'when quiz needs review' do
       before(:once) { @quiz = seed_quiz_with_submission(1, student: @student) }
 

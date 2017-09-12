@@ -29,15 +29,11 @@ describe "assignment groups" do
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
-      ConditionalRelease::Service.stubs(:active_rules).returns([])
+      allow(ConditionalRelease::Service).to receive(:active_rules).and_return([])
       make_full_screen
       course_with_teacher_logged_in
       enable_all_rcs @course.account
       stub_rcs_config
-    end
-
-    after(:each) do
-      unstub_rcs_config
     end
 
     it "should create an assignment with default dates", priority:"1", test_id: 216344 do
@@ -65,8 +61,8 @@ describe "assignment groups" do
 
     it "should allow setting overrides", priority: "1", test_id: 216349 do
       skip "regularly fails on line 99 below but looks fine in web page"
-      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
-      ConditionalRelease::Service.stubs(:jwt_for).returns(:jwt)
+      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+      allow(ConditionalRelease::Service).to receive(:jwt_for).and_return(:jwt)
 
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")

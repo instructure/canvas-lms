@@ -127,7 +127,7 @@ module Lti
         account.root_account.enable_feature!(:lti2_rereg)
         tool_proxy = create_tool_proxy
         tool_proxy.bindings.create(context: account)
-        ToolProxy.any_instance.stubs(:reregistration_message_handler).returns(true)
+        allow_any_instance_of(ToolProxy).to receive(:reregistration_message_handler).and_return(true)
 
         tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
 

@@ -316,7 +316,7 @@ describe GroupCategory do
       group = category.groups.create(:name => "Group 1", :context => @course)
       student = @course.enroll_student(user_model).user
 
-      DueDateCacher.expects(:recompute_course).with(@course.id, [assignment2.id])
+      expect(DueDateCacher).to receive(:recompute_course).with(@course.id, [assignment2.id])
       category.distribute_members_among_groups([student], [group])
     end
   end
@@ -475,11 +475,11 @@ describe GroupCategory do
         calc = GroupCategory::GroupBySectionCalculator.new(nil)
         mock_users_by_section = {}
         section_counts.each_with_index do |u_count, idx|
-          mock_users_by_section[idx] = stub(:count => u_count)
+          mock_users_by_section[idx] = double(:count => u_count)
         end
         calc.users_by_section_id = mock_users_by_section
         calc.user_count = section_counts.sum
-        calc.groups = stub(:count => group_count)
+        calc.groups = double(:count => group_count)
         dist = calc.determine_group_distribution
         dist.sort_by{|k, v| k}.map(&:last)
       end

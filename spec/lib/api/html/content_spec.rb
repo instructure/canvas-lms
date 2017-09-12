@@ -59,8 +59,8 @@ module Api
           string = "<body><a href='http://somelink.com'>link</a></body>"
           host = 'somelink.com'
           port = 80
-          Html::Link.expects(:new).with("http://somelink.com", host: host, port: port).returns(
-            stub(to_corrected_s: "http://otherlink.com")
+          expect(Html::Link).to receive(:new).with("http://somelink.com", host: host, port: port).and_return(
+            double(to_corrected_s: "http://otherlink.com")
           )
           html = Content.new(string, host: host, port: port).modified_html
           expect(html).to match(/otherlink.com/)
@@ -79,7 +79,7 @@ module Api
           string = "<div><ul><li><img class='equation_image' data-equation-content='\int f(x)/g(x)'/></li>"\
                  "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
                  "<li><img class='nothing_special'></li></ul></div>"
-          url_helper = stub(rewrite_api_urls: nil)
+          url_helper = double(rewrite_api_urls: nil)
           html = Content.new(string).rewritten_html(url_helper)
           expected = "<div><ul>\n"\
               "<li><img class=\"equation_image\" data-equation-content=\"\int f(x)/g(x)\" data-mathml=\"&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;mo&gt;/&lt;/mo&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;/math&gt;\"></li>\n"\
@@ -90,9 +90,16 @@ module Api
 
         it "inserts css/js if it is supposed to" do
           string = "<div>stuff</div>"
-          url_helper = stub
+          url_helper = double
           html = Content.new(string).rewritten_html(url_helper)
           expect(html).to eq("<div>stuff</div>")
+        end
+
+        it "re-writes root-relative urls to be absolute" do
+          string = "<p><a href=\"/blah\"></a></p>"
+          url_helper = UrlProxy.new(double, double, "example.com", "https")
+          html = Content.new(string).rewritten_html(url_helper)
+          expect(html).to eq("<p><a href=\"https://example.com/blah\"></a></p>")
         end
       end
 

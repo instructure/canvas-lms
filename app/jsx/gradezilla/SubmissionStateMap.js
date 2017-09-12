@@ -61,7 +61,14 @@ function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedG
 }
 
 function missingSubmission (student, assignment) {
-  const submission = { assignment_id: assignment.id, user_id: student.id, missing: false };
+  const submission = {
+    assignment_id: assignment.id,
+    user_id: student.id,
+    excused: false,
+    late: false,
+    missing: false,
+    seconds_late: 0
+  };
   const dueDates = assignment.effectiveDueDates[student.id] || {};
   if (dueDates.due_at != null && new Date(dueDates.due_at) < new Date()) {
     submission.missing = true;

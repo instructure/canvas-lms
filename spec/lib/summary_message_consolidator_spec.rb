@@ -49,7 +49,7 @@ describe "SummaryMessageConsolidator" do
     end
 
     SummaryMessageConsolidator.process
-    dm_summarize_expectation = DelayedMessage.expects(:summarize)
+    dm_summarize_expectation = expect(DelayedMessage).to receive(:summarize)
     dms.each_slice(delayed_messages_per_account) do |dms|
       dm_summarize_expectation.with(dms.map(&:id))
     end

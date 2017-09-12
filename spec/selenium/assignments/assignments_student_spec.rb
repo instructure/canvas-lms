@@ -237,17 +237,17 @@ describe "assignments" do
 
       context "select file or folder" do
         before(:each) do
-          # mock out function calls
-          google_drive_connection = mock()
-          google_drive_connection.stubs(:service_type).returns('google_drive')
-          google_drive_connection.stubs(:retrieve_access_token).returns('access_token')
-          google_drive_connection.stubs(:authorized?).returns(true)
+          # double out function calls
+          google_drive_connection = double()
+          allow(google_drive_connection).to receive(:service_type).and_return('google_drive')
+          allow(google_drive_connection).to receive(:retrieve_access_token).and_return('access_token')
+          allow(google_drive_connection).to receive(:authorized?).and_return(true)
 
-          # mock files to show up from "google drive"
+          # double files to show up from "google drive"
           file_list = create_file_list
-          google_drive_connection.stubs(:list_with_extension_filter).returns(file_list)
+          allow(google_drive_connection).to receive(:list_with_extension_filter).and_return(file_list)
 
-          ApplicationController.any_instance.stubs(:google_drive_connection).returns(google_drive_connection)
+          allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
           # create assignment
           @assignment.update_attributes(:submission_types => 'online_upload')
@@ -274,12 +274,12 @@ describe "assignments" do
       end
 
       it "forces users to authenticate", priority: "1", test_id: 161892 do
-        # stub out google drive
-        google_drive_connection = mock()
-        google_drive_connection.stubs(:service_type).returns('google_drive')
-        google_drive_connection.stubs(:retrieve_access_token).returns(nil)
-        google_drive_connection.stubs(:authorized?).returns(nil)
-        ApplicationController.any_instance.stubs(:google_drive_connection).returns(google_drive_connection)
+        # double out google drive
+        google_drive_connection = double()
+        allow(google_drive_connection).to receive(:service_type).and_return('google_drive')
+        allow(google_drive_connection).to receive(:retrieve_access_token).and_return(nil)
+        allow(google_drive_connection).to receive(:authorized?).and_return(nil)
+        allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
         @assignment.update_attributes(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"

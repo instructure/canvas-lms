@@ -142,15 +142,18 @@ module AttachmentFu # :nodoc:
       def self.included(base) #:nodoc:
         require 'aws-sdk-s3'
 
-        s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
-        s3_config = YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
-
+        s3_config = load_s3_config(base.attachment_options[:s3_config_path])
         bucket_name = s3_config.delete(:bucket_name)
 
         s3 = Aws::S3::Resource.new(Canvas::AWS.validate_v2_config(s3_config, 'amazon_s3.yml'))
         @@bucket = s3.bucket(bucket_name)
 
         base.before_update :rename_file
+      end
+
+      def self.load_s3_config(path = nil)
+        s3_config_path = path || (Rails.root + 'config/amazon_s3.yml')
+        YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
       end
 
       # Overwrites the base filename writer in order to store the old filename

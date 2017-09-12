@@ -137,7 +137,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
       end
 
       it "should be nil" do
-        summary.stubs(:size).returns(1)
+        allow(summary).to receive(:size).and_return(1)
         expect(summary.alpha).to be_nil
       end
     end

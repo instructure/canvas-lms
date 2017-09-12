@@ -76,14 +76,6 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  # the stream item context is decided by calling asset.context(user), i guess
-  # to differentiate from the normal asset.context() call that may not give us
-  # the context we want. in this case, they're one and the same.
-  alias_method :original_context, :context
-  def context(user = nil)
-    self.original_context
-  end
-
   def quota_context
     self.context
   end
@@ -275,6 +267,7 @@ class ContentMigration < ActiveRecord::Base
     self.workflow_state = :failed
     job_progress.fail if job_progress && !skip_job_progress
     save
+    self.update_master_migration('failed') if for_master_course_import?
     resolve_content_links! # don't leave placeholders
   end
 

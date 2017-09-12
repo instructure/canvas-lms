@@ -34,8 +34,8 @@ describe CrocodocSessionsController do
   end
 
   before :each do
-    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
-    Crocodoc::API.any_instance.stubs(:session).returns 'session' => 'SESSION'
+    allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return 'uuid' => '1234567890'
+    allow_any_instance_of(Crocodoc::API).to receive(:session).and_return 'session' => 'SESSION'
     user_session(@student)
   end
 
@@ -45,26 +45,26 @@ describe CrocodocSessionsController do
     end
 
     it "works for the user in the blob" do
-      get :show, blob: @blob, hmac: @hmac
+      get :show, params: {blob: @blob, hmac: @hmac}
       expect(response.body).to include 'https://crocodoc.com/view/SESSION'
     end
 
     it "doesn't work for others" do
       user_session(@teacher)
-      get :show, blob: @blob, hmac: @hmac
+      get :show, params: {blob: @blob, hmac: @hmac}
       assert_status(401)
     end
 
     it "fails gracefulishly when crocodoc times out" do
-      Crocodoc::API.any_instance.stubs(:session).raises(Timeout::Error)
-      get :show, blob: @blob, hmac: @hmac
+      allow_any_instance_of(Crocodoc::API).to receive(:session).and_raise(Timeout::Error)
+      get :show, params: {blob: @blob, hmac: @hmac}
       assert_status(503)
     end
 
     it "updates attachment.viewed_at if the owner (user that is the context of the attachment) views" do
       last_viewed_at = @attachment.viewed_at
 
-      get :show, blob: @blob, hmac: @hmac
+      get :show, params: {blob: @blob, hmac: @hmac}
 
       @attachment.reload
       expect(@attachment.viewed_at).not_to eq(last_viewed_at)
@@ -81,7 +81,7 @@ describe CrocodocSessionsController do
       hmac = Canvas::Security.hmac_sha1(blob)
       last_viewed_at = attachment.viewed_at
 
-      get :show, blob: blob, hmac: hmac
+      get :show, params: {blob: blob, hmac: hmac}
 
       attachment.reload
       expect(attachment.viewed_at).not_to eq(last_viewed_at)
@@ -96,7 +96,7 @@ describe CrocodocSessionsController do
       teacher_hmac = Canvas::Security.hmac_sha1(teacher_blob)
       user_session(@teacher)
 
-      get :show, blob: teacher_blob, hmac: teacher_hmac
+      get :show, params: {blob: teacher_blob, hmac: teacher_hmac}
 
       @attachment.reload
       expect(@attachment.viewed_at).to eq(last_viewed_at)
@@ -104,7 +104,7 @@ describe CrocodocSessionsController do
   end
 
   it "should 404 if a crocodoc document is unavailable" do
-    get :show, blob: @blob, hmac: @hmac
+    get :show, params: {blob: @blob, hmac: @hmac}
     assert_status(404)
   end
 
@@ -112,23 +112,23 @@ describe CrocodocSessionsController do
     before do
       @attachment.submit_to_crocodoc
       Account.default.enable_feature!(:new_annotations)
-      Canvadocs.stubs(:enabled?).returns true
-      Canvadocs.stubs(:annotations_supported?).returns true
-      Canvadocs.stubs(:hijack_crocodoc_sessions?).returns false
+      allow(Canvadocs).to receive(:enabled?).and_return true
+      allow(Canvadocs).to receive(:annotations_supported?).and_return true
+      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return false
 
-      Canvadocs::API.any_instance.stubs(:session).returns 'id' => 'SESSION'
+      allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
       PluginSetting.create! :name => 'canvadocs',
                             :settings => { "base_url" => "https://canvadocs.instructure.docker" }
     end
 
     it "should redirect to a canvadocs session instead of crocodoc when enabled" do
-      Canvadocs.stubs(:hijack_crocodoc_sessions?).returns true
-      get :show, blob: @blob, hmac: @hmac
+      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return true
+      get :show, params: {blob: @blob, hmac: @hmac}
       expect(response.body).to include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
     end
 
     it "should not redirect to a canvadocs session instead of crocodoc when disabled" do
-      get :show, blob: @blob, hmac: @hmac
+      get :show, params: {blob: @blob, hmac: @hmac}
       expect(response.body).to_not include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
     end
   end

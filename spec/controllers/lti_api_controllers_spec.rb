@@ -75,8 +75,8 @@ describe LtiApiController, type: :request do
 
     req.body = opts['body'] if opts['body']
     post "https://www.example.com#{req.path}",
-      req.body,
-      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
+      params: req.body,
+      headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
 
   end
 
@@ -95,7 +95,7 @@ describe LtiApiController, type: :request do
 
   it "adds xml to an error report if the xml is invalid according to spec" do
     body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
-    Canvas::Errors.expects(:capture).with { |_, opts| opts[:extra][:xml].present? }.returns({})
+    expect(Canvas::Errors).to receive(:capture) { |_, opts| expect(opts[:extra][:xml]).to be_present; {} }
     make_call('body' => body)
   end
 
@@ -642,8 +642,8 @@ to because the assignment has no points possible.
       consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
       req = consumer.create_signed_request(:post, opts['path'], nil, { :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'] }, opts['body'])
       post "https://www.example.com#{req.path}",
-        req.body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
+        params: req.body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
     end
 
     it "should require the correct shared secret" do

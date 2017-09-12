@@ -29,10 +29,6 @@ describe "admin settings tab" do
     user_session(@admin)
   end
 
-  after :each do
-    unstub_rcs_config
-  end
-
   def get_default_services
     default_services = []
     service_hash = Account.default.allowed_services_hash
@@ -105,11 +101,6 @@ describe "admin settings tab" do
 
   def click_submit
     move_to_click("#account_settings button[type=submit]")
-    wait_for_ajax_requests
-  end
-
-  def submit_form
-    f('#account_settings').submit
     wait_for_ajax_requests
   end
 
@@ -451,7 +442,9 @@ describe "admin settings tab" do
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'
       move_to_click('#custom_help_link_settings button[type="submit"]')
-      submit_form
+      wait_for_animations
+      trigger_form_submit_event('#account_settings')
+      wait_for_ajaximations
       cl = Account.default.help_links.detect do |hl|
         hl_indifferent = HashWithIndifferentAccess.new(hl)
         hl_indifferent['url'] == 'https://url.example.com'
@@ -467,7 +460,8 @@ describe "admin settings tab" do
       fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, '..').click
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://whatever.example.com'
       f('#custom_help_link_settings button[type="submit"]').click
-      submit_form
+      wait_for_animations
+      trigger_form_submit_event('#account_settings')
       wait_for_ajax_requests
       cl = Account.default.help_links.detect do |hl|
         hl_indifferent = HashWithIndifferentAccess.new(hl)
@@ -483,7 +477,8 @@ describe "admin settings tab" do
       expect(url).to be_disabled
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
-      submit_form
+      wait_for_animations
+      trigger_form_submit_event('#account_settings')
       wait_for_ajax_requests
       cl = Account.default.help_links.detect do |hl|
         hl_indifferent = HashWithIndifferentAccess.new(hl)
@@ -502,13 +497,13 @@ describe "admin settings tab" do
     end
 
     it "should not display external integration keys if no key types exist" do
-      ExternalIntegrationKey.stubs(:key_types).returns([])
+      allow(ExternalIntegrationKey).to receive(:key_types).and_return([])
       get "/accounts/#{Account.default.id}/settings"
       expect(f("#account_settings")).not_to contain_css("#external_integration_keys")
     end
 
     it "should not display external integration keys if no rights are granted" do
-      ExternalIntegrationKey.any_instance.stubs(:grants_right_for?).returns(false)
+      allow_any_instance_of(ExternalIntegrationKey).to receive(:grants_right_for?).and_return(false)
       get "/accounts/#{Account.default.id}/settings"
       expect(f("#account_settings")).not_to contain_css("#external_integration_keys")
     end

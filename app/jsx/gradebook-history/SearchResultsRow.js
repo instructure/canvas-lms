@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { number, shape, string } from 'prop-types';
+import { shape, string } from 'prop-types';
 
 const SearchResultsRow = (props) => {
   const item = props.item;
@@ -43,7 +43,7 @@ SearchResultsRow.propTypes = {
     to: string.isRequired,
     grader: string.isRequired,
     student: string.isRequired,
-    assignment: number.isRequired,
+    assignment: string.isRequired,
     anonymous: string.isRequired
   }).isRequired
 };

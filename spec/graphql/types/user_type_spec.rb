@@ -20,4 +20,30 @@ describe Types::UserType do
       expect(user_type.avatarUrl).to match /avatar.*png/
     end
   end
+
+  context "enrollments" do
+    before(:once) do
+      @course1 = @course
+      @course2 = course_factory
+      student_in_course(user: @student, course: @course2, active_all: true)
+    end
+
+    it "returns enrollments for the given course" do
+      expect(
+        user_type.enrollments(
+          args: {courseId: @course1.id.to_s},
+          current_user: @teacher
+        ).first.course_id
+      ).to eq @course1.id
+    end
+
+    it "doesn't return enrollments for courses the user doesn't have permission for" do
+      expect(
+        user_type.enrollments(
+          args: {courseId: @course2.id.to_s},
+          current_user: @teacher
+        )
+      ).to be_nil
+    end
+  end
 end

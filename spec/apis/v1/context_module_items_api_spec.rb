@@ -921,8 +921,8 @@ describe "Module Items API", type: :request do
 
     describe 'POST select_mastery_path' do
       before do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
-        ConditionalRelease::Service.stubs(:select_mastery_path).returns({ code: '200', body: {} })
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+        allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '200', body: {} })
         student_in_course(course: @course)
       end
 
@@ -936,7 +936,7 @@ describe "Module Items API", type: :request do
       end
 
       it 'should require mastery paths to be enabled' do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         call_select_mastery_path @assignment_tag, 100, @student.id, expected_status: 400
       end
 
@@ -955,7 +955,7 @@ describe "Module Items API", type: :request do
       end
 
       it 'should return the CYOE error if the action is unsuccessful' do
-        ConditionalRelease::Service.stubs(:select_mastery_path).returns({ code: '909', body: { 'foo' => 'bar' } })
+        allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '909', body: { 'foo' => 'bar' } })
         json = call_select_mastery_path @assignment_tag, 100, @student.id, expected_status: 909
         expect(json).to eq({ 'foo' => 'bar' })
       end
@@ -969,7 +969,7 @@ describe "Module Items API", type: :request do
         def cyoe_returns(assignment_ids)
           cyoe_ids = assignment_ids.map {|id| { 'assignment_id' => "#{id}" }} # cyoe ids in strings
           cyoe_response = { 'assignments' => cyoe_ids }
-          ConditionalRelease::Service.stubs(:select_mastery_path).returns({ code: '200', body: cyoe_response })
+          allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '200', body: cyoe_response })
         end
 
         it 'should return a list of assignments if the action is successful' do
@@ -1176,14 +1176,14 @@ describe "Module Items API", type: :request do
                     }]
                   }]
                 }]
-        ConditionalRelease::Service.stubs(headers_for: {}, submissions_for: [],
+        allow(ConditionalRelease::Service).to receive_messages(headers_for: {}, submissions_for: [],
           domain_for: "canvas.xyz", "enabled_in_context?" => true,
           rules_summary_url: "cyoe.abc/rules", request_rules: @resp)
       end
 
       describe "CYOE interaction" do
         it "makes a request to the CYOE service when included" do
-          ConditionalRelease::Service.expects(:request_rules).once
+          expect(ConditionalRelease::Service).to receive(:request_rules).once
 
           api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module1.id}/items?include[]=mastery_paths",
             :controller => "context_module_items_api", :action => "index", :format => "json",
@@ -1212,8 +1212,8 @@ describe "Module Items API", type: :request do
 
       describe "caching CYOE data" do
         it "uses the cache when requested again" do
-          ConditionalRelease::Service.expects(:request_rules).never
-          ConditionalRelease::Service.stubs(rules_cache: {rules: @resp, updated_at: 1.day.from_now})
+          expect(ConditionalRelease::Service).to receive(:request_rules).never
+          allow(ConditionalRelease::Service).to receive_messages(rules_cache: {rules: @resp, updated_at: 1.day.from_now})
           3.times do
             api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module3.id}/items?include[]=mastery_paths",
               :controller => "context_module_items_api", :action => "index", :format => "json",
@@ -1488,8 +1488,8 @@ describe "Module Items API", type: :request do
 
     describe 'POST select_mastery_path' do
       before do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
-        ConditionalRelease::Service.stubs(:select_mastery_path).returns({ code: '200', body: { 'assignments' => [] } })
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+        allow(ConditionalRelease::Service).to receive(:select_mastery_path).and_return({ code: '200', body: { 'assignments' => [] } })
       end
 
       it 'should allow a mastery path' do
@@ -1560,7 +1560,7 @@ describe "Module Items API", type: :request do
                {}, {},
                {:expected_status => 401}
       )
-      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
       api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
                {:controller => "context_module_items_api", :action => "select_mastery_path", :format => "json",
                 :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},

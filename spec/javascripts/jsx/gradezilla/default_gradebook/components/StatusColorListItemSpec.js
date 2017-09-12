@@ -69,10 +69,22 @@ test('setColor sets the ColorPicker color', function () {
   strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), color);
 });
 
+test('setColor sets the ColorPicker color, even with no octothorpe', function () {
+  const color = 'FFFFFF';
+  this.instance.setColor(color);
+  strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), `#${color}`);
+});
+
 test('setColor sets li style', function () {
   const color = '#FFFFFF';
   this.instance.setColor(color);
   strictEqual(this.wrapper.find('li').prop('style').backgroundColor, color);
+});
+
+test('setColor sets li style, even with no octothorpe', function () {
+  const color = 'FFFFFF';
+  this.instance.setColor(color);
+  strictEqual(this.wrapper.find('li').prop('style').backgroundColor, `#${color}`);
 });
 
 QUnit.module('StatusColorListItem afterSetColor');
@@ -81,7 +93,7 @@ test('setColor calls afterSetColor', function () {
   const afterSetColor = this.stub();
   const wrapper = shallow(<StatusColorListItem {...defaultProps({ afterSetColor })} />);
   const instance = wrapper.instance();
-  instance.setColor();
+  instance.setColor('#FFFFFF');
   strictEqual(afterSetColor.callCount, 1);
   wrapper.unmount();
 });

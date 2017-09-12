@@ -19,7 +19,7 @@ module OtherHelperMethods
 
   def stub_kaltura
     # trick kaltura into being activated
-    CanvasKaltura::ClientV3.stubs(:config).returns({
+    allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
                                                        'domain' => 'www.instructuremedia.com',
                                                        'resource_domain' => 'www.instructuremedia.com',
                                                        'partner_id' => '100',
@@ -30,9 +30,9 @@ module OtherHelperMethods
                                                        'kcw_ui_conf' => '1',
                                                        'upload_ui_conf' => '1'
                                                    })
-    kal = mock('CanvasKaltura::ClientV3')
-    kal.stubs(:startSession).returns "new_session_id_here"
-    CanvasKaltura::ClientV3.stubs(:new).returns(kal)
+    kal = double('CanvasKaltura::ClientV3')
+    allow(kal).to receive(:startSession).and_return "new_session_id_here"
+    allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
   end
 
   def page_view(opts={})

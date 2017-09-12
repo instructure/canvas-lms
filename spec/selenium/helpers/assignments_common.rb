@@ -104,7 +104,7 @@ module AssignmentsCommon
     frozen_atts ||= {
         "assignment_group_id" => "true"
     }
-    PluginSetting.stubs(:settings_for_plugin).returns(frozen_atts)
+    allow(PluginSetting).to receive(:settings_for_plugin).and_return(frozen_atts)
   end
 
   def frozen_assignment(group)

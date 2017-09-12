@@ -58,13 +58,18 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
     require 'net/ldap'
-    ldap = Net::LDAP.new(:encryption => self.auth_over_tls.try(:to_sym))
-    if self.requested_authn_context.present?
-      ldap.encryption({
-        method: self.auth_over_tls.try(:to_sym),
-        tls_options: { ssl_version: self.requested_authn_context }
-      })
+    args = {}
+    if auth_over_tls
+      encryption = {
+        method: auth_over_tls.to_sym,
+        tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE,
+                       verify_hostname: false }
+      }
+      encryption[:tls_options][:ssl_version] = requested_authn_context if requested_authn_context.present?
+      args = { encryption: encryption }
     end
+
+    ldap = Net::LDAP.new(args)
     ldap.host = self.auth_host
     ldap.port = self.auth_port
     ldap.base = self.auth_base
@@ -206,5 +211,9 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
       CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_error")
     end
     return nil
+  end
+
+  def user_logout_redirect(controller, _current_user)
+    controller.login_ldap_url unless controller.instance_variable_get(:@domain_root_account).auth_discovery_url
   end
 end

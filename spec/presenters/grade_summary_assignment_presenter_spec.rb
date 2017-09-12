@@ -70,7 +70,7 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#grade_distribution" do
     context "when a summary's assignment_stats is empty" do
-      before { summary.stubs(:assignment_stats).returns({}) }
+      before { allow(summary).to receive(:assignment_stats).and_return({}) }
 
       it "does not raise an error " do
         expect { presenter.grade_distribution }.to_not raise_error
@@ -100,22 +100,22 @@ describe GradeSummaryAssignmentPresenter do
 
   describe '#deduction_present?' do
     it 'returns true when submission has positive points_deducted' do
-      @submission.stubs(:points_deducted).returns(10)
+      allow(@submission).to receive(:points_deducted).and_return(10)
       expect(presenter.deduction_present?).to eq(true)
     end
 
     it 'returns false when submission has zero points_deducted' do
-      @submission.stubs(:points_deducted).returns(0)
+      allow(@submission).to receive(:points_deducted).and_return(0)
       expect(presenter.deduction_present?).to eq(false)
     end
 
     it 'returns false when submission has nil points_deducted' do
-      @submission.stubs(:points_deducted).returns(nil)
+      allow(@submission).to receive(:points_deducted).and_return(nil)
       expect(presenter.deduction_present?).to eq(false)
     end
 
     it 'returns false when submission is not present' do
-      presenter.stubs(:submission).returns(nil)
+      allow(presenter).to receive(:submission).and_return(nil)
       expect(presenter.deduction_present?).to eq(false)
     end
   end

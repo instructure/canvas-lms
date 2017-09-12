@@ -126,11 +126,11 @@ describe ContentMigration do
     cm = ContentMigration.new(:context => @course, :user => @user,)
     cm.migration_type = 'zip_file_importer'
     cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
-    # the mock below should prevent it from actually hitting the url
+    # the double below should prevent it from actually hitting the url
     cm.migration_settings[:file_url] = "http://localhost:3000/file.zip"
     cm.save!
 
-    Attachment.any_instance.expects(:clone_url).with(cm.migration_settings[:file_url], false, true, :quota_context => cm.context)
+    expect_any_instance_of(Attachment).to receive(:clone_url).with(cm.migration_settings[:file_url], false, true, :quota_context => cm.context)
 
     cm.queue_migration
     worker = Canvas::Migration::Worker::CCWorker.new
@@ -433,6 +433,8 @@ describe ContentMigration do
   end
 
   it "should correclty handle media comment resolution in quizzes" do
+    skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
     course_with_teacher
     cm = ContentMigration.new(:context => @course, :user => @user)
     cm.migration_type = 'canvas_cartridge_importer'
@@ -501,7 +503,7 @@ describe ContentMigration do
     cm.save!
     cm.queue_migration
 
-    Canvas::Migration::Worker::CCWorker.any_instance.expects(:perform).never
+    expect_any_instance_of(Canvas::Migration::Worker::CCWorker).to receive(:perform).never
     Timecop.travel(50.hours.from_now) do
       run_jobs
     end
@@ -518,10 +520,10 @@ describe ContentMigration do
     cm.migration_type = 'common_cartridge_importer'
     cm.workflow_state = 'exported'
     cm.save!
-    Canvas::Migration::Worker::CCWorker.expects(:new).never
+    expect(Canvas::Migration::Worker::CCWorker).to receive(:new).never
     cm.queue_migration
 
-    ContentMigration.any_instance.expects(:import_content).never
+    expect_any_instance_of(ContentMigration).to receive(:import_content).never
     Timecop.travel(50.hours.from_now) do
       run_jobs
     end
@@ -551,8 +553,9 @@ describe ContentMigration do
       expect(dj.run_at > 30.minutes.from_now).to be_truthy # should run in the future if something goes wrong
     end
 
-    cms[1].any_instantiation.expects(:queue_migration).with do |plugin, opts|
-      opts[:retry_count] == 1 && opts[:expires_at].present?
+    expect_any_instantiation_of(cms[1]).to receive(:queue_migration) do |_plugin, opts|
+      expect(opts[:retry_count]).to eq 1
+      expect(opts[:expires_at]).to be_present
     end
 
     run_jobs # even though the requeue is set to happen in the future, it should get run right away after the first one completes

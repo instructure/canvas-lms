@@ -73,7 +73,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       end
 
       it "saves new gradebook_settings in preferences" do
-        put :update, valid_params
+        put :update, params: valid_params
         expect(response).to be_ok
 
         expected_settings = {
@@ -85,7 +85,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       end
 
       it "transforms 'null' string values to nil" do
-        put :update, valid_params
+        put :update, params: valid_params
 
         expect(teacher.preferences[:gradebook_settings][@course.id]['filter_rows_by']['section_id']).to be_nil
       end
@@ -98,7 +98,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
         }
         teacher.save!
 
-        put :update, valid_params
+        put :update, params: valid_params
 
         expected_user_settings = {
           @course.id => show_settings_massaged.except("colors"),
@@ -119,7 +119,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
         @course.enrollment_term = term # `update_attribute` with a term has unwanted side effects
         @course.save!
 
-        put :update, valid_params
+        put :update, params: valid_params
         expect(response).to be_ok
 
         expected_settings = {
@@ -134,7 +134,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
         @course.workflow_state = "concluded"
         @course.save!
 
-        put :update, valid_params
+        put :update, params: valid_params
         expect(response).to be_ok
 
         expected_settings = {
@@ -149,7 +149,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
     context "given invalid params" do
       it "give an error response" do
         invalid_params = { "course_id" => @course.id }
-        put :update, invalid_params
+        put :update, params: invalid_params
 
         expect(response).not_to be_ok
         expect(json_response).to include(

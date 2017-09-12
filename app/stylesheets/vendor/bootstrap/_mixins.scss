@@ -337,7 +337,13 @@
 }
 
 // Updated replacement mixin for buttonBackground ^^
-@mixin canvas-button($button-color, $text-color) {
+@mixin canvas-button(
+  $button-color,
+  $text-color,
+  $button-background-is-lighter-than-text:false,
+  $button-color-darkened-5:darken($button-color, 5),
+  $button-color-darkened-15:darken($button-color, 15)
+) {
   background: $button-color;
   color: $text-color;
   border: 1px solid;
@@ -349,7 +355,7 @@
       color: $ic-color-light;
     }
     @else  {
-      background: darken($button-color, 5%);
+      background: $button-color-darkened-5;
       color: $text-color;
     }
 
@@ -360,14 +366,15 @@
         color: $ic-color-light;
       }
       @else {
-        background: darken($button-color, 6%);
+        background: $button-color-darkened-5;
         color: $text-color;
-        border-color: darken($button-color, 15%);
+        border-color: $button-color-darkened-15;
       }
     }
   }
 
-  @if lightness($button-color) > lightness($text-color) {
+
+  @if $button-background-is-lighter-than-text {
     border-color: $ic-border-color;
 
     &.active, &.Button--active, &:active { box-shadow: none; }
@@ -385,16 +392,15 @@
   }
 
   @else {
-    border-color: darken($button-color, 15%);
+    border-color: $button-color-darkened-15;
 
     &:focus { @include button-focus-dark; }
     &.active, &.Button--active, &:active {
-      background: darken($button-color, 8%);
+      background: $button-color-darkened-5;
       box-shadow: none;
     }
   }
 }
-
 
 // Grid System
 // -----------

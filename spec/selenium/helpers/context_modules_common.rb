@@ -46,7 +46,7 @@ module ContextModulesCommon
   def test_relock
     wait_for_ajaximations
     expect(f('#relock_modules_dialog')).to be_displayed
-    ContextModule.any_instance.expects(:relock_progressions).once
+    expect_any_instance_of(ContextModule).to receive(:relock_progressions).once
     fj(".ui-dialog:visible .ui-button:first-child").click
     wait_for_ajaximations
   end

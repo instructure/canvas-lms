@@ -92,7 +92,7 @@ module Lti
     #
     # @returns Webhook Subscription
     def create
-      subscription_helper = SubscriptionsValidator.new(params.require(:subscription), tool_proxy)
+      subscription_helper = SubscriptionsValidator.new(params.require(:subscription).to_unsafe_h, tool_proxy)
       subscription_helper.validate_subscription_request!
       response = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription_helper.subscription)
       forward_service_response(response)
@@ -116,7 +116,7 @@ module Lti
       subscription = params.require(:subscription)
       subscription['Id'] = params.require(:id)
 
-      subscription_helper = SubscriptionsValidator.new(params.require(:subscription), tool_proxy)
+      subscription_helper = SubscriptionsValidator.new(params.require(:subscription).to_unsafe_h, tool_proxy)
       subscription_helper.validate_subscription_request!
 
       service_response = Services::LiveEventsSubscriptionService.update_tool_proxy_subscription(tool_proxy, params.require(:id), subscription)
@@ -148,7 +148,7 @@ module Lti
     end
 
     def forward_service_response(service_response)
-      render json: service_response, status: service_response.code
+      render json: service_response.body, status: service_response.code
     end
 
     # @!appendix Webhook Subscription Required Capabilities

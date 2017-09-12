@@ -1,4 +1,4 @@
-# This YAML file is auto-generated from a Transifex import.
+# This YAML file is auto-generated from a translation import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nn: 
@@ -9570,10 +9570,10 @@ nn:
           audio_comment: "Meldinga inneheld mediekommentarar. Om du vil lytte eller svare, kan du klikke på lenka nedanfor:"
           download: "last ned"
           reply_to_conversation_message: "Du kan svare på meldinga i Canvas ved å svare direkte på denne e-postmeldinga."
-          subject: "%{user_name} sende deg nettopp ei melding Canvas."
+          subject: "%{user_name} sende deg nettopp ei melding i Canvas."
           unknown_user: "Ukjend brukar"
           view_message: "Vis denne meldinga i samtalar"
-        subject: "%{user_name} sende deg nettopp ei melding Canvas."
+        subject: "%{user_name} sende deg nettopp ei melding i Canvas."
         unknown_user: "Ukjend brukar"
         view_message: "Vis denne meldinga i samtalar"
       sms: 
@@ -9581,8 +9581,8 @@ nn:
         more_info: "Meir info på %{url}"
         unknown_user: "Ukjend brukar"
       summary: 
-        body: "%{user_name} sende deg nettopp ei melding Canvas:"
-        subject: "%{user_name} sende deg nettopp ei melding Canvas."
+        body: "%{user_name} sende deg nettopp ei melding i Canvas:"
+        subject: "%{user_name} sende deg nettopp ei melding i Canvas."
         unknown_user: "Ukjend brukar"
       twitter: 
         tweet: "Canvas-varsel – melding frå %{user_name}."
@@ -16302,7 +16302,7 @@ nn:
     notices: 
       image_reported: "Dette bildet er rapportert"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} la deg akkurat til i ein samtale i Canvas. For å sjå samtalen, klikk på lenka: %{link}."
-  user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} sende deg nettopp ei melding Canvas"
+  user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} sende deg nettopp ei melding i Canvas"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, du må *logge på* før du kan sjå sida."
   user_navigation_a097be0f: Brukarnavigering
   user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "brukar er ikkje godkjend for å administrere SIS-data – konto[sis_account_id]"

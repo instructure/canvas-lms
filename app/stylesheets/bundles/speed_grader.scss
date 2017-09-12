@@ -42,8 +42,8 @@ $gradebook_header_height: 3.5em;
 }
 
 #gradebook_header {
-  background-color: $ic-brand-global-nav-bgd;
-  color: $ic-brand-global-nav-menu-item__text-color;
+  background-color: var(--ic-brand-global-nav-bgd);
+  color: var(--ic-brand-global-nav-menu-item__text-color);
 
   padding: 0.375em 0.75em;
   @include fontSize(11px);
@@ -52,7 +52,7 @@ $gradebook_header_height: 3.5em;
     background-image: $iconsActive;
   }
   a {
-    color: $ic-brand-global-nav-menu-item__text-color;
+    color: var(--ic-brand-global-nav-menu-item__text-color);
   }
 
   #combo_box_container {
@@ -94,7 +94,7 @@ $icon-size: 1.4rem;
   .gradebookActions__Button {
     @include overwrite-default-icon-size($icon-size);
     margin-right: $ic-sp/3;
-    color: $ic-brand-global-nav-ic-icon-svg-fill;
+    color: var(--ic-brand-global-nav-ic-icon-svg-fill);
   }
 
   // sizes the svg
@@ -110,7 +110,7 @@ $icon-size: 1.4rem;
   flex-direction: column;
   flex-wrap: nowrap;
   padding-left: 20px;
-  border-left: 1px dotted $ic-brand-global-nav-menu-item__text-color;
+  border-left: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -150,7 +150,7 @@ $icon-size: 1.4rem;
   flex-wrap: nowrap;
   align-self: flex-end;
   padding-right: $ic-sp;
-  border-right: 1px dotted $ic-brand-global-nav-menu-item__text-color;
+  border-right: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
 }
 .statsMetric__Item {
   display: flex;
@@ -180,7 +180,7 @@ $icon-size: 1.4rem;
 .gradebookMoveToNext {
   padding: 0 $ic-sp;
   i {
-    color: $ic-brand-global-nav-menu-item__text-color;
+    color: var(--ic-brand-global-nav-menu-item__text-color);
   }
 }
 .gradebookAvatar {
@@ -311,7 +311,7 @@ $icon-size: 1.4rem;
       }
       &.selected .selected_icon {
         display: inline-block;
-        color: $ic-brand-primary;
+        color: var(--ic-brand-primary);
         padding-right: 6px;
       }
       a {
@@ -563,7 +563,7 @@ $icon-size: 1.4rem;
 
 body .ui-selectmenu-dropdown {
   border-radius: 0;
-  color: $ic-brand-global-nav-ic-icon-svg-fill !important;
+  color: var(--ic-brand-global-nav-ic-icon-svg-fill) !important;
   height: 1.3125em;
   background-color: transparent;;
   background-image: none;
@@ -602,7 +602,7 @@ body .ui-selectmenu-dropdown {
 
 body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .ui-selectmenu-icon {
   background-position: (-17px) 0;
-  color: $ic-brand-global-nav-ic-icon-svg-fill;
+  color: var(--ic-brand-global-nav-ic-icon-svg-fill);
 ;
 
 }
@@ -638,7 +638,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 // override the status icon color for the first item in the dropdown
 #students_selectmenu-button .ui-selectmenu-item-icon.speedgrader-selectmenu-icon:first-of-type {
-  color: $ic-brand-global-nav-ic-icon-svg-fill;
+  color: var(--ic-brand-global-nav-ic-icon-svg-fill);
 }
 
 .ui-selectmenu-item-icon {
@@ -692,7 +692,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   .ui-selectmenu-status & {
     margin-top: 1px;
-    color: $ic-brand-global-nav-menu-item__text-color;
+    color: var(--ic-brand-global-nav-menu-item__text-color);
   }
 }
 

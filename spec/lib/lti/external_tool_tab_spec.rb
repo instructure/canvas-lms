@@ -21,7 +21,7 @@ describe Lti::ExternalToolTab do
 
   let(:context) do
     account = Account.new
-    account.stubs(:id).returns(1)
+    allow(account).to receive(:id).and_return(1)
     account
   end
 
@@ -60,7 +60,7 @@ describe Lti::ExternalToolTab do
       account_navigation: account_navigation,
       user_navigation: user_navigation,
     )
-    tool.stubs(:id).returns(2)
+    allow(tool).to receive(:id).and_return(2)
     tool
   end
 
@@ -113,7 +113,7 @@ describe Lti::ExternalToolTab do
       course_navigation: course_navigation,
       account_navigation: account_navigation
     )
-    tool2.stubs(:id).returns(9)
+    allow(tool2).to receive(:id).and_return(9)
     subject = described_class.new(context, nil, [tool2, tool])
     expect(subject.tabs.map{|t| t[:id]}).to eq [tool.asset_string, tool2.asset_string]
   end
@@ -121,7 +121,7 @@ describe Lti::ExternalToolTab do
   describe "course_navigation" do
     let(:context) do
       course = Course.new
-      course.stubs(:id).returns(3)
+      allow(course).to receive(:id).and_return(3)
       course
     end
     subject {described_class.new(context, :course_navigation, [tool])}
@@ -180,7 +180,7 @@ describe Lti::ExternalToolTab do
   describe "user_navigation" do
     let(:context) do
       user = User.new
-      user.stubs(:id).returns(4)
+      allow(user).to receive(:id).and_return(4)
       user
     end
     subject {described_class.new(context, :user_navigation, [tool])}

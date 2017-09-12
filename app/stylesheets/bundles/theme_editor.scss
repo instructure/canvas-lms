@@ -49,11 +49,6 @@ body { overflow: hidden; }
   padding-bottom: 0;
 }
 
-.grid-row--fix {
-  overflow: hidden;
-  margin: 0;
-}
-
 //// Variables for theme editor
 ///////
 $te-bgd: $ic-bg-light-neutral;
@@ -282,7 +277,7 @@ $te-footer-height: 72px;
   cursor: default;
 
   input[type="file"]:focus ~ & {
-    border-color: $ic-brand-primary;
+    border-color: var(--ic-brand-primary);
   }
 }
 
@@ -558,7 +553,7 @@ $te-footer-height: 72px;
       }
     }
     &.Theme__editor_preview-img-container--ic-brand-header-image {
-      background: $ic-brand-global-nav-logo-bgd;
+      background: var(--ic-brand-global-nav-logo-bgd);
     }
     &.Theme__editor_preview-img-container--ic-brand-favicon {
       background: #ffffff; // will always be white due to xbrowsers
@@ -571,7 +566,7 @@ $te-footer-height: 72px;
     }
     &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-square,
     &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-wide{
-      background: $ic-brand-msapplication-tile-color;
+      background: var(--ic-brand-msapplication-tile-color);
     }
   }
   .Theme__editor-placeholder--main {

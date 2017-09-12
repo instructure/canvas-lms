@@ -23,7 +23,7 @@ describe AccountAuthorizationConfig::SAML::MetadataRefresher do
 
   describe ".refresh_providers" do
     before do
-      AccountAuthorizationConfig::SAML.any_instance.stubs(:download_metadata).returns(nil)
+      allow_any_instance_of(AccountAuthorizationConfig::SAML).to receive(:download_metadata).and_return(nil)
     end
 
     let (:saml1) { Account.default.authentication_providers.create!(auth_type: 'saml', metadata_uri: '1') }
@@ -31,80 +31,80 @@ describe AccountAuthorizationConfig::SAML::MetadataRefresher do
     it "keeps going even if one fails" do
       saml2 = Account.default.authentication_providers.create!(auth_type: 'saml', metadata_uri: '2')
 
-      subject.expects(:refresh_if_necessary).with(saml1.global_id, '1').raises('die')
-      subject.expects(:refresh_if_necessary).with(saml2.global_id, '2').returns(false)
-      ::Canvas::Errors.expects(:capture_exception).once
+      expect(subject).to receive(:refresh_if_necessary).with(saml1.global_id, '1').and_raise('die')
+      expect(subject).to receive(:refresh_if_necessary).with(saml2.global_id, '2').and_return(false)
+      expect(::Canvas::Errors).to receive(:capture_exception).once
 
       subject.refresh_providers
     end
 
     it "doesn't populate if nothing changed" do
-      subject.expects(:refresh_if_necessary).with(saml1.global_id, '1').returns(false)
-      saml1.expects(:populate_from_metadata_xml).never
+      expect(subject).to receive(:refresh_if_necessary).with(saml1.global_id, '1').and_return(false)
+      expect(saml1).to receive(:populate_from_metadata_xml).never
 
       subject.refresh_providers
     end
 
     it "does populate, but doesn't save, if the XML changed, but nothing changes on the model" do
-      subject.expects(:refresh_if_necessary).with(saml1.global_id, '1').returns('xml')
-      saml1.any_instantiation.expects(:populate_from_metadata_xml).with('xml')
-      saml1.any_instantiation.expects(:save!).never
+      expect(subject).to receive(:refresh_if_necessary).with(saml1.global_id, '1').and_return('xml')
+      expect_any_instantiation_of(saml1).to receive(:populate_from_metadata_xml).with('xml')
+      expect_any_instantiation_of(saml1).to receive(:save!).never
 
       subject.refresh_providers
     end
 
     it "populates and saves" do
-      subject.expects(:refresh_if_necessary).with(saml1.global_id, '1').returns('xml')
-      saml1.any_instantiation.expects(:populate_from_metadata_xml).with('xml')
-      saml1.any_instantiation.expects(:changed?).returns(true)
-      saml1.any_instantiation.expects(:save!).once
+      expect(subject).to receive(:refresh_if_necessary).with(saml1.global_id, '1').and_return('xml')
+      expect_any_instantiation_of(saml1).to receive(:populate_from_metadata_xml).with('xml')
+      expect_any_instantiation_of(saml1).to receive(:changed?).and_return(true)
+      expect_any_instantiation_of(saml1).to receive(:save!).once
 
       subject.refresh_providers
     end
   end
 
   describe ".refresh_if_necessary" do
-    let(:redis) { stub("redis") }
+    let(:redis) { double("redis") }
 
     before do
-      Canvas.stubs(:redis_enabled?).returns(true)
-      Canvas.stubs(:redis).returns(redis)
+      allow(Canvas).to receive(:redis_enabled?).and_return(true)
+      allow(Canvas).to receive(:redis).and_return(redis)
     end
 
     it "passes ETag if we know it" do
-      redis.expects(:get).returns("MyETag")
-      CanvasHttp.expects(:get).with("url", "If-None-Match" => "MyETag")
+      expect(redis).to receive(:get).and_return("MyETag")
+      expect(CanvasHttp).to receive(:get).with("url", "If-None-Match" => "MyETag")
 
       subject.send(:refresh_if_necessary, 1, 'url')
     end
 
     it "doesn't pass ETag if force_fetch: true" do
-      redis.expects(:get).never
-      CanvasHttp.expects(:get).with("url", {})
+      expect(redis).to receive(:get).never
+      expect(CanvasHttp).to receive(:get).with("url", {})
 
       subject.send(:refresh_if_necessary, 1, 'url', force_fetch: true)
     end
 
     it "returns false if not modified" do
-      redis.expects(:get).returns("MyETag")
-      response = stub("response")
-      response.expects(:is_a?).with(Net::HTTPNotModified).returns(true)
+      expect(redis).to receive(:get).and_return("MyETag")
+      response = double("response")
+      expect(response).to receive(:is_a?).with(Net::HTTPNotModified).and_return(true)
 
-      CanvasHttp.expects(:get).with("url", "If-None-Match" => "MyETag").yields(response)
+      expect(CanvasHttp).to receive(:get).with("url", "If-None-Match" => "MyETag").and_yield(response)
 
       expect(subject.send(:refresh_if_necessary, 1, 'url')).to eq false
     end
 
     it "sets the ETag if provided" do
-      redis.expects(:get).returns(nil)
-      response = stub("response")
-      response.expects(:is_a?).with(Net::HTTPNotModified).returns(false)
-      response.expects(:value)
-      response.stubs(:[]).with('ETag').returns("NewETag")
-      redis.expects(:set).with("saml_1_etag", "NewETag")
-      response.expects(:body).returns("xml")
+      expect(redis).to receive(:get).and_return(nil)
+      response = double("response")
+      expect(response).to receive(:is_a?).with(Net::HTTPNotModified).and_return(false)
+      expect(response).to receive(:value)
+      allow(response).to receive(:[]).with('ETag').and_return("NewETag")
+      expect(redis).to receive(:set).with("saml_1_etag", "NewETag")
+      expect(response).to receive(:body).and_return("xml")
 
-      CanvasHttp.expects(:get).with("url", {}).yields(response)
+      expect(CanvasHttp).to receive(:get).with("url", {}).and_yield(response)
 
       expect(subject.send(:refresh_if_necessary, 1, 'url')).to eq "xml"
     end

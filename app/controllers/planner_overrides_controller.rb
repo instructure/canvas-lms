@@ -296,14 +296,20 @@ class PlannerOverridesController < ApplicationController
   end
 
   def assignment_collections
-    grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
+    # TODO: For Teacher Planner, we'll need to optimize & add
+    # the below `grading` and `moderation` collections. Disabled
+    # for now to better optimize the Student Planner.
+    #
+    # grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
+    # moderation = @current_user.assignments_needing_moderation(default_opts)
     submitting = @current_user.assignments_needing_submitting(default_opts)
-    moderation = @current_user.assignments_needing_moderation(default_opts)
     ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts)
     submitted = @current_user.submitted_assignments(default_opts)
     scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
-               submitting: submitting, moderation: moderation}
-    scopes[:grading] = grading if grading
+              submitting: submitting}
+    # TODO: Add when ready (see above comment)
+    # scopes[:grading] = grading if grading
+    # scopes[:moderation] = moderation if moderation
     collections = []
     scopes.each do |scope_name, scope|
       next unless scope

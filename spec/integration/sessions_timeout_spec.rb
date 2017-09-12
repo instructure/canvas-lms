@@ -36,7 +36,7 @@ describe "Session Timeout" do
         get "/"
         expect(response).to be_success
 
-        Time.stubs(:now).returns(now + 40.minutes)
+        allow(Time).to receive(:now).and_return(now + 40.minutes)
         get "/"
         expect(response).to redirect_to "http://www.example.com/login"
       end
@@ -48,11 +48,11 @@ describe "Session Timeout" do
         get "/"
         expect(response).to be_success
 
-        Time.stubs(:now).returns(now + 20.minutes)
+        allow(Time).to receive(:now).and_return(now + 20.minutes)
         get "/"
         expect(response).to be_success
 
-        Time.stubs(:now).returns(now + 40.minutes)
+        allow(Time).to receive(:now).and_return(now + 40.minutes)
         get "/"
         expect(response).to be_success
       end

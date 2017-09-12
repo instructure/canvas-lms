@@ -50,10 +50,6 @@ describe "quizzes" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it "should create a new question group", priority: "1", test_id: 210060 do
       get "/courses/#{@course.id}/quizzes/new"
 

@@ -102,7 +102,7 @@ define [
     reserveSuccessCB: (cancel_existing, data) ->
       # remove previous signup(s), if applicable (this has already happened on the backend)
       if cancel_existing
-        for own k, v of @dataSource.cache.contexts[@event.contextInfo.asset_string].events
+        for own k, v of @dataSource.cache.contexts[data.context_code].events
           if v.eventType == 'calendar_event' and
              v.calendarEvent.parent_event_id and
              v.calendarEvent.appointment_group_id == @event.calendarEvent.appointment_group_id
@@ -114,7 +114,7 @@ define [
       $.publish "CommonEvent/eventSaved", @event
 
       # Add the newly created child event
-      childEvent = commonEventFactory(data, [@event.contextInfo])
+      childEvent = commonEventFactory(data, @dataSource.contexts)
       $.publish "CommonEvent/eventSaved", childEvent
 
     reserveEvent: (params={}) =>

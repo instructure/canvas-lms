@@ -429,12 +429,12 @@ describe GradingPeriodGroup do
     end
 
     it 'recomputes course scores when the weighted attribute is changed' do
-      Enrollment.expects(:recompute_final_score).once
+      expect(Enrollment).to receive(:recompute_final_score).once
       @grading_period_set.update!(weighted: true)
     end
 
     it 'does not recompute course scores when the weighted attribute is not changed' do
-      Enrollment.expects(:recompute_final_score).never
+      expect(Enrollment).to receive(:recompute_final_score).never
       @grading_period_set.update!(title: 'The Best Set')
     end
   end

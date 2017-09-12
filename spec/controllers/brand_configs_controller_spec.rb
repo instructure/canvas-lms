@@ -28,14 +28,14 @@ describe BrandConfigsController do
     it "should allow authorized admin to view" do
       admin = account_admin_user(account: @account)
       user_session(admin)
-      get 'index', account_id: @account.id
+      get 'index', params: {account_id: @account.id}
       assert_status(200)
     end
 
     it 'should not allow non admin access' do
       user = user_with_pseudonym(active_all: true)
       user_session(user)
-      get 'index', account_id: @account.id
+      get 'index', params: {account_id: @account.id}
       assert_status(401)
     end
 
@@ -43,7 +43,7 @@ describe BrandConfigsController do
       subaccount = @account.sub_accounts.create!(name: "sub")
       admin = account_admin_user(account: @account)
       user_session(admin)
-      get 'index', account_id: subaccount.id
+      get 'index', params: {account_id: subaccount.id}
       assert_status(302)
       expect(flash[:error]).to match(/cannot edit themes/)
     end
@@ -53,14 +53,14 @@ describe BrandConfigsController do
     it "should allow authorized admin to see create" do
       admin = account_admin_user(account: @account)
       user_session(admin)
-      get 'new', {brand_config: @bc, account_id: @account.id}
+      get 'new', params: {brand_config: @bc, account_id: @account.id}
       assert_status(200)
     end
 
     it "should not allow non admin access" do
       user = user_with_pseudonym(active_all: true)
       user_session(user)
-      get 'new', {brand_config: @bc, account_id: @account.id}
+      get 'new', params: {brand_config: @bc, account_id: @account.id}
       assert_status(401)
     end
 
@@ -77,7 +77,7 @@ describe BrandConfigsController do
       admin = account_admin_user(account: @subaccount)
       user_session(admin)
 
-      get 'new', {brand_config: @sub_bc, account_id: @subaccount.id}
+      get 'new', params: {brand_config: @sub_bc, account_id: @subaccount.id}
 
       variable_schema = assigns[:js_env][:variableSchema]
       variable_schema.each do |s|
@@ -102,7 +102,7 @@ describe BrandConfigsController do
 
     it "should allow authorized admin to create" do
       user_session(admin)
-      post 'create', account_id: @account.id, brand_config: bcin
+      post 'create', params: {account_id: @account.id, brand_config: bcin}
       assert_status(200)
       json = JSON.parse(response.body)
       expect(json['brand_config']['variables']['ic-brand-primary']).to eq "#000000"
@@ -111,17 +111,17 @@ describe BrandConfigsController do
     it 'should not allow non admin access' do
       user = user_with_pseudonym(active_all: true)
       user_session(user)
-      post 'create', account_id: @account.id, brand_config: bcin
+      post 'create', params: {account_id: @account.id, brand_config: bcin}
       assert_status(401)
     end
 
     it 'should return an existing brand config' do
       user_session(admin)
-      post 'create', account_id: @account.id, brand_config: {
+      post 'create', params: {account_id: @account.id, brand_config: {
         variables: {
           "ic-brand-primary" => "#321"
         }
-      }
+      }}
       assert_status(200)
       json = JSON.parse(response.body)
       expect(json['brand_config']['md5']).to eq @bc.md5
@@ -132,7 +132,7 @@ describe BrandConfigsController do
       tf = Tempfile.new('test.js')
       tf.write("test")
       uf = ActionDispatch::Http::UploadedFile.new(tempfile: tf, filename: 'test.js')
-      post 'create', account_id: @account.id, brand_config: bcin, js_overrides: uf
+      post 'create', params: {account_id: @account.id, brand_config: bcin, js_overrides: uf}
       assert_status(200)
       json = JSON.parse(response.body)
       expect(json['brand_config']['js_overrides']).to be_present
@@ -144,7 +144,7 @@ describe BrandConfigsController do
       admin = account_admin_user(account: @account)
       user_session(admin)
       session[:brand_config_md5] = @bc.md5
-      delete 'destroy', account_id: @account.id
+      delete 'destroy', params: {account_id: @account.id}
       assert_status(302)
       expect(session[:brand_config_md5]).to be_nil
       expect { @bc.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -153,7 +153,7 @@ describe BrandConfigsController do
     it 'should not allow non admin access' do
       user = user_with_pseudonym(active_all: true)
       user_session(user)
-      delete 'destroy', account_id: @account.id
+      delete 'destroy', params: {account_id: @account.id}
       assert_status(401)
     end
   end
@@ -162,7 +162,7 @@ describe BrandConfigsController do
     it "should allow authorized admin to create" do
       admin = account_admin_user(account: @account)
       user_session(admin)
-      post 'save_to_account', account_id: @account.id
+      post 'save_to_account', params: {account_id: @account.id}
       assert_status(200)
     end
 
@@ -173,7 +173,7 @@ describe BrandConfigsController do
       admin = account_admin_user(account: @account)
       user_session(admin)
       session[:brand_config_md5] = @bc.md5
-      post 'save_to_account', account_id: @account.id
+      post 'save_to_account', params: {account_id: @account.id}
       assert_status(200)
       json = JSON.parse(response.body)
       expect(json['subAccountProgresses']).to be_present
@@ -182,7 +182,7 @@ describe BrandConfigsController do
     it 'should not allow non admin access' do
       user = user_with_pseudonym(active_all: true)
       user_session(user)
-      post 'save_to_account', account_id: @account.id
+      post 'save_to_account', params: {account_id: @account.id}
       assert_status(401)
     end
   end
@@ -191,7 +191,7 @@ describe BrandConfigsController do
     it "should allow authorized admin to create" do
       admin = account_admin_user(account: @account)
       user_session(admin)
-      post 'save_to_user_session', account_id: @account.id, brand_config_md5: @bc.md5
+      post 'save_to_user_session', params: {account_id: @account.id, brand_config_md5: @bc.md5}
       assert_status(302)
       expect(session[:brand_config_md5]).to eq @bc.md5
     end
@@ -200,7 +200,7 @@ describe BrandConfigsController do
       admin = account_admin_user(account: @account)
       user_session(admin)
       session[:brand_config_md5] = @bc.md5
-      post 'save_to_user_session', account_id: @account.id, brand_config_md5: ''
+      post 'save_to_user_session', params: {account_id: @account.id, brand_config_md5: ''}
       assert_status(302)
       expect(session[:brand_config_md5]).to eq false
       expect { @bc.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -209,7 +209,7 @@ describe BrandConfigsController do
     it 'should not allow non admin access' do
       user = user_with_pseudonym(active_all: true)
       user_session(user)
-      post 'save_to_user_session', account_id: @account.id, brand_config_md5: @bc.md5
+      post 'save_to_user_session', params: {account_id: @account.id, brand_config_md5: @bc.md5}
       assert_status(401)
       expect(session[:brand_config_md5]).to be_nil
     end

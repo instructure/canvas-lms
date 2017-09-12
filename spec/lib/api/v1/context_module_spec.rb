@@ -25,9 +25,8 @@ describe Api::V1::ContextModule do
       @request
     end
 
-    def initialize
-      @request = Mocha::Mock.new('request')
-      @request.stubs(params: {frame_external_urls: 'http://www.instructure.com'})
+    def initialize(request)
+      @request = request
     end
 
     def value_to_boolean(object)
@@ -47,7 +46,7 @@ describe Api::V1::ContextModule do
   end
 
   describe "#module_item_json" do
-    subject {Dummy.new}
+    subject { Dummy.new(double(params: {frame_external_urls: 'http://www.instructure.com'})) }
 
     before do
       course_with_teacher(account: Account.default)
@@ -61,7 +60,7 @@ describe Api::V1::ContextModule do
       @tool.save!
 
       @content = @tool
-      @content.stubs(tool_id: 1)
+      allow(@content).to receive_messages(tool_id: 1)
       @content.save!
 
       @tg = ContentTag.new(context: @course, context_module: @cm, content_type: 'ContextExternalTool', content: @content)

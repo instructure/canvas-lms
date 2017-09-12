@@ -170,6 +170,9 @@
   .header-bar-left {
     float: left;
   }
+  &.no-line {
+    border: none;
+  }
 }
 
 // classes for grouping buttons on the right

@@ -206,8 +206,8 @@ class Submission < ActiveRecord::Base
   end
 
   # see #needs_grading?
-  # When changing these conditions, consider updating index_submissions_on_assignment_id
-  # to maintain performance.
+  # When changing these conditions, update index_submissions_needs_grading to
+  # maintain performance.
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
@@ -309,7 +309,7 @@ class Submission < ActiveRecord::Base
   simply_versioned :explicit => true,
     :when => lambda{ |model| model.new_version_needed? },
     :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
-    :on_load => lambda{ |model,version| model.cached_due_date = version.versionable.cached_due_date }
+    :on_load => lambda{ |model,version| model&.cached_due_date = version.versionable&.cached_due_date }
 
   # This needs to be after simply_versioned because the grade change audit uses
   # versioning to grab the previous grade.
@@ -1266,14 +1266,20 @@ class Submission < ActiveRecord::Base
     true
   end
 
-  # apply_late_policy is called directly by bulk update processes, or indirectly by before_save on a Submission
-  def apply_late_policy(late_policy=nil, points_possible=nil, grading_type=nil)
+  def late_policy_status_manually_applied?
+    cleared_late = late_policy_status_was == 'late' && ['none', nil].include?(late_policy_status)
+    cleared_none = late_policy_status_was == 'none' && late_policy_status.nil?
+    late_policy_status == 'missing' || late_policy_status == 'late' || cleared_late || cleared_none
+  end
+  private :late_policy_status_manually_applied?
+
+  def apply_late_policy(late_policy=nil, incoming_assignment=nil)
     return if points_deducted_changed? || grading_period&.closed?
-    late_policy ||= assignment.course.late_policy
-    points_possible ||= assignment.points_possible
-    grading_type ||= assignment.grading_type
-    return score_missing(late_policy, points_possible, grading_type) if missing?
-    score_late_or_none(late_policy, points_possible) if score
+    incoming_assignment ||= assignment
+    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission?
+    late_policy ||= incoming_assignment.course.late_policy
+    return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
+    score_late_or_none(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if score
   end
 
   def score_missing(late_policy, points_possible, grading_type)
@@ -1283,9 +1289,9 @@ class Submission < ActiveRecord::Base
   end
   private :score_missing
 
-  def score_late_or_none(late_policy, points_possible)
+  def score_late_or_none(late_policy, points_possible, grading_type)
     raw_score = score_changed? ? score : entered_score
-    deducted = late_points_deducted(raw_score, late_policy, points_possible)
+    deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
     new_score = raw_score - deducted
     self.points_deducted = deducted
     self.score = new_score
@@ -1301,9 +1307,12 @@ class Submission < ActiveRecord::Base
     assignment.score_to_grade(entered_score) if entered_score
   end
 
-  def late_points_deducted(raw_score, late_policy, points_possible)
-    return 0 unless late_policy && points_possible && late?
-    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: seconds_late)
+  def late_points_deducted(raw_score, late_policy, points_possible, grading_type)
+    return 0 unless late_policy && late?
+
+    late_policy.points_deducted(
+      score: raw_score, possible: points_possible, late_for: seconds_late, grading_type: grading_type
+    )
   end
   private :late_points_deducted
 
@@ -1755,27 +1764,22 @@ class Submission < ActiveRecord::Base
     final ? self.provisional_grades.final.first : self.provisional_grades.not_final.find_by(scorer: scorer)
   end
 
-  def crocodoc_whitelist
+  def moderated_grading_whitelist
     if assignment.moderated_grading?
       if assignment.grades_published?
         sel = assignment.moderated_grading_selections.where(student_id: self.user).first
+        has_crocodoc = attachments.any?(&:crocodoc_available?)
         if sel && (pg = sel.provisional_grade)
           # include the student, the final grader, and the source grader (if a moderator copied a mark)
           annotators = [self.user, pg.scorer]
           annotators << pg.source_provisional_grade.scorer if pg.source_provisional_grade
-          annotators.map(&:crocodoc_id!)
-        else
-          # student not in moderation set: no filter
-          nil
+          annotators.map { |u| u.moderated_grading_ids(has_crocodoc) }
         end
       else
         # grades not yet published: students see only their own annotations
         # (speedgrader overrides this for provisional graders)
-        [self.user.crocodoc_id!]
+        [ user.moderated_grading_ids(has_crocodoc) ]
       end
-    else
-      # not a moderated assignment: no filter
-      nil
     end
   end
 
@@ -1821,7 +1825,7 @@ class Submission < ActiveRecord::Base
   end
 
   def participating_instructors
-    commenting_instructors.present? ? commenting_instructors : context.participating_instructors.uniq
+    commenting_instructors.present? ? commenting_instructors : context.participating_instructors.to_a.uniq
   end
 
   def possible_participants_ids
@@ -1983,7 +1987,7 @@ class Submission < ActiveRecord::Base
     self.graded? && (!self.submitted_at || (self.graded_at && self.graded_at >= self.submitted_at))
   end
 
-  def context(_user=nil)
+  def context
     self.assignment.context if self.assignment
   end
 

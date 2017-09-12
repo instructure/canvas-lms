@@ -59,23 +59,23 @@ module Lti
       describe "POST 'authorize'" do
 
         it 'responds with 200' do
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           expect(response.code).to eq '200'
         end
 
         it 'includes an expiration' do
           Setting.set('lti.oauth2.access_token.expiration', 1.hour.to_s)
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           expect(JSON.parse(response.body)['expires_in']).to eq 1.hour.to_s
         end
 
         it 'has a token_type of bearer' do
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           expect(JSON.parse(response.body)['token_type']).to eq 'bearer'
         end
 
         it 'returns an access_token' do
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           access_token = Lti::Oauth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
           expect { access_token.validate! }.not_to raise_error
         end
@@ -84,27 +84,41 @@ module Lti
           tool_proxy.raw_data['enabled_capability'].delete('Security.splitSecret')
           tool_proxy.raw_data['enabled_capability'] << 'OAuth.splitSecret'
           tool_proxy.save!
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           expect(response.code).to eq '200'
         end
 
         it "renders a 400 if the JWT format is invalid" do
           params[:assertion] = '12ad3.4fgs56'
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           expect(response.code).to eq '400'
         end
 
         it "renders a the correct json if the grant_type is invalid" do
           params[:assertion] = '12ad3.4fgs56'
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           expect(response.body).to eq({error: 'invalid_grant'}.to_json)
         end
 
         it "adds the file_host and the request host to the aud" do
-          post auth_endpoint, params
+          post auth_endpoint, params: params
           file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
           jwt = JSON::JWT.decode(JSON.parse(response.body)["access_token"], :skip_verification)
           expect(jwt["aud"]).to match_array [request.host, file_host]
+        end
+
+        context 'error reports' do
+          it 'creates an error report with error as the message' do
+            params[:assertion] = '12ad3.4fgs56'
+            post auth_endpoint, params: params
+            expect(ErrorReport.last.message).to eq 'Invalid JWT Format. JWT should include 3 or 5 segments.'
+          end
+
+          it 'sets the error report category' do
+            params[:assertion] = '12ad3.4fgs56'
+            post auth_endpoint, params: params
+            expect(ErrorReport.last.category).to eq 'JSON::JWT::InvalidFormat'
+          end
         end
 
         context "reg_key" do
@@ -142,7 +156,7 @@ module Lti
 
           it 'accepts a valid reg_key' do
             enable_cache do
-              post auth_endpoint, params
+              post auth_endpoint, params: params
               expect(response.code).to eq '200'
             end
           end
@@ -176,12 +190,12 @@ module Lti
           end
 
           it "rejects the request if a valid reg_key isn't provided and grant_type is auth code" do
-            post auth_endpoint, params.delete(:code)
+            post auth_endpoint, params: params.delete(:code)
             expect(response.code).to eq '400'
           end
 
           it "accepts a developer key with a reg key" do
-            post auth_endpoint, params
+            post auth_endpoint, params: params
             expect(response.code).to eq '200'
           end
 

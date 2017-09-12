@@ -188,7 +188,7 @@ class BrandConfigsController < ApplicationController
   end
 
   def process_variables(variables)
-    variables.each_with_object({}) do |(key, value), memo|
+    variables.to_unsafe_h.each_with_object({}) do |(key, value), memo|
       next unless value.present? && (config = BrandableCSS.variables_map[key])
       value = process_file(value) if config['type'] == 'image'
       memo[key] = value

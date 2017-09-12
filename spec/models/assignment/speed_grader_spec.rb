@@ -109,7 +109,8 @@ describe Assignment::SpeedGrader do
 
       it "only shows group comments" do
         json = Assignment::SpeedGrader.new(assignment, teacher).json
-        comments = json.fetch(:submissions).first.fetch(:submission_comments).map do |comment|
+        student_A_submission = json.fetch(:submissions).select { |s| s[:user_id] == student_A.id.to_s }.first
+        comments = student_A_submission.fetch(:submission_comments).map do |comment|
           comment.slice(:author_id, :comment)
         end
         expect(comments).to include({
@@ -175,6 +176,12 @@ describe Assignment::SpeedGrader do
       expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id.to_s)).to be_falsey
       expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id.to_s)).to be_truthy
       expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id.to_s)).to be_falsey
+    end
+
+    it "sorts student view students last" do
+      test_student = @course.student_view_student
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      expect(json[:context][:students].last[:id]).to eq(test_student.id.to_s)
     end
 
     it "includes all students when is only_visible_to_overrides false" do
@@ -301,6 +308,12 @@ describe Assignment::SpeedGrader do
       setup_assignment_with_homework
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
       expect(json["GROUP_GRADING_MODE"]).not_to be_truthy
+    end
+
+    it "sorts student view students last" do
+      test_student = @course.student_view_student
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      expect(json[:context][:students].last[:id]).to eq(test_student.id.to_s)
     end
 
     it 'returns "groups" instead of students' do

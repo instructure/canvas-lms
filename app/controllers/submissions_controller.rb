@@ -397,7 +397,7 @@ class SubmissionsController < ApplicationController
     # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
     if @assignment.allowed_extensions.present?
       if params[:submission][:attachments].any? {|a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
-         params[:attachments].any? do |i, a|
+         params[:attachments].values.any? do |a|
            !a[:uploaded_data].empty? &&
            !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
          end
@@ -605,7 +605,7 @@ class SubmissionsController < ApplicationController
         }
       end
       begin
-        @submissions = @assignment.update_submission(@user, params[:submission])
+        @submissions = @assignment.update_submission(@user, params[:submission].to_unsafe_h)
       rescue => e
         Canvas::Errors.capture_exception(:submissions, e)
         logger.error(e)

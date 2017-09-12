@@ -107,7 +107,7 @@
   left: $ic-sp;
   right: $ic-sp;
   bottom: $ic-sp;
-  border: 4px dashed $ic-brand-primary;
+  border: 4px dashed var(--ic-brand-primary);
 }
 
 .DraggingOverlay__Content {
@@ -116,7 +116,7 @@
 
 .DraggingOverlay__Icon {
   text-align: center;
-  color: $ic-brand-primary;
+  color: var(--ic-brand-primary);
   @include overwrite-default-icon-size($ic-sp*8);
 }
 
@@ -139,7 +139,7 @@
 
 .UploadArea__Icon {
   text-align: center;
-  color: $ic-brand-primary;
+  color: var(--ic-brand-primary);
   @include overwrite-default-icon-size($ic-sp*3.5);
 }
 

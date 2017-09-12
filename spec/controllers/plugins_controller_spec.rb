@@ -24,9 +24,9 @@ describe PluginsController do
   describe "#update" do
     it "still enables plugins even with no settings posted" do
       expect(PluginSetting.find_by(name: 'account_reports')).to be_nil
-      controller.stubs(:require_setting_site_admin).returns(true)
+      allow(controller).to receive(:require_setting_site_admin).and_return(true)
 
-      put 'update', id: 'account_reports', account_id: Account.default.id, plugin_setting: { disabled: false }
+      put 'update', params: {id: 'account_reports', account_id: Account.default.id, plugin_setting: { disabled: false }}
       expect(response).to be_redirect
       ps = PluginSetting.find_by!(name: 'account_reports')
       expect(ps).to be_enabled
@@ -38,8 +38,8 @@ describe PluginsController do
         ps.settings = { course_storage_csv: true }.with_indifferent_access
         ps.save!
 
-        controller.stubs(:require_setting_site_admin).returns(true)
-        put 'update', id: 'account_reports', account_id: Account.default.id, settings: { 'course_storage_csv' => '0' }
+        allow(controller).to receive(:require_setting_site_admin).and_return(true)
+        put 'update', params: {id: 'account_reports', account_id: Account.default.id, settings: { 'course_storage_csv' => '0' }}
         expect(response).to be_redirect
         ps.reload
         expect(ps.settings[:course_storage_csv]).to eq false

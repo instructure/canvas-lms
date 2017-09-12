@@ -110,7 +110,7 @@ describe RubricAssociation do
           :context => @course,
           :purpose => 'bookmark'
         )
-        LearningOutcome.expects(:update_alignments).never
+        expect(LearningOutcome).to receive(:update_alignments).never
         ra.update_alignments
       end
 
@@ -194,7 +194,7 @@ describe RubricAssociation do
       @rubric = @course.rubrics.build
       rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
       rubric_association_params = HashWithIndifferentAccess.new({:association_object=>@course, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
-      @course.any_instantiation.expects(:submissions).never
+      expect_any_instantiation_of(@course).to receive(:submissions).never
       @rubric.update_with_association(@user, rubric_params, @course, rubric_association_params)
     end
   end

@@ -33,7 +33,7 @@ module Lti
 
       describe '#course_index' do
         it 'returns 401 if user is not part of course' do
-          get 'course_index', course_id: @course.id
+          get 'course_index', params: {course_id: @course.id}
           assert_unauthorized
         end
       end
@@ -48,7 +48,7 @@ module Lti
       describe "#course_index" do
         context 'without access token' do
           it 'requires a user' do
-            get 'course_index', course_id: @course.id
+            get 'course_index', params: {course_id: @course.id}
             assert_unauthorized
           end
         end
@@ -62,7 +62,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the top level' do
-            get 'course_index', course_id: @course.id
+            get 'course_index', params: {course_id: @course.id}
             hash = json_parse.with_indifferent_access
             expect(hash.keys.size).to eq(6)
 
@@ -75,7 +75,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the container level' do
-            get 'course_index', course_id: @course.id
+            get 'course_index', params: {course_id: @course.id}
             hash = json_parse.with_indifferent_access
             container = hash[:pageOf]
 
@@ -88,7 +88,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the context level' do
-            get 'course_index', course_id: @course.id
+            get 'course_index', params: {course_id: @course.id}
             hash = json_parse.with_indifferent_access
             @course.reload
             context = hash[:pageOf][:membershipSubject]
@@ -102,7 +102,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the membership level' do
-            get 'course_index', course_id: @course.id
+            get 'course_index', params: {course_id: @course.id}
             hash = json_parse.with_indifferent_access
             @teacher.reload
             memberships = hash[:pageOf][:membershipSubject][:membership]
@@ -135,7 +135,7 @@ module Lti
             end
 
             it 'outputs the expected data in the expected format at the membership level' do
-              get 'course_index', course_id: @course.id, role: IMS::LIS::ContextType::URNs::Group
+              get 'course_index', params: {course_id: @course.id, role: IMS::LIS::ContextType::URNs::Group}
               hash = json_parse.with_indifferent_access
               @group.reload
               memberships = hash[:pageOf][:membershipSubject][:membership]
@@ -176,8 +176,8 @@ module Lti
 
       describe '#as_json' do
         it 'provides the right next_page url when no page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
-          get 'course_index', course_id: @course.id
+          allow(Api).to receive(:per_page).and_return(1)
+          get 'course_index', params: {course_id: @course.id}
           hash = json_parse.with_indifferent_access
 
           uri = URI(hash.fetch(:nextPage))
@@ -188,8 +188,8 @@ module Lti
         end
 
         it 'provides the right next_page url when page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
-          get 'course_index', course_id: @course.id, page: 2, per_page: 1, role: 'Instructor'
+          allow(Api).to receive(:per_page).and_return(1)
+          get 'course_index', params: {course_id: @course.id, page: 2, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 
           uri = URI(hash.fetch(:nextPage))
@@ -200,8 +200,8 @@ module Lti
         end
 
         it 'returns nil for the next page url when the last page in the collection was requested' do
-          Api.stubs(:per_page).returns(1)
-          get 'course_index', course_id: @course.id, page: 3, per_page: 1, role: 'Instructor'
+          allow(Api).to receive(:per_page).and_return(1)
+          get 'course_index', params: {course_id: @course.id, page: 3, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 
           expect(hash.fetch(:nextPage)).to be_nil
@@ -225,7 +225,7 @@ module Lti
 
       describe '#group_index' do
         it 'returns 401 if user is not part of group' do
-          get 'group_index', group_id: @group.id
+          get 'group_index', params: {group_id: @group.id}
           assert_unauthorized
         end
       end
@@ -243,7 +243,7 @@ module Lti
 
       describe '#group_index' do
         it 'returns 401 if user is not part of group' do
-          get 'group_index', group_id: @group.id
+          get 'group_index', params: {group_id: @group.id}
           assert_unauthorized
         end
       end
@@ -263,7 +263,7 @@ module Lti
       describe "#group_index" do
         context 'without access token' do
           it 'requires a user' do
-            get 'group_index', group_id: @group.id
+            get 'group_index', params: {group_id: @group.id}
             assert_unauthorized
           end
         end
@@ -277,7 +277,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the top level' do
-            get 'group_index', group_id: @group.id
+            get 'group_index', params: {group_id: @group.id}
             hash = json_parse.with_indifferent_access
             expect(hash.keys.size).to eq(6)
 
@@ -290,7 +290,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the container level' do
-            get 'group_index', group_id: @group.id
+            get 'group_index', params: {group_id: @group.id}
             hash = json_parse.with_indifferent_access
             container = hash[:pageOf]
 
@@ -303,7 +303,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the context level' do
-            get 'group_index', group_id: @group.id
+            get 'group_index', params: {group_id: @group.id}
             hash = json_parse.with_indifferent_access
             @group.reload
             context = hash[:pageOf][:membershipSubject]
@@ -317,7 +317,7 @@ module Lti
           end
 
           it 'outputs the expected data in the expected format at the membership level' do
-            get 'group_index', group_id: @group.id
+            get 'group_index', params: {group_id: @group.id}
             hash = json_parse.with_indifferent_access
             @student.reload
             memberships = hash[:pageOf][:membershipSubject][:membership]
@@ -371,8 +371,8 @@ module Lti
 
       describe '#as_json' do
         it 'provides the right next_page url when no page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
-          get 'group_index', group_id: @group.id
+          allow(Api).to receive(:per_page).and_return(1)
+          get 'group_index', params: {group_id: @group.id}
           hash = json_parse.with_indifferent_access
 
           uri = URI(hash.fetch(:nextPage))
@@ -383,8 +383,8 @@ module Lti
         end
 
         it 'provides the right next_page url when page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
-          get 'group_index', group_id: @group.id, page: 2, per_page: 1, role: 'Instructor'
+          allow(Api).to receive(:per_page).and_return(1)
+          get 'group_index', params: {group_id: @group.id, page: 2, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 
           uri = URI(hash.fetch(:nextPage))
@@ -395,8 +395,8 @@ module Lti
         end
 
         it 'returns nil for the next page url when the last page in the collection was requested' do
-          Api.stubs(:per_page).returns(1)
-          get 'group_index', group_id: @group.id, page: 3, per_page: 1, role: 'Instructor'
+          allow(Api).to receive(:per_page).and_return(1)
+          get 'group_index', params: {group_id: @group.id, page: 3, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 
           expect(hash.fetch(:nextPage)).to be_nil

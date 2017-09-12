@@ -359,7 +359,7 @@ describe "course settings" do
 
   context "link validator" do
     it "should validate all the links" do
-      CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false).once # don't actually ping the links for the specs
+      allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 
       course_with_teacher_logged_in
       attachment_model

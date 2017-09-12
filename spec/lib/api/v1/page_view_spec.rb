@@ -23,7 +23,7 @@ describe Api::V1::PageView do
 
   before do
     @request_id = SecureRandom.uuid
-    RequestContextGenerator.stubs( :request_id => @request_id )
+    allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
 
     @domain_root_account = Account.default
 
@@ -56,7 +56,7 @@ describe Api::V1::PageView do
     end
     @page_view = @page_views.first
 
-    PageView.stubs(
+    allow(PageView).to receive_messages(
       :find_by_id => @page_view,
       :find_all_by_id => @page_views
     )

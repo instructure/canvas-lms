@@ -1083,7 +1083,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it 'should api translate event descriptions in ics' do
-      HostUrl.stubs(:default_host).returns('www.example.com')
+      allow(HostUrl).to receive(:default_host).and_return('www.example.com')
       should_translate_user_content(@course, false) do |content|
         @course.calendar_events.create!(:description => content, :start_at => Time.now + 1.hours, :end_at => Time.now + 2.hours)
         json = api_call(:get, "/api/v1/courses/#{@course.id}",
@@ -1096,7 +1096,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it "should omit assignment description in ics feed for a course" do
-      HostUrl.stubs(:default_host).returns('www.example.com')
+      allow(HostUrl).to receive(:default_host).and_return('www.example.com')
       assignment_model(description: "secret stuff here")
       get "/feeds/calendars/#{@course.feed_code}.ics"
       expect(response).to be_success

@@ -39,33 +39,33 @@ describe GradebooksController do
 
   describe "GET 'grade_summary'" do
     it "redirects to the login page if the user is logged out" do
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(response).to redirect_to(login_url)
       expect(flash[:warning]).to be_present
     end
 
     it "redirects teacher to gradebook" do
       user_session(@teacher)
-      get 'grade_summary', :course_id => @course.id, :id => nil
+      get 'grade_summary', params: {:course_id => @course.id, :id => nil}
       expect(response).to redirect_to(:action => 'show')
     end
 
     it "renders for current user" do
       user_session(@student)
-      get 'grade_summary', :course_id => @course.id, :id => nil
+      get 'grade_summary', params: {:course_id => @course.id, :id => nil}
       expect(response).to render_template('grade_summary')
     end
 
     it "does not allow access for inactive enrollment" do
       user_session(@student)
       @student_enrollment.deactivate
-      get 'grade_summary', :course_id => @course.id, :id => nil
+      get 'grade_summary', params: {:course_id => @course.id, :id => nil}
       assert_unauthorized
     end
 
     it "renders with specified user_id" do
       user_session(@student)
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(response).to render_template('grade_summary')
       expect(assigns[:presenter].courses_with_grades).not_to be_nil
     end
@@ -73,15 +73,15 @@ describe GradebooksController do
     it "does not allow access for wrong user" do
       user_factory(active_all: true)
       user_session(@user)
-      get 'grade_summary', :course_id => @course.id, :id => nil
+      get 'grade_summary', params: {:course_id => @course.id, :id => nil}
       assert_unauthorized
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       assert_unauthorized
     end
 
     it "allows access for a linked observer" do
       user_session(@observer)
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(response).to render_template('grade_summary')
       expect(assigns[:courses_with_grades]).to be_nil
     end
@@ -93,7 +93,7 @@ describe GradebooksController do
       @se.accept
       @se.update_attribute(:associated_user_id, @student.id)
       @user.reload
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       assert_unauthorized
     end
 
@@ -104,14 +104,14 @@ describe GradebooksController do
 
       user_session(@observer)
 
-      get 'grade_summary', :course_id => @course2.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course2.id, :id => @student.id}
       assert_unauthorized
     end
 
     it "allows concluded teachers to see a student grades pages" do
       user_session(@teacher)
       @teacher_enrollment.conclude
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(response).to be_success
       expect(response).to render_template('grade_summary')
       expect(assigns[:courses_with_grades]).to be_nil
@@ -120,7 +120,7 @@ describe GradebooksController do
     it "allows concluded students to see their grades pages" do
       user_session(@student)
       @student_enrollment.conclude
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(response).to render_template('grade_summary')
     end
 
@@ -130,7 +130,7 @@ describe GradebooksController do
       course_with_teacher(:user => @teacher, :active_all => 1)
       student_in_course :user => @student, :active_all => 1
       user_session(@student)
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(response).to be_success
       expect(assigns[:presenter].courses_with_grades).not_to be_nil
       expect(assigns[:presenter].courses_with_grades.length).to eq 2
@@ -142,7 +142,7 @@ describe GradebooksController do
       course_with_teacher(:user => @teacher, :active_all => 1)
       student_in_course :user => @student, :active_all => 1
       user_session(@teacher)
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(response).to be_success
       expect(assigns[:courses_with_grades]).to be_nil
     end
@@ -161,14 +161,14 @@ describe GradebooksController do
       oe.accept
 
       user_session(@observer)
-      get 'grade_summary', :course_id => course1.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => course1.id, :id => @student.id}
       expect(response).to be_success
       expect(assigns[:courses_with_grades]).to be_nil
     end
 
     it "assigns assignment group values for grade calculator to ENV" do
       user_session(@teacher)
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(assigns[:js_env][:submissions]).not_to be_nil
       expect(assigns[:js_env][:assignment_groups]).not_to be_nil
     end
@@ -179,7 +179,7 @@ describe GradebooksController do
       assignment1.submission_types = "discussion_topic"
       assignment1.save!
 
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
       expect(assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"]).to be_nil
     end
 
@@ -187,7 +187,7 @@ describe GradebooksController do
       user_session(@student)
       assignment = @course.assignments.create!(title: "Example Assignment")
       assignment.mute!
-      get 'grade_summary', course_id: @course.id, id: @student.id
+      get 'grade_summary', params: {course_id: @course.id, id: @student.id}
       expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
       expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
     end
@@ -200,7 +200,7 @@ describe GradebooksController do
       a1.mute!
       a1.grade_student(@student, grade: 10, grader: @teacher)
       a2.grade_student(@student, grade: 5, grader: @teacher)
-      get 'grade_summary', course_id: @course.id, id: @student.id
+      get 'grade_summary', params: {course_id: @course.id, id: @student.id}
       expected =
       expect(assigns[:js_env][:submissions].sort_by { |s|
         s['assignment_id']
@@ -213,7 +213,7 @@ describe GradebooksController do
       user_session(@student)
       assignment = @course.assignments.create!(points_possible: 10)
       assignment.grade_student(@student, grade: 10, grader: @teacher)
-      get('grade_summary', course_id: @course.id, id: @student.id)
+      get('grade_summary', params: {course_id: @course.id, id: @student.id})
       submission = assigns[:js_env][:submissions].first
       expect(submission).to include :excused
       expect(submission).to include :workflow_state
@@ -232,14 +232,14 @@ describe GradebooksController do
       let(:assignment_ids) { assigns[:presenter].assignments.select{ |a| a.class == Assignment }.map(&:id) }
 
       it "sorts assignments by due date (null last), then title if there is no saved order preference" do
-        get 'grade_summary', course_id: @course.id, id: @student.id
+        get 'grade_summary', params: {course_id: @course.id, id: @student.id}
         expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
       end
 
       it "sort order of 'due_at' sorts by due date (null last), then title" do
         @teacher.preferences[:course_grades_assignment_order] = { @course.id => :due_at }
         @teacher.save!
-        get 'grade_summary', course_id: @course.id, id: @student.id
+        get 'grade_summary', params: {course_id: @course.id, id: @student.id}
         expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
       end
 
@@ -250,14 +250,14 @@ describe GradebooksController do
         end
 
         it "sorts assignments by title" do
-          get 'grade_summary', course_id: @course.id, id: @student.id
+          get 'grade_summary', params: {course_id: @course.id, id: @student.id}
           expect(assignment_ids).to eq [assignment2, assignment1, assignment3].map(&:id)
         end
 
         it "ingores case" do
           assignment1.title = 'banana'
           assignment1.save!
-          get 'grade_summary', course_id: @course.id, id: @student.id
+          get 'grade_summary', params: {course_id: @course.id, id: @student.id}
           expect(assignment_ids).to eq [assignment2, assignment1, assignment3].map(&:id)
         end
       end
@@ -265,7 +265,7 @@ describe GradebooksController do
       it "sort order of 'assignment_group' sorts by assignment group position, then assignment position" do
         @teacher.preferences[:course_grades_assignment_order] = { @course.id => :assignment_group }
         @teacher.save!
-        get 'grade_summary', course_id: @course.id, id: @student.id
+        get 'grade_summary', params: {course_id: @course.id, id: @student.id}
         expect(assignment_ids).to eq [assignment1, assignment2, assignment3].map(&:id)
       end
 
@@ -296,14 +296,14 @@ describe GradebooksController do
         end
 
         it "sorts by module position, then context module tag position" do
-          get 'grade_summary', course_id: @course.id, id: @student.id
+          get 'grade_summary', params: {course_id: @course.id, id: @student.id}
           expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
         end
 
         it "sorts by module position, then context module tag position, " \
         "with those not belonging to a module sorted last" do
           assignment3.context_module_tags.first.destroy!
-          get 'grade_summary', course_id: @course.id, id: @student.id
+          get 'grade_summary', params: {course_id: @course.id, id: @student.id}
           expect(assignment_ids).to eq [assignment2, assignment1, assignment3].map(&:id)
         end
       end
@@ -324,34 +324,34 @@ describe GradebooksController do
       it "does not display totals if 'All Grading Periods' is selected" do
         user_session(@student)
         all_grading_periods_id = 0
-        get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: all_grading_periods_id
+        get 'grade_summary', params: {:course_id => @course.id, :id => @student.id, grading_period_id: all_grading_periods_id}
         expect(assigns[:exclude_total]).to eq true
       end
 
       it "assigns grading period values for grade calculator to ENV" do
         user_session(@teacher)
         all_grading_periods_id = 0
-        get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: all_grading_periods_id
+        get 'grade_summary', params: {:course_id => @course.id, :id => @student.id, grading_period_id: all_grading_periods_id}
         expect(assigns[:js_env][:submissions]).not_to be_nil
         expect(assigns[:js_env][:grading_periods]).not_to be_nil
       end
 
       it "displays totals if any grading period other than 'All Grading Periods' is selected" do
         user_session(@student)
-        get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: 1
+        get 'grade_summary', params: {:course_id => @course.id, :id => @student.id, grading_period_id: 1}
         expect(assigns[:exclude_total]).to eq false
       end
 
       it "includes the grading period group (as 'set') in the ENV" do
         user_session(@teacher)
-        get :grade_summary, { course_id: @course.id, id: @student.id }
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
         grading_period_set = assigns[:js_env][:grading_period_set]
         expect(grading_period_set[:id]).to eq @grading_period_group.id
       end
 
       it "includes grading periods within the group" do
         user_session(@teacher)
-        get :grade_summary, { course_id: @course.id, id: @student.id }
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
         grading_period_set = assigns[:js_env][:grading_period_set]
         expect(grading_period_set[:grading_periods].count).to eq 3
         period = grading_period_set[:grading_periods][0]
@@ -361,16 +361,23 @@ describe GradebooksController do
 
       it "includes necessary keys with each grading period" do
         user_session(@teacher)
-        get :grade_summary, { course_id: @course.id, id: @student.id }
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
         periods = assigns[:js_env][:grading_period_set][:grading_periods]
-        periods.each do |period|
-          expect(period).to have_key(:id)
-          expect(period).to have_key(:start_date)
-          expect(period).to have_key(:end_date)
-          expect(period).to have_key(:close_date)
-          expect(period).to have_key(:is_closed)
-          expect(period).to have_key(:is_last)
-        end
+        expect(periods).to all include(:id, :start_date, :end_date, :close_date, :is_closed, :is_last)
+      end
+
+      it 'is ordered by start_date' do
+        @grading_periods.sort_by!(&:id)
+        grading_period_ids = @grading_periods.map(&:id)
+        @grading_periods.last.update!(
+          start_date: @grading_periods.first.start_date - 1.week,
+          end_date: @grading_periods.first.start_date - 1.second
+        )
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
+        periods = assigns[:js_env][:grading_period_set][:grading_periods]
+        expected_ids = [grading_period_ids.last].concat(grading_period_ids[0..-2])
+        expect(periods.map{|period| period.fetch('id')}).to eql expected_ids
       end
     end
 
@@ -384,7 +391,7 @@ describe GradebooksController do
         [@student, @teacher, @observer].each do |u|
           controller.js_env.clear
           user_session(u)
-          get 'grade_summary', :course_id => @course.id, :id => @student.id
+          get 'grade_summary', params: {:course_id => @course.id, :id => @student.id}
           assignment_due_at = assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at
           expect(assignment_due_at.to_i).to eq due_at.to_i
         end
@@ -416,7 +423,7 @@ describe GradebooksController do
         @fake_student = @course.student_view_student
         session[:become_user_id] = @fake_student.id
 
-        get 'grade_summary', :course_id => @course.id, :id => @fake_student.id
+        get 'grade_summary', params: {:course_id => @course.id, :id => @fake_student.id}
         assignment_due_at = assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at
         expect(assignment_due_at.to_i).to eq @due_at.to_i
       end
@@ -477,7 +484,7 @@ describe GradebooksController do
     it "raises an exception on a non-integer :id" do
       user_session(@teacher)
       assert_page_not_found do
-        get 'grade_summary', :course_id => @course.id, :id => "lqw"
+        get 'grade_summary', params: {:course_id => @course.id, :id => "lqw"}
       end
     end
   end
@@ -487,7 +494,7 @@ describe GradebooksController do
       it "renders successfully" do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
-        get "show", :course_id => @course.id
+        get "show", params: {:course_id => @course.id}
         expect(response).to render_template("gradebook")
       end
     end
@@ -500,20 +507,20 @@ describe GradebooksController do
 
       it "renders new gradebook when enabled" do
         @course.enable_feature!(:new_gradebook)
-        get "show", course_id: @course.id
+        get "show", params: {course_id: @course.id}
         expect(response).to render_template("gradebooks/gradezilla/gradebook")
       end
 
       it "renders new indidivual view when enabled" do
         @course.enable_feature!(:new_gradebook)
         allow(@admin).to receive(:preferred_gradebook_version).and_return('individual')
-        get "show", course_id: @course.id
+        get "show", params: {course_id: @course.id}
         expect(response).to render_template("gradebooks/gradezilla/individual")
       end
 
       it "ignores the version parameter outside development environments" do
         allow(Rails.env).to receive(:development?).and_return(false)
-        get "show", course_id: @course.id, version: 'gradezilla-gradebook'
+        get "show", params: {course_id: @course.id, version: 'gradezilla-gradebook'}
         expect(response).to render_template(:gradebook)
       end
     end
@@ -527,25 +534,36 @@ describe GradebooksController do
 
       it "includes colors if New Gradebook is enabled" do
         @course.enable_feature!(:new_gradebook)
-        get :show, course_id: @course.id
+        get :show, params: {course_id: @course.id}
         expect(gradebook_options).to have_key :colors
       end
 
       it "does not include colors if New Gradebook is disabled" do
-        get :show, course_id: @course.id
+        get :show, params: {course_id: @course.id}
         expect(gradebook_options).not_to have_key :colors
+      end
+
+      it "includes late_policy if New Gradebook is enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options).to have_key :late_policy
+      end
+
+      it "does not include late_policy if New Gradebook is disabled" do
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options).not_to have_key :late_policy
       end
 
       it 'includes api_max_per_page' do
         Setting.set('api_max_per_page', 50)
-        get :show, course_id: @course.id
+        get :show, params: {course_id: @course.id}
         api_max_per_page = assigns[:js_env][:GRADEBOOK_OPTIONS][:api_max_per_page]
         expect(api_max_per_page).to eq(50)
       end
 
       describe "graded_late_or_missing_submissions_exist" do
         it "is not included if New Gradebook is disabled" do
-          get :show, course_id: @course.id
+          get :show, params: {course_id: @course.id}
           expect(gradebook_options).not_to have_key :graded_late_or_missing_submissions_exist
         end
 
@@ -567,7 +585,7 @@ describe GradebooksController do
           end
 
           it "is included if New Gradebook is enabled" do
-            get :show, course_id: @course.id
+            get :show, params: {course_id: @course.id}
             gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
             expect(gradebook_options).to have_key :graded_late_or_missing_submissions_exist
           end
@@ -617,8 +635,8 @@ describe GradebooksController do
 
       shared_examples_for "working download" do
         it "does not recompute enrollment grades" do
-          Enrollment.expects(:recompute_final_score).never
-          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+          expect(Enrollment).to receive(:recompute_final_score).never
+          get 'show', params: {:course_id => @course.id, :init => 1, :assignments => 1}, :format => 'csv'
         end
         it "should get all the expected datas even with multibytes characters", :focus => true do
           @course.assignments.create(:title => "Déjà vu")
@@ -654,25 +672,25 @@ describe GradebooksController do
 
       it "redirects to Grid View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "2"
-        get "show", :course_id => @course.id
+        get "show", params: {:course_id => @course.id}
         expect(response).to render_template("gradebook")
       end
 
       it "redirects to Individual View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "srgb"
-        get "show", :course_id => @course.id
+        get "show", params: {:course_id => @course.id}
         expect(response).to render_template("screenreader")
       end
 
       it "requests groups without wiki_page assignments" do
-        get "show", :course_id => @course.id
+        get "show", params: {:course_id => @course.id}
         url = controller.js_env[:GRADEBOOK_OPTIONS][:assignment_groups_url]
         expect(URI.unescape(url)).to include 'exclude_assignment_submission_types[]=wiki_page'
       end
     end
 
     it "renders the unauthorized page without gradebook authorization" do
-      get "show", :course_id => @course.id
+      get "show", params: {:course_id => @course.id}
       assert_unauthorized
     end
 
@@ -680,7 +698,7 @@ describe GradebooksController do
       before do
         user_session(@teacher)
 
-        get 'show', course_id: @course.id
+        get 'show', params: {course_id: @course.id}
 
         @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
       end
@@ -708,19 +726,19 @@ describe GradebooksController do
       before { user_session(@teacher) }
 
       it "includes context_id" do
-        get :show, course_id: @course.id
+        get :show, params: {course_id: @course.id}
         context_id = assigns[:js_env][:GRADEBOOK_OPTIONS][:context_id]
         expect(context_id).to eq @course.id.to_param
       end
 
       it "doesn't enable context cards when feature is off" do
-        get :show, course_id: @course.id
+        get :show, params: {course_id: @course.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq false
       end
 
       it "enables context cards when feature is on" do
         @course.root_account.enable_feature! :student_context_cards
-        get :show, course_id: @course.id
+        get :show, params: {course_id: @course.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
       end
     end
@@ -731,7 +749,7 @@ describe GradebooksController do
 
       it 'includes login_handle_name' do
         @course.account.update!(login_handle_name: custom_login_id)
-        get :show, course_id: @course.id
+        get :show, params: {course_id: @course.id}
 
         login_handle_name = assigns[:js_env][:GRADEBOOK_OPTIONS][:login_handle_name]
 
@@ -754,13 +772,13 @@ describe GradebooksController do
       before { user_session(@teacher) }
 
       it "includes the grading period group (as 'set') in the ENV" do
-        get :show, { course_id: @course.id }
+        get :show, params: { course_id: @course.id }
         grading_period_set = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set]
         expect(grading_period_set[:id]).to eq @grading_period_group.id
       end
 
       it "includes grading periods within the group" do
-        get :show, { course_id: @course.id }
+        get :show, params: { course_id: @course.id }
         grading_period_set = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set]
         expect(grading_period_set[:grading_periods].count).to eq 3
         period = grading_period_set[:grading_periods][0]
@@ -769,42 +787,35 @@ describe GradebooksController do
       end
 
       it "includes necessary keys with each grading period" do
-        get :show, { course_id: @course.id }
+        get :show, params: { course_id: @course.id }
         periods = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set][:grading_periods]
-        periods.each do |period|
-          expect(period).to have_key(:id)
-          expect(period).to have_key(:start_date)
-          expect(period).to have_key(:end_date)
-          expect(period).to have_key(:close_date)
-          expect(period).to have_key(:is_closed)
-          expect(period).to have_key(:is_last)
-        end
+        expect(periods).to all include(:id, :start_date, :end_date, :close_date, :is_closed, :is_last)
       end
     end
   end
 
   describe "GET 'user_ids'" do
     it "returns unauthorized if there is no current user" do
-      get :user_ids, course_id: @course.id, format: :json
+      get :user_ids, params: {course_id: @course.id}, format: :json
       assert_status(401)
     end
 
     it "returns unauthorized if the user is not authorized to manage grades" do
       user_session(@student)
-      get :user_ids, course_id: @course.id, format: :json
+      get :user_ids, params: {course_id: @course.id}, format: :json
       assert_status(401)
     end
 
     it "grants authorization to teachers in active courses" do
       user_session(@teacher)
-      get :user_ids, course_id: @course.id, format: :json
+      get :user_ids, params: {course_id: @course.id}, format: :json
       expect(response).to be_ok
     end
 
     it "grants authorization to teachers in concluded courses" do
       @course.complete!
       user_session(@teacher)
-      get :user_ids, course_id: @course.id, format: :json
+      get :user_ids, params: {course_id: @course.id}, format: :json
       expect(response).to be_ok
     end
 
@@ -821,21 +832,65 @@ describe GradebooksController do
       }
 
       user_session(@teacher)
-      get :user_ids, course_id: @course.id, format: :json
+      get :user_ids, params: {course_id: @course.id}, format: :json
       user_ids = json_parse(response.body)["user_ids"]
       expect(user_ids).to eq([student2.id, student1.id, student3.id])
+    end
+  end
+
+  describe "GET 'grading_period_assignments'" do
+    before(:once) do
+      @group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.account)
+      @group.enrollment_terms << @course.enrollment_term
+      @period1, @period2 = Factories::GradingPeriodHelper.new.create_presets_for_group(@group, :past, :current)
+      @assignment1_in_gp1 = @course.assignments.create!(due_at: 3.months.ago)
+      @assignment2_in_gp2 = @course.assignments.create!(due_at: 1.day.from_now)
+    end
+
+    it "returns unauthorized if there is no current user" do
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      assert_status(401)
+    end
+
+    it "returns unauthorized if the user is not authorized to manage grades" do
+      user_session(@student)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      assert_status(401)
+    end
+
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      expect(response).to be_ok
+    end
+
+    it "returns an array of user ids sorted according to the user's preferences" do
+      user_session(@teacher)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      json = json_parse(response.body)["grading_period_assignments"]
+      expect(json).to eq({
+        @period1.id.to_s => [@assignment1_in_gp1.id.to_s],
+        @period2.id.to_s => [@assignment2_in_gp2.id.to_s]
+      })
     end
   end
 
   describe "GET 'change_gradebook_version'" do
     it 'switches to gradebook if clicked' do
       user_session(@teacher)
-      get 'grade_summary', :course_id => @course.id, :id => nil
+      get 'grade_summary', params: {:course_id => @course.id, :id => nil}
 
       expect(response).to redirect_to(:action => 'show')
 
       # tell it to use gradebook 2
-      get 'change_gradebook_version', :course_id => @course.id, :version => 2
+      get 'change_gradebook_version', params: {:course_id => @course.id, :version => 2}
       expect(response).to redirect_to(:action => 'show')
     end
   end
@@ -844,18 +899,39 @@ describe GradebooksController do
     it "requires authentication" do
       course_factory
       assignment_model
-      post 'submissions_zip_upload', :course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'
+      post 'submissions_zip_upload', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'}
       assert_unauthorized
     end
   end
 
   describe "POST 'update_submission'" do
+    it "includes assignment_visibility" do
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @student = @course.enroll_user(User.create!(:name => "some user"))
+      post(
+        'update_submission',
+        params: {
+          course_id: @course.id,
+          submission: {
+            assignment_id: @assignment.id,
+            user_id: @student.user_id,
+            grade: 10
+          }
+        },
+        format: :json
+      )
+
+      submissions = JSON.parse(response.body).map{ |sub| sub['submission']}
+      expect(submissions).to all include('assignment_visible' => true)
+    end
+
     it "allows adding comments for submission" do
       user_session(@teacher)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
-      post 'update_submission', :course_id => @course.id, :submission =>
-        {:comment => "some comment",:assignment_id => @assignment.id, :user_id => @student.user_id}
+      post 'update_submission', params: {:course_id => @course.id, :submission =>
+        {:comment => "some comment",:assignment_id => @assignment.id, :user_id => @student.user_id}}
       expect(response).to be_redirect
       expect(assigns[:assignment]).to eql(@assignment)
       expect(assigns[:submissions]).not_to be_nil
@@ -870,11 +946,11 @@ describe GradebooksController do
       @student = @course.enroll_user(User.create!(:name => "some user"))
       data = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
       post 'update_submission',
-        :course_id => @course.id,
+        params: {:course_id => @course.id,
         :attachments => { "0" => { :uploaded_data => data } },
         :submission => { :comment => "some comment",
                          :assignment_id => @assignment.id,
-                         :user_id => @student.user_id }
+                         :user_id => @student.user_id }}
       expect(response).to be_redirect
       expect(assigns[:assignment]).to eql(@assignment)
       expect(assigns[:submissions]).not_to be_nil
@@ -891,10 +967,10 @@ describe GradebooksController do
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
       post 'update_submission',
-        :course_id => @course.id,
+        params: {:course_id => @course.id,
         :submission => { :comment => "some comment",
                          :assignment_id => @assignment.id,
-                         :user_id => @student.user_id }
+                         :user_id => @student.user_id }}
       assert_unauthorized
     end
 
@@ -908,18 +984,18 @@ describe GradebooksController do
                             :assignment => @assignment)
 
       post 'update_submission',
-        :course_id => @course.id,
+        params: {:course_id => @course.id,
         :submission => { :comment => "some comment",
                          :assignment_id => @assignment.id,
-                         :user_id => s1.user_id }
+                         :user_id => s1.user_id }}
       expect(response).to be_redirect
 
       # attempt to grade another section throws not found
       post 'update_submission',
-        :course_id => @course.id,
+        params: {:course_id => @course.id,
         :submission => { :comment => "some comment",
                          :assignment_id => @assignment.id,
-                         :user_id => s2.user_id }
+                         :user_id => s2.user_id }}
       expect(flash[:error]).to eql 'Submission was unsuccessful: Submission Failed'
     end
 
@@ -936,13 +1012,13 @@ describe GradebooksController do
       it "creates a provisional grade" do
         submission = @assignment.submit_homework(@student, :body => "hello")
         post 'update_submission',
-          :format => :json,
-          :course_id => @course.id,
+          params: {:course_id => @course.id,
           :submission => { :score => 100,
                            :comment => "provisional!",
                            :assignment_id => @assignment.id,
                            :user_id => @student.id,
-                           :provisional => true }
+                           :provisional => true }},
+          :format => :json
 
         # confirm "real" grades/comments were not written
         submission.reload
@@ -966,14 +1042,14 @@ describe GradebooksController do
       it "includes the graded anonymously flag in the provisional grade object" do
         submission = @assignment.submit_homework(@student, body: "hello")
         post 'update_submission',
-          format: :json,
-          course_id: @course.id,
+          params: {course_id: @course.id,
           submission: { score: 100,
                            comment: "provisional!",
                            assignment_id: @assignment.id,
                            user_id: @student.id,
                            provisional: true,
-                           graded_anonymously: true }
+                           graded_anonymously: true }},
+          format: :json
 
         submission.reload
         pg = submission.provisional_grade(@teacher)
@@ -981,14 +1057,14 @@ describe GradebooksController do
 
         submission = @assignment.submit_homework(@student, body: "hello")
         post 'update_submission',
-          format: :json,
-          course_id: @course.id,
+          params: {course_id: @course.id,
           submission: { score: 100,
                            comment: "provisional!",
                            assignment_id: @assignment.id,
                            user_id: @student.id,
                            provisional: true,
-                           graded_anonymously: false }
+                           graded_anonymously: false }},
+          format: :json
 
         submission.reload
         pg = submission.provisional_grade(@teacher)
@@ -1000,9 +1076,9 @@ describe GradebooksController do
         other_teacher = teacher_in_course(:course => @course, :active_all => true).user
         submission.find_or_create_provisional_grade!(other_teacher)
 
-        post 'update_submission', :format => :json, :course_id => @course.id,
+        post 'update_submission', params: {:course_id => @course.id,
           :submission => { :score => 100, :comment => "provisional!", :assignment_id => @assignment.id,
-            :user_id => @student.id, :provisional => true }
+            :user_id => @student.id, :provisional => true }}, :format => :json
         expect(response).to_not be_success
         expect(response.body).to include("Student already has the maximum number of provisional grades")
      end
@@ -1014,9 +1090,9 @@ describe GradebooksController do
 
         @assignment.moderated_grading_selections.create!(:student => @student)
 
-        post 'update_submission', :format => :json, :course_id => @course.id,
+        post 'update_submission', params: {:course_id => @course.id,
           :submission => { :score => 100, :comment => "provisional!", :assignment_id => @assignment.id,
-            :user_id => @student.id, :provisional => true }
+            :user_id => @student.id, :provisional => true }}, :format => :json
         expect(response).to be_success
       end
 
@@ -1026,15 +1102,15 @@ describe GradebooksController do
         submission.find_or_create_provisional_grade!(other_teacher) # create one so we can make a final
 
         post 'update_submission',
-          :format => :json,
-          :course_id => @course.id,
+          params: {:course_id => @course.id,
           :submission => { :score => 100,
             :comment => "provisional!",
             :assignment_id => @assignment.id,
             :user_id => @student.id,
             :provisional => true,
             :final => true
-          }
+          }},
+          :format => :json
         expect(response).to be_success
 
         # confirm "real" grades/comments were not written
@@ -1065,9 +1141,9 @@ describe GradebooksController do
       user_session(@teacher)
       assignment = @course.assignments.create!(:title => 'some assignment')
 
-      Course.any_instance.stubs(:large_roster?).returns(true)
+      allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 
-      get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
+      get 'speed_grader', params: {:course_id => @course.id, :assignment_id => assignment.id}
       expect(response).to be_redirect
       expect(flash[:notice]).to eq 'SpeedGrader is disabled for this course'
     end
@@ -1083,7 +1159,7 @@ describe GradebooksController do
       end
 
       it "redirects if the assignment is unpublished" do
-        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assign.id}
         expect(response).to be_redirect
         expect(flash[:notice]).to eq I18n.t(
           :speedgrader_enabled_only_for_published_content,
@@ -1092,7 +1168,7 @@ describe GradebooksController do
 
       it "does not redirect if the assignment is published" do
         @assign.publish
-        get 'speed_grader', course_id: @course, assignment_id: @assign.id
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assign.id}
         expect(response).not_to be_redirect
       end
     end
@@ -1101,7 +1177,7 @@ describe GradebooksController do
       user_session(@teacher)
       @assignment = @course.assignments.create!(title: "A Title", submission_types: 'online_url,online_file')
 
-      get 'speed_grader', course_id: @course, assignment_id: @assignment.id
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
     end
 
@@ -1113,7 +1189,7 @@ describe GradebooksController do
         grading_type: 'percent'
       )
 
-      get 'speed_grader', course_id: @course, assignment_id: @assignment.id
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:js_env][:grading_type]).to eq('percent')
     end
   end
@@ -1123,12 +1199,12 @@ describe GradebooksController do
       user_session(@teacher)
       expect(@teacher.preferences[:enable_speedgrader_grade_by_question]).not_to be_truthy
 
-      post 'speed_grader_settings', course_id: @course.id,
-        enable_speedgrader_grade_by_question: "1"
+      post 'speed_grader_settings', params: {course_id: @course.id,
+        enable_speedgrader_grade_by_question: "1"}
       expect(@teacher.reload.preferences[:enable_speedgrader_grade_by_question]).to be_truthy
 
-      post 'speed_grader_settings', course_id: @course.id,
-        enable_speedgrader_grade_by_question: "0"
+      post 'speed_grader_settings', params: {course_id: @course.id,
+        enable_speedgrader_grade_by_question: "0"}
       expect(@teacher.reload.preferences[:enable_speedgrader_grade_by_question]).not_to be_truthy
     end
   end
@@ -1136,7 +1212,7 @@ describe GradebooksController do
   describe "POST 'save_assignment_order'" do
     it "saves the sort order in the user's preferences" do
       user_session(@teacher)
-      post 'save_assignment_order', course_id: @course.id, assignment_order: 'due_at'
+      post 'save_assignment_order', params: {course_id: @course.id, assignment_order: 'due_at'}
       saved_order = @teacher.preferences[:course_grades_assignment_order][@course.id]
       expect(saved_order).to eq(:due_at)
     end
@@ -1248,6 +1324,19 @@ describe GradebooksController do
       expect(@controller).to receive(:external_tools).and_return([]).once
 
       expect(@controller.post_grades_ltis).to eq(@controller.post_grades_ltis)
+    end
+  end
+
+  describe '#post_grades_tools' do
+    it 'returns a tools with a type of post_grades if the post_grades feature option is enabled' do
+      @course.enable_feature!(:post_grades)
+      @controller.instance_variable_set(:@context, @course)
+      expect(@controller.post_grades_tools).to eq([{:type=>:post_grades}])
+    end
+
+    it 'does not return a tools with a type of post_grades if the post_grades feature option is enabled' do
+      @controller.instance_variable_set(:@context, @course)
+      expect(@controller.post_grades_tools).to eq([])
     end
   end
 

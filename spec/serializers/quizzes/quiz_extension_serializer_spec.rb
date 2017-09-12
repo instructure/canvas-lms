@@ -27,7 +27,7 @@ describe Quizzes::QuizExtensionSerializer do
   end
 
   let(:user) { User.new }
-  let(:session) { stub }
+  let(:session) { double }
   let(:host_name) { 'example.com' }
 
   let :controller do
@@ -37,8 +37,8 @@ describe Quizzes::QuizExtensionSerializer do
     }
 
     ActiveModel::FakeController.new(options).tap do |controller|
-      controller.stubs(:session).returns session
-      controller.stubs(:context).returns context
+      allow(controller).to receive(:session).and_return session
+      allow(controller).to receive(:context).and_return context
     end
   end
 

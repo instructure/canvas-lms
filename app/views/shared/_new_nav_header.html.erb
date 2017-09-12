@@ -53,7 +53,7 @@
               </a>
             </li>
           <% end %>
-          <% if @current_user && @current_user.all_accounts.count > 0 %>
+          <% if @current_user && @current_user.adminable_accounts.count > 0 %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
               <a id="global_nav_accounts_link" href="/accounts" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">

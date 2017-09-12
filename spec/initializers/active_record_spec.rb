@@ -241,7 +241,7 @@ module ActiveRecord
 
       context "with postgres 90300" do
         before do
-          scope.connection.stubs(:postgresql_version).returns(90300)
+          allow(scope.connection).to receive(:postgresql_version).and_return(90300)
         end
 
         it "uses FOR UPDATE on a normal exclusive lock" do
@@ -255,7 +255,7 @@ module ActiveRecord
 
       context "with postgres 90299" do
         before do
-          scope.connection.stubs(:postgresql_version).returns(90299)
+          allow(scope.connection).to receive(:postgresql_version).and_return(90299)
         end
 
         it "uses FOR UPDATE on a normal exclusive lock" do

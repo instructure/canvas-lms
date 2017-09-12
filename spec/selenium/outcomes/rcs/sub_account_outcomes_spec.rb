@@ -33,10 +33,6 @@ describe "sub account outcomes" do
         stub_rcs_config
       end
 
-      after(:each) do
-        unstub_rcs_config
-      end
-
       context "create/edit/delete outcomes" do
 
         it "should create a learning outcome with a new rating (root level)", priority: "2", test_id: 263461 do

@@ -22,8 +22,8 @@ describe CanvasLinkedInConfig do
 
   describe ".call" do
     it "returns a config with indifferent access" do
-      plugin = stub(settings: {client_id: "abcdefg", client_secret_dec: "12345"})
-      Canvas::Plugin.stubs(:find).with(:linked_in).returns(plugin)
+      plugin = double(settings: {client_id: "abcdefg", client_secret_dec: "12345"})
+      allow(Canvas::Plugin).to receive(:find).with(:linked_in).and_return(plugin)
       output = described_class.call
       expect(output['api_key']).to eq("abcdefg")
       expect(output[:api_key]).to eq("abcdefg")

@@ -81,7 +81,7 @@ describe Canvas::ICU do
     include_examples "Collator"
 
     before do
-      Canvas::ICU.stubs(:collator).returns(Canvas::ICU::NaiveCollator)
+      allow(Canvas::ICU).to receive(:collator).and_return(Canvas::ICU::NaiveCollator)
     end
   end
 

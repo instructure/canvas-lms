@@ -183,7 +183,6 @@ class NotificationMessageCreator
 
   def dispatch_dashboard_messages(messages)
     messages.each do |message|
-      message.set_asset_context_code
       message.infer_defaults
       message.create_stream_items
     end
@@ -243,7 +242,7 @@ class NotificationMessageCreator
   def message_options_for(user)
     user_asset = asset_filtered_by_user(user)
 
-    user_asset_context = %w{ContentMigration Submission WikiPage}.include?(user_asset.class.name) ? user_asset.context(user) : user_asset
+    user_asset_context = %w{ContentMigration Submission WikiPage}.include?(user_asset.class.name) ? user_asset.context : user_asset
 
     message_options = {
       :subject => @notification.subject,

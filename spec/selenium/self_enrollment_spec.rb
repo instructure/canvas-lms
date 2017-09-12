@@ -59,7 +59,7 @@ describe "self enrollment" do
     it "should authenticate and register an existing user" do
       user_with_pseudonym(:active_all => true, :username => "existing@example.com", :password => "asdfasdf")
       custom_label = "silly id"
-      Account.any_instance.stubs(:login_handle_name).returns(custom_label)
+      allow_any_instance_of(Account).to receive(:login_handle_name).and_return(custom_label)
 
       get "/enroll/#{@course.self_enrollment_code}"
       expect(f("label[for='student_email']").text).to include(custom_label)
@@ -124,7 +124,7 @@ describe "self enrollment" do
     it "should authenticate and register an existing user" do
       user_with_pseudonym(:active_all => true, :username => "existing@example.com", :password => "asdfasdf")
       custom_label = "silly id"
-      Account.any_instance.stubs(:login_handle_name).returns(custom_label)
+      allow_any_instance_of(Account).to receive(:login_handle_name).and_return(custom_label)
 
       get "/enroll/#{@course.self_enrollment_code}"
       expect(f("label[for='student_email']").text).to include(custom_label)

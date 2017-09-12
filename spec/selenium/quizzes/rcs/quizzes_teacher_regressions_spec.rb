@@ -32,10 +32,6 @@ describe 'quizzes regressions' do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   it 'calendar pops up on top of #main', priority: "1", test_id: 209957 do
     get "/courses/#{@course.id}/quizzes/new"
     wait_for_ajaximations

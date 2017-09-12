@@ -1219,13 +1219,13 @@ describe GradeCalculator do
     context "caches" do
       it 'calls invalidate caches in #compute_and_save_scores' do
         gc = GradeCalculator.new(@student.id, @course)
-        gc.expects(:invalidate_caches).once
+        expect(gc).to receive(:invalidate_caches).once
         gc.compute_and_save_scores
       end
 
       describe "#invalidate_caches" do
         it 'calls GradeSummaryPresenter.invalidate_cache' do
-          GradeSummaryPresenter.expects(:invalidate_cache).once
+          expect(GradeSummaryPresenter).to receive(:invalidate_cache).once
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
         end
       end

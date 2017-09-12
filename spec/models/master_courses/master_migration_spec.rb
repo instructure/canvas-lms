@@ -26,11 +26,12 @@ describe MasterCourses::MasterMigration do
 
   before :each do
     skip unless Qti.qti_enabled?
+    local_storage!
   end
 
   describe "start_new_migration!" do
     it "should queue a migration" do
-      MasterCourses::MasterMigration.any_instance.expects(:queue_export_job).once
+      expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).once
       mig = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       expect(mig.id).to be_present
       expect(mig.master_template).to eq @template
@@ -43,7 +44,7 @@ describe MasterCourses::MasterMigration do
       @template.active_migration = running
       @template.save!
 
-      MasterCourses::MasterMigration.any_instance.expects(:queue_export_job).never
+      expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).never
       expect {
         MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       }.to raise_error("cannot start new migration while another one is running")
@@ -55,14 +56,14 @@ describe MasterCourses::MasterMigration do
       @template.save!
 
       Timecop.freeze(2.days.from_now) do
-        MasterCourses::MasterMigration.any_instance.expects(:queue_export_job).once
+        expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).once
         MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       end
     end
 
     it "should queue a job" do
       expect { MasterCourses::MasterMigration.start_new_migration!(@template, @user) }.to change(Delayed::Job, :count).by(1)
-      MasterCourses::MasterMigration.any_instance.expects(:perform_exports).once
+      expect_any_instance_of(MasterCourses::MasterMigration).to receive(:perform_exports).once
       run_jobs
     end
   end
@@ -73,7 +74,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "shouldn't do anything if there aren't any child courses to push to" do
-      @migration.expects(:create_export).never
+      expect(@migration).to receive(:create_export).never
       @migration.perform_exports
       @migration.reload
       expect(@migration).to be_completed
@@ -85,14 +86,14 @@ describe MasterCourses::MasterMigration do
       sub = @template.add_child_course!(other_course)
       sub.destroy!
 
-      @migration.expects(:create_export).never
+      expect(@migration).to receive(:create_export).never
       @migration.perform_exports
     end
 
     it "should record errors" do
       other_course = course_factory
       @template.add_child_course!(other_course)
-      @migration.stubs(:create_export).raises "oh neos"
+      allow(@migration).to receive(:create_export).and_raise "oh neos"
       expect { @migration.perform_exports }.to raise_error("oh neos")
 
       @migration.reload
@@ -104,7 +105,7 @@ describe MasterCourses::MasterMigration do
       new_course = course_factory
       new_sub = @template.add_child_course!(new_course)
 
-      @migration.expects(:export_to_child_courses).with(:full, [new_sub], true)
+      expect(@migration).to receive(:export_to_child_courses).with(:full, [new_sub], true)
       @migration.perform_exports
     end
 
@@ -113,7 +114,7 @@ describe MasterCourses::MasterMigration do
       sel_sub = @template.add_child_course!(old_course)
       sel_sub.update_attribute(:use_selective_copy, true)
 
-      @migration.expects(:export_to_child_courses).with(:selective, [sel_sub], true)
+      expect(@migration).to receive(:export_to_child_courses).with(:selective, [sel_sub], true)
       @migration.perform_exports
     end
 
@@ -124,7 +125,7 @@ describe MasterCourses::MasterMigration do
       sel_sub = @template.add_child_course!(old_course)
       sel_sub.update_attribute(:use_selective_copy, true)
 
-      @migration.expects(:export_to_child_courses).twice
+      expect(@migration).to receive(:export_to_child_courses).twice
       @migration.perform_exports
     end
   end
@@ -174,6 +175,32 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "should continue to work with the old import_results format" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
+
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+      run_job(Delayed::Job.where(:tag => "MasterCourses::MasterMigration#perform_exports").first) # only run the export job right now
+
+      @migration.reload
+      result = @migration.migration_results.first
+      expect(result.state).to eq 'queued'
+
+      import_results = {result.content_migration_id => {
+        :state => 'queued', :import_type => result.import_type.to_sym, :subscription_id => result.child_subscription_id, :skipped => []
+      }}
+      @migration.update_attribute(:import_results, import_results)
+      MasterCourses::MigrationResult.where(:master_migration_id => @migration).delete_all # make sure they're gone
+
+      run_jobs
+
+      expect(@migration.reload).to be_completed
+      expect(@migration.imports_completed_at).to be_present
+      expect(@sub.reload.use_selective_copy?).to be_truthy # should have been marked as up-to-date now
+    end
+
     it "should copy selectively on second time" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
@@ -190,7 +217,7 @@ describe MasterCourses::MasterMigration do
       expect(topic_to).to be_present
       att_to = @copy_to.attachments.where(:migration_id => mig_id(att)).first
       expect(att_to).to be_present
-      cm1 = ContentMigration.find(@migration.import_results.keys.first)
+      cm1 = @migration.migration_results.first.content_migration
       expect(cm1.migration_settings[:imported_assets]["DiscussionTopic"]).to eq topic_to.id.to_s
       expect(cm1.migration_settings[:imported_assets]["Attachment"]).to eq att_to.id.to_s
 
@@ -202,7 +229,7 @@ describe MasterCourses::MasterMigration do
       page_to = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
       expect(page_to).to be_present
 
-      cm2 = ContentMigration.find(@migration.import_results.keys.first)
+      cm2 = @migration.migration_results.first.content_migration
       expect(cm2.migration_settings[:imported_assets]["DiscussionTopic"]).to be_blank # should have excluded it from the selective export
       expect(cm2.migration_settings[:imported_assets]["Attachment"]).to be_blank
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
@@ -267,7 +294,7 @@ describe MasterCourses::MasterMigration do
         expect(deletions['WikiPage']).to match_array([mig_id(page), mig_id(page2)])
         expect(deletions['Quizzes::Quiz']).to match_array([mig_id(quiz), mig_id(quiz2)])
 
-        skips = mm.import_results[mm.import_results.keys.first][:skipped]
+        skips = mm.migration_results.first.skipped_items
         expect(skips).to match_array([mig_id(quiz2), mig_id(page2)])
 
         expect(assmt_to.reload).to be_deleted
@@ -470,7 +497,7 @@ describe MasterCourses::MasterMigration do
       [page, assignment].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)}
 
       run_master_migration # re-copy all the content but don't actually overwrite the downstream change
-      expect(@migration.import_results.values.first[:skipped]).to match_array([mig_id(assignment), mig_id(page)])
+      expect(@migration.migration_results.first.skipped_items).to match_array([mig_id(assignment), mig_id(page)])
 
       expect(copied_page.reload.body).to eq new_child_text # should have been left alone
       expect(copied_page.title).to eq old_title # even the title
@@ -486,7 +513,7 @@ describe MasterCourses::MasterMigration do
       end
 
       run_master_migration # re-copy all the content but this time overwrite the downstream change because we locked it
-      expect(@migration.import_results.values.first[:skipped]).to be_empty
+      expect(@migration.migration_results.first.skipped_items).to be_empty
 
       expect(copied_assignment.reload.description).to eq new_master_text
       expect(copied_assignment.title).to eq new_master_title
@@ -754,7 +781,7 @@ describe MasterCourses::MasterMigration do
         child_sub_folder = copied_att.folder
         child_parent_folder = child_sub_folder.parent_folder
         expected_ids = [child_sub_folder, child_parent_folder, Folder.root_folders(@copy_to).first].map(&:id)
-        Folder.connection.expects(:select_values).never # should have already been cached in migration
+        expect(Folder.connection).to receive(:select_values).never # should have already been cached in migration
         expect(MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(@copy_to)).to match_array(expected_ids)
       end
     end
@@ -840,7 +867,7 @@ describe MasterCourses::MasterMigration do
       end
 
       before :each do
-        Canvas::Migration::ExternalContent::Migrator.stubs(:registered_services).returns({'test_service' => TestExternalContentService})
+        allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({'test_service' => TestExternalContentService})
       end
 
       it "should work" do
@@ -856,8 +883,8 @@ describe MasterCourses::MasterMigration do
         page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
         quiz = @copy_from.quizzes.create!
 
-        TestExternalContentService.stubs(:applies_to_course?).returns(true)
-        TestExternalContentService.stubs(:begin_export).returns(true)
+        allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
+        allow(TestExternalContentService).to receive(:begin_export).and_return(true)
 
         data = {
           '$canvas_assignment_id' => assmt.id,
@@ -869,8 +896,8 @@ describe MasterCourses::MasterMigration do
           '$canvas_page_id' => page.id,
           '$canvas_quiz_id' => quiz.id
         }
-        TestExternalContentService.stubs(:export_completed?).returns(true)
-        TestExternalContentService.stubs(:retrieve_export).returns(data)
+        allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
+        allow(TestExternalContentService).to receive(:retrieve_export).and_return(data)
 
         run_master_migration
 

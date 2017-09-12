@@ -73,27 +73,28 @@ describe "Admins API", type: :request do
 
     it "should return json of the new admin association" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-        { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        { :user_id => @new_user.id })
+                      {:controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s},
+                      {:user_id => @new_user.id})
       @new_user.reload
       admin = @new_user.account_users.first
       expect(json).to eq({
-        "id" => admin.id,
-        "role_id" => admin.role_id,
-        "role" => admin.role.name,
-        "user" => {
-          "id" => @new_user.id,
-          "name" => @new_user.name,
-          "short_name" => @new_user.short_name,
-          "sortable_name" => @new_user.sortable_name,
-          "login_id" => "user",
-        }
-      })
+                           "id" => admin.id,
+                           "role_id" => admin.role_id,
+                           "role" => admin.role.name,
+                           "user" => {
+                             "id" => @new_user.id,
+                             "name" => @new_user.name,
+                             "short_name" => @new_user.short_name,
+                             "sortable_name" => @new_user.sortable_name,
+                             "login_id" => "user",
+                           },
+                           "workflow_state" => 'active'
+                         })
     end
 
     it "should not send a notification email if passed a 0 'send_confirmation' value" do
-      AccountUser.any_instance.expects(:account_user_notification!).never
-      AccountUser.any_instance.expects(:account_user_registration!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_notification!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                {:controller => 'admins', :action => 'create', :format => 'json',
@@ -104,8 +105,8 @@ describe "Admins API", type: :request do
     end
 
     it "should not send a notification email if passed a false 'send_confirmation' value" do
-      AccountUser.any_instance.expects(:account_user_notification!).never
-      AccountUser.any_instance.expects(:account_user_registration!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_notification!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                       {:controller => 'admins', :action => 'create', :format => 'json',
@@ -116,7 +117,7 @@ describe "Admins API", type: :request do
     end
 
     it "should send a notification email if 'send_confirmation' isn't set" do
-      AccountUser.any_instance.expects(:account_user_registration!).once
+      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).once
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                       {:controller => 'admins', :action => 'create', :format => 'json',
@@ -162,18 +163,18 @@ describe "Admins API", type: :request do
         @au = @account.account_users.create! :user => @new_user
       end
 
-      it "should remove AccountAdmin membership implicitly" do
+      it "should remove AccountAdmin membership" do
         json = api_call(:delete, @path, @path_opts)
         expect(json['user']['id']).to eq @new_user.id
         expect(json['id']).to eq @au.id
         expect(json['role']).to eq 'AccountAdmin'
-        expect(json['status']).to eq 'deleted'
-        expect(@account.account_users.where(user_id: @new_user)).not_to be_exists
+        expect(json['workflow_state']).to eq 'deleted'
+        expect(@au.reload.workflow_state).to eq 'deleted'
       end
 
       it "should remove AccountAdmin membership explicitly" do
         api_call(:delete, @path + "?role=AccountAdmin", @path_opts.merge(:role => "AccountAdmin"))
-        expect(@account.account_users.where(user_id: @new_user)).not_to be_exists
+        expect(@account.account_users.active.where(user_id: @new_user)).not_to be_exists
       end
 
       it "should 404 if the user doesn't exist" do
@@ -187,34 +188,34 @@ describe "Admins API", type: :request do
       it "should work by sis user id" do
         api_call(:delete, @base_path + "sis_user_id:badmin",
                  @path_opts.merge(:user_id => "sis_user_id:badmin"))
-        expect(@account.account_users.where(user_id: @new_user)).not_to be_exists
+        expect(@account.account_users.active.where(user_id: @new_user)).not_to be_exists
       end
     end
 
     context "with custom membership" do
       before :once do
-        @role = custom_account_role('CustomAdmin', :account => @account)
-        @au = @account.account_users.create! :user => @new_user, :role => @role
+        @role = custom_account_role('CustomAdmin', account: @account)
+        @au = @account.account_users.create!(user: @new_user, role: @role)
       end
 
       it "should remove a custom membership from a user" do
-        api_call(:delete, @path + "?role_id=#{@role.id}", @path_opts.merge(:role_id => @role.id))
-        expect(@account.account_users.find_by_user_id_and_role_id(@new_user.id, @role.id)).to be_nil
+        api_call(:delete, @path + "?role_id=#{@role.id}", @path_opts.merge(role_id: @role.id))
+        expect(@account.account_users.active.find_by_user_id_and_role_id(@new_user.id, @role.id)).to be_nil
       end
 
       it "should still work using the deprecated role param" do
-        api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(:role => "CustomAdmin"))
-        expect(@account.account_users.where(:user_id => @new_user, :role_id => @role.id).exists?).to eq false
+        api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(role: "CustomAdmin"))
+        expect(@account.account_users.active.where(user_id: @new_user, role_id: @role.id).exists?).to eq false
       end
 
       it "should 404 if the membership type doesn't exist" do
-        api_call(:delete, @path + "?role=Blah", @path_opts.merge(:role => "Blah"), {}, {}, :expected_status => 404)
-        expect(@account.account_users.where(:user_id => @new_user, :role_id => @role.id).exists?).to eq true
+        api_call(:delete, @path + "?role=Blah", @path_opts.merge(role: "Blah"), {}, {}, expected_status: 404)
+        expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to eq true
       end
 
       it "should 404 if the membership type isn't specified" do
-        api_call(:delete, @path, @path_opts, {}, {}, :expected_status => 404)
-        expect(@account.account_users.where(:user_id => @new_user, :role_id => @role.id).exists?).to eq true
+        api_call(:delete, @path, @path_opts, {}, {}, expected_status: 404)
+        expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to eq true
       end
     end
 
@@ -227,17 +228,17 @@ describe "Admins API", type: :request do
 
       it "should leave the AccountAdmin membership alone when deleting the custom membership" do
         api_call(:delete, @path + "?role_id=#{@role.id}", @path_opts.merge(:role_id => @role.id))
-        expect(@account.account_users.where(:user_id => @new_user.id).map(&:role_id)).to eq [admin_role.id]
+        expect(@account.account_users.active.where(:user_id => @new_user.id).map(&:role_id)).to eq [admin_role.id]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership implicitly" do
         api_call(:delete, @path, @path_opts)
-        expect(@account.account_users.where(:user_id => @new_user.id).map(&:role_id)).to eq [@role.id]
+        expect(@account.account_users.active.where(:user_id => @new_user.id).map(&:role_id)).to eq [@role.id]
       end
 
       it "should leave the custom membership alone when deleting the AccountAdmin membership explicitly" do
         api_call(:delete, @path + "?role_id=#{admin_role.id}", @path_opts.merge(:role_id => admin_role.id))
-        expect(@account.account_users.where(:user_id => @new_user.id).map(&:role_id)).to eq [@role.id]
+        expect(@account.account_users.active.where(:user_id => @new_user.id).map(&:role_id)).to eq [@role.id]
       end
     end
   end
@@ -273,49 +274,53 @@ describe "Admins API", type: :request do
 
       it "should return the correct format" do
         json = api_call(:get, @path, @path_opts)
-        expect(json).to be_include({"id"=>@admin.account_users.first.id,
-                                "role"=>"AccountAdmin",
-                                "role_id" => admin_role.id,
-                                "user"=>
-                                    {"id"=>@admin.id,
-                                     "name"=>@admin.name,
-                                     "sortable_name"=>@admin.sortable_name,
-                                     "short_name"=>@admin.short_name,
-                                     "login_id"=>@admin.pseudonym.unique_id}})
+        expect(json).to be_include({"id" => @admin.account_users.first.id,
+                                    "role" => "AccountAdmin",
+                                    "role_id" => admin_role.id,
+                                    "user" =>
+                                      {"id" => @admin.id,
+                                       "name" => @admin.name,
+                                       "sortable_name" => @admin.sortable_name,
+                                       "short_name" => @admin.short_name,
+                                       "login_id" => @admin.pseudonym.unique_id},
+                                    "workflow_state" => 'active'})
       end
 
       it "should scope the results to the user_id if given" do
         json = api_call(:get, @path, @path_opts.merge(user_id: @admin.id))
-        expect(json).to eq [{"id"=>@admin.account_users.first.id,
-                        "role"=>"AccountAdmin",
-                        "role_id" => admin_role.id,
-                        "user"=>
-                            {"id"=>@admin.id,
-                             "name"=>@admin.name,
-                             "sortable_name"=>@admin.sortable_name,
-                             "short_name"=>@admin.short_name,
-                             "login_id"=>@admin.pseudonym.unique_id}}]
+        expect(json).to eq [{"id" => @admin.account_users.first.id,
+                             "role" => "AccountAdmin",
+                             "role_id" => admin_role.id,
+                             "user" =>
+                               {"id" => @admin.id,
+                                "name" => @admin.name,
+                                "sortable_name" => @admin.sortable_name,
+                                "short_name" => @admin.short_name,
+                                "login_id" => @admin.pseudonym.unique_id},
+                             "workflow_state" => 'active'}]
       end
 
       it "should scope the results to the array of user_ids if given" do
         json = api_call(:get, @path, @path_opts.merge(user_id: [@admin.id, @another_admin.id]))
-        expect(json).to eq [{"id"=>@admin.account_users.first.id,
-                        "role"=>"AccountAdmin",
-                        "role_id" => admin_role.id,
-                        "user"=>
-                            {"id"=>@admin.id,
-                             "name"=>@admin.name,
-                             "sortable_name"=>@admin.sortable_name,
-                             "short_name"=>@admin.short_name,
-                             "login_id"=>@admin.pseudonym.unique_id}},
-                       {"id"=>@another_admin.account_users.first.id,
-                        "role"=>"MT 1",
-                        "role_id"=>@roles[1].id,
-                        "user"=>
-                            {"id"=>@another_admin.id,
-                             "name"=>@another_admin.name,
-                             "sortable_name"=>@another_admin.sortable_name,
-                             "short_name"=>@another_admin.short_name}}]
+        expect(json).to eq [{"id" => @admin.account_users.first.id,
+                             "role" => "AccountAdmin",
+                             "role_id" => admin_role.id,
+                             "user" =>
+                               {"id" => @admin.id,
+                                "name" => @admin.name,
+                                "sortable_name" => @admin.sortable_name,
+                                "short_name" => @admin.short_name,
+                                "login_id" => @admin.pseudonym.unique_id},
+                             "workflow_state" => 'active'},
+                            {"id" => @another_admin.account_users.first.id,
+                             "role" => "MT 1",
+                             "role_id" => @roles[1].id,
+                             "user" =>
+                               {"id" => @another_admin.id,
+                                "name" => @another_admin.name,
+                                "sortable_name" => @another_admin.sortable_name,
+                                "short_name" => @another_admin.short_name},
+                             "workflow_state" => 'active'}]
       end
 
       context 'sharding' do

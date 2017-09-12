@@ -224,8 +224,8 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(sub.grade).to be_nil
       expect(sub.graded_anonymously).to be_nil
 
-      pg.expects(:publish_submission_comments!).once
-      pg.expects(:publish_rubric_assessments!).once
+      expect(pg).to receive(:publish_submission_comments!).once
+      expect(pg).to receive(:publish_rubric_assessments!).once
       pg.publish!
 
       sub.reload
@@ -294,16 +294,22 @@ describe ModeratedGrading::ProvisionalGrade do
 
       test_copy_to_final_mark
 
-      expect(RubricAssessment.find_by_id(fa)).to be_nil
-      expect(SubmissionComment.find_by_id(fc)).to be_nil
+      expect(RubricAssessment.find_by(id: fa.id)).to be_nil
+      expect(SubmissionComment.find_by(id: fc.id)).to be_nil
     end
 
-    it "generates crocodoc_attachment_info with all participants" do
-      att = stub(:id => 100, :crocodoc_available? => true)
-      crocodoc_ids = [@sub.user, @moderator, @scorer].map(&:crocodoc_id!)
-      att.expects(:crocodoc_url).with(@moderator, crocodoc_ids).returns('fake_url')
+    it "generates attachment_info with all participants" do
+      att = double(:id => 100, :crocodoc_available? => true, :canvadoc_available? => true)
+      whitelist = [@sub.user, @moderator, @scorer].map { |u| u.moderated_grading_ids(true) }
+      url_opts = {enable_annotations: true, moderated_grading_whitelist: whitelist}
+      expect(att).to receive(:crocodoc_url).with(@moderator, url_opts).and_return('fake_url')
+      expect(att).to receive(:canvadoc_url).with(@moderator, url_opts).and_return('fake_canvadoc_url')
       final_mark = @pg.copy_to_final_mark!(@moderator)
-      expect(final_mark.crocodoc_attachment_info(@moderator, att)).to eq({:attachment_id => 100, :crocodoc_url => 'fake_url'})
+      expect(final_mark.attachment_info(@moderator, att)).to eq({
+        attachment_id: 100,
+        crocodoc_url: 'fake_url',
+        canvadoc_url: 'fake_canvadoc_url'
+      })
     end
   end
 end
@@ -336,9 +342,9 @@ describe ModeratedGrading::NullProvisionalGrade do
   end
 
   it "should return the original submission's submission comments" do
-    sub = stub
-    comments = stub
-    sub.expects(:submission_comments).returns(comments)
+    sub = double
+    comments = double
+    expect(sub).to receive(:submission_comments).and_return(comments)
     expect(ModeratedGrading::NullProvisionalGrade.new(sub, 1, false).submission_comments).to eq(comments)
   end
 end

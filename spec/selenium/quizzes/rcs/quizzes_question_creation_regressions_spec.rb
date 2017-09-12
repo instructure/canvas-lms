@@ -32,10 +32,6 @@ describe 'quizzes question creation' do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   context "edge cases" do
     before(:each) do
       @last_quiz = start_quiz_question

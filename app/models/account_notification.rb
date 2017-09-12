@@ -50,7 +50,7 @@ class AccountNotification < ActiveRecord::Base
       # roles. try(:id) because the AccountNotificationRole may have an
       # explicitly nil role_id to indicate the announcement's intended for
       # users not enrolled in any courses
-      role_ids = announcement.account_notification_roles.map{ |anr| anr.role.try(:id) }
+      role_ids = announcement.account_notification_roles.map { |anr| anr.role&.role_for_shard&.id }
 
       unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
         # choose enrollments and account users to inspect
@@ -69,9 +69,9 @@ class AccountNotification < ActiveRecord::Base
         # map to role ids. user role.id instead of role_id to trigger Role#id
         # magic for built in roles. announcements intended for users not
         # enrolled in any courses have the NilEnrollment role type
-        user_role_ids[announcement.account_id] = enrollments.map{ |e| e.role.id }
+        user_role_ids[announcement.account_id] = enrollments.map{ |e| e.role.role_for_shard.id }
         user_role_ids[announcement.account_id] = [nil] if user_role_ids[announcement.account_id].empty?
-        user_role_ids[announcement.account_id] |= account_users.map{ |au| au.role.id }
+        user_role_ids[announcement.account_id] |= account_users.map{ |au| au.role.role_for_shard.id }
       end
 
       role_ids.empty? || (role_ids & user_role_ids[announcement.account_id]).present?

@@ -102,7 +102,7 @@ describe "login logout test" do
   end
 
   it "should login when a trusted referer exists", priority: "2" do
-    Account.any_instance.stubs(:trusted_referer?).returns(true)
+    allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
     user_with_pseudonym(active_user: true)
     get "/login"
     driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"

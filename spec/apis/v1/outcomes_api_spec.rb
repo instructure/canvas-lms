@@ -136,10 +136,6 @@ describe "Outcomes API", type: :request do
       )
     end
 
-    before :each do
-      Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
-    end
-
     def revoke_permission(account_user, permission)
       RoleOverride.manage_role_override(account_user.account, account_user.role, permission.to_s, :override => false)
     end
@@ -158,6 +154,7 @@ describe "Outcomes API", type: :request do
       it "should require read permission" do
         # new user, doesn't have a tie to the account
         user_with_pseudonym(:account => Account.create!, :active_all => true)
+        allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).and_return(true)
         raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
                      :controller => 'outcomes_api',
                      :action => 'show',

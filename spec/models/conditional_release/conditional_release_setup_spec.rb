@@ -22,7 +22,7 @@ describe ConditionalRelease::Setup do
   let(:service) { ConditionalRelease::Service }
 
   def stub_config
-    ConfigFile.stubs(:load).returns({
+    allow(ConfigFile).to receive(:load).and_return({
       protocol: 'foo', host: 'bar',
       create_account_path: 'some/path',
       edit_rule_path: 'some/other/path',
@@ -67,22 +67,22 @@ describe ConditionalRelease::Setup do
     @sub_account = account_model parent_account: @root_account
     @course = course_factory account: @sub_account, active_all: true
     @user = user_with_pseudonym account: @root_account
-    service.stubs(:jwt_for).returns("some.jwt.thing")
-    service.stubs(:unique_id).returns("unique@cyoe.id")
-    User.any_instance.stubs(:set_default_feature_flags)
-    Feature.stubs(:definitions).returns({
+    allow(service).to receive(:jwt_for).and_return("some.jwt.thing")
+    allow(service).to receive(:unique_id).and_return("unique@cyoe.id")
+    allow_any_instance_of(User).to receive(:set_default_feature_flags)
+    allow(Feature).to receive(:definitions).and_return({
       'conditional_release' => Feature.new(feature: 'conditional_release', applies_to: 'Account')
     })
     @cyoe_feature = Feature.definitions['conditional_release']
-    service.stubs(:configured?).returns(true)
+    allow(service).to receive(:configured?).and_return(true)
     @setup = ConditionalRelease::Setup.new(@account.id, @user.id)
   end
 
   describe "#activate!" do
     it "should not run if the Conditional Release service isn't configured" do
-      service.stubs(:configured?).returns(false)
-      @setup.expects(:create_token!).never
-      @setup.expects(:send_later_enqueue_args).never
+      allow(service).to receive(:configured?).and_return(false)
+      expect(@setup).to receive(:create_token!).never
+      expect(@setup).to receive(:send_later_enqueue_args).never
       @setup.activate!
     end
 
@@ -90,28 +90,28 @@ describe ConditionalRelease::Setup do
       user = setup_cr_user(@root_account)
       setup_cr_token_for_user(user)
       init = ConditionalRelease::Setup.new(@account.id, @user.id)
-      init.expects(:send_later_enqueue_args).never
+      expect(init).to receive(:send_later_enqueue_args).never
       init.activate!
     end
 
     it "should create a new Conditional Release user if not present" do
-      AccountUser.any_instance.expects(:save!).once
+      expect_any_instance_of(AccountUser).to receive(:save!).once
       @setup.activate!
     end
 
     it "should create a new Conditional Release API access token if not present" do
-      AccessToken.any_instance.expects(:save!).once
+      expect_any_instance_of(AccessToken).to receive(:save!).once
       @setup.activate!
     end
 
     it "should enqueue a job to POST the account data to the Conditional Release service" do
-      @setup.expects(:send_later_enqueue_args).once
+      expect(@setup).to receive(:send_later_enqueue_args).once
       @setup.activate!
     end
 
     # End-to-end
     it "should activate the Conditional Release service" do
-      CanvasHttp.expects(:post).once.returns(Net::HTTPSuccess.new(1.0, 202, "Accepted"))
+      expect(CanvasHttp).to receive(:post).once.and_return(Net::HTTPSuccess.new(1.0, 202, "Accepted"))
       t_new_account = account_model
       t_new_user = user_with_pseudonym account: t_new_account
 
@@ -138,9 +138,9 @@ describe ConditionalRelease::Setup do
         @test = ConditionalRelease::Setup.new(@sub_account.id, @user.id)
         @test.instance_variable_set(:@payload, data)
         @test.instance_variable_set(:@jwt, jwt)
-        CanvasHttp.expects(:post).once.with(ConditionalRelease::Service.create_account_url, {
+        expect(CanvasHttp).to receive(:post).once.with(ConditionalRelease::Service.create_account_url, {
           "Authorization" => "Bearer #{jwt}"
-        }, form_data: data.to_param).returns(Net::HTTPSuccess.new(1.0, 202, "Accepted"))
+        }, form_data: data.to_param).and_return(Net::HTTPSuccess.new(1.0, 202, "Accepted"))
       end
 
       it "should send a POST request to the conditional release service" do
@@ -148,7 +148,7 @@ describe ConditionalRelease::Setup do
       end
 
       it "should not call #undo_changes! if the request succeeds" do
-        @test.expects(:undo_changes!).never
+        expect(@test).to receive(:undo_changes!).never
         @test.send :post_to_service
       end
     end
@@ -157,7 +157,7 @@ describe ConditionalRelease::Setup do
       before :each do
         @sub_account.enable_feature! :conditional_release
         @test = ConditionalRelease::Setup.new(@sub_account.id, @user.id)
-        CanvasHttp.expects(:post).once.returns(Net::HTTPInternalServerError.new(1.0, 500, "Internal Server Error"))
+        expect(CanvasHttp).to receive(:post).once.and_return(Net::HTTPInternalServerError.new(1.0, 500, "Internal Server Error"))
       end
 
       it "should disable the conditional release feature flag if the request fails" do
@@ -179,7 +179,7 @@ describe ConditionalRelease::Setup do
       end
 
       it "should call #undo_changes! if the request fails" do
-        @test.expects(:undo_changes!).once
+        expect(@test).to receive(:undo_changes!).once
         @test.send :post_to_service rescue nil
       end
     end

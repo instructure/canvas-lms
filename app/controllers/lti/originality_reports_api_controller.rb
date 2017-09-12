@@ -283,7 +283,7 @@ module Lti
 
     def create_report_params
       @_create_report_params ||= begin
-        report_attributes = params.require(:originality_report).permit(create_attributes).to_hash.merge(
+        report_attributes = params.require(:originality_report).permit(create_attributes).to_unsafe_h.merge(
           {submission_id: params.require(:submission_id)}
         )
         report_attributes['link_id'] = link_id(report_attributes.delete('tool_setting'))

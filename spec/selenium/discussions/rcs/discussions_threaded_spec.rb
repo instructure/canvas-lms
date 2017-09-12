@@ -34,10 +34,6 @@ describe "threaded discussions" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   it "should reply to the threaded discussion", priority: "2", test_id: 222519 do
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"

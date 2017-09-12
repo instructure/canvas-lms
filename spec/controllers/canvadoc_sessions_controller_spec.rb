@@ -30,8 +30,8 @@ describe CanvadocSessionsController do
   before :each do
     PluginSetting.create! :name => 'canvadocs',
                           :settings => {"base_url" => "https://example.com"}
-    Canvadocs::API.any_instance.stubs(:upload).returns "id" => 1234
-    Canvadocs::API.any_instance.stubs(:session).returns 'id' => 'SESSION'
+    allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
+    allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
     user_session(@teacher)
   end
 
@@ -45,14 +45,14 @@ describe CanvadocSessionsController do
     end
 
     it "works" do
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
 
     it "doesn't upload documents that are already uploaded" do
       @attachment1.submit_to_canvadocs
-      Attachment.any_instance.expects(:submit_to_canvadocs).never
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      expect_any_instance_of(Attachment).to receive(:submit_to_canvadocs).never
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
 
@@ -63,7 +63,7 @@ describe CanvadocSessionsController do
         :context => @course
       @blob[:attachment_id] = attachment2.id
 
-      get :show, blob: @blob.to_json, hmac: hmac
+      get :show, params: {blob: @blob.to_json, hmac: hmac}
       assert_status(401)
     end
 
@@ -71,10 +71,10 @@ describe CanvadocSessionsController do
       Account.default.settings[:canvadocs_prefer_office_online] = true
       Account.default.save!
 
-      Attachment.stubs(:find).returns(@attachment1)
-      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
-        arg1 == 1 &&
-        arg2[:preferred_plugins] == [
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:preferred_plugins]).to eq [
           Canvadocs::RENDER_O365,
           Canvadocs::RENDER_PDFJS,
           Canvadocs::RENDER_BOX,
@@ -82,46 +82,46 @@ describe CanvadocSessionsController do
         ]
       end
 
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
     end
 
     it "should not send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is not enabled" do
       Account.default.settings[:canvadocs_prefer_office_online] = false
       Account.default.save!
 
-      Attachment.stubs(:find).returns(@attachment1)
-      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
-        arg1 == 1 &&
-        arg2[:preferred_plugins] == [
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:preferred_plugins]).to eq [
           Canvadocs::RENDER_PDFJS,
           Canvadocs::RENDER_BOX,
           Canvadocs::RENDER_CROCODOC
         ]
       end
 
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
     end
 
     it "should always send PDFjs as a preferred plugin" do
-      Attachment.stubs(:find).returns(@attachment1)
-      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
-        arg1 == 1 &&
-        arg2[:preferred_plugins] == [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       end
 
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
     end
 
     it "needs to be run by the blob user" do
       @blob[:user_id] = @student.global_id
       blob = @blob.to_json
-      get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
+      get :show, params: {blob: blob, hmac: Canvas::Security.hmac_sha1(blob)}
       assert_status(401)
     end
 
     it "doesn't let you use a crocodoc blob" do
       @blob[:type] = "crocodoc"
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
       assert_status(401)
     end
 
@@ -129,13 +129,13 @@ describe CanvadocSessionsController do
       remove_user_session
       @blob[:user_id] = nil
       blob = @blob.to_json
-      get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
+      get :show, params: {blob: blob, hmac: Canvas::Security.hmac_sha1(blob)}
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
 
     it "fails gracefulishly when canvadocs times out" do
-      Canvadocs::API.any_instance.stubs(:session).raises(Timeout::Error)
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      allow_any_instance_of(Canvadocs::API).to receive(:session).and_raise(Timeout::Error)
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
       assert_status(503)
     end
 
@@ -146,7 +146,7 @@ describe CanvadocSessionsController do
 
       user_session(@student)
 
-      get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
+      get :show, params: {blob: blob, hmac: Canvas::Security.hmac_sha1(blob)}
 
       @attachment1.reload
       expect(@attachment1.viewed_at).not_to eq(last_viewed_at)
@@ -163,7 +163,7 @@ describe CanvadocSessionsController do
 
       user_session(@student)
 
-      get :show, blob: blob, hmac: hmac
+      get :show, params: {blob: blob, hmac: hmac}
 
       attachment.reload
       expect(attachment.viewed_at).not_to eq(last_viewed_at)
@@ -172,7 +172,7 @@ describe CanvadocSessionsController do
     it "doesn't update attachment.viewed_at for non-owner views" do
       last_viewed_at = @attachment1.viewed_at
 
-      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
 
       @attachment1.reload
       expect(@attachment1.viewed_at).to eq(last_viewed_at)

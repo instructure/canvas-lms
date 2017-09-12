@@ -48,7 +48,7 @@ describe 'login' do
         st.success = response.is_success?
         st
       end
-      Login::CasController.any_instance.stubs(:client).returns(@cas_client)
+      allow_any_instance_of(Login::CasController).to receive(:client).and_return(@cas_client)
     end
 
     let(:cas_redirect_url) { Regexp.new(Regexp.escape(@cas_client.add_service_to_login_url(''))) }
@@ -61,7 +61,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', ticket: 'ST-abcd'
+      get '/login/cas', params: {ticket: 'ST-abcd'}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
 
@@ -77,7 +77,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', ticket: 'ST-abcd'
+      get '/login/cas', params: {ticket: 'ST-abcd'}
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
@@ -91,7 +91,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', ticket: 'ST-abcd'
+      get '/login/cas', params: {ticket: 'ST-abcd'}
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
@@ -102,7 +102,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', ticket: 'ST-abcd'
+      get '/login/cas', params: {ticket: 'ST-abcd'}
       expect(response).to redirect_to(login_url)
       get login_url
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
@@ -118,7 +118,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', ticket: 'ST-abcd'
+      get '/login/cas', params: {ticket: 'ST-abcd'}
       expect(response).to redirect_to(redirect_url)
     end
 
@@ -130,7 +130,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', ticket: 'ST-abcd'
+      get '/login/cas', params: {ticket: 'ST-abcd'}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
     end
@@ -145,7 +145,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', ticket: 'ST-abcd'
+      get '/login/cas', params: {ticket: 'ST-abcd'}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq cas_ticket
 
@@ -168,13 +168,13 @@ describe 'login' do
         get login_url
         redirect_until(cas_redirect_url)
 
-        get '/login/cas', ticket: 'ST-abcd'
+        get '/login/cas', params: {ticket: 'ST-abcd'}
         expect(response).to redirect_to(dashboard_url(:login_success => 1))
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
 
         # single-sign-out from CAS server cannot find key but should store the session is expired
-        post cas_logout_url, :logoutRequest => <<-SAML
+        post cas_logout_url, params: {:logoutRequest => <<-SAML}
 <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
 <saml:NameID></saml:NameID>
 <samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
@@ -195,7 +195,7 @@ describe 'login' do
         get login_url
         redirect_until(cas_redirect_url)
 
-        get '/login/cas', ticket: 'ST-abcd'
+        get '/login/cas', params: {ticket: 'ST-abcd'}
         expect(response).to redirect_to(dashboard_url(:login_success => 1))
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
@@ -222,7 +222,7 @@ describe 'login' do
         back_channel.reset!
 
         # single-sign-out from CAS server cannot find key but should store the session is expired
-        back_channel.post cas_logout_url, :logoutRequest => <<-XML
+        back_channel.post cas_logout_url, params: {:logoutRequest => <<-XML}
           <samlp:LogoutRequest
             xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
             xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
@@ -265,7 +265,7 @@ describe 'login' do
     get jobs_url
     expect(response).to redirect_to login_url
 
-    post canvas_login_url, pseudonym_session: { unique_id: @pseudonym.unique_id, password: 'qwertyuiop' }
+    post canvas_login_url, params: {pseudonym_session: { unique_id: @pseudonym.unique_id, password: 'qwertyuiop' }}
     expect(response).to redirect_to jobs_url
   end
 end

@@ -42,7 +42,7 @@ describe "API Error Handling", type: :request do
   end
 
   it "should respond not_found for 404 errors" do
-    get "/api/v1/courses/54321", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
+    get "/api/v1/courses/54321", headers: { 'Authorization' => "Bearer #{@token.full_token}" }
     expect(response.response_code).to eq 404
     json = JSON.parse(response.body)
     expect(json['errors']).to eq [{'message' => 'The specified resource does not exist.'}]

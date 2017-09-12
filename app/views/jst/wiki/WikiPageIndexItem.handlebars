@@ -1,5 +1,5 @@
 <td role="gridcell">
-  <a href="{{html_url}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
+  <a href="{{html_url}}" id="wiki_page_index_item_title_{{page_id}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
   {{#if front_page}}
     <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
   {{/if}}
@@ -13,7 +13,7 @@
   {{/if}}
   <td role="gridcell">
     <div class="inline-block">
-      <a id="{{page_id}}" class="al-trigger al-trigger-gray" href="#" role="button" data-popup-within="#application">
+      <a id="{{page_id}}" aria-label="{{title}}" class="al-trigger al-trigger-gray" href="#" role="button" data-popup-within="#application">
         <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         <span class="screenreader-only">{{#t 'menu.settings'}}Settings{{/t}}</span>
       </a>

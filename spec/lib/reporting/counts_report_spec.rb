@@ -24,7 +24,7 @@ describe Reporting::CountsReport do
       @shard1 ||= Shard.default
       @account1 = Account.create!
       @account2 = @shard1.activate { Account.create! }
-      Reporting::CountsReport.stubs(:last_activity).returns(true)
+      allow(Reporting::CountsReport).to receive(:last_activity).and_return(true)
     end
 
     it "should create a detailed report for each account" do

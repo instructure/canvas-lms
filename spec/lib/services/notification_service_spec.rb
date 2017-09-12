@@ -35,57 +35,57 @@ module Services
       end
 
       before(:each) do
-        @queue = stub('notification queue')
-        NotificationService.stubs(:notification_queue).returns(@queue)
+        @queue = double('notification queue')
+        allow(NotificationService).to receive(:notification_queue).and_return(@queue)
       end
 
       it "processes email message type" do
-        @queue.expects(:send_message).once
+        expect(@queue).to receive(:send_message).once
         @message.path_type = "email"
         expect{@message.deliver}.not_to raise_error
       end
 
       it "processes twitter message type" do
         @user.user_services.create!(service: 'twitter', service_user_name: 'user', service_user_id: 'user', visible: true)
-        @queue.expects(:send_message).once
+        expect(@queue).to receive(:send_message).once
         @message.path_type = "twitter"
         expect{@message.deliver}.not_to raise_error
       end
 
       it "processes twilio message type" do
-        @queue.expects(:send_message).once
+        expect(@queue).to receive(:send_message).once
         @message.path_type = "sms"
         expect{@message.deliver}.not_to raise_error
       end
 
       it "processes sms message type" do
-        @queue.expects(:send_message).once
+        expect(@queue).to receive(:send_message).once
         @message.path_type = "sms"
         @message.to = "+18015550100"
         expect{@message.deliver}.not_to raise_error
       end
 
       it "expects email sms message type to go through mailer" do
-        @queue.expects(:send_message).once
-        Mailer.expects(:create_message).once
+        expect(@queue).to receive(:send_message).once
+        expect(Mailer).to receive(:create_message).once
         @message.path_type = "sms"
         @message.to = "18015550100@vtext.com"
         expect{@message.deliver}.not_to raise_error
       end
 
       it "expects twilio to not call mailer create_message" do
-        @queue.expects(:send_message).once
-        Mailer.expects(:create_message).never
+        expect(@queue).to receive(:send_message).once
+        expect(Mailer).to receive(:create_message).never
         @message.path_type = "sms"
         @message.to = "+18015550100"
         expect{@message.deliver}.not_to raise_error
       end
 
       it "processes push notification message type" do
-        @queue.expects(:send_message).once
-        sns_client = mock()
-        sns_client.stubs(:create_platform_endpoint).returns(endpoint_arn: 'arn')
-        NotificationEndpoint.any_instance.stubs(:sns_client).returns(sns_client)
+        expect(@queue).to receive(:send_message).once
+        sns_client = double()
+        allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: 'arn')
+        allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: 'token')
         @message.path_type = "push"
         @message.deliver
@@ -93,14 +93,14 @@ module Services
       end
 
       it "throws error if cannot connect to queue" do
-        @queue.stubs(:send_message).raises(Aws::SQS::Errors::ServiceError.new('a', 'b'))
+        allow(@queue).to receive(:send_message).and_raise(Aws::SQS::Errors::ServiceError.new('a', 'b'))
         expect{@message.deliver}.to raise_error(Aws::SQS::Errors::ServiceError)
         expect(@message.transmission_errors).to include("Aws::SQS::Errors::ServiceError")
         expect(@message.workflow_state).to eql("staged")
       end
 
       it "throws error if queue does not exist" do
-        @queue.stubs(:send_message).raises(Aws::SQS::Errors::NonExistentQueue.new('a', 'b'))
+        allow(@queue).to receive(:send_message).and_raise(Aws::SQS::Errors::NonExistentQueue.new('a', 'b'))
         expect{@message.deliver}.to raise_error(Aws::SQS::Errors::NonExistentQueue)
         expect(@message.transmission_errors).to include("Aws::SQS::Errors::NonExistentQueue")
         expect(@message.workflow_state).to eql("staged")
@@ -116,7 +116,7 @@ module Services
 
         it "sends all parameters (directly)" do
           req_id = SecureRandom.uuid
-          RequestContextGenerator.stubs(:request_id).returns(req_id)
+          allow(RequestContextGenerator).to receive(:request_id).and_return(req_id)
           expected = {
             global_id: 1,
             type: 'email',
@@ -126,7 +126,7 @@ module Services
           }.with_indifferent_access
 
           spy = SendMessageSpy.new
-          NotificationService.stubs(:notification_queue).returns(spy)
+          allow(NotificationService).to receive(:notification_queue).and_return(spy)
 
           NotificationService.process(1, 'hello', 'email', 'alice@example.com')
           expect(expected).to eq spy.sent_hash

@@ -32,8 +32,8 @@ describe Lti::PermissionChecker do
 
     context "assignment" do
       before :each do
-        AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
-        AssignmentConfigurationToolLookup.any_instance.stubs(:destroy_subscription).returns true
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:destroy_subscription).and_return true
         @original_fallback = Canvas::DynamicSettings.fallback_data
         Canvas::DynamicSettings.fallback_data = {
           'canvas' => {},

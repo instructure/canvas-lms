@@ -29,7 +29,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
   before do
     @database ||= Canvas::Cassandra::DatabaseBuilder.from_config(:auditors)
-    DataFixup::FixAuditLogUuidIndexes::Migration.any_instance.stubs(:database).returns(@database)
+    allow_any_instance_of(DataFixup::FixAuditLogUuidIndexes::Migration).to receive(:database).and_return(@database)
 
     @stream_tables = {}
     DataFixup::FixAuditLogUuidIndexes::Migration::INDEXES.each do |index|
@@ -52,7 +52,11 @@ describe DataFixup::FixAuditLogUuidIndexes do
     @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::MAPPING_TABLE}")
     @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::LAST_BATCH_TABLE}")
 
-    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.stubs(:end_time).returns(Time.now + 1.month)
+    allow_any_instance_of(DataFixup::FixAuditLogUuidIndexes::IndexCleaner).to receive(:end_time).and_return(Time.now + 1.month)
+    allow(SecureRandom).to receive(:uuid).and_wrap_original do |original|
+      next @event_id if @event_id
+      original.call
+    end
   end
 
   def check_event_stream(event_id, stream_table, expected_total)
@@ -96,11 +100,11 @@ describe DataFixup::FixAuditLogUuidIndexes do
       Timecop.freeze(time) do
         @assignment = course.assignments.create!(:title => 'Assignment', :points_possible => 10)
       end
-      SecureRandom.stubs(:uuid).returns(event_id)
+      @event_id = event_id
       Timecop.freeze(time + 1.hour) do
         @submission = @assignment.grade_student(student, grade: i, grader: teacher).first
       end
-      SecureRandom.unstub(:uuid)
+      @event_id = nil
     end
 
     # Lets simulate a deleted submission
@@ -110,9 +114,8 @@ describe DataFixup::FixAuditLogUuidIndexes do
   end
 
   def corrupt_course_changes
-    event_id = CanvasSlug.generate
+    @event_id = CanvasSlug.generate
     courses = []
-    SecureRandom.stubs(:uuid).returns(event_id)
 
     (1..3).each do |i|
       time = Time.zone.now - i.days
@@ -126,14 +129,13 @@ describe DataFixup::FixAuditLogUuidIndexes do
       end
     end
 
-    SecureRandom.unstub(:uuid)
+    event_id, @event_id = @event_id, nil
 
     { event_id: event_id, count: 3, courses: courses }
   end
 
   def corrupt_authentications
-    event_id = CanvasSlug.generate
-    SecureRandom.stubs(:uuid).returns(event_id)
+    @event_id = CanvasSlug.generate
 
     (1..3).each do |i|
       time = Time.now - i.days
@@ -144,7 +146,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
       end
     end
 
-    SecureRandom.unstub(:uuid)
+    event_id, @event_id = @event_id, nil
 
     { event_id: event_id, count: 3 }
   end
@@ -170,14 +172,14 @@ describe DataFixup::FixAuditLogUuidIndexes do
     index = Auditors::Course::Stream.course_index
 
     migration = DataFixup::FixAuditLogUuidIndexes::Migration.new
-    migration.stubs(:batch_size).returns(1)
+    allow(migration).to receive(:batch_size).and_return(1)
     migration.fix_index(index)
 
     last_batch = migration.get_last_batch(index)
     expect(last_batch.size).to eq 3
     expect(last_batch).not_to eq ['', '', 0]
 
-    migration.expects(:update_index_batch).never
+    expect(migration).to receive(:update_index_batch).never
     migration.fix_index(index)
   end
 
@@ -194,8 +196,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
   it "fixes index rows as they are queried for events that have multiple indexes" do
     users = []
     pseudonyms = []
-    event_id = CanvasSlug.generate
-    SecureRandom.stubs(:uuid).returns(event_id)
+    @event_id = CanvasSlug.generate
     (1..3).each do |i|
       time = Time.now - i.days
 
@@ -210,7 +211,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
         end
       end
     end
-    SecureRandom.unstub(:uuid)
+    @event_id = nil
 
     users.each do |user|
       expect(Auditors::Authentication.for_user(user).paginate(per_page: 5).size).to eq 2
@@ -244,11 +245,11 @@ describe DataFixup::FixAuditLogUuidIndexes do
     stream_checks['courses'] = corrupt_course_changes
     stream_checks['authentications'] = corrupt_authentications
 
-    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.stubs(:end_time).returns(Time.now - 1.month)
+    allow_any_instance_of(DataFixup::FixAuditLogUuidIndexes::IndexCleaner).to receive(:end_time).and_return(Time.now - 1.month)
 
-    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:create_tombstone).never
-    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:create_index_entry).never
-    DataFixup::FixAuditLogUuidIndexes::IndexCleaner.any_instance.expects(:delete_index_entry).never
+    expect_any_instance_of(DataFixup::FixAuditLogUuidIndexes::IndexCleaner).to receive(:create_tombstone).never
+    expect_any_instance_of(DataFixup::FixAuditLogUuidIndexes::IndexCleaner).to receive(:create_index_entry).never
+    expect_any_instance_of(DataFixup::FixAuditLogUuidIndexes::IndexCleaner).to receive(:delete_index_entry).never
 
     # Run Fix
     DataFixup::FixAuditLogUuidIndexes::Migration.run

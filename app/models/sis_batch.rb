@@ -293,21 +293,25 @@ class SisBatch < ActiveRecord::Base
   def finalize_workflow_state(import_finished)
     if import_finished
       remove_previous_imports if self.batch_mode?
+      return if workflow_state == 'aborted'
       self.workflow_state = :imported
       self.workflow_state = :imported_with_messages if messages?
     else
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
-    self.progress = 100
-    self.ended_at = Time.now.utc
-    self.save
+  end
+
+  def term_course_scope
+    if data[:supplied_batches].include?(:course)
+      scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil)
+      scope.where(enrollment_term_id: self.batch_mode_term)
+    end
   end
 
   def non_batch_courses_scope
     if data[:supplied_batches].include?(:course)
-      scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil).where.not(sis_batch_id: self)
-      scope.where(enrollment_term_id: self.batch_mode_term)
+      term_course_scope.where.not(sis_batch_id: self)
     end
   end
 
@@ -328,11 +332,17 @@ class SisBatch < ActiveRecord::Base
     current_row
   end
 
-  def non_batch_sections_scope
+  def term_sections_scope
     if data[:supplied_batches].include?(:section)
       scope = self.account.course_sections.active.where(courses: {enrollment_term_id: self.batch_mode_term})
-      scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil).where.not(sis_batch_id: self)
+      scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil)
       scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
+    end
+  end
+
+  def non_batch_sections_scope
+    if data[:supplied_batches].include?(:section)
+      term_sections_scope.where.not(sis_batch_id: self)
     end
   end
 
@@ -350,11 +360,16 @@ class SisBatch < ActiveRecord::Base
     current_row
   end
 
+  def term_enrollments_scope
+    if data[:supplied_batches].include?(:enrollment)
+      scope = self.account.enrollments.active.joins(:course).readonly(false).where.not(sis_batch_id: nil)
+      scope.where(courses: {enrollment_term_id: self.batch_mode_term})
+    end
+  end
+
   def non_batch_enrollments_scope
     if data[:supplied_batches].include?(:enrollment)
-      scope = self.account.enrollments.active.joins(:course).readonly(false)
-      scope = scope.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
-      scope.where(courses: {enrollment_term_id: self.batch_mode_term})
+      term_enrollments_scope.where.not(sis_batch_id: self)
     end
   end
 
@@ -382,17 +397,47 @@ class SisBatch < ActiveRecord::Base
     sections = non_batch_sections_scope
     enrollments = non_batch_enrollments_scope
 
-    count += courses.count if courses
-    count += sections.count if sections
-    count += enrollments.count if enrollments
-
     begin
+      count = detect_changes(count, courses, enrollments, sections)
       row = remove_non_batch_courses(courses, count) if courses
       row = remove_non_batch_sections(sections, count, row) if sections
       remove_non_batch_enrollments(enrollments, count, row) if enrollments
     rescue SisBatch::Aborted
-      return self
+      return self.reload
     end
+  end
+
+  def detect_changes(count, courses, enrollments, sections)
+    all_count = 0
+
+    if courses
+      count += courses.count
+      all_count += term_course_scope.count
+    end
+
+    if sections
+      count += sections.count
+      all_count += term_sections_scope.count
+    end
+
+    if enrollments
+      count += enrollments.count
+      all_count += term_enrollments_scope.count
+    end
+
+    if change_threshold && count.to_f/all_count*100 > change_threshold
+      change_detected(count)
+    end
+    count
+  end
+
+  def change_detected(count)
+    abort_batch
+    processing_errors ||= []
+    processing_errors << [t("%{count} items would be deleted and exceeds the set threshold of %{change_threshold}%",
+                            count: count, change_threshold: change_threshold)]
+    SisBatch.where(id: self).update_all(processing_errors: processing_errors)
+    raise SisBatch::Aborted
   end
 
   def as_json(options={})

@@ -873,7 +873,7 @@ describe Quizzes::QuizSubmission do
       let(:questions) { [question1, question2] }
 
       before do
-        submission.stubs(:questions).returns(questions)
+        allow(submission).to receive(:questions).and_return(questions)
       end
 
       it "returns the question matching the passed in ID" do
@@ -903,7 +903,7 @@ describe Quizzes::QuizSubmission do
       let(:submission) { @quiz.quiz_submissions.build }
 
       before do
-        submission.stubs(:temporary_data).returns \
+        allow(submission).to receive(:temporary_data).and_return \
           'question_1' => 'A',
           'question_2' => '',
           'question_3_123456abcdefghijklmnopqrstuvwxyz' => 'A',
@@ -1284,7 +1284,7 @@ describe Quizzes::QuizSubmission do
 
         it "returns true if it's completed and has an ungraded submission_data" do
           submission = @quiz.generate_submission(@student)
-          submission.stubs(:completed?).returns(true)
+          allow(submission).to receive(:completed?).and_return(true)
           expect(submission.needs_grading?).to be_truthy
         end
 
@@ -1352,7 +1352,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "should pass the date from the first version of the most recent attempt to quiz#questions_regraded_since" do
-        @submission.quiz.expects(:questions_regraded_since)
+        expect(@submission.quiz).to receive(:questions_regraded_since)
         @submission.questions_regraded_since_last_attempt
       end
 
@@ -1364,7 +1364,7 @@ describe Quizzes::QuizSubmission do
         @submission = @quiz.quiz_submissions.build
       end
       it "takes ids from questions_as_object" do
-        @submission.stubs(:questions_as_object).returns [{"id" => 2}, {"id" => 3}]
+        allow(@submission).to receive(:questions_as_object).and_return [{"id" => 2}, {"id" => 3}]
 
         expect(@submission.quiz_question_ids).to eq [2, 3]
       end
@@ -1376,11 +1376,11 @@ describe Quizzes::QuizSubmission do
         @submission = @quiz.quiz_submissions.build
       end
       it "fetches questions based on quiz_question_ids" do
-        @submission.stubs(:quiz_question_ids).returns [2, 3]
-        Quizzes::QuizQuestion.expects(:where)
+        allow(@submission).to receive(:quiz_question_ids).and_return [2, 3]
+        expect(Quizzes::QuizQuestion).to receive(:where)
           .with(id: [2, 3])
-          .returns(User.where(id: [2, 3]))
-          .at_least_once
+          .and_return(User.where(id: [2, 3]))
+          .at_least(:once)
 
         @submission.quiz_questions
       end
@@ -1599,12 +1599,12 @@ describe Quizzes::QuizSubmission do
 
   describe '#retriable?' do
     it 'should not be retriable by default' do
-      subject.stubs(:attempts_left).returns 0
+      allow(subject).to receive(:attempts_left).and_return 0
       expect(subject.retriable?).to be_falsey
     end
 
     it 'should not be retriable unless it is complete' do
-      subject.stubs(:attempts_left).returns 3
+      allow(subject).to receive(:attempts_left).and_return 3
       expect(subject.retriable?).to be_falsey
     end
 
@@ -1620,15 +1620,15 @@ describe Quizzes::QuizSubmission do
 
     it 'should be retriable if it is complete and has attempts left to spare' do
       subject.workflow_state = 'complete'
-      subject.stubs(:attempts_left).returns 3
+      allow(subject).to receive(:attempts_left).and_return 3
       expect(subject.retriable?).to be_truthy
     end
 
     it 'should be retriable if it is complete and the quiz has unlimited attempts' do
       subject.workflow_state = 'complete'
-      subject.stubs(:attempts_left).returns 0
+      allow(subject).to receive(:attempts_left).and_return 0
       subject.quiz = Quizzes::Quiz.new
-      subject.quiz.stubs(:unlimited_attempts?).returns true
+      allow(subject.quiz).to receive(:unlimited_attempts?).and_return true
       expect(subject.retriable?).to be_truthy
     end
   end
@@ -1642,7 +1642,7 @@ describe Quizzes::QuizSubmission do
     it 'should generate a snapshot' do
       snapshot_data = { 'question_5_marked' => true }
 
-      Quizzes::QuizSubmissionSnapshot.expects(:create).with({
+      expect(Quizzes::QuizSubmissionSnapshot).to receive(:create).with({
         quiz_submission: subject,
         attempt: 1,
         data: snapshot_data.with_indifferent_access
@@ -1652,13 +1652,13 @@ describe Quizzes::QuizSubmission do
     end
 
     it 'should generate a full snapshot' do
-      subject.stubs(:submission_data).returns({
+      allow(subject).to receive(:submission_data).and_return({
         'question_5' => 100
       })
 
       snapshot_data = { 'question_5_marked' => true }
 
-      Quizzes::QuizSubmissionSnapshot.expects(:create).with({
+      expect(Quizzes::QuizSubmissionSnapshot).to receive(:create).with({
         quiz_submission: subject,
         attempt: 1,
         data: snapshot_data.merge(subject.submission_data).with_indifferent_access

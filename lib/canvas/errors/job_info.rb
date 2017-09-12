@@ -46,6 +46,7 @@ module Canvas
           handler: @job.handler,
           run_at: @job.run_at,
           max_attempts: @job.max_attempts,
+          shard_id: @job.current_shard&.id,
         }
       end
     end

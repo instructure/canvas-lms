@@ -60,10 +60,6 @@ describe "announcements" do
       stub_rcs_config
     end
 
-    after :each do
-      unstub_rcs_config
-    end
-
     it "should allow a group member to create an announcement", priority: "1", test_id: 220378 do
       gc = group_category
       group = gc.groups.create!(:context => @course)

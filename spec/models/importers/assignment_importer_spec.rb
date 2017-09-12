@@ -140,7 +140,7 @@ describe "Importing assignments" do
       "peer_reviews_due_at" => 1401947999000
     }
     migration = @course.content_migrations.create!
-    migration.stubs(:date_shift_options).returns(true)
+    allow(migration).to receive(:date_shift_options).and_return(true)
     expects_job_with_tag('Assignment#do_auto_peer_review', 0) {
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     }
@@ -148,7 +148,7 @@ describe "Importing assignments" do
 
   it "should include turnitin_settings" do
     course_model
-    @course.expects(:turnitin_enabled?).at_least(1).returns(true)
+    expect(@course).to receive(:turnitin_enabled?).at_least(1).and_return(true)
     migration = @course.content_migrations.create!
     nameless_assignment_hash = {
         "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
@@ -199,7 +199,7 @@ describe "Importing assignments" do
       "points_possible" => -42
     }
     migration = @course.content_migrations.create!
-    migration.stubs(:date_shift_options).returns(true)
+    allow(migration).to receive(:date_shift_options).and_return(true)
     Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     assignment = @course.assignments.where(migration_id: 'ib4834d160d180e2e91572e8b9e3b1bc6').first
     expect(assignment.points_possible).to eq 0

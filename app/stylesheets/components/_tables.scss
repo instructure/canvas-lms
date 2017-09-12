@@ -327,7 +327,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
           transition: border-color 0.3s;
           border: 4px solid transparent;
           border-top: none; border-bottom: none;
-          &:hover { border-color: $ic-brand-primary; }
+          &:hover { border-color: var(--ic-brand-primary); }
         }
       }
 

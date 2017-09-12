@@ -23,6 +23,7 @@ export function createGradebook (options = {}) {
     colors: {},
     context_id: '1',
     new_gradebook_development_enabled: true,
+    locale: 'en',
     post_grades_ltis: [],
     sections: [],
     settings: {

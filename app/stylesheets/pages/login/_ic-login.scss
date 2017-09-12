@@ -56,10 +56,10 @@ $ic-Login-confirmation-bgd: #34444f;
 }
 
 body.ic-Login-Body { // apply the background to the body element so that you don't see white bg as you scroll
-  background-color: $ic-brand-Login-body-bgd-color;
+  background-color: var(--ic-brand-Login-body-bgd-color);
   background-image:
-    linear-gradient(transparent, transparent 80%, $ic-brand-Login-body-bgd-shadow-color),
-    $ic-brand-Login-body-bgd-image; // if there is a custom image
+    linear-gradient(transparent, transparent 80%, var(--ic-brand-Login-body-bgd-shadow-color)),
+    var(--ic-brand-Login-body-bgd-image); // if there is a custom image
   background-size: cover;
   background-attachment: fixed;
   height: 100vh; // enable full height
@@ -75,39 +75,39 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__content {
   width: 400px;
   margin: 0 auto;
-  background: $ic-brand-Login-Content-bgd-color;
-  border: 5px solid $ic-brand-Login-Content-border-color;
+  background: var(--ic-brand-Login-Content-bgd-color);
+  border: 5px solid var(--ic-brand-Login-Content-border-color);
   padding: $ic-sp;
   border-radius: $ic-Login-border-radius;
 }
 .ic-Login__innerContent {
   padding-top: $ic-sp*2;
-  background: $ic-brand-Login-Content-inner-bgd;
-  border: 2px solid $ic-brand-Login-Content-inner-border;
+  background: var(--ic-brand-Login-Content-inner-bgd);
+  border: 2px solid var(--ic-brand-Login-Content-inner-border);
   border-radius: $ic-Login-border-radius;
 }
 .ic-Login__title {
-  color: $ic-brand-Login-Content-label-text-color;
+  color: var(--ic-brand-Login-Content-label-text-color);
 }
 .ic-Login__text {
-  color: $ic-brand-Login-Content-label-text-color;
+  color: var(--ic-brand-Login-Content-label-text-color);
 }
 //////////
 // Login Body
 //////////
 .ic-Login__body {
-  background: $ic-brand-Login-Content-inner-body-bgd;
-  border: 2px solid $ic-brand-Login-Content-inner-body-border;
+  background: var(--ic-brand-Login-Content-inner-body-bgd);
+  border: 2px solid var(--ic-brand-Login-Content-inner-body-border);
   padding: $ic-sp*1.5 $ic-sp*1.5 $ic-sp $ic-sp*1.5;
   margin-top: $ic-sp;
 }
 // these have !important because Canvas specificity on labels and
 // links will override these if we don't
 .ic-Form-control--login .ic-Label {
-  color: $ic-brand-Login-Content-label-text-color !important;
+  color: var(--ic-brand-Login-Content-label-text-color) !important;
 }
 .ic-Login__link {
-  color: $ic-brand-Login-Content-password-text-color !important;
+  color: var(--ic-brand-Login-Content-password-text-color) !important;
   text-decoration: underline;
 }
 .ic-Login__body__error {
@@ -159,7 +159,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   .ic-Login__actions-timeout {
     flex: 1;
     label {
-      color: $ic-brand-Login-Content-label-text-color;
+      color: var(--ic-brand-Login-Content-label-text-color);
     }
   }
   .ic-Login__actions--right {
@@ -178,23 +178,19 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   .Button--login {
     padding: $ic-sp/2 $ic-sp*3;
     background: transparent;
-    color: $ic-brand-Login-Content-password-text-color;
-    border: 1px solid $ic-brand-Login-Content-password-text-color;
+    color: var(--ic-brand-Login-Content-password-text-color);
+    border: 1px solid var(--ic-brand-Login-Content-password-text-color);
     overflow: visible;
-
-    &:hover {
-      background: rgba($ic-brand-Login-Content-password-text-color, 0.1);
-    }
 
     &::before {
       content: "";
       position: absolute;
-      top: -0.2857rem;
-      left: -0.2857rem;
-      right: -0.2857rem;
-      bottom: -0.2857rem;
-      border: 1px solid $ic-brand-Login-Content-password-text-color;
-      border-radius: 0.2857rem;
+      top: -0.375rem;
+      left: -0.375rem;
+      right: -0.375rem;
+      bottom: -0.375rem;
+      border: 1px solid var(--ic-brand-Login-Content-password-text-color);
+      border-radius: 0.375rem;
       opacity: 0;
     }
 
@@ -204,13 +200,28 @@ body.ic-Login-Body { // apply the background to the body element so that you don
         opacity: 1;
       }
     }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 0.175rem;
+    }
+
+    &:hover::after {
+      background: var(--ic-brand-Login-Content-password-text-color);
+      opacity: 0.1;
+    }
   }
 }
 //////////
 // Forgot Password
 //////////
 .ic-Login__forgot-text {
-  color: $ic-brand-Login-Content-password-text-color;
+  color: var(--ic-brand-Login-Content-password-text-color);
   @include fontSize($ic-font-size--small);
   padding: 0 0 $ic-sp*2 0;
   margin: 0;
@@ -242,7 +253,7 @@ body.ic-Login-Body #footer.ic-Login-footer {
     display: block;
     text-align: center;
     .ic-Instructure-Logo {
-      fill: $ic-brand-Login-instructure-logo;
+      fill: var(--ic-brand-Login-instructure-logo);
     }
   }
   // hide icon that gets added thru jquery
@@ -251,14 +262,14 @@ body.ic-Login-Body #footer.ic-Login-footer {
     padding: $ic-sp;
     text-align: center;
     a, .menu-item__text {
-      color: $ic-brand-Login-footer-link-color;
+      color: var(--ic-brand-Login-footer-link-color);
       @include fontSize(11px);
       padding: 0 $ic-sp/2;
       white-space: nowrap;
       text-decoration: underline;
       &:hover {
         background-color: none;
-        color: $ic-brand-Login-footer-link-color-hover;
+        color: var(--ic-brand-Login-footer-link-color-hover);
       }
     }
   }

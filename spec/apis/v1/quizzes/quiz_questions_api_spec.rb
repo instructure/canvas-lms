@@ -49,9 +49,9 @@ describe Quizzes::QuizQuestionsController, type: :request do
           })
         end
 
-        Quizzes::QuizQuestionsController.any_instance
-          .expects(:api_user_content)
-          .times(6)
+        expect_any_instance_of(Quizzes::QuizQuestionsController).
+          to receive(:api_user_content)
+          .exactly(6).times
 
         api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                  :controller => "quizzes/quiz_questions", :action => "index", :format => "json",

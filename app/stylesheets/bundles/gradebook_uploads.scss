@@ -78,8 +78,8 @@
   }
 
   .slick-cell.editable, .slick-cell.active {
-    box-shadow: 0 0 5px lighten($ic-brand-primary, 10);
-    border: 1px solid $ic-brand-primary;
+    box-shadow: 0 0 5px var(--ic-brand-primary-lightened-10);
+    border: 1px solid var(--ic-brand-primary);
   }
 
   .slick-cell:nth-child(odd) {

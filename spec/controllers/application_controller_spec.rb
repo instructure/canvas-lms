@@ -21,58 +21,58 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe ApplicationController do
 
   before :each do
-    controller.stubs(:request).returns(stub(:host_with_port => "www.example.com",
+    allow(controller).to receive(:request).and_return(double(:host_with_port => "www.example.com",
                                             :host => "www.example.com",
-                                            :headers => {}, :format => stub(:html? => true)))
+                                            :headers => {}, :format => double(:html? => true)))
   end
 
   describe "#google_drive_connection" do
     before :each do
-      settings_mock = mock()
-      settings_mock.stubs(:settings).returns({})
-      Canvas::Plugin.stubs(:find).returns(settings_mock)
+      settings_mock = double()
+      allow(settings_mock).to receive(:settings).and_return({})
+      allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
     end
 
     it "uses @real_current_user first" do
-      mock_real_current_user = mock()
-      mock_current_user = mock()
+      mock_real_current_user = double()
+      mock_current_user = double()
       controller.instance_variable_set(:@real_current_user, mock_real_current_user)
       controller.instance_variable_set(:@current_user, mock_current_user)
       session[:oauth_gdrive_refresh_token] = "session_token"
       session[:oauth_gdrive_access_token] = "sesion_secret"
 
-      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).returns(["real_current_user_token", "real_current_user_secret"])
+      expect(Rails.cache).to receive(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).and_return(["real_current_user_token", "real_current_user_secret"])
 
-      GoogleDrive::Connection.expects(:new).with("real_current_user_token", "real_current_user_secret", 30)
+      expect(GoogleDrive::Connection).to receive(:new).with("real_current_user_token", "real_current_user_secret", 30)
 
       controller.send(:google_drive_connection)
     end
 
     it "uses @current_user second" do
-      mock_current_user = mock()
+      mock_current_user = double()
       controller.instance_variable_set(:@real_current_user, nil)
       controller.instance_variable_set(:@current_user, mock_current_user)
       session[:oauth_gdrive_refresh_token] = "session_token"
       session[:oauth_gdrive_access_token] = "sesion_secret"
 
-      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).returns(["current_user_token", "current_user_secret"])
+      expect(Rails.cache).to receive(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).and_return(["current_user_token", "current_user_secret"])
 
-      GoogleDrive::Connection.expects(:new).with("current_user_token", "current_user_secret", 30)
+      expect(GoogleDrive::Connection).to receive(:new).with("current_user_token", "current_user_secret", 30)
       controller.send(:google_drive_connection)
     end
 
     it "queries user services if token isn't in the cache" do
-      mock_current_user = mock()
+      mock_current_user = double()
       controller.instance_variable_set(:@real_current_user, nil)
       controller.instance_variable_set(:@current_user, mock_current_user)
       session[:oauth_gdrive_refresh_token] = "session_token"
       session[:oauth_gdrive_access_token] = "sesion_secret"
 
-      mock_user_services = mock("mock_user_services")
-      mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:where).with(service: "google_drive").returns(stub(first: mock(token: "user_service_token", secret: "user_service_secret")))
+      mock_user_services = double("mock_user_services")
+      expect(mock_current_user).to receive(:user_services).and_return(mock_user_services)
+      expect(mock_user_services).to receive(:where).with(service: "google_drive").and_return(double(first: double(token: "user_service_token", secret: "user_service_secret")))
 
-      GoogleDrive::Connection.expects(:new).with("user_service_token", "user_service_secret", 30)
+      expect(GoogleDrive::Connection).to receive(:new).with("user_service_token", "user_service_secret", 30)
       controller.send(:google_drive_connection)
     end
 
@@ -82,7 +82,7 @@ describe ApplicationController do
       session[:oauth_gdrive_refresh_token] = "session_token"
       session[:oauth_gdrive_access_token] = "sesion_secret"
 
-      GoogleDrive::Connection.expects(:new).with("session_token", "sesion_secret", 30)
+      expect(GoogleDrive::Connection).to receive(:new).with("session_token", "sesion_secret", 30)
 
       controller.send(:google_drive_connection)
     end
@@ -90,11 +90,11 @@ describe ApplicationController do
 
   describe "js_env" do
     before do
-      controller.stubs(:api_request?).returns(false)
+      allow(controller).to receive(:api_request?).and_return(false)
     end
 
     it "should set items" do
-      HostUrl.expects(:file_host).with(Account.default, "www.example.com").returns("files.example.com")
+      expect(HostUrl).to receive(:file_host).with(Account.default, "www.example.com").and_return("files.example.com")
       controller.js_env :FOO => 'bar'
       expect(controller.js_env[:FOO]).to eq 'bar'
       expect(controller.js_env[:files_domain]).to eq 'files.example.com'
@@ -112,7 +112,7 @@ describe ApplicationController do
 
     it "sets the contextual timezone from the context" do
       Time.zone = "Mountain Time (US & Canada)"
-      controller.instance_variable_set(:@context, stub(time_zone: Time.zone, asset_string: "", class_name: nil))
+      controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
       controller.js_env({})
       expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq 'America/Denver'
     end
@@ -129,8 +129,8 @@ describe ApplicationController do
     end
 
     it 'gets appropriate settings from the root account' do
-      root_account = stub(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {})
-      HostUrl.stubs(file_host: 'files.example.com')
+      root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {})
+      allow(HostUrl).to receive_messages(file_host: 'files.example.com')
       controller.instance_variable_set(:@domain_root_account, root_account)
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
@@ -147,8 +147,8 @@ describe ApplicationController do
 
   describe "clean_return_to" do
     before do
-      req = stub('request obj', :protocol => 'https://', :host_with_port => 'canvas.example.com')
-      controller.stubs(:request).returns(req)
+      req = double('request obj', :protocol => 'https://', :host_with_port => 'canvas.example.com')
+      allow(controller).to receive(:request).and_return(req)
     end
 
     it "should build from a simple path" do
@@ -207,7 +207,7 @@ describe ApplicationController do
 
     before :each do
       # safe_domain_file_url wants to use request.protocol
-      controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
+      allow(controller).to receive(:request).and_return(double(:protocol => '', :host_with_port => ''))
 
       @common_params = {
         :user_id => nil,
@@ -218,10 +218,10 @@ describe ApplicationController do
     end
 
     it "should include inline=1 in url by default" do
-      controller.expects(:file_download_url).
+      expect(controller).to receive(:file_download_url).
         with(@attachment, @common_params.merge(:inline => 1)).
-        returns('')
-      HostUrl.expects(:file_host_with_shard).with(42, '').returns(['myfiles', Shard.default])
+        and_return('')
+      expect(HostUrl).to receive(:file_host_with_shard).with(42, '').and_return(['myfiles', Shard.default])
       controller.instance_variable_set(:@domain_root_account, 42)
       url = controller.send(:safe_domain_file_url, @attachment)
       expect(url).to match /myfiles/
@@ -229,22 +229,22 @@ describe ApplicationController do
 
     it "should include :download=>1 in inline urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
-      controller.stubs(:named_context_url).returns('')
+      allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment)
       expect(url).to match(/[\?&]download=1(&|$)/)
     end
 
     it "should not include :download=>1 in download urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
-      controller.stubs(:named_context_url).returns('')
+      allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment, nil, nil, true)
       expect(url).not_to match(/[\?&]download=1(&|$)/)
     end
 
     it "should include download_frd=1 and not include inline=1 in url when specified as for download" do
-      controller.expects(:file_download_url).
+      expect(controller).to receive(:file_download_url).
         with(@attachment, @common_params.merge(:download_frd => 1)).
-        returns('')
+        and_return('')
       controller.send(:safe_domain_file_url, @attachment, nil, nil, true)
     end
   end
@@ -258,9 +258,9 @@ describe ApplicationController do
       user_with_pseudonym
       @pseudonym.update_attribute(:sis_user_id, 'test1')
       controller.instance_variable_set(:@domain_root_account, Account.default)
-      controller.stubs(:named_context_url).with(@user, :context_url).returns('')
-      controller.stubs(:params).returns({:user_id => 'sis_user_id:test1'})
-      controller.stubs(:api_request?).returns(true)
+      allow(controller).to receive(:named_context_url).with(@user, :context_url).and_return('')
+      allow(controller).to receive(:params).and_return({:user_id => 'sis_user_id:test1'})
+      allow(controller).to receive(:api_request?).and_return(true)
       controller.send(:get_context)
       expect(controller.instance_variable_get(:@context)).to eq @user
     end
@@ -270,9 +270,9 @@ describe ApplicationController do
       @section = @course.course_sections.first
       @section.update_attribute(:sis_source_id, 'test1')
       controller.instance_variable_set(:@domain_root_account, Account.default)
-      controller.stubs(:named_context_url).with(@section, :context_url).returns('')
-      controller.stubs(:params).returns({:course_section_id => 'sis_section_id:test1'})
-      controller.stubs(:api_request?).returns(true)
+      allow(controller).to receive(:named_context_url).with(@section, :context_url).and_return('')
+      allow(controller).to receive(:params).and_return({:course_section_id => 'sis_section_id:test1'})
+      allow(controller).to receive(:api_request?).and_return(true)
       controller.send(:get_context)
       expect(controller.instance_variable_get(:@context)).to eq @section
     end
@@ -286,21 +286,21 @@ describe ApplicationController do
       acct.default_locale = "es"
       acct.save!
       controller.instance_variable_set(:@domain_root_account, acct)
-      req = mock()
+      req = double()
 
-      req.stubs(:host).returns('www.example.com')
-      req.stubs(:headers).returns({})
-      req.stubs(:format).returns(stub(:html? => true))
-      controller.stubs(:request).returns(req)
+      allow(req).to receive(:host).and_return('www.example.com')
+      allow(req).to receive(:headers).and_return({})
+      allow(req).to receive(:format).and_return(double(:html? => true))
+      allow(controller).to receive(:request).and_return(req)
       controller.send(:assign_localizer)
       I18n.set_locale_with_localizer # this is what t() triggers
       expect(I18n.locale.to_s).to eq "es"
       course_model(:locale => "ru")
-      controller.stubs(:named_context_url).with(@course, :context_url).returns('')
-      controller.stubs(:params).returns({:course_id => @course.id})
-      controller.stubs(:api_request?).returns(false)
-      controller.stubs(:session).returns({})
-      controller.stubs(:js_env).returns({})
+      allow(controller).to receive(:named_context_url).with(@course, :context_url).and_return('')
+      allow(controller).to receive(:params).and_return({:course_id => @course.id})
+      allow(controller).to receive(:api_request?).and_return(false)
+      allow(controller).to receive(:session).and_return({})
+      allow(controller).to receive(:js_env).and_return({})
       controller.send(:get_context)
       expect(controller.instance_variable_get(:@context)).to eq @course
       I18n.set_locale_with_localizer # this is what t() triggers
@@ -338,24 +338,24 @@ describe ApplicationController do
 
       it 'should log error reports to the domain_root_accounts shard' do
         report = ErrorReport.new
-        ErrorReport.stubs(:log_exception).returns(report)
-        ErrorReport.stubs(:find).returns(report)
-        Canvas::Errors::Info.stubs(:useful_http_env_stuff_from_request).returns({})
+        allow(ErrorReport).to receive(:log_exception).and_return(report)
+        allow(ErrorReport).to receive(:find).and_return(report)
+        allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request).and_return({})
 
-        req = mock()
-        req.stubs(:url).returns('url')
-        req.stubs(:headers).returns({})
-        req.stubs(:authorization).returns(nil)
-        req.stubs(:request_method_symbol).returns(:get)
-        req.stubs(:format).returns('format')
+        req = double()
+        allow(req).to receive(:url).and_return('url')
+        allow(req).to receive(:headers).and_return({})
+        allow(req).to receive(:authorization).and_return(nil)
+        allow(req).to receive(:request_method_symbol).and_return(:get)
+        allow(req).to receive(:format).and_return('format')
 
-        controller.stubs(:request).returns(req)
-        controller.stubs(:api_request?).returns(false)
-        controller.stubs(:render_rescue_action)
+        allow(controller).to receive(:request).and_return(req)
+        allow(controller).to receive(:api_request?).and_return(false)
+        allow(controller).to receive(:render_rescue_action)
 
         controller.instance_variable_set(:@domain_root_account, @account)
 
-        @shard2.expects(:activate)
+        expect(@shard2).to receive(:activate)
 
         controller.send(:rescue_action_in_public, Exception.new)
       end
@@ -365,66 +365,66 @@ describe ApplicationController do
   describe 'content_tag_redirect' do
 
     it 'redirects for lti_message_handler' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Lti::MessageHandler')
-      controller.expects(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {:module_item_id => 42, resource_link_fragment: 'ContentTag:42'}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Lti::MessageHandler')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {:module_item_id => 42, resource_link_fragment: 'ContentTag:42'}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for an assignment' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Assignment')
-      controller.expects(:named_context_url).with(Account.default, :context_assignment_url, 44, {:module_item_id => 42}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Assignment')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {:module_item_id => 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a quiz' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: true, content_type: 'Quizzes::Quiz')
-      controller.expects(:named_context_url).with(Account.default, :context_quiz_url, 44, {:module_item_id => 42}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: true, content_type: 'Quizzes::Quiz')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_quiz_url, 44, {:module_item_id => 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a discussion topic' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'DiscussionTopic')
-      controller.expects(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, {:module_item_id => 42}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'DiscussionTopic')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, {:module_item_id => 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a wikipage' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'WikiPage', content: {})
-      controller.expects(:polymorphic_url).with([Account.default, tag.content], {:module_item_id => 42}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'WikiPage', content: {})
+      expect(controller).to receive(:polymorphic_url).with([Account.default, tag.content], {:module_item_id => 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a rubric' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Rubric')
-      controller.expects(:named_context_url).with(Account.default, :context_rubric_url, 44, {:module_item_id => 42}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Rubric')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_rubric_url, 44, {:module_item_id => 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a question bank' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'AssessmentQuestionBank')
-      controller.expects(:named_context_url).with(Account.default, :context_question_bank_url, 44, {:module_item_id => 42}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'AssessmentQuestionBank')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_question_bank_url, 44, {:module_item_id => 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for an attachment' do
-      tag = mock()
-      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Attachment')
-      controller.expects(:named_context_url).with(Account.default, :context_file_url, 44, {:module_item_id => 42}).returns('nil')
-      controller.stubs(:redirect_to)
+      tag = double()
+      allow(tag).to receive_messages(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Attachment')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_file_url, 44, {:module_item_id => 42}).and_return('nil')
+      allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
@@ -454,30 +454,30 @@ describe ApplicationController do
       let(:content_tag) { ContentTag.create(content: tool, url: tool.url)}
 
       it 'returns the full path for the redirect url' do
-        controller.expects(:named_context_url).with(course, :context_url, {:include_host => true})
-        controller.expects(:named_context_url).with(course, :context_external_content_success_url, 'external_tool_redirect', {:include_host => true}).returns('wrong_url')
-        controller.stubs(:render)
-        controller.stubs(js_env:[])
+        expect(controller).to receive(:named_context_url).with(course, :context_url, {:include_host => true})
+        expect(controller).to receive(:named_context_url).with(course, :context_external_content_success_url, 'external_tool_redirect', {:include_host => true}).and_return('wrong_url')
+        allow(controller).to receive(:render)
+        allow(controller).to receive_messages(js_env:[])
         controller.instance_variable_set(:"@context", course)
         controller.send(:content_tag_redirect, course, content_tag, nil)
       end
 
       it 'sets the resource_link_id correctly' do
-        controller.stubs(:named_context_url).returns('wrong_url')
-        controller.stubs(:render)
-        controller.stubs(js_env:[])
+        allow(controller).to receive(:named_context_url).and_return('wrong_url')
+        allow(controller).to receive(:render)
+        allow(controller).to receive_messages(js_env:[])
         controller.instance_variable_set(:"@context", course)
-        content_tag.stubs(:id).returns(42)
+        allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
       end
 
       it 'uses selection_width and selection_height if provided' do
-        controller.stubs(:named_context_url).returns(tool.url)
-        controller.stubs(:render)
-        controller.stubs(js_env:[])
+        allow(controller).to receive(:named_context_url).and_return(tool.url)
+        allow(controller).to receive(:render)
+        allow(controller).to receive_messages(js_env:[])
         controller.instance_variable_set(:"@context", course)
-        content_tag.stubs(:id).returns(42)
+        allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
 
         expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '500px'
@@ -489,11 +489,11 @@ describe ApplicationController do
         tool.save!
         content_tag = ContentTag.create(content: tool, url: tool.url)
 
-        controller.stubs(:named_context_url).returns(tool.url)
-        controller.stubs(:render)
-        controller.stubs(js_env:[])
+        allow(controller).to receive(:named_context_url).and_return(tool.url)
+        allow(controller).to receive(:render)
+        allow(controller).to receive_messages(js_env:[])
         controller.instance_variable_set(:"@context", course)
-        content_tag.stubs(:id).returns(42)
+        allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
 
         expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '100%'
@@ -511,7 +511,7 @@ describe ApplicationController do
       tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
       tool.save!
 
-      controller.stubs(:polymorphic_url).returns("http://example.com")
+      allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @group)
 
       expect(external_tools).to eq([])
@@ -523,7 +523,7 @@ describe ApplicationController do
       tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true, :canvas_icon_class => 'icon-commons'}
       tool.save!
 
-      controller.stubs(:polymorphic_url).returns("http://example.com")
+      allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
 
       expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
@@ -562,7 +562,7 @@ describe ApplicationController do
     end
 
     before :each do
-      controller.stubs(:request).returns(ActionDispatch::TestRequest.create)
+      allow(controller).to receive(:request).and_return(ActionDispatch::TestRequest.create)
       controller.instance_variable_set(:@context, @course)
     end
 
@@ -599,16 +599,17 @@ describe ApplicationController do
       # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
       cookies = ActionDispatch::Cookies::CookieJar.new(nil)
       controller.allow_forgery_protection = true
-      controller.request.stubs(:cookie_jar).returns(cookies)
-      controller.request.stubs(:get?).returns(false)
-      controller.request.stubs(:head?).returns(false)
-      controller.request.stubs(:path).returns('/non-api/endpoint')
+      allow(controller.request).to receive(:cookie_jar).and_return(cookies)
+      allow(controller.request).to receive(:get?).and_return(false)
+      allow(controller.request).to receive(:head?).and_return(false)
+      allow(controller.request).to receive(:path).and_return('/non-api/endpoint')
       controller.instance_variable_set(:@pseudonym_session, "session-authenticated")
       controller.params[controller.request_forgery_protection_token] = "bogus"
       controller.request.headers['X-CSRF-Token'] = "bogus"
     end
 
     it "should raise InvalidAuthenticityToken with invalid tokens" do
+      allow(controller).to receive(:valid_request_origin?).and_return(true)
       expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 
@@ -618,12 +619,13 @@ describe ApplicationController do
     end
 
     it "should still raise on session-authenticated api request with invalid tokens" do
-      controller.request.stubs(:path).returns('/api/endpoint')
+      allow(controller.request).to receive(:path).and_return('/api/endpoint')
+      allow(controller).to receive(:valid_request_origin?).and_return(true)
       expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 
     it "should not raise on token-authenticated api request despite invalid tokens" do
-      controller.request.stubs(:path).returns('/api/endpoint')
+      allow(controller.request).to receive(:path).and_return('/api/endpoint')
       controller.instance_variable_set(:@pseudonym_session, nil)
       expect{ controller.send(:verify_authenticity_token) }.not_to raise_exception
     end
@@ -678,7 +680,7 @@ describe ApplicationController do
       user_factory
       controller.instance_variable_set(:@context, @user)
 
-      Course.expects(:where).never
+      expect(Course).to receive(:where).never
       controller.send(:get_all_pertinent_contexts, only_contexts: 'Group_1')
     end
 
@@ -686,7 +688,7 @@ describe ApplicationController do
       user_factory
       controller.instance_variable_set(:@context, @user)
 
-      @user.expects(:current_groups).never
+      expect(@user).to receive(:current_groups).never
       controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
     end
 
@@ -719,7 +721,7 @@ describe ApplicationController do
     end
 
     it 'sets flash discard if request is xhr' do
-      controller.request.stubs(xhr?: true)
+      allow(controller.request).to receive_messages(xhr?: true)
 
       expect(discard).to be_empty, 'precondition'
       controller.send(:discard_flash_if_xhr)
@@ -727,7 +729,7 @@ describe ApplicationController do
     end
 
     it 'sets flash discard if request format is text/plain' do
-      controller.request.stubs(xhr?: false, format: 'text/plain')
+      allow(controller.request).to receive_messages(xhr?: false, format: 'text/plain')
 
       expect(discard).to be_empty, 'precondition'
       controller.send(:discard_flash_if_xhr)
@@ -735,7 +737,7 @@ describe ApplicationController do
     end
 
     it 'leaves flash as is if conditions are not met' do
-      controller.request.stubs(xhr?: false, format: 'text/html')
+      allow(controller.request).to receive_messages(xhr?: false, format: 'text/html')
 
       expect(discard).to be_empty, 'precondition'
       controller.send(:discard_flash_if_xhr)
@@ -759,7 +761,7 @@ describe ApplicationController do
     it 'stringifies the non-strings in the context attributes' do
       current_user_attributes = { global_id: 12345 }
 
-      current_user = stub(current_user_attributes)
+      current_user = double(current_user_attributes)
       controller.instance_variable_set(:@current_user, current_user)
       controller.send(:setup_live_events_context)
       expect(LiveEvents.get_context).to eq({user_id: '12345'}.merge(non_conditional_values))
@@ -783,7 +785,7 @@ describe ApplicationController do
       end
 
       it 'adds root account values to the LiveEvent context' do
-        root_account = stub(root_account_attributes)
+        root_account = double(root_account_attributes)
         controller.instance_variable_set(:@domain_root_account, root_account)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -804,7 +806,7 @@ describe ApplicationController do
       end
 
       it 'sets the correct attributes on the LiveEvent context' do
-        current_user = stub(current_user_attributes)
+        current_user = double(current_user_attributes)
         controller.instance_variable_set(:@current_user, current_user)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -825,7 +827,7 @@ describe ApplicationController do
       end
 
       it 'sets the correct attributes on the LiveEvent context' do
-        real_current_user = stub(real_current_user_attributes)
+        real_current_user = double(real_current_user_attributes)
         controller.instance_variable_set(:@real_current_user, real_current_user)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -850,7 +852,7 @@ describe ApplicationController do
       end
 
       it 'sets the correct attributes on the LiveEvent context' do
-        current_pseudonym = stub(current_pseudonym_attributes)
+        current_pseudonym = double(current_pseudonym_attributes)
         controller.instance_variable_set(:@current_pseudonym, current_pseudonym)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -873,7 +875,7 @@ describe ApplicationController do
       end
 
       it 'sets the correct attributes on the LiveEvent context' do
-        canvas_context = stub(canvas_context_attributes)
+        canvas_context = double(canvas_context_attributes)
         controller.instance_variable_set(:@context, canvas_context)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
@@ -883,8 +885,8 @@ describe ApplicationController do
     context 'when a context_membership exists' do
       context 'when the context has a role' do
         it 'sets the correct attributes on the LiveEvent context' do
-          stubbed_role = stub({ name: 'name' })
-          context_membership = stub({role: stubbed_role})
+          stubbed_role = double({ name: 'name' })
+          context_membership = double({role: stubbed_role})
 
           controller.instance_variable_set(:@context_membership, context_membership)
           controller.send(:setup_live_events_context)
@@ -894,7 +896,7 @@ describe ApplicationController do
 
       context 'when the context has a type' do
         it 'sets the correct attributes on the LiveEvent context' do
-          context_membership = stub({ type: 'type' })
+          context_membership = double({ type: 'type' })
 
           controller.instance_variable_set(:@context_membership, context_membership)
           controller.send(:setup_live_events_context)
@@ -904,7 +906,7 @@ describe ApplicationController do
 
       context 'when the context has neither a role or type' do
         it 'sets the correct attributes on the LiveEvent context' do
-          context_membership = stub({ class: Class })
+          context_membership = double({ class: Class })
 
           controller.instance_variable_set(:@context_membership, context_membership)
           controller.send(:setup_live_events_context)
@@ -940,12 +942,12 @@ end
 describe WikiPagesController do
   describe "set_js_rights" do
     it "should populate js_env with policy rights" do
-      controller.stubs(:default_url_options).returns({})
+      allow(controller).to receive(:default_url_options).and_return({})
 
       course_with_teacher_logged_in :active_all => true
       controller.instance_variable_set(:@context, @course)
 
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
       expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
@@ -966,13 +968,13 @@ describe CoursesController do
 
     it "should populate js_env with course_home setting" do
       controller.instance_variable_set(:@context, @course)
-      get 'show', id: @course.id
+      get 'show', params: {id: @course.id}
       expect(controller.js_env).to include(:COURSE_HOME)
     end
 
     it "should populate js_env with setting for show_announcements flag" do
       controller.instance_variable_set(:@context, @course)
-      get 'show', id: @course.id
+      get 'show', params: {id: @course.id}
       expect(controller.js_env).to include(:SHOW_ANNOUNCEMENTS, :ANNOUNCEMENT_LIMIT)
       expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
       expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(5)

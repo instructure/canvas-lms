@@ -96,6 +96,50 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  describe 'callbacks' do
+    describe 'apply_late_policy' do
+      it 'invokes the LatePolicyApplicator for this assignment if grading type changes but due dates do not' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
+        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
+
+        assignment.save!
+      end
+
+      it 'invokes the LatePolicyApplicator only once if grading type changes and due dates also change' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
+        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
+
+        assignment.save!
+      end
+
+      it 'does not invoke the LatePolicyApplicator if neither grading type nor due dates change' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
+        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        expect(LatePolicyApplicator).not_to receive(:for_assignment).with(assignment)
+
+        assignment.save!
+      end
+
+      it 'invokes the LatePolicyApplicator only once if grading type does not change but due dates change' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
+        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
+
+        assignment.save!
+      end
+    end
+  end
+
   describe "default values for boolean attributes" do
     before(:once) do
       @assignment = @course.assignments.create!
@@ -211,6 +255,33 @@ describe Assignment do
     end
   end
 
+  describe "scope: expects_submissions" do
+    it 'includes assignments expecting online submissions' do
+      assignment_model(submission_types: "online_text_entry,online_url,online_upload", course: @course)
+      expect(Assignment.submittable).not_to be_empty
+    end
+
+    it 'excludes submissions for assignments expecting on_paper submissions' do
+      assignment_model(submission_types: "on_paper", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+
+    it 'excludes submissions for assignments expecting external_tool submissions' do
+      assignment_model(submission_types: "external_tool", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+
+    it 'excludes submissions for assignments expecting wiki_page submissions' do
+      assignment_model(submission_types: "wiki_page", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+
+    it 'excludes submissions for assignments not expecting submissions' do
+      assignment_model(submission_types: "none", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+  end
+
   describe '#tool_settings_resource_codes' do
     let(:expected_hash) do
       {
@@ -289,6 +360,7 @@ describe Assignment do
     assignment.attachments.push(Attachment.new)
     assignment.submissions.push(Submission.new)
     assignment.ignores.push(Ignore.new)
+    assignment.turnitin_asset_string
     new_assignment = assignment.duplicate
     expect(new_assignment.id).to be_nil
     expect(new_assignment.new_record?).to be true
@@ -592,7 +664,7 @@ describe Assignment do
 
     context 'with a submission that cannot be graded' do
       before :each do
-        Submission.any_instance.stubs(:grader_can_grade?).returns(false)
+        allow_any_instance_of(Submission).to receive(:grader_can_grade?).and_return(false)
       end
 
       it 'raises a GradeError when Submission#grader_can_grade? returns false' do
@@ -779,7 +851,7 @@ describe Assignment do
     @submission = @assignment.submissions.first
     original_graded_at = @submission.graded_at
     new_time = Time.zone.now + 1.hour
-    Time.stubs(:now).returns(new_time)
+    allow(Time).to receive(:now).and_return(new_time)
     @assignment.grade_student(@user, grade: 2, grader: @teacher)
     @submission.reload
     expect(@submission.graded_at).not_to eql original_graded_at
@@ -875,9 +947,9 @@ describe Assignment do
     end
 
     it "should delegate to NeedsGradingCountQuery" do
-      query = mock('Assignments::NeedsGradingCountQuery')
-      query.expects(:manual_count)
-      Assignments::NeedsGradingCountQuery.expects(:new).with(@assignment).returns(query)
+      query = double('Assignments::NeedsGradingCountQuery')
+      expect(query).to receive(:manual_count)
+      expect(Assignments::NeedsGradingCountQuery).to receive(:new).with(@assignment).and_return(query)
       @assignment.needs_grading_count
     end
 
@@ -1533,8 +1605,8 @@ describe Assignment do
       real_sub = @assignment.submissions.build(user: @user)
 
       mock_submissions = Submission.none
-      mock_submissions.stubs(:build).returns(real_sub).once
-      @assignment.stubs(:submissions).returns(mock_submissions)
+      allow(mock_submissions).to receive(:build).and_return(real_sub).once
+      allow(@assignment).to receive(:submissions).and_return(mock_submissions)
 
       sub = nil
       expect {
@@ -1890,12 +1962,12 @@ describe Assignment do
     context "to delete" do
       context "when there are no grading periods" do
         it "is true for admins" do
-          @course.stubs(:grading_periods?).returns false
+          allow(@course).to receive(:grading_periods?).and_return false
           expect(@assignment.reload.grants_right?(@admin, :delete)).to be true
         end
 
         it "is false for teachers" do
-          @course.stubs(:grading_periods?).returns false
+          allow(@course).to receive(:grading_periods?).and_return false
           expect(@assignment.reload.grants_right?(@teacher, :delete)).to be true
         end
       end
@@ -2720,7 +2792,7 @@ describe Assignment do
         end
 
         it "preload user roles for much fasterness" do
-          @assignment.context.expects(:preloaded_user_has_been?).at_least_once
+          expect(@assignment.context).to receive(:preloaded_user_has_been?).at_least(:once)
 
           @assignment.do_notifications!
         end
@@ -2811,10 +2883,9 @@ describe Assignment do
 
         it "should send a late submission notification iff the submit date is late for the submitter" do
           fake_submission_time = Time.parse "Jan 01 17:00:00 -0900 2011"
-          Time.stubs(:now).returns(fake_submission_time)
+          allow(Time).to receive(:now).and_return(fake_submission_time)
           subA = @assignment.submit_homework @studentA, :submission_type => "online_text_entry", :body => "ooga"
           subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "booga"
-          Time.unstub(:now)
 
           expect(subA.messages_sent["Assignment Submitted Late"]).not_to be_nil
           expect(subB.messages_sent["Assignment Submitted Late"]).to be_nil
@@ -2837,10 +2908,9 @@ describe Assignment do
           override.override_due_at(Time.parse("Jan 03 17:00:00 -0900 2011"))
           override.save!
           fake_submission_time = Time.parse("Jan 02 17:00:00 -0900 2011")
-          Time.stubs(:now).returns(fake_submission_time)
+          allow(Time).to receive(:now).and_return(fake_submission_time)
           subA = @assignment.submit_homework @studentA, :submission_type => "online_text_entry", :body => "eenie"
           subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "meenie"
-          Time.unstub(:now)
 
           expect(subA.messages_sent["Group Assignment Submitted Late"]).not_to be_nil
           expect(subB.messages_sent["Group Assignment Submitted Late"]).to be_nil
@@ -3299,7 +3369,7 @@ describe Assignment do
     end
 
     def stub_plugin
-      PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
+      allow(PluginSetting).to receive(:settings_for_plugin).and_return(@att_map)
     end
 
     it "should not be frozen if not copied" do
@@ -3523,7 +3593,7 @@ describe Assignment do
     end
 
     it 'refreshes the course participation counts' do
-      Progress.any_instance.expects(:process_job)
+      expect_any_instance_of(Progress).to receive(:process_job)
         .with(@assignment.context, :refresh_content_participation_counts,
               singleton: "refresh_content_participation_counts:#{@assignment.context.global_id}")
       @assignment.destroy
@@ -3739,29 +3809,29 @@ describe Assignment do
 
     it "triggers when assignment is created" do
       new_assignment = @course.assignments.build
-      DueDateCacher.expects(:recompute).with(new_assignment)
+      expect(DueDateCacher).to receive(:recompute).with(new_assignment)
       new_assignment.save
     end
 
     it "triggers when due_at changes" do
-      DueDateCacher.expects(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment)
       @assignment.due_at = 1.week.from_now
       @assignment.save
     end
 
     it "triggers when due_at changes to nil" do
-      DueDateCacher.expects(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment)
       @assignment.due_at = nil
       @assignment.save
     end
 
     it "triggers when assignment deleted" do
-      DueDateCacher.expects(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment)
       @assignment.destroy
     end
 
     it "does not trigger when nothing changed" do
-      DueDateCacher.expects(:recompute).never
+      expect(DueDateCacher).to receive(:recompute).never
       @assignment.save
     end
   end
@@ -3812,12 +3882,12 @@ describe Assignment do
     end
 
     it "is valid when due_date_ok? is true" do
-      AssignmentUtil.stubs(:due_date_ok?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_ok?).and_return(true)
       expect(assignment.valid?).to eq(true)
     end
 
     it "is not valid when due_date_ok? is false" do
-      AssignmentUtil.stubs(:due_date_ok?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_ok?).and_return(false)
       expect(assignment.valid?).to eq(false)
     end
   end
@@ -3842,12 +3912,12 @@ describe Assignment do
       end
 
       it "is not valid when AssignmentUtil.due_date_required? is true" do
-        AssignmentUtil.stubs(:due_date_required?).returns(true)
+        allow(AssignmentUtil).to receive(:due_date_required?).and_return(true)
         expect(assignment.valid?).to eq(false)
       end
 
       it "is valid when AssignmentUtil.due_date_required? is false" do
-        AssignmentUtil.stubs(:due_date_required?).returns(false)
+        allow(AssignmentUtil).to receive(:due_date_required?).and_return(false)
         expect(assignment.valid?).to eq(true)
       end
     end
@@ -3859,13 +3929,13 @@ describe Assignment do
         create_section_override_for_assignment(assignment, course_section: section_2)
       end
 
-      it "is valid when AssignmentUtil.due_date_required? is true and " do
-        AssignmentUtil.stubs(:due_date_required?).returns(true)
+      it "is valid when AssignmentUtil.due_date_required? is true" do
+        allow(AssignmentUtil).to receive(:due_date_required?).and_return(true)
         expect(assignment.valid?).to eq(true)
       end
 
       it "is valid when AssignmentUtil.due_date_required? is false" do
-        AssignmentUtil.stubs(:due_date_required?).returns(false)
+        allow(AssignmentUtil).to receive(:due_date_required?).and_return(false)
         expect(assignment.valid?).to eq(true)
       end
     end
@@ -3877,12 +3947,12 @@ describe Assignment do
     end
 
     it "is true when due_date_required? is true" do
-      AssignmentUtil.stubs(:due_date_required?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required?).and_return(true)
       expect(assignment.due_date_required?).to eq(true)
     end
 
     it "is false when due_date_required? is false" do
-      AssignmentUtil.stubs(:due_date_required?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required?).and_return(false)
       expect(assignment.due_date_required?).to eq(false)
     end
   end
@@ -4010,7 +4080,7 @@ describe Assignment do
     it 'refreshes the course participation counts' do
       assignment = assignment_model(course: @course)
       assignment.destroy
-      Progress.any_instance.expects(:process_job)
+      expect_any_instance_of(Progress).to receive(:process_job)
         .with(assignment.context, :refresh_content_participation_counts,
               singleton: "refresh_content_participation_counts:#{assignment.context.global_id}").
           once
@@ -4031,7 +4101,7 @@ describe Assignment do
     end
 
     it 'should not update grades when due_at changes' do
-      @assignment.context.expects(:recompute_student_scores).never
+      expect(@assignment.context).to receive(:recompute_student_scores).never
       @assignment.due_at = 6.months.ago
       @assignment.save!
     end
@@ -4057,7 +4127,7 @@ describe Assignment do
     end
 
     it 'should update grades when due_at changes to a grading period' do
-      @assignment.context.expects(:recompute_student_scores).twice
+      expect(@assignment.context).to receive(:recompute_student_scores).twice
       @assignment.due_at = 6.months.ago
       @assignment.save!
     end
@@ -4065,7 +4135,7 @@ describe Assignment do
     it 'should update grades twice when due_at changes to another grading period' do
       @assignment.due_at = 1.month.ago
       @assignment.save!
-      @assignment.context.expects(:recompute_student_scores).twice
+      expect(@assignment.context).to receive(:recompute_student_scores).twice
       @assignment.due_at = 6.months.ago
       @assignment.save!
     end
@@ -4073,7 +4143,7 @@ describe Assignment do
     it 'should not update grades if grading period did not change' do
       @assignment.due_at = 1.month.ago
       @assignment.save!
-      @assignment.context.expects(:recompute_student_scores).never
+      expect(@assignment.context).to receive(:recompute_student_scores).never
       @assignment.due_at = 2.months.ago
       @assignment.save!
     end
@@ -4088,34 +4158,34 @@ describe Assignment do
     end
 
     it "should update grades if points_possible changes" do
-      @assignment.context.expects(:recompute_student_scores).once
+      expect(@assignment.context).to receive(:recompute_student_scores).once
       @assignment.points_possible = 3
       @assignment.save!
     end
 
     it "should update grades if muted changes" do
-      @assignment.context.expects(:recompute_student_scores).once
+      expect(@assignment.context).to receive(:recompute_student_scores).once
       @assignment.muted = true
       @assignment.save!
     end
 
     it "should update grades if workflow_state changes" do
-      @assignment.context.expects(:recompute_student_scores).once
+      expect(@assignment.context).to receive(:recompute_student_scores).once
       @assignment.unpublish
     end
 
     it "updates when omit_from_final_grade changes" do
-      @assignment.context.expects(:recompute_student_scores).once
+      expect(@assignment.context).to receive(:recompute_student_scores).once
       @assignment.update_attribute :omit_from_final_grade, true
     end
 
     it "updates when grading_type changes" do
-      @assignment.context.expects(:recompute_student_scores).once
+      expect(@assignment.context).to receive(:recompute_student_scores).once
       @assignment.update_attribute :grading_type, "percent"
     end
 
     it "should not update grades otherwise" do
-      @assignment.context.expects(:recompute_student_scores).never
+      expect(@assignment.context).to receive(:recompute_student_scores).never
       @assignment.title = 'hi'
       @assignment.due_at = 1.hour.ago
       @assignment.description = 'blah'
@@ -4250,7 +4320,7 @@ describe Assignment do
 
       it "does not attempt validation unless points_possible has changed" do
         assignment = Assignment.new(points_possible: -13)
-        assignment.stubs(:points_possible_changed?).returns(false)
+        allow(assignment).to receive(:points_possible_changed?).and_return(false)
         assignment.valid?
         expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
@@ -4316,6 +4386,38 @@ describe Assignment do
     end
   end
 
+  describe "validate_overrides_for_sis" do
+    def api_create_assignment_in_course(course,assignment_params)
+      api_call(:post,
+               "/api/v1/courses/#{course.id}/assignments.json",
+               {
+                 :controller => 'assignments_api',
+                 :action => 'create',
+                 :format => 'json',
+                 :course_id => course.id.to_s
+               }, {:assignment => assignment_params })
+    end
+
+    let(:assignment) do
+      @course.assignments.new(assignment_valid_attributes)
+    end
+
+    before do
+      assignment.post_to_sis = true
+      allow(assignment.context.account).to receive(:sis_syncing).and_return({value: true})
+      allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(true)
+      allow(assignment.context.account).to receive(:sis_require_assignment_due_date).and_return({value: true})
+    end
+
+    it "raises an invalid record error if overrides are invalid" do
+      overrides = [{
+          'course_section_id' => @course.default_section.id,
+          'due_at' => nil
+      }]
+      expect{assignment.validate_overrides_for_sis(overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   describe "max_name_length" do
     let(:assignment) do
       @course.assignments.new(assignment_valid_attributes)
@@ -4323,10 +4425,10 @@ describe Assignment do
 
     it "returns custom name length if sis_assignment_name_length_input is present" do
       assignment.post_to_sis = true
-      assignment.context.account.stubs(:sis_syncing).returns({value: true})
-      assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
-      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
-      assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
+      allow(assignment.context.account).to receive(:sis_syncing).and_return({value: true})
+      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({value: true})
+      allow(assignment.context.account).to receive(:feature_enabled?).with('new_sis_integrations').and_return(true)
+      allow(assignment.context.account).to receive(:sis_assignment_name_length_input).and_return({value: 15})
       expect(assignment.max_name_length).to eq(15)
     end
 
@@ -4491,7 +4593,7 @@ describe Assignment do
       it "for graded submissions" do
         @assignment.grade_student(@student, grade: 10, grader: @teacher)
         @called = false
-        Submission.any_instance.stubs(:assignment_muted_changed).with() do
+        allow_any_instance_of(Submission).to receive(:assignment_muted_changed) do
           @called = true
           expect(self.submission_model).to eq @submission
         end
@@ -4501,7 +4603,7 @@ describe Assignment do
       end
 
       it "does not dispatch update for ungraded submissions" do
-        Submission.any_instance.expects(:assignment_muted_changed).never
+        expect_any_instance_of(Submission).to receive(:assignment_muted_changed).never
         @assignment.unmute!
       end
     end
@@ -4512,9 +4614,9 @@ describe Assignment do
 
     it "doesn't reference multiple shards when accessed from a different shard" do
       @assignment = @course.assignments.create! points_possible: 10
-      Assignment.connection.stubs(:use_qualified_names?).returns(true)
+      allow(Assignment.connection).to receive(:use_qualified_names?).and_return(true)
       @shard1.activate do
-        Assignment.connection.stubs(:use_qualified_names?).returns(true)
+        allow(Assignment.connection).to receive(:use_qualified_names?).and_return(true)
         sql = @course.assignments.with_student_submission_count.to_sql
         expect(sql).to be_include(Shard.default.name)
         expect(sql).not_to be_include(@shard1.name)

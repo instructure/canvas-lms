@@ -117,7 +117,7 @@
 
 .react-select-box-clear:hover:before,
 .react-select-box-clear:focus:before {
-  background-color: $ic-brand-primary;
+  background-color: var(--ic-brand-primary);
 }
 
 .react-select-box-hidden {
@@ -153,7 +153,7 @@
 
 .react-select-box-option:hover {
   color: $ic-font-color-light;
-  background-color: $ic-brand-primary;
+  background-color: var(--ic-brand-primary);
   text-decoration: none;
 }
 
@@ -195,11 +195,11 @@
 .react-select-box-option-focused {
   color: $ic-font-color-light;
   outline: 0;
-  background-color: $ic-brand-primary;
+  background-color: var(--ic-brand-primary);
 }
 
 .react-select-box-close {
-  color: $ic-brand-primary;
+  color: var(--ic-brand-primary);
   text-transform: uppercase;
   background-color: transparent;
   border: none;

@@ -570,4 +570,71 @@ describe SIS::CSV::CourseImporter do
     )
     expect(importer.warnings.map(&:last)).to include "Invalid course_format \"FAT32\" for course test_1"
   end
+
+  context "blueprint courses" do
+    before :once do
+      account_model
+      @mc = @account.courses.create!(:sis_source_id => "blahprint")
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@mc)
+    end
+
+    it "should give a warning when trying to associate an existing blueprint course" do
+      mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
+      template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
+      importer = process_csv_data(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{mc2.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
+      )
+      expect(importer.warnings.map(&:last)).to include("Cannot associate course \"#{mc2.sis_source_id}\" - is a blueprint course")
+    end
+
+    it "should give a warning when trying to associate an already associated course" do
+      mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
+      template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
+      ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
+      template2.add_child_course!(ac)
+      importer = process_csv_data(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
+      )
+      expect(importer.warnings.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is associated to another blueprint course")
+    end
+
+    it "shouldn't fail if a course is already associated to the target" do
+      ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
+      @template.add_child_course!(ac)
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
+      )
+    end
+
+    it "should be able to associate courses in bulk" do
+      c1 = @account.courses.create!(:sis_source_id => "acourse1")
+      c2 = @account.courses.create!(:sis_source_id => "acourse2")
+      mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
+      template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
+      c3 = @account.courses.create!(:sis_source_id => "acourse3")
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{c1.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
+        "#{c2.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
+        "#{c3.sis_source_id},shortname,long name,active,#{mc2.sis_source_id}"
+      )
+      expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
+      expect(template2.child_subscriptions.active.pluck(:child_course_id)).to eq([c3.id])
+    end
+
+    it "should try to queue a migration afterwards" do
+      account_admin_user(:active_all => true)
+      c1 = @account.courses.create!(:sis_source_id => "acourse1")
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{c1.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
+        :batch => @account.sis_batches.create!(:user => @admin, :data => {})
+      )
+      mm = @template.master_migrations.last
+      expect(mm).to be_queued
+    end
+  end
 end

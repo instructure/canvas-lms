@@ -250,7 +250,7 @@ class AccountReportsController < ApplicationController
     if authorized_action(@context, @current_user, :read_reports)
       available_reports = AccountReport.available_reports.keys
       raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
-      parameters = params[:parameters]&.to_hash&.with_indifferent_access
+      parameters = params[:parameters]&.to_unsafe_h
       report = @account.account_reports.build(:user=>@current_user, :report_type=>params[:report], :parameters=>parameters)
       report.workflow_state = :running
       report.progress = 0

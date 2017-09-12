@@ -26,7 +26,7 @@ describe ContextController do
 
   describe "GET 'roster'" do
     it "should require authorization" do
-      get 'roster', :course_id => @course.id
+      get 'roster', params: {:course_id => @course.id}
       assert_unauthorized
     end
 
@@ -34,7 +34,7 @@ describe ContextController do
       user_session(@student)
       @group = @course.groups.create!
       @group.add_user(@student, 'accepted')
-      get 'roster', :group_id => @group.id
+      get 'roster', params: {:group_id => @group.id}
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to eq [@student.id]
       expect(assigns[:secondary_users].each_value.first.collect(&:id)).to match_array @course.admins.map(&:id)
     end
@@ -51,7 +51,7 @@ describe ContextController do
       end
 
       user_session(@student)
-      get 'roster', :group_id => @group.id
+      get 'roster', params: {:group_id => @group.id}
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id]
     end
 
@@ -65,7 +65,7 @@ describe ContextController do
       @group.add_user(@student, 'accepted')
 
       user_session(@student)
-      get 'roster', :group_id => @group.id
+      get 'roster', params: {:group_id => @group.id}
       teacher_ids = assigns[:secondary_users].each_value.first.map(&:id)
       expect(teacher_ids & [active_teacher.id, inactive_teacher.id]).to eq [active_teacher.id]
     end
@@ -81,7 +81,7 @@ describe ContextController do
         @group.add_user(u, 'accepted')
       end
       user_session(@teacher)
-      get 'roster', :group_id => @group.id
+      get 'roster', params: {:group_id => @group.id}
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id, inactive_student.id]
     end
 
@@ -93,7 +93,7 @@ describe ContextController do
       it "is disabled when feature_flag is off" do
         @course.root_account.disable_feature! :student_context_cards
         user_session(@teacher)
-        get :roster, course_id: @course.id
+        get :roster, params: {course_id: @course.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
       end
 
@@ -102,13 +102,13 @@ describe ContextController do
           RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
         end
         user_session(@teacher)
-        get :roster, course_id: @course.id
+        get :roster, params: {course_id: @course.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
       end
 
       it "is always disabled for students" do
         user_session(@student)
-        get :roster, course_id: @course.id
+        get :roster, params: {course_id: @course.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
       end
     end
@@ -116,7 +116,7 @@ describe ContextController do
 
   describe "GET 'roster_user'" do
     it "should require authorization" do
-      get 'roster_user', :course_id => @course.id, :id => @user.id
+      get 'roster_user', params: {:course_id => @course.id, :id => @user.id}
       assert_unauthorized
     end
 
@@ -125,7 +125,7 @@ describe ContextController do
       @enrollment = @course.enroll_student(user_factory(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
-      get 'roster_user', :course_id => @course.id, :id => @student.id
+      get 'roster_user', params: {:course_id => @course.id, :id => @student.id}
       expect(assigns[:membership]).not_to be_nil
       expect(assigns[:membership]).to eql(@enrollment)
       expect(assigns[:user]).not_to be_nil
@@ -154,7 +154,7 @@ describe ContextController do
         Account.site_admin.account_users.create!(user: admin)
         user_session(admin)
 
-        get 'roster_user', :course_id => course1.id, :id => @user2.id
+        get 'roster_user', params: {:course_id => course1.id, :id => @user2.id}
         expect(response).to be_success
       end
     end
@@ -169,23 +169,23 @@ describe ContextController do
 
       it 'prevents section-limited users from seeing users in other sections' do
         user_session(@student)
-        get 'roster_user', :course_id => @course.id, :id => @other_student.id
+        get 'roster_user', params: {:course_id => @course.id, :id => @other_student.id}
         expect(response).to be_success
 
         user_session(@other_student)
-        get 'roster_user', :course_id => @course.id, :id => @student.id
+        get 'roster_user', params: {:course_id => @course.id, :id => @student.id}
         expect(response).to be_redirect
         expect(flash[:error]).to be_present
       end
 
       it 'limits enrollments by visibility' do
         user_session(@student)
-        get 'roster_user', :course_id => @course.id, :id => @teacher.id
+        get 'roster_user', params: {:course_id => @course.id, :id => @teacher.id}
         expect(response).to be_success
         expect(assigns[:enrollments].map(&:course_section_id)).to match_array([@course.default_section.id, @other_section.id])
 
         user_session(@other_student)
-        get 'roster_user', :course_id => @course.id, :id => @teacher.id
+        get 'roster_user', params: {:course_id => @course.id, :id => @teacher.id}
         expect(response).to be_success
         expect(assigns[:enrollments].map(&:course_section_id)).to match_array([@other_section.id])
       end
@@ -193,14 +193,14 @@ describe ContextController do
       it "lets admins see concluded students" do
         user_session(@teacher)
         @student.enrollments.first.complete!
-        get 'roster_user', :course_id => @course.id, :id => @student.id
+        get 'roster_user', params: {:course_id => @course.id, :id => @student.id}
         expect(response).to be_success
       end
 
       it "lets admins see inactive students" do
         user_session(@teacher)
         @student.enrollments.first.deactivate
-        get 'roster_user', :course_id => @course.id, :id => @student.id
+        get 'roster_user', params: {:course_id => @course.id, :id => @student.id}
         expect(response).to be_success
       end
 
@@ -211,7 +211,7 @@ describe ContextController do
 
         @student.enrollments.first.deactivate
 
-        get 'roster_user', :course_id => @course.id, :id => @student.id
+        get 'roster_user', params: {:course_id => @course.id, :id => @student.id}
         expect(response).to_not be_success
       end
     end
@@ -220,18 +220,18 @@ describe ContextController do
   describe "POST 'object_snippet'" do
     before(:each) do
       @obj = "<object data='test'></object>"
-      HostUrl.stubs(:is_file_host?).returns(true)
+      allow(HostUrl).to receive(:is_file_host?).and_return(true)
       @data = Base64.encode64(@obj)
       @hmac = Canvas::Security.hmac_sha1(@data)
     end
 
     it "should require a valid HMAC" do
-      post 'object_snippet', :object_data => @data, :s => 'DENIED'
+      post 'object_snippet', params: {:object_data => @data, :s => 'DENIED'}
       assert_status(400)
     end
 
     it "should render given a correct HMAC" do
-      post 'object_snippet', :object_data => @data, :s => @hmac
+      post 'object_snippet', params: {:object_data => @data, :s => @hmac}
       expect(response).to be_success
       expect(response['X-XSS-Protection']).to eq '0'
     end
@@ -239,12 +239,12 @@ describe ContextController do
 
   describe "GET '/media_objects/:id/thumbnail" do
     it "should redirect to kaltura even if the MediaObject does not exist" do
-      CanvasKaltura::ClientV3.stubs(:config).returns({})
-      CanvasKaltura::ClientV3.any_instance.expects(:thumbnail_url).returns("http://example.com/thumbnail_redirect")
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      expect_any_instance_of(CanvasKaltura::ClientV3).to receive(:thumbnail_url).and_return("http://example.com/thumbnail_redirect")
       get :media_object_thumbnail,
-        :id => '0_notexist',
+        params: {:id => '0_notexist',
         :width => 100,
-        :height => 100
+        :height => 100}
 
       expect(response).to be_redirect
       expect(response.location).to eq "http://example.com/thumbnail_redirect"
@@ -269,10 +269,10 @@ describe ContextController do
       @original_count = @user.media_objects.count
 
       post :create_media_object,
-        :context_code => "user_#{@user.id}",
+        params: {:context_code => "user_#{@user.id}",
         :id => @media_object.media_id,
         :type => @media_object.media_type,
-        :title => "new title"
+        :title => "new title"}
 
       @media_object.reload
       expect(@media_object.title).to eq "new title"
@@ -285,10 +285,10 @@ describe ContextController do
       @original_count = @user.media_objects.count
 
       post :create_media_object,
-        :context_code => "user_#{@user.id}",
+        params: {:context_code => "user_#{@user.id}",
         :id => "new_object",
         :type => "audio",
-        :title => "title"
+        :title => "title"}
 
       @user.reload
       expect(@user.media_objects.count).to eq @original_count + 1
@@ -301,11 +301,11 @@ describe ContextController do
 
     it "should truncate the title and user_entered_title" do
       post :create_media_object,
-        :context_code => "user_#{@user.id}",
+        params: {:context_code => "user_#{@user.id}",
         :id => "new_object",
         :type => "audio",
         :title => 'x' * 300,
-        :user_entered_title => 'y' * 300
+        :user_entered_title => 'y' * 300}
       @media_object = @user.reload.media_objects.last
       expect(@media_object.title.size).to be <= 255
       expect(@media_object.user_entered_title.size).to be <= 255
@@ -320,7 +320,7 @@ describe ContextController do
     end
 
     it "should paginate" do
-      get :prior_users, :course_id => @course.id
+      get :prior_users, params: {:course_id => @course.id}
       expect(response).to be_success
       expect(assigns[:prior_users].size).to eql 20
     end
@@ -332,7 +332,7 @@ describe ContextController do
       assignment_model(course: @course)
       @assignment.destroy
 
-      get :undelete_index, course_id: @course.id
+      get :undelete_index, params: {course_id: @course.id}
       expect(response).to be_success
       expect(assigns[:deleted_items]).to include(@assignment)
     end
@@ -341,8 +341,8 @@ describe ContextController do
   describe "POST 'undelete_item'" do
     it 'does not allow dangerous sends' do
       user_session(@teacher)
-      @course.any_instantiation.expects(:teacher_names).never
-      post :undelete_item, course_id: @course.id, asset_string: 'teacher_name_1'
+      expect_any_instantiation_of(@course).to receive(:teacher_names).never
+      post :undelete_item, params: {course_id: @course.id, asset_string: 'teacher_name_1'}
       expect(response.status).to eq 500
     end
 
@@ -351,7 +351,7 @@ describe ContextController do
       assignment_model(course: @course)
       @assignment.destroy
 
-      post :undelete_item, course_id: @course.id, asset_string: @assignment.asset_string
+      post :undelete_item, params: {course_id: @course.id, asset_string: @assignment.asset_string}
       expect(@assignment.reload).not_to be_deleted
     end
 
@@ -362,7 +362,7 @@ describe ContextController do
       page.workflow_state = 'deleted'
       page.save!
 
-      post :undelete_item, course_id: @course.id, asset_string: page.asset_string
+      post :undelete_item, params: {course_id: @course.id, asset_string: page.asset_string}
       expect(page.reload).not_to be_deleted
     end
 
@@ -372,7 +372,7 @@ describe ContextController do
       attachment_model
       @attachment.destroy
 
-      post :undelete_item, course_id: @course.id, asset_string: @attachment.asset_string
+      post :undelete_item, params: {course_id: @course.id, asset_string: @attachment.asset_string}
       expect(@attachment.reload).not_to be_deleted
     end
   end
@@ -391,7 +391,7 @@ describe ContextController do
     it "returns accesses" do
       user_session(@teacher)
 
-      get :roster_user_usage, course_id: @course.id, user_id: @student.id
+      get :roster_user_usage, params: {course_id: @course.id, user_id: @student.id}
 
       expect(response).to be_success
       expect(assigns[:accesses].length).to eq 1
@@ -400,7 +400,7 @@ describe ContextController do
     it "returns json" do
       user_session(@teacher)
 
-      get :roster_user_usage, course_id: @course.id, user_id: @student.id, format: :json
+      get :roster_user_usage, params: {course_id: @course.id, user_id: @student.id}, format: :json
 
       expect(response).to be_success
       expect(JSON.parse(response.body.gsub("while(1);", "")).length).to eq 1

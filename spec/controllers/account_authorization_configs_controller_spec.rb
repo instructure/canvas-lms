@@ -56,7 +56,7 @@ describe AccountAuthorizationConfigsController do
 
     context "with no aacs" do
       it "renders ok" do
-        get 'index', account_id: account.id
+        get 'index', params: {account_id: account.id}
         expect(response).to be_success
       end
     end
@@ -64,7 +64,7 @@ describe AccountAuthorizationConfigsController do
     context "with an AAC" do
       it "renders ok" do
         account.authentication_providers.create!(saml_hash)
-        get 'index', account_id: account.id
+        get 'index', params: {account_id: account.id}
         expect(response).to be_success
       end
     end
@@ -72,7 +72,7 @@ describe AccountAuthorizationConfigsController do
     context "with a Microsoft AAC" do
       it "renders ok" do
         account.authentication_providers.create!(microsoft_hash)
-        get 'index', account_id: account.id
+        get 'index', params: {account_id: account.id}
         expect(response).to be_success
       end
     end
@@ -81,7 +81,7 @@ describe AccountAuthorizationConfigsController do
 
   describe "saml_testing" do
     it "requires saml configuration to test" do
-      get "saml_testing", account_id: account.id, format: :json
+      get "saml_testing", params: {account_id: account.id}, format: :json
       expect(response).to be_success
       expect(response.body).to match("A SAML configuration is required to test SAML")
     end
@@ -94,7 +94,7 @@ describe AccountAuthorizationConfigsController do
         auth_type: 'cas',
         auth_base: 'http://example.com',
       }
-      post "create", { account_id: account.id }.merge(cas)
+      post "create", params: { account_id: account.id }.merge(cas)
 
       account.reload
       aac = account.authentication_providers.active.where(auth_type: 'cas').first
@@ -107,7 +107,7 @@ describe AccountAuthorizationConfigsController do
         client_id: '1',
         client_secret: '2'
       }
-      post "create", { account_id: account.id }.merge(linkedin)
+      post "create", params: { account_id: account.id }.merge(linkedin)
 
       account.reload
       aac = account.authentication_providers.active.where(auth_type: 'linkedin').first
@@ -122,7 +122,7 @@ describe AccountAuthorizationConfigsController do
       }
       account.authentication_providers.create!(linkedin)
 
-      post "create", { format: :json, account_id: account.id }.merge(linkedin)
+      post "create", format: :json, params: {account_id: account.id }.merge(linkedin)
       expect(response.code).to eq "422"
     end
 
@@ -135,7 +135,7 @@ describe AccountAuthorizationConfigsController do
         auth_type: 'cas',
         auth_base: 'http://example.com/cas'
       })
-      post "create", { account_id: account.id }.merge(cas)
+      post "create", params: { account_id: account.id }.merge(cas)
 
       account.reload
       aac_count = account.authentication_providers.active.where(auth_type: 'cas').count
@@ -151,7 +151,7 @@ describe AccountAuthorizationConfigsController do
       aac = account.authentication_providers.create!(linkedin)
       aac.destroy
 
-      post "create", { account_id: account.id }.merge(linkedin)
+      post "create", params: { account_id: account.id }.merge(linkedin)
       account.reload
       aac = account.authentication_providers.active.where(auth_type: 'linkedin').first
       expect(aac).to be_present
@@ -211,7 +211,7 @@ describe AccountAuthorizationConfigsController do
     }
 
     it "populates SAML from metadata" do
-      post "create", account_id: account.id, auth_type: 'saml', metadata: idp_xml
+      post "create", params: {account_id: account.id, auth_type: 'saml', metadata: idp_xml}
       expect(response).to be_redirect
 
       ap = account.authentication_providers.active.last

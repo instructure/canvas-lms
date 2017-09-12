@@ -108,8 +108,8 @@ describe ContextExternalToolsHelper do
     before :each do
 
       @controller = DummyController.new
-      @controller.stubs(:external_tool_url).returns("http://stub.dev/tool_url")
-      # @controller.stubs(:request).returns(ActionDispatch::TestRequest.new)
+      allow(@controller).to receive(:external_tool_url).and_return("http://stub.dev/tool_url")
+      # allow(@controller).to receive(:request).and_return(ActionDispatch::TestRequest.new)
       # @controller.instance_variable_set(:@context, @course)
 
     end

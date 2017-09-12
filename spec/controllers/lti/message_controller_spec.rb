@@ -44,7 +44,7 @@ module Lti
         it 'initiates a tool proxy registration request' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'registration', course_id: course.id, tool_consumer_url: 'http://tool.consumer.url'
+          get 'registration', params: {course_id: course.id, tool_consumer_url: 'http://tool.consumer.url'}
           expect(response).to be_success
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
@@ -66,14 +66,14 @@ module Lti
 
         it "doesn't allow student to register an app" do
           course_with_student_logged_in(active_all: true)
-          get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
+          get 'registration', params: {course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'}
           expect(response.code).to eq '401'
         end
 
         it "includes the authorization URL when feature flag enabled" do
-          Account.any_instance.stubs(:feature_enabled?).returns(true)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
           course_with_teacher_logged_in(active_all: true)
-          get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
+          get 'registration', params: {course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'}
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
           expect(launch_params['oauth2_access_token_url']).to(
@@ -86,7 +86,7 @@ module Lti
       context 'account' do
         it 'initiates a tool proxy registration request' do
           user_session(account_admin_user)
-          get 'registration', account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'
+          get 'registration', params: {account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'}
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
@@ -101,7 +101,7 @@ module Lti
         end
 
         it "doesn't allow non admin to register an app" do
-          get 'registration', account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'
+          get 'registration', params: {account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'}
           assert_unauthorized
         end
 
@@ -113,7 +113,7 @@ module Lti
       before {user_session(account_admin_user)}
 
       it 'does not 500 if tool registration fails' do
-        get 'registration_return', course_id: course.id, status: 'failure'
+        get 'registration_return', params: {course_id: course.id, status: 'failure'}
         expect(response).to be_succes
       end
     end
@@ -130,7 +130,7 @@ module Lti
         it 'initiates a tool proxy reregistration request' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           expect(response.code).to eq "200"
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
@@ -141,7 +141,7 @@ module Lti
         it 'sends the correct version' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
           expect(launch_params['lti_version']).to eq 'LTI-2p1'
@@ -150,7 +150,7 @@ module Lti
         it 'sends the correct resource_url' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'https://samplelaunch/rereg'
         end
@@ -158,7 +158,7 @@ module Lti
         it 'sends the correct oauth_consumer_key' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           lti_launch = assigns[:lti_launch]
           params = lti_launch.params.with_indifferent_access
           expect(params[:oauth_consumer_key]).to eq tool_proxy.guid
@@ -167,7 +167,7 @@ module Lti
         it 'sends the correct tc_profile_url' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
           account_tp_url_stub = course_tool_consumer_profile_url(course)
@@ -177,7 +177,7 @@ module Lti
         it 'sends the correct launch_presentation_return_url' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
 
@@ -190,13 +190,13 @@ module Lti
           course_with_teacher_logged_in(:active_alll => true)
           course = @course
           default_resource_handler.message_handlers.first.destroy
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           expect(response.code).to eq "404"
         end
 
         it "doesn't allow a student to reregister an app" do
           course_with_student_logged_in(active_all: true)
-          get 'reregistration', course_id: course_factory.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', params: {course_id: course_factory.id, tool_proxy_id: tool_proxy.id}
           expect(response.code).to eq '404'
         end
 
@@ -226,19 +226,19 @@ module Lti
       end
 
       it 'succeeds if tool is installed in the current account' do
-        get 'resource', account_id: account.id, resource_link_id: link_id
+        get 'resource', params: {account_id: account.id, resource_link_id: link_id}
         expect(response).to be_ok
       end
 
       it 'succeeds if the tool is installed in the current course' do
         tool_proxy.update_attributes(context: course)
-        get 'resource', course_id: course.id, resource_link_id: link_id
+        get 'resource', params: {course_id: course.id, resource_link_id: link_id}
         expect(response).to be_ok
       end
 
       it "succeeds if the tool is installed in the current course's account" do
         tool_proxy.update_attributes(context: account)
-        get 'resource', course_id: course.id, resource_link_id: link_id
+        get 'resource', params: {course_id: course.id, resource_link_id: link_id}
         expect(response).to be_ok
       end
 
@@ -256,13 +256,13 @@ module Lti
         end
 
         it "uses the 'resource_url' if provided in the 'link_id'" do
-          get 'resource', account_id: account.id, resource_link_id: link_id
+          get 'resource', params: {account_id: account.id, resource_link_id: link_id}
           expect(assigns[:lti_launch].resource_url).to eq custom_url
         end
 
         it "responds with 400 if host name does not match" do
           message_handler.update_attributes(launch_path: 'http://www.different.com')
-          get 'resource', account_id: account.id, resource_link_id: link_id
+          get 'resource', params: {account_id: account.id, resource_link_id: link_id}
           expect(response).to be_bad_request
         end
       end
@@ -273,16 +273,16 @@ module Lti
         before {tool_proxy.update_attributes(context: course)}
 
         it 'finds the specified assignment' do
-          get 'resource', course_id: course.id,
+          get 'resource', params: {course_id: course.id,
               assignment_id: assignment.id,
-              resource_link_id: link_id
+              resource_link_id: link_id}
           expect(assigns[:_assignment]).to eq assignment
         end
 
         it 'renders not found if assignment does not exist' do
-          get 'resource', course_id: course.id,
+          get 'resource', params: {course_id: course.id,
               assignment_id: assignment.id + 1,
-              resource_link_id: link_id
+              resource_link_id: link_id}
           expect(response).to be_not_found
         end
       end
@@ -294,13 +294,13 @@ module Lti
 
         it "succeeds if the tool is installed in the current account's root account" do
           tool_proxy.update_attributes(context: root_account)
-          get 'resource', account_id: account.id, resource_link_id: link_id
+          get 'resource', params: {account_id: account.id, resource_link_id: link_id}
           expect(response).to be_ok
         end
 
         it "succeeds if the tool is installed in the current course's root account" do
           tool_proxy.update_attributes(context: root_account)
-          get 'resource', course_id: course.id, resource_link_id: link_id
+          get 'resource', params: {course_id: course.id, resource_link_id: link_id}
           expect(response).to be_ok
         end
       end
@@ -308,7 +308,7 @@ module Lti
       it "renders 'not found' no message handler is found" do
         resource_handler.message_handlers = []
         resource_handler.save!
-        get 'resource', account_id: account.id, resource_link_id: link_id
+        get 'resource', params: {account_id: account.id, resource_link_id: link_id}
         expect(response).to be_not_found
       end
     end
@@ -382,21 +382,21 @@ module Lti
         end
 
         it 'sets the active tab' do
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id}
           expect(response.code).to eq "200"
           expect(assigns[:active_tab]).to eq message_handler.asset_string
         end
 
         it 'returns a 404 when when no handler is found' do
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: 0
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: 0}
           expect(response.code).to eq "404"
         end
 
         it 'redirects to login page if there is no session' do
           tool_proxy.raw_data['enabled_capability'] += enabled_capability
           tool_proxy.save!
-          PseudonymSession.stubs(:find).returns(nil)
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
+          allow(PseudonymSession).to receive(:find).and_return(nil)
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id}
           expect(response).to redirect_to(login_url)
         end
 
@@ -407,7 +407,7 @@ module Lti
           message_handler.parameters = parameters.as_json
           message_handler.save
 
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id}
           expect(response.code).to eq "200"
 
           params = assigns[:lti_launch].params.with_indifferent_access
@@ -485,8 +485,8 @@ module Lti
         it 'adds params from secure_params' do
           lti_assignment_id = SecureRandom.uuid
           jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
-          get 'basic_lti_launch_request', account_id: account.id,
-              message_handler_id: message_handler.id, secure_params: jwt
+          get 'basic_lti_launch_request', params: {account_id: account.id,
+              message_handler_id: message_handler.id, secure_params: jwt}
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['ext_lti_assignment_id']).to eq lti_assignment_id
         end
@@ -523,8 +523,8 @@ module Lti
 
         it 'creates with a resource_link_fragment' do
           Timecop.freeze do
-            get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
-                resource_link_fragment: 'my_custom_postfix'
+            get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                resource_link_fragment: 'my_custom_postfix'}
             expect(response.code).to eq "200"
 
             lti_launch = assigns[:lti_launch]

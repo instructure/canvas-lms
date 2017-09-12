@@ -30,7 +30,7 @@ describe ConversationsController, type: :request do
     @other_section = @course.course_sections.create(:name => "the other section")
     @me = @user
 
-    @bob = student_in_course(:name => "bob")
+    @bob = student_in_course(:name => "bob smith", :short_name => "bob")
     @billy = student_in_course(:name => "billy")
     @jane = student_in_course(:name => "jane")
     @joe = student_in_course(:name => "joe")
@@ -77,9 +77,9 @@ describe ConversationsController, type: :request do
             "courses" => {@course.id.to_s => []}
           },
           "participants" => [
-            {"id" => @me.id, "name" => @me.name},
-            {"id" => @billy.id, "name" => @billy.name},
-            {"id" => @bob.id, "name" => @bob.name}
+            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name},
+            {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name},
+            {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name}
           ],
           "context_name" => @c2.context_name,
           "context_code" => @c2.conversation.context_code,
@@ -104,8 +104,8 @@ describe ConversationsController, type: :request do
             "courses" => {@course.id.to_s => ["StudentEnrollment"]}
           },
           "participants" => [
-            {"id" => @me.id, "name" => @me.name},
-            {"id" => @bob.id, "name" => @bob.name}
+            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name},
+            {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name}
           ],
           "context_name" => @c1.context_name,
           "context_code" => @c1.conversation.context_code,
@@ -198,9 +198,9 @@ describe ConversationsController, type: :request do
             "courses" => {@course.id.to_s => []}
           },
           "participants" => [
-            {"id" => @me.id, "name" => @me.name},
-            {"id" => @billy.id, "name" => @billy.name},
-            {"id" => @bob.id, "name" => @bob.name}
+            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name},
+            {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name},
+            {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name}
           ],
           "context_name" => @c2.context_name,
           "context_code" => @c2.conversation.context_code,
@@ -368,13 +368,22 @@ describe ConversationsController, type: :request do
     context "sent scope" do
       it "should sort by last authored date" do
         expected_times = 5.times.to_a.reverse.map{ |h| Time.parse((Time.now.utc - h.hours).to_s) }
-        ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).times(5).returns(*expected_times)
-        @c1 = conversation(@bob)
-        @c2 = conversation(@bob, @billy)
-        @c3 = conversation(@jane)
+        Timecop.travel(expected_times[0]) do
+          @c1 = conversation(@bob)
+        end
+        Timecop.travel(expected_times[1]) do
+          @c2 = conversation(@bob, @billy)
+        end
+        Timecop.travel(expected_times[2]) do
+          @c3 = conversation(@jane)
+        end
 
-        @m1 = @c1.conversation.add_message(@bob, 'ohai')
-        @m2 = @c2.conversation.add_message(@bob, 'ohai')
+        Timecop.travel(expected_times[3]) do
+          @m1 = @c1.conversation.add_message(@bob, 'ohai')
+        end
+        Timecop.travel(expected_times[4]) do
+          @m2 = @c2.conversation.add_message(@bob, 'ohai')
+        end
 
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
                 { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'sent' })
@@ -508,8 +517,8 @@ describe ConversationsController, type: :request do
               "courses" => {@course.id.to_s => ["StudentEnrollment"]}
             },
             "participants" => [
-              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+              {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
             ],
             "messages" => [
               {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
@@ -649,9 +658,9 @@ describe ConversationsController, type: :request do
               "courses" => {@course.id.to_s => []}
             },
             "participants" => [
-              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-              {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+              {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
             ],
             "messages" => [
               {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id, @bob.id].sort}
@@ -700,8 +709,8 @@ describe ConversationsController, type: :request do
                 "courses" => {@course.id.to_s => ["StudentEnrollment"]}
               },
               "participants" => [
-                {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-                {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+                {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+                {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
               ],
               "messages" => [
                 {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
@@ -830,9 +839,9 @@ describe ConversationsController, type: :request do
               "courses" => {@course.id.to_s => ["StudentEnrollment"]}
             },
             "participants" => [
-              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-              {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+              {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
             ],
             "messages" => [
               {
@@ -922,8 +931,8 @@ describe ConversationsController, type: :request do
               "courses" => {@course.id.to_s => ["StudentEnrollment"]}
             },
             "participants" => [
-              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+              {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
             ],
             "messages" => [
               {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
@@ -1024,8 +1033,8 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => ["StudentEnrollment"]}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
           {
@@ -1154,8 +1163,8 @@ describe ConversationsController, type: :request do
               "courses" => {@course.id.to_s => ["StudentEnrollment"]}
           },
           "participants" => [
-              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+              {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
           ],
           "messages" => [
               {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
@@ -1256,8 +1265,8 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => ["StudentEnrollment"]}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "another", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
@@ -1300,9 +1309,9 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => []}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "another", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort}
@@ -1346,9 +1355,9 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => []}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "partially hydrogenated context oils", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort}
@@ -1394,9 +1403,9 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => []}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "partially hydrogenated context oils", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort}
@@ -1450,9 +1459,9 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => []}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "partially hydrogenated context oils", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id, @billy.id].sort}
@@ -1546,12 +1555,12 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => []}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @jane.id, "name" => @jane.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @joe.id, "name" => @joe.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @tommy.id, "name" => @tommy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @jane.id, "name" => @jane.short_name, "full_name" => @jane.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @joe.id, "name" => @joe.short_name, "full_name" => @joe.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @tommy.id, "name" => @tommy.short_name, "full_name" => @tommy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ],
         "messages" => [
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "jane, joe, and tommy were added to the conversation by nobody@example.com", "author_id" => @me.id, "generated" => true, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id, @bob.id, @jane.id, @joe.id, @tommy.id].sort}
@@ -1607,9 +1616,9 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => []}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.short_name, "full_name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ]
       })
     end
@@ -1676,8 +1685,8 @@ describe ConversationsController, type: :request do
           "courses" => {@course.id.to_s => ["StudentEnrollment"]}
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ]
       })
     end
@@ -1712,8 +1721,8 @@ describe ConversationsController, type: :request do
           "courses" => {} # tags, and by extension audience_contexts, get cleared out when the conversation is deleted
         },
         "participants" => [
-          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
-          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.short_name, "full_name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
         ]
       })
     end
@@ -1731,13 +1740,13 @@ describe ConversationsController, type: :request do
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
         {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6, "permissions" => {}},
-        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course", "permissions" => {}},
-        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course", "permissions" => {}},
-        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course", "permissions" => {}},
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "permissions" => {}, "context_name" => "the course"},
+        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "permissions" => {}, "context_name" => "the course"},
+        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "permissions" => {}, "context_name" => "the course"},
+        {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "bob smith", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @tommy.id, "name" => "tommy", "full_name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
       ]
     end
   end
@@ -1947,21 +1956,17 @@ describe ConversationsController, type: :request do
         end
 
         it "should fail progress if exception is raised in job" do
-          begin
-            Progress.any_instance.stubs(:complete!).raises "crazy exception"
+          allow_any_instance_of(Progress).to receive(:complete!).and_raise "crazy exception"
 
-            c1 = conversation(@me, @jane, :workflow_state => 'unread')
-            conversation_ids = [c1.conversation.id]
-            json = api_call(:put, "/api/v1/conversations",
-              { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
-              { :event => 'mark_as_read', :conversation_ids => conversation_ids })
-            run_jobs
-            progress = Progress.find(json['id'])
-            expect(progress).to be_failed
-            expect(progress.message).to include 'crazy exception'
-          ensure
-            Progress.any_instance.unstub(:complete!)
-          end
+          c1 = conversation(@me, @jane, :workflow_state => 'unread')
+          conversation_ids = [c1.conversation.id]
+          json = api_call(:put, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+            { :event => 'mark_as_read', :conversation_ids => conversation_ids })
+          run_jobs
+          progress = Progress.find(json['id'])
+          expect(progress).to be_failed
+          expect(progress.message).to include 'crazy exception'
         end
       end
     end

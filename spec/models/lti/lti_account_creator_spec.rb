@@ -23,15 +23,15 @@ describe Lti::LtiAccountCreator do
     Account.create!.tap do |account|
       account.name = 'root_account'
       account.lti_guid = 'lti_guid'
-      account.stubs(:domain).returns('account_domain')
-      account.stubs(:id).returns(42)
+      allow(account).to receive(:domain).and_return('account_domain')
+      allow(account).to receive(:id).and_return(42)
       account.sis_source_id = 'account_sis_id'
     end
   end
   let(:canvas_tool) do
     ContextExternalTool.new.tap do |canvas_tool|
       canvas_tool.context = root_account
-      canvas_tool.stubs(:opaque_identifier_for).returns('opaque_id')
+      allow(canvas_tool).to receive(:opaque_identifier_for).and_return('opaque_id')
     end
   end
   let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
@@ -39,7 +39,7 @@ describe Lti::LtiAccountCreator do
     Account.create!.tap do |account|
       account.name = 'account_name'
       account.root_account = root_account
-      account.stubs(:id).returns(123)
+      allow(account).to receive(:id).and_return(123)
       account.sis_source_id = 'sis_id'
     end
   end
@@ -49,7 +49,7 @@ describe Lti::LtiAccountCreator do
       course.sis_source_id = 'sis_id'
       course.root_account = root_account
       course.account = canvas_account
-      course.stubs(:id).returns(123)
+      allow(course).to receive(:id).and_return(123)
     end
   end
 

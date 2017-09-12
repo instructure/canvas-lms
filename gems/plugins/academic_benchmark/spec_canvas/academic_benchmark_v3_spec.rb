@@ -229,10 +229,10 @@ describe AcademicBenchmark::Converter do
   end
 
   it "raises error when crendentials are not set" do
-    AcademicBenchmark.stubs(:config).returns({})
+    allow(AcademicBenchmark).to receive(:config).and_return({})
     expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(Canvas::Migration::Error,
       "Not importing academic benchmark data because the Academic Benchmarks Partner ID is not set")
-    AcademicBenchmark.stubs(:config).returns({partner_id: "user"})
+    allow(AcademicBenchmark).to receive(:config).and_return({partner_id: "user"})
     expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(Canvas::Migration::Error,
       "Not importing academic benchmark data because the Academic Benchmarks Partner key is not set")
   end

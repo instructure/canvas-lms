@@ -20,7 +20,7 @@ shared_examples_for 'Answer Serializers' do
   #
   # Exports 'qq'.
   #
-  # To pass options to the factory, define a mock called `factory_options`
+  # To pass options to the factory, define a double called `factory_options`
   # somewhere in the test suite. For example:
   #
   # let :factory_options do
@@ -46,12 +46,12 @@ shared_examples_for 'Answer Serializers' do
     # so, we could just build a new Quiz, but it's unnecessary and this is
     # faster as we only need the #quiz_data set
     quiz = Object.new
-    quiz.stubs(:quiz_data).returns [ data ]
+    allow(quiz).to receive(:quiz_data).and_return [ data ]
 
     qq = Quizzes::QuizQuestion.new
     qq.id = question_id
     qq.question_data = data
-    qq.stubs(:quiz).returns quiz
+    allow(qq).to receive(:quiz).and_return quiz
 
     qq
   end

@@ -21,6 +21,7 @@ define [
   'jquery'
   'underscore'
   'jsx/shared/conditional_release/CyoeHelper'
+  'compiled/models/Assignment'
   'compiled/views/PublishIconView'
   'compiled/views/LockIconView'
   'compiled/views/assignments/DateDueColumnView'
@@ -36,7 +37,7 @@ define [
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, Backbone, $, _, CyoeHelper, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+], (I18n, Backbone, $, _, CyoeHelper, Assignment, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -235,7 +236,12 @@ define [
 
     addAssignmentToList: (response) =>
       return unless response
-      @model.collection.view.insertAssignment(response, @model)
+      assignment = new Assignment(response)
+      # The positions here are not always consistent with what is in the DB,
+      # so treat the position here as "canonical" to make the UI behave properly.
+      targetPosition = @model.get('position') + 1
+      assignment.set('position', targetPosition)
+      @model.collection.insertModel(assignment)
       @focusOnAssignment(response)
 
     onDuplicate: (e) =>

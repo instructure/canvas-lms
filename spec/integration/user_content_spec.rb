@@ -21,30 +21,30 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "User Content" do
   describe "ContextController#object_snippet" do
     it "should reject object_snippet on non-safefiles domain" do
-      HostUrl.stubs(:is_file_host?).with("files.example.com").returns(true)
-      HostUrl.stubs(:is_file_host?).with("canvas.example.com").returns(false)
-      HostUrl.stubs(:has_file_host?).returns(true)
+      allow(HostUrl).to receive(:is_file_host?).with("files.example.com").and_return(true)
+      allow(HostUrl).to receive(:is_file_host?).with("canvas.example.com").and_return(false)
+      allow(HostUrl).to receive(:has_file_host?).and_return(true)
 
       obj_data = "<div>test</div>"
       snippet = Base64.encode64 obj_data
       sig = Canvas::Security.hmac_sha1(snippet)
-      post "http://files.example.com/object_snippet", :object_data => snippet, :s => sig
+      post "http://files.example.com/object_snippet", params: {:object_data => snippet, :s => sig}
       expect(response).to be_success
       expect(response.body).to be_include(obj_data)
 
-      post "http://canvas.example.com/object_snippet", :object_data => snippet, :s => sig
+      post "http://canvas.example.com/object_snippet", params: {:object_data => snippet, :s => sig}
       assert_status(400)
       expect(response.body).to be_blank
     end
 
     it "should allow object_snippet if there is no safefiles domain configured" do
-      HostUrl.stubs(:default_host).returns("canvas.example.com")
-      HostUrl.stubs(:file_host).returns("canvas.example.com")
+      allow(HostUrl).to receive(:default_host).and_return("canvas.example.com")
+      allow(HostUrl).to receive(:file_host).and_return("canvas.example.com")
 
       obj_data = "<div>test</div>"
       snippet = Base64.encode64 obj_data
       sig = Canvas::Security.hmac_sha1(snippet)
-      post "http://files.example.com/object_snippet", :object_data => snippet, :s => sig
+      post "http://files.example.com/object_snippet", params: {:object_data => snippet, :s => sig}
       expect(response).to be_success
       expect(response.body).to be_include(obj_data)
     end

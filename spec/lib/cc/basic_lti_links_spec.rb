@@ -28,7 +28,7 @@ describe CC::BasicLTILinks do
   end
 
   before do
-    subject.stubs(:for_course_copy).returns false
+    allow(subject).to receive(:for_course_copy).and_return false
   end
 
   describe "#create_blti_link" do
@@ -180,7 +180,7 @@ describe CC::BasicLTILinks do
 
       context "course_copy" do
         before do
-          subject.stubs(:for_course_copy).returns true
+          allow(subject).to receive(:for_course_copy).and_return true
         end
 
         it "sets the consumer_key if it's a course copy" do

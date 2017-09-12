@@ -14,8 +14,8 @@ run.config:
     - python-2.7
     - nginx
 
-  dev_packages:
-    - libfontconfig
+  # dev_packages:
+  #   - libfontconfig
 
   extra_steps:
     - npm install phantomjs-prebuilt

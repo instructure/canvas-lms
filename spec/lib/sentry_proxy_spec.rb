@@ -28,26 +28,26 @@ describe SentryProxy do
   describe ".capture" do
     it "forwards exceptions on to raven" do
       e = MyCustomError.new
-      Raven.expects(:capture_exception).with(e, data)
+      expect(Raven).to receive(:capture_exception).with(e, data)
       SentryProxy.capture(e, data)
     end
 
     it "passes messages to the capture_message raven method" do
       e = "Some Message"
-      Raven.expects(:capture_message).with(e, data)
+      expect(Raven).to receive(:capture_message).with(e, data)
       SentryProxy.capture(e, data)
     end
 
     it "changes symbols to strings because raven chokes otherwise" do
       e = :some_exception_type
-      Raven.expects(:capture_message).with("some_exception_type", data)
+      expect(Raven).to receive(:capture_message).with("some_exception_type", data)
       SentryProxy.capture(e, data)
     end
 
     it "does not send the message if configured as ignorable" do
       SentryProxy.register_ignorable_error(MyCustomError)
       e = MyCustomError.new
-      Raven.expects(:capture_exception).times(0)
+      expect(Raven).to receive(:capture_exception).never
       SentryProxy.capture(e, data)
     end
   end

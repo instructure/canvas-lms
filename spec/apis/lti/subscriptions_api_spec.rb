@@ -45,17 +45,17 @@ module Lti
       it 'creates subscriptions' do
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        post create_endpoint, { subscription: subscription }, request_headers
+        post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_success
       end
 
       it 'checks that the tool proxy has the correct enabled capabilities' do
-        post create_endpoint, { subscription: subscription }, request_headers
+        post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
       it 'gives error message when missing capabilities' do
-        post create_endpoint, { subscription: subscription }, request_headers
+        post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Unauthorized subscription'
       end
 
@@ -63,7 +63,7 @@ module Lti
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        post create_endpoint, { subscription: subscription }, request_headers
+        post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
@@ -71,14 +71,14 @@ module Lti
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        post create_endpoint, { subscription: subscription }, request_headers
+        post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Unauthorized subscription'
       end
 
       it 'requires JWT Access token' do
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        post create_endpoint, { subscription: subscription }
+        post create_endpoint, params: { subscription: subscription }
         expect(response).to be_unauthorized
       end
 
@@ -86,7 +86,7 @@ module Lti
         allow(subscription_service).to receive_messages(available?: false)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        post create_endpoint, { subscription: subscription }, request_headers
+        post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response.status).to eq 500
       end
 
@@ -94,7 +94,7 @@ module Lti
         allow(subscription_service).to receive_messages(available?: false)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        post create_endpoint, { subscription: subscription }, request_headers
+        post create_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
     end
@@ -108,32 +108,32 @@ module Lti
 
       it 'deletes subscriptions' do
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        delete delete_endpoint, {}, request_headers
+        delete delete_endpoint, headers: request_headers
         expect(response).to be_success
       end
 
       it 'gives 404 if subscription does not exist' do
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: not_found_response)
-        delete delete_endpoint, {}, request_headers
+        delete delete_endpoint, headers: request_headers
         expect(response).not_to be_success
       end
 
       it 'requires JWT Access token' do
-        delete delete_endpoint, {}
+        delete delete_endpoint, params: {}
         expect(response).to be_unauthorized
       end
 
       it 'gives 500 if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        delete delete_endpoint, {}, request_headers
+        delete delete_endpoint, headers: request_headers
         expect(response.status).to eq 500
       end
 
       it 'gives useful message if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        delete delete_endpoint, {}, request_headers
+        delete delete_endpoint, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
     end
@@ -146,32 +146,32 @@ module Lti
 
       it 'shows subscriptions' do
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        get show_endpoint, {}, request_headers
+        get show_endpoint, headers: request_headers
         expect(response).to be_success
       end
 
       it 'gives gives 404 if subscription does not exist' do
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: not_found_response)
-        get show_endpoint, {}, request_headers
+        get show_endpoint, headers: request_headers
         expect(response).not_to be_success
       end
 
       it 'requires JWT Access token' do
-        get show_endpoint, {}
+        get show_endpoint, params: {}
         expect(response).to be_unauthorized
       end
 
       it 'gives 500 if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        get show_endpoint, {}, request_headers
+        get show_endpoint, headers: request_headers
         expect(response.status).to eq 500
       end
 
       it 'gives useful message if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
-        get show_endpoint, {}, request_headers
+        get show_endpoint, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
     end
@@ -184,27 +184,27 @@ module Lti
       end
 
       it 'updates subscriptions' do
-        put update_endpoint, {subscription: subscription}, request_headers
+        put update_endpoint, params: {subscription: subscription}, headers: request_headers
         expect(response).to be_success
       end
 
       it 'gives gives 404 if subscription does not exist' do
         allow(subscription_service).to receive_messages(update_tool_proxy_subscription: not_found_response)
-        put update_endpoint, {subscription: subscription}, request_headers
+        put update_endpoint, params: {subscription: subscription}, headers: request_headers
         expect(response).to be_not_found
       end
 
       it 'checks that the tool proxy has the correct enabled capabilities' do
         tool_proxy[:raw_data]['enabled_capability'] = []
         tool_proxy.save!
-        put update_endpoint, { subscription: subscription }, request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
       it 'gives error message when missing capabilities' do
         tool_proxy[:raw_data]['enabled_capability'] = []
         tool_proxy.save!
-        put update_endpoint, { subscription: subscription }, request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Unauthorized subscription'
       end
 
@@ -212,7 +212,7 @@ module Lti
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        put update_endpoint, { subscription: subscription }, request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
@@ -220,24 +220,24 @@ module Lti
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).with(an_instance_of(Account)).and_return(false)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
-        put update_endpoint, { subscription: subscription }, request_headers
+        put update_endpoint, params: { subscription: subscription }, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Unauthorized subscription'
       end
 
       it 'requires JWT Access token' do
-        put update_endpoint, {subscription: subscription}
+        put update_endpoint, params: {subscription: subscription}
         expect(response).to be_unauthorized
       end
 
       it 'gives 500 if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
-        put update_endpoint, {subscription: subscription}, request_headers
+        put update_endpoint, params: {subscription: subscription}, headers: request_headers
         expect(response.status).to eq 500
       end
 
       it 'gives useful message if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
-        put update_endpoint, {subscription: subscription}, request_headers
+        put update_endpoint, params: {subscription: subscription}, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
 
@@ -253,14 +253,14 @@ module Lti
       let(:pagination_request_headers) { { StartKey: pagination_key.to_json, Authorization: "Bearer #{access_token}" } }
       let(:ok_pagination_response) do
         double(
-          body: subscription.to_json,
+          body: [subscription].to_json,
           code: 200,
-          headers: { EndKey: pagination_key.to_json }
+          headers: { 'endkey' => pagination_key.to_json }
         )
       end
       let(:ok_unpaginated_response) do
         double(
-          body: subscription.to_json,
+          body: [subscription].to_json,
           code: 200,
           headers: {}
         )
@@ -268,38 +268,44 @@ module Lti
 
       it 'shows subscriptions for a tool proxy' do
         allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_unpaginated_response }
-        get index_endpoint, {}, request_headers
-        expect(response).to be_success
+        get index_endpoint, headers: request_headers
+        expect(JSON.parse(response.body).first['ContextId']).to eq account.uuid
       end
 
       it 'shows subscriptions for a tool proxy from a pagination response' do
         allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
-        get index_endpoint, {}, request_headers
+        get index_endpoint, headers: request_headers
         expect(response).to be_success
+      end
+
+      it 'includes pagination headers' do
+        allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
+        get index_endpoint, headers: request_headers
+        expect(JSON.parse(response.headers['EndKey'])).to eq pagination_key.with_indifferent_access
       end
 
       it 'shows subscriptions for a tool proxy with optional pagination header' do
         allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
-        get index_endpoint, {}, pagination_request_headers
+        get index_endpoint, headers: pagination_request_headers
         expect(response).to be_success
       end
 
       it 'requires JWT Access token' do
-        get index_endpoint, {}
+        get index_endpoint, params: {}
         expect(response).to be_unauthorized
       end
 
       it 'gives 500 if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
-        get index_endpoint, {}, request_headers
+        get index_endpoint, headers: request_headers
         expect(response.status).to eq 500
       end
 
       it 'gives useful message if the subscription service is not configured' do
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
-        get index_endpoint, {}, request_headers
+        get index_endpoint, headers: request_headers
         expect(JSON.parse(response.body)['error']).to eq 'Subscription service not configured'
       end
 

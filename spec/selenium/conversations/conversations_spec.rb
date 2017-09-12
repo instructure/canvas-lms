@@ -28,7 +28,7 @@ describe "conversations new" do
   end
 
   it "should have correct elements on the page when composing a new message", priority: "2", test_id: 86604 do
-    # For testing media comments button, we need to stub Kaltura
+    # For testing media comments button, we need to double Kaltura
     stub_kaltura
     conversations
     f('#compose-btn').click

@@ -22,7 +22,7 @@ describe Login::CanvasHelper do
   describe "#session_timeout_enabled" do
     context "when the sessions plugin is enabled" do 
       before do 
-        PluginSetting.expects(:settings_for_plugin).with('sessions').returns({"session_timeout" => 123})
+        expect(PluginSetting).to receive(:settings_for_plugin).with('sessions').and_return({"session_timeout" => 123})
       end
 
       it "returns true" do
@@ -32,7 +32,7 @@ describe Login::CanvasHelper do
 
     context "when the sessions plugin is disabled" do 
       before do 
-        PluginSetting.expects(:settings_for_plugin).with('sessions').returns(nil)
+        expect(PluginSetting).to receive(:settings_for_plugin).with('sessions').and_return(nil)
       end
 
       it "returns false" do 

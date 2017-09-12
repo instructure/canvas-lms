@@ -30,31 +30,33 @@ describe ContentMigration do
     end
 
     before :each do
-      Canvas::Migration::ExternalContent::Migrator.stubs(:registered_services).returns({'test_service' => TestExternalContentService})
+      allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({'test_service' => TestExternalContentService})
     end
 
     it "should skip everything if #applies_to_course? returns false" do
-      TestExternalContentService.stubs(:applies_to_course?).returns(false)
-      TestExternalContentService.expects(:begin_export).never
-      TestExternalContentService.expects(:export_completed?).never
-      TestExternalContentService.expects(:retrieve_export).never
-      TestExternalContentService.expects(:send_imported_content).never
+      allow(TestExternalContentService).to receive(:applies_to_course?).and_return(false)
+      expect(TestExternalContentService).to receive(:begin_export).never
+      expect(TestExternalContentService).to receive(:export_completed?).never
+      expect(TestExternalContentService).to receive(:retrieve_export).never
+      expect(TestExternalContentService).to receive(:send_imported_content).never
 
       run_course_copy
     end
 
     it "should send the data from begin_export back later to retrieve_export" do
-      TestExternalContentService.expects(:applies_to_course?).with(@copy_from).returns(true)
+      expect(TestExternalContentService).to receive(:applies_to_course?).with(@copy_from).and_return(true)
 
       test_data = {:sometestdata => "something"}
-      TestExternalContentService.expects(:begin_export).with(@copy_from, {}).returns(test_data)
-      TestExternalContentService.expects(:export_completed?).with(test_data).returns(true)
-      TestExternalContentService.expects(:retrieve_export).with(test_data).returns(nil)
-      TestExternalContentService.expects(:send_imported_content).never
+      expect(TestExternalContentService).to receive(:begin_export).with(@copy_from, {}).and_return(test_data)
+      expect(TestExternalContentService).to receive(:export_completed?).with(test_data).and_return(true)
+      expect(TestExternalContentService).to receive(:retrieve_export).with(test_data).and_return(nil)
+      expect(TestExternalContentService).to receive(:send_imported_content).never
       run_course_copy
     end
 
     it "should translate ids for copied course content" do
+      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       ann = @copy_from.announcements.create!(:message => "goodbye")
@@ -64,8 +66,8 @@ describe ContentMigration do
       page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
       quiz = @copy_from.quizzes.create!
 
-      TestExternalContentService.stubs(:applies_to_course?).returns(true)
-      TestExternalContentService.stubs(:begin_export).returns(true)
+      allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
+      allow(TestExternalContentService).to receive(:begin_export).and_return(true)
 
       data = {
         '$canvas_assignment_id' => assmt.id,
@@ -77,8 +79,8 @@ describe ContentMigration do
         '$canvas_page_id' => page.id,
         '$canvas_quiz_id' => quiz.id
       }
-      TestExternalContentService.stubs(:export_completed?).returns(true)
-      TestExternalContentService.stubs(:retrieve_export).returns(data)
+      allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
+      allow(TestExternalContentService).to receive(:retrieve_export).and_return(data)
 
       run_course_copy
 
@@ -110,10 +112,10 @@ describe ContentMigration do
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!
 
-      TestExternalContentService.stubs(:applies_to_course?).returns(true)
-      TestExternalContentService.stubs(:begin_export).returns(true)
-      TestExternalContentService.stubs(:export_completed?).returns(true)
-      TestExternalContentService.stubs(:retrieve_export).returns(
+      allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
+      allow(TestExternalContentService).to receive(:begin_export).and_return(true)
+      allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
+      allow(TestExternalContentService).to receive(:retrieve_export).and_return(
         {'$canvas_assignment_id' => assmt.id, '$canvas_discussion_topic_id' => topic.id})
 
       @cm.copy_options = {'all_discussion_topics' => '1'}
@@ -141,14 +143,14 @@ describe ContentMigration do
       item = cm.add_item(:id => assmt.id, :type => 'assignment')
       item2 = cm.add_item(:id => graded_quiz.id, :type => 'quiz')
 
-      TestExternalContentService.stubs(:applies_to_course?).returns(true)
-      TestExternalContentService.stubs(:export_completed?).returns(true)
-      TestExternalContentService.stubs(:retrieve_export).returns({})
+      allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
+      allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
+      allow(TestExternalContentService).to receive(:retrieve_export).and_return({})
 
       @cm.copy_options = {:context_modules => {mig_id(cm) => "1"}}
       @cm.save!
 
-      TestExternalContentService.expects(:begin_export).with(@copy_from,
+      expect(TestExternalContentService).to receive(:begin_export).with(@copy_from,
         {:selective => true, :exported_assets =>
           ["context_module_#{cm.id}", "assignment_#{assmt.id}", "quiz_#{graded_quiz.id}", "assignment_#{graded_quiz.assignment.id}"]})
 
@@ -156,12 +158,12 @@ describe ContentMigration do
     end
 
     it "should only check a few times for the export to finish before timing out" do
-      TestExternalContentService.stubs(:applies_to_course?).returns(true)
-      TestExternalContentService.stubs(:begin_export).returns(true)
-      Canvas::Migration::ExternalContent::Migrator.expects(:retry_delay).at_least_once.returns(0) # so we're not actually sleeping for 30s a pop
-      TestExternalContentService.expects(:export_completed?).times(6).returns(false) # retries 5 times
+      allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
+      allow(TestExternalContentService).to receive(:begin_export).and_return(true)
+      expect(Canvas::Migration::ExternalContent::Migrator).to receive(:retry_delay).at_least(:once).and_return(0) # so we're not actually sleeping for 30s a pop
+      expect(TestExternalContentService).to receive(:export_completed?).exactly(6).times.and_return(false) # retries 5 times
 
-      Canvas::Errors.expects(:capture_exception).with(:external_content_migration,
+      expect(Canvas::Errors).to receive(:capture_exception).with(:external_content_migration,
         "External content migrations timed out for test_service")
 
       run_course_copy

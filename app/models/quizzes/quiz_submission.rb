@@ -283,7 +283,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_params(params)
-    params = params.to_hash.with_indifferent_access if params.is_a?(ActionController::Parameters) # clear the strong params
+    params = params.to_unsafe_h if params.is_a?(ActionController::Parameters) # clear the strong params
 
     # if the submission has already been graded
     if graded?
@@ -371,7 +371,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     if self.finished_at && self.end_at && self.finished_at > self.end_at
       drift = self.finished_at - self.end_at
 
-      if drift <= GRACEFUL_FINISHED_AT_DRIFT_PERIOD
+      if drift <= GRACEFUL_FINISHED_AT_DRIFT_PERIOD.to_i
         self.finished_at = self.end_at
       end
     end
@@ -517,7 +517,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def less_than_allotted_time?
-    self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes
+    self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes.to_i
   end
 
   def completed?

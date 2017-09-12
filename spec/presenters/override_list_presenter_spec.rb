@@ -20,11 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe OverrideListPresenter do
   include TextHelper
   before do
-    AssignmentOverrideApplicator.stubs(:assignment_overridden_for).
-      with(assignment,user).returns overridden_assignment
-    AssignmentOverrideApplicator.stubs(:assignment_overridden_for).
-      with(assignment,nil).returns assignment
-    assignment.stubs(:has_active_overrides?).returns true
+    allow(AssignmentOverrideApplicator).to receive(:assignment_overridden_for).
+      with(assignment,user).and_return overridden_assignment
+    allow(AssignmentOverrideApplicator).to receive(:assignment_overridden_for).
+      with(assignment,nil).and_return assignment
+    allow(assignment).to receive(:has_active_overrides?).and_return true
   end
 
   around do |example|
@@ -126,9 +126,9 @@ describe OverrideListPresenter do
 
   describe "#multiple_due_dates?" do
     it "returns the result of assignment.multiple_due_dates_apply_to?(user)" do
-      assignment.expects(:has_active_overrides?).returns true
+      expect(assignment).to receive(:has_active_overrides?).and_return true
       expect(presenter.multiple_due_dates?).to eq true
-      assignment.expects(:has_active_overrides?).returns false
+      expect(assignment).to receive(:has_active_overrides?).and_return false
       expect(presenter.multiple_due_dates?).to eq false
     end
 
@@ -145,7 +145,7 @@ describe OverrideListPresenter do
     end
 
     it "returns 'Everyone else' if multiple due dates for assignment" do
-      assignment.expects(:has_active_overrides?).once.returns true
+      expect(assignment).to receive(:has_active_overrides?).once.and_return true
       due_date = {}
       expect(presenter.due_for(due_date)).to eq(
         I18n.t('overrides.everyone_else','Everyone else')
@@ -153,7 +153,7 @@ describe OverrideListPresenter do
     end
 
     it "returns 'Everyone' translated if not multiple due dates" do
-      assignment.expects(:has_active_overrides?).once.returns false
+      expect(assignment).to receive(:has_active_overrides?).once.and_return false
       due_date = {}
       expect(presenter.due_for(due_date)).to eq(
         I18n.t('overrides.everyone', 'Everyone')
@@ -166,7 +166,7 @@ describe OverrideListPresenter do
       let(:sections) do
         # the count is the important part, the actual course sections are
         # not used
-        [ stub, stub, stub ]
+        [ double, double, double ]
       end
 
       def dates_visible_to_user
@@ -186,10 +186,10 @@ describe OverrideListPresenter do
     context "when all sections have overrides" do
 
       before do
-        assignment.stubs(:context).
-          returns stub(:active_section_count => sections.count)
-        assignment.stubs(:all_dates_visible_to).with(user).
-          returns dates_visible_to_user
+        allow(assignment).to receive(:context).
+          and_return double(:active_section_count => sections.count)
+        allow(assignment).to receive(:all_dates_visible_to).with(user).
+          and_return dates_visible_to_user
         @visible_due_dates = presenter.visible_due_dates
       end
 
@@ -222,10 +222,10 @@ describe OverrideListPresenter do
       let(:dates_visible) { dates_visible_to_user[1..-1] }
 
       before do
-        assignment.stubs(:context).
-          returns stub(:active_section_count => sections.count)
-        assignment.stubs(:all_dates_visible_to).with(user).
-          returns dates_visible
+        allow(assignment).to receive(:context).
+          and_return double(:active_section_count => sections.count)
+        allow(assignment).to receive(:all_dates_visible_to).with(user).
+          and_return dates_visible
         @visible_due_dates = presenter.visible_due_dates
       end
 

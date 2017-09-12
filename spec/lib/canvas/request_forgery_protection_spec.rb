@@ -24,12 +24,12 @@ describe Canvas::RequestForgeryProtection do
     raw_headers = ActionDispatch::Request.new(raw_headers)
     headers = ActionDispatch::Http::Headers.new(raw_headers)
     cookies = ActionDispatch::Cookies::CookieJar.new(nil)
-    request = stub("request",
+    request = double("request",
       host_with_port: "example.com:80",
       headers: headers,
       get?: false,
       head?: false)
-    @controller = stub("controller",
+    @controller = double("controller",
       request: request,
       cookies: cookies,
       protect_against_forgery?: true,
@@ -60,35 +60,35 @@ describe Canvas::RequestForgeryProtection do
     end
 
     it "should not verify token if protect_against_forgery? is false" do
-      @controller.stubs(:protect_against_forgery?).returns(false)
+      allow(@controller).to receive(:protect_against_forgery?).and_return(false)
       expect(@controller.verified_request?).to be_truthy
     end
 
     it "should not verify token if request.get? is true" do
-      @controller.request.stubs(:get?).returns(true)
+      allow(@controller.request).to receive(:get?).and_return(true)
       expect(@controller.verified_request?).to be_truthy
     end
 
     it "should not verify token if request.head? is true" do
-      @controller.request.stubs(:head?).returns(true)
+      allow(@controller.request).to receive(:head?).and_return(true)
       expect(@controller.verified_request?).to be_truthy
     end
 
     it "should not verify token if api_request? is true and in_app? is false" do
-      @controller.stubs(:api_request?).returns(true)
-      @controller.stubs(:in_app?).returns(false)
+      allow(@controller).to receive(:api_request?).and_return(true)
+      allow(@controller).to receive(:in_app?).and_return(false)
       expect(@controller.verified_request?).to be_truthy
     end
 
     it "should verify token if api_request? is true but in_app? is also true" do
-      @controller.stubs(:api_request?).returns(true)
-      @controller.stubs(:in_app?).returns(true)
+      allow(@controller).to receive(:api_request?).and_return(true)
+      allow(@controller).to receive(:in_app?).and_return(true)
       expect(@controller.verified_request?).to be_falsey
     end
 
     it "should count token as verified if form_authenticity_param is valid" do
       token = @controller.form_authenticity_token
-      @controller.stubs(:form_authenticity_param).returns(token)
+      allow(@controller).to receive(:form_authenticity_param).and_return(token)
       expect(@controller.verified_request?).to be_truthy
     end
 

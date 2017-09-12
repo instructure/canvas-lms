@@ -37,8 +37,8 @@ describe Api::V1::AssignmentOverride do
                   :unlock_at => nil,
                   :lock_at => nil
       }
-      subject.stubs(:api_find_all).returns []
-      assignment = stub(:context => stub(:students => stub(:active)))
+      allow(subject).to receive(:api_find_all).and_return []
+      assignment = double(:context => double(:students => double(active: nil)))
       result = subject.interpret_assignment_override_data(assignment, override,'ADHOC')
       expect(result.first[:due_at]).to eq nil
       expect(result.first[:unlock_at]).to eq nil
@@ -57,8 +57,8 @@ describe Api::V1::AssignmentOverride do
 
         override = { :student_ids => [@student.global_id] }
 
-        subject.stubs(:api_find_all).returns [@student]
-        assignment = stub(:context => stub(:students => stub(:active)))
+        allow(subject).to receive(:api_find_all).and_return [@student]
+        assignment = double(:context => double(:students => double(active: nil)))
         result = subject.interpret_assignment_override_data(assignment, override,'ADHOC')
         expect(result[1]).to be_nil
         expect(result.first[:students]).to eq [@student]
@@ -254,7 +254,7 @@ describe Api::V1::AssignmentOverride do
     subject(:assignment_overrides_json) { test_class.new.assignment_overrides_json([@override], @student) }
 
     it 'delegates to AssignmentOverride.visible_enrollments_for' do
-      AssignmentOverride.expects(:visible_enrollments_for).once.returns(Enrollment.none)
+      expect(AssignmentOverride).to receive(:visible_enrollments_for).once.and_return(Enrollment.none)
       assignment_overrides_json
     end
   end

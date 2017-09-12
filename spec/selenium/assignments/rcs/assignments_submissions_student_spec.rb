@@ -43,10 +43,6 @@ describe "submissions" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it "should let a student submit a text entry", priority: "1", test_id: 56015 do
       @assignment.update_attributes(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

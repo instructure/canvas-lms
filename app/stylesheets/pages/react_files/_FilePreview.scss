@@ -132,6 +132,8 @@ $preview-html-background: whitesmoke;
   padding: 0 12px;
   @include fontSize($ic-font-size--small);
   border: none;
+  outline: none;
+  box-sizing: border-box;
   text-align: center;
   align-items: center;
   background: $preview-bg;
@@ -140,9 +142,14 @@ $preview-html-background: whitesmoke;
   &:hover, &:focus { color: $ic-color-light; text-decoration: none;}
   [class^=icon-] { margin-right: 3px; }
 
-  &:hover, &:focus {
-    background: rgba(white, 0.1);
-    border-bottom-color: lighten($ic-brand-primary, 15%);
+  &:focus {
+    text-decoration: underline;
+  }
+
+  &:focus,
+  &:hover {
+    background: var(--ic-brand-primary);
+    color: $ic-color-light;
   }
 
   &.ef-file-preview-button--active {
@@ -191,6 +198,14 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
 }
 .ef-file-preview-container-arrow-link {
   align-self: center;
+  outline: none;
+  &:hover, &:focus {
+    .ef-file-preview-arrow-link {
+      background: var(--ic-brand-primary);
+      border-color: var(--ic-brand-primary);
+      color: $ic-color-light;
+    }
+  }
 }
 .ef-file-preview-arrow-link {
   transition: all 0.2s;
@@ -200,25 +215,10 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   border-radius: 6px;
   padding: 20px 10px 24px;
   text-align: center;
-  &:hover, &:focus {
-    border-color: lighten($ic-brand-primary, 15%);
-    background: transparent;
-  }
-  i {
-    width: auto;
-    @include fontSize(30px);
-    line-height: normal;
-    color: $preview-font-color;
-    &:before {
-      font-size: inherit;
-      width: auto;
-    }
-  }
+  box-sizing: border-box;
+  color: $preview-font-color;
+  @include overwrite-default-icon-size(1.75rem);
 }
-.ef-file-preview-arrow {
-  height: 50px;
-}
-
 .ef-file-preview-viewer-content {
   .ef-file-preview-not-available {
     padding: 100px 0;

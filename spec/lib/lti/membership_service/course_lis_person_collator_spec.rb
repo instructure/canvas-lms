@@ -194,7 +194,7 @@ module Lti::MembershipService
 
     describe '#memberships' do
       it 'returns the number of memberships specified by the per_page params' do
-        Api.stubs(:per_page).returns(1)
+        allow(Api).to receive(:per_page).and_return(1)
         collator = CourseLisPersonCollator.new(@course, @teacher, per_page: 1, page: 1)
 
         expect(collator.memberships.size).to eq(1)
@@ -205,7 +205,7 @@ module Lti::MembershipService
       end
 
       it 'returns the right page of memberships based on the page param' do
-        Api.stubs(:per_page).returns(1)
+        allow(Api).to receive(:per_page).and_return(1)
         collator1 = CourseLisPersonCollator.new(@course, @teacher, per_page: 1, page: 1)
         collator2 = CourseLisPersonCollator.new(@course, @teacher, per_page: 1, page: 2)
         collator3 = CourseLisPersonCollator.new(@course, @teacher, per_page: 1, page: 3)
@@ -225,14 +225,14 @@ module Lti::MembershipService
 
     describe '#next_page?' do
       it 'returns true when there is an additional page of results' do
-        Api.stubs(:per_page).returns(1)
+        allow(Api).to receive(:per_page).and_return(1)
         collator = CourseLisPersonCollator.new(@course, @teacher, per_page: 1, page: 1)
 
         expect(collator.next_page?).to eq(true)
       end
 
       it 'returns false when there are no more pages' do
-        Api.stubs(:per_page).returns(1)
+        allow(Api).to receive(:per_page).and_return(1)
         collator = CourseLisPersonCollator.new(@course, @teacher, per_page: 1, page: 5)
 
         expect(collator.next_page?).to eq(false)

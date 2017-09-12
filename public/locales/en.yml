@@ -281,6 +281,7 @@ en:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: course
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "course id"
     report_header_course_name: "course name"
     report_header_course_sis: "course sis"
@@ -685,13 +686,13 @@ en:
     default_account_quotas_not_updated: "Default account quotas were not updated"
     default_account_quotas_updated: "Default account quotas updated"
     devry: 
-      dcr2: 
+      attendance_extract: 
         parameters: 
           custom_reports: 
             start: 
               parameters: 
                 header: "Activity Date:"
-      dcr4: 
+      no_submissions: 
         parameters: 
           custom_reports: 
             end: 
@@ -700,7 +701,7 @@ en:
             start: 
               parameters: 
                 header: "Start at:"
-      dcr7: 
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -1955,6 +1956,9 @@ en:
     drop_lowest_rule: 
       one: "Drop the lowest score"
       other: "Drop the lowest %{count} scores"
+    edit: 
+      links: 
+        add_rubric: Rubric
     edit_view: 
       assignment_name: "Assignment Name"
       buttons: 
@@ -2146,7 +2150,6 @@ en:
       for: For
       links: 
         add_rubric: Rubric
-        assign_rubric: "Assign Rubric"
         edit: Edit
       manage: Manage
       messages: 
@@ -2553,6 +2556,8 @@ en:
     masquerade: "Masquerade as user"
     ok: OK
     okay: Okay
+    publish: Publish
+    published: Published
     refresh: refresh
     save: Save
     search: Search
@@ -2563,6 +2568,8 @@ en:
     show_all_artifacts: "Show All Artifacts"
     submit: Submit
     unmasquerade: "Stop Masquerading"
+    unpublish: Unpublish
+    unpublished: Unpublished
     update: Update
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "By default all links are enabled for a course.  Students won't see links to sections that don't have content.  For example, if you haven't created any quizzes, they won't see the quizzes link.  You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."
   by_lti_2_registration_url_e421e523: "By LTI 2 Registration URL"
@@ -3096,15 +3103,31 @@ en:
   click_to_edit_drag_to_reorder_ab725681: "Click to edit, drag to reorder"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Click to enter comments, if the student chooses this answer"
   click_to_load_a020891b: "(click to load)"
-  click_to_publish_ad27be9d: "Click to publish."
+  click_to_order_by_email_ascending_98b1a697: "Click to order by email ascending"
+  click_to_order_by_last_login_ascending_502b6ad2: "Click to order by last login ascending"
+  click_to_order_by_sis_id_ascending_692d35a7: "Click to order by SIS ID ascending"
   click_to_report_profile_picture_370f9625: "Click to report profile picture"
   click_to_select_bd3b3a0d: "click to select"
   click_to_select_user_name_41746803: "Click to select user %{name}"
   click_to_set_this_answer_as_correct_1326e3fd: "Click to set this answer as correct"
   click_to_skip_address_8f874b32: "Click to skip %{address}"
+  click_to_sort_by_email_ascending_cb789ec4: "Click to sort by email ascending"
+  click_to_sort_by_email_descending_72801b54: "Click to sort by email descending"
+  click_to_sort_by_enrollments_ascending_f535b994: "Click to sort by enrollments ascending"
+  click_to_sort_by_enrollments_descending_3e5c80ee: "Click to sort by enrollments descending"
+  click_to_sort_by_last_login_ascending_eafcbee4: "Click to sort by last login ascending"
+  click_to_sort_by_last_login_descending_61fdadc: "Click to sort by last login descending"
+  click_to_sort_by_name_ascending_739c011e: "Click to sort by name ascending"
+  click_to_sort_by_name_descending_b6262093: "Click to sort by name descending"
+  click_to_sort_by_sis_id_ascending_832c870: "Click to sort by SIS ID ascending"
+  click_to_sort_by_sis_id_descending_2d611236: "Click to sort by SIS ID descending"
+  click_to_sort_by_subaccount_ascending_11252bc4: "Click to sort by subaccount ascending"
+  click_to_sort_by_subaccount_descending_3d8a2381: "Click to sort by subaccount descending"
+  click_to_sort_by_teacher_ascending_cda7a18c: "Click to sort by teacher ascending"
+  click_to_sort_by_teacher_descending_45ef0d1e: "Click to sort by teacher descending"
+  click_to_sort_c81ff8c8: "Click to sort."
   click_to_test_a_different_score_2e0bb6f0: "Click to test a different score"
   click_to_test_dropdown_b950974d: "Click to test dropdown"
-  click_to_unpublish_5b19e761: "Click to unpublish."
   click_to_view_event_details_b25dc1f3: "Click to view event details"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Clicking on the column headers will sort the rows by that column."
   clone_group_set_c2a40e15: "Clone Group Set"
@@ -3119,6 +3142,8 @@ en:
   closes_5c6b4367: "Closes:"
   code_is_case_sensitive_d8175cad: "Code is case sensitive."
   cog_icon_69bdffd5: "Cog icon"
+  col_is_sorted_ascending_cc5152cc: "%{col} is sorted ascending"
+  col_is_sorted_descending_1cef74aa: "%{col} is sorted descending."
   collaboration_71c024f4: Collaboration
   collaboration_ce3e2bac: "+ Collaboration"
   collaboration_creation_failed_95ff831f: "Collaboration creation failed"
@@ -4171,6 +4196,7 @@ en:
   count_items_selected_91814713: 
     one: "%{count} item selected"
     other: "%{count} items selected"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} items would be deleted and exceeds the set threshold of %{change_threshold}%"
   count_max_students_2db76773: "%{count} / %{max} students"
   count_max_users_bdebb537: "%{count} / %{max} users"
   count_messages_4f8ff204: 
@@ -5204,6 +5230,7 @@ en:
       year: Year
   day_9d999bec: Day
   day_s_7cc1231f: Day(s)
+  days_late_a3a721b0: "Days late"
   deactivate_this_key_3e79a2b5: "Deactivate this key"
   deactivate_user_86c09036: "Deactivate User"
   decaying_average_8bf6a0dd: "Decaying Average"
@@ -6596,6 +6623,7 @@ en:
   generating_c2aabc02: Generating...
   generating_preview_45b53be0: "Generating preview..."
   germany_49_fc5b8179: "Germany (+49)"
+  get_started_b9507525: "Get Started"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Get the following from your Salesforce Connected App"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Get your users error reports posted to Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Get your users error reports posted to Salesforce"
@@ -6667,6 +6695,7 @@ en:
       saving_settings: "Saving Settings..."
       submitting: Submitting...
     cancel_button: Cancel
+    canvadoc_expiring: "Your Canvas DocViewer session is expiring soon.  Please reload the window to avoid losing any work."
     column_header: 
       assignment_options: "Assignment Options"
       this_assignment_is_muted: "This assignment is muted"
@@ -7467,6 +7496,8 @@ en:
   host_8be927e0: Host
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Host is unreachable or not pointing to Catalog"
   hour_34d02553: Hour
+  hour_s_b6e8d238: Hour(s)
+  hours_late_989e9081: "Hours late"
   hover_over_me_496521b9: "Hover over me"
   how_is_this_affecting_you_b3b6a639: "How is this affecting you?"
   how_many_minutes_ecca5ee7: "How many minutes?"
@@ -7477,6 +7508,7 @@ en:
   i_have_obtained_permission_to_use_this_file_6386f087: "I have obtained permission to use this file."
   i_hold_the_copyright_71ee91b1: "I hold the copyright"
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "I need some help, but it is not urgent"
+  iceland_354_1a03c558: "Iceland (+354)"
   icon_215a1dc6: Icon
   icons: 
     discussion_submission: "Discussion Submission"
@@ -8012,6 +8044,7 @@ en:
   loading_25990131: Loading...
   loading_725811ca: loading
   loading_announcements_b927a86c: "Loading Announcements"
+  loading_assignments_352ec769: "Loading Assignments"
   loading_associations_9da66c4e: "Loading Associations"
   loading_associations_complete_b93a9c6e: "Loading associations complete"
   loading_associations_started_1f65d8d: "Loading associations started"
@@ -8025,7 +8058,9 @@ en:
   loading_courses_started_6e6d742c: "Loading courses started"
   loading_data_ecd89ba: "Loading Data.."
   loading_graders_f6a76142: "Loading Graders"
+  loading_more_grade_history_results_b235de5: "Loading more grade history results."
   loading_more_results_def6df65: "Loading more results..."
+  loading_results_769c8819: "Loading Results"
   loading_students_30b71301: "Loading Students"
   loading_sync_history_9f342cbf: "Loading Sync History"
   loading_unsynced_changes_b5d7b202: "Loading Unsynced Changes"
@@ -9996,6 +10031,7 @@ en:
   more_courses_5ebbe998: "More Courses"
   more_info_at_course_name_56dc8c10: "More info at %{course_name}"
   more_information_3dfb76b5: "More information"
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: "More results were added at the bottom of the page."
   more_than_999_submissions_need_grading_bc087dd0: "More than 999 submissions need grading"
   more_than_a19b440: "%{more_than}+"
   most_recent_export_7282b756: "Most recent export"
@@ -10176,6 +10212,7 @@ en:
   nickname_7df95b09: "Nickname:"
   no_74e9b590: "no"
   no_assignment_name_adbb215b: "No Assignment Name"
+  no_assignments_with_that_name_found_1d7be1: "No assignments with that name found"
   no_associated_terms_13bacefc: "No Associated Terms"
   no_attributes_locked_611c5cc: "no attributes locked"
   no_collaboration_apps_3bbd30ce: "No Collaboration Apps"
@@ -10197,6 +10234,7 @@ en:
   no_items_in_module_21f111a2: "No items in module"
   no_matching_users_found_83889c10: "No matching users found."
   no_migration_file: "File required for content migration."
+  no_more_results_to_load_6774fb1c: "No more results to load."
   no_outcome_file_or_authority_given_c90f9c5f: "No outcome file or authority given"
   no_password_was_given_472222e5: "No password was given"
   no_placements_enabled_f705f28: "No Placements Enabled"
@@ -10204,6 +10242,7 @@ en:
   no_points_possible_72db3a55: "No points possible"
   no_results_f36777ee: "No results"
   no_results_found_58717065: "No results found"
+  no_results_found_e4b686bd: "No results found."
   no_score_yet_c94e919b: "No score yet"
   no_students_dd8de9f0: "No Students"
   no_students_have_taken_the_quiz_yet_e667644b: "No Students have taken the quiz yet"
@@ -10917,7 +10956,6 @@ en:
   please_select_a_user_role_for_this_link_9fb4e655: "Please select a user role for this link."
   please_select_one_f931e883: "Please select one"
   please_upload_files_as_a_zip_5a2c799f: "Please upload files as a .zip"
-  please_wait_2b646bc2: "Please wait."
   please_wait_e6355980: "Please wait..."
   plugins: 
     academic_benchmark_importer: 
@@ -11770,7 +11808,6 @@ en:
   published_click_to_unpublish_item_name_aaa804b0: "Published. Click to unpublish %{item_name}."
   published_click_to_unpublish_module_name_eddd07bb: "Published. Click to unpublish %{module_name}."
   published_click_to_unpublish_name_9bdd66cf: "Published. Click to unpublish %{name}"
-  publishing_9890d50f: Publishing…
   publishing_is_disabled_for_this_item_efa7803f: "Publishing is disabled for this item"
   publishing_item_name_is_disabled_8207a9e7: "Publishing %{item_name} is disabled"
   purple_7678a9fc: Purple
@@ -12895,7 +12932,6 @@ en:
   radio_button_option_2_31e50043: "Radio button option 2"
   range_56b2f310: Range
   range_name_90614433: "Range name"
-  rangestudents_out_of_totalstudents_students_click__21beede0: "%{rangeStudents} out of %{totalStudents} students, click to view range student details"
   rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} out of %{totalStudents} students"
   ratio_answered_correctly_b0c1e7d: "%{ratio}% answered correctly"
   ratio_responded_correctly_6d890107: "%{ratio}% responded correctly"
@@ -14104,6 +14140,9 @@ en:
       titles: 
         full_comments: "Click to see full comments"
         linked_to_learning_outcome: "This criterion is linked to a Learning Outcome"
+    rubrics_component: 
+      links: 
+        assign_rubric: "Assign Rubric"
     select_content_dialog: 
       add_to_module: "Add %{item} to *module*"
       assignment_item: Assignment
@@ -14405,6 +14444,7 @@ en:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Some submissions are not gradeable; grade changes for those submissions have been ignored."
   someone: Someone
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Something is broken, but I can work around it for now"
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on \"%{assignmentTitle}\" to load SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Something went wrong re-activating the user. Please try again later."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Something went wrong updating the user's role. Please try again later."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Something went wrong when trying to sync grades to the student information system. Please try again later."
@@ -14413,10 +14453,10 @@ en:
   sort_by_72dbba9c: "Sort by"
   sort_courses_cf94b8d4: "Sort courses"
   sortable_name_73f707cf: "Sortable Name"
-  sorted_ascending_2318ec99: "Sorted Ascending"
+  sorted_ascending_3138603c: "sorted ascending."
   sorted_ascending_b6d61547: "sorted ascending"
   sorted_descending_1e30f0d5: "sorted descending"
-  sorted_descending_7fcec1ff: "Sorted Descending"
+  sorted_descending_84ec84c8: "sorted descending."
   source_code_2395ca74: "Source code"
   south_korea_82_10618967: "South Korea (+82)"
   space_ec476863: Space
@@ -14563,6 +14603,7 @@ en:
     zero: "Student who haven't taken the survey"
   students_will_automatically_receive_full_credit_on_cc61df39: "students will automatically receive full credit once they take the survey"
   students_with_no_submissions_title: "Students with no submissions"
+  sub_account_daeadd0: Sub-Account
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "You can't delete a sub-account that has courses in it"
@@ -14628,6 +14669,7 @@ en:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Submitted multiple times, choose which to view:"
     update_grade: "Update Grade"
     view_rubric_assessment_in_the_speedgrader: "View Rubric Assessment in the SpeedGrader"
+  submission_status_3079e730: "Submission status"
   submission_tray_429ac3df: "Submission tray"
   submissions: 
     assignment_submit_success: "Assignment successfully submitted."
@@ -15477,7 +15519,6 @@ en:
   unpublished_click_to_publish_name_10104b5c: "Unpublished. Click to publish %{name}"
   unpublished_courses_title: "Unpublished Courses"
   unpublished_dfd8801: unpublished
-  unpublishing_1fa99dc6: Unpublishing…
   unread_e9c1b19c: Unread
   unregister_service_985238e9: "Unregister Service"
   unreserved_e86b7425: Unreserved

@@ -30,10 +30,6 @@ describe "sync grades to sis" do
     @assignment_group = @course.assignment_groups.create!(name: 'Assignment Group')
   end
 
-  after :each do
-    unstub_rcs_config
-  end
-
   it "does not display Sync to SIS option when feature not configured", priority: "1", test_id: 246614 do
     Account.default.set_feature_flag!('post_grades', 'off')
     get "/courses/#{@course.id}/discussion_topics/new"

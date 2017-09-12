@@ -144,7 +144,7 @@ body.Sg-only {
 // Dresscode class
 .Sg-Article {
   > h1 {
-    background: $sg-content-title-background;
+    background: var(--ic-brand-primary);
     color: $sg-content-title-font-color;
     @include fontSize(48px);
     font-weight: 100;
@@ -185,7 +185,7 @@ body.Sg-only {
  .sg-src-file-path {
     text-align: center;
     padding: 5px 0;
-    background: $sg-src-file-path-background;
+    background: var(--ic-brand-primary);
     border-top:1px solid $sg-src-file-path-border-color;
     color: $sg-src-file-path-font-color;
   }

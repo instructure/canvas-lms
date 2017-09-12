@@ -241,7 +241,7 @@ describe "editing grades" do
 
   it "should display an error on failed updates", priority: "1", test_id: 220384 do
     # forces a 400
-    SubmissionsApiController.any_instance.expects(:get_user_considering_section).returns(nil)
+    expect_any_instance_of(SubmissionsApiController).to receive(:get_user_considering_section).and_return(nil)
     grade_page.visit_gradebook(@course)
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     expect_flash_message :error, "refresh"

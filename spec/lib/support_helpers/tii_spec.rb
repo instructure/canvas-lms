@@ -46,9 +46,9 @@ describe SupportHelpers::Tii do
         after_time = 2.months.ago
         e2305_fixer = SupportHelpers::Tii::Error2305Fixer.new('email', after_time)
         assignment_fixer = SupportHelpers::Tii::AssignmentFixer.new('email', after_time, @a1.id)
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).with('email', after_time, @a1.id).returns(assignment_fixer)
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).with('email', after_time, @a3.id).returns(assignment_fixer)
-        assignment_fixer.expects(:fix).with(:assignment_fix).twice
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with('email', after_time, @a1.id).and_return(assignment_fixer)
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with('email', after_time, @a3.id).and_return(assignment_fixer)
+        expect(assignment_fixer).to receive(:fix).with(:assignment_fix).twice
         Timecop.scale(300) { e2305_fixer.fix }
       end
     end
@@ -82,9 +82,9 @@ describe SupportHelpers::Tii do
         after_time = 2.months.ago
         md5_fixer = SupportHelpers::Tii::MD5Fixer.new('email', after_time)
         assignment_fixer = SupportHelpers::Tii::AssignmentFixer.new('email', after_time, @a1.id)
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).with('email', after_time, @a1.id).returns(assignment_fixer)
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).with('email', after_time, @a3.id).returns(assignment_fixer)
-        assignment_fixer.expects(:fix).with(:md5_fix).twice
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with('email', after_time, @a1.id).and_return(assignment_fixer)
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with('email', after_time, @a3.id).and_return(assignment_fixer)
+        expect(assignment_fixer).to receive(:fix).with(:md5_fix).twice
         Timecop.scale(300) { md5_fixer.fix }
       end
     end
@@ -130,9 +130,9 @@ describe SupportHelpers::Tii do
       it 'creates an AssignmentFixer for each broken assignment' do
         shard_fixer = SupportHelpers::Tii::ShardFixer.new('email')
         assignment_fixer = SupportHelpers::Tii::AssignmentFixer.new('email', nil, @a1.id)
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).with('email', is_a(Time), @a1.id).returns(assignment_fixer)
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).with('email', is_a(Time), @s4.assignment_id).returns(assignment_fixer)
-        assignment_fixer.expects(:fix).twice
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with('email', be_a(Time), @a1.id).and_return(assignment_fixer)
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with('email', be_a(Time), @s4.assignment_id).and_return(assignment_fixer)
+        expect(assignment_fixer).to receive(:fix).twice
         Timecop.scale(300) { shard_fixer.fix }
       end
     end
@@ -266,13 +266,19 @@ describe SupportHelpers::Tii do
 
       describe '#fix' do
         it 'saves the assignment and resubmits the broken submissions' do
-          turnitin_client = mock
-          Turnitin::Client.expects(:new).returns(turnitin_client)
+          turnitin_client = double
+          expect(Turnitin::Client).to receive(:new).and_return(turnitin_client)
 
           fixer = SupportHelpers::Tii::AssignmentFixer.new('email', nil, @a1.id)
-          turnitin_client.expects(:createCourse).never
-          turnitin_client.expects(:createOrUpdateAssignment).returns({assignment_id: 1})
-          Submission.any_instance.expects(:resubmit_to_turnitin).times(2)
+          expect(turnitin_client).to receive(:createCourse).never
+          expect(turnitin_client).to receive(:createOrUpdateAssignment).and_return({assignment_id: 1})
+          expect_any_instantiation_of(@s1).to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s2).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s3).to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s4).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s5).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s6).to receive(:resubmit_to_turnitin).never
+
           Timecop.scale(300) { fixer.fix(:md5_fix) }
         end
       end
@@ -308,8 +314,14 @@ describe SupportHelpers::Tii do
 
       describe '#fix' do
         it 'does nothing' do
-          Turnitin::Client.expects(:new).never
-          Submission.any_instance.expects(:resubmit_to_turnitin).never
+          expect(Turnitin::Client).to receive(:new).never
+          expect_any_instantiation_of(@s1).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s2).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s3).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s4).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s5).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s6).to receive(:resubmit_to_turnitin).never
+
 
           fixer = SupportHelpers::Tii::AssignmentFixer.new('email', nil, @a1.id)
           Timecop.scale(300) { fixer.fix }
@@ -319,16 +331,21 @@ describe SupportHelpers::Tii do
 
     def fix_helper(create_course: false, create_or_update_assignment: false)
       if create_course || create_or_update_assignment
-        turnitin_client = mock
-        Turnitin::Client.expects(:new).returns(turnitin_client)
+        turnitin_client = double
+        expect(Turnitin::Client).to receive(:new).and_return(turnitin_client)
       else
-        Turnitin::Client.expects(:new).never
+        expect(Turnitin::Client).to receive(:new).never
       end
 
       fixer = SupportHelpers::Tii::AssignmentFixer.new('email', nil, @a1.id)
-      turnitin_client.expects(:createCourse) if create_course
-      turnitin_client.expects(:createOrUpdateAssignment).returns({assignment_id: 1}) if create_or_update_assignment
-      Submission.any_instance.expects(:resubmit_to_turnitin).times(2)
+      expect(turnitin_client).to receive(:createCourse) if create_course
+      expect(turnitin_client).to receive(:createOrUpdateAssignment).and_return({assignment_id: 1}) if create_or_update_assignment
+      expect_any_instantiation_of(@s1).to receive(:resubmit_to_turnitin)
+      expect_any_instantiation_of(@s2).to receive(:resubmit_to_turnitin).never
+      expect_any_instantiation_of(@s3).to receive(:resubmit_to_turnitin)
+      expect_any_instantiation_of(@s4).to receive(:resubmit_to_turnitin).never
+      expect_any_instantiation_of(@s5).to receive(:resubmit_to_turnitin).never
+      expect_any_instantiation_of(@s6).to receive(:resubmit_to_turnitin).never
       Timecop.scale(300) { fixer.fix }
     end
   end
@@ -339,7 +356,7 @@ describe SupportHelpers::Tii do
 
     describe "#fix" do
       it 'refreshes the attachments' do
-        Turnitin::AttachmentManager.expects(:update_attachment).with(submission, attachment)
+        expect(Turnitin::AttachmentManager).to receive(:update_attachment).with(submission, attachment)
         fixer = SupportHelpers::Tii::LtiAttachmentFixer.new('email', nil, submission.id, attachment.id)
         fixer.fix()
       end
@@ -384,8 +401,8 @@ describe SupportHelpers::Tii do
   #   describe '#fix' do
   #     it 'resubmits all broken submissions and checks turnitin status for all stuck submissions' do
   #       fixer = SupportHelpers::Tii::StuckInPendingFixer.new('email')
-  #       Submission.any_instance.expects(:resubmit_to_turnitin).times(2)
-  #       Submission.any_instance.expects(:check_turnitin_status)
+  #       expect_any_instance_of(Submission).to receive(:resubmit_to_turnitin).exactly(2).times
+  #       expect_any_instance_of(Submission).to receive(:check_turnitin_status)
   #       Timecop.scale(300) { fixer.fix }
   #     end
   #   end
@@ -426,8 +443,8 @@ describe SupportHelpers::Tii do
   #   describe '#fix' do
   #     it 'resubmits all expired submissions and does not check turnitin status for any stuck submissions' do
   #       fixer = SupportHelpers::Tii::ExpiredAccountFixer.new('email')
-  #       Submission.any_instance.expects(:resubmit_to_turnitin)
-  #       Submission.any_instance.expects(:check_turnitin_status).never
+  #       expect_any_instance_of(Submission).to receive(:resubmit_to_turnitin)
+  #       expect_any_instance_of(Submission).to receive(:check_turnitin_status).never
   #       Timecop.scale(300) { fixer.fix }
   #     end
   #   end

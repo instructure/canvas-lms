@@ -86,7 +86,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
   end
 
   it 'has the right urls for script tag and stylesheets on the login page' do
-    Canvas::Cdn.config.expects(:host).at_least_once.returns(EXAMPLE_CDN_HOST)
+    expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(EXAMPLE_CDN_HOST)
     get '/login/canvas'
 
     ['bundles/common', 'bundles/login'].each { |bundle| check_css(bundle) }

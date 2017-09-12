@@ -30,10 +30,6 @@ describe "reply attachment" do
     @student = student_in_course.user
   end
 
-  after() do
-    unstub_rcs_config
-  end
-
   it "should reply to the discussion with attachment" do
     file_attachment = "graded.png"
     entry_text = 'new entry'

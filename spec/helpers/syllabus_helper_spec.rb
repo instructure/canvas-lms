@@ -33,7 +33,7 @@ describe SyllabusHelper do
       end
 
       it 'sends two arguments to `pulic_user_content`' do
-        helper.expects(:public_user_content).with(@course.syllabus_body, @course).once
+        expect(helper).to receive(:public_user_content).with(@course.syllabus_body, @course).once
         helper.syllabus_user_content
       end
     end
@@ -44,7 +44,7 @@ describe SyllabusHelper do
       end
 
       it 'sends two arguments to `pulic_user_content`' do
-        helper.expects(:public_user_content).with(@course.syllabus_body, @course, nil, true).once
+        expect(helper).to receive(:public_user_content).with(@course.syllabus_body, @course, nil, true).once
         helper.syllabus_user_content
       end
     end

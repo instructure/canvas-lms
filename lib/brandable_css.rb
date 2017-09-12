@@ -110,30 +110,64 @@ module BrandableCSS
       @default_variables_md5 ||= Digest::MD5.hexdigest(variables_map_with_image_urls.to_json)
     end
 
+    def handle_urls(value, config, css_urls)
+      return value unless config['type'] == 'image' && css_urls
+      "url('#{value}')" if value.present?
+    end
+
     # gets the *effective* value for a brandable variable
-    def brand_variable_value(variable_name, active_brand_config=nil, config_map=variables_map)
-      explicit_value = active_brand_config && active_brand_config.get_value(variable_name).presence
-      return explicit_value if explicit_value
+    def brand_variable_value(variable_name, active_brand_config=nil, config_map=variables_map, css_urls=false)
       config = config_map[variable_name]
+      explicit_value = active_brand_config && active_brand_config.get_value(variable_name).presence
+      return handle_urls(explicit_value, config, css_urls) if explicit_value
       default = config['default']
       if default && default.starts_with?('$')
-        return brand_variable_value(default[1..-1], active_brand_config, config_map)
+        if css_urls
+          return "var(--#{default[1..-1]})"
+        else
+          return brand_variable_value(default[1..-1], active_brand_config, config_map, css_urls)
+        end
       end
 
       # while in our sass, we want `url(/images/foo.png)`,
       # the Rails Asset Helpers expect us to not have the '/images/', eg: <%= image_tag('foo.png') %>
       default = default.sub(/^\/images\//, '') if config['type'] == 'image'
-      default
+      handle_urls(default, config, css_urls)
     end
 
-    def all_brand_variable_values(active_brand_config=nil)
-      variables_map.each_with_object({}) do |(key, _), memo|
-        memo[key] = brand_variable_value(key, active_brand_config, variables_map_with_image_urls)
+    def computed_variables(active_brand_config=nil)
+      [
+        ['ic-brand-primary', 'darken', 5],
+        ['ic-brand-primary', 'darken', 10],
+        ['ic-brand-primary', 'darken', 15],
+        ['ic-brand-primary', 'lighten', 5],
+        ['ic-brand-primary', 'lighten', 10],
+        ['ic-brand-primary', 'lighten', 15],
+        ['ic-brand-button--primary-bgd', 'darken', 5],
+        ['ic-brand-button--primary-bgd', 'darken', 15],
+        ['ic-brand-button--secondary-bgd', 'darken', 5],
+        ['ic-brand-button--secondary-bgd', 'darken', 15],
+      ].each_with_object({}) do |(variable_name, darken_or_lighten, percent), memo|
+        color = brand_variable_value(variable_name, active_brand_config, variables_map_with_image_urls)
+        computed_color = CanvasColor::Color.new(color).send(darken_or_lighten, percent/100.0)
+        memo["#{variable_name}-#{darken_or_lighten}ed-#{percent}"] = computed_color.to_s
+      end
+    end
+
+    def all_brand_variable_values(active_brand_config=nil, css_urls=false)
+      variables_map.each_with_object(computed_variables(active_brand_config)) do |(key, _), memo|
+        memo[key] = brand_variable_value(key, active_brand_config, variables_map_with_image_urls, css_urls)
       end
     end
 
     def all_brand_variable_values_as_js(active_brand_config=nil)
       "CANVAS_ACTIVE_BRAND_VARIABLES = #{all_brand_variable_values(active_brand_config).to_json};"
+    end
+
+    def all_brand_variable_values_as_css(active_brand_config=nil)
+      ":root {
+        #{all_brand_variable_values(active_brand_config, true).map{ |k, v| "--#{k}: #{v};"}.join("\n")}
+      }"
     end
 
     def branded_scss_folder
@@ -156,12 +190,20 @@ module BrandableCSS
       default_brand_folder.join("variables-#{default_variables_md5}.js")
     end
 
+    def default_brand_css_file
+      default_brand_folder.join("variables-#{default_variables_md5}.css")
+    end
+
     def default_json
       all_brand_variable_values.to_json
     end
 
     def default_js
       all_brand_variable_values_as_js
+    end
+
+    def default_css
+      all_brand_variable_values_as_css
     end
 
     def save_default_json!
@@ -174,6 +216,12 @@ module BrandableCSS
       default_brand_folder.mkpath
       default_brand_js_file.write(default_js)
       move_default_js_to_s3_if_enabled!
+    end
+
+    def save_default_css!
+      default_brand_folder.mkpath
+      default_brand_css_file.write(default_css)
+      move_default_css_to_s3_if_enabled!
     end
 
     def move_default_json_to_s3_if_enabled!
@@ -194,6 +242,15 @@ module BrandableCSS
       end
     end
 
+    def move_default_css_to_s3_if_enabled!
+      return unless defined?(Canvas) && Canvas::Cdn.enabled?
+      s3_uploader.upload_file(public_default_css_path)
+      begin
+        File.delete(default_brand_css_file)
+      rescue Errno::ENOENT # continue if something else deleted it in another process
+      end
+    end
+
     def s3_uploader
       @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
     end
@@ -204,6 +261,10 @@ module BrandableCSS
 
     def public_default_js_path
       "dist/brandable_css/default/variables-#{default_variables_md5}.js"
+    end
+
+    def public_default_css_path
+      "dist/brandable_css/default/variables-#{default_variables_md5}.css"
     end
 
     def variants

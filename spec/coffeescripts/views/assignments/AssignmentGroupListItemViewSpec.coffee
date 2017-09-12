@@ -331,21 +331,6 @@ define [
     equal anchor.text(), "2 Rules"
     equal anchor.attr("title"), "Drop the lowest score and Drop the highest score"
 
-  test "insertAssignment", ->
-    view = createView(@model)
-    newAssignment = -> buildAssignment
-      "id":99
-      "name":"Math HW"
-      "due_at":"2013-08-23T23:59:00-06:00"
-      "points_possible":10
-      "position":4
-
-    numVisibleAssignments = view.visibleAssignments().length
-    view.insertAssignment(newAssignment(), assignment2())
-    newAssignments = view.visibleAssignments()
-    # Check we have something new in the view
-    equal newAssignments.length, numVisibleAssignments + 1
-
   QUnit.module 'AssignmentGroupListItemView as an admin',
     setup: ->
       @model = createAssignmentGroup()

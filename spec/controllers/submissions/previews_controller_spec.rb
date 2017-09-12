@@ -27,7 +27,7 @@ describe Submissions::PreviewsController do
     end
 
     it "should render show_preview" do
-      get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true}
       expect(response).to render_template(:show_preview)
     end
 
@@ -37,7 +37,7 @@ describe Submissions::PreviewsController do
       end
 
       it "should redirect to course_quiz_url" do
-        get :show, course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true
+        get :show, params: {course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true}
         expect(response).to redirect_to(course_quiz_url(@context, @quiz, headless: 1))
       end
 
@@ -51,7 +51,7 @@ describe Submissions::PreviewsController do
         end
 
         it "should redirect to course_quiz_history_url" do
-          get :show, course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true
+          get :show, params: {course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true}
           expect(response).to redirect_to(course_quiz_history_url(@context, @quiz, {
             headless: 1,
             user_id: @student.id,
@@ -61,7 +61,7 @@ describe Submissions::PreviewsController do
 
         it "should favor params[:version] when set" do
           version = 1
-          get :show, {
+          get :show, params: {
             course_id: @context.id,
             assignment_id: @quiz.assignment.id,
             id: @student.id,

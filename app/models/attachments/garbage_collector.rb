@@ -17,10 +17,11 @@
 
 class Attachments::GarbageCollector
   class ByContextType
-    attr_reader :context_type, :older_than, :dry_run, :stats
-    def initialize(context_type:, older_than:, dry_run: false)
+    attr_reader :context_type, :older_than, :restore_state, :dry_run, :stats
+    def initialize(context_type:, older_than:, restore_state: 'processed', dry_run: false)
       @context_type = context_type
       @older_than = older_than
+      @restore_state = restore_state
       @dry_run = dry_run
       @stats = Hash.new(0)
     end
@@ -28,19 +29,24 @@ class Attachments::GarbageCollector
     def delete_content
       to_delete_scope.where(root_attachment_id: nil).find_ids_in_batches(batch_size: 500) do |ids_batch|
         non_type_children = Attachment.where(root_attachment_id: ids_batch).
+          not_deleted.
           where.not(root_attachment_id: nil). # postgres is being weird
           where.not(context_type: context_type).
           order([:root_attachment_id, :id]).
           select("distinct on (attachments.root_attachment_id) attachments.*").
           group_by(&:root_attachment_id)
         same_type_children_fields = Attachment.where(root_attachment_id: ids_batch).
+          not_deleted.
           where(context_type: context_type).
-          pluck(:id, :created_at)
-        same_type_children_ids = same_type_children_fields.map(&:first)
-        same_type_children_max_created_at = same_type_children_fields.map(&:last).compact.max
+          where.not(root_attachment_id: nil). # postgres is being weird
+          select(:id, :created_at, :root_attachment_id).
+          group_by(&:root_attachment_id)
 
         to_delete_ids = []
         Attachment.where(id: ids_batch).each do |att|
+          same_type_children_ids = same_type_children_fields[att.id]&.map(&:id) || []
+          same_type_children_max_created_at = same_type_children_fields[att.id]&.map(&:created_at)&.compact&.max
+
           if has_younger_children?(same_type_children_max_created_at)
             stats[:young_child] += 1
             next
@@ -48,7 +54,10 @@ class Attachments::GarbageCollector
 
           if non_type_children[att.id].present?
             stats[:reparent] += 1
+            # make_childless separates this object and copies the content to
+            # a new root attachment, so we still want to delete the content here.
             att.make_childless(non_type_children[att.id].first) unless dry_run
+            att.destroy_content unless dry_run
           elsif att.filename.present?
             stats[:destroyed] += 1
             att.destroy_content unless dry_run
@@ -81,7 +90,7 @@ class Attachments::GarbageCollector
             restored << att.id
           end
         end
-        updates = { workflow_state: 'zipped', file_state: 'available', deleted_at: nil, updated_at: Time.now.utc }
+        updates = { workflow_state: restore_state, file_state: 'available', deleted_at: nil, updated_at: Time.now.utc }
         Attachment.where(id: restored).update_all(updates) if restored.present?
       end
     end
@@ -121,7 +130,7 @@ class Attachments::GarbageCollector
   # file exports now go through the content export flow.
   class FolderContextType < ByContextType
     def initialize(dry_run: false)
-      super(context_type: 'Folder', older_than: nil, dry_run: dry_run)
+      super(context_type: 'Folder', older_than: nil, restore_state: 'zipped', dry_run: dry_run)
     end
   end
 

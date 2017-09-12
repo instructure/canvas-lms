@@ -17,122 +17,92 @@
  */
 
 import axios from 'axios';
-import constants from 'jsx/gradebook-history/constants';
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
 
-function mockOutParams (id, timeFrame = {from: '', to: ''}) {
-  return {
-    params: {
-      id,
-      start_time: timeFrame.from,
-      end_time: timeFrame.to,
-      per_page: 10
-    }
-  };
-}
-
 QUnit.module('HistoryApi', {
   setup () {
+    this.courseId = 123;
+
     this.getStub = this.stub(axios, 'get')
       .returns(Promise.resolve({
         status: 200,
-        response: Fixtures.response()
+        response: Fixtures.historyResponse()
       }));
   }
 });
 
-test('getByAssignment without a timeFrame', function () {
-  const assignmentId = 1;
-  const url = encodeURI(`/api/v1/audit/grade_change/assignments/${assignmentId}`);
-  const params = mockOutParams(assignmentId);
-  const promise = HistoryApi.getByAssignment(1);
-
-  return promise.then(() => {
-    equal(this.getStub.callCount, 1);
-    equal(this.getStub.firstCall.args[0], url);
-    deepEqual(this.getStub.firstCall.args[1], params);
-  });
+test('getGradeHistory sends a request to the grade change audit url', function () {
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}`;
+  HistoryApi.getGradeHistory(this.courseId, {});
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
 });
 
-test('getByAssignment with a timeFrame', function () {
-  const assignmentId = 1;
-  const url = encodeURI(`/api/v1/audit/grade_change/assignments/${assignmentId}`);
-  const params = mockOutParams(assignmentId, Fixtures.timeFrame());
-  const promise = HistoryApi.getByAssignment(1, Fixtures.timeFrame());
-
-  return promise.then(() => {
-    equal(this.getStub.callCount, 1);
-    equal(this.getStub.firstCall.args[0], url);
-    deepEqual(this.getStub.firstCall.args[1], params);
-  });
+test('getGradeHistory requests with course and assignment', function () {
+  const assignment = '21';
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/${assignment}`;
+  HistoryApi.getGradeHistory(this.courseId, { assignment });
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
 });
 
-test('getByDate', function (assert) {
-  const done = assert.async();
-  const timeFrame = Fixtures.timeFrame();
-  const url = encodeURI(`/api/v1/audit/grade_change/courses/${constants.courseId()}`);
-  const params = {
-    params: { start_time: timeFrame.from, end_time: timeFrame.to }
-  };
-  const promise = HistoryApi.getByDate(timeFrame);
-
-  promise.then(() => {
-    strictEqual(this.getStub.callCount, 1);
-    strictEqual(this.getStub.firstCall.args[0], url);
-    deepEqual(this.getStub.firstCall.args[1], params);
-    done();
-  });
+test('getGradeHistory requests with course and grader', function () {
+  const grader = '22';
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/graders/${grader}`;
+  HistoryApi.getGradeHistory(this.courseId, { grader });
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
 });
 
-test('getByGrader without a timeFrame', function () {
-  const graderId = 1;
-  const url = encodeURI(`/api/v1/audit/grade_change/graders/${graderId}`);
-  const params = mockOutParams(graderId);
-  const promise = HistoryApi.getByGrader(1);
-
-  return promise.then(() => {
-    equal(this.getStub.callCount, 1);
-    equal(this.getStub.firstCall.args[0], url);
-    deepEqual(this.getStub.firstCall.args[1], params);
-  });
+test('getGradeHistory requests with course and student', function () {
+  const student = '23';
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/students/${student}`;
+  HistoryApi.getGradeHistory(this.courseId, { student });
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
 });
 
-test('getByGrader with a timeFrame', function () {
-  const graderId = 1;
-  const url = encodeURI(`/api/v1/audit/grade_change/graders/${graderId}`);
-  const params = mockOutParams(graderId, Fixtures.timeFrame());
-  const promise = HistoryApi.getByGrader(1, Fixtures.timeFrame());
-
-  return promise.then(() => {
-    equal(this.getStub.callCount, 1);
-    equal(this.getStub.firstCall.args[0], url);
-    deepEqual(this.getStub.firstCall.args[1], params);
-  });
+test('getGradeHistory requests with course, assignment, and grader', function () {
+  const grader = '22';
+  const assignment = '210';
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/${assignment}/graders/${grader}`;
+  HistoryApi.getGradeHistory(this.courseId, { assignment, grader });
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
 });
 
-test('getByStudent without a timeFrame', function () {
-  const studentId = 1;
-  const url = encodeURI(`/api/v1/audit/grade_change/students/${studentId}`);
-  const params = mockOutParams(studentId);
-  const promise = HistoryApi.getByStudent(1);
-
-  return promise.then(() => {
-    equal(this.getStub.callCount, 1);
-    equal(this.getStub.firstCall.args[0], url);
-    deepEqual(this.getStub.firstCall.args[1], params);
-  });
+test('getGradeHistory requests with course, assignment, and student', function () {
+  const student = '23';
+  const assignment = '210';
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/${assignment}/students/${student}`;
+  HistoryApi.getGradeHistory(this.courseId, { assignment, student });
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
 });
 
-test('getByStudent with a timeFrame', function () {
-  const studentId = 1;
-  const url = encodeURI(`/api/v1/audit/grade_change/students/${studentId}`);
-  const params = mockOutParams(studentId, Fixtures.timeFrame());
-  const promise = HistoryApi.getByStudent(1, Fixtures.timeFrame());
+test('getGradeHistory requests with course, grader, and student', function () {
+  const grader = '23';
+  const student = '230';
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/graders/${grader}/students/${student}`;
+  HistoryApi.getGradeHistory(this.courseId, { grader, student });
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
+});
 
-  return promise.then(() => {
-    equal(this.getStub.callCount, 1);
-    equal(this.getStub.firstCall.args[0], url);
-    deepEqual(this.getStub.firstCall.args[1], params);
-  });
+test('getGradeHistory requests with course, assignment, grader, and student', function () {
+  const grader = '22';
+  const assignment = '220';
+  const student = '2200'
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/${assignment}/graders/${grader}/students/${student}`;
+  HistoryApi.getGradeHistory(this.courseId, { assignment, grader, student });
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
+});
+
+test('getNextPage makes an axios get request', function () {
+  const url = encodeURI('http://example.com/grades?page=42&per_page=100000000');
+  HistoryApi.getNextPage(url);
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
 });

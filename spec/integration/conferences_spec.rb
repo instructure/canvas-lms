@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ConferencesController, type: :request do
   before do
-    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
+    allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
   end
 
   it "should notify participants" do
@@ -34,7 +34,7 @@ describe ConferencesController, type: :request do
     @student2.register!
     [@teacher, @student1, @student2].each {|u| u.email_channel.confirm!}
 
-    post "/courses/#{@course.id}/conferences", { :web_conference => {"duration"=>"60", "conference_type"=>"Wimba", "title"=>"let's chat", "description"=>""}, :user => { "all" => "1" } }
+    post "/courses/#{@course.id}/conferences", params: { :web_conference => {"duration"=>"60", "conference_type"=>"Wimba", "title"=>"let's chat", "description"=>""}, :user => { "all" => "1" } }
     expect(response).to be_redirect
     @conference = WebConference.first
     expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2])
@@ -42,7 +42,7 @@ describe ConferencesController, type: :request do
     @student3 = student_in_course(:active_all => true, :user => user_with_pseudonym(:username => "student3@example.com")).user
     @student3.register!
     @student3.email_channel.confirm!
-    put "/courses/#{@course.id}/conferences/#{@conference.id}", { :web_conference => { "title" => "moar" }, :user => { @student3.id => '1' } }
+    put "/courses/#{@course.id}/conferences/#{@conference.id}", params: { :web_conference => { "title" => "moar" }, :user => { @student3.id => '1' } }
     expect(response).to be_redirect
     expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2, @student3])
   end

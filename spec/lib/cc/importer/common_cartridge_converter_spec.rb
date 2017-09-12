@@ -34,9 +34,7 @@ describe "Standard Common Cartridge importing" do
     @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   it "should import webcontent" do
@@ -452,10 +450,10 @@ describe "More Standard Common Cartridge importing" do
     @copy_to.course_code = "alt name"
 
     @migration = Object.new
-    @migration.stubs(:to_import).returns(nil)
-    @migration.stubs(:context).returns(@copy_to)
-    @migration.stubs(:import_object?).returns(true)
-    @migration.stubs(:add_imported_item)
+    allow(@migration).to receive(:to_import).and_return(nil)
+    allow(@migration).to receive(:context).and_return(@copy_to)
+    allow(@migration).to receive(:import_object?).and_return(true)
+    allow(@migration).to receive(:add_imported_item)
   end
 
   it "should properly handle top-level resource references" do
@@ -605,9 +603,7 @@ describe "LTI tool combination" do
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   it "should combine lti tools in cc packages when possible" do
@@ -645,9 +641,7 @@ describe "other cc files" do
       :base_download_dir=>unzipped_file_path, :content_migration => @migration)
     converter.export
     @course_data = converter.course.with_indifferent_access
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   describe "cc assignment extensions" do

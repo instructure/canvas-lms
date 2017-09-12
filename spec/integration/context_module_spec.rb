@@ -84,7 +84,7 @@ describe ContextModule do
       @discussion = @course.discussion_topics.create!(:title => "talk")
       @tag = @module.add_item(:type => 'discussion_topic', :id => @discussion.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", :discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id }
+        post "/courses/#{@course.id}/discussion_entries", params: {:discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id }}
         expect(response).to be_redirect
       end
     end
@@ -93,7 +93,7 @@ describe ContextModule do
       @page = @course.wiki.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
-        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", :wiki_page => { :body => 'i agree', :title => 'talk page' }
+        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: {:wiki_page => { :body => 'i agree', :title => 'talk page' }}
       end
     end
 
@@ -101,7 +101,7 @@ describe ContextModule do
       @assignment = @course.assignments.create!(:title => 'talk assn', :submission_types => 'discussion_topic')
       @tag = @module.add_item(:type => 'assignment', :id => @assignment.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", :discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id }
+        post "/courses/#{@course.id}/discussion_entries", params: {:discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id }}
         expect(response).to be_redirect
       end
     end
@@ -268,43 +268,6 @@ describe ContextModule do
         expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /4am/
         expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /7am/
       end
-    end
-  end
-
-  describe "cache_visibilities_for_students" do
-    it "should load visibilities for each model" do
-      AssignmentStudentVisibility.expects(:visible_assignment_ids_in_course_by_user).returns({}).once
-      DiscussionTopic.expects(:visible_ids_by_user).returns({}).once
-      WikiPage.expects(:visible_ids_by_user).returns({}).once
-      Quizzes::QuizStudentVisibility.expects(:visible_quiz_ids_in_course_by_user).returns({}).once
-      course_module
-      @module.assignment_visibilities_for_users([2])
-      @module.discussion_visibilities_for_users([2])
-      @module.page_visibilities_for_users([2])
-      @module.quiz_visibilities_for_users([2])
-    end
-  end
-
-  describe "object_visibilities_for_user" do
-    it "should load visibilities for each model" do
-      course_module
-      assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-
-      @module = ContextModule.find(@module.id) #clear cache of visibilities
-
-      user_visibilites = @module.assignment_visibilities_for_users([@user.id])
-      expect(user_visibilites).to eq [@assignment.id]
-    end
-
-    it "should load visibilities for each model with cache" do
-      course_module
-      assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-
-      @module = ContextModule.find(@module.id) #clear old cache of visibilities
-      @module.cache_visibilities_for_students([@user.id]) #make updated cache
-
-      user_visibilites = @module.assignment_visibilities_for_users([@user.id])
-      expect(user_visibilites).to eq [@assignment.id]
     end
   end
 end

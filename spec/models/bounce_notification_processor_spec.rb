@@ -30,60 +30,72 @@ describe BounceNotificationProcessor do
   end
 
   def mock_message(json)
-    message = mock
-    message.stubs(:body).returns(json.to_json)
+    message = double
+    allow(message).to receive(:body).and_return(json.to_json)
     message
   end
 
   describe ".process" do
     it "processes each notification in the queue" do
       bnp = BounceNotificationProcessor.new(access_key: 'key', secret_access_key: 'secret')
-      queue = mock
-      queue.expects(:poll).multiple_yields(*@all_bounce_messages_json.map {|m| mock_message(m)})
-      bnp.stubs(:bounce_queue).returns(queue)
-      bnp.expects(:process_bounce_notification).times(@bounce_count)
+      queue = double
+      expectation = receive(:poll)
+      @all_bounce_messages_json.each do |m|
+        expectation.and_yield(mock_message(m))
+      end
+      expect(queue).to expectation
+      allow(bnp).to receive(:bounce_queue).and_return(queue)
+      expect(bnp).to receive(:process_bounce_notification).exactly(@bounce_count).times
       bnp.process
     end
 
     it "flags addresses with hard bounces" do
       bnp = BounceNotificationProcessor.new(access_key: 'key', secret_access_key: 'secret')
-      queue = mock
-      queue.expects(:poll).multiple_yields(*@all_bounce_messages_json.map {|m| mock_message(m)})
-      bnp.stubs(:bounce_queue).returns(queue)
+      queue = double
+      expectation = receive(:poll)
+      @all_bounce_messages_json.each do |m|
+        expectation.and_yield(mock_message(m))
+      end
+      expect(queue).to expectation
+      allow(bnp).to receive(:bounce_queue).and_return(queue)
 
-      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, permanent_bounce:, suppression_bounce:|
-        path == 'hard@example.edu' &&
-        timestamp == '2014-08-22T12:25:46.786Z' &&
-        permanent_bounce == true &&
-        suppression_bounce == false
-      end.times(4)
-      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, permanent_bounce:, suppression_bounce:|
-        path == 'suppressed@example.edu' &&
-        timestamp == '2014-08-22T12:18:58.044Z' &&
-        permanent_bounce == true &&
-        suppression_bounce == true
-      end.times(3)
-      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, permanent_bounce:, suppression_bounce:|
-        path == 'soft@example.edu' &&
-        timestamp == '2014-08-22T13:24:31.000Z' &&
-        permanent_bounce == false &&
-        suppression_bounce == false
-      end.times(1)
+      expect(CommunicationChannel).to receive(:bounce_for_path).
+        with(include(path: 'hard@example.edu',
+                     timestamp: '2014-08-22T12:25:46.786Z',
+                     permanent_bounce: true,
+                     suppression_bounce: false)).
+        exactly(4).times
+      expect(CommunicationChannel).to receive(:bounce_for_path).
+        with(include(path: 'suppressed@example.edu',
+                     timestamp: '2014-08-22T12:18:58.044Z',
+                     permanent_bounce: true,
+                     suppression_bounce: true)).
+        exactly(3).times
+      expect(CommunicationChannel).to receive(:bounce_for_path).
+        with(include(path: 'soft@example.edu',
+                     timestamp: '2014-08-22T13:24:31.000Z',
+                     permanent_bounce: false,
+                     suppression_bounce: false)).
+        exactly(:once)
 
       bnp.process
     end
 
     it 'pings statsd' do
       bnp = BounceNotificationProcessor.new(access_key: 'key', secret_access_key: 'secret')
-      queue = mock
-      queue.expects(:poll).multiple_yields(*@all_bounce_messages_json.map {|m| mock_message(m)})
-      bnp.stubs(:bounce_queue).returns(queue)
-      CommunicationChannel.stubs(:bounce_for_path)
+      queue = double
+      expectation = receive(:poll)
+      @all_bounce_messages_json.each do |m|
+        expectation.and_yield(mock_message(m))
+      end
+      expect(queue).to expectation
+      allow(bnp).to receive(:bounce_queue).and_return(queue)
+      allow(CommunicationChannel).to receive(:bounce_for_path)
 
-      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.transient').once
-      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.no_bounce').twice
-      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.suppression').times(3)
-      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.permanent').times(4)
+      expect(CanvasStatsd::Statsd).to receive(:increment).with('bounce_notification_processor.processed.transient').once
+      expect(CanvasStatsd::Statsd).to receive(:increment).with('bounce_notification_processor.processed.no_bounce').twice
+      expect(CanvasStatsd::Statsd).to receive(:increment).with('bounce_notification_processor.processed.suppression').exactly(3).times
+      expect(CanvasStatsd::Statsd).to receive(:increment).with('bounce_notification_processor.processed.permanent').exactly(4).times
 
       bnp.process
     end

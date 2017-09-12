@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "locale_selection" do
   before do
-    I18n.stubs(:available_locales).returns([:en, :es, :fr])
+    allow(I18n).to receive(:available_locales).and_return([:en, :es, :fr])
   end
 
   after do

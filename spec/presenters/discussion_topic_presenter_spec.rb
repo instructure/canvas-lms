@@ -32,8 +32,8 @@ describe DiscussionTopicPresenter do
   }
 
   before do
-    AssignmentOverrideApplicator.stubs(:assignment_overridden_for).
-      with(topic.assignment,user).returns assignment
+    allow(AssignmentOverrideApplicator).to receive(:assignment_overridden_for).
+      with(topic.assignment,user).and_return assignment
   end
 
   describe "#initialize" do
@@ -47,8 +47,8 @@ describe DiscussionTopicPresenter do
 
     context "when discussion_topic and current_user args passed" do
       it "returns the overridden assignment if topic is for assignment" do
-        AssignmentOverrideApplicator.expects(:assignment_overridden_for).
-          with(topic.assignment,user).returns assignment
+        expect(AssignmentOverrideApplicator).to receive(:assignment_overridden_for).
+          with(topic.assignment,user).and_return assignment
         presenter = DiscussionTopicPresenter.new(topic,user)
         expect(presenter.assignment).to eq assignment
       end
@@ -63,18 +63,18 @@ describe DiscussionTopicPresenter do
 
   describe "#has_attached_rubric?" do
     it "returns true if assignment has a rubric association with a rubric" do
-      assignment.expects(:rubric_association).
-        returns stub(:try => stub(:rubric => stub))
+      expect(assignment).to receive(:rubric_association).
+        and_return double(:try => double(:rubric => double))
       expect(presenter.has_attached_rubric?).to eq true
     end
 
     it "returns false if assignment has nil rubric association" do
-      assignment.expects(:rubric_association).returns nil
+      expect(assignment).to receive(:rubric_association).and_return nil
       expect(presenter.has_attached_rubric?).to eq false
     end
 
     it "returns false if assignment has a rubric association but no rubric" do
-      assignment.expects(:rubric_association).returns stub(:rubric => nil)
+      expect(assignment).to receive(:rubric_association).and_return double(:rubric => nil)
       expect(presenter.has_attached_rubric?).to eq false
     end
   end
@@ -87,20 +87,20 @@ describe DiscussionTopicPresenter do
     end
 
     it "returns true if has_attached_rubric? is false" do
-      assignment.expects(:rubric_association).returns stub(:rubric => stub)
+      expect(assignment).to receive(:rubric_association).and_return double(:rubric => double)
       expect(presenter.should_show_rubric?(user)).to eq true
     end
 
     context "no rubric association or rubric for the topic's assignment" do
-      before { assignment.stubs(:rubric_association).returns nil }
+      before { allow(assignment).to receive(:rubric_association).and_return nil }
 
       it "returns true when the assignment grants the user update privs" do
-        assignment.expects(:grants_right?).with(user, :update).returns true
+        expect(assignment).to receive(:grants_right?).with(user, :update).and_return true
         expect(presenter.should_show_rubric?(user)).to eq true
       end
 
       it "returns false when the assignment grants the user update privs" do
-        assignment.expects(:grants_right?).with(user, :update).returns false
+        expect(assignment).to receive(:grants_right?).with(user, :update).and_return false
         expect(presenter.should_show_rubric?(user)).to eq false
       end
     end

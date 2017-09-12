@@ -60,12 +60,12 @@ describe EnrollmentTerm do
 
     it 'recomputes course scores if the grading period set is changed' do
       grading_period_set = @root_account.grading_period_groups.create!
-      Enrollment.expects(:recompute_final_score).once
+      expect(Enrollment).to receive(:recompute_final_score).once
       @term.update!(grading_period_group_id: grading_period_set)
     end
 
     it 'does not recompute course scores if the grading period set is not changed' do
-      Enrollment.expects(:recompute_final_score).never
+      expect(Enrollment).to receive(:recompute_final_score).never
       @term.update!(name: 'The Best Term')
     end
   end

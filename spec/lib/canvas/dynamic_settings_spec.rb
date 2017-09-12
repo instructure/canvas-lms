@@ -50,7 +50,7 @@ module Canvas
 
     describe ".config=" do
       it "configures imperium when config is set" do
-        DynamicSettings.kv_client.stubs(:put)
+        allow(DynamicSettings.kv_client).to receive(:put)
         DynamicSettings.config = valid_config
         expect(Imperium.configuration.url.to_s).to eq("https://consul:8500")
       end
@@ -384,25 +384,21 @@ module Canvas
           DynamicSettings.from_cache(parent_key) # prime cache
         end
 
-        after(:each) do
-          Canvas.unstub(:timeout_protection)
-        end
-
         around do |example|
           Timecop.freeze(now + 11.minutes, &example)
         end
 
         it "still returns old values if connection fails after timeout" do
-          Imperium::KV.stubs(:get).
+          allow(Imperium::KV).to receive(:get).
             with("config/canvas/#{parent_key}", imperium_read_options).
-            raises(Imperium::TimeoutError, "could not contact consul")
+            and_raise(Imperium::TimeoutError, "could not contact consul")
             value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
             expect(value["app-host"]).to eq("rce.insops.net")
         end
 
         it "returns old value during connection timeout" do
-          Imperium::KV.stubs(:get).
-            raises(Imperium::TimeoutError, "could not contact consul")
+          allow(Imperium::KV).to receive(:get).
+            and_raise(Imperium::TimeoutError, "could not contact consul")
           value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
           expect(value["app-host"]).to eq("rce.insops.net")
         end

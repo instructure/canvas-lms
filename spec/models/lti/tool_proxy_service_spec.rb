@@ -164,7 +164,7 @@ module Lti
       end
 
       it 'creates a tool_proxy' do
-        SecureRandom.stubs(:uuid).returns('my_uuid')
+        allow(SecureRandom).to receive(:uuid).and_return('my_uuid')
         tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tool_proxy_fixture, context: account, guid: tool_proxy_guid)
         expect(tool_proxy.shared_secret).to eq 'ThisIsASecret!'
         expect(tool_proxy.guid).to eq tool_proxy_guid

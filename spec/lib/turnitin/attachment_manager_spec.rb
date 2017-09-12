@@ -21,7 +21,7 @@ module Turnitin
   describe AttachmentManager do
     include_context "shared_tii_lti"
     before(:each) do
-      TiiClient.stubs(:new).with(lti_student, lti_assignment, tool, outcome_response_json).returns(tii_client)
+      allow(TiiClient).to receive(:new).with(lti_student, lti_assignment, tool, outcome_response_json).and_return(tii_client)
     end
 
     describe '.create_attachment' do

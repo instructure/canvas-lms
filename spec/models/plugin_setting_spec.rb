@@ -90,7 +90,7 @@ describe PluginSetting do
         name = "plugin_setting_test"
         ps = PluginSetting.new(:name => name, :settings => {:bar => "qwerty"})
         s.save!
-        MultiCache.expects(:fetch).once.returns(s)
+        expect(MultiCache).to receive(:fetch).once.and_return(s)
         PluginSetting.cached_plugin_setting(name) # sets the cache
         PluginSetting.cached_plugin_setting(name) # 2nd lookup
       end

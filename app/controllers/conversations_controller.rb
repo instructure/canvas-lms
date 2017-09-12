@@ -100,11 +100,9 @@ require 'atom'
 #           "type": "string"
 #         },
 #         "participants": {
-#           "description": "Array of users (id, name) participating in the conversation. Includes current user.",
+#           "description": "Array of users participating in the conversation. Includes current user.",
 #           "type": "array",
-#           "items": {
-#             "type": "string"
-#           }
+#           "items": { "$ref": "ConversationParticipant" }
 #         },
 #         "visible": {
 #           "description": "indicates whether the conversation is visible under the current scope and filter. This attribute is always true in the index API response, and is primarily useful in create/update responses so that you can know if the record should be displayed in the UI. The default scope is assumed, unless a scope or filter is passed to the create/update API call.",
@@ -114,6 +112,35 @@ require 'atom'
 #         "context_name": {
 #           "description": "Name of the course or group in which the conversation is occurring.",
 #           "example": "Canvas 101",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+# @model ConversationParticipant
+#     {
+#       "id": "ConversationParticipant",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The user ID for the participant.",
+#           "example": 2,
+#           "type": "integer",
+#           "format": "int64"
+#         },
+#         "name": {
+#           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
+#           "example": "Shelly",
+#           "type": "string"
+#         },
+#         "full_name": {
+#           "description": "The full name of the user.",
+#           "example": "Sheldon Cooper",
+#           "type": "string"
+#         },
+#         "avatar_url": {
+#           "description": "If requested, this field will be included and contain a url to retrieve the user's avatar.",
+#           "example": "https://canvas.instructure.com/images/messages/avatar-50.png",
 #           "type": "string"
 #         }
 #       }
@@ -196,7 +223,7 @@ class ConversationsController < ApplicationController
   #   membership type(s) in each course/group
   # @response_field avatar_url URL to appropriate icon for this conversation
   #   (custom, individual or group avatar, depending on audience)
-  # @response_field participants Array of users (id, name) participating in
+  # @response_field participants Array of users (id, name, full_name) participating in
   #   the conversation. Includes current user. If `include[]=participant_avatars`
   #   was passed as an argument, each user in the array will also have an
   #   "avatar_url" field
@@ -223,7 +250,10 @@ class ConversationsController < ApplicationController
   #       "audience": [2],
   #       "audience_contexts": {"courses": {"1": ["StudentEnrollment"]}, "groups": {}},
   #       "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
-  #       "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}],
+  #       "participants": [
+  #         {"id": 1, "name": "Joe", "full_name": "Joe TA"},
+  #         {"id": 2, "name": "Jane", "full_name": "Jane Teacher"}
+  #       ],
   #       "visible": true,
   #       "context_name": "Canvas 101"
   #     }
@@ -481,7 +511,11 @@ class ConversationsController < ApplicationController
   #     "audience": [2],
   #     "audience_contexts": {"courses": {"1": []}, "groups": {}},
   #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-50.png",
-  #     "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}, {"id": 3, "name": "Bob Student"}],
+  #     "participants": [
+  #       {"id": 1, "name": "Joe", "full_name": "Joe TA"},
+  #       {"id": 2, "name": "Jane", "full_name": "Jane Teacher"},
+  #       {"id": 3, "name": "Bob", "full_name": "Bob Student"}
+  #     ],
   #     "messages":
   #       [
   #         {
@@ -591,7 +625,7 @@ class ConversationsController < ApplicationController
   #     "audience": [2],
   #     "audience_contexts": {"courses": {"1": []}, "groups": {}},
   #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-50.png",
-  #     "participants": [{"id": 1, "name": "Joe TA"}]
+  #     "participants": [{"id": 1, "name": "Joe", "full_name": "Joe TA"}]
   #   }
   def update
     if @conversation.update_attributes(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
@@ -724,7 +758,12 @@ class ConversationsController < ApplicationController
   #     "audience": [2, 3, 4],
   #     "audience_contexts": {"courses": {"1": []}, "groups": {}},
   #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
-  #     "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}, {"id": 3, "name": "Bob Student"}, {"id": 4, "name": "Jim Admin"}],
+  #     "participants": [
+  #       {"id": 1, "name": "Joe", "full_name": "Joe TA"},
+  #       {"id": 2, "name": "Jane", "full_name": "Jane Teacher"},
+  #       {"id": 3, "name": "Bob", "full_name": "Bob Student"},
+  #       {"id": 4, "name": "Jim", "full_name": "Jim Admin"}
+  #     ],
   #     "messages":
   #       [
   #         {
@@ -798,7 +837,11 @@ class ConversationsController < ApplicationController
   #     "audience": [2, 3],
   #     "audience_contexts": {"courses": {"1": []}, "groups": {}},
   #     "avatar_url": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
-  #     "participants": [{"id": 1, "name": "Joe TA"}, {"id": 2, "name": "Jane Teacher"}, {"id": 3, "name": "Bob Student"}],
+  #     "participants": [
+  #       {"id": 1, "name": "Joe", "full_name": "Joe TA"},
+  #       {"id": 2, "name": "Jane", "full_name": "Jane Teacher"},
+  #       {"id": 3, "name": "Bob", "full_name": "Bob Student"}
+  #     ],
   #     "messages":
   #       [
   #         {
@@ -915,7 +958,7 @@ class ConversationsController < ApplicationController
   # @returns Progress
   def batch_update
     conversation_ids = params[:conversation_ids]
-    update_params = params.slice(:event).to_hash.with_indifferent_access
+    update_params = params.permit(:event).to_unsafe_h
 
     allowed_events = %w(mark_as_read mark_as_unread star unstar archive destroy)
     return render(:json => {:message => 'conversation_ids not specified'}, :status => :bad_request) unless params[:conversation_ids].is_a?(Array)

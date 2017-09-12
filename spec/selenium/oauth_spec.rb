@@ -36,7 +36,7 @@ describe "oauth2 flow" do
       it "should show the confirmation dialog without requiring login" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
-        expect_new_page_load { f('#modal-box .btn-primary').click() }
+        expect_new_page_load { f('#modal-box .Button--primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})
         code = driver.current_url.match(%r{code=([^\?&]+)})[1]
         expect(code).to be_present
@@ -62,7 +62,7 @@ describe "oauth2 flow" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         oauth_login_fill_out_form
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
-        expect_new_page_load { f('#modal-box .btn-primary').click() }
+        expect_new_page_load { f('#modal-box .Button--primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})
         code = driver.current_url.match(%r{code=([^\?&]+)})[1]
         expect(code).to be_present

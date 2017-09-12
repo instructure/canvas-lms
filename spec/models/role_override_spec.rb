@@ -95,7 +95,7 @@ describe RoleOverride do
 
   it "should not fail when a context's associated accounts are missing" do
     group_model
-    @group.stubs(:account).returns(nil)
+    allow(@group).to receive(:account).and_return(nil)
     expect{
       RoleOverride.permission_for(@group, :read_course_content, teacher_role)
     }.to_not raise_error
@@ -412,7 +412,7 @@ describe RoleOverride do
           @account = Account.create!
           @account.role_overrides.create!(:permission => 'become_user', :enabled => false, :role => admin_role)
         end
-        expect(RoleOverride.permission_for(@account, :become_user, admin_role)[:enabled]).to eq nil
+        expect(RoleOverride.permission_for(@account, :become_user, admin_role)[:enabled]).to eq false
       end
 
       it "should find site-admin role overrides on a non-current shard" do

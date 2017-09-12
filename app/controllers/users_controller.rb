@@ -379,6 +379,12 @@ class UsersController < ApplicationController
   #   administrative users will search on SIS ID, login ID, name, or email
   #   address; non-administrative queries will only be compared against name.
   #
+  # @argument sort [String, "username"|"email"|"sis_id"|"last_login"]
+  #   The column to sort results by.
+  #
+  # @argument order [String, "asc"|"desc"]
+  #   The order to sort the given column by.
+  #
   #  @example_request
   #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
   #       -X GET \
@@ -408,10 +414,10 @@ class UsersController < ApplicationController
           search_term = params[:search_term].presence
           page_opts = {}
           if search_term
-            users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
+            users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, {order: params[:order], sort: params[:sort]})
             page_opts[:total_entries] = nil # doesn't calculate a total count
           else
-            users = UserSearch.scope_for(@context, @current_user)
+            users = UserSearch.scope_for(@context, @current_user, order: params[:order], sort: params[:sort])
           end
 
           includes = (params[:include] || []) & %w{avatar_url email last_login time_zone}
@@ -1603,7 +1609,7 @@ class UsersController < ApplicationController
       end
     end
 
-    user.dashboard_positions = user.dashboard_positions.merge(params[:dashboard_positions])
+    user.dashboard_positions = user.dashboard_positions.merge(params[:dashboard_positions].to_unsafe_h)
 
     respond_to do |format|
       format.json do
@@ -1728,6 +1734,8 @@ class UsersController < ApplicationController
         return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
           'Invalid date or invalid datetime for birthdate')}}, :status => 400)
       end
+
+      @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
 
       respond_to do |format|
         if @user.update_attributes(user_params)

@@ -32,10 +32,6 @@ describe "submissions" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it "should allow a student view student to view/submit assignments", priority: "1", test_id: 237034 do
       skip_if_chrome('Student view breaks test in Chrome')
       @assignment = @course.assignments.create(

@@ -225,10 +225,10 @@ describe AcademicBenchmark::Converter do
     end
 
     it "should use the API to get the set data with an authority short code" do
-      response = Object.new
-      response.stubs(:body).returns(File.read(@level_0_browse))
-      response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").returns(response)
+      response = double()
+      allow(response).to receive(:body).and_return(File.read(@level_0_browse))
+      allow(response).to receive(:code).and_return("200")
+      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").and_return(response)
 
       run_and_check
       verify_full_import
@@ -237,28 +237,28 @@ describe AcademicBenchmark::Converter do
     it "should use the API to get the set data with a guid" do
       @cm.migration_settings[:authorities] = nil
       @cm.migration_settings[:guids] = ["aaaaaaaaaa"]
-      response = Object.new
-      response.stubs(:body).returns(File.read(@a_levels_3))
-      response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=aaaaaaaaaa&levels=3").returns(response)
-      responsed = Object.new
-      responsed.stubs(:body).returns(File.read(@d_levels_3))
-      responsed.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=ddddddddd&levels=3").returns(responsed)
-      responsej = Object.new
-      responsej.stubs(:body).returns(File.read(@j_levels_3))
-      responsej.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=jjjjjjjjjjj&levels=3").returns(responsej)
+      response = double('a_levels_3')
+      allow(response).to receive(:body).and_return(File.read(@a_levels_3))
+      allow(response).to receive(:code).and_return("200")
+      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=aaaaaaaaaa&levels=3").and_return(response)
+      responsed = double('d_levels_3')
+      allow(responsed).to receive(:body).and_return(File.read(@d_levels_3))
+      allow(responsed).to receive(:code).and_return("200")
+      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=ddddddddd&levels=3").and_return(responsed)
+      responsej = double('j_levels_3')
+      allow(responsej).to receive(:body).and_return(File.read(@j_levels_3))
+      allow(responsej).to receive(:code).and_return("200")
+      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=jjjjjjjjjjj&levels=3").and_return(responsej)
 
       run_and_check
       verify_full_import
     end
 
     it "should warn when api returns non-success" do
-      response = Object.new
-      response.stubs(:body).returns(%{{"status":"fail","ab_err":{"msg":"API key access violation.","code":"401"}}})
-      response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").returns(response)
+      response = double()
+      allow(response).to receive(:body).and_return(%{{"status":"fail","ab_err":{"msg":"API key access violation.","code":"401"}}})
+      allow(response).to receive(:code).and_return("200")
+      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").and_return(response)
 
       @cm.export_content
       run_jobs

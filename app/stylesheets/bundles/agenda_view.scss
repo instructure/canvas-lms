@@ -83,7 +83,7 @@
   padding: $ic-sp;
 
   &:hover, &:focus {
-    box-shadow: inset 3px 0 0 $ic-brand-primary;
+    box-shadow: inset 3px 0 0 var(--ic-brand-primary);
   }
 }
 
@@ -218,7 +218,7 @@ span.agendaView--no-assignments {
     }
     .fc-day-grid .fc-today {
       background-color: transparent;
-      box-shadow: .5px -6px 0px 0px $ic-brand-primary;
+      box-shadow: .5px -6px 0px 0px var(--ic-brand-primary);
       border: 3px solid $ic-border-light;
     }
     // this is to hide the border-right that is being added inline within the all-day row

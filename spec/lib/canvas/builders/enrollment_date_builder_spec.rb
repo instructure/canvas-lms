@@ -150,7 +150,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
       expect(loaded_enrollment_term).to be_truthy
 
       # should already be cached on the object
-      Rails.cache.expects(:fetch).never
+      expect(Rails.cache).to receive(:fetch).never
       @enrollment.enrollment_dates
     end
 
@@ -172,7 +172,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         expect(loaded_enrollment_term).to be_falsey
         # should already be cached on the object
 
-        Rails.cache.expects(:fetch).never
+        expect(Rails.cache).to receive(:fetch).never
         @enrollment.enrollment_dates
       end
     end

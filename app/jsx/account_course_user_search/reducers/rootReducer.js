@@ -56,7 +56,7 @@ import initialState from 'jsx/account_course_user_search/store/initialState'
         if (user.email) {
           return user;
         } else {
-          if (user.login_id) {
+          if (user.login_id && user.login_id.match(/([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/i)) {
             user.email = user.login_id;
           }
           return user;

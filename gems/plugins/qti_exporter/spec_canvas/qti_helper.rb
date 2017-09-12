@@ -45,48 +45,48 @@ end
 
 def get_manifest_node(question, opts={})
   manifest_node = {'identifier'=>nil, 'href'=>"#{question}.xml"}
-  manifest_node.stubs(:at_css).returns(nil)
-  manifest_node.stubs(:at_css).with('instructureMetadata').returns(manifest_node)
+  allow(manifest_node).to receive(:at_css).and_return(nil)
+  allow(manifest_node).to receive(:at_css).with('instructureMetadata').and_return(manifest_node)
 
   t = Object.new
-  t.stubs(:text).returns(opts[:title])
-  manifest_node.stubs(:at_css).with('title langstring').returns(t)
+  allow(t).to receive(:text).and_return(opts[:title])
+  allow(manifest_node).to receive(:at_css).with('title langstring').and_return(t)
 
   s = {}
-  s.stubs(:text).returns('237.0')
+  allow(s).to receive(:text).and_return('237.0')
   s["value"] = '237.0'
-  manifest_node.stubs(:at_css).with('instructureField[name=max_score]').returns(s)
+  allow(manifest_node).to receive(:at_css).with('instructureField[name=max_score]').and_return(s)
   
   it = nil
   if opts[:interaction_type]
     it = Object.new
-    it.stubs(:text).returns(opts[:interaction_type])
+    allow(it).to receive(:text).and_return(opts[:interaction_type])
   end
-  manifest_node.stubs(:at_css).with(('interactionType')).returns(it)
+  allow(manifest_node).to receive(:at_css).with(('interactionType')).and_return(it)
   
   bbqt = nil
   if opts[:bb_question_type]
     bbqt = {}
-    bbqt.stubs(:text).returns(opts[:bb_question_type])
+    allow(bbqt).to receive(:text).and_return(opts[:bb_question_type])
     bbqt["value"] = opts[:bb_question_type]
   end
-  manifest_node.stubs(:at_css).with(('instructureMetadata instructureField[name=bb_question_type]')).returns(bbqt)
+  allow(manifest_node).to receive(:at_css).with(('instructureMetadata instructureField[name=bb_question_type]')).and_return(bbqt)
 
   qt = nil
   if opts[:question_type]
     qt = {}
-    qt.stubs(:text).returns(opts[:question_type])
+    allow(qt).to receive(:text).and_return(opts[:question_type])
     qt["value"] = opts[:question_type]
   end
-  manifest_node.stubs(:at_css).with(('instructureMetadata instructureField[name=question_type]')).returns(qt)
+  allow(manifest_node).to receive(:at_css).with(('instructureMetadata instructureField[name=question_type]')).and_return(qt)
   
   bb8a = nil
   if opts[:quiz_type]
     bb8a = {}
-    bb8a.stubs(:text).returns(opts[:quiz_type])
+    allow(bb8a).to receive(:text).and_return(opts[:quiz_type])
     bb8a["value"] = opts[:quiz_type]
   end
-  manifest_node.stubs(:at_css).with(('instructureField[name=bb8_assessment_type]')).returns(bb8a)
+  allow(manifest_node).to receive(:at_css).with(('instructureField[name=bb8_assessment_type]')).and_return(bb8a)
   
   manifest_node
 end

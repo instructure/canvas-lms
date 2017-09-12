@@ -87,8 +87,8 @@ describe SisBatch do
       @a1 = @account
       @a2 = account_model
       b5 = create_csv_data(['abc'])
-      b2.any_instantiation.expects(:process_without_send_later).never
-      b5.any_instantiation.expects(:process_without_send_later).never
+      expect_any_instantiation_of(b2).to receive(:process_without_send_later).never
+      expect_any_instantiation_of(b5).to receive(:process_without_send_later).never
       SisBatch.process_all_for_account(@a1)
       [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to be_include(batch.reload.state) }
     end
@@ -492,7 +492,7 @@ s2,test_1,section2,active},
 
   context "csv diffing" do
     it "should skip diffing if previous diff not available" do
-      SIS::CSV::DiffGenerator.any_instance.expects(:generate).never
+      expect_any_instance_of(SIS::CSV::DiffGenerator).to receive(:generate).never
       batch = process_csv_data([
 %{course_id,short_name,long_name,account_id,term_id,status
 test_1,TC 101,Test Course 101,,term1,active
@@ -592,6 +592,74 @@ test_1,test_a,course
       expect(course1.reload.sis_batch_id).to eq b1.id
       expect(b1.processing_errors).to eq []
       expect(b1.processing_warnings).to eq []
+    end
+
+    describe 'change_threshold in batch mode' do
+      before :once do
+        @term1 = @account.enrollment_terms.first
+        @term1.update_attribute(:sis_source_id, 'term1')
+        @old_batch = @account.sis_batches.create!
+
+        @c1 = factory_with_protected_attributes(@account.courses, name: "delete me maybe", enrollment_term: @term1,
+                                                sis_source_id: 'test_1', sis_batch_id: @old_batch.id)
+
+        # enrollments are keyed off what term their course is in
+        u1 = user_with_managed_pseudonym({account: @account, sis_user_id: 'u1', active_all: true})
+        u2 = user_with_managed_pseudonym({account: @account, sis_user_id: 'u2', active_all: true})
+        @e1 = factory_with_protected_attributes(@c1.enrollments, workflow_state: 'active',
+                                                user: u1, sis_batch_id: @old_batch.id, type: 'StudentEnrollment')
+        @e2 = factory_with_protected_attributes(@c1.enrollments, workflow_state: 'active',
+                                                user: u2, sis_batch_id: @old_batch.id, type: 'StudentEnrollment')
+      end
+
+      it 'should not delete batch mode above threshold' do
+        batch = process_csv_data(
+          [
+            %{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active},
+            %{course_id,user_id,role,status,section_id
+test_1,u1,student,active}
+          ],
+          batch_mode: true,
+          batch_mode_term: @term1,
+          change_threshold: 20)
+
+        expect(batch.workflow_state).to eq 'aborted'
+        expect(@e1.reload).to be_active
+        expect(@e2.reload).to be_active
+        expect(batch.processing_errors.first).to eq ["1 items would be deleted and exceeds the set threshold of 20%"]
+      end
+
+      it 'should delete batch mode below threshold' do
+        batch = process_csv_data(
+          [
+            %{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active},
+            %{course_id,user_id,role,status,section_id
+test_1,u1,student,active}
+          ],
+          batch_mode: true,
+          batch_mode_term: @term1,
+          change_threshold: 50)
+
+        expect(batch.workflow_state).to eq 'imported'
+        expect(@e1.reload).to be_active
+        expect(@e2.reload).to be_deleted
+        expect(batch.processing_errors.size).to eq 0
+      end
+
+      it 'should not abort batch if it is above the threshold' do
+        b1 = process_csv_data([%{course_id,user_id,role,status
+                                test_1,u2,student,active}],
+                              batch_mode: true,
+                              batch_mode_term: @term1,
+                              change_threshold: 51)
+        expect(b1.workflow_state).to eq 'imported'
+        expect(@e1.reload).to be_deleted
+        expect(@e2.reload).to be_active
+        expect(b1.processing_errors.size).to eq 0
+      end
+
     end
   end
 end

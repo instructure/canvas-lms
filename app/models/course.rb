@@ -27,6 +27,7 @@ class Course < ActiveRecord::Base
   include TimeZoneHelper
   include ContentLicenses
   include TurnitinID
+  include Courses::ItemVisibilityHelper
 
   attr_accessor :teacher_names, :master_course
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :updating_master_template_id
@@ -60,9 +61,7 @@ class Course < ActiveRecord::Base
   has_many :all_current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')").preload(:user) }, class_name: 'Enrollment'
   has_many :prior_enrollments, -> { preload(:user, :course).where(workflow_state: 'completed') }, class_name: 'Enrollment'
   has_many :prior_users, :through => :prior_enrollments, :source => :user
-  has_many :gradable_students, through: :gradable_student_enrollments, source: :user
 
-  has_many :self_enrolled_students, -> { where("self_enrolled") }, through: :student_enrollments, source: :user
   has_many :participating_students, -> { where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
   has_many :participating_students_by_date, -> { where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' }).
     joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id").
@@ -70,9 +69,11 @@ class Course < ActiveRecord::Base
 
   has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :students, :through => :student_enrollments, :source => :user
+  has_many :self_enrolled_students, -> { where("self_enrolled") }, through: :student_enrollments, source: :user
   has_many :admin_visible_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :admin_visible_students, :through => :admin_visible_student_enrollments, :source => :user
   has_many :gradable_student_enrollments, -> { where(enrollments: { workflow_state: ['active', 'inactive'], type: ['StudentEnrollment', 'StudentViewEnrollment'] }).preload(:user) }, class_name: 'Enrollment'
+  has_many :gradable_students, through: :gradable_student_enrollments, source: :user
   has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :all_accepted_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
@@ -82,10 +83,9 @@ class Course < ActiveRecord::Base
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
   has_many :teacher_enrollments, -> { where("enrollments.workflow_state <> 'deleted' AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: 'TeacherEnrollment'
-  has_many :teachers, :through => :teacher_enrollments, :source => :user
+  has_many :teachers, -> { order("sortable_name") }, :through => :teacher_enrollments, :source => :user
   has_many :ta_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'TaEnrollment'
   has_many :tas, :through => :ta_enrollments, :source => :user
-
   has_many :observer_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'ObserverEnrollment'
   has_many :observers, :through => :observer_enrollments, :source => :user
   has_many :participating_observers, -> { where(enrollments: { workflow_state: 'active' }) }, through: :observer_enrollments, source: :user
@@ -680,7 +680,7 @@ class Course < ActiveRecord::Base
     }
 
     p.dispatch :new_course
-    p.to { self.root_account.account_users }
+    p.to { self.root_account.account_users.active }
     p.whenever { |record|
       record.root_account &&
       ((record.just_created && record.name != Course.default_name) ||
@@ -1069,7 +1069,7 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores_without_send_later(student_ids = nil, opts = {})
-    student_ids ||= self.admin_visible_student_ids
+    student_ids ||= admin_visible_student_enrollments.pluck(:user_id)
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
     Enrollment.recompute_final_score(
       student_ids,
@@ -1493,7 +1493,7 @@ class Course < ActiveRecord::Base
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
       else
-        AccountUser.where(:account_id => account_chain_ids, :user_id => user).to_a
+        AccountUser.active.where(:account_id => account_chain_ids, :user_id => user).to_a
       end
     end
     @account_users[user.global_id] ||= []
@@ -2418,24 +2418,28 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.announcements', "Announcements"),
         :css_class => 'announcements',
         :href => :course_announcements_path,
+        :screenreader => t("Course Announcements"),
         :icon => 'icon-announcement'
       }, {
         :id => TAB_ASSIGNMENTS,
         :label => t('#tabs.assignments', "Assignments"),
         :css_class => 'assignments',
         :href => :course_assignments_path,
+        :screenreader => t('#tabs.course_assignments', "Course Assignments"),
         :icon => 'icon-assignment'
       }, {
         :id => TAB_DISCUSSIONS,
         :label => t('#tabs.discussions', "Discussions"),
         :css_class => 'discussions',
         :href => :course_discussion_topics_path,
+        :screenreader => t("Course Discussions"),
         :icon => 'icon-discussion'
       }, {
         :id => TAB_GRADES,
         :label => t('#tabs.grades', "Grades"),
         :css_class => 'grades',
-        :href => :course_grades_path
+        :href => :course_grades_path,
+        :screenreader => t('#tabs.course_grades', "Course Grades")
       }, {
         :id => TAB_PEOPLE,
         :label => t('#tabs.people', "People"),
@@ -2451,6 +2455,7 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.files', "Files"),
         :css_class => 'files',
         :href => :course_files_path,
+        :screenreader => t("Course Files"),
         :icon => 'icon-folder'
       }, {
         :id => TAB_SYLLABUS,
@@ -2491,7 +2496,8 @@ class Course < ActiveRecord::Base
         :id => TAB_SETTINGS,
         :label => t('#tabs.settings', "Settings"),
         :css_class => 'settings',
-        :href => :course_settings_path
+        :href => :course_settings_path,
+        :screenreader => t('#tabs.course_settings', "Course Settings")
       }
     ]
   end
@@ -3082,6 +3088,11 @@ class Course < ActiveRecord::Base
     context_external_tools.active.find_by(query) ||
       account.context_external_tools.active.find_by(query) ||
         root_account.context_external_tools.active.find_by(query)
+  end
+
+  def find_or_create_progressions_for_user(user)
+    @progressions ||= {}
+    @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
   end
 
   private

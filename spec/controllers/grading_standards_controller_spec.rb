@@ -34,12 +34,12 @@ describe GradingStandardsController do
     let(:json_response) { json_parse['grading_standard']['data'] }
 
     it "responds with a 200 with a valid user, course id, and json format" do
-      post 'create', course_id: @course.id, format: 'json'
+      post 'create', params: {course_id: @course.id}, format: 'json'
       expect(response).to be_ok
     end
 
     it "uses the default grading standard if no standard data is provided" do
-      post 'create', course_id: @course.id, format: 'json'
+      post 'create', params: {course_id: @course.id}, format: 'json'
       expect(json_response).to eq(default_grading_standard)
     end
 
@@ -50,7 +50,7 @@ describe GradingStandardsController do
       }
       # send the request as JSON, so that the nested arrays are preserved
       request.content_type = 'application/json'
-      post 'create', course_id: @course.id, grading_standard: standard, format: 'json'
+      post 'create', params: {course_id: @course.id, grading_standard: standard}, format: 'json'
       expect(json_response).to eq(standard[:data])
     end
 
@@ -62,7 +62,7 @@ describe GradingStandardsController do
           scheme_2: {name: 'F',value: 0}
         }
       }
-      post 'create', course_id: @course.id, grading_standard: standard, format: 'json'
+      post 'create', params: {course_id: @course.id, grading_standard: standard}, format: 'json'
       expected_response_data = [['A', 0.61], ['F', 0.00]]
       expect(json_response).to eq(expected_response_data)
     end
@@ -75,7 +75,7 @@ describe GradingStandardsController do
         @admin = account_admin_user(account: @account)
       end
 
-      subject { get :index, account_id: @account.id }
+      subject { get :index, params: {account_id: @account.id} }
 
       it "returns a 200 for a valid request" do
         user_session(@admin)
@@ -93,7 +93,7 @@ describe GradingStandardsController do
         course_with_teacher(active_all: true)
       end
 
-      subject { get :index, course_id: @course.id }
+      subject { get :index, params: {course_id: @course.id} }
 
       it "returns a 200 for a valid request" do
         user_session(@teacher)

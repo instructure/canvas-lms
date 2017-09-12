@@ -27,4 +27,20 @@ describe DataFixup::DeleteInvalidCommunicationChannels do
     DataFixup::DeleteInvalidCommunicationChannels.run
     expect(CommunicationChannel.where(id: @channel.id).exists?).to be_truthy
   end
+
+  it "fixes valid email with whitespace" do
+    CommunicationChannel.where(id: @channel.id).update_all(path: " valid@example.com")
+    DataFixup::DeleteInvalidCommunicationChannels.run
+    expect(CommunicationChannel.where(id: @channel.id).pluck(:path)).to eq(["valid@example.com"])
+  end
+
+  it "deletes valid duplicate email with whitespace" do
+    CommunicationChannel.where(id: @channel.id).update_all(path: " valid@example.com")
+    @channel2 = @user.communication_channels.create!(
+      path: "valid@example.com",
+      path_type: CommunicationChannel::TYPE_EMAIL
+    )
+    DataFixup::DeleteInvalidCommunicationChannels.run
+    expect(CommunicationChannel.where(id: @channel.id).exists?).to be_falsey
+  end
 end

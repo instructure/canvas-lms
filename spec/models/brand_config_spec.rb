@@ -116,6 +116,29 @@ describe BrandConfig do
     end
   end
 
+  describe "to_css" do
+    before :once do
+      setup_subaccount_with_config
+    end
+
+    it "defines right-looking css in the :root scope" do
+      expect(@subaccount_bc.to_css).to match /:root \{
+[\s|\S]*--ic-brand-primary-darkened-5: #312111;
+--ic-brand-primary-darkened-10: #2E1F10;
+--ic-brand-primary-darkened-15: #2C1D0F;
+--ic-brand-primary-lightened-5: #3D2D1C;
+--ic-brand-primary-lightened-10: #473828;
+--ic-brand-primary-lightened-15: #514334;
+--ic-brand-button--primary-bgd-darkened-5: #312111;
+--ic-brand-button--primary-bgd-darkened-15: #2C1D0F;
+--ic-brand-button--secondary-bgd-darkened-5: #2B3942;
+--ic-brand-button--secondary-bgd-darkened-15: #27333B;
+[\s|\S]*--ic-brand-primary: #321;
+[\s|\S]*--ic-brand-global-nav-bgd: #123;
+/
+    end
+  end
+
   describe "save_all_files!" do
     before :once do
       setup_subaccount_with_config
@@ -124,17 +147,19 @@ describe BrandConfig do
     before do
       @json_file = StringIO.new
       @js_file = StringIO.new
+      @css_file = StringIO.new
       @scss_file = StringIO.new
-      @subaccount_bc.stubs(:json_file).returns(@json_file)
-      @subaccount_bc.stubs(:js_file).returns(@js_file)
-      @subaccount_bc.stubs(:scss_file).returns(@scss_file)
+      allow(@subaccount_bc).to receive(:json_file).and_return(@json_file)
+      allow(@subaccount_bc).to receive(:js_file).and_return(@js_file)
+      allow(@subaccount_bc).to receive(:css_file).and_return(@css_file)
+      allow(@subaccount_bc).to receive(:scss_file).and_return(@scss_file)
     end
 
     describe "with cdn disabled" do
       before do
-        Canvas::Cdn.expects(:enabled?).at_least_once.returns(false)
-        @subaccount_bc.expects(:s3_uploader).never
-        File.expects(:delete).never
+        expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(false)
+        expect(@subaccount_bc).to receive(:s3_uploader).never
+        expect(File).to receive(:delete).never
       end
 
       it "writes the json representation to the json file" do
@@ -147,6 +172,11 @@ describe BrandConfig do
         expect(@js_file.string).to eq "CANVAS_ACTIVE_BRAND_VARIABLES = #{@subaccount_bc.to_json};"
       end
 
+      it "writes the CSS variables to the css file" do
+        @subaccount_bc.save_all_files!
+        expect(@css_file.string).to eq @subaccount_bc.to_css
+      end
+
       it "writes the scss representation to scss file" do
         @subaccount_bc.save_all_files!
         expect(@scss_file.string).to eq @subaccount_bc.to_scss
@@ -155,11 +185,11 @@ describe BrandConfig do
 
     describe "with cdn enabled" do
       before :each do
-        Canvas::Cdn.expects(:enabled?).at_least_once.returns(true)
-        s3 = stub(bucket: nil)
-        Aws::S3::Resource.stubs(:new).returns(s3)
-        @upload_expectation = @subaccount_bc.s3_uploader.expects(:upload_file).twice
-        @delete_expectation = File.expects(:delete).twice
+        expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(true)
+        s3 = double(bucket: nil)
+        allow(Aws::S3::Resource).to receive(:new).and_return(s3)
+        @upload_expectation = expect(@subaccount_bc.s3_uploader).to receive(:upload_file).exactly(3).times
+        expect(File).to receive(:delete).exactly(3).times
       end
 
       it "writes the json representation to the json file" do
@@ -172,16 +202,16 @@ describe BrandConfig do
         expect(@js_file.string).to eq @subaccount_bc.to_js
       end
 
-      it 'uploads json & js file to s3' do
-        @upload_expectation.with(any_of(
-          @subaccount_bc.public_json_path,
-          @subaccount_bc.public_js_path
-        ))
+      it "writes the CSS variables representation to the css file" do
         @subaccount_bc.save_all_files!
+        expect(@css_file.string).to eq @subaccount_bc.to_css
       end
 
-      it 'deletes local json & js file when its done' do
-        @delete_expectation.with(@subaccount_bc.js_file).then.with(@subaccount_bc.json_file)
+      it 'uploads json, css & js file to s3' do
+        @upload_expectation.with(eq(
+          @subaccount_bc.public_json_path).or eq(
+          @subaccount_bc.public_css_path).or eq(
+          @subaccount_bc.public_js_path))
         @subaccount_bc.save_all_files!
       end
     end

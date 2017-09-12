@@ -246,9 +246,9 @@ describe EpubExport do
     end
 
     it 'is called during export and resets locale after' do
-      epub_export.expects(:infer_locale).once
+      expect(epub_export).to receive(:infer_locale).once
         .with(context: @course, user: @student, root_account: @course.root_account)
-        .returns(:ru)
+        .and_return(:ru)
       epub_export.convert_to_epub_without_send_later
       expect(I18n.locale).to be :en
     end

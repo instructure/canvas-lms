@@ -93,7 +93,7 @@ describe Quizzes::Quiz do
     end
 
     it "saves boolean attributes as true if they are set to true" do
-      Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns(true)
+      allow(Quizzes::Quiz).to receive(:lockdown_browser_plugin_enabled?).and_return(true)
       @quiz.update!(
         shuffle_answers: true,
         could_be_locked: true,
@@ -153,7 +153,7 @@ describe Quizzes::Quiz do
   describe "#publish!" do
     it "sets the workflow state to available and save!s the quiz" do
       quiz = @course.quizzes.build :title => "hello"
-      quiz.expects(:generate_quiz_data).once
+      expect(quiz).to receive(:generate_quiz_data).once
       quiz.publish!
       expect(quiz.workflow_state).to eq 'available'
     end
@@ -162,11 +162,11 @@ describe Quizzes::Quiz do
   describe "#unpublish!" do
     it "sets the workflow state to unpublished and save!s the quiz" do
       quiz = @course.quizzes.build :title => "hello"
-      quiz.expects(:save!).once
+      expect(quiz).to receive(:save!).once
       quiz.publish!
       expect(quiz.workflow_state).to eq 'available'
 
-      quiz.expects(:save!).once
+      expect(quiz).to receive(:save!).once
       quiz.unpublish!
       expect(quiz.workflow_state).to eq 'unpublished'
     end
@@ -174,7 +174,7 @@ describe Quizzes::Quiz do
     it "should fail validation with student submissions" do
       quiz = @course.quizzes.build title: 'test quiz'
       quiz.publish!
-      quiz.stubs(:has_student_submissions?).returns true
+      allow(quiz).to receive(:has_student_submissions?).and_return true
 
       expect { quiz.unpublish! }.to raise_exception(ActiveRecord::RecordInvalid)
     end
@@ -182,7 +182,7 @@ describe Quizzes::Quiz do
     it "should pass validation without student submissions" do
       quiz = @course.quizzes.build title: 'test quiz'
       quiz.publish!
-      quiz.stubs(:has_student_submissions?).returns false
+      allow(quiz).to receive(:has_student_submissions?).and_return false
 
       quiz.unpublish!
       expect(quiz.published?).to be_falsey
@@ -210,7 +210,7 @@ describe Quizzes::Quiz do
 
     it "triggers submission updates when quiz_type changes" do
       create_quiz_with_submission(quiz_type: 'graded_survey')
-      @quiz.expects(:destroy_related_submissions).never
+      expect(@quiz).to receive(:destroy_related_submissions).never
       @quiz.quiz_type = 'assignment'
 
       @quiz.save! # should trigger update_assignment
@@ -390,7 +390,7 @@ describe Quizzes::Quiz do
     a.update_attribute(:created_at, Time.now - (40 * 60))
     q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
     q.workflow_state = 'available'
-    q.assignment.expects(:save_without_broadcasting!).at_least_once
+    expect(q.assignment).to receive(:save_without_broadcasting!).at_least(:once)
     q.save
     expect(q.assignment.messages_sent).to be_empty
   end
@@ -406,7 +406,7 @@ describe Quizzes::Quiz do
     q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
     q.workflow_state = 'available'
     q.notify_of_update = 1
-    q.assignment.expects(:save_without_broadcasting!).never
+    expect(q.assignment).to receive(:save_without_broadcasting!).never
     q.save
     expect(q.assignment.messages_sent).to include('Assignment Changed')
   end
@@ -470,7 +470,7 @@ describe Quizzes::Quiz do
 
     expect(q.assignment_id).not_to be_nil
     expect(q.assignment.published?).to be false
-    q.assignment.expects(:save_without_broadcasting!).never
+    expect(q.assignment).to receive(:save_without_broadcasting!).never
 
     q.publish!
 
@@ -1035,7 +1035,7 @@ describe Quizzes::Quiz do
   end
 
   it 'should not report LDB to be required for viewing results if LDB is not required to take the quiz' do
-    Quizzes::Quiz.expects(:lockdown_browser_plugin_enabled?).twice.returns(true)
+    expect(Quizzes::Quiz).to receive(:lockdown_browser_plugin_enabled?).twice.and_return(true)
 
     q = @course.quizzes.build
     q.require_lockdown_browser_for_results = true
@@ -1112,7 +1112,7 @@ describe Quizzes::Quiz do
 
     it "returns the assignment's group category id if it has an assignment" do
       quiz = Quizzes::Quiz.new(:title => "Assignment Group Category Quizzes::Quiz")
-      quiz.expects(:assignment).returns stub(:group_category_id => 1)
+      expect(quiz).to receive(:assignment).and_return double(:group_category_id => 1)
       expect(quiz.group_category_id).to eq 1
     end
 
@@ -1204,21 +1204,21 @@ describe Quizzes::Quiz do
 
     context "when the assignment ID doesn't change" do
       it "doesn't update overrides" do
-        quiz.expects(:link_assignment_overrides).once
+        expect(quiz).to receive(:link_assignment_overrides).once
         # publish the quiz
         quiz.workflow_state = 'available'
         quiz.save
-        quiz.expects(:link_assignment_overrides).never
+        expect(quiz).to receive(:link_assignment_overrides).never
         quiz.save
       end
     end
 
     context "when the assignment ID changes" do
       it "links overrides" do
-        quiz.expects(:link_assignment_overrides).once
+        expect(quiz).to receive(:link_assignment_overrides).once
         quiz.workflow_state = 'available'
         quiz.save!
-        quiz.expects(:link_assignment_overrides).once
+        expect(quiz).to receive(:link_assignment_overrides).once
         quiz.assignment = nil
         quiz.assignment_id = 345
         quiz.save!
@@ -1277,7 +1277,7 @@ describe Quizzes::Quiz do
       it "won't validate unpublishing a quiz if there are already submissions" do
         quiz = @course.quizzes.build title: 'test quiz'
         quiz.publish!
-        quiz.stubs(:has_student_submissions?).returns true
+        allow(quiz).to receive(:has_student_submissions?).and_return true
         quiz.workflow_state = 'unpublished'
         quiz.save
         expect(quiz).not_to be_valid
@@ -1287,7 +1287,7 @@ describe Quizzes::Quiz do
       it "will allow unpublishing if no student submissions" do
         quiz = @course.quizzes.build title: 'test quiz'
         quiz.publish!
-        quiz.stubs(:has_student_submissions?).returns false
+        allow(quiz).to receive(:has_student_submissions?).and_return false
         quiz.workflow_state = 'unpublished'
         quiz.save
         expect(quiz).to be_valid
@@ -1321,12 +1321,12 @@ describe Quizzes::Quiz do
     end
 
     it "returns an empty array when no quiz data" do
-      @quiz.stubs(:quiz_data).returns nil
+      allow(@quiz).to receive(:quiz_data).and_return nil
       expect(@quiz.question_types).to eq([])
     end
 
     it "returns quiz types of question in quiz groups" do
-      @quiz.stubs(:quiz_data).returns([
+      allow(@quiz).to receive(:quiz_data).and_return([
         {"question_type" => "foo"},
         {"entry_type" => "quiz_group", "questions" => [{"question_type" => "bar"},{"question_type" => "baz"}]}
       ])
@@ -1339,19 +1339,19 @@ describe Quizzes::Quiz do
     let(:quiz) { @course.quizzes.build title: 'File Upload Quiz' }
 
     it "returns false unless there is quiz data for a quiz" do
-      quiz.stubs(:quiz_data).returns nil
+      allow(quiz).to receive(:quiz_data).and_return nil
       expect(quiz.has_file_upload_question?).to be_falsey
     end
 
     it "returns true when there is a file upload question" do
-      quiz.stubs(:quiz_data).returns [
+      allow(quiz).to receive(:quiz_data).and_return [
         {question_type: 'file_upload_question'}
       ]
       expect(quiz.has_file_upload_question?).to be_truthy
     end
 
     it "returns false when there isn't a file upload question" do
-      quiz.stubs(:quiz_data).returns [
+      allow(quiz).to receive(:quiz_data).and_return [
         {question_type: 'multiple_choice_question'}
       ]
       expect(quiz.has_file_upload_question?).to be_falsey
@@ -1454,14 +1454,14 @@ describe Quizzes::Quiz do
       regrade.quiz_question_regrades.create!(
         quiz_question_id: q.id,
         regrade_option: 'current_correct_only')
-      Quizzes::QuizRegrader::Regrader.expects(:send_later).once.
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later).once.
         with(:regrade!, quiz: quiz, version_number: quiz.version_number)
       quiz.save!
     end
 
     it "does not queue a job to regrade when no current question regrades" do
       course_with_teacher(course: @course, active_all: true)
-      Quizzes::QuizRegrader::Regrader.expects(:send_later).never
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later).never
       quiz = @course.quizzes.create!
       quiz.save!
     end
@@ -1521,9 +1521,9 @@ describe Quizzes::Quiz do
   describe "#destroy" do
     it "should logical delete published quiz" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.stubs(:has_student_submissions? => true)
+      allow(quiz).to receive_messages(:has_student_submissions? => true)
       quiz.publish!
-      quiz.assignment.stubs(:has_student_submissions? => true)
+      allow(quiz.assignment).to receive_messages(:has_student_submissions? => true)
 
       quiz.destroy
       expect(quiz.deleted?).to be_truthy
@@ -1531,10 +1531,10 @@ describe Quizzes::Quiz do
 
     it "should logical delete the published quiz's associated assignment" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.stubs(:has_student_submissions?).returns true
+      allow(quiz).to receive(:has_student_submissions?).and_return true
       quiz.publish!
       assignment = quiz.assignment
-      assignment.stubs(:has_student_submissions?).returns true
+      allow(assignment).to receive(:has_student_submissions?).and_return true
 
       quiz.destroy
       expect(assignment.deleted?).to be_truthy
@@ -1857,12 +1857,12 @@ describe Quizzes::Quiz do
     context "to delete" do
       context "when there are no grading periods" do
         it "is true for admins" do
-          @course.stubs(:grading_periods?).returns false
+          allow(@course).to receive(:grading_periods?).and_return false
           expect(@quiz.reload.grants_right?(@admin, :delete)).to be true
         end
 
         it "is false for teachers" do
-          @course.stubs(:grading_periods?).returns false
+          allow(@course).to receive(:grading_periods?).and_return false
           expect(@quiz.reload.grants_right?(@teacher, :delete)).to be true
         end
       end
@@ -2030,7 +2030,7 @@ describe Quizzes::Quiz do
 
     it "should restore to published state if there are student submissions" do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
-      @quiz.stubs(:has_student_submissions?).returns true
+      allow(@quiz).to receive(:has_student_submissions?).and_return true
 
       @quiz.destroy
       @quiz.restore
@@ -2058,15 +2058,15 @@ describe Quizzes::Quiz do
     end
 
     it 'should link the generated QS to a user' do
-      subject.expects(:generate_submission).with(participant.user, false)
+      expect(subject).to receive(:generate_submission).with(participant.user, false)
 
       subject.generate_submission_for_participant(participant)
     end
 
     it 'should link the generated QS to a temporary user code' do
-      subject.expects(:generate_submission).with(participant.user_code, false)
+      expect(subject).to receive(:generate_submission).with(participant.user_code, false)
 
-      participant.stubs(:anonymous?).returns true
+      allow(participant).to receive(:anonymous?).and_return true
       subject.generate_submission_for_participant(participant)
     end
   end
@@ -2227,12 +2227,11 @@ describe Quizzes::Quiz do
           expect(@quiz.visible_to_user?(@student1)).to be_truthy
         end
         it "should grant submit rights" do
-          @course.stubs(:grants_right?).with(@student1, nil, :participate_as_student).returns(true)
-          @course.stubs(:grants_right?).with(@student1, nil, :manage_assignments).returns(false)
-          @course.stubs(:grants_right?).with(@student1, nil, :read_as_admin).returns(false)
-          @course.stubs(:grants_right?).with(@student1, nil, :manage_grades).returns(false)
+          allow(@course).to receive(:grants_right?).with(@student1, nil, :participate_as_student).and_return(true)
+          allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_assignments).and_return(false)
+          allow(@course).to receive(:grants_right?).with(@student1, nil, :read_as_admin).and_return(false)
+          allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_grades).and_return(false)
           expect(@quiz.grants_right?(@student1, :submit)).to eq true
-          @course.unstub(:grants_right?)
         end
       end
 
@@ -2246,10 +2245,10 @@ describe Quizzes::Quiz do
           expect(@quiz.visible_to_user?(@student2)).to be_truthy
         end
         it 'should not grant submit rights' do
-          @course.stubs(:grants_right?).with(@student2, nil, :participate_as_student).returns(true)
-          @course.stubs(:grants_right?).with(@student2, nil, :manage_assignments).returns(false)
-          @course.stubs(:grants_right?).with(@student2, nil, :read_as_admin).returns(false)
-          @course.stubs(:grants_right?).with(@student2, nil, :manage_grades).returns(false)
+          allow(@course).to receive(:grants_right?).with(@student2, nil, :participate_as_student).and_return(true)
+          allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_assignments).and_return(false)
+          allow(@course).to receive(:grants_right?).with(@student2, nil, :read_as_admin).and_return(false)
+          allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_grades).and_return(false)
           expect(@quiz.grants_right?(@student2, :submit)).to eq false
         end
       end
