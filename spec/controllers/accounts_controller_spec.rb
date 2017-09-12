@@ -427,6 +427,22 @@ describe AccountsController do
       expect(@account.admins_can_view_notifications?).to be_truthy
     end
 
+    it "doesn't break I18n by setting the help_link_name unnecessarily" do
+      account_with_admin_logged_in
+
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :help_link_name  => 'Help'
+      }}}
+      @account.reload
+      expect(@account.settings[:help_link_name]).to be_nil
+
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :help_link_name => 'Halp'
+      }}}
+      @account.reload
+      expect(@account.settings[:help_link_name]).to eq 'Halp'
+    end
+
     it "should allow updating services that appear in the ui for the current user" do
       AccountServices.register_service(:test1,
                                        {name: 'test1', description: '', expose_to_ui: :setting, default: false})
