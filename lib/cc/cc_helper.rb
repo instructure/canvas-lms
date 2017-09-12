@@ -142,7 +142,7 @@ module CCHelper
 
   def get_html_title_and_body(doc)
     title = get_node_val(doc, 'html head title')
-    body = doc.at_css('html body').to_s.gsub(%r{</?body>}, '').strip
+    body = doc.at_css('html body').to_s.force_encoding(Encoding::UTF_8).gsub(%r{</?body>}, '').strip
     [title, body]
   end
 
