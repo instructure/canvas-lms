@@ -265,15 +265,12 @@ class RequestThrottle
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
     def reserve_capacity(up_front_cost = self.up_front_cost)
-      if Setting.get("request_throttle.skip", "false") == "true"
-        yield
-        return
-      end
+      return yield unless RequestThrottle.enabled?
 
       increment(0, up_front_cost)
       cost = yield
     ensure
-      increment(cost || 0, -up_front_cost)
+      increment(cost || 0, -up_front_cost) if RequestThrottle.enabled?
     end
 
     def full?

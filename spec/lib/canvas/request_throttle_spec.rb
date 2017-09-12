@@ -333,6 +333,12 @@ describe 'RequestThrottle' do
           end
         end
 
+        it "does nothing if disabled" do
+          expect(RequestThrottle).to receive(:enabled?).twice.and_return(false)
+          expect(@bucket).to receive(:increment).never
+          @bucket.reserve_capacity {}
+        end
+
         after do
           Timecop.safe_mode = true
         end
