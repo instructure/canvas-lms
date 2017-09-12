@@ -748,54 +748,6 @@ describe Account do
     end
   end
 
-  context "#global_navigation_tools" do
-    let(:account) { Account.create! name: 'root_account'}
-    let(:external_tool) do
-      ContextExternalTool.new(
-        name: 'test_name',
-        consumer_key: 'test_key',
-        shared_secret: 'bob',
-        domain: 'example.com',
-        workflow_state: 'public',
-        global_navigation: {url: 'http://www.example.com', text: 'Example URL'}
-      )
-    end
-
-    it 'should include tools for the current account' do
-      external_tool.update_attributes!(context: account)
-      expect(account.global_navigation_tools).to match_array [external_tool]
-    end
-
-    it 'should include tools for all accounts in the account chain' do
-      sub_account = Account.create!(parent_account: account, name: 'sub_account')
-      tool_two = external_tool.dup
-      tool_two.update_attributes!(context: sub_account)
-      external_tool.update_attributes!(context: account)
-      expect(sub_account.global_navigation_tools.map(&:id)).to eq [tool_two.id, external_tool.id]
-    end
-
-    it 'should not include tools intalled in sub-accounts' do
-      sub_account = Account.create!(parent_account: account, name: 'sub_account')
-      tool_two = external_tool.dup
-      tool_two.update_attributes!(context: sub_account)
-      external_tool.update_attributes!(context: account)
-      expect(account.global_navigation_tools).to match_array [external_tool]
-    end
-
-    it "should only return tools with the 'global_navigation' setting" do
-      external_tool.update_attributes!(context: account)
-      tool_two = external_tool.dup
-      tool_two.update_attributes!(context: account)
-      tool_three = external_tool.dup
-      tool_three.update_attributes!(
-        context: account,
-        global_navigation: nil
-      )
-      global_tools = account.global_navigation_tools.map{ |t| t.settings.dig(:global_navigation, 'url') }
-      expect(global_tools).to match_array ['http://www.example.com', 'http://www.example.com']
-    end
-  end
-
   context "tabs_available" do
     before :once do
       @account = Account.default.sub_accounts.create!(:name => "sub-account")

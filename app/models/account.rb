@@ -1653,11 +1653,4 @@ class Account < ActiveRecord::Base
   def migrate_to_canvadocs?
     Canvadocs.hijack_crocodoc_sessions? && feature_enabled?(:new_annotations)
   end
-
-  def global_navigation_tools
-    ContextExternalTool.active.having_setting('global_navigation').where(
-      context_type: 'Account',
-      context_id: Account.account_chain_ids(self.id)
-    ).to_a
-  end
 end
