@@ -87,7 +87,8 @@ module Canvas
         # A bit of gymnastics to wrap an existing Redis::Store into an ActiveSupport::Cache::RedisStore
         store = ActiveSupport::Cache::RedisStore.new([])
         store.instance_variable_set(:@data, Canvas.redis.__getobj__)
-        store
+        # yes, this would appear to be a no-op, but it allows switchman to add per-shard namespacing
+        ActiveSupport::Cache.lookup_store(store)
       else
         # merge in redis.yml, but give precedence to cache_store.yml
         #
