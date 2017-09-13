@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-# this is nmed _consul.rb so that other initializers (cache_store.rb in particular)
+# this is named _consul.rb so that other initializers (cache_store.rb in particular)
 # can talk to Consul
 
 module ConsulInitializer
