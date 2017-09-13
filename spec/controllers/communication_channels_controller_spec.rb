@@ -1176,41 +1176,78 @@ describe CommunicationChannelsController do
     end
   end
 
-  it "should re-send communication channel invitation for an invited channel" do
-    Notification.create(:name => 'Confirm Email Communication Channel')
-    get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
-    expect(response).to be_success
-    expect(assigns[:user]).to eql(@user)
-    expect(assigns[:cc]).to eql(@cc)
-    expect(assigns[:cc].messages_sent).not_to be_nil
-  end
-
-  it "should re-send enrollment invitation for an invited user" do
-    course_factory(active_all: true)
-    @enrollment = @course.enroll_user(@user)
-    expect(@enrollment.context).to eql(@course)
-    Notification.create(:name => 'Enrollment Invitation')
-    get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id}
-    expect(response).to be_success
-    expect(assigns[:user]).to eql(@user)
-    expect(assigns[:enrollment]).to eql(@enrollment)
-    expect(assigns[:enrollment].messages_sent).not_to be_nil
-  end
-
-  context "cross-shard user" do
-    specs_require_sharding
-    it "should re-send enrollment invitation for a cross-shard user" do
-      course_factory(active_all: true)
-      enrollment = nil
-      @shard1.activate do
-        user_with_pseudonym :active_cc => true
-        enrollment = @course.enroll_student(@user)
-      end
-      Notification.create(:name => 'Enrollment Invitation')
-      post 're_send_confirmation', params: {:user_id => enrollment.user_id, :enrollment_id => enrollment.id}
+  context "re-sending confirmations" do
+    it "should re-send communication channel invitation for an invited channel" do
+      Notification.create(:name => 'Confirm Email Communication Channel')
+      user_session(@user)
+      get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
       expect(response).to be_success
-      expect(assigns[:enrollment]).to eql(enrollment)
+      expect(assigns[:user]).to eql(@user)
+      expect(assigns[:cc]).to eql(@cc)
+      expect(assigns[:cc].messages_sent).not_to be_nil
+    end
+
+    it "should require a logged-in user" do
+      get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
+      assert_unauthorized
+    end
+
+    it "should require self to be logged in to re-send (without enrollment)" do
+      user_session(@user)
+      user_with_pseudonym(:active_all => true) # new user
+      get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
+      assert_unauthorized
+    end
+
+    it "should allow an account admin to re-send" do
+      account_admin_user(:user => @user)
+      user_session(@user)
+      user_with_pseudonym(:active_all => true) # new user
+      get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
+      expect(response).to be_success
+    end
+
+    it "should re-send enrollment invitation for an invited user" do
+      course_with_teacher_logged_in(active_all: true)
+
+      user_with_pseudonym(:active_all => true) # new user
+      @enrollment = @course.enroll_user(@user)
+      expect(@enrollment.context).to eql(@course)
+      Notification.create(:name => 'Enrollment Invitation')
+
+      get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id}
+      expect(response).to be_success
+      expect(assigns[:user]).to eql(@user)
+      expect(assigns[:enrollment]).to eql(@enrollment)
       expect(assigns[:enrollment].messages_sent).not_to be_nil
+    end
+
+    it "should require an admin with rights in the course" do
+      course_with_teacher_logged_in(:active_all => true) # other course
+
+      user_with_pseudonym(:active_all => true)
+      course_factory(active_all: true)
+      @enrollment = @course.enroll_user(@user)
+
+      get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id}
+      assert_unauthorized
+    end
+
+    context "cross-shard user" do
+      specs_require_sharding
+      it "should re-send enrollment invitation for a cross-shard user" do
+        course_with_teacher_logged_in(active_all: true)
+        enrollment = nil
+        @shard1.activate do
+          user_with_pseudonym :active_cc => true
+          enrollment = @course.enroll_student(@user)
+        end
+        Notification.create(:name => 'Enrollment Invitation')
+        post 're_send_confirmation', params: {:user_id => enrollment.user_id, :enrollment_id => enrollment.id}
+        expect(response).to be_success
+        expect(assigns[:enrollment]).to eql(enrollment)
+        expect(assigns[:enrollment].messages_sent).not_to be_nil
+      end
     end
   end
 
