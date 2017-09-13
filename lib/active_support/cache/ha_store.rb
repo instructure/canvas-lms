@@ -65,7 +65,9 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
     Canvas::Errors.capture(e)
     return options[:stale_entry].value
   ensure
-    if options[:race_condition_ttl]
+    # only unlock if we have an actual lock nonce, not just "true"
+    # that happens on failure
+    if options[:lock_nonce].is_a?(String)
       key = normalize_key(name, options)
       unlock("lock:#{key}", options[:lock_nonce])
     end
@@ -73,7 +75,16 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
 
   def lock(key, options)
     nonce = SecureRandom.hex(20)
-    nonce if data.set(key, nonce, raw: true, px: (options[:lock_timeout] * 1000).to_i, nx: true)
+    case data.set(key, nonce, raw: true, px: (options[:lock_timeout] * 1000).to_i, nx: true)
+    when true
+      nonce
+    when nil
+      # redis failed for reasons unknown; say "true" that we locked, but the
+      # nonce is useless
+      true
+    when false
+      false
+    end
   end
 
   def unlock(key, nonce)

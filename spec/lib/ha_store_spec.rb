@@ -75,5 +75,13 @@ describe ActiveSupport::Cache::HaStore do
         expect(store.fetch('bob') { raise exception }).to eq 42
       end
     end
+
+    it "calculates anyway if we couldn't contact the cache" do
+      expect(store).to receive(:read_entry).and_return(nil)
+      expect(store).to receive(:lock).and_return(true)
+      expect(store).to receive(:write_entry)
+      expect(store).to receive(:unlock).never
+      expect(store.fetch('bob') { 42 }).to eq 42
+    end
   end
 end
