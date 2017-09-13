@@ -17,7 +17,7 @@
 #
 
 require_relative '../../common'
-require_relative '../page_objects/gradebook_page'
+require_relative '../pages/gradebook_page'
 require_relative '../setup/gradebook_setup'
 
 describe "gradebook with grading periods" do

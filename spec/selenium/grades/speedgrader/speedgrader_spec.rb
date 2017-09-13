@@ -21,7 +21,7 @@ require_relative "../../helpers/groups_common"
 require_relative "../../helpers/assignments_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/speed_grader_common"
-require_relative "../page_objects/speedgrader_page"
+require_relative "../pages/speedgrader_page"
 require_relative "../../assignments/page_objects/assignment_page"
 require_relative "../../assignments/page_objects/submission_detail_page"
 require 'benchmark'

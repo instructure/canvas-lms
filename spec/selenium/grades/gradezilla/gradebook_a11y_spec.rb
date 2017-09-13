@@ -17,8 +17,8 @@
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/color_common'
-require_relative '../page_objects/gradezilla_page'
-require_relative '../page_objects/gradezilla_cells_page'
+require_relative '../pages/gradezilla_page'
+require_relative '../pages/gradezilla_cells_page'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"

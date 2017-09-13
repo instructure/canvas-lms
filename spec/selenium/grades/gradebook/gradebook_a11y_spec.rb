@@ -17,7 +17,7 @@
 
 require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/color_common'
-require_relative '../page_objects/gradebook_page'
+require_relative '../pages/gradebook_page'
 
 describe "gradebook" do
   include_context "in-process server selenium tests"

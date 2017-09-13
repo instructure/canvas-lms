@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../page_objects/gradezilla_page'
-require_relative '../page_objects/gradezilla_cells_page'
-require_relative '../page_objects/gradezilla_grade_detail_tray_page'
+require_relative '../pages/gradezilla_page'
+require_relative '../pages/gradezilla_cells_page'
+require_relative '../pages/gradezilla_grade_detail_tray_page'
 require_relative '../../helpers/gradezilla_common'
 
 describe 'Grade Detail Tray:' do

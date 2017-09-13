@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../helpers/gradezilla_common'
-require_relative '../grades/page_objects/gradezilla_page'
+require_relative '../grades/pages/gradezilla_page'
 require_relative '../grades/setup/gradebook_setup'
 
 describe "outcome gradezilla" do
