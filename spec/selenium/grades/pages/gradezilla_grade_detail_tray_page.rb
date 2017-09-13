@@ -109,6 +109,30 @@ class Gradezilla
       def grade_input
         "#grade-input"
       end
+
+      def all_comments
+        f("#SubmissionTray__Comments")
+      end
+
+      def delete_comment_button(comment)
+        fj("button:contains('Delete Comment: #{comment}')")
+      end
+
+      def comment_author_link
+        ff("#SubmissionTray__Comments a")
+      end
+
+      def new_comment_input
+        f("#SubmissionTray__Comments textarea")
+      end
+
+      def comment(comment_to_find)
+        fj("#SubmissionTray__Comments p:contains('#{comment_to_find}')")
+      end
+
+      def comment_save_button
+        fj("button:contains('Post')")
+      end
       # to-do's ---end
 
       # methods
@@ -143,6 +167,16 @@ class Gradezilla
         set_value(edit_grade, new_grade)
 
         edit_grade.send_keys(:return)
+      end
+
+      def add_new_comment(new_comment)
+        set_value(new_comment_input, new_comment)
+        comment_save_button.click
+      end
+
+      def delete_comment(comment)
+        delete_comment_button(comment).click
+        accept_alert
       end
 
     end
