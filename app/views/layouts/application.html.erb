@@ -83,7 +83,7 @@
     <% if @current_user.fake_student? %>
         <%= t("You are currently logged into Student View") %>
       <% else %>
-        <%= t("You are currently masquerading as %{user_name}", :user_name => @current_user.short_name) %>
+        <%= t("You are currently acting as %{user_name}", :user_name => @current_user.short_name) %>
     <% end %>
   </div>
 <% end %>
