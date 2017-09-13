@@ -93,8 +93,6 @@ function bzRetainedInfoSetup() {
       }
 
       var save = function() {
-        var http = new XMLHttpRequest();
-        http.open("POST", "/bz/user_retained_data", true);
         var value = ta.value;
         if(ta.getAttribute("type") == "radio"){
           if(!ta.checked)
@@ -105,11 +103,11 @@ function bzRetainedInfoSetup() {
           value = "clicked";
           ta.className += " bz-was-clicked";
         }
-        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
+        var optional = false;
         if (ta.classList.contains("bz-optional-magic-field"))
-          data += "&optional=true";
-        http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        http.send(data);
+          optional = true;
+
+        BZ_SaveMagicField(name, value, optional, ta.getAttribute("type"));
 
         // we also need to update other views on the same page
         var textareas = document.querySelectorAll("[data-bz-retained]");
@@ -134,13 +132,7 @@ function bzRetainedInfoSetup() {
     })(textareas[i]);
   }
 
-
-  var http = new XMLHttpRequest();
-  http.onload = function() {
-    // substring is to cut off json p stuff if we go back to GET, unneeded with POST though
-    var json = http.responseText; //.substring(9)
-    var obj = JSON.parse(json);
-
+  BZ_LoadMagicFields(names, function(obj) {
     for(var i = 0; i < names.length; i++) {
       var name = names[i];
       var ta = tas[i];
@@ -155,24 +147,9 @@ function bzRetainedInfoSetup() {
         console.log("THE MAGIC HAPPENS");
       }
     }
-  };
+  });
   // old one, w don't need all that info though so cutting it off while batching to optimize network use
   // http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value) + "&type=" + ta.getAttribute("type"), true);
-
-  var data = "";
-  for(var i = 0; i < names.length; i++) {
-    if(data.length)
-      data += "&";
-    data += "names[]=" + encodeURIComponent(names[i]);
-  }
-
-  // I would LIKE to use get on this, but since the name list can be arbitrarily long
-  // and I don't want to risk hitting a browser/server limit of url length, I am going to
-  // POST just in case
-  http.open("POST", "/bz/user_retained_data_batch", true);
-  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  http.send(data);
-
 }
 
 if(window != window.top) {
@@ -490,3 +467,46 @@ function BZ_GoToMasterPage(master_page_id) {
     req.send('');
 }
 
+function BZ_SaveMagicField(field_name, field_value, optional, type) {
+  if(optional == null)
+    optional = true; // the default is to skip grading; assume api updates are optional fields
+  if(type == null)
+    type = "api";
+
+  var http = new XMLHttpRequest();
+  http.open("POST", "/bz/user_retained_data", true);
+  var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + type;
+  if (optional)
+    data += "&optional=true";
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.send(data);
+}
+
+// field_names is an array!
+// callback is a function(obj) { } the properties on obj are name and value
+// so like BZ_LoadMagicFields(["foo", "bar"], function(obj) { obj["foo"] == "value_of_foo"; obj["bar"] = "value_of_var"; });
+function BZ_LoadMagicFields(field_names, callback) {
+
+  var http = new XMLHttpRequest();
+  http.onload = function() {
+    // substring is to cut off json p stuff if we go back to GET, unneeded with POST though
+    var json = http.responseText; //.substring(9)
+    var obj = JSON.parse(json);
+
+    callback(obj);
+  };
+
+  var data = "";
+  for(var i = 0; i < field_names.length; i++) {
+    if(data.length)
+      data += "&";
+    data += "names[]=" + encodeURIComponent(field_names[i]);
+  }
+
+  // I would LIKE to use get on this, but since the name list can be arbitrarily long
+  // and I don't want to risk hitting a browser/server limit of url length, I am going to
+  // POST just in case
+  http.open("POST", "/bz/user_retained_data_batch", true);
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.send(data);
+}
