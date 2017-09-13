@@ -492,7 +492,7 @@ class UsersController < ApplicationController
           integration_id: @user.pseudonym.integration_id
         }
       }
-      render :text => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
+      render :html => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
     end
   end
 

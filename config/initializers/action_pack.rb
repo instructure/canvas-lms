@@ -53,3 +53,13 @@ module DataStreamingContentLength
 end
 
 ActionController::Base.include(DataStreamingContentLength)
+
+if CANVAS_RAILS5_0
+  module DeprecateTextRender
+    def _normalize_options(options)
+      raise "`render :text` is deprecated in preparation for Rails 5.1 because it does not actually render a `text/plain` response" if options[:text]
+      super
+    end
+  end
+  ActionController::Base.prepend(DeprecateTextRender)
+end
