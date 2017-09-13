@@ -64,3 +64,4 @@ docker-compose.local.*
 deploy.env
 event.json
 .lambda
+.DS_store

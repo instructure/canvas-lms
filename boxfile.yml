@@ -14,13 +14,9 @@ run.config:
     - python-2.7
     - nginx
 
-  # dev_packages:
-  #   - libfontconfig
-
   extra_steps:
-    - npm install phantomjs-prebuilt
-    - yarn
     - npm install
+    - yarn install
     - npm install -g coffee-script@1.6.2
     - npm install -g webpack
     - npm install -g gulp
