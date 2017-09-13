@@ -82,7 +82,7 @@ module Polling
     # @API List poll sessions for a poll
     # @beta
     #
-    # Returns the list of PollSessions in this poll.
+    # Returns the paginated list of PollSessions in this poll.
     #
     # @example_response
     #   {
@@ -242,7 +242,7 @@ module Polling
     # @API List opened poll sessions
     # @beta
     #
-    # Lists all opened poll sessions available to the current user.
+    # A paginated list of all opened poll sessions available to the current user.
     #
     # @example_response
     #   {
@@ -258,7 +258,7 @@ module Polling
     # @API List closed poll sessions
     # @beta
     #
-    # Lists all closed poll sessions available to the current user.
+    # A paginated list of all closed poll sessions available to the current user.
     #
     # @example_response
     #   {

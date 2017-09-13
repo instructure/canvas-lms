@@ -147,7 +147,7 @@ class GradingStandardsApiController < ApplicationController
 
   # @API List the grading standards available in a context.
   #
-  # Returns the list of grading standards in the given context that are visible to user.
+  # Returns the paginated list of grading standards in the given context that are visible to user.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/1/grading_standards \

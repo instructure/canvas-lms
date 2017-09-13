@@ -158,9 +158,9 @@ class CollaborationsController < ApplicationController
   end
 
   # @API List collaborations
-  # List collaborations the current user has access to in the context of the course
-  # provided in the url. NOTE: this only returns ExternalToolCollaboration type
-  # collaborations.
+  # A paginated list of collaborations the current user has access to in the
+  # context of the course provided in the url. NOTE: this only returns
+  # ExternalToolCollaboration type collaborations.
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/
   #
@@ -337,7 +337,7 @@ class CollaborationsController < ApplicationController
 
   # @API List members of a collaboration.
   #
-  # List the collaborators of a given collaboration
+  # A paginated list of the collaborators of a given collaboration
   #
   # @argument include[] [String, "collaborator_lti_id"|"avatar_image_url"]
   #   - "collaborator_lti_id": Optional information to include with each member.
@@ -363,7 +363,8 @@ class CollaborationsController < ApplicationController
 
   # @API List potential members
   #
-  # List the users who can potentially be added to a collaboration in the given context.
+  # A paginated list of the users who can potentially be added to a
+  # collaboration in the given context.
   #
   # For courses, this consists of all enrolled users.  For groups, it is comprised of the
   # group members plus the admins of the course containing the group.

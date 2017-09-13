@@ -122,7 +122,7 @@ class AdminsController < ApplicationController
 
   # @API List account admins
   #
-  # List the admins in the account
+  # A paginated list of the admins in the account
   #
   # @argument user_id[] [[Integer]]
   #   Scope the results to those with user IDs equal to any of the IDs specified here.

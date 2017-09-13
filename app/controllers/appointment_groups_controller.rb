@@ -216,8 +216,8 @@ class AppointmentGroupsController < ApplicationController
 
   # @API List appointment groups
   #
-  # Retrieve the list of appointment groups that can be reserved or managed by
-  # the current user.
+  # Retrieve the paginated list of appointment groups that can be reserved or
+  # managed by the current user.
   #
   # @argument scope [String, "reservable"|"manageable"]
   #   Defaults to "reservable"
@@ -500,9 +500,9 @@ class AppointmentGroupsController < ApplicationController
 
   # @API List user participants
   #
-  # List users that are (or may be) participating in this appointment group.
-  # Refer to the Users API for the response fields. Returns no results for
-  # appointment groups with the "Group" participant_type.
+  # A paginated list of users that are (or may be) participating in this
+  # appointment group.  Refer to the Users API for the response fields. Returns
+  # no results for appointment groups with the "Group" participant_type.
   #
   # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
@@ -512,9 +512,9 @@ class AppointmentGroupsController < ApplicationController
 
   # @API List student group participants
   #
-  # List student groups that are (or may be) participating in this appointment
-  # group. Refer to the Groups API for the response fields. Returns no results
-  # for appointment groups with the "User" participant_type.
+  # A paginated list of student groups that are (or may be) participating in
+  # this appointment group. Refer to the Groups API for the response fields.
+  # Returns no results for appointment groups with the "User" participant_type.
   #
   # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"

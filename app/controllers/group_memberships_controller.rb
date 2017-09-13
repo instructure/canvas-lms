@@ -81,7 +81,7 @@ class GroupMembershipsController < ApplicationController
   #
   # @subtopic Group Memberships
   #
-  # List the members of a group.
+  # A paginated list of the members of a group.
   #
   # @argument filter_states[] [String, "accepted"|"invited"|"requested"]
   #   Only list memberships with the given workflow_states. By default it will

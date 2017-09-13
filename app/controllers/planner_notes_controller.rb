@@ -72,7 +72,7 @@ class PlannerNotesController < ApplicationController
 
   # @API List planner notes
   #
-  # Retrieve the list of planner notes
+  # Retrieve the paginated list of planner notes
   #
   # @example_response
   #   [

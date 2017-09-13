@@ -51,7 +51,7 @@ class CustomGradebookColumnsApiController < ApplicationController
 
   # @API List custom gradebook columns
   #
-  # List all custom gradebook columns for a course
+  # A paginated list of all custom gradebook columns for a course
   #
   # @argument include_hidden [Boolean]
   #   Include hidden parameters (defaults to false)

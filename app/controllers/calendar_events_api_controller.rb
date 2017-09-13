@@ -273,7 +273,7 @@ class CalendarEventsApiController < ApplicationController
 
   # @API List calendar events
   #
-  # Retrieve the list of calendar events or assignments for the current user
+  # Retrieve the paginated list of calendar events or assignments for the current user
   #
   # @argument type [String, "event"|"assignment"] Defaults to "event"
   # @argument start_date [Date]
@@ -306,7 +306,7 @@ class CalendarEventsApiController < ApplicationController
 
   # @API List calendar events for a user
   #
-  # Retrieve the list of calendar events or assignments for the specified user.
+  # Retrieve the paginated list of calendar events or assignments for the specified user.
   # To view calendar events for a user other than yourself,
   # you must either be an observer of that user or an administrator.
   #

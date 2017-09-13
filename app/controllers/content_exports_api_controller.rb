@@ -84,8 +84,8 @@ class ContentExportsApiController < ApplicationController
 
   # @API List content exports
   #
-  # List the past and pending content export jobs for a course, group, or user.
-  # Exports are returned newest first.
+  # A paginated list of the past and pending content export jobs for a course,
+  # group, or user. Exports are returned newest first.
   #
   # @returns [ContentExport]
   def index
