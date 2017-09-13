@@ -73,7 +73,7 @@ class TermsApiController < ApplicationController
 
   # @API List enrollment terms
   #
-  # Return all of the terms in the account.
+  # A paginated list of all of the terms in the account.
   #
   # @argument workflow_state[] [String, "active"|"deleted"|"all"]
   #   If set, only returns terms that are in the given state.

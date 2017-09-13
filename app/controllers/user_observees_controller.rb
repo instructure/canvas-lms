@@ -27,7 +27,7 @@ class UserObserveesController < ApplicationController
 
   # @API List observees
   #
-  # List the users that the given user is observing.
+  # A paginated list of the users that the given user is observing.
   #
   # *Note:* all users are allowed to list their own observees. Administrators can list
   # other users' observees.

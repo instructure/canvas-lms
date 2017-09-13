@@ -67,7 +67,7 @@ module Polling
     # @API List polls
     # @beta
     #
-    # Returns the list of polls for the current user.
+    # Returns the paginated list of polls for the current user.
     #
     # @example_response
     #   {

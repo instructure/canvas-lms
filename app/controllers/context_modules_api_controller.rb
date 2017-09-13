@@ -321,7 +321,7 @@ class ContextModulesApiController < ApplicationController
 
   # @API List modules
   #
-  # List the modules in a course
+  # A paginated list of the modules in a course
   #
   # @argument include[] [String, "items"|"content_details"]
   #    - "items": Return module items inline if possible.

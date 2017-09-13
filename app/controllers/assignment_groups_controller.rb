@@ -98,8 +98,8 @@ class AssignmentGroupsController < ApplicationController
 
   # @API List assignment groups
   #
-  # Returns the list of assignment groups for the current context. The returned
-  # groups are sorted by their position field.
+  # Returns the paginated list of assignment groups for the current context.
+  # The returned groups are sorted by their position field.
   #
   # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"]
   #  Associations to include with the group. "discussion_topic", "all_dates"

@@ -92,8 +92,9 @@ class PlannerOverridesController < ApplicationController
               :include_concluded, :only_favorites
   # @API List planner items
   #
-  # Retrieve the list of objects to be shown on the planner for the current user
-  # with the associated planner override to override an item's visibility if set.
+  # Retrieve the paginated list of objects to be shown on the planner for the
+  # current user with the associated planner override to override an item's
+  # visibility if set.
   #
   # @argument start_date [Date]
   #   Only return items starting from the given date.
