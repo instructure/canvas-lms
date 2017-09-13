@@ -74,7 +74,8 @@ class RequestThrottle
 
     if client_identifier(request) && !client_identifier(request).starts_with?('session')
       headers['X-Request-Cost'] = cost.to_s unless throttled
-      headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s if subject_to_throttling?(request)
+      headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s
+      headers['X-Rate-Limit-Remaining'] = 0.0.to_s if blacklisted?(request)
     end
 
     [status, headers, response]
@@ -173,9 +174,9 @@ class RequestThrottle
   end
 
   def rate_limit_exceeded
-    [ 403,
-      { 'Content-Type' => 'text/plain; charset=utf-8' },
-      ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]
+    [403,
+     {'Content-Type' => 'text/plain; charset=utf-8', 'X-Rate-Limit-Remaining' => '0.0'},
+     ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]
     ]
   end
 
@@ -265,7 +266,7 @@ class RequestThrottle
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
     def reserve_capacity(up_front_cost = self.up_front_cost)
-      return yield unless RequestThrottle.enabled?
+      return (self.count = yield) unless RequestThrottle.enabled?
 
       increment(0, up_front_cost)
       cost = yield
