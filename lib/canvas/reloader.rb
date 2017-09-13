@@ -19,25 +19,31 @@
 # Traps SIGHUP to clear the Setting cache and other associated caches, without requiring a full restart of
 # Canvas
 module Canvas::Reloader
-  def self.reload!
-    Setting.reset_cache!
-    RequestThrottle.reload!
-    to_reload.each(&:call)
-  end
+  class << self
+    attr_reader :pending_reload
 
-  def self.on_reload(&block)
-    to_reload << block
-  end
-
-  def self.trap_signal
-    trap("HUP") do
+    def reload!
       Rails.logger.info("Canvas::Reloader fired")
-      Canvas::Reloader.reload!
+      @pending_reload = false
+      Setting.reset_cache!
+      RequestThrottle.reload!
+      to_reload.each(&:call)
     end
-  end
 
-  private
-  def self.to_reload
-    @to_reload ||= []
+    def on_reload(&block)
+      to_reload << block
+    end
+
+    def trap_signal
+      trap("HUP") do
+        @pending_reload = true
+      end
+    end
+
+    private
+
+    def to_reload
+      @to_reload ||= []
+    end
   end
 end
