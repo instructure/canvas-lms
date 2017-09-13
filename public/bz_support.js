@@ -150,21 +150,6 @@ function bzRetainedInfoSetup() {
   });
   // old one, w don't need all that info though so cutting it off while batching to optimize network use
   // http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value) + "&type=" + ta.getAttribute("type"), true);
-
-  var data = "";
-  for(var i = 0; i < names.length; i++) {
-    if(data.length)
-      data += "&";
-    data += "names[]=" + encodeURIComponent(names[i]);
-  }
-
-  // I would LIKE to use get on this, but since the name list can be arbitrarily long
-  // and I don't want to risk hitting a browser/server limit of url length, I am going to
-  // POST just in case
-  http.open("POST", "/bz/user_retained_data_batch", true);
-  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  http.send(data);
-
 }
 
 if(window != window.top) {
@@ -490,7 +475,7 @@ function BZ_SaveMagicField(field_name, field_value, optional, type) {
 
   var http = new XMLHttpRequest();
   http.open("POST", "/bz/user_retained_data", true);
-  var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + ta.getAttribute("type");
+  var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + type;
   if (optional)
     data += "&optional=true";
   http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
