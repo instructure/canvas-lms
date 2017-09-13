@@ -34,6 +34,7 @@ class WikiPage < ActiveRecord::Base
   include Submittable
 
   include SearchTermHelper
+  include ContentLibraryHelper
 
   after_update :post_to_pandapub_when_revised
 
@@ -47,7 +48,12 @@ class WikiPage < ActiveRecord::Base
       end
     elsif self.body_changed?
       WikiPage.where(:clone_of_id => id).each do |page|
-        page.body = body
+        # Look for links to other pages / assignments in the Content Library and update those
+        # be links to the associated pages / assignment in the local course.
+        tag = ContentTag.where(:content_id => page.id, :content_type => 'WikiPage').first
+        local_course_id = tag.context_id
+        page.body = replace_content_library_links_with_local_links(body, local_course_id)
+
         # Syncing titles changes the page URL which has a
         # major risk of breaking links in the courses. I
         # am thus going to leave that manual - adr
@@ -62,8 +68,16 @@ class WikiPage < ActiveRecord::Base
   def clone_from_master_bank
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
       master = WikiPage.find(self.clone_of_id)
-      self.body = master.body
-      # see above
+      # Look for links to other pages / assignments in the Content Library and update those
+      # to have placeholders that Javascript can replace with the current course ID on load.
+      # NOTE: can't just straight up fix the links here b/c there is no way to get the course ID
+      # from a brand new wiki page.  The courseId isn't associted with it until after ALL saves
+      # happen and the ContentTag is created for this new page
+      # NOTE: this will result in a broken link if it's too an assignment since the Javascript
+      # can't determine the proper local assignment id. Designers will have to update the assignment
+      # in the Content Library after creation in order to fix the link.
+      self.body = replace_content_library_links_with_local_links(master.body)
+       # see above
       # self.title = master.title
     end
   end
