@@ -62,19 +62,17 @@ function bzRetainedInfoSetup() {
       }
 
       var save = function() {
-        var http = new XMLHttpRequest();
-        http.open("POST", "/bz/user_retained_data", true);
         var value = ta.value;
         if(ta.getAttribute("type") == "radio")
           if(!ta.checked)
             return; // we only want to actually save the one that is checked
         if(ta.getAttribute("type") == "checkbox")
           value = ta.checked ? "yes" : "";
-        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
+        var optional = false;
         if (ta.classList.contains("bz-optional-magic-field"))
-          data += "&optional=true";
-        http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        http.send(data);
+          optional = true;
+
+        BZ_SaveMagicField(name, value, optional, ta.getAttribute("type"));
 
         // we also need to update other views on the same page
         var textareas = document.querySelectorAll("[data-bz-retained]");
@@ -412,5 +410,20 @@ function BZ_GoToMasterPage(master_page_id) {
       }
     };
     req.send('');
+}
+
+function BZ_SaveMagicField(field_name, field_value, optional, type) {
+  if(optional == null)
+    optional = true; // the default is to skip grading; assume api updates are optional fields
+  if(type == null)
+    type = "api";
+
+  var http = new XMLHttpRequest();
+  http.open("POST", "/bz/user_retained_data", true);
+  var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + ta.getAttribute("type");
+  if (optional)
+    data += "&optional=true";
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.send(data);
 }
 
