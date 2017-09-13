@@ -250,7 +250,7 @@ define [
     ok view.$('.delete_button').length == 0
     view.remove()
 
-  test 'only move and delete buttons are available if a user\'s Outcome permissions apply only to the course level', ->
+  test 'move and delete buttons are available for an account outcome if a user is a local admin', ->
     ENV.ROOT_OUTCOME_GROUP = {context_type: "Course"}
     view = createView
       model: newOutcome(
@@ -259,6 +259,19 @@ define [
       state: 'show'
     ok view.$('.delete_button').length > 0
     ok view.$('.move_button').length > 0
+    ok view.$('.edit_button').length == 0
+    view.remove()
+
+  test 'move and delete buttons are not available for an account outcome if a user is a teacher', ->
+    ENV.ROOT_OUTCOME_GROUP = {context_type: "Course"}
+    ENV.current_user_roles = ['teacher']
+    view = createView
+      model: newOutcome(
+        { 'context_type' : 'Account', 'assessed' : false, 'native' : false, 'can_edit' : false, 'can_unlink' : true  },
+        { 'assessed' : false, 'can_unlink': true}),
+      state: 'show'
+    ok view.$('.delete_button').length == 0
+    ok view.$('.move_button').length == 0
     ok view.$('.edit_button').length == 0
     view.remove()
 
