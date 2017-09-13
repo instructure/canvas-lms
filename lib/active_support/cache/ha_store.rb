@@ -47,6 +47,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
     else
       if entry.expired? && (lock_nonce = lock(lock_key, options))
         options[:lock_nonce] = lock_nonce
+        options[:stale_entry] = entry
         return nil
       end
       # just return the stale value; someone else is busy
@@ -57,6 +58,12 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
 
   def save_block_result_to_cache(name, options)
     super
+  rescue => e
+    raise unless options[:stale_entry]
+    # if we have old stale data, silently swallow any
+    # errors fetching fresh data, and return the stale entry
+    Canvas::Errors.capture(e)
+    return options[:stale_entry].value
   ensure
     if options[:race_condition_ttl]
       key = normalize_key(name, options)
