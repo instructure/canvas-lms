@@ -183,7 +183,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List assignment submissions
   #
-  # Get all existing submissions for an assignment.
+  # A paginated list of all existing submissions for an assignment.
   #
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"]
   #   Associations to include with the group.  "group" will add group_id and group_name.
@@ -247,7 +247,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List submissions for multiple assignments
   #
-  # Get all existing submissions for a given set of students and assignments.
+  # A paginated list of all existing submissions for a given set of students and assignments.
   #
   # @argument student_ids[] [String]
   #   List of student ids to return submissions for. If this argument is
@@ -779,7 +779,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List gradeable students
   #
-  # List students eligible to submit the assignment. The caller must have permission to view grades.
+  # A paginated list of students eligible to submit the assignment. The caller must have permission to view grades.
   #
   # Section-limited instructors will only see students in their own sections.
   #
@@ -821,7 +821,7 @@ class SubmissionsApiController < ApplicationController
   # @argument assignment_ids[] [String]
   #   Assignments being requested
   #
-  # List students eligible to submit a list of assignments. The caller must have
+  # A paginated list of students eligible to submit a list of assignments. The caller must have
   # permission to view grades for the requested course.
   #
   # Section-limited instructors will only see students in their own sections.

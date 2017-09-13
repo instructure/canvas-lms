@@ -30,6 +30,8 @@ class ModerationSetController < ApplicationController
 
   # @API List students selected for moderation
   #
+  # Returns a paginated list of students selected for moderation
+  #
   # @returns [User]
   def index
     if authorized_action(@context, @current_user, :moderate_grades)

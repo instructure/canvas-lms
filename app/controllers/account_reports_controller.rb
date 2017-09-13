@@ -178,7 +178,7 @@ class AccountReportsController < ApplicationController
 
 # @API List Available Reports
 #
-# Returns the list of reports for the current context.
+# Returns a paginated list of reports for the current context.
 #
 # @response_field name The name of the report.
 # @response_field parameters The parameters will vary for each report

@@ -98,7 +98,7 @@ class GroupCategoriesController < ApplicationController
 
   # @API List group categories for a context
   #
-  # Returns a list of group categories in a context
+  # Returns a paginated list of group categories in a context
   #
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/<account_id>/group_categories \
@@ -291,7 +291,7 @@ class GroupCategoriesController < ApplicationController
 
   # @API List groups in group category
   #
-  # Returns a list of groups in a group category
+  # Returns a paginated list of groups in a group category
   #
   # @example_request
   #     curl https://<canvas>/api/v1/group_categories/<group_cateogry_id>/groups \
@@ -309,7 +309,7 @@ class GroupCategoriesController < ApplicationController
   include Api::V1::User
   # @API List users in group category
   #
-  # Returns a list of users in the group category.
+  # Returns a paginated list of users in the group category.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results

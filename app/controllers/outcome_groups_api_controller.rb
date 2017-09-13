@@ -319,7 +319,7 @@ class OutcomeGroupsApiController < ApplicationController
 
   # @API List linked outcomes
   #
-  # List the immediate OutcomeLink children of the outcome group. Paginated.
+  # A paginated list of the immediate OutcomeLink children of the outcome group.
   #
   # @argument outcome_style [Optional, String]
   #   The detail level of the outcomes. Defaults to "abbrev".
@@ -538,7 +538,7 @@ class OutcomeGroupsApiController < ApplicationController
 
   # @API List subgroups
   #
-  # List the immediate OutcomeGroup children of the outcome group. Paginated.
+  # A paginated list of the immediate OutcomeGroup children of the outcome group.
   #
   # @returns [OutcomeGroup]
   #

@@ -363,7 +363,7 @@ class UsersController < ApplicationController
   end
 
   # @API List users in account
-  # Retrieve the list of users associated with this account.
+  # A paginated list of of users associated with this account.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
@@ -786,7 +786,7 @@ class UsersController < ApplicationController
 
   include Api::V1::TodoItem
   # @API List the TODO items
-  # Returns the current user's list of todo items, as seen on the user dashboard.
+  # A paginated list of the current user's list of todo items, as seen on the user dashboard.
   #
   # @argument include[] [String, "ungraded_quizzes"]
   #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
@@ -851,7 +851,7 @@ class UsersController < ApplicationController
   include Api::V1::CalendarEvent
 
   # @API List upcoming assignments, calendar events
-  # Returns the current user's upcoming events, i.e. the same things shown
+  # A paginated list of the current user's upcoming events, i.e. the same things shown
   # in the dashboard 'Coming Up' sidebar.
   #
   # @example_response
@@ -930,7 +930,7 @@ class UsersController < ApplicationController
   end
 
   # @API List Missing Submissions
-  # returns past-due assignments for which the student does not have a submission.
+  # A paginated list of past-due assignments for which the student does not have a submission.
   # The user sending the request must either be an admin or a parent observer using the parent app
   #
   # @argument user_id

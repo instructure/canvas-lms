@@ -290,7 +290,7 @@ class Quizzes::QuizzesApiController < ApplicationController
 
   # @API List quizzes in a course
   #
-  # Returns the list of Quizzes in this course.
+  # Returns the paginated list of Quizzes in this course.
   #
   # @argument search_term [String]
   #   The partial title of the quizzes to match and return.
