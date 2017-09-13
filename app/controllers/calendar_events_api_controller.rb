@@ -1093,7 +1093,11 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_scope(user)
-    scope = CalendarEvent.active.order_by_start_at.order(:id)
+    scope = CalendarEvent
+      .shard(user&.in_region_associated_shards || Shard.current)
+      .active
+      .order_by_start_at
+      .order(:id)
     if user && !@public_to_auth
       scope = scope.for_user_and_context_codes(user, @context_codes, @section_codes)
     else
