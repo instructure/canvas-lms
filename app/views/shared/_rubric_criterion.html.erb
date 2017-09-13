@@ -110,9 +110,8 @@
             <% end %>
             <div class="description rating_description_value"><%= rating.description %></div>
             <span class="nobr">
-              <%= t "%{points}%{range_rating} pts",
-                :points => %{<span class="points">#{n(rating.points)}</span>}.html_safe,
-                :range_rating => %{<span class="range_rating" style="#{hidden if !use_range}"> to ><span class="min_points">#{n(rating_min)}</span></span>}.html_safe %>
+              <span class="points"><%= n(rating.points) %></span>
+              <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
             </span>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <% if !learning_outcome_criterion %>

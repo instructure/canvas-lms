@@ -71,11 +71,11 @@ describe "assignment rubrics" do
        f(' .ok_button').click
        wait_for_ajaximations
        f('#criterion_2 .add_rating_link_after').click
-       f('#criterion_2 tbody tr td:nth-of-type(2) .edit_rating_link').click
 
        expect(f('#flash_screenreader_holder')).to have_attribute("textContent", "New Rating Created")
        set_value(f('.rating_description'), 'rating 1')
-       f(' .ok_button').click
+       f('.ui-dialog-buttonset .save_button').click
+       wait_for_ajaximations
        submit_form('#edit_rubric_form')
        wait_for_ajaximations
       end.to change(Rubric, :count).by(1)
@@ -435,7 +435,8 @@ describe "assignment rubrics" do
 
         set_value(f('#edit_rating_form .min_points'), '2')
 
-        f(' .ok_button').click
+        f('.ui-dialog-buttonset .save_button').click
+        wait_for_ajaximations
         submit_form('#edit_rubric_form')
         wait_for_ajaximations
 
@@ -466,7 +467,7 @@ describe "assignment rubrics" do
         set_value(f('#edit_rating_form .min_points'), '2')
         set_value(f('#edit_rating_form input[name="points"]'), '2')
 
-        f('.ok_button').click
+        f('.ui-dialog-buttonset .save_button').click
         wait_for_ajaximations
 
         range_rating_element = '.criterion:nth-of-type(3) tbody tr td:nth-of-type(1) .range_rating'
@@ -488,7 +489,8 @@ describe "assignment rubrics" do
         set_value(f('#edit_rating_form .min_points'), '-1')
         set_value(f('#edit_rating_form input[name="points"]'), '100')
 
-        f(' .ok_button').click
+        f('.ui-dialog-buttonset .save_button').click
+        wait_for_ajaximations
         submit_form('#edit_rubric_form')
         wait_for_ajaximations
 
