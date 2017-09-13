@@ -83,7 +83,7 @@ module Lti
                   Lti::Oauth2::AuthorizationValidator::SecretNotFound,
                   Lti::Oauth2::AuthorizationValidator::MissingAuthorizationCode,
                   InvalidGrant do |e|
-        log_error(e)
+        Lti::Errors::ErrorLogger.log_error(e)
         render json: {error: 'invalid_grant'}, status: :bad_request
       end
       # @API authorize
@@ -129,13 +129,6 @@ module Lti
           expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
         }
       end
-
-      private
-
-      def log_error(e)
-        ErrorReport.log_error(e.class, {message: e.message, exception_message: e.message + "\n\n#{e.backtrace.join("\n")}"})
-      end
-
     end
   end
 end
