@@ -193,6 +193,7 @@
 }
 
 .messaging-wrapper {
+  display: flex;
   position: absolute;
   bottom: 0;
   top: 112px;
@@ -203,6 +204,7 @@
   border-right: 1px solid #bfbfbf;
   height: 100%;
   overflow: auto;
+  max-width: 400px;
 }
 
 .message-list {
@@ -219,24 +221,55 @@
     padding: 0 10px;
   }
 
+  // individual message container
   .messages > li {
     background: $ic-color-light;
     box-sizing: border-box;
     cursor: pointer;
-    height: 90px;
-    padding: 8px 12px 8px 32px;
-    position: relative;
+    height: 140px;
+    padding: 20px 10px;
     border-bottom: 1px solid $ic-border-light;
+    display: flex;
 
     &.active {
       background: $ic-bg-light-primary;
     }
+
     &:hover {
       box-shadow: inset -4px 0px 0px var(--ic-brand-primary);
     }
-    &:hover .message-actions a, .message-actions a:focus {
-      left: 0;
+
+    .message-left-column {
+      width: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    .message-middle-column {
+      flex-grow: 1;
+      padding: 0 10px;
+    }
+
+    .message-right-column {
+      width: 25px;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    &.active, &:hover {
+      .star-btn, .read-state {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  .date {
+    color: var(--ic-brand-primary);
+    @include fontSize(13px);
+    margin-bottom: 10px;
   }
 
   .author {
@@ -245,17 +278,30 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @include fontSize(13px);
+    @include fontSize(14px);
     font-weight: bold;
     margin: 0;
+    color: $ic-color-dark;
   }
 
-  .date {
-    color: var(--ic-brand-primary);
+  .subject {
+    @include fontSize(16px);
+    color: $ic-color-medium-darker;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: normal;
+    margin: 0;
+
+    &:focus {
+      outline: 0;
+    }
   }
 
   .summary {
-    color: $ic-font-color-dark;
+    @include fontSize(16px);
+    color: $ic-color-medium;
     height: 40px;
     margin: 0 24px 0 0;
     overflow: hidden;
@@ -263,135 +309,70 @@
     white-space: nowrap;
   }
 
-  p {
-    @include fontSize($ic-font-size--xsmall);
-    line-height: 16px;
-    margin-bottom: 8px;
+  .message-count {
+    @include fontSize(13px);
+    background-color: $ic-color-dark;
+    padding: 4px 7px;
+    border-radius: 4px;
+    text-shadow: none;
   }
-}
 
-.subject {
-  margin: 0;
-  @include fontSize(13px);
-  display: block;
-  max-width: 80%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  &:focus {
-    outline: 0;
-  }
-}
-h2.subject {
-  font-weight: bold;
-}
-
-.message-full-participants {
-  display: none;
-}
-
-.message-summarized-participants:focus, .message-full-participants:focus {
-  outline: 0;
-}
-
-.message-count {
-  @include fontSize(11px);
-  position: absolute;
-  right: 13px;
-  top: 43%;
-  background-color: $ic-color-dark;
-  text-shadow: none;
-}
-
-.message-actions {
-  left: 8px;
-  position: absolute;
-  top: 8px;
-
-  a {
+  .select-checkbox {
     position: relative;
-  }
-
-  li {
+    left: 5px;
     margin-bottom: 8px;
+    top: -2px;
   }
 
   .read-state {
-    background: $ic-color-dark;
-    border-radius: 5px;
+    border-radius: 50%;
     box-sizing: border-box;
     display: inline-block;
-    height: 10px;
     margin: 3px;
-    width: 10px;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: -0.25rem;
-      left: -0.25rem;
-      right: -0.25rem;
-      bottom: -0.25rem;
-      border: 1px solid var(--ic-brand-primary);
-      border-radius: 50%;
-      opacity: 0;
-      transform: scale(0.01);
-      transition: all 0.2s;
-    }
+    height: 16px;
+    width: 16px;
+    box-shadow: 0 0 0 1px #A5AFB5;
+    transform: translateX(-50px);
 
     &:focus {
       outline: none;
-      &::before {
-        opacity: 1;
-        transform: scale(1);
-      }
     }
 
     &.read {
       background: var(--ic-brand-primary);
-      left: -9999px;
+      box-shadow: none;
     }
   }
 
   .star-btn {
-    color: $ic-font-color-dark;
+    color: $ic-color-medium-darker;
     display: inline-block;
     font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
     @include fontSize($ic-font-size--medium);
-    left: -9999em;
-
-    &:hover {
-      text-decoration: none;
-    }
-
-    &:focus {
-      color: #333;
-      text-decoration: none;
-    }
+    transform: translateX(50px);
+    text-decoration: none;
 
     &:focus, &.active {
-      left: 0;
+      transform: translateX(0);
+    }
+
+    &:before {
+      content: '\2606';
     }
 
     &.active {
-      &:before, &:after {
-        position: absolute;
-      }
+      color: $ic-color-alert;
+      text-shadow: 0 0 1px $ic-color-alert;
       &:before {
-        color: $ic-color-alert;
-        content: "\2605";
-      }
-      &:focus {
-        color: #333;
-        &:after {
-          content: "\2606";
-          color: #333;
-          z-index: 5;
-          top: 0; left: 0;
-        }
+        content: '\2605';
       }
     }
+  }
+
+  p {
+    @include fontSize($ic-font-size--xsmall);
+    line-height: 16px;
+    margin-bottom: 8px;
   }
 }
 
@@ -412,6 +393,7 @@ h2.subject {
   width: 68.08511%;
   height: 100%;
   overflow: auto;
+  flex-grow: 1;
 
   &:focus {
     outline: none;
@@ -462,7 +444,6 @@ h2.subject {
   }
 
   .message-content > li {
-
     margin: 0 12px;
     padding: 24px 0;
     border-bottom: 1px solid $ic-border-light;
