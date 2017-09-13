@@ -66,5 +66,14 @@ describe ActiveSupport::Cache::HaStore do
       expect(store).to receive(:unlock).never
       expect(store.fetch('bob') { raise "not reached" }).to eq 42
     end
+
+    it "returns stale data if there is an exception calculating new data" do
+      store.write("bob", 42, expires_in: 1)
+      Timecop.travel(5) do
+        exception = RuntimeError.new("die")
+        expect(Canvas::Errors).to receive(:capture).with(exception)
+        expect(store.fetch('bob') { raise exception }).to eq 42
+      end
+    end
   end
 end
