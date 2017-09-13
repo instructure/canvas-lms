@@ -73,7 +73,30 @@ describe 'taking a quiz' do
 
           verify_quiz_is_locked
           verify_quiz_is_submitted
-          verify_quiz_submission_is_late
+        end
+
+        context 'with new gradebook disabled' do
+          before(:each) do
+            @course.disable_feature!(:new_gradebook)
+          end
+
+          it 'does not show the submission as late on the submission details page', priority: "1", test_id: 553506 do
+            auto_submit_quiz(quiz_past_due)
+
+            verify_quiz_submission_is_not_late
+          end
+        end
+
+        context 'with new gradebook enabled' do
+          before(:each) do
+            @course.enable_feature!(:new_gradebook)
+          end
+
+          it 'shows the submission as late on the submission details page', priority: "1", test_id: 553506 do
+            auto_submit_quiz(quiz_past_due)
+
+            verify_quiz_submission_is_late
+          end
         end
 
         it 'marks the quiz submission as "late"', priority: "1", test_id: 553015 do
@@ -93,8 +116,40 @@ describe 'taking a quiz' do
           Timecop.freeze(65.seconds.from_now) do
             verify_no_times_up_dialog
             submit_quiz
+          end
+        end
 
-            verify_quiz_submission_is_late
+        context 'with new gradebook disabled' do
+          before(:once) do
+            @course.disable_feature!(:new_gradebook)
+          end
+
+          it 'does not show the quiz submission as late on the student grades page', priority: "2", test_id: 551293 do
+            take_and_answer_quiz(submit: false, quiz: quiz_nearly_due)
+
+            Timecop.freeze(65.seconds.from_now) do
+              verify_no_times_up_dialog
+              submit_quiz
+
+              verify_quiz_submission_is_not_late
+            end
+          end
+        end
+
+        context 'with new gradebook enabled' do
+          before(:once) do
+            @course.enable_feature!(:new_gradebook)
+          end
+
+          it 'shows the quiz submission as late on the student grades page', priority: "2", test_id: 551293 do
+            take_and_answer_quiz(submit: false, quiz: quiz_nearly_due)
+
+            Timecop.freeze(65.seconds.from_now) do
+              verify_no_times_up_dialog
+              submit_quiz
+
+              verify_quiz_submission_is_late
+            end
           end
         end
 
