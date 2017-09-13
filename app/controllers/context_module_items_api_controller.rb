@@ -205,7 +205,7 @@ class ContextModuleItemsApiController < ApplicationController
 
   # @API List module items
   #
-  # List the items in a module
+  # A paginated list of the items in a module
   #
   # @argument include[] [String, "content_details"]
   #   If included, will return additional details specific to the content

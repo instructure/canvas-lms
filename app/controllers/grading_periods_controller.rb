@@ -68,7 +68,7 @@ class GradingPeriodsController < ApplicationController
   # @API List grading periods
   # @beta
   #
-  # Returns the list of grading periods for the current course.
+  # Returns the paginated list of grading periods for the current course.
   #
   # @example_response
   #   {

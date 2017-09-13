@@ -97,7 +97,7 @@ class AssignmentOverridesController < ApplicationController
   # @API List assignment overrides
   # @beta
   #
-  # Returns the list of overrides for this assignment that target
+  # Returns the paginated list of overrides for this assignment that target
   # sections/groups/students visible to the current user.
   #
   # @returns [AssignmentOverride]

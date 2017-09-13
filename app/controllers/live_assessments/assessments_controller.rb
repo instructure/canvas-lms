@@ -107,7 +107,7 @@ module LiveAssessments
     # @API List live assessments
     # @beta
     #
-    # Returns a list of live assessments.
+    # Returns a paginated list of live assessments.
     #
     # @example_response
     #  {

@@ -200,7 +200,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   include Api::V1::AccountAuthorizationConfig
 
   # @API List authentication providers
-  # Returns the list of authentication providers
+  # Returns a paginated list of authentication providers
   #
   # @example_request
   #

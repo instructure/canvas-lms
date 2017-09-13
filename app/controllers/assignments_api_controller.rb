@@ -560,7 +560,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::AssignmentOverride
 
   # @API List assignments
-  # Returns the list of assignments for the current context.
+  # Returns the paginated list of assignments for the current context.
   # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
@@ -581,7 +581,7 @@ class AssignmentsApiController < ApplicationController
   end
 
   # @API List assignments for user
-  # Returns the list of assignments for the specified user if the current user has rights to view.
+  # Returns the paginated list of assignments for the specified user if the current user has rights to view.
   # See {api:AssignmentsApiController#index List assignments} for valid arguments.
   def user_index
     @user.shard.activate do

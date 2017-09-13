@@ -218,7 +218,7 @@ class WikiPagesApiController < ApplicationController
 
   # @API List pages
   #
-  # List the wiki pages associated with a course or group
+  # A paginated list of the wiki pages associated with a course or group
   #
   # @argument sort [String, "title"|"created_at"|"updated_at"]
   #   Sort results by this field.
@@ -430,7 +430,7 @@ class WikiPagesApiController < ApplicationController
 
   # @API List revisions
   #
-  # List the revisions of a page. Callers must have update rights on the page in order to see page history.
+  # A paginated list of the revisions of a page. Callers must have update rights on the page in order to see page history.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
