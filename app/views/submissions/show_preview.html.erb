@@ -92,8 +92,8 @@
   <% js_bundle 'legacy/submissions_show_preview_text' %>
   <div style="text-align: right; margin-top: 15px;">
     <select class="data_view">
-      <option value="paper"><%= t('paper_view', 'Paper View') %></option>
-      <option value="plain_text"><%= t('plain_view', 'Plain Text View') %></option>
+      <option aria-label="<%= t("Assignment %{assignment} submission Paper View", :assignment=> @assignment.title) %>" value="paper"><%= t('Paper View') %></option>
+      <option aria-label="<%= t("Assignment %{assignment} submission Plain Text View", :assignment=> @assignment.title) %>" value="plain_text"><%= t('Plain Text View') %></option>
     </select>
   </div>
   <div id="submission_preview" class="paper user_content">
