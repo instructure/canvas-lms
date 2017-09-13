@@ -614,6 +614,7 @@ describe ApplicationController do
       allow(controller.request).to receive(:get?).and_return(false)
       allow(controller.request).to receive(:head?).and_return(false)
       allow(controller.request).to receive(:path).and_return('/non-api/endpoint')
+      controller.instance_variable_set(:@current_user, User.new)
       controller.instance_variable_set(:@pseudonym_session, "session-authenticated")
       controller.params[controller.request_forgery_protection_token] = "bogus"
       controller.request.headers['X-CSRF-Token'] = "bogus"

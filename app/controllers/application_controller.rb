@@ -1850,7 +1850,7 @@ class ApplicationController < ActionController::Base
   end
 
   def in_app?
-    @pseudonym_session
+    !!(@current_user ? @pseudonym_session : session[:session_id])
   end
 
   def json_as_text?
