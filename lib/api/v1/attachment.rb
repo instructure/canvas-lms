@@ -125,6 +125,9 @@ module Api::V1::Attachment
     if includes.include? "context_asset_string"
       hash['context_asset_string'] = attachment.context.try(:asset_string)
     end
+    if includes.include? 'avatar' && respond_to?(:avatar_json)
+      hash['avatar'] = avatar_json(user, attachment, type: 'attachment')
+    end
 
     if options[:master_course_status]
       hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))

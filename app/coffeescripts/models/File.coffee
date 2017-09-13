@@ -69,14 +69,20 @@ define [
       @set @uploadParams
       el.name = data.file_param
       @url = -> data.upload_url
+      onUpload = (data) =>
+        dfrd.resolve(data)
+        options.success?(data)
+      onError = (error) =>
+        dfrd.reject(error)
+        options.error?(error)
       FilesystemObject::save.call this, null,
         multipart: true
         success: (data) =>
-          dfrd.resolve(data)
-          options.success?(data)
-        error: (error) =>
-          dfrd.reject(error)
-          options.error?(error)
+          if data.location?
+            $.ajaxJSON(data.location, 'GET', {}, onUpload, onError)
+          else
+            onUpload(data)
+        error: onError
 
     toJSON: ->
       return super unless @get('file')

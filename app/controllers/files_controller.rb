@@ -809,11 +809,13 @@ class FilesController < ApplicationController
     @attachment.handle_duplicates(params[:on_duplicate])
 
     # trigger upload success callbacks
-    if @attachment.context.respond_to?(:file_upload_success_callback)
-      @attachment.context.file_upload_success_callback(@attachment)
+    if @context.respond_to?(:file_upload_success_callback)
+      @context.file_upload_success_callback(@attachment)
     end
 
-    render json: {}, status: :created, location: api_v1_attachment_url(@attachment)
+    url_params = {}
+    url_params[:include] = 'enhanced_preview_url' if @context.is_a?(User) || @context.is_a?(Course)
+    render json: {}, status: :created, location: api_v1_attachment_url(@attachment, url_params)
   end
 
   def api_create_success
