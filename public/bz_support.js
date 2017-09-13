@@ -35,19 +35,19 @@ function addOnMagicFieldsLoaded(func) {
 }
 
 function bzRetainedInfoSetup() {
-  function bzChangeRetainedItem(ta, value) {
-    if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox"){
-      ta.checked = (value == "yes") ? true : false;
-    } else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "radio"){
-      ta.checked = (value == ta.value) ? true : false;
-    } else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "button"){
+  function bzChangeRetainedItem(element, value) {
+    if(element.tagName == "INPUT" && element.getAttribute("type") == "checkbox"){
+      element.checked = (value == "yes") ? true : false;
+    } else if(element.tagName == "INPUT" && element.getAttribute("type") == "radio"){
+      element.checked = (value == element.value) ? true : false;
+    } else if(element.tagName == "INPUT" && element.getAttribute("type") == "button"){
       if (value == "clicked"){
-       ta.className += " bz-was-clicked";
+       element.className += " bz-was-clicked";
       }
-    } else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA"){
-      ta.value = value;
+    } else if(element.tagName == "INPUT" || element.tagName == "TEXTAREA"){
+      element.value = value;
     } else {
-      ta.textContent = value;
+      element.textContent = value;
     }
   }
 
@@ -70,84 +70,76 @@ function bzRetainedInfoSetup() {
       onMagicFieldsLoaded[i]();
   }
 
-  var textareas = document.querySelectorAll("[data-bz-retained]");
+  var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
   var names = [];
-  var tas = [];
-  for(var i = 0; i < textareas.length; i++) {
-    (function(ta) {
-      var name = ta.getAttribute("data-bz-retained");
+  var magicElements = [];
+  for(var i = 0; i < magicElementsDOM.length; i++) {
+    (function(el) {
+      var name = el.getAttribute("data-bz-retained");
 
-      if(ta.className.indexOf("bz-retained-field-setup") != -1)
+      if(el.className.indexOf("bz-retained-field-setup") != -1)
         return; // already set up, no need to redo
 
-      if(ta.tagName == "IMG") {
+      if(el.tagName == "IMG") {
         // this is a hack so the editor will not allow text inside:
         // the field pretends to be an image in that context. But, when
         // it is time to display it, we want to switch back to being an
         // ordinary span.
         var span = document.createElement("span");
-        span.className = ta.className;
-        span.setAttribute("data-bz-retained", ta.getAttribute("data-bz-retained"));
-        ta.parentNode.replaceChild(span, ta);
-        ta = span;
+        span.className = el.className;
+        span.setAttribute("data-bz-retained", el.getAttribute("data-bz-retained"));
+        el.parentNode.replaceChild(span, el);
+        el = span;
       }
 
       var save = function() {
-        var http = new XMLHttpRequest();
-        http.open("POST", "/bz/user_retained_data", true);
-        var value = ta.value;
-        if(ta.getAttribute("type") == "radio"){
-          if(!ta.checked)
+        var value = el.value;
+        if(el.getAttribute("type") == "radio"){
+          if(!el.checked)
             return; // we only want to actually save the one that is checked
-        } else if(ta.getAttribute("type") == "checkbox"){
-          value = ta.checked ? "yes" : "";
-        } else if(ta.getAttribute("type") == "button"){
+        } else if(el.getAttribute("type") == "checkbox"){
+          value = el.checked ? "yes" : "";
+        } else if(el.getAttribute("type") == "button"){
           value = "clicked";
-          ta.className += " bz-was-clicked";
+          el.className += " bz-was-clicked";
         }
-        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
-        if (ta.classList.contains("bz-optional-magic-field"))
-          data += "&optional=true";
-        http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        http.send(data);
+        var optional = false;
+        if (el.classList.contains("bz-optional-magic-field"))
+          optional = true;
+
+        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"));
 
         // we also need to update other views on the same page
-        var textareas = document.querySelectorAll("[data-bz-retained]");
-        for(var idx = 0; idx < textareas.length; idx++) {
-            var item = textareas[idx];
-            if(item == ta)
+        var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
+        for(var idx = 0; idx < magicElementsDOM.length; idx++) {
+            var item = magicElementsDOM[idx];
+            if(item == el)
               continue;
             if(item.getAttribute("data-bz-retained") == name)
               bzChangeRetainedItem(item, value);
         }
       };
 
-      ta.className += " bz-retained-field-setup";
-      if (ta.getAttribute("type") == "button")
-        ta.addEventListener("click", save);
+      el.className += " bz-retained-field-setup";
+      if (el.getAttribute("type") == "button")
+        el.addEventListener("click", save);
       else
-        ta.addEventListener("change", save);
+        el.addEventListener("change", save);
 
       pendingMagicFieldLoads += 1;
       names.push(name);
-      tas.push(ta);
-    })(textareas[i]);
+      magicElements.push(el);
+    })(magicElementsDOM[i]);
   }
 
-
-  var http = new XMLHttpRequest();
-  http.onload = function() {
-    // substring is to cut off json p stuff if we go back to GET, unneeded with POST though
-    var json = http.responseText; //.substring(9)
-    var obj = JSON.parse(json);
-
+  BZ_LoadMagicFields(names, function(obj) {
     for(var i = 0; i < names.length; i++) {
       var name = names[i];
-      var ta = tas[i];
+      var el = magicElements[i];
 
       var value = obj[name];
 
-      bzChangeRetainedItem(ta, value);
+      bzChangeRetainedItem(el, value);
       pendingMagicFieldLoads -= 1;
       if(pendingMagicFieldLoads == 0 && !pendingMagicFieldLoadEvent) {
         pendingMagicFieldLoadEvent = true;
@@ -155,24 +147,9 @@ function bzRetainedInfoSetup() {
         console.log("THE MAGIC HAPPENS");
       }
     }
-  };
+  });
   // old one, w don't need all that info though so cutting it off while batching to optimize network use
-  // http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value) + "&type=" + ta.getAttribute("type"), true);
-
-  var data = "";
-  for(var i = 0; i < names.length; i++) {
-    if(data.length)
-      data += "&";
-    data += "names[]=" + encodeURIComponent(names[i]);
-  }
-
-  // I would LIKE to use get on this, but since the name list can be arbitrarily long
-  // and I don't want to risk hitting a browser/server limit of url length, I am going to
-  // POST just in case
-  http.open("POST", "/bz/user_retained_data_batch", true);
-  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  http.send(data);
-
+  // http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(el.value) + "&type=" + el.getAttribute("type"), true);
 }
 
 if(window != window.top) {
@@ -490,3 +467,46 @@ function BZ_GoToMasterPage(master_page_id) {
     req.send('');
 }
 
+function BZ_SaveMagicField(field_name, field_value, optional, type) {
+  if(optional == null)
+    optional = true; // the default is to skip grading; assume api updates are optional fields
+  if(type == null)
+    type = "api";
+
+  var http = new XMLHttpRequest();
+  http.open("POST", "/bz/user_retained_data", true);
+  var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + type;
+  if (optional)
+    data += "&optional=true";
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.send(data);
+}
+
+// field_names is an array!
+// callback is a function(obj) { } the properties on obj are name and value
+// so like BZ_LoadMagicFields(["foo", "bar"], function(obj) { obj["foo"] == "value_of_foo"; obj["bar"] = "value_of_var"; });
+function BZ_LoadMagicFields(field_names, callback) {
+
+  var http = new XMLHttpRequest();
+  http.onload = function() {
+    // substring is to cut off json p stuff if we go back to GET, unneeded with POST though
+    var json = http.responseText; //.substring(9)
+    var obj = JSON.parse(json);
+
+    callback(obj);
+  };
+
+  var data = "";
+  for(var i = 0; i < field_names.length; i++) {
+    if(data.length)
+      data += "&";
+    data += "names[]=" + encodeURIComponent(field_names[i]);
+  }
+
+  // I would LIKE to use get on this, but since the name list can be arbitrarily long
+  // and I don't want to risk hitting a browser/server limit of url length, I am going to
+  // POST just in case
+  http.open("POST", "/bz/user_retained_data_batch", true);
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.send(data);
+}

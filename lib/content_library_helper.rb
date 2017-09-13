@@ -19,6 +19,7 @@ module ContentLibraryHelper
       next if url.match(/\/courses\/1\/files/) # Don't adjust links to download files. We expose them to all courses and can just exist in the Content Library
       next if url.match(/\/courses\/1\/rubrics/) # Don't adjust links to rubrics. We expose them to all courses and can just exist in the Content Library
       if (url.match(/\/courses\/1\//))
+        Rails.logger.debug "### replace_content_library_links_with_local_links: found matching url = #{url}. Replacing Content Library link with local link for local_course_id = #{local_course_id}"
         replaceUrl = nil
         local_assignment_id = nil
         if (url.match(/\/courses\/1\/pages/))
