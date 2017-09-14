@@ -166,21 +166,23 @@ class SearchFormComponent extends Component {
     }));
   }
 
-  hasOneDate () {
-    const { from, to } = this.state.selected;
-    return (from !== '' && !to) || (!from && to !== '');
+  hasToBeforeFrom () {
+    return moment(this.state.selected.from).diff(moment(this.state.selected.to), 'seconds') >= 0;
   }
 
-  hasNoDates () {
-    return !this.state.selected.from && !this.state.selected.to;
+  hasDateInputErrors () {
+    return this.dateInputErrors().length > 0;
   }
 
-  hasFromBeforeTo () {
-    return moment(this.state.selected.to).diff(moment(this.state.selected.from), 'seconds') >= 0;
-  }
+  dateInputErrors = () => {
+    if (this.hasToBeforeFrom()) {
+      return [{
+        type: 'error',
+        text: I18n.t('\'From\' date must be before \'To\' date')
+      }];
+    }
 
-  hasValidTimeFrame () {
-    return this.hasFromBeforeTo() || this.hasOneDate() || this.hasNoDates();
+    return [];
   }
 
   promptUserEntry = () => {
@@ -211,10 +213,6 @@ class SearchFormComponent extends Component {
   }
 
   handleSubmit = () => {
-    if (!this.hasValidTimeFrame()) {
-      return;
-    }
-
     this.props.getGradeHistory(this.state.selected);
   }
 
@@ -238,13 +236,14 @@ class SearchFormComponent extends Component {
           as="div"
           layout="columns"
           colSpacing="large"
-          vAlign="bottom"
+          vAlign="top"
           startAt="large"
         >
           <FormFieldGroup
             description={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}
             as="div"
             layout="columns"
+            vAlign="top"
             startAt="medium"
           >
             <Autocomplete
@@ -294,6 +293,8 @@ class SearchFormComponent extends Component {
             description={<ScreenReaderContent>{I18n.t('Dates')}</ScreenReaderContent>}
             layout="columns"
             startAt="small"
+            vAlign="top"
+            messages={this.dateInputErrors()}
           >
             <DateInput
               label={I18n.t('Start Date')}
@@ -308,13 +309,16 @@ class SearchFormComponent extends Component {
               onDateChange={this.setSelectedTo}
             />
           </FormFieldGroup>
-          <Button
-            onClick={this.handleSubmit}
-            type="submit"
-            variant="primary"
-          >
-            {I18n.t('Filter')}
-          </Button>
+          <div style={{margin: "1.85rem 0 0 0"}}>
+            <Button
+              onClick={this.handleSubmit}
+              type="submit"
+              variant="primary"
+              disabled={this.hasDateInputErrors()}
+            >
+              {I18n.t('Filter')}
+            </Button>
+          </div>
         </FormFieldGroup>
       </Container>
     );

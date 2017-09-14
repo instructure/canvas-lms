@@ -97,6 +97,61 @@ test('has a Button for submitting', function () {
   ok(this.wrapper.find(Button).exists());
 });
 
+test('disables the submit button if To date is before From date', function () {
+  this.wrapper.setState({
+    selected: {
+      from: '2017-05-02T00:00:00-05:00',
+      to: '2017-05-01T00:00:00-05:00'
+    }
+  }, () => {
+    const button = this.wrapper.find(Button);
+    ok(button.props().disabled);
+  });
+});
+
+test('does not disable the submit button if To date is after From date', function () {
+  this.wrapper.setState({
+    selected: {
+      from: '2017-05-01T00:00:00-05:00',
+      to: '2017-05-02T00:00:00-05:00'
+    }
+  }, () => {
+    const button = this.wrapper.find(Button);
+    notOk(button.props().disabled);
+  });
+});
+
+test('does not disable the submit button when there are no dates selected', function () {
+  const { from, to } = this.wrapper.state().selected;
+  const button = this.wrapper.find(Button);
+  ok(!from && !to);
+  notOk(button.props().disabled);
+});
+
+test('does not disable the submit button when only from date is entered', function () {
+  this.wrapper.setState({
+    selected: {
+      from: '1994-04-08T00:00:00-05:00',
+      to: ''
+    }
+  }, () => {
+    const button = this.wrapper.find(Button);
+    notOk(button.props().disabled);
+  });
+});
+
+test('does not disable the submit button when only to date is entered', function () {
+  this.wrapper.setState({
+    selected: {
+      from: '',
+      to: '2017-05-01T00:00:00-05:00'
+    }
+  }, () => {
+    const button = this.wrapper.find(Button);
+    notOk(button.props().disabled);
+  });
+});
+
 test('calls getGradeHistory prop on mount', function () {
   const props = { getGradeHistory: this.stub() };
   const wrapper = mount(<SearchFormComponent {...defaultProps()} {...props} />);
