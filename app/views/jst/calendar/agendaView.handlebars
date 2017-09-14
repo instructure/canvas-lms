@@ -17,10 +17,15 @@
                   {{#if assignment}}
                     {{#t}}Due {{/t}} {{fcMomentToString originalStart "tiny"}}
                   {{else}}
-                    {{#unless all_day}}
+                    {{#if allDay}}
+                      {{#t}}All Day{{/t}}
+                      {{fcMomentToDateString originalStart "short"}}
+                    {{else}}
                       {{#t}}Starts at{{/t}}
                       {{fcMomentToString originalStart "tiny"}}
-                    {{/unless}}
+                      {{#t}}Ends at{{/t}}
+                      {{fcMomentToString end "tiny"}}
+                    {{/if}}
                   {{/if}},
                 </span>
                 <span class="screenreader-only">
@@ -59,7 +64,7 @@
                     {{#if assignment}}
                       {{#t "due"}}Due {{/t}} {{fcMomentToString originalStart "tiny"}}
                     {{else}}
-                      {{#unless all_day}}
+                      {{#unless allDay}}
                         {{fcMomentToString originalStart "tiny"}}
                       {{/unless}}
                     {{/if}}
