@@ -232,7 +232,7 @@ class SubmissionsApiController < ApplicationController
         submissions = submissions.preload(:group) if includes.include?("group")
 
         submissions = Api.paginate(submissions, self,
-                                   api_v1_course_assignment_submissions_url(@context, @assignment))
+                                   polymorphic_url([:api_v1, @section || @context, @assignment, :submissions]))
         bulk_load_attachments_and_previews(submissions)
 
         submissions.map do |s|
