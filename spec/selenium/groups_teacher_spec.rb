@@ -635,12 +635,12 @@ describe "new groups" do
         set_cloned_groupset_name('')
 
         # Verifies error text
-        expect(fj('.error_text > div:first-child').text).to match 'Name is required'
+        expect(f('.errorBox:not(#error_box_template)')).to include_text('Name is required')
 
         set_cloned_groupset_name(@group_category.first.name)
 
         # Verifies error text
-        expect(fj('.error_text > div:first-child').text).to match @group_category.first.name+' is already in use.'
+        expect(f('.errorBox:not(#error_box_template)')).to include_text(@group_category.first.name+' is already in use.')
       end
 
       it "should change group membership after an assignment has been deleted" do

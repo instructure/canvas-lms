@@ -96,7 +96,13 @@ define [
         saveDfd
       else
         # focus on the first element with an error for accessibility
-        first_error = (_.keys(errors)[0])
+        dateOverrideErrors = _.map($('[data-error-type]'), (element) =>
+          $(element).attr('data-error-type')
+        )
+        assignmentFieldErrors = _.chain(_.keys(errors))
+                                .reject((err) -> _.contains(dateOverrideErrors, err))
+                                .value()
+        first_error = assignmentFieldErrors[0] || dateOverrideErrors[0]
         @findField(first_error).focus()
         # short timeout to ensure alerts are properly read after focus change.
         window.setTimeout((=>
@@ -230,6 +236,8 @@ define [
     findField: (field) ->
       selector = @fieldSelectors?[field] or "[name='#{field}']"
       $el = @$(selector)
+      if $el.length == 0 # 3rd fallback in case prior selectors find no elements
+        $el = @$("[data-error-type='#{field}']")
       if $el.data('rich_text')
         $el = @findSiblingTinymce($el)
       if $el.length > 1 # e.g. hidden input + checkbox, show it by the checkbox

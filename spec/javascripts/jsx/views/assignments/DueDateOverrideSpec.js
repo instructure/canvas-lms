@@ -40,7 +40,8 @@ QUnit.module('DueDateOverride#validateTokenInput', {
 test('rowKey can be prefixed with a zero', function () {
   const errorBoxSpy = this.spy($.fn, 'errorBox');
   const view = new DueDateOverrideView();
-  view.validateTokenInput({}, {});
+  const errs = view.validateTokenInput({}, {});
+  view.showError(errs.blankOverrides.element, errs.blankOverrides.message)
   strictEqual(errorBoxSpy.calledOnce, true);
 });
 
@@ -66,8 +67,8 @@ test('rowKey can be prefixed with a zero', function () {
   this.stub(StudentGroupStore, 'fetchComplete').returns(true);
   this.stub(StudentGroupStore, 'groupsFilteredForSelectedSet').returns([]);
   const errorBoxSpy = this.spy($.fn, 'errorBox');
-
   const view = new DueDateOverrideView();
-  view.validateGroupOverrides(data, {});
+  const errs = view.validateGroupOverrides(data, {});
+  view.showError(errs.invalidGroupOverride.element, errs.invalidGroupOverride.message)
   strictEqual(errorBoxSpy.calledOnce, true);
 });
