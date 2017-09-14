@@ -887,6 +887,7 @@ ko:
       recently_logged_in_users_title: "최근 로그인한 사용자"
       recently_started_courses_title: "최근 시작한 과목"
       started_at: "%{at}에 시작"
+      title_data_point_over_time: "%{value} 시간 외"
       uploaded_data: 
         one: "*파일 %{count}개* %{file_size} "
         other: "*파일 %{count}개* %{file_size} "
