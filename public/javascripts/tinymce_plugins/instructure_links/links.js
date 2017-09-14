@@ -417,7 +417,7 @@ import YouTubeApi from './youtube_api'
   }
 
   function initEditor (ed) {
-    if (initializedEditors.get(ed)) {
+    if (initializedEditors.get(ed) || ed.on === undefined) {
       return
     }
     ed.on('PreProcess', function(event) {

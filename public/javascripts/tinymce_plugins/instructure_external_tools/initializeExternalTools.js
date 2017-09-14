@@ -25,6 +25,7 @@ import {send} from 'jsx/shared/rce/RceCommandShim'
 import '../../jquery.instructure_misc_helpers'
 import 'jqueryui/dialog'
 import '../../jquery.instructure_misc_plugins'
+import Links from 'tinymce_plugins/instructure_links/links'
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
@@ -33,6 +34,7 @@ import '../../jquery.instructure_misc_plugins'
 
   var ExternalToolsPlugin = {
     init: function(ed, url, _INST) {
+      Links.initEditor(ed)
       if(!_INST || !_INST.editorButtons || !_INST.editorButtons.length) {
         return
       }

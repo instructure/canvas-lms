@@ -17,6 +17,7 @@
  */
 import initializeExternalTools from 'tinymce_plugins/instructure_external_tools/initializeExternalTools'
 import INST from 'INST'
+import Links from 'tinymce_plugins/instructure_links/links'
 
 export default function loadEventListeners (callbacks = {}) {
   const validCallbacks = [
@@ -43,12 +44,8 @@ export default function loadEventListeners (callbacks = {}) {
   })
 
   document.addEventListener('tinyRCE/initLinks', ({detail}) => {
-    require.ensure([], (require) => {
-      const Links = require('tinymce_plugins/instructure_links/links')
-      Links.initEditor(detail.ed)
-      Links.renderDialog(detail.ed)
-      callbacks.linksCB()
-    }, 'initLinksAsyncChunk')
+    Links.renderDialog(detail.ed)
+    callbacks.linksCB()
   })
 
   document.addEventListener('tinyRCE/initImagePicker', (e) => {

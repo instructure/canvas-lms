@@ -74,7 +74,6 @@ define [
     done = assert.async()
     @stub(Links)
     loadEventListeners({linksCB: () =>
-      ok(Links.initEditor.calledWithExactly(fakeEditor))
       ok(Links.renderDialog.calledWithExactly(fakeEditor))
       done()
     })
