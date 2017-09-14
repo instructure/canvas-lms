@@ -66,6 +66,10 @@ export default class ActAsModal extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.closeButton.focus();
+  }
+
   handleModalRequestClose = () => {
     const defaultUrl = '/'
 
@@ -156,7 +160,7 @@ export default class ActAsModal extends React.Component {
     const user = this.props.user
 
     return (
-      <span>
+      <div>
         <Modal
           onDismiss={this.handleModalRequestClose}
           transition="fade"
@@ -164,6 +168,7 @@ export default class ActAsModal extends React.Component {
           label={I18n.t('Act as User')}
           closeButtonLabel={I18n.t('Close')}
           applicationElement={() => document.getElementById('application')}
+          closeButtonRef={(el) => this.closeButton = el}
           open
         >
           <ModalHeader>
@@ -258,6 +263,7 @@ export default class ActAsModal extends React.Component {
                         data-method="post"
                         onClick={this.handleClick}
                         margin="large 0 0 0"
+                        buttonRef={(el) => this.proceedButton = el}
                       >
                         {I18n.t('Proceed')}
                       </Button>
@@ -268,7 +274,7 @@ export default class ActAsModal extends React.Component {
             }
           </ModalBody>
         </Modal>
-      </span>
+      </div>
     )
   }
 }

@@ -496,7 +496,7 @@ class UsersController < ApplicationController
           end
         }
       }
-      render :html => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
+      render :html => '<div id="application"></div><div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
     end
   end
 
