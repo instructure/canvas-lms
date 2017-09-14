@@ -52,7 +52,7 @@ class FeatureFlag < ActiveRecord::Base
 
   def clear_cache
     if self.context
-      self.class.connection.after_transaction_commit { MultiCache.delete(self.context.feature_flag_cache_key(feature)) }
+      self.class.connection.after_transaction_commit { self.context.feature_flag_cache.delete(self.context.feature_flag_cache_key(feature)) }
       self.context.touch if Feature.definitions[feature].try(:touch_context)
     end
   end
