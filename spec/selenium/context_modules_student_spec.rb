@@ -473,6 +473,26 @@ describe "context modules" do
       end
     end
 
+    it "shows Mark as Done button for assignments with external tool submission", priority: "2", test_id: 3340306 do
+      tool = @course.context_external_tools.create!(name: "a",
+                                                    url: "example.com",
+                                                    consumer_key: '12345',
+                                                    shared_secret: 'secret')
+      @assignment = @course.assignments.create!
+      @assignment.tool_settings_tool = tool
+      @assignment.submission_types = "external_tool"
+      @assignment.external_tool_tag_attributes = {url: tool.url}
+      @assignment.save!
+
+      @mark_done_module = create_context_module('Mark Done Module')
+      @tag = @mark_done_module.add_item({id: @assignment.id, type: 'assignment'})
+      @mark_done_module.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+      @mark_done_module.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f('#content')).to contain_css('#mark-as-done-checkbox')
+    end
+
     describe "module header icons" do
       def create_additional_assignment_for_module_1
         @assignment_4 = @course.assignments.create!(:title => "assignment 4")
