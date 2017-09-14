@@ -1247,6 +1247,40 @@ describe UsersController do
     end
   end
 
+  describe 'GET masquerade' do
+    let(:user2) do
+      user2 = user_with_pseudonym(name: "user2", short_name: "u2")
+      user2.pseudonym.sis_user_id = "user2_sisid1"
+      user2.pseudonym.integration_id = "user2_intid1"
+      user2.pseudonym.login = "user2_login1@foo.com"
+      user2.pseudonym.save!
+      user2
+    end
+
+    before do
+      user_session(site_admin_user)
+    end
+
+    it 'should set the js_env properly with act as user data' do
+      get 'masquerade', params: {user_id: user2.id}
+      assert_response(:success)
+      act_as_user_data = controller.js_env[:act_as_user_data][:user]
+      expect(act_as_user_data).to include({
+        name: user2.name,
+        short_name: user2.short_name,
+        id: user2.id,
+        avatar_image_url: user2.avatar_image_url,
+        sortable_name: user2.sortable_name,
+        email: user2.email,
+        pseudonyms: [
+          { login_id: user2.pseudonym.login,
+            sis_id: user2.pseudonym.sis_user_id,
+            integration_id: user2.pseudonym.integration_id }
+        ]
+      })
+    end
+  end
+
   describe 'GET media_download' do
     let(:kaltura_client) do
       kaltura_client = instance_double('CanvasKaltura::ClientV3')

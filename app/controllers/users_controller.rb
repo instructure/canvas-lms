@@ -483,9 +483,11 @@ class UsersController < ApplicationController
           avatar_image_url: @user.avatar_image_url,
           sortable_name: @user.sortable_name,
           email: @user.email,
-          login_id: @user.pseudonym.login,
-          sis_id: @user.pseudonym.sis_user_id,
-          integration_id: @user.pseudonym.integration_id
+          pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
+            { login_id: pseudonym.login,
+              sis_id: pseudonym.sis_user_id,
+              integration_id: pseudonym.integration_id }
+          end
         }
       }
       render :html => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
