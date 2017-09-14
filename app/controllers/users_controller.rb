@@ -1992,8 +1992,8 @@ class UsersController < ApplicationController
       user_id = User.user_id_from_avatar_key(params[:user_id])
     end
     account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
-    user_id, user_shard = Shard.local_id_for(user_id)
-    user_shard ||= Shard.current
+    user_id = Shard.global_id_for(user_id)
+    user_shard = Shard.shard_for(user_id)
     url = user_shard.activate do
       Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
         user = User.where(id: user_id).first if user_id.present?

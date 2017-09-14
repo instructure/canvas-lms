@@ -33,8 +33,8 @@ class Cacher < ActiveRecord::Observer
          obj.avatar_image_source_changed? ||
          obj.avatar_state_changed?
         User::AVATAR_SETTINGS.each do |avatar_setting|
-          Rails.cache.delete(Cacher.avatar_cache_key(obj.id, avatar_setting))
-          Rails.cache.delete(Cacher.inline_avatar_cache_key(obj.id, avatar_setting))
+          Rails.cache.delete(Cacher.avatar_cache_key(obj.global_id, avatar_setting))
+          Rails.cache.delete(Cacher.inline_avatar_cache_key(obj.global_id, avatar_setting))
         end
       end
     end
