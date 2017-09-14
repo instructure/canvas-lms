@@ -104,8 +104,22 @@ module Qti
 
     # try to escape unmatched '<' and '>' characters because some people don't format their QTI correctly...
     def escape_unmatched_brackets(string)
-      string.split(/(\<[^\<\>]*\>)/).map do |sub|
-        if sub.start_with?("<") && sub.end_with?(">")
+      unmatched = false
+      lcount = 0
+      string.scan(/[\<\>]/) do |s|
+        if s == ">"
+          if lcount == 0
+            unmatched = true
+          else
+            lcount -= 1
+          end
+        else
+          lcount += 1
+        end
+      end
+      return string unless unmatched || lcount > 0
+      string.split(/(\<[^\<\>]*\>)/m).map do |sub|
+        if sub.strip.start_with?("<") && sub.strip.end_with?(">")
           sub
         else
           sub.gsub("<", "&lt;").gsub(">", "&gt;")
