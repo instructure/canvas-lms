@@ -35,6 +35,7 @@ import wikiSidebar from 'wikiSidebar'
 //
 
 export const RCELOADED_EVENT_NAME = 'RceLoaded'
+export let tmce
 
 function delaySend ($target, methodName, ...args) {
   $target.one(RCELOADED_EVENT_NAME, {
@@ -47,9 +48,18 @@ function delaySend ($target, methodName, ...args) {
   )
 }
 
+export function setTinymce(t) {
+  tmce = t
+}
+
+export function getTinymce() {
+  return tmce || tinymce
+}
+
 export function send ($target, methodName, ...args) {
   const remoteEditor = $target.data('remoteEditor')
   if (remoteEditor) {
+    let ret
     if (methodName === 'get_code' && remoteEditor.isHidden()) {
       return $target.val()
     }
@@ -62,7 +72,15 @@ export function send ($target, methodName, ...args) {
       const dataAttributes = args[0].dataAttributes
       args[0]['data-preview-alt'] = dataAttributes && dataAttributes['preview-alt']
     }
-    return remoteEditor.call(methodName, ...args)
+    ret = remoteEditor.call(methodName, ...args)
+    if (methodName === 'toggle') {
+      if ($target.is(':visible')) {
+        $target.focus()
+      } else {
+        remoteEditor.focus()
+      }
+    }
+    return ret
   } else if ($target.editorBox && $target.data('rich_text')) {
     return $target.editorBox(methodName, ...args)
   } else {
@@ -84,7 +102,9 @@ export function focus ($target) {
   if (remoteEditor) {
     remoteEditor.focus()
   } else if ($target.data('rich_text')) {
+    const editor = getTinymce().get($target[0].id)
     wikiSidebar.attachToEditor($target)
+    editor && editor.focus()
   } else {
     console.warn("called focus() on an RCE instance that hasn't fully loaded, ignored")
   }

@@ -30,7 +30,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
           <input type="hidden" name="quiz[title]" value="<%=@quiz.title%>"/>
         <% else %>
           <label for="quiz_title" class="screenreader-only"><%= t('Quiz Title') %></label>
-          <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
+          <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254", :autofocus => true %>
         <% end %>
       </div>
 

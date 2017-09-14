@@ -199,14 +199,6 @@ const RichContentEditor = {
         establishParentNode($target)
       }
 
-      const originalOnFocus = tinyMCEInitOptions.onFocus
-      tinyMCEInitOptions.onFocus = (editor) => {
-        this.activateRCE($target)
-        if (typeof originalOnFocus === 'function') {
-          originalOnFocus(editor)
-        }
-      }
-
       loadServiceRCE($target, tinyMCEInitOptions, callback)
     } else {
       loadLegacyRCE($target, tinyMCEInitOptions, callback)

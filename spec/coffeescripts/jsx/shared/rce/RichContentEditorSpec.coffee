@@ -142,13 +142,6 @@ define [
     RichContentEditor.loadNewEditor(@$target, {})
     equal $resize.attr('aria-hidden'), "true"
 
-  test 'passes onFocus to loadOnTarget', ->
-    options = {}
-    RichContentEditor.loadNewEditor(@$target, options)
-    onFocus = RCELoader.loadOnTarget.firstCall.args[1].onFocus
-    onFocus()
-    ok Sidebar.show.called
-
   test 'onFocus calls options.onFocus if exists', ->
     options = {onFocus: @spy()}
     RichContentEditor.loadNewEditor(@$target, options)

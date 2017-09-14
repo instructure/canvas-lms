@@ -32,21 +32,12 @@ export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBo
       auto_focus: autoFocus,
       setup : function(ed) {
         var $editor = $("#" + ed.id);
-        var focus = function() {
-          $editor.triggerHandler('editor_box_focus');
-        };
-
-        ed.on('click', focus);
-        ed.on('keypress', focus);
-
         // KeyboardShortcuts.coffee needs to listen to events
         // fired from inside the editor, so we pass out
         // keyup events to the document
         ed.on('keyup', function(e){
           $(document).trigger("editorKeyUp", [e]);
         });
-
-        ed.on('activate', focus);
 
         ed.on('change', function() {
           $editor.trigger('change');
