@@ -47,7 +47,7 @@ describe CourseLinkValidator do
     topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
     mod = @course.context_modules.create!(:name => "some module")
     tag = mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
-    page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => html)
+    page = @course.wiki_pages.create!(:title => "wiki", :body => html)
     quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
 
     qq = quiz.quiz_questions.create!(:question_data => aq.question_data)
@@ -183,10 +183,10 @@ describe CourseLinkValidator do
 
   it "should find links to wiki pages" do
     course_factory
-    active = @course.wiki.wiki_pages.create!(:title => "active and stuff")
-    unpublished = @course.wiki.wiki_pages.create!(:title => "unpub")
+    active = @course.wiki_pages.create!(:title => "active and stuff")
+    unpublished = @course.wiki_pages.create!(:title => "unpub")
     unpublished.unpublish!
-    deleted = @course.wiki.wiki_pages.create!(:title => "baleeted")
+    deleted = @course.wiki_pages.create!(:title => "baleeted")
     deleted.destroy
 
     active_link = "/courses/#{@course.id}/pages/#{active.url}"
@@ -289,7 +289,7 @@ describe CourseLinkValidator do
 
   it "should not flag wiki pages with url encoding" do
     course_factory
-    page = @course.wiki.wiki_pages.create!(:title => "semi;colon", :body => 'sutff')
+    page = @course.wiki_pages.create!(:title => "semi;colon", :body => 'sutff')
 
     @course.syllabus_body = %{<a href='/courses/#{@course.id}/pages/#{CGI.escape(page.title)}'>link</a>}
     @course.save!

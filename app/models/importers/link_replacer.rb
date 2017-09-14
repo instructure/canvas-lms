@@ -40,9 +40,9 @@ module Importers
         begin
           item_key[:item] ||= retrieve_item(item_key)
 
-          add_missing_link_warnings!(item_key, field_links)
-
           replace_item_placeholders!(item_key, field_links)
+
+          add_missing_link_warnings!(item_key, field_links)
         rescue
           @migration.add_warning("An error occurred while translating content links", $!)
         end
@@ -77,7 +77,7 @@ module Importers
     def add_missing_link_warnings!(item_key, field_links)
       fix_issue_url = nil
       field_links.each do |field, links|
-        missing_links = links.select{|link| link[:missing_url] || !link[:new_value]}
+        missing_links = links.select{|link| link[:replaced] && (link[:missing_url] || !link[:new_value])}
         if missing_links.any?
           fix_issue_url ||= fix_issue_url(item_key)
           type = item_key[:type].to_s.humanize.titleize
@@ -139,6 +139,7 @@ module Importers
       links.each do |link|
         new_value = link[:new_value] || link[:old_value]
         if html.gsub!(link[:placeholder], new_value)
+          link[:replaced] = true
           subbed = true
         end
       end

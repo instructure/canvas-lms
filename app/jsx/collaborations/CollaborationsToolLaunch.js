@@ -17,41 +17,106 @@
  */
 
 import React from 'react'
-  let main = document.querySelector('#main')
+import I18n from 'i18n!collaborations'
 
-  class CollaborationsToolLaunch extends React.Component {
-    constructor (props) {
-      super(props)
-      this.state = {height: 500}
+let main
 
-      this.setHeight = this.setHeight.bind(this)
+class CollaborationsToolLaunch extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      height: 500,
+      beforeExternalContentAlertClass: 'screenreader-only',
+      afterExternalContentAlertClass: 'screenreader-only',
+      iframeStyle: {}
     }
 
-    componentDidMount () {
-      this.setHeight()
-      window.addEventListener('resize', this.setHeight)
-    }
-
-    componentWillUnMount () {
-      window.removeEventListener('resize', this.setHeight)
-    }
-
-    setHeight () {
-      this.setState({
-        height: main.getBoundingClientRect().height - 48
-      })
-    }
-
-    render () {
-      return (
-        <div className='CollaborationsToolLaunch' style={{height: this.state.height}}>
-          <iframe
-            className='tool_launch'
-            src={this.props.launchUrl}
-          ></iframe>
-        </div>
-      )
-    }
+    main = document.querySelector('#main')
+    this.handleAlertFocus = this.handleAlertFocus.bind(this)
+    this.handleAlertBlur = this.handleAlertBlur.bind(this)
+    this.setHeight = this.setHeight.bind(this)
   }
+
+  componentDidMount () {
+    this.setHeight()
+    window.addEventListener('resize', this.setHeight)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.setHeight)
+  }
+
+  setHeight () {
+    this.setState({
+      height: main.getBoundingClientRect().height - 48
+    })
+  }
+
+  handleAlertFocus (event) {
+    const newState = {
+      iframeStyle: { border: '2px solid #008EE2', width: `${(this.iframe.offsetWidth - 4)}px` }
+    }
+    if (event.target.className.search('before') > -1) {
+      newState.beforeExternalContentAlertClass = ''
+    } else if (event.target.className.search('after') > -1) {
+      newState.afterExternalContentAlertClass = ''
+    }
+    this.setState(newState)
+  }
+
+  handleAlertBlur (event) {
+    const newState = {
+      iframeStyle: { border: 'none', width: '100%' }
+    }
+    if (event.target.className.search('before') > -1) {
+      newState.beforeExternalContentAlertClass = 'screenreader-only'
+    } else if (event.target.className.search('after') > -1) {
+      newState.afterExternalContentAlertClass = 'screenreader-only'
+    }
+    this.setState(newState)
+  }
+
+  render () {
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
+
+    return (
+      <div className="CollaborationsToolLaunch" style={{height: this.state.height}}>
+        <div
+          onFocus={this.handleAlertFocus}
+          onBlur={this.handleAlertBlur}
+          className={beforeAlertStyles}
+          tabIndex="0"
+        >
+          <div className="ic-flash-info">
+            <div className="ic-flash__icon" aria-hidden="true">
+              <i className="icon-info" />
+            </div>
+            {I18n.t('The following content is partner provided')}
+          </div>
+        </div>
+        <iframe
+          className="tool_launch"
+          src={this.props.launchUrl}
+          style={this.state.iframeStyle}
+          ref={(e) => { this.iframe = e; }}
+        />
+        <div
+          onFocus={this.handleAlertFocus}
+          onBlur={this.handleAlertBlur}
+          className={afterAlertStyles}
+          tabIndex="0"
+        >
+          <div className="ic-flash-info">
+            <div className="ic-flash__icon" aria-hidden="true">
+              <i className="icon-info" />
+            </div>
+            {I18n.t('The preceding content is partner provided')}
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
 
 export default CollaborationsToolLaunch

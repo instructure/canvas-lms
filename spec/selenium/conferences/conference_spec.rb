@@ -53,6 +53,14 @@ describe 'Web conferences' do
       create_conference(title: conference_title, invite_all_users: true)
       verify_conference_list_includes(conference_title)
     end
+
+    it 'includes observers in manual invite', priority: "1", test_id: 3255709 do
+      course_with_observer(name: 'Observer Kim', course: @course, active_all: true)
+      get conferences_index_page
+      new_conference_button.click
+      f('.all_users_checkbox').click
+      expect(f('#members_list')).to include_text('Kim, Observer')
+    end
   end
 
   context 'when concluding a conference' do

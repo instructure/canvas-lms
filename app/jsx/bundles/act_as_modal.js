@@ -16,5 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/gradebook_history/gradebook_history.scss";
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ActAsModal from 'jsx/actAs/ActAsModal'
+
+ReactDOM.render((
+  <ActAsModal user={ENV.act_as_user_data.user} />
+), document.getElementById('act_as_modal'))

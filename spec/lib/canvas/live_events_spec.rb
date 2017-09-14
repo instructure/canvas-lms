@@ -131,7 +131,7 @@ describe Canvas::LiveEvents do
   describe ".wiki_page_updated" do
     before(:each) do
       course_with_teacher
-      @page = @course.wiki.wiki_pages.create(:title => "old title", :body => "old body")
+      @page = @course.wiki_pages.create(:title => "old title", :body => "old body")
     end
 
     def wiki_page_updated

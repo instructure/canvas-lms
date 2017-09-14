@@ -62,7 +62,7 @@ module Importers
       hash = hash.with_indifferent_access
       item ||= WikiPage.where(wiki_id: context.wiki, id: hash[:id]).first
       item ||= WikiPage.where(wiki_id: context.wiki, migration_id: hash[:migration_id]).first
-      item ||= context.wiki.wiki_pages.temp_record
+      item ||= context.wiki_pages.temp_record(:wiki => context.wiki)
       item.mark_as_importing!(migration)
 
       new_record = item.new_record?
@@ -135,7 +135,7 @@ module Importers
         hash[:contents].each do |sub_item|
           sub_item = sub_item.with_indifferent_access
           if ['folder', 'FOLDER_TYPE'].member? sub_item[:type]
-            obj = context.wiki.wiki_pages.where(migration_id: sub_item[:migration_id]).first
+            obj = context.wiki_pages.where(migration_id: sub_item[:migration_id]).first
             contents += "  <li><a href='/courses/#{context.id}/pages/#{obj.url}'>#{obj.title}</a></li>\n" if obj
           elsif sub_item[:type] == 'embedded_content'
             if contents && contents.length > 0
@@ -157,7 +157,7 @@ module Importers
                 obj = context.quizzes.where(migration_id: sub_item[:linked_resource_id]).first
                 contents += "  <li><a href='/courses/#{context.id}/quizzes/#{obj.id}'>#{obj.title}</a></li>\n" if obj
               when /PAGE_TYPE|WIKI_TYPE/
-                obj = context.wiki.wiki_pages.where(migration_id: sub_item[:linked_resource_id]).first
+                obj = context.wiki_pages.where(migration_id: sub_item[:linked_resource_id]).first
                 contents += "  <li><a href='/courses/#{context.id}/pages/#{obj.url}'>#{obj.title}</a></li>\n" if obj
               when 'FILE_TYPE'
                 file = context.attachments.where(migration_id: sub_item[:linked_resource_id]).first

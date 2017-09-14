@@ -62,7 +62,7 @@ module MasterCourses::Restrictor
 
     def check_for_restricted_column_changes
       return true if @importing_migration || !is_child_content?
-      return true if new_record? && !self.respond_to?(:owner_for_restrictions) # shouldn't be able to create new collection items if owner is locked
+      return true if new_record? && !self.check_restrictions_on_creation? # shouldn't be able to create new collection items if owner is locked
 
       restrictions = nil
       locked_columns = []
@@ -95,6 +95,10 @@ module MasterCourses::Restrictor
         raise "invalid edit type"
       end
     end
+  end
+
+  def check_restrictions_on_creation?
+    false
   end
 
   def mark_downstream_changes(changed_columns=nil)

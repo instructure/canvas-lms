@@ -168,6 +168,7 @@ describe SectionsController, type: :request do
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil,
+          'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
           'sis_section_id' => nil
@@ -193,6 +194,7 @@ describe SectionsController, type: :request do
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil,
+          'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
           'sis_section_id' => 'my_section'
@@ -222,6 +224,7 @@ describe SectionsController, type: :request do
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil,
+          'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
           'sis_section_id' => nil
@@ -238,6 +241,7 @@ describe SectionsController, type: :request do
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil,
+          'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
           'sis_section_id' => 'my_section'
@@ -254,6 +258,7 @@ describe SectionsController, type: :request do
             'nonxlist_course_id' => nil,
             'start_at' => nil,
             'end_at' => nil,
+            'restrict_enrollments_to_section_dates' => nil,
             'integration_id' => 'my_section',
             'sis_course_id' => nil,
             'sis_section_id' => nil
@@ -286,7 +291,8 @@ describe SectionsController, type: :request do
           'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
-          'end_at' => nil
+          'end_at' => nil,
+          'restrict_enrollments_to_section_dates' => nil
         })
       end
     end

@@ -46,6 +46,7 @@ describe PseudonymsController do
         @cc.confirm
         @cc.reload
         expect(@cc).to be_active
+        expect(@cc.confirmation_code_expires_at).to be_nil
         pword = @pseudonym.crypted_password
         code = @cc.confirmation_code
         post 'change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}}
@@ -71,6 +72,21 @@ describe PseudonymsController do
       @cc.reload
       expect(@cc.confirmation_code).to eql(code)
       expect(@cc).not_to be_active
+    end
+
+    it "accepts a non-expired password-change token" do
+      Setting.set('password_reset_token_expiration_minutes', '60')
+      @cc.forgot_password!
+      expect(@cc.confirmation_code_expires_at).to be_between(58.minutes.from_now, 62.minutes.from_now)
+      post 'change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'} }
+      expect(response).to be_success
+    end
+
+    it "rejects an expired password-change token" do
+      @cc.forgot_password!
+      @cc.update_attributes :confirmation_code_expires_at => 1.hour.ago
+      post 'change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'} }
+      assert_status(400)
     end
 
     describe "forgot password" do
@@ -131,6 +147,13 @@ describe PseudonymsController do
     it "should render confirm change password view for unregistered user" do
       get 'confirm_change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code}
       expect(response).to be_success
+    end
+
+    it "should not render confirm change password view if token is expired" do
+      @user.register
+      @cc.update_attributes :confirmation_code_expires_at => 1.hour.ago
+      get 'confirm_change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code }
+      expect(response).to be_redirect
     end
   end
 

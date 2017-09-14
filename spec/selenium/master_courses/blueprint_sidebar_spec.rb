@@ -99,7 +99,7 @@ describe "master courses sidebar" do
 
     # now push some incremental changes
     Timecop.freeze(2.seconds.from_now) do
-      @page = @master.wiki.wiki_pages.create! title: 'Unicorn'
+      @page = @master.wiki_pages.create! title: 'Unicorn'
       page_tag = @template.content_tag_for(@page)
       page_tag.restrictions = @template.default_restrictions
       page_tag.save!

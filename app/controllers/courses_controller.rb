@@ -2177,14 +2177,14 @@ class CoursesController < ApplicationController
   # @argument course[blueprint_restrictions] [BlueprintRestriction]
   #   Sets a default set to apply to blueprint course objects when restricted,
   #   unless _use_blueprint_restrictions_by_object_type_ is enabled.
-  #   See the {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction} documentation
+  #   See the {api:Blueprint_Courses:BlueprintRestriction Blueprint Restriction} documentation
   #
   # @argument course[use_blueprint_restrictions_by_object_type] [Boolean]
   #   When enabled, the _blueprint_restrictions_ parameter will be ignored in favor of
   #   the _blueprint_restrictions_by_object_type_ parameter
   #
   # @argument course[blueprint_restrictions_by_object_type] [multiple BlueprintRestrictions]
-  #   Allows setting multiple {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction}
+  #   Allows setting multiple {api:Blueprint_Courses:BlueprintRestriction Blueprint Restriction}
   #   to apply to blueprint course objects of the matching type when restricted.
   #   The possible object types are "assignment", "attachment", "discussion_topic", "quiz" and "wiki_page".
   #   Example usage:
@@ -2514,7 +2514,7 @@ class CoursesController < ApplicationController
     @entries.concat(@context.discussion_topics.active.select{ |dt|
       dt.published? && !dt.locked_for?(@current_user, :check_policies => true)
     })
-    @entries.concat @context.wiki.wiki_pages
+    @entries.concat @context.wiki_pages
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

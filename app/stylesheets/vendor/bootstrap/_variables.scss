@@ -90,7 +90,6 @@ $btnBorder:                         #bbb !default;
 @if $use_high_contrast { $btnBorder: #555 }
 
 $btnPrimaryBackground:              $linkColor !default;
-$btnPrimaryBackgroundHighlight:     adjust-hue($btnPrimaryBackground, 20%) !default;
 
 $btnInfoBackground:                 #5bc0de !default;
 @if $use_high_contrast { $btnInfoBackground: darken($btnInfoBackground, 8%) }

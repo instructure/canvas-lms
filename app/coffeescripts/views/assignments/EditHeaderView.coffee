@@ -59,7 +59,10 @@ define [
     onDelete: (e) =>
       e.preventDefault()
       if @canDelete()
-        @delete() if confirm(@messages.confirm)
+        if confirm(@messages.confirm)
+          @delete()
+        else
+          window.$('a:first[role="button"].al-trigger.btn').focus()
 
     delete: ->
       disablingDfd = new $.Deferred()

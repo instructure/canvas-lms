@@ -24,7 +24,7 @@ describe "enhanceable_content" do
     stub_kaltura
     course_with_teacher_logged_in
 
-    page = @course.wiki.wiki_pages.build(:title => 'title')
+    page = @course.wiki_pages.build(:title => 'title')
     page.body = %{
       <div id="dialog_for_link1" class="enhanceable_content dialog">dialog for link 1</div>
       <a href="#dialog_for_link1" id="link1">link 1</a>
@@ -99,7 +99,7 @@ describe "enhanceable_content" do
       course_factory(active_all: true)
 
       @attachment = @course.attachments.create!(:uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
-      @page = @course.wiki.wiki_pages.build(:title => 'title')
+      @page = @course.wiki_pages.build(:title => 'title')
       @page.body = %{
         <a id="media_comment_0_deadbeef" class="instructure_file_link instructure_video_link" title="Video.mp4"
           href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">Video</a>

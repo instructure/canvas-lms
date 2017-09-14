@@ -161,6 +161,7 @@ describe Quizzes::QuizSubmission do
         v = qs.versions.current.model
         expect(v.score).to eq 45
         expect(v.fudge_points).to eq -5
+        expect(qs.submission.unread?(@student)).to eq true
       end
 
       context 'on a graded_survey' do

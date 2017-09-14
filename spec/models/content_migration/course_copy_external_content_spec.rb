@@ -63,7 +63,7 @@ describe ContentMigration do
       cm = @copy_from.context_modules.create!(:name => "some module")
       item = cm.add_item(:id => assmt.id, :type => 'assignment')
       att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-      page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
       quiz = @copy_from.quizzes.create!
 
       allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
@@ -90,7 +90,7 @@ describe ContentMigration do
       copied_cm = @copy_to.context_modules.where(:migration_id => mig_id(cm)).first
       copied_item = @copy_to.context_module_tags.where(:migration_id => mig_id(item)).first
       copied_att = @copy_to.attachments.where(:migration_id => mig_id(att)).first
-      copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
 
       expect(TestExternalContentService.course).to eq @copy_to

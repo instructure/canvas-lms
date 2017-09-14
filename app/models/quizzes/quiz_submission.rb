@@ -640,7 +640,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     params = (params || {}).with_indifferent_access
     self.manually_scored = false
     self.grader_id = params[:grader_id]
-
+    self.submission&.mark_unread(self.user)
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]

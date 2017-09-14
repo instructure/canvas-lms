@@ -123,7 +123,7 @@ describe MasterCourses::MasterTemplate do
       expect(@template.content_tag_for(@assignment).id).to eq old_tag_id
 
       # should still create a tag even if it's not found in the index
-      @page = @course.wiki.wiki_pages.create!(:title => "title")
+      @page = @course.wiki_pages.create!(:title => "title")
       page_tag = @template.content_tag_for(@page)
       expect(page_tag.reload.content).to eq @page
     end
@@ -300,6 +300,16 @@ describe MasterCourses::MasterTemplate do
       expect(t2.instance_variable_get(:@last_export_completed_at)).to eq time1
       expect(t3.instance_variable_defined?(:@last_export_completed_at)).to be_truthy
       expect(t3.instance_variable_get(:@last_export_completed_at)).to be_nil
+    end
+
+    it "should not count deleted courses" do
+      t = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      t.add_child_course!(Course.create!)
+      t.add_child_course!(Course.create!(:workflow_state => 'deleted'))
+
+      MasterCourses::MasterTemplate.preload_index_data([t])
+
+      expect(t.child_course_count).to eq 1
     end
   end
 end

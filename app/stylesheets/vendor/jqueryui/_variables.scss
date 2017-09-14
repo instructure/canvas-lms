@@ -19,18 +19,9 @@ $fcHover: #313131;
 $borderColorActive: hsl(207, 74%, 45%);
 $bgColorActive: hsl(198, 96%, 47%);
 $gradientTopActive: hsl(196, 100%, 52%);
-
-@if $use_high_contrast {
-  $gradientTopActive: $linkColor;
-}
-
 $gradientBottomActive: adjust-hue($gradientTopActive, 10%);
 
 $fcActive: #fff;
-
-//TODO REMOVE
-$btnPrimaryBackground: $gradientTopActive;
-$btnPrimaryBackgroundHighlight: $gradientBottomActive;
 
 $borderColorHighlight: #eedc94;
 $bgColorHighlight: #eedc94;

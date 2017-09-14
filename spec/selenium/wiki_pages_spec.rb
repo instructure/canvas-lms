@@ -38,8 +38,8 @@ describe "Wiki Pages" do
     end
 
     it "should navigate to pages tab with no front page set", priority: "1", test_id: 126843 do
-      @course.wiki.wiki_pages.create!(title: 'Page1')
-      @course.wiki.wiki_pages.create!(title: 'Page2')
+      @course.wiki_pages.create!(title: 'Page1')
+      @course.wiki_pages.create!(title: 'Page2')
       get "/courses/#{@course.id}"
       f('.pages').click
       expect(driver.current_url).to include("/courses/#{@course.id}/pages")
@@ -50,7 +50,7 @@ describe "Wiki Pages" do
     end
 
     it "should navigate to front page when set", priority: "1", test_id: 126844 do
-      front = @course.wiki.wiki_pages.create!(title: 'Front')
+      front = @course.wiki_pages.create!(title: 'Front')
       front.set_as_front_page!
       front.save!
       get "/courses/#{@course.id}"
@@ -64,7 +64,7 @@ describe "Wiki Pages" do
     end
 
     it "should have correct front page UI elements when set as home page", priority: "1", test_id: 126848 do
-      front = @course.wiki.wiki_pages.create!(title: 'Front')
+      front = @course.wiki_pages.create!(title: 'Front')
       front.set_as_front_page!
       @course.update_attribute :default_view, "wiki"
       get "/courses/#{@course.id}"
@@ -81,7 +81,7 @@ describe "Wiki Pages" do
     end
 
     it "navigates to the wiki pages edit page from the show page" do
-      wikiPage = @course.wiki.wiki_pages.create!(:title => "Foo")
+      wikiPage = @course.wiki_pages.create!(:title => "Foo")
       edit_url = edit_course_wiki_page_url(@course, wikiPage)
       get course_wiki_page_path(@course, wikiPage)
 
@@ -96,7 +96,7 @@ describe "Wiki Pages" do
     end
 
     it "should update the page with changes made in another window", priority: "1", test_id: 126833 do
-      @course.wiki.wiki_pages.create!(title: 'Page1')
+      @course.wiki_pages.create!(title: 'Page1')
       edit_page('this is')
       driver.execute_script("window.open()")
       driver.switch_to.window(driver.window_handles.last)
@@ -109,10 +109,18 @@ describe "Wiki Pages" do
     end
 
     it "blocks linked page from redirecting parent page", priority: "2", test_id: 927147 do
-      @course.wiki.wiki_pages.create!(title: 'Garfield and Odie Food Preparation',
+      @course.wiki_pages.create!(title: 'Garfield and Odie Food Preparation',
         body: '<a href="http://example.com/poc/" target="_blank" id="click_here_now">click_here</a>')
       get "/courses/#{@course.id}/pages/garfield-and-odie-food-preparation"
       expect(f('#click_here_now').attribute("rel")).to eq "noreferrer"
+    end
+
+    it "does not mark valid links as invalid", priority: "2", test_id: 927788 do
+      @course.wiki_pages.create!(title: 'Page1', body: 'http://www.instructure.com/')
+      get "/courses/#{@course.id}/link_validator"
+      fj('button:contains("Start Link Validation")').click
+      run_jobs
+      expect(f('#link_validator')).to contain_jqcss('div:contains("No unresponsive links found")')
     end
   end
 
@@ -123,7 +131,7 @@ describe "Wiki Pages" do
     end
 
     it "should edit page title from pages index", priority: "1", test_id: 126849 do
-      @course.wiki.wiki_pages.create!(title: 'B-Team')
+      @course.wiki_pages.create!(title: 'B-Team')
       get "/courses/#{@course.id}/pages"
       f('.al-trigger').click
       f('.edit-menu-item').click
@@ -135,7 +143,7 @@ describe "Wiki Pages" do
     end
 
     it "should display a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
-      @course.wiki.wiki_pages.create!(title: 'deleted')
+      @course.wiki_pages.create!(title: 'deleted')
       get "/courses/#{@course.id}/pages"
       f('.al-trigger').click
       f('.delete-menu-item').click
@@ -152,7 +160,7 @@ describe "Wiki Pages" do
     end
 
     it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
-      page = @course.wiki.wiki_pages.create!(title: 'delete_deux')
+      page = @course.wiki_pages.create!(title: 'delete_deux')
       # sets the workflow_state = deleted to act as a deleted page
       page.workflow_state = 'deleted'
       page.save!
@@ -177,9 +185,9 @@ describe "Wiki Pages" do
     before :once do
       account_model
       course_with_teacher :account => @account
-      @course.wiki.wiki_pages.create!(:title => "Foo")
-      @course.wiki.wiki_pages.create!(:title => "Bar")
-      @course.wiki.wiki_pages.create!(:title => "Baz")
+      @course.wiki_pages.create!(:title => "Foo")
+      @course.wiki_pages.create!(:title => "Bar")
+      @course.wiki_pages.create!(:title => "Baz")
     end
 
     before :each do
@@ -344,7 +352,7 @@ describe "Wiki Pages" do
         @timestamps = %w(2015-01-01 2015-01-02 2015-01-03).map { |d| Time.zone.parse(d) }
 
         Timecop.freeze(@timestamps[0]) do      # rev 1
-          @vpage = @course.wiki.wiki_pages.build :title => 'bar'
+          @vpage = @course.wiki_pages.build :title => 'bar'
           @vpage.workflow_state = 'unpublished'
           @vpage.body = 'draft'
           @vpage.save!
@@ -463,7 +471,7 @@ describe "Wiki Pages" do
     end
 
     it "should lock page based on module date", priority: "1", test_id: 126845 do
-      locked = @course.wiki.wiki_pages.create! title: 'locked'
+      locked = @course.wiki_pages.create! title: 'locked'
       mod2 = @course.context_modules.create! name: 'mod2', unlock_at: 1.day.from_now
       mod2.add_item id: locked.id, type: 'wiki_page'
       mod2.save!
@@ -477,8 +485,8 @@ describe "Wiki Pages" do
     end
 
     it "should lock page based on module progression", priority: "1", test_id: 126846 do
-      foo = @course.wiki.wiki_pages.create! title: 'foo'
-      bar = @course.wiki.wiki_pages.create! title: 'bar'
+      foo = @course.wiki_pages.create! title: 'foo'
+      bar = @course.wiki_pages.create! title: 'bar'
       mod = @course.context_modules.create! name: 'the_mod', require_sequential_progress: true
       foo_item = mod.add_item id: foo.id, type: 'wiki_page'
       bar_item = mod.add_item id: bar.id, type: 'wiki_page'
@@ -497,7 +505,7 @@ describe "Wiki Pages" do
       @course.tab_configuration = [ { :id => Course::TAB_PAGES, :hidden => true } ]
       @course.save!
 
-      foo = @course.wiki.wiki_pages.create! title: 'foo'
+      foo = @course.wiki_pages.create! title: 'foo'
       get "/courses/#{@course.id}/pages/foo"
 
       expect(f("#content")).not_to contain_css('.view_all_pages')
@@ -518,7 +526,7 @@ describe "Wiki Pages" do
       @course.save!
 
       title = "foo"
-      wikiPage = @course.wiki.wiki_pages.create!(:title => title, :body => "bar")
+      wikiPage = @course.wiki_pages.create!(:title => title, :body => "bar")
 
       get "/courses/#{@course.id}/pages/#{title}"
       expect(f('#wiki_page_show')).not_to be_nil
@@ -569,7 +577,7 @@ describe "Wiki Pages" do
 
     it "should display wiki content", priority: "1", test_id: 270035 do
       title = "foo"
-      public_course.wiki.wiki_pages.create!(:title => title, :body => "bar")
+      public_course.wiki_pages.create!(:title => title, :body => "bar")
 
       get "/courses/#{public_course.id}/wiki/#{title}"
       expect(f('.user_content')).not_to be_nil
@@ -579,7 +587,7 @@ describe "Wiki Pages" do
   context "embed video in a Page" do
     before :each do
       course_with_teacher_logged_in :account => @account, :active_all => true
-      @course.wiki.wiki_pages.create!(title: 'Page1')
+      @course.wiki_pages.create!(title: 'Page1')
     end
 
     it "should embed vimeo video in the page", priority: "1", test_id: 126835 do
@@ -611,7 +619,7 @@ describe "Wiki Pages" do
 
     it "should load mathjax in a page with <math>" do
       title = "mathML"
-      public_course.wiki.wiki_pages.create!(
+      public_course.wiki_pages.create!(
         :title => title,
         :body => "<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>"
       )
@@ -622,7 +630,7 @@ describe "Wiki Pages" do
 
     it "should not load mathjax without <math>" do
       title = "not_mathML"
-      public_course.wiki.wiki_pages.create!(:title => title, :body => "not mathML")
+      public_course.wiki_pages.create!(:title => title, :body => "not mathML")
       get "/courses/#{public_course.id}/wiki/#{title}"
       is_mathjax_loaded = driver.execute_script("return (typeof MathJax == 'object')")
       expect(is_mathjax_loaded).not_to match(true)

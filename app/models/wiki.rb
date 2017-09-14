@@ -8,7 +8,7 @@
 # Software Foundation, version 3 of the License.
 #
 # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FORg
 # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 # details.
 #
@@ -72,8 +72,7 @@ class Wiki < ActiveRecord::Base
 
     # return an implicitly created page if a page could not be found
     unless page
-      page = self.wiki_pages.temp_record(:title => url.titleize, :url => url)
-      page.wiki = self
+      page = self.wiki_pages.temp_record(:title => url.titleize, :url => url, :context => self.context)
     end
     page
   end
@@ -166,6 +165,7 @@ class Wiki < ActiveRecord::Base
     self.shard.activate do
       page = WikiPage.new(opts)
       page.wiki = self
+      page.context = self.context
       page.initialize_wiki_page(user)
       page
     end

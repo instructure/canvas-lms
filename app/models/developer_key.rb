@@ -119,6 +119,14 @@ class DeveloperKey < ActiveRecord::Base
         end
       end
     end
+
+    def by_cached_vendor_code(vendor_code)
+      MultiCache.fetch("developer_key/#{vendor_code}") do
+        Shackles.activate(:slave) do
+          DeveloperKey.where(vendor_code: vendor_code)
+        end
+      end
+    end
   end
 
   def clear_cache

@@ -659,5 +659,21 @@ describe "people" do
       expect_new_page_load { group_link.click }
       expect(driver.current_url).to include("/courses/#{@course.id}/groups")
     end
+
+    context "student tray" do
+
+      before(:each) do
+        @account = Account.default
+        @account.enable_feature!(:student_context_cards)
+        @student = create_user('student@test.com')
+        @course.enroll_student(@student, enrollment_state: :active)
+      end
+
+      it "course people page should display student name in tray", priority: "1", test_id: 3022066 do
+        get("/courses/#{@course.id}/users")
+        f("a[data-student_id='#{@student.id}']").click
+        expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("student@test.com")
+      end
+    end
   end
 end

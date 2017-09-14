@@ -80,16 +80,16 @@ module BlueprintCourseCommon
 
     def create_and_migrate_master_pages(master)
       template = master.master_course_templates.first
-      @page1 = master.wiki.wiki_pages.create!(title: "Page 1", body: "Wiki Page 1")
+      @page1 = master.wiki_pages.create!(title: "Page 1", body: "Wiki Page 1")
       template.create_content_tag_for!(@page1)
-      @page2 = master.wiki.wiki_pages.create!(title: "Page 2", body: "Wiki Page 2")
+      @page2 = master.wiki_pages.create!(title: "Page 2", body: "Wiki Page 2")
       tag1 = template.create_content_tag_for!(@page2)
       tag1.update(restrictions: {content: true})
       run_master_course_migration(master)
     end
 
     def update_child_page(minion)
-      child_page = minion.wiki.wiki_pages.where(title: @page1.title).first
+      child_page = minion.wiki_pages.where(title: @page1.title).first
       child_page.update(body: "Child Wiki Page updated")
     end
 

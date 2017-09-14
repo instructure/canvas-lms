@@ -410,10 +410,6 @@ class Attachment < ActiveRecord::Base
     res.to_s
   end
 
-  def self.clear_cached_mime_ids
-    @@mime_ids = {}
-  end
-
   def default_values
     self.modified_at = Time.now.utc if self.modified_at.nil?
     self.display_name = nil if self.display_name && self.display_name.empty?

@@ -33,6 +33,20 @@ define [
     els:
       'iframe.tool_launch': "$iframe"
 
+    events:
+      'focus .before_external_content_info_alert': 'handleAlertFocus'
+      'focus .after_external_content_info_alert': 'handleAlertFocus'
+      'blur .before_external_content_info_alert': 'handleAlertBlur'
+      'blur .after_external_content_info_alert': 'handleAlertBlur'
+
+    handleAlertFocus: (e) ->
+      $(e.target).removeClass('screenreader-only')
+      @$el.find('iframe').addClass('info_alert_outline')
+
+    handleAlertBlur: (e) =>
+      $(e.target).addClass('screenreader-only')
+      @$el.find('iframe').removeClass('info_alert_outline')
+
     attach: ->
       @model.on 'change', => @render()
 

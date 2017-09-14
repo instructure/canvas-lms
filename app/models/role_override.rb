@@ -628,7 +628,7 @@ class RoleOverride < ActiveRecord::Base
         :available_to => %w(AccountAdmin AccountMembership),
       },
       :become_user => {
-        :label => lambda { t('permissions.become_user', "Become other users") },
+        :label => lambda { t('Act as users') },
         :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),

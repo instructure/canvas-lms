@@ -270,7 +270,7 @@ button.ic-app-header__menu-list-link {
     position: absolute;
     pointer-events: none;
     border-color: transparent;
-    border-right-color: $ic-brand-global-nav-ic-icon-svg-fill--active;
+    border-right-color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
     border-width: $ic-tooltip-arrow-size;
     margin-top: -($ic-tooltip-arrow-size);
   }
@@ -307,6 +307,7 @@ button.ic-app-header__menu-list-link {
       padding: 0 $ic-sp + 2;
     }
   }
+  padding: 0;
 }
 
 .ic-app-header__logomark {
@@ -319,25 +320,10 @@ button.ic-app-header__menu-list-link {
   background-repeat: no-repeat;
   background-size: contain;
   transition: transform 0.3s;
+  height: 75px;
 
-  @if $ic-brand-header-image != $ic-logomark-url {
-    height: 75px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    // transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
-
-  }
-  @else {
-    height: 75px;
-    // transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
-  }
   body.primary-nav-expanded & {
-    @if $ic-brand-header-image != $ic-logomark-url {
-      height: 85px;
-    }
-    @else {
-      height: 75px;
-    }
+    height: 85px;
   }
 }
 // set to block to avoid any exta inline spacing at bottom
@@ -364,7 +350,7 @@ body.primary-nav-expanded {
     .menu-item__text {
 
       @if $use_high_contrast {
-        color: $ic-link-color;
+        color: var(--ic-link-color);
       }
       @else {
         color: $ic-brand-global-nav-menu-item__text-color--active;
@@ -497,7 +483,7 @@ body.primary-nav-expanded {
     display: inline-block;
     &:focus {
       @include ic-focus-base;
-      @include ic-focus-variant($color: $ic-link-color, $offset: 2px);
+      @include ic-focus-variant($color: var(--ic-link-color), $offset: 2px);
     }
     i[class*=icon-],
     i[class^=icon-] { margin-right: $ic-sp/3; }

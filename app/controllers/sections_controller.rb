@@ -69,6 +69,10 @@
 #           "description": "the end date for the section, if applicable",
 #           "type": "datetime"
 #         },
+#         "restrict_enrollments_to_section_dates": {
+#           "description": "Restrict user enrollments to the start and end dates of the section",
+#           "type": "boolean"
+#         },
 #         "nonxlist_course_id": {
 #           "description": "The unique identifier of the original course of a cross-listed section",
 #           "type": "integer"

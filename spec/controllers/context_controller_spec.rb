@@ -358,7 +358,7 @@ describe ContextController do
     it 'allows undeleting wiki pages' do
       # wiki pages are special because they have to go through context.wiki
       user_session(@teacher)
-      page = @course.wiki.wiki_pages.create(:title => "some page")
+      page = @course.wiki_pages.create(:title => "some page")
       page.workflow_state = 'deleted'
       page.save!
 
@@ -379,7 +379,7 @@ describe ContextController do
 
   describe "GET 'roster_user_usage'" do
     before(:once) do
-      page = @course.wiki.wiki_pages.create(:title => "some page")
+      page = @course.wiki_pages.create(:title => "some page")
       AssetUserAccess.create!({
         user_id: @student,
         asset_code: page.asset_string,

@@ -103,7 +103,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
       c.context_external_tools,
       c.discussion_topics,
       c.quizzes,
-      c.wiki.wiki_pages
+      c.wiki_pages
     ]
   end
 end

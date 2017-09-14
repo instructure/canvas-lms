@@ -182,14 +182,14 @@ define [
         else # show
           data['points_possible'] ||= 0
           data['mastery_points'] ||= 0
-          can_move = !@readOnly() && ENV.PERMISSIONS?.manage_outcomes
-          can_edit = can_move && @model.isNative() && @model.get('can_edit')
-          can_remove = can_move && @model.outcomeLink.can_unlink
+          can_manage = !@readOnly() && @model.canManage()
+          can_edit = can_manage && @model.isNative()
+          can_unlink = can_manage && @model.outcomeLink.can_unlink
 
           @$el.html outcomeTemplate _.extend data,
-            can_move: can_move,
+            can_manage: can_manage,
             can_edit: can_edit,
-            can_remove: can_remove,
+            can_unlink: can_unlink,
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER,

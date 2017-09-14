@@ -114,6 +114,8 @@ import './vendor/ui.selectmenu'
     $grade = $grade_container.find('input, select'),
     $score = $grade_container.find('.score'),
     $deduction_box = $('#deduction-box'),
+    $points_deducted = $('#points-deducted'),
+    $final_grade = $('#final-grade'),
     $average_score_wrapper = $('#average-score-wrapper'),
     $submission_details = $('#submission_details'),
     $multiple_submissions = $('#multiple_submissions'),
@@ -2463,26 +2465,11 @@ import './vendor/ui.selectmenu'
       }
 
       if (submission.points_deducted) {
-        $deduction_box.html(
-          I18n.t('*%{penalty}* **%{adjusted}**', {
-            penalty: I18n.t('Late Penalty: *%{pointsDeducted}*', {
-              pointsDeducted: grade.pointsDeducted,
-              wrapper: '<span class="bold">$1</span>'
-            }),
-
-            adjusted: I18n.t('Final Grade: *%{finalGrade}*', {
-              finalGrade: grade.adjusted,
-              wrapper: '<span class="bold">$1</span>'
-            }),
-
-            wrappers: [
-              '<span class="error">$1</span>',
-              '<span class="primary">$1</span>'
-            ]
-          })
-        ).show();
+        $deduction_box.removeClass('hidden');
+        $points_deducted.text(grade.pointsDeducted);
+        $final_grade.text(grade.adjusted);
       } else {
-        $deduction_box.hide().empty();
+        $deduction_box.addClass('hidden');
       }
 
       $('#submit_same_score').hide();

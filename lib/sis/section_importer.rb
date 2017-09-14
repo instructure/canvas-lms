@@ -40,7 +40,12 @@ module SIS
         # ideally we change this to find_in_batches, and call (the currently non-existent) Enrollment.destroy_batch
         Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_each do |enrollment|
           Shackles.activate(:master) do
-            enrollment.destroy
+            begin
+              enrollment.destroy
+            rescue => e
+              ::Canvas::Errors.capture(e, type: :sis_import, account: @batch.account)
+              raise ImportError, "Failed to remove enrollment #{enrollment.id} from section #{enrollment.course_section.sis_source_id}"
+            end
           end
         end
       end

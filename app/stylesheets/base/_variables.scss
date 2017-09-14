@@ -82,6 +82,7 @@ $fire:                      #FC5E13; // orange
 $variables-have-been-defined: false !default;
 @if $use_high_contrast {
   $ic-brand-primary: #0770A3;
+  $ic-link-color-high-contrast: #0073A7;
   @if not $variables-have-been-defined { // makes sure this is only output once
     $variables-have-been-defined: true;
     :root {
@@ -89,6 +90,9 @@ $variables-have-been-defined: false !default;
       --ic-brand-primary-darkened-5: darken($ic-brand-primary, 5);
       --ic-brand-primary-darkened-10: darken($ic-brand-primary, 10);
       --ic-brand-primary-lightened-15: lighten($ic-brand-primary, 15);
+      --ic-link-color: $ic-link-color-high-contrast;
+      --ic-link-color-darkened-10: darken($ic-link-color-high-contrast, 10);
+      --ic-link-color-lightened-10: darken($ic-link-color-high-contrast, 10);
     }
   }
 }
@@ -233,11 +237,11 @@ $ic-border-dark:          $heather;
 // Text-color variables
 //=====================
 $ic-font-color-light:     $ic-color-light;
-$ic-font-color-dark:      $ic-brand-font-color-dark;
+$ic-font-color-dark:      var(--ic-brand-font-color-dark);
 @if $use_high_contrast { $ic-font-color-dark: $ic-color-dark; }
-$ic-font-color--subdued:  lighten($ic-font-color-dark, 15);
+$ic-font-color--subdued:  var(--ic-brand-font-color-dark-lightened-15);
 @if $use_high_contrast { $ic-font-color--subdued:  $ic-color-medium-darker; }
-$ic-hint-text:            lighten($ic-font-color-dark, 30);
+$ic-hint-text:            var(--ic-brand-font-color-dark-lightened-30);
 @if $use_high_contrast { $ic-hint-text: $ic-color-medium; }
 
 // textColor is a deprecated Bootstrap 2 variable. Please use $ic-font-color-dark!
@@ -246,23 +250,19 @@ $textColor:               $ic-font-color-dark; // deprecated - do not use
 //=============================
 // Link-color-related variables
 //=============================
-
-@if $use_high_contrast {    $ic-link-color: #0073A7; }
-$ic-link-color-hover:       darken($ic-link-color, 10%);
-
-$ic-icon-link-color-hover: lighten($ic-font-color-dark, 15%);
+$ic-icon-link-color-hover: var(--ic-brand-font-color-dark-lightened-15);
 @if $use_high_contrast {
 $ic-icon-link-color-hover: $ic-font-color-dark;
 }
 
-$ic-icon-link-color:       lighten($ic-font-color-dark, 30%);
+$ic-icon-link-color:       var(--ic-brand-font-color-dark-lightened-30);
 @if $use_high_contrast {
 $ic-icon-link-color:       lighten($ic-font-color-dark, 12%);
 }
 
-// linkColor is a deprecated Bootstrap 2 variable. Please use $ic-link-color!
-$linkColor:                 $ic-link-color; // deprecated - do not use
-$linkColorHover:            $ic-link-color-hover; // deprecated - do not use
+// linkColor is a deprecated Bootstrap 2 variable
+$linkColor:                 var(--ic-link-color); // deprecated - do not use
+$linkColorHover:            var(--ic-link-color-darkened-10); // deprecated - do not use
 
 //=====================
 // Course Nav Variables

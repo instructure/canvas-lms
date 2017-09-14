@@ -96,7 +96,8 @@ module Lti
          vnd.Canvas.submission.history.url
          vnd.Canvas.submission.url
          Context.title
-         com.instructure.Assignment.lti.id)
+         com.instructure.Assignment.lti.id
+         com.instructure.PostMessageToken)
     }
 
     describe '#supported_capabilities' do

@@ -433,35 +433,28 @@ describe Message do
         expect(message.root_account).to eq Account.default
       end
 
-      it 'pulls the reply_to_name from the asset_context if there is one' do
+      it 'pulls the reply_to_name from the asset if there is one' do
         with_reply_to_name = build_conversation_message
         without_reply_to_name = course_model
-        expect(message_model(asset_context: without_reply_to_name, context: without_reply_to_name).
+        expect(message_model(context: without_reply_to_name).
           reply_to_name).to be_nil
-        reply_to_message = message_model(asset_context: with_reply_to_name,
-                                         context: with_reply_to_name,
+        reply_to_message = message_model(context: with_reply_to_name,
                                          notification_name: "Conversation Message")
         expect(reply_to_message.reply_to_name).to eq "#{user1.short_name} via Canvas Notifications"
       end
 
       describe ":from_name" do
-        it 'pulls from the asset_context if there is one' do
+        it 'pulls from the assets directly, if possible' do
           convo_message = build_conversation_message
-          message = message_model(:context => convo_message,
-            :asset_context => convo_message, notification_name: "Conversation Message")
+          message = message_model(:context => convo_message, notification_name: "Conversation Message")
           expect(message.from_name).to eq user1.short_name
         end
 
-        it "can differentiate when the context and asset_context are different" do
-          submission = build_submission
-          message = message_model(context: submission,
-            asset_context: submission.context, notification_name: "Assignment Submitted")
-          expect(message.from_name).to eq submission.user.short_name
-        end
-
-        it 'uses the default host url if the asset context wont override it' do
-          message = message_model()
-          expect(message.from_name).to eq HostUrl.outgoing_email_default_name
+        it "pulls from the asset's context, if possible" do
+          assign = assignment_model
+          notification = Notification.create(:name => 'Assignment Changed')
+          message = message_model(:context => assign, notification: notification)
+          expect(message.from_name).to eq assign.context.name
         end
 
         it 'uses the root_account override if there is one' do
@@ -473,6 +466,18 @@ describe Message do
           expect(message.from_name).to eq "OutgoingName"
         end
 
+        it 'uses the default host url if the asset context wont override it' do
+          message = message_model()
+          expect(message.from_name).to eq HostUrl.outgoing_email_default_name
+        end
+
+        it 'uses a course nickname if exists' do
+          assign = assignment_model
+          user = user_model(preferences: { course_nicknames: { assign.context.id => 'nickname' }})
+          notification = Notification.create(:name => 'Assignment Changed')
+          message = message_model(:context => assign, notification: notification, user: user)
+          expect(message.from_name).to eq 'nickname'
+        end
       end
     end
 
@@ -591,5 +596,25 @@ describe Message do
     msg = Message.new
     msg.url = url
     msg.save!
+  end
+
+  describe "#context_context" do
+    it "finds context for an assignment" do
+      assign = assignment_model
+      message = Message.new(context: assign)
+      expect(message.context_context).to eq assign.context
+    end
+
+    it "finds context for a submission" do
+      sub = submission_model
+      message = Message.new(context: sub)
+      expect(message.context_context).to eq sub.assignment.context
+    end
+
+    it "finds context for a discussion" do
+      dt = discussion_topic_model
+      message = Message.new(context: dt)
+      expect(message.context_context).to eq dt.context
+    end
   end
 end

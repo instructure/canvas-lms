@@ -17,34 +17,49 @@
  */
 
 import React from 'react';
-import { shape, string } from 'prop-types';
+import { bool, shape, string } from 'prop-types';
+import I18n from 'i18n!gradebook_history';
+import IconOffLine from 'instructure-icons/lib/Line/IconOffLine';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import Tooltip from 'instructure-ui/lib/components/Tooltip';
+
+const anonymouslyGraded = anonymous => (
+  anonymous ? (
+    <div>
+      <Tooltip tip={I18n.t('Anonymously graded')}>
+        <IconOffLine />
+      </Tooltip>
+      <ScreenReaderContent>{I18n.t('Anonymously graded')}</ScreenReaderContent>
+    </div>
+  ) : (
+    <ScreenReaderContent>{I18n.t('Not anonymously graded')}</ScreenReaderContent>
+  )
+);
 
 const SearchResultsRow = (props) => {
   const item = props.item;
   return (
     <tr>
       <td>{item.date}</td>
-      <td>{item.time}</td>
-      <td>{item.from}</td>
-      <td>{item.to}</td>
-      <td>{item.grader}</td>
+      <td>{anonymouslyGraded(item.anonymous)}</td>
       <td>{item.student}</td>
+      <td>{item.grader}</td>
       <td>{item.assignment}</td>
-      <td>{item.anonymous}</td>
+      <td>{item.before}</td>
+      <td>{item.after}</td>
     </tr>
   );
 };
 
 SearchResultsRow.propTypes = {
   item: shape({
+    after: string.isRequired,
+    anonymous: bool.isRequired,
+    assignment: string.isRequired,
+    before: string.isRequired,
     date: string.isRequired,
-    time: string.isRequired,
-    from: string.isRequired,
-    to: string.isRequired,
     grader: string.isRequired,
     student: string.isRequired,
-    assignment: string.isRequired,
-    anonymous: string.isRequired
   }).isRequired
 };
 

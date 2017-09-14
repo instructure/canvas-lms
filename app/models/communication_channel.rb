@@ -253,7 +253,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   def forgot_password!
     @request_password = true
-    set_confirmation_code(true)
+    set_confirmation_code(true, Setting.get('password_reset_token_expiration_minutes', '120').to_i.minutes.from_now)
     self.save!
     @request_password = false
   end
@@ -301,13 +301,14 @@ class CommunicationChannel < ActiveRecord::Base
   # works.  If you are resetting the confirmation_code, call @cc.
   # set_confirmation_code(true), or just save the record to leave the old
   # confirmation code in place.
-  def set_confirmation_code(reset=false)
+  def set_confirmation_code(reset=false, expires_at=nil)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
       self.confirmation_code ||= CanvasSlug.generate(nil, 25)
     else
       self.confirmation_code ||= CanvasSlug.generate
     end
+    self.confirmation_code_expires_at = expires_at if reset
     true
   end
 

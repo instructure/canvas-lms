@@ -91,7 +91,23 @@ HEREDOC
     </td>
   </tr>
 </table>
+<div class="before_external_content_info_alert screenreader-only" tabindex="0">
+  <div class="ic-flash-info">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-info"></i>
+    </div>
+    <%= t('The following content is partner provided') %>
+  </div>
+</div>
 <iframe class="tool_launch" id="lti_new_collaboration_iframe"></iframe>
+<div class="after_external_content_info_alert screenreader-only" tabindex="0">
+  <div class="ic-flash-info">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-info"></i>
+    </div>
+    <%= t('The preceding content is partner provided') %>
+  </div>
+</div>
 <% end %>
 <div id="delete_collaboration_dialog" style="display: none;">
   <%= t 'messages.delete_google_doc_as_well', "This collaboration is being stored as a Google Doc.  Did you want to delete it just

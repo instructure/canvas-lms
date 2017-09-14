@@ -104,6 +104,13 @@ define [
     gridReady: $.Deferred()
 
     constructor: (@options) ->
+      @courseContent =
+        gradingPeriodAssignments: {}
+
+      @assignments = {}
+      @assignmentGroups = {}
+      @effectiveDueDates = {}
+
       @students = {}
       @studentViewStudents = {}
       @rows = []
@@ -154,14 +161,19 @@ define [
         postGradesDialog.open()
 
       submissionParams =
-        response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
+        response_fields: [
+          'id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id',
+          'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused', 'cached_due_date'
+        ]
         exclude_response_fields: ['preview_url']
       submissionParams['grading_period_id'] = @gradingPeriodToShow if @gradingPeriodSet? && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
       dataLoader = DataLoader.loadGradebookData(
         assignmentGroupsURL: @options.assignment_groups_url
         assignmentGroupsParams: assignmentGroupsParams
+        courseId: @options.context_id
 
         customColumnsURL: @options.custom_columns_url
+        getGradingPeriodAssignments: @gradingPeriodSet?
 
         sectionsURL: @options.sections_url
 
@@ -174,20 +186,19 @@ define [
         submissionsChunkSize: @options.chunk_size
         customColumnDataURL: @options.custom_column_data_url
         customColumnDataPageCb: @gotCustomColumnDataChunk
-        effectiveDueDatesURL: @options.effective_due_dates_url
       )
 
-      gotGroupsAndDueDates = $.when(
-        dataLoader.gotAssignmentGroups,
-        dataLoader.gotEffectiveDueDates
-      ).then(@gotAllAssignmentGroupsAndEffectiveDueDates)
+      dataLoader.gotGradingPeriodAssignments?.then (response) =>
+        @courseContent.gradingPeriodAssignments = response.grading_period_assignments
 
+      dataLoader.gotAssignmentGroups.then @gotAllAssignmentGroups
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
 
       $.when(
         dataLoader.gotCustomColumns,
-        gotGroupsAndDueDates
+        dataLoader.gotAssignmentGroups,
+        dataLoader.gotGradingPeriodAssignments
       ).then(@doSlickgridStuff)
 
       @studentsLoaded = dataLoader.gotStudents
@@ -293,13 +304,7 @@ define [
       @gridReady.resolve()
       @loadOverridesForSIS()
 
-    gotAllAssignmentGroupsAndEffectiveDueDates: (assignmentGroups, dueDatesResponse) =>
-      @effectiveDueDates = dueDatesResponse[0]
-      @gotAllAssignmentGroups(assignmentGroups)
-
     gotAllAssignmentGroups: (assignmentGroups) =>
-      @assignmentGroups = {}
-      @assignments      = {}
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
@@ -309,8 +314,7 @@ define [
         for assignment in group.assignments
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
-          assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
-          assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
+          @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
 
     gotSections: (sections) =>
@@ -362,6 +366,13 @@ define [
 
       @grid.render()
 
+    updateEffectiveDueDatesFromSubmissions: (submissions) =>
+      EffectiveDueDates.updateWithSubmissions(@effectiveDueDates, submissions, @gradingPeriodSet?.gradingPeriods)
+
+    updateAssignmentEffectiveDueDates: (assignment) ->
+      assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
+      assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
+
     rowIndex: 0
     addRow: (student) =>
       student.computed_current_score ||= 0
@@ -389,7 +400,7 @@ define [
 
       student.display_name = RowStudentNameTemplate
         student_id: student.id
-        course_id: ENV.GRADEBOOK_OPTIONS.context_id
+        course_id: @options.context_id
         avatar_url: student.avatar_url
         display_name: displayName
         enrollment_status: enrollmentStatus
@@ -612,20 +623,25 @@ define [
       @sortRowsBy (a, b) => @localeSort(a.sortable_name, b.sortable_name)
 
     gotSubmissionsChunk: (student_submissions) =>
+      changedStudentIds = []
+      submissions = []
+
       for data in student_submissions
+        changedStudentIds.push(data.user_id)
         student = @student(data.user_id)
         for submission in data.submissions
+          submissions.push(submission)
           @updateSubmission(submission)
 
         student.loaded = true
 
-        if @grid
-          @calculateStudentGrade(student)
-          @grid.invalidateRow(student.row)
+      @updateEffectiveDueDatesFromSubmissions(submissions)
+      _.each @assignments, (assignment) =>
+        @updateAssignmentEffectiveDueDates(assignment)
 
-      # TODO: if gb2 survives long enough, we should consider debouncing all
-      # the invalidation/rendering for smoother performance while loading
-      @grid?.render()
+      changedStudentIds = _.uniq(changedStudentIds)
+      students = changedStudentIds.map(@student)
+      @setupGrading(students)
 
     student: (id) =>
       @students[id] || @studentViewStudents[id]

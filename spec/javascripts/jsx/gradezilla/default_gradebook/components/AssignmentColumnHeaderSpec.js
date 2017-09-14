@@ -634,8 +634,21 @@ test('renders a warning icon when the assignment does not count towards final gr
   equal(icon.props().title, expectedLinkTitle);
 });
 
-test('renders a warning icon when the assignment is invalid', function () {
-  this.props.assignment.invalid = true;
+test('renders a warning icon when the assignment has zero points possible', function () {
+  this.props.assignment.pointsPossible = 0;
+  this.wrapper = mountComponent(this.props);
+  const link = this.wrapper.find('.assignment-name Link');
+  const icon = link.find('IconWarningSolid');
+  const expectedLinkTitle = 'This assignment has no points possible and cannot be included in grade calculation';
+
+  equal(link.length, 1);
+  deepEqual(link.props().title, expectedLinkTitle);
+  equal(icon.length, 1);
+  equal(icon.props().title, expectedLinkTitle);
+});
+
+test('renders a warning icon when the assignment has null points possible', function () {
+  this.props.assignment.pointsPossible = null;
   this.wrapper = mountComponent(this.props);
   const link = this.wrapper.find('.assignment-name Link');
   const icon = link.find('IconWarningSolid');

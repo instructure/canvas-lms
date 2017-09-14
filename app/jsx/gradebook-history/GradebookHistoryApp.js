@@ -20,32 +20,21 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import 'instructure-ui/lib/themes/canvas';
 import I18n from 'i18n!gradebook_history';
-import Heading from 'instructure-ui/lib/components/Heading';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import SearchForm from 'jsx/gradebook-history/SearchForm';
 import SearchResults from 'jsx/gradebook-history/SearchResults';
 
 import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore';
 
-/* eslint-disable react/prefer-stateless-function */
-class GradebookHistoryApp extends React.Component {
-  render () {
-    return (
-      <Provider store={GradebookHistoryStore}>
-        <div className="GradebookHistory__Content">
-          <div className="GradebookHistory__Heading">
-            <Heading level="h2" as="h1" margin="none none large">{I18n.t('Gradebook History')}</Heading>
-          </div>
-          <div className="GradebookHistory__SearchForm">
-            <SearchForm />
-          </div>
-          <hr className="GradebookHistory__Separator" />
-          <div className="GradebookHistory__Results">
-            <SearchResults caption={I18n.t('Grade Changes')} />
-          </div>
-        </div>
-      </Provider>
-    );
-  }
-}
+const GradebookHistoryApp = () => (
+  (
+    <Provider store={GradebookHistoryStore}>
+      <div>
+        <SearchForm />
+        <SearchResults caption={<ScreenReaderContent>{I18n.t('Grade Changes')}</ScreenReaderContent>} />
+      </div>
+    </Provider>
+  )
+);
 
 export default GradebookHistoryApp;

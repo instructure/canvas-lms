@@ -33,7 +33,7 @@ describe 'appointment_reserved_for_user' do
 
   let(:notification_name) { :appointment_reserved_for_user }
   let(:asset) { @event }
-  let(:message_options) { { data: { updating_user: @teacher } } }
+  let(:message_options) { { data: { updating_user_name: @teacher.name } } }
 
   context ".email" do
     let(:path_type) { :email }

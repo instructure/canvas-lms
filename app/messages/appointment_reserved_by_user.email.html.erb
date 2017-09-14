@@ -14,7 +14,7 @@
 <% end %>
 <% end -%>
 
-<p><%= t :message, '%{user} has signed up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %></p>
+<p><%= t :message, '%{user} has signed up for "%{appointment_name}".', :user => data.updating_user_name || data.updating_user.name, :appointment_name => asset.title %></p>
 
 <p><strong><%= t :details, 'Appointment Details' %>:</strong></p>
 <table border="0" style="font-size: 14px; color: #444444;

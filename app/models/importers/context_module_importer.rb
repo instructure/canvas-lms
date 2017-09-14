@@ -163,7 +163,8 @@ module Importers
         end
       end
 
-      item.content_tags.where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
+      item.content_tags.where.not(:migration_id => nil).
+        where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
       if hash[:completion_requirements]
         c_reqs = []
@@ -199,7 +200,7 @@ module Importers
       hash[:indent] = [hash[:indent] || 0, level].max
       resource_class = linked_resource_type_class(hash[:linked_resource_type])
       if resource_class == WikiPage
-        wiki = context_module.context.wiki.wiki_pages.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
+        wiki = context_module.context.wiki_pages.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if wiki
           item = context_module.add_item({
             :title => wiki.title.presence || hash[:title] || hash[:linked_resource_title],

@@ -302,9 +302,10 @@ class PlannerOverridesController < ApplicationController
     #
     # grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     # moderation = @current_user.assignments_needing_moderation(default_opts)
-    submitting = @current_user.assignments_needing_submitting(default_opts)
+    submitting = @current_user.assignments_needing_submitting(default_opts).
+      preload(:quiz, :discussion_topic)
     ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts)
-    submitted = @current_user.submitted_assignments(default_opts)
+    submitted = @current_user.submitted_assignments(default_opts).preload(:quiz, :discussion_topic)
     scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
               submitting: submitting}
     # TODO: Add when ready (see above comment)

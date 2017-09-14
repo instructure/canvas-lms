@@ -17,12 +17,12 @@
 
 define [
   'compiled/models/Outcome'
-], (Outcome) ->
+  'helpers/fakeENV',
+], (Outcome, fakeENV) ->
 
-  QUnit.module "Outcome",
-
+  QUnit.module "Course Outcomes",
     setup: ->
-      @accountOutcome =
+      @importedOutcome =
         "context_type" : "Account"
         "context_id" : 1
         "outcome" :
@@ -31,28 +31,78 @@ define [
           "context_id" : 1
           "calculation_method" : "decaying_average"
           "calculation_int" : 65
-      @nativeOutcome =
+      @courseOutcome =
         "context_type" : "Course"
         "context_id" : 2
         "outcome" :
-          "title" : "Native Course Outcome"
+          "title" : "Course Outcome"
           "context_type" : "Course"
           "context_id" : 2
+      fakeENV.setup()
+      ENV.PERMISSIONS = {manage_outcomes: true}
+      ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
 
-  test "native returns true for a course outcome", ->
-    outcome = new Outcome(@accountOutcome, { parse: true })
+    teardown: ->
+      fakeENV.teardown()
+
+  test "isNative returns false for an outcome imported from the account level", ->
+    outcome = new Outcome(@importedOutcome, { parse: true })
     equal outcome.isNative(), false
 
-  test "native returns false for a course outcome imported from the account level", ->
-    outcome = new Outcome(@nativeOutcome, { parse: true })
+  test "isNative returns true for an outcome created in the course", ->
+    outcome = new Outcome(@courseOutcome, { parse: true })
     equal outcome.isNative(), true
+
+  test "CanManage returns true for an account outcome on the course level", ->
+    outcome = new Outcome(@importedOutcome, { parse: true })
+    equal outcome.canManage(), true
 
   test "default calculation method settings not set if calculation_method exists", ->
     spy = @spy(Outcome.prototype, 'setDefaultCalcSettings')
-    outcome = new Outcome(@accountOutcome, { parse: true })
+    outcome = new Outcome(@importedOutcome, { parse: true })
     ok not spy.called
 
   test "default calculation method settings set if calculation_method is null", ->
     spy = @spy(Outcome.prototype, 'setDefaultCalcSettings')
-    outcome = new Outcome(@nativeOutcome, { parse: true })
+    outcome = new Outcome(@courseOutcome, { parse: true })
     ok spy.calledOnce
+
+  QUnit.module "Account Outcomes",
+    setup: ->
+      @accountOutcome =
+        "context_type" : "Account"
+        "context_id" : 1
+        "outcome" :
+          "title" : "Account Outcome"
+          "context_type" : "Account"
+          "context_id" : 1
+      fakeENV.setup()
+      ENV.PERMISSIONS = {manage_outcomes: true}
+      ENV.ROOT_OUTCOME_GROUP = {context_type: 'Account'}
+
+    teardown: ->
+      fakeENV.teardown()
+
+  test "isNative is true for an account level outcome when viewed on the account", ->
+    outcome = new Outcome(@accountOutcome, { parse: true })
+    equal outcome.isNative(), true
+
+  QUnit.module "Global Outcomes in a course",
+    setup: ->
+      @globalOutcome =
+        "context_type" : "Account"
+        "context_id" : 1
+        "outcome" :
+          "title" : "Account Outcome"
+          "context_type" : undefined
+          "context_id" : undefined
+      fakeENV.setup()
+      ENV.PERMISSIONS = {manage_outcomes: true}
+      ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
+
+    teardown: ->
+      fakeENV.teardown()
+
+  test "CanManage returns true for a global outcome on the course level", ->
+    outcome = new Outcome(@globalOutcome, { parse: true })
+    equal outcome.canManage(), true

@@ -523,9 +523,8 @@ class ExternalToolsController < ApplicationController
     @headers = false
 
     return unless find_tool(params[:external_tool_id], selection_type)
-    @lti_launch = lti_launch(tool: @tool, selection_type: selection_type)
+    @lti_launch = lti_launch(tool: @tool, selection_type: selection_type, launch_token: params[:launch_token])
     return unless @lti_launch
-
     render Lti::AppUtil.display_template('borderless')
   end
 
@@ -543,13 +542,13 @@ class ExternalToolsController < ApplicationController
   end
   protected :find_tool
 
-  def lti_launch(tool:, selection_type: nil, launch_url: nil, content_item_id: nil, secure_params: nil)
+  def lti_launch(tool:, selection_type: nil, launch_url: nil, content_item_id: nil, secure_params: nil, launch_token: nil)
     link_params = {custom:{}, ext:{}}
     if secure_params.present?
       jwt_body = Canvas::Security.decode_jwt(secure_params)
       link_params[:ext][:lti_assignment_id] = jwt_body[:lti_assignment_id] if jwt_body[:lti_assignment_id]
     end
-    opts = {launch_url: launch_url, link_params: link_params}
+    opts = {launch_url: launch_url, link_params: link_params, launch_token: launch_token}
     @return_url ||= url_for(@context)
     message_type = tool.extension_setting(selection_type, 'message_type') if selection_type
     case message_type
@@ -590,7 +589,7 @@ class ExternalToolsController < ApplicationController
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
     adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(
       @return_url,
-      variable_expander(assignment: assignment, tool: tool, launch: lti_launch),
+      variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token]),
       opts
     )
 

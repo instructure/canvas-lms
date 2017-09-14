@@ -32,7 +32,7 @@ a#accessibility_warning {
   border-radius: 0.25rem;
 
   // from app/stylesheets/vendor/bootstrap/_forms.scss .uneditable-input:focus
-  border: 1px solid lighten($ic-link-color, 10%);
+  border: 1px solid var(--ic-link-color-lightened-10);
   outline: 0;
 }
 
@@ -129,6 +129,11 @@ $gradebook_cell_padding_top: 8px;
       padding-top: 2px;
       padding-bottom: 1px;
     }
+
+    color: #333333;
+    @include fontSize(12px);
+    text-align: center;
+    line-height: 35px;
   }
 }
 
@@ -161,23 +166,16 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .student-grades-link {
-  @if $use_high_contrast { color: darken($ic-link-color, 5%); }
+  @if $use_high_contrast { color: var(--ic-link-color-darkened-10); }
 }
 
 .student-placeholder {
   display: none;
 }
 
-.student-section, .secondary-info {
+.secondary-info {
   margin-top: -5px;
   @include fontSize(12px);
-}
-
-.secondary_identifier_cell, .custom_column {
-  color: #333333;
-  @include fontSize(12px);
-  text-align: center;
-  line-height: 35px;
 }
 
 .student-name,
@@ -187,16 +185,6 @@ $gradebook_cell_padding_top: 8px;
 .Gradebook__ColumnHeaderDetail > * {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-// show and hide student names using a parent css class.
-.hide-students {
-  .student-placeholder {
-    display: block;
-  }
-  .secondary_identifier_cell {
-    text-indent: -9999em;
-  }
 }
 
 // override the default jquery ui top border
@@ -422,7 +410,6 @@ $gradebook_cell_padding_top: 8px;
   white-space: pre-line;
   padding-top: 5px;
   padding-bottom: 55px;
-  margin-top: -25px;
   margin-bottom: -50px;
 }
 
@@ -430,9 +417,10 @@ $gradebook_cell_padding_top: 8px;
   display: none;
 }
 
-.gradebook-tooltip-last {
+.container_1 .slick-cell:last-child .gradebook-tooltip {
   left: auto;
   right: 0;
+
   &:after {
     left: auto;
     right: 15px;
