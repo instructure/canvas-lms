@@ -225,16 +225,17 @@ class ConversationParticipant < ActiveRecord::Base
 
   def participants(options = {})
     participants = shard.activate do
-      include_indirect_participants = options[:include_indirect_participants] || false
-      Rails.cache.fetch([conversation, user, 'participants', include_indirect_participants].cache_key) do
-        participants = conversation.participants
-        if include_indirect_participants
+      key = [conversation, 'participants'].cache_key
+      participants = Rails.cache.fetch(key) { conversation.participants }
+      if options[:include_indirect_participants]
+        indirect_key = [conversation, user, 'indirect_participants'].cache_key
+        participants += Rails.cache.fetch(indirect_key) do
           user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
           user_ids -= participants.map(&:id)
-          participants += AddressBook.available(user_ids)
+          AddressBook.available(user_ids)
         end
-        participants
       end
+      participants
     end
 
     if options[:include_participant_contexts]
