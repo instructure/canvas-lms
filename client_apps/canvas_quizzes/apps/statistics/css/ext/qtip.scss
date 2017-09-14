@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "vendor/bootstrap/mixins";
-
 /* Default tooltip style */
 .qtip-default {
   border-width: 1px;
   border-style: solid;
   border-color: $tooltipArrowColor;
-  @include border-radius($baseBorderRadius);
+  border-radius: $baseBorderRadius;
 
   background-color: $tooltipBackground;
   color: $tooltipColor;
@@ -52,4 +50,3 @@
     color: #777;
   }
 }
-

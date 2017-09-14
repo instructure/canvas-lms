@@ -244,7 +244,8 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         padding-left: 25px;
         color: #666666;
         margin-bottom: 0px;
-        @include border-top-radius(3px);
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
         .group_name {
           font-size: 1.5em;
           font-weight: bold;

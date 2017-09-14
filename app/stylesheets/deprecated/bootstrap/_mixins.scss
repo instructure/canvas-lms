@@ -1,3 +1,5 @@
+@import "base/ic_mixins"; // so Bootstrap mixins that need clearfix can still use it
+
 //
 // Mixins
 // --------------------------------------------------
@@ -5,23 +7,6 @@
 
 // UTILITY MIXINS
 // --------------------------------------------------
-
-// Clearfix
-// --------
-// For clearing floats like a boss h5bp.com/q
-@mixin clearfix {
-  &:before,
-  &:after {
-    display: table;
-    content: "";
-    // Fixes Opera/contenteditable bug:
-    // http://nicolasgallagher.com/micro-clearfix-hack/#comment-36952
-    line-height: 0;
-  }
-  &:after {
-    clear: both;
-  }
-}
 
 // Webkit-style focus
 // ------------------
@@ -32,24 +17,6 @@
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
   text-decoration: none;
-}
-
-// Center-align a block level element
-// ----------------------------------
-@mixin center-block() {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-// Sizing shortcuts
-// -------------------------
-@mixin size($height, $width) {
-  width: $width;
-  height: $height;
-}
-@mixin square($size) {
-  @include size($size, $size);
 }
 
 // Placeholder text
@@ -66,15 +33,6 @@
   }
 }
 
-// Text overflow
-// -------------------------
-// Requires inline-block or block for proper styling
-@mixin text-overflow() {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 // CSS image replacement
 // -------------------------
 // Source: https://github.com/h5bp/html5-boilerplate/commit/aa0396eae757
@@ -88,34 +46,11 @@
 
 // FONTS
 // --------------------------------------------------
-
-@mixin font-family-serif() {
-  font-family: $serifFontFamily;
-}
-@mixin font-family-sans-serif() {
-  font-family: $sansFontFamily;
-}
-@mixin font-family-monospace() {
-  font-family: $monoFontFamily;
-}
 @mixin font-shorthand($size: $baseFontSize, $weight: normal, $lineHeight: $baseLineHeight) {
   @include fontSize($size);
   font-weight: $weight;
   line-height: $lineHeight;
 }
-@mixin font-serif($size: $baseFontSize, $weight: normal, $lineHeight: $baseLineHeight) {
-  @include font-family-serif();
-  @include font-shorthand($size, $weight, $lineHeight);
-}
-@mixin font-sans-serif($size: $baseFontSize, $weight: normal, $lineHeight: $baseLineHeight) {
-  @include font-family-sans-serif();
-  @include font-shorthand($size, $weight, $lineHeight);
-}
-@mixin font-monospace($size: $baseFontSize, $weight: normal, $lineHeight: $baseLineHeight) {
-  @include font-family-monospace();
-  @include font-shorthand($size, $weight, $lineHeight);
-}
-
 
 // FORMS
 // --------------------------------------------------
@@ -176,20 +111,10 @@
 @mixin border-radius($radius) {
   border-radius: $radius;
 }
-
-
 // Single Side Border Radius
-@mixin border-top-radius($radius) {
-  border-top-right-radius: $radius;
-  border-top-left-radius: $radius;
-}
 @mixin border-right-radius($radius) {
   border-top-right-radius: $radius;
   border-bottom-right-radius: $radius;
-}
-@mixin border-bottom-radius($radius) {
-  border-bottom-right-radius: $radius;
-  border-bottom-left-radius: $radius;
 }
 @mixin border-left-radius($radius) {
   border-top-left-radius: $radius;
@@ -215,25 +140,6 @@
 @mixin box-sizing($boxmodel) {
   box-sizing: $boxmodel;
 }
-
-// User select
-// For selecting text on the page
-@mixin user-select($select) {
-  user-select: $select;
-}
-
-// Resize anything
-@mixin resizable($direction) {
-  resize: $direction; // Options: horizontal, vertical, both
-  overflow: auto; // Safari fix
-}
-
-// Opacity
-@mixin opacity($opacity) {
-  opacity: $opacity / 100;
-}
-
-
 
 // BACKGROUNDS
 // --------------------------------------------------
@@ -276,131 +182,6 @@
   border-bottom: 1px solid $bottom;
 }
 
-// Accessibility prompts (visible through keyboard navigation focus)
-// If the prompt is not a clickable link, set $is-link to false when including the mixin
-@mixin accessibility-prompt($is-link: true) {
-  padding: 4px 8px;
-  background: var(--ic-link-color);
-  background-clip: border-box;
-  text-align: center;
-  color: $ic-color-light;
-  text-decoration: none;
-  border-radius: 4px;
-  border: 1px dashed rgba($ic-color-light, 0.8);
-  &:focus {
-    color: #fff;
-  }
-  @if $is-link {
-    &:focus { text-decoration: underline; }
-  }
-}
-
-@mixin ic-focus-base {
-  outline-width: 1px;
-  outline-color: transparent;
-  outline-style: solid;
-}
-
-@mixin ic-focus-variant($color: var(--ic-link-color), $offset: -1px) {
-  outline-offset: $offset;
-  outline-color: $color;
-}
-
-@mixin button-focus-light {
-  @if $use_high_contrast { box-shadow: inset 0 0 0 2px var(--ic-link-color); }
-  @else { box-shadow: inset 0 0 0 1px var(--ic-link-color); }
-}
-
-@mixin button-focus-dark {
-  @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-color-light; }
-  @else { box-shadow: inset 0 0 0 1px $ic-color-light;  }
-}
-
-// Button backgrounds
-// ------------------
-@mixin buttonBackground($startColor, $endColor, $textColor: #fff, $textShadow: 0 -1px 0 rgba(0,0,0,.25)) {
-  // gradientBar will set the background to a pleasing blend of these, to support IE<=9
-  @include gradientBar($startColor, $endColor, $textColor, $textShadow);
-
-  // in these cases the gradient won't cover the background, so we override
-  &:hover, &:active, &.active, &.disabled, &[disabled] {
-    color: $textColor;
-    background-color: $endColor;
-  }
-
-  &:focus {
-    color: $textColor;
-    background: $endColor;
-    text-decoration: none;
-  }
-}
-
-// Updated replacement mixin for buttonBackground ^^
-@mixin canvas-button(
-  $button-color,
-  $text-color,
-  $button-background-is-lighter-than-text:false,
-  $button-color-darkened-5:darken($button-color, 5),
-  $button-color-darkened-15:darken($button-color, 15)
-) {
-  background: $button-color;
-  color: $text-color;
-  border: 1px solid;
-
-  &:focus { color: $text-color; }
-  &:hover {
-    @if $use_high_contrast {
-      background: darken($ic-color-dark, 20%);
-      color: $ic-color-light;
-    }
-    @else  {
-      background: $button-color-darkened-5;
-      color: $text-color;
-    }
-
-    // handle jquery UI ui-button conflicts
-    &.ui-state-hover {
-      @if $use_high_contrast {
-        background: darken($ic-color-dark, 20%);
-        color: $ic-color-light;
-      }
-      @else {
-        background: $button-color-darkened-5;
-        color: $text-color;
-        border-color: $button-color-darkened-15;
-      }
-    }
-  }
-
-
-  @if $button-background-is-lighter-than-text {
-    border-color: $ic-border-color;
-
-    &.active, &.Button--active, &:active { box-shadow: none; }
-    &.active, &.Button--active {
-      background: darken($button-color, 55%);
-      border-color: darken($button-color, 65%);
-      color: $ic-color-light;
-    }
-    &:focus { @include button-focus-light; }
-    // handle jquery UI ui-button states
-    &.ui-state-focus.ui-state-active {
-      &:focus { @include button-focus-dark; }
-    }
-    &:active { background: darken($button-color, 8%); }
-  }
-
-  @else {
-    border-color: $button-color-darkened-15;
-
-    &:focus { @include button-focus-dark; }
-    &.active, &.Button--active, &:active {
-      background: $button-color-darkened-5;
-      box-shadow: none;
-    }
-  }
-}
-
 // Grid System
 // -----------
 
@@ -416,18 +197,6 @@
   float: none; // undo default grid column styles
   width: (($gridColumnWidth) * $columnSpan) + ($gridGutterWidth * ($columnSpan - 1)) - 16; // 16 is total padding on left and right of table cells
   margin-left: 0; // undo default grid column styles
-}
-
-// Make a Grid
-// Use .makeRow and .makeColumn to assign semantic layouts grid system behavior
-@mixin makeRow() {
-  margin-left: $gridGutterWidth * -1;
-  @include clearfix();
-}
-@mixin makeColumn($columns: 1, $offset: 0) {
-  float: left;
-  margin-left: ($gridColumnWidth * $offset) + ($gridGutterWidth * ($offset - 1)) + ($gridGutterWidth * 2);
-  width: ($gridColumnWidth * $columns) + ($gridGutterWidth * ($columns - 1));
 }
 
 // The Grid

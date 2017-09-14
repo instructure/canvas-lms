@@ -17,6 +17,7 @@
  */
 
 @import 'base/environment';
+@import "deprecated/bootstrap/mixins";
 @import 'vendor/bootstrap/button-groups';
 
 $border-dark:  #c1c7cf;

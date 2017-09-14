@@ -87,7 +87,7 @@ thead th {
 /* Column striping */
 
 .notification-table-wrapper {
-  @include transition(margin 0.3s ease);
+  transition: margin 0.3s ease;
 }
 
 @media screen and (max-width: 1300px) {
