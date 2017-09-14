@@ -398,6 +398,31 @@ describe GroupCategory do
       expect(memberships.map { |m| m.user }).to include(student2)
     end
 
+    it "should handle unequal group sizes" do
+      initial_spread  = [0, 0, 0]
+      max_memberships = [2, 3, 4]
+      result_spread   = [2, 3, 4]
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships: max_memberships)
+    end
+
+    it "should not overassign to groups" do
+      groups = (2..4).map{ |i| @category.groups.create(name: "Group #{i}", max_membership: i, context: @course)}
+      students = (1..10).map { |i| @course.enroll_student(user_model).user }
+      memberships = @category.assign_unassigned_members
+      expect(memberships.size).to be 9
+      groups.each(&:reload)
+      expect(groups[0].users.size).to be 2
+      expect(groups[1].users.size).to be 3
+      expect(groups[2].users.size).to be 4
+    end
+
+    it "puts leftovers into groups with no cap" do
+      initial_spread  = [0, 0, 0]
+      max_memberships = [nil, 2, 5]
+      result_spread   = [2, 5, 14]
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships: max_memberships)
+    end
+
     it "should assign unassigned users while respecting group limits in the category" do
       initial_spread = [0, 0, 0]
       result_spread = [2, 2, 2]
@@ -611,7 +636,14 @@ def assert_random_group_assignment(category, course, initial_spread, result_spre
 
   # set up course groups
   group_count = result_spread.size
-  group_count.times { |i| category.groups.create(:name => "Group #{i}", :context => course) }
+  max_memberships = opts[:max_memberships] || []
+  group_count.times do |i|
+    category.groups.create(
+      name: "Group #{i}",
+      context: course,
+      max_membership: max_memberships[i]
+    )
+  end
 
   # set up course users
   user_count = result_spread.inject(:+) + expected_leftover_count
