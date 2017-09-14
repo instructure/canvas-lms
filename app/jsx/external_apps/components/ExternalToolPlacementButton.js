@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
@@ -56,6 +55,7 @@ export default React.createClass({
     propTypes: {
       tool: PropTypes.object.isRequired,
       type: PropTypes.string, // specify "button" if this is not a menu item
+      onClose: PropTypes.func
     },
 
     getInitialState() {
@@ -84,7 +84,9 @@ export default React.createClass({
     },
 
     closeModal() {
-      this.setState({ modalIsOpen: false });
+      this.setState({ modalIsOpen: false }, () => {
+        if (this.props.onClose) this.props.onClose()
+      })
     },
 
     placements() {

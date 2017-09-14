@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -37,6 +36,10 @@ export default React.createClass({
       canAddEdit: PropTypes.bool.isRequired
     },
 
+    onModalClose () {
+      this.button.focus()
+    },
+
     renderButtons() {
       if (this.props.tool.installed_locally && !this.props.tool.restricted_by_master_course) {
         var configureButton, updateBadge, updateOption, dimissUpdateOption = null;
@@ -48,8 +51,6 @@ export default React.createClass({
 
         if(this.props.tool.has_update) {
           var badgeAriaLabel = I18n.t('An update is available for %{toolName}', { toolName: this.props.tool.name });
-
-
           updateBadge = <i className="icon-upload tool-update-badge" aria-label={badgeAriaLabel}></i>;
         }
 
@@ -57,7 +58,7 @@ export default React.createClass({
           <td className="links text-right" nowrap="nowrap">
             {updateBadge}
             <div className={"al-dropdown__container"} >
-              <a className={"al-trigger btn"} role="button" href="#">
+              <a className={"al-trigger btn"} role="button" href="#" ref={(c) => { this.button = c }}>
                 <i className={"icon-settings"}></i>
                 <i className={"icon-mini-arrow-down"}></i>
                 <span className={"screenreader-only"}>{ this.props.tool.name + ' ' + I18n.t('Settings') }</span>
@@ -66,7 +67,7 @@ export default React.createClass({
                 {configureButton}
                 <ManageUpdateExternalToolButton tool={this.props.tool} />
                 <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} canAddEdit={this.props.canAddEdit}/>
-                <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} />
+                <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} onClose={this.onModalClose} />
                 <ReregisterExternalToolButton ref="reregisterExternalToolButton" tool={this.props.tool} canAddEdit={this.props.canAddEdit}/>
                 <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} canAddEdit={this.props.canAddEdit} />
               </ul>
