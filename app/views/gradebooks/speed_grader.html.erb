@@ -240,7 +240,7 @@
               <div id="rubric_holder">
                 <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
                 <div class="button-container">
-                  <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
+                  <% if can_do(@context, @current_user, :manage_grades) %>
                     <button type="button" class="save_rubric_button Button Button--primary"><%= t("Save") %></button>
                   <% end %>
                   <button type="button" class="hide_rubric_link Button"><%= t("Cancel") %></button>

@@ -148,7 +148,7 @@ describe "/submissions/show" do
         view_context(@course, @student)
         assign(:assignment, @assignment)
         assign(:submission, @submission)
-        assign(:rubric_association, @submission.rubric_association_with_assessing_user_id)
+        assign(:rubric_association, @assignment.rubric_association)
 
         render 'submissions/show'
         html = Nokogiri::HTML.fragment(response.body)

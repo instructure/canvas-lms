@@ -3423,18 +3423,6 @@ describe Submission do
     end
   end
 
-  describe '#rubric_association_with_assessing_user_id' do
-    before :once do
-      submission_model assignment: @assignment, user: @student
-      rubric_association_model association_object: @assignment, purpose: 'grading'
-    end
-    subject { @submission.rubric_association_with_assessing_user_id }
-
-    it 'sets assessing_user_id to submission.user_id' do
-      expect(subject.assessing_user_id).to eq @submission.user_id
-    end
-  end
-
   describe '#visible_rubric_assessments_for' do
     before :once do
       submission_model assignment: @assignment, user: @student

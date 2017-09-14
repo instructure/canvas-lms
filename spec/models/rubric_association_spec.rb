@@ -169,7 +169,7 @@ describe RubricAssociation do
 
       admin = account_admin_user_with_role_changes(:active_all => true, :role_changes => {:manage_courses => false})
 
-      [:manage, :delete, :assess].each do |permission|
+      [:manage, :delete].each do |permission|
         expect(ra.grants_right?(admin, permission)).to be_truthy
       end
     end

@@ -18,6 +18,7 @@
 
 class RubricAssessmentsController < ApplicationController
   before_action :require_context
+  before_action :require_user
 
   def create
     update
@@ -39,17 +40,16 @@ class RubricAssessmentsController < ApplicationController
     @association_object = @association.association_object
 
     # only check if there's no @assessment object, since that's the only time
-    # this param matters (assessing_user_id and arg find_asset_for_assessment)
+    # this param matters (find_asset_for_assessment)
     user_id = params[:rubric_assessment][:user_id]
     if !@assessment && user_id !~ Api::ID_REGEX
       raise ActiveRecord::RecordNotFound
     end
 
     # Funky flow to avoid a double-render, re-work it if you like
-    @association.assessing_user_id = user_id
     if @assessment && !authorized_action(@assessment, @current_user, :update)
       return
-    elsif @assessment || authorized_action(@association, @current_user, :assess)
+    else
       opts = {}
       if value_to_boolean(params[:provisional])
         opts[:provisional_grader] = @current_user
@@ -57,6 +57,8 @@ class RubricAssessmentsController < ApplicationController
       end
 
       @asset, @user = @association_object.find_asset_for_assessment(@association, @assessment ? @assessment.user_id : user_id, opts)
+      return render_unauthorized_action unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user)
+
       @assessment = @association.assess(:assessor => @current_user, :user => @user, :artifact => @asset, :assessment => params[:rubric_assessment],
         :graded_anonymously => value_to_boolean(params[:graded_anonymously]))
       @asset.reload
