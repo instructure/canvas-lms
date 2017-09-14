@@ -6800,10 +6800,10 @@ zh-Hans:
   eportfolio: 
     buttons: 
       done_editing: 完成编辑
-      manage_sections: 管理班级
+      manage_sections: 管理章节
     confirm_delete_message: 是否确定要删除此消息?
     confirm_delete_page: 删除此页及其所有内容?
-    confirm_delete_section: 删除此班级及其所有页面?
+    confirm_delete_section: 删除此章节及其所有页面?
     default_description: "这是我在 %{course} 中提交的 %{assignment}。"
     eportfolio_settings: 电子学习档案设置
     errors: 
@@ -6811,8 +6811,8 @@ zh-Hans:
       missing_file: 请选择文件
       name_required: 需要姓名
       name_too_long: 姓名太长
-      section_name_invalid: 班级名无效
-      section_name_too_long: 班级名太长
+      section_name_invalid: 章节名无效
+      section_name_too_long: 章节名太长
       upload_failed: 上传失败。
     first_category: 主页
     first_entry: 
@@ -6829,7 +6829,7 @@ zh-Hans:
     errors: 
       missing_page: 找不到该页
   eportfolio_category: 
-    default_section: 班级名称
+    default_section: 章节名称
   eportfolio_entries: 
     errors: 
       not_found: 找不到
@@ -6857,7 +6857,7 @@ zh-Hans:
       updated_at: "最近更新时间 %{updated_at}"
     help_link_text: "%{help_icon} 如何...?"
     manage_pages_link_text: 组织/管理页面
-    manage_sections_link_text: 按照班级整理
+    manage_sections_link_text: 按照章节整理
     notices: 
       created: 电子学习档案成功创建
       deleted: 电子学习档案成功删除
@@ -6869,12 +6869,12 @@ zh-Hans:
       default_page_name: 页面名称
       edit_instructions: 单击任何页面名称可对其重命名，单击并拖动可重新排序。
       headers: 
-        page_list: 此班级的页面
+        page_list: 此章节的页面
       links: 
         add_page: 添加其它页面
       titles: 
         delete_page: 删除此页面
-        manage_pages: 添加、删除或重排此班级的页面
+        manage_pages: 添加、删除或重排此章节的页面
         rename_page: 重命名页面
     page_section: 
       links: 
@@ -6887,8 +6887,8 @@ zh-Hans:
         rich_text: 富文本内容
         submission: 课程提交
       titles: 
-        delete_section: 删除此班级
-        move_section: 拖动以重排班级
+        delete_section: 删除此章节
+        move_section: 拖动以重排章节
     page_section_static: 
       headers: 
         submission: "学生提交的 %{assignment} 创建日期为 %{created_date}"
@@ -6911,7 +6911,7 @@ zh-Hans:
         manage_sections: 添加、删除或重排此电子学业档案的班级
         rename_section: 重命名此班级
     show: 
-      add_submission: 要为此提交文件添加新页面，请选择班级并输入新页面的名称。
+      add_submission: 要为此提交文件添加新页面，请选择章节并输入新页面的名称。
       attachment_count: 
         one: "%{count} 个附件"
         other: "%{count} 个附件"
@@ -6949,7 +6949,7 @@ zh-Hans:
         loading_submission: 正在加载提交文件
         make_public: 公开
         page_name: 页面名称
-        section: 班级
+        section: 章节
         show_comments: 公开评论
         uploading_file: 正在上传
       links: 
@@ -6966,7 +6966,7 @@ zh-Hans:
         view_original: 查看原始文件
         wizard: 入门向导
       login_required: 必须*登录*后才能在此页发表评论。
-      new_section: 新班级
+      new_section: 新章节
       no_comments: 无评论
       no_files: 未上传文件
       no_submissions: 找不到提交文件
@@ -7028,30 +7028,30 @@ zh-Hans:
         instructions: 使用电子学习档案
         introduction: 简介
         page_content: 页面内容
-        pages: 班级页面
-        sections: 学习档案班级
+        pages: 章节页面
+        sections: 学习档案章节
         settings: 电子学习档案设置
         submissions: 添加提交文件
       introduction: 
-        body: "电子学习档案是用来展示作品的地方。它们由班级和页面组成。窗口 (%{showme1}) 左侧显示班级列表。每个班级可能有多个页面，这些页面显示在窗口 (%{showme2}) 右侧。"
+        body: "电子学习档案是用来展示作品的地方。它们由章节和页面组成。窗口 (%{showme1}) 左侧显示章节列表。每个章节可能有多个页面，这些页面显示在窗口 (%{showme2}) 右侧。"
       links: 
         portfolio: 查看学习档案
       page_content: 
         body1: "您在页面上看到的内容与任何访客看到的内容相同。要编辑此内容，请单击 \"%{edit_link_text}\" 链接 (%{showme})，页面将会变为编辑模式。"
         body2: "现在可以编辑了！根据需要重命名页面或更改评论可选功能 (%{showme1})。通过单击右侧的按钮 (%{showme2})，可随时保存、预览或取消更改。"
-        body3: "内容分为多个子班级，每个子班级都有虚线边框。通过单击子班级右上角的 %{edit_icon} 或 %{delete_icon} 图标，可编辑或删除该子班级的内容。"
-        body4: "要添加新子班级，请在页面 (%{showme}) 右侧的可选功能列表中查找并单击要添加的内容类型。"
+        body3: "内容分为多个子章节，每个子章节都有虚线边框。通过单击子班级右上角的 %{edit_icon} 或 %{delete_icon} 图标，可编辑或删除该子章节的内容。"
+        body4: "要添加新子章节，请在页面 (%{showme}) 右侧的可选功能列表中查找并单击要添加的内容类型。"
       pages: 
-        body1: "班级含有多个页面。您可以在窗口 (%{showme1}) 右侧查看当前班级的页面列表。要组织或添加页面，请单击 \"%{manage_pages}\" 链接 (%{showme2})。"
+        body1: "章节含有多个页面。您可以在窗口 (%{showme1}) 右侧查看当前章节的页面列表。要组织或添加页面，请单击 \"%{manage_pages}\" 链接 (%{showme2})。"
         body2: "您可以通过单击 %{edit_icon} 图标来重命名任何页面，通过单击 %{delete_icon} 图标来删除页面，或通过单击并拖动来重排页面顺序。"
       sections: 
-        body1: "窗口 (%{showme1}) 左侧列出各个班级。每个班级可能含有多个页面。要组织或添加班级，请单击 \"%{manage_sections}\" 链接 (%{showme2})。"
-        body2: "您可以通过单击 %{edit_icon} 图标来重命名任何班级，通过单击并拖动来重新排列班级，或通过单击 %{delete_icon} 图标来删除班级。"
+        body1: "窗口 (%{showme1}) 左侧列出各个章节。每个章节可能含有多个页面。要组织或添加章节，请单击 \"%{manage_sections}\" 链接 (%{showme2})。"
+        body2: "您可以通过单击 %{edit_icon} 图标来重命名任何章节，通过单击并拖动来重新排列章节，或通过单击 %{delete_icon} 图标来删除章节。"
       settings: 
         body: "要更改学习档案的设置，请单击 \"学习档案设置\" 链接 (%{showme})。您可以重命名学习档案，也可以将其可见性更改为公开或私人。私人学习档案只有您授权的用户才能查看。"
       submissions: 
         body1: "您可能已经注意到，此页的底部是班级 (%{showme}) 最近提交的文件列表。您可以在此页中快速添加提交文件到学习档案中的新页面。只需单击要添加的提交的作业，就会弹出一个简单的对话框。"
-        body2: "很好！现在要完成添加提交文件的操作，您需要选择要添加到的班级，并指定页面名称。单击 \"添加页面\" 之后，您将会转到新页面，以便能够根据需要进行详细编辑。"
+        body2: "很好！现在要完成添加提交文件的操作，您需要选择要添加到的章节，并指定页面名称。单击 \"添加页面\" 之后，您将会转到新页面，以便能够根据需要进行详细编辑。"
   eportfolios_f6dc4579: 电子学习档案
   epub_exporting_f5592ff2: "ePub 格式导出"
   error_59293a2c: 错误
@@ -15908,7 +15908,7 @@ zh-Hans:
         crosslist_this_section: 交叉列出此班级
         current_enrollments: 当前注册
         decrosslist_section: 取消交叉列出此班级
-  sections_94731e51: 章节
+  sections_94731e51: 班级
   see_rubric_results_62a6447d: 查看评分细则结果
   see_scoring_details_f7fd1f3b: 查看评分详细信息
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*看见一些LTI工具*在Canvas运作很好。"
@@ -18153,7 +18153,7 @@ zh-Hans:
   up_c553575d: 上
   update_4d8ee62: 更新
   update_and_view_sections_course_details_navigation_dd10b45e: 更新和查看章节、课程详细信息、导航、功能选择和外部应用集成，全部仅对讲师可见。
-  update_and_view_sections_course_details_navigation_de248be8: 更新和查看章节、课程详细信息、导航、功能选择和外部应用集成，全部仅对讲师可见。
+  update_and_view_sections_course_details_navigation_de248be8: 更新和查看班级、课程详细信息、导航、功能选择和外部应用集成，全部仅对讲师可见。
   update_details_6abfed16: 更新详细信息
   update_link_b7cab181: 更新链接
   update_tool_7d48ef2a: "更新 %{tool}"
