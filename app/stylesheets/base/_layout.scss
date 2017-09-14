@@ -42,7 +42,7 @@ body {
     h2, .h2 {
       @include ui-widget-header-bg-and-text;
       @include fontSize($ic-font-size--small);
-      font-weight: bold;
+      font-weight: 500;
       margin: (-0.95em) -0.95em 1em;
       padding: 0.4em 1em;
       line-height: 20px;

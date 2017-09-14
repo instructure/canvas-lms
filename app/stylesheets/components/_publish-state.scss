@@ -62,6 +62,7 @@ The publish button has two states on click (publish and published) and a hover s
 .btn-unpublish {
   transition: none;
   padding-left: 9px;
+  @include fontSize(14px);
 
   i {
     margin-right: 4px;
@@ -123,7 +124,7 @@ The publish button has two states on click (publish and published) and a hover s
 
 .published-status {
   &.published {
-    font-weight: bold;
+    font-weight: 500;
     @if $use_high_contrast { color: darken($ic-color-success, 4%); }
     @else { color: $ic-color-success; }
   }

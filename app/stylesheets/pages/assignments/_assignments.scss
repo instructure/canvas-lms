@@ -19,7 +19,7 @@
 .lock_date {
   color: #444;
   padding-left: 20px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 #submit_assignment {
@@ -114,7 +114,7 @@
       display: inline-block;
     }
     .title {
-      font-weight: bold;
+      font-weight: 500;
       padding-right: 0.5em;
     }
     .value {
@@ -137,7 +137,7 @@
   }
   .control-group {
     .control-label {
-      font-weight: bold;
+      font-weight: 500;
     }
     .controls .value {
       display: block;
@@ -177,14 +177,14 @@
     }
     .header {
       font-size: 1.2em;
-      font-weight: bold;
+      font-weight: 500;
       margin-top: 2px;
     }
     .content {
       padding-left: 5px;
       h4 {
         @include fontSize(11px);
-        font-weight: bold;
+        font-weight: 500;
         margin-bottom: 0;
       }
       .module {
@@ -192,7 +192,7 @@
       }
       .late {
         color: $ic-color-danger;
-        font-weight: bold;
+        font-weight: 500;
       }
       .unstyled_list {
         margin: 5px 10px 0 10px;

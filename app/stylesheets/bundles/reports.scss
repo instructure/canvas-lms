@@ -47,12 +47,12 @@ table.report_example, table.report {
       th.reports {
         padding: 5px;
         background-color: #DDD;
-        font-weight: bold;
+        font-weight: 500;
       }
       td.reports {
         padding: 5px;
         &.title {
-          font-weight: bold;
+          font-weight: 500;
         }
         &.action {
           text-align: center;

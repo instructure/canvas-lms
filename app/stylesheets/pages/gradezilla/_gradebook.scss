@@ -230,7 +230,7 @@ $gradebook_cell_padding_top: 8px;
     background-color: $ic-bg-light-primary;
   }
   .slick-column-name {
-    font-weight: bold;
+    font-weight: 500;
     color: #2f2a34;
     text-shadow: white 0 0 1px;
   }
@@ -683,7 +683,7 @@ $gradebook_checkbox_size: 16px;
 
 @mixin gradebook_menu_label($fontsize) {
   font-size: $fontsize;
-  font-weight: bold;
+  font-weight: 500;
   margin-bottom: 0;
   vertical-align: 0px !important;
   position: relative;

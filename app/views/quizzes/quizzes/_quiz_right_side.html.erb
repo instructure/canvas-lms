@@ -19,7 +19,7 @@
 <% allow_take ||= false %>
 <% if @quiz.available? || (params[:preview] && @submission) %>
   <div>
-    <div style="border-bottom: 1px solid #888; font-size: 1.1em; font-weight: bold;">
+    <div style="border-bottom: 1px solid #888; font-size: 1.1em; font-weight: 500;">
       <% if @quiz.allowed_attempts == 1 %>
         <%= before_label(:submission_details, "Submission Details") %>
       <% else %>

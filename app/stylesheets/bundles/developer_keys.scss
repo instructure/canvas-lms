@@ -33,7 +33,7 @@
   }
   td {
     span.name {
-      font-weight: bold;
+      font-weight: 500;
       @include fontSize(14px);
     }
     &.notes {

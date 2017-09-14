@@ -168,7 +168,7 @@ $left_side_width:           175px;
 $min_main_width:            510px;
 $max_main_width:            1100px;
 $ic-sp:                     12px;
-$ic-border-radius:          $ic-sp/2;
+$ic-border-radius:          4px;
 $spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
 $borderRadius:              4px;
 $contentBoxPadding:         8px;
@@ -185,7 +185,7 @@ $ic-font-family: 'Montserrat', "LatoWeb", "Helvetica Neue", Helvetica, Arial, sa
 
 $ic-font-family-fallback: 'Open Sans', Helvetica, Arial, sans-serif; // "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-$ic-font-weight: bold; // we can phase this var out now we're on Lato
+$ic-font-weight: 500; // we can phase this var out now we're on Lato
 
 $ic-font-size: 16px;
 
@@ -193,7 +193,7 @@ $ic-font-size--xlarge:   $ic-font-size + 14;
 $ic-font-size--large:    $ic-font-size + 9;
 $ic-font-size--medium:   $ic-font-size + 2;
 $ic-font-size--small:    $ic-font-size;
-$ic-font-size--xsmall:   $ic-font-size - 2;
+$ic-font-size--xsmall:   $ic-font-size - 4;
 
 /* Legacy variables. Discontinue to use these: */
 $h1-font-size:  23px;

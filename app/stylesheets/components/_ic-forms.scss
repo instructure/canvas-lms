@@ -1605,7 +1605,7 @@ form.ic-Form-group { margin: 0; }
   margin: 0 0 $ic-sp/2;
   display: block;
   line-height: $ic-label-line-height;
-  font-weight: bold;
+  font-weight: 500;
   @include fontSize($ic-font-size--small);
 }
 
@@ -1633,7 +1633,7 @@ form.ic-Form-group { margin: 0; }
 
     .ic-Legend {
       margin-bottom: $ic-sp/2;
-      font-weight: bold;
+      font-weight: 500;
       @include fontSize($ic-font-size--small);
       border-bottom: none;
       padding-bottom: 0;

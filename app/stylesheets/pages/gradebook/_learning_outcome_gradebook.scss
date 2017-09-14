@@ -215,7 +215,7 @@ $page-dark: #ebeff2;
   .slick-header-column-sorted, .slick-header-column-sorted:hover {
     background: #fff;
     font-style: normal;
-    font-weight: bold;
+    font-weight: 500;
   }
 
   .slick-header-column:hover .slick-resizable-handle {
@@ -245,7 +245,7 @@ $page-dark: #ebeff2;
 
     .slick-column-name {
       color: $header-font-color;
-      font-weight: bold;
+      font-weight: 500;
     }
 
     &.ui-state-default {
@@ -278,7 +278,7 @@ $page-dark: #ebeff2;
       background: transparent;
       border: none;
       @include fontSize(15px);
-      font-weight: bold;
+      font-weight: 500;
       line-height: 39px;
       min-height: 40px;
     }
@@ -339,7 +339,7 @@ $page-dark: #ebeff2;
 }
 
 .outcome-score {
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .outcome-result {

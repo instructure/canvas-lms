@@ -30,7 +30,7 @@
   // oldskool compat
   #section-tabs-header {
     @include fontSize($ic-font-size--small);
-    font-weight: bold;
+    font-weight: 500;
     margin: 0 0 $ic-sp/2;
     white-space: nowrap;
     overflow: hidden;
@@ -93,7 +93,7 @@
 
   a.active {
     background-color: var(--ic-brand-primary);
-    font-weight: bold;
+    font-weight: 500;
     color: $ic-color-light;
     &:hover, &:focus { background-color: var(--ic-brand-primary); }
     .nav-badge {
@@ -124,7 +124,7 @@
     display: block;
     padding: 8px 0;
     color: $ic-font-color-dark;
-    font-weight: bold;
+    font-weight: 500;
     border-bottom: 1px solid $ic-border-light;
 
     &:hover, &:focus {

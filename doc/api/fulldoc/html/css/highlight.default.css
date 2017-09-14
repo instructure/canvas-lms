@@ -113,7 +113,7 @@ pre .tex .command,
 pre .markdown .strong,
 pre .request,
 pre .status {
-  font-weight: bold;
+  font-weight: 500;
 }
 
 pre .markdown .emphasis {

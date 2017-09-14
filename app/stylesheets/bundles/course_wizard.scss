@@ -180,7 +180,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include fontSize(36px);
   text-align: center;
   color: $ic-color-light;
-  font-weight: bold;
+  font-weight: 500;
   margin: 0;
   @include breakpoint(mini-tablet) {
     @include fontSize(48px);

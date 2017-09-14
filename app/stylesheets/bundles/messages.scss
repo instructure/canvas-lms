@@ -27,7 +27,7 @@ dl {
 dt {
   clear: left;
   float: left;
-  font-weight: bold;
+  font-weight: 500;
   margin-right: 8px;
 
   &:after { content: ":"; }
@@ -38,7 +38,7 @@ dd {
 }
 
 .h6 {
-  font-weight: bold;
+  font-weight: 500;
 }
 
 /*-- message list styles --*/
@@ -97,7 +97,7 @@ table.grid tr:first-child td {
   border-radius: 3px;
   color: white;
   @include fontSize(12px);
-  font-weight: bold;
+  font-weight: 500;
   line-height: 14px;
   padding: 1px 4px 2px;
   text-shadow: 0 -1px 0 rgba(black, .25);

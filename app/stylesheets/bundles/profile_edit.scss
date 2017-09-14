@@ -155,7 +155,7 @@ li[id$=service_google_docs] {
     width: 100%;
 
     th {
-      font-weight: bold;
+      font-weight: 500;
       vertical-align: top;
       white-space: nowrap;
       width: 5%;
@@ -201,7 +201,7 @@ li[id$=service_google_docs] {
 .select-photo-link {
   display: block;
   @include fontSize(18px);
-  font-weight: bold;
+  font-weight: 500;
   padding: 0 0 16px 0;
   text-align: center;
   text-decoration: none;

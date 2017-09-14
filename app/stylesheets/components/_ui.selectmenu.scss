@@ -33,11 +33,11 @@
 .ui-selectmenu-menu li .ui-icon, .ui-selectmenu-status .ui-icon { position: absolute; top: 1em; margin-top: -8px; left: 0; }
 .ui-selectmenu-status { line-height: 1.4em; }
 .ui-selectmenu-menu li span,.ui-selectmenu-status span { display:block; margin-bottom: .2em; }
-.ui-selectmenu-menu li .ui-selectmenu-item-header { font-weight: bold; }
+.ui-selectmenu-menu li .ui-selectmenu-item-header { font-weight: 500; }
 .ui-selectmenu-menu li .ui-selectmenu-item-footer { opacity: .8; }
 /* for optgroups */
 .ui-selectmenu-menu .ui-selectmenu-group { font-size: 1em; }
-.ui-selectmenu-menu .ui-selectmenu-group .ui-selectmenu-group-label { line-height: 1.4em; display:block; padding: .6em .5em 0; font-weight: bold; }
+.ui-selectmenu-menu .ui-selectmenu-group .ui-selectmenu-group-label { line-height: 1.4em; display:block; padding: .6em .5em 0; font-weight: 500; }
 .ui-selectmenu-menu .ui-selectmenu-group ul { margin: 0; padding: 0; }
 /* IE7 workaround (opacity disabled) */
 *+html .ui-state-disabled, *+html .ui-state-disabled a { color: silver; }

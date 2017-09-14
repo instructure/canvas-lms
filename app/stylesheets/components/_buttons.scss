@@ -395,6 +395,7 @@ input[type="button"] {
 .ui-button {
   position: relative;
   @extend .Button;
+  @include fontSize(14px);
   &.ui-state-hover { @extend .Button:hover }
   &.ui-state-focus { @extend .Button:focus }
   &.ui-state-active {
@@ -402,6 +403,7 @@ input[type="button"] {
     &:hover { @extend .Button--active; }
   }
   &.ui-state-disabled { @extend .Button.disabled; }
+
 }
 
 .Button--theme-editor-apply {

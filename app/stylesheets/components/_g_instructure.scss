@@ -84,7 +84,7 @@
     min-height: 20px;
     vertical-align: middle;
     text-align: center;
-    font-weight: bold;
+    font-weight: 500;
     position: relative;
     z-index: 2;
     width: 400px;
@@ -197,7 +197,7 @@
   width: 300px;
   z-index: 2;
   a {
-    font-weight: bold;
+    font-weight: 500;
     cursor: pointer;
   }
 }
@@ -211,7 +211,7 @@
   }
   h4.item_list_header, .h4.item_list_header {
     font-size: 1.3em;
-    font-weight: bold;
+    font-weight: 500;
     border-bottom: 1px solid #888;
     margin: 0;
   }
@@ -232,7 +232,7 @@
     margin: 5px 0px;
     width: 100%;
     tbody th {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
   table.notifications {
@@ -254,7 +254,7 @@
       color: #888;
       .name {
         font-size: 1.5em;
-        font-weight: bold;
+        font-weight: 500;
       }
       .links {
         font-size: 0.8em;
@@ -346,7 +346,7 @@
     border-radius: 5px;
     .header {
       color: #444;
-      font-weight: bold;
+      font-weight: 500;
     }
     .preview {
       margin: 5px 30px 10px;
@@ -370,7 +370,7 @@ table.summary {
     padding: $ic-sp/2;
   }
   thead th, caption {
-    font-weight: bold;
+    font-weight: 500;
     border-bottom: 1px solid $ic-border-dark;
   }
   td, tbody th {
@@ -400,7 +400,7 @@ table.formtable td {
 .courses, .groups, .accounts {
   .name {
     font-size: 1.1em;
-    font-weight: bold;
+    font-weight: 500;
   }
   .unpublished {
     .name a {
@@ -471,7 +471,7 @@ span.hint {
 .mini_discussion {
   font-size: 0.8em;
   .name {
-    font-weight: bold;
+    font-weight: 500;
     margin-left: 10px;
   }
   .date {
@@ -630,7 +630,7 @@ $wizard-bg-color: $ic-color-dark;
       }
       .option {
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 500;
         color: #444;
         border-radius: 3px;
         &:hover {
@@ -681,7 +681,7 @@ $wizard-bg-color: $ic-color-dark;
       padding: 0;
       margin: 0;
       border-bottom-color: rgba($ic-color-light, 0.15);
-      font-weight: bold;
+      font-weight: 500;
     }
     .wizard-box__feature-icon {
       display: none;
@@ -977,7 +977,7 @@ $wizard-bg-color: $ic-color-dark;
         padding: 1px 2px;
       }
       .keycode {
-        font-weight: bold;
+        font-weight: 500;
         font-size: 1.2em;
         color: #248;
         font-family: courier, monospace;
@@ -1030,7 +1030,7 @@ $wizard-bg-color: $ic-color-dark;
       .title {
         margin-left: 10px;
         font-size: 1em;
-        font-weight: bold;
+        font-weight: 500;
         // :color #444
 
       }
@@ -1517,7 +1517,7 @@ html > body .new_activity_message form textarea {
     border-bottom: 1px solid #ccc;
     background-color: #eee;
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: 500;
     padding: 2px 5px;
   }
   .content {
@@ -1616,7 +1616,7 @@ body > #ui-datepicker-div {
         background-image: url(/images/downtick.png);
       }
       &.current {
-        font-weight: bold;
+        font-weight: 500;
         font-size: 1.1em;
         margin: 2px 0;
       }

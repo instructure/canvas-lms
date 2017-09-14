@@ -22,7 +22,7 @@
 .ui-datepicker select.ui-datepicker-month,
 .ui-datepicker select.ui-datepicker-year { width: 49%;}
 .ui-datepicker table {width: 100%; font-size: .9em; border-collapse: collapse; margin:0 0 .4em; }
-.ui-datepicker th { padding: .7em .3em; text-align: center; font-weight: bold; border: 0;  }
+.ui-datepicker th { padding: .7em .3em; text-align: center; font-weight: 500; border: 0;  }
 .ui-datepicker td { border: 0; }
 .ui-datepicker td span, .ui-datepicker td a { display: block; padding: 2px; text-align: center; text-decoration: none; border-color: transparent; }
 .ui-datepicker .ui-datepicker-buttonpane { background-image: none; margin: .7em 0 0 0; padding:0 .2em; border-left: 0; border-right: 0; border-bottom: 0; }
@@ -66,7 +66,7 @@
     color: #333;
     background: #d5dde3;
     background: linear-gradient(to bottom, #e0e6eb, #d4dce2);
-    font-weight: bold;
+    font-weight: 500;
     text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.75);
   }
   .ui-datepicker-time {
@@ -85,7 +85,7 @@
 .ui-datepicker-today .ui-state-highlight:not(.ui-state-active){
   background: transparent;
   border-color: transparent;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 

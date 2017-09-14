@@ -194,7 +194,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-title {
   @include fontSize(13px);
-  font-weight: bold;
+  font-weight: 500;
   line-height: 23px;
   margin: 0;
 }
@@ -418,7 +418,7 @@ $discussion-dark-text: $ic-color-dark;
   background: white;
   padding: 10px 10px 13px 10px;
   @include fontSize(10px);
-  font-weight: bold;
+  font-weight: 500;
   @include clearfix;
   a {
     float: left;
@@ -687,7 +687,7 @@ $discussion-dark-text: $ic-color-dark;
   margin: 16px 0;
   width: 100%;
   th {
-    font-weight: bold;
+    font-weight: 500;
     text-align: left;
   }
 }

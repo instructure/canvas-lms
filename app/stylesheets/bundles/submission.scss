@@ -19,7 +19,7 @@
 @import "base/environment";
 
 .submission_details {
-  .bold { font-weight: bold; }
+  .bold { font-weight: 500; }
   .error { color: $ic-color-danger; }
   td { padding-left: 1em; }
   th { font-weight: normal; }
@@ -38,7 +38,7 @@
 
   &.late {
   color: $ic-color-danger;
-  font-weight: bold;
+  font-weight: 500;
   }
 }
 .submission-details-container {
@@ -86,7 +86,7 @@
   > a {
     @include fontSize(13px); // need to overwrite default tiny-text style here
     margin-right: $ic-sp/2;
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 

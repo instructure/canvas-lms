@@ -177,12 +177,12 @@ $revision-button-color: $ic-color-dark;
       }
       th {
         vertical-align: middle;
-        font-weight: bold;
+        font-weight: 500;
       }
     }
     .table tbody {
       .page_title {
-        font-weight: bold;
+        font-weight: 500;
       }
       .front-page {
         margin: auto 0.5em;
@@ -234,7 +234,7 @@ $revision-button-color: $ic-color-dark;
         .wiki-page-link {
           @include fontSize(13px);
           color: $darkened-text-color;
-          font-weight: bold;
+          font-weight: 500;
         }
         .wiki-page-link.published {
           color: $published-text-color;
@@ -304,7 +304,7 @@ $revision-button-color: $ic-color-dark;
   .course-title {
     display: none;
     font-size: 1.8em;
-    font-weight: bold;
+    font-weight: 500;
     line-height: 30px;
     margin: 0;
     color: #666;
@@ -423,7 +423,7 @@ $revision-button-color: $ic-color-dark;
     .revision-history {
       @include fontSize($ic-font-size--small);
       position: relative;
-      font-weight: bold;
+      font-weight: 500;
       margin-bottom: $ic-sp;
       @include fontSize($ic-font-size--small);
     }
@@ -503,7 +503,7 @@ $revision-button-color: $ic-color-dark;
     a {
       user-select: none;
       text-transform: uppercase;
-      font-weight: bold;
+      font-weight: 500;
     }
     a:hover {
       text-decoration: none;

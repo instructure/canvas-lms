@@ -56,7 +56,7 @@
       }
     }
     label[for=rubric-title] {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
   .rubric_table {
@@ -79,7 +79,7 @@
     border-right: 1px solid $ic-border-color;
     padding: 5px;
     margin-right: 1px;
-    font-weight: bold;
+    font-weight: 500;
   }
   .has-assessments-warning {
     font-size: 0.8em;
@@ -223,7 +223,7 @@
     tr.criterion td.criterion_description {
       .long_description_holder {
         font-size: 0.8em;
-        font-weight: bold;
+        font-weight: 500;
         &.empty {
           font-weight: normal;
           display: block;

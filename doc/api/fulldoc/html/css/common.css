@@ -120,7 +120,7 @@ h3.beta {
   background-color: #E5E8FF;
   text-align: center;
   padding: 6px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 #sidebar {
@@ -134,7 +134,7 @@ h3.beta {
 #sidebar h2 {
   padding: 14px 10px 14px 6px;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
   border-left: 3px solid #0073ac;
 
   margin:  0;
@@ -214,7 +214,7 @@ table.tool th {
   background-color: #DDD;
 }
 table.tool tr td:first-child {
-  font-weight: bold;
+  font-weight: 500;
   width: 20%;
 }
 table.tool tr td:last-child {
@@ -277,7 +277,7 @@ div.appendix img {
 
 div.warning-message {
   background-color: #ffb700;
-  font-weight: bold;
+  font-weight: 500;
   padding: 4px 8px 4px 8px;
   min-height: 20px;
   vertical-align: middle;
@@ -289,7 +289,7 @@ div.warning-message {
 
 code.enum {
   color: white;
-  font-weight: bold;
+  font-weight: 500;
   padding: 0 4px;
   background-color: #2A404D;
   border: 1px solid #2A404D;
@@ -297,7 +297,7 @@ code.enum {
 }
 .param-values .allowed {
   display: block;
-  font-weight: bold;
+  font-weight: 500;
   margin-bottom: 13px;
 }
 .param-values {

@@ -36,7 +36,7 @@ $ic-global-nav-link-active:  darken($ic-brand-global-nav-bgd, 8%);
 $ic-masquerade-color: $ic-color-action;
 $ic-subnav-panel-bgd: $ic-color-light;
 $ic-subnav-tray-bgd: black;
-$ic-logomark-url: url("/images/svg-icons/svg_canvas_logomark_only.svg");
+$ic-logomark-url: url("/images/svg-icons/strongmind-global-nav-logo.svg");
 $ic-tooltip-arrow-size: 0.375rem;
 
 
@@ -294,6 +294,8 @@ button.ic-app-header__menu-list-link {
   width: 100%;
   background-color: $ic-brand-global-nav-logo-bgd;
   box-sizing: border-box;
+  margin-top: 10px;
+  margin-bottom: 20px;
 
   @if $ic-brand-header-image != $ic-logomark-url {
     padding: 0;
@@ -322,10 +324,12 @@ button.ic-app-header__menu-list-link {
     height: 75px;
     margin-top: 10px;
     margin-bottom: 10px;
+    // transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
+
   }
   @else {
-    height: 65px;
-    transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
+    height: 75px;
+    // transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
   }
   body.primary-nav-expanded & {
     @if $ic-brand-header-image != $ic-logomark-url {
@@ -567,7 +571,7 @@ body.primary-nav-expanded {
   display: table;
   font-size: 1em;
   line-height: inherit;
-  font-weight: bold;
+  font-weight: 500;
   margin: 0;
   padding: 0;
   border: 0;

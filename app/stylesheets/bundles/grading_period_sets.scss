@@ -42,7 +42,7 @@
 .ItemGroup__header__title {
   display: inline-block;
   flex: 1 1 auto;
-  font-weight: bold;
+  font-weight: 500;
   line-height: 20px;
   margin: auto;
   text-decoration: none;
@@ -100,7 +100,7 @@
 
 .GradingPeriodSet__title {
   display: inline;
-  font-weight: bold;
+  font-weight: 500;
   @include fontSize($ic-font-size--small);
 }
 

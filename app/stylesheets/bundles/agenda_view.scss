@@ -31,7 +31,7 @@
     padding: 0;
     @include fontSize(14px);
     line-height: 1.3;
-    font-weight: bold;
+    font-weight: 500;
 
     i {
       vertical-align: middle;
@@ -258,7 +258,7 @@ span.agendaView--no-assignments {
     .fc-today {
       background: $ic-color-medium-light;
       @if $use_high_contrast {
-        font-weight: bold;
+        font-weight: 500;
         text-decoration: underline;
       }
     }
@@ -324,11 +324,11 @@ span.agendaView--no-assignments {
   label {
     display: inline;
     @include fontSize(13px);
-    font-weight: bold;
+    font-weight: 500;
   }
   .checked label {
     @include fontSize(13px);
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 

@@ -45,7 +45,7 @@
     border-radius: 3px;
     color: white;
     @include fontSize(12px);
-    font-weight: bold;
+    font-weight: 500;
     line-height: 14px;
     padding: 1px 4px 2px;
     text-shadow: 0 -1px 0 rgba(black, .25);
@@ -78,7 +78,7 @@
     padding-right: 0.75em;
 
     &.meta-data-label {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 }

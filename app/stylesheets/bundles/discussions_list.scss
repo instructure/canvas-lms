@@ -44,7 +44,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
         }
       }
     }
-    &.unread .discussion-title{ font-weight: bold; }
+    &.unread .discussion-title{ font-weight: 500; }
     &.selected {
       background-color: $ic-bg-light-primary;
     }
@@ -83,7 +83,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     @include fontSize(14px);
     line-height: 1;
     display: block;
-    font-weight: bold;
+    font-weight: 500;
   }
   .discussion-column {
     &.image-block {
@@ -126,7 +126,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
 
   h1,h2,h3,h4,h5,h6 {
     @include fontSize(16px);
-    font-weight: bold;
+    font-weight: 500;
     line-height: 20px;
     margin: 0 0 8px 16px;
 
@@ -287,14 +287,14 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .discussion-date-available {
     width: 200px;
     .status-description {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 
   .discussion-due-date {
     width: 200px;
     .discussion-date-type {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 
@@ -338,7 +338,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .title {
     display: block;
     @include fontSize(14px);
-    font-weight: bold;
+    font-weight: 500;
     &:focus {
       outline: 0;
       text-decoration: underline;

@@ -344,7 +344,7 @@ $te-footer-height: 72px;
         border-radius: 0;
         transition: padding 0.2s;
         padding: $ic-sp/2 0;
-        font-weight: bold;
+        font-weight: 500;
         @include fontSize(14px);
         &:hover {
           color: $ic-color-light;
@@ -622,7 +622,7 @@ $te-footer-height: 72px;
   flex: 0 0 36%;
   padding-right: $ic-sp*2;
   font-size: $baseFontSize;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .Theme-editor-progress-list-item__bar {

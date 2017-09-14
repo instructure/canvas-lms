@@ -286,7 +286,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
   th {
     border-bottom-color: $ic-border-dark;
     padding-bottom: $sp-table/2;
-    font-weight: bold;
+    font-weight: 500;
     // If you need to use headers for the row in order to kick in the bold font for the first cell of the row
     &.ic-Table--header-row {
       border-bottom-color: $ic-border-light;

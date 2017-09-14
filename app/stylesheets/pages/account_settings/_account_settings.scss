@@ -33,7 +33,7 @@
 }
 
 .admins_list .user_name {
-  font-weight: bold;
+  font-weight: 500;
   float: left;
 }
 
@@ -96,7 +96,7 @@
   flex: 1;
   box-sizing: border-box;
   padding-right: $ic-sp;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .announcement-details-roles {
@@ -179,7 +179,7 @@
 #account_settings_tabs {
   legend:not(.ic-Legend) {
     @include fontSize(15px);
-    font-weight: bold;
+    font-weight: 500;
   }
   .alert {
     padding-top: 0;

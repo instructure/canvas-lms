@@ -208,7 +208,7 @@ import './vendor/jquery.scrollTo'
             }
             $("<div class='bookmark'/>")
               .appendTo($dialog.find(".results"))
-              .append($('<a class="bookmark_link" style="font-weight: bold;"/>').attr({
+              .append($('<a class="bookmark_link" style="font-weight: 500;"/>').attr({
                   href: data[idx].url,
                   title: data[idx].title
                 }).text(data[idx].short_title)

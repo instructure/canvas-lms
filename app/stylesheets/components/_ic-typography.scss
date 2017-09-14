@@ -54,7 +54,7 @@
        url('/fonts/lato/latin/LatoLatin-Bold.woff') format('woff'),
        url('/fonts/lato/latin/LatoLatin-Bold.ttf') format('truetype');
   font-style: normal;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 @font-face {
@@ -95,7 +95,7 @@ small {
   font-size: 85%; // Ex: 14px base font * 85% = about 12px
 }
 strong {
-  font-weight: bold;
+  font-weight: 500;
 }
 em {
   font-style: italic;
@@ -208,7 +208,7 @@ a {
 
 // make links in .alert be same color as alert text but bold
 .alert a {
-  font-weight: bold;
+  font-weight: 500;
   color: inherit;
 }
 
@@ -242,7 +242,7 @@ dd {
   line-height: $ic-line-height;
 }
 dt {
-  font-weight: bold;
+  font-weight: 500;
 }
 dd {
   margin-left: 10px;

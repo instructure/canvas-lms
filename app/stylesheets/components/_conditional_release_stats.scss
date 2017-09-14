@@ -142,7 +142,7 @@
 
   [class*="-Tab__accordion"] {
     border-radius: 0;
-    font-weight: bold;
+    font-weight: 500;
     margin: 0 0 1px;
     text-indent: 10px;
     border: none;
@@ -179,7 +179,7 @@
   width: 30px;
   height: 30px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 500;
   float: right;
 
   &.crs-student__trend-icon__positive {
@@ -351,7 +351,7 @@ i.crs-icon-discussion {
   flex-direction: column;
   align-items: center;
   margin-right: 10px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .crs-student-details__loading {

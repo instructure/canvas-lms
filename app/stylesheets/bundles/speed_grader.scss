@@ -320,7 +320,7 @@ $icon-size: 1.4rem;
         span {
           padding: 0 8px;
           &.mark_title {
-            font-weight: bold;
+            font-weight: 500;
           }
         }
       }
@@ -447,7 +447,7 @@ $icon-size: 1.4rem;
   }
   h2, .h2 {
     @include fontSize(14px);
-    font-weight: bold;
+    font-weight: 500;
   }
   .content_box {
     padding: $ic-sp*2;
@@ -542,7 +542,7 @@ $icon-size: 1.4rem;
     }
     /////// END: fix for chrome bug.
     .prompt {
-      font-weight: bold;
+      font-weight: 500;
       line-height: 24px;
       padding-right: 4px;
       float: left;
@@ -716,16 +716,16 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   .late {
     color: #d12f19;
-    font-weight: bold;
+    font-weight: 500;
     white-space: nowrap;
   }
   #submission_late_notice {
     color: #d12f19;
-    font-weight: bold;
+    font-weight: 500;
   }
   #submission_not_newest_notice {
     color: $orange;
-    font-weight: bold;
+    font-weight: 500;
     padding: $ic-sp/2 0;
   }
   .submission_attachment_viewed_at {
@@ -733,13 +733,13 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   .see-all-attempts {
     display: block;
-    font-weight: bold;
+    font-weight: 500;
   }
   select {
     width: 99%;
   }
   label {
-    font-weight: bold;
+    font-weight: 500;
   }
   .labelText--not-bold {
     font-weight: normal;
@@ -786,7 +786,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     }
     .submission-file-selected {
       background: #DCECFB url("/images/pass.png") no-repeat center left;
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 }
@@ -806,7 +806,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     overflow: hidden;
     white-space: nowrap;
     color: $ic-font-color-dark;
-    font-weight: bold;
+    font-weight: 500;
     @include fontSize(12px);
   }
   #section_currently_showing {
@@ -831,7 +831,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         line-height: 24px;
         color: $ic-font-color-dark;
         &.selected {
-          font-weight: bold;
+          font-weight: 500;
         }
         &:hover {
           background: $ic-bg-light-neutral;
@@ -903,7 +903,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     margin-right: 1em;
   }
   .bold {
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 

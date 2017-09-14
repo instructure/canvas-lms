@@ -241,13 +241,13 @@
 <% end %>
 </div>
 <div id="confirm_email_channel" style="display: none;" class="dialog" role="dialog">
-  <div style="text-align: center;"><%= t(<<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+  <div style="text-align: center;"><%= t(<<-TEXT, :email_address => raw('<span class="path" style="font-weight: 500;">&nbsp;</span>'))
     We emailed a confirmation link to %{email_address}. Click the link in that
     email to finish registering. Make sure to check your spam box in case it
     got filtered.
     TEXT
   %></div>
-  <div style="text-align: center; margin: 10px 0; font-weight: bold;">
+  <div style="text-align: center; margin: 10px 0; font-weight: 500;">
     <a href="#" class="re_send_confirmation_link"><%= t('links.resend_confirmation', "Re-Send Confirmation") %></a>
     <a href="<%= re_send_confirmation_url("{{ user_id }}", "{{ id }}") %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </div>
@@ -260,7 +260,7 @@
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>
   <div id='sms_confirmation_instructions' style="text-align: center;">
-  <%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+  <%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: 500;">&nbsp;</span>'))
     To activate SMS, enter the four-character confirmation code sent to %{sms_number}.
     TEXT
   %>

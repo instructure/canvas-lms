@@ -51,7 +51,7 @@
     }
 
     .slick-column-name {
-      font-weight: bold;
+      font-weight: 500;
     }
 
     .slick-header-column:nth-child(even) {
@@ -97,7 +97,7 @@
     border-top-color: $ic-color-danger;
     border-bottom-color: $ic-color-danger;
     color:$ic-color-danger;
-    font-weight: bold;
+    font-weight: 500;
   }
 
   .right-highlight {
@@ -107,7 +107,7 @@
     border-top-color: $ic-color-danger;
     border-bottom-color: $ic-color-danger;
     color:$ic-color-danger;
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 

@@ -48,7 +48,7 @@
   border-top: none;
   font-size: 1em;
   padding: 4px 5px 2px;
-  font-weight: bold;
+  font-weight: 500;
   background-color: #444;
   color: #fff;
   text-align: left;
@@ -56,7 +56,7 @@
     text-transform: uppercase;
     color: black;
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: 500;
     border-bottom: 2px solid black;
     padding-left: 0;
   }
@@ -141,7 +141,7 @@
 
 #grades_summary tr > .assignment_score .grade.changed {
   color: #800;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 #grades_summary th.possible {
@@ -214,7 +214,7 @@
   @media print {
     background-color: transparent;
     &.title {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 }
@@ -223,7 +223,7 @@
   background-color: #666;
   color: #eee;
   font-size: 1.5em;
-  font-weight: bold;
+  font-weight: 500;
   @media print {
     background-color: transparent;
     text-transform: uppercase;
@@ -236,7 +236,7 @@
   td, th[scope=row] {
     background-color: #ccc;
     border-top-width: 0;
-    font-weight: bold;
+    font-weight: 500;
     @media print {
       background-color: transparent;
       border-top-width: 1px;
@@ -338,7 +338,7 @@
 
   td {
     padding-left: 1em;
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 
@@ -391,7 +391,7 @@ $outcome-border: 1px solid #BCC2CA;
 #outcomes {
   h2 {
     font-size: 1.4em;
-    font-weight: bold;
+    font-weight: 500;
   }
   .group {
     border: $outcome-border;
@@ -511,12 +511,12 @@ $outcome-border: 1px solid #BCC2CA;
       }
     }
     .title {
-      font-weight: bold;
+      font-weight: 500;
       h4 {
         padding: 0;
         margin: 0;
         font-size: inherit;
-        font-weight: bold;
+        font-weight: 500;
       }
     }
     .alignment-info {
@@ -618,7 +618,7 @@ $outcome-border: 1px solid #BCC2CA;
   padding: 7px 0;
   .title {
     float: left;
-    font-weight: bold;
+    font-weight: 500;
   }
   .outcome-bar-wrapper {
     float: right;

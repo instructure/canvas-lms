@@ -6,7 +6,7 @@
 .close {
   float: right;
   @include fontSize(20px);
-  font-weight: bold;
+  font-weight: 500;
   line-height: $baseLineHeight;
   color: $black;
   text-shadow: 0 1px 0 rgba(255,255,255,1);

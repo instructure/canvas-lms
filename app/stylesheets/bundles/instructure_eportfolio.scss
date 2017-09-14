@@ -68,7 +68,7 @@ a {
 #edit_page_sidebar {
   .header {
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: 500;
     border-bottom: 1px solid #888;
   }
   ul {
@@ -92,7 +92,7 @@ a {
     }
     .section .section_type_name {
       display: block;
-      font-weight: bold;
+      font-weight: 500;
       font-size: 1.2em;
       position: absolute;
       top: 2px;
@@ -200,7 +200,7 @@ ul.submission_list.instTree li.submission.leaf {
     .attachment {
       font-size: 1.1em;
       .filename {
-        font-weight: bold;
+        font-weight: 500;
         text-decoration: underline;
       }
       img {
@@ -229,7 +229,7 @@ ul.submission_list.instTree li.submission.leaf {
   .section_header {
     border-bottom: 1px solid #888;
     font-size: 1.3em;
-    font-weight: bold;
+    font-weight: 500;
     position: relative;
     .links {
       position: absolute;
@@ -248,7 +248,7 @@ ul.submission_list.instTree li.submission.leaf {
       justify-content: space-between;
     }
     .page.current a {
-      font-weight: bold;
+      font-weight: 500;
     }
     .page a:hover {
       text-decoration: underline;

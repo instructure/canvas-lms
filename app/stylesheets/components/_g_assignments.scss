@@ -59,7 +59,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
     padding: 4px 12px;
     text-shadow: none;
     .name {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 
@@ -158,19 +158,19 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
       }
       a.grade {
         color: #444444;
-        font-weight: bold;
+        font-weight: 500;
         display: inline;
       }
     }
     &.group_assignment_ungraded {
       .assignment_due {
-        font-weight: bold;
+        font-weight: 500;
         color: #888822;
       }
     }
     &.group_assignment_overdue {
       .assignment_due {
-        font-weight: bold;
+        font-weight: 500;
         color: #cc0000;
       }
     }
@@ -189,7 +189,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         margin-left: 30px;
         .title {
           font-size: 1.3em;
-          font-weight: bold;
+          font-weight: 500;
         }
         .course_name {
           font-size: 0.8em;
@@ -247,7 +247,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         @include border-top-radius(3px);
         .group_name {
           font-size: 1.5em;
-          font-weight: bold;
+          font-weight: 500;
         }
         .more_info_brief {
           line-height: 1.7em;
@@ -280,7 +280,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
       }
       &.group_assignment_overdue {
         .assignment_due {
-          font-weight: bold;
+          font-weight: 500;
           color: #cc0000;
         }
       }
@@ -290,7 +290,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         padding: 2px 5px 2px 5px;
         &.assignment_title {
           width: 40%;
-          font-weight: bold;
+          font-weight: 500;
           margin-left: 30px;
           .context_name {
             font-weight: normal;
@@ -315,7 +315,7 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         }
         &.name {
           margin-right: 10px;
-          font-weight: bold;
+          font-weight: 500;
           width: 200px;
         }
         &.move {
@@ -334,11 +334,11 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
     padding: 1px;
   }
   th {
-    font-weight: bold;
+    font-weight: 500;
     border-bottom: 1px solid #888888;
   }
   td.total {
-    font-weight: bold;
+    font-weight: 500;
   }
   tr.group_weight {
     .move {
@@ -377,13 +377,13 @@ table.full_assignment_table {
       font-style: italic;
     }
     &.file_submission {
-      font-weight: bold;
+      font-weight: 500;
       padding-left: 28px;
       background: url(/images/file.png) no-repeat 10px center;
       @include fontSize($ic-font-size--medium);
     }
     &.url_submission {
-      font-weight: bold;
+      font-weight: 500;
       padding-left: 28px;
       background: url(/images/link.png) no-repeat 10px center;
       @include fontSize($ic-font-size--medium);

@@ -215,7 +215,7 @@
   color: #3d454c;
   @include fontSize(16px);
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .ig-text {
@@ -231,7 +231,7 @@
   .ig-header-title {
     text-decoration: none;
     @include fontSize(16px);
-    font-weight: bold;
+    font-weight: 500;
     line-height: 20px;
     margin: auto;
     display: inline-block;
@@ -368,7 +368,7 @@
 .ig-title {
   display: inline-block;
   box-sizing: border-box;
-  font-weight: bold;
+  font-weight: 500;
   padding-right: $ic-sp;
   line-height: $ic-label-line-height;
   margin-bottom: $ic-sp/4;

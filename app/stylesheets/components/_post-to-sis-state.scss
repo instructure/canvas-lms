@@ -27,7 +27,7 @@
   }
 
   &.enabled {
-    font-weight: bold;
+    font-weight: 500;
     @if $use_high_contrast { color: darken($ic-color-success, 4%); }
     @else { color: $ic-color-success; }
   }

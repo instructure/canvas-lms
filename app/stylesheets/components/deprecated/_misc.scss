@@ -55,7 +55,7 @@ a.x-close-link {
   float: right;
   color: black !important;
   @include fontSize(20px);
-  font-weight: bold;
+  font-weight: 500;
   line-height: 13.5px;
   text-shadow: 0 1px 0 white;
   text-decoration: none;
