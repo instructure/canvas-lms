@@ -60,7 +60,7 @@ module FeatureFlags
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag2', self.class.name, self.global_id, feature.to_s].cache_key
+    ['feature_flag3', self.class.name, self.global_id, feature.to_s].cache_key
   end
 
   def feature_flag_cache
