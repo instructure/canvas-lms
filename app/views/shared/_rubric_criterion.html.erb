@@ -107,12 +107,14 @@
                 <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit rating' %></span></a>
                 <a href="#" class="delete_rating_link"><i class="icon-trash standalone-icon" ></i><span class="screenreader-only"><%= t 'Delete rating' %></span></a>
               </div>
+              <div class="clear"></div>
             <% end %>
-            <div class="description rating_description_value"><%= rating.description %></div>
             <span class="nobr">
               <span class="points"><%= n(rating.points) %></span>
               <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
             </span>
+            <div class="description rating_description_value"><%= rating.description %></div>
+            <div class="rating_long_description small_description"><%= rating.long_description %></div>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <% if !learning_outcome_criterion %>
               <div class="editing links add_rating_link">

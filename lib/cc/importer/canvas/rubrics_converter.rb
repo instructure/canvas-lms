@@ -52,6 +52,7 @@ module CC::Importer::Canvas
           c_node.css('rating').each do |rat_node|
             rating = {}
             rating[:description] = get_node_val(rat_node, 'description')
+            rating[:long_description] = get_node_val(rat_node, 'long_description')
             rating[:id] = get_node_val(rat_node, 'id')
             rating[:criterion_id] = get_node_val(rat_node, 'criterion_id')
             rating[:points] = get_float_val(rat_node, 'points')

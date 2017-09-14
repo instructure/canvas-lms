@@ -72,9 +72,12 @@
         </span><%= t('pts') %>
       </div>
       <div>
-        <label class="rating_form_label"><%= t "Rating Description" %>
-          <input type="text" class="rating_description" style="min-width: 100px; width: 90%;" name="description"/>
-        </label>
+        <label for="rating_form_title" class="rating_form_label"><%= t "Rating Title" %></label>
+        <input id="rating_form_title" type="text" class="rating_description" style="width: 90%;" name="description"/>
+      </div>
+      <div>
+        <label for="rating_form_description" class="rating_form_label"><%= t "Rating Description" %></label>
+        <textarea id="rating_form_description" rows="4" style="width: 90%;" class="rating_long_description" name="rating_long_description" form="edit_rating_form"></textarea>
       </div>
       <div class="button-container">
         <button type="button" class="btn button-secondary cancel_button"><%= t "Cancel" %></button>

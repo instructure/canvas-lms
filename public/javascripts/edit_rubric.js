@@ -64,7 +64,7 @@ import 'compiled/jquery/fixDialogButtons'
             pts = numberHelper.parse($this.find(".points").text()),
             $criterion = $this.parents(".criterion"),
             $criterionPoints = $criterion.find(".criterion_points"),
-            data = { description: "Rating Description", min_points: pts },
+            data = { description: "", rating_long_description: "", min_points: pts },
             hasClassAddLeft = $this.hasClass('add_left');
         if($this.hasClass('add_left')) {
           var more_points = numberHelper.parse($this.prev(".rating").find(".points").text());
@@ -330,9 +330,10 @@ import 'compiled/jquery/fixDialogButtons'
         var rating_idx = 0;
         $criterion.find(".rating").each(function() {
           var $rating = $(this);
-          const rating_vals = $rating.getTemplateData({textValues: ['description', 'points', 'rating_id']});
+          const rating_vals = $rating.getTemplateData({textValues: ['description', 'rating_long_description', 'points', 'rating_id']});
           var pre_rating = pre_criterion + "[ratings][" + rating_idx + "]";
           data[pre_rating + "[description]"] = rating_vals.description;
+          data[pre_rating + "[long_description]"] = rating_vals.rating_long_description;
           data[pre_rating + "[points]"] = numberHelper.parse(rating_vals.points);
           data[pre_rating + "[id]"] = rating_vals.rating_id;
           rating_idx++;
@@ -451,6 +452,7 @@ import 'compiled/jquery/fixDialogButtons'
         criterion.ratings.forEach(function(rating) {
           count++;
           rating.rating_id = rating.id;
+          rating.rating_long_description = rating.long_description;
           rating.min_points = 0
           if (count < criterion.ratings.length) {
             rating.min_points = rubricEditing.localizedPoints(criterion.ratings[count].points)
@@ -541,7 +543,7 @@ import 'compiled/jquery/fixDialogButtons'
       event.preventDefault();
       const $criterion = $(this).parents(".criterion");
       const $rating = $(this).parents(".rating");
-      const data = $rating.getTemplateData({textValues: ['description', 'points', 'min_points']});
+      const data = $rating.getTemplateData({textValues: ['description', 'points', 'min_points', 'rating_long_description']});
       const criterion_data = $criterion.getTemplateData({textValues: ['description']});
 
       if(!$rating.parents(".rubric").hasClass('editing')) { return; }
@@ -723,6 +725,7 @@ import 'compiled/jquery/fixDialogButtons'
         rubricEditing.flagInfinitesimalRating($previousRating, use_range);
       }
       rubricEditing.updateCriterionPoints($criterion, true);
+      rubricEditing.originalSizeRatings();
       $rating.removeClass("new_rating");
       $rubric_rating_dialog.dialog('close');
       setTimeout(function() {
@@ -1015,7 +1018,6 @@ import 'compiled/jquery/fixDialogButtons'
       $previousRating.fillTemplateData({data: previous_data})
       event.preventDefault();
       rubricEditing.hideCriterionAdd($(this).parents(".rubric"));
-      $target.focus();
       $(this).parents(".rating").fadeOut(function() {
         const $criterion = $(this).parents(".criterion");
         rubricEditing.flagInfinitesimalRating($previousRating, $criterion.find('.criterion_use_range').attr('checked'))

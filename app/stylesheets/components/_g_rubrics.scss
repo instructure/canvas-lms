@@ -41,6 +41,10 @@
     float: right;
     text-align: right;
   }
+  .small_description {
+    font-style: italic;
+    margin-top: .5rem;
+  }
 
   &.editing {
     tr.criterion .links {
@@ -115,7 +119,6 @@
       position: relative;
       font-size: 0.9em;
       display: table;
-      height: 100%;
       width: 100%;
     }
     .description_content {
@@ -266,6 +269,9 @@
       border-right: 0;
     }
     tr.criterion td.criterion_description {
+      .container {
+        height: 100%;
+      }
       .long_description_holder {
         font-size: 0.8em;
         font-weight: bold;
@@ -354,6 +360,7 @@
 
 #edit_rating_form div{
   margin-top: 30px;
+  width: 100%;
 }
 .rating_form_label {
   font-size: 1rem;

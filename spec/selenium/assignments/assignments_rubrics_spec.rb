@@ -307,6 +307,7 @@ describe "assignment rubrics" do
       expect(f('.total_points_holder .assessing')).to include_text "out of 5"
       f("#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
       expect(f('.rubric_total')).to include_text "5"
+      scroll_into_view('.save_rubric_button')
       f('.save_rubric_button').click
       expect(f('.grading_value')).to have_attribute(:value, '5')
     end
@@ -371,6 +372,27 @@ describe "assignment rubrics" do
 
       f("#rubric_#{@rubric.id} .edit_rubric_link").click
       expect(is_checked(".grading_rubric_checkbox:visible")).to be_truthy
+    end
+
+    it "allows user to set a long description", priority: "1", test_id: 220341 do
+      assignment_with_editable_rubric(10, 'Assignment Rubric')
+
+      get "/courses/#{@assignment.course.id}/assignments/#{@assignment.id}"
+
+      f('.rubric_title .icon-edit').click
+      wait_for_ajaximations
+
+      hover_and_click('.criterion:nth-of-type(1) tbody tr td:nth-of-type(1) .edit_rating_link')
+      wait_for_ajaximations
+
+      set_value(f('#edit_rating_form .rating_long_description'), 'long description')
+
+      f('.ui-dialog-buttonset .save_button').click
+      wait_for_ajaximations
+      submit_form('#edit_rubric_form')
+      wait_for_ajaximations
+
+      expect(fj('.criterion:visible .rating_long_description')).to include_text "long description"
     end
 
     context "ranged ratings" do
