@@ -45,11 +45,10 @@ export default React.createClass({
     displayName: 'ExternalToolPlacementButton',
 
     componentDidUpdate: function() {
-      var _this = this;
+      const _this = this;
       window.requestAnimationFrame(function() {
-        var node = document.getElementById('close' + _this.state.tool.name);
-        if (node) {
-          node.focus();
+        if (_this.refs.closex) {
+          _this.refs.closex.focus();
         }
       });
     },
@@ -144,7 +143,7 @@ export default React.createClass({
                 <h4 tabIndex="-1">{I18n.t('App Placements')}</h4>
               </div>
               <div className="ReactModal__Header-Actions">
-                <button  className="Button Button--icon-action" type="button"  onClick={this.closeModal} >
+                <button  className="Button Button--icon-action" type="button" ref='closex'  onClick={this.closeModal} >
                   <i className="icon-x"></i>
                   <span className="screenreader-only">Close</span>
                 </button>
