@@ -58,6 +58,7 @@ class WikiPage < ActiveRecord::Base
         # major risk of breaking links in the courses. I
         # am thus going to leave that manual - adr
         # page.title = title
+        page.is_content_library_sync = true
         page.save
       end
     end
@@ -67,6 +68,7 @@ class WikiPage < ActiveRecord::Base
   before_create :clone_from_master_bank
   def clone_from_master_bank
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
+      self.is_content_library_sync = true
       master = WikiPage.find(self.clone_of_id)
       # Look for links to other pages / assignments in the Content Library and update those
       # to have placeholders that Javascript can replace with the current course ID on load.
@@ -80,6 +82,17 @@ class WikiPage < ActiveRecord::Base
        # see above
       # self.title = master.title
     end
+  end
+
+  # Set to true if the update of this page is running for a content library sync to prevent
+  # some default logic from running
+  def is_content_library_sync=(val)
+    @content_library_sync = Canvas::Plugin.value_to_boolean(val)
+  end
+
+  after_save :remove_content_library_sync_flag
+  def remove_content_library_sync_flag
+    @content_library_sync = false
   end
 
   belongs_to :wiki, :touch => true
