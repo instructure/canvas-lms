@@ -123,7 +123,9 @@ define [
           errorReducer = (errorString, currentError) ->
             errorString += currentError.message
 
-          message = if errors.base
+          message = if _.isString(errors.base)
+            errors.base
+          else if _.isArray(errors.base)
             errors.base.reduce(errorReducer, '')
           else
             I18n.t('Your profile photo could not be uploaded. You may have exceeded your upload limit.')
@@ -131,7 +133,7 @@ define [
           $.flashError(message)
           @enableSelectButton()
 
-    preflightRequest: ->
+    preflightRequest: =>
       $.post('/files/pending', {
         name: 'profile.jpg'
         format: 'text'
@@ -140,15 +142,12 @@ define [
         'attachment[folder_id]': ENV.folder_id
         'attachment[filename]': 'profile.jpg'
         'attachment[context_code]': 'user_'+ENV.current_user_id
-      })
+      }).fail((xhr) => @handleErrorUpdating(xhr.responseText))
 
     onPreflight: (image, response) =>
-      @handleErrorUpdating(response[0].responseText)
       @image = image
       preflightResponse = response[0]
       @postAvatar(preflightResponse).then(_.partial(@onPostAvatar, preflightResponse))
-
-
 
     postAvatar: (preflightResponse) =>
       image = @image
