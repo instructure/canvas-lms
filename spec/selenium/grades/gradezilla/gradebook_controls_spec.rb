@@ -96,6 +96,17 @@ describe 'Gradebook Controls' do
       expect(Gradezilla.content_selector).not_to contain_css('.assignment-name')
     end
   end
+
+  context 'using Actions dropdown' do
+
+    it 'navigates to upload page', test_id: 3265129, priority: '1' do
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
+      Gradezilla.action_menu_item_selector("import").click
+
+      expect(driver.current_url).to include "courses/#{@course.id}/gradebook_upload/new"
+    end
+  end
 end
 
 
