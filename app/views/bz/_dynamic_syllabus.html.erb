@@ -73,6 +73,7 @@
           icon = 'document'
           # need the page for the direct link
           page = @course.wiki_pages.active.where(:title => disp_name).first
+          next if page.nil?
           # need the module for the unlock date
           mod = @course.context_modules.active.where(:name => disp_name).first
           link = "/courses/#{@course.id}/pages/#{page.url}"
