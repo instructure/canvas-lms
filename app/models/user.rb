@@ -1595,9 +1595,9 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").distinct.select(:assignment_id)).
-        preload(:context).
-        need_grading_info
+        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").
+          where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
+        preload(:context)
       if options[:scope_only]
         scope # Also need to check the rights like below
       else
