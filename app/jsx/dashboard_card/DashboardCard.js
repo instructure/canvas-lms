@@ -23,6 +23,8 @@ import I18n from 'i18n!dashcards'
 import DashboardCardAction from './DashboardCardAction'
 import DashboardColorPicker from './DashboardColorPicker'
 import CourseActivitySummaryStore from './CourseActivitySummaryStore'
+import CourseProgressStore from './CourseProgressStore'
+
 import DashboardCardMovementMenu from './DashboardCardMovementMenu'
 
 export default class DashboardCard extends Component {
@@ -75,7 +77,8 @@ export default class DashboardCard extends Component {
 
     this.state = _.extend(
       { nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id) },
-      CourseActivitySummaryStore.getStateForCourse(props.id)
+      CourseActivitySummaryStore.getStateForCourse(props.id),
+      CourseProgressStore.getStateForCourse(props.id)
     )
   }
 
@@ -85,11 +88,13 @@ export default class DashboardCard extends Component {
 
   componentDidMount () {
     CourseActivitySummaryStore.addChangeListener(this.handleStoreChange)
+    CourseProgressStore.addChangeListener(this.handleStoreChange)
     this.parentNode = this.cardDiv
   }
 
   componentWillUnmount () {
     CourseActivitySummaryStore.removeChangeListener(this.handleStoreChange)
+    CourseProgressStore.removeChangeListener(this.handleStoreChange)
   }
 
   // ===============
@@ -108,6 +113,9 @@ export default class DashboardCard extends Component {
   handleStoreChange = () => {
     this.setState(
       CourseActivitySummaryStore.getStateForCourse(this.props.id)
+    );
+    this.setState(
+      CourseProgressStore.getStateForCourse(this.props.id)
     );
   }
 
@@ -204,6 +212,7 @@ export default class DashboardCard extends Component {
         return (
           <DashboardCardAction
             unreadCount={this.unreadCount(link.icon, this.state.stream)}
+            progress={this.state.progress}
             iconClass={link.icon}
             linkClass={link.css_class}
             path={link.path}
@@ -279,6 +288,7 @@ export default class DashboardCard extends Component {
   }
 
   render () {
+    let courseProgress = ["30%", "78%", "12%"]
     const dashboardCard = (
       <div
         className="ic-DashboardCard"
@@ -297,6 +307,9 @@ export default class DashboardCard extends Component {
           </span>
           {this.renderHeaderHero()}
           <a href={this.props.href} className="ic-DashboardCard__link">
+            <div className="sm-DashboardCard__course_grade">
+              {"B+"}
+            </div>
             <div
               className="ic-DashboardCard__header_content"
               style={{height: (this.props.term ? '75px' : '65px')}}
@@ -335,6 +348,9 @@ export default class DashboardCard extends Component {
         >
           { this.linksForCard() }
         </nav>
+        <div className="sm-DashboardCard__progress-container">
+          <div className="sm-DashboardCard__progress-container_progress-meter" style={{width: courseProgress[2], backgroundColor: this.props.backgroundColor}}/>
+        </div>
         { this.colorPickerIfEditing() }
       </div>
     );
@@ -343,7 +359,7 @@ export default class DashboardCard extends Component {
       const { connectDragSource, connectDropTarget } = this.props;
       return connectDragSource(connectDropTarget(dashboardCard));
     }
-
+    console.log("This is", this);
     return dashboardCard;
   }
 }
