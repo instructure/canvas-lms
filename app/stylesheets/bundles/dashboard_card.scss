@@ -102,16 +102,19 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   position: absolute;
   padding: 10px;
   background-color: #FFF;
-  left: 216px;
-  top: -19px;
+  left: 198px;
+  top: -31px;
   border-radius: 50%;
-  width: 15px;
-  height: 15px;
+  width: 38px;
+  height: 29px;
   @include fontSize(14px);
-  line-height: 14px;
+  line-height: 32px;
   color: var(--ic-brand-primary);
   font-weight: 500;
   z-index: 1000;
+  text-align: center;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 
 .ic-DashboardCard__header_content {
