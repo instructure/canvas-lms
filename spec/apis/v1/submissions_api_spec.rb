@@ -3369,7 +3369,10 @@ describe 'Submissions API', type: :request do
         a1 = attachment_model(:context => @user)
         a2 = attachment_model(:context => @user)
         json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
-        expect(json['attachments'].map { |a| a['url'] }).to eq [ file_download_url(a1, :verifier => a1.uuid, :download => '1', :download_frd => '1'), file_download_url(a2, :verifier => a2.uuid, :download => '1', :download_frd => '1') ]
+        sub_a1 = Attachment.where(:root_attachment_id => a1).first
+        sub_a2 = Attachment.where(:root_attachment_id => a2).first
+        expect(json['attachments'].map { |a| a['url'] }).to eq [ file_download_url(sub_a1, :verifier => sub_a1.uuid, :download => '1', :download_frd => '1'),
+          file_download_url(sub_a2, :verifier => sub_a2.uuid, :download => '1', :download_frd => '1') ]
       end
 
       it "creates a media comment submission" do
@@ -3383,7 +3386,6 @@ describe 'Submissions API', type: :request do
       end
 
       it "copys files to the submissions folder if they're not there already" do
-        @course.root_account.enable_feature! :submissions_folder
         @assignment.update_attributes(:submission_types => 'online_upload')
         a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
         a2 = attachment_model(:context => @user)
@@ -3426,16 +3428,10 @@ describe 'Submissions API', type: :request do
                         { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })
       end
 
-      it "uploads to a student's Submissions folder if the feature is enabled" do
-        @course.root_account.enable_feature! :submissions_folder
+      it "uploads to a student's Submissions folder" do
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         f = Attachment.last.folder
         expect(f.submission_context_code).to eq @course.asset_string
-      end
-
-      it "does not do so otherwise" do
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
-        expect(Attachment.last.folder).not_to be_for_submissions
       end
     end
 

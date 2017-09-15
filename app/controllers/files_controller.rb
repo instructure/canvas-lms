@@ -704,8 +704,7 @@ class FilesController < ApplicationController
           @folder = @context.folders.active.where(id: params[:attachment][:folder_id]).first
           return unless authorized_action(@folder, @current_user, :manage_contents)
         end
-        if intent == 'submit' && context.respond_to?(:submissions_folder) &&
-            @asset && @asset.context.root_account.feature_enabled?(:submissions_folder)
+        if intent == 'submit' && context.respond_to?(:submissions_folder) && @asset
           @folder ||= @context.submissions_folder(@asset.context)
         end
         @folder ||= Folder.unfiled_folder(@context)

@@ -165,7 +165,7 @@ module Api::V1::Attachment
     end
     if @attachment.folder
       return unless authorized_action(@attachment.folder, @current_user, :manage_contents)
-    elsif opts[:submission_context] && opts[:submission_context].root_account.feature_enabled?(:submissions_folder)
+    elsif opts[:submission_context]
       @attachment.folder = context.submissions_folder(opts[:submission_context]) if context.respond_to?(:submissions_folder)
     end
     duplicate_handling = check_duplicate_handling_option(params)

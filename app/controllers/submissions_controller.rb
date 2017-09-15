@@ -248,10 +248,7 @@ class SubmissionsController < ApplicationController
       :body, :url, :submission_type, :comment, :group_comment,
       :media_comment_type, :media_comment_id, :attachment_ids => []
     )
-    submission_params[:attachments] = params[:submission][:attachments].compact.uniq
-    if @context.root_account.feature_enabled?(:submissions_folder)
-      submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, submission_params[:attachments])
-    end
+    submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
 
     begin
       @submission = @assignment.submit_homework(@current_user, submission_params)
