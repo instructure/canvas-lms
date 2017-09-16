@@ -36,5 +36,11 @@ describe Account::HelpLinks do
       expect(translated.last[:subtext]).to be_a(Proc)
       expect(translated.last[:available_to]).to eq ['user']
     end
+
+    it 'does not choke on links with nil id' do
+      links = [{ type: 'default', text: 'bob', available_to: ['user'] }]
+      translated = Account::HelpLinks.map_default_links(links)
+      expect(translated.first).to eq({ type: 'default', text: 'bob', available_to: ['user'] })
+    end
   end
 end
