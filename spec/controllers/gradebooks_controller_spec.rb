@@ -572,6 +572,10 @@ describe GradebooksController do
             @course.enable_feature!(:new_gradebook)
           end
 
+          after(:each) do
+            ENV.delete("GRADEBOOK_DEVELOPMENT")
+          end
+
           let(:assignment) do
             @course.assignments.create!(
               due_at: 3.days.ago,
@@ -590,11 +594,19 @@ describe GradebooksController do
             expect(gradebook_options).to have_key :graded_late_or_missing_submissions_exist
           end
 
-          it "is true if graded late submissions exist" do
+          it "is true if graded late submissions exist and the development flag is on" do
+            ENV["GRADEBOOK_DEVELOPMENT"] = "true"
             assignment.submit_homework(@student, body: "a body")
             assignment.grade_student(@student, grader: @teacher, grade: 8)
             get :show, params: {course_id: @course.id}
             expect(graded_late_or_missing_submissions_exist).to be true
+          end
+
+          it "is false if graded late submissions exist and the development flag is off" do
+            assignment.submit_homework(@student, body: "a body")
+            assignment.grade_student(@student, grader: @teacher, grade: 8)
+            get :show, params: {course_id: @course.id}
+            expect(graded_late_or_missing_submissions_exist).to be false
           end
 
           it "is false if late submissions exist, but they are not graded" do
@@ -603,10 +615,17 @@ describe GradebooksController do
             expect(graded_late_or_missing_submissions_exist).to be false
           end
 
-          it "is true if graded missing submissions exist" do
+          it "is true if graded missing submissions exist and the development flag is on" do
+            ENV["GRADEBOOK_DEVELOPMENT"] = "true"
             assignment.grade_student(@student, grader: @teacher, grade: 8)
             get :show, params: {course_id: @course.id}
             expect(graded_late_or_missing_submissions_exist).to be true
+          end
+
+          it "is false if graded missing submissions exist and the development flag is off" do
+            assignment.grade_student(@student, grader: @teacher, grade: 8)
+            get :show, params: {course_id: @course.id}
+            expect(graded_late_or_missing_submissions_exist).to be false
           end
 
           it "is false if missing submissions exist, but they are not graded" do

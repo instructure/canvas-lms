@@ -110,8 +110,9 @@ module LoginAndSessionMethods
   end
 
   def masquerade_as(user)
-    get "/users/#{user.id}/masquerade"
-    f('.masquerade_button').click
+    masquerade_url = "/users/#{user.id}/masquerade"
+    get masquerade_url
+    f('a[href="' + masquerade_url + '"]').click
   end
 
   def displayed_username

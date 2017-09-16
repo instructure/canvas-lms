@@ -33,10 +33,22 @@ define [
       'click .delete_collaboration_link': 'onDelete'
       'keyclick .delete_collaboration_link': 'onDelete'
       'click .cancel_button': 'onCloseForm'
+      'focus .before_external_content_info_alert': 'handleAlertFocus'
+      'focus .after_external_content_info_alert': 'handleAlertFocus'
+      'blur .before_external_content_info_alert': 'handleAlertBlur'
+      'blur .after_external_content_info_alert': 'handleAlertBlur'
 
     initialize: ->
       super
       @id = @$el.data('id')
+
+    handleAlertFocus: (e) ->
+      $(e.target).removeClass('screenreader-only')
+      @$el.find('iframe').addClass('info_alert_outline')
+
+    handleAlertBlur: (e) =>
+      $(e.target).addClass('screenreader-only')
+      @$el.find('iframe').removeClass('info_alert_outline')
 
     # Internal: Create collaboration edit form HTML.
     #

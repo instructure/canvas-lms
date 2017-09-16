@@ -263,12 +263,20 @@ class SubmissionsApiController < ApplicationController
   #   If this argument is present, the response will be grouped by student,
   #   rather than a flat array of submissions.
   #
+  # @argument post_to_sis [Boolean]
+  #   If this argument is set to true, the response will only include
+  #   assignments that have the post_to_sis flag set to true.
+  #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
   #   (Requires grading periods to exist on the account)
   #
   # @argument workflow_state [String, "submitted"|"unsubmitted"|"graded"|"pending_review"]
   #   The current status of the submission
+  #
+  # @argument enrollment_state [String, "active"|"concluded"|]
+  #   The current state of the enrollments. If omitted will include all
+  #   enrollments that are not deleted.
   #
   # @argument order [String, "id"|"graded_at"]
   #   The order submissions will be returned in.  Defaults to "id".  Doesn't
@@ -334,10 +342,10 @@ class SubmissionsApiController < ApplicationController
       if all
         student_ids = allowed_student_ids
       else
-        # if any student_ids exist that the current_user shouldnt have access to, return an error
+        # if any student_ids exist that the current_user shouldn't have access to, return an error
         # (student looking at other students, observer looking at student out of their scope)
         inaccessible_students = student_ids - allowed_student_ids
-        return render_unauthorized_action if !inaccessible_students.empty?
+        return render_unauthorized_action unless inaccessible_students.empty?
       end
     end
 
@@ -345,9 +353,21 @@ class SubmissionsApiController < ApplicationController
       return render json: { error: 'too many students' }, status: 400
     end
 
+    if (enrollment_state = params[:enrollment_state].presence)
+      case enrollment_state
+      when 'active'
+        student_ids = @context.all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
+      when 'concluded'
+        student_ids = @context.all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
+      else
+        return render json: {error: 'invalid enrollment_state'}, status: :bad_request
+      end
+    end
+
     includes = Array(params[:include])
 
     assignment_scope = @context.assignments.published
+    assignment_scope = assignment_scope.where(post_to_sis: true) if value_to_boolean(params[:post_to_sis])
     requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
     if requested_assignment_ids.present?
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
@@ -377,20 +397,7 @@ class SubmissionsApiController < ApplicationController
         eager_load(:user => :pseudonyms).
         where("users.id" => student_ids)
 
-      submissions_scope = if requested_assignment_ids.present?
-                            Submission.active.where(
-                              :user_id => student_ids,
-                              :assignment_id => assignments
-                            )
-                          else
-                            Submission.active.joins(:assignment).where(
-                              :user_id => student_ids,
-                              "assignments.context_type" => @context.class.name,
-                              "assignments.context_id" => @context.id
-                            ).where(
-                              "assignments.workflow_state != 'deleted'"
-                            )
-                          end
+      submissions_scope = Submission.active.where(user_id: student_ids, assignment_id: assignments)
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
@@ -444,7 +451,7 @@ class SubmissionsApiController < ApplicationController
       order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
       order = "#{order_by} #{order_direction}"
       submissions = @context.submissions.except(:order).where(user_id: student_ids).order(order)
-      submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
+      submissions = submissions.where(:assignment_id => assignments)
       submissions = submissions.where(:workflow_state => params[:workflow_state]) if params[:workflow_state].present?
       submissions = submissions.preload(:user, :originality_reports)
 
@@ -681,8 +688,8 @@ class SubmissionsApiController < ApplicationController
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
       end
-      if submission.key?(:late_policy_status)
-        @submission.late_policy_status = submission[:late_policy_status]
+      if submission.key?(:late_policy_status) || submission.key?(:seconds_late_override)
+        @submission.late_policy_status = submission[:late_policy_status] if submission.key?(:late_policy_status)
         if @submission.late_policy_status == 'late' && submission[:seconds_late_override].present?
           @submission.seconds_late_override = submission[:seconds_late_override]
         end

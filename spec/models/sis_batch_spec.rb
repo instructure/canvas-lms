@@ -361,6 +361,19 @@ s2,test_1,section2,active},
       expect(@c1.reload).to be_available
     end
 
+    it "shouldn't do batch mode when there is not batch data types" do
+      @term = @account.enrollment_terms.first
+      @term.update_attribute(:sis_source_id, 'term_1')
+      @previous_batch = @account.sis_batches.create!
+
+      batch = create_csv_data([%{user_id,login_id,status
+                                 user_1,user_1,active}])
+      batch.update_attributes(batch_mode: true, batch_mode_term: @term)
+      expect(batch).to receive(:remove_previous_imports).once
+      expect(batch).to receive(:non_batch_courses_scope).never
+      batch.process_without_send_later
+    end
+
     it "should only do batch mode removals for supplied data types" do
       @term = @account.enrollment_terms.first
       @term.update_attribute(:sis_source_id, 'term_1')
@@ -478,14 +491,14 @@ s2,test_1,section2,active},
   it "should write all warnings/errors to a file and cleanup temp files" do
     Setting.set('sis_batch_max_messages', '3')
     batch = @account.sis_batches.create!
-    5.times do |i|
+    4.times do |i|
       batch.add_warnings([['testfile.csv', "test warning#{i}"]])
       batch.add_warnings([['testfile.csv', "test error#{i}"]])
     end
     batch.finish(false)
     error_file = batch.errors_attachment.reload
     expect(error_file.display_name).to eq "sis_errors_attachment_#{batch.id}.csv"
-    expect(CSV.parse(error_file.open).map.to_a.size).to eq 10
+    expect(CSV.parse(error_file.open).map.to_a.size).to eq 8
     expect(Attachment.where(context: batch).count).to eq 1
     expect(Attachment.where(context: batch, id: batch.errors_attachment_id).count).to eq 1
   end
@@ -592,6 +605,34 @@ test_1,test_a,course
       expect(course1.reload.sis_batch_id).to eq b1.id
       expect(b1.processing_errors).to eq []
       expect(b1.processing_warnings).to eq []
+    end
+
+    it 'should set batch_ids on admins' do
+      u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+      a1 = @account.account_users.create!(user_id: u1.id)
+      b1 = process_csv_data([
+%{user_id,account_id,role,status
+U001,,AccountAdmin,active
+}])
+      expect(a1.reload.sis_batch_id).to eq b1.id
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq []
+    end
+
+    it 'should not allow removing import admin with sis import' do
+      user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+      b1 = process_csv_data([%{user_id,account_id,role,status
+                               U001,,AccountAdmin,deleted}])
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq [["csv_0.csv", "Can't remove yourself user_id 'U001'"]]
+    end
+
+    it 'should not allow removing import admin user with sis import' do
+      p = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001').pseudonym
+      b1 = process_csv_data([%{user_id,login_id,status
+                               U001,#{p.unique_id},deleted}])
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq [["csv_0.csv", "Can't remove yourself user_id 'U001'"]]
     end
 
     describe 'change_threshold in batch mode' do

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import Columns from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Columns';
 import Events from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Events';
 import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
 import Navigation from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Navigation';
@@ -30,12 +31,14 @@ export default class GridSupport {
     this.events = new Events();
     this.helper = new GridHelper(grid);
 
+    this.columns = new Columns(grid, this);
     this.state = new State(grid, this);
     this.navigation = new Navigation(grid, this);
     this.style = new Style(grid, this);
   }
 
   initialize () {
+    this.columns.initialize();
     this.state.initialize();
     this.navigation.initialize();
     this.style.initialize();

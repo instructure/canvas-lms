@@ -89,9 +89,9 @@ describe Course do
 
       # wiki pages tests
       migration_ids = ["1865116206002", "1865116207002"].sort
-      added_migration_ids = @course.wiki.wiki_pages.map(&:migration_id).uniq.sort
+      added_migration_ids = @course.wiki_pages.map(&:migration_id).uniq.sort
       expect(added_migration_ids).to eq(migration_ids)
-      expect(@course.wiki.wiki_pages.length).to eq(migration_ids.length)
+      expect(@course.wiki_pages.length).to eq(migration_ids.length)
       # front page
       page = @course.wiki.front_page
       expect(page).not_to be_nil
@@ -368,6 +368,24 @@ describe Course do
 
   it 'should be able to i18n without keys' do
     expect { Importers::CourseContentImporter.translate('stuff') }.not_to raise_error
+  end
+
+  it "shouldn't create missing link migration issues if the link got sanitized away" do
+    data = {:assignments => [
+      {:migration_id => "broken", :description => "heres a normal bad link <a href='/badness'>blah</a>"},
+      {:migration_id => "kindabroken", :description => "here's a link that's going to go away in a bit <link rel=\"stylesheet\" href=\"/badness\"/>"}
+    ]}.with_indifferent_access
+
+    course_factory
+    migration = @course.content_migrations.create!
+    Importers::CourseContentImporter.import_content(@course, data, {}, migration)
+
+    broken_assmt = @course.assignments.where(:migration_id => "broken").first
+    unbroken_assmt = @course.assignments.where(:migration_id => "kindabroken").first
+    expect(unbroken_assmt.description).to_not include("stylesheet")
+
+    expect(migration.migration_issues.count).to eq 1 # should ignore the sanitized one
+    expect(migration.migration_issues.first.fix_issue_html_url).to eq "/courses/#{@course.id}/assignments/#{broken_assmt.id}"
   end
 end
 

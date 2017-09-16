@@ -100,6 +100,10 @@ class Submission < ActiveRecord::Base
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :with_comments, -> { preload(:submission_comments) }
+  scope :unread_for, -> (user_id) do
+    joins(:content_participations).
+    where(user_id: user_id, content_participations: {workflow_state: 'unread', user_id: user_id})
+  end
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
   scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
@@ -1159,6 +1163,12 @@ class Submission < ActiveRecord::Base
     end
 
     self.seconds_late_override = nil unless late_policy_status == 'late'
+    if self.excused_changed? && self.excused
+      self.late_policy_status = nil
+      self.seconds_late_override = nil
+    elsif self.late_policy_status_changed? && self.late_policy_status.present?
+      self.excused = false
+    end
     self.submitted_at ||= Time.now if self.has_submission?
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
@@ -1279,21 +1289,26 @@ class Submission < ActiveRecord::Base
     return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission?
     late_policy ||= incoming_assignment.course.late_policy
     return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
-    score_late_or_none(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if score
+    score_late_or_none(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type)
   end
 
   def score_missing(late_policy, points_possible, grading_type)
-    return unless late_policy&.missing_submission_deduction_enabled
-    self.points_deducted = nil
-    self.score = late_policy.points_for_missing(points_possible, grading_type)
+    if self.points_deducted.present?
+      self.score = entered_score unless score_changed?
+      self.points_deducted = nil
+    end
+
+    if late_policy&.missing_submission_deduction_enabled && self.score.nil?
+      self.score = late_policy.points_for_missing(points_possible, grading_type)
+    end
   end
   private :score_missing
 
   def score_late_or_none(late_policy, points_possible, grading_type)
-    raw_score = score_changed? ? score : entered_score
+    raw_score = score_changed? || @regraded ? score : entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
-    new_score = raw_score - deducted
-    self.points_deducted = deducted
+    new_score = raw_score && raw_score - deducted
+    self.points_deducted = late? ? deducted : nil
     self.score = new_score
   end
   private :score_late_or_none
@@ -1308,7 +1323,7 @@ class Submission < ActiveRecord::Base
   end
 
   def late_points_deducted(raw_score, late_policy, points_possible, grading_type)
-    return 0 unless late_policy && late?
+    return 0 unless raw_score && late_policy && late?
 
     late_policy.points_deducted(
       score: raw_score, possible: points_possible, late_for: seconds_late, grading_type: grading_type
@@ -1317,7 +1332,8 @@ class Submission < ActiveRecord::Base
   private :late_points_deducted
 
   def late_policy_relevant_changes?
-    return false unless grade_matches_current_submission
+    return true if @regraded
+    return false if grade_matches_current_submission == false # nil is treated as true
     changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status).any?
   end
   private :late_policy_relevant_changes?
@@ -1507,7 +1523,7 @@ class Submission < ActiveRecord::Base
     end
 
     attachments_by_submission = submissions.map do |s|
-      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.uniq]
+      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq]
     end
     Hash[attachments_by_submission]
   end
@@ -1968,7 +1984,6 @@ class Submission < ActiveRecord::Base
 
     def seconds_late
       return (seconds_late_override || 0) if late_policy_status == 'late'
-      return 0 if ['none', 'missing'].include?(late_policy_status)
       return 0 if cached_due_date.nil? || time_of_submission <= cached_due_date
 
       (time_of_submission - cached_due_date).to_i
@@ -2144,6 +2159,14 @@ class Submission < ActiveRecord::Base
 
   def unread?(current_user)
     !read?(current_user)
+  end
+
+  def mark_read(current_user)
+    change_read_state("read", current_user)
+  end
+
+  def mark_unread(current_user)
+    change_read_state("unread", current_user)
   end
 
   def change_read_state(new_state, current_user)

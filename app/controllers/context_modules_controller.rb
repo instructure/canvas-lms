@@ -60,7 +60,7 @@ class ContextModulesController < ApplicationController
 
       modules_cache_key
 
-      @is_cyoe_on = ConditionalRelease::Service.enabled_in_context?(@context)
+      @is_cyoe_on = @current_user && ConditionalRelease::Service.enabled_in_context?(@context)
       if allow_web_export_download?
         @allow_web_export_download = true
         @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last

@@ -143,16 +143,22 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(DelayedMessageScrubber, :scrub)
   end
 
-  if BounceNotificationProcessor.enabled?
-    Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
-      BounceNotificationProcessor.process
-    end
+  Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
+    DatabaseServer.send_in_each_region(
+      BounceNotificationProcessor,
+      :process,
+      { run_current_region_asynchronously: true,
+        singleton: 'BounceNotificationProcessor.process' }
+    )
   end
 
-  if NotificationFailureProcessor.enabled?
-    Delayed::Periodic.cron 'NotificationFailureProcessor.process', '*/5 * * * *' do
-      NotificationFailureProcessor.process
-    end
+  Delayed::Periodic.cron 'NotificationFailureProcessor.process', '*/5 * * * *' do
+    DatabaseServer.send_in_each_region(
+      NotificationFailureProcessor,
+      :process,
+      { run_current_region_asynchronously: true,
+        singleton: 'NotificationFailureProcessor.process' }
+    )
   end
 
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
@@ -169,10 +175,12 @@ Rails.configuration.after_initialize do
                                   :refresh_providers)
     end
 
-    Delayed::Periodic.cron 'AccountAuthorizationConfig::SAML::InCommon.refresh_providers', '45 0 * * *' do
-      DatabaseServer.send_in_each_region(AccountAuthorizationConfig::SAML::InCommon,
-                                  :refresh_providers,
-                                  singleton: 'AccountAuthorizationConfig::SAML::InCommon.refresh_providers')
+    AccountAuthorizationConfig::SAML::Federation.descendants.each do |federation|
+      Delayed::Periodic.cron "AccountAuthorizationConfig::SAML::#{federation.class_name}.refresh_providers", '45 0 * * *' do
+        DatabaseServer.send_in_each_region(federation,
+                                    :refresh_providers,
+                                    singleton: "AccountAuthorizationConfig::SAML::#{federation.class_name}.refresh_providers")
+      end
     end
   end
 

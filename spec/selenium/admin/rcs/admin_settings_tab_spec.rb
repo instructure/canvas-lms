@@ -418,7 +418,8 @@ describe "admin settings tab" do
 
       help_links = Account.default.help_links
       expect(help_links).to include(help_link.merge(:type => "custom"))
-      expect(help_links & Account::HelpLinks.default_links).to eq Account::HelpLinks.default_links
+      expect(help_links & Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links)).to eq(
+                                                                                                       Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links))
 
       get "/accounts/#{Account.default.id}/settings"
 
@@ -429,9 +430,9 @@ describe "admin settings tab" do
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links).to_not include(Account::HelpLinks.default_links.first)
-      expect(new_help_links).to include(Account::HelpLinks.default_links.last)
-      expect(new_help_links).to include(help_link.merge(:type => "custom"))
+      expect(new_help_links.map { |x| x[:id] }).to_not include(Account::HelpLinks.default_links.first[:id].to_s)
+      expect(new_help_links.map { |x| x[:id] }).to include(Account::HelpLinks.default_links.last[:id].to_s)
+      expect(new_help_links.last).to include(help_link)
     end
 
     it "adds a custom link" do
@@ -449,7 +450,7 @@ describe "admin settings tab" do
         hl_indifferent = HashWithIndifferentAccess.new(hl)
         hl_indifferent['url'] == 'https://url.example.com'
       end
-      expect(cl).to eq({"text"=>"text", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin"]})
+      expect(cl).to include({"text"=>"text", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin"]})
     end
 
     it "edits a custom link" do

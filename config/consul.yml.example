@@ -9,40 +9,8 @@ test:
   host: test.domain
   port: 8500
   ssl: false
-  init_values_without_env:
-    canvas:
-      signing-secret: astringthatisactually32byteslong
-      encryption-secret: astringthatisactually32byteslong
-    rich-content-service:
-      app-host: rce.docker
-      cdn-host: rce.docker
-    address-book:
-      app-host: http://address-book.docker
-      secret: opensesame
-    live-events-subscription-service:
-      app-host: http://les.docker
-      sad-panda: null
 development:
   environment: "dev"
   host: dev.domain
   port: 8500
   ssl: false
-  init_values_without_env:
-    canvas:
-      signing-secret: astringthatisactually32byteslong
-      encryption-secret: astringthatisactually32byteslong
-    rich-content-service:
-      app-host: rce.docker
-    address-book:
-      app-host: http://address-book.docker
-      secret: opensesame
-    live-events-subscription-service:
-      app-host: http://les.docker
-    live-events:
-      aws_endpoint: http://localhost:4567 # assumes kinesalite is running locally
-      kinesis_stream_name: live-events
-  init_values:
-    math-man:
-      base_url: 'http://mathman.docker'
-      use_for_svg: 'false'
-      use_for_mml: 'false'

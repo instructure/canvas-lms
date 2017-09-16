@@ -60,7 +60,11 @@ describe NotificationFailureProcessor do
           error: 'Error from SNS system'
         }
       ])
-      nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
+      nfp = NotificationFailureProcessor.new
+      allow(NotificationFailureProcessor).to receive(:config).and_return({
+        access_key: 'key',
+        secret_access_key: 'secret'
+      })
       allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
       nfp.process
 
@@ -99,7 +103,11 @@ describe NotificationFailureProcessor do
           error: 'EndpointDisabled: Endpoint is disabled'
         },
       ])
-      nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
+      nfp = NotificationFailureProcessor.new
+      allow(NotificationFailureProcessor).to receive(:config).and_return({
+        access_key: 'key',
+        secret_access_key: 'secret'
+      })
       allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
 
       expect(sns_client).to receive(:delete_endpoint).with(endpoint_arn: bad_arn)
@@ -118,7 +126,11 @@ describe NotificationFailureProcessor do
           error: 'error'
         },
       ])
-      nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
+      nfp = NotificationFailureProcessor.new
+      allow(NotificationFailureProcessor).to receive(:config).and_return({
+        access_key: 'key',
+        secret_access_key: 'secret'
+      })
       allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
 
       expect{ Message.find(nonexistent_id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -138,7 +150,11 @@ describe NotificationFailureProcessor do
             error: 'Error from mail system'
           }
         ])
-        nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
+        nfp = NotificationFailureProcessor.new
+        allow(NotificationFailureProcessor).to receive(:config).and_return({
+          access_key: 'key',
+          secret_access_key: 'secret'
+        })
         allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
         @shard1.activate do
           nfp.process

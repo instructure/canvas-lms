@@ -18,10 +18,12 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, bool, func, shape, string } from 'prop-types';
+import { arrayOf, bool, func, node, shape, string } from 'prop-types';
 import $ from 'jquery';
 import 'jquery.instructure_date_and_time'
 import I18n from 'i18n!gradebook_history';
+import Container from 'instructure-ui/lib/components/Container';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
 import Typography from 'instructure-ui/lib/components/Typography';
@@ -30,13 +32,12 @@ import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow';
 
 const colHeaders = [
   I18n.t('Date'),
-  I18n.t('Time'),
-  I18n.t('From'),
-  I18n.t('To'),
-  I18n.t('Grader'),
+  <ScreenReaderContent>{I18n.t('Anonymous Grading')}</ScreenReaderContent>,
   I18n.t('Student'),
+  I18n.t('Grader'),
   I18n.t('Assignment'),
-  I18n.t('Anonymous')
+  I18n.t('Before'),
+  I18n.t('After')
 ];
 
 const nearPageBottom = () => (
@@ -47,23 +48,26 @@ class SearchResultsComponent extends Component {
   static propTypes = {
     getNextPage: func.isRequired,
     fetchHistoryStatus: string.isRequired,
-    caption: string.isRequired,
+    caption: node.isRequired,
     historyItems: arrayOf(shape({
-      anonymous: string.isRequired,
+      anonymous: bool.isRequired,
       assignment: string.isRequired,
       date: string.isRequired,
-      from: string.isRequired,
+      displayAsPoints: bool.isRequired,
       grader: string.isRequired,
-      student: string.isRequired,
-      time: string.isRequired,
-      to: string.isRequired
+      gradeAfter: string.isRequired,
+      gradeBefore: string.isRequired,
+      id: string.isRequired,
+      pointsPossibleAfter: string.isRequired,
+      pointsPossibleBefore: string.isRequired,
+      student: string.isRequired
     })).isRequired,
     nextPage: string.isRequired,
     requestingResults: bool.isRequired
   };
 
   componentDidMount () {
-    document.addEventListener('scroll', this.handleScroll);
+    this.attachListeners();
   }
 
   componentDidUpdate (prevProps) {
@@ -75,18 +79,33 @@ class SearchResultsComponent extends Component {
     if (prevProps.historyItems.length < this.props.historyItems.length) {
       $.screenReaderFlashMessage(I18n.t('More results were added at the bottom of the page.'));
     }
+
+    this.attachListeners();
+  }
+
+  componentWillUnmount () {
+    this.detachListeners();
   }
 
   getNextPage = () => {
-    if (!this.props.requestingResults && this.props.nextPage) {
+    if (!this.props.requestingResults && this.props.nextPage && nearPageBottom()) {
       this.props.getNextPage(this.props.nextPage);
+      this.detachListeners();
     }
   }
 
-  handleScroll = () => {
-    if (nearPageBottom()) {
-      this.getNextPage();
+  attachListeners = () => {
+    if (this.props.requestingResults || !this.props.nextPage) {
+      return;
     }
+
+    document.addEventListener('scroll', this.getNextPage);
+    window.addEventListener('resize', this.getNextPage);
+  }
+
+  detachListeners = () => {
+    document.removeEventListener('scroll', this.getNextPage);
+    window.removeEventListener('resize', this.getNextPage);
   }
 
   hasHistory () {
@@ -97,67 +116,57 @@ class SearchResultsComponent extends Component {
     return this.props.fetchHistoryStatus === 'success' && !this.hasHistory();
   }
 
-  showAtEnd () {
-    if (this.props.requestingResults || this.props.nextPage || !this.hasHistory()) {
-      return null;
+  showResults = () => (
+    <div>
+      <Table
+        caption={this.props.caption}
+      >
+        <thead>
+          <tr>
+            {colHeaders.map(header => (
+              <th scope="col" key={`${header}-column`}>{ header }</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {this.props.historyItems.map(item => (
+            <SearchResultsRow
+              key={`history-items-${item.id}`}
+              item={item}
+            />
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  )
+
+  showStatus = () => {
+    if (this.props.requestingResults) {
+      $.screenReaderFlashMessage(I18n.t('Loading more grade history results.'));
+
+      return (
+        <Spinner size="small" title={I18n.t('Loading Results')} />
+      );
     }
 
-    return (<Typography fontStyle="italic">{I18n.t('No more results to load.')}</Typography>);
-  }
-
-  showResults = () => {
     if (this.noResultsFound()) {
       return (<Typography fontStyle="italic">{I18n.t('No results found.')}</Typography>);
     }
 
-    if (!this.hasHistory()) {
-      return null;
+    if (!this.props.requestingResults && !this.props.nextPage && this.hasHistory()) {
+      return (<Typography fontStyle="italic">{I18n.t('No more results to load.')}</Typography>);
     }
 
-    return (
-      <div>
-        <Table
-          caption={this.props.caption}
-          striped="rows"
-        >
-          <thead>
-            <tr>
-              {colHeaders.map(header => (
-                <th scope="col" key={`${header}-column`}>{ header }</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.historyItems.map(item => (
-              <SearchResultsRow
-                key={`history-items-${item.id}`}
-                item={item}
-              />
-            ))}
-          </tbody>
-        </Table>
-        {this.showAtEnd()}
-      </div>
-    );
-  }
-
-  showSpinner = () => {
-    if (!this.props.requestingResults) {
-      return null;
-    }
-
-    $.screenReaderFlashMessage(I18n.t('Loading more grade history results.'));
-
-    return (
-      <Spinner title={I18n.t('Loading Results')} />
-    );
+    return null;
   }
 
   render () {
     return (
       <div>
-        {this.showResults()}
-        {this.showSpinner()}
+        {this.hasHistory() && this.showResults()}
+        <Container as="div" textAlign="center" margin="medium 0 0 0">
+          {this.showStatus()}
+        </Container>
       </div>
     );
   }

@@ -29,12 +29,35 @@ module Canvas::Migration
     end
 
     def zip_file
-      @zip_file ||= Zip::File.open(file) rescue false
+      unless defined?(@zip_file)
+        @zip_file = Zip::File.open(file) rescue nil
+      end
+      @zip_file
+    end
+
+    def nested_dir
+      return false unless zip_file
+      unless defined?(@nested_dir)
+        # sometimes people try to use packages that unzip to a folder containing the files we expect
+        # so we should just try to handle it
+        # see if there's only one directory at the root
+        @nested_dir = nil
+        base_entries = zip_file.glob("*")
+        unless base_entries.any?{|e| !e.directory?}
+          root_dirs = base_entries.reject{|e| File.basename(e.name) =~ UnzipAttachment::THINGS_TO_IGNORE_REGEX}
+          @nested_dir = root_dirs.first.name if root_dirs.count == 1
+        end
+      end
+      @nested_dir
+    end
+
+    def nest_entry_if_needed(entry)
+      nested_dir ? File.join(nested_dir, entry) : entry
     end
 
     def read(entry)
       if zip_file
-        zip_file.read(entry)
+        zip_file.read(nest_entry_if_needed(entry))
       else
         unzip_archive
         path = File.join(self.unzipped_file_path, entry)
@@ -44,7 +67,7 @@ module Canvas::Migration
 
     def find_entry(entry)
       if zip_file
-        zip_file.find_entry(entry)
+        zip_file.find_entry(nest_entry_if_needed(entry))
       else
         # if it's not an actual zip file
         # just extract the package (or try to) and look for the file
@@ -93,7 +116,8 @@ module Canvas::Migration
     def unzip_archive
       return if @unzipped
       Rails.logger.debug "Extracting #{path} to #{unzipped_file_path}"
-      warnings = CanvasUnzip.extract_archive(path, unzipped_file_path)
+
+      warnings = CanvasUnzip.extract_archive(path, unzipped_file_path, nested_dir: nested_dir)
       @unzipped = true
       unless warnings.empty?
         diagnostic_text = ''

@@ -39,26 +39,26 @@ QUnit.module('LatePolicyGrade', function (hooks) {
 
   test('includes the late penalty as a negative value', function () {
     mountComponent();
-    ok(wrapper.text().includes('Late Penalty: -3'));
+    ok(wrapper.find('#late-penalty-value').text().includes('-3'));
   });
 
   test('includes the final grade', function () {
     mountComponent();
-    ok(wrapper.text().includes('Final Grade: 70%'));
+    ok(wrapper.find('#final-grade-value').text().includes('70%'));
   });
 
   test('rounds the final grade when a decimal value', function () {
     mountComponent({ submission: { grade: '7.345', pointsDeducted: 3 } });
-    ok(wrapper.text().includes('Final Grade: 7.35'));
+    ok(wrapper.find('#final-grade-value').text().includes('7.35'));
   });
 
   test('rounds the final grade when a decimal percentage', function () {
     mountComponent({ submission: { grade: '73.456%', pointsDeducted: 3 } });
-    ok(wrapper.text().includes('Final Grade: 73.46%'));
+    ok(wrapper.find('#final-grade-value').text().includes('73.46%'));
   });
 
   test('includes the final grade without formatting when not a number', function () {
     mountComponent({ submission: { grade: 'C+', pointsDeducted: 3 } });
-    ok(wrapper.text().includes('Final Grade: C+'));
+    ok(wrapper.find('#final-grade-value').text().includes('C+'));
   });
 });

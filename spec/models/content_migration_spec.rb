@@ -20,6 +20,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentMigration do
+  before :once do
+    course_with_teacher
+    @cm = ContentMigration.create!(context: @course, user: @teacher)
+  end
+
   context "#prepare_data" do
     it "should strip invalid utf8" do
       data = {
@@ -32,11 +37,6 @@ describe ContentMigration do
   end
 
   context "import_object?" do
-    before :once do
-      course_factory
-      @cm = ContentMigration.new(context: @course)
-    end
-
     it "should return true for everything if there are no copy options" do
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
@@ -106,12 +106,10 @@ describe ContentMigration do
     end
 
     it "should import into a course" do
-      course_with_teacher
       test_zip_import(@course)
     end
 
     it "should import into a user" do
-      user_factory
       test_zip_import(@user)
     end
 
@@ -122,8 +120,7 @@ describe ContentMigration do
   end
 
   it "should use url for migration file" do
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @user,)
+    cm = @cm
     cm.migration_type = 'zip_file_importer'
     cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
     # the double below should prevent it from actually hitting the url
@@ -142,7 +139,6 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -177,7 +173,6 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -210,7 +205,6 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -247,7 +241,6 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -290,8 +283,7 @@ describe ContentMigration do
   it "should not overwrite deleted quizzes unless overwrite_quizzes is true" do
     skip unless Qti.qti_enabled?
 
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm = @cm
     cm.migration_type = 'qti_converter'
     cm.migration_settings['import_immediately'] = true
 
@@ -351,8 +343,7 @@ describe ContentMigration do
   it "selectively imports quizzes when id_prepender is in use" do
     skip unless Qti.qti_enabled?
 
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm = @cm
     cm.migration_type = 'qti_converter'
     cm.migration_settings['import_immediately'] = true
     cm.save!
@@ -385,8 +376,7 @@ describe ContentMigration do
   it "should identify and import compressed tarball archives" do
     skip unless Qti.qti_enabled?
 
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm = @cm
     cm.migration_type = 'qti_converter'
     cm.migration_settings['import_immediately'] = true
     cm.save!
@@ -410,8 +400,7 @@ describe ContentMigration do
   end
 
   it "should try to handle utf-16 encoding errors" do
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm = @cm
     cm.migration_type = 'canvas_cartridge_importer'
     cm.migration_settings['import_immediately'] = true
     cm.save!
@@ -435,8 +424,7 @@ describe ContentMigration do
   it "should correclty handle media comment resolution in quizzes" do
     skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm = @cm
     cm.migration_type = 'canvas_cartridge_importer'
     cm.migration_settings['import_immediately'] = true
     cm.save!
@@ -469,6 +457,7 @@ describe ContentMigration do
     before :once do
       @account = Account.create!(:name => 'account')
     end
+
     def create_ab_cm
       cm = ContentMigration.new(:context => @account)
       cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
@@ -479,25 +468,26 @@ describe ContentMigration do
       cm.save!
       cm
     end
+
     it "should not throw an error when checking if blocked by current migration" do
       cm = create_ab_cm
       cm.queue_migration
       cm = create_ab_cm
       expect(cm.blocked_by_current_migration?(nil, 0, nil)).to be_truthy
     end
+
     it "should not throw an error checking for blocked migrations on save" do
       cm1 = create_ab_cm
       cm1.queue_migration
       cm2 = create_ab_cm
       cm2.queue_migration
       cm1.workflow_state = 'imported'
-      cm1.save!
+      expect { cm1.save! }.not_to raise_error
     end
   end
 
   it "expires migration jobs after 48 hours" do
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm = @cm
     cm.migration_type = 'common_cartridge_importer'
     cm.workflow_state = 'created'
     cm.save!
@@ -515,8 +505,7 @@ describe ContentMigration do
   end
 
   it "expires import jobs after 48 hours" do
-    course_with_teacher
-    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm = @cm
     cm.migration_type = 'common_cartridge_importer'
     cm.workflow_state = 'exported'
     cm.save!
@@ -535,8 +524,6 @@ describe ContentMigration do
   end
 
   it "delays queueing imports if one in course is already running" do
-    course_with_teacher
-
     cms = []
     Timecop.freeze(Time.now) do
       2.times do
@@ -559,5 +546,57 @@ describe ContentMigration do
     end
 
     run_jobs # even though the requeue is set to happen in the future, it should get run right away after the first one completes
+  end
+
+  it "should try to handle zip files with a nested root directory" do
+    cm = @cm
+    cm.migration_type = 'common_cartridge_importer'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_nested.zip")
+    attachment = Attachment.new(:context => cm, :filename => 'file.zip')
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.save!
+
+    cm.update_attribute(:attachment, attachment)
+    cm.queue_migration
+    run_jobs
+
+    expect(cm.reload.migration_issues).to be_empty
+  end
+
+  describe "#expired?" do
+    it "marks as expired after X days" do
+      ContentMigration.where(id: @cm.id).update_all(created_at: 405.days.ago)
+      expect(@cm.reload).to be_expired
+    end
+
+    it "does not mark new exports as expired" do
+      expect(@cm.reload).not_to be_expired
+    end
+
+    it "does not mark as expired if setting is 0" do
+      Setting.set('content_migrations_expire_after_days', '0')
+      ContentMigration.where(id: @cm.id).update_all(created_at: 405.days.ago)
+      expect(@cm.reload).not_to be_expired
+    end
+  end
+
+  describe "#expired" do
+    it "marks as expired after X days" do
+      ContentMigration.where(id: @cm.id).update_all(created_at: 405.days.ago)
+      expect(ContentMigration.expired.pluck(:id)).to eq [@cm.id]
+    end
+
+    it "does not mark new exports as expired" do
+      expect(ContentMigration.expired.pluck(:id)).to be_empty
+    end
+
+    it "does not mark as expired if setting is 0" do
+      Setting.set('content_migrations_expire_after_days', '0')
+      ContentMigration.where(id: @cm.id).update_all(created_at: 405.days.ago)
+      expect(ContentMigration.expired.pluck(:id)).to be_empty
+    end
   end
 end

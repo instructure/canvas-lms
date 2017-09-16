@@ -22,23 +22,40 @@ import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
 import Typography from 'instructure-ui/lib/components/Typography';
 import { SearchResultsComponent } from 'jsx/gradebook-history/SearchResults';
-import { formatHistoryItems } from 'jsx/gradebook-history/actions/HistoryActions';
-import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 
-const defaultProps = () => (
-  {
+function defaultHistoryItems () {
+  return [
+    {
+      anonymous: false,
+      assignment: 'Rustic Rubber Duck',
+      date: 'May 30, 2017',
+      displayAsPoints: true,
+      grader: 'Ms. Twillie Jones',
+      gradeAfter: '21',
+      gradeBefore: '19',
+      id: '123456',
+      pointsPossibleBefore: '25',
+      pointsPossibleAfter: '25',
+      student: 'Norval Abbott',
+      time: '11:16pm'
+    }
+  ];
+}
+
+function defaultProps () {
+  return {
     caption: 'search results caption',
     fetchHistoryStatus: 'success',
-    historyItems: formatHistoryItems(Fixtures.historyResponse().data),
+    historyItems: defaultHistoryItems(),
     getNextPage () {},
     nextPage: 'example.com',
     requestingResults: false
-  }
-);
+  };
+}
 
-const mountComponent = (customProps = {}) => (
-  shallow(<SearchResultsComponent {...defaultProps()} {...customProps} />)
-);
+function mountComponent (customProps = {}) {
+  return shallow(<SearchResultsComponent {...defaultProps()} {...customProps} />);
+}
 
 QUnit.module('SearchResults', {
   setup () {
@@ -67,27 +84,27 @@ test('Table is passed the label and caption props', function () {
 test('Table has column headers in correct order', function () {
   const expectedHeaders = [
     'Date',
-    'Time',
-    'From',
-    'To',
-    'Grader',
+    'Anonymous Grading',
     'Student',
+    'Grader',
     'Assignment',
-    'Anonymous'
+    'Before',
+    'After'
   ];
   const wrapper = mount(<SearchResultsComponent {...defaultProps()} />);
   const headerNodes = wrapper.find('thead').find('tr').find('th').nodes;
   const headers = [];
 
   for (let i = 0; i < headerNodes.length; i += 1) {
-    headers.push(headerNodes[i].innerHTML);
+    headers.push(headerNodes[i].innerText);
   }
 
   deepEqual(headers, expectedHeaders);
+  wrapper.unmount();
 });
 
 test('Table displays the formatted historyItems passed it', function () {
-  const items = formatHistoryItems(Fixtures.historyResponse().data);
+  const items = defaultHistoryItems();
   const props = { ...defaultProps(), items }
   const tableBody = mount(<SearchResultsComponent {...props} />);
   equal(tableBody.find('tbody').find('tr').length, items.length);
@@ -114,7 +131,7 @@ test('Table shows text if request was made but no results were found', function 
 });
 
 test('shows text indicating that the end of results was reached', function () {
-  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
+  const historyItems = defaultHistoryItems();
   const props = { ...defaultProps(), nextPage: '', requestingResults: false, historyItems };
   const wrapper = mount(<SearchResultsComponent {...props} />);
   const textBox = wrapper.find(Typography);
@@ -127,7 +144,7 @@ test('loads next page if possible and the first results did not result in a scro
   const actualInnerHeight = window.innerHeight;
   // fake to test that there's not a vertical scrollbar
   window.innerHeight = document.body.clientHeight + 1;
-  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
+  const historyItems = defaultHistoryItems();
   const props = { ...defaultProps(), nextPage: 'example.com', getNextPage: this.stub() };
   const wrapper = mount(<SearchResultsComponent {...props} />);
   wrapper.setProps({ historyItems });
@@ -138,10 +155,8 @@ test('loads next page if possible and the first results did not result in a scro
 
 test('loads next page on scroll if possible', function () {
   const actualInnerHeight = window.innerHeight;
-  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
   const props = {
     ...defaultProps(),
-    historyItems,
     nextPage: 'example.com',
     getNextPage: this.stub()
   };
@@ -150,5 +165,20 @@ test('loads next page on scroll if possible', function () {
   document.dispatchEvent(new Event('scroll'));
   ok(props.getNextPage.callCount > 0);
   window.innerHeight = actualInnerHeight;
+  wrapper.unmount();
+});
+
+test('loads next page if available on window resize that causes window to not have a scrollbar', function () {
+  const historyItems = defaultHistoryItems();
+  const props = {
+    ...defaultProps(),
+    historyItems,
+    nextPage: 'example.com',
+    getNextPage: this.stub()
+  };
+  const wrapper = mount(<SearchResultsComponent {...props} />);
+  window.innerHeight = document.body.clientHeight;
+  window.dispatchEvent(new Event('resize'));
+  strictEqual(props.getNextPage.callCount, 1);
   wrapper.unmount();
 });

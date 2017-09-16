@@ -70,6 +70,7 @@ module PlannerPageObject
     get '/'
     click_dashboard_settings
     select_list_view
+    wait_for_planner_load
   end
 
   def validate_link_to_url(object, url_type) # should pass the type of object as a string
@@ -90,6 +91,8 @@ module PlannerPageObject
   end
 
   def wait_for_planner_load
+    wait_for_dom_ready
+    wait_for_ajaximations
     todo_modal_button
   end
 

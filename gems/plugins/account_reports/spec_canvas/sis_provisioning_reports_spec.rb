@@ -299,7 +299,7 @@ describe "Default Account Reports" do
       Notification.where(name: "Report Generated").first_or_create
       Notification.where(name: "Report Generation Failed").first_or_create
       @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-      @admin = account_admin_user(:account => @account)
+      @admin = account_admin_user(account: @account, name: 'default admin')
       @default_term = @account.default_enrollment_term
     end
 
@@ -816,6 +816,8 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["enrollments"] = true
+        # this extra pseudonym should not cause an extra row in the output
+        @user2.pseudonyms.create!(unique_id: "pseudonym2@instructure.com")
         parsed = read_report("sis_export_csv", {params: parameters, order: [1, 0]})
         expect(parsed.length).to eq 4
 
@@ -1249,6 +1251,76 @@ describe "Default Account Reports" do
         expect(parsed).to match_array [["user_sis_id_02", "user_sis_id_01", "deleted"],
                                        ["user_sis_id_04", "user_sis_id_03", "active"]]
         expect(parsed.length).to eq 2
+      end
+    end
+
+    describe 'admins' do
+      before(:once) do
+        create_an_account
+        @u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001', name: 'user 1')
+        @u2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002', name: 'user 2')
+        @admin2 = @sub_account.account_users.create(user: @u1)
+        @admin2.sis_batch_id=@sis.id
+        @admin2.save!
+        @role1 = custom_account_role('role1', account: @account)
+        @admin3 = @account.account_users.create(user: @u2, role: @role1)
+        @admin3.sis_batch_id=@sis.id
+        @admin3.save!
+      end
+
+      it 'should run sis' do
+        parameters = {}
+        parameters['admins'] = true
+        parameters['include_deleted'] = true
+        parsed = read_report('sis_export_csv', {params: parameters, order: 3, header: true})
+        expect(parsed).to match_array [['user_id', 'account_id', 'role_id', 'role', 'status'],
+                                       ['U001', 'sub1', admin_role.id.to_s, 'AccountAdmin', 'active'],
+                                       ['U002', nil, @role1.id.to_s, 'role1', 'active']]
+      end
+
+      it 'should run provisioning' do
+        parameters = {}
+        parameters['admins'] = true
+        parameters['include_deleted'] = true
+        @admin.pseudonyms.create!(account: @account, unique_id: 'deleted').destroy
+        parsed = read_report('provisioning_csv', {params: parameters, order: [1, 5], header: true})
+        expect(parsed).to match_array [['admin_user_name', 'canvas_user_id', 'user_id', 'canvas_account_id',
+                                        'account_id', 'role_id', 'role', 'status', 'created_by_sis'],
+                                       ['user 1', @u1.id.to_s, 'U001', @sub_account.id.to_s, 'sub1',
+                                        admin_role.id.to_s, 'AccountAdmin', 'active', 'true'],
+                                       ['user 2', @u2.id.to_s, 'U002', @account.id.to_s, nil,
+                                        @role1.id.to_s, 'role1', 'active', 'true'],
+                                       ['default admin', @admin.id.to_s, nil, @account.id.to_s, nil,
+                                        admin_role.id.to_s, 'AccountAdmin', 'active', 'false']]
+      end
+
+      describe 'sharding' do
+        specs_require_sharding
+
+        it 'should run with cross shard pseudonyms' do
+          @shard1.activate do
+            @root = Account.create
+            @user = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
+                                                username: 'other_shard@example.com', sis_user_id: 'other_shard')
+          end
+          allow(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
+          allow(@account).to receive(:trust_exists?).and_return(true)
+          @admin4 = @account.account_users.create(user: @user)
+          @admin4.sis_batch_id=@sis.id
+          @admin4.save!
+
+          parameters = {}
+          parameters['admins'] = true
+          parsed = read_report('sis_export_csv', {params: parameters, order: [3, 0], header: true})
+
+          expect(parsed).to match_array [['user_id', 'account_id', 'role_id', 'role', 'status', 'root_account'],
+                                         ['U001', 'sub1', admin_role.id.to_s, 'AccountAdmin',
+                                          'active', HostUrl.context_host(@account)],
+                                         ['U002', nil, @role1.id.to_s, 'role1',
+                                          'active', HostUrl.context_host(@account)],
+                                         ['other_shard', nil, admin_role.id.to_s, 'AccountAdmin',
+                                          'active', HostUrl.context_host(@root)]]
+        end
       end
     end
 

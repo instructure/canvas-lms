@@ -89,6 +89,14 @@ describe Canvas do
   end
 
   if Canvas.redis_enabled?
+    describe '.lookup_cache_store' do
+      it "has the switchman namespace when using the pre-existing data redis" do
+        store = Canvas.lookup_cache_store({ 'cache_store' => 'redis_store' }, Rails.env)
+        expect(store.options[:namespace]).not_to be_nil
+        expect(store.data).to eq (Canvas.redis.__getobj__)
+      end
+    end
+
     describe ".short_circuit_timeout" do
       it "should wrap the block in a timeout" do
         expect(Timeout).to receive(:timeout).with(15).and_yield

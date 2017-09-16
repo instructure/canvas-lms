@@ -18,16 +18,11 @@
 
 import React from 'react';
 import { mount } from 'enzyme';
-import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
-import { formatHistoryItems } from 'jsx/gradebook-history/actions/HistoryActions';
 import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow';
 
-const mountComponent = (props = {}) => {
-  const singleItem = formatHistoryItems(Fixtures.historyResponse().data)[0];
-  const defaultProps = { item: singleItem };
+function mountComponent (props = {}) {
   const tbody = document.getElementById('search-results-tbody');
-
-  return mount(<SearchResultsRow {...defaultProps} {...props} />, {attachTo: tbody});
+  return mount(<SearchResultsRow {...props} />, { attachTo: tbody });
 }
 
 QUnit.module('SearchResultsRow', {
@@ -37,7 +32,20 @@ QUnit.module('SearchResultsRow', {
     tbody.id = 'search-results-tbody';
     document.body.appendChild(tbody);
 
-    this.item = formatHistoryItems(Fixtures.historyResponse().data)[0];
+    this.item = {
+      anonymous: false,
+      assignment: 'Rustic Rubber Duck',
+      date: '2017-05-30T23:16:59Z',
+      displayAsPoints: true,
+      grader: 'Ms. Lopez',
+      gradeAfter: '21',
+      gradeBefore: '19',
+      id: '123456',
+      pointsPossibleBefore: '25',
+      pointsPossibleAfter: '30',
+      student: 'Norval Abbott',
+      time: '11:16pm'
+    };
     this.wrapper = mountComponent({ item: this.item });
   },
 
@@ -50,40 +58,56 @@ QUnit.module('SearchResultsRow', {
 
 test('displays the history date', function () {
   const date = this.wrapper.find('td').nodes[0].innerText;
-  strictEqual(date, this.item.date);
+  strictEqual(date, 'May 30, 2017 at 11:16pm');
 });
 
-test('displays the history time', function () {
-  const time = this.wrapper.find('td').nodes[1].innerText;
-  strictEqual(time, this.item.time);
+test('has text for when not anonymously graded', function () {
+  const anonymous = this.wrapper.find('td').nodes[1].innerText;
+  strictEqual(anonymous, 'Not anonymously graded');
 });
 
-test('displays the history from', function () {
-  const from = this.wrapper.find('td').nodes[2].innerText;
-  strictEqual(from, this.item.from);
-});
-
-test('displays the history to', function () {
-  const to = this.wrapper.find('td').nodes[3].innerText;
-  strictEqual(to, this.item.to);
-});
-
-test('displays the history grader', function () {
-  const grader = this.wrapper.find('td').nodes[4].innerText;
-  strictEqual(grader, this.item.grader);
+test('has text for when anonymously graded', function () {
+  const item = { ...this.item, anonymous: true };
+  const wrapper = mountComponent({ item });
+  const anonymous = wrapper.find('td').nodes[1].innerText;
+  strictEqual(anonymous.trim(), 'Anonymously graded');
 });
 
 test('displays the history student', function () {
-  const student = this.wrapper.find('td').nodes[5].innerText;
+  const student = this.wrapper.find('td').nodes[2].innerText;
   strictEqual(student, this.item.student);
 });
 
+test('displays the history grader', function () {
+  const grader = this.wrapper.find('td').nodes[3].innerText;
+  strictEqual(grader, this.item.grader);
+});
+
 test('displays the history assignment', function () {
-  const assignment = this.wrapper.find('td').nodes[6].innerText;
+  const assignment = this.wrapper.find('td').nodes[4].innerText;
   strictEqual(assignment, this.item.assignment.toString());
 });
 
-test('displays the history anonymity', function () {
-  const anonymous = this.wrapper.find('td').nodes[7].innerText;
-  strictEqual(anonymous, this.item.anonymous);
+test('displays the history grade before and points possible before if points based', function () {
+  const gradeBefore = this.wrapper.find('td').nodes[5].innerText;
+  strictEqual(gradeBefore, `${this.item.gradeBefore}/${this.item.pointsPossibleBefore}`);
+});
+
+test('displays only the history grade before if not points based', function () {
+  this.item.displayAsPoints = false;
+  this.wrapper = mountComponent({ item: this.item });
+  const gradeBefore = this.wrapper.find('td').nodes[5].innerText;
+  strictEqual(gradeBefore, this.item.gradeBefore);
+});
+
+test('displays the history grade after and points possible after if points based', function () {
+  const gradeAfter = this.wrapper.find('td').nodes[6].innerText;
+  strictEqual(gradeAfter, `${this.item.gradeAfter}/${this.item.pointsPossibleAfter}`);
+});
+
+test('displays only the history grade after if not points based', function () {
+  this.item.displayAsPoints = false;
+  this.wrapper = mountComponent({ item: this.item });
+  const gradeAfter = this.wrapper.find('td').nodes[6].innerText;
+  strictEqual(gradeAfter, this.item.gradeAfter);
 });

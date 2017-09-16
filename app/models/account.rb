@@ -131,6 +131,9 @@ class Account < ActiveRecord::Base
   are_sis_sticky :name
 
   include FeatureFlags
+  def feature_flag_cache
+    MultiCache.cache
+  end
 
   def default_locale(recurse = false)
     result = read_attribute(:default_locale)
@@ -526,7 +529,7 @@ class Account < ActiveRecord::Base
     return unless id
     default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
     Shard.default.activate do
-      Rails.cache.delete(account_lookup_cache_key(default_id)) if default_id
+      MultiCache.delete(account_lookup_cache_key(default_id)) if default_id
     end
   rescue
     nil
@@ -1170,7 +1173,7 @@ class Account < ActiveRecord::Base
   def self.find_cached(id)
     default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
     Shard.default.activate do
-      Rails.cache.fetch(account_lookup_cache_key(default_id)) do
+      MultiCache.fetch(account_lookup_cache_key(default_id)) do
         begin
           account = Account.find(default_id)
         rescue ActiveRecord::RecordNotFound => e
@@ -1433,13 +1436,15 @@ class Account < ActiveRecord::Base
           link[:type] = 'custom'
         end
       end
+      links = HelpLinks.map_default_links(links)
     end
 
-    if settings[:new_custom_help_links]
-      links || Account::HelpLinks.default_links
+    result = if settings[:new_custom_help_links]
+      links || HelpLinks.default_links
     else
-      Account::HelpLinks.default_links + (links || [])
+      HelpLinks.default_links + (links || [])
     end
+    HelpLinks.instantiate_links(result)
   end
 
   def set_service_availability(service, enable)

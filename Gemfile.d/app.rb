@@ -37,7 +37,7 @@ gem 'authlogic', '3.6.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.11.1'
+gem 'switchman', '1.11.2'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -53,7 +53,7 @@ gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
 gem 'bcrypt', '3.1.11'
-gem 'canvas_connect', '0.3.12'
+gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.6', require: false
 gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.13.5'
@@ -68,7 +68,7 @@ gem 'i18nliner', '0.0.13'
   gem 'ruby2ruby', '2.3.1', require: false
   gem 'ruby_parser', '3.9.0', require: false
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.1.3', require: 'ims'
+gem 'ims-lti', '2.2.1', require: 'ims'
 gem 'json', '2.1.0'
 gem 'oj', '3.3.2'
 gem 'jwt', '1.5.6', require: false
@@ -113,7 +113,7 @@ gem 'canvas_statsd', '2.0.4'
   gem 'aroi', '0.0.5', require: false
 gem 'gepub', '0.7.0beta4'
 gem 'imperium', '0.1.3', require: false
-gem 'academic_benchmarks', '0.0.9', require: false
+gem 'academic_benchmarks', '0.0.10', require: false
 
 gem 'graphql', '1.6.6'
 gem 'graphql-batch', '~>0.3.1'

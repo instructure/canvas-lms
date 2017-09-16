@@ -75,12 +75,12 @@ $revision-button-color: $ic-color-dark;
 }
 
 .add_prerequisite_or_requirement_link {
-  color: $ic-link-color;
+  color: var(--ic-link-color);
   border: none;
   background: none;
   padding: 0px;
   &:hover {
-    color: $ic-link-color-hover;
+    color: var(--ic-link-color-darkened-10);
     background: none;
     text-decoration: underline;
   }
@@ -476,7 +476,7 @@ $revision-button-color: $ic-color-dark;
       }
     }
     &:not(.selected):hover {
-      border-left-color: $ic-link-color;
+      border-left-color: var(--ic-link-color);
       .revision-content {
         cursor: pointer;
       }
@@ -492,7 +492,7 @@ $revision-button-color: $ic-color-dark;
       cursor: pointer;
     }
     &.selected {
-      border-left-color: $ic-link-color;
+      border-left-color: var(--ic-link-color);
       background: $ic-bg-light-primary;
     }
   }

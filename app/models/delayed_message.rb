@@ -137,7 +137,6 @@ class DelayedMessage < ActiveRecord::Base
       )
       message.delayed_messages = delayed_messages
       message.context = context
-      message.asset_context = %w{ContentMigration Submission WikiPage}.include?(context.class.name) ? context.context : context
       message.root_account_id = root_account_id
       message.delay_for = 0
       message.parse!

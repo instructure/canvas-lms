@@ -28,7 +28,6 @@ import IcCheckbox from './IcCheckbox'
 
 const { string, bool, func, arrayOf, shape } = PropTypes
 
-
 class CoursesToolbar extends React.Component {
   static propTypes = {
     onUpdateFilters: func.isRequired,
@@ -79,7 +78,6 @@ class CoursesToolbar extends React.Component {
     return <option value="">{I18n.t('Loading...')}</option>
   }
 
-
   render () {
     const { terms, accounts, onUpdateFilters, isLoading, errors, ...props } = this.props
 
@@ -108,6 +106,17 @@ class CoursesToolbar extends React.Component {
                 onChange={e => onUpdateFilters({enrollment_term_id: e.target.value})}
               >
                 {this.renderTerms()}
+              </IcSelect>
+              <IcSelect
+                value={props.search_by}
+                onChange={e => onUpdateFilters({search_by: e.target.value})}
+              >
+                <option key="course" value="course">
+                  {I18n.t('Course')}
+                </option>
+                <option key="teacher" value="teacher">
+                  {I18n.t('Teacher')}
+                </option>
               </IcSelect>
               <IcInput
                 value={props.search_term}
@@ -139,6 +148,6 @@ class CoursesToolbar extends React.Component {
       </div>
     )
   }
-  }
+}
 
 export default CoursesToolbar

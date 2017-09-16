@@ -52,7 +52,7 @@ define [
         "EX"
       else
         submission = @opts.item[@opts.column.field]
-        grade = submission.grade || ""
+        grade = submission.entered_grade || submission.grade || ""
         formattedGrade = GradeFormatHelper.formatGrade(grade, { gradingType: submission.gradingType })
         @val = htmlEscape(formattedGrade)
       @$input.val(@val)
@@ -97,6 +97,7 @@ define [
     validate: () ->
       { valid: true, msg: null }
 
+    # default formatter (points, percent)
     @formatter: (row, col, submission, assignment, student, opts = {}) ->
       if submission.excused
         grade = "EX"
@@ -219,6 +220,7 @@ define [
       @$input = @$wrapper.find('input').focus().select()
 
   class SubmissionCell.letter_grade extends SubmissionCell
+    # Letter Grade formatter
     @formatter: (row, col, submission, assignment, student, opts={}) ->
       innerContents = if submission.excused
         "EX"
@@ -230,6 +232,7 @@ define [
       SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student, isLocked: !!opts.isLocked, tooltip: opts.tooltip})
 
   class SubmissionCell.gpa_scale extends SubmissionCell
+    # GPA Scale formatter
     @formatter: (row, col, submission, assignment, student, opts={}) ->
       innerContents = if submission.excused
         "EX"
@@ -252,6 +255,8 @@ define [
     states = ['pass', 'fail', '']
     classFromSubmission = (submission) ->
       if submission.excused
+        # this can never occur, since excused submissions have no grade
+        # and ungraded submissions do not use htmlFromSubmission
         "EX"
       else
         { pass: 'pass', complete: 'pass', fail: 'fail', incomplete: 'fail' }[submission.rawGrade] || ''
@@ -264,6 +269,8 @@ define [
         <i class="#{htmlEscape iconClass}" role="presentation"></i>
         """
 
+    # Complete/Incomplete (pass_fail) cell formatter and editor
+    # only used by formatter for graded submissions
     htmlFromSubmission: (options={}) ->
       cssClass = classFromSubmission(options.submission)
       iconClass = iconClassFromSubmission(options.submission)
@@ -279,6 +286,7 @@ define [
           aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape(passFailMessage(cssClass))}</span>#{checkboxButtonTemplate(iconClass)}</button>
         """, options)
 
+    # Complete/Incomplete (pass_fail) formatter
     @formatter: (row, col, submission, assignment, student, opts={}) ->
       return SubmissionCell.formatter.apply(this, arguments) unless submission.grade?
       pass_fail::htmlFromSubmission({ submission, assignment, editable: false, isLocked: opts.isLocked, tooltip: opts.tooltip })
@@ -317,7 +325,8 @@ define [
         .addClass(iconClassFromSubmission(rawGrade: newValue))
 
     loadValue: () ->
-      @val = @opts.item[@opts.column.field].grade || ""
+      submission = @opts.item[@opts.column.field]
+      @val = submission.entered_grade || submission.grade || ""
 
     serializeValue: () ->
       @$input.data('value')

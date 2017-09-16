@@ -19,6 +19,12 @@
 import $ from 'jquery'
 import cheaterDepaginate from 'jsx/shared/CheatDepaginator'
 import _ from 'underscore'
+
+function getGradingPeriodAssignments (courseId) {
+  const url = `/courses/${courseId}/gradebook/grading_period_assignments`;
+  return $.ajaxJSON(url, 'GET', {});
+}
+
   // loaders
   const getAssignmentGroups = (url, params) => {
     return cheaterDepaginate(url, params);
@@ -27,9 +33,6 @@ import _ from 'underscore'
     return $.ajaxJSON(url, "GET", {});
   };
   const getSections = (url) => {
-    return $.ajaxJSON(url, "GET", {});
-  };
-  const getEffectiveDueDates = (url) => {
     return $.ajaxJSON(url, "GET", {});
   };
 
@@ -127,7 +130,10 @@ import _ from 'underscore'
       return { gotAssignmentGroups };
     }
 
-    const gotEffectiveDueDates = getEffectiveDueDates(opts.effectiveDueDatesURL);
+    let gotGradingPeriodAssignments;
+    if (opts.getGradingPeriodAssignments) {
+      gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId);
+    }
     const gotCustomColumns = getCustomColumns(opts.customColumnsURL);
     const gotStudents = getStudents(opts.studentsURL, opts.studentsParams, opts.studentsPageCb);
     const gotSubmissions = getSubmissions(opts.submissionsURL, opts.submissionsParams, opts.submissionsChunkCb, opts.submissionsChunkSize);
@@ -138,12 +144,12 @@ import _ from 'underscore'
         [gotSubmissions]);
 
     return {
-      gotAssignmentGroups: gotAssignmentGroups,
-      gotCustomColumns: gotCustomColumns ,
-      gotStudents: gotStudents,
-      gotSubmissions: gotSubmissions,
-      gotCustomColumnData: gotCustomColumnData,
-      gotEffectiveDueDates: gotEffectiveDueDates,
+      gotAssignmentGroups,
+      gotCustomColumns,
+      gotGradingPeriodAssignments,
+      gotStudents,
+      gotSubmissions,
+      gotCustomColumnData
     };
   };
 

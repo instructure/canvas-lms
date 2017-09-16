@@ -422,6 +422,58 @@ describe Submission do
     end
   end
 
+  describe "#excused" do
+    let(:submission) do
+      submission = @assignment.submissions.find_by!(user: @student)
+      submission.update!(excused: true)
+      submission
+    end
+
+    it "sets excused to false if the late_policy_status is being changed to a not-nil value" do
+      submission.update!(late_policy_status: "missing")
+      expect(submission).not_to be_excused
+    end
+
+    it "does not set excused to false if the late_policy_status ie being changed to a nil value" do
+      # need to skip callbacks so excused does not get set to false
+      submission.update_column(:late_policy_status, "missing")
+      submission.update!(late_policy_status: nil)
+      expect(submission).to be_excused
+    end
+  end
+
+  describe "#late_policy_status" do
+    let(:submission) do
+      submission = @assignment.submissions.find_by!(user: @student)
+      submission.update!(late_policy_status: "late", seconds_late_override: 60)
+      submission
+    end
+
+    it "sets late_policy_status to nil if the submission is updated to be excused" do
+      submission.update!(excused: true)
+      expect(submission.late_policy_status).to be_nil
+    end
+
+    it "sets seconds_late_override to nil if the submission is updated to be excused" do
+      submission.update!(excused: true)
+      expect(submission.seconds_late_override).to be_nil
+    end
+
+    it "does not set late_policy_status to nil if the submission is updated to not be excused" do
+      # need to skip callbacks so late_policy_status does not get set to nil
+      submission.update_column(:excused, true)
+      submission.update!(excused: false)
+      expect(submission.late_policy_status).to eql "late"
+    end
+
+    it "does not set seconds_late_override to nil if the submission is updated to not be excused" do
+      # need to skip callbacks so seconds_late_override does not get set to nil
+      submission.update_column(:excused, true)
+      submission.update!(excused: false)
+      expect(submission.seconds_late_override).to be 60
+    end
+  end
+
   describe "seconds_late_override" do
     let(:submission) { @assignment.submissions.find_by!(user: @student) }
 
@@ -495,22 +547,6 @@ describe Submission do
       end
     end
 
-    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'none'" do
-      Timecop.freeze(@date) do
-        @assignment.submit_homework(@student, body: "a body")
-        submission.update!(late_policy_status: "none")
-        expect(submission.seconds_late).to be 0
-      end
-    end
-
-    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'missing'" do
-      Timecop.freeze(@date) do
-        @assignment.submit_homework(@student, body: "a body")
-        submission.update!(late_policy_status: "missing")
-        expect(submission.seconds_late).to be 0
-      end
-    end
-
     it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
     " and sets seconds_late_override to zero" do
       Timecop.freeze(@date) do
@@ -560,6 +596,63 @@ describe Submission do
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
 
+    context "as a before_save" do
+      before(:once) do
+        @late_policy.update!(course_id: @course)
+      end
+
+      it "deducts a percentage per interval late if grade_matches_current_submission is true" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          submission.score = 700
+          submission.grade_matches_current_submission = true
+          submission.save!
+          expect(submission.points_deducted).to eql 300.0
+        end
+      end
+
+      it "deducts a percentage per interval late if grade_matches_current_submission is nil" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          submission.score = 700
+          submission.grade_matches_current_submission = nil
+          submission.save!
+          expect(submission.points_deducted).to eql 300.0
+        end
+      end
+
+      it "deducts nothing if grade_matches_current_submission is false" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          submission.score = 700
+          submission.grade_matches_current_submission = false
+          submission.save!
+          expect(submission.points_deducted).to be_nil
+        end
+      end
+
+      it "sets points_deducted to nil if a submission's status is changed to missing" do
+        submission.update!(score: 5, points_deducted: 2)
+        expect { submission.update!(late_policy_status: "missing") }.to change {
+          submission.points_deducted
+        }.from(2).to(nil)
+      end
+
+      it "sets score to raw_score if a submission has points_deducted and the status is changed to missing" do
+        submission.update!(score: 5, points_deducted: 2)
+        expect { submission.update!(late_policy_status: "missing") }.to change {
+          submission.score
+        }.from(5).to(7)
+      end
+
+      it "keeps the given score if a submission is set to missing and given a score" do
+        submission.update!(score: 5, points_deducted: 2)
+        expect { submission.update!(score: 3, late_policy_status: "missing") }.to change {
+          submission.score
+        }.from(5).to(3)
+      end
+    end
+
     it "deducts nothing if grading period is closed" do
       grading_period = double("grading_period", closed?: true)
       expect(submission).to receive(:grading_period).and_return(grading_period)
@@ -594,11 +687,11 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "gary, what have you done?")
         submission.score = 700
-        allow(submission).to receive(:late?).and_return(false)
+        submission.late_policy_status = "missing"
         submission.apply_late_policy(@late_policy, @assignment)
 
         expect(submission.score).to eq 700
-        expect(submission.points_deducted).to eq 0
+        expect(submission.points_deducted).to be_nil
       end
     end
 
@@ -625,11 +718,40 @@ describe Submission do
       end
     end
 
+    it "sets the points_deducted to 0.0 if the score is set to nil and the submission is late" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(score: 400, points_deducted: 300)
+        submission.score = nil
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.points_deducted).to eql 0.0
+      end
+    end
+
+    it "sets the points_deducted to nil if the score is set to nil and the submission is not late" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(score: 400, points_deducted: 300)
+        submission.score = nil
+        submission.late_policy_status = "none"
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.points_deducted).to be_nil
+      end
+    end
+
     it "applies missing policy if submission is missing" do
       Timecop.freeze(1.day.from_now(@date)) do
         submission.score = nil
         submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 200
+      end
+    end
+
+    it "does not change the score of a missing submission if it already has one" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        @assignment.grade_student(@student, grade: 1000, grader: @teacher)
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.score).to be 1000.0
       end
     end
 
@@ -684,9 +806,9 @@ describe Submission do
             .to change { submission.score }.from(300).to(700)
         end
 
-        it "sets points_deducted to 0" do
+        it "sets points_deducted to nil" do
           expect { submission.update!(late_policy_status: 'none') }
-            .to change { submission.points_deducted }.from(400).to(0)
+            .to change { submission.points_deducted }.from(400).to(nil)
         end
       end
 
@@ -705,7 +827,7 @@ describe Submission do
 
         it "applies the late policy to points_deducted" do
           expect { submission.update!(late_policy_status: 'none') }
-            .to change { submission.points_deducted }.from(400).to(0)
+            .to change { submission.points_deducted }.from(400).to(nil)
         end
       end
 
@@ -779,6 +901,16 @@ describe Submission do
         @assignment.grade_student(@student, grade: 600, grader: @teacher)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 100
+      end
+    end
+
+    it "applies the late policy when entered grade is equal to previous penalized grade" do
+      Timecop.freeze(2.days.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        @assignment.grade_student(@student, grade: 600, grader: @teacher)
+
+        @assignment.grade_student(@student, grade: 500, grader: @teacher)
+        expect(submission.score).to eq 400
       end
     end
 
@@ -2143,6 +2275,18 @@ describe Submission do
       @submission.save!
       expect(@submission.read?(@user)).to be_truthy
     end
+
+    it "mark read/unread" do
+      @submission = @assignment.submit_homework(@user)
+      @submission.workflow_state = 'graded'
+      @submission.graded_at = Time.now
+      @submission.save!
+      expect(@submission.read?(@user)).to be_truthy
+      @submission.mark_unread(@user)
+      expect(@submission.read?(@user)).to be_falsey
+      @submission.mark_read(@user)
+      expect(@submission.read?(@user)).to be_truthy
+    end
   end
 
   describe "mute" do
@@ -2749,6 +2893,15 @@ describe Submission do
         end
       end
 
+      it "filters out deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+        submission_with_attachments = Submission.bulk_load_versioned_attachments([submission]).first
+        expect(submission_with_attachments.versioned_attachments).to be_empty
+      end
+
       it "includes url submission attachments" do
         s = submission_for_some_user
         s.attachment = attachment_model(filename: "screenshot.jpg",
@@ -2816,6 +2969,42 @@ describe Submission do
         expected_attachments_for_submissions = { s => [] }
         result = Submission.bulk_load_attachments_for_submissions(s)
         expect(result).to eq(expected_attachments_for_submissions)
+      end
+
+      it "filters out attachment associations that don't point to an attachment" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        submission.attachment_associations.find_by(attachment_id: attachment.id).update!(attachment_id: nil)
+        attachments = Submission.bulk_load_attachments_for_submissions([submission]).first.second
+        expect(attachments).to be_empty
+      end
+
+      it "filters out attachment associations that point to deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+        attachments = Submission.bulk_load_attachments_for_submissions([submission]).first.second
+        expect(attachments).to be_empty
+      end
+
+      it "includes valid attachments and filters out deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+
+        another_student = student_in_course(active_all: true).user
+        another_attachment = attachment_model(filename: "submission.doc", context: another_student)
+        another_submission = @assignment.submit_homework(another_student, attachments: [another_attachment])
+
+        bulk_loaded_submissions = Submission.bulk_load_attachments_for_submissions([submission, another_submission])
+        submission_attachments = bulk_loaded_submissions.find { |s| s.first.id == submission.id }.second
+        expect(submission_attachments).to be_empty
+
+        another_submission_attachments = bulk_loaded_submissions.find { |s| s.first.id == another_submission.id }.second
+        expect(another_submission_attachments).not_to be_empty
       end
     end
   end

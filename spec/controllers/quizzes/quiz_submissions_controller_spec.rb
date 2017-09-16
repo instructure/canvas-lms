@@ -154,6 +154,12 @@ describe Quizzes::QuizSubmissionsController do
       expect(json['time_left']).to be_within(5.0).of(60 * 60)
     end
 
+    it "should not backup if no submission can be found" do
+      user_session(@teacher)
+      put 'backup', params: { quiz_id: @quiz.id, course_id: @course.id, a: 'test', preview: 1 }
+      json = JSON.parse(response.body)
+      expect(json['backup']).to be_falsey
+    end
   end
 
   describe "POST 'record_answer'" do

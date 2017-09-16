@@ -38,6 +38,7 @@ Rails.configuration.to_prepare do
   IncomingMail::ReplyToAddress.address_pool = config[:reply_to_addresses] ||
     Array(HostUrl.outgoing_email_address)
   IncomingMailProcessor::MailboxAccount.default_outgoing_email = HostUrl.outgoing_email_address
+  IncomingMailProcessor::MailboxAccount.reply_to_enabled = config[:reply_to_disabled].blank?
 end
 
 # delivery_method can be :smtp, :sendmail, :letter_opener, or :test

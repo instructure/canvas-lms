@@ -24,7 +24,7 @@ module AccountReports
 
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections",
                        "enrollments", "groups", "group_membership",
-                       "group_categories", "xlist", "user_observers"].freeze
+                       "group_categories", "xlist", "user_observers", "admins"].freeze
 
     def initialize(account_report, params = {})
       @account_report = account_report
@@ -424,9 +424,6 @@ module AccountReports
         select("enrollments.*, courses.sis_source_id AS course_sis_id,
                 nxc.id AS nxc_id, nxc.sis_source_id AS nxc_sis_id,
                 cs.sis_source_id AS course_section_sis_id,
-                pseudonyms.unique_id, pseudonyms.sis_user_id AS pseudonym_sis_id,
-                pseudonyms.workflow_state AS pseudo_state,
-                ob.sis_user_id AS ob_sis_id, ob.unique_id AS ob_unique_id,
                 CASE WHEN cs.workflow_state = 'deleted' THEN 'deleted'
                      WHEN courses.workflow_state = 'deleted' THEN 'deleted'
                      WHEN enrollments.workflow_state = 'invited' THEN 'invited'
@@ -438,10 +435,7 @@ module AccountReports
                      WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
         joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
                INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id
-               LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=enrollments.user_id
-               LEFT OUTER JOIN #{Course.quoted_table_name} nxc ON cs.nonxlist_course_id = nxc.id
-               LEFT OUTER JOIN #{Pseudonym.quoted_table_name} AS ob ON ob.user_id = enrollments.associated_user_id
-                 AND ob.account_id = enrollments.root_account_id").
+               LEFT OUTER JOIN #{Course.quoted_table_name} nxc ON cs.nonxlist_course_id = nxc.id").
         where("enrollments.type <> 'StudentViewEnrollment'")
 
       if @include_deleted
@@ -466,15 +460,14 @@ module AccountReports
         # because it often is big enough that the slave
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
         enrol.find_in_batches(start: 0) do |batch|
-          if include_other_roots
-            users = batch.map {|e| User.new(id: e.user_id) if e.unique_id.nil?}.compact
-            users += batch.map {|e| User.new(id: e.associated_user_id) if e.ob_unique_id.nil? && !e.associated_user_id.nil?}.compact
-            users_by_id = users.index_by(&:id)
-            pseudonyms = load_cross_shard_logins(users)
-          end
+          users = batch.map {|e| User.new(id: e.user_id) }.compact
+          users += batch.map {|e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil?}.compact
+          users.uniq!
+          users_by_id = users.index_by(&:id)
+          pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+
           batch.each do |e|
-            next if e.pseudo_state == 'deleted' && !@include_deleted
-            p = p2 = pseudo_root = nil
+            p2 = nil
             row = []
             if e.nxc_id.nil?
               row << e.course_id unless @sis_format
@@ -484,52 +477,53 @@ module AccountReports
               row << e.nxc_sis_id
             end
             row << e.user_id unless @sis_format
-            if e.unique_id.nil? && include_other_roots
-              u = users_by_id[e.user_id]
-              p = loaded_pseudonym(pseudonyms, u)
-              next unless p
-              pseudo_root = p.account
-            end
-            row << (p ? p.sis_user_id : e.pseudonym_sis_id)
+
+            p = loaded_pseudonym(pseudonyms,
+                                 users_by_id[e.user_id],
+                                 include_deleted: @include_deleted)
+            next unless p
+
+            row << p.sis_user_id
             row << e.sis_role
             row << e.role_id
             row << e.course_section_id unless @sis_format
             row << e.course_section_sis_id
             row << e.enroll_state
             row << e.associated_user_id unless @sis_format
-            if e.ob_unique_id.nil? && !e.associated_user_id.nil? && include_other_roots
-              u2 = users_by_id[e.associated_user_id]
-              p2 = loaded_pseudonym(pseudonyms, u2)
+            if !e.associated_user_id.nil?
+              p2 = loaded_pseudonym(pseudonyms,
+                                    users_by_id[e.associated_user_id],
+                                    include_deleted: @include_deleted)
             end
-            row << (p2 ? p2.sis_user_id : e.ob_sis_id)
+            row << p2&.sis_user_id
             row << e.sis_batch_id? unless @sis_format
             row << e.type unless @sis_format
             row << e.limit_privileges_to_course_section
-            pseudo_root ||= root_account
-            row << HostUrl.context_host(pseudo_root) if include_other_roots
+            row << HostUrl.context_host(p.account) if include_other_roots
             csv << row
           end
         end
       end
     end
 
-    def loaded_pseudonym(pseudonyms, u)
+    def loaded_pseudonym(pseudonyms, u, include_deleted: false)
       user_pseudonyms = pseudonyms[u.id] || []
-      u.association(:pseudonyms).target = []
-      u.instance_variable_set(:@all_active_pseudonyms, user_pseudonyms)
-      SisPseudonym.for(u, root_account, {type: :trusted, require_sis: false})
+      u.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
+      SisPseudonym.for(u, root_account, {type: :trusted, require_sis: false, include_deleted: include_deleted})
     end
 
-    def load_cross_shard_logins(users)
+    def load_cross_shard_logins(users, include_deleted: false)
       shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
       shards << root_account.shard
       User.preload_shard_associations(users)
       shards = shards & users.map(&:associated_shards).flatten
-      pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users).active
+      pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users)
+      pseudonyms = pseudonyms.active unless include_deleted
       pseudonyms.each do |p|
         p.account = root_account if p.account_id == root_account.id
       end
-      ActiveRecord::Associations::Preloader.new.preload(pseudonyms, account: :role_links)
+      preloads = Account.reflections['role_links'] ? { account: :role_links } : :account
+      ActiveRecord::Associations::Preloader.new.preload(pseudonyms, preloads)
       pseudonyms.group_by(&:user_id)
     end
 
@@ -651,15 +645,13 @@ module AccountReports
       end
 
       gm = root_account.all_groups.
-        select("group_id, groups.sis_source_id, group_memberships.user_id, pseudonyms.sis_user_id AS user_sis_id,
+        select("group_id, groups.sis_source_id, group_memberships.user_id,
                   group_memberships.workflow_state, group_memberships.sis_batch_id").
-        joins("INNER JOIN #{GroupMembership.quoted_table_name} ON groups.id = group_memberships.group_id
-               INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=group_memberships.user_id").
-        where("pseudonyms.account_id=groups.root_account_id AND
-               NOT EXISTS (SELECT user_id
+        joins("INNER JOIN #{GroupMembership.quoted_table_name} ON groups.id = group_memberships.group_id").
+        where("NOT EXISTS (SELECT user_id
                            FROM #{Enrollment.quoted_table_name} e
                            WHERE e.type = 'StudentViewEnrollment'
-                           AND e.user_id = pseudonyms.user_id)")
+                           AND e.user_id = group_memberships.user_id)")
 
       gm = gm.where.not(group_memberships: {sis_batch_id: nil}) if @sis_format || @created_by_sis
 
@@ -667,8 +659,7 @@ module AccountReports
         gm.where!("(groups.workflow_state<>'deleted'
                      AND group_memberships.workflow_state<>'deleted')
                      OR
-                     (pseudonyms.sis_user_id IS NOT NULL
-                     AND group_memberships.sis_batch_id IS NOT NULL)")
+                     (group_memberships.sis_batch_id IS NOT NULL)")
       else
         gm.where!("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
       end
@@ -685,15 +676,25 @@ module AccountReports
       end
 
       generate_and_run_report headers do |csv|
-        gm.find_each do |m|
-          row = []
-          row << m.group_id unless @sis_format
-          row << m.sis_source_id
-          row << m.user_id unless @sis_format
-          row << m.user_sis_id
-          row << m.workflow_state
-          row << m.sis_batch_id? unless @sis_format
-          csv << row
+        gm.find_in_batches do |batch|
+          users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
+          users_by_id = users.index_by(&:id)
+          sis_ids = load_cross_shard_logins(users, include_deleted: @include_deleted)
+
+          batch.each do |m|
+            row = []
+            row << m.group_id unless @sis_format
+            row << m.sis_source_id
+            row << m.user_id unless @sis_format
+            p = loaded_pseudonym(sis_ids,
+                                 users_by_id[m.user_id],
+                                 include_deleted: @include_deleted)
+            next unless p
+            row << p.sis_user_id
+            row << m.workflow_state
+            row << m.sis_batch_id? unless @sis_format
+            csv << row
+          end
         end
       end
     end
@@ -790,6 +791,70 @@ module AccountReports
           row << observer.ob_state
           row << observer.o_batch_id? unless @sis_format
           csv << row
+        end
+      end
+    end
+
+    def admins
+      include_other_roots = root_account.trust_exists?
+      if @sis_format
+        # headers are not translated on sis_export to maintain import compatibility
+        headers = ['user_id','account_id','role_id','role','status']
+        headers << 'root_account' if include_other_roots
+      else
+        headers = []
+        headers << I18n.t('admin_user_name')
+        headers << I18n.t('canvas_user_id')
+        headers << I18n.t('user_id')
+        headers << I18n.t('canvas_account_id')
+        headers << I18n.t('account_id')
+        headers << I18n.t('role_id')
+        headers << I18n.t('role')
+        headers << I18n.t('status')
+        headers << I18n.t('created_by_sis')
+        headers << I18n.t('root_account') if include_other_roots
+      end
+
+      root_account.shard.activate do
+        admins = AccountUser.
+          select("account_users.*,
+                  a.sis_source_id AS account_sis_id,
+                  r.name AS role_name,
+                  u.name AS user_name").
+          joins("INNER JOIN #{Account.quoted_table_name} a ON account_users.account_id=a.id
+                 INNER JOIN #{User.quoted_table_name} u ON account_users.user_id=u.id
+                 INNER JOIN #{Role.quoted_table_name} r ON account_users.role_id=r.id").
+          where("account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                 OR account_users.account_id= :account_id", {account_id: account.id})
+
+        admins = admins.where.not(account_users: {sis_batch_id: nil}) if @sis_format
+        admins = admins.where.not(account_users: {workflow_state: 'deleted'}) unless @include_deleted
+
+        generate_and_run_report headers do |csv|
+          admins.find_in_batches do |batch|
+            users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
+            users_by_id = users.index_by(&:id)
+            sis_ids = load_cross_shard_logins(users, include_deleted: @include_deleted)
+
+            batch.each do |admin|
+              row = []
+              row << admin.user_name unless @sis_format
+              row << admin.user_id unless @sis_format
+              p = loaded_pseudonym(sis_ids,
+                                   users_by_id[admin.user_id],
+                                   include_deleted: @include_deleted)
+              next unless p
+              row << p.sis_user_id
+              row << admin.account_id unless @sis_format
+              row << admin.account_sis_id
+              row << admin.role_id
+              row << admin.role_name
+              row << admin.workflow_state
+              row << admin.sis_batch_id? unless @sis_format
+              row << HostUrl.context_host(p.account) if include_other_roots
+              csv << row
+            end
+          end
         end
       end
     end

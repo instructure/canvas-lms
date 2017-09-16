@@ -31,6 +31,7 @@ define [
 
       # init dialog
       @$dialog = $(postGradesFrameDialog())
+      @$iframe = @$dialog.find('.post-grades-frame')
       @$dialog.on('dialogopen', @onDialogOpen)
       @$dialog.on('dialogclose', @onDialogClose)
       @$dialog.dialog
@@ -39,6 +40,27 @@ define [
         width: 800
         height: 600
         dialogClass: 'post-grades-frame-dialog'
+
+      # list for focus/blur events
+      $('.before_external_content_info_alert, .after_external_content_info_alert').on('focus', (e) =>
+        iframeWidth = @$iframe.outerWidth(true)
+        iframeHeight = @$iframe.outerHeight(true)
+        @$iframe.addClass('info_alert_outline')
+        $(e.target).removeClass('screenreader-only')
+        alertHeight = $(e.target).outerHeight(true)
+        @$iframe.css('height', (iframeHeight - alertHeight - 4) + 'px')
+          .css('width', (iframeWidth - 4) + 'px')
+        @$dialog.scrollLeft(0).scrollTop(0)
+      ).on('blur', (e) =>
+        iframeWidth = @$iframe.outerWidth(true)
+        iframeHeight = @$iframe.outerHeight(true)
+        alertHeight = $(e.target).outerHeight(true)
+        @$iframe.removeClass('info_alert_outline')
+        $(e.target).addClass('screenreader-only')
+        @$iframe.css('height', (iframeHeight + alertHeight) + 'px')
+          .css('width', iframeWidth + 'px')
+        @$dialog.scrollLeft(0).scrollTop(0)
+      )
 
       # other init
       if @baseUrl

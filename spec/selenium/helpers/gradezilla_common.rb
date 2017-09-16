@@ -104,14 +104,6 @@ module GradezillaCommon
     accept_alert
   end
 
-  def open_assignment_options(cell_index)
-    assignment_cell = ffj('#gradebook_grid .container_1 .slick-header-column')[cell_index]
-    driver.action.move_to(assignment_cell).perform
-    trigger = assignment_cell.find_element(:css, '.gradebook-header-drop')
-    trigger.click
-    expect(fj("##{trigger['aria-owns']}")).to be_displayed
-  end
-
   def find_slick_cells(row_index, element)
     grid = element
     rows = grid.find_elements(:css, '.slick-row')
@@ -147,40 +139,9 @@ module GradezillaCommon
     ::Gradezilla.select_section(section)
   end
 
-  def gradebook_column_array(css_row_class)
-    column = ff(css_row_class)
-    text_values = []
-    column.each do |row|
-      text_values.push(row.text)
-    end
-    text_values
-  end
-
-  def conclude_and_unconclude_course
-    # conclude course
-    @course.complete!
-    @user.reload
-    @user.cached_current_enrollments
-    @enrollment.reload
-
-    # un-conclude course
-    @enrollment.workflow_state = 'active'
-    @enrollment.save!
-    @course.reload
-  end
-
   def gradebook_data_setup(opts={})
     assignment_setup_defaults
     assignment_setup(opts)
-  end
-
-  def data_setup_as_observer
-    user_with_pseudonym
-    course_with_observer user: @user, active_all: true
-    @course.observers=[@observer]
-    assignment_setup_defaults
-    assignment_setup
-    @all_students.each {|s| s.observers=[@observer]}
   end
 
   def assignment_setup_defaults
@@ -309,9 +270,5 @@ module GradezillaCommon
       :submission_types => 'not_graded',
       :assignment_group => @group
     )
-  end
-
-  def get_group_points
-    ff('div.assignment-points-possible')
   end
 end

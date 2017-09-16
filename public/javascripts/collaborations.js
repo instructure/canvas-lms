@@ -69,6 +69,13 @@ import 'compiled/jquery.rails_flash_notifications'
       $(document).fragmentChange(this.onFragmentChange);
       $('#collaboration_collaboration_type').on('change', this.onTypeChange).change();
       $(window).on('externalContentReady', this.onExternalContentReady.bind(this));
+      $('.before_external_content_info_alert, .after_external_content_info_alert').on('focus', function (e) {
+        $(this).removeClass('screenreader-only');
+        $('#lti_new_collaboration_iframe').addClass('info_alert_outline');
+      }).on('blur', function (e) {
+        $(this).addClass('screenreader-only');
+        $('#lti_new_collaboration_iframe').removeClass('info_alert_outline');
+      });
     },
 
     onClose: function(e) {
@@ -108,8 +115,10 @@ import 'compiled/jquery.rails_flash_notifications'
         $('.collaborate_data, #google_docs_description').hide();
         $('#collaborate_authorize_google_docs').hide();
         $('#lti_new_collaboration_iframe').attr('src', launch_url).show();
+        $('.before_external_content_info_alert, .after_external_content_info_alert').show();
       } else {
         $('#lti_new_collaboration_iframe').hide();
+        $('.before_external_content_info_alert, .after_external_content_info_alert').hide();
         $('.collaborate_data, #google_docs_description').show();
         if (INST.collaboration_types) {
           for (var i in INST.collaboration_types) {

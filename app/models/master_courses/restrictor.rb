@@ -60,9 +60,13 @@ module MasterCourses::Restrictor
       @importing_migration = cm if cm && cm.master_course_subscription
     end
 
+    def skip_downstream_changes!
+      @skip_downstream_changes = true
+    end
+
     def check_for_restricted_column_changes
       return true if @importing_migration || !is_child_content?
-      return true if new_record? && !self.respond_to?(:owner_for_restrictions) # shouldn't be able to create new collection items if owner is locked
+      return true if new_record? && !self.check_restrictions_on_creation? # shouldn't be able to create new collection items if owner is locked
 
       restrictions = nil
       locked_columns = []
@@ -97,10 +101,15 @@ module MasterCourses::Restrictor
     end
   end
 
+  def check_restrictions_on_creation?
+    false
+  end
+
   def mark_downstream_changes(changed_columns=nil)
-    return if @importing_migration || !is_child_content? # don't mark changes on import
+    return if @importing_migration || @skip_downstream_changes || !is_child_content? # don't mark changes on import
 
     changed_columns ||= self.changes.keys & self.class.base_class.restricted_column_settings.values.flatten
+    changed_columns << "manually_deleted" if self.changes["workflow_state"]&.last == "deleted"
     if changed_columns.any?
       if self.is_a?(Assignment) && submittable = self.submittable_object
         tag_content = submittable # mark on the owner's tag
@@ -149,6 +158,16 @@ module MasterCourses::Restrictor
         end
       end
     end
+
+    if self.changes["workflow_state"]&.first == "deleted" && child_tag.downstream_changes.include?("manually_deleted")
+      if self.editing_restricted?(:any)
+        child_tag.downstream_changes.delete("manually_deleted")
+        child_tag.save!
+      else
+        columns_to_restore << "workflow_state" # don't restore if we manually deleted it
+      end
+    end
+
     if columns_to_restore.any?
       @importing_migration.add_skipped_item(child_tag)
       Rails.logger.debug("Undoing imported changes to #{self.class} #{self.id} because changed downstream - #{columns_to_restore.join(', ')}")

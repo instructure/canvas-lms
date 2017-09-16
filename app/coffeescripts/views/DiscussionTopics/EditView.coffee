@@ -198,7 +198,7 @@ define [
         (@assignmentGroupFetchDfd ||= @assignmentGroupCollection.fetch()).done @renderAssignmentGroupOptions
 
       _.defer(@renderGradingTypeOptions)
-      _.defer(@renderGroupCategoryOptions)
+      _.defer(@renderGroupCategoryOptions) if @permissions.CAN_SET_GROUP
       _.defer(@renderPeerReviewOptions)
       _.defer(@renderPostToSisOptions) if ENV.POST_TO_SIS
       _.defer(@watchUnload)
@@ -287,7 +287,7 @@ define [
       data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
       data.todo_date = null unless data.allow_todo_date is '1'
 
-      unless ENV?.IS_LARGE_ROSTER
+      if @groupCategorySelector && !ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
 
       assign_data = data.assignment
@@ -401,7 +401,7 @@ define [
       else
         @model.set 'assignment', @model.createAssignment(set_assignment: false)
 
-      if !ENV?.IS_LARGE_ROSTER && @isTopic()
+      if !ENV?.IS_LARGE_ROSTER && @isTopic() && @groupCategorySelector
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
       if data.allow_todo_date == '1' && data.todo_date == null
         errors['todo_date'] = [{type: 'date_required_error', message: I18n.t('You must enter a date')}]

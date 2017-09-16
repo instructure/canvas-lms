@@ -26,7 +26,7 @@ describe WikiPagesController do
   end
 
   def create_page(attrs)
-    page = @course.wiki.wiki_pages.create!(attrs)
+    page = @course.wiki_pages.create!(attrs)
     page.publish! if page.unpublished?
     page
   end
@@ -50,7 +50,7 @@ describe WikiPagesController do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
     group_category = @course.group_categories.build(:name => "mygroup")
     @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
-    @wiki_page = @group.wiki.wiki_pages.create :title => 'hello', :body => 'This is a wiki page.'
+    @wiki_page = @group.wiki_pages.create :title => 'hello', :body => 'This is a wiki page.'
 
     def test_page(url)
       get url
@@ -71,7 +71,7 @@ describe WikiPagesController do
   it "should work with account group wiki pages" do
     group = Account.default.groups.create!
     group.add_user(@user)
-    group_page = group.wiki.wiki_pages.create!(title: "ponies5ever", body: "")
+    group_page = group.wiki_pages.create!(title: "ponies5ever", body: "")
 
     get "/groups/#{group.id}/pages/#{group_page.url}"
     expect(response).to be_successful
@@ -124,7 +124,7 @@ describe WikiPagesController do
 
     it "should load as many pages as the setting allows" do
       Setting.get('wiki_sidebar_item_limit', 3)
-      4.times{ |i| @course.wiki.wiki_pages.create!(:title => "Page #{i}") }
+      4.times{ |i| @course.wiki_pages.create!(:title => "Page #{i}") }
       get "/courses/#{@course.id}/pages/page-1/edit"
       doc = Nokogiri::HTML(response.body)
 

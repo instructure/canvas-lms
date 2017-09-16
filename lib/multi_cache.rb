@@ -18,13 +18,26 @@
 
 class MultiCache < ActiveSupport::Cache::Store
   def self.cache
-    if defined?(ActiveSupport::Cache::RedisStore) && Rails.cache.is_a?(ActiveSupport::Cache::RedisStore) &&
-        defined?(Redis::DistributedStore) && (store = Rails.cache.instance_variable_get(:@data)).is_a?(Redis::DistributedStore)
-      store.instance_variable_get(:@multi_cache) || store.instance_variable_set(:@multi_cache, MultiCache.new(store.ring.nodes))
-    else
-      Rails.cache
+    @multi_cache ||= begin
+      ha_cache_config = YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: ApplicationController.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
+      if (ha_cache_config[:cache_store])
+        store = ActiveSupport::Cache.lookup_store(ha_cache_config[:cache_store].to_sym, ha_cache_config)
+        store.options.delete(:namespace)
+        store
+      elsif defined?(ActiveSupport::Cache::RedisStore) && Rails.cache.is_a?(ActiveSupport::Cache::RedisStore) &&
+          defined?(Redis::DistributedStore) && (store = Rails.cache.instance_variable_get(:@data)).is_a?(Redis::DistributedStore)
+        store.instance_variable_get(:@multi_cache) || store.instance_variable_set(:@multi_cache, MultiCache.new(store.ring.nodes))
+      else
+        Rails.cache
+      end
     end
   end
+
+  def self.reset
+    @multi_cache = nil
+  end
+
+  Canvas::Reloader.on_reload { reset }
 
   def initialize(ring)
     @ring = ring

@@ -55,7 +55,7 @@ describe SIS::UserImporter do
 
     before(:once) do
       @user_id = 'sis_id1'
-      @login_id = '--*(&*(&%^&*%..-'
+      @login_id = "--*\x01(&*(&%^&*%..-"
       messages = []
       account_model
       Setting.set('sis_transaction_seconds', '1')

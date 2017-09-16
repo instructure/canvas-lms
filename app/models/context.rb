@@ -112,7 +112,7 @@ module Context
         res[:modules] = self.respond_to?(:context_modules) && self.context_modules.active.exists?
         res[:quizzes] = self.respond_to?(:quizzes) && self.quizzes.active.exists?
         res[:assignments] = self.respond_to?(:assignments) && self.assignments.active.exists?
-        res[:pages] = self.respond_to?(:wiki) && self.wiki_id && self.wiki.wiki_pages.active.exists?
+        res[:pages] = self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists?
         res[:conferences] = self.respond_to?(:web_conferences) && self.web_conferences.active.exists?
         res[:announcements] = self.respond_to?(:announcements) && self.announcements.active.exists?
         res[:outcomes] = self.respond_to?(:has_outcomes?) && self.has_outcomes?
@@ -149,18 +149,23 @@ module Context
     result
   end
 
-  def self.find_by_asset_string(string)
-    opts = string.split("_", -1)
-    id = opts.pop
-    klass_name = opts.join('_').classify.to_sym
+  def self.find_polymorphic(context_type, context_id)
+    klass_name = context_type.classify.to_sym
     if CONTEXT_TYPES.include?(klass_name)
       type = Object.const_get(klass_name, false)
-      type.find(id)
+      type.find(context_id)
     else
       nil
     end
   rescue => e
     nil
+  end
+
+  def self.find_by_asset_string(string)
+    opts = string.split("_", -1)
+    id = opts.pop
+    type = opts.join('_')
+    Context.find_polymorphic(type, id)
   end
 
   def self.asset_type_for_string(string)

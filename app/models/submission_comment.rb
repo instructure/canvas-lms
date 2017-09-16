@@ -165,14 +165,16 @@ class SubmissionComment < ActiveRecord::Base
     elsif !message || message.empty?
       raise "Message body cannot be blank"
     else
-      SubmissionComment.create!({
-        :comment => message,
-        :submission_id => self.submission_id,
-        :author => user,
-        :context_id => self.context_id,
-        :context_type => self.context_type,
-        :provisional_grade_id => self.provisional_grade_id
-      })
+      self.shard.activate do
+        SubmissionComment.create!({
+          :comment => message,
+          :submission_id => self.submission_id,
+          :author => user,
+          :context_id => self.context_id,
+          :context_type => self.context_type,
+          :provisional_grade_id => self.provisional_grade_id
+        })
+      end
     end
   end
 

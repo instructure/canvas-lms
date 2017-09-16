@@ -2096,7 +2096,7 @@ describe Course, "backup" do
     group = @course.assignment_groups.create!(:name => "Some Assignment Group")
     @course.assignments.create!(:title => "Some Assignment", :assignment_group => group)
     @course.calendar_events.create!(:title => "Some Event", :start_at => Time.now, :end_at => Time.now)
-    @course.wiki.wiki_pages.create!(:title => "Some Page")
+    @course.wiki_pages.create!(:title => "Some Page")
     topic = @course.discussion_topics.create!(:title => "Some Discussion")
     topic.discussion_entries.create!(:message => "just a test")
     @course

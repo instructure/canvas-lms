@@ -1006,7 +1006,7 @@ nn:
         turnitin_account_id: Turnitin-konto-ID
         turnitin_comments: "Kommentarar til innlevering"
         turnitin_host: Turnitin-vert
-        turnitin_pledge: Turnitin-løfte
+        turnitin_pledge: Likskapsløfte
         turnitin_shared_secret: "Turnitin delt hemmelegheit"
         users_can_edit_name: "Brukarar kan redigere namnet sitt"
         value: "Slå av kommentering av kunngjeringar"
@@ -1418,6 +1418,7 @@ nn:
   add_tas_to_the_course_2aac6e02: "Legg til undervisingsassistentar på emnet"
   add_theme_32fa3d50: "Legg til tema"
   add_to_course_481a51c4: "Legg til emnet..."
+  add_to_student_to_do_58e66b4b: "Legg til studentens å gjere-liste"
   add_trigger_bc1a0fae: "Legg til utløysar"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Legg til brukar med e-postadresse, Login-ID eller SIS-ID"
   add_user_e73e8e50: "Legg til brukar"
@@ -1540,7 +1541,8 @@ nn:
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Det oppstod eit problem under importeringa av påmeldingssemester. "
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Det oppstod eit problem under importeringa av setta med karaktersetjingsperiodar"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Det oppstod eit problem under oppdateringa av setta med karaktersetjingsperiodar"
-  an_error_occurred_making_a_network_request_d1bda348: "Det oppstod ein feil ved nettverksførespurnaden. "
+  an_error_occurred_changing_the_lock_state_for_file_77443f15: "Det oppstod ein feil ved endring av låsestatus for\"%{fileName}\""
+  an_error_occurred_making_a_network_request_d1bda348: "Det oppstod ein feil ved nettverksførespurnaden "
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod ein feil*, legg inn svaret ditt på nytt seinare"
   an_error_occurred_please_try_again_later_84223241: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occurred_publishing_grades_cfdf7631: "Det oppstod ein feil under publisering av karakterar."
@@ -1550,12 +1552,20 @@ nn:
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod ein feil under førebuing av nedlasting. Prøv på nytt seinare."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Det oppstod ein feil under innstilling av bruksretten for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ein feil oppstod ved forsøk på å kontakte Turnitin"
-  an_error_occurred_while_checking_the_migration_sta_d17035b1: "Det oppstod ein feil ved sjekk av overføringsstatus."
-  an_error_occurred_while_loading_courses_11d4571e: "Det oppstod ein feil under emneinnlastinga. "
+  an_error_occurred_while_checking_the_migration_sta_d17035b1: "Det oppstod ein feil ved sjekk av overføringsstatus"
+  an_error_occurred_while_loading_associations_9699b3ee: "Det oppstod ein feil under lastinga av forbindelsane"
+  an_error_occurred_while_loading_changes_9851b56f: "Det oppstod ein feil under lastinga av endringane"
+  an_error_occurred_while_loading_courses_11d4571e: "Det oppstod ein feil under emneinnlastinga"
+  an_error_occurred_while_loading_late_policies_c415f676: "Det oppstod ein feil under lastinga av tidlegare retningslinjer"
   an_error_occurred_while_migrating_405ac0b5: "Det oppstod ein feil under overføringa."
-  an_error_occurred_while_starting_migration_8e6015e2: "Det oppstod ein feil i starten av overføringa."
+  an_error_occurred_while_saving_associations_bd66f3f4: "Det oppstod ein feil under lagringa av forbindelsane"
+  an_error_occurred_while_starting_migration_8e6015e2: "Det oppstod ein feil i starten av overføringa"
+  an_error_occurred_while_updating_late_policies_a95b707f: "Det oppstod ein feil under oppdateringa av tidlegare retningslinjer"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Det oppstod eit problem under sletting av avtalegruppa"
+  an_error_ocurred_while_loading_sync_history_ad9dc6df: "Det oppstod ein feil under lastinga av synkroniseringshistorikken"
+  an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "Det oppstod ein feil under lastinga av usynkroniserte endringar"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Det oppstod eit problem under lagring av avtalegruppa"
+  an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Ein eksisterande Canvas-brukar med SIS-ID %{user_id}har allereie gjort krav på %{other_user_id} sin user_id "
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
   an_internal_error_occurred_83b8a685: "Det oppstod ein feil"
   an_item_named_name_already_exists_in_this_location_147b7312: "Eit element med namnet \"%{name}\" finst allereie.\" Vil du erstatte den eksisterande fila?"
@@ -1630,6 +1640,7 @@ nn:
     podcast_feed_description_group: "Alle mediafiler tilkopla eller innebygde i kunngjeringar i gruppa \"%{group}\" blir viste i denne straumen."
     podcast_feed_name: "%{course} kunngjeringar i podkastformat"
   announcements_a4b8ed4a: Kunngjeringar
+  announcements_tutorial_tray_994287d6: "Kunngjeringar opplæringsmeny"
   anonymous_e1b8ad27: Anonym
   anonymous_grading_ccb5045c: "Anonym karaktersetjing"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetjing tvingar studentnamn til å vere skjulte i SpeedGrader™"
@@ -1683,8 +1694,8 @@ nn:
         not_started_yet: "Emnet du vil ha tilgang til har enno ikkje starta. Det startar %{date}."
         unpublished: "Emnet er enno ikkje publisert av faglæraren."
     notices: 
-      first_teacher: "Emnet er no gjort krav på og du er registrert som den første faglæraren."
-      first_teacher_with_email: "Emnet er no gjort krav på og du er registrert som den første faglæraren. Du vil om kort tid ta imot ein e-post og kunne fullføre registreringsprosessen."
+      first_teacher: "Emnet er no gjort krav på og du er registrert som den første faglæraren"
+      first_teacher_with_email: "Emnet er no gjort krav på og du er registrert som den første faglæraren. Du vil om kort tid ta imot ein e-post og kunne fullføre registreringsprosessen"
       need_to_accept_enrollment: "Du må [godta invitasjonen til påmelding](%{url}) før du kan delta på emnet fullt ut."
       need_to_accept_future_enrollment: "Du må [godta invitasjonen til påmelding](%{url}) før du kan delta på emnet fullt ut, startdato %{date}."
       page_disabled: "Sida er deaktivert"
@@ -1750,6 +1761,7 @@ nn:
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på at du vil rapportere profilbilde?"
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Er du sikker på at du vil synkronisere karakterane på nytt til studentinformasjonssystemet?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Er du sikker på at du vil sende denne kommentaren?"
+  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Er du sikker på at du vil synkronisere karakterane til studentinformasjonssystemet? Du bør gjere dette berre dersom alle karakterane er ferdigstilte."
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   arrange_by_34a545de: "Sorter etter"
@@ -1833,6 +1845,7 @@ nn:
     scores_lower_than_the_average: "Poengsummar lågare enn gjennomsnittet %{average}"
     total_graded_submissions: "Innleveringar som er karaktersette totalt:"
   assignment_details_expanded_20c6f0c7: "oppgåvedetaljar viser"
+  assignment_excused_eb6c08fa: "Fritak for oppgåva"
   assignment_grades_have_already_been_published_ff2d84c6: "Karakterane på oppgåvene er allereie publiserte."
   assignment_group: 
     default_name: Oppgåver
@@ -1858,9 +1871,11 @@ nn:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Du kan ikkje slette ei gruppe som inneheld ei låst oppgåve."
+  assignment_groups_bc9cc3c9: Oppgåvegrupper
   assignment_groups_weight_2f1a5a7c: Oppgåvegruppevekting
   assignment_menu_91fe3716: Oppgåvemeny
   assignment_muted_4cb590a4: "Oppgåvene er skjulte"
+  assignment_muted_8d74bfa0: "Oppgåvene er skjulte"
   assignment_muter: 
     mute_assignment: "Skjul oppgåve"
     muting_assignment: "Skjuler oppgåve..."
@@ -2404,12 +2419,14 @@ nn:
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga."
   assignments_list_fe3e54be: Oppgåveliste
   assignments_settings_30613d0c: Oppgåveinnstillingar
+  assignments_tutorial_tray_4cc844b: "Oppgåver opplæringsmeny"
   associated_74756cc4: Tilknytte
   associated_account_course_id_d87a01c5: "Tilknytte konto-/emne-ID"
   associated_account_name_91854e37: "Tilknytte kontonamn"
   associated_course_name_9b5b1945: "Tilknytte emnenamn"
   associated_courses_1fbc6202: "Tilknytte emne"
-  associations_3fd4abe8: Samanslutningar
+  associations_3fd4abe8: Forbindelsar
+  associations_saved_successfully_48b9eae3: "Forbindelsane er lagra"
   attach_terms_2b8770a5: "Legg ved semester"
   attached_display_name_afa00c2e: "Lagt ved: %{display_name}"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "Vedlagde filer skal vere større enn 0 byte"
@@ -2519,6 +2536,7 @@ nn:
   blocked_by_running_migration_d8a57cb7: "Blokkert av \"running migration\""
   blue_daf8fea9: Blå
   blueprint_5cca2ef: Blåkopi
+  blueprint_course_associations_72c9609: "Forbindelsane til blåkopiemne"
   blueprint_course_e16ed131: Blåkopiemne
   blueprint_courses_9dd321b8: Blåkopiemne
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blåkopiemne (opprett / rediger / tilknytt / slett)"
@@ -3049,7 +3067,7 @@ nn:
   can_edit_this_page_role_selection_6ccec3c7: "Kan redigere denne sida"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan berre sjå brukarar frå eigen klasse"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikkje rekne ut poengsum før ei oppgåve har moglege poeng"
-  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikkje slette justeringar som er baserte på tilknytte vurderingsskjema. Dersom du vil fjerne tilknytingane, må du fjerne rada frå vurderingsskjemaet"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikkje slette justeringar som er baserte på tilknytte vurderingsskjema. Dersom du vil fjerne forbindelsane, må du fjerne rada frå vurderingsskjemaet"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kan ikkje utføre differensiering opp mot meir enn ei fil av same type"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Kan ikkje fjerne publisering dersom det finst studentinnleveringar"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Kan ikkje fjerne publisering av %{item_name} dersom det finst studentinnleveringar"
@@ -3335,6 +3353,7 @@ nn:
   collaborations_5c56c15f: Samarbeid
   collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Samarbeid er nettbaserte verkty som tillet studentar t.d. å ta felles notater eller arbeide med gruppeoppgåver. Start ved å klikke på \"+ Samarbeid\"-knappen."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbeid er nettbaserte verkty som tillet studentar t.d. å ta felles notater eller arbeide med gruppeoppgåver. Start ved å legge til ein samarbeids-app."
+  collaborations_tutorial_tray_9219d9d: "Samarbeid opplæringsmeny"
   collapse_group_c2af7cad: "Skjul gruppe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Skjul medlemslista for gruppe %{groupName}"
   collapse_subdiscussion_89af1f5c: "Skjul underordna diskusjon"
@@ -8655,6 +8674,9 @@ nn:
   loading_25990131: Lastar...
   loading_725811ca: lastar
   loading_announcements_b927a86c: "Lastar kunngjeringar"
+  loading_associations_9da66c4e: "Lastar forbindelsar"
+  loading_associations_complete_b93a9c6e: "Lasting av forbindelsane er ferdig"
+  loading_associations_started_1f65d8d: "Lasting av forbindelsane er starta"
   loading_bde52856: Lastar
   loading_courses_409a3641: "Lastar emne"
   loading_courses_bd1bffe: "Lastar emne... "
@@ -10692,11 +10714,11 @@ nn:
     mute_assignment: "Skjul oppgåve"
     score_change_notifications: "Varsel om resultatendring"
     see_grade: "Deira karakter for oppgåva"
-    students_will_see: "Studentar ser at denne oppgåva er gjort utilgjengeleg."
+    students_will_see: "Studentar ser at denne oppgåva er skjult."
     submission_comments: "Kommentarar til innlevering"
     sure_you_want_to_mute: "Er du sikker på at du vil skjule denne oppgåva? Når oppgåva er utilgjengeleg kan studentane ikkje motta nye varsel om eller sjå:"
   mute_unmute_assignment_62608e44: "Skjul/opphev skjuling av oppgåve"
-  muted_283cfa0f: (utilgjengeleg)
+  muted_283cfa0f: (skjult)
   my_dashboard_b724020: "Mitt dashbord"
   my_themes_b72217b8: "Mine tema"
   n_554bc493: "n"
@@ -13944,6 +13966,9 @@ nn:
   save_grading_period_set_e029fa88: "Lagre sett med karaktersetjingsperiodar"
   save_publish_36440725: "Lagre og publiser"
   save_theme_f706116e: "Lagre tema"
+  saving_associations_989bd4da: "Lagrar forbindelsane"
+  saving_associations_complete_e4b9634d: "Lagring av forbindelsane er ferdig"
+  saving_associations_started_8ac85360: "Lagring av forbindelsane er starta"
   saving_d55dd90e: Lagrar...
   saving_recording_e111cb05: "Lagrar opptak..."
   schedule_student_availability_332154a: "Planlegg tilgjenge studentar"

@@ -559,3 +559,94 @@ define [
     @stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
     @gradebook.updateSubmission(@submission)
     equal(@submission.rawGrade, '123.45')
+
+  QUnit.module 'Gradebook#gotSubmissionsChunk', (hooks) ->
+    $fixtures = null
+    studentSubmissions = null
+    gradebook = null
+
+    hooks.beforeEach (hooks) ->
+      $fixtures = document.createElement('div')
+      document.body.appendChild($fixtures)
+      $fixtures.innerHTML = '
+        <div id="application">
+          <div id="wrapper">
+            <div id="StudentTray__Container"></div>
+            <span data-component="GridColor"></span>
+            <div id="gradebook_grid"></div>
+          </div>
+        </div>
+      '
+
+      gradebook = createGradebook()
+      gradebook.customColumns = []
+      sinon.stub(gradebook, 'getFrozenColumnCount').returns(1)
+      sinon.stub(gradebook, 'updateSubmission')
+      sinon.stub(gradebook, 'setupGrading')
+
+      students = [{
+        id: '1101',
+        name: 'Adam Jones',
+        enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+      }, {
+        id: '1102',
+        name: 'Betty Ford',
+        enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+      }]
+      gradebook.gotChunkOfStudents(students)
+
+      studentSubmissions = [{
+        submissions: [{
+          assignment_id: '201',
+          assignment_visible: true,
+          cached_due_date: '2015-02-01T12:00:00Z',
+          score: 10,
+          user_id: '1101'
+        }, {
+          assignment_id: '202',
+          assignment_visible: true,
+          cached_due_date: '2015-02-02T12:00:00Z',
+          score: 9,
+          user_id: '1101'
+        }],
+        user_id: '1101'
+      }, {
+        submissions: [{
+          assignment_id: '201',
+          assignment_visible: true,
+          cached_due_date: '2015-02-03T12:00:00Z',
+          score: 8,
+          user_id: '1102'
+        }],
+        user_id: '1102'
+      }]
+
+    hooks.afterEach () ->
+      $fixtures.remove()
+
+    test 'updates effectiveDueDates with the submissions', () ->
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      deepEqual(Object.keys(gradebook.effectiveDueDates), ['201', '202'])
+      deepEqual(Object.keys(gradebook.effectiveDueDates[201]), ['1101', '1102'])
+      deepEqual(Object.keys(gradebook.effectiveDueDates[202]), ['1101'])
+
+    test 'updates effectiveDueDates on related assignments', () ->
+      gradebook.assignments =
+        201: { id: '201', name: 'Math Assignment', published: true },
+        202: { id: '202', name: 'English Assignment', published: false }
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      deepEqual(Object.keys(gradebook.assignments[201].effectiveDueDates), ['1101', '1102'])
+      deepEqual(Object.keys(gradebook.assignments[202].effectiveDueDates), ['1101'])
+
+    test 'updates inClosedGradingPeriod on related assignments', () ->
+      gradebook.assignments =
+        201: { id: '201', name: 'Math Assignment', published: true },
+        202: { id: '202', name: 'English Assignment', published: false }
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      deepEqual(Object.keys(gradebook.assignments[201].effectiveDueDates), ['1101', '1102'])
+      deepEqual(Object.keys(gradebook.assignments[202].effectiveDueDates), ['1101'])
+
+    test 'sets up grading for the related students', () ->
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      [students] = gradebook.setupGrading.lastCall.args
+      deepEqual(students.map((student) => student.id), ['1101', '1102'])

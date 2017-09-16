@@ -149,7 +149,7 @@ describe CC::CCHelper do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
-      page = @course.wiki.wiki_pages.create(:title => '9000, the level is over')
+      page = @course.wiki_pages.create(:title => '9000, the level is over')
       html = <<-HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
@@ -162,7 +162,7 @@ describe CC::CCHelper do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
-      page = @course.wiki.wiki_pages.create(:title => '9000')
+      page = @course.wiki_pages.create(:title => '9000')
       html = <<-HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML

@@ -33,7 +33,6 @@ module Factories
     raise "options must be a hash!" unless options.is_a? Hash
     @notification = Notification.where(name: notification_name.to_s).first_or_create!
     user = options[:user]
-    asset_context = options[:asset_context]
     data = options[:data] || {}
     user ||= User.create!(:name => "some user")
 
@@ -45,7 +44,6 @@ module Factories
                            context: asset,
                            user: user,
                            communication_channel: @cc,
-                           asset_context: asset_context,
                            data: data)
     @message.delayed_messages = []
     @message.parse!(path_type.to_s)

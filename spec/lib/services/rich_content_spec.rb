@@ -22,8 +22,9 @@ module Services
   describe RichContent do
     before do
       allow(Services::RichContent).to receive(:contextually_on).and_call_original
+      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(Canvas::DynamicSettings).to receive(:find)
-        .with('rich-content-service', use_env: false)
+        .with('rich-content-service', default_ttl: 5.minutes)
         .and_return({
           "app-host" => "rce-app",
           "cdn-host" => "rce-cdn"
@@ -50,7 +51,7 @@ module Services
 
       it "populates hosts with an error signal when consul is down" do
         allow(Canvas::DynamicSettings).to receive(:find)
-          .with('rich-content-service', use_env: false)
+          .with('rich-content-service', default_ttl: 5.minutes)
           .and_raise(Imperium::UnableToConnectError, "can't talk to consul")
         root_account = double("root_account", feature_enabled?: true)
         env = described_class.env_for(root_account)
@@ -60,7 +61,7 @@ module Services
       end
 
       it "logs errors for later consideration" do
-        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", use_env: false).
+        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).
           and_raise(Canvas::DynamicSettings::ConsulError, "can't talk to consul")
         root_account = double("root_account", feature_enabled?: true)
         expect(Canvas::Errors).to receive(:capture_exception) do |type, e|

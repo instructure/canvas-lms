@@ -274,7 +274,7 @@ input[type="button"] {
 .btn-info, // <-- deprecated- do not use
 .Button--secondary {
   @if $use_high_contrast {
-    @include canvas-button($ic-brand-button--secondary-bgd, $ic-brand-button--secondary-text);
+    @include canvas-button($ic-color-dark, $ic-color-light);
   } @else {
     @include canvas-button(
       var(--ic-brand-button--secondary-bgd),
@@ -306,7 +306,7 @@ input[type="button"] {
 .Button--link {
   border-color: transparent;
   cursor: pointer;
-  color: $ic-link-color;
+  color: var(--ic-link-color);
 
   @if $use_high_contrast {
     text-decoration: underline;
@@ -317,7 +317,7 @@ input[type="button"] {
   }
 
   &:hover {
-    color: $ic-link-color-hover;
+    color: var(--ic-link-color-darkened-10);
     text-decoration: underline;
     background: transparent;
 
@@ -328,16 +328,16 @@ input[type="button"] {
     body.Underline-All-Links__enabled & {
       text-decoration: none;
     }
-    &:focus { color: $ic-link-color; }
+    &:focus { color: var(--ic-link-color); }
   }
 
-  &:focus { color: $ic-link-color; }
+  &:focus { color: var(--ic-link-color); }
 
   &.active, &.Button--active, &:active {
     background: rgba($ic-color-dark, 0.05);
     box-shadow: none;
     border-color: transparent;
-    color: $ic-link-color;
+    color: var(--ic-link-color);
   }
 
   &.disabled, &[disabled] {
@@ -379,7 +379,7 @@ input[type="button"] {
     background: transparent;
     box-shadow: none;
     border-color: transparent;
-    color: $ic-link-color;
+    color: var(--ic-link-color);
   }
 }
 

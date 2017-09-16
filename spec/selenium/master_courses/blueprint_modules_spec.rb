@@ -27,7 +27,7 @@ describe "master courses - child courses - module item locking" do
 
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-      @original_page = @copy_from.wiki.wiki_pages.create!(title: "blah", body: "bloo")
+      @original_page = @copy_from.wiki_pages.create!(title: "blah", body: "bloo")
       @page_mc_tag = @template.create_content_tag_for!(@original_page, restrictions: {content: true})
 
       @original_topic = @copy_from.discussion_topics.create!(title: "blah", message: "bloo")
@@ -37,7 +37,7 @@ describe "master courses - child courses - module item locking" do
       @copy_to = @course
       @sub = @template.add_child_course!(@copy_to)
 
-      @page_copy = @copy_to.wiki.wiki_pages.create!(title: "locked page", migration_id: @page_mc_tag.migration_id)
+      @page_copy = @copy_to.wiki_pages.create!(title: "locked page", migration_id: @page_mc_tag.migration_id)
       @topic_copy = @copy_to.discussion_topics.create!(title: "unlocked topic", migration_id: @topic_mc_tag.migration_id)
       [@page_copy, @topic_copy].each{|obj| @sub.create_content_tag_for!(obj)}
       @assmt = @copy_to.assignments.create!(title: "normal assignment")
@@ -114,7 +114,7 @@ describe "master courses - child courses - module item locking" do
       @assmt = @course.assignments.create!(title: "assmt blah", description: "bloo")
       @assmt_tag = @template.create_content_tag_for!(@assmt)
 
-      @page = @course.wiki.wiki_pages.create!(title: "page blah", body: "bloo")
+      @page = @course.wiki_pages.create!(title: "page blah", body: "bloo")
       @page_tag = @template.create_content_tag_for!(@page, restrictions: {all: true})
 
       @topic = @course.discussion_topics.create!(title: "topic blah", message: "bloo")

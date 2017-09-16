@@ -27,7 +27,7 @@ describe ContentExportsApiController, type: :request do
 
   let_once(:t_course) do
     course_with_teacher(user: t_teacher, active_all: true)
-    @course.wiki.wiki_pages.create! title: "something to export"
+    @course.wiki_pages.create! title: "something to export"
     @course
   end
 
@@ -256,12 +256,12 @@ describe ContentExportsApiController, type: :request do
                            :uploaded_data => StringIO.new("more stuff"), :folder => Folder.unfiled_folder(t_course))
       end
       let_once :page_to_copy do
-        page_to_copy = t_course.wiki.wiki_pages.create!(:title => "other page")
+        page_to_copy = t_course.wiki_pages.create!(:title => "other page")
         page_to_copy.body = "<p><a href=\"/courses/#{t_course.id}/files/#{att_to_copy.id}/preview\">hey look a link</a></p>"
         page_to_copy.save!
         page_to_copy
       end
-      let_once(:page_to_not_copy){ t_course.wiki.wiki_pages.create!(:title => "another page") }
+      let_once(:page_to_not_copy){ t_course.wiki_pages.create!(:title => "another page") }
       let_once(:mod) do
         # both the wiki page and the referenced attachment should be exported implicitly through the module
         mod = t_course.context_modules.create!(:name => "who cares")
@@ -305,9 +305,9 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         expect(@course.context_modules.where(migration_id: CC::CCHelper.create_key(mod))).to be_exists
-        copied_page = @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
+        copied_page = @course.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
         expect(copied_page).not_to be_nil
-        expect(@course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy))).not_to be_exists
+        expect(@course.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy))).not_to be_exists
 
         copied_att = @course.attachments.where(filename: att_to_copy.filename).first
         expect(copied_att).not_to be_nil
@@ -345,9 +345,9 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         expect(@course.context_modules.where(migration_id: CC::CCHelper.create_key(mod))).to be_exists
-        copied_page = @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
+        copied_page = @course.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
         expect(copied_page).not_to be_nil
-        expect(@course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy))).not_to be_exists
+        expect(@course.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy))).not_to be_exists
 
         copied_att = @course.attachments.where(filename: att_to_copy.filename).first
         expect(copied_att).not_to be_nil
@@ -454,9 +454,9 @@ describe ContentExportsApiController, type: :request do
 
         run_jobs
 
-        copied_page = @course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
+        copied_page = @course.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_copy)).first
         expect(copied_page).not_to be_nil
-        expect(@course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy))).not_to be_exists
+        expect(@course.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy))).not_to be_exists
       end
 
       it "should export rubrics attached to discussions" do
@@ -497,7 +497,7 @@ describe ContentExportsApiController, type: :request do
       @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @cm = @course.context_modules.create!(:name => "some module")
       @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @wiki = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
 
       @quiz = @course.quizzes.create!(:title => "quizz")
       @quiz.did_edit
@@ -629,6 +629,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
         export = t_course.content_exports.where(id: json['id']).first
         expect(export).to be_present
+        expect(export.settings["errors"]).to be_blank
         expect(export.attachment).to be_present
         expect(export.attachment.display_name).to eql 'course_files_export.zip'
         tf = export.attachment.open need_local_file: true

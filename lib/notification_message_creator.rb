@@ -19,11 +19,11 @@
 class NotificationMessageCreator
   include LocaleSelection
 
-  attr_accessor :notification, :asset, :asset_context, :to_users, :to_channels, :message_data
+  attr_accessor :notification, :asset, :to_users, :to_channels, :message_data
 
   # Options can include:
   #  :to_list - A list of Users, User IDs, and CommunicationChannels to send to
-  #  :data, :asset_context - Options merged with Message options
+  #  :data - Options merged with Message options
   def initialize(notification, asset, options={})
     @notification = notification
     @asset = asset
@@ -34,7 +34,6 @@ class NotificationMessageCreator
       @to_channels = communication_channels_from_to_list(options[:to_list])
     end
     @message_data = options.delete(:data)
-    @asset_context = options.delete(:asset_context)
   end
 
   # Public: create (and dispatch, and queue delayed) a message
@@ -242,20 +241,16 @@ class NotificationMessageCreator
   def message_options_for(user)
     user_asset = asset_filtered_by_user(user)
 
-    user_asset_context = %w{ContentMigration Submission WikiPage}.include?(user_asset.class.name) ? user_asset.context : user_asset
-
     message_options = {
       :subject => @notification.subject,
       :notification => @notification,
       :notification_name => @notification.name,
       :user => user,
       :context => user_asset,
-      :asset_context => user_asset_context
     }
     # can't just merge these because nil values need to be overwritten in a later merge
     message_options[:delay_for] = @notification.delay_for if @notification.delay_for
     message_options[:data] = @message_data if @message_data
-    message_options[:asset_context] = @asset_context if @asset_context
     message_options
   end
 

@@ -426,7 +426,6 @@ describe Quizzes::QuizzesController do
       submission = @quiz.generate_submission @student
       create_attachment_for_file_upload_submission!(submission)
       get 'show', params: {:course_id => @course.id, :id => @quiz.id}
-
       path = "courses/#{@course.id}/quizzes/#{@quiz.id}/submission_versions"
       expect(assigns[:js_env][:SUBMISSION_VERSIONS_URL]).to include(path)
     end

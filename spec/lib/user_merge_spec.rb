@@ -146,21 +146,28 @@ describe UserMerge do
       qs1 = q1.generate_submission(user1)
       qs2 = q1.generate_submission(user2)
 
+      sub = submission_model(user: user2)
+      sub.quiz_submission_id = qs2
+      sub.save!
+      qs2.submission_id = sub
+      qs2.save!
+
       q2 = quiz_model
       qs3 = q2.generate_submission(user2)
 
-      expect(user1.quiz_submissions.length).to eql(1)
-      expect(user2.quiz_submissions.length).to eql(2)
+      expect(user1.quiz_submissions.length).to be(1)
+      expect(user2.quiz_submissions.length).to be(2)
 
       UserMerge.from(user2).into(user1)
 
       user2.reload
       user1.reload
 
-      expect(user2.quiz_submissions.length).to eql(1)
-      expect(user2.quiz_submissions.first.id).to eql(qs2.id)
+      expect(user2.quiz_submissions.length).to be(1)
+      expect(user2.quiz_submissions.first.id).to be(qs2.id)
+      expect(qs2.reload.submission_id).to be_nil
 
-      expect(user1.quiz_submissions.length).to eql(2)
+      expect(user1.quiz_submissions.length).to be(2)
       expect(user1.quiz_submissions.map(&:id)).to be_include(qs1.id)
       expect(user1.quiz_submissions.map(&:id)).to be_include(qs3.id)
     end
@@ -608,7 +615,7 @@ describe UserMerge do
 
     it "should update other appropriate versions" do
       course_factory(active_all: true)
-      wiki_page = @course.wiki.wiki_pages.create(:title => "Hi", :user_id => user2.id)
+      wiki_page = @course.wiki_pages.create(:title => "Hi", :user_id => user2.id)
       ra = rubric_assessment_model(:context => @course, :user => user2)
 
       expect(wiki_page.versions).to be_present

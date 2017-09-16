@@ -303,4 +303,28 @@ module Calendar2Common
     assert_week_view(title,due)
     assert_month_view(title,due)
   end
+
+  def agenda_item
+    f('.agenda-event__item-container')
+  end
+
+  def all_agenda_items
+    ff('.agenda-event__item-container')
+  end
+
+  def delete_event_button
+    f('.event-details .delete_event_link')
+  end
+
+  def agenda_view_header
+    f('.navigation_title')
+  end
+
+  def agenda_item_title
+    f('.agenda-event__title')
+  end
+
+  def find_appointment_button
+    f('#FindAppointmentButton')
+  end
 end

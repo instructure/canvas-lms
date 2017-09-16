@@ -43,10 +43,16 @@ module Lti
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account, developer_key)
-        tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update, registration_url)
+        tool_proxy = create_tool_proxy(tp: tp,
+                                       context: context,
+                                       product_family: product_family,
+                                       tool_proxy:
+                                       tool_proxy_to_update,
+                                       registration_url: registration_url,
+                                       developer_key: developer_key)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
-        create_tool_settings(tp, tool_proxy)
+        create_or_update_tool_settings(tp, tool_proxy)
       end
 
       tool_proxy.reload
@@ -77,15 +83,25 @@ module Lti
     end
 
     private
+
+    def developer_key_mismatch?(tool_proxy, developer_key)
+      installing_vendor = tool_proxy&.tool_profile&.product_instance&.product_info&.product_family&.vendor&.code
+      return true if installing_vendor.blank?
+      vendor_dev_keys = DeveloperKey.by_cached_vendor_code(installing_vendor)
+      return false if developer_key.blank? && vendor_dev_keys.blank?
+      !vendor_dev_keys.include?(developer_key)
+    end
+
     def deprecated_split_secret?(tp)
       tp.enabled_capability.present? &&
       tp.enabled_capability.include?("OAuth.splitSecret") &&
       tp.security_contract.tp_half_shared_secret.present?
     end
 
-    def create_tool_proxy(tp, context, product_family, tool_proxy=nil, registration_url)
+    def create_tool_proxy(tp:, context:, product_family:, tool_proxy: nil, registration_url:, developer_key: nil)
       # make sure the guid never changes
       raise Lti::Errors::InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
+      raise Errors::InvalidToolProxyError, 'Developer key mismatch' if developer_key_mismatch?(tp, developer_key)
 
       tool_proxy ||= ToolProxy.new
       tool_proxy.registration_url = registration_url
@@ -205,8 +221,13 @@ module Lti
       end
     end
 
-    def create_tool_settings(tp, tool_proxy)
-      ToolSetting.create!(tool_proxy:tool_proxy, custom: tp.custom) if tp.custom.present?
+    def create_or_update_tool_settings(tp, tool_proxy)
+      if tp.custom.present?
+        tool_setting = ToolSetting.where(tool_proxy:tool_proxy).first_or_create!
+        custom = tool_setting.custom || {}
+        tool_setting.update(custom: custom.merge(tp.custom) )
+      end
+
     end
 
     def create_json(obj)

@@ -100,7 +100,7 @@ describe "master courses - locked items" do
 
     # setup some stuff
     @assignment = @master.assignments.create!(title: 'Blah', points_possible: 10)
-    @page = @master.wiki.wiki_pages.create!(title: 'Unicorn')
+    @page = @master.wiki_pages.create!(title: 'Unicorn')
     @quiz = @master.quizzes.create!(title: 'TestQuiz')
     @discussion = @master.discussion_topics.create!(title: 'My discussion')
 

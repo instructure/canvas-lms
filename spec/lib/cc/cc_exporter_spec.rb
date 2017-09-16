@@ -26,7 +26,7 @@ describe "Common Cartridge exporting" do
     course = course_model
     user = user_model
     message = "fail"
-    allow(course).to receive(:wiki).and_raise(message)
+    allow(course).to receive(:wiki_pages).and_raise(message)
     content_export = ContentExport.new
     content_export.context = course
     content_export.user = user
@@ -121,8 +121,8 @@ describe "Common Cartridge exporting" do
       @cm1 = @course.context_modules.create!(:name => "another module")
       @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @att2 = Attachment.create!(:filename => 'second.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
-      @wiki2 = @course.wiki.wiki_pages.create!(:title => "wiki2", :body => "ohais")
+      @wiki = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @wiki2 = @course.wiki_pages.create!(:title => "wiki2", :body => "ohais")
       @event = @course.calendar_events.create!(:title => "event", :start_at =>1.week.from_now)
       @event1 = @course.calendar_events.create!(:title => "event2", :start_at =>2.weeks.from_now)
       @bank = @course.assessment_question_banks.create!(:title => 'bank')
@@ -469,7 +469,7 @@ describe "Common Cartridge exporting" do
       allow(CC::CCHelper).to receive(:media_object_info).and_return({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
-      page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
       page.body = %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>}
       page.save!
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
@@ -648,7 +648,7 @@ describe "Common Cartridge exporting" do
         assignment = @course.assignments.create!({title: 'assignment', unlock_at: 5.days.from_now})
         quiz = @course.quizzes.create!(title: 'quiz', unlock_at: 5.days.from_now)
         topic = @course.discussion_topics.create!(title: 'topic', unlock_at: 5.days.from_now)
-        page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+        page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
         mod = @course.context_modules.create!(:name => "some module")
         mod.add_item(type: 'page', id: page.id)
         mod.unlock_at = 5.days.from_now

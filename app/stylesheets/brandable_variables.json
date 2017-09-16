@@ -83,7 +83,7 @@
     "variable_name": "ic-brand-header-image",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg,image/svg",
-    "default": "/images/svg-icons/svg_canvas_logomark_only.svg"
+    "default": "/images/canvas_logomark_only@2x.png"
   }
 ]},
 {

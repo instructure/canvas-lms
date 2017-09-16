@@ -150,6 +150,9 @@ module AccountReports
             :user_observers => {
               :description => 'Get the Provisioning file for user_observers'
             },
+            :admins => {
+              :description => 'Get the Provisioning file for admins'
+            },
             :created_by_sis => {
               :description => 'Only include objects that were created by sis'
             },
@@ -207,6 +210,9 @@ module AccountReports
             },
             :user_observers => {
               :description => 'Get the SIS file for user_observers'
+            },
+            :admins => {
+              :description => 'Get the SIS file for admins'
             },
             :created_by_sis => {
               :description => 'Only include objects that were created by sis'

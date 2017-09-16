@@ -25,7 +25,7 @@ describe MarkDonePresenter do
   end
 
   let(:the_module) { @course.context_modules.create(:name => "mark_as_done_module") }
-  let(:wiki_page) { @course.wiki.wiki_pages.create(:title => "mark_as_done page", :body => "") }
+  let(:wiki_page) { @course.wiki_pages.create(:title => "mark_as_done page", :body => "") }
 
   def add_wiki_page_to_module
     the_module.add_item(:id => wiki_page.id, :type => 'wiki_page')

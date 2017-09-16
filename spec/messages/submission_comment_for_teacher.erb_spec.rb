@@ -29,4 +29,26 @@ describe 'submission_comment_for_teacher' do
   let(:notification_name) { :submission_comment_for_teacher }
 
   include_examples "a message"
+
+  context ".email" do
+    let(:path_type) { :email }
+
+    it "should render" do
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.url).to match(/\/courses\/\d+\/assignments\/\d+\/submissions\/\d+/)
+      expect(msg.body.include?("new comment on the submission")).to eq true
+    end
+
+    it "should render correct footer if replys are enabled" do
+      IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.body.include?("responding to this message")).to eq true
+    end
+
+    it "should render correct footer if replys are disabled" do
+      IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.body.include?("responding to this message")).to eq false
+    end
+  end
 end

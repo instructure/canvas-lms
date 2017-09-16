@@ -277,9 +277,9 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-rate-action--checked {
-  color: $linkColor;
+  color: var(--ic-link-color);
   &:hover, &:focus {
-    color: $linkColor;
+    color: var(--ic-link-color);
   }
 }
 
@@ -533,7 +533,7 @@ $discussion-dark-text: $ic-color-dark;
   &:hover, &:focus {
     color: #444;
     text-decoration: none;
-    border-color: lighten($ic-link-color, 5%);
+    border-color: var(--ic-link-color);
   }
 }
 

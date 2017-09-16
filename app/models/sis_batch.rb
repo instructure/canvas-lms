@@ -31,6 +31,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :user
 
   before_save :limit_size_of_messages
+  after_save :cleanup_error_files_when_finished
 
   validates_presence_of :account_id, :workflow_state
   validates_length_of :diffing_data_set_identifier, maximum: 128
@@ -283,6 +284,7 @@ class SisBatch < ActiveRecord::Base
     @data_file&.close
     @data_file = nil
     return self if workflow_state == 'aborted'
+    remove_previous_imports if self.batch_mode? && import_finished
     compile_all_errors
     finalize_workflow_state(import_finished)
     self.progress = 100
@@ -292,7 +294,6 @@ class SisBatch < ActiveRecord::Base
 
   def finalize_workflow_state(import_finished)
     if import_finished
-      remove_previous_imports if self.batch_mode?
       return if workflow_state == 'aborted'
       self.workflow_state = :imported
       self.workflow_state = :imported_with_messages if messages?
@@ -389,7 +390,8 @@ class SisBatch < ActiveRecord::Base
   def remove_previous_imports
     # we shouldn't be able to get here without a term, but if we do, skip
     return unless self.batch_mode_term
-    return unless data[:supplied_batches]
+    supplied_batches = data[:supplied_batches].dup.keep_if { |i| [:course, :section, :enrollment].include? i }
+    return unless supplied_batches.present?
     SisBatch.where(id: self).update_all(workflow_state: 'cleanup_batch')
 
     count = 0
@@ -486,7 +488,6 @@ class SisBatch < ActiveRecord::Base
       end
     end
     write_all_errors(all_errors)
-    cleanup_error_files
   end
 
   def write_all_errors(errors)
@@ -503,9 +504,15 @@ class SisBatch < ActiveRecord::Base
     )
   end
 
+  def cleanup_error_files_when_finished
+    return unless self.errors_attachment_id?
+    cleanup_error_files
+  end
+
   def cleanup_error_files
     atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).to_a
     atts.each do |a|
+      a.reload
       a.make_childless
       a.destroy_content unless a.root_attachment_id?
     end

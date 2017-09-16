@@ -414,10 +414,12 @@ class UsersController < ApplicationController
           search_term = params[:search_term].presence
           page_opts = {}
           if search_term
-            users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, {order: params[:order], sort: params[:sort]})
+            users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
+              {order: params[:order], sort: params[:sort], role_filter_id: params[:role_filter_id]})
             page_opts[:total_entries] = nil # doesn't calculate a total count
           else
-            users = UserSearch.scope_for(@context, @current_user, order: params[:order], sort: params[:sort])
+            users = UserSearch.scope_for(@context, @current_user,
+              {order: params[:order], sort: params[:sort], role_filter_id: params[:role_filter_id]})
           end
 
           includes = (params[:include] || []) & %w{avatar_url email last_login time_zone}
@@ -467,7 +469,30 @@ class UsersController < ApplicationController
       return_url = session[:masquerade_return_to]
       session.delete(:masquerade_return_to)
       @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
-      return return_to(return_url, request.referer || dashboard_url)
+      if request.referer =~ /.*\/users\/#{@user.id}\/masquerade/
+        return return_to(return_url, dashboard_url)
+      else
+        return return_to(return_url, request.referer || dashboard_url)
+      end
+    else
+      js_bundle :act_as_modal
+      css_bundle :act_as_modal
+
+      @page_title = t('Act as %{user_name}', user_name: @user.short_name)
+      js_env act_as_user_data: {
+        user: {
+          name: @user.name,
+          short_name: @user.short_name,
+          id: @user.id,
+          avatar_image_url: @user.avatar_image_url,
+          sortable_name: @user.sortable_name,
+          email: @user.email,
+          login_id: @user.pseudonym.login,
+          sis_id: @user.pseudonym.sis_user_id,
+          integration_id: @user.pseudonym.integration_id
+        }
+      }
+      render :text => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
     end
   end
 
@@ -482,6 +507,11 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if planner_enabled?
+      js_env :DEBUG_PLANNER => Rails.env.development? || Rails.env.test?
+      js_bundle :react_todo_sidebar
+      css_bundle :react_todo_sidebar
+    end
     session.delete(:parent_registration) if session[:parent_registration]
     check_incomplete_registration
     get_context
@@ -1904,7 +1934,7 @@ class UsersController < ApplicationController
       @entries.concat context.assignments.active.where("updated_at>?", cutoff)
       @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
       @entries.concat context.discussion_topics.active.where("updated_at>?", cutoff)
-      @entries.concat context.wiki.wiki_pages.not_deleted.where("updated_at>?", cutoff)
+      @entries.concat context.wiki_pages.not_deleted.where("updated_at>?", cutoff)
     end
     @entries.each do |entry|
       feed.entries << entry.to_atom(:include_context => true, :context => @context)

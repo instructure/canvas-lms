@@ -264,8 +264,8 @@ describe ContentMigration do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
-      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
-      page2 = @copy_from.wiki.wiki_pages.create!(:title => "some page 2")
+      page = @copy_from.wiki_pages.create!(:title => "some page")
+      page2 = @copy_from.wiki_pages.create!(:title => "some page 2")
       mod1.add_item({:id => page.id, :type => 'wiki_page'})
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
@@ -305,7 +305,7 @@ describe ContentMigration do
 
 
       expect(@copy_to.assignments.where(migration_id: mig_id(asmnt1)).first).not_to be_nil
-      expect(@copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first).not_to be_nil
+      expect(@copy_to.wiki_pages.where(migration_id: mig_id(page)).first).not_to be_nil
       expect(@copy_to.attachments.where(migration_id: mig_id(att)).first).not_to be_nil
       expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool)).first).not_to be_nil
       expect(@copy_to.discussion_topics.where(migration_id: mig_id(topic)).first).not_to be_nil
@@ -314,7 +314,7 @@ describe ContentMigration do
       expect(@copy_to.context_modules.where(migration_id: mig_id(mod2)).first).to be_nil
       expect(@copy_to.assignments.where(migration_id: mig_id(asmnt2)).first).to be_nil
       expect(@copy_to.attachments.where(migration_id: mig_id(att2)).first).to be_nil
-      expect(@copy_to.wiki.wiki_pages.where(migration_id: mig_id(page2)).first).to be_nil
+      expect(@copy_to.wiki_pages.where(migration_id: mig_id(page2)).first).to be_nil
       expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool2)).first).to be_nil
       expect(@copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first).to be_nil
       expect(@copy_to.quizzes.where(migration_id: mig_id(quiz2)).first).to be_nil

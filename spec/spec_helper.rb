@@ -338,9 +338,7 @@ RSpec.configure do |config|
     HostUrl.reset_cache!
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
-    Attachment.clear_cached_mime_ids
     Folder.reset_path_lookups!
-    Role.ensure_built_in_roles!
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
@@ -348,6 +346,7 @@ RSpec.configure do |config|
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
+    MultiCache.reset
     Course.enroll_user_call_count = 0
     $spec_api_tokens = {}
   end
@@ -362,6 +361,7 @@ RSpec.configure do |config|
 
   config.before :all do
     raise "all specs need to use transactions" unless using_transactions_properly?
+    Role.ensure_built_in_roles!
   end
 
   Onceler.configure do |c|
@@ -562,6 +562,7 @@ RSpec.configure do |config|
     previous_perform_caching = ActionController::Base.perform_caching
     allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
+    MultiCache.reset
     if block_given?
       begin
         yield

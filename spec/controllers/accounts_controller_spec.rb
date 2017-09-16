@@ -925,5 +925,100 @@ describe AccountsController do
       expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"xylophone\".+\"name\":\"bar\".+\"name\":\"foo\"/)
     end
 
+    it "should be able to search by teacher" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+
+      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
+      user.save!
+      enrollment.course = @c3
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c3.reload
+
+      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'active'
+      enrollment2.save!
+      @c3.reload
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+
+      @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "hot dog eating", sis_source_id: 63))
+
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "teacher", order: "asc", search_by: "teacher", search_term: "teach"}
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"hot dog eating\".+\"name\":\"xylophone\"/)
+    end
+
+    it "should be able to search by course name" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+
+      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
+      user.save!
+      enrollment.course = @c3
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c3.reload
+
+      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'active'
+      enrollment2.save!
+      @c3.reload
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 52))
+
+      @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "cappuccino", sis_source_id: 63))
+
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "course_name", order: "asc", search_by: "course", search_term: "aPp"}
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"Apps\".+\"name\":\"cappuccino\"/)
+      expect(response.body).not_to match(/\"name\":\"apple\".+\"name\":\"Apps\".+\"name\":\"bar\".+\"name\":\"cappuccino\".+\"name\":\"foo\"/)
+    end
+
+    it "should be able to search by course sis id" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30012)
+
+      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
+      user.save!
+      enrollment.course = @c3
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c3.reload
+
+      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'active'
+      enrollment2.save!
+      @c3.reload
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
+
+      @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "cappuccino", sis_source_id: 63))
+
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "course_name", order: "asc", search_by: "course", search_term: "300"}
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"Apps\"/)
+      expect(response.body).not_to match(/\"name\":\"apple\".+\"name\":\"Apps\".+\"name\":\"bar\".+\"name\":\"cappuccino\".+\"name\":\"foo\"/)
+    end
+
   end
 end

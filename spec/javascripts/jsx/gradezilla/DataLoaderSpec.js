@@ -389,7 +389,30 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     equal(typeof dataLoader.gotGradingPeriodAssignments, 'undefined');
   });
 
-  QUnit.module('Custom Column Data');
+  QUnit.module('Custom Columns');
+
+  test('requests custom columns using the given url', function () {
+    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
+
+    callLoadGradebookData();
+
+    const userIdsRequests = XHRS.filter(xhr => xhr.url.match('/customcols'));
+    strictEqual(userIdsRequests.length, 1, 'one request for custom columns was made');
+  });
+
+  test('includes hidden columns when requesting custom columns', function (assert) {
+    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotCustomColumns.then(() => {
+      const request = XHRS.find(xhr => xhr.url.match('/customcols'));
+      const params = qs.parse(request.url.split('?')[1]);
+      equal(params.include_hidden, 'true');
+      resolve();
+    });
+  });
 
   test('resolves promise with custom columns', function (assert) {
     respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);

@@ -16,11 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
 import 'jquery.instructure_date_and_time'
-import I18n from 'i18n!gradebook_history';
-import environment from 'jsx/gradebook-history/environment';
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 
 const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
@@ -30,32 +26,33 @@ const FETCH_HISTORY_NEXT_PAGE_START = 'FETCH_HISTORY_NEXT_PAGE_START';
 const FETCH_HISTORY_NEXT_PAGE_SUCCESS = 'FETCH_HISTORY_NEXT_PAGE_SUCCESS';
 const FETCH_HISTORY_NEXT_PAGE_FAILURE = 'FETCH_HISTORY_NEXT_PAGE_FAILURE';
 
-function indexNameById (collection = []) {
+function indexById (collection = []) {
   return collection.reduce((acc, item) => {
-    acc[item.id] = item.name;
+    acc[item.id] = item;
     return acc;
   }, {});
 }
 
 function formatHistoryItems (data) {
   const historyItems = data.events || [];
-  const users = indexNameById(data.users);
-  const assignments = indexNameById(data.assignments);
+  const users = indexById(data.users);
+  const assignments = indexById(data.assignments);
 
-  return historyItems.map((item) => {
-    const dateChanged = new Date(item.created_at);
-    return {
-      date: $.dateString(dateChanged, { format: 'medium', timezone: environment.timezone() }),
-      time: $.timeString(dateChanged, { format: 'medium', timezone: environment.timezone() }),
-      from: GradeFormatHelper.formatGrade(item.grade_before, { defaultValue: '-' }),
-      to: GradeFormatHelper.formatGrade(item.grade_after, { defaultValue: '-' }),
-      grader: users[item.links.grader] || I18n.t('Not available'),
-      student: users[item.links.student] || I18n.t('Not available'),
-      assignment: assignments[item.links.assignment] || I18n.t('Not available'),
-      anonymous: item.graded_anonymously ? I18n.t('yes') : I18n.t('no'),
-      id: item.id
-    };
-  });
+  return historyItems.map(item => (
+    {
+      anonymous: item.graded_anonymously,
+      assignment: assignments[item.links.assignment] ? assignments[item.links.assignment].name : '',
+      date: item.created_at,
+      displayAsPoints: assignments[item.links.assignment] ? assignments[item.links.assignment].grading_type === 'points' : false,
+      grader: users[item.links.grader] ? users[item.links.grader].name : '',
+      gradeAfter: item.grade_after || '',
+      gradeBefore: item.grade_before || '',
+      id: item.id,
+      pointsPossibleAfter: item.points_possible_after ? item.points_possible_after.toString() : '',
+      pointsPossibleBefore: item.points_possible_before ? item.points_possible_before.toString() : '',
+      student: users[item.links.student] ? users[item.links.student].name : '',
+    }
+  ));
 }
 
 function fetchHistoryStart () {

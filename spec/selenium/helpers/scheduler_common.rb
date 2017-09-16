@@ -187,4 +187,24 @@ module SchedulerCommon
     f('.edit_event_link').click
     wait_for_ajaximations
   end
+
+  def limit_timeslot_checkbox
+    f('[type=checkbox][name="per_slot_option"]')
+  end
+
+  def allow_visibility_checkbox
+    f('[type=checkbox][name="participant_visibility"]')
+  end
+
+  def limit_participation_checkbox
+    f('[type=checkbox][name="max_appointments_per_participant_option"]')
+  end
+
+  def agenda_item
+    f('.agenda-event__item .agenda-event__item-container')
+  end
+
+  def scheduler_event
+    f('.fc-event.scheduler-event')
+  end
 end

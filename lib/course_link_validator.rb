@@ -124,7 +124,7 @@ class CourseLinkValidator
     progress.update_completion! 85
 
     # Wiki pages
-    self.course.wiki.wiki_pages.not_deleted.each do |page|
+    self.course.wiki_pages.not_deleted.each do |page|
       find_invalid_links(page.body) do |links|
         self.issues << {:name => page.title, :type => :wiki_page,
                    :content_url => "/courses/#{self.course.id}/pages/#{page.url}"}.merge(:invalid_links => links)

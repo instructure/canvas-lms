@@ -67,60 +67,46 @@ module Canvas
     @redis = nil
   end
 
-  def self.cache_stores
-    unless @cache_stores
-      # this method is called really early in the bootup process, and
-      # autoloading might not be available yet, so we need to manually require
-      # Config
-      require_dependency 'lib/config_file'
-      @cache_stores = {}
-      configs = ConfigFile.load('cache_store', false) || {}
+  def self.cache_store_config_for(cluster)
+    yaml_config = ConfigFile.load("cache_store", cluster)
+    consul_config = YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: cluster)["cache_store.yml"] || "{}") || {}
+    consul_config = consul_config.with_indifferent_access if consul_config.is_a?(Hash)
 
-      non_hashes = configs.keys.select { |k| !configs[k].is_a?(Hash) }
-      non_hashes.reject! { |k| configs[k].is_a?(String) && configs[configs[k]].is_a?(Hash) }
-      unless non_hashes.empty?
-        raise <<-EOS
-          Invalid config/cache_store.yml: Some keys are not hashes:
-          #{non_hashes.join(', ')}. See comments in
-          config/cache_store.yml.example
-        EOS
-      end
+    consul_config.presence || yaml_config
+  end
 
-      configs.each do |env, config|
-        config = {'cache_store' => 'nil_store'}.merge(config)
-        case config.delete('cache_store')
-        when 'redis_store'
-          Bundler.require 'redis'
-          require_dependency 'canvas/redis'
-          Canvas::Redis.patch
-          # if cache and redis data are configured identically, we want to share connections
-          if config == {} && env == Rails.env && Canvas.redis_enabled?
-            # A bit of gymnastics to wrap an existing Redis::Store into an ActiveSupport::Cache::RedisStore
-            store = ActiveSupport::Cache::RedisStore.new([])
-            store.instance_variable_set(:@data, Canvas.redis.__getobj__)
-            @cache_stores[env] = store
-          else
-            # merge in redis.yml, but give precedence to cache_store.yml
-            #
-            # the only options currently supported in redis-cache are the list of
-            # servers, not key prefix or database names.
-            config = (ConfigFile.load('redis', env) || {}).merge(config)
-            config_options = config.symbolize_keys.except(:key, :servers, :database)
-            servers = config['servers']
-            if servers
-              servers = config['servers'].map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
-              @cache_stores[env] = :redis_store, servers
-            end
-          end
-        when 'memory_store'
-          @cache_stores[env] = :memory_store
-        when 'nil_store'
-          @cache_stores[env] = :null_store
+  def self.lookup_cache_store(config, cluster)
+    config = {'cache_store' => 'nil_store'}.merge(config)
+    case config.delete('cache_store')
+    when 'redis_store'
+      Bundler.require 'redis'
+      require_dependency 'canvas/redis'
+      Canvas::Redis.patch
+      # if cache and redis data are configured identically, we want to share connections
+      if config == {}
+        # A bit of gymnastics to wrap an existing Redis::Store into an ActiveSupport::Cache::RedisStore
+        store = ActiveSupport::Cache::RedisStore.new([])
+        store.instance_variable_set(:@data, Canvas.redis.__getobj__)
+        # yes, this would appear to be a no-op, but it allows switchman to add per-shard namespacing
+        ActiveSupport::Cache.lookup_store(store)
+      else
+        # merge in redis.yml, but give precedence to cache_store.yml
+        #
+        # the only options currently supported in redis-cache are the list of
+        # servers, not key prefix or database names.
+        config = (ConfigFile.load('redis', cluster) || {}).merge(config)
+        config_options = config.symbolize_keys.except(:key, :servers, :database)
+        servers = config.delete('servers')
+        if servers
+          servers = servers.map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
+          ActiveSupport::Cache.lookup_store(:redis_store, servers, config)
         end
       end
-      @cache_stores[Rails.env] ||= :null_store
+    when 'memory_store'
+      ActiveSupport::Cache.lookup_store(:memory_store)
+    when 'nil_store', 'null_store'
+      ActiveSupport::Cache.lookup_store(:null_store)
     end
-    @cache_stores
   end
 
   # `sample` reports KB, not B

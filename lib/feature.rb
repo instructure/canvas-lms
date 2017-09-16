@@ -497,7 +497,7 @@ END
       description: -> { I18n.t('Enable the creation of Blueprint Courses') },
       applies_to: 'RootAccount',
       state: 'allowed',
-      beta: true,
+      beta: false,
     },
     'student_context_cards' =>
     {

@@ -71,6 +71,32 @@ describe CustomGradebookColumnDataApiController, type: :request do
       expect(json).to eq [custom_gradebook_column_datum_json(d, @user, session)]
     end
 
+    it 'includes students with inactive enrollments' do
+      student = user_factory(active_all: true)
+      @course.default_section.enroll_user(student, 'StudentEnrollment', 'inactive')
+      @col.custom_gradebook_column_data.create!(user_id: student.id, content: "Example Note")
+      @user = @teacher
+      json = api_call :get,
+        "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
+        course_id: @course.to_param, id: @col.to_param, action: "index",
+        controller: "custom_gradebook_column_data_api", format: "json"
+      expect(response).to be_success
+      expect(json.map {|datum| datum["user_id"]}).to include student.id
+    end
+
+    it 'includes students with concluded enrollments' do
+      student = user_factory(active_all: true)
+      @course.default_section.enroll_user(student, 'StudentEnrollment', 'completed')
+      @col.custom_gradebook_column_data.create!(user_id: student.id, content: "Example Note")
+      @user = @teacher
+      json = api_call :get,
+        "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
+        course_id: @course.to_param, id: @col.to_param, action: "index",
+        controller: "custom_gradebook_column_data_api", format: "json"
+      expect(response).to be_success
+      expect(json.map {|datum| datum["user_id"]}).to include student.id
+    end
+
     it 'returns the column data' do
       json = api_call :get,
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
@@ -128,6 +154,26 @@ describe CustomGradebookColumnDataApiController, type: :request do
          controller: "custom_gradebook_column_data_api", format: "json"},
         "column_data[content]" => "jkl;"
       assert_status(404)
+    end
+
+    it 'works for students with inactive enrollments' do
+      student = user_factory(active_all: true)
+      @course.default_section.enroll_user(student, 'StudentEnrollment', 'inactive')
+      @user = @teacher
+      update(student, "Example Note")
+      expect(response).to be_success
+      datum = @col.custom_gradebook_column_data.find_by(user_id: student.id)
+      expect(datum.content).to eq "Example Note"
+    end
+
+    it 'works for students with concluded enrollments' do
+      student = user_factory(active_all: true)
+      @course.default_section.enroll_user(student, 'StudentEnrollment', 'completed')
+      @user = @teacher
+      update(student, "Example Note")
+      expect(response).to be_success
+      datum = @col.custom_gradebook_column_data.find_by(user_id: student.id)
+      expect(datum.content).to eq "Example Note"
     end
 
     it 'works' do

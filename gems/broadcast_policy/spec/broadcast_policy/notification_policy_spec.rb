@@ -59,13 +59,6 @@ describe BroadcastPolicy::NotificationPolicy do
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
-  it "should send even if there isn't a context" do
-    record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
-    subject.context = ->(_) { nil }
-    subject.broadcast(record)
-    expect(BroadcastPolicy.notifier.messages).to_not be_empty
-  end
-
   it "should send even if there isn't data" do
     record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.data = ->(_) { nil }

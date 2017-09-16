@@ -405,6 +405,7 @@ class ContentMigration < ActiveRecord::Base
     if !self.migration_settings.has_key?(:overwrite_quizzes)
       self.migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
     end
+    self.migration_settings.reverse_merge!(:prefer_existing_tools => true) if self.migration_type == 'common_cartridge_importer' # default to true
 
     check_quiz_id_prepender
   end
@@ -585,8 +586,6 @@ class ContentMigration < ActiveRecord::Base
       next unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(klass)
       mig_ids = deletions[klass]
       item_scope = case klass
-      when 'WikiPage'
-        self.context.wiki.wiki_pages.not_deleted.where(migration_id: mig_ids)
       when 'Attachment'
         self.context.attachments.not_deleted.where(migration_id: mig_ids)
       else
@@ -600,6 +599,7 @@ class ContentMigration < ActiveRecord::Base
           add_skipped_item(child_tag)
         else
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
+          content.skip_downstream_changes!
           content.destroy
         end
       end
@@ -904,4 +904,25 @@ class ContentMigration < ActiveRecord::Base
         record.master_migration && record.master_migration.send_notification?
     }
   end
+
+  def self.expire_days
+    Setting.get('content_migrations_expire_after_days', '30').to_i
+  end
+
+  def self.expire?
+    ContentMigration.expire_days > 0
+  end
+
+  def expired?
+    return false unless ContentMigration.expire?
+    created_at < ContentMigration.expire_days.days.ago
+  end
+
+  scope :expired, -> {
+    if ContentMigration.expire?
+      where('created_at < ?', ContentMigration.expire_days.days.ago)
+    else
+      none
+    end
+  }
 end

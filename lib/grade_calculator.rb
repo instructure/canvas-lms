@@ -97,6 +97,7 @@ class GradeCalculator
 
   def compute_scores_and_group_sums_for_batch(user_ids)
     user_ids.map do |user_id|
+      next unless enrollments_by_user[user_id].first
       group_sums = compute_group_sums_for_user(user_id)
       scores = compute_scores_for_user(user_id, group_sums)
       update_changes_hash_for_user(user_id, scores)
@@ -106,7 +107,7 @@ class GradeCalculator
         final: scores[:final],
         final_groups: group_sums[:final].index_by { |group| group[:id] }
       }
-    end
+    end.compact
   end
 
   def assignment_visible_to_student?(assignment_id, user_id)

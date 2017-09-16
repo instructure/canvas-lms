@@ -140,6 +140,10 @@ module SIS
             should_update_account_associations = false
 
             if !status_is_active && !user.new_record?
+              if user.id == @batch&.user_id
+                @messages << "Can't remove yourself user_id '#{user_row.user_id}'"
+                next
+              end
               # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and
               # delete the pseudonym.
               enrollment_ids = @root_account.enrollments.active.where(user_id: user).where.not(:workflow_state => 'deleted').pluck(:id)
@@ -183,7 +187,7 @@ module SIS
               user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
               @messages << I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
             end
-            pseudo.integration_id = user_row.integration_id
+            pseudo.integration_id = user_row.integration_id if user_row.integration_id
             pseudo.account = @root_account
             pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
             if pseudo.new_record? && status_is_active

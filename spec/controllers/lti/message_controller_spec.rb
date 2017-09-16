@@ -121,7 +121,7 @@ module Lti
     describe "GET #reregistration" do
       before(:each) do
         MessageHandler.create!(
-          message_type: IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE,
+          message_type: IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE,
           launch_path: 'https://samplelaunch/rereg',
           resource_handler: default_resource_handler
         )
@@ -134,8 +134,8 @@ module Lti
           expect(response.code).to eq "200"
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
-          expect(launch_params['lti_message_type'])
-            .to eq IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE
+          expect(launch_params[:lti_message_type])
+            .to eq IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE
         end
 
         it 'sends the correct version' do
@@ -144,7 +144,7 @@ module Lti
           get 'reregistration', params: {course_id: course.id, tool_proxy_id: tool_proxy.id}
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
-          expect(launch_params['lti_version']).to eq 'LTI-2p1'
+          expect(launch_params[:lti_version]).to eq 'LTI-2p0'
         end
 
         it 'sends the correct resource_url' do
@@ -171,7 +171,7 @@ module Lti
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
           account_tp_url_stub = course_tool_consumer_profile_url(course)
-          expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
+          expect(launch_params[:tc_profile_url]).to include(account_tp_url_stub)
         end
 
         it 'sends the correct launch_presentation_return_url' do
@@ -182,7 +182,7 @@ module Lti
           launch_params = lti_launch.params
 
           expected_launch = "courses/#{course.id}/lti/registration_return"
-          expect(launch_params['launch_presentation_return_url']).to include expected_launch
+          expect(launch_params[:launch_presentation_return_url]).to include expected_launch
         end
 
 
@@ -348,6 +348,28 @@ module Lti
           expect(authenticator.valid_signature?).to eq true
         end
 
+        it 'returns the roles as an array' do
+          tool_proxy.raw_data['enabled_capability'] += enabled_capability
+          tool_proxy.save!
+          get 'basic_lti_launch_request', params: {account_id: account.id,
+                                                   message_handler_id: message_handler.id,
+                                                   params: { tool_launch_context: 'my_custom_context' }}
+          params = assigns[:lti_launch].params.stringify_keys!
+          message = IMS::LTI::Models::Messages::Message.generate(params)
+          expect(message.post_params["roles"]).to eq ["http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
+        end
+
+        it 'url encodes the aud' do
+          message_handler.launch_path = "http://example.com/test?query with space=true"
+          message_handler.save!
+          get 'basic_lti_launch_request', params: {account_id: account.id,
+                                                   message_handler_id: message_handler.id,
+                                                   params: { tool_launch_context: 'my_custom_context' }}
+          params = assigns[:lti_launch].params.stringify_keys!
+          aud = JSON::JWT.decode(params["jwt"], :skip_verification)["aud"]
+          expect(aud).to eq "http://example.com/test?query%20with%20space=true"
+        end
+
       end
 
       context 'account' do
@@ -424,6 +446,16 @@ module Lti
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['roles']).to eq "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
         end
+
+        it 'returns the oauth_callback' do
+          tool_proxy.raw_data['enabled_capability'] += enabled_capability
+          tool_proxy.save!
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                   params: { tool_launch_context: 'my_custom_context' }}
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['oauth_callback']).to eq 'about:blank'
+        end
+
 
         it 'adds module item substitutions' do
           parameters = %w( Canvas.module.id Canvas.moduleItem.id ).map do |key|

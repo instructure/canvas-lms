@@ -160,6 +160,15 @@ describe "Canvas::Redis" do
         expect(Canvas.redis.client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
         expect(Canvas.redis.setnx('my_key', 5)).to eq nil
       end
+
+      it "distinguishes between failure and not exists for set nx" do
+        Canvas.redis.del('my_key')
+        expect(Canvas.redis.set('my_key', 5, nx: true)).to eq true
+        expect(Canvas.redis.set('my_key', 5, nx: true)).to eq false
+        expect(Canvas.redis.client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
+        expect(Canvas.redis.set('my_key', 5, nx: true)).to eq nil
+      end
+
     end
   end
 

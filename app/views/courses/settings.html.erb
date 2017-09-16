@@ -256,7 +256,9 @@
           <% no_language = t(:no_language_preference, "Not set (user-configurable, defaults to %{language})", :language => available_locales[infer_locale(:context => @context.account)]) %>
           <% if can_manage %>
             <div>
-              <%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @context.locale}, {:class => 'locale'} %>
+              <%= f.select :locale,
+                           [[no_language, nil]] + available_locales.invert.sort_by { |desc, _| Canvas::ICU.collation_key(desc) },
+                           {:selected => @context.locale}, {:class => 'locale'} %>
               <%= render :partial => 'shared/locale_warning' %>
               <p> <%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/instructure/canvas-crowdsource/"
   Join the [Canvas Translation Community](%{transifex_url})
@@ -308,7 +310,7 @@
         <td class="form-label"><%= f.label :license, :en => "License" %></td>
         <td colspan="3">
           <% if can_manage %>
-            <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license], id]}.partition{|n, id| id.start_with?('cc')} %>
+            <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license].call, id]}.partition{|n, id| id.start_with?('cc')} %>
             <select name="course[license]" id="course_license">
               <%= options_for_select(non_cc, @context.license) %>
               <%= grouped_options_for_select([[t("Creative Commons Licenses"), cc]], @context.license) %>

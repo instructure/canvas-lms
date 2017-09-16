@@ -64,6 +64,12 @@ define [
     name: ->
       @get 'title'
 
+    canManage: ->
+      @get('can_edit') || @canManageInContext()
+
+    canManageInContext: ->
+      ENV.ROOT_OUTCOME_GROUP?.context_type == "Course" && ENV.PERMISSIONS?.manage_outcomes && ENV.current_user_roles?.includes('admin')
+
     isNative: ->
       @outcomeLink && (@get('context_id') == @outcomeLink.context_id && @get('context_type') == @outcomeLink.context_type)
 

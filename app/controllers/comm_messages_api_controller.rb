@@ -64,6 +64,11 @@
 #           "example": "notifications@example.com",
 #           "type": "string"
 #         },
+#         "from_name": {
+#           "description": "The display name for the from address",
+#           "example": "Instructure Canvas",
+#           "type": "string"
+#         },
 #         "to": {
 #           "description": "The address the message was sent to:",
 #           "example": "someone@example.com",

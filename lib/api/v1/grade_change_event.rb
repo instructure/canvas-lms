@@ -26,24 +26,26 @@ module Api::V1::GradeChangeEvent
 
   def grade_change_event_json(event, user, session)
     links = {
-      :assignment => Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current),
-      :course => Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
-      :student => Shard.relative_id_for(event.student_id, Shard.current, Shard.current),
-      :grader => Shard.relative_id_for(event.grader_id, Shard.current, Shard.current),
-      :page_view => event.request_id && PageView.find_by_id(event.request_id).try(:id)
+      assignment: Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current),
+      course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
+      student: Shard.relative_id_for(event.student_id, Shard.current, Shard.current),
+      grader: Shard.relative_id_for(event.grader_id, Shard.current, Shard.current),
+      page_view: event.request_id && PageView.find_by_id(event.request_id).try(:id)
     }
 
     {
-      :id => event.id,
-      :created_at => event.created_at.in_time_zone,
-      :event_type => event.event_type,
-      :grade_before => event.grade_before,
-      :grade_after => event.grade_after,
-      :excused_before => event.excused_before,
-      :excused_after => event.excused_after,
-      :graded_anonymously => event.graded_anonymously,
-      :version_number => event.version_number,
-      :links => links
+      id: event.id,
+      created_at: event.created_at.in_time_zone,
+      event_type: event.event_type,
+      grade_before: event.grade_before,
+      grade_after: event.grade_after,
+      excused_before: event.excused_before,
+      excused_after: event.excused_after,
+      graded_anonymously: event.graded_anonymously,
+      points_possible_after: event.points_possible_after,
+      points_possible_before: event.points_possible_before,
+      version_number: event.version_number,
+      links: links
     }
   end
 

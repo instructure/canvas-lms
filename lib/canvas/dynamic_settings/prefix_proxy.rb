@@ -25,17 +25,31 @@ module Canvas
       DEFAULT_TTL = 5.minutes
       # The TTL for cached values if none is specified in the constructor
 
-      attr_reader :prefix
+      attr_reader :prefix, :tree, :service, :environment, :cluster
 
       # Build a new prefix proxy
       #
       # @param prefix [String] The prefix to be prepended to keys for querying.
+      # @param tree [String] Which tree to use (config, private, store)
+      # @param service [String] The service name to use (i.e. who owns the configuration). Defaults to canvas
+      # @param environment [String] An optional environment to look for so that multiple Canvas environments can share Consul
+      # @param cluster [String] An optional cluster to override region or global settings
       # @param default_ttl [ActiveSupport::Duration] The TTL to use for cached
       #   values when not specified to the fetch methods.
       # @param kv_client [Imperium::KV] The client to use for connecting to
       #   Consul, defaults to Imperium::KV.default_client
-      def initialize(prefix, default_ttl: DEFAULT_TTL, kv_client: Imperium::KV.default_client)
+      def initialize(prefix = nil,
+                     tree: :config,
+                     service: :canvas,
+                     environment: nil,
+                     cluster: nil,
+                     default_ttl: DEFAULT_TTL,
+                     kv_client: Imperium::KV.default_client)
         @prefix = prefix
+        @tree = tree
+        @service = service
+        @environment = environment
+        @cluster = cluster
         @default_ttl = default_ttl
         @kv_client = kv_client
       end
@@ -70,12 +84,25 @@ module Canvas
       #   defaults to value supplied to the constructor.
       # @return [Imperium::KVGETResponse]
       def fetch_object(key, ttl: @default_ttl)
-        full_key = "#{@prefix}/#{key}"
-        Cache.fetch(full_key, ttl: ttl) do
-          @kv_client.get(full_key, *CONSUL_READ_OPTIONS)
+        keys = [
+          [tree, service, environment, cluster, prefix, key].compact.join("/"),
+          [tree, service, environment, prefix, key].compact.join("/"),
+          [tree, service, prefix, key].compact.join("/"), # for backcompat only
+          ["global", tree, service, environment, prefix, key].compact.join("/"),
+          ].uniq
+
+        # cache with the most specific value
+        Cache.fetch(keys.first, ttl: ttl) do
+          result = nil
+          keys.each do |full_key|
+            result = @kv_client.get(full_key, *CONSUL_READ_OPTIONS)
+            result = nil unless result&.status == 200
+            break if result
+          end
+          result
         end
       rescue Imperium::TimeoutError => exception
-        Cache.fallback_fetch(full_key).tap do |val|
+        Cache.fallback_fetch(keys.first).tap do |val|
           if val
             Canvas::Errors.capture_exception(:consul, exception)
             val
@@ -95,6 +122,10 @@ module Canvas
       def for_prefix(prefix_extension, default_ttl: @default_ttl)
         self.class.new(
           "#{@prefix}/#{prefix_extension}",
+          tree: tree,
+          service: service,
+          environment: environment,
+          cluster: cluster,
           default_ttl: default_ttl,
           kv_client: @kv_client
         )

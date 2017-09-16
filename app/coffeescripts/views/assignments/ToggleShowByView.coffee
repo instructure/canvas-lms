@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
+  'react'
+  'react-dom'
   'i18n!assignments'
   'jquery'
   'underscore'
@@ -23,26 +25,18 @@ define [
   'compiled/class/cache'
   'compiled/util/hasLocalStorage'
   'compiled/models/AssignmentGroup'
-  'jst/assignments/ToggleShowBy'
-], (I18n, $, _, Backbone, Cache, hasLocalStorage, AssignmentGroup, template) ->
+  'instructure-ui/lib/components/RadioInputGroup'
+  'instructure-ui/lib/components/RadioInput'
+  'instructure-ui/lib/components/ScreenReaderContent'
+], (React, ReactDOM, I18n, $, _, Backbone, Cache, hasLocalStorage, AssignmentGroup, { default: RadioInputGroup }, { default: RadioInput }, { default: ScreenReaderContent }) ->
 
   class ToggleShowByView extends Backbone.View
     @optionProperty 'course'
     @optionProperty 'assignmentGroups'
 
-    template: template
-
-    els:
-      '#show_by': '$showBy'
-      '#show_by_date': '$showByDate'
-
-    events:
-      'click input': 'toggleShowBy'
-
     initialize: ->
       super
-      @initialized = false
-      @initializeCache()
+      @initialized = $.Deferred()
       @course.on 'change', @initializeCache
       @course.on 'change', @render
       @assignmentGroups.once 'change:submissions', @initializeDateGroups
@@ -54,7 +48,7 @@ define [
       $.extend true, @, Cache
       @cache.use('localStorage') if hasLocalStorage && ENV.current_user_id? # default: {}
       @cache.set(@cacheKey(), true) if !@cache.get(@cacheKey())?
-      @initialized = true
+      @initialized.resolve()
 
     initializeDateGroups: =>
       assignments = _.flatten(@assignmentGroups.map (ag) -> ag.get('assignments').models)
@@ -100,12 +94,27 @@ define [
       assignments.comparator = (a) -> new Date() - Date.parse(a.dueAt())
       assignments.sort()
 
-    toJSON: ->
-      visible: @initialized
-      showByDate: @showByDate()
-
     afterRender: ->
-      @$showBy?.buttonset()
+      $.when(@initialized)
+        .then(=> @renderToggle())
+
+    renderToggle: ->
+      createElement = React.createElement
+      description = createElement(ScreenReaderContent, {}, (I18n.t("Show By")))
+      defaultValue = if @showByDate() then 'date' else 'type'
+      ReactDOM.render(
+        createElement(RadioInputGroup, {
+          description: description,
+          size:'medium',
+          name: 'show_by',
+          variant: 'toggle',
+          defaultValue: defaultValue,
+          onChange: @toggleShowBy
+        },
+          createElement(RadioInput, {id: 'show_by_date', label: I18n.t("Show by Date"), value: "date", context: "off"})
+          createElement(RadioInput, {id: 'show_by_type', label: I18n.t("Show by Type"), value: "type", context: "off"})
+        ), @el
+      )
 
     setAssignmentGroups: =>
       groups = if @showByDate() then @groupedByDate else @groupedByAG
@@ -126,16 +135,15 @@ define [
             assignment.set('assignment_group_id', assignment_group.id)
 
     showByDate: ->
-      return true unless @initialized
+      return true unless @cache
       @cache.get(@cacheKey())
 
     cacheKey: ->
       ["course", @course.get('id'), "user", ENV.current_user_id, "assignments_show_by_date"]
 
-    toggleShowBy: (ev) =>
-      ev.preventDefault()
+    toggleShowBy: (sort) =>
       key = @cacheKey()
-      showByDate = @$showByDate.is(':checked')
+      showByDate = sort == "date"
       currentlyByDate = @cache.get(key)
       if currentlyByDate != showByDate
         @cache.set(key, showByDate)

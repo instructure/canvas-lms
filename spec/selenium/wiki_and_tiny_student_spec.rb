@@ -87,7 +87,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       f("#title").send_keys("new page")
 
       expect_new_page_load { f('form.edit-form button.submit').click }
-      new_page = @course.wiki.wiki_pages.last
+      new_page = @course.wiki_pages.last
       expect(new_page).to be_published
     end
 
@@ -106,7 +106,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       expect(f('#new_page_link')).to_not be_nil
       expect_new_page_load { f('form.edit-form button.submit').click }
-      new_page = @course.wiki.wiki_pages.last
+      new_page = @course.wiki_pages.last
       expect(new_page).to be_published
     end
   end

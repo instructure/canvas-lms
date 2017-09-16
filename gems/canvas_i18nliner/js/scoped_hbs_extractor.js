@@ -40,7 +40,7 @@ ScopedHbsExtractor.prototype.inferI18nScope = function(path) {
                   .replace(/^_/, '')       // some hbs files have a leading _
                   .replace(/([A-Z]+)([A-Z][a-z])/g,'$1_$2') // camel -> underscore
                   .replace(/([a-z\d])([A-Z])/g, '$1_$2')    // ditto
-                  .replace("-", "_")
+                  .replace(/-/g, "_")
                   .replace(/\/_?/g, '.')
                   .toLowerCase();
   this.scope = scope;

@@ -815,7 +815,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   ul {
     position: absolute;
     top:0;
-    right: 220px;
+    left: -200px;
     width: 200px;
     background-color: $ic-color-light;
     padding: 0;
@@ -897,7 +897,18 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 #deduction-box {
+  display: flex;
   margin: 0 .25em;
+
+  &.hidden {
+    display: none;
+  }
+  .deduction-box-labels {
+    margin-right: .5em;
+  }
+  .deduction-box-values {
+    flex: 1
+  }
   .error {
     color: $ic-color-danger;
     margin-right: 1em;
@@ -913,7 +924,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 #settings_form .icon-info {
   vertical-align: -4px;
-  color: $linkColor;
+  color: var(--ic-link-color);
 }
 
 .gradebook-icon-link:hover {

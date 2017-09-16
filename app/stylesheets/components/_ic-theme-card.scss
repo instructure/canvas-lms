@@ -209,7 +209,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   text-align: left;
   background: transparent;
   border: none;
-  color: $ic-link-color;
+  color: var(--ic-link-color);
   padding: 8px;
   display: block;
   max-width: 212px;
@@ -222,7 +222,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   }
 
   &:focus {
-    outline: 1px solid $ic-link-color;
+    outline: 1px solid var(--ic-link-color);
     outline-offset: -1px;
   }
 }

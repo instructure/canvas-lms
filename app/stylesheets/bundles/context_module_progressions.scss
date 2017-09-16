@@ -109,7 +109,7 @@
         background-color: $btnBackground;
         border-bottom: solid 1px $ic-border-light;
         margin-left: -1px;
-        a { color: $ic-link-color; }
+        a { color: var(--ic-link-color); }
       }
     }
     .student + .student.active {

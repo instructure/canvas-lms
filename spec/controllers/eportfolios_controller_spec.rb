@@ -62,7 +62,8 @@ describe EportfoliosController do
       }
 
       before do
-        allow(Canvas::DynamicSettings).to receive(:find).with("canvas", use_env: false).and_return(fake_secrets)
+        allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
       end
 
       it "assigns variables" do
@@ -74,7 +75,7 @@ describe EportfoliosController do
 
       it "exposes the feature state for rich content service to js_env" do
         @user.account.root_account.enable_feature!(:rich_content_service_high_risk)
-        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", use_env: false).and_return({
+        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return({
           'app-host' => 'rce.docker',
           'cdn-host' => 'rce.docker'
         })

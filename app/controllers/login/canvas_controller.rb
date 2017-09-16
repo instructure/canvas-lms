@@ -29,6 +29,7 @@ class Login::CanvasController < ApplicationController
     @pseudonym_session = PseudonymSession.new
     @headers = false
     flash.now[:error] = params[:message] if params[:message]
+    flash.now[:notice] = t('Your password has been changed.') if params[:password_changed] == '1'
 
     maybe_render_mobile_login
   end
@@ -77,7 +78,7 @@ class Login::CanvasController < ApplicationController
                     end
         next unless unique_id
 
-        pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+        pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
         pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
         next unless pseudonym
 
