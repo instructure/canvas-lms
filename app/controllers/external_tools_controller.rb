@@ -749,6 +749,9 @@ class ExternalToolsController < ApplicationController
   # @argument course_home_sub_navigation[icon_url] [String]
   #   The url of the icon to show in the right-side course home navigation menu
   #
+  # @argument course_navigation[url] [String]
+  #   The url of the external tool
+  #
   # @argument course_navigation[enabled] [Boolean]
   #   Set this to enable this feature
   #
