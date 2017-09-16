@@ -71,9 +71,6 @@
   background-color: white;
   min-width: 320px;
   max-width: 500px;
-  ul {
-    @include reset-list;
-  }
   th {
     padding-bottom: 3px;
     padding-right: 8px;
