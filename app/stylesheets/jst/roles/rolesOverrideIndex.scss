@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.table th, .table td{
-  border: none !important;
-}
+ @import "base/environment";
 
 .role-tab {
   padding-bottom: 200px !important;
   overflow-x: scroll;
 }
 
-.manage-permissions{
-  thead th{
+.manage-permissions {
+  thead th {
     text-align: center;
     white-space: nowrap;
     width: 0;
@@ -36,16 +34,16 @@
     vertical-align: middle;
   }
 
-  th{
+  th {
     width: 20%;
   }
 }
 
-.toolbar{
-  th, td {
-    background-color:#dae1e6 !important;
-    &:hover{
-      background-color:#dae1e6 !important;
-    }
+.roles_table .toolbar {
+  background-color: $ic-color-light !important;
+  color:$ic-color-medium-darker;
+
+  &:not(:first-of-type) th {
+    padding-top: $ic-sp*2;
   }
 }

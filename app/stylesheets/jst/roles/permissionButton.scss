@@ -18,7 +18,12 @@
 
  @import "base/environment";
 
-.table td.permissionButtonView {
+ //since each item is treated as a row header don't want to color the border darker
+.roles_table.ic-Table th[role="rowheader"] {
+  border-bottom-color: $ic-border-light;
+}
+
+table.roles_table.ic-Table td.permissionButtonView {
   position: relative;
 
     .default_permission {

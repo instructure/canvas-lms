@@ -32,7 +32,7 @@ describe "brandableCss JS integration specs" do
     admin_logged_in
     get "/accounts/#{Account.default.id}/permissions?account_roles=1"
 
-    css_bundle = 'jst/roles/rolesOverrideIndex'
+    css_bundle = 'jst/roles/newRole'
     data = BrandableCSS.all_fingerprints_for(css_bundle).values.first
     expect(data[:includesNoVariables]).to be_truthy
     expect(data[:combinedChecksum]).to match(/\A[a-f0-9]{10}\z/), '10 chars of an MD5'
