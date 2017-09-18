@@ -153,7 +153,7 @@ class StreamItem < ActiveRecord::Base
 
   ROOT_DISCUSSION_ENTRY_LIMIT = 3
   def generate_data(object)
-    self.context ||= object.context rescue nil
+    self.context ||= object.try(:context) unless object.is_a?(Message)
 
     case object
     when DiscussionTopic
