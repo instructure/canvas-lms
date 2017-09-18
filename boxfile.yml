@@ -32,7 +32,7 @@ web.site:
     - log
 
 worker.jobs:
-  start: bundle script/delayed_job run
+  start: script/delayed_job run
 
 data.chrome:
   image: selenium/standalone-chrome
@@ -50,4 +50,3 @@ deploy.config:
 
   extra_steps:
     - rake canvas:compile_assets RAILS_ENV=production
-

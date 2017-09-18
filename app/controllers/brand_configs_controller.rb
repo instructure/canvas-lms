@@ -80,10 +80,16 @@ class BrandConfigsController < ApplicationController
 
   def duped_brandable_vars
     BrandableCSS::BRANDABLE_VARIABLES.map do |group|
+      p "------------------------------ THIS IS THE THEME ------------------------------"
+      p group
+      p "------------------------------ END THE THEME ------------------------------"
       new_group = group.deep_dup
       new_group["group_name"] =  BrandableCSS::GROUP_NAMES[new_group['group_key']].call
       new_group["variables"] = new_group["variables"].map(&:deep_dup)
       new_group["variables"].each do |v|
+        p "------------------------------ THIS IS THE THEME ------------------------------"
+        p v
+        p "------------------------------ END THE THEME ------------------------------"
         v["human_name"] = BrandableCSS::VARIABLE_HUMAN_NAMES[v['variable_name']].call
         if helper_text_proc = BrandableCSS::HELPER_TEXTS[v['variable_name']]
           v["helper_text"] = helper_text_proc.call
