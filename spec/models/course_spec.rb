@@ -3483,6 +3483,9 @@ describe Course, "manageable_by_user" do
     course = Course.create!(:account => sub_sub_account)
 
     expect(Course.manageable_by_user(user.id).map{ |c| c.id }).to be_include(course.id)
+
+    user.account_users.first.destroy!
+    expect(Course.manageable_by_user(user.id)).to_not be_exists
   end
 
   it "should include courses the user is actively enrolled in as a teacher" do
