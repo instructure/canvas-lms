@@ -694,6 +694,30 @@ describe SubmissionsController do
       expect(body['published_score']).to eq 10
     end
 
+    it "mark read if reading one's own submission" do
+      user_session(@student)
+      request.accept = Mime[:json].to_s
+      @submission.mark_unread(@student)
+      @submission.save!
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}, format: :json
+      expect(response).to be_success
+      submission = Submission.find(@submission.id)
+      expect(submission.read?(@student)).to be_truthy
+    end
+
+    it "don't mark read if reading someone else's submission" do
+      user_session(@teacher)
+      request.accept = Mime[:json].to_s
+      @submission.mark_unread(@student)
+      @submission.mark_unread(@teacher)
+      @submission.save!
+      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}, format: :json
+      expect(response).to be_success
+      submission = Submission.find(@submission.id)
+      expect(submission.read?(@student)).to be_falsey
+      expect(submission.read?(@teacher)).to be_falsey
+    end
+
     it "renders json with scores for teachers on muted assignments" do
       @assignment.update!(muted: true)
       request.accept = Mime[:json].to_s

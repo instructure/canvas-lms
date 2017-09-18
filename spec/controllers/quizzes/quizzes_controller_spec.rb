@@ -995,6 +995,30 @@ describe Quizzes::QuizzesController do
       expect(assigns[:submission]).to eql(@submission)
     end
 
+    it "mark read if the student is viewing his own quiz history" do
+      user_session(@student)
+      @submission = @quiz.generate_submission(@student)
+      @submission.submission.mark_unread(@student)
+      @submission.save!
+      get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id}
+      expect(response).to be_success
+      submission = Quizzes::QuizSubmission.find(@submission.id)
+      expect(submission.submission.read?(@student)).to be_truthy
+    end
+
+    it "don't mark read if viewing *someone else's* history" do
+      user_session(@teacher)
+      @submission = @quiz.generate_submission(@student)
+      @submission.submission.mark_unread(@teacher)
+      @submission.submission.mark_unread(@student)
+      @submission.save!
+      get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student.id}
+      expect(response).to be_success
+      submission = Quizzes::QuizSubmission.find(@submission.id)
+      expect(submission.submission.read?(@teacher)).to be_falsey
+      expect(submission.submission.read?(@student)).to be_falsey
+    end
+
     it "should find the observed submissions" do
       @submission = @quiz.generate_submission(@student)
       @observer = user_factory
