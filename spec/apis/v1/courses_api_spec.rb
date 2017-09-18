@@ -2076,7 +2076,7 @@ describe CoursesController, type: :request do
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
-      %w{sis_user_id sis_login_id unique_id}.each do |attribute|
+      %w{sis_user_id unique_id}.each do |attribute|
         expect(json.map { |u| u[attribute] }).to eq [nil, nil]
       end
     end
@@ -2092,7 +2092,6 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
       expect(json.map { |u| u['sis_user_id'] }.sort).to eq ['user1', 'user2'].sort
-      expect(json.map { |u| u['sis_login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
       expect(json.map { |u| u['login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
     end
 
@@ -2109,7 +2108,6 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course1.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course1.to_param, :format => 'json' })
       expect(json.map { |u| u['sis_user_id'] }.sort).to eq ['user2', 'user3'].sort
-      expect(json.map { |u| u['sis_login_id'] }.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
       expect(json.map { |u| u['login_id'] }.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
     end
 
@@ -2124,7 +2122,6 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
       expect(json.map { |u| u['sis_user_id'] }.sort).to eq ['user1', 'user2'].sort
-      expect(json.map { |u| u['sis_login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
       expect(json.map { |u| u['login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
     end
 
@@ -2291,7 +2288,6 @@ describe CoursesController, type: :request do
             'short_name' => 'TAPerson',
             'sis_user_id' =>nil,
             'integration_id' =>nil,
-            'sis_login_id' =>nil,
             'email' => 'ta@ta.com',
             'bio' => 'hey'
           }
@@ -2564,7 +2560,7 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
                         :enrollment_type => 'student')
         expect(json.length).to eq 2
-        %w{sis_user_id sis_login_id unique_id}.each do |attribute|
+        %w{sis_user_id unique_id}.each do |attribute|
           expect(json.map { |u| u[attribute] }).to eq [nil, nil]
         end
       end
@@ -2581,7 +2577,6 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
                         :enrollment_type => 'student')
         expect(json.map { |u| u['sis_user_id'] }.sort).to eq ['user1', 'user2'].sort
-        expect(json.map { |u| u['sis_login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
         expect(json.map { |u| u['login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
       end
 
@@ -2599,7 +2594,6 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
                         :enrollment_type => 'student')
         expect(json.map { |u| u['sis_user_id'] }.compact.sort).to eq ['user2', 'user3'].sort
-        expect(json.map { |u| u['sis_login_id'] }.compact.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
         expect(json.map { |u| u['login_id'] }.compact.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
       end
 
@@ -2615,7 +2609,6 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
                         :enrollment_type => 'student')
         expect(json.map { |u| u['sis_user_id'] }.sort).to eq ['user1', 'user2'].sort
-        expect(json.map { |u| u['sis_login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
         expect(json.map { |u| u['login_id'] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
       end
 

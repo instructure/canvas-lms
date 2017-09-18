@@ -94,10 +94,6 @@ require 'atom'
 #           "type": "integer",
 #           "format": "int64"
 #         },
-#         "sis_login_id": {
-#           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
-#           "type": "string"
-#         },
 #         "integration_id": {
 #           "description": "The integration_id associated with the user.  This field is only included if the user came from a SIS import and has permissions to view SIS information.",
 #           "example": "ABC59802",

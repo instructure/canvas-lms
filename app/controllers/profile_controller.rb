@@ -64,11 +64,6 @@
 #           "example": "sis1",
 #           "type": "string"
 #         },
-#         "sis_login_id": {
-#           "description": "sis1-login",
-#           "example": "sis1-login",
-#           "type": "string"
-#         },
 #         "lti_user_id": {
 #           "type": "string"
 #         },

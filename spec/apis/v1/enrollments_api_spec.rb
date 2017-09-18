@@ -951,7 +951,6 @@ describe EnrollmentsApiController, type: :request do
               'short_name' => e.user.short_name,
               'sis_user_id' =>nil,
               'integration_id' =>nil,
-              'sis_login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil,
               'sis_import_id' =>nil,
               'id' => e.user.id,
               'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
@@ -1158,7 +1157,6 @@ describe EnrollmentsApiController, type: :request do
               'short_name' => e.user.short_name,
               'sis_user_id' => e.user.pseudonym ? e.user.pseudonym&.sis_user_id : nil,
               'integration_id' => e.user.pseudonym ? e.user.pseudonym&.integration_id : nil,
-              'sis_login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil,
               'sis_import_id' => e.user.pseudonym ? e.user.pseudonym.sis_batch_id : nil,
               'id' => e.user.id,
               'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
@@ -1525,7 +1523,7 @@ describe EnrollmentsApiController, type: :request do
       it "should not include the users' sis and login ids" do
         json = api_call(:get, @path, @params)
         json.each do |res|
-          %w{sis_user_id sis_login_id login_id}.each { |key| expect(res['user']).not_to include(key) }
+          %w{sis_user_id login_id}.each { |key| expect(res['user']).not_to include(key) }
         end
       end
     end
@@ -1550,7 +1548,6 @@ describe EnrollmentsApiController, type: :request do
                       }
           user_json.merge!({
               'sis_user_id' => e.user.pseudonym.sis_user_id,
-              'sis_login_id' => e.user.pseudonym.unique_id,
               'integration_id' => e.user.pseudonym.integration_id,
             })
           h = {
