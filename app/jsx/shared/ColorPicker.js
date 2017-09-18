@@ -100,6 +100,8 @@ import 'compiled/jquery.rails_flash_notifications'
       focusOnMount: PropTypes.bool
     },
 
+    hexInputRef: null,
+
     // ===============
     //    LIFECYCLE
     // ===============
@@ -115,7 +117,18 @@ import 'compiled/jquery.rails_flash_notifications'
     getDefaultProps () {
       return {
         currentColor: "#efefef",
-        hideOnScroll: true,
+        // hideOnScroll exists because the modal doesn't track its target
+        // when the page scrolls, so we just chose to close it.  However on
+        // mobile, focusing on the hex color textbox opens the keyboard which
+        // triggers a scroll and the modal closed. To work around this, init
+        // hideOnScroll to false if we're on a mobile device, which we detect,
+        // somewhat loosely, by seeing if a TouchEven exists.  The result isn't
+        // great, but it's better than before.
+        // A more permenant fix is in the works, pending a fix to INSTUI Popover.
+        hideOnScroll: function () {
+          try{ document.createEvent("TouchEvent"); return false; }
+          catch(e){ return true; }
+        }(),
         withAnimation: true,
         withArrow: true,
         withBorder: true,
@@ -133,15 +146,11 @@ import 'compiled/jquery.rails_flash_notifications'
         this.setFocus();
       }
 
-      if (this.props.hideOnScroll) {
-        $(window).on('scroll', this.closeModal);
-      }
+      $(window).on('scroll', this.handleScroll);
     },
 
     componentWillUnmount () {
-      if (this.props.hideOnScroll) {
-        $(window).off('scroll', this.closeModal);
-      }
+      $(window).off('scroll', this.handleScroll);
     },
 
     componentWillReceiveProps (nextProps) {
@@ -271,6 +280,14 @@ import 'compiled/jquery.rails_flash_notifications'
       //reset to the cards current actual displaying color
       this.setCurrentColor(this.props.currentColor);
       this.closeModal();
+    },
+
+    handleScroll() {
+      if (this.props.hideOnScroll) {
+        this.closeModal()
+      } else if (this.state.isOpen){
+        this.hexInputRef.scrollIntoView()
+      }
     },
 
     // ===============
@@ -405,6 +422,7 @@ import 'compiled/jquery.rails_flash_notifications'
               onChange={this.setInputColor}
               size="small"
               margin="0 0 0 x-small"
+              inputRef={(r) => {this.hexInputRef = r}}
             />
           </div>
 
