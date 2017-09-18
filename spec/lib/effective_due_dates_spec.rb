@@ -656,23 +656,12 @@ describe Course do
         expect(edd.to_hash).to eq({})
       end
 
-      it 'includes not-assigned students with existing graded submissions' do
+      it 'ignores not-assigned students with existing graded submissions' do
         @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
         result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student1.id => {
-              due_at: nil,
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Submission'
-            }
-          }
-        }
-        expect(result).to eq expected
+        expect(result).to be_empty
       end
 
       it 'uses assigned date instead of submission date even if submission was late' do
@@ -1435,39 +1424,6 @@ describe Course do
                   in_closed_grading_period: false,
                   override_id: nil,
                   override_source: 'Everyone Else'
-                }
-              }
-            }
-            expect(result).to eq expected
-          end
-
-          it 'is false if the due date is only due to a graded submission even if the last grading period is closed' do
-            Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 50.days.ago(@now),
-              end_date: 35.days.ago(@now),
-              close_date: 30.days.from_now(@now)
-            })
-            Factories::GradingPeriodHelper.new.create_for_group(@gp_group, {
-              start_date: 20.days.ago(@now),
-              end_date: 15.days.ago(@now),
-              close_date: 10.days.ago(@now)
-            })
-            @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
-            @assignment1.submissions.find_by!(user: @student1).update!(
-              submitted_at: 1.week.from_now(@now),
-              submission_type: 'online_text_entry'
-            )
-
-            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-            result = edd.to_hash
-            expected = {
-              @assignment1.id => {
-                @student1.id => {
-                  due_at: nil,
-                  grading_period_id: nil,
-                  in_closed_grading_period: false,
-                  override_id: nil,
-                  override_source: 'Submission'
                 }
               }
             }

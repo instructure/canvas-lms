@@ -139,6 +139,25 @@ describe DeveloperKey do
       end
 
       include_examples "authorized_for_account?"
+
+      describe '#by_cached_vendor_code' do
+        let(:vendor_code) { 'tool vendor code' }
+        let(:not_site_admin_shard) { Shard.create! }
+
+        it 'finds keys in the current shard and site admin shard' do
+          site_admin_key = nil
+          local_key = nil
+
+          Account.site_admin.shard.activate do
+            site_admin_key = DeveloperKey.create!(vendor_code: vendor_code)
+          end
+          not_site_admin_shard.activate do
+            local_key = DeveloperKey.create!(vendor_code: vendor_code)
+            expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include local_key
+            expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include site_admin_key
+          end
+        end
+      end
     end
 
     context 'without sharding' do

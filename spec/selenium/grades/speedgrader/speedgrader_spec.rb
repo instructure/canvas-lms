@@ -21,9 +21,10 @@ require_relative "../../helpers/groups_common"
 require_relative "../../helpers/assignments_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/speed_grader_common"
-require_relative "../page_objects/speedgrader_page"
+require_relative "../pages/speedgrader_page"
 require_relative "../../assignments/page_objects/assignment_page"
 require_relative "../../assignments/page_objects/submission_detail_page"
+require 'benchmark'
 
 describe 'Speedgrader' do
   include_context "in-process server selenium tests"
@@ -109,6 +110,16 @@ describe 'Speedgrader' do
       before(:once) do
         init_course_with_students
         @quiz = seed_quiz_with_submission
+      end
+
+      it "page should load in acceptable time ", priority:"1" do
+        page_load_time = Benchmark.measure do
+          Speedgrader.visit(@course.id,@quiz.assignment_id)
+          let_speedgrader_load
+        end
+        Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment"\
+                             " #{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
+        expect(page_load_time.real).to be > 0.0
       end
 
       before(:each) do

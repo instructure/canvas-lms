@@ -66,7 +66,7 @@ export default React.createClass({
         },
 
         render() {
-            return(
+            return (
                 <Modal className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
                        overlayClassName="ReactModal__Overlay--canvas"
                        isOpen={this.state.modalIsOpen}
@@ -98,7 +98,7 @@ export default React.createClass({
                         </div>
                     </div>
                 </Modal>
-            )
+            );
         }
 
     });

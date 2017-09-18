@@ -17,18 +17,19 @@
 
 class SisPseudonym
   # type: :exact, :trusted, or :implicit
-  def self.for(user, context, type: :exact, require_sis: true)
+  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false)
     raise ArgumentError("type must be :exact, :trusted, or :implicit") unless [:exact, :trusted, :implicit].include?(type)
-    self.new(user, context, type, require_sis).pseudonym
+    self.new(user, context, type, require_sis, include_deleted).pseudonym
   end
 
-  attr_reader :user, :context, :type, :require_sis
+  attr_reader :user, :context, :type, :require_sis, :include_deleted
 
-  def initialize(user, context, type, require_sis)
+  def initialize(user, context, type, require_sis, include_deleted)
     @user = user
     @context = context
     @type = type
     @require_sis = require_sis
+    @include_deleted = include_deleted
   end
 
   def pseudonym
@@ -42,8 +43,14 @@ class SisPseudonym
   private
   def find_in_other_accounts
     return nil if type == :exact
-    if user.all_active_pseudonyms_loaded?
-      return pick_user_pseudonym(user.all_active_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
+    if include_deleted
+      if user.all_pseudonyms_loaded?
+        return pick_user_pseudonym(user.all_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
+      end
+    else
+      if user.all_active_pseudonyms_loaded?
+        return pick_user_pseudonym(user.all_active_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
+      end
     end
 
     shards = user.associated_shards
@@ -76,7 +83,8 @@ class SisPseudonym
       if user.pseudonyms.loaded?
         pick_user_pseudonym(user.pseudonyms,[root_account.id])
       else
-        pick_user_pseudonym(user.all_active_pseudonyms,[root_account.id])
+        pick_user_pseudonym(include_deleted ? user.all_pseudonyms : user.all_active_pseudonyms,
+                            [root_account.id])
       end
     else
       root_account.shard.activate do
@@ -86,7 +94,8 @@ class SisPseudonym
   end
 
   def use_loaded_collection?(shard)
-    user.pseudonyms.loaded? && user.shard == shard || user.all_active_pseudonyms_loaded?
+    user.pseudonyms.loaded? && user.shard == shard ||
+      (include_deleted ? user.all_pseudonyms_loaded? : user.all_active_pseudonyms_loaded?)
   end
 
   def root_account
@@ -115,11 +124,11 @@ class SisPseudonym
   end
 
   def pick_user_pseudonym(collection, account_ids)
-    collection.sort_by {|p| [p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id)] }.detect do |p|
+    collection.sort_by {|p| [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id)] }.detect do |p|
       next if account_ids && !account_ids.include?(p.account_id)
       next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
       next if require_sis && !p.sis_user_id
-      p.workflow_state != 'deleted'
+      include_deleted || p.workflow_state != 'deleted'
     end
   end
 end

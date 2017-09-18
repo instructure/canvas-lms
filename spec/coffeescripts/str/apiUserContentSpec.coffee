@@ -37,7 +37,7 @@ define ['compiled/str/apiUserContent'], (apiUserContent) ->
     ok(!output.includes("<span class=\"hidden-readable\"><math "))
 
   test "adds media comments for tagged audio content", ->
-    html = "<div><audio class='instructure_inline_media_comment' data-media_comment_id='42' data-media_comment_type='audio'><span>24</span></audio></div>"
+    html = "<div><audio class='instructure_inline_media_comment' data-media_comment_id='42' data-media_comment_type='audio' data-alt='audio file'><span>24</span></audio></div>"
     output = apiUserContent.convert(html)
-    expected = "<div><a id=\"media_comment_42\" data-media_comment_type=\"audio\" class=\"instructure_inline_media_comment audio_comment\"><span>24</span></a></div>"
+    expected = "<div><a id=\"media_comment_42\" data-media_comment_type=\"audio\" class=\"instructure_inline_media_comment audio_comment\" data-alt=\"audio file\"><span>24</span></a></div>"
     equal(output, expected)

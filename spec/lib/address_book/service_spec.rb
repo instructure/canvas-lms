@@ -19,7 +19,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.r
 
 describe AddressBook::Service do
   before do
-    allow(Canvas::DynamicSettings).to receive(:from_cache).
+    allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(Canvas::DynamicSettings).to receive(:find).
       with("address-book", anything).
       and_return({'app-host' => 'http://test.host'})
 

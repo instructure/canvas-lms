@@ -17,10 +17,10 @@
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/groups_common'
-require_relative '../page_objects/gradezilla_page'
+require_relative '../pages/gradezilla_page'
 require_relative '../setup/gradebook_setup'
 
-require_relative '../page_objects/gradezilla_cells_page'
+require_relative '../pages/gradezilla_cells_page'
 
 describe "Filter" do
   include_context "in-process server selenium tests"

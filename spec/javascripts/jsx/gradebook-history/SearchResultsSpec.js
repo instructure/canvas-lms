@@ -33,9 +33,11 @@ function defaultHistoryItems () {
       grader: 'Ms. Twillie Jones',
       gradeAfter: '21',
       gradeBefore: '19',
+      gradeCurrent: '22',
       id: '123456',
       pointsPossibleBefore: '25',
       pointsPossibleAfter: '25',
+      pointsPossibleCurrent: '30',
       student: 'Norval Abbott',
       time: '11:16pm'
     }
@@ -89,7 +91,8 @@ test('Table has column headers in correct order', function () {
     'Grader',
     'Assignment',
     'Before',
-    'After'
+    'After',
+    'Current'
   ];
   const wrapper = mount(<SearchResultsComponent {...defaultProps()} />);
   const headerNodes = wrapper.find('thead').find('tr').find('th').nodes;

@@ -64,7 +64,7 @@
     </a>
 
     <% if editable || module_item.nil? %>
-    <div class="ig-handle">
+    <div aria-hidden="true" class="ig-handle">
       <span
         class="draggable-handle move_item_link"
         title="<%= t('drag_to_reorder', %{Drag to reorder or move item to another module}) %>"
@@ -217,8 +217,7 @@
           data-published="<%= module_item && item_data[:published_status] == 'published' %>"
           data-publishable="<%= module_item_publishable?(module_item) %>"
           data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
-          data-publish-message="<%= t('Unpublished. Click to publish %{item_name}.', {item_name: module_item && module_item.title ? module_item.title : ''}) %>"
-          data-unpublish-message="<%= t('Published. Click to unpublish %{item_name}.', {item_name: module_item && module_item.title ? module_item.title : ''}) %>"
+          data-publish-title="<%= module_item && module_item.title ? module_item.title : '' %>"
           title=""
           data-tooltip
           class="publish-icon <%= item_data[:published_status] %>"

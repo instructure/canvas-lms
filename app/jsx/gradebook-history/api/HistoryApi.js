@@ -27,15 +27,16 @@ function getGradeHistory (courseId, input) {
   const params = {
     params: {
       start_time: input.from,
-      end_time: input.to
+      end_time: input.to,
+      include: ['current_grade']
     }
   };
 
-  return axios.get(encodeURI(url), params);
+  return axios.get(url, params);
 }
 
 function getNextPage (url) {
-  return axios.get(encodeURI(url));
+  return axios.get(url);
 }
 
 export default {

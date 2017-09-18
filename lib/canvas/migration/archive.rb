@@ -81,7 +81,7 @@ module Canvas::Migration
       if @settings[:export_archive_path]
         File.open(@settings[:export_archive_path], 'rb')
       elsif @settings[:course_archive_download_url].present?
-        _, uri = CanvasHttp.validate_url(@settings[:course_archive_download_url])
+        _, uri = CanvasHttp.validate_url(@settings[:course_archive_download_url], check_host: true)
         CanvasHttp.get(@settings[:course_archive_download_url]) do |http_response|
           raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
           tmpfile = CanvasHttp.tempfile_for_uri(uri)

@@ -78,6 +78,17 @@ describe 'RequestThrottle' do
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
 
+    it "should have headers even when disabled" do
+      allow(RequestThrottle).to receive(:enabled?).and_return(false)
+      allow(throttler).to receive(:calculate_cost).and_return(30)
+
+      expected = response
+      expected[1]['X-Request-Cost'] = '30'
+      # hwm of 600 - cost of the request
+      expected[1]['X-Rate-Limit-Remaining'] = '570.0'
+      expect(throttler.call(request_user_1)).to eq expected
+    end
+
     it "should blacklist based on ip" do
       set_blacklist('ip:1.2.3.4')
       expect(throttler.call(request_user_1)).to eq rate_limit_exceeded
@@ -160,6 +171,8 @@ describe 'RequestThrottle' do
     end
 
     def throttled_request
+      allow(RequestThrottle).to receive(:enabled?).and_return(true)
+      allow(Canvas).to receive(:redis_enabled?).and_return(true)
       bucket = double('Bucket')
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
@@ -181,9 +194,12 @@ describe 'RequestThrottle' do
       bucket = double('Bucket')
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
+      expect(bucket).to receive(:remaining).and_return(1)
       # the cost is still returned anyway
       expected = response
       expected[1]['X-Request-Cost'] = '1'
+      # the remaining is also returned anyway
+      expected[1]['X-Rate-Limit-Remaining'] = '1'
       expect(throttler.call(request_user_1)).to eq expected
     end
 
@@ -331,6 +347,12 @@ describe 'RequestThrottle' do
             end
             expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(5)
           end
+        end
+
+        it "does nothing if disabled" do
+          expect(RequestThrottle).to receive(:enabled?).twice.and_return(false)
+          expect(@bucket).to receive(:increment).never
+          @bucket.reserve_capacity {}
         end
 
         after do

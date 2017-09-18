@@ -74,6 +74,29 @@ describe Submission do
       end
 
       describe "grade" do
+        context "the submission is deleted" do
+          before(:once) do
+            @assignment.due_at = in_open_grading_period
+            @assignment.save!
+            submission_spec_model
+            @submission.update(workflow_state: 'deleted')
+          end
+
+          it "does not have grade permissions if the user is a root account admin" do
+            expect(@submission.grants_right?(@admin, :grade)).to eq(false)
+          end
+
+          it "does not have grade permissions if the user is non-root account admin with manage_grades permissions" do
+            expect(@submission.grants_right?(@teacher, :grade)).to eq(false)
+          end
+
+          it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
+            @student = user_factory(active_all: true)
+            @context.enroll_student(@student)
+            expect(@submission.grants_right?(@student, :grade)).to eq(false)
+          end
+        end
+
         context "the submission is due in an open grading period" do
           before(:once) do
             @assignment.due_at = in_open_grading_period
@@ -89,7 +112,7 @@ describe Submission do
             expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
           end
 
-          it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
+          it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
             @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
@@ -111,7 +134,7 @@ describe Submission do
             expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
           end
 
-          it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
+          it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
             @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
@@ -2893,6 +2916,15 @@ describe Submission do
         end
       end
 
+      it "filters out deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+        submission_with_attachments = Submission.bulk_load_versioned_attachments([submission]).first
+        expect(submission_with_attachments.versioned_attachments).to be_empty
+      end
+
       it "includes url submission attachments" do
         s = submission_for_some_user
         s.attachment = attachment_model(filename: "screenshot.jpg",
@@ -2960,6 +2992,42 @@ describe Submission do
         expected_attachments_for_submissions = { s => [] }
         result = Submission.bulk_load_attachments_for_submissions(s)
         expect(result).to eq(expected_attachments_for_submissions)
+      end
+
+      it "filters out attachment associations that don't point to an attachment" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        submission.attachment_associations.find_by(attachment_id: attachment.id).update!(attachment_id: nil)
+        attachments = Submission.bulk_load_attachments_for_submissions([submission]).first.second
+        expect(attachments).to be_empty
+      end
+
+      it "filters out attachment associations that point to deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+        attachments = Submission.bulk_load_attachments_for_submissions([submission]).first.second
+        expect(attachments).to be_empty
+      end
+
+      it "includes valid attachments and filters out deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+
+        another_student = student_in_course(active_all: true).user
+        another_attachment = attachment_model(filename: "submission.doc", context: another_student)
+        another_submission = @assignment.submit_homework(another_student, attachments: [another_attachment])
+
+        bulk_loaded_submissions = Submission.bulk_load_attachments_for_submissions([submission, another_submission])
+        submission_attachments = bulk_loaded_submissions.find { |s| s.first.id == submission.id }.second
+        expect(submission_attachments).to be_empty
+
+        another_submission_attachments = bulk_loaded_submissions.find { |s| s.first.id == another_submission.id }.second
+        expect(another_submission_attachments).not_to be_empty
       end
     end
   end

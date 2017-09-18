@@ -17,7 +17,7 @@
  */
 
 import ReactDOM from 'react-dom';
-import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook, setFixtureHtml } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 import StudentColumnHeaderRenderer
 from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/StudentColumnHeaderRenderer';
 
@@ -33,12 +33,18 @@ QUnit.module('StudentColumnHeaderRenderer', function (suiteHooks) {
 
   suiteHooks.beforeEach(function () {
     $container = document.createElement('div');
+    document.body.appendChild($container);
+    setFixtureHtml($container);
 
     gradebook = createGradebook({
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS'
     });
     renderer = new StudentColumnHeaderRenderer(gradebook);
+  });
+
+  suiteHooks.afterEach(function() {
+    $container.remove();
   });
 
   QUnit.module('#render', function () {

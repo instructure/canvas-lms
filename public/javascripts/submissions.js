@@ -405,3 +405,11 @@ import './rubric_assessment' /*global rubricAssessment*/
       $.ajaxJSON(url, 'GET', {}, submissionLoaded);
     }, 500);
   };
+
+  $(document).ready(function() {
+    window.addEventListener('message', function(event) {
+      if (event.data === 'refreshGrades') {
+        INST.refreshGrades();
+      }
+    }, false);
+  });

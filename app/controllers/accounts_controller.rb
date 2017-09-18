@@ -187,7 +187,6 @@ class AccountsController < ApplicationController
           :hide_enrollmentless_courses => @hide_enrollmentless_courses,
           :only_master_courses => @only_master_courses,
           :order => sort_order)
-
         ActiveRecord::Associations::Preloader.new.preload(@courses, :enrollment_term)
         build_course_stats
       end
@@ -706,6 +705,10 @@ class AccountsController < ApplicationController
             @account.trusted_referers = trusted_referers if @account.root_account?
           end
         end
+
+        # don't accidentally turn the default help link name into a custom one and thereby break i18n
+        help_link_name = params.dig(:account, :settings, :help_link_name)
+        params[:account][:settings][:help_link_name] = nil if help_link_name == default_help_link_name
 
         ensure_sis_max_name_length_value!(params[:account]) if params[:account][:settings]
 

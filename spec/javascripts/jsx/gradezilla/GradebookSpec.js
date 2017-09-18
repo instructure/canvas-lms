@@ -218,14 +218,14 @@ QUnit.module('Gradebook#gotCustomColumnDataChunk', {
 
 test('updates students with custom column data', function () {
   const data = [{ user_id: '1101', content: 'example' }, { user_id: '1102', content: 'sample' }];
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
   equal(this.gradebook.students[1101].custom_col_2401, 'example');
   equal(this.gradebook.students[1102].custom_col_2401, 'sample');
 });
 
 test('invalidates rows for related students', function () {
   const data = [{ user_id: '1101', content: 'example' }, { user_id: '1102', content: 'sample' }];
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
   strictEqual(this.gradebook.invalidateRowsForStudentIds.callCount, 1);
   const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1101', '1102'], 'both students had custom column data');
@@ -233,7 +233,7 @@ test('invalidates rows for related students', function () {
 
 test('ignores students without custom column data', function () {
   const data = [{ user_id: '1102', content: 'sample' }];
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
   const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1102'], 'only the student 1102 had custom column data');
 });
@@ -244,7 +244,7 @@ test('invalidates rows after updating students', function () {
     equal(this.gradebook.students[1101].custom_col_2401, 'example');
     equal(this.gradebook.students[1102].custom_col_2401, 'sample');
   });
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
 });
 
 QUnit.module('Gradebook - initial .gridDisplaySettings');
@@ -625,6 +625,35 @@ test('includes the submissions chunk size when calling DataLoader.loadGradebookD
   gradebook.reloadStudentData();
   const [options] = DataLoader.loadGradebookData.lastCall.args;
   equal(options.submissionsChunkSize, 10);
+});
+
+test('includes the stored custom columns when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ chunk_size: 10 });
+  gradebook.gotCustomColumns([{ id: '2401' }, { id: '2402' }]);
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  deepEqual(options.customColumnIds, ['2401', '2402']);
+});
+
+test('includes the custom column data url when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ custom_column_data_url: '/custom-column-data' });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.customColumnDataURL, '/custom-column-data');
+});
+
+test('includes the custom column data page callback when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.customColumnDataPageCb, gradebook.gotCustomColumnDataChunk);
+});
+
+test('requests data for hidden custom columns', function () {
+  const gradebook = createGradebook({ custom_column_data_url: '/custom-column-data' });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.customColumnDataParams.include_hidden, true);
 });
 
 test('stores student ids when loaded', function () {
@@ -3104,6 +3133,7 @@ QUnit.module('Menus', {
     this.gradebook.postGradesLtis = [];
     this.gradebook.postGradesStore = {};
     $fixtures.innerHTML = `
+      <div id="application"></div>
       <span data-component="ViewOptionsMenu"></span>
       <span data-component="ActionMenu"></span>
       <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
@@ -3137,13 +3167,16 @@ test('GradebookMenu is rendered on renderGradebookMenu', function () {
 });
 
 test('StatusesModal is mounted on renderStatusesModal', function () {
+  const clock = sinon.useFakeTimers();
   const statusModal = this.gradebook.renderStatusesModal();
   statusModal.open();
+  clock.tick(500); // wait for Modal to transition open
   const header = document.querySelector('h3');
   equal(header.innerText, 'Statuses');
 
   const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']");
   ReactDOM.unmountComponentAtNode(statusesModalMountPoint);
+  clock.restore();
 });
 
 QUnit.module('setupGrading', {
@@ -6059,13 +6092,12 @@ test('includes the column ids for related assignments when updating column heade
 QUnit.module('Gradebook#renderSubmissionTray', {
   setup () {
     this.mountPointId = 'StudentTray__Container';
-    $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
+    $fixtures.innerHTML = `<div id="${this.mountPointId}"></div><div id="application"></div>`;
     this.gradebook = createGradebook();
     this.gradebook.students = {
       1101: {
         id: '1101',
         name: 'Adam Jones',
-        wtf: true,
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         }
@@ -6093,22 +6125,31 @@ QUnit.module('Gradebook#renderSubmissionTray', {
 });
 
 test('shows a submission tray on the page when rendering an open tray', function () {
+  const clock = sinon.useFakeTimers();
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  ok(document.querySelector('div[aria-label="Submission tray"]'));
+  clock.tick(500); // wait for Tray to transition open
+  ok(document.querySelector('[aria-label="Submission tray"]'));
+  clock.restore();
 });
 
 test('does not show a submission tray on the page when rendering a closed tray', function () {
+  const clock = sinon.useFakeTimers();
   this.gradebook.setSubmissionTrayState(false, '1101', '2301');
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  notOk(document.querySelector('div[aria-label="Submission tray"]'));
+  clock.tick(500); // wait for Tray transition to ensure it has not opened
+  notOk(document.querySelector('[aria-label="Submission tray"]'));
+  clock.restore();
 });
 
 test('shows a submission tray when the related submission has not loaded for the student', function () {
+  const clock = sinon.useFakeTimers();
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.student('1101').assignment_2301 = undefined;
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  ok(document.querySelector('div[aria-label="Submission tray"]'));
+  clock.tick(500); // wait for Tray to transition open
+  ok(document.querySelector('[aria-label="Submission tray"]'));
+  clock.restore();
 });
 
 QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {

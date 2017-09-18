@@ -228,6 +228,7 @@ class User < ActiveRecord::Base
   }
 
   def reload(*)
+    @all_pseudonyms = nil
     @all_active_pseudonyms = nil
     super
   end
@@ -2015,6 +2016,7 @@ class User < ActiveRecord::Base
           subs_with_comment_scope = Submission.active.where(user_id: self).for_context_codes(context_codes).
             joins(:submission_comments, :assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
+            where('submission_comments.created_at>?', opts[:start_at]).
             where.not(:submission_comments => {:author_id => self, :draft => true}).
             distinct_on("submissions.id").
             order("submissions.id, submission_comments.created_at DESC"). # get the last created comment
@@ -2871,18 +2873,26 @@ class User < ActiveRecord::Base
     associated_shards.select { |shard| shard.in_current_region? || shard.default? }
   end
 
+  def adminable_accounts_scope
+    Account.shard(self.in_region_associated_shards).active.joins(:account_users).
+      where(account_users: {user_id: self.id}).
+      where.not(account_users: {workflow_state: 'deleted'})
+  end
+
   def adminable_accounts
     @adminable_accounts ||= shard.activate do
       Rails.cache.fetch(['adminable_accounts', self, ApplicationController.region].cache_key) do
-        Account.shard(self).active.joins(:account_users).
-          where(account_users: {user_id: self.id}).
-          where.not(account_users: {workflow_state: 'deleted'})
+        adminable_accounts_scope.to_a
       end
     end
   end
 
   def all_paginatable_accounts
-    ShardedBookmarkedCollection.build(Account::Bookmarker, self.adminable_accounts)
+    ShardedBookmarkedCollection.build(Account::Bookmarker, self.adminable_accounts_scope)
+  end
+
+  def all_pseudonyms_loaded?
+    !!@all_pseudonyms
   end
 
   def all_pseudonyms

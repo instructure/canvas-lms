@@ -58,7 +58,7 @@ function getContextModules (url) {
 }
 
 function getCustomColumns (url) {
-  return $.ajaxJSON(url, 'GET', { include_hidden: true });
+  return cheaterDepaginate(url, { include_hidden: true });
 }
 
 function gotSubmissionsChunk (data) {
@@ -156,25 +156,30 @@ function getStudents (options, gotStudentIds) {
   return studentsLoaded;
 }
 
-function getDataForColumn (column, url, params, cb) {
-  const columnUrl = url.replace(/:id/, column.id);
-  const augmentedCallback = data => cb(column, data);
+function getDataForColumn (columnId, url, params, cb) {
+  const columnUrl = url.replace(/:id/, columnId);
+  const augmentedCallback = data => cb(columnId, data);
   return cheaterDepaginate(columnUrl, params, augmentedCallback);
 }
 
-function getCustomColumnData (url, params, cb, customColumnsDfd, waitForDfds) {
+function getCustomColumnData (options, customColumnsDfd, waitForDfds) {
+  const url = options.customColumnDataURL;
+  const params = options.customColumnDataParams;
+  const cb = options.customColumnDataPageCb;
   const customColumnDataLoaded = $.Deferred();
 
   if (url) {
-    let customColumnDataDfds;
-
     // waitForDfds ensures that custom column data is loaded *last*
     $.when(...waitForDfds).then(() => {
-      customColumnsDfd.then((customColumns) => {
-        customColumnDataDfds = customColumns.map(col => getDataForColumn(col, url, params, cb));
-
+      if (options.customColumnIds) {
+        const customColumnDataDfds = options.customColumnIds.map(columnId => getDataForColumn(columnId, url, params, cb));
         $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve());
-      });
+      } else {
+        customColumnsDfd.then((customColumns) => {
+          const customColumnDataDfds = customColumns.map(col => getDataForColumn(col.id, url, params, cb));
+          $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve());
+        });
+      }
     });
   }
 
@@ -199,13 +204,7 @@ function loadGradebookData (opts) {
   const gotSubmissions = getSubmissions(opts.submissionsURL, opts.submissionsChunkCb, opts.submissionsChunkSize);
 
   // Custom Column Data will load only after custom columns and all submissions.
-  const gotCustomColumnData = getCustomColumnData(
-    opts.customColumnDataURL,
-    opts.customColumnDataParams,
-    opts.customColumnDataPageCb,
-    gotCustomColumns,
-    [gotSubmissions]
-  );
+  const gotCustomColumnData = getCustomColumnData(opts, gotCustomColumns, [gotSubmissions]);
 
   return {
     gotAssignmentGroups,

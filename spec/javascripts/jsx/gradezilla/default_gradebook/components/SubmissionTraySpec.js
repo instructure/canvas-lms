@@ -21,11 +21,21 @@ import { mount, ReactWrapper } from 'enzyme';
 import SubmissionTray from 'jsx/gradezilla/default_gradebook/components/SubmissionTray';
 
 QUnit.module('SubmissionTray', function (hooks) {
+  let clock;
   let content;
   let wrapper;
 
+  hooks.beforeEach(function () {
+    const applicationElement = document.createElement('div');
+    applicationElement.id = 'application';
+    document.getElementById('fixtures').appendChild(applicationElement);
+    clock = sinon.useFakeTimers();
+  });
+
   hooks.afterEach(function () {
     wrapper.unmount();
+    document.getElementById('fixtures').innerHTML = '';
+    clock.restore();
   });
 
   function mountComponent (props) {
@@ -70,6 +80,7 @@ QUnit.module('SubmissionTray', function (hooks) {
       selectPreviousAssignment: () => {}
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
+    clock.tick(50); // wait for Tray to transition open
   }
 
   function avatarDiv () {

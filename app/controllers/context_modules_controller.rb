@@ -60,7 +60,7 @@ class ContextModulesController < ApplicationController
 
       modules_cache_key
 
-      @is_cyoe_on = ConditionalRelease::Service.enabled_in_context?(@context)
+      @is_cyoe_on = @current_user && ConditionalRelease::Service.enabled_in_context?(@context)
       if allow_web_export_download?
         @allow_web_export_download = true
         @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last
@@ -120,7 +120,7 @@ class ContextModulesController < ApplicationController
 
       if item.present? && item.published? && item.context_module.published?
         rules = ConditionalRelease::Service.rules_for(@context, @current_user, item, session)
-        rule = conditional_release(item, conditional_release_rules: rules)
+        rule = conditional_release_rule_for_module_item(item, conditional_release_rules: rules)
 
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
         # but instead progress forward and return a warning message if is locked later on

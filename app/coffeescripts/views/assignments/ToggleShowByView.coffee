@@ -111,8 +111,8 @@ define [
           defaultValue: defaultValue,
           onChange: @toggleShowBy
         },
-          createElement(RadioInput, {id: 'show_by_date', label: I18n.t("Show by Date"), value: "date"})
-          createElement(RadioInput, {id: 'show_by_type', label: I18n.t("Show by Type"), value: "type"})
+          createElement(RadioInput, {id: 'show_by_date', label: I18n.t("Show by Date"), value: "date", context: "off"})
+          createElement(RadioInput, {id: 'show_by_type', label: I18n.t("Show by Type"), value: "type", context: "off"})
         ), @el
       )
 

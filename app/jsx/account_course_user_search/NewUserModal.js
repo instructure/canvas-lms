@@ -32,22 +32,6 @@ import 'compiled/jquery.rails_flash_notifications'
 
   const { object, string } = PropTypes
 
-  const modalOverrides = {
-    overlay : {
-      backgroundColor: 'rgba(0,0,0,0.5)'
-    },
-    content : {
-      position: 'static',
-      top: '0',
-      left: '0',
-      right: 'auto',
-      bottom: 'auto',
-      borderRadius: '0',
-      border: 'none',
-      padding: '0'
-    }
-  };
-
   var NewUserModal = React.createClass({
 
     propTypes: {
@@ -127,7 +111,6 @@ import 'compiled/jquery.rails_flash_notifications'
         <Modal
           className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
           isOpen={isOpen}
-          style={modalOverrides}
           title={I18n.t('Add a New User')}
           contentLabel={I18n.t('Add a New User')}
           onRequestClose={this.closeModal}

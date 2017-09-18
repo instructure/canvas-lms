@@ -11,9 +11,9 @@ module Types
 
     field :user, UserType, resolve: ->(s, _, _) { Loaders::IDLoader.for(User).load(s.user_id) }
 
-    field :score, types.Float
+    field :score, types.Float, resolve: SubmissionHelper.protect_submission_grades(:score)
 
-    field :grade, types.String
+    field :grade, types.String, resolve: SubmissionHelper.protect_submission_grades(:grade)
 
     field :excused, types.Boolean,
       "excused assignments are ignored when calculating grades",
@@ -21,5 +21,15 @@ module Types
 
     field :submittedAt, TimeType, property: :submitted_at
     field :gradedAt, TimeType, property: :graded_at
+  end
+
+  class SubmissionHelper
+    def self.protect_submission_grades(attr)
+      ->(submission, _, ctx) {
+        submission.user_can_read_grade?(ctx[:current_user], ctx[:session]) ?
+          submission.send(attr) :
+          nil
+      }
+    end
   end
 end

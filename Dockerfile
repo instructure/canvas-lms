@@ -8,6 +8,7 @@ FROM instructure/ruby-passenger:2.4
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
+ENV YARN_VERSION 0.27.5-1
 
 # Work around github.com/zertosh/v8-compile-cache/issues/2
 # This can be removed once yarn pushes a release including the fixed version
@@ -23,7 +24,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
   && apt-get update -qq \
   && apt-get install -qqy --no-install-recommends \
        nodejs \
-       yarn \
+       yarn="$YARN_VERSION" \
        libxmlsec1-dev \
        python-lxml \
        libicu-dev \

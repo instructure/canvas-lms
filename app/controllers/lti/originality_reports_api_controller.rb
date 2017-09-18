@@ -152,13 +152,13 @@ module Lti
     # @returns OriginalityReport
     def create
       render_unauthorized_action and return unless tool_proxy_associated?
-      @report = OriginalityReport.create!(create_report_params)
-      render json: api_json(@report, @current_user, session), status: :created
-    rescue ActiveRecord::RecordInvalid
-      return render json: @report.errors, status: :bad_request
-    rescue ActiveRecord::RecordNotUnique
-      return render json: {error: {message: I18n.t('the specified file with file_id already has an originality report'),
-                                   type: 'RecordNotUnique'}}, status: :bad_request
+      @report = OriginalityReport.new(create_report_params)
+
+      if @report.save
+        render json: api_json(@report, @current_user, session), status: :created
+      else
+        render json: @report.errors, status: :bad_request
+      end
     end
 
     # @API Edit an Originality Report

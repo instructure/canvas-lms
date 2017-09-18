@@ -21,14 +21,16 @@ module Factories
   end
 
   def stub_rcs_config
-    allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", use_env: false).and_return(
+    # make sure this is loaded first
+    allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
       {
         "app-host":"",
         "cdn-host":"",
         "sidebar-source":"fake"
       }
     )
-    allow(Canvas::DynamicSettings).to receive(:find).with("canvas", use_env: false).and_return(
+    allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
       {
         "signing-secret" => "asdfasdfasdfasdfasdfasdfasdfasdf",
         "encryption-secret" => "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;"

@@ -65,7 +65,7 @@ class Account::HelpLinks
     # so that a school can still customize it
     def map_default_links(links)
       links.map do |link|
-        default_link = link[:type] == 'default' && default_links_hash[link[:id].to_sym]
+        default_link = link[:type] == 'default' && default_links_hash[link[:id]&.to_sym]
         if default_link
           link = link.dup
           link[:text] = default_link[:text]

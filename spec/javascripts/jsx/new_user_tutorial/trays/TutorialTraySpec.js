@@ -22,9 +22,20 @@ import {shallow, mount} from 'enzyme';
 import TutorialTray from 'jsx/new_user_tutorial/trays/TutorialTray';
 import createTutorialStore from 'jsx/new_user_tutorial/utils/createTutorialStore'
 
-QUnit.module('TutorialTray Spec');
+QUnit.module('TutorialTray Spec', {
+  setup () {
+    const applicationElement = document.createElement('div');
+    applicationElement.id = 'application';
+    document.getElementById('fixtures').appendChild(applicationElement);
+    store = createTutorialStore();
+  },
 
-const store = createTutorialStore();
+  teardown () {
+    document.getElementById('fixtures').innerHTML = '';
+  }
+});
+
+let store;
 
 const getDefaultProps = overrides => (
   Object.assign({}, {
@@ -47,6 +58,7 @@ test('Renders', () => {
     </TutorialTray>
   );
   ok(wrapper.exists());
+  wrapper.unmount()
 });
 
 test('handleEntering sets focus on the toggle button', () => {
@@ -55,13 +67,11 @@ test('handleEntering sets focus on the toggle button', () => {
       <div>Some Content</div>
     </TutorialTray>
   );
-  wrapper.setState({
-    isCollapsed: false
-  });
-
+  wrapper.instance().handleToggleClick();
   wrapper.instance().handleEntering();
 
   ok(wrapper.instance().toggleButton.button.focused);
+  wrapper.unmount()
 });
 
 test('handleExiting calls focus on the return value of the returnFocusToFunc', () => {
@@ -76,6 +86,7 @@ test('handleExiting calls focus on the return value of the returnFocusToFunc', (
   wrapper.instance().handleExiting();
 
   ok(spy.called);
+  wrapper.unmount()
 });
 
 test('handleToggleClick toggles the isCollapsed state of the store', () => {
@@ -88,6 +99,7 @@ test('handleToggleClick toggles the isCollapsed state of the store', () => {
   wrapper.instance().handleToggleClick();
 
   ok(store.getState().isCollapsed);
+  wrapper.unmount()
 });
 
 test('initial state sets endUserTutorialShown to false', () => {
@@ -98,6 +110,7 @@ test('initial state sets endUserTutorialShown to false', () => {
   );
 
   equal(wrapper.state('endUserTutorialShown'), false);
+  wrapper.unmount()
 });
 
 test('handleEndTutorialClick sets endUserTutorialShown to true', () => {
@@ -110,6 +123,7 @@ test('handleEndTutorialClick sets endUserTutorialShown to true', () => {
   wrapper.instance().handleEndTutorialClick();
 
   equal(wrapper.state('endUserTutorialShown'), true);
+  wrapper.unmount()
 });
 
 test('closeEndTutorialDialog sets endUserTutorialShown to false', () => {
@@ -122,4 +136,5 @@ test('closeEndTutorialDialog sets endUserTutorialShown to false', () => {
   wrapper.instance().closeEndTutorialDialog();
 
   equal(wrapper.state('endUserTutorialShown'), false);
+  wrapper.unmount()
 });

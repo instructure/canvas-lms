@@ -24,11 +24,12 @@
   rubric_association ||= nil
   edit_view ||= false
   assessment_rating ||= nil
+  range_rating_enabled = @domain_root_account.feature_enabled?(:rubric_criterion_range)
+  range_rating_visible = range_rating_enabled && !criterion.try(:learning_outcome_id)
 
   learning_outcome_criterion = criterion.try(:learning_outcome_id)
   description = criterion.try(:description) || t('defaults.description', "Description of criterion")
 %>
-
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
   <td class="criterion_description hover-container">
     <div class="container">
@@ -40,6 +41,12 @@
       <div class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
         <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
         <textarea class="long_description" aria-label="<%= t 'labels.long_description', "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
+      </div>
+      <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
+        <div class="criterion_use_range_div editing">
+          <label><%= t 'Range' %>
+            <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/></label>
+        </div>
       </div>
       <div class="threshold">
         <%= before_label :threshold, "threshold" %>
@@ -83,12 +90,19 @@
         <% ratings = (criterion.ratings rescue nil); ratings = nil if ratings && ratings.length < 2  %>
         <% ratings ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
         <% ratings.each_index do |idx| %>
-          <% rating = ratings[idx]; rating.edge = (idx == 0 || idx == ratings.length - 1) %>
-          <td id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %>">
+          <% rating = ratings[idx];
+             rating.edge = (idx == 0 || idx == ratings.length - 1);
+             next_rating = ratings[idx+1] if idx != ratings.length - 1;
+             rating_min = (next_rating ? next_rating.points : 0);
+             use_range = (criterion.try(:criterion_use_range) && rating_min.try(:to_f) != rating.points.try(:to_f) && range_rating_enabled);
+          %>
+          <td id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %> <%= "infinitesimal" if rating_min.try(:to_f) == rating.points.try(:to_f) %>">
           <div class="container">
             <div class="description rating_description_value"><%= rating.description %></div>
             <span class="nobr">
-              <%= t "%{points} pts", :points => %{<span class="points">#{n(rating.points)}</span>}.html_safe %>
+              <%= t "%{points}%{range_rating} pts",
+                :points => %{<span class="points">#{n(rating.points)}</span>}.html_safe,
+                :range_rating => %{<span class="range_rating" style="#{hidden if !use_range}"> to ><span class="min_points">#{n(rating_min)}</span></span>}.html_safe %>
             </span>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <% if !learning_outcome_criterion %>

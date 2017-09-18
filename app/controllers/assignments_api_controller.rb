@@ -433,6 +433,11 @@
 #             ]
 #           }
 #         },
+#         "has_submitted_submissions": {
+#           "description": "If true, the assignment has been submitted to by at least one student",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "grading_type": {
 #           "description": "The type of grading the assignment receives; one of 'pass_fail', 'percent', 'letter_grade', 'gpa_scale', 'points'",
 #           "example": "points",
@@ -810,7 +815,7 @@ class AssignmentsApiController < ApplicationController
   #   format.
   #
   # @argument assignment[integration_data]
-  #   Data related to third party integrations, JSON string required.
+  #   Data used for SIS integrations. Requires admin-level token with the "Manage SIS" permission. JSON string required.
   #
   # @argument assignment[integration_id]
   #   Unique ID from third party integrations
@@ -965,7 +970,7 @@ class AssignmentsApiController < ApplicationController
   #   format.
   #
   # @argument assignment[integration_data]
-  #   Data related to third party integrations, JSON string required.
+  #   Data used for SIS integrations. Requires admin-level token with the "Manage SIS" permission. JSON string required.
   #
   # @argument assignment[integration_id]
   #   Unique ID from third party integrations

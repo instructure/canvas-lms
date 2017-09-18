@@ -23,7 +23,7 @@ Rails.configuration.to_prepare do
   LiveEvents.settings = -> {
     plugin_settings = Canvas::Plugin.find(:live_events)&.settings
     if plugin_settings && Canvas::Plugin.value_to_boolean(plugin_settings['use_consul'])
-      Canvas::DynamicSettings.from_cache('live-events', expires_in: 2.hours)
+      Canvas::DynamicSettings.find('live-events', default_ttl: 2.hours)
     else
       plugin_settings
     end

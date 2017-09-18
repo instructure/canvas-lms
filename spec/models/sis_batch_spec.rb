@@ -491,14 +491,14 @@ s2,test_1,section2,active},
   it "should write all warnings/errors to a file and cleanup temp files" do
     Setting.set('sis_batch_max_messages', '3')
     batch = @account.sis_batches.create!
-    5.times do |i|
+    4.times do |i|
       batch.add_warnings([['testfile.csv', "test warning#{i}"]])
       batch.add_warnings([['testfile.csv', "test error#{i}"]])
     end
     batch.finish(false)
     error_file = batch.errors_attachment.reload
     expect(error_file.display_name).to eq "sis_errors_attachment_#{batch.id}.csv"
-    expect(CSV.parse(error_file.open).map.to_a.size).to eq 10
+    expect(CSV.parse(error_file.open).map.to_a.size).to eq 8
     expect(Attachment.where(context: batch).count).to eq 1
     expect(Attachment.where(context: batch, id: batch.errors_attachment_id).count).to eq 1
   end
@@ -688,6 +688,19 @@ test_1,u1,student,active}
         expect(@e2.reload).to be_deleted
         expect(batch.processing_errors.size).to eq 0
       end
+
+      it 'should not abort batch if it is above the threshold' do
+        b1 = process_csv_data([%{course_id,user_id,role,status
+                                test_1,u2,student,active}],
+                              batch_mode: true,
+                              batch_mode_term: @term1,
+                              change_threshold: 51)
+        expect(b1.workflow_state).to eq 'imported'
+        expect(@e1.reload).to be_deleted
+        expect(@e2.reload).to be_active
+        expect(b1.processing_errors.size).to eq 0
+      end
+
     end
   end
 end

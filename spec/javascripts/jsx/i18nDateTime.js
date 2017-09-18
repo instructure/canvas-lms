@@ -141,4 +141,22 @@ locales.forEach((locale) => {
       ok(false, 'missing bigeasy locale file')
     }
   })
+
+  test(`hour format matches timezone locale for ${locale.key}`, () => {
+    I18n.locale = locale.key
+    tz.changeLocale(locale.bigeasy, locale.moment)
+    const formats = [
+      'date.formats.date_at_time',
+      'date.formats.full',
+      'date.formats.full_with_weekday',
+      'time.formats.tiny',
+      'time.formats.tiny_on_the_hour'
+    ]
+    const invalid = key => {
+      const format = I18n.lookup(key)
+      // ok(/%p/i.test(format) === tz.hasMeridian(), `format: ${format}, hasMeridian: ${tz.hasMeridian()}`)
+      ok(tz.hasMeridian() || !/%p/i.test(format), `format: ${format}, hasMeridian: ${tz.hasMeridian()}`)
+    }
+    ok(!formats.forEach(invalid))
+  })
 })

@@ -20,41 +20,41 @@ import React from 'react'
 import * as enzyme from 'enzyme'
 import BlueprintSidebar from 'jsx/blueprint_courses/components/BlueprintSidebar'
 
-QUnit.module('BlueprintSidebar component')
+QUnit.module('BlueprintSidebar', function (hooks) {
+  let clock
+  let wrapper
 
-const defaultProps = () => ({
+  hooks.beforeEach(() => {
+    clock = sinon.useFakeTimers()
+    const appElement = document.createElement('div')
+    appElement.id = 'application'
+    document.getElementById('fixtures').appendChild(appElement)
+  })
 
-})
+  hooks.afterEach(() => {
+    wrapper.unmount()
+    document.getElementById('fixtures').innerHTML = ''
+    clock.restore()
+  })
 
-test('renders the BlueprintSidebar component', () => {
-  const tree = enzyme.shallow(<BlueprintSidebar {...defaultProps()} />)
-  const node = tree.find('.bcs__wrapper')
-  ok(node.exists())
-})
+  test('renders the BlueprintSidebar component', () => {
+    wrapper = enzyme.shallow(<BlueprintSidebar />)
+    ok(wrapper.find('.bcs__wrapper').exists())
+  })
 
-test('clicking open button sets isOpen to true', () => {
-  const props = defaultProps()
-  const tree = enzyme.mount(<BlueprintSidebar {...props} />)
+  test('clicking open button sets isOpen to true', () => {
+    wrapper = enzyme.mount(<BlueprintSidebar />)
+    wrapper.find('.bcs__trigger button').at(0).simulate('click')
+    clock.tick(500)
+    strictEqual(wrapper.instance().state.isOpen, true)
+  })
 
-  const button = tree.find('.bcs__trigger button')
-  button.at(0).simulate('click')
-
-  const instance = tree.instance()
-  equal(instance.state.isOpen, true)
-  tree.unmount()
-})
-
-test('clicking close button sets isOpen to false', () => {
-  const props = defaultProps()
-  const tree = enzyme.mount(<BlueprintSidebar {...props} />)
-
-  const instance = tree.instance()
-  instance.setState({ isOpen: true })
-
-  const closeBtn = instance.closeBtn
-  const btnWrapper = new enzyme.ReactWrapper(closeBtn, closeBtn)
-  btnWrapper.at(0).simulate('click')
-
-  equal(instance.state.isOpen, false)
-  tree.unmount()
+  test('clicking close button sets isOpen to false', () => {
+    wrapper = enzyme.mount(<BlueprintSidebar />)
+    wrapper.instance().open()
+    clock.tick(500)
+    wrapper.instance().closeBtn.click()
+    clock.tick(500)
+    strictEqual(wrapper.instance().state.isOpen, false)
+  })
 })

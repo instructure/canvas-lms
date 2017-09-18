@@ -112,6 +112,18 @@ class Speedgrader
       f('.display_name')
     end
 
+    def submission_status_pill(status)
+      fj("[title='#{status}']:contains('#{status}')")
+    end
+
+    def late_points_deducted_text
+      f("#points-deducted").text
+    end
+
+    def final_late_policy_grade_text
+      f("#final-grade").text
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
@@ -169,5 +181,8 @@ class Speedgrader
       click_option(submission_to_view_dropdown, option_index, :value)
     end
 
+    def submit_settings_form
+      fj('.ui-dialog-buttonset .ui-button:visible:last').click
+    end
   end
 end

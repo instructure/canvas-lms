@@ -738,7 +738,23 @@ class Attachment < ActiveRecord::Base
   end
 
   def downloadable?
+   if InstFS.enabled?
+      !!self.instfs_uuid
+   else
     !!(self.authenticated_s3_url rescue false)
+   end
+  end
+
+  def authenticated_url(*thumbnail, **options)
+    if InstFS.enabled? && self.instfs_uuid
+      InstFS.authenticated_url(self, options)
+    else
+      # attachment_fu doesn't like the extra option when building s3 urls
+      should_download = options.delete(:download)
+      disposition = should_download ? "attachment" : "inline"
+      options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
+      self.authenticated_s3_url(*thumbnail, **options)
+    end
   end
 
   def local_storage_path
@@ -908,11 +924,11 @@ class Attachment < ActiveRecord::Base
   end
 
   def download_url(ttl = url_ttl)
-    authenticated_s3_url(expires_in: ttl, response_content_disposition: "attachment; " + disposition_filename)
+    authenticated_url(expires_in: ttl, download: true)
   end
 
   def inline_url(ttl = url_ttl)
-    authenticated_s3_url(expires_in: ttl, response_content_disposition: "inline; " + disposition_filename)
+    authenticated_url(expires_in: ttl, download: false)
   end
 
   def url_ttl
@@ -1685,7 +1701,7 @@ class Attachment < ActiveRecord::Base
   # Pass an existing attachment in opts[:attachment] to use that, rather than
   # creating a new attachment.
   def self.clone_url_as_attachment(url, opts = {})
-    _, uri = CanvasHttp.validate_url(url)
+    _, uri = CanvasHttp.validate_url(url, check_host: true)
 
     CanvasHttp.get(url) do |http_response|
       if http_response.code.to_i == 200

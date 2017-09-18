@@ -18,8 +18,9 @@
 define [
   'jquery',
   'tinymce_plugins/instructure_links/linkable_editor',
-  'jsx/shared/rce/RceCommandShim'
-], ($, LinkableEditor, RceCommandShim) ->
+  'jsx/shared/rce/RceCommandShim',
+  'tinymce_plugins/instructure_links/links',
+], ($, LinkableEditor, RceCommandShim, links) ->
 
   rawEditor = null
 
@@ -90,4 +91,20 @@ define [
       )
     })
     equal(extractedText, "")
+
+  QUnit.module "instructure_links link.js",
+    setup: ->
+      $('#fixtures').html('<div id="some_editor" data-value="42"><img class="iframe_placeholder" src="some_img.png" height="600" width="300"></div>')
+    teardown: ->
+      $("#fixtures").empty()
+
+  test "links initEditor PreProcess event preserves iframe size", ->
+    $editor = $(new LinkableEditor(rawEditor))
+    event = $.Event('PreProcess')
+    event.node = $('#fixtures')[0]
+    links.initEditor($editor)
+    $editor.trigger(event)
+    $iframe = $('#fixtures').find('iframe')
+    equal($iframe.attr('width'), 300)
+    equal($iframe.attr('height'), 600)
 

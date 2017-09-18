@@ -54,7 +54,13 @@ describe OriginalityReport do
     expect(subject.errors[:attachment]).to eq ["can't be blank"]
   end
 
-  it 'requies a valid workflow_state' do
+  it 'is invalid if the attachment is already taken' do
+    subject
+    duplicate = OriginalityReport.create(attachment: attachment, submission: submission_model)
+    expect(duplicate).to be_invalid
+  end
+
+  it 'requires a valid workflow_state' do
     subject.workflow_state = 'invalid_state'
     subject.valid?
     expect(subject.errors).not_to include :workflow_state

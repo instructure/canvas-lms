@@ -76,11 +76,15 @@ task :build_media_element_js do
   puts 'Copying Skin Files'
   img_path = "#{public_path}/images/mediaelement"
   FileUtils.mkdir_p img_path
-  [ 'src/css/controls.png',
-    'src/css/controls.svg',
+  [ 
+    'src/css/background.png',
     'src/css/bigplay.png',
     'src/css/bigplay.svg',
+    'src/css/controls.png',
+    'src/css/controls.svg',
     'src/css/loading.gif',
+    'src/css/jumpforward.png',
+    'src/css/skipback.png',
     'build/flashmediaelement.swf',
     'build/silverlightmediaelement.xap'
   ].each { |file| FileUtils.cp "#{repo_path}/#{file}", img_path }

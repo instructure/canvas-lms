@@ -140,21 +140,6 @@ import I18n from 'i18n!file_rename_form'
           title={I18n.t('Copy')}
           onRequestClose={this.props.onClose}
           closeWithX={this.props.closeWithX}
-          style={{
-            overlay : {
-              backgroundColor: 'rgba(0,0,0,0.5)'
-            },
-            content : {
-              position: 'static',
-              top: '0',
-              left: '0',
-              right: 'auto',
-              bottom: 'auto',
-              borderRadius: '0',
-              border: 'none',
-              padding: '0'
-            }
-          }}
         >
           <ModalContent>
             {this.buildContent()}

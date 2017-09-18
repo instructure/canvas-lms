@@ -398,7 +398,7 @@ class FilesController < ApplicationController
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
     if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-      render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
+      render :json  => { :public_url => @attachment.authenticated_url(:secure => request.ssl?) }
     end
   end
 
@@ -537,11 +537,11 @@ class FilesController < ApplicationController
           # some form.
           if @current_user &&
              (attachment.canvadocable? ||
-              (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
+              (service_enabled?(:google_docs_previews) && attachment.authenticated_url))
             attachment.context_module_action(@current_user, :read)
           end
-          if url = service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
-            json[:attachment][:authenticated_s3_url] = url
+          if url = service_enabled?(:google_docs_previews) && attachment.authenticated_url
+            json[:attachment][:authenticated_url] = url
           end
 
           json_include = if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)
@@ -773,9 +773,8 @@ class FilesController < ApplicationController
     end
 
     # check service authorization
-    key = Base64.decode64(InstFS.jwt_secret)
     begin
-      Canvas::Security.decode_jwt(params[:token], [ key ])
+      Canvas::Security.decode_jwt(params[:token], [ InstFS.jwt_secret ])
     rescue
       head :forbidden
       return
@@ -792,7 +791,7 @@ class FilesController < ApplicationController
 
     # service metadata
     @attachment.filename = params[:name]
-    @attachment.display_name = params[:name].presence
+    @attachment.display_name = params[:display_name] || params[:name]
     @attachment.size = params[:size]
     @attachment.content_type = params[:content_type]
     @attachment.instfs_uuid = params[:instfs_uuid]

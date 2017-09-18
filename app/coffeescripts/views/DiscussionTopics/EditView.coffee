@@ -181,7 +181,7 @@ define [
 
     render: =>
       super
-      $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
+      $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message')).css('display', 'none')
 
       unless @lockedItems.content
         RichContentEditor.initSidebar()

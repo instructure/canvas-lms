@@ -17,8 +17,8 @@
 #
 
 require_relative '../../helpers/gradezilla_common'
-require_relative '../page_objects/gradezilla_page'
-require_relative '../page_objects/grading_curve_page'
+require_relative '../pages/gradezilla_page'
+require_relative '../pages/grading_curve_page'
 require_relative '../setup/gradebook_setup'
 
 describe "Gradezilla editing grades" do

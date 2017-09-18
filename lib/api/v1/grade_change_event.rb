@@ -33,7 +33,7 @@ module Api::V1::GradeChangeEvent
       page_view: event.request_id && PageView.find_by_id(event.request_id).try(:id)
     }
 
-    {
+    json = {
       id: event.id,
       created_at: event.created_at.in_time_zone,
       event_type: event.event_type,
@@ -47,6 +47,9 @@ module Api::V1::GradeChangeEvent
       version_number: event.version_number,
       links: links
     }
+
+    json[:grade_current] = event.grade_current if event.grade_current.present?
+    json
   end
 
   def grade_change_events_json(events, user, session)

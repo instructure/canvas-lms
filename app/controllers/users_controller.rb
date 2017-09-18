@@ -492,7 +492,7 @@ class UsersController < ApplicationController
           integration_id: @user.pseudonym.integration_id
         }
       }
-      render :text => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
+      render :html => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
     end
   end
 
@@ -771,7 +771,7 @@ class UsersController < ApplicationController
     @courses = @query.present? ?
       @context.manageable_courses_name_like(@query, include_concluded) :
       @context.manageable_courses(include_concluded).limit(500)
-    @courses = @courses.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key')
+    @courses = @courses.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
 
     cancel_cache_buster
     expires_in 30.minutes

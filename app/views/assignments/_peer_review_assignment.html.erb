@@ -42,9 +42,14 @@
       style="<%= hidden if request && request.completed? %>"
       href="<%= context_url(@context, :context_assignment_remind_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>">
       <span class="screenreader-only"><%= reminder %></span>
-      <i class="icon-alerts" aria-hidden="true"></i>
+      <i class="icon-alerts" aria-hidden="true" title="<%= reminder %>"></i>
     </a>
-    <a class="delete_review_link no-hover" href="<%= context_url(@context, :context_assignment_delete_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>"><i class="icon-trash" title="<%= t('Delete') %>"></i></a>
+    <a
+      class="delete_review_link no-hover"
+      href="<%= context_url(@context, :context_assignment_delete_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>">
+      <span class="screenreader-only"><%= t('Delete') %></span>
+      <i class="icon-trash" aria-hidden="true" title="<%= t('Delete') %>"></i>
+    </a>
   </div>
   <div class="clear"></div>
 </li>

@@ -64,7 +64,7 @@ import 'compiled/jquery/fixDialogButtons'
             pts = numberHelper.parse($this.find(".points").text()),
             $criterion = $this.parents(".criterion"),
             $criterionPoints = $criterion.find(".criterion_points"),
-            data = { description: "Rating Description" },
+            data = { description: "Rating Description", min_points: pts },
             hasClassAddLeft = $this.hasClass('add_left');
         if($this.hasClass('add_left')) {
           var more_points = numberHelper.parse($this.prev(".rating").find(".points").text());
@@ -74,16 +74,22 @@ import 'compiled/jquery/fixDialogButtons'
           }
         } else {
           var less_points = numberHelper.parse($this.next(".rating").find(".points").text());
+          data.min_points = less_points;
           data.points = Math.round((pts + less_points) / 2);
           if(data.points == pts || data.points == less_points) {
             data.points = less_points;
           }
         }
         $td.fillTemplateData({data: data});
+        rubricEditing.flagInfinitesimalRating($td, $criterion.find('.criterion_use_range').attr('checked'));
         if(hasClassAddLeft) {
           $this.before($td);
         } else {
           $this.after($td);
+        }
+        const $previousRating = $td.prev('.rating')
+        if ($previousRating) {
+          $previousRating.fillTemplateData({data: {min_points: data.points} })
         }
         rubricEditing.hideCriterionAdd($rubric);
         rubricEditing.updateCriterionPoints($criterion);
@@ -107,6 +113,7 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.find('.mastery_points').val(outcome.get('mastery_points'));
       $criterion.addClass('learning_outcome_criterion');
       $criterion.find('.learning_outcome_id').text(outcome.id);
+      $criterion.find('.hide_when_learning_outcome').hide();
       $criterion.find(".criterion_points").val(outcome.get('ratings')[0].points).blur();
 
       for (var i = 0; i < outcome.get('ratings').length - 2; i++) {
@@ -148,6 +155,7 @@ import 'compiled/jquery/fixDialogButtons'
       var ratings = $.makeArray($criterion.find(".rating")).reverse();
       var rating_points = -1;
       var points = numberHelper.parse($criterion.find(".criterion_points").val());
+      const use_range = $criterion.find('.criterion_use_range').attr('checked')
       if(isNaN(points)) {
         points = 5;
       } else {
@@ -167,6 +175,7 @@ import 'compiled/jquery/fixDialogButtons'
         rating_points = data.points;
         data.points = rubricEditing.localizedPoints(data.points);
         $rating.fillTemplateData({data: data});
+        rubricEditing.flagInfinitesimalRating($rating, use_range);
       });
       if(baseOnRatings && rating_points > points) { points = rating_points; }
       $criterion.find(".criterion_points").val(rubricEditing.localizedPoints(points));
@@ -197,6 +206,9 @@ import 'compiled/jquery/fixDialogButtons'
             newPts = Math.max(0, newPts);
             lastPts = newPts;
             $($ratingList[i]).find(".points").text(rubricEditing.localizedPoints(newPts));
+            if (i > 0) {
+              $($ratingList[i - 1]).find('.min_points').text(rubricEditing.localizedPoints(newPts));
+            }
           }
         }
         $criterion.data('criterion_points', points);
@@ -206,14 +218,18 @@ import 'compiled/jquery/fixDialogButtons'
     editRating: function($rating) {
       if(!$rating.parents(".rubric").hasClass('editing')) { return; }
       if($rating.parents(".criterion").hasClass('learning_outcome_criterion')) { return; }
+      const $nextRating = $rating.closest('td').next('.rating')
+      const use_range = $rating.parents('.criterion').find('.criterion_use_range').attr('checked')
       rubricEditing.hideEditRating(true);
       rubricEditing.hideCriterionAdd($rating.parents(".rubric"));
       var height = Math.max(40, $rating.find(".rating").height());
-      var data = $rating.getTemplateData({textValues: ['description', 'points']});
+      const data = $rating.getTemplateData({textValues: ['description', 'points', 'min_points']});
       var $box = $("#edit_rating");
       $box.fillFormData(data);
+      $box.find('.min_points').prop('disabled', !$nextRating.length)
       $rating.find(".container").hide();
       $rating.append($box.show());
+      $box.find('.range_rating').showIf(use_range);
       $box.find(":input:first").focus().select();
       $rating.addClass('editing');
       rubricEditing.sizeRatings($rating.parents(".criterion"));
@@ -227,6 +243,21 @@ import 'compiled/jquery/fixDialogButtons'
       $rating.find(".container").show();
       rubricEditing.sizeRatings($rating.parents(".criterion"));
       rubricEditing.hideCriterionAdd($rating.parents(".rubric"));
+    },
+    flagInfinitesimalRating($rating, use_range) {
+      const data = $rating.getTemplateData({textValues: ['points', 'min_points']});
+      if (numberHelper.parse(data.min_points) === numberHelper.parse(data.points)) {
+        $rating.addClass("infinitesimal");
+        $rating.find(".range_rating").hide()
+      }
+      else {
+        $rating.removeClass("infinitesimal");
+        $rating.find(".range_rating").showIf(use_range)
+      }
+    },
+    capPointChange(points, $neighbor, action, compare_target) {
+      const data = $neighbor.getTemplateData({textValues: [compare_target]});
+      return rubricEditing.localizedPoints(action(points, numberHelper.parse(data[compare_target])));
     },
     editCriterion: function($criterion) {
       if(!$criterion.parents(".rubric").hasClass('editing')) { return; }
@@ -300,6 +331,7 @@ import 'compiled/jquery/fixDialogButtons'
       var criterion_idx = 0;
       $rubric.find(".criterion:not(.blank)").each(function() {
         var $criterion = $(this);
+        const use_range = !!$criterion.find('.criterion_use_range').attr('checked');
         if(!$criterion.hasClass('learning_outcome_criterion')) {
           var masteryPoints = $criterion.find("input.mastery_points").val();
           $criterion.find("span.mastery_points").text(numberHelper.validate(masteryPoints) ? masteryPoints : 0);
@@ -313,6 +345,7 @@ import 'compiled/jquery/fixDialogButtons'
         data[pre_criterion + "[learning_outcome_id]"] = vals.learning_outcome_id;
         data[pre_criterion + "[long_description]"] = vals.long_description;
         data[pre_criterion + "[id]"] = vals.criterion_id;
+        data[pre_criterion + "[criterion_use_range]"] = use_range;
         if ($criterion.hasClass('ignore_criterion_for_scoring')) {
           data[pre_criterion + "[ignore_for_scoring]"] = '1';
         }
@@ -322,11 +355,11 @@ import 'compiled/jquery/fixDialogButtons'
         var rating_idx = 0;
         $criterion.find(".rating").each(function() {
           var $rating = $(this);
-          var vals = $rating.getTemplateData({textValues: ['description', 'points', 'rating_id']});
+          const rating_vals = $rating.getTemplateData({textValues: ['description', 'points', 'rating_id']});
           var pre_rating = pre_criterion + "[ratings][" + rating_idx + "]";
-          data[pre_rating + "[description]"] = vals.description;
-          data[pre_rating + "[points]"] = numberHelper.parse(vals.points);
-          data[pre_rating + "[id]"] = vals.rating_id;
+          data[pre_rating + "[description]"] = rating_vals.description;
+          data[pre_rating + "[points]"] = numberHelper.parse(rating_vals.points);
+          data[pre_rating + "[id]"] = rating_vals.rating_id;
           rating_idx++;
         });
         criterion_idx++;
@@ -434,16 +467,23 @@ import 'compiled/jquery/fixDialogButtons'
         $criterion.removeClass('blank');
         $criterion.fillTemplateData({data: criterion});
         $criterion.find(".long_description_holder").toggleClass('empty', !criterion.long_description);
+        $criterion.find('.criterion_use_range').attr('checked', criterion.criterion_use_range === true);
         $criterion.find(".ratings").empty();
+        $criterion.find('.hide_when_learning_outcome').showIf(!criterion.learning_outcome_id);
         $criterion.toggleClass('learning_outcome_criterion', !!criterion.learning_outcome_id);
         $criterion.toggleClass('ignore_criterion_for_scoring', !!criterion.ignore_for_scoring);
         var count = 0;
         criterion.ratings.forEach(function(rating) {
           count++;
           rating.rating_id = rating.id;
+          rating.min_points = 0
+          if (count < criterion.ratings.length) {
+            rating.min_points = rubricEditing.localizedPoints(criterion.ratings[count].points)
+          }
           var $rating = $rating_template.clone(true);
           $rating.toggleClass('edge_rating', count === 0 || count === criterion.ratings.length - 1);
           $rating.fillTemplateData({data: rating});
+          $rating.find('.range_rating').showIf(criterion.criterion_use_range === true && rating.min_points !== rating.points);
           $criterion.find(".ratings").append($rating);
         });
         if (criterion.learning_outcome_id) {
@@ -484,7 +524,7 @@ import 'compiled/jquery/fixDialogButtons'
 
       if(editing && !isLearningOutcome) {
         $rubric_long_description_dialog
-          .fillFormData(data)
+          .fillFormData(data).fillTemplateData({data: data})
           .find('.editing').show().end()
           .find(".displaying").hide().end();
       } else {
@@ -512,13 +552,12 @@ import 'compiled/jquery/fixDialogButtons'
         .data('current_criterion', $criterion)
         .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
-          width: 400,
+          width: 416,
           buttons: []
         });
 
       if(editing && !isLearningOutcome) {
         $rubric_long_description_dialog.fixDialogButtons();
-        $rubric_long_description_dialog.find("textarea:visible:first").focus().select();
       }
     })
     .delegate(".find_rubric_link", 'click', function(event) {
@@ -757,7 +796,7 @@ import 'compiled/jquery/fixDialogButtons'
           ENV.MASTER_COURSE_DATA.is_master_course_child_content && ENV.MASTER_COURSE_DATA.master_course_restrictions.points) {
           skipPointsUpdate = true;
         } else if (data['rubric_association[use_for_grading]'] == '1') {
-          var assignmentPoints = numberHelper.parse($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
+          const assignmentPoints = numberHelper.parse($("#assignment_show .points_possible, #rubrics.rubric_dialog .assignment_points_possible").text());
           var rubricPoints = parseFloat(data.points_possible);
           if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {
             var pointRatio = assignmentPoints === 0 ? rubricPoints : rubricPoints / assignmentPoints;
@@ -773,6 +812,7 @@ import 'compiled/jquery/fixDialogButtons'
               $("#edit_rubric_form").submit();
             };
             $confirmDialog.dialog({
+              dialogClass: 'edit-rubric-confirm-points-change',
               buttons: [
                 {
                   text: I18n.t('change', 'Change'),
@@ -941,7 +981,14 @@ import 'compiled/jquery/fixDialogButtons'
     }).delegate('.rating', 'mouseout', function(event) {
       $(this).data('hover_offset', null).data('hover_width', null);
     }).delegate('.delete_rating_link', 'click', function(event) {
-      var $target = $(this).closest('td').next().find('.edit_rating_link');
+      const $rating_cell = $(this).closest('td')
+      const $target = $rating_cell.next().find('.edit_rating_link');
+      const $previousRating = $rating_cell.prev('.rating')
+      const previous_data = {min_points: $rating_cell.next('.rating').find('.points').text()}
+      if (previous_data.min_points !== previous_data.points) {
+        $previousRating.removeClass("infinitesimal")
+      }
+      $previousRating.fillTemplateData({data: previous_data})
       event.preventDefault();
       rubricEditing.hideCriterionAdd($(this).parents(".rubric"));
       $(this).parents(".rating").fadeOut(function() {
@@ -989,18 +1036,49 @@ import 'compiled/jquery/fixDialogButtons'
     });
     $("#edit_rating_form").submit(function(event) {
       var $target = $(this).closest('td.rating').find('.edit_rating_link');
+      const use_range = $target.parents('.criterion').find('.criterion_use_range').attr('checked')
+      const $rating = $(this).parents('.rating');
+      const $nextRating = $rating.next('.rating')
+      const $previousRating = $rating.prev('.rating')
       event.preventDefault();
       event.stopPropagation();
       var data = $(this).parents("#edit_rating").getFormData();
-      data.points = numberHelper.parse(data.points);
-      if(isNaN(data.points)) {
+      data.points = round(numberHelper.parse(data.points), 2);
+      if (isNaN(data.points)) {
         data.points = numberHelper.parse($(this).parents(".criterion").find(".criterion_points").val());
         if(isNaN(data.points)) { data.points = 5; }
+        if(data.points < 0) { data.points = 0; }
       }
-      var $rating = $(this).parents(".rating");
+      data.min_points = round(numberHelper.parse(data.min_points), 2);
+      if (isNaN(data.min_points) || (data.min_points < 0)) {
+        data.min_points = 0;
+      }
+      if (use_range) {
+        // Fix up min and max if the user reversed them.
+        if (data.points < data.min_points) {
+          const tmp_points = data.points;
+          data.points = data.min_points;
+          data.min_points = tmp_points;
+        }
+        if ($previousRating.length !== 0) {
+          data.points = rubricEditing.capPointChange(data.points, $previousRating, Math.min, "points");
+        }
+        if ($nextRating.length !== 0) {
+          data.min_points = rubricEditing.capPointChange(data.min_points, $nextRating, Math.max, "min_points");
+        }
+      }
       $rating.fillTemplateData({data: data});
+      rubricEditing.flagInfinitesimalRating($rating, use_range)
       if($rating.prev(".rating").length === 0) {
         $(this).parents(".criterion").find(".criterion_points").val(rubricEditing.localizedPoints(data.points));
+      }
+      if ($nextRating) {
+        $nextRating.fillTemplateData({data: {points: data.min_points} })
+        rubricEditing.flagInfinitesimalRating($nextRating, use_range);
+      }
+      if ($previousRating) {
+        $previousRating.fillTemplateData({data: {min_points: data.points} })
+        rubricEditing.flagInfinitesimalRating($previousRating, use_range);
       }
       rubricEditing.updateCriterionPoints($(this).parents(".criterion"), true);
       $target.focus();
@@ -1008,7 +1086,10 @@ import 'compiled/jquery/fixDialogButtons'
     $("#edit_rubric_form .rubric_custom_rating").change(function() {
       $(this).parents(".rubric").find("tr.criterion")
         .find(".ratings").showIf(!$(this).attr('checked')).end()
-        .find(".custom_ratings").showIf($(this).attr('checked'));
+        .find('.criterion_use_range_div')
+          .showIf(!$(this).attr('checked')).end()
+        .find(".custom_ratings")
+          .showIf($(this).attr('checked'));
     }).triggerHandler('change');
     $("#edit_rubric_form #totalling_rubric").change(function() {
       $(this).parents(".rubric").find(".total_points_holder").showIf(!$(this).attr('checked'));
@@ -1016,6 +1097,13 @@ import 'compiled/jquery/fixDialogButtons'
     $("#edit_rubric_form .grading_rubric_checkbox").change(function() {
       $(this).parents(".rubric").find(".totalling_rubric").css('visibility', $(this).attr('checked') ? 'hidden' : 'visible');
       $(this).parents(".rubric").find(".totalling_rubric_checkbox").attr('checked', false);
+    }).triggerHandler('change');
+    $('.criterion_use_range').change(function () {
+      const checked = $(this).attr('checked')
+      $(this).parents('tr.criterion').find('.rating').each(function() {
+        const use_range = checked  && !$(this).hasClass("infinitesimal")
+        $(this).find('.range_rating').showIf(use_range);
+      });
     }).triggerHandler('change');
     $("#criterion_blank").find(".criterion_points").val("5");
     if($("#default_rubric").find(".criterion").length <= 1) {

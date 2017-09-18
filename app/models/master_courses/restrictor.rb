@@ -186,7 +186,7 @@ module MasterCourses::Restrictor
 
     locked_types = []
     self.class.base_class.restricted_column_settings.each do |type, columns|
-      if (child_tag.downstream_changes & columns).any?
+      if !self.child_content_restrictions[type] && (child_tag.downstream_changes & columns).any?
         locked_types << type
       end
     end

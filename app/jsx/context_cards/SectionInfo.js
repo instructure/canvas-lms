@@ -21,36 +21,25 @@ import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!student_context_tray'
 
+const sectionShape = PropTypes.shape({
+  name: PropTypes.string.isRequired
+});
+const enrollmentsShape = PropTypes.shape({
+  section: sectionShape.isRequired
+});
+const userShape = PropTypes.shape({
+  enrollments: PropTypes.arrayOf(enrollmentsShape).isRequired
+});
+
   class SectionInfo extends React.Component {
     static propTypes = {
-      course: PropTypes.object,
-      user: PropTypes.object
-    }
-
-    static defaultProps = {
-      course: {},
-      user: {}
-    }
-
-    get sections () {
-      if (
-        typeof this.props.user.enrollments === 'undefined' ||
-        typeof this.props.course.sections === 'undefined'
-      ) {
-        return []
-      }
-
-      const sectionIds = this.props.user.enrollments.map((enrollment) => {
-        return enrollment.course_section_id
-      })
-
-      return this.props.course.sections.filter((section) => {
-        return _.contains(sectionIds, section.id)
-      })
+      user: userShape.isRequired
     }
 
     render () {
-      const sections = this.sections
+      const sections = this.props.user.enrollments
+        .map(e => e.section)
+        .filter(s => s != null);
 
       if (sections.length > 0) {
         const sectionNames = sections.map((section) => {

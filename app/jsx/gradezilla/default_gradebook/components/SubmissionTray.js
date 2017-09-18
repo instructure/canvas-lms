@@ -65,12 +65,12 @@ export default function SubmissionTray (props) {
     <Tray
       contentRef={props.contentRef}
       label={I18n.t('Submission tray')}
-      isDismissable
       closeButtonLabel={I18n.t('Close submission tray')}
-      isOpen={props.isOpen}
-      trapFocus
+      applicationElement={() => document.getElementById('application')}
+      open={props.isOpen}
+      shouldContainFocus
       placement="end"
-      onRequestClose={props.onRequestClose}
+      onDismiss={props.onRequestClose}
       onClose={props.onClose}
     >
       <div className="SubmissionTray__Container">

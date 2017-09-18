@@ -103,7 +103,7 @@ class AssignmentGroupsController < ApplicationController
   #
   # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"]
   #  Associations to include with the group. "discussion_topic", "all_dates"
-  #  "assignment_visibility" & "submission" are only valid are only valid if "assignments" is also included.
+  #  "assignment_visibility" & "submission" are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #
   # @argument exclude_assignment_submission_types[] [String, "online_quiz"|"discussion_topic"|"wiki_page"|"external_tool"]

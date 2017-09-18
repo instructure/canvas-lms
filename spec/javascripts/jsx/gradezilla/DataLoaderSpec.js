@@ -34,7 +34,8 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
   const STUDENTS_PAGE_2 = [{ id: '1103' }];
   const SUBMISSIONS_CHUNK_1 = [{ id: '2501' }];
   const SUBMISSIONS_CHUNK_2 = [{ id: '2502' }, { id: '2503' }];
-  const CUSTOM_COLUMNS = [{ id: '2401' }];
+  const CUSTOM_COLUMNS_PAGE_1 = [{ id: '2401' }, { id: '2402' }];
+  const CUSTOM_COLUMNS_PAGE_2 = [{ id: '2403' }];
 
   hooks.beforeEach(function () {
     this.qunitTimeout = QUnit.config.testTimeout;
@@ -47,8 +48,7 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     fakeXhr = sinon.useFakeXMLHttpRequest();
     fakeXhr.onCreate = (xhr) => {
       XHRS.push(xhr);
-         // this settimeout allows jquery to finish setting up the xhr
-         // before we try to handle it
+      // This setTimeout allows jquery to finish setting up the XHR before we try to handle it.
       setTimeout(() => {
         if (XHR_HANDLERS && typeof XHR_HANDLERS[handlerIndex] === 'function') {
           XHR_HANDLERS[handlerIndex]();
@@ -65,27 +65,26 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     this.qunitTimeout = null;
   });
 
-  const callLoadGradebookData = (opts = {}) => {
-    const defaults = {
-      perPage: 2,
+  function callLoadGradebookData (options = {}) {
+    return DataLoader.loadGradebookData({
+      assignmentGroupsParams: { ag_params: 'ok' },
       assignmentGroupsURL: '/ags',
-      assignmentGroupsParams: {ag_params: 'ok'},
       contextModulesURL: '/context-modules',
       courseId: '1201',
-      customColumnsURL: '/customcols',
-      studentsURL: '/students',
-      studentsPageCb: () => {},
-      studentsParams: {student_params: 'whatever'},
-      submissionsURL: '/submissions',
-      submissionsParams: {submission_params: 'blahblahblah'},
-      submissionsChunkCb: () => {},
-      submissionsChunkSize: 2,
+      customColumnDataPageCb () {},
+      customColumnDataParams: { custom_column_data_params: '...' },
       customColumnDataURL: '/customcols/:id/data',
-      customColumnDataParams: {custom_column_data_params: '...'},
-      customColumnDataPageCb: () => {},
-    };
-
-    return DataLoader.loadGradebookData({...defaults, ...opts});
+      customColumnsURL: '/customcols',
+      perPage: 2,
+      studentsPageCb () {},
+      studentsParams: { student_params: 'whatever' },
+      studentsURL: '/students',
+      submissionsChunkCb () {},
+      submissionsChunkSize: 2,
+      submissionsParams: { submission_params: 'blahblahblah' },
+      submissionsURL: '/submissions',
+      ...options
+    });
   }
 
   function matchParams (request, params) {
@@ -217,7 +216,8 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     const resolve = assert.async();
 
     dataLoader.gotStudents.then(() => {
-      ok(true, 'gotStudents resolved');
+      const studentRequests = XHRS.filter(xhr => xhr.url.match('/students'));
+      strictEqual(studentRequests.length, 2);
       resolve();
     });
   });
@@ -392,7 +392,7 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
   QUnit.module('Custom Columns');
 
   test('requests custom columns using the given url', function () {
-    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
+    respondWith('/customcols', {}, 200, { Link: '' }, CUSTOM_COLUMNS_PAGE_1);
 
     callLoadGradebookData();
 
@@ -401,7 +401,7 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
   });
 
   test('includes hidden columns when requesting custom columns', function (assert) {
-    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
+    respondWith('/customcols', {}, 200, { Link: '' }, CUSTOM_COLUMNS_PAGE_1);
 
     const dataLoader = callLoadGradebookData();
     const resolve = assert.async();
@@ -414,33 +414,64 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     });
   });
 
+  test('requests all paginated pages of custom columns', function (assert) {
+    respondWith('/customcols', {}, 200, { Link: '</customcols&page=2>; rel="last"' }, CUSTOM_COLUMNS_PAGE_1);
+    respondWith('/customcols', { page: '2' }, 200, { Link: '' }, CUSTOM_COLUMNS_PAGE_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotCustomColumns.then(() => {
+      const requests = XHRS.filter(xhr => xhr.url.match('/customcols'));
+      strictEqual(requests.length, 2);
+      resolve();
+    });
+  });
+
   test('resolves promise with custom columns', function (assert) {
-    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
+    respondWith('/customcols', {}, 200, { Link: '' }, CUSTOM_COLUMNS_PAGE_1);
 
     const resolve = assert.async();
     const dataLoader = callLoadGradebookData();
 
     dataLoader.gotCustomColumns.then((cols) => {
-      ok(_.isEqual(cols, CUSTOM_COLUMNS));
+      deepEqual(cols, CUSTOM_COLUMNS_PAGE_1);
       resolve();
     });
   });
 
   test("doesn't fetch custom column data until all other data is done", function (assert) {
-    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
+    respondWith('/customcols', {}, 200, { Link: '' }, CUSTOM_COLUMNS_PAGE_1);
 
     const done = assert.async();
     const dataLoader = callLoadGradebookData();
 
     dataLoader.gotCustomColumns.then(() => {
-      ok(XHRS.filter(xhr => xhr.url.match(/data/)).length === 0,
-           'custom columns for other data to finish');
+      strictEqual(XHRS.filter(xhr => xhr.url.match(/data/)).length, 0, 'custom columns for other data to finish');
 
       dataLoader.gotSubmissions.resolve();
+
       setTimeout(() => {
-        ok(XHRS.filter(xhr => xhr.url.match(/data/)).length === 1);
+        strictEqual(XHRS.filter(xhr => xhr.url.match(/data/)).length, 2);
         done();
       });
+    });
+  });
+
+  test('requests custom column data for the given column ids', function (assert) {
+    const done = assert.async();
+    const dataLoader = callLoadGradebookData({ customColumnIds: ['2401', '2402'] });
+
+    dataLoader.gotSubmissions.resolve();
+
+    setTimeout(() => {
+      const urls = XHRS.filter(xhr => xhr.url.match(/data/)).map(xhr => xhr.url);
+      const expectedUrls = [
+        '/customcols/2401/data?custom_column_data_params=...',
+        '/customcols/2402/data?custom_column_data_params=...'
+      ];
+      deepEqual(urls, expectedUrls);
+      done();
     });
   });
 });

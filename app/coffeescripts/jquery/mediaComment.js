@@ -20,6 +20,7 @@ import I18n from 'i18n!media_comments'
 import _ from 'underscore'
 import pubsub from 'vendor/jquery.ba-tinypubsub'
 import mejs from 'vendor/mediaelement-and-player'
+import MediaElementKeyActionHandler from 'jsx/mediaelement/MediaElementKeyActionHandler'
 import $ from 'jquery'
 import kalturaAnalytics from 'compiled/util/kalturaAnalytics'
 import htmlEscape from 'str/htmlEscape'
@@ -147,7 +148,7 @@ const mediaCommentActions = {
     $('#media_recorder_container').removeAttr('id')
     this.attr('id', 'media_recorder_container')
     pubsub.unsubscribe('media_comment_created')
-    pubsub.subscribe('media_comment_created', data => callback(data.id, data.mediaType))
+    pubsub.subscribe('media_comment_created', data => callback(data.id, data.mediaType, data.title))
 
     const initOpts = {modal: false, defaultTitle}
     if ($.isFunction(onClose)) initOpts.close = onClose.bind(this)
@@ -169,10 +170,25 @@ const mediaCommentActions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
             mediaCommentId: id,
             googleAnalyticsTitle: id,
+            menuTimeoutMouseLeave: 50,
             success (media) {
               holder.focus()
               media.play()
             },
+            keyActions: [
+              {
+                keys: _.values(MediaElementKeyActionHandler.keyCodes),
+                action (player, media, keyCode, event) {
+                  if (player.isVideo) {
+                    player.showControls()
+                    player.startControlsTimer()
+                  }
+
+                  const handler = new MediaElementKeyActionHandler(mejs, player, media, event)
+                  handler.dispatch()
+                },
+              }
+            ],
           }
 
           const $mediaTag = createMediaTag({

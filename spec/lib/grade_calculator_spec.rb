@@ -33,6 +33,37 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to eql(25.0)
     end
 
+    it "weighted grading periods: gracefully handles (by skipping) enrollments from other courses" do
+      first_course = @course
+      course_with_student active_all: true
+      grading_period_set = @course.root_account.grading_period_groups.create!(weighted: true)
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now,
+        weight: 50
+      )
+      expect {
+        GradeCalculator.recompute_final_score(@student.id, first_course.id)
+      }.not_to raise_error
+    end
+
+    it "weighted grading periods: gracefully handles (by skipping) deleted enrollments" do
+      grading_period_set = @course.root_account.grading_period_groups.create!(weighted: true)
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now,
+        weight: 50
+      )
+      @user.enrollments.first.destroy
+      expect {
+        GradeCalculator.recompute_final_score(@user.id, @course.id)
+      }.not_to raise_error
+    end
+
     it "can compute scores for users with deleted enrollments when grading periods are used" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term
@@ -1174,27 +1205,32 @@ describe GradeCalculator do
           set_up_course_for_differentiated_assignments
         end
         it "should calculate scores based on visible assignments only" do
-          # 5 + 15 + 10 + 20 + 10
-          expect(final_grade_info(@user, @course)[:total]).to eq 60
-          expect(final_grade_info(@user, @course)[:possible]).to eq 100
+          # Non-overridden assignments are not visible to this student at all even though she's been graded on them
+          # because the assignment is only visible to overrides. Therefore only the (first three) overridden assignments
+          # ever count towards her final grade in all these specs
+          # 5 + 15 + 10
+          expect(final_grade_info(@user, @course)[:total]).to eq 30
+          expect(final_grade_info(@user, @course)[:possible]).to eq 60
         end
         it "should drop the lowest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_lowest:1')
-          # 5 + 15 + 10 + 20 + 10 - 5
-          expect(final_grade_info(@user, @course)[:total]).to eq 55
-          expect(final_grade_info(@user, @course)[:possible]).to eq 80
+          @group.update_attribute(:rules, 'drop_lowest:1') # rubocop:disable Rails/SkipsModelValidations
+          # 5 + 15 + 10 - 5
+          expect(final_grade_info(@user, @course)[:total]).to eq 25
+          expect(final_grade_info(@user, @course)[:possible]).to eq 40
         end
         it "should drop the highest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_highest:1')
-          # 5 + 15 + 10 + 20 + 10 - 20
-          expect(final_grade_info(@user, @course)[:total]).to eq 40
-          expect(final_grade_info(@user, @course)[:possible]).to eq 80
+          @group.update_attribute(:rules, 'drop_highest:1') # rubocop:disable Rails/SkipsModelValidations
+          # 5 + 15 + 10 - 15
+          expect(final_grade_info(@user, @course)[:total]).to eq 15
+          expect(final_grade_info(@user, @course)[:possible]).to eq 40
         end
         it "should not count an invisible assignment with never drop on" do
+          # rubocop:disable Rails/SkipsModelValidations
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
-          # 5 + 15 + 10 + 20 + 10 - 10 - 10
-          expect(final_grade_info(@user, @course)[:total]).to eq 40
-          expect(final_grade_info(@user, @course)[:possible]).to eq 60
+          # rubocop:enable Rails/SkipsModelValidations
+          # 5 + 15 + 10 - 10
+          expect(final_grade_info(@user, @course)[:total]).to eq 20
+          expect(final_grade_info(@user, @course)[:possible]).to eq 40
         end
       end
     end

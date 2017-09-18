@@ -70,10 +70,12 @@ module Api
 
         describe 'transforming a video node' do
           let(:media_comment_id) { '42' }
+          let(:alt_text) { 'media alt text' }
           let(:base_tag) do
             tag = double(name: 'video', inner_html: "inner_html")
             allow(tag).to receive(:[]).with('class').and_return('')
             allow(tag).to receive(:[]).with('data-media_comment_id').and_return(media_comment_id)
+            allow(tag).to receive(:[]).with('data-alt').and_return(alt_text)
             tag
           end
           let(:media_tag) do
@@ -92,6 +94,7 @@ module Api
           specify{ expect(html5_node['src']).to eq(url_helper.media_redirect_url) }
           specify{ expect(html5_node.inner_html).to eq(base_tag.inner_html) }
           specify{ expect(html5_node.tag_name).to eq('video') }
+          specify{ expect(html5_node['data-alt']).to eq(alt_text) }
 
           context 'when media object has subtitle tracks' do
             let(:media_object) do
@@ -121,12 +124,14 @@ module Api
         end
 
         describe 'transforming a audio node' do
+          let(:alt_text) { 'media alt text' }
           let(:base_tag){ double(name: 'audio', inner_html: "inner_html") }
 
           let(:html5_node){
             tag = base_tag
             allow(tag).to receive(:[]).with('class').and_return('audio_comment')
             allow(tag).to receive(:[]).with('data-media_comment_id').and_return('24')
+            allow(tag).to receive(:[]).with('data-alt').and_return(alt_text)
             media_tag = MediaTag.new(tag, doc, StubbedNode)
             media_tag.as_html5_node(url_helper)
           }
@@ -140,6 +145,7 @@ module Api
           specify{ expect(html5_node['src']).to eq(url_helper.media_redirect_url) }
           specify{ expect(html5_node.inner_html).to eq(base_tag.inner_html) }
           specify{ expect(html5_node.tag_name).to eq('audio') }
+          specify{ expect(html5_node['data-alt']).to eq(alt_text) }
         end
 
       end

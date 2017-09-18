@@ -1840,30 +1840,28 @@ describe Assignment do
     context "differentiated_assignments" do
       before :once do
         setup_differentiated_assignments
-        @submissions = []
-        [@student1, @student2].each do |u|
-          @submissions << @assignment.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
-        end
+        @assignment.submit_homework(@student1, submission_type: 'online_url', url: 'http://www.google.com')
+        @submissions = @assignment.submissions
       end
       context "feature on" do
         it "should assign peer reviews only to students with visibility" do
           @assignment.peer_review_count = 1
           res = @assignment.assign_peer_reviews
-          expect(res.length).to eql(0)
-          @submissions.each do |s|
-            expect(res.map{|a| a.asset}).not_to be_include(s)
-            expect(res.map{|a| a.assessor_asset}).not_to be_include(s)
+          expect(res.length).to be 0
+          @submissions.reload.each do |s|
+            expect(res.map(&:asset)).not_to include(s)
+            expect(res.map(&:assessor_asset)).not_to include(s)
           end
 
-          # once graded the student will have visibility
-          # and will therefore show up in the peer reviews
-          @assignment.grade_student(@student2, :grader => @teacher, :grade => '100')
+          # let's add this student to the section the assignment is assigned to
+          student_in_section(@section1, user: @student2)
+          @assignment.submit_homework(@student2, submission_type: 'online_url', url: 'http://www.google.com')
 
           res = @assignment.assign_peer_reviews
-          expect(res.length).to eql(@submissions.length)
-          @submissions.each do |s|
-            expect(res.map{|a| a.asset}).to be_include(s)
-            expect(res.map{|a| a.assessor_asset}).to be_include(s)
+          expect(res.length).to be 2
+          @submissions.reload.each do |s|
+            expect(res.map(&:asset)).to include(s)
+            expect(res.map(&:assessor_asset)).to include(s)
           end
         end
 

@@ -22,6 +22,10 @@ import PropTypes from 'prop-types'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 import PreventDefault from 'compiled/fn/preventDefault'
 
+function readCookie(key) {
+  return (document.cookie.match('(^|; )' + encodeURIComponent(key) + '=([^;]*)') || 0)[2]
+}
+
   var ProfileTray = React.createClass({
 
     propTypes: {
@@ -66,7 +70,7 @@ import PreventDefault from 'compiled/fn/preventDefault'
             >
               <input name="utf8" value="✓" type="hidden"/>
               <input name="_method" value="delete" type="hidden"/>
-              <input name="authenticity_token" value={$.cookie('_csrf_token')} type="hidden"/>
+              <input name="authenticity_token" value={readCookie('_csrf_token')} type="hidden"/>
               <button
                 type="submit"
                 className="Button Button--small">

@@ -63,7 +63,7 @@ describe 'Canvadoc' do
     end
 
     it "ignores annotatable if unavailable" do
-      stub_upload.with(@doc.attachment.authenticated_s3_url, {})
+      stub_upload.with(@doc.attachment.authenticated_url, {})
       @doc.upload annotatable: true
     end
   end

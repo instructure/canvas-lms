@@ -46,6 +46,7 @@ module Api
             n['poster'] = url_helper.media_object_thumbnail_url(media_id)
           end
           n['src'] = url_helper.media_redirect_url(media_id, media_type)
+          n['data-alt'] = tag['data-alt']
           n.inner_html = tag.inner_html
           if media_object.present?
             media_object.media_tracks.each do |media_track|

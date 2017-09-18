@@ -372,6 +372,133 @@ describe "assignment rubrics" do
       f("#rubric_#{@rubric.id} .edit_rubric_link").click
       expect(is_checked(".grading_rubric_checkbox:visible")).to be_truthy
     end
+
+    context "ranged ratings" do
+      before(:each) do
+        @course.account.root_account.enable_feature!(:rubric_criterion_range)
+        @assignment = @course.assignments.create(name: 'assignment with rubric')
+        outcome_with_rubric
+        @rubric.associate_with(@assignment, @course, purpose: 'grading')
+      end
+
+      it "should hide range option when using custom ratings", priority: "1", test_id: 220336 do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        expect(ffj(".criterion_use_range:visible").count).to eq 1
+        f('.rubric_custom_rating').click
+        wait_for_ajaximations
+
+        expect(f(".rubric_container")).not_to contain_jqcss(".criterion_use_range:visible")
+      end
+
+      it "should hide range option when using learning outcomes", priority: "1", test_id: 220336 do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        expect(f('.criterion:nth-of-type(1) .criterion_use_range_div').css_value('display')).to eq 'none'
+      end
+
+      it "should show min points when range is selected", priority: "1", test_id: 220337 do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        fj('.criterion_use_range:visible').click()
+        wait_for_ajaximations
+
+        expect(ffj(".range_rating:visible").count).to eq 2
+      end
+
+      it "should adjust the min points of a rating and the neighboring max points", priority: "1", test_id: 220338 do
+        @rubric.data[1][:criterion_use_range] = true
+        @rubric.save!
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        # The min points of the rating being edited should start at 3.
+        expect(ffj('.range_rating:visible .min_points')[0]).to include_text "3"
+
+        # The max points of the rating to the right should start at 3.
+        expect(ff('.criterion:nth-of-type(2) tbody tr td:nth-of-type(2) .points')[1]).to include_text "3"
+
+        hover_and_click('.criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .edit_rating_link')
+        wait_for_ajaximations
+
+        set_value(f('#edit_rating_form .min_points'), '2')
+
+        f(' .ok_button').click
+        submit_form('#edit_rubric_form')
+        wait_for_ajaximations
+
+        # The min points of the cell being edited should now be 2.
+        expect(ffj('.range_rating:visible .min_points')[0]).to include_text "2"
+
+        # The max points of the cell to the right should now be 2.
+        expect(ff('.criterion:nth-of-type(3) .points')[1]).to include_text "2"
+
+        # The min points of the cell to the right should not have changed.
+        expect(ffj('.range_rating:visible .min_points')[1]).to include_text "0"
+      end
+
+      it "should display explicit rating when range is infinitely small", priority: "1", test_id: 220339 do
+        @rubric.data[1][:criterion_use_range] = true
+        @rubric.save!
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        range_rating_element = '.criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .range_rating'
+        expect(f(range_rating_element).css_value('display')).to eq 'inline'
+        hover_and_click('.criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .edit_rating_link')
+        wait_for_ajaximations
+
+        set_value(f('#edit_rating_form .min_points'), '2')
+        set_value(f('#edit_rating_form input[name="points"]'), '2')
+
+        f('.ok_button').click
+        wait_for_ajaximations
+
+        range_rating_element = '.criterion:nth-of-type(3) tbody tr td:nth-of-type(1) .range_rating'
+        expect(f(range_rating_element).css_value('display')).to eq 'none'
+      end
+
+      it "should cap the range expansion based on neighboring cells", priority: "1", test_id: 220340 do
+        @rubric.data[1][:criterion_use_range] = true
+        @rubric.save!
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        hover_and_click('.criterion:nth-of-type(2) tbody tr td:nth-of-type(2) .edit_rating_link')
+        wait_for_ajaximations
+
+        set_value(f('#edit_rating_form .min_points'), '-1')
+        set_value(f('#edit_rating_form input[name="points"]'), '100')
+
+        f(' .ok_button').click
+        submit_form('#edit_rubric_form')
+        wait_for_ajaximations
+
+        # The max points of the cell being edited should now be 5.
+        expect(ff('.criterion:nth-of-type(3) .points')[1]).to include_text "5"
+
+        # The min points of the cell being edited should now be 0.
+        expect(ff('.criterion:nth-of-type(3) .min_points')[1]).to include_text "0"
+      end
+    end
   end
 
   context "assignment rubrics as a student" do

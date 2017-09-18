@@ -40,9 +40,11 @@ QUnit.module('SearchResultsRow', {
       grader: 'Ms. Lopez',
       gradeAfter: '21',
       gradeBefore: '19',
+      gradeCurrent: '22',
       id: '123456',
       pointsPossibleBefore: '25',
       pointsPossibleAfter: '30',
+      pointsPossibleCurrent: '30',
       student: 'Norval Abbott',
       time: '11:16pm'
     };
@@ -88,26 +90,59 @@ test('displays the history assignment', function () {
   strictEqual(assignment, this.item.assignment.toString());
 });
 
-test('displays the history grade before and points possible before if points based', function () {
+test('displays the history grade before and points possible before if points based and grade is numeric', function () {
   const gradeBefore = this.wrapper.find('td').nodes[5].innerText;
-  strictEqual(gradeBefore, `${this.item.gradeBefore}/${this.item.pointsPossibleBefore}`);
+  strictEqual(gradeBefore, "19/25");
 });
 
 test('displays only the history grade before if not points based', function () {
   this.item.displayAsPoints = false;
   this.wrapper = mountComponent({ item: this.item });
   const gradeBefore = this.wrapper.find('td').nodes[5].innerText;
-  strictEqual(gradeBefore, this.item.gradeBefore);
+  strictEqual(gradeBefore, "19");
 });
 
-test('displays the history grade after and points possible after if points based', function () {
+test('displays only the history grade before if grade cannot be parsed as a number', function () {
+  this.item.gradeBefore = "B";
+  this.wrapper = mountComponent({ item: this.item });
+  const gradeBefore = this.wrapper.find('td').nodes[5].innerText;
+  strictEqual(gradeBefore, "B");
+});
+
+test('displays the history grade after and points possible after if points based and grade is numeric', function () {
   const gradeAfter = this.wrapper.find('td').nodes[6].innerText;
-  strictEqual(gradeAfter, `${this.item.gradeAfter}/${this.item.pointsPossibleAfter}`);
+  strictEqual(gradeAfter, "21/30");
 });
 
 test('displays only the history grade after if not points based', function () {
   this.item.displayAsPoints = false;
   this.wrapper = mountComponent({ item: this.item });
   const gradeAfter = this.wrapper.find('td').nodes[6].innerText;
-  strictEqual(gradeAfter, this.item.gradeAfter);
+  strictEqual(gradeAfter, "21");
+});
+
+test('displays only the history grade after if grade cannot be parsed as a number', function () {
+  this.item.gradeAfter = "B";
+  this.wrapper = mountComponent({ item: this.item });
+  const gradeAfter = this.wrapper.find('td').nodes[6].innerText;
+  strictEqual(gradeAfter, "B");
+});
+
+test('displays the current grade and points possible if points based and grade is numeric', function () {
+  const gradeCurrent = this.wrapper.find('td').nodes[7].innerText;
+  strictEqual(gradeCurrent, "22/30");
+});
+
+test('displays only the history grade current if not points based', function () {
+  this.item.displayAsPoints = false;
+  this.wrapper = mountComponent({ item: this.item });
+  const gradeCurrent = this.wrapper.find('td').nodes[7].innerText;
+  strictEqual(gradeCurrent, "22");
+});
+
+test('displays only the history grade current if grade cannot be parsed as a number', function () {
+  this.item.gradeCurrent = "B";
+  this.wrapper = mountComponent({ item: this.item });
+  const gradeCurrent = this.wrapper.find('td').nodes[7].innerText;
+  strictEqual(gradeCurrent, "B");
 });

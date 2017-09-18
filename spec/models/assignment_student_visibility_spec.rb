@@ -226,11 +226,11 @@ describe "differentiated_assignments" do
             teacher_in_course(course: @course)
             enroll_user_in_group(@group_foo, {user: @student})
           end
-          it "should keep the assignment visible if there is a grade" do
+          it "should not keep the assignment visible even if there is a grade" do
             @assignment.grade_student(@student, grade: 10, grader: @teacher)
             @student.group_memberships.each(&:destroy!)
             enroll_user_in_group(@group_bar, {user: @student})
-            ensure_user_sees_assignment
+            ensure_user_does_not_see_assignment
           end
 
           it "should not keep the assignment visible if there is no grade" do
@@ -240,11 +240,11 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
 
-          it "should keep the assignment visible if the grade is zero" do
+          it "should not keep the assignment visible even if the grade is zero" do
             @assignment.grade_student(@student, grade: 0, grader: @teacher)
             @student.group_memberships.each(&:destroy!)
             enroll_user_in_group(@group_bar, {user: @student})
-            ensure_user_sees_assignment
+            ensure_user_does_not_see_assignment
           end
         end
 
@@ -297,12 +297,12 @@ describe "differentiated_assignments" do
             enroller_user_in_section(@section_foo)
           end
 
-          it "should keep the assignment visible if there is a grade" do
+          it "should not keep the assignment visible even if there is a grade" do
             @assignment.grade_student(@user, grade: 10, grader: @teacher)
             Score.where(enrollment_id: @user.enrollments).delete_all
             @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
-            ensure_user_sees_assignment
+            ensure_user_does_not_see_assignment
           end
 
           it "should not keep the assignment visible if there is no grade" do
@@ -313,12 +313,12 @@ describe "differentiated_assignments" do
             ensure_user_does_not_see_assignment
           end
 
-          it "should keep the assignment visible if the grade is zero" do
+          it "should not keep the assignment visible even if the grade is zero" do
             @assignment.grade_student(@user, grade: 0, grader: @teacher)
             Score.where(enrollment_id: @user.enrollments).delete_all
             @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
-            ensure_user_sees_assignment
+            ensure_user_does_not_see_assignment
           end
         end
 
@@ -345,7 +345,7 @@ describe "differentiated_assignments" do
           end
           it "should update when the override is deleted" do
             ensure_user_sees_assignment
-            @assignment.assignment_overrides.each(&:destroy_permanently!)
+            @assignment.assignment_overrides.each(&:destroy!)
             ensure_user_does_not_see_assignment
           end
           it "should not return duplicate visibilities with multiple visible sections" do

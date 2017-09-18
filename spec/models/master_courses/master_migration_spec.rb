@@ -175,6 +175,32 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "should continue to work with the old import_results format" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
+
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+      run_job(Delayed::Job.where(:tag => "MasterCourses::MasterMigration#perform_exports").first) # only run the export job right now
+
+      @migration.reload
+      result = @migration.migration_results.first
+      expect(result.state).to eq 'queued'
+
+      import_results = {result.content_migration_id => {
+        :state => 'queued', :import_type => result.import_type.to_sym, :subscription_id => result.child_subscription_id, :skipped => []
+      }}
+      @migration.update_attribute(:import_results, import_results)
+      MasterCourses::MigrationResult.where(:master_migration_id => @migration).delete_all # make sure they're gone
+
+      run_jobs
+
+      expect(@migration.reload).to be_completed
+      expect(@migration.imports_completed_at).to be_present
+      expect(@sub.reload.use_selective_copy?).to be_truthy # should have been marked as up-to-date now
+    end
+
     it "should copy selectively on second time" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
@@ -191,7 +217,7 @@ describe MasterCourses::MasterMigration do
       expect(topic_to).to be_present
       att_to = @copy_to.attachments.where(:migration_id => mig_id(att)).first
       expect(att_to).to be_present
-      cm1 = ContentMigration.find(@migration.import_results.keys.first)
+      cm1 = @migration.migration_results.first.content_migration
       expect(cm1.migration_settings[:imported_assets]["DiscussionTopic"]).to eq topic_to.id.to_s
       expect(cm1.migration_settings[:imported_assets]["Attachment"]).to eq att_to.id.to_s
 
@@ -203,7 +229,7 @@ describe MasterCourses::MasterMigration do
       page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       expect(page_to).to be_present
 
-      cm2 = ContentMigration.find(@migration.import_results.keys.first)
+      cm2 = @migration.migration_results.first.content_migration
       expect(cm2.migration_settings[:imported_assets]["DiscussionTopic"]).to be_blank # should have excluded it from the selective export
       expect(cm2.migration_settings[:imported_assets]["Attachment"]).to be_blank
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
@@ -268,7 +294,7 @@ describe MasterCourses::MasterMigration do
         expect(deletions['WikiPage']).to match_array([mig_id(page), mig_id(page2)])
         expect(deletions['Quizzes::Quiz']).to match_array([mig_id(quiz), mig_id(quiz2)])
 
-        skips = mm.import_results[mm.import_results.keys.first][:skipped]
+        skips = mm.migration_results.first.skipped_items
         expect(skips).to match_array([mig_id(quiz2), mig_id(page2)])
 
         expect(assmt_to.reload).to be_deleted
@@ -283,6 +309,42 @@ describe MasterCourses::MasterMigration do
         expect(event_to.reload).to be_deleted
         expect(tool_to.reload).to be_deleted
       end
+    end
+
+    it "should sync deleted quiz questions (unless changed downstream)" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!
+      qq1 = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      qq2 = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question 2', 'question_type' => 'essay_question'})
+      qgroup = quiz.quiz_groups.create!(:name => "group", :pick_count => 1)
+      qq3 = qgroup.quiz_questions.create!(:quiz => quiz, :question_data => {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      qq1_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq1)).first
+      qq2_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq2)).first
+      qq3_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq3)).first
+
+      new_text = "new text"
+      qq1_to.update_attribute(:question_data, qq1_to.question_data.merge('question_text' => new_text))
+      Timecop.freeze(2.minutes.from_now) do
+        qq2.destroy
+      end
+      run_master_migration
+
+      expect(qq1_to.reload.question_data['question_text']).to eq new_text
+      expect(qq2_to.reload).to_not be_deleted # should not have overwritten because downstream changes
+
+      Timecop.freeze(4.minutes.from_now) do
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true})
+      end
+      run_master_migration
+
+      expect(qq1_to.reload.question_data['question_text']).to_not eq new_text # should overwrite now because locked
+      expect(qq2_to.reload).to be_deleted
+      expect(qq3_to.reload).to_not be_deleted
     end
 
     it "tracks creations and updates in selective migrations" do
@@ -504,7 +566,7 @@ describe MasterCourses::MasterMigration do
       [page, assignment].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)}
 
       run_master_migration # re-copy all the content but don't actually overwrite the downstream change
-      expect(@migration.import_results.values.first[:skipped]).to match_array([mig_id(assignment), mig_id(page)])
+      expect(@migration.migration_results.first.skipped_items).to match_array([mig_id(assignment), mig_id(page)])
 
       expect(copied_page.reload.body).to eq new_child_text # should have been left alone
       expect(copied_page.title).to eq old_title # even the title
@@ -520,7 +582,7 @@ describe MasterCourses::MasterMigration do
       end
 
       run_master_migration # re-copy all the content but this time overwrite the downstream change because we locked it
-      expect(@migration.import_results.values.first[:skipped]).to be_empty
+      expect(@migration.migration_results.first.skipped_items).to be_empty
 
       expect(copied_assignment.reload.description).to eq new_master_text
       expect(copied_assignment.title).to eq new_master_title
@@ -894,6 +956,30 @@ describe MasterCourses::MasterMigration do
       end
       run_master_migration
       expect(tag.reload).to_not be_deleted
+    end
+
+    it "should copy outcomes in selective copies" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      default = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.create!(:context => @copy_from, :title => "outcome groupd")
+      default.adopt_outcome_group(log)
+
+      run_master_migration # get the full sync out of the way
+
+      Timecop.freeze(1.minute.from_now) do
+        @lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
+        @lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2},
+          {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+        @lo.save!
+        log.reload.add_outcome(@lo)
+      end
+
+      run_master_migration
+      expect(@migration).to be_completed
+      lo_to = @copy_to.learning_outcomes.where(:migration_id => mig_id(@lo)).first
+      expect(lo_to).to be_present
     end
 
     it "sends notifications", priority: "2", test_id: 3211103 do

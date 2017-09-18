@@ -69,7 +69,7 @@ define [
     contentItem = TinyMCEContentItem.fromJSON(contentItems.lti_iframe)
     equal(contentItem.text, "Arch Linux plain iframe")
     equal(contentItem.url, "/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti")
-    equal(contentItem.codePayload, '<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="width: 800px; height: 600px;"></iframe>')
+    equal(contentItem.codePayload, '<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="800" height="600" style="width: 800px; height: 600px;"></iframe>')
 
   test "Handles LTI link with presentation target of 'window' and thumbnail is *NOT* set", ->
     iframe = $('.mce-tinymce').find('iframe')[0]
@@ -101,7 +101,7 @@ define [
     contentItem = TinyMCEContentItem.fromJSON(contentItems.text_thumb_iframe)
     equal(contentItem.text, "Arch Linux file item thumbnail iframe")
     equal(contentItem.url, "http://lti-tool-provider-example.dev/test_file.txt")
-    equal(contentItem.codePayload, '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="width: 800px; height: 600px;"></iframe>')
+    equal(contentItem.codePayload, '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="800" height="600" style="width: 800px; height: 600px;"></iframe>')
 
   test "Handles File item with presentation target of 'window' and thumbnail is set", ->
     contentItem = TinyMCEContentItem.fromJSON(contentItems.text_thumb_window)
@@ -125,7 +125,7 @@ define [
     contentItem = TinyMCEContentItem.fromJSON(contentItems.text_iframe)
     equal(contentItem.text, "Arch Linux file item iframe")
     equal(contentItem.url, "http://lti-tool-provider-example.dev/test_file.txt")
-    equal(contentItem.codePayload, '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="width: 800px; height: 600px;"></iframe>')
+    equal(contentItem.codePayload, '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="800" height="600" style="width: 800px; height: 600px;"></iframe>')
 
   test "Handles File item with presentation target of 'window' and thumbnail is *NOT* set", ->
     contentItem = TinyMCEContentItem.fromJSON(contentItems.text_window)

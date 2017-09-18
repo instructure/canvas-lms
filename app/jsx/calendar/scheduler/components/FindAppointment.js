@@ -121,7 +121,7 @@ import Actions from 'jsx/calendar/scheduler/actions'
           </div>
           </Modal>
         </div>
-      )
+      );
     }
   }
 

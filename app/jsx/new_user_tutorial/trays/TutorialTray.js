@@ -91,14 +91,13 @@ class TutorialTray extends React.Component {
     return (
       <Tray
         label={this.props.label}
-        isDismissable={false}
-        isOpen={!this.state.isCollapsed}
+        open={!this.state.isCollapsed}
         placement="end"
         zIndex="100"
-        onEntering={this.handleEntering}
         onExiting={this.handleExiting}
         onEntered={this.handleEntering}
-        trapFocus
+        shouldContainFocus
+        applicationElement={() => document.getElementById('application')}
       >
         <div className="NewUserTutorialTray">
           <div className="NewUserTutorialTray__ButtonContainer">

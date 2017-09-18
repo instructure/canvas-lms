@@ -60,14 +60,18 @@ module FeatureFlags
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag2', self.class.name, self.global_id, feature.to_s].cache_key
+    ['feature_flag3', self.class.name, self.global_id, feature.to_s].cache_key
+  end
+
+  def feature_flag_cache
+    Rails.cache
   end
 
   # return the feature flag for the given feature that is defined on this object, if any.
   # (helper method.  use lookup_feature_flag to test policy.)
   def feature_flag(feature)
     self.shard.activate do
-      result = MultiCache.fetch(feature_flag_cache_key(feature)) do
+      result = feature_flag_cache.fetch(feature_flag_cache_key(feature)) do
         self.feature_flags.where(feature: feature.to_s).first
       end
       result

@@ -35,6 +35,7 @@ class Auditors::GradeChange
                :score_before,
                :points_possible_after,
                :points_possible_before
+    attr_accessor :grade_current
 
     def self.generate(submission, event_type=nil)
       new(

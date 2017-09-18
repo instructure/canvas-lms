@@ -26,7 +26,8 @@ RSpec.shared_context "JWT setup" do
   }
 
   before do
-    allow(Canvas::DynamicSettings).to receive(:find).with("canvas", use_env: false).and_return(fake_secrets)
+    allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
   end
 
   after do

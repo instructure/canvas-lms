@@ -585,8 +585,12 @@ module ApplicationHelper
     (@domain_root_account && @domain_root_account.settings[:help_link_icon]) || 'help'
   end
 
+  def default_help_link_name
+    I18n.t('Help')
+  end
+
   def help_link_name
-    (@domain_root_account && @domain_root_account.settings[:help_link_name]) || I18n.t('Help')
+    (@domain_root_account && @domain_root_account.settings[:help_link_name]) || default_help_link_name
   end
 
   def help_link_data

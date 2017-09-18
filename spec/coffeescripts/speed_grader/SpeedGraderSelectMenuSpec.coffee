@@ -26,7 +26,7 @@ define [
       @testArea = document.createElement('div')
       @testArea.id = "test_area"
       @fixtureNode.appendChild(@testArea)
-      @selectMenu = new SpeedgraderSelectMenu(null, null)
+      @selectMenu = new SpeedgraderSelectMenu(null)
 
     teardown: ->
       @fixtureNode.innerHTML = ""
@@ -80,10 +80,9 @@ define [
 
 
   test "A key press event on the select menu causes the change function to call", ->
-    MENU_PARTS_DELIMITER = "----NO----"
-    optionsHTML = '<option value="1" class="graded ui-selectmenu-hasIcon">Student 1----NO----graded----NO----graded</option><option value="2" class="not_graded ui-selectmenu-hasIcon">Student 2----NO----not graded----NO----not_graded</option>'
+    optionsArray = [{ id: '1', name: 'Student 1', className: { raw: 'not_graded', formatted: 'not graded' } }]
     fired = false
-    selectMenu = new SpeedgraderSelectMenu(optionsHTML, MENU_PARTS_DELIMITER)
+    selectMenu = new SpeedgraderSelectMenu(optionsArray);
     selectMenu.appendTo('#test_area', (e)->
       fired = true
     )
@@ -98,3 +97,59 @@ define [
     @selectMenu.replaceDropdownIcon(@testArea)
 
     equal(@testArea.innerHTML,'<span class="ui-selectmenu-icon"><i class="icon-mini-arrow-down"></i></span>')
+
+  QUnit.module "SpeedGraderSelectMenu - rendered select control",
+    setup: ->
+      @fixtureNode = document.getElementById("fixtures")
+      @testArea = document.createElement('div')
+      @testArea.id = "test_area"
+      @fixtureNode.appendChild(@testArea)
+      @optionsArray = [
+        name: 'Showing all sections'
+        options: [
+          { id: 'section_all', data: { 'section-id': 'all' }, name: 'Show all sections', className: { raw: 'section_all' } },
+          { id: 'section_1', data: { 'section-id': '1' }, name: 'Change section to Section 1', className: { raw: 'section_1' } },
+        ]
+        { id: '3', name: 'Student 2', className: { raw: 'graded', formatted: 'graded' } }
+        { id: '1', name: 'Student 1', className: { raw: 'not_graded', formatted: 'not graded' } },
+      ]
+      @selectMenu = new SpeedgraderSelectMenu(@optionsArray)
+      @selectMenu.appendTo('#test_area')
+
+    teardown: ->
+      @fixtureNode.innerHTML = ""
+      $(".ui-selectmenu-menu").remove()
+
+  test "renders a select control", ->
+    strictEqual(@selectMenu.$el.prop('tagName'), 'SELECT')
+
+  test "renders the select control with an id of students_selectmenu", ->
+    strictEqual(@selectMenu.$el.prop('id'), 'students_selectmenu')
+
+  test "renders one optgroup inside the select control to allow changing sections", ->
+    strictEqual(@selectMenu.$el.find('optgroup[label="Showing all sections"]').length, 1)
+
+  test "renders two options inside the section optgroup - one for all sections and one for the specific section", ->
+    strictEqual(@selectMenu.$el.find('optgroup[label="Showing all sections"] option').length, 2)
+
+  test "renders an option for showing all sections", ->
+    optgroup = @selectMenu.$el.find('optgroup[label="Showing all sections"]')
+    strictEqual(optgroup.find('option:contains("Show all sections")').length, 1)
+
+  test "renders an option for switching to section 1", ->
+    optgroup = @selectMenu.$el.find('optgroup[label="Showing all sections"]')
+    strictEqual(optgroup.find('option:contains("Change section to Section 1")').length, 1)
+
+  test "renders two options outside the section optgroup - one for each student", ->
+    strictEqual(@selectMenu.$el.find('> option').length, 2)
+
+  test "renders an option for Student 1", ->
+    strictEqual(@selectMenu.$el.find('> option[value="1"]:contains("Student 1"):contains("not graded").not_graded.ui-selectmenu-hasIcon').length, 1)
+
+  test "renders an option for Student 2", ->
+    strictEqual(@selectMenu.$el.find('> option[value="3"]:contains("Student 2"):contains("graded").graded.ui-selectmenu-hasIcon').length, 1)
+
+  test "option for Student 2 comes first as in the order of the options passed in", ->
+    options = @selectMenu.$el.find('> option.ui-selectmenu-hasIcon').toArray()
+
+    deepEqual(options.map((opt) => $(opt).attr('value')), ['3', '1'])

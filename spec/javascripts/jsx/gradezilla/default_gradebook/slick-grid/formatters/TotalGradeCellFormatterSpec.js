@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook, setFixtureHtml } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 import TotalGradeCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/TotalGradeCellFormatter';
 
 QUnit.module('TotalGradeCellFormatter', function (hooks) {
@@ -28,6 +28,7 @@ QUnit.module('TotalGradeCellFormatter', function (hooks) {
   hooks.beforeEach(function () {
     $fixture = document.createElement('div');
     document.body.appendChild($fixture);
+    setFixtureHtml($fixture);
 
     gradebook = createGradebook({
       grading_standard: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]],

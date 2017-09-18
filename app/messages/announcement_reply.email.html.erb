@@ -55,4 +55,8 @@
   </p>
 <% end %>
 
+<% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
 <p><%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %></p>
+<% else %>
+<p><%= t "Join the conversation using the link below." %></p>
+<% end %>

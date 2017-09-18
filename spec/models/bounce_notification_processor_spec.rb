@@ -37,7 +37,11 @@ describe BounceNotificationProcessor do
 
   describe ".process" do
     it "processes each notification in the queue" do
-      bnp = BounceNotificationProcessor.new(access_key: 'key', secret_access_key: 'secret')
+      bnp = BounceNotificationProcessor.new
+      allow(BounceNotificationProcessor).to receive(:config).and_return({
+        access_key: 'key',
+        secret_access_key: 'secret'
+      })
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each do |m|
@@ -50,7 +54,11 @@ describe BounceNotificationProcessor do
     end
 
     it "flags addresses with hard bounces" do
-      bnp = BounceNotificationProcessor.new(access_key: 'key', secret_access_key: 'secret')
+      bnp = BounceNotificationProcessor.new
+      allow(BounceNotificationProcessor).to receive(:config).and_return({
+        access_key: 'key',
+        secret_access_key: 'secret'
+      })
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each do |m|
@@ -82,7 +90,11 @@ describe BounceNotificationProcessor do
     end
 
     it 'pings statsd' do
-      bnp = BounceNotificationProcessor.new(access_key: 'key', secret_access_key: 'secret')
+      bnp = BounceNotificationProcessor.new
+      allow(BounceNotificationProcessor).to receive(:config).and_return({
+        access_key: 'key',
+        secret_access_key: 'secret'
+      })
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each do |m|

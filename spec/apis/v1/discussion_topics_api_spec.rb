@@ -804,6 +804,16 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic).not_to be_locked
         expect(@topic.delayed_post_at).to be_nil
         expect(@topic.lock_at).to be_nil
+
+        # should work even if the assignment dates are nil
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+          {:delayed_post_at => 2.weeks.ago.as_json, :lock_at => 1.week.ago.as_json,
+            :assignment => {:unlock_at => nil, :lock_at => nil}})
+        expect(@topic.reload.assignment.reload.unlock_at).to be_nil
+        expect(@topic.assignment.lock_at).to be_nil
+        expect(@topic.delayed_post_at).to be_nil
+        expect(@topic.lock_at).to be_nil
       end
 
       it "should update due dates with cache enabled" do

@@ -17,8 +17,8 @@
 #
 
 require_relative '../../helpers/gradebook_common'
-require_relative '../page_objects/srgb_page'
-require_relative '../page_objects/grading_curve_page'
+require_relative '../pages/srgb_page'
+require_relative '../pages/grading_curve_page'
 
 describe "Screenreader Gradebook" do
   include_context 'in-process server selenium tests'

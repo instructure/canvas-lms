@@ -131,6 +131,9 @@ class Account < ActiveRecord::Base
   are_sis_sticky :name
 
   include FeatureFlags
+  def feature_flag_cache
+    MultiCache.cache
+  end
 
   def default_locale(recurse = false)
     result = read_attribute(:default_locale)
@@ -458,7 +461,8 @@ class Account < ActiveRecord::Base
       all_courses
     else
       shard.activate do
-        Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self).where("course_id=courses.id"))
+        Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self, course_section_id: nil)
+              .where("course_id=courses.id"))
       end
     end
   end
@@ -526,7 +530,7 @@ class Account < ActiveRecord::Base
     return unless id
     default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
     Shard.default.activate do
-      Rails.cache.delete(account_lookup_cache_key(default_id)) if default_id
+      MultiCache.delete(account_lookup_cache_key(default_id)) if default_id
     end
   rescue
     nil
@@ -1170,7 +1174,7 @@ class Account < ActiveRecord::Base
   def self.find_cached(id)
     default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
     Shard.default.activate do
-      Rails.cache.fetch(account_lookup_cache_key(default_id)) do
+      MultiCache.fetch(account_lookup_cache_key(default_id)) do
         begin
           account = Account.find(default_id)
         rescue ActiveRecord::RecordNotFound => e

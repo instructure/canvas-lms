@@ -89,7 +89,8 @@ module CC
         c_node.mastery_points criterion[:mastery_points] if criterion[:mastery_points]
         c_node.ignore_for_scoring criterion[:ignore_for_scoring] unless criterion[:ignore_for_scoring].nil?
         c_node.description criterion[:description]
-        c_node.long_description criterion[:long_description] unless criterion[:long_description].blank?
+        c_node.long_description criterion[:long_description] if criterion[:long_description].present?
+        c_node.criterion_use_range criterion[:criterion_use_range] if criterion[:criterion_use_range].present?
         if criterion[:learning_outcome_id].present?
           if lo = @course.available_outcome(criterion[:learning_outcome_id])
             c_node.learning_outcome_identifierref create_key(lo)

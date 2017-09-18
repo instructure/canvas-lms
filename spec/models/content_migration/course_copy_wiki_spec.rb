@@ -79,13 +79,15 @@ describe ContentMigration do
 
     it "should keep assignment relationship" do
       vanilla_page_from = @copy_from.wiki_pages.create!(title: "Everyone Sees This Page")
-      wiki_page_assignment_model(course: @copy_from, title: "conditional page")
+      title = "conditional page"
+      wiki_page_assignment_model(course: @copy_from, title: title)
 
       run_course_copy
 
       page_to = @copy_to.wiki_pages.where(migration_id: mig_id(@page)).take!
       asg_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).take!
       expect(asg_to.wiki_page).to eq page_to
+      expect(asg_to.title).to eq page_to.title
 
       vanilla_page_to = @copy_to.wiki_pages.where(migration_id: mig_id(vanilla_page_from)).take!
       expect(vanilla_page_to.assignment).to be_nil

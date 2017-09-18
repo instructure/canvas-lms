@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,9 +14,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-ActiveSupport::Notifications.subscribe("cache_generate.active_support") do |_name, start, finish, _id, _options|
-  elapsed_time = finish - start
-  # used by Redis::Client#log_request_response added in lib/canvas/redis.rb
-  Thread.current[:last_cache_generate] = elapsed_time
+class BackfillAssignmentAnonymousInstructorAnnotations < ActiveRecord::Migration[5.0]
+  tag :postdeploy
+
+  def up
+    DataFixup::BackfillNulls.run(Assignment, :anonymous_instructor_annotations, default_value: false)
+  end
 end

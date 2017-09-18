@@ -56,7 +56,7 @@ window.rubricAssessment = {
         if ($(this).parents('.rubric').hasClass('assessing')) {
           var val = $(this).val();
           if(val && val.length > 0) {
-            $(this).parents(".custom_ratings_entry").find(".custom_rating_field").val(unescape(val));
+            $(this).parents(".custom_ratings_entry").find(".custom_rating_field").val(decodeURIComponent(val));
           }
         }
       })
@@ -89,16 +89,26 @@ window.rubricAssessment = {
       .find(".criterion_points").bind('keyup change blur', function(event) {
         var $obj = $(event.target);
         if($obj.parents(".rubric").hasClass('assessing')) {
-          var val = parseFloat($obj.val(), 10);
+          let val = numberHelper.parse($obj.val());
           if(isNaN(val)) { val = null; }
           var $criterion = $obj.parents(".criterion");
           $criterion.find(".rating.selected").removeClass('selected');
           if (val || val === 0) {
             $criterion.find(".criterion_description").addClass('completed');
             $criterion.find(".rating").each(function() {
-              var rating_val = parseFloat($(this).find(".points").text(), 10);
-              if(rating_val == val) {
+              const rating_val = numberHelper.parse($(this).find(".points").text());
+              const use_range = $criterion.find('.criterion_use_range').attr('checked')
+              if (rating_val === val) {
                 $(this).addClass('selected');
+              } else if (use_range) {
+                const $nextRating = $(this).next('.rating')
+                let min_value = 0;
+                if ($nextRating.find(".points").text()) {
+                  min_value = numberHelper.parse($nextRating.find('.points').text());
+                }
+                if ((rating_val > val) && (min_value < val)){
+                  $(this).addClass('selected');
+                }
               }
             });
           } else {

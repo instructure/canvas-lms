@@ -60,6 +60,9 @@ import $ from 'jquery'
       }).css({
         width: tinyMCEContentItem.placementAdvice.displayWidth,
         height: tinyMCEContentItem.placementAdvice.displayHeight
+      }).attr({
+        width: tinyMCEContentItem.placementAdvice.displayWidth,
+        height: tinyMCEContentItem.placementAdvice.displayHeight
       })).html();
     },
 

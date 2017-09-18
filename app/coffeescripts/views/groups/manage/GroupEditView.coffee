@@ -65,12 +65,9 @@ define [
       super
       # reset the form contents
       @render()
-      # auto-focus the first input
-      @$('input:first').focus()
 
     toJSON: ->
       json = _.extend super,
         role: @groupCategory.get('role')
         nameOnly: @options.nameOnly
       json
-

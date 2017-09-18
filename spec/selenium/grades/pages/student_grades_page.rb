@@ -65,4 +65,20 @@ class StudentGradesPage
   def toggle_comment_module
     fj('.toggle_comments_link .icon-discussion:first').click
   end
+
+  def status_pill(assignment_id, status)
+    fj("#submission_#{assignment_id} .submission-#{status}-pill:contains('#{status}')")
+  end
+
+  def show_details_button
+    f("#show_all_details_button")
+  end
+
+  def submission_late_penalty_text(assignment_id)
+    fj("#score_details_#{assignment_id} td:contains('Late Penalty:') .error").text
+  end
+
+  def late_submission_final_score_text(assignment_id)
+    f("#submission_#{assignment_id} .assignment_score .grade").text
+  end
 end

@@ -222,9 +222,10 @@ class SubmissionsApiController < ApplicationController
                         .pluck(:user_id)
                     end
       submissions = @assignment.submissions.where(user_id: student_ids).preload(:originality_reports)
+      submissions = submissions.preload(:quiz_submission) if @assignment.quiz?
 
-      if includes.include?("visibility")
-        json = bulk_process_submissions_for_visibility(submissions, includes)
+      json = if includes.include?("visibility")
+        bulk_process_submissions_for_visibility(submissions, includes)
       else
         submissions = submissions.order(:user_id)
 
@@ -234,10 +235,10 @@ class SubmissionsApiController < ApplicationController
                                    api_v1_course_assignment_submissions_url(@context, @assignment))
         bulk_load_attachments_and_previews(submissions)
 
-        json = submissions.map { |s|
+        submissions.map do |s|
           s.visible_to_user = true
-          submission_json(s, @assignment, @current_user, session, @context, includes)
-        }
+          submission_json(s, @assignment, @current_user, session, @context, includes, params)
+        end
       end
 
       render :json => json
@@ -263,12 +264,20 @@ class SubmissionsApiController < ApplicationController
   #   If this argument is present, the response will be grouped by student,
   #   rather than a flat array of submissions.
   #
+  # @argument post_to_sis [Boolean]
+  #   If this argument is set to true, the response will only include
+  #   assignments that have the post_to_sis flag set to true.
+  #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
   #   (Requires grading periods to exist on the account)
   #
   # @argument workflow_state [String, "submitted"|"unsubmitted"|"graded"|"pending_review"]
   #   The current status of the submission
+  #
+  # @argument enrollment_state [String, "active"|"concluded"|]
+  #   The current state of the enrollments. If omitted will include all
+  #   enrollments that are not deleted.
   #
   # @argument order [String, "id"|"graded_at"]
   #   The order submissions will be returned in.  Defaults to "id".  Doesn't
@@ -334,10 +343,10 @@ class SubmissionsApiController < ApplicationController
       if all
         student_ids = allowed_student_ids
       else
-        # if any student_ids exist that the current_user shouldnt have access to, return an error
+        # if any student_ids exist that the current_user shouldn't have access to, return an error
         # (student looking at other students, observer looking at student out of their scope)
         inaccessible_students = student_ids - allowed_student_ids
-        return render_unauthorized_action if !inaccessible_students.empty?
+        return render_unauthorized_action unless inaccessible_students.empty?
       end
     end
 
@@ -345,9 +354,21 @@ class SubmissionsApiController < ApplicationController
       return render json: { error: 'too many students' }, status: 400
     end
 
+    if (enrollment_state = params[:enrollment_state].presence)
+      case enrollment_state
+      when 'active'
+        student_ids = @context.all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
+      when 'concluded'
+        student_ids = @context.all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
+      else
+        return render json: {error: 'invalid enrollment_state'}, status: :bad_request
+      end
+    end
+
     includes = Array(params[:include])
 
     assignment_scope = @context.assignments.published
+    assignment_scope = assignment_scope.where(post_to_sis: true) if value_to_boolean(params[:post_to_sis])
     requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
     if requested_assignment_ids.present?
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
@@ -359,6 +380,10 @@ class SubmissionsApiController < ApplicationController
       assignments = assignment_scope.to_a
     end
 
+    if requested_assignment_ids.present? && (requested_assignment_ids - assignments.map(&:id)).present?
+      return render json: { error: 'invalid assignment ids requested'}, status: :forbidden
+    end
+
     assignment_visibilities = {}
     assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
 
@@ -366,7 +391,6 @@ class SubmissionsApiController < ApplicationController
     unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
       assignments = assignments.select{ |a| (assignment_visibilities.fetch(a.id,[]) & student_ids).any?}
     end
-
 
     # preload with stuff already in memory
     assignments.each { |a| a.context = @context }
@@ -377,24 +401,11 @@ class SubmissionsApiController < ApplicationController
         eager_load(:user => :pseudonyms).
         where("users.id" => student_ids)
 
-      submissions_scope = if requested_assignment_ids.present?
-                            Submission.active.where(
-                              :user_id => student_ids,
-                              :assignment_id => assignments
-                            )
-                          else
-                            Submission.active.joins(:assignment).where(
-                              :user_id => student_ids,
-                              "assignments.context_type" => @context.class.name,
-                              "assignments.context_id" => @context.id
-                            ).where(
-                              "assignments.workflow_state != 'deleted'"
-                            )
-                          end
+      submissions_scope = Submission.active.where(user_id: student_ids, assignment_id: assignments)
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
-      submissions = submissions_scope.preload(:originality_reports).to_a
+      submissions = submissions_scope.preload(:originality_reports, :quiz_submission).to_a
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
@@ -428,10 +439,10 @@ class SubmissionsApiController < ApplicationController
 
             visible_assignments = assignment_visibilities.fetch(submission.user_id, [])
             submission.visible_to_user = visible_assignments.include? submission.assignment_id
-            hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
+            hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes, params)
           end
         end
-        if includes.include?('total_scores') && params[:grouped].present?
+        if includes.include?('total_scores')
           hash.merge!(
             :computed_final_score => enrollment.computed_final_score,
             :computed_current_score => enrollment.computed_current_score
@@ -444,9 +455,9 @@ class SubmissionsApiController < ApplicationController
       order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
       order = "#{order_by} #{order_direction}"
       submissions = @context.submissions.except(:order).where(user_id: student_ids).order(order)
-      submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
+      submissions = submissions.where(:assignment_id => assignments)
       submissions = submissions.where(:workflow_state => params[:workflow_state]) if params[:workflow_state].present?
-      submissions = submissions.preload(:user, :originality_reports)
+      submissions = submissions.preload(:user, :originality_reports, :quiz_submission)
 
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
@@ -457,7 +468,7 @@ class SubmissionsApiController < ApplicationController
         s.assignment = assignments_hash[s.assignment_id]
         visible_assignments = assignment_visibilities.fetch(s.user_id, [])
         s.visible_to_user = visible_assignments.include? s.assignment_id
-        submission_json(s, s.assignment, @current_user, session, @context, includes)
+        submission_json(s, s.assignment, @current_user, session, @context, includes, params)
       }
     end
 
@@ -481,7 +492,7 @@ class SubmissionsApiController < ApplicationController
            @submission.assignment_visible_to_user?(@current_user)
         includes = Array(params[:include])
         @submission.visible_to_user = includes.include?("visibility") ? @assignment.visible_to_user?(@submission.user) : true
-        render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes)
+        render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
       else
         @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
         return render_unauthorized_action
@@ -642,13 +653,12 @@ class SubmissionsApiController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
 
-    authorized = false
-    @submission = @assignment.submissions.find_or_create_by!(user: @user)
+    @submission = @assignment.all_submissions.find_or_create_by!(user: @user)
 
-    if params[:submission] || params[:rubric_assessment]
-      authorized = authorized_action(@submission, @current_user, :grade)
+    authorized = if params[:submission] || params[:rubric_assessment]
+      authorized_action(@submission, @current_user, :grade)
     else
-      authorized = authorized_action(@submission, @current_user, :comment)
+      authorized_action(@submission, @current_user, :comment)
     end
 
     if authorized
@@ -691,11 +701,16 @@ class SubmissionsApiController < ApplicationController
 
       assessment = params[:rubric_assessment]
       if assessment.is_a?(ActionController::Parameters) && @assignment.rubric_association
+        if (assessment.keys & @assignment.rubric_association.rubric.criteria_object.map{|c| c.id.to_s}).empty?
+          return render :json => {:message => "invalid rubric_assessment"}, :status => :bad_request
+        end
+
         # prepend each key with "criterion_", which is required by the current
         # RubricAssociation#assess code.
         assessment.keys.each do |crit_name|
           assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
         end
+
         @rubric_assessment = @assignment.rubric_association.assess(
           assessor: @current_user,
           user: @user,
@@ -744,18 +759,17 @@ class SubmissionsApiController < ApplicationController
         user_ids = @submissions.map(&:user_id)
         users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
       end
-      json = submission_json(@submission, @assignment, @current_user, session, @context, includes)
+      json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
 
       includes.delete("submission_comments")
       Version.preload_version_number(@submissions)
-      json[:all_submissions] = @submissions.map { |submission|
-
+      json[:all_submissions] = @submissions.map do |submission|
         if visiblity_included
           submission.visible_to_user = users_with_visibility.include?(submission.user_id)
         end
 
-        submission_json(submission, @assignment, @current_user, session, @context, includes)
-      }
+        submission_json(submission, @assignment, @current_user, session, @context, includes, params)
+      end
       render :json => json
     end
   end
@@ -1040,14 +1054,7 @@ class SubmissionsApiController < ApplicationController
 
       submission_array = submission_batch.map do |submission|
         submission.visible_to_user = users_with_visibility.include?(submission.user_id)
-        submission_json(
-          submission,
-          @assignment,
-          @current_user,
-          session,
-          @context,
-          includes
-        )
+        submission_json(submission, @assignment, @current_user, session, @context, includes, params)
       end
 
       result.concat(submission_array)

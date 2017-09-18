@@ -87,8 +87,11 @@
          // handle clicks to the source radio buttons
          .delegate('input[type=radio]', 'click', function() {
            // set aria states
+           var selector = $(this).closest('.mejs-sourcechooser-selector');
            $(this).attr('aria-selected', true).attr('checked', 'checked');
-           $(this).closest('.mejs-sourcechooser-selector').find('input[type=radio]').not(this).attr('aria-selected', 'false').removeAttr('checked');
+           selector.find('input[type=radio]').not(this).attr('aria-selected', 'false').removeAttr('checked');
+           selector.find('.mejs-selected').removeClass('mejs-selected')
+           selector.find('input[type="radio"]:checked').next().addClass('mejs-selected');
 
            var src = this.value;
 
@@ -112,7 +115,7 @@
              media.load();
            }
 
-           t.setAriaLabel(media);
+           t.setSourcechooserAriaLabel(media);
          })
 
          // Handle click so that screen readers can toggle the menu
@@ -134,10 +137,10 @@
        }
      }
 
-     t.setAriaLabel(media);
+     t.setSourcechooserAriaLabel(media);
    },
 
-   setAriaLabel: function(media) {
+   setSourcechooserAriaLabel: function(media) {
      var label = mejs.i18n.t(this.options.sourcechooserText)
      var current = this.currentSource(media);
 
@@ -159,8 +162,8 @@
 
      t.sourcechooserButton.find('ul').append(
        $('<li>'+
-           '<input type="radio" name="' + t.id + '_sourcechooser" id="' + t.id + '_sourcechooser_' + label + type + '" role="menuitemradio" value="' + src + '" ' + (isCurrent ? 'checked="checked"' : '') + 'aria-selected="' + isCurrent + '" aria-label="' + label + '"' + ' />'+
-           '<label for="' + t.id + '_sourcechooser_' + label + type + '" aria-hidden="true">' + label + ' (' + type + ')</label>'+
+           '<input type="radio" name="' + t.id + '_sourcechooser" id="' + t.id + '_sourcechooser_' + label + type + '" role="menuitemradio" value="' + src + '" ' + (isCurrent ? 'checked="checked"' : '') + 'aria-selected="' + isCurrent + '" aria-label="' + label + '"' + ' tabindex=-1' + ' />'+
+           '<label for="' + t.id + '_sourcechooser_' + label + type + '" aria-hidden="true"' + (isCurrent ? ' class="mejs-selected"' : '') + '>' + label + ' (' + type + ')</label>'+
          '</li>')
      );
 

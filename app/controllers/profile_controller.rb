@@ -347,7 +347,7 @@ class ProfileController < ApplicationController
       if @user.update_attributes(user_params)
         pseudonymed = false
         if params[:default_email_id].present?
-          @email_channel = @user.communication_channels.email.where(id: params[:default_email_id]).first
+          @email_channel = @user.communication_channels.email.active.where(id: params[:default_email_id]).first
           if @email_channel
             @email_channel.move_to_top
             @user.clear_email_cache!

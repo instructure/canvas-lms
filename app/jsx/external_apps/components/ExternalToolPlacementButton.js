@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
@@ -45,17 +44,18 @@ export default React.createClass({
     displayName: 'ExternalToolPlacementButton',
 
     componentDidUpdate: function() {
-      var _this = this;
+      const _this = this;
       window.requestAnimationFrame(function() {
-        var node = document.getElementById('close' + _this.state.tool.name);
-        if (node) {
-          node.focus();
+        if (_this.refs.closex) {
+          _this.refs.closex.focus();
         }
       });
     },
 
     propTypes: {
-      tool: PropTypes.object.isRequired
+      tool: PropTypes.object.isRequired,
+      type: PropTypes.string, // specify "button" if this is not a menu item
+      onClose: PropTypes.func
     },
 
     getInitialState() {
@@ -84,7 +84,9 @@ export default React.createClass({
     },
 
     closeModal() {
-      this.setState({ modalIsOpen: false });
+      this.setState({ modalIsOpen: false }, () => {
+        if (this.props.onClose) this.props.onClose()
+      })
     },
 
     placements() {
@@ -143,7 +145,7 @@ export default React.createClass({
                 <h4 tabIndex="-1">{I18n.t('App Placements')}</h4>
               </div>
               <div className="ReactModal__Header-Actions">
-                <button  className="Button Button--icon-action" type="button"  onClick={this.closeModal} >
+                <button  className="Button Button--icon-action" type="button" ref='closex'  onClick={this.closeModal} >
                   <i className="icon-x"></i>
                   <span className="screenreader-only">Close</span>
                 </button>
@@ -174,7 +176,7 @@ export default React.createClass({
 
       if (this.props.type === "button") {
         return(
-          <a href="#" ref="placementButton" role="menuitem" aria-label={editAriaLabel} className="btn long" onClick={this.openModal} >
+          <a href="#" ref="placementButton" role="button" aria-label={editAriaLabel} className="btn long" onClick={this.openModal} >
             <i className="icon-info" data-tooltip="left" title={I18n.t('Tool Placements')}></i>
             { this.getModal() }
           </a>

@@ -26,8 +26,16 @@
   background-color: white;
   border-radius: 500px;
   display: block;
+  overflow: hidden;
 }
 
 #avatars tr .avatar_state {
   text-align: center;
+}
+
+// needed to allow full visibility on the user avatar flag/edit icon
+.profile-link,
+.report_avatar_link,
+.profile_pic_link {
+  overflow: visible;
 }

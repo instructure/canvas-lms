@@ -25,6 +25,10 @@ shared_context "blueprint lock context" do
     f('.bpc-lock-toggle__label')
   end
 
+  def blueprint_lock_icon_button
+    blueprint_lock_icon_label.find_element(:xpath, '../../parent::button')
+  end
+
   def associated_index_lock_icon
     f('#content-wrapper.ic-Layout-contentWrapper')
   end
@@ -59,12 +63,12 @@ shared_context "blueprint lock context" do
     expect(element).not_to contain_css(@locked_button_css) # the item is now unlocked.
   end
 
-  def verify_show_page_locked(element)
+  def verify_show_page_locked
     element = blueprint_lock_icon_label
     expect(element).to include_text("Locked") # verify item is locked
   end
 
-  def verify_show_page_unlocked(element)
+  def verify_show_page_unlocked
     element = blueprint_lock_icon_label
     expect(element).to include_text("Blueprint") # verify the item is unlocked
   end
@@ -105,6 +109,7 @@ describe "master courses - locked items" do
     @discussion = @master.discussion_topics.create!(title: 'My discussion')
 
     run_master_course_migration(@master)
+    @quiz_copy = @minion.quizzes.last
   end
 
   context "on the index page," do
@@ -165,6 +170,14 @@ describe "master courses - locked items" do
 
         refresh_page
         verify_index_unlocked
+      end
+
+      it "does not show wiki sidebar for locked quizzes", priority: "2", test_id: 3333845 do
+        @tag = @template.create_content_tag_for!(@quiz)
+        lock_index_tag
+
+        get "/courses/#{@minion.id}/quizzes/#{@quiz_copy.id}/edit"
+        expect(f('#right-side')).not_to contain_css('#editor_tabs')
       end
     end
 
@@ -271,18 +284,15 @@ describe "master courses - locked items" do
       @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/assignments/#{@assignment.id}"
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
-      element.click
+      verify_show_page_locked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_unlocked(element)
-      element.click
+      verify_show_page_unlocked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
+      verify_show_page_locked
     end
 
     it "discussions show a lock icon on the show page", priority: "2", test_id: 3127582 do
@@ -290,18 +300,15 @@ describe "master courses - locked items" do
       @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/discussion_topics/#{@discussion.id}"
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
-      element.click
+      verify_show_page_locked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_unlocked(element)
-      element.click
+      verify_show_page_unlocked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
+      verify_show_page_locked
     end
 
     it "pages show a lock icon on the show page", priority: "2", test_id: 3127583 do
@@ -309,18 +316,15 @@ describe "master courses - locked items" do
       @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/pages/#{@page.id}"
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
-      element.click
+      verify_show_page_locked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_unlocked(element)
-      element.click
+      verify_show_page_unlocked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
+      verify_show_page_locked
     end
 
     it "quizzes show a lock icon on the show page", priority: "2", test_id: 3127584 do
@@ -328,18 +332,15 @@ describe "master courses - locked items" do
       @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/quizzes/#{@quiz.id}"
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
-      element.click
+      verify_show_page_locked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_unlocked(element)
-      element.click
+      verify_show_page_unlocked
+      blueprint_lock_icon_button.click
       refresh_page
 
-      element = blueprint_lock_icon_label
-      verify_show_page_locked(element)
+      verify_show_page_locked
     end
   end
 end

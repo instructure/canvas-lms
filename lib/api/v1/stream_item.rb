@@ -83,7 +83,10 @@ module Api::V1::StreamItem
         hash['notification_category'] = data.notification_category
         hash['html_url'] = hash['url'] = data.url
       when 'Submission'
-        json = submission_json(stream_item.asset, stream_item.asset.assignment, current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url', 'user'])
+        submission = stream_item.asset
+        assignment = submission.assignment
+        includes = %w|submission_comments assignment course html_url user|
+        json = submission_json(submission, assignment, current_user, session, nil, includes, params)
         json.delete('id')
         hash.merge! json
         hash['submission_id'] = stream_item.asset_id

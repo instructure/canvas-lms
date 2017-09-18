@@ -64,6 +64,7 @@ define [
         name: @model.name()
         maxNameLength: @model.maxNameLength()
         maxNameLengthRequired: @maxNameLengthRequired
+        allDates: @model.allDates()
       })
       errors = @errorsExist(validationHelper)
       if errors['has_error'] == true && @model.sisIntegrationSettingsEnabled()

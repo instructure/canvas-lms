@@ -122,3 +122,7 @@ define [
     openDialog()
     util.closeDialog()
     ok @closeSpy.called
+
+  test 'focuses close button when opened', ->
+    openDialog()
+    equal document.activeElement, $('.ui-dialog-titlebar-close')[0]

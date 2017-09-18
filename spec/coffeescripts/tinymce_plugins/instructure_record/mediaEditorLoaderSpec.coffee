@@ -39,9 +39,9 @@ define [
       window.$.mediaComment.restore  && window.$.mediaComment.restore()
 
   test 'properly makes link html', ->
-    linkHTML = @mel.makeLinkHtml("FOO", "BAR")
-    expectedResult =  "<a href='/media_objects/FOO' class='instructure_inline_media_comment BAR" +
-      "_comment' id='media_comment_FOO'>this is a media comment</a><br>";
+    linkHTML = @mel.makeLinkHtml("FOO", "BAR", "FOO title")
+    expectedResult =  '<a href="/media_objects/FOO" class="instructure_inline_media_comment BAR' +
+      '_comment" id="media_comment_FOO" data-alt="FOO title">this is a media comment</a>';
 
     equal linkHTML, expectedResult
 

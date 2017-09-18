@@ -496,7 +496,7 @@ class ContextModuleItemsApiController < ApplicationController
   def select_mastery_path
     return unless authorized_action(@context, @current_user, :read)
     return unless @student == @current_user || authorized_action(@context, @current_user, :manage_assignments)
-    return render json: { message: 'mastery paths not enabled' }, status: :bad_request unless ConditionalRelease::Service.enabled_in_context?(@context)
+    return render json: { message: 'mastery paths not enabled' }, status: :bad_request unless cyoe_enabled?(@context)
     return render json: { message: 'assignment_set_id required' }, status: :bad_request unless params[:assignment_set_id]
 
     get_module_item
@@ -595,8 +595,8 @@ class ContextModuleItemsApiController < ApplicationController
   MAX_SEQUENCES = 10
   # @API Get module item sequence
   #
-  # Given an asset in a course, find the ModuleItem it belongs to, and also the previous and next Module Items
-  # in the course sequence.
+  # Given an asset in a course, find the ModuleItem it belongs to, the previous and next Module Items
+  # in the course sequence, and also any applicable mastery path rules
   #
   # @argument asset_type [String, "ModuleItem"|"File"|"Page"|"Discussion"|"Assignment"|"Quiz"|"ExternalTool"]
   #   The type of asset to find module sequence information for. Use the ModuleItem if it is known
@@ -683,6 +683,11 @@ class ContextModuleItemsApiController < ApplicationController
         end
         if ix < tag_ids.size - 1
           hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session)
+        end
+        if cyoe_enabled?(@context)
+          is_student = @context.user_is_student?(@current_user)
+          opts = { context: @context, user: @current_user, session: session, is_student: is_student }
+          hash[:mastery_path] = conditional_release_rule_for_module_item(needed_tags[tag_ids[ix]], opts)
         end
         result[:items] << hash
       end

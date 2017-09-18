@@ -1,5 +1,5 @@
-<%
-# Copyright (C) 2014 - present Instructure, Inc.
+#
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,10 +14,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
+#
 
-<% if @assignment && @assignment.description.present? %>
-  <div class="description user_content" style="margin: 20px">
-    <%= user_content(@assignment.description) %>
-  </div>
-<% end %>
+class AddAnonymousInstructorAnnotationsToAssignment < ActiveRecord::Migration[5.0]
+  tag :predeploy
+
+  def up
+    add_column :assignments, :anonymous_instructor_annotations, :boolean
+
+    change_column_default :assignments, :anonymous_instructor_annotations, false
+  end
+
+  def down
+    remove_column :assignments, :anonymous_instructor_annotations
+  end
+end

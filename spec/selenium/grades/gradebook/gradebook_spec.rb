@@ -17,7 +17,7 @@
 
 require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/groups_common'
-require_relative '../page_objects/gradebook_page'
+require_relative '../pages/gradebook_page'
 
 describe "gradebook" do
   include_context "in-process server selenium tests"
@@ -36,7 +36,7 @@ describe "gradebook" do
     @gradebook_page.visit_gradebook(@course)
     page_load_finish_time = Time.now
     page_load_time = page_load_finish_time - page_load_start_time
-    puts "The page loaded in #{page_load_time} seconds"
+    Rails.logger.debug "The gradebook page /courses/#{@course}/gradebook loaded in #{page_load_time} seconds"
     expect(page_load_time).to be > 0.0
   end
 

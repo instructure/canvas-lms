@@ -28,7 +28,7 @@ describe ShardedBookmarkedCollection do
   context "without sharding" do
 
     it "returns a paginatable collection" do
-      collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts) do |scope|
+      collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts_scope) do |scope|
         scope.active
       end
       expect(collection.paginate(per_page: 10).size).to equal 1

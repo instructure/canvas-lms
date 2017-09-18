@@ -22,6 +22,9 @@
 // Variables (including Bootstrap and jQuery UI), mixins, and functions
 @import "base/environment";
 
+// Reset
+@import "components/ic-reset";
+
 // Heavily customized vendor styles
 @import "vendor/jqueryui/jquery.ui.all";
 @import "base/custom_bootstrap";
@@ -30,7 +33,52 @@
 // Canvas components and area-specific styles
 @import "components/alerts";
 @import "components/buttons";
-@import "components/g_base";
+@import "components/ic-code";
+@import "components/deprecated/chevron_crumbs";
+@import "components/deprecated/legacy_buttons";
+@import "components/deprecated/fancy_links";
+@import "components/deprecated/tooltip";
+@import "components/deprecated/ui_listview";
+@import "components/breadcrumbs";
+@import "components/admin_links";
+@import "components/borders";
+@import "components/centered-block";
+@import "components/components";
+@import "components/external_link";
+@import "components/gutters";
+@import "components/header_bar";
+@import "components/canvas-icons";
+@import "components/indicate_loading";
+@import "components/inst_tree";
+@import "components/misc";
+@import "components/new-and-total-badge";
+@import "components/react_modal";
+@import "components/react_select_box";
+@import "components/show_hide_opacity";
+@import "components/spacing";
+@import "components/alignment";
+@import "components/forms";
+@import "components/avatars";
+@import "components/item-groups";
+@import "components/item-groups-condensed";
+@import "components/publish-state";
+@import "components/lock-state";
+@import "components/post-to-sis-state";
+@import "components/pill";
+@import "components/alerts";
+@import "components/element-toggler";
+@import "components/ic-super-toggle";
+@import "components/ic-image-text-combo";
+@import "components/ic-color-picker";
+@import "components/ic-forms";
+@import "components/ic-badge";
+@import "base/layout";
+@import "base/ic_app_layout";
+@import "base/ic_app_header";
+@import "base/#left-side";
+@import "base/#right-side";
+@import "base/print";
+@import "base/module_sequence_footer";
 @import "components/ic-typography";
 @import "components/accordion";
 @import "components/g_instructure";

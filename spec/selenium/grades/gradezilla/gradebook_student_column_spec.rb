@@ -18,7 +18,7 @@
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../setup/gradebook_setup'
-require_relative '../page_objects/gradezilla_page'
+require_relative '../pages/gradezilla_page'
 
 describe "Student column header options" do
   include_context "in-process server selenium tests"

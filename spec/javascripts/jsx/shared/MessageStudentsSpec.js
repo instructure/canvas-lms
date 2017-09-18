@@ -35,18 +35,27 @@ define([
     { default: Transition }
    ) => {
 
-  let $domNode, subject
+  let $domNode, subject, fixtures
 
   const renderComponent = (props) => {
-    $domNode = $domNode || document.createElement('div')
+    $domNode = document.createElement('div')
+    fixtures.appendChild($domNode)
     return ReactDOM.render(<MessageStudents { ...props } />, $domNode)
   }
 
   QUnit.module('MessageStudents', (hooks)  => {
+    hooks.beforeEach(() => {
+      fixtures = document.getElementById('fixtures')
+      const appElement = document.createElement('div')
+      appElement.id = 'application'
+      fixtures.appendChild(appElement)
+
+    })
     hooks.afterEach(() => {
       ReactDOM.unmountComponentAtNode($domNode)
       $domNode = null
       subject= null
+      fixtures.innerHTML = ''
     })
 
     test('it renders', () => {

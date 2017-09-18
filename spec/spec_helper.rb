@@ -43,6 +43,7 @@ WebMock.enable!
 module WebMock::API
   include WebMock::Matchers
   def self.included(other)
+    other.before { allow(CanvasHttp).to receive(:insecure_host?).and_return(false) }
     other.after { WebMock.reset! }
   end
 end
@@ -346,6 +347,7 @@ RSpec.configure do |config|
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
+    MultiCache.reset
     Course.enroll_user_call_count = 0
     $spec_api_tokens = {}
   end
@@ -561,6 +563,7 @@ RSpec.configure do |config|
     previous_perform_caching = ActionController::Base.perform_caching
     allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
+    MultiCache.reset
     if block_given?
       begin
         yield

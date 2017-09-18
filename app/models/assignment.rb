@@ -167,9 +167,9 @@ class Assignment < ActiveRecord::Base
     result.discussion_topic = nil
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
-    # Default to the last position of all active assignments.  Clients can still
+    # Default to the last position of all active assignments in the group.  Clients can still
     # override later.  Just helps to avoid duplicate positions.
-    result.position = Assignment.active.maximum(:position) + 1
+    result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
     result.title =
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
 
@@ -291,7 +291,8 @@ class Assignment < ActiveRecord::Base
     grades_published_at
     omit_from_final_grade
     grading_standard_id
-  )
+    anonymous_instructor_annotations
+  ).freeze
 
   def external_tool?
     self.submission_types == 'external_tool'

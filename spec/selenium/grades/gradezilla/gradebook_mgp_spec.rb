@@ -17,8 +17,8 @@
 #
 
 require_relative '../../common'
-require_relative '../page_objects/gradezilla_page'
-require_relative '../page_objects/gradezilla_cells_page'
+require_relative '../pages/gradezilla_page'
+require_relative '../pages/gradezilla_cells_page'
 require_relative '../setup/gradebook_setup'
 
 describe "Gradezilla with grading periods" do

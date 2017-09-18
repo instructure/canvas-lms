@@ -16,48 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery', 'mathml'], ($, mathml) => {
-  QUnit.module('MathML and MathJax test', {
-    setup () {
-      let mathElem = document.createElement('math')
-      mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
-      $('body')[0].appendChild(mathElem)
+import $ from 'jquery'
+import * as mathml from 'mathml'
+
+QUnit.module('MathML and MathJax test', {
+  setup () {
+    const mathElem = document.createElement('math')
+    mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
+    $('body')[0].appendChild(mathElem)
+  }
+})
+
+test('loadMathJax loads mathJax', () => {
+  window.MathJax = undefined
+  sinon.stub($, 'getScript')
+  mathml.loadMathJax('bogus')
+  ok($.getScript.called)
+  $.getScript.restore()
+})
+
+test('loadMathJax does not load mathJax', () => {
+  sinon.stub($, 'getScript')
+  window.MathJax = {}
+  mathml.loadMathJax('bogus')
+  ok(!$.getScript.called)
+  $.getScript.restore()
+})
+
+test('isMathMLOnPage returns true', () => {
+  ok(mathml.isMathMLOnPage())
+})
+
+test('isMathJaxLoaded return true', () => {
+  window.MathJax = {}
+  ok(mathml.isMathJaxLoaded())
+})
+
+test('reloadElement reloads the element', () => {
+  window.MathJax = {
+    Hub: {
+      Queue: () => {}
     }
-  });
-
-  test('loadMathJax loads mathJax', (assert) => {
-    MathJax = undefined
-    sinon.stub($, 'getScript')
-    mathml.loadMathJax('bogus')
-    ok($.getScript.called)
-    $.getScript.restore()
-  });
-
-  test('loadMathJax does not load mathJax', (assert) => {
-    sinon.stub($, 'getScript')
-    MathJax = {}
-    mathml.loadMathJax('bogus')
-    ok(!$.getScript.called)
-    $.getScript.restore()
-  });
-
-  test('isMathMLOnPage returns true', (assert) => {
-    ok(mathml.isMathMLOnPage())
-  });
-
-  test('isMathJaxLoaded return true', (assert) => {
-    MathJax = {}
-    ok(mathml.isMathJaxLoaded())
-  });
-
-  test('reloadElement reloads the element', (assert) => {
-    MathJax = {
-      Hub: {
-        Queue: () => {}
-      }
-    }
-    sinon.stub(MathJax.Hub, 'Queue')
-    mathml.reloadElement('content')
-    ok(MathJax.Hub.Queue.called)
-  });
-});
+  }
+  sinon.stub(window.MathJax.Hub, 'Queue')
+  mathml.reloadElement('content')
+  ok(window.MathJax.Hub.Queue.called)
+})

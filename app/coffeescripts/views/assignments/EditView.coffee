@@ -306,7 +306,8 @@ define [
             parseInt(ENV.COURSE_ID),
             @$secureParams.val(),
             parseInt(ENV.SELECTED_CONFIG_TOOL_ID),
-            ENV.SELECTED_CONFIG_TOOL_TYPE)
+            ENV.SELECTED_CONFIG_TOOL_TYPE,
+            ENV.REPORT_VISIBILITY_SETTING)
 
       @_attachEditorToDescription()
       @addTinyMCEKeyboardShortcuts()
@@ -336,6 +337,7 @@ define [
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
         lockedItems: @lockedItems
+        anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
 
 
     _attachEditorToDescription: =>
@@ -558,7 +560,7 @@ define [
       errors
 
     _validateExternalTool: (data, errors) =>
-      if data.submission_type == 'external_tool' and $.trim(data.external_tool_tag_attributes?.url?.toString()).length == 0
+      if data.submission_type == 'external_tool' && data.grading_type != 'not_graded' && $.trim(data.external_tool_tag_attributes?.url?.toString()).length == 0
         errors["external_tool_tag_attributes[url]"] = [
           message: I18n.t 'External Tool URL cannot be left blank'
         ]

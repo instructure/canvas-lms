@@ -419,14 +419,17 @@ import '../../jquery.instructure_misc_plugins'
       $(event.node).find("img.iframe_placeholder").each(function() {
         var $holder = $(this);
         var $frame = $("<iframe/>");
+        var height = $holder.attr('height') || $holder.css('height');
+        var width = $holder.hasClass('fullWidth') ? '100%' : $holder.attr('width') || $holder.css('width');
+
+        $holder.attr('width', width);
+        $holder.css('width', width);
         $frame.attr('src', $holder.attr('rel'));
         $frame.attr('style', $holder.attr('_iframe_style'));
-        $frame.height($holder.attr('height') || $holder.css('height'));
-        if($holder.hasClass('fullWidth')) {
-          $holder.attr('width', '100%');
-          $holder.css('width', '100%');
-        }
-        $frame.css('width', $holder.attr('width') || $holder.css('width'));
+        $frame.attr('height', height);
+        $frame.css('height', height);
+        $frame.attr('width', width);
+        $frame.css('width', width);
         $(this).after($frame);
         $(this).remove();
       });

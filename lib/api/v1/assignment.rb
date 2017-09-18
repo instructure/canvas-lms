@@ -48,6 +48,7 @@ module Api::V1::Assignment
       grading_standard_id
       moderated_grading
       omit_from_final_grade
+      anonymous_instructor_annotations
     )
   }.freeze
 
@@ -306,9 +307,10 @@ module Api::V1::Assignment
 
     if submission = opts[:submission]
       if submission.is_a?(Array)
-        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session) }
+        ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
+        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, params) }
       else
-        hash['submission'] = submission_json(submission, assignment, user, session)
+        hash['submission'] = submission_json(submission, assignment, user, session, params)
       end
     end
 
@@ -388,7 +390,8 @@ module Api::V1::Assignment
     notify_of_update
     integration_id
     omit_from_final_grade
-  )
+    anonymous_instructor_annotations
+  ).freeze
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(
     originality_report_visibility
@@ -400,14 +403,14 @@ module Api::V1::Assignment
     exclude_small_matches_type
     exclude_small_matches_value
     submit_papers_to
-  )
+  ).freeze
 
   API_ALLOWED_VERICITE_SETTINGS = %w(
     originality_report_visibility
     exclude_quoted
     exclude_self_plag
     store_in_index
-  )
+  ).freeze
 
   def create_api_assignment(assignment, assignment_params, user, context = assignment.context)
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
@@ -781,6 +784,11 @@ module Api::V1::Assignment
     if plagiarism_capable?(assignment_params)
       tool = assignment_configuration_tool(assignment_params)
       assignment.tool_settings_tool = tool
+      if assignment_params[:report_visibility].present?
+        settings = assignment.turnitin_settings
+        settings[:originality_report_visibility] = assignment_params[:report_visibility]
+        assignment.turnitin_settings = settings
+      end
     end
   end
 
@@ -792,7 +800,7 @@ module Api::V1::Assignment
     elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
       mh = Lti::MessageHandler.find(tool_id)
       mh_context = mh.resource_handler.tool_proxy.context
-      tool = mh if mh_context == @context || mh_context == @context.account || mh_context == @context.root_account
+      tool = mh if mh_context == @context || @context.account_chain.include?(mh_context)
     end
     tool
   end

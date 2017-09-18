@@ -253,14 +253,14 @@ module Lti
       let(:pagination_request_headers) { { StartKey: pagination_key.to_json, Authorization: "Bearer #{access_token}" } }
       let(:ok_pagination_response) do
         double(
-          body: subscription.to_json,
+          body: [subscription].to_json,
           code: 200,
-          headers: { EndKey: pagination_key.to_json }
+          headers: { 'endkey' => pagination_key.to_json }
         )
       end
       let(:ok_unpaginated_response) do
         double(
-          body: subscription.to_json,
+          body: [subscription].to_json,
           code: 200,
           headers: {}
         )
@@ -269,13 +269,19 @@ module Lti
       it 'shows subscriptions for a tool proxy' do
         allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_unpaginated_response }
         get index_endpoint, headers: request_headers
-        expect(response).to be_success
+        expect(JSON.parse(response.body).first['ContextId']).to eq account.uuid
       end
 
       it 'shows subscriptions for a tool proxy from a pagination response' do
         allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
         get index_endpoint, headers: request_headers
         expect(response).to be_success
+      end
+
+      it 'includes pagination headers' do
+        allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
+        get index_endpoint, headers: request_headers
+        expect(JSON.parse(response.headers['EndKey'])).to eq pagination_key.with_indifferent_access
       end
 
       it 'shows subscriptions for a tool proxy with optional pagination header' do
