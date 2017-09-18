@@ -50,22 +50,19 @@ module Api::V1::User
       if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
         include_root_account = @domain_root_account.trust_exists?
         pseudonym = SisPseudonym.for(user, @domain_root_account, type: :implicit, require_sis: false)
-        sis_pseudonym = pseudonym if pseudonym&.sis_user_id
-        enrollment_json_opts[:sis_pseudonym] = sis_pseudonym
-        if sis_pseudonym
-          # the sis fields on pseudonym are poorly named -- sis_user_id is
-          # the id in the SIS import data, where on every other table
-          # that's called sis_source_id.
+        enrollment_json_opts[:sis_pseudonym] = pseudonym if pseudonym&.sis_user_id
+        # the sis fields on pseudonym are poorly named -- sis_user_id is
+        # the id in the SIS import data, where on every other table
+        # that's called sis_source_id.
 
-          if user_can_read_sis_data?(current_user, context)
-            json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
-                        :integration_id => sis_pseudonym.integration_id,
-                        # TODO: don't send sis_login_id; it's garbage data
-                        :sis_login_id => sis_pseudonym.unique_id
-          end
-          json[:sis_import_id] = sis_pseudonym.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
-          json[:root_account] = HostUrl.context_host(sis_pseudonym.account) if include_root_account
+        if user_can_read_sis_data?(current_user, context)
+          json.merge! :sis_user_id => pseudonym&.sis_user_id,
+                      :integration_id => pseudonym&.integration_id,
+                      # TODO: don't send sis_login_id; it's garbage data
+                      :sis_login_id => pseudonym&.unique_id
         end
+        json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
+        json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
 
         if pseudonym
           json[:login_id] = pseudonym.unique_id
