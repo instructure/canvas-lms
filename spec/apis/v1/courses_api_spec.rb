@@ -2289,6 +2289,9 @@ describe CoursesController, type: :request do
             'name' => 'TAPerson',
             'sortable_name' => 'TAPerson',
             'short_name' => 'TAPerson',
+            'sis_user_id' =>nil,
+            'integration_id' =>nil,
+            'sis_login_id' =>nil,
             'email' => 'ta@ta.com',
             'bio' => 'hey'
           }
