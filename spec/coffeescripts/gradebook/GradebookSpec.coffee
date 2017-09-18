@@ -626,27 +626,37 @@ define [
 
     test 'updates effectiveDueDates with the submissions', () ->
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(Object.keys(gradebook.effectiveDueDates), ['201', '202'])
-      deepEqual(Object.keys(gradebook.effectiveDueDates[201]), ['1101', '1102'])
-      deepEqual(Object.keys(gradebook.effectiveDueDates[202]), ['1101'])
+      gradebook.gridReady.resolve().then =>
+        deepEqual(Object.keys(gradebook.effectiveDueDates), ['201', '202'])
+        deepEqual(Object.keys(gradebook.effectiveDueDates[201]), ['1101', '1102'])
+        deepEqual(Object.keys(gradebook.effectiveDueDates[202]), ['1101'])
+
+    test 'waits for gridReady to resolve', () ->
+      deepEqual(Object.keys(gradebook.effectiveDueDates), [])
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      gradebook.gridReady.resolve().then =>
+        deepEqual(Object.keys(gradebook.effectiveDueDates), ['201', '202'])
 
     test 'updates effectiveDueDates on related assignments', () ->
       gradebook.assignments =
         201: { id: '201', name: 'Math Assignment', published: true },
         202: { id: '202', name: 'English Assignment', published: false }
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(Object.keys(gradebook.assignments[201].effectiveDueDates), ['1101', '1102'])
-      deepEqual(Object.keys(gradebook.assignments[202].effectiveDueDates), ['1101'])
+      gradebook.gridReady.resolve().then =>
+        deepEqual(Object.keys(gradebook.assignments[201].effectiveDueDates), ['1101', '1102'])
+        deepEqual(Object.keys(gradebook.assignments[202].effectiveDueDates), ['1101'])
 
     test 'updates inClosedGradingPeriod on related assignments', () ->
       gradebook.assignments =
         201: { id: '201', name: 'Math Assignment', published: true },
         202: { id: '202', name: 'English Assignment', published: false }
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(Object.keys(gradebook.assignments[201].effectiveDueDates), ['1101', '1102'])
-      deepEqual(Object.keys(gradebook.assignments[202].effectiveDueDates), ['1101'])
+      gradebook.gridReady.resolve().then =>
+        deepEqual(Object.keys(gradebook.assignments[201].effectiveDueDates), ['1101', '1102'])
+        deepEqual(Object.keys(gradebook.assignments[202].effectiveDueDates), ['1101'])
 
     test 'sets up grading for the related students', () ->
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      [students] = gradebook.setupGrading.lastCall.args
-      deepEqual(students.map((student) => student.id), ['1101', '1102'])
+      gradebook.gridReady.resolve().then =>
+        [students] = gradebook.setupGrading.lastCall.args
+        deepEqual(students.map((student) => student.id), ['1101', '1102'])
