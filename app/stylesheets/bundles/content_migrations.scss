@@ -194,3 +194,9 @@ i.course_select_warning {
   padding: 8px 0 0 8px;
   color: $btnWarningBackground;
 }
+
+.migration--error-detail {
+  font-style: italic;
+  padding-left: $ic-sp;
+}
+
