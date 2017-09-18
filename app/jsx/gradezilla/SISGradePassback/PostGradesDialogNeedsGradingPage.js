@@ -37,7 +37,7 @@ import React from 'react'
             </em>
           </small>
           <br/><br/>
-          <table className="table table-hover table-condensed">
+          <table className="ic-Table ic-Table--hover-row ic-Table--condensed">
             <tbody>
               <thead>
                 <td>{I18n.t("Assignment Name")}</td>
