@@ -26,11 +26,6 @@ $context_module_bg_color: #f2f3f4;
 }
 
 .context_module {
-  // border: {
-  //   top: 1px dotted $context_module_border_color;
-  //   bottom: 1px dotted $context_module_border_color;
-  // };
-  background-color: $context_module_bg_color;
   min-width: 20px;
   margin-bottom: 15px;
   .links a, .reorder_module_link, .move_item_link {
@@ -49,10 +44,6 @@ $context_module_bg_color: #f2f3f4;
     white-space: nowrap;
   }
   .header {
-    background-color: darken($context_module_bg_color, 5%);
-    border-bottom: 1px dotted #aaa;
-    padding: 6px 0;
-    color: #323232;
     .links {
       float: right;
     }

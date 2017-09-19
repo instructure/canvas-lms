@@ -27,7 +27,7 @@
 
 <% cache_if_module(context_module, editable, @is_student, @can_view_unpublished, @current_user, @context) do %>
 <div
-  class="item-group-condensed context_module collapsed_module
+  class="context_module sm-context_module collapsed_module
     <%= 'editable_context_module' if editable %>
     <%= 'has_requirements' if context_module && context_module.completion_requirements.present? %>
     "
@@ -39,7 +39,7 @@
     style="<%= hidden unless context_module %>"
 >
   <a id="module_<%= context_module.id if context_module %>"></a>
-  <div class="ig-header header" id="<%= context_module.id if context_module %>">
+  <div class="ig-header header sm-header" id="<%= context_module.id if context_module %>">
     <span
       class="sortable-handle reorder_module_link"
       title="<%= t('reorder_modules', %{Drag to reorder modules}) %>"

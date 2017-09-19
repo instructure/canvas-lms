@@ -1989,16 +1989,11 @@ import 'compiled/jquery.rails_flash_notifications'
     // from context_modules/_content
     var foundExpanded = false;
     var collapsedModules = ENV.COLLAPSED_MODULES;
-    // for(var idx in collapsedModules) {
-    //   $("#context_module_" + collapsedModules[idx]).addClass('collapsed_module');
-    // }
 
     var currentModules = ENV.CURRENT_MODULES;
     for(var idx in currentModules) {
-      $("#context_module_" + currentModules[idx]).removeClass('collapsed_module');
+      $("#context_module_" + currentModules[idx]).addClass('sm-started').removeClass('collapsed_module');
     }
-    console.log("Current Modules", currentModules)
-
 
     var foundModules = [];
     var $contextModules = $("#context_modules .context_module");
