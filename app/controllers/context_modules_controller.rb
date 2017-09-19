@@ -52,8 +52,7 @@ class ContextModulesController < ApplicationController
     def load_modules
       @modules = @context.modules_visible_to(@current_user)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select{|cm_id, collapsed| !!collapsed }.map(&:first)
-
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :workflow_state).select{|cm_id, workflow_state| workflow_state != "started" }.map(&:first)
       @can_edit = can_do(@context, @current_user, :manage_content)
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
