@@ -64,13 +64,13 @@ $left-offset:  16px;
 
 .feature-flag-group-title {
   @include fontSize(16px);
-  font-weight: bold;
+  font-weight: 500;
   line-height: 24px;
   padding-left: $left-offset;
 }
 
 .feature-title {
-  font-weight: bold;
+  font-weight: 500;
   margin-right: 8px;
 }
 
@@ -79,7 +79,7 @@ $left-offset:  16px;
 }
 
 .feature-release-date {
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .feature-details {
@@ -136,7 +136,7 @@ $switch-text: rgba($ic-color-light, 0.8);
     border-radius: 20px;
     height: 15px;
     line-height: 15px;
-    font-weight: bold;
+    font-weight: 500;
     &.ui-corner-left {
       border-radius: 20px;
     }

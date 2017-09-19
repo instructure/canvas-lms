@@ -29,12 +29,17 @@ module BrandableCSS
 
   VARIABLE_HUMAN_NAMES = {
     "ic-brand-primary" => lambda { I18n.t("Primary Brand Color") },
+    "ic-brand-secondary" => lambda { I18n.t("Secondary Brand Color") },
+    "ic-brand-tertiary" => lambda { I18n.t("Tertiary Brand Color") },
+    "ic-brand-white" => lambda { I18n.t("White Brand Color") },
+    "ic-brand-shade-3" => lambda { I18n.t("Brand Shade 3 Color") },
     "ic-brand-font-color-dark" => lambda { I18n.t("Main Text Color") },
     "ic-link-color" => lambda { I18n.t("Link Color") },
     "ic-brand-button--primary-bgd" => lambda { I18n.t("Primary Button") },
     "ic-brand-button--primary-text" => lambda { I18n.t("Primary Button Text") },
     "ic-brand-button--secondary-bgd" => lambda { I18n.t("Secondary Button") },
     "ic-brand-button--secondary-text" => lambda { I18n.t("Secondary Button Text") },
+    "ic-brand-button--secondary-border-color" => lambda { I18n.t("Secondary Button Border Color") },
     "ic-brand-global-nav-bgd" => lambda { I18n.t("Nav Background") },
     "ic-brand-global-nav-ic-icon-svg-fill" => lambda { I18n.t("Nav Icon") },
     "ic-brand-global-nav-ic-icon-svg-fill--active" => lambda { I18n.t("Nav Icon Active") },

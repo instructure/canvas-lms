@@ -126,7 +126,7 @@ body.Sg-only {
   &:focus {
     @include fontSize(13px);
     padding: 8px 10px;
-    font-weight: bold;
+    font-weight: 500;
     color: $sg-header-subnavigation-item;
     text-decoration: none;
   }

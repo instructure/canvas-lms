@@ -216,7 +216,7 @@
 
 .ic-flash__headline {
   margin: 0;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .ic-flash__text {
@@ -278,7 +278,7 @@ body.is-masquerading-or-student-view {
     }
   }
   &.ic-alert-masquerade-student-view-module--header {
-    font-weight: bold;
+    font-weight: 500;
   }
   &.ic-alert-masquerade-student-view-module--description {
     font-style: italic;
@@ -348,7 +348,7 @@ $ic-notification-border-thickness: 2px;
   margin-right: $ic-sp/3;
   @include fontSize($ic-font-size--small);
   display: inline;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .ic-notification__content {

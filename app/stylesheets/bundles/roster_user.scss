@@ -29,7 +29,7 @@ fieldset {
   padding: 5px 10px;
   margin-bottom: 5px;
   legend {
-    font-weight: bold;
+    font-weight: 500;
     border: none;
     width: auto;
     margin-left: 20px;
@@ -46,3 +46,17 @@ table.details {
     text-align: left;
   }
 }
+
+.user-switch-alert {
+  border: 1px solid black;
+  background-color: #FFD;
+  margin: 5px 0;
+  padding: 20px;
+  .warning-text {
+    font-weight: 500;
+  }
+  .links, .add_holder {
+    display: none;
+  }
+}
+

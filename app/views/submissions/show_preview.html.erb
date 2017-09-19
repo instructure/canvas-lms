@@ -188,11 +188,11 @@
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
   <meta HTTP-EQUIV="REFRESH" content="0; url=<%= retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless', url: @submission.external_tool_url) %>"/>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
-  <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
+  <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: 500;">
     <%= t('no_preview_available', 'No Preview Available') %>
   </div>
 <% else %>
-  <div style="margin: 20px auto; width: 200px; height: 50px; font-size: 1.5em;  font-weight: bold;">
+  <div style="margin: 20px auto; width: 200px; height: 50px; font-size: 1.5em;  font-weight: 500;">
     <%= t('no_submission', 'No Submission') %>
   </div>
 <% end %>

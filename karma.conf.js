@@ -29,7 +29,7 @@ const karmaConfig = {
   // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
   // - PhantomJS
   // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-  browsers: ['Chrome'],
+  browsers: ['PhantomJS'],
 
   // Run headless chrome with `karma start --browsers ChromeHeadlessNoSandbox`
   customLaunchers: {

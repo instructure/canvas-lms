@@ -107,7 +107,7 @@ div.form-column-right, div.overrides-column-right {
     margin-top: 20px;
     padding-bottom: 5px;
     @include fontSize(15px);
-    font-weight: bold;
+    font-weight: 500;
   }
 
   /* nested form els within a group */

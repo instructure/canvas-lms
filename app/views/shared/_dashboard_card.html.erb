@@ -21,6 +21,9 @@
 
 <%
 dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
+# p "=================================="
+# p dashboard_courses
+# p "=================================="
 js_env({
   :DASHBOARD_COURSES => dashboard_courses,
   :DASHBOARD_REORDERING_ENABLED => @domain_root_account.feature_enabled?(:dashcard_reordering)

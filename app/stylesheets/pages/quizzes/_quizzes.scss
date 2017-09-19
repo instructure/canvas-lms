@@ -50,7 +50,7 @@ li.quiz {
     @include breakpoint(desktop) { flex: 0 0 30%;}
   }
   .ig-details { flex: 1; }
-  .default-dates .status-description { font-weight: bold; }
+  .default-dates .status-description { font-weight: 500; }
 }
 
 #quiz_show {
@@ -119,7 +119,7 @@ li.quiz {
   .control-group {
     margin-bottom: 0px;
     .control-label {
-      font-weight: bold;
+      font-weight: 500;
       width: 33.3%;
     }
     .controls {
@@ -142,7 +142,7 @@ li.quiz {
     li {
       display: inline-block;
       .title {
-        font-weight: bold;
+        font-weight: 500;
         margin-right: 2px;
       }
       .value {
@@ -161,7 +161,7 @@ li.quiz {
   overflow: hidden;
   h1, h2 {
     margin-top: 0;
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 
@@ -425,7 +425,7 @@ li.quiz {
       }
     }
     .group_display.name {
-      font-weight: bold;
+      font-weight: 500;
       padding-right: 20px;
       line-height: 20px;
       @include fontSize($ic-font-size--small);
@@ -568,7 +568,7 @@ li.quiz {
   }
   .header {
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: 500;
     border-bottom: 1px solid $borderColor;
     background-color: $questionHeaderBackground;
     padding: 8px 20px;
@@ -576,7 +576,7 @@ li.quiz {
     .question_points_holder {
       float: right;
       font-size: 0.9em;
-      font-weight: bold;
+      font-weight: 500;
       color: darken($ic-color-neutral, 55);
       margin-top: 0.1em;
     }
@@ -606,7 +606,7 @@ li.quiz {
       width: 100%;
     }
     .calculated_question_answers_header {
-      font-weight: bold;
+      font-weight: 500;
     }
     .formulas_list div {
       margin-bottom: 2px;
@@ -647,7 +647,7 @@ li.quiz {
         .answer_list {
           margin: 5px;
           padding-left: 0;
-          font-weight: bold;
+          font-weight: 500;
         }
         .answer_input {
           width: 12px;
@@ -690,13 +690,13 @@ li.quiz {
         &.partial_answer {
           background: url(/images/partial_answer.png) no-repeat 3px 5px;
           .answer_text {
-            font-weight: bold;
+            font-weight: 500;
           }
         }
         &.negative_answer {
           background: url(/images/negative_answer.png) no-repeat 3px 5px;
           .answer_text {
-            font-weight: bold;
+            font-weight: 500;
           }
         }
       }
@@ -814,7 +814,7 @@ li.quiz {
     .answer_match_left, .answer_match_left_html {
       float: left;
       width: 45%;
-      font-weight: bold;
+      font-weight: 500;
       overflow: auto;
     }
     .answer_match_middle {
@@ -829,7 +829,7 @@ li.quiz {
         .correct_answer {
           padding-left: 5px;
           .answer_text {
-            font-weight: bold;
+            font-weight: 500;
           }
         }
       }
@@ -1141,7 +1141,7 @@ ul#question_list {
       color: #396eb2;
     }
     &.marked {
-      font-weight: bold;
+      font-weight: 500;
       background: url(/images/flagged_question.png) 3px 7px no-repeat;
       @if $use_high_contrast {
         @include bg-image(flagged_question_hc, png, no-repeat, 3px, 7px, transparent, 10px, 8px);
@@ -1149,7 +1149,7 @@ ul#question_list {
     }
     &.current_question {
       color: $ic-font-color-dark !important;
-      font-weight: bold;
+      font-weight: 500;
     }
     &.correct {
       color: #080;
@@ -1176,7 +1176,7 @@ ul#question_list {
 .quiz_score {
   .score_value {
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: 500;
     color: #444;
   }
 }
@@ -1185,7 +1185,7 @@ ul#quiz_versions {
   margin-top: 5px;
   .quiz_version {
     &.selected {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 }
@@ -1349,7 +1349,7 @@ ul#quiz_versions {
       }
       .option-caption {
         @include fontSize(15px);
-        font-weight: bold;
+        font-weight: 500;
         line-height: 1.4em;
         &:not(:first-of-type) {
           margin-top: 30px;
@@ -1363,7 +1363,7 @@ ul#quiz_versions {
 }
 
 .options_header {
-  font-weight: bold;
+  font-weight: 500;
   font-size: 1.2em;
   a {
     margin-right: 10px;
@@ -1448,7 +1448,7 @@ ul#quiz_versions {
       }
     }
     .formula_row.last_row {
-      font-weight: bold;
+      font-weight: 500;
     }
     .formula_row.last_row .status {
       font-size: 1.2em;
@@ -1497,7 +1497,7 @@ ul#quiz_versions {
   .equation_answers {
     .equation_header {
       font-size: 1.1em;
-      font-weight: bold;
+      font-weight: 500;
       margin-bottom: 5px;
       display: block;
       .equation_subheader {
@@ -1520,7 +1520,7 @@ ul#quiz_versions {
 #find_question_dialog {
   .page_link {
     display: block;
-    font-weight: bold;
+    font-weight: 500;
     margin: 5px 0;
   }
   .found_question {
@@ -1530,7 +1530,7 @@ ul#quiz_versions {
       font-size: 0.8em;
     }
     .question_name {
-      font-weight: bold;
+      font-weight: 500;
     }
     .already_added_message {
       display: none;
@@ -1553,7 +1553,7 @@ ul#quiz_versions {
 #ip_filters_dialog {
   .searching_message {
     font-size: 1.1em;
-    font-weight: bold;
+    font-weight: 500;
   }
   .filters {
     border-collapse: collapse;
@@ -1565,7 +1565,7 @@ ul#quiz_versions {
       .name_and_account {
         padding: 2px 10px 2px 5px;
         .name {
-          font-weight: bold;
+          font-weight: 500;
         }
         .account {
           font-size: 0.8em;
@@ -1593,7 +1593,7 @@ ul#quiz_versions {
     border-bottom: 1px dotted #ccc;
     .short_description {
       float: left;
-      font-weight: bold;
+      font-weight: 500;
     }
     .delete_outcome_link {
       float: right;
@@ -1618,7 +1618,7 @@ ul#quiz_versions {
     margin: 0 20px;
     border-bottom: 1px dotted #ccc;
     .title {
-      font-weight: bold;
+      font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1632,7 +1632,7 @@ ul#quiz_versions {
     }
     &.selected {
       background-color: #ccc;
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 }
@@ -1685,7 +1685,7 @@ ul#quiz_versions {
   background-repeat: repeat-x;
   display: inline-block;
   @include fontSize($ic-font-size--xsmall);
-  font-weight: bold;
+  font-weight: 500;
   line-height: 27px;
   min-width: 96px;
   padding: 0 8px;
@@ -2039,7 +2039,7 @@ ul#quiz_versions {
       background: white;
       border: 1px solid $selectedBorderColor;
       color: #0088cc;
-      font-weight: bold;
+      font-weight: 500;
     }
     &.complete a {
       background-color: #eeeeee;
@@ -2066,7 +2066,7 @@ ul#quiz_versions {
 
 #quiz-draft-state {
   padding: 10px;
-  font-weight: bold;
+  font-weight: 500;
   &.published {
     color: #007711;
   }
@@ -2082,7 +2082,7 @@ ul#quiz_versions {
     margin: 0;
     text-transform: uppercase;
     font-size: 100%;
-    font-weight: bold;
+    font-weight: 500;
     span {
       font-weight: normal;
       text-transform: none;
@@ -2282,7 +2282,7 @@ li.quiz.quiz-loading-overrides {
     background-color: transparent;
     border-color: transparent;
     box-shadow: none;
-    font-weight: bold;
+    font-weight: 500;
     cursor: default;
     padding-left: 0;
     &:focus {

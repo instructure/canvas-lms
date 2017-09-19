@@ -1,0 +1,53 @@
+run.config:
+  engine: ruby
+  engine.config:
+    runtime: ruby-2.4
+
+  extra_packages:
+    - nodejs-6
+    - xmlsec1
+    - pkgconf
+    - libxml2
+    - libxslt
+    - zlib
+    - postgresql96-client
+    - python-2.7
+    - nginx
+    - ImageMagick
+
+  extra_steps:
+    - npm install
+    - yarn install
+    - npm install -g coffee-script@1.6.2
+    - npm install -g webpack
+    - npm install -g gulp
+
+
+web.site:
+  start:
+      nginx: nginx -c /app/config/nginx.conf
+      puma: bundle exec puma -C /app/config/puma.rb
+
+  writable_dirs:
+    - tmp
+    - log
+
+worker.jobs:
+  start: script/delayed_job run
+
+data.chrome:
+  image: selenium/standalone-chrome
+
+data.queue:
+  image: nanobox/redis
+
+data.db:
+  image: nanobox/postgresql:9.6
+
+deploy.config:
+  # before_live:
+  #   web.site:
+  #     - rake db:create
+
+  extra_steps:
+    - rake canvas:compile_assets RAILS_ENV=production

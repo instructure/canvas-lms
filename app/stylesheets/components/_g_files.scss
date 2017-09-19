@@ -74,7 +74,7 @@
     }
     &.selected, .temp_selected {
       background-color: #fea;
-      font-weight: bold;
+      font-weight: 500;
       .links {
         display: block;
         opacity: 1;
@@ -114,7 +114,7 @@
 #view_options {
   .header {
     font-size: 1em;
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 
@@ -152,7 +152,7 @@
           background-color: #ddd;
           border-top: 1px solid #eee;
           border-bottom: 1px solid #eee;
-          font-weight: bold;
+          font-weight: 500;
         }
         &.related {
           background-color: #ddd;
@@ -187,7 +187,7 @@
       background-color: #d0e0f0;
     }
     .file_name {
-      font-weight: bold;
+      font-weight: 500;
     }
     .cancel_upload_link {
       float: right;

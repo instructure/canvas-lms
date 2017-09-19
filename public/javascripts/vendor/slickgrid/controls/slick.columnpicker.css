@@ -23,7 +23,7 @@
 .slick-columnpicker li a {
   display: block;
   padding: 4px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .slick-columnpicker li a:hover {

@@ -99,6 +99,6 @@
 .ui-dialog .ui-dialog-titlebar {
   border-top: 0; border-left: 0; border-right: 0;
   border-bottom-left-radius: 0; border-bottom-right-radius: 0;
-  font-weight: bold;
+  font-weight: 500;
   @include fontSize(14px);
 }

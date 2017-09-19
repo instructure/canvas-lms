@@ -36,7 +36,7 @@
   margin: 0 0 $ic-sp; padding: 0;
   line-height: 1.1;
   @include fontSize($ic-font-size--small);
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .ColorPicker__Container.with-animation {

@@ -76,7 +76,7 @@
       text {
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         font-size: 125%;
-        font-weight: bold;
+        font-weight: 500;
       }
 
       tspan.subcaption {
@@ -151,7 +151,7 @@
 
     .index {
       font-size: 24px;
-      font-weight: bold;
+      font-weight: 500;
       font-style: normal;
 
       &.negative {
@@ -188,7 +188,7 @@
     tr.correct {
       td, th {
         color: $rowTextHighlightColor;
-        font-weight: bold;
+        font-weight: 500;
         box-shadow: none;
         background-color: $rowHighlightBackgroundColor;
       }

@@ -45,7 +45,7 @@
 
   .section-title {
     line-height: 1;
-    font-weight: bold;
+    font-weight: 500;
   }
 
   .answer-set-tabs {
@@ -55,7 +55,7 @@
       display: inline-block;
       background: $inactiveBg;
       color: $inactiveFg;
-      font-weight: bold;
+      font-weight: 500;
       padding: 5px 10px;
       border: none;
       border-radius: 4px;
@@ -82,7 +82,7 @@
     }
 
     h3 {
-      font-weight: bold;
+      font-weight: 500;
       margin-bottom: 0;
       line-height: 22px;
       font-size: 14.5px;

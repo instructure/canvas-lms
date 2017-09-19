@@ -27,6 +27,7 @@ class Course < ActiveRecord::Base
   include TimeZoneHelper
   include ContentLicenses
   include TurnitinID
+  include Courses::ItemVisibilityHelper
 
   attr_accessor :teacher_names, :master_course
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :updating_master_template_id
@@ -2417,24 +2418,28 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.announcements', "Announcements"),
         :css_class => 'announcements',
         :href => :course_announcements_path,
+        :screenreader => t("Course Announcements"),
         :icon => 'icon-announcement'
       }, {
         :id => TAB_ASSIGNMENTS,
         :label => t('#tabs.assignments', "Assignments"),
         :css_class => 'assignments',
         :href => :course_assignments_path,
+        :screenreader => t('#tabs.course_assignments', "Course Assignments"),
         :icon => 'icon-assignment'
       }, {
         :id => TAB_DISCUSSIONS,
         :label => t('#tabs.discussions', "Discussions"),
         :css_class => 'discussions',
         :href => :course_discussion_topics_path,
+        :screenreader => t("Course Discussions"),
         :icon => 'icon-discussion'
       }, {
         :id => TAB_GRADES,
         :label => t('#tabs.grades', "Grades"),
         :css_class => 'grades',
-        :href => :course_grades_path
+        :href => :course_grades_path,
+        :screenreader => t('#tabs.course_grades', "Course Grades")
       }, {
         :id => TAB_PEOPLE,
         :label => t('#tabs.people', "People"),
@@ -2450,6 +2455,7 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.files', "Files"),
         :css_class => 'files',
         :href => :course_files_path,
+        :screenreader => t("Course Files"),
         :icon => 'icon-folder'
       }, {
         :id => TAB_SYLLABUS,
@@ -2490,7 +2496,8 @@ class Course < ActiveRecord::Base
         :id => TAB_SETTINGS,
         :label => t('#tabs.settings', "Settings"),
         :css_class => 'settings',
-        :href => :course_settings_path
+        :href => :course_settings_path,
+        :screenreader => t('#tabs.course_settings', "Course Settings")
       }
     ]
   end
@@ -3081,6 +3088,11 @@ class Course < ActiveRecord::Base
     context_external_tools.active.find_by(query) ||
       account.context_external_tools.active.find_by(query) ||
         root_account.context_external_tools.active.find_by(query)
+  end
+
+  def find_or_create_progressions_for_user(user)
+    @progressions ||= {}
+    @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
   end
 
   private

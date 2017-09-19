@@ -93,7 +93,7 @@
     display: inline-flex;
     h3 {
       margin: 0 7px 0 5px;
-      font-weight: bold;
+      font-weight: 500;
       @include fontSize($ic-font-size--small);
       float: left;
       line-height: 18px;
@@ -124,7 +124,7 @@
   .student-group-join {
     position: absolute;
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: 500;
     right: 10px;
     text-align: right;
   }
@@ -205,7 +205,7 @@
   &:focus {
     background: $ic-color-medium;
     color: $ic-font-color-light;
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 // need to account for setting focus to the first option (if selected)

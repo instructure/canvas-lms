@@ -173,7 +173,7 @@ $app_height: 143px;
           .content {
             padding: 15px;
             .name {
-              font-weight: bold;
+              font-weight: 500;
               @include fontSize($ic-font-size--small);
               color: #d6ecfc;
             }
@@ -237,7 +237,7 @@ $app_height: 143px;
     padding-top: 5px;
     border-top: thin solid #dddddd;
     .rate_app {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
   .review-item {

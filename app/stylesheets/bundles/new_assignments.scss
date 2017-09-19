@@ -56,12 +56,12 @@
     text-align: right;
   }
   tfoot td {
-    font-weight: bold;
+    font-weight: 500;
   }
 }
 
 .assignment {
-  .default-dates .status-description { font-weight: bold; }
+  .default-dates .status-description { font-weight: 500; }
 }
 
 @media screen and (max-width: 1280px) {
@@ -132,7 +132,7 @@
   @include fontSize(14px);
   line-height: 20px;
   border-bottom: 0;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .show-by-label {
@@ -232,7 +232,7 @@
 form[data-view='edit-assignment'] {
   h3 {
     margin: 5px 8px;
-    font-weight: bold;
+    font-weight: 500;
     font-size: 1em;
   }
   @include readonly-input;

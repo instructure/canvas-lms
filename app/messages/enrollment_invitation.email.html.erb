@@ -24,16 +24,16 @@
     border-collapse: collapse;">
     <tr>
         <td style="padding-right: 10px;"><%= t(:name, 'Name') %>:</td>
-        <td style="font-weight: bold;"><%= asset.user.name %></td>
+        <td style="font-weight: 500;"><%= asset.user.name %></td>
     </tr>
     <tr>
         <td style="padding-right: 10px"><%= t(:email, 'Email') %>:</td>
-        <td style="font-weight: bold;"><%= email %></td>
+        <td style="font-weight: 500;"><%= email %></td>
     </tr>
     <% if email != login %>
       <tr>
           <td style="padding-right: 10px;"><%= t(:username, 'Username') %>:</td>
-          <td style="font-weight: bold;"><%= asset.user.pseudonym.unique_id rescue t(:none, "none") %></td>
+          <td style="font-weight: 500;"><%= asset.user.pseudonym.unique_id rescue t(:none, "none") %></td>
       </tr>
     <% end %>
 </table>
@@ -43,7 +43,7 @@
 <table width="100%" border="0" style="text-align:center;">
   <tr>
     <td>
-      <a href="<%= content(:link) %>" style="color: #FFFFFF; background-color: #008EE2; padding: 8px 40px; border-radius: 3px; text-decoration: none; font-weight: bold;">
+      <a href="<%= content(:link) %>" style="color: #FFFFFF; background-color: #008EE2; padding: 8px 40px; border-radius: 3px; text-decoration: none; font-weight: 500;">
         <%= t('Get Started') %>
       </a>
     </td>

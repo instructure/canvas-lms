@@ -163,12 +163,13 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.lti_context_id = nil
+    result.turnitin_id = nil
     result.discussion_topic = nil
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
-    # Default to the last position of all active assignments.  Clients can still
+    # Default to the last position of all active assignments in the group.  Clients can still
     # override later.  Just helps to avoid duplicate positions.
-    result.position = Assignment.active.maximum(:position) + 1
+    result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
     result.title =
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
 
@@ -2550,13 +2551,19 @@ class Assignment < ActiveRecord::Base
 
   def assignment_overrides_due_date_ok?(overrides={})
     if AssignmentUtil.due_date_required?(self)
-      overrides = self.assignment_overrides.empty? ? overrides : self.assignment_overrides
+      overrides = gather_override_data(overrides)
       if overrides.select{|o| o['due_at'].nil?}.length > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end
-      return true
     end
+    true
+  end
+
+  def gather_override_data(overrides)
+    return self.assignment_overrides unless self.assignment_overrides.empty?
+    return overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
+    overrides
   end
 
   def active_assignment_overrides?

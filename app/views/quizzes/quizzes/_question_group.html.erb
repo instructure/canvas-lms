@@ -90,8 +90,8 @@
 </div>
 <% if !group || question_bank %>
   <div class="assessment_question_bank" style="<%= hidden unless question_bank %>"><%= before_label(:question_bank, "Questions will be pulled from the bank") %>
-    <a href="/<%= question_bank.try(:context_type).try(:underscore).try(:pluralize) || '{{ context_type_string }}' %>/<%= question_bank.try(:context_id) || '{{ context_id }}' %>/question_banks/<%= question_bank.try(:id) || '{{ bank_id }}' %>" class="bank_name bank_name_link" style="font-weight: bold; <%= hidden unless question_bank %>"><%= question_bank.try(:title) %></a>
-    <span class="bank_name" style="font-weight: bold; <%= hidden if question_bank %>"><%= question_bank.try(:title) %></span>
+    <a href="/<%= question_bank.try(:context_type).try(:underscore).try(:pluralize) || '{{ context_type_string }}' %>/<%= question_bank.try(:context_id) || '{{ context_id }}' %>/question_banks/<%= question_bank.try(:id) || '{{ bank_id }}' %>" class="bank_name bank_name_link" style="font-weight: 500; <%= hidden unless question_bank %>"><%= question_bank.try(:title) %></a>
+    <span class="bank_name" style="font-weight: 500; <%= hidden if question_bank %>"><%= question_bank.try(:title) %></span>
   </div>
 <% end %>
 <div class="insufficient_count_warning" id="insufficient_count_warning_<%= hash_get(group, :id, 'template') %>"  style="<%= hidden %>">

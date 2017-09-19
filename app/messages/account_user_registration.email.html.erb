@@ -22,16 +22,16 @@
     border-collapse: collapse;">
   <tr>
       <td style="padding-right: 10px;"><%= t(:name, 'Name') %>:</td>
-      <td style="font-weight: bold;"><%=  asset.user.name %></td>
+      <td style="font-weight: 500;"><%=  asset.user.name %></td>
   </tr>
   <tr>
       <td style="padding-right: 10px"><%= t(:email, 'Email') %>:</td>
-      <td style="font-weight: bold;"><%= email %></td>
+      <td style="font-weight: 500;"><%= email %></td>
   </tr>
   <% if email != login %>
     <tr>
         <td style="padding-right: 10px;"><%= t(:username, 'Username') %>:</td>
-        <td style="font-weight: bold;"><%= login %></td>
+        <td style="font-weight: 500;"><%= login %></td>
     </tr>
   <% end %>
 </table>

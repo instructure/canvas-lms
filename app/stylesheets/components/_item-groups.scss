@@ -204,7 +204,6 @@
 }
 
 .item-group {
-  border: 1px solid $ic-border-light;
   padding: $ic-sp;
   border-radius: $baseBorderRadius;
   margin-bottom: $ic-sp*2;
@@ -215,7 +214,7 @@
   color: #3d454c;
   @include fontSize(16px);
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .ig-text {
@@ -231,7 +230,7 @@
   .ig-header-title {
     text-decoration: none;
     @include fontSize(16px);
-    font-weight: bold;
+    font-weight: 500;
     line-height: 20px;
     margin: auto;
     display: inline-block;
@@ -286,7 +285,6 @@
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
   color: $ic-font-color--subdued;
-  border: 1px solid $ic-border-light;
   background: $ic-color-light;
 
   a.ig-title {
@@ -368,7 +366,7 @@
 .ig-title {
   display: inline-block;
   box-sizing: border-box;
-  font-weight: bold;
+  font-weight: 500;
   padding-right: $ic-sp;
   line-height: $ic-label-line-height;
   margin-bottom: $ic-sp/4;

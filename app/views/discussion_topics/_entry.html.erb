@@ -52,14 +52,14 @@
         <% if out_of_context %>
           <span style="font-size: 0.8em; padding-left: 20px;">from
             <% if assignment_visible_to_user %>
-              <a href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
+              <a href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: 500;"><%= entry.discussion_topic.title %></a>
             <% else %>
               <b> <%= entry.discussion_topic.title %> </b>
             <% end %>
           </span>
         <% else %>
           <% if @topic_agglomerated && entry %>
-            <a href="<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>" style="font-weight: bold;"><%= entry.context.name %></a>
+            <a href="<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>" style="font-weight: 500;"><%= entry.context.name %></a>
           <% end %>
           <a title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, user_id) %>" class="user_name"><%= context_user_name(@context, entry && entry.user_id) %></a>
         <% end %>

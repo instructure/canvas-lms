@@ -27,6 +27,10 @@
       <td><%= f.blabel :api_key, :en => "Crocodoc API Key" %></td>
       <td><%= f.text_field :api_key %></td>
     </tr>
+    <tr>
+      <td><%= f.blabel :disable_polling, :en => "Disabling polling for document status" %></td>
+      <td><%= f.check_box :disable_polling %></td>
+    </tr>
   </table>
 <% end %>
 

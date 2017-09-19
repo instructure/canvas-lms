@@ -267,6 +267,7 @@ class ContentMigration < ActiveRecord::Base
     self.workflow_state = :failed
     job_progress.fail if job_progress && !skip_job_progress
     save
+    self.update_master_migration('failed') if for_master_course_import?
     resolve_content_links! # don't leave placeholders
   end
 

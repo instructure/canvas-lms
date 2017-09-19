@@ -133,7 +133,7 @@ table {
 .swagger-ui-wrap b,
 .swagger-ui-wrap strong {
     font-family: "Arial", sans-serif;
-    font-weight: bold;
+    font-weight: 500;
 }
 .swagger-ui-wrap q,
 .swagger-ui-wrap blockquote {
@@ -274,7 +274,7 @@ table {
 }
 .swagger-ui-wrap .info_title {
     padding-bottom: 10px;
-    font-weight: bold;
+    font-weight: 500;
     font-size: 25px;
 }
 .swagger-ui-wrap p.big,
@@ -381,7 +381,7 @@ table {
     font-style: italic;
 }
 .swagger-ui-wrap .model-signature .description .strong {
-    font-weight: bold;
+    font-weight: 500;
     color: #000;
     font-size: .9em;
 }
@@ -391,11 +391,11 @@ table {
     margin-left: 1em;
 }
 .swagger-ui-wrap .model-signature .description .stronger {
-    font-weight: bold;
+    font-weight: 500;
     color: #000;
 }
 .swagger-ui-wrap .model-signature .propName {
-    font-weight: bold;
+    font-weight: 500;
 }
 .swagger-ui-wrap .model-signature .signature-container {
     clear: both;
@@ -413,7 +413,7 @@ table {
     padding: 1px 3px;
 }
 .swagger-ui-wrap .required {
-    font-weight: bold;
+    font-weight: 500;
 }
 .swagger-ui-wrap input.parameter {
     width: 300px;
@@ -425,7 +425,7 @@ table {
     line-height: 1.3em;
     padding: 10px 0 10px 0;
     font-family: "Arial", sans-serif;
-    font-weight: bold;
+    font-weight: 500;
 }
 .swagger-ui-wrap .heading_with_menu {
     float: none;
@@ -636,7 +636,7 @@ margin-top: 10px;
     clear: none;
     float: left;
     font-family: "Arial", sans-serif;
-    font-weight: bold;
+    font-weight: 500;
 }
 .swagger-ui-wrap ul#resources li.resource div.heading h2 a {
     color: #1C87C6;
@@ -1027,7 +1027,7 @@ margin-top: 10px;
 }
 #header a#logo {
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: 500;
     text-decoration: none;
     padding: 20px 0 20px 140px;
     color: white;
@@ -1053,7 +1053,7 @@ margin-top: 10px;
 #header form#api_selector .input a#explore {
     display: block;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 500;
     padding: 6px 8px;
     font-size: 0.9em;
     color: white;

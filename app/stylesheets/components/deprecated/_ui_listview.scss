@@ -38,7 +38,7 @@
     border: 1px solid #ccc;
     border-bottom-width: 0;
     background: #eee;
-    font-weight: bold;
+    font-weight: 500;
     color: #444;
     text-shadow: 0 1px 1px #f6f6f6;
     text-decoration: none;
@@ -55,7 +55,7 @@
     &:hover {
       border-color: #bbb;
       background:       #dadada;
-      font-weight: bold;
+      font-weight: 500;
       color:          #101010;
       text-decoration: none;
       text-shadow: 0 1px 1px  #fff;
@@ -65,7 +65,7 @@
     &:active, &.active {
       border: 1px solid     #999;
       background:       #999;
-      font-weight: bold;
+      font-weight: 500;
       color:          #fff;
       cursor: pointer;
       text-shadow: 0 -1px 1px #999;

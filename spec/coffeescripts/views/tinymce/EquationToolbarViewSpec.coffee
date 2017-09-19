@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,27 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CreateK12Theme < ActiveRecord::Migration[4.2]
-  tag :predeploy
+define [
+  'mathml',
+  'compiled/views/tinymce/EquationToolbarView'
+], (mathml, EquationToolbarView) ->
 
-  NAME = "K12 Theme"
+  QUnit.module 'EquationToolbarView MathJax',
+    setup: ->
+    teardown: ->
 
-  def up
-    variables = {
-      "ic-brand-primary"=>"#E66135",
-      "ic-brand-button--primary-bgd"=>"#4A90E2",
-      "ic-link-color"=>"#4A90E2",
-      "ic-brand-global-nav-bgd"=>"#4A90E2",
-      "ic-brand-global-nav-logo-bgd"=>"#3B73B4"
-    }
-    bc = BrandConfig.new(variables: variables)
-    bc.name = NAME
-    bc.share = true
-    bc.save!
-    bc.save_scss_file!
-  end
-
-  def down
-    BrandConfig.where(name: NAME).delete_all
-  end
-end
+  test 'mathjax is loaded properly', ->
+    equationToolbarView = new EquationToolbarView
+    @mock(mathml).expects('loadMathJax').withArgs('TeX-AMS_HTML.js')
+    equationToolbarView.render()
+    @mock(mathml).restore()

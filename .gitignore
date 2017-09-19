@@ -24,7 +24,6 @@ app/stylesheets/brandable_css_brands
 /config/RAILS5_1
 /coverage/
 /coverage-js/
-/db/schema.rb
 /db/*.sqlite*
 /db/*sql
 /exports/
@@ -60,3 +59,8 @@ npm-debug.log
 
 # user docker compose overrides
 docker-compose.local.*
+.env
+deploy.env
+event.json
+.lambda
+.DS_store

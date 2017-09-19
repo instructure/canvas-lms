@@ -61,7 +61,7 @@
 .react-select-box-option {
   line-height: $ic-line-height;
   @include fontSize($ic-font-size--xsmall);
-  font-weight: bold;
+  font-weight: 500;
   color: $ic-font-color-dark;
 }
 
@@ -207,7 +207,7 @@
   display: block;
   text-align: center;
   width: 100%;
-  font-weight: bold;
+  font-weight: 500;
   cursor: pointer;
   outline: none;
 }

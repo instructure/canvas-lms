@@ -616,18 +616,20 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   end
 
   def get_exceptions_by_subscription(subscriptions)
-    import_ids = @mm.import_results.keys
-    import_ids_by_course = ContentMigration.where(id: import_ids).pluck(:context_id, :id).to_h
+    results = @mm.import_results.present? ?
+      @mm.import_results.values.index_by{|h| h[:subscription_id]} :
+      Hash[@mm.migration_results.where(:child_subscription_id => subscriptions).where.not(:results => nil).pluck(:child_subscription_id, :results)]
 
     exceptions = {}
     subscriptions.each do |sub|
-      import_id = import_ids_by_course[sub.child_course_id]
-      next unless import_id
-      sub.content_tags.where(:migration_id => @mm.import_results[import_id][:skipped]).each do |child_tag|
+      next unless result = results[sub.id]
+      skipped_items = result[:skipped]
+      next unless skipped_items.present?
+      sub.content_tags.where(:migration_id => skipped_items).each do |child_tag|
         exceptions[child_tag.migration_id] ||= []
         exceptions[child_tag.migration_id] << { :course_id => sub.child_course_id,
-                                                :conflicting_changes => change_classes(
-                                                  child_tag.content_type.constantize, child_tag.downstream_changes) }
+          :conflicting_changes => change_classes(
+            child_tag.content_type.constantize, child_tag.downstream_changes) }
       end
     end
     exceptions

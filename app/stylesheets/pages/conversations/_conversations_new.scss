@@ -245,7 +245,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     @include fontSize(13px);
-    font-weight: bold;
+    font-weight: 500;
     margin: 0;
   }
 
@@ -283,7 +283,7 @@
   }
 }
 h2.subject {
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .message-full-participants {
@@ -424,7 +424,7 @@ h2.subject {
     color: #bbbbbb;
     display: block;
     @include fontSize(20px);
-    font-weight: bold;
+    font-weight: 500;
     margin-top: 5%;
     text-align: center;
 

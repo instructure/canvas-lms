@@ -67,7 +67,7 @@
   .nav-collapse .nav > li > a,
   .nav-collapse .dropdown-menu a {
     padding: 9px 15px;
-    font-weight: bold;
+    font-weight: 500;
     color: $navbarLinkColor;
     @include border-radius(3px);
   }

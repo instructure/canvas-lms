@@ -4,31 +4,56 @@
   "variables": [{
     "variable_name": "ic-brand-primary",
     "type": "color",
-    "default": "#008EE2"
-  },{
+    "default": "#33373F"
+  },
+  {
+    "variable_name": "ic-brand-secondary",
+    "type": "color",
+    "default": "#FDB414"
+  },
+  {
+    "variable_name": "ic-brand-tertiary",
+    "type": "color",
+    "default": "#133ABD"
+  },
+  {
+    "variable_name": "ic-brand-white",
+    "type": "color",
+    "default": "#F5F5F6"
+  },
+  {
+    "variable_name": "ic-brand-shade-3",
+    "type": "color",
+    "default": "#717A8B"
+  },
+  {
     "variable_name": "ic-brand-font-color-dark",
     "type": "color",
-    "default": "#2D3B45"
+    "default": "#1E1E1E"
   },{
     "variable_name": "ic-link-color",
     "type": "color",
-    "default": "#008EE2"
+    "default": "#133ABD"
   },{
     "variable_name": "ic-brand-button--primary-bgd",
     "type": "color",
-    "default": "$ic-brand-primary"
+    "default": "$ic-brand-secondary"
   },{
     "variable_name": "ic-brand-button--primary-text",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-primary"
   },{
     "variable_name": "ic-brand-button--secondary-bgd",
     "type": "color",
-    "default": "#2D3B45"
+    "default": "transparent"
   },{
     "variable_name": "ic-brand-button--secondary-text",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-primary"
+  },{
+    "variable_name": "ic-brand-button--secondary-border-color",
+    "type": "color",
+    "default": "$ic-brand-primary"
   }
 ]},
 {
@@ -37,12 +62,12 @@
   {
     "variable_name": "ic-brand-global-nav-bgd",
     "type": "color",
-    "default": "#394B58"
+    "default": "$ic-brand-primary"
   },
   {
     "variable_name": "ic-brand-global-nav-ic-icon-svg-fill",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-white"
   },
   {
     "variable_name": "ic-brand-global-nav-ic-icon-svg-fill--active",
@@ -52,17 +77,17 @@
   {
     "variable_name": "ic-brand-global-nav-menu-item__text-color",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-white"
   },
   {
     "variable_name": "ic-brand-global-nav-menu-item__text-color--active",
     "type": "color",
-    "default": "$ic-link-color"
+    "default": "$ic-brand-primary"
   },
   {
     "variable_name": "ic-brand-global-nav-avatar-border",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-white"
   },
   {
     "variable_name": "ic-brand-global-nav-menu-item__badge-bgd",
@@ -72,18 +97,18 @@
   {
     "variable_name": "ic-brand-global-nav-menu-item__badge-text",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-white"
   },
   {
     "variable_name": "ic-brand-global-nav-logo-bgd",
     "type": "color",
-    "default": "#394B58"
+    "default": "$ic-brand-primary"
   },
   {
     "variable_name": "ic-brand-header-image",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg,image/svg",
-    "default": "/images/canvas_logomark_only@2x.png"
+    "default": "/images/svg-icons/strongmind-global-nav-logo.svg"
   }
 ]},
 {
@@ -133,7 +158,7 @@
   "variables": [{
     "variable_name": "ic-brand-Login-body-bgd-color",
     "type": "color",
-    "default": "#394B58"
+    "default": "$ic-brand-white"
   },
   {
     "variable_name": "ic-brand-Login-body-bgd-image",
@@ -144,7 +169,7 @@
   {
     "variable_name": "ic-brand-Login-body-bgd-shadow-color",
     "type": "color",
-    "default": "#2D3B45"
+    "default": "transparent"
   },
   {
     "variable_name": "ic-brand-Login-logo",
@@ -155,7 +180,7 @@
   {
     "variable_name": "ic-brand-Login-Content-bgd-color",
     "type": "color",
-    "default": "none"
+    "default": ""
   },
   {
     "variable_name": "ic-brand-Login-Content-border-color",
@@ -185,27 +210,27 @@
   {
     "variable_name": "ic-brand-Login-Content-label-text-color",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-primary"
   },
   {
     "variable_name": "ic-brand-Login-Content-password-text-color",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-primary"
   },
   {
     "variable_name": "ic-brand-Login-footer-link-color",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-shade-3"
   },
   {
     "variable_name": "ic-brand-Login-footer-link-color-hover",
     "type": "color",
-    "default": "#ffffff"
+    "default": "$ic-brand-primary"
   },
   {
     "variable_name": "ic-brand-Login-instructure-logo",
     "type": "color",
-    "default": "#ffffff"
+    "default": ""
   }
 ]
 }]
