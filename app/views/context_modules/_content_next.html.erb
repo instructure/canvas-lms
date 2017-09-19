@@ -21,6 +21,7 @@
   course_home ||= false
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
+    :CURRENT_MODULES => @current_modules,
     :CAN_MANAGE_MODULES => @can_edit,
     :IS_STUDENT => can_do(@context, @current_user, :participate_as_student),
     :COURSE_ID => @context.id,
@@ -76,7 +77,7 @@
   </div>
 <% end %>
 
-<div class="item-group-container" id="context_modules_sortable_container">
+<div class="item-group-container sm-course-overview-container" id="context_modules_sortable_container">
   <div id="no_context_modules_message" style="display:none;">
     <% if can_do(@context.context_modules.temp_record, @current_user, :create) %>
       <div id="modules_homepage_user_create"></div>

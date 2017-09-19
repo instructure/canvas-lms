@@ -234,14 +234,14 @@
 */
 
 .item-group-container {
-  background: $lightBackground;
-  padding-bottom: $ic-sp*6;
-  border: 1px solid $ic-border-light;
+  // background: $lightBackground;
+  // padding-bottom: $ic-sp*6;
+  // border: 1px solid $ic-border-light;
   border-top: none;
 
   .item-group-condensed {
-    border-bottom: 1px dashed $ic-border-dark;
-    padding: $ic-sp*1.5;
+    // border-bottom: 1px dashed $ic-border-dark;
+    // padding: $ic-sp*1.5;
   }
 
   .item-group-condensed:last-child,
@@ -270,7 +270,7 @@
     border-top-width: 0;
     border-radius: 0;
     background: #fff;
-    border-bottom: 1px solid $ic-border-light;
+    // border-bottom: 1px solid $ic-border-light;
   }
 
   .ig-list li:first-child,
@@ -283,7 +283,7 @@
   .first_visible .ig-row {
     border-top-left-radius: $baseBorderRadius;
     border-top-right-radius: $baseBorderRadius;
-    border-top: 1px solid $ic-border-light;
+    // border-top: 1px solid $ic-border-light;
     &.ig-row-empty { border-top: 1px solid #dcdee0; }
   }
 
@@ -298,7 +298,7 @@
   .item-group-expandable {
     border-radius: $baseBorderRadius;
     background-color: $ic-color-light;
-    border: 1px solid $ic-border-light;
+    // border: 1px solid $ic-border-light;
 
     .ig-list {
       li { margin: 0; }
@@ -334,7 +334,7 @@
       background-color: $ic-bg-light-neutral;
       box-shadow: inset 0 1px 0 #f0f0f0;
       border-top: 1px solid $ic-border-light;
-      border-bottom: 1px solid $ic-border-light;
+      // border-bottom: 1px solid $ic-border-light;
 
       ul {
         list-style:none;
@@ -354,7 +354,7 @@
         li .ig-row {
           box-shadow: none;
           margin: 0;
-          border-bottom: 1px dotted #e1e2e3;
+          // border-bottom: 1px dotted #e1e2e3;
           padding-top: $ic-sp/2;
           padding-bottom: $ic-sp/2;
           padding-left: $ic-sp*2.5;

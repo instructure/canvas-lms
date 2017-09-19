@@ -26,10 +26,10 @@ $context_module_bg_color: #f2f3f4;
 }
 
 .context_module {
-  border: {
-    top: 1px dotted $context_module_border_color;
-    bottom: 1px dotted $context_module_border_color;
-  };
+  // border: {
+  //   top: 1px dotted $context_module_border_color;
+  //   bottom: 1px dotted $context_module_border_color;
+  // };
   background-color: $context_module_bg_color;
   min-width: 20px;
   margin-bottom: 15px;

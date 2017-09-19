@@ -27,7 +27,7 @@
 
 <% cache_if_module(context_module, editable, @is_student, @can_view_unpublished, @current_user, @context) do %>
 <div
-  class="item-group-condensed context_module
+  class="item-group-condensed context_module collapsed_module
     <%= 'editable_context_module' if editable %>
     <%= 'has_requirements' if context_module && context_module.completion_requirements.present? %>
     "

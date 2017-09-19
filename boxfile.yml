@@ -13,6 +13,7 @@ run.config:
     - postgresql96-client
     - python-2.7
     - nginx
+    - ImageMagick
 
   extra_steps:
     - npm install
