@@ -922,6 +922,23 @@ describe MasterCourses::MasterMigration do
       expect(tag.reload).to_not be_deleted
     end
 
+    it "should be able to delete modules" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      mod = @copy_from.context_modules.create!(:name => "module")
+
+      run_master_migration
+
+      mod_to = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      expect(mod_to).to be_active
+
+      mod.destroy
+
+      run_master_migration
+      expect(@migration).to be_completed
+      expect(mod_to.reload).to be_deleted
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")
