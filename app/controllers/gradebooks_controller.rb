@@ -410,7 +410,7 @@ class GradebooksController < ApplicationController
         gradebook_column_order_settings_url: save_gradebook_column_order_course_gradebook_url,
         post_grades_ltis: post_grades_ltis,
         post_grades_feature: post_grades_feature?,
-        sections: sections_json(@context.active_course_sections, @current_user, session),
+        sections: sections_json(@context.active_course_sections, @current_user, session, [], allow_sis_ids: true),
         settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
         settings: gradebook_settings.fetch(@context.id, {}),
         login_handle_name: @context.root_account.settings[:login_handle_name],

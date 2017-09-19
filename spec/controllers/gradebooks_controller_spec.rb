@@ -561,6 +561,13 @@ describe GradebooksController do
         expect(api_max_per_page).to eq(50)
       end
 
+      it "includes sis_section_id on the sections even if the teacher doesn't have 'Read SIS Data' permissions" do
+        @course.root_account.role_overrides.create!(permission: :read_sis, enabled: false, role: teacher_role)
+        get :show, params: { course_id: @course.id }
+        section = gradebook_options.fetch(:sections).first
+        expect(section).to have_key :sis_section_id
+      end
+
       describe "graded_late_or_missing_submissions_exist" do
         it "is not included if New Gradebook is disabled" do
           get :show, params: {course_id: @course.id}

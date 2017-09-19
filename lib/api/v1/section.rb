@@ -20,10 +20,10 @@ module Api::V1::Section
   include Api::V1::Json
   include Api::V1::PostGradesStatus
 
-  def section_json(section, user, session, includes)
+  def section_json(section, user, session, includes, options = {})
     res = section.as_json(:include_root => false,
                           :only => %w(id name course_id nonxlist_course_id start_at end_at restrict_enrollments_to_section_dates))
-    if section.course.grants_any_right?(user, :read_sis, :manage_sis)
+    if options[:allow_sis_ids] || section.course.grants_any_right?(user, :read_sis, :manage_sis)
       res['sis_section_id'] = section.sis_source_id
       res['sis_course_id'] = section.course.sis_source_id
       res['integration_id'] = section.integration_id
@@ -52,7 +52,7 @@ module Api::V1::Section
     res
   end
 
-  def sections_json(sections, user, session, includes = [])
-    sections.map { |s| section_json(s, user, session, includes) }
+  def sections_json(sections, user, session, includes = [], options = {})
+    sections.map { |s| section_json(s, user, session, includes, options) }
   end
 end
