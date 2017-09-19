@@ -62,7 +62,16 @@ import 'jquery.cookie'
     return $.fn.originalScrollTop.apply(this, arguments);
   };
   $.windowScrollTop = function() {
-    return ($.browser.safari ? $("body") : $("html")).scrollTop();
+    // $.browser.safari is true for chrome.
+    // with chrome 61, we want the documentElement.scrollTop, so the
+    // original code (now the else block) always returns 0.
+    // if chrome > 60, force it to return documentElement.scrollTop
+    const chromeVer = window.navigator.userAgent.match(/Chrome\/(\d+)/)
+    if (chromeVer && parseInt(chromeVer[1], 10) > 60) {
+      return $("html").scrollTop()
+    } else {
+      return ($.browser.safari ? $("body") : $("html")).scrollTop();
+    }
   };
 
   // indicate we want stringified IDs for JSON responses
@@ -96,4 +105,3 @@ import 'jquery.cookie'
   });
 
 export default $;
-
