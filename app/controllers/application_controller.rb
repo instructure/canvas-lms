@@ -1483,7 +1483,9 @@ class ApplicationController < ActionController::Base
       if @tag.context.is_a?(Assignment)
         @assignment = @tag.context
         @resource_title = @assignment.title
-        @module_tag = @context.context_module_tags.not_deleted.find(params[:module_item_id]) if params[:module_item_id]
+        @module_tag = params[:module_item_id] ?
+          @context.context_module_tags.not_deleted.find(params[:module_item_id]) :
+          @assignment.context_module_tags.first
       else
         @module_tag = @tag
         @resource_title = @tag.title
