@@ -258,4 +258,21 @@ describe Api::V1::AssignmentOverride do
       assignment_overrides_json
     end
   end
+
+  describe "perform_batch_update_assignment_overrides" do
+    before :once do
+      course_with_teacher(active_all: true)
+      assignment_model(course: @course)
+    end
+
+    it "touches the assignment" do
+      expect(@assignment).to receive(:touch)
+      subject.perform_batch_update_assignment_overrides(@assignment, {
+        overrides_to_create: [],
+        overrides_to_update: [],
+        overrides_to_delete: [],
+        override_errors: []
+      })
+    end
+  end
 end
