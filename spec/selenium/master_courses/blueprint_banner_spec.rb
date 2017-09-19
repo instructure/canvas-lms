@@ -39,9 +39,9 @@ describe "master courses banner" do
     context "for pages" do
       before :once do
         # sets up the page that gets blueprinted
-        @original_page = @master.wiki.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
+        @original_page = @master.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
         run_master_course_migration(@master)
-        @copy_page = @minion.wiki.wiki_pages.last
+        @copy_page = @minion.wiki_pages.last
       end
 
       it "locks down the content and shows banner", priority:"2", test_id: 3248172 do

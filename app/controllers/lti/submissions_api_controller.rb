@@ -190,6 +190,7 @@ module Lti
     private
 
     def activate_tool_shard!
+      render_unauthorized and return unless access_token
       tool_shard = Shard.lookup(access_token.shard_id)
       return if tool_shard == Shard.current
       tool_shard.activate!

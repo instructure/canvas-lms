@@ -43,21 +43,21 @@ class WikiPage < ActiveRecord::Base
   after_update :post_to_pandapub_when_revised
 
   belongs_to :wiki, :touch => true
-  belongs_to :course, foreign_key: 'wiki_id', primary_key: 'wiki_id'
-  belongs_to :group, foreign_key: 'wiki_id', primary_key: 'wiki_id'
   belongs_to :user
 
-  acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
+  belongs_to :context, polymorphic: [:course, :group]
+
+  acts_as_url :title, :sync_url => true
 
   validate :validate_front_page_visibility
 
   before_save :default_submission_values,
     if: proc { self.context.try(:feature_enabled?, :conditional_release) }
   before_save :set_revised_at
+  before_validation :ensure_wiki_and_context
   before_validation :ensure_unique_title
 
-  before_save :ensure_context
-  after_save  :touch_wiki_context
+  after_save  :touch_context
   after_save  :update_assignment,
     if: proc { self.context.try(:feature_enabled?, :conditional_release) }
 
@@ -88,15 +88,12 @@ class WikiPage < ActiveRecord::Base
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
 
-  def ensure_context
-    # TODO: get rid of once all existing wiki pages have their context populated and wiki page creation methods can be rewritten
-    # e.g. course.wiki.wiki_pages.create -> course.wiki_pages.create
-    self.context_type ||= self.context.class.base_class.name
-    self.context_id ||= self.context.id
+  def ensure_wiki_and_context
+    self.wiki_id ||= (self.context.wiki_id || self.context.wiki.id)
   end
 
-  def touch_wiki_context
-    self.wiki.touch_context if self.wiki && self.wiki.context
+  def touch_context
+    self.context.touch
   end
 
   def validate_front_page_visibility
@@ -109,13 +106,13 @@ class WikiPage < ActiveRecord::Base
     return if deleted?
     to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/){$1.capitalize}.strip }
     self.title ||= to_cased_title.call(self.url || "page")
-    return unless self.wiki
     # TODO i18n (see wiki.rb)
+
     if self.title == "Front Page" && self.new_record?
-      baddies = self.wiki.wiki_pages.not_deleted.where(title: "Front Page").select{|p| p.url != "front-page" }
+      baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
-    if existing = self.wiki.wiki_pages.not_deleted.where(title: self.title).first
+    if existing = self.context.wiki_pages.not_deleted.where(title: self.title).first
       return if existing == self
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
@@ -123,7 +120,7 @@ class WikiPage < ActiveRecord::Base
         mod = "-#{n}"
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-      end while self.wiki.wiki_pages.not_deleted.where(title: new_title).exists?
+      end while self.context.wiki_pages.not_deleted.where(title: new_title).exists?
 
       self.title = new_title
     end
@@ -134,6 +131,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def ensure_unique_url
+    return if deleted?
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
     base_url = self.send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !self.only_when_blank
@@ -142,30 +140,15 @@ class WikiPage < ActiveRecord::Base
       conditions.first << " and id != ?"
       conditions << id
     end
-    # make stringex scoping a little more useful/flexible... in addition to
-    # the normal constructed attribute scope(s), it also supports paramater-
-    # less scopeds. note that there needs to be an instance_method of
-    # the same name for this to work
-    scopes = self.class.scope_for_url ? Array(self.class.scope_for_url) : []
-    base_scope = self.class
-    scopes.each do |scope|
-      next unless self.respond_to?(scope)
-      if base_scope.respond_to?(scope)
-        return unless send(scope)
-        base_scope = base_scope.send(scope)
-      else
-        conditions.first << " and #{self.class.connection.quote_column_name(scope)} = ?"
-        conditions << send(scope)
-      end
-    end
-    url_owners = base_scope.where(conditions).to_a
+
+    urls = self.context.wiki_pages.where(*conditions).not_deleted.pluck(:url)
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
     # instead of "front-page-1"
-    if url_owners.size > 0 && url_owners.detect{|u| u.send(url_attribute) == base_url}
+    if urls.size > 0 && urls.detect{|u| u == base_url}
       n = 2
-      while url_owners.detect{|u| u.send(url_attribute) == "#{base_url}-#{n}"}
+      while urls.detect{|u| u == "#{base_url}-#{n}"}
         n = n.succ
       end
       write_attribute url_attribute, "#{base_url}-#{n}"
@@ -363,12 +346,6 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
-  def context
-    shard.activate do
-      @context ||= association(:wiki).loaded? ? wiki.context : (Course.where(wiki_id: self.wiki_id).first || Group.where(wiki_id: self.wiki_id).first)
-    end
-  end
-
   def participants
     res = []
     if context && context.available?
@@ -449,6 +426,8 @@ class WikiPage < ActiveRecord::Base
     result = WikiPage.new({
       :title => opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy")),
       :wiki_id => self.wiki_id,
+      :context_id => self.context_id,
+      :context_type => self.context_type,
       :body => self.body,
       :workflow_state => "unpublished",
       :user_id => self.user_id,

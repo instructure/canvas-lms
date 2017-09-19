@@ -24,13 +24,15 @@ module Lti
       Rails.cache.read(req_cache_key(context, guid))
     end
 
-    def self.create_request(context, tc_profile_url, return_url, registration_url)
+    def self.create_request(context, tc_profile_url, return_url, registration_url, tool_proxy_service_url)
       registration_request = IMS::LTI::Models::Messages::RegistrationRequest.new(
         lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
         launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME,
         tc_profile_url: tc_profile_url,
       )
       reg_key, reg_password = registration_request.generate_key_and_password
+      registration_request.tool_proxy_guid = reg_key
+      registration_request.tool_proxy_url = tool_proxy_service_url
       registration_request.launch_presentation_return_url = return_url.call()
       cache_registration(context, reg_key, reg_password, registration_url)
 

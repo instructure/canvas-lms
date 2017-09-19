@@ -21,7 +21,6 @@
   $range-input-handle-color-hover: var(--ic-brand-primary-darkened-10);
 
   $range-input-handle-size: 20px;
-  $range-input-handle-shadow: 0 3px 6px rgba(black, 0.3);
 
   $range-input-slider-color: $ic-color-neutral;
   $range-input-value-bg-color: $ic-color-dark;
@@ -72,7 +71,6 @@
       height: $range-input-handle-size;
       border-radius: 50%;
       background: $range-input-handle-color;
-      box-shadow: $range-input-handle-shadow;
       cursor: pointer;
       transition: all .15s ease-in-out;
 
@@ -89,8 +87,8 @@
     &:active {
       outline: none;
       @include range-input-handle-selector {
-        box-shadow: $range-input-handle-shadow,
-                    0 0 0 $range-input-handle-size/2 rgba($range-input-handle-color, .15);
+        box-shadow: 0 0 0 3px $ic-color-light,
+                    0 0 0 4px var(--ic-brand-primary);
       }
     }
 

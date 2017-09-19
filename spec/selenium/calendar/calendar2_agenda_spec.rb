@@ -49,7 +49,7 @@ describe "calendar2" do
         f('#create_new_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
         wait_for_ajaximations
-        expect(ffj('.agenda-event__item-container').length).to eq 1
+        expect(all_agenda_items.length).to eq 1
       end
 
       it "should display agenda events" do
@@ -58,19 +58,19 @@ describe "calendar2" do
       end
 
       it "should set the header in the format 'Oct 11, 2013'", priority: "1", test_id: 28546 do
-        start_date = Time.now.beginning_of_day + 12.hours
-        event = @course.calendar_events.create!(title: "ohai",
-                                                start_at: start_date, end_at: start_date + 1.hour)
+        start_date = Time.zone.now.beginning_of_day + 12.hours
+        @course.calendar_events.create!(title: "ohai",
+                                        start_at: start_date, end_at: start_date + 1.hour)
         load_agenda_view
-        expect(f('.navigation_title').text).to match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{4}/)
+        expect(agenda_view_header.text).to match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{4}/)
       end
 
       it "should respect context filters" do
         start_date = Time.now.utc.beginning_of_day + 12.hours
-        event = @course.calendar_events.create!(title: "ohai",
-                                                start_at: start_date, end_at: start_date + 1.hour)
+        @course.calendar_events.create!(title: "ohai",
+                                        start_at: start_date, end_at: start_date + 1.hour)
         load_agenda_view
-        expect(ff('.agenda-event__item-container').length).to eq 1
+        expect(all_agenda_items.length).to eq 1
         fj('.context-list-toggle-box:last').click
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
@@ -83,17 +83,17 @@ describe "calendar2" do
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
         quick_jump_to_date(yesterday.strftime("%b %-d %Y"))
         wait_for_ajaximations
-        expect(ff('.agenda-event__item-container').length).to eq 1
+        expect(all_agenda_items.length).to eq 1
       end
 
       it "should be navigable via the minical" do
         yesterday = 1.day.ago
-        event = make_event(start: yesterday)
+        make_event(start: yesterday)
         load_agenda_view
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
         f('.fc-prev-button').click
         f('#right-side .fc-day-number').click
-        expect(ff('.agenda-event__item-container').length).to eq 1
+        expect(all_agenda_items.length).to eq 1
       end
 
       it "should persist the start date across reloads" do
@@ -102,42 +102,43 @@ describe "calendar2" do
         quick_jump_to_date(next_year)
         refresh_page
         wait_for_ajaximations
-        expect(f('.navigation_title')).to include_text(next_year)
+        expect(agenda_view_header).to include_text(next_year)
       end
 
       it "should transfer the start date when switching views" do
         get "/calendar2"
         f('.navigate_next').click
         f('#agenda').click
-        expect(f('.navigation_title')).to include_text(1.month.from_now.strftime("%b"))
+        expect(agenda_view_header).to include_text(1.month.from_now.strftime("%b"))
         next_year = 1.year.from_now.strftime("%Y")
         quick_jump_to_date(next_year)
         f('#month').click
-        expect(f('.navigation_title')).to include_text(next_year)
+        expect(agenda_view_header).to include_text(next_year)
       end
 
       it "should display the displayed date range in the header" do
         tomorrow = 1.day.from_now
-        event = make_event(start: tomorrow)
+        make_event(start: tomorrow)
         load_agenda_view
-        expect(f('.navigation_title')).to include_text(format_date_for_view(Time.zone.now, :medium))
-        expect(f('.navigation_title')).to include_text(format_date_for_view(tomorrow, :medium))
+
+        expect(agenda_view_header).to include_text(format_date_for_view(Time.zone.now, :medium))
+        expect(agenda_view_header).to include_text(format_date_for_view(tomorrow, :medium))
       end
 
       it "should not display a date range if no events are found" do
         load_agenda_view
-        expect(f('.navigation_title')).not_to include_text('Invalid')
+        expect(agenda_view_header).not_to include_text('Invalid')
       end
 
       it "should allow deleting events", priority: "1", test_id: 138857 do
-        tomorrow = 3.day.from_now
-        event = make_event(start: tomorrow)
+        tomorrow = 3.days.from_now
+        make_event(start: tomorrow)
 
         load_agenda_view
-        expect(f(".agenda-event__title")).to include_text("User Event")
+        expect(agenda_item_title).to include_text("User Event")
 
-        f('.agenda-event__item-container').click
-        f('.event-details .delete_event_link').click
+        agenda_item.click
+        delete_event_button.click
         fj('.ui-dialog:visible .btn-primary').click
 
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
@@ -145,13 +146,13 @@ describe "calendar2" do
 
       it "should allow deleting assignments", priority: "1", test_id: 138858 do
         title = "Maniac Mansion"
-        @assignment = @course.assignments.create!(:name => title,:due_at => 3.day.from_now)
+        @assignment = @course.assignments.create!(name: title,due_at: 3.days.from_now)
 
         load_agenda_view
-        expect(f(".agenda-event__title")).to include_text(title)
+        expect(agenda_item_title).to include_text(title)
 
-        f('.agenda-event__item-container').click
-        f('.event-details .delete_event_link').click
+        agenda_item.click
+        delete_event_button.click
         fj('.ui-dialog:visible .btn-primary').click
 
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
@@ -161,19 +162,19 @@ describe "calendar2" do
         create_quiz
 
         load_agenda_view
-        expect(f(".agenda-event__title")).to include_text("Test Quiz")
+        expect(agenda_item_title).to include_text("Test Quiz")
 
-        f('.agenda-event__item-container').click
-        f('.event-details .delete_event_link').click
+        agenda_item.click
+        delete_event_button.click
         fj('.ui-dialog:visible .btn-primary').click
 
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
       end
 
       it "should display midnight assignments at 11:59" do
-        assignment_model(:course => @course,
-                         :title => "super important",
-                         :due_at => Time.zone.now.beginning_of_day + 1.day - 1.minute)
+        assignment_model(course: @course,
+                         title: "super important",
+                         due_at: Time.zone.now.beginning_of_day + 1.day - 1.minute)
         calendar_events = @teacher.calendar_events_for_calendar.last
 
         expect(calendar_events.title).to eq "super important"
@@ -182,38 +183,38 @@ describe "calendar2" do
         load_agenda_view
 
         expect(f('.agenda-event__time')).to include_text('11:59')
-        f('.agenda-event__item-container').click
+        agenda_item.click
         expect(fj('.event-details:visible time')).to include_text('11:59')
       end
 
       it "should have a working today button", priority: "1", test_id: 28550 do
         load_month_view
-        #Go to a future calendar date to test going back
+        # Go to a future calendar date to test going back
         change_calendar
 
-        #Get the current date and make sure it is not in the header
+        # Get the current date and make sure it is not in the header
         date = format_date_for_view(Time.zone.now, :medium)
-        expect(f('.navigation_title').text).not_to include(date)
+        expect(agenda_view_header.text).not_to include(date)
 
-        #Go the agenda view and click the today button
+        # Go the agenda view and click the today button
         f('#agenda').click
         wait_for_ajaximations
         change_calendar(:today)
 
-        #Make sure that today's date is in the header
-        expect(f('.navigation_title').text).to include(date)
+        # Make sure that today's date is in the header
+        expect(agenda_view_header.text).to include(date)
       end
 
       it "should show the location when clicking on a calendar event", priority: "1", test_id: 138890 do
         location_name = "brighton"
         location_address = "cottonwood"
-        make_event(:location_name => location_name, :location_address => location_address)
+        make_event(location_name: location_name, location_address: location_address)
         load_agenda_view
 
-        #Click calendar item to bring up event summary
-        f(".agenda-event__item-container").click
+        # Click calendar item to bring up event summary
+        agenda_item.click
 
-        #expect to find the location name and address
+        # expect to find the location name and address
         expect(f('.event-details-content')).to include_text(location_name)
         expect(f('.event-details-content')).to include_text(location_address)
       end
@@ -221,8 +222,8 @@ describe "calendar2" do
       it "should bring up a calendar date picker when clicking on the agenda range", priority: "1", test_id: 140223 do
         load_agenda_view
 
-        #Click on the agenda header
-        f('.navigation_title').click
+        # Click on the agenda header
+        agenda_view_header.click
 
         # Expect that a the event picker is present
         # Check various elements to verify that the calendar looks good
@@ -234,7 +235,7 @@ describe "calendar2" do
         create_quiz
 
         load_agenda_view
-        expect(f(".agenda-event__item")).to include_text('Test Quiz')
+        expect(agenda_item).to include_text('Test Quiz')
       end
 
       it "should show assignment due dates for different sections", priority: "1", test_id: 138848 do
@@ -249,10 +250,10 @@ describe "calendar2" do
         @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
 
         load_agenda_view
-        expect(ff('.agenda-event__item-container')).to have_size(3)
+        expect(all_agenda_items).to have_size(3)
 
         # Verify Titles include section name
-        agenda_array = ff('.agenda-event__item-container')
+        agenda_array = all_agenda_items
         expect(f('.agenda-event__title', agenda_array[1])).to include_text('Section1')
         expect(f('.agenda-event__title', agenda_array[2])).to include_text('Section2')
 
@@ -269,10 +270,10 @@ describe "calendar2" do
 
         it "should allow deleting a graded discussion", priority: "1", test_id: 138859 do
           load_agenda_view
-          expect(f('.agenda-event__title')).to include_text('Graded Discussion')
+          expect(agenda_item_title).to include_text('Graded Discussion')
 
-          f('.agenda-event__item-container').click
-          f('.event-details .delete_event_link').click
+          agenda_item.click
+          delete_event_button.click
           fj('.ui-dialog:visible .btn-primary').click
 
           expect(f("#content")).not_to contain_css('.agenda-event__item-container')
@@ -284,7 +285,7 @@ describe "calendar2" do
           load_agenda_view
 
           # Open Edit modal
-          f('.agenda-event__item-container').click
+          agenda_item.click
           wait_for_ajaximations
           f('.event-details .edit_event_link').click
           wait_for_ajaximations
@@ -296,7 +297,7 @@ describe "calendar2" do
           wait_for_ajaximations
 
           # Verify edits
-          expect(f('.agenda-event__title')).to include_text(test_name)
+          expect(agenda_item_title).to include_text(test_name)
           expect(f('.agenda-date')).to include_text(date_string(test_date, :short_with_weekday))
         end
 
@@ -308,7 +309,7 @@ describe "calendar2" do
           load_agenda_view
 
           # Open More Options window
-          f('.agenda-event__item-container').click
+          agenda_item.click
           wait_for_ajaximations
           f('.edit_event_link').click
           wait_for_ajaximations
@@ -324,8 +325,8 @@ describe "calendar2" do
 
           # Verify edited title, description, and date
           load_agenda_view
-          expect(ff('.agenda-event__item-container')).to have_size(1)
-          f('.agenda-event__item-container').click
+          expect(all_agenda_items).to have_size(1)
+          agenda_item.click
           wait_for_ajaximations
           expect(f('.view_event_link')).to include_text(test_title)
           expect(f('.event-detail-overflow')).to include_text(test_description)
@@ -337,9 +338,9 @@ describe "calendar2" do
 
   context "as a student" do
     before(:each) do
-        course_with_teacher(:active_all => true, :name => 'teacher@example.com')
-        course_with_student_logged_in
-      end
+      course_with_teacher(active_all: true, name: 'teacher@example.com')
+      course_with_student_logged_in
+    end
 
     it "student can not delete events created by a teacher", priority: "1", test_id: 138856 do
       # create an event as the teacher
@@ -349,7 +350,7 @@ describe "calendar2" do
       load_agenda_view
 
       # click on the event and rxpect there not to be a delete button
-      f('.agenda-event__item-container').click
+      agenda_item.click
       expect(f("#content")).not_to contain_css('.event-details .delete_event_link')
     end
   end
@@ -365,44 +366,44 @@ describe "calendar2" do
     context "as a student" do
       before(:each) do
         course_with_student_logged_in
-        create_appointment_group(:contexts => [@course])
-        create_appointment_group(:contexts => [@course])
+        create_appointment_group(contexts: [@course])
+        create_appointment_group(contexts: [@course])
       end
 
       it "shows all options when in find appointment mode" do
-        get "/calendar2#view_name=agenda&view_start=#{(Date.today + 1.day).strftime}"
+        get "/calendar2#view_name=agenda&view_start=#{(Time.zone.today + 1.day).strftime}"
         wait_for_ajaximations
         expect(f('#content')).not_to contain_css('.agenda-event__item')
-        f('#FindAppointmentButton').click
+        find_appointment_button.click
         f('.ReactModalPortal button[type="submit"]').click
-        expect(ff('.agenda-event__item').count).to equal(2)
+        expect(all_agenda_items.count).to equal(2)
       end
 
       it "shows only the reserved option when not in find appointment mode" do
-        get "/calendar2#view_name=agenda&view_start=#{(Date.today + 1.day).strftime}"
+        get "/calendar2#view_name=agenda&view_start=#{(Time.zone.today + 1.day).strftime}"
         wait_for_ajaximations
-        f('#FindAppointmentButton').click
+        find_appointment_button.click
         f('.ReactModalPortal button[type="submit"]').click
-        f('.agenda-event__item').click
+        agenda_item.click
         f('.reserve_event_link').click
         wait_for_ajaximations
-        f('#FindAppointmentButton').click
-        expect(ff('.agenda-event__item').count).to equal(1)
-        expect(f('.agenda-event__item')).to include_text 'Reserved'
+        find_appointment_button.click
+        expect(all_agenda_items.count).to equal(1)
+        expect(agenda_item).to include_text 'Reserved'
       end
     end
 
     context "as a teacher" do
       before(:each) do
         course_with_teacher_logged_in
-        create_appointment_group(:contexts => [@course])
-        create_appointment_group(:contexts => [@course])
+        create_appointment_group(contexts: [@course])
+        create_appointment_group(contexts: [@course])
       end
 
       it "shows all appointment groups" do
-        get "/calendar2#view_name=agenda&view_start=#{(Date.today + 1.day).strftime}"
+        get "/calendar2#view_name=agenda&view_start=#{(Time.zone.today + 1.day).strftime}"
         wait_for_ajaximations
-        expect(ff('.agenda-event__item').count).to equal(2)
+        expect(all_agenda_items.count).to equal(2)
       end
     end
   end

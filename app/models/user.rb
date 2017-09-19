@@ -1686,13 +1686,14 @@ class User < ActiveRecord::Base
         opts[:due_after] ||= 2.weeks.ago
 
         {
-          submitted: Set.new(submitted_assignments(opts).map(&:id)),
+          submitted: Set.new(submitted_assignments(opts).pluck(:id)),
           excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
           graded: Set.new(Submission.active.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
           late: Set.new(Submission.active.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
           missing: Set.new(Submission.active.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
           needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
-          has_feedback: Set.new(self.recent_feedback(start_at: opts[:due_after]).map(&:assignment_id))
+          has_feedback: Set.new(self.recent_feedback(start_at: opts[:due_after]).pluck(:assignment_id)),
+          new_activity: Set.new(Submission.active.with_assignment.unread_for(self).pluck(:assignment_id))
         }.with_indifferent_access
     end
   end
@@ -2623,6 +2624,8 @@ class User < ActiveRecord::Base
         sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
+    p "*****************************"
+    p @menu_courses
     @menu_courses
   end
 

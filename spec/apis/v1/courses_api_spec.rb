@@ -3213,7 +3213,7 @@ describe ContentImportsController, type: :request do
     @course.assignments.create!(:title => 'Assignment 1', :points_possible => 10, :assignment_group => group)
     @copy_from.discussion_topics.create!(:title => "Topic 1", :message => "<p>watup?</p>")
     @copy_from.syllabus_body = "haha"
-    @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => 'hi')
+    @copy_from.wiki_pages.create!(:title => "some page", :body => 'hi')
     @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com')
     Attachment.create!(:filename => 'wut.txt', :display_name => "huh?", :uploaded_data => StringIO.new('uh huh.'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
     @copy_from.calendar_events.create!(:title => 'event', :description => 'hi', :start_at => 1.day.from_now)
@@ -3354,7 +3354,7 @@ describe ContentImportsController, type: :request do
   it "should only copy wiki pages" do
     run_only_copy(:wiki_pages)
     check_counts 0
-    expect(@copy_to.wiki.wiki_pages.count).to eq 1
+    expect(@copy_to.wiki_pages.count).to eq 1
   end
 
   each_copy_option do |option, association|
@@ -3375,7 +3375,7 @@ describe ContentImportsController, type: :request do
   it "should skip copy wiki pages" do
     run_except_copy(:wiki_pages)
     check_counts 1
-    expect(@copy_to.wiki.wiki_pages.count).to eq 0
+    expect(@copy_to.wiki_pages.count).to eq 0
   end
   each_copy_option do |option, association|
     it "should skip copy #{option}" do

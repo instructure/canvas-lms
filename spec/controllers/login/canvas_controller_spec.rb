@@ -172,6 +172,21 @@ describe Login::CanvasController do
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
     end
 
+    it "ignores a pseudonym explicitly linked to a different LDAP" do
+      user_with_pseudonym(:username => '12345', :active_all => 1)
+      aac = Account.default.authentication_providers.create!(auth_type: 'ldap', identifier_format: 'uid')
+      aac2 = Account.default.authentication_providers.create!(auth_type: 'ldap', identifier_format: 'uid')
+      expect_any_instantiation_of(aac).to receive(:ldap_bind_result).once.
+        with('username', 'password').
+        and_return([{ 'uid' => ['12345'] }])
+      expect_any_instantiation_of(aac2).to receive(:ldap_bind_result).once.
+        with('username', 'password').
+        and_return(nil)
+      @pseudonym.update_attribute(:authentication_provider, aac2)
+      post 'create', params: {:pseudonym_session => { :unique_id => 'username', :password => 'password'}}
+      assert_status(400)
+    end
+
     it "should only query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
       user_with_pseudonym(:username => 'username', :active_all => 1)
       aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')

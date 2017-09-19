@@ -208,7 +208,7 @@ describe PlannerOverridesController do
             time = 4.days.from_now
             @assignment.update_attribute(:due_at, time)
             @assignment2.update_attribute(:due_at, time)
-            page = @course.wiki.wiki_pages.create!(:title => "t1", :todo_date => time)
+            page = @course.wiki_pages.create!(:title => "t1", :todo_date => time)
             note = planner_note_model(:todo_date => time)
             discussion = discussion_topic_model(context: @course, todo_date: time)
 

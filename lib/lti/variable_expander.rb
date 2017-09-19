@@ -67,6 +67,7 @@ module Lti
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
     ATTACHMENT_ASSOCIATION_GUARD = -> { @tool_setting&.context&.is_a?(AttachmentAssociation) }
     LTI_ASSIGN_ID = -> { @assignment.present? || @tool_setting&.context&.is_a?(AttachmentAssociation) || @secure_params.present? }
+    MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch&.instance_of?(Lti::Launch) }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -122,6 +123,18 @@ module Lti
     register_expansion 'Context.title', [],
                        -> { @context.name },
                        default_name: 'context_title'
+
+    # A token that can be used for frontend communication between an LTI tool
+    # and Canvas via the Window.postMessage API
+    # @launch_parameter com_instructure_post_message_token
+    # @example
+    #   ```
+    #   9ae4170c-6b64-444d-9246-0b7dedd5f560
+    #   ```
+    register_expansion 'com.instructure.PostMessageToken', [],
+                      -> { @post_message_token || @launch.post_message_token },
+                      MESSAGE_TOKEN_GUARD,
+                      default_name: 'com_instructure_post_message_token'
 
     # The LTI assignment id of an assignment. This value corresponds with
     # the `ext_lti_assignment_id` send in various launches and webhooks.

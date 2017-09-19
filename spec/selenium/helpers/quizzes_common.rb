@@ -851,24 +851,22 @@ module QuizzesCommon
   def verify_quiz_submission_late_status(late)
     open_student_quiz_submission
     submission_page_info = f('.submission_details', f('#not_right_side'))
-    late_status = 'LATE'
 
     if late
-      expect(submission_page_info).to include_text late_status
+      expect(submission_page_info).to contain_css('.submission-late-pill')
     else
-      expect(submission_page_info).not_to include_text late_status
+      expect(submission_page_info).not_to contain_css('.submission-late-pill')
     end
   end
 
   def verify_quiz_submission_status_in_speedgrader(late)
     open_quiz_in_speedgrader
-    speedgrader_submission_details = fj('#submission_details', '.right_side_content')
-    late_note = 'Note: This submission was LATE'
+    speedgrader_submission_details = f('#submission_details', f('.right_side_content'))
 
     if late
-      expect(speedgrader_submission_details).to include_text late_note
+      expect(speedgrader_submission_details).to contain_css('.submission-late-pill')
     else
-      expect(speedgrader_submission_details).not_to include_text late_note
+      expect(speedgrader_submission_details).not_to contain_css('.submission-late-pill')
     end
   end
 

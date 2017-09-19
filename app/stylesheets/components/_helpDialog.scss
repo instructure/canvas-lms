@@ -43,7 +43,7 @@
         }
         &:focus {
           outline: none;
-          box-shadow: inset 0 0 0 1px $ic-link-color;
+          box-shadow: inset 0 0 0 1px var(--ic-link-color);
         }
         &:focus, &:hover {
           background-color: $ic-bg-light-neutral;

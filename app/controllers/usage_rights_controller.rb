@@ -146,7 +146,7 @@ class UsageRightsController < ApplicationController
     # there are no per-context licenses yet, but let's pretend like there are, for future expandability
     if authorized_action(@context, @current_user, :read)
       render json: UsageRights.licenses.map { |license, data|
-        { id: license, name: data[:readable_license], url: data[:license_url] }
+        { id: license, name: data[:readable_license].call, url: data[:license_url] }
       }
     end
   end

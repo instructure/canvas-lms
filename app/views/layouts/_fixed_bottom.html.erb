@@ -54,12 +54,12 @@
             </div>
           <% end %>
           <div class="ic-image-text-combo__text">
-            <%= t('masquerading.warning_title', "You are currently masquerading as %{user_name}", :user_name => @current_user.short_name) %>
+            <%= t("You are currently acting as %{user_name}", :user_name => @current_user.short_name) %>
           </div>
         </div>
       </div>
       <div class="buttons ic-fixed-bottom-module ic-fixed-bottom-module--buttons">
-        <%= link_to t('masquerading.stop', "Stop Masquerading"), user_masquerade_url(@real_current_user.id), 'data-method' => :post, :rel => 'nofollow', :class => 'Button stop_masquerading' %>
+        <%= link_to t("Stop Acting as User"), user_masquerade_url(@real_current_user.id), 'data-method' => :post, :rel => 'nofollow', :class => 'Button stop_masquerading' %>
       </div>
     </div>
   <% end %>

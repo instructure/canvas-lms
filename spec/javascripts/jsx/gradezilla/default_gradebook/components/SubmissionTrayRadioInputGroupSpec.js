@@ -31,6 +31,8 @@ QUnit.module('SubmissionTrayRadioInputGroup', {
       latePolicy: { lateSubmissionInterval: 'day' },
       locale: 'en',
       submission: { excused: false, late: false, missing: false, secondsLate: 0 },
+      submissionUpdating: false,
+      updateSubmission () {},
       ...customProps
     };
     return mount(<SubmissionTrayRadioInputGroup {...props} />);
@@ -45,54 +47,143 @@ QUnit.module('SubmissionTrayRadioInputGroup', {
   }
 });
 
-test('initializes with "none" selected if the submission is not late, missing, or excused', function () {
+test('renders with "none" selected if the submission is not late, missing, or excused', function () {
   this.wrapper = this.mountComponent();
   const radio = this.getRadioOption('none');
   strictEqual(radio.checked, true);
 });
 
-test('initializes with "Excused" selected if the submission is excused', function () {
+test('renders with "Excused" selected if the submission is excused', function () {
   this.wrapper = this.mountComponent({ submission: { excused: true, late: false, missing: false, secondsLate: 0 } });
   const radio = this.getRadioOption('excused');
   strictEqual(radio.checked, true);
 });
 
-test('initializes with "Excused" selected if the submission is excused and also late', function () {
+test('renders with "Excused" selected if the submission is excused and also late', function () {
   this.wrapper = this.mountComponent({ submission: { excused: true, late: true, missing: false, secondsLate: 0 } });
   const radio = this.getRadioOption('excused');
   strictEqual(radio.checked, true);
 });
 
-test('initializes with "Excused" selected if the submission is excused and also missing', function () {
+test('renders with "Excused" selected if the submission is excused and also missing', function () {
   this.wrapper = this.mountComponent({ submission: { excused: true, late: false, missing: true, secondsLate: 0 } });
   const radio = this.getRadioOption('excused');
   strictEqual(radio.checked, true);
 });
 
-test('initializes with "Late" selected if the submission is not excused and is late', function () {
+test('renders with "Late" selected if the submission is not excused and is late', function () {
   this.wrapper = this.mountComponent({ submission: { excused: false, late: true, missing: false, secondsLate: 60 } });
   const radio = this.getRadioOption('late');
   strictEqual(radio.checked, true);
 });
 
-test('initializes with "Missing" selected if the submission is not excused and is missing', function () {
+test('renders with "Missing" selected if the submission is not excused and is missing', function () {
   this.wrapper = this.mountComponent({ submission: { excused: false, late: false, missing: true, secondsLate: 0 } });
   const radio = this.getRadioOption('missing');
   strictEqual(radio.checked, true);
 });
 
-test('handleRadioInputChanged selects the radio option it is passed', function () {
-  this.wrapper = this.mountComponent();
-  const event = { target: { value: 'late' } };
+test('handleRadioInputChanged calls updateSubmission with the late policy status for the selected radio input', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: 'missing' } };
   this.wrapper.instance().handleRadioInputChanged(event);
-  const radio = this.getRadioOption('late');
-  strictEqual(radio.checked, true);
+  strictEqual(updateSubmission.callCount, 1);
+  deepEqual(updateSubmission.getCall(0).args[0], { latePolicyStatus: 'missing' });
 });
 
-test('handleRadioInputChanged deselects the previously selected radio option', function () {
-  this.wrapper = this.mountComponent();
+test('handleRadioInputChanged calls updateSubmission with secondsLateOverride set to 0 if the "late" option is selected', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
   const event = { target: { value: 'late' } };
   this.wrapper.instance().handleRadioInputChanged(event);
-  const radio = this.getRadioOption('none');
-  strictEqual(radio.checked, false);
+  strictEqual(updateSubmission.callCount, 1);
+  deepEqual(updateSubmission.getCall(0).args[0], { latePolicyStatus: 'late', secondsLateOverride: 0 });
+});
+
+test('handleRadioInputChanged calls updateSubmission with excuse set to true if the "excused" option is selected', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: 'excused' } };
+  this.wrapper.instance().handleRadioInputChanged(event);
+  strictEqual(updateSubmission.callCount, 1);
+  deepEqual(updateSubmission.getCall(0).args[0], { excuse: true });
+});
+
+test('handleRadioInputChanged does not call updateSubmission if the radio input is already selected', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: 'none' } };
+  this.wrapper.instance().handleRadioInputChanged(event);
+  strictEqual(updateSubmission.callCount, 0);
+});
+
+test('handleRadioInputChanged does not call updateSubmission if there is already a submission update in-flight', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission, submissionUpdating: true });
+  const event = { target: { value: 'missing' } };
+  this.wrapper.instance().handleRadioInputChanged(event);
+  strictEqual(updateSubmission.callCount, 0);
+});
+
+test('handleNumberInputBlur does not call updateSubmission if the input value is an empty string', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: '' } };
+  this.wrapper.instance().handleNumberInputBlur(event);
+  strictEqual(updateSubmission.callCount, 0);
+});
+
+test('handleNumberInputBlur does not call updateSubmission if the input value cannot be parsed as a number', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: 'foo' } };
+  this.wrapper.instance().handleNumberInputBlur(event);
+  strictEqual(updateSubmission.callCount, 0);
+});
+
+test('handleNumberInputBlur calls updateSubmission if the input can be parsed as a number', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: '2' } };
+  this.wrapper.instance().handleNumberInputBlur(event);
+  strictEqual(updateSubmission.callCount, 1);
+});
+
+test('handleNumberInputBlur calls updateSubmission with latePolicyStatus set to "late"', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: '2' } };
+  this.wrapper.instance().handleNumberInputBlur(event);
+  strictEqual(updateSubmission.getCall(0).args[0].latePolicyStatus, 'late');
+});
+
+test('interval is hour: handleNumberInputBlur calls updateSubmission with the input converted to seconds', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission, latePolicy: { lateSubmissionInterval: 'hour' } });
+  const event = { target: { value: '2' } };
+  this.wrapper.instance().handleNumberInputBlur(event);
+  strictEqual(updateSubmission.callCount, 1);
+  const expectedSeconds = 2 * 3600;
+  strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds);
+});
+
+test('interval is day: handleNumberInputBlur calls updateSubmission with the input converted to seconds', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: '2' } };
+  const expectedSeconds = 2 * 86400;
+  this.wrapper.instance().handleNumberInputBlur(event);
+  strictEqual(updateSubmission.callCount, 1);
+  strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds);
+});
+
+test('truncates the remainder if one exists', function () {
+  const updateSubmission = this.stub();
+  this.wrapper = this.mountComponent({ updateSubmission });
+  const event = { target: { value: '2.3737' } };
+  const expectedSeconds = Math.trunc(2.3737 * 86400);
+  this.wrapper.instance().handleNumberInputBlur(event);
+  strictEqual(updateSubmission.callCount, 1);
+  strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds);
 });

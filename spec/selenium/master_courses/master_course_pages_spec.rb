@@ -25,7 +25,7 @@ describe "master courses - pages locking" do
 
     @course = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-    @page = @course.wiki.wiki_pages.create!(title: 'Page1')
+    @page = @course.wiki_pages.create!(title: 'Page1')
     @tag = @template.create_content_tag_for!(@page)
   end
 

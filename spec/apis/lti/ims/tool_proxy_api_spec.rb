@@ -133,8 +133,7 @@ module Lti
         context "custom tool consumer profile" do
           let(:account) {Account.create!}
           let(:dev_key) do
-            dev_key = DeveloperKey.create(api_key: 'test-api-key')
-            allow(DeveloperKey).to receive(:find_cached).and_return(dev_key)
+            dev_key = DeveloperKey.create(api_key: 'test-api-key', vendor_code: vendor_code)
             dev_key
           end
           let!(:tcp) do
@@ -151,10 +150,14 @@ module Lti
             Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
           end
           let(:request_headers) { {Authorization: "Bearer #{access_token}"} }
+
+          before { allow(DeveloperKey).to receive(:find_cached) { dev_key }  }
+
           it 'supports using a specified custom TCP' do
             course_with_teacher_logged_in(:active_all => true)
             tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
             tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+            tp.tool_profile.product_instance.product_info.product_family.vendor.code = vendor_code
             message = tp.tool_profile.resource_handlers.first.messages.first
             tp.tool_consumer_profile = tcp_url
             message.enabled_capability = *Lti::ToolConsumerProfile::RESTRICTED_CAPABILITIES
@@ -170,6 +173,7 @@ module Lti
       describe "POST #create with JWT access token" do
         let(:access_token) do
           aud = host rescue (@request || request).host
+          developer_key.update_attributes(vendor_code: vendor_code)
           Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
         end
         let(:request_headers) { {Authorization: "Bearer #{access_token}"} }
@@ -182,10 +186,9 @@ module Lti
               registration_url: 'http://example.com/register'
           })
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-          json = JSON.parse(tool_proxy_fixture)
-          json[:format] = 'json'
-          json[:account_id] = @course.account.id
-          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tool_proxy_fixture, headers: request_headers
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          tp.tool_profile.product_instance.product_info.product_family.vendor.code = vendor_code
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tp.to_json, headers: request_headers
           expect(response).to eq 201
         end
 
@@ -236,14 +239,13 @@ module Lti
           fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
           tool_proxy_fixture = JSON.parse(File.read(fixture_file))
 
-          tcp_url = polymorphic_url([@course.account, :tool_consumer_profile],
-                                    tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
+          tcp_url = polymorphic_url([@course.account, :tool_consumer_profile])
           tool_proxy_fixture["tool_consumer_profile"] = tcp_url
 
           headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tool_proxy_fixture.to_json, headers: headers
 
-          expect(response).to eq 200
+          expect(response).to eq 201
 
           tool_proxy.reload
           expect(tool_proxy.update_payload).to eq({

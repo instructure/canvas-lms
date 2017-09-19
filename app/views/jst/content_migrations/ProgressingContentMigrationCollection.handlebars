@@ -8,3 +8,9 @@
   {{#t "no_items"}}No jobs have been queued{{/t}}
 </p>
 {{/if}}
+
+{{#ifEqual ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS 0}}
+{{! expiration is disabled, show nothing }}
+{{else}}
+<p><em>{{#t}}Content import files cannot be downloaded after {{ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS}} days.{{/t}}</em></p>
+{{/ifEqual}}

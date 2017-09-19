@@ -184,7 +184,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @topic = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @cm = @course.context_modules.create!(:name => "some module")
       attachment_model(:context => @course, :filename => 'a5.html')
-      @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @wiki = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
       @category = @course.group_categories.create(:name => "other category")
       @group = Group.create!(:name=>"group1", :group_category => @category, :context => @course)
       @announcement = announcement_model

@@ -84,7 +84,7 @@
 }
 #new_alert .add_criterion_link,
 #new_alert .add_recipient_link {
-  color: $ic-link-color;
+  color: var(--ic-link-color);
   text-decoration: none;
   font-weight: normal;
   &:hover {

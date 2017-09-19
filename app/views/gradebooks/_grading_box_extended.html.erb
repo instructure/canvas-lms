@@ -43,4 +43,17 @@
 
 </label>
 
-<div id="deduction-box"></div>
+<div id="deduction-box" class="hidden">
+  <div class="deduction-box-labels">
+    <div class="error">
+      <%= I18n.t('Late Penalty:') %>
+    </div>
+    <div class="primary">
+      <%= I18n.t('Final Grade:') %>
+    </div>
+  </div>
+  <div class="deduction-box-values">
+    <div id="points-deducted" class="error bold"></div>
+    <div id="final-grade" class="primary bold"></div>
+  </div>
+</div>

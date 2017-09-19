@@ -55,7 +55,7 @@ class Group < ActiveRecord::Base
   has_many :external_feeds, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
   belongs_to :wiki
-  has_many :wiki_pages, foreign_key: 'wiki_page', primary_key: 'wiki_page'
+  has_many :wiki_pages, as: :context, inverse_of: :context
   has_many :web_conferences, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :media_objects, :as => :context, :inverse_of => :context

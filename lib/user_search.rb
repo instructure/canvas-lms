@@ -20,7 +20,7 @@ module UserSearch
   def self.for_user_in_context(search_term, context, searcher, session=nil, options = {})
     search_term = search_term.to_s
     return User.none if search_term.strip.empty?
-    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, 
+    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role,
       :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments, :sort, :order))
     if search_term.to_s =~ Api::ID_REGEX
       db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)
@@ -40,7 +40,13 @@ module UserSearch
       restrict_search = true
     end
     context.shard.activate do
-      base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
+      base_scope = base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
+      if options[:role_filter_id] && options[:role_filter_id] != ""
+        base_scope = base_scope.where("#{options[:role_filter_id]} IN 
+                            (SELECT role_id FROM #{Enrollment.quoted_table_name}
+                            WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
+      end
+      base_scope
     end
   end
 
@@ -120,18 +126,18 @@ module UserSearch
             end
 
     if options[:role_filter_id] && options[:role_filter_id] != ""
-      users = users.where("#{options[:role_filter_id]} IN
+      users = users.where("#{options[:role_filter_id]} IN 
                             (SELECT role_id FROM #{Enrollment.quoted_table_name}
                               WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
     end
 
     if enrollment_role_ids || enrollment_roles
-      if enrollment_role_ids
-        roles = enrollment_role_ids.map{|id| Role.get_role_by_id(id)}.compact
-      else
-        roles = enrollment_roles.map{|name| context.is_a?(Account) ? context.get_course_role_by_name(name) :
-            context.account.get_course_role_by_name(name)}.compact
-      end
+      roles = if enrollment_role_ids
+                enrollment_role_ids.map{|id| Role.get_role_by_id(id)}.compact
+              else
+                enrollment_roles.map{|name| context.is_a?(Account) ? context.get_course_role_by_name(name) :
+                  context.account.get_course_role_by_name(name)}.compact
+              end
       conditions_sql = "role_id IN (?)"
       # TODO: this can go away after we take out the enrollment role shim (after role_id has been populated)
       roles.each do |role|

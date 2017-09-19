@@ -51,7 +51,7 @@ describe "Modules API", type: :request do
                                                :unlock_at => @christmas,
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
-    @wiki_page = @course.wiki.wiki_pages.create!(:title => "Front Page", :body => "")
+    @wiki_page = @course.wiki_pages.create!(:title => "Front Page", :body => "")
     @wiki_page.workflow_state = 'active'; @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
 
@@ -340,7 +340,7 @@ describe "Modules API", type: :request do
         @test_modules[2..3].each { |m| m.update_attribute(:workflow_state , 'unpublished') }
         @modules_to_update = [@test_modules[1], @test_modules[3]]
 
-        @wiki_page = @course.wiki.wiki_pages.create(:title => 'Wiki Page Title')
+        @wiki_page = @course.wiki_pages.create(:title => 'Wiki Page Title')
         @wiki_page.unpublish!
         @wiki_page_tag = @test_modules[3].add_item(:id => @wiki_page.id, :type => 'wiki_page')
 
@@ -437,7 +437,7 @@ describe "Modules API", type: :request do
         @module1.workflow_state = 'unpublished'
         @module1.save!
 
-        @wiki_page = @course.wiki.wiki_pages.create(:title => 'Wiki Page Title')
+        @wiki_page = @course.wiki_pages.create(:title => 'Wiki Page Title')
         @wiki_page.unpublish!
         @wiki_page_tag = @module1.add_item(:id => @wiki_page.id, :type => 'wiki_page')
 

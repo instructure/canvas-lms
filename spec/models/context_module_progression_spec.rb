@@ -98,6 +98,10 @@ describe ContextModuleProgression do
       @module.unpublish
       expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq true
     end
+    it "should default to collapsed when created" do
+      progression = ContextModuleProgression.create(user: @user, context_module: @module)
+      expect(progression.collapsed).to eq true
+    end
   end
 
   context '#evaluate' do

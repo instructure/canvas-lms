@@ -38,37 +38,16 @@ function defaultDurationLate (interval, secondsLate) {
   return round(durationLate, 2).toString();
 }
 
-function renderNumberInput (interval, locale, secondsLate) {
-  const numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late');
-  const numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)');
-  return (
-    <span className="NumberInput__Container NumberInput__Container-LeftIndent">
-      <NumberInput
-        defaultValue={defaultDurationLate(interval, secondsLate)}
-        inline
-        label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
-        locale={locale}
-        min="0"
-        showArrows={false}
-        width="5rem"
-      />
-
-      <PresentationContent>
-        <Container as="div" margin="0 small">
-          <Typography>{numberInputText}</Typography>
-        </Container>
-      </PresentationContent>
-    </span>
-  );
-}
-
 export default function SubmissionTrayRadioInput (props) {
   const showNumberInput = props.value === 'late' && props.checked;
+  const interval = props.latePolicy.lateSubmissionInterval;
+  const numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late');
+  const numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)');
   const styles = {
     backgroundColor: props.color,
     height: showNumberInput ? '5rem' : '2rem'
   };
-  const interval = props.latePolicy.lateSubmissionInterval;
+
   const radioInputClasses = classnames(
     'SubmissionTray__RadioInput',
     { 'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent' }
@@ -84,7 +63,27 @@ export default function SubmissionTrayRadioInput (props) {
         value={props.value}
       />
 
-      {showNumberInput && renderNumberInput(interval, props.locale, props.submission.secondsLate)}
+      {
+        showNumberInput &&
+          <span className="NumberInput__Container NumberInput__Container-LeftIndent">
+            <NumberInput
+              defaultValue={defaultDurationLate(interval, props.submission.secondsLate)}
+              inline
+              label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
+              locale={props.locale}
+              min="0"
+              onBlur={props.onNumberInputBlur}
+              showArrows={false}
+              width="5rem"
+            />
+
+            <PresentationContent>
+              <Container as="div" margin="0 small">
+                <Typography>{numberInputText}</Typography>
+              </Container>
+            </PresentationContent>
+          </span>
+      }
     </div>
   );
 }
@@ -97,11 +96,12 @@ SubmissionTrayRadioInput.propTypes = {
   }).isRequired,
   locale: string.isRequired,
   onChange: func.isRequired,
-  text: string.isRequired,
-  value: string.isRequired,
+  onNumberInputBlur: func.isRequired,
   submission: shape({
-    secondsLate: number.isRequired,
-  }).isRequired
+    secondsLate: number.isRequired
+  }).isRequired,
+  text: string.isRequired,
+  value: string.isRequired
 };
 
 SubmissionTrayRadioInput.defaultProps = {

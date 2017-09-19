@@ -67,23 +67,23 @@ test('Table is passed the label and caption props', function () {
 test('Table has column headers in correct order', function () {
   const expectedHeaders = [
     'Date',
-    'Time',
-    'From',
-    'To',
-    'Grader',
+    'Anonymous Grading',
     'Student',
+    'Grader',
     'Assignment',
-    'Anonymous'
+    'Before',
+    'After'
   ];
   const wrapper = mount(<SearchResultsComponent {...defaultProps()} />);
   const headerNodes = wrapper.find('thead').find('tr').find('th').nodes;
   const headers = [];
 
   for (let i = 0; i < headerNodes.length; i += 1) {
-    headers.push(headerNodes[i].innerHTML);
+    headers.push(headerNodes[i].innerText);
   }
 
   deepEqual(headers, expectedHeaders);
+  wrapper.unmount();
 });
 
 test('Table displays the formatted historyItems passed it', function () {

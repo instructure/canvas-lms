@@ -32,7 +32,7 @@ describe WikiPagesController do
     end
 
     it "sets up js_env for view_all_pages link" do
-      front_page = @wiki.wiki_pages.create!(title: "ponies4ever")
+      front_page = @course.wiki_pages.create!(title: "ponies4ever")
       @wiki.set_front_page_url!(front_page.url)
       get 'front_page', params: {course_id: @course.id}
       expect(response).to be_success
@@ -42,7 +42,7 @@ describe WikiPagesController do
 
   context "with page" do
     before do
-      @page = @wiki.wiki_pages.create!(title: "ponies5ever", body: "")
+      @page = @course.wiki_pages.create!(title: "ponies5ever", body: "")
     end
 
     describe "GET 'show_redirect'" do

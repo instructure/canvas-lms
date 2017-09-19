@@ -53,7 +53,7 @@ describe ContentMigration do
 
     it "should copy links to unpublished items in modules" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
-      page = @copy_from.wiki.wiki_pages.create(:title => "some page")
+      page = @copy_from.wiki_pages.create(:title => "some page")
       page.workflow_state = :unpublished
       page.save!
       mod1.add_item({:id => page.id, :type => 'wiki_page'})
@@ -91,13 +91,13 @@ describe ContentMigration do
     end
 
     it "should copy unpublished wiki pages" do
-      wiki = @copy_from.wiki.wiki_pages.create(:title => "wiki", :body => "ohai")
+      wiki = @copy_from.wiki_pages.create(:title => "wiki", :body => "ohai")
       wiki.workflow_state = :unpublished
       wiki.save!
 
       run_course_copy
 
-      wiki2 = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first
+      wiki2 = @copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first
       expect(wiki2.workflow_state).to eq 'unpublished'
     end
 
@@ -141,7 +141,7 @@ describe ContentMigration do
       topic = @copy_from.discussion_topics.create!(:title => "some topic")
       tags << mod.add_item({ :id => topic.id, :type => 'discussion_topic' })
 
-      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+      page = @copy_from.wiki_pages.create!(:title => "some page")
       tags << mod.add_item({ :id => page.id, :type => 'wiki_page' })
 
       file = @copy_from.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)

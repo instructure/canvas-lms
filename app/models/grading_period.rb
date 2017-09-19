@@ -32,7 +32,7 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :adjust_close_date_for_course_period
   before_validation :ensure_close_date
 
-  after_save :recompute_scores, if: :dates_or_weight_changed?
+  after_save :recompute_scores, if: :dates_or_weight_or_workflow_state_changed?
   after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
   scope :current, -> do
@@ -175,7 +175,6 @@ class GradingPeriod < ActiveRecord::Base
     scores.find_ids_in_ranges do |min_id, max_id|
       scores.where(id: min_id..max_id).update_all(workflow_state: :deleted)
     end
-    recompute_scores if grading_period_group.weighted
   end
 
   def destroy_grading_period_set
@@ -243,33 +242,29 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def recompute_scores
-    gp_id = time_boundaries_changed? ? id : nil
+    dates_or_workflow_state_changed = time_boundaries_changed? || workflow_state_changed?
+
     if course_group?
-      recompute_score_for(grading_period_group.course, gp_id)
-      DueDateCacher.recompute_course(grading_period_group.course) if gp_id
+      recompute_scores_for_course(grading_period_group.course, dates_or_workflow_state_changed)
     else
-      self.send_later_if_production(:recompute_scores_for_term_courses, gp_id) # there could be a lot of courses here
+      self.send_later_if_production(:recompute_scores_for_each_course, dates_or_workflow_state_changed)
     end
   end
 
-  def recompute_scores_for_term_courses(grading_period_id)
-    term_ids = grading_period_group.enrollment_terms.pluck(:id)
-    Course.active.where(enrollment_term_id: term_ids).find_in_batches do |courses|
-      courses.each do |course|
-        recompute_score_for(course, grading_period_id)
-      end
-    end
+  def recompute_scores_for_each_course(dates_or_workflow_state_changed)
+    courses = Course.active.joins(:enrollment_term).where(
+      "enrollment_terms.grading_period_group_id = ?",
+      grading_period_group_id
+    )
+
+    courses.find_each { |course| recompute_scores_for_course(course, dates_or_workflow_state_changed) }
   end
 
-  def recompute_score_for(course, grading_period_id)
-    course.recompute_student_scores(
-      # different assignments could fall in this period if time
-      # boundaries changed so we need to recalculate scores.
-      # otherwise, weight must have changed, in which case we
-      # do not need to recompute the grading period scores (we
-      # only need to recompute the overall course score)
-      grading_period_id: grading_period_id,
-      update_all_grading_period_scores: false)
+  def recompute_scores_for_course(course, dates_or_workflow_state_changed)
+    # we don't need to recompute scores for each grading period if only weight has changed
+    course.recompute_student_scores(update_all_grading_period_scores: dates_or_workflow_state_changed)
+    # DueDateCacher handles updating the cached grading_period_id on submissions
+    DueDateCacher.recompute_course(course) if dates_or_workflow_state_changed
   end
 
   def weight_actually_changed?
@@ -280,7 +275,7 @@ class GradingPeriod < ActiveRecord::Base
     start_date_changed? || end_date_changed?
   end
 
-  def dates_or_weight_changed?
-    time_boundaries_changed? || weight_actually_changed?
+  def dates_or_weight_or_workflow_state_changed?
+    time_boundaries_changed? || weight_actually_changed? || workflow_state_changed?
   end
 end

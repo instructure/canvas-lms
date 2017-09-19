@@ -34,7 +34,7 @@ describe "context modules" do
     end
 
      it 'should add an unpublished page to a module', priority: "1", test_id: 126709 do
-      @unpub_page = @course.wiki.wiki_pages.create!(title: 'Unpublished Page')
+      @unpub_page = @course.wiki_pages.create!(title: 'Unpublished Page')
       @unpub_page.workflow_state = 'unpublished'
       @unpub_page.save!
       @mod.add_item(type: 'wiki_page', id: @unpub_page.id)
@@ -44,7 +44,7 @@ describe "context modules" do
      end
 
     it 'should add a published page to a module', priority: "1", test_id: 126710 do
-      @pub_page = @course.wiki.wiki_pages.create!(title: 'Published Page')
+      @pub_page = @course.wiki_pages.create!(title: 'Published Page')
       @mod.add_item(type: 'wiki_page', id: @pub_page.id)
       go_to_modules
       verify_module_title('Published Page')
@@ -214,7 +214,7 @@ describe "context modules" do
     end
 
     it 'edit content page module item inline', priority: "2", test_id: 132491 do
-      @edit_page = @course.wiki.wiki_pages.create!(title: 'EditMe Page')
+      @edit_page = @course.wiki_pages.create!(title: 'EditMe Page')
       @mod.add_item(type: 'wiki_page', id: @edit_page.id)
       go_to_modules
       verify_edit_item_form

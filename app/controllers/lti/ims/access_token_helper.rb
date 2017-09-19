@@ -33,10 +33,13 @@ module Lti::Ims::AccessTokenHelper
   end
 
   def access_token
-    @_access_token ||= Lti::Oauth2::AccessToken.from_jwt(
-      aud: request.host,
-      jwt: AuthenticationMethods.access_token(request)
-    )
+    @_access_token ||= begin
+      access_token = AuthenticationMethods.access_token(request)
+      access_token && Lti::Oauth2::AccessToken.from_jwt(
+        aud: request.host,
+        jwt: access_token
+      )
+    end
   end
 
   def oauth2_request?
@@ -67,7 +70,7 @@ module Lti::Ims::AccessTokenHelper
   end
 
   def developer_key
-    @_developer_key ||= begin
+    @_developer_key ||= access_token && begin
       tp = Lti::ToolProxy.find_by(guid: access_token.sub)
       if tp.present?
         raise Lti::Oauth2::InvalidTokenError, 'Tool Proxy is not active' if tp.workflow_state != 'active'

@@ -53,37 +53,39 @@ test('displays the history date', function () {
   strictEqual(date, this.item.date);
 });
 
-test('displays the history time', function () {
-  const time = this.wrapper.find('td').nodes[1].innerText;
-  strictEqual(time, this.item.time);
+test('has text for when not anonymously graded', function () {
+  const anonymous = this.wrapper.find('td').nodes[1].innerText;
+  strictEqual(anonymous, 'Not anonymously graded');
 });
 
-test('displays the history from', function () {
-  const from = this.wrapper.find('td').nodes[2].innerText;
-  strictEqual(from, this.item.from);
-});
-
-test('displays the history to', function () {
-  const to = this.wrapper.find('td').nodes[3].innerText;
-  strictEqual(to, this.item.to);
-});
-
-test('displays the history grader', function () {
-  const grader = this.wrapper.find('td').nodes[4].innerText;
-  strictEqual(grader, this.item.grader);
+test('has text for when anonymously graded', function () {
+  const item = { ...this.item, anonymous: true };
+  const wrapper = mountComponent({ item });
+  const anonymous = wrapper.find('td').nodes[1].innerText;
+  strictEqual(anonymous.trim(), 'Anonymously graded');
 });
 
 test('displays the history student', function () {
-  const student = this.wrapper.find('td').nodes[5].innerText;
+  const student = this.wrapper.find('td').nodes[2].innerText;
   strictEqual(student, this.item.student);
 });
 
+test('displays the history grader', function () {
+  const grader = this.wrapper.find('td').nodes[3].innerText;
+  strictEqual(grader, this.item.grader);
+});
+
 test('displays the history assignment', function () {
-  const assignment = this.wrapper.find('td').nodes[6].innerText;
+  const assignment = this.wrapper.find('td').nodes[4].innerText;
   strictEqual(assignment, this.item.assignment.toString());
 });
 
-test('displays the history anonymity', function () {
-  const anonymous = this.wrapper.find('td').nodes[7].innerText;
-  strictEqual(anonymous, this.item.anonymous);
+test('displays the history before grade', function () {
+  const from = this.wrapper.find('td').nodes[5].innerText;
+  strictEqual(from, this.item.before);
+});
+
+test('displays the history after grade', function () {
+  const to = this.wrapper.find('td').nodes[6].innerText;
+  strictEqual(to, this.item.after);
 });

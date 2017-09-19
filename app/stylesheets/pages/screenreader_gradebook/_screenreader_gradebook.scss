@@ -101,7 +101,7 @@ ic-tab {
     background-color: $grayLighter;
   }
   &[selected] {
-    background-color: $linkColor;
+    background-color: var(--ic-link-color);
     color: $white;
   }
 }
@@ -119,7 +119,7 @@ select.grading_box.pass_fail {
   width: inherit;
 }
 
-span.late-pill {
+span.late-pill, span.missing-pill {
   padding-left: 12px;
   text-transform: uppercase;
 }
@@ -129,16 +129,26 @@ span.late-pill {
   border-color: $ic-color-danger;
 }
 
-span.submission_late_penalty {
+.submission_late_penalty {
   color: $ic-color-danger;
   padding-left: 12px;
 }
 
-span.submission_final_grade {
+.submission_final_grade {
   padding-left: 12px;
 }
 
 // short-term hack until this version of srgb rides into the sunset
 .pill-align {
   transform: translateY(6px);
+}
+
+.deduction-box {
+  display: flex;
+  .deduction-box-labels {
+    margin-right: .5em;
+  }
+  .deduction-box-values {
+    flex: 1
+  }
 }

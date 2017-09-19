@@ -33,7 +33,7 @@ module DifferentiableAssignment
                   !self.differentiated_assignments_applies? #checks if DA enabled on course and then only_visible_to_overrides
 
     # will add users if observer and only filter based on DA when necessary (not for teachers/some observers)
-    visible_instances = DifferentiableAssignment.filter([self],user,self.context) do |_, user_ids|
+    visible_instances = DifferentiableAssignment.filter([self], user, self.context) do |_, user_ids|
       conditions = {user_id: user_ids}
       conditions[column_name] = self.id
       visibility_view.where(conditions)
@@ -71,19 +71,23 @@ module DifferentiableAssignment
     end
   end
 
+  # private
   def self.teacher_or_public_user?(user, context, opts)
     return true if opts[:is_teacher] == true
     RequestCache.cache('teacher_or_public_user', user, context) do
-      if !context.includes_user?(user)
-        true
-      else
-        permissions_implying_visibility = [:read_as_admin, :manage_grades, :manage_assignments]
-        permissions_implying_visibility << :manage_content if context.is_a?(Course)
-        context.grants_any_right?(user, *permissions_implying_visibility)
+      Rails.cache.fetch([context, user, 'teacher_or_public_user'].cache_key) do
+        if !context.includes_user?(user)
+          true
+        else
+          permissions_implying_visibility = [:read_as_admin, :manage_grades, :manage_assignments]
+          permissions_implying_visibility << :manage_content if context.is_a?(Course)
+          context.grants_any_right?(user, *permissions_implying_visibility)
+        end
       end
     end
   end
 
+  # private
   def self.user_not_observer?(user, context, opts)
     return true if opts[:ignore_observer_logic] || context.is_a?(Group)
     !context.user_has_been_observer?(user)

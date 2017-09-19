@@ -34,7 +34,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       create_session(@teacher.pseudonym)
 
       add_file_to_rce
-      @course.wiki.wiki_pages.first.publish!
+      @course.wiki_pages.first.publish!
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}/pages/front-page"
       expect(fj('a[title="text_file.txt"]')).to be_displayed

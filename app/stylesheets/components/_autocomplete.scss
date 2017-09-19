@@ -97,7 +97,7 @@ ul[class*=ac-] {
   width: 100%;
 
   &.focused {
-    border-color: lighten($ic-link-color, 10%);
+    border-color: var(--ic-link-color);
   }
 
   &.disabled {
@@ -183,7 +183,7 @@ ul[class*=ac-] {
   &:hover {
     background: #bccef4;
     @if $use-high-contrast {
-      background: $ic-color-light;  
+      background: $ic-color-light;
     }
     border-color: #6f94e6;
   }
@@ -303,6 +303,6 @@ i[class*=icon-].icon-messageRecipient--cancel {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 80%;    
+    width: 80%;
   }
 }

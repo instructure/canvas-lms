@@ -368,3 +368,57 @@ test('selecting a student from options clears options for students', function ()
   ok(this.props.clearSearchOptions.called);
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'students');
 });
+
+test('no search records found for students results in a message instead', function () {
+  this.wrapper.setProps({
+    students: {
+      fetchStatus: 'success',
+      items: [],
+      nextPage: ''
+    }
+  });
+
+  this.wrapper.find('#students').node.click();
+
+  const noRecords = [...document.getElementsByTagName('span')].find(
+                      span => span.textContent === 'No students with that name found'
+                    );
+
+  ok(noRecords);
+});
+
+test('no search records found for graders results in a message instead', function () {
+  this.wrapper.setProps({
+    graders: {
+      fetchStatus: 'success',
+      items: [],
+      nextPage: ''
+    }
+  });
+
+  this.wrapper.find('#graders').node.click();
+
+  const noRecords = [...document.getElementsByTagName('span')].find(
+                      span => span.textContent === 'No graders with that name found'
+                    );
+
+  ok(noRecords);
+});
+
+test('no search records found for assignments results in a message instead', function () {
+  this.wrapper.setProps({
+    assignments: {
+      fetchStatus: 'success',
+      items: [],
+      nextPage: ''
+    }
+  });
+
+  this.wrapper.find('#assignments').node.click();
+
+  const noRecords = [...document.getElementsByTagName('span')].find(
+                      span => span.textContent === 'No assignments with that name found'
+                    );
+
+  ok(noRecords);
+});

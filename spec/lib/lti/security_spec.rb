@@ -39,7 +39,6 @@ describe Lti::Security do
           params,
           consumer_key: consumer_key,
           consumer_secret: consumer_secret,
-          callback: 'about:blank',
           nonce: nonce,
           timestamp: timestamp
         )

@@ -49,7 +49,7 @@ module Types
     connection :submissionsConnection, SubmissionType.connection_type do
       description "all the submissions for assignments in this course"
 
-      argument :studentIds, !types[types.ID], "Only return submissions for the given students.",
+      argument :studentIds, !types[!types.ID], "Only return submissions for the given students.",
         prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
       argument :orderBy, types[SubmissionOrderInputType]
 
@@ -78,6 +78,16 @@ module Types
         }
 
         submissions
+      }
+    end
+
+    field :permissions, CoursePermissionsType do
+      description "returns permission information for the current user in this course"
+      resolve ->(course, _, ctx) {
+        Loaders::CoursePermissionsLoader.for(
+          course,
+          current_user: ctx[:current_user], session: ctx[:session]
+        )
       }
     end
   end

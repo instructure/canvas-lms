@@ -320,7 +320,7 @@ describe ExternalToolsController do
 
       it "sends content item json for a page" do
         user_session(@teacher)
-        page = @course.wiki.wiki_pages.create!(title: 'a page')
+        page = @course.wiki_pages.create!(title: 'a page')
         get :show, params: {:course_id => @course.id, id: @tool.id, :pages => [page.id]}
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
@@ -334,7 +334,7 @@ describe ExternalToolsController do
 
       it "sends content item json for selected content" do
         user_session(@teacher)
-        page = @course.wiki.wiki_pages.create!(title: 'a page')
+        page = @course.wiki_pages.create!(title: 'a page')
         assignment = @course.assignments.create!(name: 'an assignment')
         get :show, params: {:course_id => @course.id, id: @tool.id, :pages => [page.id], :assignments => [assignment.id]}
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first

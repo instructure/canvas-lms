@@ -19,10 +19,8 @@
 module Factories
   def wiki_page_model(opts={})
     course = opts.delete(:course) || (course_with_student(active_all: true); @course)
-    @wiki = course.wiki
-    @wiki.save!
     opts = opts.slice(:title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update, :todo_date)
-    @page = @wiki.wiki_pages.create!(valid_wiki_page_attributes.merge(opts))
+    @page = course.wiki_pages.create!(valid_wiki_page_attributes.merge(opts))
   end
 
   def wiki_page_assignment_model(opts={})

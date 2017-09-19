@@ -23,6 +23,7 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
     let XHRS, XHR_HANDLERS, handlerIndex;
 
     const ASSIGNMENT_GROUPS = [{id: 1}, {id: 4}];
+    const GRADING_PERIOD_ASSIGNMENTS = { 1401: ['2301'] };
     const STUDENTS_PAGE_1 = [{id: 2}, {id: 5}];
     const STUDENTS_PAGE_2 = [{id: 3}, {id: 7}];
     const SUBMISSIONS_CHUNK_1 = [{id: 99}];
@@ -60,6 +61,7 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
       const defaults = {
         assignmentGroupsURL: "/ags",
         assignmentGroupsParams: {ag_params: "ok"},
+        courseId: '1201',
         customColumnsURL: "/customcols",
         studentsURL: "/students",
         studentsPageCb: () => {},
@@ -216,6 +218,38 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
         ok(submissionsCbCalled === 2);
         submissionsDone();
       });
+    });
+
+    QUnit.module('Grading Period Assignments');
+
+    test('resolves promise with data when grading period assignments are loaded', function (assert) {
+      const responseData = { grading_period_assignments: GRADING_PERIOD_ASSIGNMENTS };
+      XHR_HANDLERS = [
+        () => {
+          respondToXhr('/courses/1201/gradebook/grading_period_assignments', 200, {}, responseData);
+        }
+      ];
+
+      const dataLoader = callLoadGradebookData({ getGradingPeriodAssignments: true });
+      const resolve = assert.async();
+
+      dataLoader.gotGradingPeriodAssignments.then((data) => {
+        deepEqual(data, responseData);
+        resolve();
+      });
+    });
+
+    test('optionally does not request grading period assignments', function () {
+      const responseData = { grading_period_assignments: GRADING_PERIOD_ASSIGNMENTS };
+      XHR_HANDLERS = [
+        () => {
+          respondToXhr('/courses/1201/gradebook/grading_period_assignments', 200, {}, responseData);
+        }
+      ];
+
+      const dataLoader = callLoadGradebookData();
+
+      equal(typeof dataLoader.gotGradingPeriodAssignments, 'undefined');
     });
 
     QUnit.module("Custom Column Data");

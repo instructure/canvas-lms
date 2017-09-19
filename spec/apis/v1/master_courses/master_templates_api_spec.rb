@@ -299,7 +299,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       assmt = @course.assignments.create!
       topic = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
-      page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
       quiz = @course.quizzes.create!
       file = @course.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
       tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
@@ -344,7 +344,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     it "should use default restrictions by object type if enabled" do
       assmt = @course.assignments.create!
       assmt_tag = @template.content_tag_for(assmt)
-      page = @course.wiki.wiki_pages.create!(:title => "blah")
+      page = @course.wiki_pages.create!(:title => "blah")
       page_tag = @template.content_tag_for(page)
 
       assmt_restricts = {:content => true, :points => true}
@@ -398,7 +398,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @minions.last.assignments.first.update_attribute :points_possible, 11
 
       # now push some incremental changes
-      @page = @master.wiki.wiki_pages.create! :title => 'Unicorn'
+      @page = @master.wiki_pages.create! :title => 'Unicorn'
       page_tag = @template.content_tag_for(@page)
       page_tag.restrictions = @template.default_restrictions
       page_tag.save!
@@ -456,7 +456,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       minion = @minions.first
       minion_migration = minion.content_migrations.last
-      minion_page = minion.wiki.wiki_pages.where(migration_id: @template.migration_id_for(@page)).first
+      minion_page = minion.wiki_pages.where(migration_id: @template.migration_id_for(@page)).first
       minion_assignment = minion.assignments.where(migration_id: @template.migration_id_for(@assignment)).first
       minion_file = minion.attachments.where(migration_id: @template.migration_id_for(@file)).first
       minion_quiz = minion.quizzes.where(migration_id: @template.migration_id_for(@quiz)).first
@@ -510,7 +510,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         setup_template
         @master = @course
         @template.add_child_course!(course_factory(:name => 'Minion'))
-        @page = @master.wiki.wiki_pages.create! :title => 'Old News'
+        @page = @master.wiki_pages.create! :title => 'Old News'
         @ann = @master.announcements.create! :title => 'Boring', :message => 'Yawn'
         @file = attachment_model(:context => @master, :display_name => 'Some File')
         @template.content_tag_for(@file).update_attribute(:restrictions, {:content => true})
@@ -521,7 +521,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     it 'detects creates, updates, and deletes since the last sync' do
       @ann.destroy
       @file.update_attribute(:display_name, 'Renamed')
-      @new_page = @master.wiki.wiki_pages.create! :title => 'New News'
+      @new_page = @master.wiki_pages.create! :title => 'New News'
 
       json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
         :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
@@ -539,7 +539,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     it "limits result size" do
       Setting.set('master_courses_history_count', '2')
 
-      3.times { |x| @master.wiki.wiki_pages.create! :title => "Page #{x}" }
+      3.times { |x| @master.wiki_pages.create! :title => "Page #{x}" }
 
       json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
         :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',

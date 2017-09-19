@@ -37,7 +37,7 @@ module Importers
     def resolve_link!(link)
       case link[:link_type]
       when :wiki_page
-        if linked_wiki_url = context.wiki.wiki_pages.where(migration_id: link[:migration_id]).limit(1).pluck(:url).first
+        if linked_wiki_url = context.wiki_pages.where(migration_id: link[:migration_id]).limit(1).pluck(:url).first
           link[:new_value] = "#{context_path}/pages/#{linked_wiki_url}"
         end
       when :discussion_topic

@@ -40,7 +40,7 @@ describe UsageRightsController, type: :request do
       it "should list licenses" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/content_licenses",
                  { controller: 'usage_rights', action: 'licenses', course_id: @course.to_param, format: 'json'})
-        expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license], 'url' => data[:license_url] } })
+        expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license].call, 'url' => data[:license_url] } })
       end
     end
 
@@ -202,7 +202,7 @@ describe UsageRightsController, type: :request do
     it "should list licenses" do
       json = api_call(:get, "/api/v1/users/#{@user.id}/content_licenses",
                       { controller: 'usage_rights', action: 'licenses', user_id: @user.to_param, format: 'json'})
-      expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license], 'url' => data[:license_url] } })
+      expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license].call, 'url' => data[:license_url] } })
     end
 
     it "should set usage rights" do
@@ -223,7 +223,7 @@ describe UsageRightsController, type: :request do
     it "should list licenses" do
       json = api_call(:get, "/api/v1/groups/#{@group.id}/content_licenses",
                       { controller: 'usage_rights', action: 'licenses', group_id: @group.to_param, format: 'json'})
-      expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license], 'url' => data[:license_url] } })
+      expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license].call, 'url' => data[:license_url] } })
     end
 
     it "should set usage rights" do

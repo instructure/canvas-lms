@@ -51,7 +51,7 @@ describe "Sessions Timeout" do
     login_as
     expect(f('#global_nav_profile_display_name').text).to eq @user.primary_pseudonym.unique_id
 
-    Timecop.travel(Time.now + 1.minute) do
+    Timecop.travel(Time.now + 61.seconds) do
       get "/courses"
 
       assert_flash_warning_message("You must be logged in to access this page")

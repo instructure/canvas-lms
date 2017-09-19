@@ -26,12 +26,12 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import UsersListRow from './UsersListRow'
 
-const { string, array, object, func } = PropTypes
+const { string, object, func } = PropTypes
 
 class UsersList extends React.Component {
   static propTypes = {
     accountId: string.isRequired,
-    users: array.isRequired,
+    users: PropTypes.arrayOf(object).isRequired,
     timezones: object.isRequired,
     permissions: object.isRequired,
     handlers: object.isRequired,
@@ -55,6 +55,7 @@ class UsersList extends React.Component {
       search_term: this.props.userList.searchFilter.search_term,
       sort: column,
       order: newOrder,
+      role_filter_id: this.props.userList.searchFilter.role_filter_id
     })
     this.props.onApplyFilters()
   }

@@ -56,6 +56,13 @@ describe DeveloperKeysController do
         expect(response).to be_success
         expect(assigns[:keys]).to be_include(dk)
       end
+
+      it "should include the key's 'vendor_code'" do
+        user_session(@admin)
+        DeveloperKey.create!(vendor_code: 'test_vendor_code')
+        get 'index', params: {account_id: Account.site_admin.id}
+        expect(assigns[:keys].first.vendor_code).to eq 'test_vendor_code'
+      end
     end
 
     describe "POST 'create'" do

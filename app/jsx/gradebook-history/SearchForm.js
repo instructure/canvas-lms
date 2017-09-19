@@ -232,27 +232,21 @@ class SearchFormComponent extends Component {
 
   render () {
     return (
-      <FormFieldGroup
-        description={<ScreenReaderContent>{I18n.t('Search Form')}</ScreenReaderContent>}
-      >
-        <Container as="div" textAlign="center" margin="none large">
-          <div className="GradebookHistory__SearchFormInput">
-            <Autocomplete
-              id="graders"
-              allowEmpty
-              emptyOption={this.state.messages.graders}
-              filter={this.filterNone}
-              label={I18n.t('Grader')}
-              loading={this.props.graders.fetchStatus === 'started'}
-              loadingOption={<Spinner size="small" title={I18n.t('Loading Graders')} />}
-              onBlur={this.promptUserEntry}
-              onChange={this.setSelectedGrader}
-              onInputChange={this.handleSearchEntry}
-            >
-              {this.renderAsOptions(this.props.graders.items)}
-            </Autocomplete>
-          </div>
-          <div className="GradebookHistory__SearchFormInput">
+      <Container as="div" margin="0 0 xx-large x-small">
+        <FormFieldGroup
+          description={<ScreenReaderContent>{I18n.t('Search Form')}</ScreenReaderContent>}
+          as="div"
+          layout="columns"
+          colSpacing="large"
+          vAlign="bottom"
+          startAt="large"
+        >
+          <FormFieldGroup
+            description={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}
+            as="div"
+            layout="columns"
+            startAt="medium"
+          >
             <Autocomplete
               id="students"
               allowEmpty
@@ -267,8 +261,20 @@ class SearchFormComponent extends Component {
             >
               {this.renderAsOptions(this.props.students.items)}
             </Autocomplete>
-          </div>
-          <div className="GradebookHistory__SearchFormInput">
+            <Autocomplete
+              id="graders"
+              allowEmpty
+              emptyOption={this.state.messages.graders}
+              filter={this.filterNone}
+              label={I18n.t('Grader')}
+              loading={this.props.graders.fetchStatus === 'started'}
+              loadingOption={<Spinner size="small" title={I18n.t('Loading Graders')} />}
+              onBlur={this.promptUserEntry}
+              onChange={this.setSelectedGrader}
+              onInputChange={this.handleSearchEntry}
+            >
+              {this.renderAsOptions(this.props.graders.items)}
+            </Autocomplete>
             <Autocomplete
               id="assignments"
               allowEmpty
@@ -283,34 +289,34 @@ class SearchFormComponent extends Component {
             >
               {this.renderAsOptions(this.props.assignments.items)}
             </Autocomplete>
-          </div>
-          <div className="GradebookHistory__SearchFormInput">
+          </FormFieldGroup>
+          <FormFieldGroup
+            description={<ScreenReaderContent>{I18n.t('Dates')}</ScreenReaderContent>}
+            layout="columns"
+            startAt="small"
+          >
             <DateInput
-              label={I18n.t('From')}
+              label={I18n.t('Start Date')}
               previousLabel={I18n.t('Previous Month')}
               nextLabel={I18n.t('Next Month')}
               onDateChange={this.setSelectedFrom}
             />
-          </div>
-          <div className="GradebookHistory__SearchFormInput">
             <DateInput
-              label={I18n.t('To')}
+              label={I18n.t('End Date')}
               previousLabel={I18n.t('Previous Month')}
               nextLabel={I18n.t('Next Month')}
               onDateChange={this.setSelectedTo}
             />
-          </div>
-          <div className="GradebookHistory__SearchFormInput GradebookHistory__SearchFormButton">
-            <Button
-              onClick={this.handleSubmit}
-              type="submit"
-              variant="primary"
-            >
-              {I18n.t('Find')}
-            </Button>
-          </div>
-        </Container>
-      </FormFieldGroup>
+          </FormFieldGroup>
+          <Button
+            onClick={this.handleSubmit}
+            type="submit"
+            variant="primary"
+          >
+            {I18n.t('Filter')}
+          </Button>
+        </FormFieldGroup>
+      </Container>
     );
   }
 }

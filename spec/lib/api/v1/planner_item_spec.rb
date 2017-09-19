@@ -30,6 +30,7 @@ describe Api::V1::PlannerItem do
     def wiki_page_json(*args); end
     def discussion_topic_api_json(*args); end
     def named_context_url(*args); end
+    def api_v1_planner_notes_show_path(*args); end
   end
 
   before :once do
@@ -50,10 +51,10 @@ describe Api::V1::PlannerItem do
     @student_override = planner_override_model(plannable: @assignment, user: @student, marked_complete: true)
   end
 
-  describe '.planner_item_json' do
-    let(:api) { PlannerItemHarness.new }
-    let(:session) { double }
+  let(:api) { PlannerItemHarness.new }
+  let(:session) { double }
 
+  describe '.planner_item_json' do
     it 'should return with a plannable_date for the respective item' do
       asg_due_at = 1.week.ago
       asg = assignment_model course: @couse, submission_types: 'online_text_entry', due_at: asg_due_at
@@ -168,6 +169,50 @@ describe Api::V1::PlannerItem do
         json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
         expect(json[:submissions][:has_feedback]).to be true
       end
+    end
+  end
+
+  describe '#new_activity' do
+    it 'should return true for assignments with new grades' do
+      graded_submission(@quiz, @student)
+      graded_submission_model(assignment: @assignment, user: @student).update_attributes(score: 5)
+      graded_submission_model(assignment: @topic.assignment, user: @student).update_attributes(score: 5)
+      expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@assignment, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
+    end
+
+    it 'should return true for assignments with new feedback' do
+      student_in_course active_all: true
+      submission_model(assignment: @quiz.assignment, user: @student).add_comment(author: @teacher, comment: 'hi')
+      submission_model(assignment: @assignment, user: @student).add_comment(author: @teacher, comment: 'hi')
+      submission_model(assignment: @topic.assignment, user: @student).add_comment(author: @teacher, comment: 'hi')
+      expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@assignment, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
+    end
+
+    it 'should return true for discussions with new replies' do
+      student_in_course active_all: true
+      @group_category = nil
+      announcement_model(context: @course).reply_from(user: @teacher, text: 'reply')
+      group_discussion_assignment.reply_from(user: @teacher, text: 'reply')
+      expect(api.planner_item_json(@a, @student, session)[:new_activity]).to be true
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
+    end
+
+    it 'should return false for items without new activity' do
+      student_in_course active_all: true
+      announcement_model(context: @course)
+      expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be false
+      expect(api.planner_item_json(@assignment, @student, session)[:new_activity]).to be false
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be false
+      expect(api.planner_item_json(@a, @student, session)[:new_activity]).to be false
+    end
+
+    it 'should return false for items that cannot have new activity' do
+      planner_note_model(user: @student)
+      expect(api.planner_item_json(@planner_note, @student, session)[:new_activity]).to be false
     end
   end
 end

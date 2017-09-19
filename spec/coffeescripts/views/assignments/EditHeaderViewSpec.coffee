@@ -94,6 +94,30 @@ define [
     ok window.confirm.notCalled
     ok view.delete.notCalled
 
+  QUnit.module 'EditHeaderView - try deleting assignment',
+    setup: ->
+      fakeENV.setup()
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
+    teardown: ->
+      fakeENV.teardown()
+      window.$.restore()
+
+  test 'attempt to delete an assignment, but clicked Cancel on confirmation box', ->
+    view = editHeaderView(in_closed_grading_period: false)
+    @stub(window, "confirm").returns(false)
+    @spy view, "delete"
+
+    setFocusStub = sinon.stub()
+    sinon.stub(window, '$')
+      .withArgs('a:first[role="button"].al-trigger.btn')
+      .returns({focus: setFocusStub})
+
+    view.$(".delete_assignment_link").click()
+    ok window.confirm.called
+    ok view.delete.notCalled
+    ok setFocusStub.called
+
   QUnit.module 'EditHeaderView - ConditionalRelease',
     setup: ->
       fakeENV.setup()

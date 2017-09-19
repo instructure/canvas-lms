@@ -144,7 +144,7 @@ class Course < ActiveRecord::Base
   has_many :context_external_tools, -> { order('name') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :tool_proxies, class_name: 'Lti::ToolProxy', as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :wiki
-  has_many :wiki_pages, foreign_key: 'wiki_id', primary_key: 'wiki_id'
+  has_many :wiki_pages, as: :context, inverse_of: :context
   has_many :quizzes, -> { order('lock_at, title, id') }, class_name: 'Quizzes::Quiz', as: :context, inverse_of: :context, dependent: :destroy
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :through => :quizzes
   has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: 'Quizzes::Quiz', as: :context, inverse_of: :context
@@ -474,7 +474,7 @@ class Course < ActiveRecord::Base
   end
 
   def readable_license
-    license_data[:readable_license]
+    license_data[:readable_license].call
   end
 
   def unpublishable?
@@ -2044,7 +2044,7 @@ class Course < ActiveRecord::Base
     res += self.quizzes
     res += self.discussion_topics.active
     res += self.discussion_entries.active
-    res += self.wiki.wiki_pages.active
+    res += self.wiki_pages.active
     res += self.calendar_events.active
     res
   end
@@ -2990,7 +2990,7 @@ class Course < ActiveRecord::Base
       self.discussion_topics.touch_all
       self.quizzes.touch_all
       self.wiki.touch
-      self.wiki.wiki_pages.touch_all
+      self.wiki_pages.touch_all
     end
   end
 

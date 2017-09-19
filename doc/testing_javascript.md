@@ -3,6 +3,23 @@
 The process of testing JavaScript sometimes confuses people. This document's goal
 is to alleviate that confusion and establish how to run JavaScript tests.
 
+## With Docker and headless Chrome
+
+This is probably the easiest way to run tests, especially for developers that
+don't work with Canvas on a regular basis.
+
+Create a `.env` file in the repository root, containing:
+
+```
+COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose/js-tests.override.yml
+```
+
+Then run:
+
+```
+docker-compose run --rm js-tests
+```
+
 ## With Docker and Webpack
 
 This is becoming the go to standard for running Canvas and compiling your not-JavaScript
