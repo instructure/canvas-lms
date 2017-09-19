@@ -58,12 +58,7 @@ Example Response:
   "upload_url": "https://some-bucket.s3.amazonaws.com/",
   "upload_params": {
     "key": "/users/1234/files/profile_pic.jpg",
-    "acl": "private",
-    "Filename": "profile_pic.jpg",
-    "AWSAccessKeyId": "some_id",
-    "Policy": "some_opaque_string",
-    "Signature": "another_opaque_string",
-    "Content-Type": "image/jpeg"
+    <unspecified parameters; key above will not necesarily be present either>
   }
 }
 ```
@@ -97,13 +92,7 @@ Example Request:
 ```bash
 curl '<upload_url>' \
      -F 'key=/users/1234/files/profile_pic.jpg' \
-     -F 'acl=private' \
-     -F 'Filename=profile_pic.jpg' \
-     -F 'AWSAccessKeyId=some_id' \
-     -F 'Policy=some_opaque_string' \
-     -F 'Signature=another_opaque_string' \
-     -F 'Content-Type=image/jpeg' \
-     -F '<any other fields returned in upload_params>' \
+     <any other parameters specified in the upload_params response>
      -F 'file=@my_local_file.jpg'
 ```
 

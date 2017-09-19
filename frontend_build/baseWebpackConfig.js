@@ -256,6 +256,11 @@ module.exports = {
 
     new WebpackHooks(),
 
+    // avoids warnings caused by
+    // https://github.com/graphql/graphql-language-service/issues/111, should
+    // be removed when that issue is fixed
+    new webpack.IgnorePlugin(/\.flow$/),
+
   ]
   .concat(process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE ? [
 

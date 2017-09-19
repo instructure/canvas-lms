@@ -677,6 +677,7 @@ describe 'Submissions API', type: :request do
         "id"=>sub1.id,
         "grade"=>"A-",
         "entered_grade"=>"A-",
+        "grading_period_id" => sub1.grading_period_id,
         "excused" => sub1.excused,
         "grader_id"=>@teacher.id,
         "graded_at"=>sub1.graded_at.as_json,
@@ -855,6 +856,7 @@ describe 'Submissions API', type: :request do
       [{"id"=>sub1.id,
         "grade"=>"A-",
         "entered_grade"=>"A-",
+        "grading_period_id" => nil,
         "excused" => sub1.excused,
         "grader_id"=>@teacher.id,
         "graded_at"=>sub1.graded_at.as_json,
@@ -891,6 +893,7 @@ describe 'Submissions API', type: :request do
          [{"id"=>sub1.id,
            "grade"=>nil,
            "entered_grade"=>nil,
+           "grading_period_id" => nil,
            "excused" => nil,
            "grader_id"=>nil,
            "graded_at"=>nil,
@@ -915,6 +918,7 @@ describe 'Submissions API', type: :request do
           {"id"=>sub1.id,
            "grade"=>nil,
            "entered_grade"=>nil,
+           "grading_period_id" => nil,
            "excused" => nil,
            "grader_id"=>nil,
            "graded_at"=>nil,
@@ -945,6 +949,7 @@ describe 'Submissions API', type: :request do
           {"id"=>sub1.id,
            "grade"=>"A-",
            "entered_grade"=>"A-",
+           "grading_period_id" => nil,
            "excused" => false,
            "grader_id"=>@teacher.id,
            "graded_at"=>sub1.graded_at.as_json,
@@ -1034,6 +1039,7 @@ describe 'Submissions API', type: :request do
        {"id"=>sub2.id,
         "grade"=>"F",
         "entered_grade"=>"F",
+        "grading_period_id" => nil,
         "excused" => sub2.excused,
         "grader_id"=>@teacher.id,
         "cached_due_date" => nil,
@@ -1047,6 +1053,7 @@ describe 'Submissions API', type: :request do
          [{"id"=>sub2.id,
            "grade"=>"F",
            "entered_grade"=>"F",
+           "grading_period_id" => nil,
            "excused" => nil,
            "grader_id"=>@teacher.id,
            "graded_at"=>sub2.graded_at.as_json,
@@ -2271,7 +2278,7 @@ describe 'Submissions API', type: :request do
       expect(json['late_policy_status']).to eq 'missing'
     end
 
-    it "can set seconds_late_override on a submission" do
+    it "can set seconds_late_override on a submission along with the late_policy_status of late" do
       seconds_late_override = 3.days
       json = api_call(
         :put,
@@ -2295,6 +2302,28 @@ describe 'Submissions API', type: :request do
       expect(submission.late_policy_status).to eq 'late'
       expect(submission.seconds_late).to eql seconds_late_override.to_i
       expect(json['late_policy_status']).to eq 'late'
+      expect(json['seconds_late']).to eql seconds_late_override.to_i
+    end
+
+    it "can set seconds_late_override on a submission that has a late_policy_status of 'late'" do
+      @assignment.grade_student(@student, grade: 5, grader: @teacher)
+      @assignment.submission_for_student(@student).update!(late_policy_status: 'late')
+      seconds_late_override = 3.days
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: { seconds_late_override: seconds_late_override }
+        }
+      )
+
       expect(json['seconds_late']).to eql seconds_late_override.to_i
     end
 
@@ -3939,6 +3968,11 @@ describe 'Submissions API', type: :request do
           expected_url = "http://www.example.com/courses/#{assignment.course.id}/external_tools/retrieve?assignment_id=#{assignment.id}&url=http%3A%2F%2Fwww.test.com%2Fbasic-launch"
           submission_json = api_call_as_user(teacher, :get, path, params)
           expect(submission_json.first['url']).to eq expected_url
+        end
+
+        it 'includes the external tool URL' do
+          submission_json = api_call_as_user(teacher, :get, path, params)
+          expect(submission_json.first['external_tool_url']).to eq external_tool_url
         end
       end
     end

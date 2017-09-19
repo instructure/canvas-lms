@@ -1936,7 +1936,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "sis validations enabled" do
-      before do
+      before(:each) do
         a = @course.account
         a.enable_feature!(:new_sis_integrations)
         a.settings[:sis_syncing] = {value: true}
@@ -3925,6 +3925,7 @@ describe AssignmentsApiController, type: :request do
          "excused" => nil,
          "grade" => "99",
          "entered_grade" => "99",
+         "grading_period_id" => @submission.grading_period_id,
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
          "grader_id" => @teacher.id,
@@ -3962,6 +3963,7 @@ describe AssignmentsApiController, type: :request do
          "excused" => nil,
          "grade" => "99",
          "entered_grade" => "99",
+         "grading_period_id" => @submission.grading_period_id,
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
          "grader_id" => @teacher.id,

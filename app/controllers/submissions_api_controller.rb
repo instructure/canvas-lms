@@ -681,8 +681,8 @@ class SubmissionsApiController < ApplicationController
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
       end
-      if submission.key?(:late_policy_status)
-        @submission.late_policy_status = submission[:late_policy_status]
+      if submission.key?(:late_policy_status) || submission.key?(:seconds_late_override)
+        @submission.late_policy_status = submission[:late_policy_status] if submission.key?(:late_policy_status)
         if @submission.late_policy_status == 'late' && submission[:seconds_late_override].present?
           @submission.seconds_late_override = submission[:seconds_late_override]
         end

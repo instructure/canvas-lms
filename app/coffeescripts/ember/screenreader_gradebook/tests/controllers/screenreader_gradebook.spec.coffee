@@ -32,8 +32,7 @@ define [
   CourseGradeCalculator
 ) ->
 
-  workAroundRaceCondition = ->
-    ajax.request()
+  qunitTimeout = QUnit.config.testTimeout
 
   App = null
   originalIsDraft = null
@@ -48,17 +47,17 @@ define [
     gradingPeriods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }]
     weighted: true
 
-  setup = (isDraftState=false, sortOrder='assignment_group') ->
+  setFixtures = (isDraftState=false, sortOrder='assignment_group') ->
     fixtures.create()
     @contextGetStub = sinon.stub(userSettings, 'contextGet')
     @contextSetStub = sinon.stub(userSettings, 'contextSet')
     @contextGetStub.withArgs('sort_grade_columns_by').returns({sortType: sortOrder})
     @contextSetStub.returns({sortType: sortOrder})
+
+  initializeApp = ->
     App = startApp()
     Ember.run =>
       @srgb = SRGBController.create()
-      effectiveDueDates = Ember.ObjectProxy.create(content: clone fixtures.effectiveDueDates)
-      Ember.setProperties effectiveDueDates, { isLoaded: true }
       @srgb.set('model', {
         enrollments: Ember.ArrayProxy.create(content: clone fixtures.students)
         assignment_groups: Ember.ArrayProxy.create(content: [])
@@ -66,10 +65,15 @@ define [
         sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
         outcomes: Ember.ArrayProxy.create(content: clone fixtures.outcomes)
         outcome_rollups: Ember.ArrayProxy.create(content: clone fixtures.outcome_rollups)
-        effectiveDueDates: effectiveDueDates
       })
 
+  setup = (isDraftState=false, sortOrder='assignment_group') ->
+    setFixtures.call(this, isDraftState, sortOrder)
+    initializeApp.call(this)
+    QUnit.config.testTimeout = 1000
+
   teardown = ->
+    QUnit.config.testTimeout = qunitTimeout
     @contextGetStub.restore()
     @contextSetStub.restore()
     Ember.run App, 'destroy'
@@ -84,12 +88,11 @@ define [
     equal @srgb.get('students.length'), 10
     equal @srgb.get('students.firstObject').name, fixtures.students[0].user.name
 
-  asyncTest 'calculates assignments properly', ->
-    workAroundRaceCondition().then =>
+  test 'calculates assignments properly', ->
+    ajax.request().then =>
       equal @srgb.get('assignments.length'), 7
       ok !@srgb.get('assignments').findBy('name', 'Not Graded')
       equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
-      start()
 
   test 'calculates outcomes properly', ->
     equal @srgb.get('outcomes.length'), 2
@@ -100,13 +103,13 @@ define [
       strictEqual @srgb.get('students').findBy('id', obj.id), obj
 
   asyncTest 'assignmentGroupsHash retuns the expected hash', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       _.each @srgb.assignmentGroupsHash(), (obj) =>
         strictEqual @srgb.get('assignment_groups').findBy('id', obj.id), obj
       start()
 
   asyncTest 'student objects have isLoaded flag set to true once submissions are loaded', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       @srgb.get('students').forEach (s) ->
         equal Ember.get(s, 'isLoaded'), true
       start()
@@ -157,7 +160,7 @@ define [
     equal @srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy'
 
   asyncTest 'sorting assignments by position', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       Ember.run =>
         @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
       equal @srgb.get('assignments.firstObject.name'), 'Z Eats Soup'
@@ -165,7 +168,7 @@ define [
       start()
 
   asyncTest 'updates assignment_visibility on an assignment', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       assignments = @srgb.get('assignments')
       assgn = assignments.objectAt(2)
       @srgb.updateAssignmentVisibilities(assgn, '3')
@@ -173,7 +176,7 @@ define [
       start()
 
   asyncTest 'studentsThatCanSeeAssignment doesnt return all students', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       assgn = @srgb.get('assignments.firstObject')
       students = @srgb.studentsThatCanSeeAssignment(assgn)
       ids = Object.keys(students)
@@ -182,7 +185,7 @@ define [
       start()
 
   asyncTest 'sorting assignments alphabetically', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       Ember.run =>
         @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
       equal @srgb.get('assignments.firstObject.name'), 'Apples are good'
@@ -190,12 +193,95 @@ define [
       start()
 
   asyncTest 'sorting assignments by due date', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       Ember.run =>
         @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
       equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
       equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
       start()
+
+  QUnit.module 'screenreader_gradebook_controller Loading Submissions',
+    setup: ->
+      setFixtures.call(this)
+      ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.submissions_url,
+        response: [
+          {
+            submissions: [{
+              assignment_id: '1',
+              assignment_visible: true,
+              cached_due_date: '2015-03-01T12:00:00Z',
+              score: 10,
+              user_id: '1'
+            }, {
+              assignment_id: '2',
+              assignment_visible: true,
+              cached_due_date: '2015-05-02T12:00:00Z',
+              score: 9,
+              user_id: '1'
+            }],
+            user_id: '01'
+          }, {
+            submissions: [{
+              assignment_id: '1',
+              assignment_visible: true,
+              cached_due_date: '2015-07-03T12:00:00Z',
+              score: 8,
+              user_id: '2'
+            }],
+            user_id: '2'
+          }
+        ]
+        jqXHR: { getResponseHeader: -> {} }
+        textStatus: 'success'
+
+      ENV.GRADEBOOK_OPTIONS.grading_period_set =
+        id: '1501'
+        grading_periods: [
+          {
+            id: '1403'
+            close_date: '2015-07-08T12:00:00Z'
+            end_date: '2015-07-01T12:00:00Z'
+            is_closed: false
+            start_date: '2015-05-01T12:00:00Z'
+          },
+          {
+            id: '1401'
+            close_date: '2015-03-08T12:00:00Z'
+            end_date: '2015-03-01T12:00:00Z'
+            is_closed: true
+            start_date: '2015-01-01T12:00:00Z'
+          },
+          {
+            id: '1402'
+            close_date: '2015-05-08T12:00:00Z'
+            end_date: '2015-05-01T12:00:00Z'
+            is_closed: false
+            start_date: '2015-03-01T12:00:00Z'
+          }
+        ]
+        weighted: true
+
+      initializeApp.call(this)
+
+    teardown: ->
+      teardown.call(this)
+
+  test 'updates effective due dates', ->
+    ajax.request('/api/v1/submissions').then =>
+      effectiveDueDates = @srgb.get('effectiveDueDates.content')
+      deepEqual(Object.keys(effectiveDueDates), ['1', '2'])
+      deepEqual(Object.keys(effectiveDueDates[1]), ['1', '2'])
+      deepEqual(Object.keys(effectiveDueDates[2]), ['1'])
+
+  test 'updates effective due dates on related assignments', ->
+    ajax.request('/api/v1/submissions').then =>
+      deepEqual(Object.keys(@srgb.get('assignments').findBy('id', '1').effectiveDueDates), ['1', '2'])
+      deepEqual(Object.keys(@srgb.get('assignments').findBy('id', '2').effectiveDueDates), ['1'])
+
+  test 'updates inClosedGradingPeriod on related assignments', ->
+    ajax.request('/api/v1/submissions').then =>
+      strictEqual(@srgb.get('assignments').findBy('id', '1').inClosedGradingPeriod, true)
+      strictEqual(@srgb.get('assignments').findBy('id', '2').inClosedGradingPeriod, false)
 
   QUnit.module 'screenreader_gradebook_controller#gradesAreWeighted',
     setup: ->
@@ -310,7 +396,7 @@ define [
       @stub(@srgb, 'calculateStudentGrade')
       @stub(@srgb, 'subtotalByGradingPeriod')
       @completeSetup = =>
-        workAroundRaceCondition().then =>
+        ajax.request().then =>
           Ember.run =>
             @srgb.set('selectedGradingPeriod', { id: '3' })
             @srgb.set('assignment_groups', Ember.ArrayProxy.create(content: clone fixtures.assignment_groups))
@@ -325,18 +411,12 @@ define [
       strictEqual @srgb.get('selectedSubmission'), null
       start()
 
-  asyncTest 'assignments excludes any due for the selected student in a different grading period', ->
-    @srgb.has_grading_periods = true
-    @completeSetup().then =>
-      deepEqual(@srgb.get('assignments').mapBy('id'), ['3'])
-      start()
-
   QUnit.module 'screenreader_gradebook_controller: with selected student, assignment, and outcome',
     setup: ->
       setup.call this
       @completeSetup = =>
         Ember.run =>
-          workAroundRaceCondition().then =>
+          ajax.request().then =>
             @student = @srgb.get('students.firstObject')
             @assignment = @srgb.get('assignments.firstObject')
             @outcome = @srgb.get('outcomes.firstObject')
@@ -390,7 +470,7 @@ define [
     setup: ->
       setup.call this
       @completeSetup = =>
-        workAroundRaceCondition().then =>
+        ajax.request().then =>
           @assignment = @srgb.get('assignments.firstObject')
           Ember.run =>
             @srgb.set('selectedAssignment', @assignment)
@@ -433,7 +513,7 @@ define [
     setup: ->
       setup.call this, true
       @completeSetup = =>
-        workAroundRaceCondition().then =>
+        ajax.request().then =>
           Ember.run =>
             @srgb.get('assignment_groups').pushObject
               id: '100'
@@ -504,7 +584,7 @@ define [
       calculationSetup.call this
 
   asyncTest 'calculates final grade', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       equal @srgb.get('students.firstObject.total_percent'), 79.55
       start()
 
@@ -513,7 +593,7 @@ define [
       calculationSetup.call this, calc_stub_with_0_possible
 
   asyncTest 'calculates final grade', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       equal @srgb.get('students.firstObject.total_percent'), 0
       start()
 
@@ -760,7 +840,7 @@ define [
       equal @srgb.get('selectedSubmissionHidden'), false
 
   asyncTest 'selectedSubmissionHidden is true when students dont have visibility', ->
-    workAroundRaceCondition().then =>
+    ajax.request().then =>
       student = @srgb.get('students').objectAt(2)
       assignment = @srgb.get('assignments.firstObject')
 

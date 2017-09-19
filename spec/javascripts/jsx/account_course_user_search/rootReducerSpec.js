@@ -71,6 +71,39 @@ define(['jsx/account_course_user_search/reducers/rootReducer'], (reducer) => {
     equal(user.email, 'some_email@example.com', 'creates an email property if needed');
   });
 
+  test('ADD_TO_USERS action reducer invalid email', () => {
+    const initialState = {
+      userList: {
+        users: [],
+        isLoading: true,
+        errors: {search_term: ''},
+        next: undefined,
+        searchFilter: {search_term: ''},
+        timezones: [],
+        permissions: [],
+        accountId: '123'
+      }
+    };
+    const action = {
+      type: 'ADD_TO_USERS',
+      payload: {
+        users: [{
+          id: '1',
+          locale: null,
+          login_id: 'invalid.com',
+          name: 'someuser',
+          short_name: 'someuser',
+          sortable_name: 'someuser'
+        }]
+      }
+    };
+
+    const newState = reducer(initialState, action);
+    const user = newState.userList.users[0]
+
+    equal(user.email, null, 'creates an email property if needed');
+  });
+
   test('GOT_USERS action reducer', () => {
     const initialState = {
       userList: {

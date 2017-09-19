@@ -19,6 +19,9 @@ test:
     address-book:
       app-host: http://address-book.docker
       secret: opensesame
+    inst-fs:
+      app-host: http://api.instfs.docker
+      secret: supersecretyup
     live-events-subscription-service:
       app-host: http://les.docker
       sad-panda: null
@@ -36,6 +39,9 @@ development:
     address-book:
       app-host: http://address-book.docker
       secret: opensesame
+    inst-fs:
+      app-host: http://api.instfs.docker
+      secret: supersecretyup
     live-events-subscription-service:
       app-host: http://les.docker
     live-events:

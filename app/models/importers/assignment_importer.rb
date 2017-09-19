@@ -58,13 +58,8 @@ module Importers
 
       assignment_ids = assignment_records.map(&:id)
       Submission.suspend_callbacks(:update_assignment, :touch_graders) do
-        # execute this query against the slave, so that it will use a cursor, and not
-        # attempt to order by submissions.id, because in very large dbs that can cause
-        # the postgres planner to prefer to search the submission_pkey index
-        Shackles.activate(:slave) do
-          Submission.where(assignment_id: assignment_ids).find_each do |sub|
-            Shackles.activate(:master) { sub.save! }
-          end
+        Submission.where(assignment_id: assignment_ids).find_each do |sub|
+          sub.save!
         end
       end
 
@@ -79,6 +74,7 @@ module Importers
       item ||= context.assignments.temp_record #new(:context => context)
 
       item.mark_as_importing!(migration)
+      master_migration = migration&.for_master_course_import?  # propagate null dates only for blueprint syncs
 
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
@@ -185,6 +181,8 @@ module Importers
         assoc.save
 
         item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
+      elsif master_migration && item.rubric
+        item.rubric_association.destroy
       end
 
       if hash[:assignment_overrides]
@@ -236,7 +234,6 @@ module Importers
       end
 
       hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
-      master_migration = migration&.for_master_course_import?  # propagate null dates only for blueprint syncs
       [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
         if hash.has_key?(key) && (master_migration || hash[key].present?)
           item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])

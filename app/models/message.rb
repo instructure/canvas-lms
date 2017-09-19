@@ -496,12 +496,7 @@ class Message < ActiveRecord::Base
     # (temporarily) override course name with user's nickname for the course
     hacked_course = apply_course_nickname_to_asset(self.context, self.user)
 
-    # Ensure we have a path_type
-    path_type = 'dashboard' if to == 'summary'
-    unless path_type
-      path_type = communication_channel.try(:path_type) || 'email'
-    end
-
+    path_type ||= communication_channel.try(:path_type) || 'email'
 
     # Determine the message template file to be used in the message
     filename = template_filename(path_type)
@@ -511,7 +506,7 @@ class Message < ActiveRecord::Base
       self.context, self.user, @delayed_messages, self.asset_context, @data]
 
     link_root_account.shard.activate do
-      if message_body_template.present? && path_type.present?
+      if message_body_template.present?
         populate_body(message_body_template, path_type, binding, filename)
 
         # Set the subject and url
@@ -669,6 +664,24 @@ class Message < ActiveRecord::Base
     current_context.root_account
   end
 
+  # This is a dumb name, but it's the context (course/group/account/user) of
+  # the message.context (which should really be message.asset)
+  def context_context
+    @context_context ||= begin
+      unbounded_loop_paranoia_counter = 10
+      current_context = context
+
+      until current_context&.is_a_context?
+        return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
+        return nil unless current_context.respond_to?(:context)
+        current_context = current_context.context
+        unbounded_loop_paranoia_counter -= 1
+      end
+
+      current_context
+    end
+  end
+
   def custom_logo
     context_root_account && context_root_account.settings[:email_logo]
   end
@@ -748,7 +761,7 @@ class Message < ActiveRecord::Base
   #
   # Returns json hash.
   def as_json(options = {})
-    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :to, :reply_to, :subject, :body, :html_body])['message']
+    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :from_name, :to, :reply_to, :subject, :body, :html_body])['message']
   end
 
   protected
@@ -881,10 +894,8 @@ class Message < ActiveRecord::Base
 
   private
   def infer_from_name
-    if asset_context
-      return name_helper.from_name if name_helper.from_name.present?
-      return asset_context.name if can_use_asset_name_for_from?
-    end
+    return name_helper.from_name if name_helper.from_name.present?
+    return context_context.nickname_for(user) if can_use_name_for_from?(context_context)
 
     if root_account && root_account.settings[:outgoing_email_default_name]
       return root_account.settings[:outgoing_email_default_name]
@@ -893,8 +904,9 @@ class Message < ActiveRecord::Base
     HostUrl.outgoing_email_default_name
   end
 
-  def can_use_asset_name_for_from?
-    !asset_context.is_a?(Account) && asset_context.name && notification.dashboard? rescue false
+  def can_use_name_for_from?(c)
+    c && !c.is_a?(Account) && notification&.dashboard? &&
+      c.respond_to?(:name) && c.name.present?
   end
 
   def name_helper

@@ -35,7 +35,6 @@ services:
       <<: *BASE-ENV
       VIRTUAL_HOST: .canvas.docker
 
-
   postgres:
     volumes:
       - pg_data:/var/lib/postgresql/data

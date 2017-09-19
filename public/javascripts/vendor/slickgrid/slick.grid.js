@@ -647,14 +647,16 @@ if (typeof Slick === "undefined") {
       }
 
       var columnDef = columns[idx];
-      var headers = [];
-      if(options.numberOfColumnsToFreeze > 0) {
-        headers.push($headers_0.children());
-      }
-      headers.push($headers_1.children());
+      let $header;
 
-      for(var i = 0; i < headers.length; i++) {
-        var $header = $headers[i].eq(idx);
+      if (options.numberOfColumnsToFreeze > 0) {
+        if (options.numberOfColumnsToFreeze > idx) {
+          $header = $headers_0.children().eq(idx);
+        } else {
+          $header = $headers_1.children().eq(idx - options.numberOfColumnsToFreeze);
+        }
+      }
+
       if ($header) {
         if (title !== undefined) {
           columns[idx].name = title;
@@ -677,7 +679,6 @@ if (typeof Slick === "undefined") {
           "column": columnDef
         });
       }
-    }
     }
 
     function getHeaderRow() {

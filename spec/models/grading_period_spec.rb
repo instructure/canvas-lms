@@ -388,19 +388,37 @@ describe GradingPeriod do
       grading_period.destroy
     end
 
-    it 'does not recalculate course scores if the grading period group is not weighted' do
-      course = Course.create!
-      grading_period_group.enrollment_terms << course.enrollment_term
-      enrollment = student_in_course(course: course)
-      enrollment.scores.create!(grading_period: grading_period)
-      expect(GradeCalculator).not_to receive(:recompute_final_score)
-      grading_period.destroy
-    end
-
     it 'does not destroy the set when the last grading period is destroyed (account grading periods)' do
       grading_period.save!
       grading_period.destroy
       expect(grading_period_group).not_to be_deleted
+    end
+
+    it 'updates the grading_period_id to nil on submissions that were in the deleted grading period' do
+      student = User.create!
+      course.enroll_student(student, enrollment_state: :active)
+      grading_period.save!
+      assignment = course.assignments.create!(due_at: 2.hours.from_now(grading_period.start_date))
+      submission = assignment.submissions.find_by(user_id: student)
+      expect { grading_period.destroy }.to change {
+        submission.reload.grading_period_id
+      }.from(grading_period.id).to(nil)
+    end
+
+    it 'places submissions without due dates in the new "last" period if the "last" period was deleted' do
+      student = User.create!
+      course.enroll_student(student, enrollment_state: :active)
+      grading_period.save!
+      other_period = grading_period_group.grading_periods.create!(
+        title: "I will be the last period when the other one is deleted",
+        start_date: 2.days.ago(grading_period.start_date),
+        end_date: 1.day.ago(grading_period.start_date)
+      )
+      assignment = course.assignments.create!
+      submission = assignment.submissions.find_by(user_id: student)
+      expect { grading_period.destroy }.to change {
+        submission.reload.grading_period_id
+      }.from(grading_period.id).to(other_period.id)
     end
 
     context 'course grading periods (legacy support)' do
@@ -895,6 +913,27 @@ describe GradingPeriod do
       expect{ grading_period.update!(start_date: 1.day.ago(@assignment.due_at)) }.to change{
         Score.where(grading_period_id: grading_period).first.current_score
       }.from(nil).to(80.0)
+    end
+
+    it 'updates grading period ids on submissions without due dates if the "last" period changes' do
+      student = User.create!
+      course.enroll_student(student, enrollment_state: :active)
+      grading_period.save!
+      other_period = grading_period_group.grading_periods.create!(
+        title: "I will be the last period when the other one changes dates",
+        start_date: 2.days.ago(grading_period.start_date),
+        end_date: 1.day.ago(grading_period.start_date)
+      )
+      assignment = course.assignments.create!
+      submission = assignment.submissions.find_by(user_id: student)
+      expect do
+        grading_period.update!(
+          start_date: 2.days.ago(other_period.start_date),
+          end_date: 1.day.ago(other_period.start_date)
+        )
+      end.to change {
+        submission.reload.grading_period_id
+      }.from(grading_period.id).to(other_period.id)
     end
 
     it 'updates course score when the grading period weight is changed' do

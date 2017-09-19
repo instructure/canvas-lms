@@ -104,7 +104,7 @@ module Lti
                    when 'module'
                      @context.context_modules.where(id: @media_types[:modules].first).first.name
                    when 'page'
-                     @context.wiki.wiki_pages.where(id: @media_types[:pages].first).first.title
+                     @context.wiki_pages.where(id: @media_types[:pages].first).first.title
                    when 'module_item'
                      tag.title
                    when 'quiz'
@@ -156,7 +156,7 @@ module Lti
                 when 'modules'
                   @context.context_modules
                 when 'pages'
-                  @context.wiki.wiki_pages
+                  @context.wiki_pages
                 when 'module_items'
                   @context.context_module_tags
                 when 'quizzes'

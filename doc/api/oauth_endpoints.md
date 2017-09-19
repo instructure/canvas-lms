@@ -217,7 +217,8 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   If your application supports logout functionality, you can revoke your own
   access token. This is useful for security reasons, as well as removing your
   application from the list of tokens on the user's profile page. Simply make
-  an authenticated request to the following endpoint:
+  an authenticated request to the following endpoint by including an Authorization
+  header or providing the access_token as a request parameter.
 
   <h3 class="endpoint">DELETE /login/oauth2/token</h3>
 

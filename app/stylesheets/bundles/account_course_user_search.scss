@@ -56,7 +56,7 @@
 
   li[role=tab] {
     font-size: 1.1em;
-    color: $ic-link-color;
+    color: var(--ic-link-color);
     padding: 0;
 
     a {

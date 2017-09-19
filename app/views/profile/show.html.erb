@@ -38,7 +38,7 @@
             <li class="show-if-editing"><a data-event="cancelEditProfile" role="menuitem"><%= t('cancel_editing', 'Cancel Editing') %></a></li>
             <li><a href="<%= user_path(@user.id) %>"role="menuitem"><%= t('links.user_account_details', %{Account Details}) %></a></li>
             <% if @user != @current_user %>
-              <li><a href="<%= user_profile_url(@user, :become_user_id => @user) %>"role="menuitem"> <%= t('masquerade', 'Masquerade') %></a></li>
+              <li><a href="<%= user_profile_url(@user, :become_user_id => @user) %>"role="menuitem"> <%= t('Act as User') %></a></li>
             <% end %>
           </ul>
         </div>

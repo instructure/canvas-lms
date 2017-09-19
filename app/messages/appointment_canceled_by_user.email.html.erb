@@ -17,7 +17,7 @@
   <%= t('subject', 'Reservation canceled for %{appointment_name} (%{course})', :appointment_name => asset.title, :course => courses) %>
 <% end %>
 
-<p><%= t :message, '%{user} canceled his/her reservation for %{appointment_name}.', :user => data.updating_user.name, :appointment_name => asset.title %></p>
+<p><%= t :message, '%{user} canceled his/her reservation for %{appointment_name}.', :user => data.updating_user_name || data.updating_user.name, :appointment_name => asset.title %></p>
 
 <strong><%= t :details, 'Appointment Details' %>:</strong>
 <p>

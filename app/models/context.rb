@@ -112,7 +112,7 @@ module Context
         res[:modules] = self.respond_to?(:context_modules) && self.context_modules.active.exists?
         res[:quizzes] = self.respond_to?(:quizzes) && self.quizzes.active.exists?
         res[:assignments] = self.respond_to?(:assignments) && self.assignments.active.exists?
-        res[:pages] = self.respond_to?(:wiki) && self.wiki_id && self.wiki.wiki_pages.active.exists?
+        res[:pages] = self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists?
         res[:conferences] = self.respond_to?(:web_conferences) && self.web_conferences.active.exists?
         res[:announcements] = self.respond_to?(:announcements) && self.announcements.active.exists?
         res[:outcomes] = self.respond_to?(:has_outcomes?) && self.has_outcomes?

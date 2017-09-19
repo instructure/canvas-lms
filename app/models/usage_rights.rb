@@ -41,7 +41,7 @@ class UsageRights < ActiveRecord::Base
   end
 
   def license_name
-    self.class.licenses[license || 'private'][:readable_license]
+    self.class.licenses[license || 'private'][:readable_license].call
   end
 
   def license_url

@@ -385,7 +385,7 @@ describe "course settings" do
       topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
       mod = @course.context_modules.create!(:name => "some module")
       tag = mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
-      page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => html)
+      page = @course.wiki_pages.create!(:title => "wiki", :body => html)
       quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
 
       qq = quiz.quiz_questions.create!(:question_data => aq.question_data.merge('question_name' => 'other test question'))
@@ -436,7 +436,7 @@ describe "course settings" do
         <a href='#{deleted_link}'>link</a>
       }
       @course.save!
-      page = @course.wiki.wiki_pages.create!(:title => "wikiii", :body => %{<a href='#{unpublished_link}'>link</a>})
+      page = @course.wiki_pages.create!(:title => "wikiii", :body => %{<a href='#{unpublished_link}'>link</a>})
 
       get "/courses/#{@course.id}/link_validator"
       wait_for_ajaximations

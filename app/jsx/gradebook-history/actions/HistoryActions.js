@@ -45,14 +45,13 @@ function formatHistoryItems (data) {
   return historyItems.map((item) => {
     const dateChanged = new Date(item.created_at);
     return {
-      date: $.dateString(dateChanged, { format: 'medium', timezone: environment.timezone() }),
-      time: $.timeString(dateChanged, { format: 'medium', timezone: environment.timezone() }),
-      from: GradeFormatHelper.formatGrade(item.grade_before, { defaultValue: '-' }),
-      to: GradeFormatHelper.formatGrade(item.grade_after, { defaultValue: '-' }),
-      grader: users[item.links.grader] || I18n.t('Not available'),
+      date: $.datetimeString(dateChanged, { format: 'medium', timezone: environment.timezone() }),
       student: users[item.links.student] || I18n.t('Not available'),
+      grader: users[item.links.grader] || I18n.t('Not available'),
       assignment: assignments[item.links.assignment] || I18n.t('Not available'),
-      anonymous: item.graded_anonymously ? I18n.t('yes') : I18n.t('no'),
+      before: GradeFormatHelper.formatGrade(item.grade_before, { defaultValue: '-' }),
+      after: GradeFormatHelper.formatGrade(item.grade_after, { defaultValue: '-' }),
+      anonymous: item.graded_anonymously,
       id: item.id
     };
   });

@@ -90,7 +90,7 @@ describe ContextModule do
     end
 
     it "should progress for wiki pages" do
-      @page = @course.wiki.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
+      @page = @course.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
         put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: {:wiki_page => { :body => 'i agree', :title => 'talk page' }}
@@ -216,7 +216,7 @@ describe ContextModule do
     it "should progress to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
+          page = @course.wiki_pages.create!(:title => "wiki", :body => content)
           @test_url = "/courses/#{@course.id}/pages/#{page.url}"
           @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
           expect(@tag2).to be_published

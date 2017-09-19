@@ -186,10 +186,10 @@ module Lti
           expect(tcp_creator.create.capability_offered).not_to include 'Canvas.placements.similarityDetection'
         end
 
-        it 'adds the ToolProxyReregistrationRequest capability if the feature flag is on' do
+        it 'adds the ToolProxyUpdateRequest capability if the feature flag is on' do
           allow(root_account).to receive(:feature_enabled?).and_return(true)
 
-          expected_capability = IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE
+          expected_capability = IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE
           expect(tcp_creator.create.capability_offered).to include expected_capability
         end
 
@@ -203,7 +203,7 @@ module Lti
           it 'adds the oauth2_access_token_ws_security profile' do
             security_profiles = tcp_creator.create.security_profiles
             profile = security_profiles.find{|p| p.security_profile_name == 'oauth2_access_token_ws_security'}
-            expect(profile.digest_algorithms).to match_array ['HS256']
+            expect(profile).to be_present
           end
 
           it 'adds the lti_jwt_ws_security' do

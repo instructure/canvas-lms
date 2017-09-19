@@ -70,7 +70,7 @@ module Lti
       return @reregistration_message_handler if @reregistration_message_handler
       if default_resource_handler
         @reregistration_message_handler ||= default_resource_handler.message_handlers.
-            by_message_types(IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE).first
+            by_message_types(IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE).first
       end
       @reregistration_message_handler
     end

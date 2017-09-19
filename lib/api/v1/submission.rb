@@ -91,7 +91,7 @@ module Api::V1::Submission
 
   SUBMISSION_JSON_FIELDS = %w(id user_id url score grade excused attempt submission_type submitted_at body
     assignment_id graded_at grade_matches_current_submission grader_id workflow_state late_policy_status
-    points_deducted cached_due_date).freeze
+    points_deducted grading_period_id cached_due_date).freeze
   SUBMISSION_JSON_METHODS = %w(late missing seconds_late entered_grade entered_score).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries).freeze
 
@@ -185,6 +185,7 @@ module Api::V1::Submission
     end
 
     if attempt.submission_type == 'basic_lti_launch'
+      hash['external_tool_url'] = attempt.external_tool_url
       hash['url'] = retrieve_course_external_tools_url(context.id,
                                                        assignment_id: assignment.id,
                                                        url: attempt.external_tool_url)

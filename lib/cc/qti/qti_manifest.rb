@@ -128,7 +128,7 @@ module QTI
             node.imsmd :value, "yes"
           end
           rights.imsmd :description do |desc|
-            desc.imsmd :string, "#{course.license_data[:readable_license]} - #{course.license_data[:license_url]}"
+            desc.imsmd :string, "#{course.readable_license} - #{course.license_data[:license_url]}"
           end
         end
       end

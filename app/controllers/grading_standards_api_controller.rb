@@ -147,7 +147,7 @@ class GradingStandardsApiController < ApplicationController
 
   # @API List the grading standards available in a context.
   #
-  # Returns the list of grading standards in the given context that are visible to user.
+  # Returns the list of grading standards for the given context that are visible to the user.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/1/grading_standards \
@@ -160,6 +160,22 @@ class GradingStandardsApiController < ApplicationController
         grading_standard_json(g, @current_user, session)
       end
       render json: grading_standards_json
+    end
+  end
+
+  # @API Get a single grading standard in a context.
+  #
+  # Returns a grading standard for the given context that is visible to the user.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/grading_standards/5 \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns GradingStandard
+  def context_show
+    if authorized_action(@context, @current_user, :read)
+      grading_standard = @context.grading_standards.find(params[:grading_standard_id])
+      render json: grading_standard_json(grading_standard, @current_user, session)
     end
   end
 

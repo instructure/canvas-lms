@@ -585,8 +585,6 @@ class ContentMigration < ActiveRecord::Base
       next unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(klass)
       mig_ids = deletions[klass]
       item_scope = case klass
-      when 'WikiPage'
-        self.context.wiki.wiki_pages.not_deleted.where(migration_id: mig_ids)
       when 'Attachment'
         self.context.attachments.not_deleted.where(migration_id: mig_ids)
       else
@@ -904,4 +902,25 @@ class ContentMigration < ActiveRecord::Base
         record.master_migration && record.master_migration.send_notification?
     }
   end
+
+  def self.expire_days
+    Setting.get('content_migrations_expire_after_days', '30').to_i
+  end
+
+  def self.expire?
+    ContentMigration.expire_days > 0
+  end
+
+  def expired?
+    return false unless ContentMigration.expire?
+    created_at < ContentMigration.expire_days.days.ago
+  end
+
+  scope :expired, -> {
+    if ContentMigration.expire?
+      where('created_at < ?', ContentMigration.expire_days.days.ago)
+    else
+      none
+    end
+  }
 end

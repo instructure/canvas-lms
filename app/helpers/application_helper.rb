@@ -158,7 +158,7 @@ module ApplicationHelper
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
     if @context.respond_to?(:wiki)
       limit = Setting.get('wiki_sidebar_item_limit', 1000000).to_i
-      @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).select('title, url, workflow_state').limit(limit)
+      @wiki_sidebar_data[:wiki_pages] = @context.wiki_pages.active.order(:title).select('title, url, workflow_state').limit(limit)
       @wiki_sidebar_data[:wiki] = @context.wiki
     end
     @wiki_sidebar_data[:wiki_pages] ||= []

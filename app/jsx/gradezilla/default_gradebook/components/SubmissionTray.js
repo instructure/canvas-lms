@@ -93,6 +93,8 @@ export default function SubmissionTray (props) {
                     locale={props.locale}
                     latePolicy={props.latePolicy}
                     submission={props.submission}
+                    submissionUpdating={props.submissionUpdating}
+                    updateSubmission={props.updateSubmission}
                   />
                 </div>
               </div>
@@ -135,6 +137,8 @@ SubmissionTray.propTypes = {
   }),
   courseId: string.isRequired,
   speedGraderEnabled: bool.isRequired,
+  submissionUpdating: bool.isRequired,
+  updateSubmission: func.isRequired,
   locale: string.isRequired,
   latePolicy: shape({
     lateSubmissionInterval: string

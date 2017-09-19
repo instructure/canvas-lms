@@ -116,12 +116,12 @@
 .crs-link-button {
   background: transparent;
   border: none;
-  color: $ic-link-color;
+  color: var(--ic-link-color);
 
   &:focus,
   &:hover {
     text-decoration: underline;
-    color: $ic-link-color-hover;
+    color: var(--ic-link-color-darkened-10);
   }
 }
 
@@ -292,11 +292,11 @@
 .crs-breakdown__link {
   text-decoration: none;
   font-weight: normal;
-  color: $ic-link-color;
+  color: var(--ic-link-color);
 
   &:focus,
   &:hover {
-    color: $ic-link-color-hover;
+    color: var(--ic-link-color-darkened-10);
     text-decoration: underline;
   }
 }

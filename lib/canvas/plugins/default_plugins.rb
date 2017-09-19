@@ -425,4 +425,13 @@ Canvas::Plugin.register('live_events', nil, {
   :settings_partial => 'plugins/live_events_settings',
   :validator => 'LiveEventsValidator'
 })
+Canvas::Plugin.register('inst_fs', nil, {
+  :name =>lambda{ t :name, 'Inst-FS' },
+  :description => lambda{ t :description, 'File service that proxies for S3.' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '0.0.1',
+  :settings => nil,
+  :settings_partial => 'plugins/inst_fs_settings'
+})
 require_dependency 'canvas/plugins/address_book'

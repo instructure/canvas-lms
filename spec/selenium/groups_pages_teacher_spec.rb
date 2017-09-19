@@ -173,13 +173,13 @@ describe "groups" do
       end
 
       it "should allow teachers to access a page", priority: "1", test_id: 289992 do
-        @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @students.first)
+        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
         # Verifies teacher can access the group page & that it's the correct page
         verify_member_sees_group_page
       end
 
       it "has unique pages in the cloned groups", priority: "2", test_id: 1041949 do
-        @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @students.first)
+        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
         get pages_page
         expect(f('.index-content')).to contain_css('.wiki-page-link')
 

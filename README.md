@@ -16,3 +16,10 @@ on our wiki.
 
  * [Quick Start](http://github.com/instructure/canvas-lms/wiki/Quick-Start)
  * [Production Start](http://github.com/instructure/canvas-lms/wiki/Production-Start)
+
+
+https://github.com/instructure/canvas-lms/wiki/Upgrading
+rake db:schema:dump
+RAILS_ENV=test rails db:migrate
+rspec spec/models/context_module_progression_spec.rb:101
+ContextModuleProgression.update_all collapsed: true

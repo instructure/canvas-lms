@@ -36,7 +36,7 @@ describe LiveEvents do
     context 'Wiki Pages' do
 
       def create_page(attrs)
-        page = @course.wiki.wiki_pages.create!(attrs)
+        page = @course.wiki_pages.create!(attrs)
         page.publish! if page.unpublished?
         page
       end

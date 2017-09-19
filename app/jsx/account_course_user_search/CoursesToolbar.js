@@ -28,7 +28,6 @@ import IcCheckbox from './IcCheckbox'
 
 const { string, bool, func, arrayOf, shape } = PropTypes
 
-
 class CoursesToolbar extends React.Component {
   static propTypes = {
     onUpdateFilters: func.isRequired,
@@ -139,6 +138,6 @@ class CoursesToolbar extends React.Component {
       </div>
     )
   }
-  }
+}
 
 export default CoursesToolbar

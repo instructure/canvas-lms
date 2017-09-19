@@ -447,6 +447,7 @@ describe ApplicationController do
           :selection_height => 400}
         tool.settings[:selection_width] = 500
         tool.settings[:selection_height] = 300
+        tool.settings[:custom_fields] = {"test_token"=>"$com.instructure.PostMessageToken"}
         tool.save!
         tool
       end
@@ -470,6 +471,16 @@ describe ApplicationController do
         allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
+      end
+
+      it 'sets the post message token' do
+        allow(controller).to receive(:named_context_url).and_return('wrong_url')
+        allow(controller).to receive(:render)
+        allow(controller).to receive_messages(js_env:[])
+        controller.instance_variable_set(:"@context", course)
+        allow(content_tag).to receive(:id).and_return(42)
+        controller.send(:content_tag_redirect, course, content_tag, nil)
+        expect(assigns[:lti_launch].params["custom_test_token"]).to be_present
       end
 
       it 'uses selection_width and selection_height if provided' do
@@ -963,7 +974,7 @@ describe CoursesController do
       @course.show_announcements_on_home_page = true
       @course.home_page_announcement_limit = 5
       @course.save!
-      @course.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
     end
 
     it "should populate js_env with course_home setting" do
@@ -990,13 +1001,13 @@ describe CoursesController do
 
       @master_course = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      @master_page = @course.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
+      @master_page = @course.wiki_pages.create!(:title => "blah", :body => "bloo")
       @tag = @template.content_tag_for(@master_page)
 
       @child_course = course_factory
       @template.add_child_course!(@child_course)
 
-      @child_page = @child_course.wiki.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
+      @child_page = @child_course.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
     end
 
     it "should populate master-side data (unrestricted)" do

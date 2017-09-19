@@ -58,7 +58,8 @@ module CanvasHttp
   # rather than reading it all into memory.
   #
   # Eventually it may be expanded to optionally do cert verification as well.
-  def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false)
+  def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false,
+    body: nil, content_type: nil)
     last_scheme = nil
     last_host = nil
 
@@ -76,6 +77,8 @@ module CanvasHttp
 
       request = request_class.new(uri.request_uri, other_headers)
       add_form_data(request, form_data) if form_data && !multipart
+      request.body = body if body
+      request.content_type = content_type if content_type
 
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       args = [request]

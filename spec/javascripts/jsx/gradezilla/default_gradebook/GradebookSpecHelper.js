@@ -21,15 +21,24 @@ import Gradebook from 'compiled/gradezilla/Gradebook';
 export function createGradebook (options = {}) {
   const gradebook = new Gradebook({
     colors: {},
+    context_allows_gradebook_uploads: true,
     context_id: '1',
-    new_gradebook_development_enabled: true,
+    context_url: '/courses/1/',
+    export_gradebook_csv_url: 'http://example.com/export',
+    gradebook_import_url: 'http://example.com/import',
+    gradebook_is_editable: true,
+    graded_late_or_missing_submissions_exist: false,
     locale: 'en',
+    new_gradebook_development_enabled: true,
+    outcome_gradebook_enabled: false,
     post_grades_ltis: [],
     sections: [],
     settings: {
       show_concluded_enrollments: 'false',
       show_inactive_enrollments: 'false'
     },
+    closed_grading_period_ids: [],
+    speed_grader_enabled: true,
     ...options
   });
   gradebook.keyboardNav = {
@@ -38,6 +47,28 @@ export function createGradebook (options = {}) {
   };
 
   return gradebook;
+}
+
+export function setFixtureHtml ($fixture) {
+  /* eslint-disable no-param-reassign */
+  $fixture.innerHTML = `
+    <div id="application">
+      <div id="wrapper">
+        <div data-component="GridColor"></div>
+        <div data-component="ViewOptionsMenu"></div>
+        <div data-component="ActionMenu"></div>
+        <div id="search-filter-container">
+          <input type="text" />
+        </div>
+        <div id="gradebook-settings-modal-button-container"></div>
+        <div data-component="GradebookSettingsModal"></div>
+        <div data-component="StatusesModal"></div>
+        <div id="StudentTray__Container"></div>
+        <div id="gradebook_grid"></div>
+      </div>
+    </div>
+  `;
+  /* eslint-enable no-param-reassign */
 }
 
 export default {

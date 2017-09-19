@@ -118,4 +118,21 @@ describe "admin avatars" do
     expect(user.avatar_state).to eq :none
     expect(user.avatar_image_url).to be_nil
   end
+
+  context "student tray" do
+
+    before(:each) do
+      @account = Account.default
+      @account.enable_feature!(:student_context_cards)
+      @student = User.create!
+      @student.avatar_image_url = "http://www.example.com"
+      @course.enroll_student(@student).accept!
+    end
+
+    it "should display student avatar in tray", priority: "1", test_id: 3299466 do
+      get("/courses/#{@course.id}/gradebook")
+      f("a[data-student_id='#{@student.id}']").click
+      expect(f(".StudentContextTray__Avatar a span")).to have_attribute('style', /http/)
+    end
+  end
 end

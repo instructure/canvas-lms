@@ -63,7 +63,7 @@
   </div>
 {{/if}}
 
-{{#if can_move}}
+{{#if can_manage}}
   <div class="pull-right">
     <button class="move_button ui-button ui-widget ui-state-default ui-corner-all">
       <span aria-hidden="true">{{#t}}Move{{/t}}</span>
@@ -76,7 +76,7 @@
         <span class="screenreader-only">{{#t}}Edit Outcome{{/t}}</span>
       </button>
     {{/if}}
-    {{#if can_remove}}
+    {{#if can_unlink}}
       <button class="delete_button ui-button ui-widget ui-state-default ui-corner-all"
         {{#if assessedInContext}} disabled {{/if}}>
         <span aria-hidden="true">{{#t "links.delete_outcome"}}Delete{{/t}}</span>
