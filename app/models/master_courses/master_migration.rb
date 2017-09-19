@@ -219,6 +219,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.child_subscription_id = sub.id
       cm.workflow_state = 'exported'
       cm.exported_attachment = export.attachment
+      cm.user_id = export.user_id
       cm.save!
 
       self.migration_results.create!(:content_migration => cm, :import_type => type, :child_subscription_id => sub.id, :state => "queued")
