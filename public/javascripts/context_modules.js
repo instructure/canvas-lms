@@ -738,9 +738,6 @@ import 'compiled/jquery.rails_flash_notifications'
             }
           }
         });
-        // if(data.collapsed == 'true') {
-        //   $module.addClass('collapsed_module');
-        // }
       },
       sortable_module_options: {
         connectWith: '.context_module_items',
