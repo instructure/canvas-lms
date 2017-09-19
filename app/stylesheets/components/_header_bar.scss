@@ -133,7 +133,6 @@
 
 .header-bar {
   @include clearfix;
-  border-bottom: 1px solid $ic-border-light;
   background-color: #fff;
   min-height: 33px;
   padding-bottom: $ic-sp;

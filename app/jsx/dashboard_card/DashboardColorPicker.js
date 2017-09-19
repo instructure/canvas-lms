@@ -121,14 +121,14 @@ import cx from 'classnames'
 
     leftPosition: function(){
       return this.tooltipOnRight() ?
-        (this.leftPlusElement() - 80) :
+        (this.leftPlusElement()) :
         (this.leftPlusElement() - 360)
     },
 
     pickerToolTipStyle: function() {
       if (this.props.isOpen) {
         return {
-          position: 'absolute',
+          position: 'fixed',
           top: this.topPosition(),
           left: this.leftPosition(),
           zIndex: 9999
