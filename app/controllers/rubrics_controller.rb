@@ -103,7 +103,7 @@ class RubricsController < ApplicationController
 
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
-    if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_rubrics)
+    if can_manage_rubrics_or_association_object?(@association_object)
       @association = @context.rubric_associations.where(id: params[:rubric_association_id]).first if params[:rubric_association_id].present?
       @association_object ||= @association.association_object if @association
       association_params[:association_object] = @association_object
@@ -159,4 +159,25 @@ class RubricsController < ApplicationController
     outcome_group_json(root_outcome, @current_user, session)
   end
   protected :get_root_outcome
+
+  private
+
+  def can_manage_rubrics_or_association_object?(object)
+    return true if object && (can_update?(object) || can_read?(object) && can_manage_rubrics_context?) ||
+                   !object && can_manage_rubrics_context?
+    render_unauthorized_action
+    false
+  end
+
+  def can_update?(object)
+    object.grants_right?(@current_user, session, :update)
+  end
+
+  def can_read?(object)
+    object.grants_right?(@current_user, session, :read)
+  end
+
+  def can_manage_rubrics_context?
+    @context.grants_right?(@current_user, session, :manage_rubrics)
+  end
 end

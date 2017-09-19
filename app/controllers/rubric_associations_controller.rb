@@ -32,22 +32,23 @@ class RubricAssociationsController < ApplicationController
     rubric_id = association_params.delete(:rubric_id)
     @rubric = @association ? @association.rubric : Rubric.find(rubric_id)
     # raise "User doesn't have access to this rubric" unless @rubric.grants_right?(@current_user, session, :read)
-    if !@association && !authorized_action(@context, @current_user, :manage_rubrics)
-      return
-    elsif !@association || authorized_action(@association, @current_user, :update)
-      if params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
-        @rubric.update_criteria(params[:rubric])
-      end
-      association_params[:association_object] = @association.association_object if @association
-      association_params[:association_object] ||= @association_object
-      association_params[:id] = @association.id if @association
-      @association = RubricAssociation.generate(@current_user, @rubric, @context, association_params)
-      json_res = {
-        :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}),
-        :rubric_association => @association.as_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :permissions => {:user => @current_user, :session => session})
-      }
-      render :json => json_res
+    return unless can_manage_rubrics_or_association_object?(@assocation, @association_object)
+    return unless can_update_association?(@association)
+    if params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
+      @rubric.update_criteria(params[:rubric])
     end
+    association_params[:association_object] = @association.association_object if @association
+    association_params[:association_object] ||= @association_object
+    association_params[:id] = @association.id if @association
+    @association = RubricAssociation.generate(@current_user, @rubric, @context, association_params)
+    json_res = {
+      :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user,
+                                                                                                 :session => session}),
+      :rubric_association => @association.as_json(:include_root => false,
+                                                  :include => %i{rubric_assessments assessment_requests},
+                                                  :permissions => {:user => @current_user, :session => session})
+    }
+    render :json => json_res
   end
 
   def destroy
@@ -65,4 +66,19 @@ class RubricAssociationsController < ApplicationController
       render :json => @association
     end
   end
+
+  private
+
+  def can_manage_rubrics_or_association_object?(association, association_object)
+    return true if association ||
+                   @context.grants_right?(@current_user, session, :manage_rubrics) ||
+                   association_object && association_object.grants_right?(@current_user, session, :update)
+    render_unauthorized_action
+    false
+  end
+
+  def can_update_association?(association)
+    !association || authorized_action(association, @current_user, :update)
+  end
+
 end

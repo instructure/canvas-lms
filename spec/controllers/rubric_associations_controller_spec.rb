@@ -29,9 +29,26 @@ describe RubricAssociationsController do
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
-      post 'create', params: {:course_id => @course.id, :rubric_association => {:rubric_id => @rubric.id, :title => "some association", :association_type => @rubric_association.association_object.class.name, :association_id => @rubric_association.association_object.id}}
+      post 'create', params: {:course_id => @course.id,
+                              :rubric_association => {:rubric_id => @rubric.id,
+                                                      :title => "some association",
+                                                      :association_type =>
+                                                        @rubric_association.association_object.class.name,
+                                                      :association_id => @rubric_association.association_object.id}}
       expect(assigns[:association]).not_to be_nil
       expect(assigns[:association].title).to eql("some association")
+      expect(response).to be_success
+    end
+    it "should create without manager_rubrics permission" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.account.role_overrides.create! :role => teacher_role, :permission => 'manage_rubrics', :enabled => false
+      rubric_association_model(:user => @user, :context => @course)
+      post 'create', params: {:course_id => @course.id,
+                              :rubric_association => {:rubric_id => @rubric.id,
+                                                      :title => "some association",
+                                                      :association_type =>
+                                                        @rubric_association.association_object.class.name,
+                                                      :association_id => @rubric_association.association_object.id}}
       expect(response).to be_success
     end
   end
