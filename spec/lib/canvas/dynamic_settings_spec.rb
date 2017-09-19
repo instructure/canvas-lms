@@ -106,8 +106,25 @@ module Canvas
       end
 
       context "when consul is not configured" do
+        let(:data) {
+          {
+            config: {
+              canvas: {foo: {bar: 'baz'}},
+              frobozz: {some: {thing: 'magic'}}
+            },
+            private: {
+              canvas: {zab: {rab: 'oof'}}
+            }
+          }
+        }
+
         before do
           DynamicSettings.config = nil
+          DynamicSettings.fallback_data = data
+        end
+
+        after do
+          DynamicSettings.fallback_data = nil
         end
 
         it 'must return an empty FallbackProxy when fallback data is also unconfigured' do
@@ -117,37 +134,34 @@ module Canvas
         end
 
         it 'must return a FallbackProxy with configured fallback data' do
-          DynamicSettings.fallback_data = {'foo' => {bar: 'baz'}}
-          proxy = DynamicSettings.find('foo')
+          proxy = DynamicSettings.find('foo', tree: 'config', service: 'canvas')
           expect(proxy).to be_a(DynamicSettings::FallbackProxy)
           expect(proxy[:bar]).to eq 'baz'
         end
 
-        it 'must treat a non-canvas service as a prefix' do
-          DynamicSettings.fallback_data = {'service' => {'foo' => {bar: 'baz'}}}
-          proxy = DynamicSettings.find('foo', service: 'service')
-          expect(proxy[:bar]).to eq 'baz'
+        it 'must default the the config tree' do
+          proxy = DynamicSettings.find('foo', service: 'canvas')
+          expect(proxy['bar']).to eq 'baz'
         end
 
-        it 'must ignore a nil service' do
-          DynamicSettings.fallback_data = {'foo' => {bar: 'baz'}}
-          proxy = DynamicSettings.find('foo', service: nil)
-          expect(proxy[:bar]).to eq 'baz'
+        it 'must handle an alternate tree' do
+          proxy = DynamicSettings.find('zab', tree: 'private', service: 'canvas')
+          expect(proxy['rab']).to eq 'oof'
         end
 
-        it 'must not treat explicit canvas service as a prefix' do
-          DynamicSettings.fallback_data = {
-            'foo' => {bar: 'baz'},
-            'canvas' => {'foo' => {bar: 'quux'}}
-          }
-          proxy = DynamicSettings.find('foo', service: :canvas)
-          expect(proxy[:bar]).to eq 'baz'
+        it 'must default to the canvas service' do
+          proxy = DynamicSettings.find('foo', tree: 'config')
+          expect(proxy['bar']).to eq 'baz'
+        end
+
+        it 'must accept an alternate service' do
+          proxy = DynamicSettings.find('some', tree: 'config', service: 'frobozz')
+          expect(proxy['thing']).to eq 'magic'
         end
 
         it 'must ignore a nil prefix' do
-          DynamicSettings.fallback_data = {'service' => {'foo' => 'bar'}}
-          proxy = DynamicSettings.find(service: 'service')
-          expect(proxy['foo']).to eq 'bar'
+          proxy = DynamicSettings.find(tree: 'config', service: 'canvas')
+          expect(proxy.for_prefix('foo')['bar']).to eq 'baz'
         end
       end
     end

@@ -29,8 +29,12 @@ describe MathMan do
   before do
     @original_fallback = Canvas::DynamicSettings.fallback_data
     Canvas::DynamicSettings.fallback_data = {
-      'math-man': {
-        base_url: service_url,
+      config: {
+        canvas: {
+          'math-man': {
+            base_url: service_url,
+          }
+        }
       }
     }
     PluginSetting.create!(
