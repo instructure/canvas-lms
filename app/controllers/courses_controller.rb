@@ -544,9 +544,7 @@ class CoursesController < ApplicationController
   #
   # @returns [Course]
   def user_index
-    @user.shard.activate do
-      render json: courses_for_user(@user, paginate_url: api_v1_user_courses_url(@user))
-    end
+    render json: courses_for_user(@user, paginate_url: api_v1_user_courses_url(@user))
   end
 
   # @API Create a new course
