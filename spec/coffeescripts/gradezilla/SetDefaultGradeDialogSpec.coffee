@@ -53,3 +53,14 @@ define [
     dialog.show(callback)
     $('button.ui-dialog-titlebar-close').click();
     equal(callback.callCount, 1)
+
+  test '#show text', ->
+    dialog = new SetDefaultGradeDialog({ @assignment })
+    dialog.show()
+    ok document.getElementById('default_grade_description').innerText.includes('same grade')
+
+  test '#show changes text for grading percent', ->
+    @assignment.grading_type = 'percent'
+    dialog = new SetDefaultGradeDialog({ @assignment })
+    dialog.show()
+    ok document.getElementById('default_grade_description').innerText.includes('same percent grade')
