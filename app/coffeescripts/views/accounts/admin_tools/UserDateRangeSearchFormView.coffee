@@ -69,7 +69,9 @@ define [
       @collection.on 'sync', @notificationsFound
 
     resultsFound: =>
-      $.screenReaderFlashMessage(I18n.t('%{length} results found', { length: @usersView.collection.length }))
+      setTimeout(() =>
+        $.screenReaderFlashMessageExclusive(I18n.t('%{length} results found', { length: @usersView.collection.length }))
+      , 500)
 
     notificationsFound: =>
       $.screenReaderFlashMessage(I18n.t('%{length} notifications found', { length: @collection.length }))
