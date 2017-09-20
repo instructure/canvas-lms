@@ -261,7 +261,7 @@ module Api
   end
 
   def self.max_per_page
-    Setting.get('api_max_per_page', '50').to_i
+    Setting.get('api_max_per_page', '500').to_i
   end
 
   def self.per_page
