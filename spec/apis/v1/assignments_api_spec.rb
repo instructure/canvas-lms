@@ -1348,6 +1348,46 @@ describe AssignmentsApiController, type: :request do
       expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
     end
 
+    it 'gives plagiarism platform settings priority of plagiarism plugins for Vericite' do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      response = api_create_assignment_in_course(@course, {
+        'description' => 'description',
+        'similarityDetectionTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool',
+        'submission_type' => 'online',
+        'submission_types' => ['online_upload'],
+        'report_visibility' => 'after_grading',
+        "vericite_settings" => {  
+          "originality_report_visibility" => "immediately",
+          "exclude_quoted" => true,
+          "exclude_self_plag" => true,
+          "store_in_index" =>true
+        }
+      })
+      a = Assignment.find response['id']
+      expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
+    end
+
+    it 'gives plagiarism platform settings priority of plagiarism plugins for TII' do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      response = api_create_assignment_in_course(@course, {
+        'description' => 'description',
+        'similarityDetectionTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool',
+        'submission_type' => 'online',
+        'submission_types' => ['online_upload'],
+        'report_visibility' => 'after_grading',
+        "turnitin_settings" => {  
+          "originality_report_visibility" => "immediately",
+          "exclude_quoted" => true,
+          "exclude_self_plag" => true,
+          "store_in_index" =>true
+        }
+      })
+      a = Assignment.find response['id']
+      expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
+    end
+
     context 'LTI 2.x' do
       include_context 'lti2_spec_helper'
 
