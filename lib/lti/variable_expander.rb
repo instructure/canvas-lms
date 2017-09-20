@@ -345,6 +345,27 @@ module Lti
                        CONTROLLER_GUARD,
                        LTI1_GUARD
 
+    # returns the URL to retrieve the brand config JSON for the launching context.
+    # @example
+    #   ```
+    #   http://example.url/path.json
+    #   ```
+    register_expansion 'com.instructure.brandConfigJSON.url', [],
+                       -> { @controller.active_brand_config_json_url },
+                       CONTROLLER_GUARD
+
+    # returns the URL to retrieve the brand config javascript for the launching context.
+    # This URL should be used as the src attribute for a script tag on the external tool
+    # provider's web page. It is configured to be used with the [instructure-ui node module](https://github.com/instructure/instructure-ui).
+    # More information on on how to use instructure ui react components can be found [here](http://instructure.github.io/instructure-ui/).
+    # @example
+    #   ```
+    #   http://example.url/path.js
+    #   ```
+    register_expansion 'com.instructure.brandConfigJS.url', [],
+                       -> { @controller.active_brand_config_js_url },
+                       CONTROLLER_GUARD
+
     # returns the URL for the common css file.
     # @example
     #   ```
