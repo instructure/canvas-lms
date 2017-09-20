@@ -28,6 +28,9 @@
   line-height: 1.2;
   padding-bottom: $ic-sp;
   font-size: 1.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .recent_activity > li {
