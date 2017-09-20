@@ -741,16 +741,18 @@ class DiscussionTopic < ActiveRecord::Base
     elsif !self.grants_right?(user, :read)
       nil
     else
-      entry = DiscussionEntry.new({
-        :message => message,
-        :discussion_topic => self,
-        :user => user,
-      })
-      if !entry.grants_right?(user, :create)
-        raise IncomingMail::Errors::ReplyToLockedTopic
-      else
-        entry.save!
-        entry
+      self.shard.activate do
+        entry = DiscussionEntry.new({
+          :message => message,
+          :discussion_topic => self,
+          :user => user,
+        })
+        if !entry.grants_right?(user, :create)
+          raise IncomingMail::Errors::ReplyToLockedTopic
+        else
+          entry.save!
+          entry
+        end
       end
     end
   end
