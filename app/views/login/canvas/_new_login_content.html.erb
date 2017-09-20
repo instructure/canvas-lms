@@ -102,18 +102,18 @@
       </div> <!-- end ic-Login__innerContent  -->
       <footer role="contentinfo" id="footer" class="ic-Login-footer">
 
+        <a href="https://strongmind.com" class="ic-Login-footer__logo-link">
+          <%= render "login/canvas/instructure_logo.svg" %>
+        </a>
+
         <div id="footer-links" class="ic-Login-footer__links">
-          <% if Setting.get("show_opensource_linkback", "false") == "true" %>
-            <a href="https://github.com/strongmind/canvas-lms">
-              <%= t('open_source_learning_management_system', 'Open Source LMS') %>
-            </a>
-          <% end %>
+          <a href="https://github.com/strongmind/canvas-lms">
+            <%= t('open_source_learning_management_system', 'Modified Open Source LMS') %>
+          </a>
+
           <%= help_link %>
           <%= render :partial => 'shared/footer_links' %>
         </div>
-        <a href="https://github.com/strongmind/canvas-lms" class="ic-Login-footer__logo-link">
-          <%= render "login/canvas/instructure_logo.svg" %>
-        </a>
     </footer>
     </div> <!-- end ic-Login__content -->
   </div>
