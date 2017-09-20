@@ -69,6 +69,15 @@
     >
       <i class="icon-mini-arrow-down"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
+      <br>
+      <% if context_module && context_module.completion_requirements.present? %>
+          <% count = context_module.requirement_count %>
+          <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
+          <span class="sm-data-requirement-text" aria-label="<%= completion_label %>" data-requirement-count="<%= count %>">
+            <%= completion_label %>
+          </span>
+      <% end %>
+
     </span>
     <span
       role="button"
@@ -82,20 +91,12 @@
       <i class="icon-mini-arrow-right"></i>
       <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
     </span>
-
+    <span class="sm-unit-header_progress-container">
+      <span class="sm-unit-header_progress-background">
+        <span class="sm-unit-header_progress-bar"></span>
+      </span>
+    </span>
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
-
-    <div class="requirements_message">
-      <% if context_module && context_module.completion_requirements.present? %>
-        <ul class="pill">
-          <% count = context_module.requirement_count %>
-          <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
-          <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>" tabindex="0">
-            <%= completion_label %>
-          </li>
-        </ul>
-      <% end %>
-    </div>
 
     <div class="ig-header-admin">
       <% unless editable %>
