@@ -169,8 +169,8 @@
             <% account_chain = @context.account.account_chain.reverse %>
             <% account_chain.each do |account| %>
               <% if can_do(account, @current_user, :manage_courses) %>
-                <% if account.root_account? && account.all_accounts.count > 500 %>
-                  <a href="<%= context_url(account, :context_sub_accounts_url, :format => :json) %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
+                <% if account.root_account? && account.all_accounts.count > Setting.get('course_settings_sub_account_dropdown_limit', '500').to_i %>
+                  <a href="<%= context_url(account, :context_sub_accounts_url, :format => :json, :include_self => "1") %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
                   <input type="hidden" name="course[account_id]" id="course_account_id" value="<%= @context.account_id %>"/>
                   <input type="text" name="account[name]" id="course_account_id_lookup" value="<%= @context.account.name %>" style="width: 150px;"/>
                 <% else %>

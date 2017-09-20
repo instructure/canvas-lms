@@ -48,7 +48,9 @@ class SubAccountsController < ApplicationController
     if @query
       @accounts = []
       if @context && @context.is_a?(Account)
-        @accounts = @context.all_accounts.active.name_like(@query).limit(100)
+        @accounts = @context.all_accounts.active.name_like(@query).limit(100).to_a
+        @accounts << @context if value_to_boolean(params[:include_self]) && @context.name.downcase.include?(@query.downcase)
+        @accounts.sort_by!{|a| Canvas::ICU.collation_key(a.name)}
       end
       respond_to do |format|
         format.html {
