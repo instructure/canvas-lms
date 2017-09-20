@@ -44,6 +44,8 @@ load_cache_config = -> do
 
     if last_cluster_cache_config != config
       cache_map[cluster] = Canvas.lookup_cache_store(config, cluster)
+    else
+      cache_map[cluster] = Switchman.config[:cache_map][cluster]
     end
   end
 
