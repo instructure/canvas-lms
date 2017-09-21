@@ -91,6 +91,14 @@ module Lti
 
         expect(service).not_to be_nil
       end
+
+      it "includes 'vnd.Canvas.User'" do
+        expect(
+          Lti::ToolConsumerProfile::RESTRICTED_SERVICES.any? do |s|
+            s[:id].include? 'vnd.Canvas.User'
+          end
+        ).to be_truthy
+      end
     end
 
   end

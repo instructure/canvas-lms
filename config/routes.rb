@@ -2039,6 +2039,10 @@ CanvasRails::Application.routes.draw do
       get "subscriptions", action: :index
     end
 
+    scope(controller: 'lti/users_api') do
+      get 'users/:id', action: :show
+    end
+
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
       post "#{prefix}/authorize", controller: 'lti/ims/authorization', action: :authorize, as: "#{context}_lti_oauth2_authorize"

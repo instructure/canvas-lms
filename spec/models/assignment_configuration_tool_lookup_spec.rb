@@ -119,4 +119,48 @@ describe AssignmentConfigurationToolLookup do
       expect(lookup.resource_codes).to eq({})
     end
   end
+
+  describe '#configured_assignments' do
+    let(:root_account) { Account.create!(name: 'root account') }
+    let(:account) { Account.create!(name: 'account', root_account: root_account) }
+    let(:course) { Course.create!(account: account) }
+    let(:assignment) do
+      a = course.assignments.new(title: 'Test Assignment')
+      a.workflow_state = 'published'
+      a.tool_settings_tool = message_handler
+      a.save!
+      a
+    end
+
+    before do
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
+      message_handler.update_attributes(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
+      assignment
+    end
+
+    it 'finds configured assignments when installed in an account' do
+      tool_proxy.update_attributes!(context: account)
+      expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
+    end
+
+    it 'finds configured assignments when installed in a root acocunt' do
+      tool_proxy.update_attributes!(context: root_account)
+      expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
+    end
+
+    it 'finds configured assignments when installed in a course' do
+      tool_proxy.update_attributes!(context: course)
+      expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
+    end
+
+    it 'handles multiple configured assignments' do
+      second_assignment = assignment.dup
+      second_assignment.tool_settings_tool = message_handler
+      second_assignment.lti_context_id = SecureRandom.uuid
+      second_assignment.save!
+      tool_proxy.update_attributes!(context: root_account)
+      expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment, second_assignment]
+    end
+  end
 end

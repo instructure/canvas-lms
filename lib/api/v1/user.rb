@@ -132,6 +132,10 @@ module Api::V1::User
         zone = user.time_zone || @domain_root_account.try(:default_time_zone) || Time.zone
         json[:time_zone] = zone.name
       end
+
+      if includes.include?('lti_id')
+        json[:lti_id] = user.lti_context_id
+      end
     end
   end
 
