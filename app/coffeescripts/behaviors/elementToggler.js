@@ -132,10 +132,10 @@ const elementTogglerBehavior = {
       const $region = $parent.find(`#${$this.attr('aria-controls').replace(/\s/g, ', #')}`)
       if ($region.length) toggleRegion($region, force, $this)
 
-      const $icon = $this.find('i[class*="icon-mini-arrow"].auto_rotate')
+      const $icon = $this.find('i[class*="icon-arrow-open"].auto_rotate')
       if ($icon.length) {
-        $icon.toggleClass('icon-mini-arrow-down')
-        $icon.toggleClass('icon-mini-arrow-right')
+        $icon.toggleClass('icon-arrow-open-down')
+        $icon.toggleClass('icon-arrow-open-right')
       }
     })
   }

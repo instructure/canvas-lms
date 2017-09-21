@@ -376,7 +376,6 @@ export default class DashboardCard extends Component {
       const { connectDragSource, connectDropTarget } = this.props;
       return connectDragSource(connectDropTarget(dashboardCard));
     }
-    console.log("This is", this);
     return dashboardCard;
   }
 }
