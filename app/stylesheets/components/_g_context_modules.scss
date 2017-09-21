@@ -260,6 +260,42 @@ $context_module_bg_color: #f2f3f4;
   }
 }
 
+.ig-header-title.collapse_module_link .sm-data-requirement-text{
+  font-size: 12px;
+  color: var(--ic-brand-shade-3);
+  font-style: italic;
+  margin-top: 10px;
+  margin-left: 35px;
+}
+
+.sm-unit-header_progress-container{
+  width: 150px;
+  position: relative;
+}
+
+.sm-progress-title{
+  font-size: 12px;
+  color: var(--ic-brand-shade-3);
+  text-align: center;
+}
+
+.sm-unit-header_progress-background{
+    background-color: var(--ic-brand-button--secondary-bgd-darkened-15);
+    position: absolute;
+    width: 100%;
+    border-radius: 5px;
+    height: 10px;
+}
+
+.sm-unit-header_progress-bar{
+  background-color: var(--ic-brand-secondary);
+  position: absolute;
+  left: 0;
+  width: 0%;
+  border-radius: 5px;
+  height: 10px;
+}
+
 .context_module_item {
   border-bottom: 1px dotted #e0e0e0;
   &.indent_0 {
