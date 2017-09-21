@@ -218,6 +218,7 @@ import 'compiled/jquery.rails_flash_notifications'
             });
             return Math.floor((total_completed.length / total_items) * 100);
           }
+          return 0;
         }
 
         var courseItems = JSON.parse(window.localStorage.getItem("course_items"));
