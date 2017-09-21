@@ -415,6 +415,46 @@ describe AccountsController do
       expect(@account.admins_can_view_notifications?).to be_truthy
     end
 
+    it "doesn't break I18n by setting the help_link_name unnecessarily" do
+      account_with_admin_logged_in
+
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :help_link_name  => 'Help'
+      }}}
+      @account.reload
+      expect(@account.settings[:help_link_name]).to be_nil
+
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :help_link_name => 'Halp'
+      }}}
+      @account.reload
+      expect(@account.settings[:help_link_name]).to eq 'Halp'
+    end
+
+    it "doesn't break I18n by setting customized text for default help links unnecessarily" do
+      account_with_admin_logged_in
+      post 'update', params: {:id => @account.id, :account => { :custom_help_links => { '0' =>
+        { :id => 'instructor_question', :text => 'Ask Your Instructor a Question',
+          :subtext => 'Questions are submitted to your instructor', :type => 'default',
+          :url => '#teacher_feedback', :available_to => ['student'] }
+      }}}
+      @account.reload
+      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
+      expect(link).not_to have_key('text')
+      expect(link).not_to have_key('subtext')
+      expect(link).not_to have_key('url')
+
+      post 'update', params: {:id => @account.id, :account => { :custom_help_links => { '0' =>
+        { :id => 'instructor_question', :text => 'yo', :subtext => 'wiggity', :type => 'default',
+          :url => '#dawg', :available_to => ['student'] }
+      }}}
+      @account.reload
+      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
+      expect(link['text']).to eq 'yo'
+      expect(link['subtext']).to eq 'wiggity'
+      expect(link['url']).to eq '#dawg'
+    end
+
     it "should allow updating services that appear in the ui for the current user" do
       AccountServices.register_service(:test1,
                                        {name: 'test1', description: '', expose_to_ui: :setting, default: false})
