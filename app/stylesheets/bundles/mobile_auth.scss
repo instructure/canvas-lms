@@ -50,7 +50,7 @@ html, body {
 
 .mobileLogin-Header {
   z-index: 1;
-  background-image: url("/images/mobile_login/canvas_logo_login.svg");
+  background-image: url("/images/login/canvas-logo.svg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 156px 108px;
@@ -102,5 +102,5 @@ input::-webkit-input-placeholder {
   display: none;
 }
 .button_box .Button {
-  padding-bottom: $ic-sp/2;  
+  padding-bottom: $ic-sp/2;
 }

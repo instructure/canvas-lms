@@ -195,6 +195,45 @@ import 'compiled/jquery.rails_flash_notifications'
         });
       },
 
+      getCourseItems: function(callback){
+        $.ajaxJSON($(".course_items_json_url").attr('href'), 'GET', {}, function(data) {
+          window.localStorage.setItem("course_items", JSON.stringify(data));
+        }).then(function(){
+          callback();
+        })
+      },
+
+      updateCourseProgress: function(callback){
+
+        function calculateUnitProgress(item){
+          if(item.items_count){
+            let total_items = item.items_count;
+            var total_completed = [];
+
+            item.items.map(function(module){
+              let cr = module.completion_requirement || {};
+              if(cr.completed){
+                total_completed.push(module);
+              }
+            });
+            return Math.floor((total_completed.length / total_items) * 100);
+          }
+          return 0;
+        }
+
+        var courseItems = JSON.parse(window.localStorage.getItem("course_items"));
+
+        courseItems.map(function(item){
+          let progressBar = $("#"+item.id+" .sm-unit-header_progress-container .sm-unit-header_progress-bar");
+          let progressText = $("#"+item.id+" .sm-unit-header_progress-container .sm-progress-percentage");
+          let progress = calculateUnitProgress(item);
+          progressText.html(progress + "%")
+          progressBar.css("width", progress + "%");
+          $("#"+item.id+" .sm-unit-header_progress-container").fadeIn(200)
+
+        })
+      },
+
       updateAssignmentData: function(callback) {
         return $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
           $.each(data, function(id, info) {
@@ -1991,6 +2030,11 @@ import 'compiled/jquery.rails_flash_notifications'
     for(var idx in currentModules) {
       $("#context_module_" + currentModules[idx]).addClass('sm-started').removeClass('collapsed_module');
     }
+
+    if(ENV.IS_STUDENT){
+      modules.getCourseItems(modules.updateCourseProgress);
+    }
+
 
     var foundModules = [];
     var $contextModules = $("#context_modules .context_module");
