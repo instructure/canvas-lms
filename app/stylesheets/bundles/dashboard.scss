@@ -99,8 +99,6 @@ body.dashboard-is-planner {
   display: flex;
   align-items: center;
   padding: 0 0 ($ic-sp * 0.75);
-  border-bottom: 1px solid $ic-border-light;
-  background: rgba($ic-color-light, 0.95);
 }
 
 .ic-Dashboard-Activity { padding: $ic-sp; }

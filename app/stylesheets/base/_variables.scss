@@ -179,7 +179,7 @@ $ic-border-radius:          4px;
 $spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
 $borderRadius:              4px;
 $contentBoxPadding:         8px;
-$sm-body-background-color: $sm-page;
+$sm-body-background-color: $ic-brand-white;
 //============================
 // Typography Variables
 //============================
@@ -210,8 +210,8 @@ $h3-font-size:  19px;
 //============================
 // Layout Functional Variables
 //============================
-$ic-body-background-color:      lighten($ic-color-neutral, 4);
-$ic-content-background-color:   $ic-color-light;
+$ic-body-background-color:      $sm-page; //lighten($ic-color-neutral, 4);
+$ic-content-background-color:   $sm-page; //$ic-color-light;
 $ic-content-padding:            15px;
 $ic-header-background:          #34444f;
 $ic-header-primary-width:       200px;
