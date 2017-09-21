@@ -314,6 +314,7 @@ describe SplitUsers do
       UserMerge.from(user1).into(user2)
       expect(submission1.reload.user).to eq user1
       expect(submission2.reload.user).to eq user2
+      Submission.where(id: submission1).update_all(workflow_state: 'deleted')
       SplitUsers.split_db_users(user2)
       expect(submission1.reload.user).to eq user1
       expect(submission2.reload.user).to eq user2
