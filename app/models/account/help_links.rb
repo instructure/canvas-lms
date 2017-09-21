@@ -59,18 +59,31 @@ class Account::HelpLinks
       end
     end
 
-    # take an array of links, and replace the duplicated default links with
-    # the canonical version from the code. This makes sure the text translates,
-    # and that updates to the link are pushed through. available_to is not copied,
-    # so that a school can still customize it
+    # take an array of links, and infer the default text, subtext, and url for links that don't customize these
+    # (text is only stored in account settings if it's customized)
     def map_default_links(links)
       links.map do |link|
         default_link = link[:type] == 'default' && default_links_hash[link[:id]&.to_sym]
         if default_link
           link = link.dup
-          link[:text] = default_link[:text]
-          link[:subtext] = default_link[:subtext]
-          link[:url] = default_link[:url]
+          link[:text] ||= default_link[:text]
+          link[:subtext] ||= default_link[:subtext]
+          link[:url] ||= default_link[:url]
+        end
+        link
+      end
+    end
+
+    # complementing the above method: for each link, remove the text, subtext, and/or url
+    # if these match the defaults from the code. this way, other users will see localized text
+    def process_links_before_save(links)
+      links.map do |link|
+        default_link = link[:type] == 'default' && default_links_hash[link[:id]&.to_sym]
+        if default_link
+          link = link.dup
+          link.delete(:text) if link[:text] == default_link[:text].call
+          link.delete(:subtext) if link[:subtext] == default_link[:subtext].call
+          link.delete(:url) if link[:url] == default_link[:url]
         end
         link
       end

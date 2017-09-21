@@ -639,12 +639,13 @@ class AccountsController < ApplicationController
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
           sorted_help_links = custom_help_links.to_unsafe_h.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
-          @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
+          sorted_help_links.map! do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
             hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type", "id"]
             hash
           end
+          @account.settings[:custom_help_links] = Account::HelpLinks.process_links_before_save(sorted_help_links)
           @account.settings[:new_custom_help_links] = true
         end
 
