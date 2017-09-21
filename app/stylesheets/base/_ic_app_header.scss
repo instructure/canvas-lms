@@ -78,7 +78,7 @@ li.ic-app-header__menu-list-item {
 
   &.ic-app-header__menu-list-item--active {
     .ic-app-header__menu-list-link {
-      background: $ic-color-light;
+      background: $sm-page;
       display: block;
       overflow: hidden;
 
@@ -145,7 +145,7 @@ li.ic-app-header__menu-list-item {
   }
 
   &:hover, &:focus {
-    background-color: $ic-global-nav-link-hover;
+    background-color: $sm-brand-dark;
     @if $use_high_contrast == false {
       text-decoration: none;
       outline: none;
@@ -300,9 +300,8 @@ button.ic-app-header__menu-list-link {
 
 .ic-app-header__logomark-container {
   width: 100%;
-  background-color: $ic-brand-global-nav-logo-bgd;
+  background-color: $sm-brand-dark;
   box-sizing: border-box;
-  margin-top: 20px;
   margin-bottom: 20px;
 
   @if $ic-brand-header-image != $ic-logomark-url {
@@ -312,7 +311,7 @@ button.ic-app-header__menu-list-link {
     padding: 0 $ic-sp/2;
 
     body.primary-nav-expanded & {
-      padding: 0 $ic-sp + 2;
+      padding: 20px $ic-sp + 2;
     }
   }
   padding: 0;
@@ -322,7 +321,7 @@ button.ic-app-header__menu-list-link {
   display: block;
   width: 100%;
   overflow: hidden;
-  margin: 20px auto 20px auto;
+  margin: 0 auto 20px auto;
   background-image: $ic-brand-header-image;
   background-position: 50%;
   background-repeat: no-repeat;

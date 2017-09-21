@@ -102,6 +102,9 @@ $ic-color-action:           $barney;
 $ic-color-danger:           $crimson;
 $ic-color-alert:            $fire;
 
+$sm-page: #ECECED;
+$sm-brand-dark: #2A2E34;
+
 //====================================
 // Gray-ish Scale
 //====================================
@@ -176,7 +179,7 @@ $ic-border-radius:          4px;
 $spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
 $borderRadius:              4px;
 $contentBoxPadding:         8px;
-
+$sm-body-background-color: $sm-page;
 //============================
 // Typography Variables
 //============================
