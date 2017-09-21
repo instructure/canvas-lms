@@ -222,6 +222,7 @@ class LatePoliciesTabPanel extends React.Component {
     }
 
     const { data, validationErrors } = this.props.latePolicy;
+    const numberInputWidth = "5.5rem";
     return (
       <div id="LatePoliciesTabPanel__Container">
         {this.state.showAlert &&
@@ -270,7 +271,7 @@ class LatePoliciesTabPanel extends React.Component {
                   min="0"
                   max="100"
                   inline
-                  width="4rem"
+                  width={numberInputWidth}
                 />
 
                 <PresentationContent>
@@ -320,7 +321,7 @@ class LatePoliciesTabPanel extends React.Component {
                     min="0"
                     max="100"
                     inline
-                    width="4rem"
+                    width={numberInputWidth}
                   />
                   <PresentationContent>
                     <Container as="div" margin="0 small">
@@ -377,7 +378,7 @@ class LatePoliciesTabPanel extends React.Component {
                   min="0"
                   max="100"
                   inline
-                  width="4rem"
+                  width={numberInputWidth}
                 />
 
                 <PresentationContent>
