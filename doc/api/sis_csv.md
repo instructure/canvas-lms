@@ -98,6 +98,10 @@ as source system, data type, and term id. Some examples of good identifiers:
  * users:fall-2015
  * source-system-1:all-data:spring-2016
 
+Diffing mode by default marks objects as "deleted" when they are not included
+for an import, but enrollments can be marked as 'completed' or 'inactive' if the
+`diffing_drop_status` is passed.
+
 If changes are made to SIS-managed objects outside of the normal import
 process, as in the example given above, it may be necessary to process a SIS
 import with the same data set identifier, but apply the entire import

@@ -504,6 +504,41 @@ s2,test_1,section2,active},
   end
 
   context "csv diffing" do
+    describe 'diffing_drop_status' do
+      before :once do
+        process_csv_data(
+          [
+            %{user_id,login_id,status
+              user_1,user_1,active},
+            %{course_id,short_name,long_name,term_id,status
+              course_1,course_1,course_1,term_1,active},
+            %{section_id,course_id,name,status
+              section_1,course_1,section_1,active},
+            %{section_id,user_id,role,status
+              section_1,user_1,student,active}
+          ], diffing_data_set_identifier: 'default')
+      end
+
+      it 'should use diffing_drop_status' do
+        batch = process_csv_data([%{section_id,user_id,role,status}],
+                                 diffing_data_set_identifier: 'default',
+                                 options: {diffing_drop_status: 'completed'})
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob('*.csv')
+        expect(csvs.first.get_input_stream.read).to eq(%{section_id,user_id,role,status\nsection_1,user_1,student,completed\n})
+      end
+
+      it 'should not use diffing_drop_status for non-enrollments' do
+        batch = process_csv_data(
+          [
+            %{user_id,login_id,status}
+          ], diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob('*.csv')
+        expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,deleted\n")
+      end
+    end
+
     it "should skip diffing if previous diff not available" do
       expect_any_instance_of(SIS::CSV::DiffGenerator).to receive(:generate).never
       batch = process_csv_data([
