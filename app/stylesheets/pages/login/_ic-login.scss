@@ -46,7 +46,7 @@
 $ic-Login-border-radius: 5px;
 $modal_box_width: 623px;
 $modal_box_padding: 20px;
-$ic-Login-confirmation-bgd: #34444f;
+$ic-Login-confirmation-bgd: $ic-brand-white;
 
 ////////////////////////////////////////
 // New Login Styles
@@ -354,7 +354,7 @@ body.body--login-confirmation {
 }
 
 .ic-Login-confirmation__logo {
-  width: 140px; height: 57px;
+  width: 140px; height: 24.5px;
 }
 
 .ic-Login-confirmation__content {
