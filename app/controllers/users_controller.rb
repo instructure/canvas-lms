@@ -540,14 +540,6 @@ class UsersController < ApplicationController
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
-    p "------------------------------------------------------------------------------------"
-    p @current_user
-    p @current_user.all_courses
-    @current_user.menu_courses.each do |item|
-      # byebug
-      p item
-    end
-    p "------------------------------------------------------------------------------------"
     @pending_invitations = @current_user.cached_invitations(:include_enrollment_uuid => session[:enrollment_uuid], :preload_course => true)
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
   end

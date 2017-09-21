@@ -67,7 +67,7 @@
       aria-expanded="true"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
-      <i class="icon-mini-arrow-down"></i>
+      <i class="icon-arrow-open-down"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
       <br>
       <% if context_module && context_module.completion_requirements.present? %>
@@ -88,42 +88,19 @@
       aria-expanded="false"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
-      <i class="icon-mini-arrow-right"></i>
+      <i class="icon-arrow-open-right"></i>
       <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
     </span>
-    <span class="sm-unit-header_progress-container">
+    <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
+    <span class="sm-unit-header_progress-container" style="display:none">
+      <span class="sm-progress-title">Progress: <span class="sm-progress-percentage">0%</span></span>
+      <br>
       <span class="sm-unit-header_progress-background">
         <span class="sm-unit-header_progress-bar"></span>
       </span>
     </span>
-    <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
 
     <div class="ig-header-admin">
-      <% unless editable %>
-        <% if context_module %>
-          <div class="completion_status">
-            <i class="icon-check complete_icon"
-               data-tooltip
-               title="<%= t('Completed')%>"
-            >
-              <span class="screenreader-only"><%= t("Module Completed") %></span>
-            </i>
-            <i class="icon-minimize in_progress_icon"
-               data-tooltip
-               title="<%= t('In Progress') %>"
-            >
-              <span class="screenreader-only"><%= t("Module In Progress") %></span>
-            </i>
-            <i class="icon-lock locked_icon"
-               data-tooltip
-               title="<%= context_module && context_module.to_be_unlocked ?
-                       t('Locked until %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp)) : t('Locked') %>"
-             >
-              <span class="screenreader-only"><%= t("Module Locked") %></span>
-            </i>
-          </div>
-        <% end %>
-      <% end %>
 
       <% if editable %>
         <span
