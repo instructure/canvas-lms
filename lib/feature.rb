@@ -507,15 +507,6 @@ END
       state: "allowed",
       beta: true
     },
-    'new_gradebook_history' =>
-    {
-      display_name: -> { I18n.t('New Gradebook History') },
-      description: -> { I18n.t('Enable New Gradebook History page.') },
-      applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true,
-    },
     'new_user_tutorial' =>
     {
       display_name: -> { I18n.t('New User Tutorial')},

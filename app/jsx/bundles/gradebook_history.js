@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import GradebookHistory from 'gradebook-history'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp';
 
-$(document).ready(GradebookHistory.init)
+ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'));

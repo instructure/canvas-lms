@@ -409,24 +409,15 @@ class GradebooksController < ApplicationController
 
   def history
     if authorized_action(@context, @current_user, :manage_grades)
-      return new_history if @context.root_account.feature_enabled?(:new_gradebook_history)
+      crumbs.delete_if { |crumb| crumb[0] == "Grades" }
+      add_crumb(t("Gradebook History"),
+                context_url(@context, controller: :gradebooks, action: :history))
+      @page_title = t("Gradebook History")
+      @body_classes << "full-width padless-content"
+      js_bundle :gradebook_history
+      js_env({})
 
-      #
-      # Temporary disabling of this page for large courses
-      # We need some reworking of the gradebook history to allow using it
-      # in large courses in a performant manner. Until that happens, we're
-      # disabling it over a certain threshold.
-      #
-      submissions_count = @context.submissions.not_placeholder.count
-      submissions_limit = Setting.get('gradebook_history_submission_count_threshold', '0').to_i
-      if submissions_limit == 0 || submissions_count <= submissions_limit
-        # TODO this whole thing could go a LOT faster if you just got ALL the versions of ALL the submissions in this course then did a ruby sort_by day then grader
-        @days = SubmissionList.days(@context)
-      end
-
-      respond_to do |format|
-        format.html
-      end
+      render html: "", layout: true
     end
   end
 
@@ -781,16 +772,6 @@ class GradebooksController < ApplicationController
     else
       render :screenreader
     end
-  end
-
-  def new_history
-    @page_title = t("Gradebook History")
-    @body_classes << "full-width padless-content"
-    js_bundle :react_gradebook_history
-    css_bundle :react_gradebook_history
-    js_env({})
-
-    render html: "", layout: true
   end
 
   def percentage(weight)
