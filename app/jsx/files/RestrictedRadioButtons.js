@@ -36,7 +36,7 @@ import 'jquery.instructure_date_and_time'
         ref: 'publishInput',
         text: I18n.t('Publish'),
         selectedOptionKey: 'published',
-        iconClasses: 'icon-publish RestrictedRadioButtons__publish_icon',
+        iconClasses: 'icon-publish icon-Solid RestrictedRadioButtons__publish_icon',
         onChange () {
           this.updateBtnEnable();
           this.setState({selectedOption: 'published'});
