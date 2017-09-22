@@ -2606,9 +2606,9 @@ class Course < ActiveRecord::Base
         end
 
         if !user || !self.grants_right?(user, :manage_content)
-          # remove some tabs for logged-out users or non-students
+          # remove outcomes tab for logged-out users or non-students
           unless grants_any_right?(user, :read_as_admin, :participate_as_student)
-            tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
+            tabs.delete_if { |t| t[:id] == TAB_OUTCOMES }
           end
 
           # remove hidden tabs from students
