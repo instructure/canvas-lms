@@ -1616,7 +1616,7 @@ sv:
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Tillåt kursbilder att tilldelas till en kurs och användas i kontrollpanelerna."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Låt översiktskort registreras för varje användare."
   allow_in_mastery_paths_5332c786: "Tillåt i måluppfyllelseväg"
-  allow_intra_group_peer_reviews_53f1e455: "Tillåt interngrupp att kika på granskningar"
+  allow_intra_group_peer_reviews_53f1e455: "Tillåt interngrupp att kika på referentgranskningar"
   allow_lor_tools: "Tillåt användare att visa och använda externa verktyg som konfigurerats för LOR."
   allow_multiple_attempts_e67a0a37: "Tillåt flera försök"
   allow_opt_out_of_inbox: "Tillåt användare att välja om de vill ut ur konversations-inkorgen. Det kommer leda till att alla konversationsmeddelanden och aviseringar skickas som ASAP-aviseringar till användarens primära e-post, dölj Konversations-inkorgens märke för olästa meddelanden, och dölj Konversations-inkorgens aviseringspreferenser. "
@@ -2232,7 +2232,7 @@ sv:
       graded_count: "%{graded_count} *av* %{total} Inlämningar bedömda"
       links: 
         download_submissions: "Ladda ner inlämningar"
-        peer_reviews: "Person recensioner"
+        peer_reviews: Referentgranskningar
         reupload_submissions: "Ladda upp inlämningar igen"
       resubmission_count: 
         one: "1 icke betygsatt åter-inlämning"
@@ -2370,43 +2370,43 @@ sv:
     peer_reviews: 
       buttons: 
         add: "Lägg till"
-        assign_peer_reviews: "Tilldela förhandsvisning"
+        assign_peer_reviews: "Tilldela referentgranskningar"
       descriptions: 
-        automatically_assign_reviews: "Du kan tilldela förhandsvisningar för de som har lämnat in men ännu inte har tilldelats förhandsvisningar genom att klicka på knappen nedan. "
+        automatically_assign_reviews: "Du kan tilldela referentgranskningar för de som har lämnat in men ännu inte har tilldelats referentgranskningar genom att klicka på knappen nedan. "
       details: "Till vänster kan du se en lista av studenter för den här uppgiften, och även vilka studentuppgifter (om några) de har tillåtelse att förhandsvisa."
       links: 
         assign_peer_review: "Ge %{student} en annan inlämning att bedöma"
         back_to_assignment: "Tillbaka till uppgift"
       messages: 
-        cancel_peer_review: "Avbryt den här recensionen?"
+        cancel_peer_review: "Avbryt den här referentgranskning?"
         no_students_found: "Inga studenter hittades"
       none_assigned: "Inga tilldelningar"
       not_yet_submitted: "ännu inte inlämnad"
       options: 
         select_student: "[Välj student]"
       overview: |-
-          Recensioner kommer anses vara färdiga när studenten 
+          Referentgranskningar kommer anses vara färdiga när studenten 
           har kommenterat minst en gång på sidan.
-      overview_with_rubric: "Recensioner kommer anses vara färdiga när studenten har kommenterat minst en gång på sidan och markerat i matrisen för uppgiften."
-      page_title: "Person recensioner"
+      overview_with_rubric: "Referentgranskningar kommer anses vara färdiga när studenten har kommenterat minst en gång på sidan och markerat i matrisen för uppgiften."
+      page_title: Referentgranskningar
       reviews_per_user: "%{count} recensioner per användare"
       submitted: inlämnad
-      title: "%{assignment} Recensioner"
+      title: "%{assignment} Referentgranskningar"
       titles: 
         automatically_assign_reviews: "Tilldela recensioner automatisk"
         remind: "Påminn %{assessor} om bedömningen, senast påmind %{time}"
         reminder: "Påminn %{assessor} om bedömningen, senast påmind %{time}"
     peer_reviews_selector: 
       anonymous_peer_reviews: Anonymitet
-      how_to_peer_review: "Hur du tilldelar recensioner"
+      how_to_peer_review: "Hur du tilldelar referentgranskningar"
       labels: 
-        anonymous_peer_reviews: "Recensioner visas anonymt"
-        automatically_assign_peer_reviews: "Tilldela recensioner automatiskt"
-        manually_assign_peer_reviews: "Tilldela recensioner manuellt"
-        require_peer_reviews: "Begär recensioner"
+        anonymous_peer_reviews: "Referentgranskningar visas anonymt"
+        automatically_assign_peer_reviews: "Tilldela referentgranskningar automatiskt"
+        manually_assign_peer_reviews: "Tilldela referentgranskningar manuellt"
+        require_peer_reviews: "Begär referentgranskningar"
       locked_until: "Tilldela bedömning"
       peer_reviews_assign_at_explanation: "Måste komma efter inlämningsdatum. Om blank, använd sista dagen."
-      peer_reviews_header: "Person recensioner"
+      peer_reviews_header: Referentgranskningar
       reviews_per_user: "Bedömningar per användare"
     points_possible_number: "Möjliga poäng måste vara ett nummer"
     positive_number: "Du måste använda ett positivt nummer"
@@ -2478,7 +2478,7 @@ sv:
         no_comments: "Inga kommentarer"
         submission_late_timestamp: "%{submitted_at} (sen)"
       titles: 
-        assigned_peer_reviews: "Tilldelade recensioner"
+        assigned_peer_reviews: "Tilldelade referentgranskningar"
         comments: "Kommentarer:"
         submission: Inlämning
         submission_not_turned_in: "Inte inlämnad!"
@@ -6347,7 +6347,7 @@ sv:
       last_page: Sista
     peer_reviews: 
       due_date: "slutdatum %{date}"
-      peer_review_alert: "Du har tilldelats en personlig recension av %{person}"
+      peer_review_alert: "Du har tilldelats en referentgranskning av %{person}"
     points_possible_number: "Möjliga poäng måste vara ett nummer"
     published_button: 
       buttons: 
@@ -6376,7 +6376,7 @@ sv:
       from_context: "Från *%{context_name}*"
       initial_post_required: "Svar är endast synliga för dem som har skrivit minst ett svar."
       links: 
-        peer_reviews: "Person recensioner"
+        peer_reviews: Referentgranskningar
       loading_replies: "Laddar svar..."
       lock_topic: "Stäng för kommentarer"
       locked: "Det här ämnet är stängt för kommentarer"
@@ -8950,8 +8950,8 @@ sv:
       conversation_label: "Besök konversationer"
       discussion_details: Diskussiondetaljer
       discussion_label: "Besök kursdiskussionerna"
-      peer_review_details: Recensionsdetaljer
-      peer_review_label: "Besök kursens recensioner"
+      peer_review_details: "Referentgranskning Detaljer"
+      peer_review_label: "Besök kursens referentgranskningar"
       x_more: "%{x} mer..."
       x_new_in_announcements: 
         one: "*1* meddelande"
@@ -8967,7 +8967,7 @@ sv:
         other: "*%{count}* Diskussioner"
       x_new_in_peer_reviews: 
         one: "*1* Recension"
-        other: "*%{count}* Recensioner"
+        other: "*%{count}* Referentgranskningar"
     local: Lokal
     select: 
       prompt: "Vänligen välj"
@@ -11379,16 +11379,16 @@ sv:
     page_unpublished_module: "Den här sidan är en del av en avpublicerad modul och är därför inte tillgänglig än."
     peer_review_invitation: 
       email: 
-        body: "Du har blivit inbjuden till att recensera %{reviewee}. Följ länken nedanför för att lämna dem en recension!"
+        body: "Du har blivit inbjuden till att referentgranskning %{reviewee}. Följ länken nedanför för att lämna dem en recension!"
         html: 
           link_message: "Klicka här för att slutföra din recension"
-        subject: "recensera för %{reviewee}"
+        subject: "referentgranskning för %{reviewee}"
       sms: 
         more_info: "Mer information på %{url}"
       summary: 
         body: "Du har blivit inbjuden till att recensera %{reviewee}. Följ länken nedanför för att lämna dem en recension!"
       twitter: 
-        body: "Du har blivit inbjuden till att recensera %{reviewee}. Följ länken nedanför för att lämna dem en recension!"
+        body: "Du har blivit inbjuden till att referentgranskning %{reviewee}. Följ länken nedanför för att lämna dem en recension!"
     pseudonym_registration: 
       email: 
         body: "Du har registrerat dig för ett Canvaskontot på %{account}! Innan du kan logga in och börja använda Canvas måste du färdigställa konfigurationen."
@@ -11788,11 +11788,11 @@ sv:
   moderate_grades_4f43f85d: "Moderera betyg"
   moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Modererade bedömning låter flera betygsättare bedömma valda uppgifter på egen hand, med en moderator som ger slutbetyget."
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderering av grupper kan inte aktiveras för gruppuppgifter"
-  moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderering av betyg kan inte aktiveras för granskade uppgifter"
+  moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderering av betyg kan inte aktiveras för referentgranskning uppgifter"
   moderated_grading_e6127f72: "Modererade bedömning"
   moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Moderering av betyg kan inte ändras om en betygsatt inlämning existerar"
   moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Moderering av betyg kan inte aktiveras för gruppuppgifter"
-  moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Moderering av granskade uppgifter kan inte aktiveras"
+  moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Moderering av referentgranskning uppgifter kan inte aktiveras"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Moderering av betyg kan inte aktiveras för ej betygsatta uppgifter"
   moderator_49b9f2e1: Moderator
   moderator_sortorder_18063692: "Moderator %{sortOrder}"
@@ -12353,7 +12353,7 @@ sv:
         * Webb-konferenser
         * Grupper
         * Samarbeten
-        * Förgranskningar & påminnelser
+        * Referentgranskning & påminnelser
     invitation_display: Inbjudan
     late_grading_description: |-
         *Endast lärare och administratörer:*
@@ -12918,12 +12918,12 @@ sv:
   paypal: 
     exception: "Ursäkta, ett fel uppstod, vänligen försök igen senare."
   pdf_d8236d9a: PDF
-  peer_review_for_assignment_ce72fc52: "Recension för %{assignment}"
+  peer_review_for_assignment_ce72fc52: "Referentgranskning för %{assignment}"
   peer_reviewed_graded_discussion_b339df5b: "Förgranskad betygsdiskussion:"
   peer_reviews_api: 
     errors: 
       delete_reminder_failed: "Radering misslyckades"
-  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Granskningar kan inte aktiveras för modererade uppgifter"
+  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Referentgranskningar kan inte aktiveras för modererade uppgifter"
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Väntar
   pending_message_2d9a8796: "Väntar: %{message}"
@@ -17194,7 +17194,7 @@ sv:
   stop_acting_as_user_8809a97f: "Sluta att agera som en användare"
   storage_used_in_mb_c75fbd9c: "använt utrymme i MB"
   stream_items_api: 
-    assessment_request_title: "Recension för %{title}"
+    assessment_request_title: "Referentgranskning för %{title}"
   student_5da6bfd1: Student
   student_921b864d: student
   student_assignment_outcome_map_title: "Studenters kompetenser"
@@ -17379,14 +17379,14 @@ sv:
       media_comment: Mediakommentar
       media_comment_link: "Det här är en mediakommentar, *klicka här för att visa den*."
       only_see_your_own_comments_muted: "Du kan inte se alla kommentarer just nu eftersom uppgiften betygsätts"
-      only_see_your_own_comments_peer: "Som en recenserande student kan du endast se kommentarer som lämnats av dig."
+      only_see_your_own_comments_peer: "Som en referentgranskning student kan du endast se kommentarer som lämnats av dig."
       options: 
         new_assessment: "[Ny uppgift]"
       out_of_points: "utav %{points_possible}"
-      peer_review: Recension
-      peer_review_not_done: "**Den här recensionen är inte färdig än:** För att den ska anses som färdig måste du lämna minst en kommentar."
-      peer_review_not_done_rubric: "**Den här recensionen är inte färdig än:** För att den ska anses som färdig måste du lämna minst en kommentar och fylla i matrisen till höger."
-      peer_review_steps_complete: "Du har gjort klart de nödvändiga stegen för den här recensionen."
+      peer_review: Referentgranskning
+      peer_review_not_done: "**Den här referentgranskning är inte färdig än:** För att den ska anses som färdig måste du lämna minst en kommentar."
+      peer_review_not_done_rubric: "**Den här referentgranskning är inte färdig än:** För att den ska anses som färdig måste du lämna minst en kommentar och fylla i matrisen till höger."
+      peer_review_steps_complete: "Du har gjort klart de nödvändiga stegen för den här referentgranskning."
       see_vericite_results: "Se VeriCite resultat"
       sent_to_whole_group: "Skicka kommentar till hela gruppen"
       show_rubric: "Visa matris"
@@ -19167,7 +19167,7 @@ sv:
   you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: "Du har inte behörighet att hantera betyg för den här kursen"
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "Du har fått extra tid för det här försöket"
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ändrat kravens utveckling för den här kursen. Det kan finnas studenter som redan har använt utveckling för den här moduler och andra som förlitar sig på den."
-  you_have_completed_a_peer_review_for_person_thank__1371f37e: "Du har slutfört en granskning för %{person}. Tack"
+  you_have_completed_a_peer_review_for_person_thank__1371f37e: "Du har slutfört en referentgranskning för %{person}. Tack"
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort ändringar på frågor i detta Quiz.* Dessa ändringar kommer inte synas för studenterna innan du sparat detta Quiz."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Du har inte konfigurerat några samarbetsappar. Prata med din lärare för att ställa in några."
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "Du har inga LTI:er konfigurerade att skapa samarbeten med. Prata med dina lärare för att ställa in några."
@@ -19218,8 +19218,8 @@ sv:
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du har blivit inbjuden till %{course}. Kursroll: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du har bjudits in att delta i en kurs på %{website}. Kursen heter %{course}. Kursroll: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du har blivit inbjuden att delta i kursen, %{course}. Kursroll: %{role_type}"
-  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du har blivit inbjuden att recensera %{reviewee}."
-  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Du har blivit inbjuden att recensera %{reviewee}. Följ denna länken för att recensera dem: %{link}."
+  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du har blivit inbjuden att referentgranskning %{reviewee}."
+  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Du har blivit inbjuden att referentgranskning %{reviewee}. Följ denna länken för att recensera dem: %{link}."
   you_ve_been_invited_to_the_course_course_2aac8140: "Du har bjudits in till kursen %{course}."
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Du har blivit inbjuden till kursen, %{course}. Kursroll: %{role_type}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Du har blivit påmind att utvärdera %{rubric}, %{context}."

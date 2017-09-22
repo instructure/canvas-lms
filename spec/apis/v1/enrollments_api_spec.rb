@@ -949,6 +949,10 @@ describe EnrollmentsApiController, type: :request do
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
               'short_name' => e.user.short_name,
+              'sis_user_id' =>nil,
+              'integration_id' =>nil,
+              'sis_login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil,
+              'sis_import_id' =>nil,
               'id' => e.user.id,
               'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
             },
@@ -1152,6 +1156,10 @@ describe EnrollmentsApiController, type: :request do
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
               'short_name' => e.user.short_name,
+              'sis_user_id' => e.user.pseudonym ? e.user.pseudonym&.sis_user_id : nil,
+              'integration_id' => e.user.pseudonym ? e.user.pseudonym&.integration_id : nil,
+              'sis_login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil,
+              'sis_import_id' => e.user.pseudonym ? e.user.pseudonym.sis_batch_id : nil,
               'id' => e.user.id,
               'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
             },
@@ -1543,7 +1551,8 @@ describe EnrollmentsApiController, type: :request do
           user_json.merge!({
               'sis_user_id' => e.user.pseudonym.sis_user_id,
               'sis_login_id' => e.user.pseudonym.unique_id,
-            }) if e.user.pseudonym && e.user.pseudonym.sis_user_id
+              'integration_id' => e.user.pseudonym.integration_id,
+            })
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,

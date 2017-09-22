@@ -101,9 +101,10 @@ define [
         max: 110
 
     hasSections: $.Deferred()
-    gridReady: $.Deferred()
 
     constructor: (@options) ->
+      @gridReady = $.Deferred()
+
       @courseContent =
         gradingPeriodAssignments: {}
 
@@ -623,25 +624,26 @@ define [
       @sortRowsBy (a, b) => @localeSort(a.sortable_name, b.sortable_name)
 
     gotSubmissionsChunk: (student_submissions) =>
-      changedStudentIds = []
-      submissions = []
+      @gridReady.then =>
+        changedStudentIds = []
+        submissions = []
 
-      for data in student_submissions
-        changedStudentIds.push(data.user_id)
-        student = @student(data.user_id)
-        for submission in data.submissions
-          submissions.push(submission)
-          @updateSubmission(submission)
+        for data in student_submissions
+          changedStudentIds.push(data.user_id)
+          student = @student(data.user_id)
+          for submission in data.submissions
+            submissions.push(submission)
+            @updateSubmission(submission)
 
-        student.loaded = true
+          student.loaded = true
 
-      @updateEffectiveDueDatesFromSubmissions(submissions)
-      _.each @assignments, (assignment) =>
-        @updateAssignmentEffectiveDueDates(assignment)
+        @updateEffectiveDueDatesFromSubmissions(submissions)
+        _.each @assignments, (assignment) =>
+          @updateAssignmentEffectiveDueDates(assignment)
 
-      changedStudentIds = _.uniq(changedStudentIds)
-      students = changedStudentIds.map(@student)
-      @setupGrading(students)
+        changedStudentIds = _.uniq(changedStudentIds)
+        students = changedStudentIds.map(@student)
+        @setupGrading(students)
 
     student: (id) =>
       @students[id] || @studentViewStudents[id]

@@ -1993,23 +1993,33 @@ describe CoursesController, type: :request do
                       { :state => ['unpublished'] })
       expect(json.collect{ |c| c['id'].to_i }.sort).to eq [@course3.id, @course4.id]
     end
+  end
 
-    context "sharding" do
-      specs_require_sharding
+  context "course list + sharding" do
+    specs_require_sharding
 
-      it "returns courses for out-of-shard users" do
-        @shard1.activate { @user = User.create!(name: 'outofshard') }
-        enrollment = @course1.enroll_student(@user)
+    before :once do
+      @shard1.activate { @student = User.create!(name: 'outofshard') }
+      enrollment = @course1.enroll_student(@student)
+    end
 
-        @me = @user
+    it "returns courses for out-of-shard users" do
+      @user = @student
+      json = api_call(:get, "/api/v1/courses.json",
+        { :controller => 'courses', :action => 'index', :format => 'json' },
+        { :state => ['available'] })
 
-        json = api_call(:get, "/api/v1/courses.json",
-          { :controller => 'courses', :action => 'index', :format => 'json' },
-          { :state => ['available'] })
+      expect(json.size).to eq(1)
+      expect(json.first['id']).to eq(@course1.id)
+    end
 
-        expect(json.size).to eq(1)
-        expect(json.first['id']).to eq(@course1.id)
-      end
+    it "returns courses relative to root account shard when looking at other users" do
+      account_admin_user(:active_all => true)
+      json = api_call(:get, "/api/v1/users/#{@student.id}/courses",
+        { :controller => 'courses', :action => 'user_index', :user_id => @student.id.to_s, :format => 'json' })
+
+      expect(json.size).to eq(1)
+      expect(json.first['id']).to eq(@course1.id)
     end
   end
 
@@ -2289,6 +2299,9 @@ describe CoursesController, type: :request do
             'name' => 'TAPerson',
             'sortable_name' => 'TAPerson',
             'short_name' => 'TAPerson',
+            'sis_user_id' =>nil,
+            'integration_id' =>nil,
+            'sis_login_id' =>nil,
             'email' => 'ta@ta.com',
             'bio' => 'hey'
           }

@@ -25,7 +25,7 @@ describe 'Late Policy statuses:' do
 
   let(:student_grades_page) { StudentGradesPage.new }
 
-  context "grade display late policy pills" do
+  describe "grade display late policy pills" do
 
     before(:once) do
       # create course with students, assignments, submissions and grades
@@ -39,32 +39,59 @@ describe 'Late Policy statuses:' do
     before(:each) do
       ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
-      student_grades_page.visit_as_teacher(@course, @course.students.first)
     end
 
     after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
-    it 'missing submission has missing pill' do
-      expect(student_grades_page.status_pill(@a2.id, 'missing')).to be_displayed
+    context 'with new gradebook disabled' do
+      before(:once) do
+        @course.disable_feature!(:new_gradebook)
+      end
+
+      before(:each) do
+        student_grades_page.visit_as_teacher(@course, @course.students.first)
+      end
+
+      it 'missing submission does not have missing pill' do
+        expect(f('#content')).not_to contain_css("#submission_#{@a2.id} .submission-missing-pill")
+      end
+
+      it 'late submission does not have late pill' do
+        expect(f('#content')).not_to contain_css("#submission_#{@a1.id} .submission-late-pill")
+      end
     end
 
-    it 'late submission has late pill' do
-      expect(student_grades_page.status_pill(@a1.id, 'late')).to be_displayed
-    end
+    context 'with new gradebook enabled' do
+      before(:once) do
+        @course.enable_feature!(:new_gradebook)
+      end
 
-    it 'late submission has late penalty' do
-      student_grades_page.show_details_button.click
-      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
+      before(:each) do
+        student_grades_page.visit_as_teacher(@course, @course.students.first)
+      end
 
-      # the data from rails and data from ui are not in the same format
-      expect(student_grades_page.submission_late_penalty_text(@a1.id).to_f.to_s).to eq late_penalty_value
-    end
+      it 'missing submission has missing pill' do
+        expect(student_grades_page.status_pill(@a2.id, 'missing')).to be_displayed
+      end
 
-    it 'late submission has final grade' do
-      student_grades_page.show_details_button.click
-      final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
+      it 'late submission has late pill' do
+        expect(student_grades_page.status_pill(@a1.id, 'late')).to be_displayed
+      end
 
-      expect(student_grades_page.late_submission_final_score_text(@a1.id)).to eq final_grade_value
+      it 'late submission has late penalty' do
+        student_grades_page.show_details_button.click
+        late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
+
+        # the data from rails and data from ui are not in the same format
+        expect(student_grades_page.submission_late_penalty_text(@a1.id).to_f.to_s).to eq late_penalty_value
+      end
+
+      it 'late submission has final grade' do
+        student_grades_page.show_details_button.click
+        final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
+
+        expect(student_grades_page.late_submission_final_score_text(@a1.id)).to eq final_grade_value
+      end
     end
   end
 end
