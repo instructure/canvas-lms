@@ -3,6 +3,8 @@ module Types
     name "Submission"
 
     implements GraphQL::Relay::Node.interface
+    interfaces [Interfaces::TimestampInterface]
+
     global_id_field :id
     # not doing a legacy canvas id since they aren't used in the rest api
 
