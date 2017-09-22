@@ -71,12 +71,16 @@ $ic-tooltip-arrow-size: 0.375rem;
   @include reset-list;
 }
 
-.ic-app-header__menu-list-item {
+li.ic-app-header__menu-list-item {
   box-sizing: border-box;
+  overflow: hidden;
+  margin-bottom: 10px;
 
   &.ic-app-header__menu-list-item--active {
     .ic-app-header__menu-list-link {
-      background: $ic-color-light;
+      background: $ic-brand-white;
+      display: block;
+      overflow: hidden;
 
       body:not(.primary-nav-expanded) & {
         &:hover, &:focus {
@@ -111,11 +115,12 @@ $ic-tooltip-arrow-size: 0.375rem;
 .ic-app-header__menu-list-link {
   box-sizing: border-box;
   transition:
-    background-color 0.3s,
-    padding 0.3s;
+  background-color 0.3s,
+  padding 0.3s;
   position: relative;
   text-align: center;
   display: block;
+  overflow: hidden;
   color: $ic-brand-global-nav-menu-item__text-color;
 
   &:not(.ic-app-header__menu-list-link--nav-toggle) {
@@ -140,7 +145,7 @@ $ic-tooltip-arrow-size: 0.375rem;
   }
 
   &:hover, &:focus {
-    background-color: $ic-global-nav-link-hover;
+    background-color: $sm-brand-dark;
     @if $use_high_contrast == false {
       text-decoration: none;
       outline: none;
@@ -217,9 +222,12 @@ button.ic-app-header__menu-list-link {
   transform: translate3d(0,0,0);
   position: relative;
   z-index: 1;
-  width: $ic-sp*4;
+  width: 30px;
+  height: 30px;
   margin: 0 auto;
   color: $ic-brand-global-nav-ic-icon-svg-fill;
+  float: left;
+  margin-left: 15px;
 
   .ic-avatar {
     transform: translate3d(0,0,0);
@@ -292,9 +300,8 @@ button.ic-app-header__menu-list-link {
 
 .ic-app-header__logomark-container {
   width: 100%;
-  background-color: $ic-brand-global-nav-logo-bgd;
+  background-color: $sm-brand-dark;
   box-sizing: border-box;
-  margin-top: 10px;
   margin-bottom: 20px;
 
   @if $ic-brand-header-image != $ic-logomark-url {
@@ -304,7 +311,7 @@ button.ic-app-header__menu-list-link {
     padding: 0 $ic-sp/2;
 
     body.primary-nav-expanded & {
-      padding: 0 $ic-sp + 2;
+      padding: 20px $ic-sp + 2;
     }
   }
   padding: 0;
@@ -314,16 +321,16 @@ button.ic-app-header__menu-list-link {
   display: block;
   width: 100%;
   overflow: hidden;
-  margin: 0 auto;
+  margin: 0 auto 20px auto;
   background-image: $ic-brand-header-image;
   background-position: 50%;
   background-repeat: no-repeat;
   background-size: contain;
   transition: transform 0.3s;
-  height: 75px;
+  height: 70px;
 
   body.primary-nav-expanded & {
-    height: 85px;
+    height: 70px;
   }
 }
 // set to block to avoid any exta inline spacing at bottom
@@ -360,7 +367,7 @@ body.primary-nav-expanded {
 
   .ic-app-header__menu-list-link {
     &:not(.ic-app-header__menu-list-link--nav-toggle) {
-      padding: 0.5625rem 0;
+      padding: 10px 0;
     }
 
     &.ic-app-header__menu-list-link--nav-toggle {
@@ -379,15 +386,17 @@ body.primary-nav-expanded {
   .menu-item__text {
     transition: none;
     position: static;
-    left: auto;
-    top: auto;
+    float: left;
     transform: none;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-family: $ic-font-family;
     opacity: 1;
-    text-align: center;
+    text-align: left;
     display: block;
     line-height: 1.4;
     border-radius: 0;
-    margin: $ic-sp/4 0 0;
+    margin: 5px 0 0 10px;
     padding: 0;
     background: transparent;
     color: $ic-brand-global-nav-menu-item__text-color;
@@ -395,6 +404,7 @@ body.primary-nav-expanded {
     word-wrap: break-word;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
+    font-size: 16px;
 
     &::after {
       display: none;
