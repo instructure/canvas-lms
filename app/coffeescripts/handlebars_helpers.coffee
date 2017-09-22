@@ -32,7 +32,7 @@ define [
     bz_checked_if_ghang_link : (str) ->
       if typeof str == "undefined"
         return "checked"
-      if str == "" || str.match(/\/hangouts\//)
+      if str == null || str == "" || str.match(/\/hangouts\//)
         return "checked"
       else
         return ""
