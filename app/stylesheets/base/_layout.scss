@@ -23,7 +23,7 @@ $layout-modal-font-color:           $ic-font-color-dark;
 
 body {
   min-height: 100vh;
-  background: $ic-color-light;
+  background: $sm-body-background-color;
   font-weight: 300;
 
   &:not(.is-inside-submission-frame):not(.embedded) {
