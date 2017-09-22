@@ -3,14 +3,60 @@
            xmlns="http://canvas.instructure.com/xsd/cccv1p0"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified">
-  <!-- todo: useful comments as documentation ;) -->
+
+  <!--
+  Builder::XmlMarkup generates XML elements with an empty value when the corresponding
+  Ruby expression is nil, but XML validators do not allow an empty value for non-string
+  types.  Define optional_integer, optional_dateTime and optional_float types for such elements.
+  -->
+
+  <xs:simpleType name="optional_integer">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base='xs:string'>
+          <xs:length value="0"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base='xs:integer' />
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:simpleType name="optional_dateTime">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base='xs:string'>
+          <xs:length value="0"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base='xs:dateTime' />
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:simpleType name="optional_float">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base='xs:string'>
+          <xs:length value="0"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base='xs:float' />
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
   <xs:element name="course">
     <xs:complexType>
       <xs:all minOccurs="0" maxOccurs="1">
         <xs:element name="title" type="xs:string" minOccurs="1"/>
         <xs:element name="course_code" type="xs:string" minOccurs="0"/>
-        <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
-        <xs:element name="conclude_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="start_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="conclude_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="tab_configuration" type="xs:string" minOccurs="0"/>
         <xs:element name="is_public" type="xs:boolean" minOccurs="0"/>
         <xs:element name="indexed" type="xs:boolean" minOccurs="0"/>
         <xs:element name="publish_grades_immediately" type="xs:boolean" minOccurs="0"/>
@@ -30,15 +76,21 @@
         <xs:element name="hide_final_grade" type="xs:boolean" minOccurs="0"/>
         <xs:element name="grading_standard_enabled" type="xs:boolean" minOccurs="0"/>
         <xs:element name="grading_standard_identifier_ref" type="xs:string" minOccurs="0"/>
-        <xs:element name="grading_standard_id" type="xs:integer" minOccurs="0"/>
-        <xs:element name="storage_quota" type="xs:float" minOccurs="0"/>
+        <xs:element name="grading_standard_id" type="optional_integer" minOccurs="0"/>
+        <xs:element name="storage_quota" type="optional_float" minOccurs="0"/>
         <xs:element name="lock_all_announcements" type="xs:boolean" minOccurs="0"/>
         <xs:element name="public_syllabus" type="xs:boolean" minOccurs="0"/>
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_topics" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_editing" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="show_announcements_on_home_page" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="home_page_announcement_limit" type="optional_integer" minOccurs="0"/>
         <xs:element name="restrict_student_future_view" type="xs:boolean" minOccurs="0"/>
         <xs:element name="restrict_student_past_view" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="public_syllabus_to_auth" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="show_total_grade_as_points" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="organize_epub_by_content_type" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="enable_offline_web_export" type="xs:boolean" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
@@ -84,10 +136,11 @@
   <xs:complexType name="assignmentType">
     <xs:all minOccurs="0" maxOccurs="1">
       <xs:element name="title" type="xs:string" minOccurs="1"/>
-      <xs:element name="due_at" type="xs:dateTime" minOccurs="0"/>
-      <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
-      <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
-      <xs:element name="peer_reviews_due_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>
+      <xs:element name="due_at" type="optional_dateTime" minOccurs="0"/>
+      <xs:element name="lock_at" type="optional_dateTime" minOccurs="0"/>
+      <xs:element name="unlock_at" type="optional_dateTime" minOccurs="0"/>
+      <xs:element name="peer_reviews_due_at" type="optional_dateTime" minOccurs="0"/>
       <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
       <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="grading_standard_identifierref" type="xs:string" minOccurs="0"/>
@@ -98,20 +151,21 @@
       <xs:element name="rubric_hide_score_total" type="xs:boolean" minOccurs="0"/>
       <xs:element name="quiz_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="allowed_extensions" type="xs:string" minOccurs="0"/>
-      <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
-      <xs:element name="min_score" type="xs:float" minOccurs="0"/>
-      <xs:element name="max_score" type="xs:float" minOccurs="0"/>
-      <xs:element name="mastery_score" type="xs:float" minOccurs="0"/>
+      <xs:element name="points_possible" type="optional_float" minOccurs="0"/>
+      <xs:element name="min_score" type="optional_float" minOccurs="0"/>
+      <xs:element name="max_score" type="optional_float" minOccurs="0"/>
+      <xs:element name="mastery_score" type="optional_float" minOccurs="0"/>
       <xs:element name="grading_type" type="xs:string" minOccurs="0"/>
       <xs:element name="all_day" type="xs:boolean" minOccurs="0"/>
       <xs:element name="submission_types" type="xs:string" minOccurs="0"/>
-      <xs:element name="position" type="xs:integer" minOccurs="0"/>
+      <xs:element name="position" type="optional_integer" minOccurs="0"/>
       <xs:element name="turnitin_enabled" type="xs:boolean" minOccurs="0"/>
       <xs:element name="turnitin_settings" type="xs:string" minOccurs="0"/>
       <xs:element name="vericite_enabled" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="peer_review_count" type="xs:integer" minOccurs="0"/>
+      <xs:element name="peer_review_count" type="optional_integer" minOccurs="0"/>
       <xs:element name="peer_reviews_assigned" type="xs:boolean" minOccurs="0"/>
       <xs:element name="peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="intra_group_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="automatic_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="anonymous_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="moderated_grading" type="xs:boolean" minOccurs="0"/>
@@ -123,6 +177,7 @@
       <xs:element name="external_tool_url" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_new_tab" type="xs:boolean" minOccurs="0"/>
       <xs:element name="freeze_on_copy" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="module_locked" type="xs:boolean" minOccurs="0"/>
       <xs:element name="muted" type="xs:boolean" minOccurs="0"/>
       <xs:element name="omit_from_final_grade" type="xs:boolean" minOccurs="0"/>
       <xs:element name="only_visible_to_overrides" type="xs:boolean" minOccurs="0"/>
@@ -138,7 +193,7 @@
       <xs:element name="saved_rubric_comments" minOccurs="0">
         <xs:complexType>
           <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="comment" type="xs:string">
+            <xs:element name="comment">
               <xs:complexType>
                 <xs:attribute name="criterion_id" type="xs:string" use="required"/>
               </xs:complexType>
@@ -149,14 +204,14 @@
       <xs:element name="assignment_overrides" minOccurs="0">
         <xs:complexType>
           <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="override" type="xs:string">
+            <xs:element name="override">
               <xs:complexType>
                 <xs:attribute name="set_type" type="xs:string" use="required"/>
                 <xs:attribute name="set_id" type="xs:string" use="required"/>
                 <xs:attribute name="title" type="xs:string" use="required"/>
-                <xs:attribute name="due_at" type="xs:dateTime"/>
-                <xs:attribute name="unlock_at" type="xs:dateTime"/>
-                <xs:attribute name="lock_at" type="xs:dateTime"/>
+                <xs:attribute name="due_at" type="optional_dateTime"/>
+                <xs:attribute name="unlock_at" type="optional_dateTime"/>
+                <xs:attribute name="lock_at" type="optional_dateTime"/>
                 <xs:attribute name="due_at_overridden" type="xs:boolean"/>
                 <xs:attribute name="unlock_at_overridden" type="xs:boolean"/>
                 <xs:attribute name="lock_at_overridden" type="xs:boolean"/>
@@ -175,10 +230,10 @@
         <xs:element name="topic_id" type="xs:ID" minOccurs="1"/>
         <xs:element name="title" type="xs:string" minOccurs="1"/>
         <xs:element name="assignment" type="assignmentType" minOccurs="0"/>
-        <xs:element name="posted_at" type="xs:dateTime" minOccurs="0"/>
-        <xs:element name="delayed_post_at" type="xs:dateTime" minOccurs="0"/>
-        <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
-        <xs:element name="position" type="xs:integer" minOccurs="0"/>
+        <xs:element name="posted_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="delayed_post_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="lock_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="position" type="optional_integer" minOccurs="0"/>
         <xs:element name="pinned" type="xs:boolean" minOccurs="0"/>
         <xs:element name="require_initial_post" type="xs:boolean" minOccurs="0"/>
         <xs:element name="external_feed_identifierref" type="xs:string" minOccurs="0"/>
@@ -189,7 +244,7 @@
         <xs:element name="allow_rating" type="xs:boolean" minOccurs="0"/>
         <xs:element name="only_graders_can_rate" type="xs:boolean" minOccurs="0"/>
         <xs:element name="sort_by_rating" type="xs:boolean" minOccurs="0"/>
-        <xs:element name="todo_date" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="todo_date" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="discussion_type" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -220,12 +275,13 @@
             <xs:all minOccurs="0">
               <xs:element name="title" type="xs:string" minOccurs="1"/>
               <xs:element name="workflow_state" type="xs:string" minOccurs="1"/>
-              <xs:element name="position" type="xs:integer" minOccurs="0"/>
-              <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
-              <xs:element name="end_at" type="xs:dateTime" minOccurs="0"/>
-              <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="position" type="optional_integer" minOccurs="0"/>
+              <xs:element name="start_at" type="optional_dateTime" minOccurs="0"/>
+              <xs:element name="end_at" type="optional_dateTime" minOccurs="0"/>
+              <xs:element name="unlock_at" type="optional_dateTime" minOccurs="0"/>
+              <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
               <xs:element name="require_sequential_progress" type="xs:boolean" minOccurs="0"/>
-              <xs:element name="requirement_count" type="xs:integer" minOccurs="0"/>
+              <xs:element name="requirement_count" type="optional_integer" minOccurs="0"/>
 
               <xs:element name="prerequisites" minOccurs="0">
                 <xs:complexType>
@@ -252,9 +308,12 @@
                           <xs:element name="content_type" type="xs:string" minOccurs="1"/>
                           <xs:element name="title" type="xs:string" minOccurs="1"/>
                           <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
+                          <xs:element name="global_identifierref" type="xs:string" minOccurs="0"/>
                           <xs:element name="url" type="xs:string" minOccurs="0"/>
-                          <xs:element name="position" type="xs:integer" minOccurs="0"/>
-                          <xs:element name="indent" type="xs:integer" minOccurs="0"/>
+                          <xs:element name="position" type="optional_integer" minOccurs="0"/>
+                          <xs:element name="indent" type="optional_integer" minOccurs="0"/>
+                          <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>
+                          <xs:element name="new_tab" type="xs:string" minOccurs="0"/>
                         </xs:all>
                         <xs:attribute name="identifier" type="xs:ID" use="required"/>
                       </xs:complexType>
@@ -270,8 +329,8 @@
                       <xs:complexType>
                         <xs:all minOccurs="0">
                           <xs:element name="identifierref" type="xs:string" minOccurs="1"/>
-                          <xs:element name="min_score" type="xs:float" minOccurs="0"/>
-                          <xs:element name="max_score" type="xs:float" minOccurs="0"/>
+                          <xs:element name="min_score" type="optional_float" minOccurs="0"/>
+                          <xs:element name="max_score" type="optional_float" minOccurs="0"/>
                         </xs:all>
                         <xs:attribute name="type" type="xs:string" use="required"/>
                       </xs:complexType>
@@ -336,8 +395,8 @@
           <xs:complexType>
             <xs:all minOccurs="0">
               <xs:element name="title" type="xs:string" minOccurs="1"/>
-              <xs:element name="position" type="xs:integer" minOccurs="0"/>
-              <xs:element name="group_weight" type="xs:float" minOccurs="0"/>
+              <xs:element name="position" type="optional_integer" minOccurs="0"/>
+              <xs:element name="group_weight" type="optional_float" minOccurs="0"/>
               <xs:element name="rules" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>
@@ -354,7 +413,7 @@
                             </xs:simpleType>
                           </xs:element>
                           <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
-                          <xs:element name="drop_count" type="xs:integer" minOccurs="0"/>
+                          <xs:element name="drop_count" type="optional_integer" minOccurs="0"/>
                         </xs:all>
                       </xs:complexType>
                     </xs:element>
@@ -379,7 +438,7 @@
               <xs:element name="data" type="xs:string" minOccurs="1"/>
             </xs:all>
             <xs:attribute name="identifier" type="xs:ID" use="required"/>
-            <xs:attribute name="version" type="xs:integer" default="1"/>
+            <xs:attribute name="version" type="optional_integer" default="1"/>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
@@ -393,7 +452,7 @@
           <xs:all minOccurs="0">
             <xs:element name="id" type="xs:string" minOccurs="0"/>
             <xs:element name="description" type="xs:string" minOccurs="1"/>
-            <xs:element name="points" type="xs:float" minOccurs="1"/>
+            <xs:element name="points" type="optional_float" minOccurs="1"/>
             <xs:element name="criterion_id" type="xs:string" minOccurs="0"/>
             <xs:element name="long_description" type="xs:string" minOccurs="0"/>
           </xs:all>
@@ -411,10 +470,10 @@
           <xs:all minOccurs="0">
             <xs:element name="title" type="xs:string" minOccurs="0"/>
             <xs:element name="description" type="xs:string" minOccurs="0"/>
-            <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
-            <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
+            <xs:element name="points_possible" type="optional_float" minOccurs="0"/>
+            <xs:element name="mastery_points" type="optional_float" minOccurs="0"/>
             <xs:element name="calculation_method" type="xs:string" minOccurs="0"/>
-            <xs:element name="calculation_int" type="xs:integer" minOccurs="0"/>
+            <xs:element name="calculation_int" type="optional_integer" minOccurs="0"/>
             <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
             <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
             <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>
@@ -427,8 +486,8 @@
                         <xs:element name="content_type" type="xs:string" minOccurs="1"/>
                         <xs:element name="content_id" type="xs:string" minOccurs="1"/>
                         <xs:element name="mastery_type" type="xs:string" minOccurs="0"/>
-                        <xs:element name="mastery_score" type="xs:float" minOccurs="0"/>
-                        <xs:element name="position" type="xs:integer" minOccurs="0"/>
+                        <xs:element name="mastery_score" type="optional_float" minOccurs="0"/>
+                        <xs:element name="position" type="optional_integer" minOccurs="0"/>
                       </xs:all>
                     </xs:complexType>
                   </xs:element>
@@ -465,7 +524,7 @@
               <xs:element name="read_only" type="xs:boolean" minOccurs="0"/>
               <xs:element name="reusable" type="xs:boolean" minOccurs="0"/>
               <xs:element name="public" type="xs:boolean" minOccurs="0"/>
-              <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+              <xs:element name="points_possible" type="optional_float" minOccurs="0"/>
               <xs:element name="hide_score_total" type="xs:boolean" minOccurs="0"/>
               <xs:element name="free_form_criterion_comments" type="xs:boolean" minOccurs="0"/>
               <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
@@ -479,8 +538,8 @@
                           <xs:element name="criterion_id" type="xs:string" minOccurs="0"/>
                           <xs:element name="description" type="xs:string" minOccurs="0"/>
                           <xs:element name="long_description" type="xs:string" minOccurs="0"/>
-                          <xs:element name="points" type="xs:float" minOccurs="0"/>
-                          <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
+                          <xs:element name="points" type="optional_float" minOccurs="0"/>
+                          <xs:element name="mastery_points" type="optional_float" minOccurs="0"/>
                           <xs:element name="ignore_for_scoring" type="xs:boolean" minOccurs="0"/>
                           <xs:element name="learning_outcome_identifierref" type="xs:string" minOccurs="0"/>
                           <xs:element name="criterion_use_range" type="xs:boolean" minOccurs="0"/>
@@ -534,11 +593,12 @@
       <xs:all minOccurs="0" maxOccurs="1">
         <xs:element name="title" type="xs:string" minOccurs="1"/>
         <xs:element name="description" type="xs:string" minOccurs="1"/>
-        <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+        <xs:element name="points_possible" type="optional_float" minOccurs="0"/>
         <xs:element name="assignment" type="assignmentType" minOccurs="0"/>
-        <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
-        <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
-        <xs:element name="due_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="lock_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="unlock_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="module_locked" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="due_at" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="shuffle_answers" type="xs:boolean" minOccurs="0"/>
         <xs:element name="hide_results" type="xs:string" minOccurs="0"/>
         <xs:element name="require_lockdown_browser" type="xs:boolean" minOccurs="0"/>
@@ -548,11 +608,13 @@
         <xs:element name="access_code" type="xs:string" minOccurs="0"/>
         <xs:element name="ip_filter" type="xs:string" minOccurs="0"/>
         <xs:element name="show_correct_answers" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="show_correct_answers_at" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="hide_correct_answers_at" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="anonymous_submissions" type="xs:boolean" minOccurs="0"/>
         <xs:element name="could_be_locked" type="xs:boolean" minOccurs="0"/>
         <xs:element name="available" type="xs:boolean" minOccurs="0"/>
-        <xs:element name="time_limit" type="xs:integer" minOccurs="0"/>
-        <xs:element name="allowed_attempts" type="xs:integer" minOccurs="0"/>
+        <xs:element name="time_limit" type="optional_integer" minOccurs="0"/>
+        <xs:element name="allowed_attempts" type="optional_integer" minOccurs="0"/>
         <xs:element name="one_question_at_a_time" type="xs:boolean" minOccurs="0"/>
         <xs:element name="cant_go_back" type="xs:boolean" minOccurs="0"/>
         <xs:element name="one_time_results" type="xs:boolean" minOccurs="0"/>
@@ -576,6 +638,7 @@
             <xs:restriction base="xs:string">
               <xs:enumeration value="keep_latest"/>
               <xs:enumeration value="keep_highest"/>
+              <xs:enumeration value="keep_average"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -583,14 +646,14 @@
         <xs:element name="assignment_overrides" minOccurs="0">
           <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
-              <xs:element name="override" type="xs:string">
+              <xs:element name="override">
                 <xs:complexType>
                   <xs:attribute name="set_type" type="xs:string" use="required"/>
                   <xs:attribute name="set_id" type="xs:string" use="required"/>
                   <xs:attribute name="title" type="xs:string" use="required"/>
-                  <xs:attribute name="due_at" type="xs:dateTime"/>
-                  <xs:attribute name="unlock_at" type="xs:dateTime"/>
-                  <xs:attribute name="lock_at" type="xs:dateTime"/>
+                  <xs:attribute name="due_at" type="optional_dateTime"/>
+                  <xs:attribute name="unlock_at" type="optional_dateTime"/>
+                  <xs:attribute name="lock_at" type="optional_dateTime"/>
                   <xs:attribute name="due_at_overridden" type="xs:boolean"/>
                   <xs:attribute name="unlock_at_overridden" type="xs:boolean"/>
                   <xs:attribute name="lock_at_overridden" type="xs:boolean"/>
@@ -613,8 +676,8 @@
             <xs:all minOccurs="0">
               <xs:element name="title" type="xs:string" minOccurs="0"/>
               <xs:element name="description" type="xs:string" minOccurs="0"/>
-              <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
-              <xs:element name="end_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="start_at" type="optional_dateTime" minOccurs="0"/>
+              <xs:element name="end_at" type="optional_dateTime" minOccurs="0"/>
               <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
               <xs:element name="all_day" type="xs:boolean" minOccurs="0"/>
             </xs:all>
@@ -630,12 +693,11 @@
       <xs:sequence minOccurs="0" maxOccurs="unbounded">
         <xs:element name="media">
           <xs:complexType>
-            <xs:attribute name="identifierref" type="xs:ID" use="required"/>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
               <xs:element name="track">
                 <xs:complexType>
                   <xs:attribute name="identifierref" type="xs:ID" use="required"/>
-                  <xs:attribute name="kind" type="xs:string" use="required">
+                  <xs:attribute name="kind" use="required">
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
                         <xs:enumeration value="subtitles"/>
@@ -650,6 +712,7 @@
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
+            <xs:attribute name="identifierref" type="xs:ID" use="required"/>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
@@ -667,8 +730,8 @@
                   <xs:all minOccurs="0">
                     <xs:element name="hidden" type="xs:boolean" minOccurs="0"/>
                     <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
-                    <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
-                    <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
+                    <xs:element name="lock_at" type="optional_dateTime" minOccurs="0"/>
+                    <xs:element name="unlock_at" type="optional_dateTime" minOccurs="0"/>
                   </xs:all>
                   <xs:attribute name="path" type="xs:string" use="required"/>
                 </xs:complexType>
@@ -685,11 +748,15 @@
                     <xs:element name="display_name" type="xs:string" minOccurs="0"/>
                     <xs:element name="hidden" type="xs:boolean" minOccurs="0"/>
                     <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
-                    <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
-                    <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
+                    <xs:element name="lock_at" type="optional_dateTime" minOccurs="0"/>
+                    <xs:element name="unlock_at" type="optional_dateTime" minOccurs="0"/>
                     <xs:element name="usage_rights" minOccurs="0" maxOccurs="1">
                       <xs:complexType>
-                        <xs:attribute name="use_justification" type="xs:string" use="required">
+                        <xs:all minOccurs="0">
+                          <xs:element name="legal_copyright" type="xs:string" minOccurs="0"/>
+                          <xs:element name="license" type="xs:string" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="use_justification" use="required">
                           <xs:simpleType>
                             <xs:restriction base="xs:string">
                               <xs:enumeration value="public_domain"/>
@@ -700,10 +767,6 @@
                             </xs:restriction>
                           </xs:simpleType>
                         </xs:attribute>
-                        <xs:all minOccurs="0">
-                          <xs:element name="legal_copyright" type="xs:string" minOccurs="0"/>
-                          <xs:element name="license" type="xs:string" minOccurs="0"/>
-                        </xs:all>
                       </xs:complexType>
                     </xs:element>
                   </xs:all>

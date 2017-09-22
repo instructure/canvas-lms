@@ -21,6 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lti2_course_spec_helpe
 require 'nokogiri'
 
 describe "Common Cartridge exporting" do
+  let(:ccc_schema) do
+    get_ccc_schema
+  end
 
   it "should collect errors and finish running" do
     course = course_model
@@ -172,24 +175,29 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("learningOutcomeGroup[identifier=#{mig_id(@log3)}]")).to be_nil
       expect(doc.at_css("learningOutcome[identifier=#{mig_id(@lo)}]")).not_to be_nil
       expect(doc.at_css("learningOutcome[identifier=#{mig_id(@lo2)}]")).to be_nil
+      expect(ccc_schema.validate(doc)).to be_empty
 
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/assignment_groups.xml"))
       expect(doc.at_css("assignmentGroup[identifier=#{mig_id(@ag)}]")).not_to be_nil
       expect(doc.at_css("assignmentGroup[identifier=#{mig_id(@ag2)}]")).to be_nil
+      expect(ccc_schema.validate(doc)).to be_empty
 
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/rubrics.xml"))
       expect(doc.at_css("rubric[identifier=#{mig_id(@rubric)}]")).not_to be_nil
       expect(doc.at_css("rubric[identifier=#{mig_id(@rubric2)}]")).to be_nil
+      expect(ccc_schema.validate(doc)).to be_empty
 
       expect(@manifest_doc.at_css("item[identifier=LearningModules] item[identifier=#{mig_id(@cm)}]")).not_to be_nil
       expect(@manifest_doc.at_css("item[identifier=LearningModules] item[identifier=#{mig_id(@cm2)}]")).to be_nil
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/module_meta.xml"))
       expect(doc.at_css("module[identifier=#{mig_id(@cm)}]")).not_to be_nil
       expect(doc.at_css("module[identifier=#{mig_id(@cm2)}]")).to be_nil
+      expect(ccc_schema.validate(doc)).to be_empty
 
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/events.xml"))
       expect(doc.at_css("event[identifier=#{mig_id(@event)}]")).not_to be_nil
       expect(doc.at_css("event[identifier=#{mig_id(@event2)}]")).to be_nil
+      expect(ccc_schema.validate(doc)).to be_empty
     end
 
     it "should create a quizzes-only export" do
@@ -404,6 +412,16 @@ describe "Common Cartridge exporting" do
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/assignment_groups.xml"))
       expect(doc.at_css("assignmentGroup[identifier=#{mig_id(@ag)}]")).not_to be_nil
       expect(doc.at_css("assignmentGroup[identifier=#{mig_id(@ag2)}]")).not_to be_nil
+      expect(ccc_schema.validate(doc)).to be_empty
+    end
+
+    it "has valid course settings XML" do
+      # include all possible settings, not just changed ones
+      # (if this test fails, you need to add your setting to lib/cc/xsd/cccv1p0.xsd)
+      allow(@course).to receive(:disable_setting_defaults).and_yield
+      run_export
+      doc = Nokogiri::XML.parse(@zip_file.read("course_settings/course_settings.xml"))
+      expect(ccc_schema.validate(doc)).to be_empty
     end
 
     it "should not export syllabus if not selected" do
@@ -480,6 +498,7 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.read(file_node['href'])).to eql(track.content)
       track_doc = Nokogiri::XML(@zip_file.read('course_settings/media_tracks.xml'))
       expect(track_doc.at_css('media_tracks media track[locale=tlh][kind=subtitles][identifierref=id4164d7d594985594573e63f8ca15975]')).to be_present
+      expect(ccc_schema.validate(track_doc)).to be_empty
     end
 
     it "should export CC 1.3 assignments" do
