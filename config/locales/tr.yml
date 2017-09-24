@@ -65,6 +65,7 @@ tr:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Notlandırma şema verisini içeren tablo. Her satırda bir isim, maksimum yüzde ve minimum yüzde vardır. Ayrıca, her satırda bir alt satır eklemek ve mevcut satırı silmek için bir simge vardır."
   a_z_243c3301: A–Z
   a_z_29d8e67c: A-Z
+  about_this_service_b10bc808: "Bu hizmet hakkında"
   academic_benchmark: 
     api_error: "%{auth} yetkilendirmesi için standartlar güncellenemedi."
     bad_ab_file: "Sağlanan Academic Benchmark dosyasında hata meydana geldi."
@@ -151,7 +152,7 @@ tr:
     account_required: "LDAP kimlik doğrulaması olmalıdır"
     index: 
       delete_auth_confirmation: "Bu kaldırılırsa, kullanıcıların oturum açmaları mümkün olmayabilir. Emin misiniz?"
-      delete_auth_link: "Tüm Kimlik Doğrulamaları Kaldır"
+      delete_auth_link: "Kimlik doğrulama yöntemini kaldır"
       ip_address_list_description: "Eğer LDAP gibi, doğrudan sunucuya bağlantı gerektiren bir kimlik doğrulama hizmetini kullanıyorsanız, sunucunun bu IP adreslerinden gelen bağlantıları kabul edebildiğinden emin olmanız gerekir:"
       no_auth_type_description: "Bu hesap, şu anda bir kimlik sağlayıcı ile entegre değildir."
       page_title: "Kimlik Doğrulama Ayarları"
@@ -242,6 +243,7 @@ tr:
   account_course_and_user_search_22bf297a: "Hesap içinde Ders ve Kullanıcı Arama"
   account_domain_78f43049: "Hesap Alan Adı"
   account_id_2c3b4f15: "hesap id"
+  account_id_73966078: account_id
   account_id_f6e26867: "Hesap Id"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "hesap adı"
@@ -299,6 +301,7 @@ tr:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: ders
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "ders id"
     report_header_course_name: "ders adı"
     report_header_course_sis: "ders sis"
