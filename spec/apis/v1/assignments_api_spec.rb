@@ -2273,6 +2273,27 @@ describe AssignmentsApiController, type: :request do
       )
     end
 
+    it 'allows trying to update points (that get ignored) on an ungraded assignment when locked' do
+      other_course = Account.default.courses.create!
+      template = MasterCourses::MasterTemplate.set_as_master_course(other_course)
+      original_assmt = other_course.assignments.create!(:title => "blah", :description => "bloo")
+      tag = template.create_content_tag_for!(original_assmt, :restrictions => {:points => true})
+
+      course_with_teacher(:active_all => true)
+      @assignment = @course.assignments.create!(:name => "something", :migration_id => tag.migration_id, :submission_types => "not_graded")
+
+      api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+        {
+          :controller => 'assignments_api',
+          :action => 'update',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :id => @assignment.id.to_s
+        },
+        { :assignment => {:points_possible => 0} },
+        {}, {:expected_status => 200})
+    end
+
     context "without overrides or frozen attributes" do
       before :once do
         @start_group = @course.assignment_groups.create!({:name => "start group"})

@@ -99,6 +99,7 @@ class Assignment < ActiveRecord::Base
     false
   }
   before_validation do |assignment|
+    assignment.points_possible = nil unless assignment.graded?
     assignment.lti_context_id ||= SecureRandom.uuid
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
@@ -616,7 +617,6 @@ class Assignment < ActiveRecord::Base
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
     # have to use peer_reviews_due_at here because it's the column name
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
-    self.points_possible = nil unless self.graded?
     [
       :all_day, :could_be_locked, :grade_group_students_individually,
       :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
