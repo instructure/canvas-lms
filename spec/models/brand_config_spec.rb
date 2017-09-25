@@ -148,11 +148,9 @@ describe BrandConfig do
       @json_file = StringIO.new
       @js_file = StringIO.new
       @css_file = StringIO.new
-      @scss_file = StringIO.new
       allow(@subaccount_bc).to receive(:json_file).and_return(@json_file)
       allow(@subaccount_bc).to receive(:js_file).and_return(@js_file)
       allow(@subaccount_bc).to receive(:css_file).and_return(@css_file)
-      allow(@subaccount_bc).to receive(:scss_file).and_return(@scss_file)
     end
 
     describe "with cdn disabled" do
@@ -177,10 +175,6 @@ describe BrandConfig do
         expect(@css_file.string).to eq @subaccount_bc.to_css
       end
 
-      it "writes the scss representation to scss file" do
-        @subaccount_bc.save_all_files!
-        expect(@scss_file.string).to eq @subaccount_bc.to_scss
-      end
     end
 
     describe "with cdn enabled" do

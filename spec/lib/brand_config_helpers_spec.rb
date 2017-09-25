@@ -84,7 +84,6 @@ describe BrandConfigHelpers do
       site_admin_config.save!
       regenerator = BrandConfigRegenerator.new(Account.site_admin, user_factory, site_admin_config)
 
-      brandable_css_stub = allow(BrandableCSS).to receive(:compile_brand!)
       Delayed::Testing.drain
 
       expect(@parent_account.first_parent_brand_config).to eq site_admin_config

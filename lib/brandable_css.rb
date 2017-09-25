@@ -174,10 +174,6 @@ module BrandableCSS
       }"
     end
 
-    def branded_scss_folder
-      Pathname.new(CONFIG['paths']['branded_scss_folder'])
-    end
-
     def public_brandable_css_folder
       Pathname.new('public/dist/brandable_css')
     end
@@ -295,13 +291,13 @@ module BrandableCSS
           memo[k] = v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
         end.freeze
       elsif defined?(Rails) && Rails.env.production?
-        raise "#{file.expand_path} does not exist. You need to run #{cli} before you can serve css."
+        raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
       else
         # for dev/test there might be cases where you don't want it to raise an exception
         # if you haven't ran `brandable_css` and the manifest file doesn't exist yet.
         # eg: you want to test a controller action and you don't care that it links
         # to a css file that hasn't been created yet.
-        default_value = {combinedChecksum: "Error: unknown css checksum. you need to run #{cli}"}.freeze
+        default_value = {combinedChecksum: "Error: unknown css checksum. you need to run brandable_css"}.freeze
         @combined_checksums = Hash.new(default_value).freeze
       end
     end
@@ -319,53 +315,5 @@ module BrandableCSS
         object[variant] = cache_for(bundle_path, variant)
       end
     end
-
-    def cli
-      './node_modules/.bin/brandable_css'
-    end
-
-    def compile_all!
-      run_cli!
-    end
-
-    def compile_brand!(brand_id, opts=nil)
-      run_cli!('--brand-id', brand_id, opts)
-    end
-
-    private
-
-    def run_cli!(*args)
-      opts = args.extract_options!
-      # this makes sure the symlinks to app/stylesheets/plugins/analytics, etc exist
-      # so their scss files can be picked up and compiled with everything else
-      require 'config/initializers/plugin_symlinks'
-
-      command = [cli].push(*args).shelljoin
-      msg = "running BrandableCSS CLI: #{command}"
-      Rails.logger.try(:debug, msg) if defined?(Rails)
-
-      percent_complete = 0
-      Open3.popen2e(command) do |_stdin, stdout_and_stderr, wait_thr|
-        error_output = []
-        stdout_and_stderr.each do |line|
-          Rails.logger.try(:debug, line.chomp!) if defined?(Rails)
-          error_output.push(line)
-          # This is a good-enough-for-now approximation to show the progress
-          # bar in the UI.  Since we don't know exactly how many files there are,
-          # it will progress towards 100% but never quite hit it until it is complete.
-          # Each tick it will cut 4% of the remaining percentage. Meaning it will look like
-          # it goes fast at first but then slows down, but will always keep moving.
-          if opts && opts[:on_progress] && line.starts_with?('compiled ')
-            percent_complete += (100.0 - percent_complete) * 0.04
-            opts[:on_progress].call(percent_complete)
-          end
-        end
-        unless wait_thr.value.success?
-          STDERR.puts error_output.join("\n")
-          raise("Error #{msg}")
-        end
-      end
-    end
   end
-
 end

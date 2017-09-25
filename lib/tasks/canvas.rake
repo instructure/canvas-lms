@@ -41,7 +41,6 @@ namespace :canvas do
     end
 
     require 'parallel'
-
     tasks = Hash.new
 
     if build_styleguide
