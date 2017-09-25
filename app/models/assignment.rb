@@ -58,7 +58,13 @@ class Assignment < ActiveRecord::Base
 
         if rubric != assignment.rubric
           assignment.rubric_association.destroy if assignment.rubric_association
-          assignment.rubric_association = rubric_association.clone if rubric_association
+          if rubric_association
+            rubric_association_clone_of_master = rubric_association.clone
+            rubric_association_clone_of_master.context_id = assignment.context_id
+            rubric_association_clone_of_master.context_code = assignment.context_code
+            assignment.rubric_association = rubric_association_clone_of_master
+            assignment.rubric_association.save
+          end
         end
 
         assignment.is_content_library_sync = true
@@ -81,7 +87,13 @@ class Assignment < ActiveRecord::Base
       self.submission_types = master.submission_types
       if self.rubric != master.rubric
         self.rubric_association.destroy if self.rubric_association
-        self.rubric_association = master.rubric_association.clone if master.rubric_association
+        if master.rubric_association
+          rubric_association_clone_of_master = master.rubric_association.clone
+          rubric_association_clone_of_master.context_id = self.context_id
+          rubric_association_clone_of_master.context_code = self.context_code
+          self.rubric_association = rubric_association_clone_of_master
+          self.rubric_association.save
+        end
       end
     end
   end
