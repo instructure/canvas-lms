@@ -22,7 +22,7 @@ describe ActiveSupport::Cache::HaStore do
     skip unless Canvas.redis_enabled?
   end
 
-  let(:store) { ActiveSupport::Cache::HaStore.new(Canvas.redis.id, expires_in: 5.minutes, race_condition_ttl: 7.days) }
+  let(:store) { ActiveSupport::Cache::HaStore.new(Canvas.redis.id, expires_in: 5.minutes, race_condition_ttl: 7.days, consul_event: 'invalidate') }
 
   describe "#fetch" do
     it "locks for a new key" do
@@ -82,6 +82,14 @@ describe ActiveSupport::Cache::HaStore do
       expect(store).to receive(:write_entry)
       expect(store).to receive(:unlock).never
       expect(store.fetch('bob') { 42 }).to eq 42
+    end
+  end
+
+  describe "#delete" do
+    it "triggers a consul event when configured" do
+      # will get called twice; once with rails51: prefix, once without
+      expect(Imperium::Events.default_client).to receive(:fire).with("invalidate", match(/mykey$/), anything).twice
+      store.delete('mykey')
     end
   end
 end
