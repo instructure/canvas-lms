@@ -2151,7 +2151,9 @@ class Course < ActiveRecord::Base
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
       :organize_epub_by_content_type, :show_announcements_on_home_page,
-      :home_page_announcement_limit, :enable_offline_web_export ]
+      :home_page_announcement_limit, :enable_offline_web_export,
+      :restrict_student_future_view, :restrict_student_past_view
+    ]
   end
 
   def set_course_dates_if_blank(shift_options)
