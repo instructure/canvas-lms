@@ -149,7 +149,7 @@ define [
 
       cellCommentHTML = if !opts.student.isConcluded && !opts.isLocked
         """
-        <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
+        <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label hide-text">submission comments</span></a>
         """
       else
         ''

@@ -176,7 +176,6 @@
     margin-right: 10px;
     text-align: center;
     .social {
-      @include hide-text;
       width: 30px;
       height: 30px;
       background-image: url(/images/social-icons.png);

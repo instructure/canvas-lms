@@ -54,7 +54,9 @@
 
 // Accessible yet invisible text
 .hide-text {
-  @include hide-text();
+  text-indent: -119988px;
+  overflow: hidden;
+  text-align: left; 
 }
 
 // Uses box-sizing mixin, so must be defined here
