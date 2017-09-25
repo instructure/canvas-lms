@@ -132,8 +132,8 @@ define [
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10 }, { }, student)
     equal submissionCellResponse.indexOf("grayed-out"), -1
 
-  test "#letter_grade.formatter, shows EX when submission is excused", ->
-    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('EX').returns('ok')
+  test "#letter_grade.formatter, shows Excused when submission is excused", ->
+    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('Excused').returns('ok')
     formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {excused:true}, {}, {})
     equal formattedResponse, 'ok'
 
