@@ -68,7 +68,7 @@
           <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">
             <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
-                  <%= svg_icon :dashboard %>
+                  <%= svg_icon :sm_dashboard %>
               </div>
               <div class="menu-item__text"><%= t('Dashboard') %></div>
             </a>
@@ -76,7 +76,7 @@
           <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
             <a id="global_nav_courses_link" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
-                <%= svg_icon :courses_new_styles %>
+                <%= svg_icon :sm_courses %>
               </div>
               <div class="menu-item__text">
                 <%= t('Courses') %>
@@ -98,7 +98,7 @@
           <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/calendar') %>">
             <a id="global_nav_calendar_link" href="/calendar" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
-                <%= svg_icon :calendar_new_styles %>
+                <%= svg_icon :sm_calendar %>
               </div>
               <div class="menu-item__text">
                 <%= t('Calendar') %>
@@ -108,7 +108,7 @@
           <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
             <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
-                <%= svg_icon :inbox %>
+                <%= svg_icon :sm_inbox %>
                 <span class="menu-item__badge" style="display: none">0</span>
               </div>
               <div class="menu-item__text">
