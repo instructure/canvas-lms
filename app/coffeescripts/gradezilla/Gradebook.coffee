@@ -2200,6 +2200,7 @@ define [
       rowIndex = @grid.getActiveCell().row
       studentId = @rows[rowIndex].id
       @updateRowAndRenderSubmissionTray(studentId)
+      @gridSupport.helper.beginEdit()
 
     getSubmissionTrayState: =>
       @gridDisplaySettings.submissionTray

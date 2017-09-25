@@ -6319,7 +6319,8 @@ QUnit.module('Gradebook#closeSubmissionTray', {
     this.gradebook.gridSupport = {
       helper: {
         commitCurrentEdit () {},
-        focus () {}
+        focus () {},
+        beginEdit () {}
       }
     };
     this.gradebook.setSubmissionTrayState(true, '1101', '2');
@@ -6341,6 +6342,12 @@ test('calls updateRowAndRenderSubmissionTray with the student id for the active 
     this.gradebook.updateRowAndRenderSubmissionTray.getCall(0).args[0],
     this.activeStudentId
   );
+});
+
+test('puts the active grid cell back into "editing" mode', function () {
+  this.stub(this.gradebook.gridSupport.helper, 'beginEdit');
+  this.gradebook.closeSubmissionTray();
+  strictEqual(this.gradebook.gridSupport.helper.beginEdit.callCount, 1);
 });
 
 QUnit.module('Gradebook#setSubmissionTrayState', {
