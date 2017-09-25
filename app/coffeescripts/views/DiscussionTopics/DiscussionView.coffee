@@ -105,11 +105,12 @@ define [
         options.dateDueColumnView = new DateDueColumnView(model: @model.get('assignment'))
       @newModalView = new NewMoveDialogView
         model: @model
-        nested: true
+        nested: false
         closeTarget: @$el.find('a[id=manage_link]')
         saveURL: @model.collection.reorderURL()
         onSuccessfulMove: @onSuccessfulMove
         movePanelParent: document.getElementById('not_right_side')
+        modalTitle: I18n.t('Move Discussion')
       super
 
     render: ->

@@ -140,7 +140,7 @@ export default class MoveItemTray extends React.Component {
             <option value="default">{I18n.t('Select One')}</option>
             {
               this.props.moveSelectionList.map((item) =>
-                <option key={item.attributes.id} value={item.attributes.id}>{item.attributes.title}</option>
+                <option key={item.attributes.id} value={item.attributes.id}>{item.attributes.title || item.attributes.name}</option>
               )
             }
           </Select>

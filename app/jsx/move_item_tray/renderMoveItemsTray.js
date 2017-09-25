@@ -19,13 +19,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MoveItemTray from 'jsx/move_item_tray/MoveItemTray';
+import NestedMoveItemTray from 'jsx/move_item_tray/NestedMoveItemTray';
 
-export default function renderMoveItemsTray(movePanelRoot, model, moveTraySubmit, closeFunction, trayTitle) {
+export function renderMoveItemsTray(options) {
+  const { movePanelRoot, model, moveTraySubmit, closeFunction, trayTitle } = options;
   ReactDOM.render(
     <MoveItemTray
       currentItem={{
         id: model.attributes.id,
-        title: model.attributes.title
+        title: model.attributes.title || model.attributes.name
       }}
       onExited={() => {
         ReactDOM.unmountComponentAtNode(movePanelRoot)
@@ -35,5 +37,28 @@ export default function renderMoveItemsTray(movePanelRoot, model, moveTraySubmit
       moveSelectionList={model.collection.models.filter(item => item.id !== model.attributes.id)}
       title={trayTitle}
       initialOpenState
+    />, movePanelRoot);
+};
+
+export function renderNestedMoveItemsTray(options) {
+  const { movePanelRoot, model, moveTraySubmit, closeFunction,
+    trayTitle, parentGroups, parentTitleLabel, childKey } = options;
+
+  ReactDOM.render(
+    <NestedMoveItemTray
+      currentItem={{
+        id: model.attributes.id,
+        title: model.attributes.title || model.attributes.name
+      }}
+      onExited={() => {
+        ReactDOM.unmountComponentAtNode(movePanelRoot)
+        closeFunction()
+      }}
+      onMoveTraySubmit={moveTraySubmit}
+      title={trayTitle}
+      initialOpenState
+      parentGroups={parentGroups}
+      parentTitleLabel={parentTitleLabel}
+      childKey={childKey}
     />, movePanelRoot);
 };

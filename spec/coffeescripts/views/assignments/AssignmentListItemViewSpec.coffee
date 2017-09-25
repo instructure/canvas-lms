@@ -140,7 +140,10 @@ define [
   genSetup = (model=assignment1()) ->
     fakeENV.setup(
       current_user_roles: ['teacher'],
-      PERMISSIONS: {manage: false}
+      PERMISSIONS: {manage: false},
+      URLS: {
+        assignment_sort_base_url : "test"
+      }
     )
     @model = model
     @submission = new Submission
@@ -157,7 +160,10 @@ define [
   QUnit.module 'AssignmentListItemViewSpec',
     setup: ->
       fakeENV.setup({
-        current_user_roles: ['teacher']
+        current_user_roles: ['teacher'],
+        URLS: {
+          assignment_sort_base_url : "test"
+        }
       })
       genSetup.call @
       @snapshot = tz.snapshot()
@@ -677,7 +683,10 @@ define [
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher'],
-        CONDITIONAL_RELEASE_SERVICE_ENABLED: true
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        URLS: {
+          assignment_sort_base_url : "test"
+        }
       })
     teardown: ->
       fakeENV.teardown()
@@ -764,6 +773,9 @@ define [
               },
             ],
           }],
+        },
+        URLS: {
+          assignment_sort_base_url : "test"
         }
       })
       CyoeHelper.reloadEnv()
@@ -814,6 +826,9 @@ define [
               },
             ],
           }],
+        },
+        URLS: {
+          assignment_sort_base_url : "test"
         }
       })
       CyoeHelper.reloadEnv()

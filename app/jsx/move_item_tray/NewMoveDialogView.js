@@ -17,20 +17,29 @@
  */
 
 import axios from 'axios';
-import renderMoveItemsTray from 'jsx/move_item_tray/renderMoveItemsTray';
+import { showFlashError } from 'jsx/shared/FlashAlert'
+import {renderMoveItemsTray, renderNestedMoveItemsTray} from 'jsx/move_item_tray/renderMoveItemsTray';
 import I18n from 'i18n!move_item_tray';
 
 export default class NewMoveDialogView {
   constructor(options) {
-     this.model = options.model;
-     this.nested = options.nested;
-     this.closeTarget = options.closeTarget;
-     this.saveURL = options.saveURL;
-     this.onSuccessfulMove = options.onSuccessfulMove;
-     this.movePanelParent = options.movePanelParent;
+    this.nested = options.nested;
+    this.model = options.model;
+    this.closeTarget = options.closeTarget;
+    this.saveURL = options.saveURL;
+    this.modalTitle = options.modalTitle;
+    this.onSuccessfulMove = options.onSuccessfulMove;
+    this.movePanelParent = options.movePanelParent;
+
+    if(options.nested) {
+      this.movePanelParent = options.movePanelParent;
+      this.childKey = options.childKey;
+      this.parentTitleLabel = options.parentTitleLabel;
+      this.parentCollection = options.parentCollection;
+    }
   }
 
-  renderOpenMoveDialog() {
+  renderOpenMoveDialog = () => {
     // We only render the move component first time it opens
     let movePanelRoot = document.getElementById('move_panel_tray');
     if (!movePanelRoot) {
@@ -40,7 +49,17 @@ export default class NewMoveDialogView {
       movePanelParent.appendChild(movePanelElement);
       movePanelRoot = movePanelElement
     }
-    renderMoveItemsTray(movePanelRoot, this.model, this.onMoveItemTray, this.moveTrayClose, I18n.t('Move Discussion'));
+    if(this.nested) {
+      const parentGroups = this.parentCollection.models.map((item) => {
+        return {groupId: item.id, name: item.attributes.name || item.attributes.title,
+          children: item.get(this.childKey).models.filter(child => child.id !== this.model.attributes.id)}
+      });
+      renderNestedMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemNestedTray, closeFunction:
+        this.moveTrayClose, trayTitle: this.modalTitle, parentGroups, parentTitleLabel: this.parentTitleLabel, childKey: this.childKey } );
+    } else {
+      renderMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemTray,
+        closeFunction: this.moveTrayClose, trayTitle: this.modalTitle });
+    }
   }
 
   onMoveItemTray = (movedItems) => {
@@ -49,14 +68,23 @@ export default class NewMoveDialogView {
       order: movedItems.join(',')}
     ).then((response) => {
       this.onSuccessfulMove(response.data.order);
-    })
+    }).catch(showFlashError(I18n.t('Failed to Move Items')))
+  }
+
+  onMoveItemNestedTray = (movedItems, groupId) => {
+    // this.saveURL can apparently be a function
+    axios.post(`${this.saveURL}/${groupId}/reorder`, {
+      order: movedItems.join(',')}
+    ).then((response) => {
+      this.onSuccessfulMove(response.data.order, groupId);
+    }).catch(showFlashError(I18n.t('Failed to Move Items')))
   }
 
   setCloseFocus(closeButton) {
     this.focusOnCloseItem = closeButton;
   }
 
-  moveTrayClose() {
+  moveTrayClose = () => {
     this.focusOnCloseItem.focus()
   }
 }
