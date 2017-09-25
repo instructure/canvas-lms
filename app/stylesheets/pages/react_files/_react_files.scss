@@ -272,7 +272,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   }
 }
 
-.ef-name-col__link {
+.ef-name-col__link, .ef-name-col__click-wrapper {
   display: flex;
   align-items: center;
   overflow: hidden;
