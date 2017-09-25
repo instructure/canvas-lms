@@ -296,11 +296,15 @@ class ContentExport < ActiveRecord::Base
   end
 
   def create_key(obj, prepend="")
-    if for_master_migration?
+    if for_master_migration? && !is_external_object?(obj)
       master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
     else
       CC::CCHelper.create_key(obj, prepend)
     end
+  end
+
+  def is_external_object?(obj)
+    obj.is_a?(ContextExternalTool) && obj.context_type == "Account"
   end
 
   # Method Summary
