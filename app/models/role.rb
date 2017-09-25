@@ -156,7 +156,7 @@ class Role < ActiveRecord::Base
     # most roles are going to be built in, so don't do a db search every time
     local_id, shard = Shard.local_id_for(id)
     shard ||= Shard.current
-    role = built_in_roles_by_id(false, shard)[local_id] || Role.shard(shard).where(:id => local_id).first
+    role = built_in_roles_by_id(false, shard)[local_id] || Role.where(:id => id).take
     role
   end
 
