@@ -176,12 +176,19 @@
   padding: 20px;
 }
 
-.sm-context_module.context_module.collapsed_module .sm-header.ig-header{
+.sm-context_module.context_module.sm-started .sm-header.ig-header{
   background-color: #FFFFFF;
+  border-bottom: 2px solid var(--ic-brand-button--secondary-bgd-darkened-15);
 }
 
-.sm-context_module.context_module.sm-started .sm-header.ig-header{
-  background-color: var(--ic-brand-white);
+.sm-context_module.context_module.collapsed_module.sm-started .sm-header.ig-header{
+  background-color: #FFFFFF;
+  border-bottom: none;
+}
+
+.sm-context_module.context_module.collapsed_module .sm-header.ig-header{
+  background-color: #FFFFFF;
+  border-bottom: none;
 }
 
 .sortable-handle a, .draggable-handle a {
