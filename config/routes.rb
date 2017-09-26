@@ -181,8 +181,6 @@ CanvasRails::Application.routes.draw do
     # DEPRECATED
     get 'self_enrollment/:self_enrollment' => 'courses#self_enrollment', as: :self_enrollment
     post 'self_unenrollment/:self_unenrollment' => 'courses#self_unenrollment', as: :self_unenrollment
-    post :restore
-    post :backup
     post :unconclude
     get :students
     post :enrollment_invitation
@@ -440,7 +438,6 @@ CanvasRails::Application.routes.draw do
 
   resources :page_views, only: :update
   post 'media_objects' => 'context#create_media_object', as: :create_media_object
-  get 'media_objects/kaltura_notifications' => 'context#kaltura_notifications', as: :kaltura_notifications
   get 'media_objects/:id' => 'context#media_object_inline', as: :media_object
   get 'media_objects/:id/redirect' => 'context#media_object_redirect', as: :media_object_redirect
   get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail

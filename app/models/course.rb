@@ -2031,26 +2031,6 @@ class Course < ActiveRecord::Base
   attr_accessor :full_migration_hash, :external_url_hash,
                 :folder_name_lookups, :assignment_group_no_drop_assignments, :migration_results
 
-
-  def backup_to_json
-    backup.to_json
-  end
-
-  def backup
-    res = []
-    res += self.folders.active
-    res += self.attachments.active
-    res += self.assignment_groups.active
-    res += self.assignments.active
-    res += self.submissions
-    res += self.quizzes
-    res += self.discussion_topics.active
-    res += self.discussion_entries.active
-    res += self.wiki_pages.active
-    res += self.calendar_events.active
-    res
-  end
-
   def map_merge(old_item, new_item)
     @merge_mappings ||= {}
     @merge_mappings[old_item.asset_string] = new_item && new_item.id

@@ -753,32 +753,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def backup
-    get_context
-    if authorized_action(@context, @current_user, :update)
-      backup_json = @context.backup_to_json
-      send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Time.zone.today}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
-      render :json => proc {|response, output|
-        output.write backup_json
-      }
-    end
-  end
-
-  def restore
-    get_context
-    if authorized_action(@context, @current_user, :update)
-      respond_to do |format|
-        if params[:restore]
-          @context.restore_from_json_backup(params[:restore])
-          flash[:notice] = t('notices.backup_restored', "Backup Successfully Restored!")
-          format.html { redirect_to named_context_url(@context, :context_url) }
-        else
-          format.html
-        end
-      end
-    end
-  end
-
   def unconclude
     get_context
     if authorized_action(@context, @current_user, :change_course_state)
