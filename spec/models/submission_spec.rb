@@ -1832,6 +1832,25 @@ describe Submission do
 
     end
 
+    describe '#attachment_ids_for_version' do
+      let(:attachments) do
+        [
+          attachment_model(filename: "submission-a.doc", context: @student),
+          attachment_model(filename: "submission-b.doc", context: @student),
+          attachment_model(filename: "submission-c.doc", context: @student)
+        ]
+      end
+      let(:single_attachment) { attachment_model(filename: "single.doc", context: @student) }
+
+      before { student_in_course(active_all: true) }
+
+      it "includes attachment ids from 'attachment_id'" do
+        submission = @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: attachments)
+        submission.update_attributes!(attachment_id: single_attachment)
+        expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id) + [single_attachment.id]
+      end
+    end
+
     describe '#originality_report_url' do
       let_once(:test_course) do
         test_course = course_model
@@ -1870,6 +1889,27 @@ describe Submission do
       it 'requires the :grade permission' do
         unauthorized_user = User.new
         expect(submission.originality_report_url(attachment.asset_string, unauthorized_user)).to be_nil
+      end
+
+      it 'treats attachments in submission history as valid' do
+        submission = nil
+        attachments = [attachment]
+        Timecop.freeze(10.second.ago) do
+          submission = assignment.submit_homework(test_student, submission_type: 'online_upload',
+                                     attachments: [attachments[0]])
+        end
+
+        attachments << attachment_model(filename: "submission-b.doc", :context => test_student)
+        Timecop.freeze(5.second.ago) do
+          submission = assignment.submit_homework test_student, attachments: [attachments[1]]
+        end
+
+        attachments << attachment_model(filename: "submission-c.doc", :context => test_student)
+        Timecop.freeze(1.second.ago) do
+          submission = assignment.submit_homework test_student, attachments: [attachments[2]]
+        end
+
+        expect(submission.originality_report_url(attachments.first.asset_string, test_teacher)).to eq(report_url)
       end
     end
   end
