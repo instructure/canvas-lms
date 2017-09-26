@@ -1760,6 +1760,17 @@ import 'compiled/jquery.rails_flash_notifications'
    if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
+      $('.context_module_sub_header').each(function () {
+        var header = $(this);
+        var activities = header.nextUntil('.context_module_sub_header').detach();
+        var activity_container = $('<div style="display: none;"></div>').append(activities);
+
+        header.find('.context_module_sub_header_expander').click(function (event) {
+
+        });
+        $(this).after(activity_container);
+        $
+      });
     }
 
     $('.external_url_link').click(function(event) {
