@@ -3044,36 +3044,38 @@ class Course < ActiveRecord::Base
     effective_due_dates.any_in_closed_grading_period?
   end
 
+  def relevant_grading_period_group
+    return @relevant_grading_period_group if defined?(@relevant_grading_period_group)
+
+    @relevant_grading_period_group = grading_period_groups.detect { |gpg| gpg.workflow_state == 'active' }
+    return @relevant_grading_period_group unless @relevant_grading_period_group.nil?
+
+    if enrollment_term.grading_period_group&.workflow_state == 'active'
+      @relevant_grading_period_group = enrollment_term.grading_period_group
+    end
+  end
+
   # Does this course have grading periods?
   # checks for both legacy and account-level grading period groups
   def grading_periods?
     return @has_grading_periods unless @has_grading_periods.nil?
     return @has_grading_periods = true if @has_weighted_grading_periods
 
-    @has_grading_periods = shard.activate do
-      GradingPeriodGroup.active.
-        where("id = ? or course_id = ?", enrollment_term.grading_period_group_id, id).
-        exists?
-    end
+    @has_grading_periods = relevant_grading_period_group.present?
   end
 
   def display_totals_for_all_grading_periods?
     return @display_totals_for_all_grading_periods if defined?(@display_totals_for_all_grading_periods)
 
-    @display_totals_for_all_grading_periods =
-      !!GradingPeriodGroup.for_course(self)&.display_totals_for_all_grading_periods?
+    @display_totals_for_all_grading_periods = !!relevant_grading_period_group&.display_totals_for_all_grading_periods?
   end
 
   def weighted_grading_periods?
     return @has_weighted_grading_periods unless @has_weighted_grading_periods.nil?
     return @has_weighted_grading_periods = false if @has_grading_periods == false
 
-    @has_weighted_grading_periods = shard.activate do
-      grading_period_groups.active.none? &&
-      GradingPeriodGroup.active.
-        where(id: enrollment_term.grading_period_group_id, weighted: true).
-        exists?
-    end
+    @has_weighted_grading_periods = grading_period_groups.to_a.none? { |gpg| gpg.workflow_state == 'active' } &&
+      !!relevant_grading_period_group&.weighted?
   end
 
   def quiz_lti_tool

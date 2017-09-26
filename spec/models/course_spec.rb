@@ -264,6 +264,34 @@ describe Course do
     end
   end
 
+  describe "#relevant_grading_period_group" do
+    it "favors legacy over enrollment term grading_period_groups" do
+      @course.save!
+      account_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      account_group.enrollment_terms << @course.enrollment_term
+      grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      expect(@course.relevant_grading_period_group).to eq(grading_period_group)
+    end
+
+    it "returns a legacy grading_period_group" do
+      @course.save!
+      grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      expect(@course.relevant_grading_period_group).to eq(grading_period_group)
+    end
+
+    it "returns an enrollment term grading_period_group" do
+      @course.save!
+      grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      grading_period_group.enrollment_terms << @course.enrollment_term
+      expect(@course.relevant_grading_period_group).to eq(grading_period_group)
+    end
+
+    it "returns nil when there are no relevant grading_period_group" do
+      @course.save!
+      expect(@course.relevant_grading_period_group).to be nil
+    end
+  end
+
   describe "#weighted_grading_periods?" do
     it "returns false if course has legacy grading periods" do
       @course.save!
