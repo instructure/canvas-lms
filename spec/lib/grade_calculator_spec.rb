@@ -392,13 +392,14 @@ describe GradeCalculator do
           expect(scores[:final][:grade]).to eq 25
         end
 
-        it "should be impossible to save grades that considered muted assignments" do
-          @course.update_attribute(:group_weighting_scheme, "percent")
+        it "saves unmuted scores" do
+          @assignment.mute!
           calc = GradeCalculator.new [@user.id],
-                                     @course.id,
-                                     :ignore_muted => false
-           # save_scores is a private method
-          expect { calc.send(:save_scores) }.to raise_error("Can't save scores when ignore_muted is false")
+                                     @course.id
+          calc.compute_and_save_scores
+          score = Enrollment.where(user_id: @user.id, course_id: @course.id).first.find_score(course_score: true)
+          expect(score.unposted_current_score).to eq 50
+          expect(score.current_score).to be_nil
         end
       end
     end
@@ -664,6 +665,94 @@ describe GradeCalculator do
       calc = GradeCalculator.new [@user.id], @course.id
       score = nil
       expect(calc.send(:number_or_null, score)).to eql('NULL::float')
+    end
+  end
+
+  describe 'memoization' do
+    it 'only fetches groups once' do
+      expect(GradeCalculator).to receive(:new).twice.and_call_original
+      expect(@course).to receive(:assignment_groups).once.and_call_original
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+    end
+
+    it 'only fetches assignments once' do
+      expect(GradeCalculator).to receive(:new).twice.and_call_original
+      expect(@course).to receive(:assignments).once.and_call_original
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+    end
+
+    it 'only fetches submissions once' do
+      expect(GradeCalculator).to receive(:new).twice.and_call_original
+      expect(@course).to receive(:submissions).once.and_call_original
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+    end
+
+    it 'only fetches grading periods once' do
+      expect(GradeCalculator).to receive(:new).twice.and_call_original
+      expect(GradingPeriod).to receive(:for).once.and_call_original
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+    end
+
+    it 'only fetches enrollments once' do
+      expect(GradeCalculator).to receive(:new).twice.and_call_original
+      expect(Enrollment).to receive(:shard).once.and_call_original
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+    end
+  end
+
+  describe 'GradeCalculator.recompute_final_score' do
+    it 'accepts a course' do
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, Hash).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course)
+    end
+
+    it 'accepts a course id' do
+      expect(GradeCalculator).to receive(:new).with([@student.id], Course, Hash).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course.id)
+    end
+
+    it 'fetches assignments for GradeCalculator' do
+      expect(@course).to receive_message_chain(:assignments, :published, :gradeable, :to_a => [5,6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5,6])).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course)
+    end
+
+    it 'does not fetch assignments if they are already passed' do
+      expect(@course).not_to receive(:assignments)
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5,6])).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course, assignments: [5,6])
+    end
+
+    it 'fetches groups for GradeCalculator' do
+      expect(@course).to receive_message_chain(:assignment_groups, :active, :to_a => [5,6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5,6])).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course)
+    end
+
+    it 'does not fetch groups if they are already passed' do
+      expect(@course).not_to receive(:assignment_groups)
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5,6])).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course, groups: [5,6])
+    end
+
+    it 'fetches periods for GradeCalculator' do
+      expect(GradingPeriod).to receive(:for).with(@course).and_return([5,6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5,6])).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course)
+    end
+
+    it 'does not fetch periods if they are already passed' do
+      expect(GradingPeriod).not_to receive(:for)
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5,6])).
+        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course, periods: [5,6])
     end
   end
 
@@ -1363,7 +1452,7 @@ describe GradeCalculator do
 
       describe "#invalidate_caches" do
         it 'calls GradeSummaryPresenter.invalidate_cache' do
-          expect(GradeSummaryPresenter).to receive(:invalidate_cache).once
+          expect(GradeSummaryPresenter).to receive(:invalidate_cache).twice
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
         end
       end

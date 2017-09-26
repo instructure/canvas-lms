@@ -25,7 +25,7 @@ class Score < ActiveRecord::Base
   has_one :course, through: :enrollment
 
   validates :enrollment, presence: true
-  validates :current_score, :final_score, numericality: true, allow_nil: true
+  validates :current_score, :unposted_current_score, :final_score, :unposted_final_score, numericality: true, allow_nil: true
 
   validate :scorable_association_check, if: -> { Score.course_score_populated? }
 
@@ -44,8 +44,16 @@ class Score < ActiveRecord::Base
     score_to_grade(current_score)
   end
 
+  def unposted_current_grade
+    score_to_grade(unposted_current_score)
+  end
+
   def final_grade
     score_to_grade(final_score)
+  end
+
+  def unposted_final_grade
+    score_to_grade(unposted_final_score)
   end
 
   def scorable
