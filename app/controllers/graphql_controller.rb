@@ -17,7 +17,8 @@ class GraphQLController < ApplicationController
   end
 
   def graphiql
-    if Rails.env.production?
+    if Rails.env.production? &&
+        !::Account.site_admin.grants_right?(@current_user, session, :read_as_admin)
        render plain: "unauthorized", status: :unauthorized
     else
       render :graphiql, layout: 'bare'
