@@ -1760,16 +1760,33 @@ import 'compiled/jquery.rails_flash_notifications'
    if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
-      $('.context_module_sub_header').each(function () {
+      var course_items = JSON.parse(window.localStorage.getItem("course_items"));
+
+     course_items.forEach(function (unit){
+       unit.items.forEach(function (item) {
+         if (item.type == "SubHeader") {
+           // this is in a lesson
+           // Lesson States
+           //   1. Fully completed: Hide
+           debugger
+           //   2. Partially completed: Open
+           //   3. None started: Open first
+           //   4. X completed but none partially or started: Open next based on last completed
+           console.log(item);
+         };
+       });
+     });
+
+     $('.context_module_sub_header').each(function () {
         var header = $(this);
         var activities = header.nextUntil('.context_module_sub_header').detach();
-        var activity_container = $('<div style="display: none;"></div>').append(activities);
+        var activity_container = $('<div ></div>').append(activities);
 
         header.find('.context_module_sub_header_expander').click(function (event) {
 
         });
         $(this).after(activity_container);
-        $
+
       });
     }
 
