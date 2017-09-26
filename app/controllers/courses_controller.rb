@@ -758,7 +758,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :update)
       backup_json = @context.backup_to_json
       send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Time.zone.today}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
-      render :text => proc {|response, output|
+      render :json => proc {|response, output|
         output.write backup_json
       }
     end
@@ -2915,7 +2915,7 @@ class CoursesController < ApplicationController
       add_crumb(title)
       js_bundle :webzip_export
       css_bundle :webzip_export
-      render :text => '<div id="course-webzip-export-app"></div>'.html_safe, :layout => true
+      render :html => '<div id="course-webzip-export-app"></div>'.html_safe, :layout => true
     end
   end
 
