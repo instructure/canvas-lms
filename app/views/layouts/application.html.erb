@@ -122,7 +122,7 @@
       <% end %>
       <% if @show_left_side %>
         <div id="left-side"
-          class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
+          class="ic-app-course-menu sm-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
           style="display: <%= @collapse_course_menu ? "none" : "block" %>"
           >
           <% if left_side %>
@@ -147,6 +147,7 @@
           <% if left_side_custom %>
             <%= left_side_custom %>
           <% end %>
+          <div class="sm-course-menu-clear"></div>
         </div>
       <% end %>
       <div id="not_right_side" class="ic-app-main-content">
