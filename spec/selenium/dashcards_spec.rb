@@ -22,6 +22,7 @@ require_relative 'helpers/color_common'
 
 describe 'dashcards' do
   include_context 'in-process server selenium tests'
+  include Factories
   include AnnouncementsCommon
   include ColorCommon
   include FilesCommon
@@ -132,9 +133,10 @@ describe 'dashcards' do
       expect(f("#content")).not_to contain_css('a.discussions .unread_count')
     end
 
-    it 'should show assignments created notifications in dashcard', priority: "1", test_id: 238413
-
-    it 'should show files created notifications in dashcard', priority: "1", test_id: 238414
+    # These tests are currently marked as 'ignore'
+    # it 'should show assignments created notifications in dashcard', priority: "1", test_id: 238413
+    #
+    # it 'should show files created notifications in dashcard', priority: "1", test_id: 238414
 
     context "course name and code display" do
       before :each do
@@ -166,10 +168,10 @@ describe 'dashcards' do
     context "dashcard custom color calendar" do
       before :each do
         # create another course to ensure the color matches to the right course
-        @course1 = course_model
-        @course1.name = 'Test Course'
-        @course1.offer!
-        @course1.save!
+        @course1 = course_factory(
+          course_name: 'Second Course',
+          active_course: true
+        )
         enrollment = student_in_course(course: @course1, user: @student)
         enrollment.accept!
       end
@@ -182,34 +184,24 @@ describe 'dashcards' do
         expect(hero).to eq(calendar_color)
       end
 
-      it 'should customize color by selecting from color palet in the calendar page', priority: "1", test_id: 239994 do
-        select_color_pallet_from_calendar_page
+      it 'should customize color by selecting from color palette in the calendar page', priority: "1", test_id: 239994 do
+        select_color_palette_from_calendar_page
 
-        old_color = f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
-
-        expect(f('.ColorPicker__Container')).to be_displayed
-        f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(7)').click
+        # pick a random color from the default 15 colors
+        new_color_element = ff('.ColorPicker__ColorBlock')[rand(0..15)]
+        new_color_element.click
+        new_color_code = f("#ColorPickerCustomInput-course_#{@course1.id}").attribute(:value)
+        f('#ColorPicker__Apply').click
         wait_for_ajaximations
-        new_color =  f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
 
-        # make sure that we choose a new color for background
-        if old_color == new_color
-          f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(8)').click
-          wait_for_ajaximations
-        end
+        new_displayed_color = f("[role='checkbox'].group_course_#{@course1.id}").style('color')
 
-        f('.ColorPicker__Container #ColorPicker__Apply').click
-        rgb = convert_hex_to_rgb_color(new_color)
-        get '/'
-        hero = f('.ic-DashboardCard__header_hero')
-        expect(hero).to have_attribute("style", rgb)
-        refresh_page
-        expect(f('.ic-DashboardCard__header_hero')).to have_attribute("style", rgb)
-        expect(f('.ic-DashboardCard__header-title')).to include_text(@course1.name)
+        expect('#'+rgba_to_hex(new_displayed_color)).to eq(new_color_code)
+        expect(f("#group_course_#{@course1.id}_checkbox_label")).to include_text(@course1.name)
       end
 
       it 'should customize color by using hex code in calendar page', priority: "1", test_id: 239993 do
-        select_color_pallet_from_calendar_page
+        select_color_palette_from_calendar_page
 
         hex = random_hex_color
         replace_content(f("#ColorPickerCustomInput-#{@course1.asset_string}"), hex)
@@ -333,7 +325,7 @@ describe 'dashcards' do
     end
   end
 
-  def select_color_pallet_from_calendar_page
+  def select_color_palette_from_calendar_page
     get '/calendar'
     fail 'Not the right course' unless f('#context-list li:nth-of-type(2)').text.include? @course1.name
     f('#context-list li:nth-of-type(2) .ContextList__MoreBtn').click
