@@ -247,8 +247,8 @@ class ApplicationController < ActionController::Base
   end
   helper_method :master_courses?
 
-  def setup_master_course_restrictions(objects, course)
-    return unless master_courses? && course.is_a?(Course) && course.grants_right?(@current_user, session, :read_as_admin)
+  def setup_master_course_restrictions(objects, course, user_can_edit: false)
+    return unless master_courses? && course.is_a?(Course) && (user_can_edit || course.grants_right?(@current_user, session, :read_as_admin))
 
     if MasterCourses::MasterTemplate.is_master_course?(course)
       MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)
@@ -2108,8 +2108,8 @@ class ApplicationController < ActionController::Base
     end
 
     if @page
-      if @context.wiki.grants_right?(@current_user, :manage)
-        mc_status = setup_master_course_restrictions(@page, @context)
+      if @page.grants_any_right?(@current_user, session, :update, :update_content)
+        mc_status = setup_master_course_restrictions(@page, @context, user_can_edit: true)
       end
 
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true, :master_course_status => mc_status)

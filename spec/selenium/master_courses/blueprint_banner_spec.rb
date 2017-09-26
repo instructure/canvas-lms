@@ -52,8 +52,7 @@ describe "master courses banner" do
         expect(f('#blueprint-lock-banner')).to include_text('Content')
         run_master_course_migration(@master)
         get "/courses/#{@minion.id}/pages/#{@copy_page.id}/edit"
-        expect(f('.edit-content')).not_to contain_css('#tinymce')
-        expect(f('#blueprint-lock-banner')).to include_text('Content')
+        assert_flash_warning_message("You are not allowed to edit the page")
       end
 
       it "shows locked banner when locking", priority:"2", test_id: 3248173 do
