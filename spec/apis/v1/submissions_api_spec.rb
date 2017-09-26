@@ -778,6 +778,7 @@ describe 'Submissions API', type: :request do
              "display_name" => nil
            },
            "created_at"=>comment.created_at.as_json,
+           "edited_at" => nil,
            "author"=>{
               "id" => @teacher.id,
               "display_name" => "User",
@@ -1090,6 +1091,7 @@ describe 'Submissions API', type: :request do
              "display_name" => nil
            },
            "created_at"=>comment.reload.created_at.as_json,
+           "edited_at" => nil,
            "author"=>{
              "id" => @teacher.id,
              "display_name" => "User",

@@ -33,7 +33,7 @@ describe SubmissionComment do
   end
 
   it "should create a new instance given valid attributes" do
-    SubmissionComment.create!(@valid_attributes)
+    expect { SubmissionComment.create!(@valid_attributes) }.not_to raise_error
   end
 
   describe 'notifications' do
@@ -451,6 +451,39 @@ This text has a http://www.google.com link in it...
           change { @submission_comment.submission.reload.submission_comments_count }.
             from(1).to(2)
         )
+      end
+    end
+  end
+
+  describe "#edited_at" do
+    before(:once) do
+      @comment = SubmissionComment.create!(@valid_attributes)
+    end
+
+    it "is nil for newly-created submission comments" do
+      expect(@comment.edited_at).to be_nil
+    end
+
+    it "remains nil if the submission comment is updated but the 'comment' attribute is unchanged" do
+      @comment.update!(draft: true, hidden: true)
+      expect(@comment.edited_at).to be_nil
+    end
+
+    it "is set if the 'comment' attribute is updated on the submission comment" do
+      now = Time.zone.now
+      Timecop.freeze(now) { @comment.update!(comment: "changing the comment!") }
+      expect(@comment.edited_at).to eql now
+    end
+
+    it "is updated on subsequent changes to the 'comment' attribute" do
+      now = Time.zone.now
+      Timecop.freeze(now) { @comment.update!(comment: "changing the comment!") }
+
+      later = 2.minutes.from_now(now)
+      Timecop.freeze(later) do
+        expect { @comment.update!(comment: "and again, changing it!") }.to change {
+          @comment.edited_at
+        }.from(now).to(later)
       end
     end
   end

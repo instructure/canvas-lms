@@ -228,22 +228,30 @@ describe PeerReviewsApiController, type: :request do
     end
 
     def assessment_with_comments(comment)
-      {"assessor_id"=>@student2.id,
-       "asset_id"=>@submission.id,
-       "asset_type"=>"Submission",
-       "id"=>@assessment_request.id,
-       "submission_comments" => [{"author_id"=>@student2.id,
-                                  "author_name"=>@student2.name,
-                                  "comment"=>comment.comment,
-                                  "created_at"=>comment.created_at.as_json,
-                                  "id"=>comment.id,
-                                  "author"=>{"id"=>@student2.id,
-                                             "display_name"=>@student2.name,
-                                             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
-                                             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student2.id}"}}],
-       "user_id"=>@student1.id,
-       "workflow_state"=>@assessment_request.workflow_state}
-
+      {
+        "assessor_id" => @student2.id,
+        "asset_id" => @submission.id,
+        "asset_type" => "Submission",
+        "id" => @assessment_request.id,
+        "submission_comments" => [
+          {
+            "author_id" => @student2.id,
+            "author_name" => @student2.name,
+            "comment" => comment.comment,
+            "created_at" => comment.created_at.as_json,
+            "edited_at" => nil,
+            "id" => comment.id,
+            "author" => {
+              "id" => @student2.id,
+              "display_name" => @student2.name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student2.id}"
+            }
+          }
+        ],
+        "user_id" => @student1.id,
+        "workflow_state" => @assessment_request.workflow_state
+      }
     end
 
     context 'with admin_context' do
@@ -393,18 +401,27 @@ describe PeerReviewsApiController, type: :request do
         @user = @student1
         json = api_call(:get, @resource_path, @resource_params, { :include => %w(submission_comments) })
         expect(json.count).to eq(1)
-        expect(json[0]).to eq({"asset_id"=>@submission.id,
-                               "asset_type"=>"Submission",
-                               "id"=>@assessment_request.id,
-                               "submission_comments" => [{"author_id"=>nil,
-                                                          "author_name"=>"Anonymous User",
-                                                          'avatar_path' => User.default_avatar_fallback,
-                                                          "comment"=>"review comment",
-                                                          "created_at"=>@comment.created_at.as_json,
-                                                          "id"=>@comment.id,
-                                                          "author"=>{}}],
-                               "user_id"=>@student1.id,
-                               "workflow_state"=>@assessment_request.workflow_state})
+        expect(json[0]).to eq(
+          {
+            "asset_id"=>@submission.id,
+            "asset_type"=>"Submission",
+            "id"=>@assessment_request.id,
+            "submission_comments" => [
+              {
+                "author_id" => nil,
+                "author_name" => "Anonymous User",
+                "avatar_path" => User.default_avatar_fallback,
+                "comment" => "review comment",
+                "created_at" => @comment.created_at.as_json,
+                "edited_at" => nil,
+                "id" => @comment.id,
+                "author" => {}
+              }
+            ],
+            "user_id"=>@student1.id,
+            "workflow_state"=>@assessment_request.workflow_state
+          }
+        )
       end
 
       it 'should return peer reviews for a specific submission' do

@@ -78,6 +78,10 @@ require 'action_controller_test_process'
 #           "example": "2012-01-01T01:00:00Z",
 #           "type": "datetime"
 #         },
+#         "edited_at" : {
+#           "example": "2012-01-02T01:00:00Z",
+#           "type": "datetime"
+#         },
 #         "media_comment": {
 #           "$ref": "MediaComment"
 #         }

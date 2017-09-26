@@ -31,6 +31,7 @@ class SubmissionComment < ActiveRecord::Base
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
 
   before_save :infer_details
+  before_save :set_edited_at
   after_save :update_participation
   after_save :check_for_media_object
   after_update :publish_other_comments_in_this_group
@@ -287,5 +288,11 @@ class SubmissionComment < ActiveRecord::Base
   private
   def skip_group_callbacks?
     !!@skip_group_callbacks
+  end
+
+  def set_edited_at
+    if comment_changed? && comment_was.present?
+      self.edited_at = Time.zone.now
+    end
   end
 end
