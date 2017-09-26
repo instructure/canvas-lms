@@ -188,8 +188,10 @@ describe 'dashcards' do
         select_color_palette_from_calendar_page
 
         # pick a random color from the default 15 colors
-        new_color_element = ff('.ColorPicker__ColorBlock')[rand(0..15)]
-        new_color_element.click
+        new_color = ff('.ColorPicker__ColorContainer button.ColorPicker__ColorBlock')[rand(0..15)]
+        # anything to make chrome happy
+        driver.mouse.move_to(new_color)
+        driver.action.click.perform
         new_color_code = f("#ColorPickerCustomInput-course_#{@course1.id}").attribute(:value)
         f('#ColorPicker__Apply').click
         wait_for_ajaximations
