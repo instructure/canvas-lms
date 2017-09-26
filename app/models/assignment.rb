@@ -58,9 +58,16 @@ class Assignment < ActiveRecord::Base
 
         if rubric != assignment.rubric
           assignment.rubric_association.destroy if assignment.rubric_association
-          assignment.rubric_association = rubric_association.clone if rubric_association
+          if rubric_association
+            rubric_association_clone_of_master = rubric_association.clone
+            rubric_association_clone_of_master.context_id = assignment.context_id
+            rubric_association_clone_of_master.context_code = assignment.context_code
+            assignment.rubric_association = rubric_association_clone_of_master
+            assignment.rubric_association.save
+          end
         end
 
+        assignment.is_content_library_sync = true
         assignment.save
       end
     end
@@ -70,6 +77,7 @@ class Assignment < ActiveRecord::Base
   before_create :clone_from_master_bank
   def clone_from_master_bank
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
+      self.is_content_library_sync = true
       master = Assignment.find(self.clone_of_id)
       # Look for links to other pages / assignments in the Content Library and update those
       # be links to the associated pages / assignment in the local course.
@@ -79,9 +87,26 @@ class Assignment < ActiveRecord::Base
       self.submission_types = master.submission_types
       if self.rubric != master.rubric
         self.rubric_association.destroy if self.rubric_association
-        self.rubric_association = master.rubric_association.clone if master.rubric_association
+        if master.rubric_association
+          rubric_association_clone_of_master = master.rubric_association.clone
+          rubric_association_clone_of_master.context_id = self.context_id
+          rubric_association_clone_of_master.context_code = self.context_code
+          self.rubric_association = rubric_association_clone_of_master
+          self.rubric_association.save
+        end
       end
     end
+  end
+
+  # Set to true if the update of this assignment is running for a content library sync to prevent
+  # some default logic from running
+  def is_content_library_sync=(val)
+    @content_library_sync = Canvas::Plugin.value_to_boolean(val)
+  end
+
+  after_save :remove_content_library_sync_flag
+  def remove_content_library_sync_flag
+    @content_library_sync = false
   end
 
   ALLOWED_GRADING_TYPES = %w(
