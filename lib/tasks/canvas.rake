@@ -16,30 +16,6 @@ def parallel_processes
 end
 
 namespace :canvas do
-  desc "Compresses static assets"
-  task :compress_assets do
-    assets = FileList.new('public/**/*.js', 'public/**/*.css')
-    mutex = Mutex.new
-    before_bytes = 0
-    after_bytes = 0
-    processed = 0
-
-    require 'parallel'
-
-    Parallel.each(assets, in_threads: parallel_processes, progress: 'compressing assets') do |asset|
-      asset_compressed = "#{asset}.gz"
-      unless File.exists?(asset_compressed)
-        `gzip --best --stdout "#{asset}" > "#{asset_compressed}"`
-        mutex.synchronize do
-          before_bytes += File::Stat.new(asset).size
-          after_bytes += File::Stat.new(asset_compressed).size
-          processed += 1
-        end
-      end
-    end
-    puts "Compressed #{processed} assets, #{before_bytes} -> #{after_bytes} bytes (#{"%.0f" % ((before_bytes.to_f - after_bytes.to_f) / before_bytes * 100)}% reduction)"
-  end
-
   desc "Compile javascript and css assets."
   task :compile_assets do |t, args|
 
