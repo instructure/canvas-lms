@@ -184,7 +184,7 @@ module Api::V1
 
     def current_grading_period
       return @current_grading_period if defined?(@current_grading_period)
-      @current_grading_period = GradingPeriod.current_period_for(@course)
+      @current_grading_period = @course.relevant_grading_period_group&.grading_periods&.detect(&:current?)
     end
 
     def include_current_grading_period_scores?
