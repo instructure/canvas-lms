@@ -443,6 +443,17 @@ describe ContentMigration do
 
     end
 
+    it "should copy nil values for hide_results" do
+      q = @copy_from.quizzes.create!(:hide_results => "always")
+      run_course_copy
+      q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+      expect(q_to.hide_results).to eq "always"
+
+      q.update_attribute(:hide_results, nil)
+      run_course_copy
+      expect(q_to.reload.hide_results).to be_nil
+    end
+
     it "should leave file references in AQ context as-is on copy" do
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       @attachment = attachment_with_context(@copy_from)
@@ -1050,7 +1061,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       run_course_copy
 
       run_course_copy # run it twice
-      
+
       aq_to = @copy_to.assessment_questions.where(:migration_id => mig_id(aq)).first
       expect(aq_to.data['question_type']).to eq "multiple_choice_question"
     end
