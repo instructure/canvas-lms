@@ -13901,7 +13901,7 @@ pt-BR:
       labels: 
         title: "Nome do banco"
       page_title: "Bancos de perguntas"
-      see_bookmarked_banks: "Viualizar Bancos de favoritos"
+      see_bookmarked_banks: "Visualizar Bancos de favoritos"
       user_question_banks: "Bancos de perguntas do usuário"
     question_bank: 
       bookmark_bank: "Marcar este banco de perguntas nos favoritos"
@@ -14572,7 +14572,7 @@ pt-BR:
           students_select_multiple: "Os alunos escolhem múltiplas respostas"
         question_type: 
           calculated: "Pergunta de fórmula"
-          essay: "Pergunta de ensaio"
+          essay: "Pergunta dissertativa"
           file_upload: "Pergunta de envio de arquivo"
           fill_in_multiple_blanks: "Preencher múltiplas lacunas"
           matching: Correspondência
