@@ -252,6 +252,7 @@ body:not(.course-menu-expanded) {
 .sm-course-menu.list-view{
   background-color: #FFFFFF;
   padding: 0 $ic-sp*2;
+  position: relative;
 
   ul{
     li{
@@ -259,8 +260,8 @@ body:not(.course-menu-expanded) {
 
       a{
         border-radius: 0px;
-        padding: 20px 0px;
-        margin-right: 20px;
+        padding: 20px 15px;
+        // margin-right: 20px;
 
        &.active{
 
@@ -275,8 +276,21 @@ body:not(.course-menu-expanded) {
   }
 }
 
+.sm-course-menu.list-view > nav > ul > li > a:hover,
+.sm-course-menu.list-view > nav > ul > li > a:focus{
+  background-color: #FFFFFF;
+  padding-bottom: 16px;
+  border-bottom: 4px solid $sm-gray-4;
+}
+
 .sm-course-menu-clear{
   clear: both;
+}
+
+.sm-teacher-tools-container{
+  float: right;
+  margin-top: 10px;
+  position: relative;
 }
 
 .ic-app-nav-toggle-and-crumbs {

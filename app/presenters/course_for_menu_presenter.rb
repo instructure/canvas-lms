@@ -31,6 +31,7 @@ class CourseForMenuPresenter
     @available_section_tabs = (available_section_tabs || []).select do |tab|
       DASHBOARD_CARD_TABS.include?(tab[:id])
     end
+
   end
   attr_reader :course, :available_section_tabs
 
