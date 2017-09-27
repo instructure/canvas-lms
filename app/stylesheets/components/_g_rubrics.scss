@@ -64,7 +64,7 @@
     }
     .add_rating_link_after {
       border-radius: 1rem;
-      background-color: $ic-link-color;
+      background-color: var(--ic-link-color);
       text-align: center;
       vertical-align: middle;
       display: table-cell;
