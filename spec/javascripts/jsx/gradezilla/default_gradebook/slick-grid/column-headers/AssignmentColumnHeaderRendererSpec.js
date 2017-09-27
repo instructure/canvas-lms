@@ -119,18 +119,6 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       strictEqual(component.props.assignment.id, '2301');
     });
 
-    test('includes the assignment "in closed grading period" status when true', function () {
-      assignment.inClosedGradingPeriod = true;
-      render();
-      strictEqual(component.props.assignment.inClosedGradingPeriod, true);
-    });
-
-    test('includes the assignment "in closed grading period" status when false', function () {
-      assignment.inClosedGradingPeriod = false;
-      render();
-      strictEqual(component.props.assignment.inClosedGradingPeriod, false);
-    });
-
     test('includes the assignment muted status when true', function () {
       assignment.muted = true;
       render();
@@ -146,18 +134,6 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
     test('includes the assignment name', function () {
       render();
       equal(component.props.assignment.name, 'Math Assignment');
-    });
-
-    test('includes the assignment "omit from final grade" setting when true', function () {
-      assignment.omit_from_final_grade = true;
-      render();
-      strictEqual(component.props.assignment.omitFromFinalGrade, true);
-    });
-
-    test('includes the assignment "omit from final grade" setting when false', function () {
-      assignment.omit_from_final_grade = false;
-      render();
-      strictEqual(component.props.assignment.omitFromFinalGrade, false);
     });
 
     test('includes the assignment points possible', function () {

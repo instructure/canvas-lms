@@ -1501,7 +1501,7 @@ define [
         width: assignmentWidth
         cssClass: "assignment #{columnId}"
         headerCssClass: "assignment #{columnId}"
-        toolTip: htmlEscape(assignment.name)
+        toolTip: assignment.name
         type: 'assignment'
         assignmentId: assignment.id
 
@@ -1525,7 +1525,7 @@ define [
       {
         id: columnId
         field: fieldName
-        toolTip: htmlEscape(assignmentGroup.name)
+        toolTip: assignmentGroup.name
         object: assignmentGroup
         minWidth: columnWidths.assignmentGroup.min
         maxWidth: columnWidths.assignmentGroup.max

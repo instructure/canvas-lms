@@ -107,7 +107,7 @@ define [
         @prevActiveLocation = activeLocation
         @prevActiveElement = document.activeElement
 
-      @getHeaderFromActiveCell().querySelector('.Gradebook__ColumnHeaderAction')?.click()
+      @getHeaderFromActiveCell().querySelector('.Gradebook__ColumnHeaderAction button')?.click()
 
     gotoAssignment: =>
       return unless @currentColumnType() == 'assignment'

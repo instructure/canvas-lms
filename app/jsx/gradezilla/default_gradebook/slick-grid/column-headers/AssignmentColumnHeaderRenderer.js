@@ -65,10 +65,8 @@ function getProps (column, gradebook, options) {
       courseId: assignment.course_id,
       htmlUrl: assignment.html_url,
       id: assignment.id,
-      inClosedGradingPeriod: assignment.inClosedGradingPeriod,
       muted: assignment.muted,
       name: assignment.name,
-      omitFromFinalGrade: assignment.omit_from_final_grade,
       pointsPossible: assignment.points_possible,
       published: assignment.published,
       submissionTypes: assignment.submission_types

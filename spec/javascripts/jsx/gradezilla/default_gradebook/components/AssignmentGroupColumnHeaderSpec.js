@@ -27,7 +27,7 @@ function mountComponent (props, mountOptions = {}) {
 
 function mountAndOpenOptions (props) {
   const wrapper = mountComponent(props);
-  wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
   return wrapper;
 }
 
@@ -79,24 +79,24 @@ test('renders the assignment group name', function () {
 
 test('renders the assignment groupWeight percentage', function () {
   const groupWeight = this.wrapper.find('.Gradebook__ColumnHeaderDetail').childAt(1);
-  equal(groupWeight.text().trim(), '42.50% of grade');
+  equal(groupWeight.text().trim(), '42.5% of grade');
 });
 
 test('renders a PopoverMenu with a trigger', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
+  const optionsMenuTrigger = this.wrapper.find('.Gradebook__ColumnHeaderAction button');
   equal(optionsMenuTrigger.length, 1);
 });
 
-test('adds a class to the trigger when the PopoverMenu is opened', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
-  optionsMenuTrigger.simulate('click');
-  ok(optionsMenuTrigger.hasClass('menuShown'));
+test('adds a class to the action container when the PopoverMenu is opened', function () {
+  const actionContainer = this.wrapper.find('.Gradebook__ColumnHeaderAction');
+  actionContainer.find('button').simulate('click');
+  ok(actionContainer.hasClass('menuShown'));
 });
 
 test('calls addGradebookElement prop on open', function () {
   notOk(this.props.addGradebookElement.called);
 
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   ok(this.props.addGradebookElement.called);
 });
@@ -104,15 +104,15 @@ test('calls addGradebookElement prop on open', function () {
 test('calls removeGradebookElement prop on close', function () {
   notOk(this.props.removeGradebookElement.called);
 
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   ok(this.props.removeGradebookElement.called);
 });
 
 test('calls onMenuClose prop on close', function () {
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   strictEqual(this.props.onMenuClose.callCount, 1);
 });
@@ -123,14 +123,13 @@ test('renders 0% as the groupWeight percentage when weightedGroups is true but g
   const props = defaultProps({ assignmentGroup: { groupWeight: 0 } });
   const wrapper = mount(<AssignmentGroupColumnHeader {...props} />);
   const groupWeight = wrapper.find('.Gradebook__ColumnHeaderDetail').childAt(1);
-  equal(groupWeight.text().trim(), '0.00% of grade');
+  equal(groupWeight.text().trim(), '0% of grade');
 });
 
 test('does not render the groupWeight percentage when weightedGroups is false', function () {
   const props = defaultProps({ props: { weightedGroups: false } });
   const wrapper = mount(<AssignmentGroupColumnHeader {...props} />);
-  const headerDetails = wrapper.find('.Gradebook__ColumnHeaderDetail').children();
-  equal(headerDetails.length, 1, 'only the assignment group name is visible');
+  const headerDetails = wrapper.find('.Gradebook__ColumnHeaderDetail');
   equal(headerDetails.text().trim(), 'Assignment Group 1');
 });
 

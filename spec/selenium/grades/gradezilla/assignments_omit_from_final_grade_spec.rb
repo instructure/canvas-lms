@@ -77,25 +77,6 @@ describe 'Gradezilla omit from final grade assignments' do
     end
   end
 
-  context 'in gradebook' do
-    before(:each) do
-      enroll_teacher_and_students
-      assignment_1.grade_student(student, grade: 10, grader: teacher)
-      assignment_3.grade_student(student, grade: 5, grader: teacher)
-      user_session(teacher)
-      Gradezilla.visit(test_course)
-    end
-
-    it 'displays triangle warning' do
-      expect(Gradezilla.select_assignment_header_warning_icon.size).to eq(1)
-    end
-
-    it 'does not include omitted assignment in final' do
-      total_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')
-      expect(total_grade).to include_text('10')
-    end
-  end
-
   context 'as a student' do
     before(:each) do
       enroll_teacher_and_students

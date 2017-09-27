@@ -19,17 +19,20 @@
 import React from 'react';
 import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types';
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Container from '@instructure/ui-core/lib/components/Container';
+import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
 import {
   MenuItem,
   MenuItemFlyout,
   MenuItemGroup,
   MenuItemSeparator
-} from 'instructure-ui/lib/components/Menu';
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
-import Typography from 'instructure-ui/lib/components/Typography';
+} from '@instructure/ui-core/lib/components/Menu';
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
+import Text from '@instructure/ui-core/lib/components/Text';
 import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
 
 export default class StudentColumnHeader extends ColumnHeader {
@@ -112,124 +115,136 @@ export default class StudentColumnHeader extends ColumnHeader {
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail">
-          <Typography weight="normal" fontStyle="normal" size="small">
-            { I18n.t('Student Name') }
-          </Typography>
-        </span>
+        <div style={{ flex: 1, minWidth: '1px' }}>
+          <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
+            <GridRow>
+              <GridCol textAlign="start">
+                <Container className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
+                  <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Student Name') }</Text>
+                </Container>
+              </GridCol>
 
-        <PopoverMenu
-          contentRef={this.bindOptionsMenuContent}
-          shouldFocusTriggerOnClose={false}
-          trigger={
-            <span ref={this.bindOptionsMenuTrigger} className={classes}>
-              <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-                <IconMoreSolid className="rotated" title={I18n.t('Student Name Options')} />
-              </Typography>
-            </span>
-          }
-          onToggle={this.onToggle}
-          onClose={this.props.onMenuClose}
-        >
-          <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
-            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
-              <MenuItem
-                selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
-                disabled={disabled}
-                onSelect={onSortBySortableNameAscending}
-              >
-                <span>{I18n.t('A–Z')}</span>
-              </MenuItem>
+              <GridCol textAlign="center" width="auto">
+                <div className={classes}>
+                  <PopoverMenu
+                    contentRef={this.bindOptionsMenuContent}
+                    shouldFocusTriggerOnClose={false}
+                    trigger={
+                      <Button buttonRef={this.bindOptionsMenuTrigger} margin="0" size="small" variant="icon">
+                        <IconMoreSolid title={I18n.t('Student Name Options')} />
+                      </Button>
+                    }
+                    onToggle={this.onToggle}
+                    onClose={this.props.onMenuClose}
+                  >
+                    <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
+                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+                        <MenuItem
+                          selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
+                          disabled={disabled}
+                          onSelect={onSortBySortableNameAscending}
+                        >
+                          <span>{I18n.t('A–Z')}</span>
+                        </MenuItem>
 
-              <MenuItem
-                selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
-                disabled={disabled}
-                onSelect={onSortBySortableNameDescending}
-              >
-                <span>{I18n.t('Z–A')}</span>
-              </MenuItem>
-            </MenuItemGroup>
-          </MenuItemFlyout>
+                        <MenuItem
+                          selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
+                          disabled={disabled}
+                          onSelect={onSortBySortableNameDescending}
+                        >
+                          <span>{I18n.t('Z–A')}</span>
+                        </MenuItem>
+                      </MenuItemGroup>
+                    </MenuItemFlyout>
 
-          <MenuItemFlyout label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent} disabled={this.props.disabled}>
-            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}>
-              <MenuItem
-                key="first_last"
-                selected={this.props.selectedPrimaryInfo === 'first_last'}
-                onSelect={this.onShowFirstLastNames}
-              >
-                {studentRowHeaderConstants.primaryInfoLabels.first_last}
-              </MenuItem>
-              <MenuItem
-                key="last_first"
-                selected={this.props.selectedPrimaryInfo === 'last_first'}
-                onSelect={this.onShowLastFirstNames}
-              >
-                {studentRowHeaderConstants.primaryInfoLabels.last_first}
-              </MenuItem>
-            </MenuItemGroup>
-          </MenuItemFlyout>
+                    <MenuItemFlyout label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent} disabled={this.props.disabled}>
+                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}>
+                        <MenuItem
+                          key="first_last"
+                          selected={this.props.selectedPrimaryInfo === 'first_last'}
+                          onSelect={this.onShowFirstLastNames}
+                        >
+                          {studentRowHeaderConstants.primaryInfoLabels.first_last}
+                        </MenuItem>
+                        <MenuItem
+                          key="last_first"
+                          selected={this.props.selectedPrimaryInfo === 'last_first'}
+                          onSelect={this.onShowLastFirstNames}
+                        >
+                          {studentRowHeaderConstants.primaryInfoLabels.last_first}
+                        </MenuItem>
+                      </MenuItemGroup>
+                    </MenuItemFlyout>
 
-          <MenuItemFlyout label={I18n.t('Secondary info')} contentRef={this.bindSecondaryInfoMenuContent} disabled={this.props.disabled}>
-            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>}>
-              {
-                this.props.sectionsEnabled &&
-                <MenuItem
-                  key="section"
-                  selected={this.props.selectedSecondaryInfo === 'section'}
-                  onSelect={this.onShowSectionNames}
-                >
-                  {studentRowHeaderConstants.secondaryInfoLabels.section}
-                </MenuItem>
-              }
-              <MenuItem
-                key="sis_id"
-                selected={this.props.selectedSecondaryInfo === 'sis_id'}
-                onSelect={this.onShowSisId}
-              >
-                {this.props.sisName || studentRowHeaderConstants.secondaryInfoLabels.sis_id}
-              </MenuItem>
+                    <MenuItemFlyout
+                      contentRef={this.bindSecondaryInfoMenuContent}
+                      disabled={this.props.disabled}
+                      label={I18n.t('Secondary info')}
+                    >
+                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>}>
+                        {
+                          this.props.sectionsEnabled &&
+                          <MenuItem
+                            key="section"
+                            selected={this.props.selectedSecondaryInfo === 'section'}
+                            onSelect={this.onShowSectionNames}
+                          >
+                            {studentRowHeaderConstants.secondaryInfoLabels.section}
+                          </MenuItem>
+                        }
+                        <MenuItem
+                          key="sis_id"
+                          selected={this.props.selectedSecondaryInfo === 'sis_id'}
+                          onSelect={this.onShowSisId}
+                        >
+                          {this.props.sisName || studentRowHeaderConstants.secondaryInfoLabels.sis_id}
+                        </MenuItem>
 
-              <MenuItem
-                key="login_id"
-                selected={this.props.selectedSecondaryInfo === 'login_id'}
-                onSelect={this.onShowLoginId}
-              >
-                {this.props.loginHandleName || studentRowHeaderConstants.secondaryInfoLabels.login_id}
-              </MenuItem>
+                        <MenuItem
+                          key="login_id"
+                          selected={this.props.selectedSecondaryInfo === 'login_id'}
+                          onSelect={this.onShowLoginId}
+                        >
+                          {this.props.loginHandleName || studentRowHeaderConstants.secondaryInfoLabels.login_id}
+                        </MenuItem>
 
-              <MenuItem
-                key="none"
-                selected={this.props.selectedSecondaryInfo === 'none'}
-                onSelect={this.onHideSecondaryInfo}
-              >
-                {studentRowHeaderConstants.secondaryInfoLabels.none}
-              </MenuItem>
-            </MenuItemGroup>
-          </MenuItemFlyout>
+                        <MenuItem
+                          key="none"
+                          selected={this.props.selectedSecondaryInfo === 'none'}
+                          onSelect={this.onHideSecondaryInfo}
+                        >
+                          {studentRowHeaderConstants.secondaryInfoLabels.none}
+                        </MenuItem>
+                      </MenuItemGroup>
+                    </MenuItemFlyout>
 
-          <MenuItemSeparator />
+                    <MenuItemSeparator />
 
-          <MenuItemGroup label={I18n.t('Show')} allowMultiple>
-            <MenuItem
-              key="inactive"
-              selected={this.props.selectedEnrollmentFilters.includes('inactive')}
-              onSelect={this.onToggleInactive}
-              disabled={this.props.disabled}
-            >
-              {studentRowHeaderConstants.enrollmentFilterLabels.inactive}
-            </MenuItem>
+                    <MenuItemGroup label={I18n.t('Show')} allowMultiple>
+                      <MenuItem
+                        key="inactive"
+                        selected={this.props.selectedEnrollmentFilters.includes('inactive')}
+                        onSelect={this.onToggleInactive}
+                        disabled={this.props.disabled}
+                      >
+                        {studentRowHeaderConstants.enrollmentFilterLabels.inactive}
+                      </MenuItem>
 
-            <MenuItem
-              key="concluded"
-              selected={this.props.selectedEnrollmentFilters.includes('concluded')}
-              onSelect={this.onToggleConcluded}
-              disabled={this.props.disabled}
-            >
-              {studentRowHeaderConstants.enrollmentFilterLabels.concluded}
-            </MenuItem>
-          </MenuItemGroup>
-        </PopoverMenu>
+                      <MenuItem
+                        key="concluded"
+                        selected={this.props.selectedEnrollmentFilters.includes('concluded')}
+                        onSelect={this.onToggleConcluded}
+                        disabled={this.props.disabled}
+                      >
+                        {studentRowHeaderConstants.enrollmentFilterLabels.concluded}
+                      </MenuItem>
+                    </MenuItemGroup>
+                  </PopoverMenu>
+                </div>
+              </GridCol>
+            </GridRow>
+          </Grid>
+        </div>
       </div>
     );
   }

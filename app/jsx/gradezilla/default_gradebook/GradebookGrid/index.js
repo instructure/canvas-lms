@@ -54,7 +54,6 @@ export default class GradebookGrid {
     ));
 
     this.grid = new Grid(this.options.$container, this.gridData.rows, columns, options);
-    this.grid.setSortColumn('student');
 
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,
