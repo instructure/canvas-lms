@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test-watch": "jest -w",
     "dev": "webpack-dev-server --open",
     "extract": "format-message extract \"src/**/*.js\" > locales/en.json",
     "fmt": "prettier --no-semi --write \"src/**/*.js\"",
