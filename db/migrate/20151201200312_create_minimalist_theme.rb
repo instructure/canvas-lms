@@ -45,7 +45,6 @@ class CreateMinimalistTheme < ActiveRecord::Migration[4.2]
     bc.name = NAME
     bc.share = true
     bc.save!
-    bc.save_all_files!
   end
 
   def down

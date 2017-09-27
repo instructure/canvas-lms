@@ -7,6 +7,8 @@ namespace :css do
   end
 
   task :compile do
+    # try to get a conection to the database so we can do the brand_configs:write below
+    require 'config/environment' rescue nil
     require 'lib/brandable_css'
     puts "--> Starting: 'css:compile'"
     time = Benchmark.realtime do

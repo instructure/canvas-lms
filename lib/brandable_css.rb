@@ -23,6 +23,7 @@ module BrandableCSS
   APP_ROOT = defined?(Rails) && Rails.root || Pathname.pwd
   CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze
   BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
+  MIGRATION_NAME = 'RegenerateBrandFilesBasedOnNewDefaults'.freeze
 
   use_compressed = (defined?(Rails) && Rails.env.production?) || (ENV['RAILS_ENV'] == 'production')
   SASS_STYLE = ENV['SASS_STYLE'] || ((use_compressed ? 'compressed' : 'nested')).freeze
@@ -106,8 +107,48 @@ module BrandableCSS
       end.freeze
     end
 
+    def things_that_go_into_defaults_md5
+      variables_map.each_with_object({}) do |(variable_name, config), memo|
+        default = config['default']
+        if config['type'] == 'image'
+          # to make consistent md5s whether the cdn is enabled or not, don't include hostname in defaults
+          default = ActionController::Base.helpers.image_path(default, host: '')
+        end
+        memo[variable_name] = default
+      end.freeze
+    end
+
+    def migration_version
+      # ActiveRecord usually uses integer timestamps to generate migration versions but any integer
+      # will work, so we just use the result of stripping out the alphabetic characters from the md5
+      default_variables_md5_without_migration_check.gsub(/[a-z]/, '').to_i.freeze
+    end
+
+    def check_if_we_need_to_create_a_db_migration
+      migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths.first)
+      ['predeploy', 'postdeploy'].each do |pre_or_post|
+        migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
+        # they can't have the same id, so we just add 1 to the postdeploy one
+        expected_version = (pre_or_post == 'predeploy') ? migration_version : (migration_version + 1)
+        raise DefaultMD5NotUpToDateError unless migration && migration.version == expected_version
+      end
+    end
+
+    def skip_migration_check?
+      # our canvas_rspec build doesn't even run `yarn install` or `gulp rev` so since
+      # they are not expecting all the frontend assets to work, this check isn't useful
+      Rails.env.test? && !Rails.root.join('public', 'dist', 'rev-manifest.json').exist?
+    end
+
     def default_variables_md5
-      @default_variables_md5 ||= Digest::MD5.hexdigest(variables_map_with_image_urls.to_json)
+      @default_variables_md5 ||= begin
+        check_if_we_need_to_create_a_db_migration unless skip_migration_check?
+        default_variables_md5_without_migration_check
+      end
+    end
+
+    def default_variables_md5_without_migration_check
+      Digest::MD5.hexdigest(things_that_go_into_defaults_md5.to_json).freeze
     end
 
     def handle_urls(value, config, css_urls)
@@ -297,7 +338,7 @@ module BrandableCSS
         # if you haven't ran `brandable_css` and the manifest file doesn't exist yet.
         # eg: you want to test a controller action and you don't care that it links
         # to a css file that hasn't been created yet.
-        default_value = {combinedChecksum: "Error: unknown css checksum. you need to run brandable_css"}.freeze
+        default_value = {:combinedChecksum => "Error: unknown css checksum. you need to run brandable_css"}.freeze
         @combined_checksums = Hash.new(default_value).freeze
       end
     end
@@ -314,6 +355,27 @@ module BrandableCSS
       variants.each_with_object({}) do |variant, object|
         object[variant] = cache_for(bundle_path, variant)
       end
+    end
+  end
+
+  class DefaultMD5NotUpToDateError < RuntimeError
+    def initialize
+      super <<-END
+
+You have made changes to either app/stylesheets/brandable_variables.json or one of the images it
+references so you need to rename the db migrations that makes sure when this change is deployed it
+makes a new .css file for the css variables for each brand based on these new defaults.
+To do that, run this command and then restart your rails process. (for local dev, if you want the
+changes to show up in the ui, make sure you also run `rake db:migrate`).
+
+mv db/migrate/*_#{MIGRATION_NAME.underscore}_predeploy.rb \\
+   db/migrate/#{BrandableCSS.migration_version}_#{MIGRATION_NAME.underscore}_predeploy.rb \\
+&& \\
+mv db/migrate/*_#{MIGRATION_NAME.underscore}_postdeploy.rb \\
+   db/migrate/#{BrandableCSS.migration_version + 1}_#{MIGRATION_NAME.underscore}_postdeploy.rb
+
+FYI, current variables are: #{BrandableCSS.things_that_go_into_defaults_md5}
+END
     end
   end
 end
