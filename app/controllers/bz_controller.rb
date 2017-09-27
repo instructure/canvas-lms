@@ -12,6 +12,121 @@ class BzController < ApplicationController
   before_filter :require_user
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
+  def grades_download
+    assignment = Assignment.find(params[:assignment_id])
+    sg = Assignment::SpeedGrader.new(
+      assignment,
+      @current_user,
+      avatars: false,
+      grading_role: :grader
+    ).json
+
+    rubric = assignment.rubric
+
+    criteria = []
+    rubric.data.each do |criterion|
+      obj = {}
+      obj["description"] = criterion["description"]
+      obj["criterion_id"] = criterion["id"]
+      obj["section"] = criterion["description"][/^([0-9]+)/, 1]
+      obj["subsection"] = criterion["description"][/^[0-9]+\.([0-9]+)/, 1]
+      obj["points_available"] = criterion["points"]
+      criteria << obj
+    end
+
+    criteria = criteria.sort_by { |h| [h["section"], h["subsection"]] }
+
+    sections = []
+    criteria.each do |c|
+      if sections.length == 0 || sections[-1] != c["section"]
+        sections << c["section"]
+      end
+    end
+
+    sections_points_available = []
+    sections.each do |s|
+      sections_points_available << 0.0
+    end
+    criteria.each do |c|
+      sections_points_available[c["section"].to_i - 1] += c["points_available"].to_f # zero-based index of one-based index
+    end
+
+
+
+    csv = CSV.generate do |csv|
+      # header
+      row = []
+      row << "Student Name"
+      row << "Total Score"
+
+      sections.each do |section|
+        row << "Section #{section} Average"
+      end
+
+      criteria.each do |criterion|
+        row << criterion["description"]
+      end
+
+      csv << row
+
+      # data
+
+      sg["context"]["students"].each do |student|
+        row = []
+
+        latest_assessment = student["rubric_assessments"].last
+
+        row << student["name"]
+        if latest_assessment
+          row << latest_assessment["score"]
+        else
+          row << "0"
+        end
+
+        # section averages...
+
+        section_scores = []
+        sections.each do |s|
+          section_scores << 0.0
+        end
+
+        criteria.each do |criterion|
+          points = 0.0
+          if latest_assessment
+            latest_assessment["data"].each do |datum|
+              points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
+            end
+          end
+          section_scores[criterion["section"].to_i - 1] += points # zero-based array of one-based sections
+        end
+
+
+        section_scores.each_with_index do |ss, idx|
+          row << "#{(ss * 100 / sections_points_available[idx]).round(2)}%"
+        end
+
+
+        # individual breakdown...
+
+        criteria.each do |criterion|
+          points = 0.0
+          if latest_assessment
+            latest_assessment["data"].each do |datum|
+              points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
+            end
+          end
+          row << points
+        end
+
+        csv << row
+      end
+    end
+
+    respond_to do |format|
+      format.csv { render text: csv }
+    end
+  end
+
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
   # Canvas prefers the file upload. It won't even submit the magic field info if the user
   # uploads the file, nor will it allow the grader to see it.
