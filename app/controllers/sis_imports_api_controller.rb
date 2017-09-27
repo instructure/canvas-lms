@@ -310,6 +310,7 @@ class SisImportsApiController < ApplicationController
   #   If set, this SIS import will be run in batch mode, deleting any data
   #   previously imported via SIS that is not present in this latest import.
   #   See the SIS CSV Format page for details.
+  #   Batch mode cannot be used with diffing.
   #
   # @argument batch_mode_term_id [String]
   #   Limit deletions to only this term. Required if batch mode is enabled.
@@ -337,6 +338,7 @@ class SisImportsApiController < ApplicationController
   #   comparing this set of CSVs to the previous set that has the same data set
   #   identifier, and only applying the difference between the two. See the
   #   SIS CSV Format documentation for more details.
+  #   Diffing cannot be used with batch_mode
   #
   # @argument diffing_remaster_data_set [Boolean]
   #   If true, and diffing_data_set_identifier is sent, this SIS import will be
@@ -352,14 +354,14 @@ class SisImportsApiController < ApplicationController
   #   number of items deleted is higher than the percentage set. If set to 10
   #   and a term has 200 enrollments, and batch would delete more than 20 of
   #   the enrollments the batch will abort before the enrollments are deleted.
+  #   The change_threshold will be evaluated for course, sections, and
+  #   enrollments independently.
   #   If set with diffing, diffing  will not be performed if the files are
   #   greater than the threshold as a percent. If set to 5 and the file is more
   #   than 5% smaller or more than 5% larger than the file that is being
   #   compared to, diffing will not be performed. If the files are less than 5%,
   #   diffing will be performed. See the SIS CSV Format documentation for more
   #   details.
-  #   If set with batch_mode and diffing, the same threshold is used for both
-  #   steps of the import.
   #
   # @returns SisImport
   def create
@@ -424,12 +426,12 @@ class SisImportsApiController < ApplicationController
       end
 
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch|
+        batch.change_threshold = params[:change_threshold]
         if batch_mode_term
           batch.batch_mode = true
           batch.batch_mode_term = batch_mode_term
         elsif params[:diffing_data_set_identifier].present?
           batch.enable_diffing(params[:diffing_data_set_identifier],
-                               change_threshold: params[:change_threshold],
                                remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
 

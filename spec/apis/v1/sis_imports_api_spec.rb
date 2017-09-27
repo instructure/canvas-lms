@@ -234,6 +234,20 @@ describe SisImportsApiController, type: :request do
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
   end
 
+  it "should use change threshold for batch mode" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { controller: 'sis_imports_api', action: 'create',
+            format: 'json', account_id: @account.id.to_s },
+          { import_type: 'instructure_csv',
+            attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            batch_mode: '1',
+            change_threshold: 7,
+            batch_mode_term_id: @account.default_enrollment_term.id })
+    batch = SisBatch.find(json["id"])
+    expect(batch.change_threshold).to eq 7
+  end
+
   it "should enable batch with sis stickyness" do
     json = api_call(:post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",

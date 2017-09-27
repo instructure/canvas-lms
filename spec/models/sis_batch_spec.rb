@@ -703,7 +703,7 @@ test_1,u1,student,active}
         expect(batch.workflow_state).to eq 'aborted'
         expect(@e1.reload).to be_active
         expect(@e2.reload).to be_active
-        expect(batch.processing_errors.first).to eq ["1 items would be deleted and exceeds the set threshold of 20%"]
+        expect(batch.processing_errors.first).to eq ["1 enrollments would be deleted and exceeds the set threshold of 20%"]
       end
 
       it 'should delete batch mode below threshold' do
