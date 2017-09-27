@@ -2155,8 +2155,7 @@ define [
       @setSubmissionTrayState(true, studentId, assignment.assignmentId)
       @updateRowAndRenderSubmissionTray(studentId)
 
-    renderSubmissionTray: (student) =>
-      mountPoint = document.getElementById('StudentTray__Container')
+    getSubmissionTrayProps: (student) =>
       { open, studentId, assignmentId, comments } = @getSubmissionTrayState()
       # get the student's submission, or use a fake submission object in case the
       # submission has not yet loaded
@@ -2178,45 +2177,53 @@ define [
       isFirstStudent = activeLocation.row == 0
       isLastStudent = activeLocation.row == (@listRows().length - 1)
 
-      props =
-        assignment: ConvertCase.camelize(assignment)
-        colors: @getGridColors()
-        courseId: @options.context_id
-        isFirstAssignment: isFirstAssignment
-        isLastAssignment: isLastAssignment
-        isFirstStudent: isFirstStudent
-        isLastStudent: isLastStudent
-        isOpen: open
-        key: "grade_details_tray"
-        latePolicy: @courseContent.latePolicy
-        locale: @options.locale
-        onClose: => @gridSupport.helper.focus()
-        onRequestClose: @closeSubmissionTray
-        selectNextAssignment: => @loadTrayAssignment('next')
-        selectPreviousAssignment: => @loadTrayAssignment('previous')
-        selectNextStudent: => @loadTrayStudent('next')
-        selectPreviousStudent: => @loadTrayStudent('previous')
-        showContentComingSoon: !@options.new_gradebook_development_enabled
-        speedGraderEnabled: @options.speed_grader_enabled
-        student:
-          id: student.id
-          name: htmlDecode(student.name)
-          avatarUrl: htmlDecode(student.avatar_url)
-          gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
-        submission: ConvertCase.camelize(submission)
-        submissionUpdating: @contentLoadStates.submissionUpdating
-        updateSubmission: @updateSubmissionAndRenderSubmissionTray
-        processing: @getCommentsUpdating()
-        setProcessing: @setCommentsUpdating
-        updateSubmissionComments: @updateSubmissionComments
-        createSubmissionComment: @createSubmissionComment
-        deleteSubmissionComment: @deleteSubmissionComment
-        submissionComments: @getSubmissionComments()
-        submissionCommentsLoaded: @getSubmissionCommentsLoaded()
+      submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId });
 
+      assignment: ConvertCase.camelize(assignment)
+      colors: @getGridColors()
+      comments: comments
+      courseId: @options.context_id
+      isFirstAssignment: isFirstAssignment
+      isInOtherGradingPeriod: !!submissionState?.inOtherGradingPeriod
+      isInClosedGradingPeriod: !!submissionState?.inClosedGradingPeriod
+      isInNoGradingPeriod: !!submissionState?.inNoGradingPeriod
+      isLastAssignment: isLastAssignment
+      isFirstStudent: isFirstStudent
+      isLastStudent: isLastStudent
+      isOpen: open
+      key: "grade_details_tray"
+      latePolicy: @courseContent.latePolicy
+      locale: @options.locale
+      onClose: => @gridSupport.helper.focus()
+      onRequestClose: @closeSubmissionTray
+      selectNextAssignment: => @loadTrayAssignment('next')
+      selectPreviousAssignment: => @loadTrayAssignment('previous')
+      selectNextStudent: => @loadTrayStudent('next')
+      selectPreviousStudent: => @loadTrayStudent('previous')
+      showContentComingSoon: !@options.new_gradebook_development_enabled
+      speedGraderEnabled: @options.speed_grader_enabled
+      student:
+        id: student.id
+        name: htmlDecode(student.name)
+        avatarUrl: htmlDecode(student.avatar_url)
+        gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
+      submission: ConvertCase.camelize(submission)
+      submissionUpdating: @contentLoadStates.submissionUpdating
+      updateSubmission: @updateSubmissionAndRenderSubmissionTray
+      processing: @getCommentsUpdating()
+      setProcessing: @setCommentsUpdating
+      updateSubmissionComments: @updateSubmissionComments
+      createSubmissionComment: @createSubmissionComment
+      deleteSubmissionComment: @deleteSubmissionComment
+      submissionComments: @getSubmissionComments()
+      submissionCommentsLoaded: @getSubmissionCommentsLoaded()
+
+    renderSubmissionTray: (student) =>
+      { open, studentId, assignmentId } = @getSubmissionTrayState()
+      mountPoint = document.getElementById('StudentTray__Container')
+      props = @getSubmissionTrayProps(student)
       @loadSubmissionComments(assignmentId, studentId) if !@getSubmissionCommentsLoaded() and open
-
-      renderComponent(SubmissionTray, mountPoint, Object.assign(props, { comments: comments }))
+      renderComponent(SubmissionTray, mountPoint, props)
 
     loadSubmissionComments: (assignmentId, studentId) =>
       SubmissionCommentApi.getSubmissionComments(@options.context_id, assignmentId, studentId)

@@ -34,6 +34,7 @@ import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePol
 import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
 import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem';
 import SubmissionCommentForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentForm';
+import SubmissionStatus from 'jsx/gradezilla/default_gradebook/components/SubmissionStatus';
 import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 
 function renderAvatar (name, avatarUrl) {
@@ -205,6 +206,14 @@ export default function SubmissionTray (props) {
               </Container>
 
               <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+                <SubmissionStatus
+                  assignment={props.assignment}
+                  submission={props.submission}
+                  isInOtherGradingPeriod={props.isInOtherGradingPeriod}
+                  isInClosedGradingPeriod={props.isInClosedGradingPeriod}
+                  isInNoGradingPeriod={props.isInNoGradingPeriod}
+                />
+
                 {!!props.submission.pointsDeducted &&
                   <div>
                     <LatePolicyGrade submission={props.submission} />
@@ -224,6 +233,8 @@ export default function SubmissionTray (props) {
                   />
                 </Container>
 
+                <Container as="div" margin="small 0" className="hr" />
+
                 <Container as="div" id="SubmissionTray__Comments" padding="xx-small">
                   {renderSubmissionComments(submissionCommentsProps)}
                 </Container>
@@ -237,13 +248,16 @@ export default function SubmissionTray (props) {
 
 SubmissionTray.defaultProps = {
   contentRef: undefined,
-  latePolicy: { lateSubmissionInterval: 'day' }
+  latePolicy: { lateSubmissionInterval: 'day' },
+  submission: { drop: false }
 };
 
 SubmissionTray.propTypes = {
   assignment: shape({
     name: string.isRequired,
-    htmlUrl: string.isRequired
+    htmlUrl: string.isRequired,
+    muted: bool.isRequired,
+    published: bool.isRequired
   }).isRequired,
   contentRef: func,
   isOpen: bool.isRequired,
@@ -262,6 +276,7 @@ SubmissionTray.propTypes = {
     gradesUrl: string.isRequired
   }).isRequired,
   submission: shape({
+    drop: bool,
     excused: bool.isRequired,
     grade: string,
     late: bool.isRequired,
@@ -292,5 +307,8 @@ SubmissionTray.propTypes = {
   deleteSubmissionComment: func.isRequired,
   updateSubmissionComments: func.isRequired,
   processing: bool.isRequired,
-  setProcessing: func.isRequired
+  setProcessing: func.isRequired,
+  isInOtherGradingPeriod: bool.isRequired,
+  isInClosedGradingPeriod: bool.isRequired,
+  isInNoGradingPeriod: bool.isRequired
 };

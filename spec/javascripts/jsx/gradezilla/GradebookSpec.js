@@ -6202,6 +6202,168 @@ test('includes the column ids for related assignments when updating column heade
   deepEqual(columnIds.sort(), ['assignment_201', 'assignment_202']);
 });
 
+QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
+  const url = '/api/v1/courses/1/assignments/2/submissions/3';
+  const mountPointId = 'StudentTray__Container';
+  let gradebook;
+
+  suiteHooks.beforeEach(() => {
+    moxios.install();
+    moxios.stubRequest(url, { status: 200, response: { submission_comments: [] }});
+    $fixtures.innerHTML = `<div id="${mountPointId}"></div><div id="application"></div>`;
+    gradebook = createGradebook();
+    gradebook.students = {
+      1101: {
+        id: '1101',
+        name: 'J&#x27;onn J&#x27;onzz',
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        },
+        enrollments: [
+          {
+            grades: {
+              html_url: 'http://gradesUrl/'
+            }
+          }
+        ]
+      }
+    };
+    gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit () {},
+        focus () {}
+      },
+      state: {
+        getActiveLocation: () => ({ region: 'body', cell: 0, row: 0 })
+      },
+      grid: {
+        getColumns: () => []
+      }
+    };
+  });
+
+  suiteHooks.afterEach(() => {
+    const node = document.getElementById(mountPointId);
+    ReactDOM.unmountComponentAtNode(node);
+    $fixtures.innerHTML = '';
+    moxios.uninstall();
+  });
+
+  test('student has valid gradesUrl', function () {
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.student.gradesUrl, 'http://gradesUrl/#tab-assignments');
+  });
+
+  test('student has html decoded name', function () {
+    gradebook.students[1101].name = 'J&#x27;onn J&#x27;onzz';
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.student.name, "J'onn J'onzz");
+  });
+
+  test('isInOtherGradingPeriod is true when the SubmissionStateMap returns true', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ inOtherGradingPeriod: true });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInOtherGradingPeriod, true);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInOtherGradingPeriod is false when the SubmissionStateMap returns false', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ inOtherGradingPeriod: false });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInOtherGradingPeriod, false);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInOtherGradingPeriod is false when the SubmissionStateMap returns undefined', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInOtherGradingPeriod, false);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInClosedGradingPeriod is true when the SubmissionStateMap returns true', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ inClosedGradingPeriod: true });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInClosedGradingPeriod, true);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInClosedGradingPeriod is false when the SubmissionStateMap returns false', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ inClosedGradingPeriod: false });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInClosedGradingPeriod, false);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInClosedGradingPeriod is false when the SubmissionStateMap returns undefined', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInClosedGradingPeriod, false);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInNoGradingPeriod is true when the SubmissionStateMap returns true', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ inNoGradingPeriod: true });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInNoGradingPeriod, true);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInNoGradingPeriod is false when the SubmissionStateMap returns false', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ inNoGradingPeriod: false });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInNoGradingPeriod, false);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+
+  test('isInNoGradingPeriod is false when the SubmissionStateMap returns undefined', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ });
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.isInNoGradingPeriod, false);
+
+    gradebook.submissionStateMap.getSubmissionState.restore();
+  });
+});
+
 QUnit.module('Gradebook#renderSubmissionTray', {
   setup () {
     moxios.install();
@@ -6277,49 +6439,11 @@ test('shows a submission tray when the related submission has not loaded for the
   clock.restore();
 });
 
-test('SubmissionTray props have student with valid gradesUrl', function () {
-  sinon.spy(React, 'createElement');
-
+test('calls getSubmissionTrayProps with the student', function () {
+  this.spy(this.gradebook, 'getSubmissionTrayProps');
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-
-  strictEqual(React.createElement.getCall(0).args[1].student.gradesUrl, 'http://gradesUrl/#tab-assignments');
-
-  React.createElement.restore();
-});
-
-test('SubmissionTray props have student with html decoded name', function () {
-  sinon.spy(React, 'createElement');
-
-  this.gradebook.students[1101].name = 'J&#x27;onn J&#x27;onzz';
-  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
-  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-
-  strictEqual(React.createElement.getCall(0).args[1].student.name, "J'onn J'onzz");
-
-  React.createElement.restore();
-});
-
-test('calls loadSubmissionComments', function () {
-  const loadSubmissionCommentsStub = this.stub(this.gradebook, 'loadSubmissionComments');
-  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
-  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  strictEqual(loadSubmissionCommentsStub.callCount, 1);
-});
-
-test('does not call loadSubmissionComments if not open', function () {
-  const loadSubmissionCommentsStub = this.stub(this.gradebook, 'loadSubmissionComments');
-  this.gradebook.setSubmissionTrayState(false, '1101', '2301');
-  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  strictEqual(loadSubmissionCommentsStub.callCount, 0);
-});
-
-test('does not call loadSubmissionComments if loaded', function () {
-  const loadSubmissionCommentsStub = this.stub(this.gradebook, 'loadSubmissionComments');
-  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
-  this.gradebook.setSubmissionCommentsLoaded(true);
-  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  strictEqual(loadSubmissionCommentsStub.callCount, 0);
+  deepEqual(this.gradebook.getSubmissionTrayProps.firstCall.args, [this.gradebook.student('1101')]);
 });
 
 QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hooks) {
@@ -6453,6 +6577,28 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
     nextStudentButton.click();
     strictEqual(gradebook.loadTrayStudent.callCount, 1);
     deepEqual(gradebook.loadTrayStudent.getCall(0).args, ['previous'])
+  });
+
+  test('calls loadSubmissionComments', function () {
+    const loadSubmissionCommentsStub = sinon.stub(gradebook, 'loadSubmissionComments');
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    strictEqual(loadSubmissionCommentsStub.callCount, 1);
+  });
+
+  test('does not call loadSubmissionComments if not open', function () {
+    const loadSubmissionCommentsStub = sinon.stub(gradebook, 'loadSubmissionComments');
+    gradebook.setSubmissionTrayState(false, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    strictEqual(loadSubmissionCommentsStub.callCount, 0);
+  });
+
+  test('does not call loadSubmissionComments if loaded', function () {
+    const loadSubmissionCommentsStub = sinon.stub(gradebook, 'loadSubmissionComments');
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.setSubmissionCommentsLoaded(true);
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    strictEqual(loadSubmissionCommentsStub.callCount, 0);
   });
 });
 

@@ -73,7 +73,9 @@ QUnit.module('SubmissionTray', function (hooks) {
       updateSubmission () {},
       assignment: {
         name: 'Book Report',
-        htmlUrl: 'http://htmlUrl/'
+        htmlUrl: 'http://htmlUrl/',
+        muted: false,
+        published: true
       },
       isFirstAssignment: true,
       isLastAssignment: true,
@@ -89,7 +91,10 @@ QUnit.module('SubmissionTray', function (hooks) {
       deleteSubmissionComment () {},
       processing: false,
       setProcessing () {},
-      submissionComments: []
+      submissionComments: [],
+      isInOtherGradingPeriod: false,
+      isInClosedGradingPeriod: false,
+      isInNoGradingPeriod: false
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
     clock.tick(50); // wait for Tray to transition open
@@ -145,6 +150,47 @@ QUnit.module('SubmissionTray', function (hooks) {
   test('shows no avatar if showContentComingSoon is false and avatar is null', function () {
     mountComponent({ student: { id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/' } });
     notOk(avatarDiv());
+  });
+
+  test('shows the state of the submission', function () {
+    mountComponent();
+
+    strictEqual(wrapContent().find('SubmissionStatus').length, 1);
+  });
+
+  test('passes along assignment prop to SubmissionStatus', function () {
+    mountComponent();
+    const submissionStatusProps = wrapContent().find('SubmissionStatus').at(0).props();
+
+    deepEqual(submissionStatusProps.assignment, wrapper.props().assignment);
+  });
+
+  test('passes along submission prop to SubmissionStatus', function () {
+    mountComponent();
+    const submissionStatusProps = wrapContent().find('SubmissionStatus').at(0).props();
+
+    deepEqual(submissionStatusProps.submission, wrapper.props().submission);
+  });
+
+  test('passes along isInOtherGradingPeriod prop to SubmissionStatus', function () {
+    mountComponent();
+    const isInOtherGradingPeriod = wrapContent().find('SubmissionStatus').at(0).prop('isInOtherGradingPeriod');
+
+    deepEqual(isInOtherGradingPeriod, wrapper.prop('isInOtherGradingPeriod'));
+  });
+
+  test('passes along isInClosedGradingPeriod prop to SubmissionStatus', function () {
+    mountComponent();
+    const isInClosedGradingPeriod = wrapContent().find('SubmissionStatus').at(0).prop('isInClosedGradingPeriod');
+
+    deepEqual(isInClosedGradingPeriod, wrapper.prop('isInClosedGradingPeriod'));
+  });
+
+  test('passes along isInNoGradingPeriod prop to SubmissionStatus', function () {
+    mountComponent();
+    const isInNoGradingPeriod = wrapContent().find('SubmissionStatus').at(0).prop('isInNoGradingPeriod');
+
+    deepEqual(isInNoGradingPeriod, wrapper.prop('isInNoGradingPeriod'));
   });
 
   test('shows name if showContentComingSoon is false', function () {
