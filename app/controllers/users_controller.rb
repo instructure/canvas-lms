@@ -1741,7 +1741,7 @@ class UsersController < ApplicationController
             :url => av_json['url'] }
         end
       elsif url = avatar.try(:[], :url)
-        user_params[:avatar_image] = { :type => 'external', :url => url }
+        user_params[:avatar_image] = { :url => url }
       end
     end
 

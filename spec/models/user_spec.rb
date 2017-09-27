@@ -1165,10 +1165,22 @@ describe User do
       expect(@user.avatar_image_url).to be_nil
     end
 
-    it "should allow external url's to be assigned" do
+    it "should not allow external url's to be assigned" do
       @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq 'http://www.example.com/image.jpg'
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should allow external url's that match avatar_external_url_patterns to be assigned" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.instructure.com/image.jpg' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should allow gravatar url's to be assigned" do
+      @user.avatar_image = { 'type' => 'gravatar', 'url' => 'http://www.gravatar.com/image.jpg' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq 'http://www.gravatar.com/image.jpg'
     end
 
     it "should return a useful avatar_fallback_url" do

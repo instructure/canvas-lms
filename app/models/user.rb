@@ -19,6 +19,7 @@
 require 'atom'
 
 class User < ActiveRecord::Base
+  GRAVATAR_PATTERN = /^https?:\/\/[^.?&\/]+.gravatar.com\//
   include TurnitinID
 
   # this has to be before include Context to prevent a circular dependency in Course
@@ -1214,17 +1215,18 @@ class User < ActiveRecord::Base
     # Return here if we're passed a nil val or any non-hash val (both of which
     # will just nil the user's avatar).
     return unless val.is_a?(Hash)
+    external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[^.?&\/]+.instructure.com/').split(/,/).map {|re| Regexp.new re}
 
-    if val['type'] == 'gravatar'
+    if val['url'] && val['url'].match?(GRAVATAR_PATTERN)
       self.avatar_image_source = 'gravatar'
-      self.avatar_image_url = nil
-      self.avatar_state = 'submitted'
-    elsif val['type'] == 'external'
-      self.avatar_image_source = 'external'
       self.avatar_image_url = val['url']
       self.avatar_state = 'submitted'
     elsif val['type'] == 'attachment' && val['url']
       self.avatar_image_source = 'attachment'
+      self.avatar_image_url = val['url']
+      self.avatar_state = 'submitted'
+    elsif val['url'] && external_avatar_url_patterns.find { |p| val['url'].match?(p) }
+      self.avatar_image_source = 'external'
       self.avatar_image_url = val['url']
       self.avatar_state = 'submitted'
     end
