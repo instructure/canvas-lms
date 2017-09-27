@@ -21,6 +21,7 @@ import ModuleFile from 'compiled/models/ModuleFile'
 import PublishCloud from 'jsx/shared/PublishCloud'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import NewMoveDialogView from 'jsx/move_item_tray/NewMoveDialogView'
 import PublishableModuleItem from 'compiled/models/PublishableModuleItem'
 import PublishIconView from 'compiled/views/PublishIconView'
 import LockIconView from 'compiled/views/LockIconView'
@@ -346,7 +347,6 @@ import 'compiled/jquery.rails_flash_notifications'
         var relativeToId = $('#move_module_item_select').val();
         var selectedModuleId = $('#move_module_item_module_select').val();
 
-
         if (beforeOrAfterVal === 'before') {
           $('#context_module_item_' + relativeToId).before($currentItem);
         }
@@ -360,23 +360,24 @@ import 'compiled/jquery.rails_flash_notifications'
 
         modules.hideMoveModuleItem();
         modules.updateModuleItemPositions(null, {item: $currentItem});
-
-
       },
-      submitMoveModule: function () {
-        var beforeOrAfterVal = $('[name="move_location"]:checked').val();
-        var $currentModule = $('#move_context_module_form').data('current_module');
-        var relativeToId = $('#move_context_module_select').val();
+      submitMoveModule (movedItemsIDList, { action, relativeID }) {
+        const currentModule = $('#move_context_module_form').data('current_module');
 
-        if (beforeOrAfterVal === 'before') {
-          $('#context_module_' + relativeToId).before($currentModule);
+        const $relativeContextModule = $(`#context_module_${relativeID}`)
+        if (action === 'before') {
+          $relativeContextModule.before(htmlEscape(currentModule));
+        } else if (action === 'after') {
+          $relativeContextModule.after(htmlEscape(currentModule));
+        } else if (action === 'first') {
+          $relativeContextModule.parent().prepend(htmlEscape(currentModule));
+        } else if (action === 'last') {
+          $relativeContextModule.parent().append(htmlEscape(currentModule));
         }
-        if (beforeOrAfterVal === 'after') {
-          $('#context_module_' + relativeToId).after($currentModule);
-        }
-        modules.hideMoveModule();
-        modules.updateModulePositions();
 
+        movedItemsIDList.forEach((module) => {
+          $(`#context_module_${module.context_module.id}`).triggerHandler('update', module);
+        });
       },
 
       editModule: function($module) {
@@ -1135,7 +1136,6 @@ import 'compiled/jquery.rails_flash_notifications'
       })
     });
 
-
     $(".delete_module_link").live('click', function(event) {
       event.preventDefault();
       $(this).parents(".context_module").confirmDelete({
@@ -1316,8 +1316,34 @@ import 'compiled/jquery.rails_flash_notifications'
 
     $('.move_module_link').on('click keyclick', function (event) {
       event.preventDefault();
-      var $cogLink = $(this).closest('.ig-header-admin').children('.al-trigger');
-      modules.showMoveModule($(this).parents('.context_module'), $cogLink);
+      const url = $(".reorder_modules_url").attr('href');
+      const $cogLink = $(this).closest('.ig-header-admin').children('.al-trigger');
+      const currentModule = $(this).parents('.context_module')
+
+      const moduleSelectOptions = []
+      $("#context_modules .context_module").each(function() {
+        const id = $(this).attr('id').substring('context_module_'.length);
+        const name = $(this).find('.header > .collapse_module_link > .name').text();
+        moduleSelectOptions.push({ attributes: { id, name } });
+      });
+
+      const model = {
+        attributes: {
+          id:  currentModule.attr('id').substring('context_module_'.length),
+          name: currentModule.find('.header > .collapse_module_link > .name').text()
+        },
+        collection: {
+          models: moduleSelectOptions
+        }
+      }
+
+      const $form = $('#move_context_module_form');
+      $form.data('current_module', $(this).parents('.context_module'));
+
+      const moveDialog = new NewMoveDialogView({ movePanelParent: document.getElementById("not_right_side"), model,
+        modalTitle: I18n.t("Move Modules Group"), modules: true, saveURL: url, onSuccessfulMove: modules.submitMoveModule, closeTarget: $cogLink,
+        nested: false});
+        moveDialog.renderOpenMoveDialog();
     });
 
     $('#move_context_module_form').on('submit', function (event) {

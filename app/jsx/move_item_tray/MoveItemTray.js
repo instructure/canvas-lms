@@ -84,11 +84,13 @@ export default class MoveItemTray extends React.Component {
     {
       case 'first':
         vals = [this.props.currentItem.id, ...vals]
-        this.props.onMoveTraySubmit(vals)
+        this.props.onMoveTraySubmit({movedItems: vals, action: 'first',
+          currentID: this.props.currentItem.id, relativeID: vals[1]})
         break
       case 'last':
         vals.push(this.props.currentItem.id);
-        this.props.onMoveTraySubmit(vals)
+        this.props.onMoveTraySubmit({movedItems: vals, action: 'last',
+          currentID: this.props.currentItem.id, relativeID: vals[vals.length - 2]})
         break
       default:
         break
@@ -103,11 +105,13 @@ export default class MoveItemTray extends React.Component {
     {
       case 'after':
         vals.splice(index + 1, 0, this.props.currentItem.id);
-        this.props.onMoveTraySubmit(vals)
+        this.props.onMoveTraySubmit({ movedItems: vals, action: this.state.currentAction,
+          currentID: this.props.currentItem.id, relativeID:  e.target.value })
         break
       case 'before':
         vals.splice(index, 0, this.props.currentItem.id);
-        this.props.onMoveTraySubmit(vals)
+        this.props.onMoveTraySubmit({ movedItems: vals, action: this.state.currentAction,
+          currentID: this.props.currentItem.id, relativeID:  e.target.value })
         break
       default:
         break

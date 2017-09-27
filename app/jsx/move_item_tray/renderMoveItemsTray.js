@@ -34,7 +34,7 @@ export function renderMoveItemsTray(options) {
         closeFunction()
       }}
       onMoveTraySubmit={moveTraySubmit}
-      moveSelectionList={model.collection.models.filter(item => item.id !== model.attributes.id)}
+      moveSelectionList={model.collection.models.filter(item => item.attributes.id !== model.attributes.id)}
       title={trayTitle}
       initialOpenState
     />, movePanelRoot);

@@ -31,6 +31,10 @@ export default class NewMoveDialogView {
     this.onSuccessfulMove = options.onSuccessfulMove;
     this.movePanelParent = options.movePanelParent;
 
+    if(options.modules) {
+      this.modules = options.modules
+    }
+
     if(options.nested) {
       this.movePanelParent = options.movePanelParent;
       this.childKey = options.childKey;
@@ -49,6 +53,7 @@ export default class NewMoveDialogView {
       movePanelParent.appendChild(movePanelElement);
       movePanelRoot = movePanelElement
     }
+
     if(this.nested) {
       const parentGroups = this.parentCollection.models.map((item) => {
         return {groupId: item.id, name: item.attributes.name || item.attributes.title,
@@ -56,13 +61,16 @@ export default class NewMoveDialogView {
       });
       renderNestedMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemNestedTray, closeFunction:
         this.moveTrayClose, trayTitle: this.modalTitle, parentGroups, parentTitleLabel: this.parentTitleLabel, childKey: this.childKey } );
+    } else if(this.modules) {
+      renderMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveModuleGroupsTray,
+        closeFunction: this.moveTrayClose, trayTitle: this.modalTitle });
     } else {
       renderMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemTray,
         closeFunction: this.moveTrayClose, trayTitle: this.modalTitle });
     }
   }
 
-  onMoveItemTray = (movedItems) => {
+  onMoveItemTray = ({ movedItems }) => {
     // this.saveURL can apparently be a function
     axios.post(this.saveURL, {
       order: movedItems.join(',')}
@@ -80,11 +88,20 @@ export default class NewMoveDialogView {
     }).catch(showFlashError(I18n.t('Failed to Move Items')))
   }
 
+  onMoveModuleGroupsTray = ({ movedItems, action, currentID, relativeID }) => {
+    // this.saveURL can apparently be a function
+    axios.post(this.saveURL, {
+      order: movedItems.join(',')}
+    ).then((response) => {
+      this.onSuccessfulMove(response.data, { action, currentID, relativeID });
+    }).catch(showFlashError(I18n.t('Failed to Move Items')))
+  }
+
   setCloseFocus(closeButton) {
-    this.focusOnCloseItem = closeButton;
+    this.closeTarget = closeButton;
   }
 
   moveTrayClose = () => {
-    this.focusOnCloseItem.focus()
+    this.closeTarget.focus()
   }
 }

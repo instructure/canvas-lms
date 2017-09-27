@@ -155,7 +155,7 @@ test('calls onMoveTraySubmit correctly for placing before', () => {
       value : "12"
     }
   })
-  ok(spy.calledWith(["10", "12", "30", "55"]))
+  deepEqual(spy.args[0][0].movedItems, ["10", "12", "30", "55"])
 })
 
 test('calls onMoveTraySubmit correctly for placing after', () => {
@@ -178,7 +178,7 @@ test('calls onMoveTraySubmit correctly for placing after', () => {
       value : "12"
     }
   })
-  ok(spy.calledWith(["12", "10", "30", "55"]))
+  deepEqual(spy.args[0][0].movedItems, ["12", "10", "30", "55"])
 })
 
 test('correctly for calls item with first spot', () => {
@@ -200,7 +200,7 @@ test('correctly for calls item with first spot', () => {
       value : 'first'
     }
   })
-  ok(spy.calledWith(["123", "12", "30", "55"]))
+  deepEqual(spy.args[0][0].movedItems, ["123", "12", "30", "55"])
 })
 
 test('correctly for calls item in last spot', () => {
@@ -222,5 +222,5 @@ test('correctly for calls item in last spot', () => {
       value : 'last'
     }
   })
-  ok(spy.calledWith(["12", "30", "55", "10"]))
+  deepEqual(spy.args[0][0].movedItems, ["12", "30", "55", "10"])
 })
