@@ -1766,11 +1766,16 @@ import 'compiled/jquery.rails_flash_notifications'
         var activities = header.nextUntil('.context_module_sub_header').detach();
         var activity_container = $('<div ></div>').append(activities);
 
-        header.find('.context_module_sub_header_expander').click(function (event) {
-
-        });
         $(this).after(activity_container);
-
+        header.find('.context_module_sub_header_expander').click(function (event) {
+          var button = $(this);
+          activity_container.slideToggle();
+          if (button.hasClass('icon-arrow-open-right')) {
+            button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+          } else if (button.hasClass('icon-arrow-open-down')) {
+            button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
+          };
+        });
       });
     }
 
