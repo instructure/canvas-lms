@@ -83,7 +83,7 @@ module Api::V1::QuizSubmission
   # @return [Hash]
   #   A JSON-API complying construct representing the quiz submissions, and
   #   any associations requested.
-  def quiz_submissions_json(quiz_submissions, quiz, user, session, context = nil, includes = [])
+  def quiz_submissions_json(quiz_submissions, quiz, user, session, context = nil, includes = [], params)
     hash = {}
     hash[:quiz_submissions] = [ quiz_submissions ].flatten.map do |qs|
       quiz_submission_json(qs, quiz, user, session, context)
@@ -94,7 +94,7 @@ module Api::V1::QuizSubmission
       with_submissions = quiz_submissions.select { |qs| !!qs.submission }
 
       hash[:submissions] = with_submissions.map do |qs|
-        submission_json(qs.submission, quiz.assignment, user, session, context, params)
+        submission_json(qs.submission, quiz.assignment, user, session, context, includes, params)
       end
     end
 

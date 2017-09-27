@@ -440,12 +440,15 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   def serialize_and_render(quiz_submissions)
     quiz_submissions = [ quiz_submissions ] unless quiz_submissions.is_a? Array
 
-    render :json => quiz_submissions_json(quiz_submissions,
+    render :json => quiz_submissions_json(
+      quiz_submissions,
       @quiz,
       @current_user,
       session,
       @context,
-      Array(params[:include]))
+      Array(params[:include]),
+      params
+    )
   end
 
   def validate_ldb_status!(quiz = @quiz)
