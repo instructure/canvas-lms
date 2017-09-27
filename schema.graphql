@@ -1,6 +1,7 @@
-type Assignment implements Node {
+type Assignment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
+  createdAt: Time
   description: String
 
   # when this assignment is due
@@ -15,6 +16,7 @@ type Assignment implements Node {
 
   # determines the order this assignment is displayed in in its assignment group
   position: Int
+  updatedAt: Time
 }
 
 # The connection type for Assignment.
@@ -40,7 +42,7 @@ input AssignmentInput {
   name: String!
 }
 
-type Course implements Node {
+type Course implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentsConnection(
@@ -59,6 +61,7 @@ type Course implements Node {
 
   # course short name
   courseCode: String
+  createdAt: Time
   gradingPeriodsConnection(
     # Returns the elements in the list that come after the specified global ID.
     after: String
@@ -110,6 +113,7 @@ type Course implements Node {
     # Only return submissions for the given students.
     studentIds: [ID!]!
   ): SubmissionConnection
+  updatedAt: Time
   usersConnection(
     # Returns the elements in the list that come after the specified global ID.
     after: String
@@ -142,10 +146,11 @@ enum CourseWorkflowState {
   deleted
 }
 
-type Enrollment implements Node {
+type Enrollment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
   course: Course
+  createdAt: Time
   grades(
     # The grading period to return grades for. If not specified, will use the
     # current grading period (or the course grade for courses that don't use
@@ -157,6 +162,7 @@ type Enrollment implements Node {
   section: Section
   state: EnrollmentWorkflowState!
   type: EnrollmentType!
+  updatedAt: Time
   user: User
 }
 
@@ -190,16 +196,18 @@ type Grades {
   finalScore: Float
 }
 
-type GradingPeriod implements Node {
+type GradingPeriod implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
 
   #     assignments can only be graded before the grading period closes
   closeDate: Time
+  createdAt: Time
   endDate: Time
   id: ID!
   startDate: Time
   title: String
+  updatedAt: Time
 
   #     used to calculate how much the assignments in this grading period
   #     contribute to the overall grade
@@ -288,11 +296,13 @@ type Query {
   ): Node
 }
 
-type Section implements Node {
+type Section implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
+  createdAt: Time
   id: ID!
   name: String!
+  updatedAt: Time
 }
 
 # The connection type for Section.
@@ -320,8 +330,9 @@ type StudentSummaryAnalytics {
   tardinessBreakdown: TardinessBreakdown
 }
 
-type Submission implements Node {
+type Submission implements Node, Timestamped {
   assignment: Assignment
+  createdAt: Time
 
   # excused assignments are ignored when calculating grades
   excused: Boolean
@@ -330,6 +341,7 @@ type Submission implements Node {
   id: ID!
   score: Float
   submittedAt: Time
+  updatedAt: Time
   user: User
 }
 
@@ -372,12 +384,19 @@ type TardinessBreakdown {
 # an ISO8601 formatted time string
 scalar Time
 
+# Contains timestamp metadata
+interface Timestamped {
+  createdAt: Time
+  updatedAt: Time
+}
+
 scalar URL
 
-type User implements Node {
+type User implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
   avatarUrl: URL
+  createdAt: Time
   enrollments(
     # only return enrollments for this course
     courseId: ID!
@@ -394,6 +413,7 @@ type User implements Node {
     # returns summary analytics for this course
     courseId: ID!
   ): StudentSummaryAnalytics
+  updatedAt: Time
 }
 
 # The connection type for User.
