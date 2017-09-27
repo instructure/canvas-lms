@@ -1,44 +1,47 @@
-const formatMessage = require('../format-message')
+const formatMessage = require("../format-message")
 
-const VALID_SCOPES = ['row', 'col', 'rowgroup', 'colgroup']
+const VALID_SCOPES = ["row", "col", "rowgroup", "colgroup"]
 
 module.exports = {
-  test: (elem) => {
-    if (elem.tagName !== 'TH') {
+  test: elem => {
+    if (elem.tagName !== "TH") {
       return true
     }
-    return VALID_SCOPES.indexOf(elem.getAttribute('scope')) !== -1
+    return VALID_SCOPES.indexOf(elem.getAttribute("scope")) !== -1
   },
 
-  data: (elem) => {
+  data: elem => {
     return {
-      scope: elem.getAttribute('scope') || 'none'
+      scope: elem.getAttribute("scope") || "none"
     }
   },
 
-  form: () => [{
-    label: formatMessage('Set header scope'),
-    dataKey: 'scope',
-    options: [
-      ['none', formatMessage('None')],
-      ['row', formatMessage('Row')],
-      ['col', formatMessage('Column')],
-      ['rowgroup', formatMessage('Row Group')],
-      ['colgroup', formatMessage('Column Group')],
-    ]
-  }],
+  form: () => [
+    {
+      label: formatMessage("Set header scope"),
+      dataKey: "scope",
+      options: [
+        ["none", formatMessage("None")],
+        ["row", formatMessage("Row")],
+        ["col", formatMessage("Column")],
+        ["rowgroup", formatMessage("Row Group")],
+        ["colgroup", formatMessage("Column Group")]
+      ]
+    }
+  ],
 
   update: (elem, data) => {
-    if (data.header === 'none') {
-      elem.removeAttribute('scope')
+    if (data.header === "none") {
+      elem.removeAttribute("scope")
       return
     }
-    elem.setAttribute('scope', data.scope)
+    elem.setAttribute("scope", data.scope)
   },
 
-  message: () => formatMessage('Tables headers should have scope specified'),
+  message: () => formatMessage("Tables headers should have scope specified"),
 
-  why: () => formatMessage(`Paragraph about why table header scope is important.`),
+  why: () =>
+    formatMessage(`Paragraph about why table header scope is important.`),
 
-  link: 'https://www.w3.org/TR/WCAG20-TECHS/G95.html'
+  link: "https://www.w3.org/TR/WCAG20-TECHS/G95.html"
 }

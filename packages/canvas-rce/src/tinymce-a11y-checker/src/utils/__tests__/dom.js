@@ -1,6 +1,6 @@
-const dom = require('../dom')
+const dom = require("../dom")
 
-test('walk calls function with each child element depth first', () => {
+test("walk calls function with each child element depth first", () => {
   document.body.innerHTML = `
     <div>
       <h1>Test Heading</h1>
@@ -11,18 +11,18 @@ test('walk calls function with each child element depth first', () => {
   const nodeNames = []
   const fn = node => nodeNames.push(node.nodeName)
   dom.walk(document.body, fn)
-  expect(nodeNames).toEqual(['DIV', 'H1', 'P', 'A', 'H2'])
+  expect(nodeNames).toEqual(["DIV", "H1", "P", "A", "H2"])
 })
 
-test('select creats a range for the doc and selects the node', () => {
+test("select creats a range for the doc and selects the node", () => {
   const range = { selectNode: jest.fn() }
   const doc = { createRange: () => range }
-  const node = 'node'
+  const node = "node"
   dom.select(doc, node)
   expect(range.selectNode).toBeCalledWith(node)
 })
 
-test('select does nothing if node is underfined', () => {
+test("select does nothing if node is underfined", () => {
   const range = { selectNode: jest.fn() }
   const doc = { createRange: jest.fn().mockReturnValue(range) }
   const node = undefined

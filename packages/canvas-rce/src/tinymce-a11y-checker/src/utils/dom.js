@@ -1,7 +1,7 @@
 const ELEMENT_NODE = 1
 const WALK_BATCH_SIZE = 25
 
-function walk (node, fn, done) {
+function walk(node, fn, done) {
   const stack = [{ node, index: 0 }]
   const processBatch = () => {
     let batchRemaining = WALK_BATCH_SIZE
@@ -24,7 +24,7 @@ function walk (node, fn, done) {
   processBatch()
 }
 
-function select (elem) {
+function select(elem) {
   if (elem == null) {
     return
   }
@@ -43,7 +43,7 @@ function select (elem) {
   elem.scrollIntoView()
 }
 
-function prepend (parent, child) {
+function prepend(parent, child) {
   if (parent.childNodes.length > 0) {
     parent.insertBefore(child, parent.childNodes[0])
   } else {
@@ -51,7 +51,7 @@ function prepend (parent, child) {
   }
 }
 
-function changeTag (elem, tagName) {
+function changeTag(elem, tagName) {
   const newElem = elem.ownerDocument.createElement(tagName)
   while (elem.firstChild) {
     newElem.appendChild(elem.firstChild)
