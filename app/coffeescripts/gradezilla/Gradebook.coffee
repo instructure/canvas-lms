@@ -2134,8 +2134,19 @@ define [
 
       assignment
 
+    loadTrayStudent: (direction) =>
+      location = @gridSupport.state.getActiveLocation()
+      rowDelta = if direction == 'next' then 1 else -1
+      newRowIdx = location.row + rowDelta
+      student = @listRows()[newRowIdx]
+
+      return unless student
+
+      @gridSupport.state.setActiveLocation('body', { row: newRowIdx, cell: location.cell })
+      @setSubmissionTrayState(true, student.id)
+      @updateRowAndRenderSubmissionTray(student.id)
+
     loadTrayAssignment: (direction) =>
-      @unloadSubmissionComments()
       studentId = @getSubmissionTrayState().studentId
       assignment = @navigateAssignment(direction)
 
@@ -2159,10 +2170,13 @@ define [
       currentColumn = columns[cell]
 
       assignmentColumns = @assignmentColumns()
-      currentIndex = assignmentColumns.indexOf(currentColumn)
+      currentAssignmentIdx = assignmentColumns.indexOf(currentColumn)
 
-      isFirstAssignment = currentIndex == 0
-      isLastAssignment = currentIndex == assignmentColumns.length - 1
+      isFirstAssignment = currentAssignmentIdx == 0
+      isLastAssignment = currentAssignmentIdx == assignmentColumns.length - 1
+
+      isFirstStudent = activeLocation.row == 0
+      isLastStudent = activeLocation.row == (@listRows().length - 1)
 
       props =
         assignment: ConvertCase.camelize(assignment)
@@ -2170,6 +2184,8 @@ define [
         courseId: @options.context_id
         isFirstAssignment: isFirstAssignment
         isLastAssignment: isLastAssignment
+        isFirstStudent: isFirstStudent
+        isLastStudent: isLastStudent
         isOpen: open
         key: "grade_details_tray"
         latePolicy: @courseContent.latePolicy
@@ -2178,12 +2194,15 @@ define [
         onRequestClose: @closeSubmissionTray
         selectNextAssignment: => @loadTrayAssignment('next')
         selectPreviousAssignment: => @loadTrayAssignment('previous')
+        selectNextStudent: => @loadTrayStudent('next')
+        selectPreviousStudent: => @loadTrayStudent('previous')
         showContentComingSoon: !@options.new_gradebook_development_enabled
         speedGraderEnabled: @options.speed_grader_enabled
         student:
-          id: student.id,
-          name: student.name,
+          id: student.id
+          name: student.name
           avatarUrl: htmlDecode(student.avatar_url)
+          gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
         submission: ConvertCase.camelize(submission)
         submissionUpdating: @contentLoadStates.submissionUpdating
         updateSubmission: @updateSubmissionAndRenderSubmissionTray
@@ -2208,6 +2227,7 @@ define [
         .catch(FlashAlert.showFlashError I18n.t 'There was an error fetching Submission Comments')
 
     updateRowAndRenderSubmissionTray: (studentId) =>
+      @unloadSubmissionComments()
       @updateRowCellsForStudentIds([studentId])
       @renderSubmissionTray(@student(studentId))
 
@@ -2220,7 +2240,6 @@ define [
       @updateRowAndRenderSubmissionTray(studentId)
 
     closeSubmissionTray: =>
-      @unloadSubmissionComments()
       @setSubmissionTrayState(false)
       rowIndex = @grid.getActiveCell().row
       studentId = @rows[rowIndex].id

@@ -132,3 +132,13 @@ test('right button is not disabled', function () {
   this.wrapper = mountComponent({ displayRightArrow: true, disabled: true });
   strictEqual(this.wrapper.find('Button').prop('disabled'), true );
 });
+
+test('adds a VO description for the left arrow button', function () {
+  this.wrapper = mountComponent({ displayLeftArrow: true, leftArrowDescription: 'Previous record' });
+  strictEqual(this.wrapper.find('IconArrowOpenLeftLine').prop('title'), 'Previous record');
+});
+
+test('adds a VO description for the right arrow button', function () {
+  this.wrapper = mountComponent({ displayRightArrow: true, rightArrowDescription: 'Next record' });
+  strictEqual(this.wrapper.find('IconArrowOpenRightLine').prop('title'), 'Next record');
+});

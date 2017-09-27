@@ -53,7 +53,7 @@ export default class Carousel extends Component {
         onClick={this.handleLeftArrowClick}
         size="small"
       >
-        <ArrowOpenLeft />
+        <ArrowOpenLeft title={this.props.leftArrowDescription} />
       </Button>
     );
 
@@ -65,7 +65,7 @@ export default class Carousel extends Component {
         onClick={this.handleRightArrowClick}
         size="small"
       >
-        <ArrowOpenRight />
+        <ArrowOpenRight title={this.props.rightArrowDescription} />
       </Button>
     );
 
@@ -88,7 +88,8 @@ export default class Carousel extends Component {
 }
 
 Carousel.defaultProps = {
-  id: null
+  id: null,
+  showBorderBottom: true
 };
 
 Carousel.propTypes = {
@@ -98,5 +99,7 @@ Carousel.propTypes = {
   displayLeftArrow: bool.isRequired,
   displayRightArrow: bool.isRequired,
   onLeftArrowClick: func.isRequired,
-  onRightArrowClick: func.isRequired
+  onRightArrowClick: func.isRequired,
+  leftArrowDescription: string.isRequired,
+  rightArrowDescription: string.isRequired
 };

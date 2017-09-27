@@ -160,19 +160,32 @@ export default function SubmissionTray (props) {
               <div>
                 {avatarUrl && renderAvatar(name, avatarUrl)}
 
-                <div id="SubmissionTray__StudentName">
-                  {name}
-                </div>
+                <Carousel
+                  id="student-carousel"
+                  disabled={props.processing || !props.submissionCommentsLoaded}
+                  displayLeftArrow={!props.isFirstStudent}
+                  displayRightArrow={!props.isLastStudent}
+                  leftArrowDescription={I18n.t('Previous student')}
+                  onLeftArrowClick={props.selectPreviousStudent}
+                  onRightArrowClick={props.selectNextStudent}
+                  rightArrowDescription={I18n.t('Next student')}
+                >
+                  <Link href={props.student.gradesUrl}>
+                    {name}
+                  </Link>
+                </Carousel>
 
                 <Container as="div" margin="small 0" className="hr" />
 
                 <Carousel
                   id="assignment-carousel"
-                  onLeftArrowClick={props.selectPreviousAssignment}
-                  onRightArrowClick={props.selectNextAssignment}
+                  disabled={props.processing || !props.submissionCommentsLoaded}
                   displayLeftArrow={!props.isFirstAssignment}
                   displayRightArrow={!props.isLastAssignment}
-                  disabled={props.processing || !props.submissionCommentsLoaded}
+                  leftArrowDescription={I18n.t('Previous assignment')}
+                  onLeftArrowClick={props.selectPreviousAssignment}
+                  onRightArrowClick={props.selectNextAssignment}
+                  rightArrowDescription={I18n.t('Next assignment')}
                 >
                   <Link href={props.assignment.htmlUrl}>
                     {props.assignment.name}
@@ -238,7 +251,8 @@ SubmissionTray.propTypes = {
   student: shape({
     id: string.isRequired,
     name: string.isRequired,
-    avatarUrl: string
+    avatarUrl: string,
+    gradesUrl: string.isRequired
   }).isRequired,
   submission: shape({
     excused: bool.isRequired,
@@ -253,6 +267,10 @@ SubmissionTray.propTypes = {
   isLastAssignment: bool.isRequired,
   selectNextAssignment: func.isRequired,
   selectPreviousAssignment: func.isRequired,
+  isFirstStudent: bool.isRequired,
+  isLastStudent: bool.isRequired,
+  selectNextStudent: func.isRequired,
+  selectPreviousStudent: func.isRequired,
   courseId: string.isRequired,
   speedGraderEnabled: bool.isRequired,
   submissionUpdating: bool.isRequired,

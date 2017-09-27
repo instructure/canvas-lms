@@ -6215,7 +6215,14 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         name: 'Adam Jones',
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
-        }
+        },
+        enrollments: [
+          {
+            grades: {
+              html_url: 'http://gradesUrl/'
+            }
+          }
+        ]
       }
     };
     this.gradebook.gridSupport = {
@@ -6268,6 +6275,18 @@ test('shows a submission tray when the related submission has not loaded for the
   clock.restore();
 });
 
+test('SubmissionTray props have student with valid gradesUrl', function () {
+  sinon.spy(React, 'createElement');
+  sinon.stub(this.gradebook, 'isInNoGradingPeriod').returns(true);
+
+  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
+  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
+
+  strictEqual(React.createElement.getCall(0).args[1].student.gradesUrl, 'http://gradesUrl/#tab-assignments');
+
+  React.createElement.restore();
+});
+
 test('calls loadSubmissionComments', function () {
   const loadSubmissionCommentsStub = this.stub(this.gradebook, 'loadSubmissionComments');
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
@@ -6290,12 +6309,303 @@ test('does not call loadSubmissionComments if loaded', function () {
   strictEqual(loadSubmissionCommentsStub.callCount, 0);
 });
 
+QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hooks) {
+  let gradebook;
+  let mountPointId;
+  let clock;
+
+  hooks.beforeEach(() => {
+    mountPointId = 'StudentTray__Container';
+    $fixtures.innerHTML = `<div id="${mountPointId}"></div><div id="application"></div>`;
+    gradebook = createGradebook();
+    gradebook.students = {
+      1100: {
+        id: '1100',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        },
+        enrollments: [
+          {
+            grades: {
+              html_url: 'http://gradesUrl/'
+            }
+          }
+        ]
+      },
+      1101: {
+        id: '1101',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        },
+        enrollments: [
+          {
+            grades: {
+              html_url: 'http://gradesUrl/'
+            }
+          }
+        ]
+      },
+      1102: {
+        id: '1100',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        },
+        enrollments: [
+          {
+            grades: {
+              html_url: 'http://gradesUrl/'
+            }
+          }
+        ]
+      }
+    };
+    sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]));
+    gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit () {},
+        focus () {}
+      },
+      state: {
+        getActiveLocation: () => ({ region: 'body', cell: 0, row: 0 })
+      },
+      grid: {
+        getColumns: () => []
+      }
+    };
+    clock = sinon.useFakeTimers();
+  });
+
+  hooks.afterEach(() => {
+    if (clock) {
+      clock.restore();
+    }
+    const node = document.getElementById(mountPointId);
+    ReactDOM.unmountComponentAtNode(node);
+    $fixtures.innerHTML = '';
+  });
+
+  test('does not show the previous student arrow for the first student', function () {
+    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    clock.tick(500); // wait for Tray to transition open
+
+    strictEqual(document.querySelectorAll('#student-carousel .left-arrow-button-container button').length, 0);
+  });
+
+  test('shows the next student arrow for the first student', function () {
+    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    clock.tick(500); // wait for Tray to transition open
+
+    strictEqual(document.querySelectorAll('#student-carousel .right-arrow-button-container button').length, 1);
+  });
+
+  test('does not show the next student arrow for the last student', function () {
+    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    clock.tick(500); // wait for Tray to transition open
+
+    strictEqual(document.querySelectorAll('#student-carousel .right-arrow-button-container button').length, 0);
+  });
+
+  test('shows the previous student arrow for the last student', function () {
+    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    clock.tick(500); // wait for Tray to transition open
+
+    strictEqual(document.querySelectorAll('#student-carousel .left-arrow-button-container button').length, 1);
+  });
+
+  test('clicking the next student arrow calls loadTrayStudent with "next"', function () {
+    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
+    sinon.stub(gradebook, 'loadTrayStudent');
+    sinon.stub(gradebook, 'getCommentsUpdating').returns(false);
+    sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true);
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    clock.tick(500); // wait for Tray to transition open
+
+    const nextStudentButton = document.querySelector('#student-carousel .right-arrow-button-container button');
+    nextStudentButton.click();
+    strictEqual(gradebook.loadTrayStudent.callCount, 1);
+    deepEqual(gradebook.loadTrayStudent.getCall(0).args, ['next'])
+  });
+
+  test('clicking the previous student arrow calls loadTrayStudent with "previous"', function () {
+    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
+    sinon.stub(gradebook, 'loadTrayStudent');
+    sinon.stub(gradebook, 'getCommentsUpdating').returns(false);
+    sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true);
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    gradebook.renderSubmissionTray(gradebook.student('1101'));
+    clock.tick(500); // wait for Tray to transition open
+
+    const nextStudentButton = document.querySelector('#student-carousel .left-arrow-button-container button');
+    nextStudentButton.click();
+    strictEqual(gradebook.loadTrayStudent.callCount, 1);
+    deepEqual(gradebook.loadTrayStudent.getCall(0).args, ['previous'])
+  });
+});
+
+QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
+  let gradebook;
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook();
+    gradebook.gridSupport = {
+      state: {
+        getActiveLocation: () => ({ region: 'body', cell: 0, row: 1 }),
+        setActiveLocation: sinon.stub()
+      },
+      helper: {
+        commitCurrentEdit () {}
+      }
+    };
+    gradebook.students = {
+      1100: {
+        id: '1100',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        }
+      },
+      1101: {
+        id: '1101',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        }
+      },
+      1102: {
+        id: '1102',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        }
+      }
+    };
+    sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]));
+    sinon.stub(gradebook, 'updateRowAndRenderSubmissionTray');
+    sinon.stub(gradebook, 'unloadSubmissionComments');
+  });
+
+  test('when called with "previous", changes the highlighted cell to the previous row', function () {
+    gradebook.loadTrayStudent('previous');
+
+    const expectation = ['body', { cell: 0, row: 0}];
+    deepEqual(gradebook.gridSupport.state.setActiveLocation.firstCall.args, expectation);
+  });
+
+  test('when called with "previous", updates the submission tray state', function () {
+    gradebook.loadTrayStudent('previous');
+
+    const submissionTrayState = gradebook.getSubmissionTrayState();
+    const fieldsToConsider = ['open', 'studentId'];
+
+    const actual = {}
+    fieldsToConsider.forEach((field) => { actual[field] = submissionTrayState[field] });
+
+    const expectation = { open: true, studentId: '1100' };
+    deepEqual(actual, expectation);
+  });
+
+  test('when called with "previous", updates and renders the submission tray with the new student', function () {
+    gradebook.loadTrayStudent('previous');
+
+    deepEqual(gradebook.updateRowAndRenderSubmissionTray.firstCall.args, ['1100']);
+  });
+
+  test('when called with "previous" while on the first row, does not change the highlighted cell', function () {
+    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    gradebook.loadTrayStudent('previous');
+
+    strictEqual(gradebook.gridSupport.state.setActiveLocation.callCount, 0);
+  });
+
+  test('when called with "previous" while on the first row, does not update the submission tray state', function () {
+    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    sinon.stub(gradebook, 'setSubmissionTrayState');
+    gradebook.loadTrayStudent('previous');
+
+    strictEqual(gradebook.setSubmissionTrayState.callCount, 0);
+  });
+
+  test('when called with "previous" while on the first row, does not update and render the submission tray', function () {
+    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    gradebook.loadTrayStudent('previous');
+
+    strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0);
+  });
+
+  test('when called with "next", changes the highlighted cell to the next row', function () {
+    gradebook.loadTrayStudent('next');
+
+    const expectation = ['body', { cell: 0, row: 2}];
+    deepEqual(gradebook.gridSupport.state.setActiveLocation.firstCall.args, expectation);
+  });
+
+  test('when called with "next", updates the submission tray state', function () {
+    gradebook.loadTrayStudent('next');
+
+    const submissionTrayState = gradebook.getSubmissionTrayState();
+    const fieldsToConsider = ['open', 'studentId'];
+
+    const actual = {};
+    fieldsToConsider.forEach((field) => { actual[field] = submissionTrayState[field] });
+
+    const expectation = { open: true, studentId: '1102' };
+    deepEqual(actual, expectation);
+  });
+
+  test('when called with "next", updates and renders the submission tray with the new student', function () {
+    gradebook.loadTrayStudent('next');
+
+    deepEqual(gradebook.updateRowAndRenderSubmissionTray.firstCall.args, ['1102']);
+  });
+
+  test('when called with "next" while on the last row, does not change the highlighted cell', function () {
+    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    gradebook.loadTrayStudent('next');
+
+    strictEqual(gradebook.gridSupport.state.setActiveLocation.callCount, 0);
+  });
+
+  test('when called with "next" while on the last row, does not update the submission tray state', function () {
+    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    sinon.stub(gradebook, 'setSubmissionTrayState');
+    gradebook.loadTrayStudent('next');
+
+    strictEqual(gradebook.setSubmissionTrayState.callCount, 0);
+  });
+
+  test('when called with "next" while on the last row, does not update and render the submission tray', function () {
+    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    gradebook.loadTrayStudent('next');
+
+    strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0);
+  });
+});
+
 QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {
   setup () {
     this.gradebook = createGradebook();
     this.stub(this.gradebook, 'updateRowCellsForStudentIds');
     this.stub(this.gradebook, 'renderSubmissionTray');
   }
+});
+
+test('unloads comments for the submission', function () {
+  this.stub(this.gradebook, 'unloadSubmissionComments');
+  this.gradebook.updateRowAndRenderSubmissionTray('1');
+
+  strictEqual(this.gradebook.unloadSubmissionComments.callCount, 1);
 });
 
 test('updates the row cell for the given student id', function () {
@@ -6384,12 +6694,6 @@ test('puts the active grid cell back into "editing" mode', function () {
   this.stub(this.gradebook.gridSupport.helper, 'beginEdit');
   this.gradebook.closeSubmissionTray();
   strictEqual(this.gradebook.gridSupport.helper.beginEdit.callCount, 1);
-});
-
-test('calls unloadSubmissionComments', function () {
-  const unloadSubmissionCommentStub = this.stub(this.gradebook, 'unloadSubmissionComments');
-  this.gradebook.closeSubmissionTray();
-  strictEqual(unloadSubmissionCommentStub.callCount, 1);
 });
 
 QUnit.module('Gradebook#setSubmissionTrayState', {
@@ -6666,14 +6970,6 @@ test('on failure a flash error is triggered', function () {
   this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
   this.promise.catchFn(new Error('A failure'));
   strictEqual($.flashError.callCount, 1);
-});
-
-test('loadTrayAssignment calls unloadSubmissionComment', function () {
-  const unloadSubmissionCommentsStub = this.stub(this.gradebook, 'unloadSubmissionComments')
-  this.stub(this.gradebook, 'getSubmissionTrayState').returns({ studentIt: '1' });
-  this.stub(this.gradebook, 'navigateAssignment');
-  this.gradebook.loadTrayAssignment();
-  strictEqual(unloadSubmissionCommentsStub.callCount, 1);
 });
 
 QUnit.module('#getSubmissionComments', {
