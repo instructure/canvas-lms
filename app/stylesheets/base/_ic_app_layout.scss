@@ -250,9 +250,9 @@ body:not(.course-menu-expanded) {
 }
 
 .sm-course-menu.list-view{
-  background-color: #FFFFFF;
-  padding: 0 $ic-sp*2;
+  padding: 0 10px;
   position: relative;
+  border-bottom: $sm-gray-4;
 
   ul{
     li{
@@ -262,6 +262,10 @@ body:not(.course-menu-expanded) {
         border-radius: 0px;
         padding: 20px 15px;
         // margin-right: 20px;
+
+        &:hover{
+          background-color: transparent;
+        }
 
        &.active{
 
@@ -277,10 +281,40 @@ body:not(.course-menu-expanded) {
 }
 
 .sm-course-menu.list-view > nav > ul > li > a:hover,
-.sm-course-menu.list-view > nav > ul > li > a:focus{
-  background-color: #FFFFFF;
+.sm-course-menu.list-view > nav > ul > li > a:focus {
   padding-bottom: 16px;
   border-bottom: 4px solid $sm-gray-4;
+}
+
+#left-side > div.sm-teacher-tools-container > button > div.caret{
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+#sm-teacher-tools{
+  min-width: 180px;
+
+  & > li{
+    display: block;
+    float: none;
+
+  }
+}
+
+#sm-teacher-tools > li > a {
+
+  &:hover{
+    background-color: $sm-gray-4;
+    color: var(--ic-brand-primary);
+  }
+
+  &.active{
+     color: #FFFFFF;
+     font-weight: 500;
+     background-color: var(--ic-brand-primary);
+     padding-bottom: 16px;
+     border-bottom: none;
+   }
 }
 
 .sm-course-menu-clear{
@@ -288,9 +322,43 @@ body:not(.course-menu-expanded) {
 }
 
 .sm-teacher-tools-container{
-  float: right;
-  margin-top: 10px;
+  float: left;
   position: relative;
+}
+
+
+.sm-teacher-tools-container > .sm-left-nav-toggler{
+  border-radius: 0px;
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+  color: var(--ic-brand-primary);
+  padding: 19px 15px 13px 15px;
+  border-bottom: 4px solid transparent;
+
+  &:hover, &:focus{
+    color: var(--ic-brand-primary);
+    border-bottom: 4px solid $sm-gray-4;
+  }
+
+  i{
+    margin-left: 10px;
+  }
+
+  &.active{
+
+     color: var(--ic-brand-primary);
+     font-weight: 500;
+     background-color: transparent;
+     border-bottom: 4px solid var(--ic-brand-tertiary);
+
+     &:hover, &:focus{
+       background-color: transparent;
+       color: var(--ic-brand-primary);
+       border-bottom: 4px solid $sm-gray-4;
+     }
+
+   }
 }
 
 .ic-app-nav-toggle-and-crumbs {

@@ -45,9 +45,7 @@ module SectionTabHelper
         }) do
           concat(content_tag(:ul, id: 'section-tabs') do
             available_section_tabs(@context).map do |tab|
-              p tab["hidden"]
-              p "AAAAAAAAAAAAAAAAAAAA"
-              if !tab["hidden"]
+              if !tab["hidden"] or !tab["hidden_unused"]
                 section_tab_tag(tab, @context, @active_tab)
               end
             end
@@ -57,43 +55,12 @@ module SectionTabHelper
     end
     raw(@section_tabs)
   end
-  #
-  # def hidden_section_tabs
-  #   @hidden_section_tabs ||= begin
-  #     if @context && available_section_tabs(@context).any?
-  #       content_tag(:div, {
-  #           class: "btn-group bootstrap-select"
-  #         }) do
-  #         content_tag(:button, {
-  #           class: "btn dropdown-toggle",
-  #           'data-toggle': "dropdown",
-  #           'data-id': "type-filter"
-  #         })
-  #
-  #         content_tag(:div, {
-  #           class: "dropdown-menu"
-  #           }) do
-  #           concat(content_tag(:ul, {
-  #             class: "dropdown-menu inner"
-  #             }) do
-  #             available_section_tabs(@context).map do |tab|
-  #               if tab["hidden"]
-  #                 hidden_section_tab_tag(tab, @context, @active_tab)
-  #               end
-  #             end
-  #           end)
-  #         end
-  #       end
-  #     end
-  #   end
-  #   raw(@hidden_section_tabs)
-  # end
 
   def hidden_section_tabs
     @hidden_section_tabs ||= begin
       if @context && available_section_tabs(@context).any?
         content_tag(:ul, {
-            class: "dropdown-menu",
+            class: "dropdown-menu dropdown-menu-right",
             id: "sm-teacher-tools",
             }) do
             available_section_tabs(@context).map do |tab|
