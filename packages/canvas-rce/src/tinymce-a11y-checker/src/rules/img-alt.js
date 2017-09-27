@@ -5,26 +5,42 @@ module.exports = {
     if (elem.tagName !== "IMG") {
       return true
     }
-    const alt = elem.attributes.getNamedItem("alt")
-    return alt && !!elem.attributes.getNamedItem("alt").value
+
+    const alt = elem.getAttribute("alt")
+    const isDecorative = elem.hasAttribute("data-decorative")
+    return alt || isDecorative
   },
 
   data: elem => {
-    const alt = elem.attributes.getNamedItem("alt")
+    const alt = elem.getAttribute("alt")
+    const decorative = elem.hasAttribute("data-decorative")
     return {
-      alt: alt ? alt.value : ""
+      alt: alt || "",
+      decorative: !alt && decorative
     }
   },
 
   form: () => [
     {
       label: formatMessage("Add alt text for the image"),
-      dataKey: "alt"
+      dataKey: "alt",
+      disabledIf: data => data.decorative
+    },
+    {
+      label: formatMessage("Decorative Image"),
+      dataKey: "decorative",
+      checkbox: true
     }
   ],
 
   update: (elem, data) => {
-    elem.setAttribute("alt", data.alt)
+    if (data.decorative) {
+      elem.setAttribute("alt", "")
+      elem.setAttribute("data-decorative", "true")
+    } else {
+      elem.setAttribute("alt", data.alt)
+      elem.removeAttribute("data-decorative")
+    }
     return elem
   },
 
