@@ -6,6 +6,7 @@ const Heading = require("instructure-ui/lib/components/Heading").default
 const Button = require("instructure-ui/lib/components/Button").default
 const Link = require("instructure-ui/lib/components/Link").default
 const Alert = require("instructure-ui/lib/components/Alert").default
+const Checkbox = require("instructure-ui/lib/components/Checkbox").default
 const TextInput = require("instructure-ui/lib/components/TextInput").default
 const Select = require("instructure-ui/lib/components/Select").default
 const ContextBox = require("instructure-ui/lib/components/ContextBox").default
@@ -51,7 +52,7 @@ class Checker extends React.Component {
     clearTimeout(this._closeTimout)
   }
 
-  check() {
+  check(done) {
     this.setState(
       {
         open: true,
@@ -59,11 +60,11 @@ class Checker extends React.Component {
         errors: [],
         errorIndex: 0
       },
-      () => this._check()
+      () => this._check(done)
     )
   }
 
-  _check() {
+  _check(done) {
     const node = this.props.getBody()
     const errors = []
     if (node) {
@@ -77,7 +78,10 @@ class Checker extends React.Component {
           }
         },
         () => {
-          this.setState({ errors, checking: false }, this.firstError)
+          this.setState({ errors, checking: false }, () => {
+            this.firstError()
+            done()
+          })
           if (errors.length === 0) {
             this._closeTimout = setTimeout(this.handleClose, 3000)
           }
@@ -147,7 +151,11 @@ class Checker extends React.Component {
 
   updateFormState({ target }) {
     const formState = Object.assign({}, this.state.formState)
-    formState[target.name] = target.value
+    if (target.type === "checkbox") {
+      formState[target.name] = target.checked
+    } else {
+      formState[target.name] = target.value
+    }
     this.setState({
       formState,
       formStateValid: this.formStateValid(formState)
@@ -326,35 +334,53 @@ class Checker extends React.Component {
   }
 
   renderField(f) {
-    if (f.options) {
-      return (
-        <Select
-          label={f.label}
-          name={f.dataKey}
-          value={this.state.formState[f.dataKey]}
-          onChange={this.updateFormState}
-        >
-          {f.options.map(o => <option value={o[0]}>{o[1]}</option>)}
-        </Select>
-      )
-    } else if (f.color) {
-      return (
-        <ColorField
-          label={f.label}
-          name={f.dataKey}
-          value={this.state.formState[f.dataKey]}
-          onChange={this.updateFormState}
-        />
-      )
-    } else {
-      return (
-        <TextInput
-          label={f.label}
-          name={f.dataKey}
-          value={this.state.formState[f.dataKey]}
-          onChange={this.updateFormState}
-        />
-      )
+    const disabled = !!f.disabledIf && f.disabledIf(this.state.formState)
+    switch (true) {
+      case !!f.options:
+        return (
+          <Select
+            label={f.label}
+            name={f.dataKey}
+            value={this.state.formState[f.dataKey]}
+            onChange={this.updateFormState}
+            disabled={disabled}
+          >
+            {f.options.map(o => (
+              <option key={o[0]} value={o[0]}>
+                {o[1]}
+              </option>
+            ))}
+          </Select>
+        )
+      case f.checkbox:
+        return (
+          <Checkbox
+            label={f.label}
+            name={f.dataKey}
+            checked={this.state.formState[f.dataKey]}
+            onChange={this.updateFormState}
+            disabled={disabled}
+          />
+        )
+      case f.color:
+        return (
+          <ColorField
+            label={f.label}
+            name={f.dataKey}
+            value={this.state.formState[f.dataKey]}
+            onChange={this.updateFormState}
+          />
+        )
+      default:
+        return (
+          <TextInput
+            label={f.label}
+            name={f.dataKey}
+            value={this.state.formState[f.dataKey]}
+            onChange={this.updateFormState}
+            disabled={disabled}
+          />
+        )
     }
   }
 }
