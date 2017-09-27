@@ -104,7 +104,6 @@ class SisBatch < ActiveRecord::Base
   def enable_diffing(data_set_id, opts = {})
     if data[:import_type] == "instructure_csv"
       self.diffing_data_set_identifier = data_set_id
-      self.change_threshold = opts[:change_threshold]
       if opts[:remaster]
         self.diffing_remaster = true
       end
@@ -189,6 +188,12 @@ class SisBatch < ActiveRecord::Base
 
   def abort_batch
     SisBatch.not_completed.where(id: self).update_all(workflow_state: 'aborted')
+  end
+
+  def batch_aborted(message)
+    add_errors([message])
+    self.save!
+    raise SisBatch::Aborted
   end
 
   def self.abort_all_pending_for_account(account)
@@ -415,31 +420,37 @@ class SisBatch < ActiveRecord::Base
     if courses
       count += courses.count
       all_count += term_course_scope.count
+      detect_change_item(count, all_count, 'courses')
     end
 
     if sections
-      count += sections.count
-      all_count += term_sections_scope.count
+      s_count = sections.count
+      count += s_count
+      s_all_count = term_sections_scope.count
+      detect_change_item(s_count, s_all_count, 'sections')
     end
 
     if enrollments
-      count += enrollments.count
-      all_count += term_enrollments_scope.count
+      e_count = enrollments.count
+      count += e_count
+      e_all_count = term_enrollments_scope.count
+      detect_change_item(e_count, e_all_count, 'enrollments')
     end
 
-    if change_threshold && count.to_f/all_count*100 > change_threshold
-      change_detected(count)
-    end
     count
   end
 
-  def change_detected(count)
-    abort_batch
-    processing_errors ||= []
-    processing_errors << [t("%{count} items would be deleted and exceeds the set threshold of %{change_threshold}%",
-                            count: count, change_threshold: change_threshold)]
-    SisBatch.where(id: self).update_all(processing_errors: processing_errors)
-    raise SisBatch::Aborted
+  def detect_change_item(count, all_count, type)
+    if change_threshold && count.to_f/all_count*100 > change_threshold
+      abort_batch
+      message = change_detected_message(count, type)
+      batch_aborted(message)
+    end
+  end
+
+  def change_detected_message(count, type)
+    [t("%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%",
+       count: count, type: type, change_threshold: change_threshold)]
   end
 
   def as_json(options={})
