@@ -987,7 +987,7 @@ class SubmissionsApiController < ApplicationController
       student_scope = @assignment.students_with_visibility(student_scope)
       student_ids = student_scope.pluck(:id)
 
-      graded = @context.submissions.in_workflow_state('graded').where(user_id: student_ids, assignment_id: @assignment).count
+      graded = @context.submissions.graded.where(user_id: student_ids, assignment_id: @assignment).count
       ungraded = @context.submissions.
         needs_grading.having_submission.
         where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).

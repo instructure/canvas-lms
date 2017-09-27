@@ -4207,6 +4207,16 @@ describe 'Submissions API', type: :request do
       expect(json['not_submitted']).to eq 1
     end
 
+    it 'doesnt count submissions where the grade was removed as graded' do
+      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.grade_student @student2, score: 98, grader: @teacher
+      @assignment.grade_student @student2, score: nil, grader: @teacher
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 1
+      expect(json['ungraded']).to eq 1
+      expect(json['not_submitted']).to eq 1
+    end
+
     it 'is unauthorized as a student' do
       json = api_call_as_user(@student1, :get, @path, @params)
       expect(json['status']).to eq 'unauthorized'

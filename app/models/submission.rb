@@ -1649,7 +1649,7 @@ class Submission < ActiveRecord::Base
 
   scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
 
-  scope :graded, -> { where("submissions.grade IS NOT NULL") }
+  scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
 
   scope :ungraded, -> { where(:grade => nil).preload(:assignment) }
 

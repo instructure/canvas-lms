@@ -1089,6 +1089,7 @@ describe Submission do
 
     # only graded submissions are updated by assignment
     @submission.score = 111
+    @submission.workflow_state = 'graded'
     @submission.save!
 
     @assignment.points_possible = 999
