@@ -45,9 +45,19 @@ test('uses I18n#t to format pass_fail based grades: complete', function () {
   equal(GradeFormatHelper.formatGrade('complete'), '* complete');
 });
 
+test('uses I18n#t to format pass_fail based grades: pass', function () {
+  I18n.t.withArgs('complete').returns('* complete');
+  equal(GradeFormatHelper.formatGrade('pass'), '* complete');
+});
+
 test('uses I18n#t to format pass_fail based grades: incomplete', function () {
   I18n.t.withArgs('incomplete').returns('* incomplete');
   equal(GradeFormatHelper.formatGrade('incomplete'), '* incomplete');
+});
+
+test('uses I18n#t to format pass_fail based grades: fail', function () {
+  I18n.t.withArgs('incomplete').returns('* incomplete');
+  equal(GradeFormatHelper.formatGrade('fail'), '* incomplete');
 });
 
 test('returns "Excused" when the grade is "EX"', function () {
@@ -543,30 +553,30 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
       });
 
       test('returns "complete" when the "final" score is not zero', () => {
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'complete');
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Complete');
       });
 
       test('returns "incomplete" when the "final" score is zero', () => {
         submission.score = 0;
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
       });
 
       test('uses the "final" score when explicitly specified', () => {
         options.version = 'final';
         submission.score = 0;
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
       });
 
       test('optionally uses the "entered" score', () => {
         options.version = 'entered';
         submission.score = 0; // "final" score is made "incomplete"
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'complete');
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Complete');
       });
 
       test('uses the "final" score when given an unknown version', () => {
         options.version = 'unknown';
         submission.score = 0; // "final" score is made "incomplete"
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
       });
 
       test('returns "ungraded" when the score is null', () => {
@@ -591,13 +601,48 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         submission.score = 0;
       });
 
-      test('returns the "final" grade when the submission has been graded', () => {
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+      test('returns "Complete" for a "complete" grade when using the "final" grade', () => {
+        submission.grade = 'complete';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Complete');
       });
 
-      test('optionally uses the "entered" grade', () => {
+      test('returns "Complete" for a "pass" grade when using the "final" grade', () => {
+        submission.grade = 'pass';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Complete');
+      });
+
+      test('returns "Incomplete" for a "incomplete" grade when using the "final" grade', () => {
+        submission.grade = 'incomplete';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
+      });
+
+      test('returns "Incomplete" for a "fail" grade when using the "final" grade', () => {
+        submission.grade = 'fail';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
+      });
+
+      test('returns "Complete" for a "complete" grade when using the "entered" grade', () => {
         options.version = 'entered';
-        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'complete');
+        submission.enteredGrade = 'complete';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Complete');
+      });
+
+      test('returns "Complete" for a "pass" grade when using the "entered" grade', () => {
+        options.version = 'entered';
+        submission.enteredGrade = 'pass';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Complete');
+      });
+
+      test('returns "Incomplete" for a "incomplete" grade when using the "entered" grade', () => {
+        options.version = 'entered';
+        submission.enteredGrade = 'incomplete';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
+      });
+
+      test('returns "Incomplete" for a "fail" grade when using the "entered" grade', () => {
+        options.version = 'entered';
+        submission.enteredGrade = 'fail';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'Incomplete');
       });
     });
   });

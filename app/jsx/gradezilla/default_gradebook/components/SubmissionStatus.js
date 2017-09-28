@@ -58,6 +58,7 @@ export default class SubmissionStatus extends React.Component {
     isInOtherGradingPeriod: bool.isRequired,
     submission: shape({
       drop: bool,
+      excused: bool
     }).isRequired
   };
 
@@ -80,6 +81,12 @@ export default class SubmissionStatus extends React.Component {
     if (submission.drop) {
       statusPillComponents.push(
         <Pill key="dropped-submission" variant="default" text={I18n.t('Dropped')} margin="0 0 x-small" />
+      );
+    }
+
+    if (submission.excused) {
+      statusPillComponents.push(
+        <Pill key="excused-assignment" variant="default" text={I18n.t('Excused')} margin="0 0 x-small" />
       );
     }
 

@@ -51,7 +51,9 @@ QUnit.module('SubmissionTray', function (hooks) {
       },
       editedCommentId: null,
       editSubmissionComment () {},
+      gradingDisabled: false,
       locale: 'en',
+      onGradeSubmission () {},
       onRequestClose () {},
       onClose () {},
       showContentComingSoon: false,
@@ -66,18 +68,20 @@ QUnit.module('SubmissionTray', function (hooks) {
         gradesUrl: 'http://gradeUrl/'
       },
       submission: {
-        grade: '100%',
+        assignmentId: '30',
         excused: false,
+        grade: '100%',
+        id: '2501',
         late: false,
         missing: false,
         pointsDeducted: 3,
-        secondsLate: 0,
-        assignmentId: '30'
+        secondsLate: 0
       },
       updateSubmission () {},
       updateSubmissionComment () {},
       assignment: {
         name: 'Book Report',
+        gradingType: 'points',
         htmlUrl: 'http://htmlUrl/',
         muted: false,
         published: true
@@ -128,6 +132,70 @@ QUnit.module('SubmissionTray', function (hooks) {
     mountComponent({ showContentComingSoon: true });
     ok(document.querySelector('.ComingSoonContent__Container'));
     server.restore();
+  });
+
+  QUnit.module('Student Carousel', function () {
+    test('is disabled when the tray is "processing"', function () {
+      mountComponent({ processing: true });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), true);
+    });
+
+    test('is not disabled when the tray is not "processing"', function () {
+      mountComponent({ processing: false });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission comments have not loaded', function () {
+      mountComponent({ submissionCommentsLoaded: false });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission comments have loaded', function () {
+      mountComponent({ submissionCommentsLoaded: true });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission is updating', function () {
+      mountComponent({ submissionUpdating: true });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission is not updating', function () {
+      mountComponent({ submissionUpdating: false });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), false);
+    });
+  });
+
+  QUnit.module('Assignment Carousel', function () {
+    test('is disabled when the tray is "processing"', function () {
+      mountComponent({ processing: true });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), true);
+    });
+
+    test('is not disabled when the tray is not "processing"', function () {
+      mountComponent({ processing: false });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission comments have not loaded', function () {
+      mountComponent({ submissionCommentsLoaded: false });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission comments have loaded', function () {
+      mountComponent({ submissionCommentsLoaded: true });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission is updating', function () {
+      mountComponent({ submissionUpdating: true });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission is not updating', function () {
+      mountComponent({ submissionUpdating: false });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), false);
+    });
   });
 
   test('shows SpeedGrader link if enabled', function () {
@@ -215,12 +283,20 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('does not show the late policy grade when zero points have been deducted', function () {
-    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: 0, secondsLate: 0, assignmentId: '30' } });
+    mountComponent({
+      submission: {
+        excused: false, id: '2501', late: true, missing: false, pointsDeducted: 0, secondsLate: 0, assignmentId: '30'
+      }
+    });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
   test('does not show the late policy grade when points deducted is null', function () {
-    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: null, secondsLate: 0, assignmentId: '30' } });
+    mountComponent({
+      submission: {
+        excused: false, id: '2501', late: true, missing: false, pointsDeducted: null, secondsLate: 0, assignmentId: '30'
+      }
+    });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
@@ -406,6 +482,57 @@ QUnit.module('SubmissionTray', function (hooks) {
     });
 
     strictEqual(wrapContent().find('#SubmissionTray__Content').find('Container').at(0).prop('padding'), 'small 0 0 0');
+  });
+
+  QUnit.module('Grade Input', function () {
+    test('receives the "assignment" given to the Tray', function () {
+      const assignment = {
+        gradingType: 'points',
+        htmlUrl: 'http://htmlUrl/',
+        muted: false,
+        name: 'Book Report',
+        published: true
+      };
+      mountComponent({ assignment });
+      equal(wrapContent().find('GradeInput').prop('assignment'), assignment);
+    });
+
+    test('is disabled when grading is disabled', function () {
+      mountComponent({ gradingDisabled: true });
+      strictEqual(wrapContent().find('GradeInput').prop('disabled'), true);
+    });
+
+    test('is not disabled when grading is not disabled', function () {
+      mountComponent({ gradingDisabled: false });
+      strictEqual(wrapContent().find('GradeInput').prop('disabled'), false);
+    });
+
+    test('receives the "onGradeSubmission" callback given to the Tray', function () {
+      function onGradeSubmission () {}
+      mountComponent({ onGradeSubmission });
+      equal(wrapContent().find('GradeInput').prop('onSubmissionUpdate'), onGradeSubmission);
+    });
+
+    test('receives the "submission" given to the Tray', function () {
+      const submission = {
+        assignmentId: '2301',
+        enteredGrade: '100%',
+        excused: false,
+        grade: '70%',
+        id: '2501',
+        late: false,
+        missing: false,
+        pointsDeducted: 3,
+        secondsLate: 0
+      };
+      mountComponent({ submission });
+      equal(wrapContent().find('GradeInput').prop('submission'), submission);
+    });
+
+    test('receives the "submissionUpdating" given to the Tray', function () {
+      mountComponent({ submissionUpdating: true });
+      strictEqual(wrapContent().find('GradeInput').prop('submissionUpdating'), true);
+    });
   });
 
   test('renders the new comment form if the editedCommentId is null', function () {

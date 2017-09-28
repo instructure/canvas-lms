@@ -17,6 +17,8 @@
 #
 
 class LatePolicy < ActiveRecord::Base
+  POINT_DEDUCTIBLE_GRADING_TYPES = %w(points percent letter_grade gpa_scale).freeze
+
   belongs_to :course, inverse_of: :late_policy
 
   validates :course_id,
@@ -33,7 +35,7 @@ class LatePolicy < ActiveRecord::Base
 
   def points_deducted(score: nil, possible: 0.0, late_for: 0.0, grading_type: nil)
     return 0.0 unless late_submission_deduction_enabled && score && possible&.positive? && late_for&.positive?
-    return 0.0 unless Assignment::POINTED_GRADING_TYPES.include?(grading_type)
+    return 0.0 unless POINT_DEDUCTIBLE_GRADING_TYPES.include?(grading_type)
 
     intervals_late = (late_for / interval_seconds).ceil
     minimum_percent = late_submission_minimum_percent_enabled ? late_submission_minimum_percent : 0.0

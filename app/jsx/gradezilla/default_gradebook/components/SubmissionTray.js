@@ -30,6 +30,7 @@ import Typography from 'instructure-ui/lib/components/Typography';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
 import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
 import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
+import GradeInput from 'jsx/gradezilla/default_gradebook/components/GradeInput';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
 import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem';
@@ -78,6 +79,7 @@ function renderTraySubHeading (headingText) {
 export default class SubmissionTray extends React.Component {
   static defaultProps = {
     contentRef: undefined,
+    gradingDisabled: false,
     latePolicy: { lateSubmissionInterval: 'day' },
     submission: { drop: false }
   };
@@ -93,6 +95,7 @@ export default class SubmissionTray extends React.Component {
     currentUserId: string.isRequired,
     editedCommentId: string,
     editSubmissionComment: func.isRequired,
+    gradingDisabled: bool,
     isOpen: bool.isRequired,
     colors: shape({
       late: string.isRequired,
@@ -100,6 +103,7 @@ export default class SubmissionTray extends React.Component {
       excused: string.isRequired
     }).isRequired,
     onClose: func.isRequired,
+    onGradeSubmission: func.isRequired,
     onRequestClose: func.isRequired,
     showContentComingSoon: bool.isRequired,
     student: shape({
@@ -215,6 +219,7 @@ export default class SubmissionTray extends React.Component {
       processing: this.props.processing,
       setProcessing: this.props.setProcessing,
     };
+    const trayIsBusy = this.props.processing || this.props.submissionUpdating || !this.props.submissionCommentsLoaded;
 
     let carouselContainerStyleOverride = '0 0 0 0';
 
@@ -245,7 +250,7 @@ export default class SubmissionTray extends React.Component {
 
                   <Carousel
                     id="student-carousel"
-                    disabled={this.props.processing || !this.props.submissionCommentsLoaded}
+                    disabled={trayIsBusy}
                     displayLeftArrow={!this.props.isFirstStudent}
                     displayRightArrow={!this.props.isLastStudent}
                     leftArrowDescription={I18n.t('Previous student')}
@@ -262,7 +267,7 @@ export default class SubmissionTray extends React.Component {
 
                   <Carousel
                     id="assignment-carousel"
-                    disabled={this.props.processing || !this.props.submissionCommentsLoaded}
+                    disabled={trayIsBusy}
                     displayLeftArrow={!this.props.isFirstAssignment}
                     displayRightArrow={!this.props.isLastAssignment}
                     leftArrowDescription={I18n.t('Previous assignment')}
@@ -289,13 +294,21 @@ export default class SubmissionTray extends React.Component {
                     isInNoGradingPeriod={this.props.isInNoGradingPeriod}
                   />
 
-                  {!!this.props.submission.pointsDeducted &&
-                    <div>
-                      <LatePolicyGrade submission={this.props.submission} />
+                  <GradeInput
+                    assignment={this.props.assignment}
+                    disabled={this.props.gradingDisabled}
+                    onSubmissionUpdate={this.props.onGradeSubmission}
+                    submission={this.props.submission}
+                    submissionUpdating={this.props.submissionUpdating}
+                  />
 
-                      <Container as="div" margin="small 0" className="hr" />
-                    </div>
+                  {!!this.props.submission.pointsDeducted &&
+                    <Container as="div" margin="small 0 0 0">
+                      <LatePolicyGrade submission={this.props.submission} />
+                    </Container>
                   }
+
+                  <Container as="div" margin="small 0" className="hr" />
 
                   <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
                     <SubmissionTrayRadioInputGroup

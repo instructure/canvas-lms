@@ -98,6 +98,22 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
 
     strictEqual(droppedPills.length, 0);
   });
+
+  test('shows the "Excused" pill when the submission is excused', function () {
+    props.submission.excused = true;
+    wrapper = mountComponent();
+    const excusedPills = wrapper.find('Pill').nodes.filter(node => node.props.text === 'Excused');
+
+    strictEqual(excusedPills.length, 1);
+  });
+
+  test('does not show the "Excused" pill when the submission is not excused', function () {
+    props.submission.excused = false;
+    wrapper = mountComponent();
+    const excusedPills = wrapper.find('Pill').nodes.filter(node => node.props.text === 'Excused');
+
+    strictEqual(excusedPills.length, 0);
+  });
 });
 
 QUnit.module('SubmissionStatus - Grading Period Warnings', function (hooks) {

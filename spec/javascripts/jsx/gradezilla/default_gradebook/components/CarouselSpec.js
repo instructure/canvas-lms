@@ -23,11 +23,13 @@ import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
 function mountComponent (props) {
   const defaultProps = {
     children: 'Book Report',
+    disabled: false,
     displayLeftArrow: false,
     displayRightArrow: false,
+    leftArrowDescription: 'Previous',
     onLeftArrowClick () {},
     onRightArrowClick () {},
-    disabled: false
+    rightArrowDescription: 'Next'
   };
 
   const tbody = document.createElement('div');

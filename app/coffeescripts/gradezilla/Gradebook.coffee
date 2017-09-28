@@ -33,6 +33,7 @@ define [
   'compiled/views/InputFilterView'
   'i18nObj'
   'i18n!gradezilla'
+  'jsx/shared/helpers/numberHelper'
   'compiled/gradezilla/GradebookTranslations'
   'jsx/gradebook/CourseGradeCalculator'
   'jsx/gradebook/EffectiveDueDates'
@@ -79,6 +80,7 @@ define [
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
   'jsx/gradezilla/shared/helpers/TextMeasure'
+  'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/grading/LatePolicyApplicator'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
@@ -98,7 +100,7 @@ define [
   'compiled/jquery/fixDialogButtons'
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, axios, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
-  GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
+  GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, numberHelper, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
@@ -107,7 +109,7 @@ define [
   GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, LatePolicyApplicator, { default: Button },
+  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, OutlierScoreHelper, LatePolicyApplicator, { default: Button },
   { default: IconSettingsSolid }, FlashAlert) ->
 
   isAdmin = =>
@@ -2193,13 +2195,14 @@ define [
       isFirstStudent = activeLocation.row == 0
       isLastStudent = activeLocation.row == (@listRows().length - 1)
 
-      submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId });
+      submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
 
       assignment: ConvertCase.camelize(assignment)
       colors: @getGridColors()
       comments: comments
       courseId: @options.context_id
       currentUserId: @options.currentUserId
+      gradingDisabled: !!submissionState?.locked || student.isConcluded
       isFirstAssignment: isFirstAssignment
       isInOtherGradingPeriod: !!submissionState?.inOtherGradingPeriod
       isInClosedGradingPeriod: !!submissionState?.inClosedGradingPeriod
@@ -2212,6 +2215,7 @@ define [
       latePolicy: @courseContent.latePolicy
       locale: @options.locale
       onClose: => @gridSupport.helper.focus()
+      onGradeSubmission: @gradeSubmission
       onRequestClose: @closeSubmissionTray
       selectNextAssignment: => @loadTrayAssignment('next')
       selectPreviousAssignment: => @loadTrayAssignment('previous')
@@ -2721,6 +2725,18 @@ define [
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
 
+    gradeSubmission: (submission) =>
+      if submission.excused
+        submissionData = { excuse: true }
+      else
+        submissionData = { posted_grade: GradeFormatHelper.delocalizeGrade(submission.enteredGrade) }
+      @updateSubmissionAndRenderSubmissionTray(submissionData)
+        .then((response) =>
+          assignment = @getAssignment(submission.assignmentId)
+          outlierScoreHelper = new OutlierScoreHelper(response.data.score, assignment.points_possible)
+          $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
+        )
+
     updateSubmissionAndRenderSubmissionTray: (data) =>
       { studentId, assignmentId } = @getSubmissionTrayState()
       student = @student(studentId)
@@ -2731,8 +2747,10 @@ define [
           @setSubmissionUpdating(false)
           @updateSubmissionsFromExternal(response.data.all_submissions)
           @renderSubmissionTray(student)
-        ).catch(=>
+          response
+        ).catch((response) =>
           @setSubmissionUpdating(false)
           $.flashError I18n.t('There was a problem updating the submission.')
           @renderSubmissionTray(student)
+          Promise.reject(response)
         )

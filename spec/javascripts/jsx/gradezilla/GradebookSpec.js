@@ -6204,7 +6204,7 @@ QUnit.module('Gradebook#onGridBlur', {
       id: '1101',
       name: 'Adam Jones',
       assignment_2301: {
-        assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        assignment_id: '2301', id: '2501', late: false, missing: false, excused: false, seconds_late: 0
       }
     }]
     this.gradebook.gotChunkOfStudents(students);
@@ -6212,10 +6212,11 @@ QUnit.module('Gradebook#onGridBlur', {
       2301: {
         id: '2301',
         course_id: '1',
+        grading_type: 'points',
         name: 'Assignment 1',
         assignment_visibility: [],
         only_visible_to_overrides: false,
-        html_url: 'foo',
+        html_url: 'http://assignmentUrl',
         muted: false,
         omit_from_final_grade: false,
         published: true,
@@ -6223,7 +6224,6 @@ QUnit.module('Gradebook#onGridBlur', {
       }
     });
     this.gradebook.initGrid();
-    this.gradebook.assignments = { 2301: { name: 'An Assignment', html_url: 'http://assignmentUrl' } };
     this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
     this.spy(this.gradebook.gridSupport.state, 'blur');
   },
@@ -6394,6 +6394,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     moxios.stubRequest(url, { status: 200, response: { submission_comments: [] }});
     $fixtures.innerHTML = `<div id="${mountPointId}"></div><div id="application"></div>`;
     gradebook = createGradebook();
+    gradebook.initSubmissionStateMap();
     gradebook.students = {
       1101: {
         id: '1101',
@@ -6429,6 +6430,49 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     ReactDOM.unmountComponentAtNode(node);
     $fixtures.innerHTML = '';
     moxios.uninstall();
+  });
+
+  test('gradingDisabled is true when the submission state is locked', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ locked: true });
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.gradingDisabled, true);
+  });
+
+  test('gradingDisabled is false when the submission state is not locked', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ locked: false });
+    gradebook.student('1101').isConcluded = false;
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.gradingDisabled, false);
+  });
+
+  test('gradingDisabled is false when the submission state is undefined', function () {
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns(undefined);
+    gradebook.student('1101').isConcluded = false;
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.gradingDisabled, false);
+  });
+
+  test('gradingDisabled is true when the student enrollment is concluded', function () {
+    gradebook.student('1101').isConcluded = true;
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.gradingDisabled, true);
+  });
+
+  test('gradingDisabled is false when the student enrollment is not concluded', function () {
+    gradebook.student('1101').isConcluded = false;
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    strictEqual(props.gradingDisabled, false);
+  });
+
+  test('onGradeSubmission is the Gradebook "gradeSubmission" method', function () {
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+    equal(props.onGradeSubmission, gradebook.gradeSubmission);
   });
 
   test('student has valid gradesUrl', function () {
@@ -6558,6 +6602,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
       2301: {
         id: '2301',
         course_id: '1',
+        grading_type: 'points',
         name: 'Assignment 1',
         assignment_visibility: [],
         only_visible_to_overrides: false,
@@ -6573,7 +6618,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         id: '1101',
         name: 'J&#x27;onn J&#x27;onzz',
         assignment_2301: {
-          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+          assignment_id: '2301', id: '2501', late: false, missing: false, excused: false, seconds_late: 0
         },
         enrollments: [
           {
@@ -6657,6 +6702,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
       2301: {
         id: '2301',
         course_id: '1',
+        grading_type: 'points',
         name: 'Assignment 1',
         assignment_visibility: [],
         only_visible_to_overrides: false,
@@ -7286,6 +7332,119 @@ test('sets the submission updating state', function () {
   strictEqual(this.gradebook.contentLoadStates.submissionUpdating, true);
 });
 
+QUnit.module('Gradebook', () => {
+  QUnit.module('.gradeSubmission', (hooks) => {
+    let apiPromise;
+    let gradebook;
+    let submission;
+    let response;
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      gradebook.setAssignments({
+        2301: { id: '2301', name: 'Math Assignment', points_possible: 10, published: true },
+        2302: { id: '2302', name: 'English Assignment', points_possible: 5, published: false }
+      });
+      submission = {
+        id: '2501', assignmentId: '2301', excused: false, enteredGrade: '100%'
+      };
+      response = {
+        data: { score: 10}
+      };
+      sinon.stub(gradebook, 'updateSubmissionAndRenderSubmissionTray')
+        .callsFake(() => {
+          apiPromise = Promise.resolve(response);
+          return apiPromise;
+        });
+      sinon.stub($, 'flashWarning');
+    });
+
+    hooks.afterEach(() => {
+      $.flashWarning.restore();
+    });
+
+    test('updates the submission via Gradebook.updateSubmissionAndRenderSubmissionTray', () => {
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        strictEqual(gradebook.updateSubmissionAndRenderSubmissionTray.callCount, 1);
+      })
+    });
+
+    test('sets "submission.excuse" to true when the submission is excused', () => {
+      submission.excused = true;
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        const [submissionData] = gradebook.updateSubmissionAndRenderSubmissionTray.firstCall.args;
+        strictEqual(submissionData.excuse, true);
+      });
+    });
+
+    test('does not set "submission.excuse" when the submission is not excused', () => {
+      submission.excused = false;
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        const [submissionData] = gradebook.updateSubmissionAndRenderSubmissionTray.firstCall.args;
+        notOk('excuse' in submissionData, 'does not set "excuse"')
+      });
+    });
+
+    test('sets "submission.posted_grade" to the entered grade when the submission is not excused', () => {
+      submission.excused = false;
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        const [submissionData] = gradebook.updateSubmissionAndRenderSubmissionTray.firstCall.args;
+        strictEqual(submissionData.posted_grade, '100%');
+      });
+    });
+
+    test('does not set "submission.posted_grade" when the submission is excused', () => {
+      submission.excused = true;
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        const [submissionData] = gradebook.updateSubmissionAndRenderSubmissionTray.firstCall.args;
+        notOk('posted_grade' in submissionData, 'does not set "excuse"')
+      });
+    });
+
+    test('delocalizes the grade', () => {
+      submission.enteredGrade = '100,00%';
+      sinon.stub(GradeFormatHelper, 'delocalizeGrade').withArgs('100,00%').returns('100.00%');
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        const [submissionData] = gradebook.updateSubmissionAndRenderSubmissionTray.firstCall.args;
+        strictEqual(submissionData.posted_grade, '100.00%');
+        GradeFormatHelper.delocalizeGrade.restore();
+      });
+    });
+
+    test('warns about unusually high grades', () => {
+      response.data.score = 15;
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        strictEqual($.flashWarning.callCount, 1);
+      });
+    });
+
+    test('does not warn about slightly high grades', () => {
+      response.data.score = 14.99;
+      gradebook.gradeSubmission(submission);
+      return apiPromise.then(() => {
+        strictEqual($.flashWarning.callCount, 0);
+      });
+    });
+
+    test('does not warn about the given grade when the update fails', () => {
+      submission.enteredGrade = '1000';
+      apiPromise = Promise.reject(new Error('FAIL'));
+      gradebook.updateSubmissionAndRenderSubmissionTray.returns(apiPromise);
+      return gradebook.gradeSubmission(submission)
+        .catch(() => {
+          strictEqual($.flashWarning.callCount, 0);
+        });
+    });
+  });
+});
+
 QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
   setup () {
     this.gradebook = createGradebook();
@@ -7336,23 +7495,26 @@ test('on success the tray has been rendered a second time', function () {
 test('on failure the submission is not in an updating state', function () {
   this.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
-  this.promise.catchFn(new Error('A failure'));
-  strictEqual(this.gradebook.contentLoadStates.submissionUpdating, false);
+  return this.promise.catchFn(new Error('A failure')).catch(() => {
+    strictEqual(this.gradebook.contentLoadStates.submissionUpdating, false);
+  });
 });
 
 test('on failure the submission has been rendered a second time', function () {
   this.stub(this.gradebook, 'renderSubmissionTray');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
-  this.promise.catchFn(new Error('A failure'));
-  strictEqual(this.gradebook.renderSubmissionTray.callCount, 2);
+  return this.promise.catchFn(new Error('A failure')).catch(() => {
+    strictEqual(this.gradebook.renderSubmissionTray.callCount, 2);
+  });
 });
 
 test('on failure a flash error is triggered', function () {
   this.stub(this.gradebook, 'renderSubmissionTray');
   this.stub($, 'flashError');
   this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
-  this.promise.catchFn(new Error('A failure'));
-  strictEqual($.flashError.callCount, 1);
+  return this.promise.catchFn(new Error('A failure')).catch(() => {
+    strictEqual($.flashError.callCount, 1);
+  });
 });
 
 QUnit.module('#getSubmissionComments', {

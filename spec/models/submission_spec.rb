@@ -165,16 +165,28 @@ describe Submission do
   describe 'entered_grade' do
     let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
 
-    it 'returns grade if grading_type is pass_fail' do
-      @assignment.update(grading_type: 'pass_fail')
-      submission.update(score: 100)
-      expect(submission.entered_grade).to eql(submission.grade)
-    end
-
     it 'returns grade without deduction' do
       @assignment.update(grading_type: 'percent', points_possible: 100)
       submission.update(score: 25.5, points_deducted: 60)
       expect(submission.entered_grade).to eql('85.5%')
+    end
+
+    it 'returns grade if grading_type is pass_fail' do
+      @assignment.update(grading_type: 'pass_fail')
+      submission.update(grade: 'complete')
+      expect(submission.entered_grade).to eql('complete')
+    end
+
+    it 'returns the grade for a letter grade assignment with no points possible' do
+      @assignment.update(grading_type: 'letter_grade', points_possible: 0)
+      submission.update(grade: 'B')
+      expect(submission.entered_grade).to eql('B')
+    end
+
+    it 'returns the grade for a GPA scale assignment with no points possible' do
+      @assignment.update(grading_type: 'gpa_scale', points_possible: nil)
+      submission.update(grade: 'B')
+      expect(submission.entered_grade).to eql('B')
     end
   end
 

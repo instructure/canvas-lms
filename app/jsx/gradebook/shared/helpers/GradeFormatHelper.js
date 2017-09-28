@@ -25,12 +25,15 @@ const POINTS = 'points';
 const PERCENT = 'percent';
 const PASS_FAIL = 'pass_fail';
 
+const PASS_GRADES = ['complete', 'pass'];
+const FAIL_GRADES = ['incomplete', 'fail'];
+
 function isPassFail (grade, gradeType) {
   if (gradeType) {
     return gradeType === PASS_FAIL;
   }
 
-  return grade === 'complete' || grade === 'incomplete';
+  return PASS_GRADES.includes(grade) || FAIL_GRADES.includes(grade);
 }
 
 function isPercent (grade, gradeType) {
@@ -45,6 +48,16 @@ function isExcused (grade) {
   return grade === 'EX';
 }
 
+function normalizeCompleteIncompleteGrade (grade) {
+  if (PASS_GRADES.includes(grade)) {
+    return 'complete';
+  }
+  if (FAIL_GRADES.includes(grade)) {
+    return 'incomplete';
+  }
+  return null;
+}
+
 function shouldFormatGradingType (gradingType) {
   return gradingType === POINTS || gradingType === PERCENT || gradingType === PASS_FAIL;
 }
@@ -55,6 +68,40 @@ function shouldFormatGrade (grade, gradingType) {
   }
 
   return typeof grade === 'number' || isPassFail(grade);
+}
+
+function excused () {
+  return I18n.t('Excused');
+}
+
+function formatPointsGrade (score) {
+  return I18n.n(score, { precision: 2, strip_insignificant_zeros: true });
+}
+
+function formatPercentageGrade (score, options) {
+  const percent = options.pointsPossible ? score / options.pointsPossible * 100 : score;
+  return I18n.n(round(percent, 2), { percentage: true, precision: 2, strip_insignificant_zeros: true });
+}
+
+function formatGradingSchemeGrade (score, grade, options) {
+  if (options.pointsPossible) {
+    const percent = score / options.pointsPossible * 100;
+    return scoreToGrade(percent, options.gradingScheme);
+  } else if (grade != null) {
+    return grade;
+  } else {
+    return scoreToGrade(score, options.gradingScheme);
+  }
+}
+
+function formatCompleteIncompleteGrade (score, grade, options) {
+  let passed = false;
+  if (options.pointsPossible) {
+    passed = score > 0;
+  } else {
+    passed = PASS_GRADES.includes(grade);
+  }
+  return passed ? I18n.t('Complete') : I18n.t('Incomplete');
 }
 
 const GradeFormatHelper = {
@@ -83,13 +130,14 @@ const GradeFormatHelper = {
     }
 
     if (isExcused(grade)) {
-      return I18n.t('Excused');
+      return excused();
     }
 
-    const parsedGrade = GradeFormatHelper.parseGrade(grade, options);
+    let parsedGrade = GradeFormatHelper.parseGrade(grade, options);
 
     if (shouldFormatGrade(parsedGrade, options.gradingType)) {
       if (isPassFail(parsedGrade, options.gradingType)) {
+        parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade);
         formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete');
       } else {
         const roundedGrade = round(parsedGrade, options.precision || 2);
@@ -142,53 +190,32 @@ const GradeFormatHelper = {
     return parsedGrade;
   },
 
+  excused,
   isExcused,
 
   formatSubmissionGrade (submission, options = { version: 'final' }) {
     if (submission.excused) {
-      return I18n.t('Excused');
+      return excused();
     }
 
     const score = options.version === 'entered' ? submission.enteredScore : submission.score;
+    const grade = options.version === 'entered' ? submission.enteredGrade : submission.grade;
 
     if (score == null) {
       return options.formatType === 'passFail' ? I18n.t('ungraded') : '–';
     }
 
-    if (options.formatType === 'percent') {
-      if (options.pointsPossible) {
-        const percent = score / options.pointsPossible * 100;
-        return I18n.n(round(percent, 2), { percentage: true, precision: 2, strip_insignificant_zeros: true });
-      }
-      return I18n.n(round(score, 2), { percentage: true, precision: 2, strip_insignificant_zeros: true });
+    switch (options.formatType) {
+      case 'percent':
+        return formatPercentageGrade(score, options);
+      case 'gradingScheme':
+        return formatGradingSchemeGrade(score, grade, options);
+      case 'passFail':
+        return formatCompleteIncompleteGrade(score, grade, options);
+      default:
+        return formatPointsGrade(score);
     }
 
-    if (options.formatType === 'gradingScheme') {
-      if (options.pointsPossible) {
-        const percent = score / options.pointsPossible * 100;
-        return scoreToGrade(percent, options.gradingScheme);
-      } else if (submission.enteredGrade != null && options.version === 'entered') {
-        return submission.enteredGrade;
-      } else if (submission.grade != null) {
-        return submission.grade;
-      } else {
-        return scoreToGrade(score, options.gradingScheme);
-      }
-    }
-
-    if (options.formatType === 'passFail') {
-      let passed = false;
-      if (options.pointsPossible) {
-        passed = score > 0;
-      } else if (options.version === 'entered') {
-        passed = submission.enteredGrade === 'complete';
-      } else {
-        passed = submission.grade === 'complete';
-      }
-      return passed ? I18n.t('complete') : I18n.t('incomplete');
-    }
-
-    return I18n.n(score, { precision: 2, strip_insignificant_zeros: true });
   }
 };
 

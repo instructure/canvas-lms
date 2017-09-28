@@ -1339,7 +1339,8 @@ class Submission < ActiveRecord::Base
   end
 
   def entered_grade
-    return grade if grading_type == 'pass_fail'
+    return grade if score == entered_score
+    return grade unless LatePolicy::POINT_DEDUCTIBLE_GRADING_TYPES.include?(grading_type)
     assignment.score_to_grade(entered_score) if entered_score
   end
 
