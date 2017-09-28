@@ -15,6 +15,16 @@
       </a>
     {{/if}}
 
+    {{#if showModule}}
+      <div class="sm-module-footer">
+        <ul class="sm-module-footer__nav">
+          {{#each items}}
+            <li id="{{id}}"></li>
+          {{/each}}
+        </ul>
+      </div>
+    {{/if}}
+
     {{#if next.show}}
       <a
         href="{{next.url}}"

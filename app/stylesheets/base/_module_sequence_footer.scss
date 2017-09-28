@@ -56,3 +56,24 @@ $bar-height: 64px;
     display: none;
   }
 }
+
+.sm-module-footer{
+  display: flex;
+  flex: 1 0 auto;
+  padding: 10px;
+}
+
+.sm-module-footer__nav{
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+
+  li{
+    float: left;
+    background-color: var(--ic-brand-priamry);
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+}
