@@ -48,6 +48,11 @@ test('the avatar names the author', function () {
   strictEqual(this.wrapper.find('Avatar').prop('name'), this.props().author);
 });
 
+test('the avatar has alt text', function () {
+  const expectedAltText = `Avatar for ${this.props().author}`;
+  strictEqual(this.wrapper.find('Avatar').prop('alt'), expectedAltText);
+});
+
 test("the avatar soruce is the author's avatar url", function () {
   strictEqual(this.wrapper.find('Avatar').prop('src'), this.props().authorAvatarUrl);
 });

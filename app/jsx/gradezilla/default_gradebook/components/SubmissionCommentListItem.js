@@ -56,6 +56,7 @@ export default function SubmissionCommentListItem (props) {
             <Avatar
               size="small"
               name={author}
+              alt={I18n.t('Avatar for %{author}', { author })}
               src={authorAvatarUrl}
               margin="0 x-small 0 0"
             />
