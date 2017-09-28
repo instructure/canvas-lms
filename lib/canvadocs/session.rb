@@ -23,9 +23,8 @@ module Canvadocs
 
     def canvadoc_permissions_for_user(user, enable_annotations, moderated_grading_whitelist=nil)
       return {} unless enable_annotations && canvadocs_can_annotate?(user)
-
-      opts = canvadocs_default_options_for_user(user)
-      return opts if submissions.empty?
+      return canvadocs_default_options_for_user(user) if submissions.empty?
+      opts = canvadocs_default_options_for_user(user, observing?(user))
 
       opts[:read_grade] = submissions.any? { |s| s.grants_right? user, :read_grade }
       opts.delete :user_filter if opts[:read_grade]
@@ -40,6 +39,19 @@ module Canvadocs
       opts
     end
     private :canvadoc_permissions_for_user
+
+    def observing?(user)
+      user.enrollments.each do |enrollment|
+        next unless enrollment.type == "ObserverEnrollment"
+        submissions.each do |submission|
+          if submission.assignment.context_id == enrollment.course_id &&
+            submission.user_id == enrollment.associated_user_id
+            return true
+          end
+        end
+      end
+      false
+    end
 
     def canvadocs_can_annotate?(user)
       user.present?
@@ -69,10 +81,10 @@ module Canvadocs
     end
     private :canvadocs_annotation_context
 
-    def canvadocs_default_options_for_user(user)
+    def canvadocs_default_options_for_user(user, observing=false)
       opts = {
         annotation_context: canvadocs_annotation_context,
-        permissions: "readwrite",
+        permissions: observing ? 'read' : 'readwrite',
         user_id: user.global_id.to_s,
         user_name: user.short_name.delete(","),
         user_role: "",
