@@ -739,6 +739,7 @@ import 'compiled/jquery.rails_flash_notifications'
           }
           // set the status icon
           var $icon_container = $mod_item.find('.module-item-status-icon');
+
           var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
 
           var completed = _.any(reqs_met, function(req) {
@@ -746,13 +747,16 @@ import 'compiled/jquery.rails_flash_notifications'
           });
           if (completed)  {
             $mod_item.addClass('completed_item');
+            $icon_container.fadeIn(500);
             addIcon($icon_container, 'icon-check', I18n.t('Completed'));
           } else if (progression_state == 'completed') {
             // if it's already completed then don't worry about warnings, etc
             if ($mod_item.hasClass('progression_requirement')) {
+              $icon_container.fadeIn(500);
               addIcon($icon_container, 'no-icon', I18n.t('Not completed'));
             }
           } else if ($mod_item.data('past_due') != null) {
+            $icon_container.fadeIn(500);
             addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'));
           } else {
             var incomplete_req = null;
@@ -764,14 +768,17 @@ import 'compiled/jquery.rails_flash_notifications'
             if (incomplete_req) {
               if (incomplete_req.score != null) {
                 // didn't score high enough
+                $icon_container.fadeIn(500);
                 addIcon($icon_container, 'icon-minimize',
                   I18n.t("You scored a %{score}.", {'score': incomplete_req.score}) + " " + criterionMessage($mod_item) + ".");
               } else {
                 // hasn't been scored yet
+                $icon_container.fadeIn(500);
                 addIcon($icon_container, 'icon-info', I18n.t("Your submission has not been graded yet"));
               }
             } else {
               if ($mod_item.hasClass('progression_requirement')) {
+                $icon_container.fadeIn(500);
                 addIcon($icon_container, 'icon-mark-as-read', criterionMessage($mod_item));
               }
             }
