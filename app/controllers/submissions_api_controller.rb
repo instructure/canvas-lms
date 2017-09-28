@@ -324,7 +324,7 @@ class SubmissionsApiController < ApplicationController
     elsif can_view_all
       visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids).pluck(:user_id)
       inaccessible_students = student_ids - visible_student_ids
-      if !inaccessible_students.empty?
+      unless inaccessible_students.empty?
         return render_unauthorized_action
       end
     else
@@ -357,9 +357,9 @@ class SubmissionsApiController < ApplicationController
     if (enrollment_state = params[:enrollment_state].presence)
       case enrollment_state
       when 'active'
-        student_ids = @context.all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
+        student_ids = (@section || @context).all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
       when 'concluded'
-        student_ids = @context.all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
+        student_ids = (@section || @context).all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
       else
         return render json: {error: 'invalid enrollment_state'}, status: :bad_request
       end

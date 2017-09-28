@@ -134,6 +134,17 @@ describe 'Submissions API', type: :request do
       end
     end
 
+    context 'active enrollment_state with active and concluded enrollments' do
+      include_examples 'enrollment_state'
+      before do
+        e = @course.enroll_user(@student1, 'StudentEnrollment', section: @default_section)
+        e.conclude
+        @enrollment_state = 'concluded'
+        @active_count = 1
+        @concluded_count = 1
+      end
+    end
+
     context 'active enrollment_state' do
       include_examples 'enrollment_state'
       before do
