@@ -1779,12 +1779,8 @@ import 'compiled/jquery.rails_flash_notifications'
      $('.context_module_sub_header').each(function () {
         var header = $(this);
         var activities = header.nextUntil('.context_module_sub_header').detach();
-<<<<<<< HEAD
-        var activity_container = $('<div></div>').append(activities);
-=======
         var activity_container = $('<div style="display: none;"></div>').append(activities);
 
->>>>>>> fffd78909cb66c9aa66af1cd6d7bfe462325f88a
         $(this).after(activity_container);
         header.find('.context_module_sub_header_expander').click(function (event) {
           var button = $(this);
@@ -1830,34 +1826,7 @@ import 'compiled/jquery.rails_flash_notifications'
         if (item.type == "SubHeader") {
           // This is a subheader - if we have a current activity,
           // evaluate if it is complete, partially complete or undone
-<<<<<<< HEAD
-          if (_.every(completions)) {
-            // if the container is complete, close it by default.
-            current_lesson_state = "complete";
-            if (current_activity_container)
-              {
-                current_activity_container.hide();
-              }
-          } else if (_.some(completions)){
-            // in this case, always open the lesson
-            current_lesson_state = "started";
-
-            if (current_activity_container) {
-              var button = $('.context_module_sub_header_expander_' + item.id )
-              //init_icon_status(button)
-              current_activity_container.show();
-            }
-          } else {
-            current_lesson_state = "unstarted";
-            if (last_lesson_state == "complete") {
-              // in this case, open the lesson, *if* the last lesson is complete
-              if (current_activity_container)
-                current_activity_container.show();
-            }
-          };
-=======
           evaluate_lesson()
->>>>>>> fffd78909cb66c9aa66af1cd6d7bfe462325f88a
           if (current_lesson_state) {
             last_lesson_state = current_lesson_state;
           }
