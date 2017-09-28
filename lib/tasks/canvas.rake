@@ -56,6 +56,8 @@ namespace :canvas do
       }
     end
 
+    raise "Error running gulp rev" unless system('yarn run gulp rev')
+
     if compile_css
       # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
       # to exist before we run handlebars stuff, so we have to do this first
@@ -108,8 +110,6 @@ namespace :canvas do
     end
     combined_time = times.reduce(:+)
     puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
-
-    log_time("gulp rev") { Rake::Task['js:gulp_rev'].invoke }
   end
 
   desc "Just compile css and js for development"
