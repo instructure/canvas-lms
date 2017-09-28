@@ -1755,26 +1755,41 @@ import 'compiled/jquery.rails_flash_notifications'
       return content_type + '_' + content_id;
     }
   }
-
+  function update_icon_status(button){
+      if (button.hasClass('icon-arrow-open-right')) {
+        button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+      } else if (button.hasClass('icon-arrow-open-down')) {
+        button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
+      }
+      else {
+        console.log("else")
+      };
+  };
+  function init_icon_status(button){
+    button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+  };
   $(document).ready(function() {
+
+
    if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
 
+
      $('.context_module_sub_header').each(function () {
         var header = $(this);
         var activities = header.nextUntil('.context_module_sub_header').detach();
-        var activity_container = $('<div ></div>').append(activities);
-
+        var activity_container = $('<div></div>').append(activities);
         $(this).after(activity_container);
+        // header.find('.context_module_sub_header_expander').each( function () {
+        //   //if $(this).nextElementSibling. update_icon_status(button);
+        //   console.log(activity_container);
+        // });
+
         header.find('.context_module_sub_header_expander').click(function (event) {
           var button = $(this);
           activity_container.slideToggle();
-          if (button.hasClass('icon-arrow-open-right')) {
-            button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
-          } else if (button.hasClass('icon-arrow-open-down')) {
-            button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
-          };
+          update_icon_status(button);
         });
       });
     }
@@ -1786,6 +1801,8 @@ import 'compiled/jquery.rails_flash_notifications'
       var completions = [];
       var last_lesson_state = "complete"; // because we want the first lesson to open by default if none of its activities are complete
       unit.items.forEach(function (item) {
+        // console.log("Item:", item.id, item);
+
         if (last_was_subheader && item.type != "SubHeader") {
           current_activity_container = $('#context_module_item_' + item.id).parent();
         };
@@ -1795,21 +1812,39 @@ import 'compiled/jquery.rails_flash_notifications'
           if (_.every(completions)) {
             // if the container is complete, close it by default.
             current_lesson_state = "complete";
-            if (current_activity_container) current_activity_container.hide();
+            if (current_activity_container)
+              {
+                //current_activity_container.hide();
+              }
           } else if (_.some(completions)){
             // in this case, always open the lesson
             current_lesson_state = "started";
-            if (current_activity_container) current_activity_container.show();
+
+            if (current_activity_container) {
+              var button = $('.context_module_sub_header_expander_' + item.id )
+              init_icon_status(button)
+              current_activity_container.show();
+            }
           } else {
             current_lesson_state = "unstarted";
             if (last_lesson_state == "complete") {
               // in this case, open the lesson, *if* the last lesson is complete
-              if (current_activity_container) current_activity_container.show();
+              if (current_activity_container)
+                current_activity_container.show();
             }
           };
           if (current_lesson_state) {
             last_lesson_state = current_lesson_state;
           }
+          if (item.id==8)
+            {
+              console.log("completion array", completions)
+              console.log("current_activity_container", current_activity_container);
+              console.log("current state",current_lesson_state);
+              console.log("._every",_.every(completions));
+              console.log("_.some",_.some(completions));
+              console.log("_____________");
+            }
           completions = [];
           current_activity_container = false;
           last_was_subheader = true;
@@ -1820,6 +1855,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
         if (current_activity_container && item.type != "SubHeader") {
           if (item.completion_requirement) {
+            // console.log(item.id, item.title);
             completions.push(item.completion_requirement.completed);
           }
         };
