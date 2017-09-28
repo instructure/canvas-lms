@@ -223,6 +223,7 @@ define [
       params.reserve_comments = @event.object.reserve_comments ?= @event.object.comments
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
+      params.isPlannerNote = @event.eventType == 'planner_note'
 
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
       @popover.el.data('showEventDetailsDialog', @)
