@@ -1814,7 +1814,7 @@ import 'compiled/jquery.rails_flash_notifications'
             current_lesson_state = "complete";
             if (current_activity_container)
               {
-                //current_activity_container.hide();
+                current_activity_container.hide();
               }
           } else if (_.some(completions)){
             // in this case, always open the lesson
@@ -1822,7 +1822,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
             if (current_activity_container) {
               var button = $('.context_module_sub_header_expander_' + item.id )
-              init_icon_status(button)
+              //init_icon_status(button)
               current_activity_container.show();
             }
           } else {
