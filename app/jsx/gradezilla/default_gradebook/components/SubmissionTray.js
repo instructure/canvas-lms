@@ -38,24 +38,20 @@ import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/comp
 
 function renderAvatar (name, avatarUrl) {
   return (
-    <div style={{ flex: 'none' }}>
-      <div id="SubmissionTray__Avatar">
-        <Avatar name={name} src={avatarUrl} size="auto" />
-      </div>
+    <div id="SubmissionTray__Avatar">
+      <Avatar name={name} src={avatarUrl} size="auto" />
     </div>
   );
 }
 
 function renderSpeedGraderLink (speedGraderUrl) {
   return (
-    <div style={{ flex: 'none' }}>
-      <Container as="div" textAlign="center">
-        <Button href={speedGraderUrl} variant="link">
-          <IconSpeedGraderLine />
-          {I18n.t('SpeedGrader')}
-        </Button>
-      </Container>
-    </div>
+    <Container as="div" textAlign="center">
+      <Button href={speedGraderUrl} variant="link">
+        <IconSpeedGraderLine />
+        {I18n.t('SpeedGrader')}
+      </Button>
+    </Container>
   );
 }
 
@@ -130,8 +126,11 @@ function renderSubmissionComments (args) {
 
 export default function SubmissionTray (props) {
   const { name, avatarUrl } = props.student;
-  const speedGraderUrl = `/courses/${props.courseId}/gradebook/speed_grader` +
-    `?assignment_id=${props.submission.assignmentId}#%7B%22student_id%22%3A${props.student.id}%7D`;
+
+  const assignmentParam = `assignment_id=${props.submission.assignmentId}`;
+  const studentParam = `#%7B%22student_id%22%3A${props.student.id}%7D`;
+  const speedGraderUrl = `/courses/${props.courseId}/gradebook/speed_grader?${assignmentParam}${studentParam}`;
+
   const submissionCommentsProps = {
     submissionComments: props.submissionComments,
     submissionCommentsLoaded: props.submissionCommentsLoaded,
@@ -157,14 +156,16 @@ export default function SubmissionTray (props) {
       <div className="SubmissionTray__Container">
         { props.showContentComingSoon ?
             renderComingSoon(props.speedGraderEnabled, speedGraderUrl) :
-            <div id="SubmissionTray__Content" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-              {avatarUrl && renderAvatar(name, avatarUrl)}
+            <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div>
+                {avatarUrl && renderAvatar(name, avatarUrl)}
 
-              <div style={{ flex: 'none' }} id="SubmissionTray__StudentName">
-                {name}
-              </div>
+                <div id="SubmissionTray__StudentName">
+                  {name}
+                </div>
 
-              <div style={{ flex: 'none' }}>
+                <Container as="div" margin="small 0" className="hr" />
+
                 <Carousel
                   id="assignment-carousel"
                   onLeftArrowClick={props.selectPreviousAssignment}
@@ -177,29 +178,22 @@ export default function SubmissionTray (props) {
                     {props.assignment.name}
                   </Link>
                 </Carousel>
-              </div>
-
-              <Container
-                as="div"
-                style={{
-                  width: '100%',
-                  overflowY: 'auto',
-                  flex: '1 0 5rem',
-                  alignSelf: 'flex-end',
-                  paddingTop: '1rem'
-                }}
-              >
 
                 { props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
 
+                <Container as="div" margin="small 0" className="hr" />
+              </div>
+
+              <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
                 {!!props.submission.pointsDeducted &&
-                  <div style={{ flex: 'none' }}>
+                  <div>
                     <LatePolicyGrade submission={props.submission} />
+
+                    <Container as="div" margin="small 0" className="hr" />
                   </div>
                 }
 
-                <div id="SubmissionTray__RadioInputGroup" style={{ margin: '0 0 1rem' }}>
-                  {renderTraySubHeading('Status')}
+                <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
                   <SubmissionTrayRadioInputGroup
                     colors={props.colors}
                     locale={props.locale}
@@ -208,11 +202,9 @@ export default function SubmissionTray (props) {
                     submissionUpdating={props.submissionUpdating}
                     updateSubmission={props.updateSubmission}
                   />
-                </div>
+                </Container>
 
-                <div
-                  id="SubmissionTray__Comments"
-                >
+                <div id="SubmissionTray__Comments">
                   {renderSubmissionComments(submissionCommentsProps)}
                 </div>
               </Container>

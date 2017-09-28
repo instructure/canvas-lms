@@ -73,7 +73,6 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
   }
 
   render () {
-    const description = <ScreenReaderContent>{I18n.t('Submission status')}</ScreenReaderContent>;
     const radioOptions = ['none', 'late', 'missing', 'excused'].map(status =>
       <SubmissionTrayRadioInput
         key={status}
@@ -89,7 +88,11 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
       />
     );
 
-    return <FormFieldGroup description={description} rowSpacing="none">{radioOptions}</FormFieldGroup>;
+    return (
+      <FormFieldGroup description={I18n.t('Status')} layout="stacked" rowSpacing="none">
+        {radioOptions}
+      </FormFieldGroup>
+    );
   }
 }
 

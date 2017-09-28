@@ -851,6 +851,8 @@ $gradebook_checkbox_size: 16px;
 }
 
 .SubmissionTray__Container {
+  box-sizing: border-box;
+  height: 100%;
   padding: 1.5rem;
 
   input[type="text"] {
@@ -879,6 +881,7 @@ $gradebook_checkbox_size: 16px;
 #SubmissionTray__Content {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 #SubmissionTray__Avatar {
