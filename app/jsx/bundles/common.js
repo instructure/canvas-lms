@@ -125,7 +125,6 @@ if(!window.ENV.IS_STUDENT){
       $(".sm-teacher-tools-container").hide();
     }
     let activeDropdown = $("#sm-teacher-tools").find("a").hasClass("active")
-    console.log("activeDropdown", activeDropdown);
     if(activeDropdown){
         $('.sm-left-nav-toggler').addClass("active");
     }

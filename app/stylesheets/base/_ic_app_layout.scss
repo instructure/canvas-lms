@@ -191,7 +191,6 @@ body:not(.course-menu-expanded) {
   }
 
   body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame) & {
-    // margin-left: $ic-left-side-width;
 
     .ic-Layout-watermark {
       left: -$ic-left-side-width;
@@ -252,7 +251,7 @@ body:not(.course-menu-expanded) {
 .sm-course-menu.list-view{
   padding: 0 10px;
   position: relative;
-  border-bottom: $sm-gray-4;
+  border-bottom: $sm-course-nav-hover-color;
 
   ul{
     li{
@@ -261,7 +260,6 @@ body:not(.course-menu-expanded) {
       a{
         border-radius: 0px;
         padding: 20px 15px;
-        // margin-right: 20px;
 
         &:hover{
           background-color: transparent;
@@ -283,7 +281,7 @@ body:not(.course-menu-expanded) {
 .sm-course-menu.list-view > nav > ul > li > a:hover,
 .sm-course-menu.list-view > nav > ul > li > a:focus {
   padding-bottom: 16px;
-  border-bottom: 4px solid $sm-gray-4;
+  border-bottom: 4px solid $sm-course-nav-hover-color;
 }
 
 #left-side > div.sm-teacher-tools-container > button > div.caret{
@@ -304,7 +302,7 @@ body:not(.course-menu-expanded) {
 #sm-teacher-tools > li > a {
 
   &:hover{
-    background-color: $sm-gray-4;
+    background-color: $sm-course-nav-hover-color;
     color: var(--ic-brand-primary);
   }
 
@@ -338,7 +336,7 @@ body:not(.course-menu-expanded) {
 
   &:hover, &:focus{
     color: var(--ic-brand-primary);
-    border-bottom: 4px solid $sm-gray-4;
+    border-bottom: 4px solid $sm-course-nav-hover-color;
   }
 
   i{
@@ -355,7 +353,7 @@ body:not(.course-menu-expanded) {
      &:hover, &:focus{
        background-color: transparent;
        color: var(--ic-brand-primary);
-       border-bottom: 4px solid $sm-gray-4;
+       border-bottom: 4px solid $sm-course-nav-hover-color;
      }
 
    }

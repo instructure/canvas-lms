@@ -485,7 +485,6 @@
       <% @context.course_sections.active.order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
         <li class="section">
           <% if can_do section, @current_user, :read %>
-            Farts are funny
             <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
               <%= section.display_name %>
             </a>
