@@ -157,14 +157,14 @@ class Assignment < ActiveRecord::Base
     opts_with_default = default_opts.merge(opts)
 
     result = self.clone
-    result.migration_id = nil
     result.all_submissions.clear
     result.attachments.clear
     result.ignores.clear
     result.moderated_grading_selections.clear
-    result.lti_context_id = nil
-    result.turnitin_id = nil
-    result.discussion_topic = nil
+    [:migration_id, :lti_context_id, :turnitin_id,
+      :discussion_topic, :integration_id, :integration_data].each do |attr|
+      result.send(:"#{attr}=", nil)
+    end
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
     # Default to the last position of all active assignments in the group.  Clients can still
