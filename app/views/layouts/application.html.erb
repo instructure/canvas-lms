@@ -140,13 +140,13 @@
             <% end %>
             <%= section_tabs %>
             <% if defined? @context.grants_any_right? && !can_do(@context, @current_user, :participate_as_student) %>
-            <div class="sm-teacher-tools-container">
-              <a href="#" type="button" aria-haspopup="true" class="sm-left-nav-toggler" data-toggle="dropdown" data-id="teacher-tools" aria-owns="sm-teacher-tools" aria-labelledby="type-filter-description" aria-expanded="false">
-                <div class="filter-option pull-left"><%= t("Teacher Tools")%></div>
-                <i class="icon-arrow-open-down"></i>
-              </a>
-              <%= hidden_section_tabs %>
-            </div>
+              <div class="sm-teacher-tools-container" style="display: none">
+                <a href="#" type="button" aria-haspopup="true" class="sm-left-nav-toggler" data-toggle="dropdown" data-id="teacher-tools" aria-owns="sm-teacher-tools" aria-labelledby="type-filter-description" aria-expanded="false">
+                  <div class="filter-option pull-left"><%= t("Teacher Tools")%></div>
+                  <i class="icon-arrow-open-down"></i>
+                </a>
+                <%= hidden_section_tabs %>
+              </div>
             <% end %>
 
           <% end %>

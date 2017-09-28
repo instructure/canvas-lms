@@ -120,9 +120,11 @@ if (
 
 if(!window.ENV.IS_STUDENT){
   $(document).ready(function(){
-    let showTeacherTools = $("#sm-teacher-tools").find("a").length
-    if (showTeacherTools === 0 ){
-      $(".sm-teacher-tools-container").hide();
+    let showTeacherTools = $("#sm-teacher-tools").find("a").length;
+    console.log(showTeacherTools);
+
+    if (showTeacherTools > 0 ){
+      $(".sm-teacher-tools-container").show();
     }
     let activeDropdown = $("#sm-teacher-tools").find("a").hasClass("active")
     if(activeDropdown){
