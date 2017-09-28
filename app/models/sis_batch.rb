@@ -191,7 +191,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def batch_aborted(message)
-    add_errors([message])
+    add_errors([[message]])
     self.save!
     raise SisBatch::Aborted
   end
@@ -308,10 +308,23 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
+  def batch_mode_terms
+    if self.options[:multi_term_batch_mode]
+      @terms ||= EnrollmentTerm.where(sis_batch_id: self)
+      unless @terms.exists?
+        abort_batch
+        batch_aborted(t('Terms not found. Terms must be included with multi_term_batch_mode'))
+      end
+      @terms
+    else
+      self.batch_mode_term
+    end
+  end
+
   def term_course_scope
     if data[:supplied_batches].include?(:course)
       scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil)
-      scope.where(enrollment_term_id: self.batch_mode_term)
+      scope.where(enrollment_term_id: batch_mode_terms)
     end
   end
 
@@ -340,7 +353,7 @@ class SisBatch < ActiveRecord::Base
 
   def term_sections_scope
     if data[:supplied_batches].include?(:section)
-      scope = self.account.course_sections.active.where(courses: {enrollment_term_id: self.batch_mode_term})
+      scope = self.account.course_sections.active.where(courses: {enrollment_term_id: batch_mode_terms})
       scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil)
       scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
     end
@@ -369,7 +382,7 @@ class SisBatch < ActiveRecord::Base
   def term_enrollments_scope
     if data[:supplied_batches].include?(:enrollment)
       scope = self.account.enrollments.active.joins(:course).readonly(false).where.not(sis_batch_id: nil)
-      scope.where(courses: {enrollment_term_id: self.batch_mode_term})
+      scope.where(courses: {enrollment_term_id: batch_mode_terms})
     end
   end
 
@@ -394,17 +407,18 @@ class SisBatch < ActiveRecord::Base
 
   def remove_previous_imports
     # we shouldn't be able to get here without a term, but if we do, skip
-    return unless self.batch_mode_term
+    return unless self.batch_mode_term || options[:multi_term_batch_mode]
     supplied_batches = data[:supplied_batches].dup.keep_if { |i| [:course, :section, :enrollment].include? i }
     return unless supplied_batches.present?
-    SisBatch.where(id: self).update_all(workflow_state: 'cleanup_batch')
-
-    count = 0
-    courses = non_batch_courses_scope
-    sections = non_batch_sections_scope
-    enrollments = non_batch_enrollments_scope
-
     begin
+      batch_mode_terms if options[:multi_term_batch_mode]
+      SisBatch.where(id: self).update_all(workflow_state: 'cleanup_batch')
+
+      count = 0
+      courses = non_batch_courses_scope
+      sections = non_batch_sections_scope
+      enrollments = non_batch_enrollments_scope
+
       count = detect_changes(count, courses, enrollments, sections)
       row = remove_non_batch_courses(courses, count) if courses
       row = remove_non_batch_sections(sections, count, row) if sections
@@ -449,8 +463,8 @@ class SisBatch < ActiveRecord::Base
   end
 
   def change_detected_message(count, type)
-    [t("%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%",
-       count: count, type: type, change_threshold: change_threshold)]
+    t("%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%",
+      count: count, type: type, change_threshold: change_threshold)
   end
 
   def as_json(options={})

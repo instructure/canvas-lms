@@ -420,22 +420,28 @@ class SisImportsApiController < ApplicationController
           batch_mode_term = api_find(@account.enrollment_terms.active,
                                      params[:batch_mode_term_id])
         end
-        unless batch_mode_term
+        unless batch_mode_term || params[:multi_term_batch_mode]
           return render :json => {:message => "Batch mode specified, but the given batch_mode_term_id cannot be found."}, :status => :bad_request
         end
       end
 
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch|
         batch.change_threshold = params[:change_threshold]
+        batch.options ||= {}
         if batch_mode_term
           batch.batch_mode = true
           batch.batch_mode_term = batch_mode_term
+        elsif params[:multi_term_batch_mode]
+          batch.batch_mode=true
+          batch.options[:multi_term_batch_mode] = value_to_boolean(params[:multi_term_batch_mode])
+          unless batch.change_threshold
+            return render json: {message: "change_threshold is required to use multi term_batch mode."}, status: :bad_request
+          end
         elsif params[:diffing_data_set_identifier].present?
           batch.enable_diffing(params[:diffing_data_set_identifier],
                                remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
 
-        batch.options ||= {}
         if value_to_boolean(params[:override_sis_stickiness])
           batch.options[:override_sis_stickiness] = true
           [:add_sis_stickiness, :clear_sis_stickiness].each do |option|

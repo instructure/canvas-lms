@@ -48,6 +48,15 @@ The change_threshold can be set to any integer between 1 and 100.
 
 change_threshold also impacts diffing mode.
 
+Multi Term Batch Mode
+---------------------
+
+Multi term batch mode is just like batch mode except against multiple terms.
+Multi term batch mode is run against all terms included in the same import for
+the batch. To use multi term batch mode you must also set a change_threshold. If
+you intend to remove all items with multi term batch mode, you can set the
+change_threshold to 100.
+
 Diffing Mode
 ------------
 

@@ -248,6 +248,31 @@ describe SisImportsApiController, type: :request do
     expect(batch.change_threshold).to eq 7
   end
 
+  it "should requre change threshold for multi_term_batch_mode" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { controller: 'sis_imports_api', action: 'create',
+            format: 'json', account_id: @account.id.to_s },
+          { import_type: 'instructure_csv',
+            attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            multi_term_batch_mode: '1'})
+    expect(json['message']).to eq 'change_threshold is required to use multi term_batch mode.'
+  end
+
+  it "should use multi_term_batch_mode" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { controller: 'sis_imports_api', action: 'create',
+            format: 'json', account_id: @account.id.to_s },
+          { import_type: 'instructure_csv',
+            attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            batch_mode: '1',
+            multi_term_batch_mode: '1',
+            change_threshold: 7,})
+    batch = SisBatch.find(json["id"])
+    expect(batch.options[:multi_term_batch_mode]).to be_truthy
+  end
+
   it "should enable batch with sis stickyness" do
     json = api_call(:post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",
