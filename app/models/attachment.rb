@@ -948,7 +948,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def url_ttl
-    Setting.get('attachment_url_ttl', 1.day.to_s).to_i
+    Setting.get('attachment_url_ttl', 1.day.to_s).to_i.seconds
   end
   protected :url_ttl
 

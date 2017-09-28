@@ -1011,10 +1011,10 @@ describe Attachment do
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       allow(attachment).to receive(:authenticated_url) # allow other calls due to, e.g., save
-      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 86400))
+      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 86400.seconds))
       attachment.download_url
-      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 172800))
-      attachment.download_url(2.days.to_i)
+      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 2.days))
+      attachment.download_url(2.days)
     end
 
     it "should include response-content-disposition" do
