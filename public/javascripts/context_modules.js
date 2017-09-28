@@ -1779,7 +1779,12 @@ import 'compiled/jquery.rails_flash_notifications'
      $('.context_module_sub_header').each(function () {
         var header = $(this);
         var activities = header.nextUntil('.context_module_sub_header').detach();
+<<<<<<< HEAD
         var activity_container = $('<div></div>').append(activities);
+=======
+        var activity_container = $('<div style="display: none;"></div>').append(activities);
+
+>>>>>>> fffd78909cb66c9aa66af1cd6d7bfe462325f88a
         $(this).after(activity_container);
         header.find('.context_module_sub_header_expander').click(function (event) {
           var button = $(this);
@@ -1789,12 +1794,33 @@ import 'compiled/jquery.rails_flash_notifications'
       });
     }
 
-    var course_items = JSON.parse(window.localStorage.getItem("course_items"));
+    var course_items = JSON.parse(window.localStorage.getItem("course_items")) || [];
 
     course_items.forEach(function (unit){
       var current_activity_container, last_was_subheader, current_lesson_state;
       var completions = [];
       var last_lesson_state = "complete"; // because we want the first lesson to open by default if none of its activities are complete
+      function evaluate_lesson () {
+        if (_.every(completions)) {
+          // if the container is complete, close it by default.
+          current_lesson_state = "complete";
+          if (current_activity_container) current_activity_container.hide();
+        } else if (_.some(completions)) {
+          // in this case, always open the lesson
+          current_lesson_state = "started";
+          if (current_activity_container) current_activity_container.show();
+          current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+        } else {
+          current_lesson_state = "unstarted";
+          if (last_lesson_state == "complete") {
+            // in this case, open the lesson, *if* the last lesson is complete
+            if (current_activity_container) current_activity_container.show();
+            current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+          }
+        }
+        ;
+      }
+
       unit.items.forEach(function (item) {
         // console.log("Item:", item.id, item);
 
@@ -1804,6 +1830,7 @@ import 'compiled/jquery.rails_flash_notifications'
         if (item.type == "SubHeader") {
           // This is a subheader - if we have a current activity,
           // evaluate if it is complete, partially complete or undone
+<<<<<<< HEAD
           if (_.every(completions)) {
             // if the container is complete, close it by default.
             current_lesson_state = "complete";
@@ -1828,6 +1855,9 @@ import 'compiled/jquery.rails_flash_notifications'
                 current_activity_container.show();
             }
           };
+=======
+          evaluate_lesson()
+>>>>>>> fffd78909cb66c9aa66af1cd6d7bfe462325f88a
           if (current_lesson_state) {
             last_lesson_state = current_lesson_state;
           }
@@ -1856,6 +1886,7 @@ import 'compiled/jquery.rails_flash_notifications'
         };
 
       });
+      evaluate_lesson()
     });
 
 
