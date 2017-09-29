@@ -40,12 +40,17 @@ test('Provider with a store prop', function () {
   equal(provider.props().store, GradebookHistoryStore);
 });
 
+test('Heading', function () {
+  const heading = this.wrapper.find('h1');
+  strictEqual(heading.length, 1);
+});
+
 test('SearchForm', function () {
   const form = this.wrapper.find(SearchForm);
-  equal(form.length, 1);
+  strictEqual(form.length, 1);
 });
 
 test('SearchResults', function () {
   const results = this.wrapper.find(SearchResults);
-  equal(results.length, 1);
+  strictEqual(results.length, 1);
 });

@@ -30,6 +30,7 @@ const GradebookHistoryApp = () => (
   (
     <Provider store={GradebookHistoryStore}>
       <div>
+        <h1>{I18n.t('Gradebook History')}</h1>
         <SearchForm />
         <SearchResults caption={<ScreenReaderContent>{I18n.t('Grade Changes')}</ScreenReaderContent>} />
       </div>
