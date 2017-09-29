@@ -103,14 +103,10 @@
   <div id="wrapper" class="ic-Layout-wrapper">
     <% if crumbs.length > 1 %>
       <div class="ic-app-nav-toggle-and-crumbs no-print">
-        <% if @show_left_side %>
-          <button type="button" id="courseMenuToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>" title="<%= subnav_menu_text %>">
-            <i class="icon-hamburger" aria-hidden="true"></i>
-          </button>
-          <div class="ic-app-crumbs">
-        <% end %>
+        <div class="ic-app-crumbs">
         <%= render_crumbs %>
-        <% if @show_left_side %></div><% end %>
+        </div>
+
         <% if tutorials_enabled? %>
           <div class="TutorialToggleHolder"></div>
         <% end %>
@@ -122,7 +118,7 @@
       <% end %>
       <% if @show_left_side %>
         <div id="left-side"
-          class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
+          class="ic-app-course-menu sm-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
           style="display: <%= @collapse_course_menu ? "none" : "block" %>"
           >
           <% if left_side %>
@@ -143,10 +139,21 @@
               <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
             <% end %>
             <%= section_tabs %>
+            <% if defined? @context.grants_any_right? && !can_do(@context, @current_user, :participate_as_student) %>
+              <div class="sm-teacher-tools-container" style="display: none">
+                <a href="#" type="button" aria-haspopup="true" class="sm-left-nav-toggler" data-toggle="dropdown" data-id="teacher-tools" aria-owns="sm-teacher-tools" aria-labelledby="type-filter-description" aria-expanded="false">
+                  <div class="filter-option pull-left"><%= t("Teacher Tools")%></div>
+                  <i class="icon-arrow-open-down"></i>
+                </a>
+                <%= hidden_section_tabs %>
+              </div>
+            <% end %>
+
           <% end %>
           <% if left_side_custom %>
             <%= left_side_custom %>
           <% end %>
+          <div class="sm-course-menu-clear"></div>
         </div>
       <% end %>
       <div id="not_right_side" class="ic-app-main-content">
