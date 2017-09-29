@@ -17,14 +17,23 @@
 %>
 
 <div id="rubric_long_description_dialog" style="display: none;">
-  <div class="description" style="border-bottom: 1px solid #ccc; padding: 5px 0; font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">
-  </div>
   <div class="editing">
-    <textarea class="long_description" aria-label="<%= t 'labels.long_description', "Long Description" %>" name="long_description" style="width: 370px;"></textarea>
-    <div class="button-container">
-      <button type="button" class="btn btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-      <button type="button" class="btn save_button"><%= t 'buttons.update_description', "Update Description" %></button>
-    </div>
+    <form id="edit_criterion_form" class="no-margin-bottom">
+      <div>
+        <label class="rating_form_label"><%= t "Description" %>
+          <textarea class="description" rows="1" name="description"></textarea>
+        </label>
+      </div>
+      <div>
+        <label class="rating_form_label"><%= t "Long Description" %>
+          <textarea class="long_description" rows="4" name="long_description"></textarea>
+        </label>
+      </div>
+      <div class="button-container">
+        <button type="button" class="btn btn button-secondary cancel_button"><%= t "Cancel" %></button>
+        <button type="button" class="btn save_button btn-primary"><%= t "Update Criterion" %></button>
+      </div>
+    </form>
   </div>
   <div class="displaying">
     <div class="long_description">
@@ -47,8 +56,8 @@
       name="criterion_comments"
       style="width: 370px;"></textarea>
     <div class="button-container">
-      <button type="button" class="btn btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-      <button type="button" class="btn save_button"><%= t 'buttons.update_comments', "Update Comments" %></button>
+      <button type="button" class="btn btn button-secondary cancel_button"><%= t "Cancel" %></button>
+      <button type="button" class="btn save_button"><%= t "Update Comments" %></button>
     </div>
   </div>
   <div class="displaying">
