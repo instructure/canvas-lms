@@ -257,9 +257,7 @@ table {
   border-spacing: 0;
 }
 
-$sp-table: 14px; // Will replace this with global spacing variable, when it hits master
-
-//ic-Tab__Panel--is-open
+$sp-table: $ic-sp + 2;
 
 .ic-Table {
   max-width: 100%;
@@ -293,6 +291,11 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
     }
   }
 
+  tbody th {
+    border-bottom-color: $ic-border-light;
+    padding-bottom: $sp-table;
+  }
+
   td {
     border-bottom-color: $ic-border-light;
     // If you need to add admin links to the far-right cell, enclose them in .ic-Table--actions
@@ -310,6 +313,10 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
     th {
       padding: $sp-table/2;
       padding-bottom: $sp-table/4;
+    }
+    tbody th {
+      padding-bottom: $sp-table/2;
+      @include fontSize($ic-font-size--xsmall);
     }
   }
 
