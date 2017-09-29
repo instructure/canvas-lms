@@ -1080,6 +1080,32 @@ describe SIS::CSV::UserImporter do
     expect(user2.user.workflow_state).to eq 'registered'
   end
 
+  it 'should leave users enrollments when there is another pseudonym' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    u = @account.pseudonyms.where(sis_user_id: 'user_1').take.user
+    pseudonym2 = u.pseudonyms.create!(account: @account, unique_id: 'other_login@example.com')
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,teacher,,active,,,",
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,deleted"
+    )
+    pseudonym1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
+    expect(u.workflow_state).to eq 'registered'
+    expect(pseudonym1.workflow_state).to eq 'deleted'
+    expect(pseudonym2.workflow_state).to eq 'active'
+    expect(u.enrollments.take.workflow_state).to eq 'active'
+  end
+
   it 'should remove enrollments when a user is deleted' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",

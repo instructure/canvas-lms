@@ -280,8 +280,10 @@ still be provided.</td>
 <p>The user's name (either first_name and last_name, or full_name) should always
 be provided. Otherwise, the name will be blanked out.</p>
 
-<p>When a student is 'deleted' all of its enrollments will also be deleted and
-they won't be able to log in to the school's account. If you still want the
+
+<p>When a user is 'deleted' it will delete the login tied to the sis_id.
+If the login is the last one, all of the users enrollments will also be deleted
+and they won't be able to log in to the school's account. If you still want the
 student to be able to log in but just not participate, leave the student
 'active' but set the enrollments to 'completed'.</p>
 
