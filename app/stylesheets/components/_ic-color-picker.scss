@@ -132,7 +132,7 @@
     left: -4px;
     right: -4px;
     bottom: -4px;
-    border: 1px solid $ic-brand-primary;
+    border: 1px solid var(--ic-brand-primary);
     border-radius: 5px;
     transform: scale(0.01);
     transition: all 0.2s;
