@@ -1,42 +1,51 @@
 <div class='module-sequence-padding'></div>
 <div class='module-sequence-footer' role="navigation" aria-label="{{#t}}Module Navigation{{/t}}">
   <div class="module-sequence-footer-content">
-    {{#if previous.show}}
-      <a
-        href="{{previous.url}}"
-        role="button"
-        class="Button module-sequence-footer-button--previous"
-        data-tooltip="right"
-        data-html-tooltip-title="{{previous.tooltip}}"
-        aria-describedby="msf{{instanceNumber}}-previous-desc"
-      >
-        <i class="icon-mini-arrow-left"></i>{{#t 'previous'}}Previous{{/t}}
-        <span id="msf{{instanceNumber}}-previous-desc" class="hidden" hidden>{{previous.tooltipText}}</span>
-      </a>
-    {{/if}}
+    <div class="sm-footer-nav-container">
+
+      <div class="sm-footer-title-container">
+        {{#if previous.show}}
+          <a
+            href="{{previous.url}}"
+            role="button"
+            class="Button module-sequence-footer-button--previous"
+            data-tooltip="right"
+            data-html-tooltip-title="{{previous.tooltip}}"
+            aria-describedby="msf{{instanceNumber}}-previous-desc"
+          >
+            <i class="icon-mini-arrow-left"></i>{{#t 'previous'}}Previous{{/t}}
+            <span id="msf{{instanceNumber}}-previous-desc" class="hidden" hidden>{{previous.tooltipText}}</span>
+          </a>
+        {{/if}}
+
+        <h2>The Title Goes Here</h2>
+
+        {{#if next.show}}
+          <a
+            href="{{next.url}}"
+            role="button"
+            class="Button module-sequence-footer-button--next"
+            data-tooltip="left"
+            data-html-tooltip-title="{{next.tooltip}}"
+            aria-describedby="msf{{instanceNumber}}-next-desc"
+          >
+            {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>
+            <span id="msf{{instanceNumber}}-next-desc" class="hidden" hidden>{{next.tooltipText}}</span>
+          </a>
+        {{/if}}
+      </div>
+
+    </div>
 
     {{#if showModule}}
       <div class="sm-module-footer">
         <ul class="sm-module-footer__nav">
           {{#each items}}
-            <li id="{{id}}"></li>
+            <li id="{{id}}"><a href="{{html_url}}" data-tooltip="top"
+            data-html-tooltip-title="{{title}}"></a></li>
           {{/each}}
         </ul>
       </div>
-    {{/if}}
-
-    {{#if next.show}}
-      <a
-        href="{{next.url}}"
-        role="button"
-        class="Button module-sequence-footer-button--next"
-        data-tooltip="left"
-        data-html-tooltip-title="{{next.tooltip}}"
-        aria-describedby="msf{{instanceNumber}}-next-desc"
-      >
-        {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>
-        <span id="msf{{instanceNumber}}-next-desc" class="hidden" hidden>{{next.tooltipText}}</span>
-      </a>
     {{/if}}
   </div>
 </div>

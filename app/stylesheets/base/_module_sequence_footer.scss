@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$bar-height: 64px;
+$bar-height: 120px;
 
 .module-sequence-footer {
   position: relative;
@@ -36,7 +36,6 @@ $bar-height: 64px;
   background: transparent;
   border-top: 1px solid $ic-border-light;
   box-sizing: border-box;
-  padding-top: $ic-sp;
 }
 
 @keyframes module-sequence-footer-animation {
@@ -63,17 +62,44 @@ $bar-height: 64px;
   padding: 10px;
 }
 
-.sm-module-footer__nav{
-  overflow: hidden;
+.sm-footer-title-container{
+  max-height: 30px;
+
+
+  h2{
+    font-size: 18px;
+    display: flex;
+    flex: 1 0 auto;
+    text-align: center;
+  }
+}
+
+ul.sm-module-footer__nav{
   width: 100%;
   display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  padding: 0;
+  margin: 0;
 
   li{
-    float: left;
-    background-color: var(--ic-brand-priamry);
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+
+    a{
+      display: block;
+      margin: auto;
+      background-color: var(--ic-brand-primary);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 10px;
+
+      &.current{
+        width: 20px;
+        height: 20px;
+      }
+    }
   }
 }
