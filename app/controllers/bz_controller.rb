@@ -30,8 +30,13 @@ class BzController < ApplicationController
         obj = {}
         obj["description"] = criterion["description"]
         obj["criterion_id"] = criterion["id"]
-        obj["section"] = criterion["description"][/^([0-9]+)/, 1]
-        obj["subsection"] = criterion["description"][/^[0-9]+\.([0-9]+)/, 1]
+        if criterion["description"]
+          obj["section"] = criterion["description"][/^([0-9]+)/, 1]
+          obj["subsection"] = criterion["description"][/^[0-9]+\.([0-9]+)/, 1]
+        else
+          obj["section"] = 0
+          obj["subsection"] = 0
+        end
         obj["points_available"] = criterion["points"]
         criteria << obj
       end
