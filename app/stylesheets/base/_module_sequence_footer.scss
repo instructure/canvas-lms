@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$bar-height: 120px;
+$bar-height: 130px;
 
 .module-sequence-footer {
   position: relative;
@@ -47,8 +47,7 @@ $bar-height: 120px;
   animation: module-sequence-footer-animation 0.5s ease-out;
 }
 
-.module-sequence-footer-button--next { float: right; }
-.module-sequence-footer-button--previous { float: left; }
+
 
 @media print {
   .module-sequence-padding, .module-sequence-footer {
@@ -63,24 +62,38 @@ $bar-height: 120px;
 }
 
 .sm-footer-title-container{
-  max-height: 30px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  box-sizing: border-box;
 
 
   h2{
     font-size: 18px;
-    display: flex;
+    font-weight: 500;
+    display: inline-block;
     flex: 1 0 auto;
     text-align: center;
+
   }
+
+  .sm-flow-control-cotainer{
+      display: flex;
+      flex-direction: column;
+  }
+
 }
 
 ul.sm-module-footer__nav{
+
   width: 100%;
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   padding: 0;
   margin: 0;
+  margin-top: 10px;
 
   li{
     display: flex;
@@ -90,15 +103,23 @@ ul.sm-module-footer__nav{
     a{
       display: block;
       margin: auto;
-      background-color: var(--ic-brand-primary);
+      background-color: $sm-footer-progress-background;
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      margin-right: 10px;
 
       &.current{
         width: 20px;
         height: 20px;
+        background-color: $sm-footer-progress-background-current;
+
+        &:hover{
+          background-color: darken($sm-footer-progress-background-current, 5%);
+        }
+      }
+
+      &:hover{
+        background-color: $sm-footer-progress-background-hover;
       }
     }
   }

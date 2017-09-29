@@ -133,8 +133,6 @@
 
 .header-bar {
   @include clearfix;
-  min-height: 33px;
-  padding-bottom: $ic-sp;
 
   &.pinned {
     position: fixed;
@@ -170,6 +168,9 @@
   }
   &.no-line {
     border: none;
+  }
+  .header-bar-right__buttons{
+    margin-bottom: $ic-sp;
   }
 }
 

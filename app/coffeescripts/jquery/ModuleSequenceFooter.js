@@ -67,7 +67,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
       let module = JSON.parse(window.localStorage.getItem(`module|${this.msfInstance.moduleID}`)) || {}
       let items = module.items || []
       let showModule = items.length > 0
-      console.log("module", module)
+      let currentItem = _.findWhere(items, {id: this.msfInstance.item.current.id})
 
       if (this.msfInstance.hide) {
         this.hide()
@@ -78,6 +78,8 @@ $.fn.moduleSequenceFooter = function (options = {}) {
         showModule: showModule,
         items: items,
         module: module,
+        currentItem: currentItem,
+        currentID: this.msfInstance.assetID,
         instanceNumber: this.msfInstance.instanceNumber,
         previous: this.msfInstance.previous,
         next: this.msfInstance.next,
@@ -181,7 +183,7 @@ export default class ModuleSequenceFooter {
       this.hide = true
       return
     }
-
+    this.current = data.current
     this.item = data.items[0]
     // Show the buttons if they aren't null
     if ((this.next.show = this.item.next)) this.buildNextData()
