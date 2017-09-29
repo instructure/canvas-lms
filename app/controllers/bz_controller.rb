@@ -93,7 +93,7 @@ class BzController < ApplicationController
         row << "Total Score -- #{assignment.name}"
 
         sections.each do |section|
-          row << "Section #{section} Average -- #{assignment.name}"
+          row << "Category #{section} Average -- #{assignment.name}"
         end
 
         criteria.each do |criterion|
