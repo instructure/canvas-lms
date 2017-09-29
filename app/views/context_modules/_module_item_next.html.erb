@@ -73,6 +73,9 @@
       </span>
     </div>
     <% end %>
+    <% if module_item && module_item.content_type_class == 'context_module_sub_header' %>
+        <i class="context_module_sub_header_expander_<%= module_item ? module_item.id : "blank" %> context_module_sub_header_expander icon-arrow-open-right"></i>
+    <% end %>
 
     <span class="type_icon" title="<%= module_item_translated_content_type(module_item) %>">
       <span class="ig-type-icon">
