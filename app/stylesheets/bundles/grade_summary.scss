@@ -31,59 +31,53 @@
   margin-bottom: 0px;
 }
 
+.dropdowns {
+  display: inline-block;
+
+  .course_selector,
+  .assignment_order {
+    float: left;
+    margin-right: $ic-sp;
+  }
+}
 // styles for grade summary tables
 #grades_summary {
   border-collapse: collapse;
-  border-bottom: 1px solid #eee;
+  margin-top: $ic-sp;
+
   @media print {
     border-bottom: none;
     a {
       text-decoration: none !important;
-      color: black;
     }
   }
 }
 
 #grades_summary thead th {
-  border-top: none;
-  font-size: 1em;
-  padding: 4px 5px 2px;
-  font-weight: bold;
-  background-color: #444;
-  color: #fff;
-  text-align: left;
   @media print {
     text-transform: uppercase;
-    color: black;
-    font-size: 1.2em;
+    font-size: $ic-font-size - 2;
     font-weight: bold;
     border-bottom: 2px solid black;
     padding-left: 0;
   }
 }
 
-#grades_summary tr {
-  > * {
-    padding: 5px;
-    text-align: left;
-    border-top: 2px solid black;
-    background-color: #fff;
-    @media print {
-      border-top: 1px solid black;
-      color: black !important;
-      background-color: transparent !important;
-    }
+#grades_summary {
+  .status,
+  .assignment_score,
+  .possible,
+  .details {
+    text-align: center;
   }
 }
 
 #grades_summary tr.comments td {
   border-width: 0;
-  font-size: 0.8em;
   padding-left: 30px;
   @media print {
     padding-left: 0;
     font-style: italic;
-    font-size: 0.9em;
   }
 }
 
@@ -96,56 +90,12 @@
   }
 }
 
-#grades_summary tr.editable:hover > * {
-  background-color: lighten(#cdf, 6%);
-}
-
-#grades_summary tr.editable.student_assignment.dropped:hover td.points_possible,
-#grades_summary tr.editable.student_assignment.excused:hover td.points_possible {
-  background-image: url(/images/earmark_hover.png);
-}
-
-#grades_summary tr.student_assignment.dropped td,
-#grades_summary tr.student_assignment.excused td {
-  color: #ccc;
-  @media print {
-    color: black;
-  }
-}
-
-#grades_summary tr.student_assignment.dropped td.points_possible,
-#grades_summary tr.student_assignment.excused td.points_possible {
-  background-image: url(/images/earmark.png);
-  background-repeat: no-repeat;
-  background-position: top left;
-}
-
-#grades_summary tr.student_assignment.dropped td a,
-#grades_summary tr.student_assignment.excused td a {
-  color: #aaa;
-  @media print {
-    color: black;
-    font-weight: normal;
-  }
-}
-
-#grades_summary th.assignment_score {
-  text-align: center;
-}
-
 #grades_summary td.assignment_score {
   cursor: pointer;
-  text-align: center;
   white-space: nowrap;
 }
 
-#grades_summary tr > .assignment_score .grade.changed {
-  color: #800;
-  font-weight: bold;
-}
-
 #grades_summary th.possible {
-  text-align: right;
   white-space: nowrap;
 }
 
@@ -159,37 +109,29 @@
   }
 }
 
-#grades_summary td.possible {
-  text-align: right;
-  padding-right: 15px;
-}
-
 #grades_summary td.details {
   text-align: right;
   padding-left: 0;
   white-space: nowrap;
-  // 4 x 20 pixel icons
-  min-width: 80px;
+  min-width: 80px;  // equals 4 x 20 pixel icons
+
+  & a {
+    color: $ic-icon-link-color;
+    &:hover, &:focus {
+      color: $ic-icon-link-color-hover;
+    }
+  }
 }
 
 #grades_summary th.title {
-  font-size: 1.1em;
   font-weight: normal;
-  padding-left: 20px;
-  word-break: break-all;
-  @media print {
-    padding-left: 0;
-    font-size: 1em;
-    font-weight: normal;
-  }
+  border-bottom-color: $ic-border-light;
 }
 
 #grades_summary th.title .context {
   visibility: hidden;
-  font-size: 0.8em;
-  padding-left: 10px;
-  line-height: 0.5em;
-  color: darken($ic-color-neutral, 40);
+  font-size: $ic-font-size - 2;
+  color: $ic-font-color-dark;
   @media print {
     visibility: visible;
     margin: 5px 0;
@@ -202,44 +144,35 @@
 }
 
 #grades_summary td.due {
-  font-size: 0.8em;
   white-space: nowrap;
-  @media print {
-    font-size: 1em;
+}
+
+#grades_summary tr.assignment_graded {
+  .unread-grade {
+    margin-left: -24px;
   }
 }
 
-#grades_summary tr.assignment_graded > * {
-  background-color: #eee;
-  @media print {
-    background-color: transparent;
-    &.title {
-      font-weight: bold;
-    }
-  }
-}
-
-#grades_summary tr.final_grade > * {
-  background-color: #666;
-  color: #eee;
-  font-size: 1.5em;
+#grades_summary tr.final_grade {
+  font-size: $ic-font-size + 6;
   font-weight: bold;
+  border-top: 2px solid $ic-border-dark;
+
+  .possible {
+    font-size: $ic-font-size;
+  }
+
   @media print {
-    background-color: transparent;
     text-transform: uppercase;
     border-top: 2px solid black;
-    font-size: 1.2em;
+    font-size: $ic-font-size;
   }
 }
 
 #grades_summary tr.group_total {
   td, th[scope=row] {
-    background-color: #ccc;
-    border-top-width: 0;
     font-weight: bold;
     @media print {
-      background-color: transparent;
-      border-top-width: 1px;
       text-transform: uppercase;
       &.title .context {
         display: none;
@@ -294,16 +227,15 @@
     position: absolute;
   }
   .tooltip_text {
-    background-color: #444;
+    background-color: $ic-color-dark;
     background-position: left bottom;
-    color: #fff;
+    color: $ic-color-light;
     left: 0px;
     max-width: 250px;
     padding: 2px 7px 2px;
     white-space: nowrap;
     table tr td {
       background-color: transparent;
-      font-size: 1em;
       padding: 0 2px;
       border-width: 0px;
     }
@@ -328,9 +260,6 @@
 }
 
 #grades_summary table.score_details_table {
-  font-size: 1.3em;
-  width: 100%;
-  border: 1px solid black;
 
   .error {
     color: $ic-color-danger;
@@ -338,16 +267,12 @@
 
   td {
     padding-left: 1em;
-    font-weight: bold;
   }
 }
 
 a.screenreader-toggle {
   font-weight: normal;
   padding-right: 5px;
-  #grades_summary .score_details_table & {
-    color: white;
-  }
 }
 
 .grade-summary-graph-component {
@@ -357,7 +282,7 @@ a.screenreader-toggle {
   width: 0;
   overflow: hidden;
   border-style: solid;
-  border-color: darken($ic-color-neutral, 38);
+  border-color: $ic-border-dark;
 }
 
 div.rubric-toggle {
