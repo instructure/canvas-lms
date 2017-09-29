@@ -502,6 +502,7 @@ YYYY-MM-DDTHH:MM:SSZ</td>
 <td>The SIS id of a pre-existing Blueprint course. When provided, 
 the current course will be set up to receive updates from the blueprint course.
 Requires Blueprint Courses feature.
+To remove the Blueprint Course link you can pass 'dissociate' in place of the id.
 </td>
 </tr>
 </table>
