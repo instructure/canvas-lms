@@ -118,7 +118,7 @@ module Api::V1::CalendarEvent
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, '{{ id }}')
       end
       if participant_limit = event.participants_per_appointment
-        hash["available_slots"] = [participant_limit - hash["child_events_count"], 0].max
+        hash["available_slots"] = [participant_limit - event.child_events.size, 0].max
         hash["participants_per_appointment"] = participant_limit
       end
     end
