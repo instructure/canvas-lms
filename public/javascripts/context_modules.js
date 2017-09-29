@@ -1830,15 +1830,6 @@ import 'compiled/jquery.rails_flash_notifications'
           if (current_lesson_state) {
             last_lesson_state = current_lesson_state;
           }
-          // if (item.id==8)
-          //   {
-          //     console.log("completion array", completions)
-          //     console.log("current_activity_container", current_activity_container);
-          //     console.log("current state",current_lesson_state);
-          //     console.log("._every",_.every(completions));
-          //     console.log("_.some",_.some(completions));
-          //     console.log("_____________");
-          //   }
           completions = [];
           current_activity_container = false;
           last_was_subheader = true;
