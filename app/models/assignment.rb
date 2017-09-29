@@ -980,11 +980,11 @@ class Assignment < ActiveRecord::Base
 
   def interpret_grade(grade)
     case grade.to_s
-    when %r{%$}
+    when %r{^[+-]?\d*\.?\d+%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
       points_possible.to_f * percentage
-    when %r{[\d\.]+}
+    when %r{^[+-]?\d*\.?\d+$}
       if grading_type == "gpa_scale"
         # if it matches something in a scheme, take that, else return nil
         return nil unless standard_based_score = grading_standard_or_default.grade_to_score(grade)
