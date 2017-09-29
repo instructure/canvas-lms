@@ -211,6 +211,7 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
       expect(json[0]['user']).not_to be_nil
       expect(json[0]['user']['id']).to eq(@student1.id)
+      expect(response.headers["Link"]).to include("/api/v1/sections/#{@section.id}")
     end
 
     it "returns assignment_visible" do
