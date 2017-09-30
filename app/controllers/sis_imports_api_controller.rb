@@ -173,6 +173,10 @@
 #             "items": {"type": "string"}
 #           }
 #         },
+#         "user": {
+#           "description": "The user that initiated the sis_batch. See the Users API for details.",
+#           "$ref": "User"
+#         },
 #         "processing_errors": {
 #           "description": "An array of CSV_file/error_message pairs.",
 #           "example": [["students.csv","Error while importing CSV. Please contact support."]],

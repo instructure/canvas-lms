@@ -58,6 +58,7 @@ describe SisImportsApiController, type: :request do
       expect(json["batch_mode_term_id"]).not_to be_nil
     end
     json.delete("batch_mode_term_id")
+    json.delete("user")
     batch = SisBatch.last
     expect(json).to eq({
           "data" => { "import_type"=>"instructure_csv"},
@@ -97,6 +98,7 @@ describe SisImportsApiController, type: :request do
     json.delete("ended_at")
     expect(json.has_key?("started_at")).to eq true
     json.delete("started_at")
+    json.delete("user")
     batch = SisBatch.last
     expect(json).to eq({
           "data" => { "import_type"=>"instructure_csv"},
@@ -133,6 +135,7 @@ describe SisImportsApiController, type: :request do
     json.delete("ended_at")
     expect(json.has_key?("started_at")).to eq true
     json.delete("started_at")
+    json.delete("user")
     expect(json).to eq({
           "data" => { "import_type" => "instructure_csv",
                       "supplied_batches" => ["user"],
@@ -645,6 +648,7 @@ describe SisImportsApiController, type: :request do
     json["sis_imports"].first.delete("updated_at")
     json["sis_imports"].first.delete("ended_at")
     json["sis_imports"].first.delete("started_at")
+    json["sis_imports"].first.delete("user")
 
     expect(json).to eq({"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
