@@ -296,7 +296,8 @@ describe "Outcome Groups API", type: :request do
             "title" => @outcome.title.to_s,
             "display_name" => nil,
             "url" => api_v1_outcome_path(:id => @outcome.id),
-            "can_edit" => can_edit
+            "can_edit" => can_edit,
+            "has_updateable_rubrics" => false
           })
         end
       end
@@ -811,7 +812,8 @@ describe "Outcome Groups API", type: :request do
             "title" => outcome.title,
             "display_name" => nil,
             "url" => api_v1_outcome_path(:id => outcome.id),
-            "can_edit" => true
+            "can_edit" => true,
+            "has_updateable_rubrics" => false
           }
         }
       end.sort_by{ |link| link['outcome']['id'] })
@@ -899,7 +901,8 @@ describe "Outcome Groups API", type: :request do
             "title" => @outcome.title.to_s,
             "display_name" => nil,
             "url" => api_v1_outcome_path(:id => @outcome.id),
-            "can_edit" => !LearningOutcome.find(@outcome.id).assessed?
+            "can_edit" => !LearningOutcome.find(@outcome.id).assessed?,
+            "has_updateable_rubrics" => @outcome.updateable_rubrics?
           })
         end
       end
@@ -1137,7 +1140,8 @@ describe "Outcome Groups API", type: :request do
             "title" => @outcome.title,
             "display_name" => nil,
             "url" => api_v1_outcome_path(:id => @outcome.id),
-            "can_edit" => false
+            "can_edit" => false,
+            "has_updateable_rubrics" => false
           }
         })
       end
@@ -1482,7 +1486,8 @@ describe "Outcome Groups API", type: :request do
           "display_name" => nil,
           "title" => @outcome.title,
           "url" => api_v1_outcome_path(:id => @outcome.id),
-          "can_edit" => false
+          "can_edit" => false,
+          "has_updateable_rubrics" => false
         }
       })
     end
