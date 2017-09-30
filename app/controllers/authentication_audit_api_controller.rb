@@ -26,6 +26,8 @@
 # are also included. Refer to the Logins, Accounts, Page Views, and Users APIs
 # for descriptions of the objects in those collections.
 #
+# Authentication logs are stored for one year.
+#
 # @model AuthenticationEvent
 #     {
 #       "id": "AuthenticationEvent",
@@ -74,6 +76,7 @@ class AuthenticationAuditApiController < AuditorApiController
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
+  #   Events are stored for one year.
   #
   # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
@@ -94,6 +97,7 @@ class AuthenticationAuditApiController < AuditorApiController
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
+  #   Events are stored for one year.
   #
   # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
@@ -114,6 +118,7 @@ class AuthenticationAuditApiController < AuditorApiController
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
+  #   Events are stored for one year.
   #
   # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
