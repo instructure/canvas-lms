@@ -98,6 +98,7 @@ class SplitUsers
     private
 
     def split_users(user, merge_data)
+      # user is the active user that was the destination of the user merge
       user.shard.activate do
         ActiveRecord::Base.transaction do
           records = merge_data.user_merge_data_records
@@ -115,6 +116,8 @@ class SplitUsers
       end
     end
 
+    # source_user is the destination user of the user merge
+    # user is the old user that is being restored
     def move_records_to_old_user(source_user, user, records)
       fix_communication_channels(source_user, user, records.where(context_type: 'CommunicationChannel'))
       move_user_observers(source_user, user, records.where(context_type: 'UserObserver', previous_user_id: user))
@@ -140,11 +143,16 @@ class SplitUsers
       restore_worklow_states_from_records(records)
     end
 
+    # source_user is the destination user of the user merge
+    # user is the old user that is being restored
     def fix_communication_channels(source_user, user, cc_records)
       if source_user.shard != user.shard
-        user.shard.activate do
+        source_user.shard.activate do
           # remove communication channels that didn't exist prior to the merge
-          CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non_existent').pluck(:context_id)).delete_all
+          ccs = CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non_existent').pluck(:context_id))
+          DelayedMessage.where(communication_channel_id: ccs).delete_all
+          NotificationPolicy.where(communication_channel: ccs).delete_all
+          ccs.delete_all
         end
       end
       # move moved communication channels back

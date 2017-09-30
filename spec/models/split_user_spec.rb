@@ -393,6 +393,9 @@ describe SplitUsers do
 
         @shard1.activate do
           UserMerge.from(user1).into(@user2)
+          cc = @user2.reload.communication_channels.where(path: 'user1@example.com').take
+          n = Notification.create!(name: 'Assignment Createds', subject: 'Tests', category: 'TestNevers')
+          NotificationPolicy.create(notification: n, communication_channel: cc, frequency: 'immediately')
           SplitUsers.split_db_users(@user2)
         end
 
