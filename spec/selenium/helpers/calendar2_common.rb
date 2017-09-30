@@ -43,7 +43,7 @@ module Calendar2Common
   end
 
   def create_appointment_group(params={})
-    tomorrow = (Date.today + 1.day).to_s
+    tomorrow = (Time.now.utc.to_date + 1.day).to_s
     default_params = {
         :title => "new appointment group",
         :contexts => [@course],
@@ -57,7 +57,7 @@ module Calendar2Common
   end
 
   def create_appointment_group_early(params={})
-    tomorrow = (Date.today + 1.day).to_s
+    tomorrow = (Time.now.utc.to_date + 1.day).to_s
     default_params = {
         :title => "new appointment group",
         :contexts => [@course],

@@ -172,6 +172,8 @@ describe "calendar2" do
 
         get "/calendar2"
 
+        # navigate to the next month for end of month
+        f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
         open_edit_event_dialog
         description = 'description...'
         replace_content f('[name=description]'), description

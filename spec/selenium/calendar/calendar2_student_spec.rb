@@ -43,6 +43,8 @@ describe "calendar2" do
         @user = @me
         get "/calendar2"
 
+        # navigate to the next month for end of month
+        f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
         fj('.fc-event:visible').click
         expect(fj("#popover-0")).to be_displayed
         expect_new_page_load { driver.execute_script("$('#popover-0 .view_event_link').hover().click()") }
