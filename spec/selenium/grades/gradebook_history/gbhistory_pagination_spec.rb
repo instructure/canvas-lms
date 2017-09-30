@@ -67,7 +67,7 @@ describe "Gradebook History Page" do
     end
 
     # as a teacher grade the assignments
-    2.times do
+    50.times do
       @assignment_past_due_day.grade_student(@student, grade: String(Random.rand(1...100)), grader: @teacher)
       @assignment_due_one_day.grade_student(@student, grade: String(Random.rand(1...100)), grader: @teacher)
       @assignment_due_one_week.grade_student(@student, grade: String(Random.rand(1...10)), grader: @teacher)
@@ -79,18 +79,15 @@ describe "Gradebook History Page" do
     GradeBookHistory.visit(@course)
   end
 
-  context "shows the results table for a valid search" do
-
-    it "with all valid inputs", test_id: 3308073, priority: "1" do
-      GradeBookHistory.click_filter_button
-      wait_for_ajaximations
-      expect(GradeBookHistory.results_table).to be_displayed
-    end
-
-    it "and the current column has the same grade as related grade history rows", test_id: 3308871, priority: "1" do
-       GradeBookHistory.click_filter_button
-       wait_for_ajaximations
-       expect(GradeBookHistory.check_current_col_for_history('assignment two')).to be true
-    end
+  it "should show additional new rows on a new page scroll", test_id: 3308073, priority: "1" do
+    GradeBookHistory.click_filter_button
+    wait_for_ajaximations
+    initial_row_count=GradeBookHistory.fetch_results_table_row_count
+    scroll_page_to_bottom
+    # wait_for_ajaximations fails, adding sleep temporarily, will refactor in future
+    sleep 1 # sorry :'(
+    final_row_count=GradeBookHistory.fetch_results_table_row_count
+    paginated_rows_displayed=final_row_count-initial_row_count
+    expect(paginated_rows_displayed).to be > 0
   end
 end

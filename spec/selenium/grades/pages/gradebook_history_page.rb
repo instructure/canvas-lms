@@ -14,152 +14,145 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-require_relative '../../helpers/gradezilla_common'
+
 require_relative '../../common'
 
 
 class GradeBookHistory
   class << self
-  include SeleniumDependencies
+    include SeleniumDependencies
 
-  def visit(course)
-    get "/courses/#{course.id}/gradebook/history"
-  end
-
-  def select_student_name(student_name)
-    student_name_textfield.send_keys(student_name)
-    select_data_from_dropdown(student_name)
-  end
-
-  def select_grader_name(grader_name)
-    grader_name_textfield.send_keys(grader_name)
-    select_data_from_dropdown(grader_name)
-  end
-
-  def select_assignment_name(assignment_name)
-    assignment_name_textfield.send_keys(assignment_name)
-    select_data_from_dropdown(assignment_name)
-  end
-
-  def enter_student_name(student_name)
-    student_name_textfield.send_keys(student_name)
-  end
-
-  def enter_grader_name(grader_name)
-    grader_name_textfield.send_keys(grader_name)
-  end
-
-  def enter_assignment_name(assignment_name)
-    assignment_name_textfield.send_keys(assignment_name)
-  end
-
-  def enter_from_date(from_date)
-    from_date_textfield.send_keys(from_date)
-  end
-
-  def enter_to_date(to_date)
-    to_date_textfield.send_keys(to_date)
-  end
-
-  def click_filter_button
-    filter_button.click
-  end
-
-  def select_data_from_dropdown(to_be_selected) end
-
-  def edit_grade(grade)
-    grade_edit_textfield.send_keys(grade)
-  end
-
-  def fetch_results_table_row_count
-    results_table_rows.size
-  end
-
-  def search_with_all_data
-    # enter_student_name('user')
-    # enter_grader_name('nobody')
-    # enter_assignment_name('assignment one')
-    # set_from_date('')
-    # set_to_date('')
-    click_filter_button
-  end
-
- def check_current_col_for_history(assignment_name)
-   row_elements= results_table_rows
-   current_grade_arr=Array.[]
-
-   for index in 1...row_elements.size
-     if results_table_assignment_col(index).text == assignment_name
-        current_grade_arr[index] = results_table_col(index).text
-     end
-   end
-   check_arr_unique_element(current_grade_arr)
- end
-
-  def check_arr_unique_element(arr)
-    test_passed = false
-    unless arr.uniq.size == 1
-      test_passed = true
+    def visit(course)
+      get "/courses/#{course.id}/gradebook/history"
     end
 
-    test_passed
-  end
+    def select_student_name(student_name)
+      enter_student_name(student_name)
+      select_data_from_dropdown(student_name)
+    end
 
+    def select_grader_name(grader_name)
+      enter_grader_name(grader_name)
+      select_data_from_dropdown(grader_name)
+    end
 
+    def select_assignment_name(assignment_name)
+      enter_assignment_name(assignment_name)
+      select_data_from_dropdown(assignment_name)
+    end
 
-  # private
+    def enter_student_name(student_name)
+      student_name_textfield.send_keys(student_name)
+    end
 
-  def student_name_textfield
-    f('#students')
-  end
+    def enter_grader_name(grader_name)
+      grader_name_textfield.send_keys(grader_name)
+    end
 
-  def grader_name_textfield
-    f('#graders')
-  end
+    def enter_assignment_name(assignment_name)
+      assignment_name_textfield.send_keys(assignment_name)
+    end
 
-  def assignment_name_textfield
-    f('#assignments')
-  end
+    def enter_start_date(from_date)
+      start_date_textfield.send_keys(from_date)
+    end
 
-  def from_date_textfield
-    f('')
-  end
+    def enter_end_date(to_date)
+      end_date_textfield.send_keys(to_date)
+    end
 
-  def to_date_textfield
-    f('')
-  end
+    def click_filter_button
+      filter_button.click
+    end
 
-  def filter_button
-    # f('#content button > span')
-    # driver.find_element(:xpath, "//*[contains(text(), 'Filter')]")
-    driver.find_element(:xpath,"//button[@type='submit']")
-  end
+    def select_data_from_dropdown(to_be_selected) end
 
-  def results_table
-    driver.find_element(:xpath, "//table")
-  end
+    def edit_grade(grade)
+      grade_edit_textfield.send_keys(grade)
+    end
 
-  def type_ahead_dropdown
-    f('')
-  end
+    def fetch_results_table_row_count
+      results_table_rows.size
+    end
 
-  def results_table_rows
-    # ff('#content > div > div.GradebookHistory__Results > div > div > table > tbody > tr')
-    driver.find_elements(:xpath, "//table/tbody/tr")
-  end
+    def search_with_all_data
+      enter_student_name('Student')
+      enter_grader_name('Grader One')
+      enter_assignment_name('Assignment One')
+      enter_start_date(1.day.ago(now))
+      enter_end_date(1.day.from_now(now))
+      click_filter_button
+    end
 
-  def results_table_current_col(index)
-    # f("#content>div>div:nth-child(2)>div:nth-child(1)>table>tbody>tr:nth-child(#{index})>td:nth-child(8)")
-    driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[8]")
-  end
+    def check_current_col_for_history(assignment_name)
+      row_elements= results_table_rows
+      current_grade_arr=Array.[]
+      for index in 1...row_elements.size
+        if results_table_assignment_col(index).text == assignment_name
+          current_grade_arr[index] = results_table_col(index).text
+        end
+      end
+      check_arr_unique_element(current_grade_arr)
+    end
 
-  def results_table_assignment_col(index)
-    # f("#content>div>div:nth-child(2)>div:nth-child(1)>table>tbody>tr:nth-child(#{index})>td:nth-child(8)")
-    driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[8]")
-  end
+    def check_arr_unique_element(arr)
+      test_passed = false
+      unless arr.uniq.size == 1
+        test_passed = true
+      end
+      test_passed
+    end
 
+    # private
+
+    def student_name_textfield
+      f('#students')
+    end
+
+    def grader_name_textfield
+      f('#graders')
+    end
+
+    def assignment_name_textfield
+      f('#assignments')
+    end
+
+    def start_date_textfield
+      driver.find_element(:xpath,"//*[contains(text(),'Start Date')]/../../following-sibling::span[1]/span/input")
+    end
+
+    def end_date_textfield
+      driver.find_element(:xpath,"//*[contains(text(),'End Date')]/../../following-sibling::span[1]/span/input")
+    end
+
+    def error_text_invalid_dates
+      driver.find_element(:xpath,"(//span[contains(text(), 'date must be before')])[2]")
+    end
+
+    def filter_button
+      f("button[type='submit']")
+    end
+
+    def filter_button_for_aria
+       driver.find_element(:xpath,"//button[@type='submit']")
+    end
+
+    def results_table
+      driver.find_element(:xpath, "//table")
+    end
+
+    def type_ahead_dropdown() end
+
+    def results_table_rows
+      driver.find_elements(:xpath, "//table/tbody/tr")
+    end
+
+    def results_table_current_col(index)
+      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[8]")
+    end
+
+    def results_table_assignment_col(index)
+      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[8]")
+    end
   end
 end
-
-
