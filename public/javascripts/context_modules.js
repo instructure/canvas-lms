@@ -753,10 +753,12 @@ import 'compiled/jquery.rails_flash_notifications'
             // if it's already completed then don't worry about warnings, etc
             if ($mod_item.hasClass('progression_requirement')) {
               $icon_container.fadeIn(500);
+              $mod_item.addClass('incomplete_item');
               addIcon($icon_container, 'no-icon', I18n.t('Not completed'));
             }
           } else if ($mod_item.data('past_due') != null) {
             $icon_container.fadeIn(500);
+            $mod_item.addClass('overdue_item');
             addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'));
           } else {
             var incomplete_req = null;
@@ -785,19 +787,34 @@ import 'compiled/jquery.rails_flash_notifications'
           }
         });
 
+        // Determine total progress for lesson groups
         $module.find('.context_module_sub_header').each(function () {
           var $subheader = $(this);
-          var activities_container_id = "#"+$subheader.attr('id')+"_activities";
+          var activities_container_id = "#" + $subheader.attr('id') + "_activities";
           var $activities_container = $(activities_container_id);
-          var $activity_items = $activities_container.find('li.context_module_item');
-          var $completed_items = $activities_container.find('li.context_module_item.completed_item');
           var $icon_container = $subheader.find('.module-item-status-icon');
-
-          if ($activity_items.length === $completed_items.length) {
+          var total_items_count = $activities_container.find('li.context_module_item').length;
+          var completed_items_count = $activities_container.find('li.context_module_item.completed_item').length;
+          var overdue_items_count = $activities_container.find('li.context_module_item.overdue_item').length;
+          
+          if (total_items_count === completed_items_count) {
             $subheader.addClass('completed_item');
             $icon_container.fadeIn(500);
             addIcon($icon_container, 'icon-check', I18n.t('Completed'));
+          } else if (completed_items_count > 0 && overdue_items_count === 0) {
+            $subheader.addClass('incomplete_item');
+            $icon_container.fadeIn(500);
+            addIcon($icon_container, 'no-icon', I18n.t('Not completed'));
+          } else if (overdue_items_count > 0) {
+            $subheader.addClass('overdue_item');
+            $icon_container.fadeIn(500);
+            addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'));
+          } else {
+            $subheader.addClass('unstarted_item');
+            $icon_container.fadeIn(500);
+            addIcon($icon_container, 'icon-mark-as-read', I18n.t('This assignment has not been started'));
           }
+
         });
 
       },
@@ -1875,7 +1892,7 @@ import 'compiled/jquery.rails_flash_notifications'
         });
         evaluate_lesson()
       });
-
+    }
 
     $('.external_url_link').click(function(event) {
       Helper.externalUrlLinkClick(event, $(this))
