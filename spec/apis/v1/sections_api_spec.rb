@@ -184,6 +184,15 @@ describe SectionsController, type: :request do
         expect(json['total_students']).to eq 1
       end
 
+      it "should not include test students" do
+        @course.student_view_student
+        expect(@course.default_section.students.count).to eq 1
+        expect(@course.default_section.students.not_fake_student.count).to eq 0
+        json = api_call(:get, "#{@path_prefix}/#{@course.default_section.id}",
+          @path_params.merge({ :id => @course.default_section.to_param, :include => ['total_students'] }))
+        expect(json["total_students"]).to eq 0
+      end
+
       it "should be accessible from the course context via sis id" do
         @section.update_attribute(:sis_source_id, 'my_section')
         json = api_call(:get, "#{@path_prefix}/sis_section_id:my_section", @path_params.merge({ :id => 'sis_section_id:my_section' }))
