@@ -2117,7 +2117,7 @@ import 'compiled/jquery.rails_flash_notifications'
     var workflow_modules = ENV.WORKFLOW_MODULES;
     if(currentModules.length < 1){
       var new_module = workflow_modules.find(function (flow) {
-        return flow[1] == "started";
+        return flow[1] != "completed" ;
       });
       currentModules.push(new_module[0]);
     }
