@@ -33,9 +33,10 @@ module.exports = {
   update: (elem, data) => {
     if (data.header === "none") {
       elem.removeAttribute("scope")
-      return
+    } else {
+      elem.setAttribute("scope", data.scope)
     }
-    elem.setAttribute("scope", data.scope)
+    return elem
   },
 
   message: () => formatMessage("Tables headers should have scope specified"),

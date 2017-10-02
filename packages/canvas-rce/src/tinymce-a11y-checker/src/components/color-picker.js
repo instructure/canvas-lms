@@ -8,7 +8,6 @@ const {
 const Pointer = require("./pointer")
 const PointerCircle = require("react-color/lib/components/photoshop/PhotoshopPointerCircle")
   .default
-console.log(Pointer, PointerCircle)
 
 class ColorPicker extends React.Component {
   render() {
