@@ -207,16 +207,21 @@ import 'compiled/jquery.rails_flash_notifications'
 
         function calculateUnitProgress(item){
           if(item.items_count){
-            let total_items = item.items_count;
+            let total_items = 0;
             var total_completed = [];
 
             item.items.map(function(module){
+              if (module.completion_requirement) {
+                total_items++;
+              }
               let cr = module.completion_requirement || {};
               if(cr.completed){
                 total_completed.push(module);
               }
             });
-            return Math.floor((total_completed.length / total_items) * 100);
+            if (total_items) {
+              return Math.floor((total_completed.length / total_items) * 100);
+            }
           }
           return 0;
         }
