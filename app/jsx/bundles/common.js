@@ -121,8 +121,6 @@ if (
 if(!window.ENV.IS_STUDENT){
   $(document).ready(function(){
     let showTeacherTools = $("#sm-teacher-tools").find("a").length;
-    console.log(showTeacherTools);
-
     if (showTeacherTools > 0 ){
       $(".sm-teacher-tools-container").show();
     }

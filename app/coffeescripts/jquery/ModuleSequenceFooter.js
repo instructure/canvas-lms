@@ -69,6 +69,41 @@ $.fn.moduleSequenceFooter = function (options = {}) {
       let showModule = items.length > 0
       let currentItem = _.findWhere(items, {id: this.msfInstance.item.current.id})
 
+      var lessons = _.where(items, {indent: 0})
+      var nextLesson, previousLesson
+
+      let lessonBookendStart = _.last(lessons.filter((l) => {
+        console.log("lesson", l)
+        return currentItem.position >= l.position
+      }))
+
+      let lessonBookendEnd = _.first(lessons.filter((l) => {
+        console.log("lesson", l)
+        return currentItem.position <= l.position
+      }))
+
+      console.log("lessonBookendStart", lessonBookendStart)
+      console.log("lessonBookendEnd", lessonBookendEnd)
+
+      // lessons.findIndex((i) => {return i.id == lessonBookendEnd.id})
+
+      let next = ( lessonBookendStart.id === lessonBookendEnd.id ) ? lessons[lessons.findIndex((i) => {return i.id == lessonBookendEnd.id}) + 1] : lessonBookendEnd;
+      console.log("next", next)
+
+      let lessonArray = items.filter((i) => {
+        return lessonBookendStart.position < i.position && i.position < next.position
+      })
+
+
+
+
+      // whil
+
+      console.log("lessons", lessons)
+      console.log("lessonArray", lessonArray)
+      // let lessonArray = items.slice(_.indexOf())
+
+
       if (this.msfInstance.hide) {
         this.hide()
         return
@@ -76,7 +111,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
 
       this.html(template({
         showModule: showModule,
-        items: items,
+        items: lessonArray,
         module: module,
         currentItem: currentItem,
         currentID: this.msfInstance.assetID,
