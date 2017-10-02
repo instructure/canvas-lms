@@ -573,6 +573,18 @@ describe ContentMigration do
       expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.gsub("/courses/#{@copy_from.id}/file_contents/course%20files",'')
     end
 
+    it "should copy weird object links" do
+      att = Attachment.create!(:filename => 'test.txt', :uploaded_data => StringIO.new('pixels and frames and stuff'),
+        :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      @copy_from.syllabus_body = "<object><param value=\"/courses/#{@copy_from.id}/files/#{att.id}/download\"></object>"
+      @copy_from.save!
+
+      run_course_copy
+
+      att2 = @copy_to.attachments.where(:migration_id => mig_id(att)).first
+      expect(@copy_to.reload.syllabus_body).to include "/courses/#{@copy_to.id}/files/#{att2.id}/download"
+    end
+
     it "should re-use kaltura media objects" do
       expect {
         media_id = '0_deadbeef'
