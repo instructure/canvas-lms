@@ -784,6 +784,22 @@ import 'compiled/jquery.rails_flash_notifications'
             }
           }
         });
+
+        $module.find('.context_module_sub_header').each(function () {
+          var $subheader = $(this);
+          var activities_container_id = "#"+$subheader.attr('id')+"_activities";
+          var $activities_container = $(activities_container_id);
+          var $activity_items = $activities_container.find('li.context_module_item');
+          var $completed_items = $activities_container.find('li.context_module_item.completed_item');
+          var $icon_container = $subheader.find('.module-item-status-icon');
+
+          if ($activity_items.length === $completed_items.length) {
+            $subheader.addClass('completed_item');
+            $icon_container.fadeIn(500);
+            addIcon($icon_container, 'icon-check', I18n.t('Completed'));
+          }
+        });
+
       },
       sortable_module_options: {
         connectWith: '.context_module_items',
@@ -1768,93 +1784,97 @@ import 'compiled/jquery.rails_flash_notifications'
       } else if (button.hasClass('icon-arrow-open-down')) {
         button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
       }
-      else {
-        console.log("else")
-      };
   };
   function init_icon_status(button){
     button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
   };
   $(document).ready(function() {
 
-
-   if (ENV.IS_STUDENT) {
+    if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
 
+      var $context_module_subheaders = $('.context_module_sub_header');
 
-     $('.context_module_sub_header').each(function () {
-        var header = $(this);
-        var activities = header.nextUntil('.context_module_sub_header').detach();
-        var activity_container = $('<div style="display: none;"></div>').append(activities);
+      $context_module_subheaders.each(function () {
+        var $header = $(this);
+        var activities = $header.nextUntil('.context_module_sub_header').detach();
+        var activity_container = $('<div id="' + $header.attr('id') + '_activities" style="display: none;"></div>').append(activities);
 
         $(this).after(activity_container);
-        header.find('.context_module_sub_header_expander').click(function (event) {
+        $header.find('.context_module_sub_header_expander').click(function (event) {
           var button = $(this);
           activity_container.slideToggle();
           update_icon_status(button);
         });
       });
-    }
 
-    var course_items = JSON.parse(window.localStorage.getItem("course_items")) || [];
+      var course_items = JSON.parse(window.localStorage.getItem("course_items")) || [];
 
-    course_items.forEach(function (unit){
-      var current_activity_container, last_was_subheader, current_lesson_state;
-      var completions = [];
-      var last_lesson_state = "complete"; // because we want the first lesson to open by default if none of its activities are complete
-      function evaluate_lesson () {
-        if (_.every(completions)) {
-          // if the container is complete, close it by default.
-          current_lesson_state = "complete";
-          if (current_activity_container) current_activity_container.hide();
-        } else if (_.some(completions)) {
-          // in this case, always open the lesson
-          current_lesson_state = "started";
-          if (current_activity_container) current_activity_container.show();
-          current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
-        } else {
-          current_lesson_state = "unstarted";
-          if (last_lesson_state == "complete") {
-            // in this case, open the lesson, *if* the last lesson is complete
-            if (current_activity_container) current_activity_container.show();
+      course_items.forEach(function (unit) {
+        var current_activity_container, last_was_subheader, current_lesson_state;
+        var completions = [];
+        var last_lesson_state = "complete"; // because we want the first lesson to open by default if none of its activities are complete
+
+        function evaluate_lesson() {
+          if (_.every(completions)) {
+            // if the container is complete, close it by default.
+            current_lesson_state = "complete";
+            if (current_activity_container) {
+              current_activity_container.hide();
+            }
+          } else if (_.some(completions)) {
+            // in this case, always open the lesson
+            current_lesson_state = "started";
+            if (current_activity_container) {
+              current_activity_container.show();
+            }
             current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+          } else {
+            current_lesson_state = "unstarted";
+            if (last_lesson_state === "complete") {
+              // in this case, open the lesson, *if* the last lesson is complete
+              if (current_activity_container) {
+                current_activity_container.show();
+              }
+              current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+            }
           }
         }
-        ;
-      }
 
-      unit.items.forEach(function (item) {
-        // console.log("Item:", item.id, item);
+        unit.items.forEach(function (item) {
+          // console.log("Item:", item.id, item);
 
-        if (last_was_subheader && item.type != "SubHeader") {
-          current_activity_container = $('#context_module_item_' + item.id).parent();
-        };
-        if (item.type == "SubHeader") {
-          // This is a subheader - if we have a current activity,
-          // evaluate if it is complete, partially complete or undone
-          evaluate_lesson()
-          if (current_lesson_state) {
-            last_lesson_state = current_lesson_state;
+          if (last_was_subheader && item.type != "SubHeader") {
+            current_activity_container = $('#context_module_item_' + item.id).parent();
           }
-          completions = [];
-          current_activity_container = false;
-          last_was_subheader = true;
-          current_lesson_state = "unstarted";
-        } else {
-          last_was_subheader = false;
-        };
 
-        if (current_activity_container && item.type != "SubHeader") {
-          if (item.completion_requirement) {
-            // console.log(item.id, item.title);
-            completions.push(item.completion_requirement.completed);
+          if (item.type === "SubHeader") {
+            // This is a subheader - if we have a current activity,
+            // evaluate if it is complete, partially complete or undone
+            evaluate_lesson();
+            //console.log($('#context_module_item_' + item.id))
+            if (current_lesson_state) {
+              last_lesson_state = current_lesson_state;
+            }
+            completions = [];
+            current_activity_container = false;
+            last_was_subheader = true;
+            current_lesson_state = "unstarted";
+          } else {
+            last_was_subheader = false;
           }
-        };
 
+          if (current_activity_container && item.type != "SubHeader") {
+            if (item.completion_requirement) {
+              // console.log(item.id, item.title);
+              completions.push(item.completion_requirement.completed);
+            }
+          }
+
+        });
+        evaluate_lesson()
       });
-      evaluate_lesson()
-    });
 
 
     $('.external_url_link').click(function(event) {
