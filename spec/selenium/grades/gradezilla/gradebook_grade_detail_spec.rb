@@ -226,14 +226,14 @@ describe 'Grade Detail Tray:' do
 
     after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
-    it "add a comment" do
+    it "add a comment", test_id: 3339965, priority: '1' do
       Gradezilla::Cells.open_tray(@course.students.first, @a1)
       Gradezilla::GradeDetailTray.add_new_comment(comment_2)
 
       expect(Gradezilla::GradeDetailTray.comment(comment_2)).to be_displayed
     end
 
-    it "delete a comment" do
+    it "delete a comment", test_id: 3339966, priority: '1' do
       Gradezilla::Cells.open_tray(@course.students.first, @a1)
       Gradezilla::GradeDetailTray.delete_comment(comment_1)
 
