@@ -19,7 +19,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { func, shape, string } from 'prop-types';
-import update from 'react-addons-update';
+import update from 'immutability-helper';
 import I18n from 'i18n!gradebook';
 import Button from 'instructure-ui/lib/components/Button';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from 'instructure-ui/lib/components/Modal';

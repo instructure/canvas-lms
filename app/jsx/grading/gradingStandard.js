@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import update from 'react-addons-update'
+import update from 'immutability-helper'
 import DataRow from 'jsx/grading/dataRow'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
