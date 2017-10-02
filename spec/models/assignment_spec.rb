@@ -98,6 +98,13 @@ describe Assignment do
 
   describe 'callbacks' do
     describe 'apply_late_policy' do
+      it "calls apply_late_policy for the assignment if points_possible changes" do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
+
+        assignment.update!(points_possible: 3.14)
+      end
+
       it 'invokes the LatePolicyApplicator for this assignment if grading type changes but due dates do not' do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
