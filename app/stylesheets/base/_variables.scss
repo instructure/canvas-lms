@@ -102,9 +102,73 @@ $ic-color-action:           $barney;
 $ic-color-danger:           $crimson;
 $ic-color-alert:            $fire;
 
+
+
+//==================
+// Strongmind Brand Variables
+//==================
+
 $sm-page: #ECECED;
 $sm-brand-dark: #2A2E34;
 
+$sm-blue-1: #8BB0C1 !default;
+$sm-blue-2: #2E728F !default;
+$sm-blue-3: #005377 !default;
+$sm-blue-4: #00354C !default;
+$sm-blue-5: #002637 !default;
+
+$sm-teal-1: #8DD7C3 !default;
+$sm-teal-2: #60C7AC !default;
+$sm-teal-3: #33B794 !default;
+$sm-teal-4: #046B50 !default;
+$sm-teal-5: #034C39 !default;
+
+$sm-green-1: #C3DD96 !default;
+$sm-green-2: #ABCF6C !default;
+$sm-green-3: #93C242 !default;
+$sm-green-4: #7CB518 !default;
+$sm-green-5: #4F7410 !default;
+$sm-green-6: #39530b !default;
+
+$sm-yellow-1: #FEDC94 !default;
+$sm-yellow-2: #FDCF69 !default;
+$sm-yellow-3: #FDC13E !default;
+$sm-yellow-4: #FDB414 !default;
+$sm-yellow-5: #D09411 !default;
+$sm-yellow-6: #73520A !default;
+
+$sm-orange-1: #FDB78E !default;
+$sm-orange-2: #FA9A61 !default;
+$sm-orange-3: #FB7D34 !default;
+$sm-orange-4: #A03E05 !default;
+$sm-orange-5: #732D04 !default;
+
+$sm-red-1: #EC9D9D !default;
+$sm-red-2: #D62828 !default;
+$sm-red-3: #B02121 !default;
+$sm-red-4: #891A1A !default;
+$sm-red-5: #621313 !default;
+
+$sm-purple-1: #CE8FB0 !default;
+$sm-purple-2: #A83571 !default;
+$sm-purple-3: #950952 !default;
+$sm-purple-4: #7A0844 !default;
+$sm-purple-5: #5F0635 !default;
+$sm-purple-6: #440526 !default;
+
+$sm-gray-1: #ECECED !default;
+$sm-gray-2: #D9DADC !default;
+$sm-gray-3: #C7C8CA !default;
+$sm-gray-4: #B4B6B9 !default;
+$sm-gray-5: #454950 !default;
+$sm-gray-6: #33373F !default;
+$sm-gray-7: #2A2E34 !default;
+$sm-gray-8: #212329 !default;
+
+//====================================
+// Strong Mind Theme Colors
+//========================= ===========
+$sm-course-nav-hover-color: $sm-gray-4;
 //====================================
 // Gray-ish Scale
 //====================================
@@ -180,6 +244,11 @@ $spacing-width:             20px; // TODO - would be nice to phase this one out 
 $borderRadius:              4px;
 $contentBoxPadding:         8px;
 $sm-body-background-color: $ic-brand-white;
+
+
+
+
+
 //============================
 // Typography Variables
 //============================
