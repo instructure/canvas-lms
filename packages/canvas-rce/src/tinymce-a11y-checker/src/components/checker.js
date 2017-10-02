@@ -80,7 +80,9 @@ class Checker extends React.Component {
         () => {
           this.setState({ errors, checking: false }, () => {
             this.firstError()
-            done()
+            if (typeof done === "function") {
+              done()
+            }
           })
           if (errors.length === 0) {
             this._closeTimout = setTimeout(this.handleClose, 3000)
@@ -131,6 +133,13 @@ class Checker extends React.Component {
     return error && error.node
   }
 
+  updateErrorNode(elem) {
+    const error = this.error()
+    if (error) {
+      error.node = elem
+    }
+  }
+
   errorRule() {
     const error = this.error()
     return error && error.rule
@@ -164,36 +173,44 @@ class Checker extends React.Component {
 
   formStateValid(formState) {
     formState = formState || this.state.formState
-    const node = this.tempNode()
+    let node = this.tempNode(true)
     const rule = this.errorRule()
     if (!node || !rule) {
       return false
     }
-    rule.update(node, formState)
+    node = rule.update(node, formState)
     return rule.test(node)
   }
 
   fixIssue(ev) {
     ev.preventDefault()
     const rule = this.errorRule()
-    const node = this.errorNode()
+    let node = this.errorNode()
     if (rule && node) {
       this.removeTempNode()
-      rule.update(node, this.state.formState)
+      node = rule.update(node, this.state.formState)
+      this.updateErrorNode(node)
       if (rule.test(node)) {
         this.removeError()
       }
     }
   }
 
-  tempNode() {
-    if (!this._tempNode) {
+  tempNode(refresh = false) {
+    if (!this._tempNode || refresh) {
       const node = this.errorNode()
       if (node) {
-        this._tempNode = node.cloneNode(true)
-        const parent = node.parentNode
-        parent.insertBefore(this._tempNode, node)
-        parent.removeChild(node)
+        const newTempNode = node.cloneNode(true)
+        if (refresh && this._tempNode) {
+          const parent = this._tempNode.parentNode
+          parent.insertBefore(newTempNode, this._tempNode)
+          parent.removeChild(this._tempNode)
+        } else {
+          const parent = node.parentNode
+          parent.insertBefore(newTempNode, node)
+          parent.removeChild(node)
+        }
+        this._tempNode = newTempNode
       }
     }
     return this._tempNode

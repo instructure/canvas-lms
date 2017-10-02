@@ -35,7 +35,7 @@ module.exports = {
       dom.changeTag(th, "td")
     })
     if (data.header === "none") {
-      return
+      return elem
     }
     const row = data.header === "row" || data.header === "both"
     const col = data.header === "col" || data.header === "both"
@@ -57,6 +57,7 @@ module.exports = {
         th.setAttribute("scope", "row")
       }
     }
+    return elem
   },
 
   message: () => formatMessage("Tables should have at least one header"),

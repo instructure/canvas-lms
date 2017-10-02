@@ -1,13 +1,13 @@
 module.exports = [
   {
-    test: () => false,
-    data: () => ({
+    test: jest.fn().mockReturnValue(false),
+    data: jest.fn().mockReturnValue({
       select: "a",
       checkbox: true,
       color: "rgba(40, 100, 200, 0.6)",
       text: "Text"
     }),
-    form: () => [
+    form: jest.fn().mockReturnValue([
       {
         label: "Select Field",
         dataKey: "select",
@@ -28,10 +28,10 @@ module.exports = [
         dataKey: "text",
         disabledIf: () => true
       }
-    ],
-    update: () => {},
-    message: () => "Error Message",
-    why: () => "Why Text",
+    ]),
+    update: jest.fn(),
+    message: jest.fn().mockReturnValue("Error Message"),
+    why: jest.fn().mockReturnValue("Why Text"),
     link: "http://some-url"
   }
 ]
