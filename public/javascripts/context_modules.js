@@ -207,16 +207,21 @@ import 'compiled/jquery.rails_flash_notifications'
 
         function calculateUnitProgress(item){
           if(item.items_count){
-            let total_items = item.items_count;
+            let total_items = 0;
             var total_completed = [];
 
             item.items.map(function(module){
+              if (module.completion_requirement) {
+                total_items++;
+              }
               let cr = module.completion_requirement || {};
               if(cr.completed){
                 total_completed.push(module);
               }
             });
-            return Math.floor((total_completed.length / total_items) * 100);
+            if (total_items) {
+              return Math.floor((total_completed.length / total_items) * 100);
+            }
           }
           return 0;
         }
@@ -2113,8 +2118,14 @@ import 'compiled/jquery.rails_flash_notifications'
     // from context_modules/_content
     var foundExpanded = false;
     var collapsedModules = ENV.COLLAPSED_MODULES;
-
     var currentModules = ENV.CURRENT_MODULES;
+    var workflow_modules = ENV.WORKFLOW_MODULES;
+    if(currentModules.length < 1){
+      var new_module = workflow_modules.find(function (flow) {
+        return flow[1] != "completed" ;
+      });
+      currentModules.push(new_module[0]);
+    }
     for(var idx in currentModules) {
       $("#context_module_" + currentModules[idx]).addClass('sm-started').removeClass('collapsed_module');
     }
@@ -2122,7 +2133,6 @@ import 'compiled/jquery.rails_flash_notifications'
     if(ENV.IS_STUDENT){
       modules.getCourseItems(modules.updateCourseProgress);
     }
-
 
     var foundModules = [];
     var $contextModules = $("#context_modules .context_module");
