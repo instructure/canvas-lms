@@ -801,7 +801,7 @@ import 'compiled/jquery.rails_flash_notifications'
           var total_items_count = $activities_container.find('li.context_module_item').length;
           var completed_items_count = $activities_container.find('li.context_module_item.completed_item').length;
           var overdue_items_count = $activities_container.find('li.context_module_item.overdue_item').length;
-          
+
           if (total_items_count === completed_items_count) {
             $subheader.addClass('completed_item');
             $icon_container.fadeIn(500);
@@ -1836,7 +1836,7 @@ import 'compiled/jquery.rails_flash_notifications'
       course_items.forEach(function (unit) {
         var current_activity_container, last_was_subheader, current_lesson_state;
         var completions = [];
-        var last_lesson_state = "complete"; // because we want the first lesson to open by default if none of its activities are complete
+        var last_lesson_state = "started"; // because we want the first lesson to open by default if none of its activities are complete
 
         function evaluate_lesson() {
           if (_.every(completions)) {
