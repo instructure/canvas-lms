@@ -661,6 +661,16 @@ class User < ActiveRecord::Base
     User.name_parts(self.sortable_name, likely_already_surname_first: true)[1] || ''
   end
 
+  def roster_name
+    #send nil if short_name is empty
+    unless self.short_name.empty? || self.short_name.eql?(self.name)
+      name = self.short_name
+    else
+      name = nil
+    end
+    name
+  end
+
   # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
   SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
 
