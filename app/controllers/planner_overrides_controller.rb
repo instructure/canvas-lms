@@ -83,6 +83,7 @@
 class PlannerOverridesController < ApplicationController
   include Api::V1::PlannerItem
   include Api::V1::PlannerOverride
+  include PlannerHelper
 
   before_action :require_user
   before_action :set_date_range
@@ -170,7 +171,7 @@ class PlannerOverridesController < ApplicationController
   #   }
   # ]
   def items_index
-    ensure_valid_params or return
+    ensure_valid_planner_params or return
 
     items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
       items = params[:filter] == 'new_activity' ? unread_items : planner_items
@@ -373,23 +374,8 @@ class PlannerOverridesController < ApplicationController
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
-    @start_date = formatted_date('start_date', @start_date, 10.years.ago)
-    @end_date   = formatted_date('end_date', @end_date, 10.years.from_now)
-  end
-
-  def formatted_date(input, val, default)
-    @errors ||= {}
-    if val.present? && val.is_a?(String)
-      if val =~ Api::DATE_REGEX
-        Time.zone.parse(val).beginning_of_day
-      elsif val =~ Api::ISO8601_REGEX
-        Time.zone.parse(val)
-      else
-        @errors[input] = t('Invalid date or invalid datetime for %{attr}', attr: input)
-      end
-    else
-      default
-    end
+    @start_date = formatted_planner_date('start_date', @start_date, 10.years.ago)
+    @end_date   = formatted_planner_date('end_date', @end_date, 10.years.from_now)
   end
 
   def set_params
@@ -402,15 +388,6 @@ class PlannerOverridesController < ApplicationController
 
   def require_user
     render_unauthorized_action if !@current_user || !@domain_root_account.feature_enabled?(:student_planner)
-  end
-
-  def ensure_valid_params
-    if @errors.empty?
-      true
-    else
-      render json: {errors: @errors.as_json}, status: :bad_request
-      false
-    end
   end
 
   def default_opts
