@@ -17,21 +17,18 @@
 
 require_relative '../pages/gradebook_history_page'
 require_relative '../setup/gradebook_setup'
+require_relative '../../helpers/gradezilla_common'
 
 describe "Gradebook History Page" do
   include_context "in-process server selenium tests"
+  include GradezillaCommon
   include GradebookSetup
   include CustomScreenActions
 
 
   before(:once) do
-    # init_course_with_students(3)
+    init_course_with_students(1)
     now = Time.zone.now
-
-    # create course with teacher and student
-    course_factory(active_all: true)
-    student_in_course
-
 
     # create 1 assignments due in the past,
     # and 2 in future
@@ -61,16 +58,16 @@ describe "Gradebook History Page" do
 
     # as a student submit all assignments
     Timecop.freeze(now) do
-      @assignment_past_due_day.submit_homework(@student, body: 'submitting my homework')
-      @assignment_due_one_day.submit_homework(@student, body: 'submitting my homework')
-      @assignment_due_one_week.submit_homework(@student, body: 'submitting my homework')
+      @assignment_past_due_day.submit_homework(@course.students.first, body: 'submitting my homework')
+      @assignment_due_one_day.submit_homework(@course.students.first, body: 'submitting my homework')
+      @assignment_due_one_week.submit_homework(@course.students.first, body: 'submitting my homework')
     end
 
     # as a teacher grade the assignments
     2.times do
-      @assignment_past_due_day.grade_student(@student, grade: String(Random.rand(1...100)), grader: @teacher)
-      @assignment_due_one_day.grade_student(@student, grade: String(Random.rand(1...100)), grader: @teacher)
-      @assignment_due_one_week.grade_student(@student, grade: String(Random.rand(1...10)), grader: @teacher)
+      @assignment_past_due_day.grade_student(@course.students.first, grade: String(Random.rand(1...100)), grader: @teacher)
+      @assignment_due_one_day.grade_student(@course.students.first, grade: String(Random.rand(1...100)), grader: @teacher)
+      @assignment_due_one_week.grade_student(@course.students.first, grade: String(Random.rand(1...10)), grader: @teacher)
     end
   end
 
@@ -81,16 +78,31 @@ describe "Gradebook History Page" do
 
   context "shows the results table for a valid search" do
 
-    it "with all valid inputs", test_id: 3308073, priority: "1" do
-      GradeBookHistory.click_filter_button
-      wait_for_ajaximations
-      expect(GradeBookHistory.results_table).to be_displayed
+    it "with student name input and typeahead selection", test_id: %w(3308073 3308054), priority: "1" do
+        student_name=@course.students.first.name
+        GradeBookHistory.search_with_student_name(
+          student_name[0...3], student_name
+        )
+        expect(GradeBookHistory.check_table_for_student_name(student_name)).to be true
+    end
+
+    it "with grader name input and typeahead selection", test_id: %w(3308073 3308054), priority: "1" do
+      GradeBookHistory.search_with_grader_name(
+        @teacher.email
+      )
+      expect(GradeBookHistory.check_table_for_grader_name(@teacher.email)).to be true
+    end
+
+    it "with all assignment name and typeahead selection", test_id: %w(3308073 3308054), priority: "1" do
+      GradeBookHistory.search_with_assignment_name(
+        @assignment_past_due_day.title
+      )
+      expect(GradeBookHistory.check_table_for_assignment_name(@assignment_past_due_day.title)).to be true
     end
 
     it "and the current column has the same grade as related grade history rows", test_id: 3308871, priority: "1" do
-       GradeBookHistory.click_filter_button
-       wait_for_ajaximations
-       expect(GradeBookHistory.check_current_col_for_history('assignment two')).to be true
+        GradeBookHistory.click_filter_button
+        expect(GradeBookHistory.check_current_col_for_history('assignment two')).to be true
     end
   end
 end

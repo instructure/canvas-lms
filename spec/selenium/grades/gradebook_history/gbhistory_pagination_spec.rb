@@ -81,7 +81,6 @@ describe "Gradebook History Page" do
 
   it "should show additional new rows on a new page scroll", test_id: 3308073, priority: "1" do
     GradeBookHistory.click_filter_button
-    wait_for_ajaximations
     initial_row_count=GradeBookHistory.fetch_results_table_row_count
     scroll_page_to_bottom
     # wait_for_ajaximations fails, adding sleep temporarily, will refactor in future

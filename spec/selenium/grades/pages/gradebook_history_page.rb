@@ -26,19 +26,25 @@ class GradeBookHistory
       get "/courses/#{course.id}/gradebook/history"
     end
 
-    def select_student_name(student_name)
-      enter_student_name(student_name)
+    def select_student_name(typeahead, student_name)
+      enter_student_name(typeahead)
+      wait_for_ajaximations
       select_data_from_dropdown(student_name)
+      wait_for_ajaximations
     end
 
     def select_grader_name(grader_name)
       enter_grader_name(grader_name)
+      wait_for_ajaximations
       select_data_from_dropdown(grader_name)
+      wait_for_ajaximations
     end
 
     def select_assignment_name(assignment_name)
       enter_assignment_name(assignment_name)
+      wait_for_ajaximations
       select_data_from_dropdown(assignment_name)
+      wait_for_ajaximations
     end
 
     def enter_student_name(student_name)
@@ -63,9 +69,12 @@ class GradeBookHistory
 
     def click_filter_button
       filter_button.click
+      wait_for_ajaximations
     end
 
-    def select_data_from_dropdown(to_be_selected) end
+    def select_data_from_dropdown(text)
+      fj("[id*=Autocomplete_Options_]li[role=option]:contains('#{text}')").click
+    end
 
     def edit_grade(grade)
       grade_edit_textfield.send_keys(grade)
@@ -75,12 +84,25 @@ class GradeBookHistory
       results_table_rows.size
     end
 
-    def search_with_all_data
-      enter_student_name('Student')
-      enter_grader_name('Grader One')
-      enter_assignment_name('Assignment One')
-      enter_start_date(1.day.ago(now))
-      enter_end_date(1.day.from_now(now))
+    def search_with_student_name(type_ahead, student)
+      select_student_name(type_ahead, student)
+      click_filter_button
+    end
+
+    def search_with_grader_name(grader)
+      select_grader_name(grader)
+      click_filter_button
+    end
+
+    def search_with_assignment_name(assignment)
+      select_assignment_name(assignment)
+      click_filter_button
+    end
+
+    def search_with_all_data(type_ahead, student, grader, assignment)
+      select_student_name(type_ahead, student)
+      select_grader_name(grader)
+      select_assignment_name(assignment)
       click_filter_button
     end
 
@@ -89,11 +111,45 @@ class GradeBookHistory
       current_grade_arr=Array.[]
       for index in 1...row_elements.size
         if results_table_assignment_col(index).text == assignment_name
-          current_grade_arr[index] = results_table_col(index).text
+          current_grade_arr[index] = results_table_current_col(index).text
         end
       end
       check_arr_unique_element(current_grade_arr)
     end
+
+    def check_table_for_assignment_name(string_in_row)
+      row_elements= results_table_rows
+      test_passed = true
+      for index in 1...row_elements.size
+        if results_table_assignment_col(index).text != string_in_row
+          test_passed = false
+        end
+      end
+      test_passed
+    end
+
+    def check_table_for_grader_name(string_in_row)
+      row_elements= results_table_rows
+      test_passed = true
+      for index in 1...row_elements.size
+        if results_table_grader_col(index).text != string_in_row
+          test_passed = false
+        end
+      end
+      test_passed
+    end
+
+    def check_table_for_student_name(string_in_row)
+      row_elements= results_table_rows
+      test_passed = true
+      for index in 1...row_elements.size
+        if results_table_student_col(index).text != string_in_row
+          test_passed = false
+        end
+      end
+      test_passed
+    end
+
 
     def check_arr_unique_element(arr)
       test_passed = false
@@ -141,8 +197,6 @@ class GradeBookHistory
       driver.find_element(:xpath, "//table")
     end
 
-    def type_ahead_dropdown() end
-
     def results_table_rows
       driver.find_elements(:xpath, "//table/tbody/tr")
     end
@@ -152,7 +206,15 @@ class GradeBookHistory
     end
 
     def results_table_assignment_col(index)
-      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[8]")
+      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[5]")
+    end
+
+    def results_table_grader_col(index)
+      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[4]")
+    end
+
+    def results_table_student_col(index)
+      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[3]")
     end
   end
 end
