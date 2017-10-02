@@ -62,7 +62,7 @@ module Importers
       return unless node[attr].present?
 
       if attr == 'value'
-        return unless node['name'] && node['name'] == 'src'
+        return unless node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE}
       end
 
       url = node[attr].dup
