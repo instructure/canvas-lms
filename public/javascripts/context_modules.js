@@ -2113,8 +2113,14 @@ import 'compiled/jquery.rails_flash_notifications'
     // from context_modules/_content
     var foundExpanded = false;
     var collapsedModules = ENV.COLLAPSED_MODULES;
-
     var currentModules = ENV.CURRENT_MODULES;
+    var workflow_modules = ENV.WORKFLOW_MODULES;
+    if(currentModules.length < 1){
+      var new_module = workflow_modules.find(function (flow) {
+        return flow[1] == "started";
+      });
+      currentModules.push(new_module[0]);
+    }
     for(var idx in currentModules) {
       $("#context_module_" + currentModules[idx]).addClass('sm-started').removeClass('collapsed_module');
     }
@@ -2122,7 +2128,6 @@ import 'compiled/jquery.rails_flash_notifications'
     if(ENV.IS_STUDENT){
       modules.getCourseItems(modules.updateCourseProgress);
     }
-
 
     var foundModules = [];
     var $contextModules = $("#context_modules .context_module");

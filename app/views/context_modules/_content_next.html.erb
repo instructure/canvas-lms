@@ -22,6 +22,7 @@
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
     :CURRENT_MODULES => @current_modules,
+    :WORKFLOW_MODULES => @workflow_modules,
     :CAN_MANAGE_MODULES => @can_edit,
     :IS_STUDENT => can_do(@context, @current_user, :participate_as_student),
     :COURSE_ID => @context.id,
