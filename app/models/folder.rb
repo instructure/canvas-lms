@@ -384,7 +384,8 @@ class Folder < ActiveRecord::Base
     component = components.shift
     if components.empty?
       # find the attachment
-      return visible_file_attachments.to_a.find {|a| a.matches_filename?(component) }
+      atts = visible_file_attachments.to_a
+      return atts.detect {|a| Attachment.matches_name?(a.display_name, component) } || atts.detect {|a| Attachment.matches_name?(a.filename, component) }
     else
       # find a subfolder and recurse (yes, we can have multiple sub-folders w/ the same name)
       active_sub_folders.where(name: component).each do |folder|
