@@ -1,5 +1,6 @@
 const React = require("react")
 
+const { LiveAnnouncer, LiveMessage } = require("react-aria-live")
 const Tray = require("instructure-ui/lib/components/Tray").default
 const Container = require("instructure-ui/lib/components/Container").default
 const Heading = require("instructure-ui/lib/components/Heading").default
@@ -15,13 +16,13 @@ const GridRow = require("instructure-ui/lib/components/Grid/GridRow").default
 const GridCol = require("instructure-ui/lib/components/Grid/GridCol").default
 const Spinner = require("instructure-ui/lib/components/Spinner").default
 const ColorField = require("./color-field")
-
 const Typography = require("instructure-ui/lib/components/Typography").default
 const IconCompleteSolid = require("instructure-icons/lib/Solid/IconCompleteSolid")
   .default
 const IconQuestionSolid = require("instructure-icons/lib/Solid/IconQuestionSolid")
   .default
 
+const describe = require("../utils/describe")
 const dom = require("../utils/dom")
 const rules = require("../rules")
 const formatMessage = require("../format-message")
@@ -252,101 +253,118 @@ class Checker extends React.Component {
 
   render() {
     const rule = this.errorRule()
+    const issueNumberMessage = formatMessage("Issue { num } of { total }", {
+      num: this.state.errorIndex + 1,
+      total: this.state.errors.length
+    })
+
     return (
-      <Tray
-        label={formatMessage("Accessibility Checker")}
-        isDismissable
-        isOpen={this.state.open}
-        onRequestClose={this.handleClose}
-        placement="end"
-        closeButtonLabel={formatMessage("Close Accessibility Checker")}
-      >
-        <Container as="div" style={{ width: "20rem" }} padding="medium">
-          <Heading level="h3" as="h2" margin="medium 0" color="brand">
-            <IconCompleteSolid
-              style={{
-                verticalAlign: "middle",
-                paddingBottom: "0.1em"
-              }}
-            />
-            {" " + formatMessage("Accessibility Checker")}
-          </Heading>
-          {this.state.errors.length > 0 && (
-            <Container as="div">
-              <Typography size="small">
-                {formatMessage("Issue { num } of { total }", {
-                  num: this.state.errorIndex + 1,
-                  total: this.state.errors.length
-                })}
-              </Typography>
-              <form onSubmit={this.fixIssue}>
-                <Container as="div" margin="x-small 0 medium">
-                  <Grid
-                    vAlign="middle"
-                    hAlign="space-between"
-                    colSpacing="none"
-                  >
-                    <GridRow>
-                      <GridCol>
-                        <Button onClick={this.prevError}>
-                          {formatMessage("Prev")}
-                        </Button>{" "}
-                        <Button onClick={this.nextError} variant="primary">
-                          {formatMessage("Next")}
-                        </Button>
-                      </GridCol>
-                      <GridCol width="auto">
-                        <Button
-                          type="submit"
-                          variant="success"
-                          disabled={!this.state.formStateValid}
-                        >
-                          {formatMessage("Apply Fix")}
-                        </Button>
-                      </GridCol>
-                    </GridRow>
-                  </Grid>
-                </Container>
-                <Alert variant="warning">{this.errorMessage()}</Alert>
-                {rule.form().map(f => (
-                  <Container as="div" key={f.dataKey} margin="medium 0 0">
-                    {this.renderField(f)}
+      <LiveAnnouncer>
+        <Tray
+          label={formatMessage("Accessibility Checker")}
+          isDismissable
+          trapFocus
+          isOpen={this.state.open}
+          onRequestClose={this.handleClose}
+          placement="end"
+          closeButtonLabel={formatMessage("Close Accessibility Checker")}
+        >
+          <Container as="div" style={{ width: "20rem" }} padding="medium">
+            <Heading level="h3" as="h2" margin="medium 0" color="brand">
+              <IconCompleteSolid
+                style={{
+                  verticalAlign: "middle",
+                  paddingBottom: "0.1em"
+                }}
+              />
+              {" " + formatMessage("Accessibility Checker")}
+            </Heading>
+            {this.state.errors.length > 0 && (
+              <Container as="div">
+                <LiveMessage
+                  aria-live="polite"
+                  message={`
+                  ${issueNumberMessage}
+                  ${describe(this.errorNode())}
+                  ${this.errorMessage()}
+                `}
+                />
+                <Typography size="small">{issueNumberMessage}</Typography>
+                <form onSubmit={this.fixIssue}>
+                  <Container as="div" margin="x-small 0 medium">
+                    <Grid
+                      vAlign="middle"
+                      hAlign="space-between"
+                      colSpacing="none"
+                    >
+                      <GridRow>
+                        <GridCol>
+                          <Button onClick={this.prevError}>
+                            {formatMessage("Prev")}
+                          </Button>{" "}
+                          <Button onClick={this.nextError} variant="primary">
+                            {formatMessage("Next")}
+                          </Button>
+                        </GridCol>
+                        <GridCol width="auto">
+                          <Button
+                            type="submit"
+                            variant="success"
+                            disabled={!this.state.formStateValid}
+                          >
+                            {formatMessage("Apply Fix")}
+                          </Button>
+                        </GridCol>
+                      </GridRow>
+                    </Grid>
                   </Container>
-                ))}
-              </form>
-              <Container as="div" margin="large 0 0">
-                <Heading level="h4" as="h3" padding="0 0 x-small">
-                  <IconQuestionSolid
-                    style={{
-                      verticalAlign: "middle",
-                      paddingBottom: "0.1em"
-                    }}
-                  />
-                  {" " + formatMessage("Why")}
-                </Heading>
-                <Typography size="small">
-                  {rule.why() + " "}
-                  <Link href={rule.link} target="_blank">
-                    {formatMessage("Learn more")}
-                  </Link>
-                </Typography>
+                  <Alert variant="warning">{this.errorMessage()}</Alert>
+                  {rule.form().map(f => (
+                    <Container as="div" key={f.dataKey} margin="medium 0 0">
+                      {this.renderField(f)}
+                    </Container>
+                  ))}
+                </form>
+                <Container as="div" margin="large 0 0">
+                  <Heading level="h4" as="h3" padding="0 0 x-small">
+                    <IconQuestionSolid
+                      style={{
+                        verticalAlign: "middle",
+                        paddingBottom: "0.1em"
+                      }}
+                    />
+                    {" " + formatMessage("Why")}
+                  </Heading>
+                  <Typography size="small">
+                    {rule.why() + " "}
+                    <Link href={rule.link} target="_blank">
+                      {formatMessage("Learn more")}
+                    </Link>
+                  </Typography>
+                </Container>
               </Container>
-            </Container>
-          )}
-          {this.state.errors.length === 0 &&
-            !this.state.checking && (
-              <Alert variant="success">
-                {formatMessage("No accessibility issues were detected.")}
-              </Alert>
             )}
-          {this.state.checking && (
-            <Spinner
-              margin="medium auto"
-              title={formatMessage("Checking for accessibility issues")}
-            />
-          )}
-        </Container>
-      </Tray>
+            {this.state.errors.length === 0 &&
+              !this.state.checking && (
+                <Alert variant="success">
+                  {formatMessage("No accessibility issues were detected.")}
+                </Alert>
+              )}
+            {this.state.checking && (
+              <div>
+                <LiveMessage
+                  message={formatMessage("Checking for accessibility issues")}
+                  aria-live="polite"
+                />
+                <Spinner
+                  title={formatMessage("Checking for accessibility issues")}
+                  margin="medium auto"
+                />
+              </div>
+            )}
+          </Container>
+        </Tray>
+      </LiveAnnouncer>
     )
   }
 
