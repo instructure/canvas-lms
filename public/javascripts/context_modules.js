@@ -40,6 +40,8 @@ import PublishButtonView from 'compiled/views/PublishButtonView'
 import htmlEscape from './str/htmlEscape'
 import setupContentIds from 'jsx/modules/utils/setupContentIds'
 import get from 'lodash/get'
+import axios from 'axios'
+import { showFlashError } from 'jsx/shared/FlashAlert'
 import './jquery.ajaxJSON'
 import './jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */
 import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
@@ -507,6 +509,9 @@ import 'compiled/jquery.rails_flash_notifications'
         }
         $item.addClass(data.type + '_' + data.id);
         $item.addClass(data.type);
+        if (data.is_duplicate_able) {
+          $item.addClass('dupeable')
+        }
         $item.attr('aria-label', data.title);
         $item.find('.title').attr('title', data.title);
         $item.fillTemplateData({
@@ -1467,7 +1472,35 @@ import 'compiled/jquery.rails_flash_notifications'
         };
         INST.selectContentDialog(options);
       }
-    });
+    })
+
+    $('.duplicate_item_link').on('click', function(event) {
+      event.preventDefault()
+
+      const $module = $(this).closest('.context_module')
+      const url = $(this).attr('href')
+
+      axios.post(url)
+        .then(({ data }) => {
+          const $item = modules.addItemToModule($module, data.content_tag)
+          initNewItemPublishButton($item, data.content_tag)
+          modules.updateAssignmentData()
+
+          $item.find('.lock-icon').data({moduleType: data.content_tag.type, contentId: data.content_tag.id})
+          modules.loadMasterCourseData(data.content_tag.id)
+
+          $module.find('.context_module_items.ui-sortable').sortable('disable')
+          data.new_positions.forEach(({ content_tag }) => {
+            $module.find(`#context_module_item_${content_tag.id}`).fillTemplateData({
+              data: {position: content_tag.position}
+            })
+          })
+
+          $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
+        })
+        .catch(showFlashError('Error duplicating item'))
+    })
+
     $("#add_module_prerequisite_dialog .cancel_button").click(function() {
       $("#add_module_prerequisite_dialog").dialog('close');
     });
