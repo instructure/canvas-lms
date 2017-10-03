@@ -113,16 +113,18 @@ define [
     if obj.assignment?.frozen
       obj.can_delete = false
 
-    # TODO: can't edit yet. above, can_create_calendar_events could have made true
-    if obj.eventType == 'planner_note'
-      obj.can_edit = false
-      obj.can_delete = false  # even though this works, seems wrong to del if can't edit
-
     # events can be moved to a different calendar in limited circumstances
     if type == 'calendar_event'
       unless obj.object.appointment_group_id || obj.object.parent_event_id ||
              obj.object.child_events_count || obj.object.effective_context_code
         obj.can_change_context = true
+
+    if type == 'planner_note'
+      # planner_notes can only be created by the user for herself,
+      # so she can always edit them
+      obj.can_change_context = true
+      obj.can_edit = true
+      obj.can_delete = true
 
     # disable fullcalendar.js dragging unless the user has permissions
     obj.editable = false unless obj.can_edit

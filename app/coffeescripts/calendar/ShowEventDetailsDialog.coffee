@@ -18,6 +18,7 @@
 define [
   'jquery'
   'i18n!calendar'
+  'str/htmlEscape'
   'compiled/util/Popover'
   'compiled/util/fcUtil'
   'compiled/calendar/CommonEvent'
@@ -34,7 +35,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], ($, I18n, Popover, fcUtil, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, axios, {publish}) ->
+], ($, I18n, htmlEscape, Popover, fcUtil, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, axios, {publish}) ->
 
   destroyArguments = (fn) => -> fn.apply(this, [])
 
@@ -224,6 +225,10 @@ define [
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
       params.isPlannerNote = @event.eventType == 'planner_note'
+      if params.isPlannerNote
+        # when displayed in the template description is first processed by apiUserContent,
+        # which shoves the html string into the document, which will execute any <script>
+        params.description = htmlEscape(params.description)
 
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
       @popover.el.data('showEventDetailsDialog', @)
