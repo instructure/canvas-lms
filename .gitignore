@@ -50,7 +50,7 @@ npm-debug.log
 
 # generated client app stuff
 /public/javascripts/client_apps/
-
+.vscode
 
 # canvas-gems
 /gems/*/coverage
