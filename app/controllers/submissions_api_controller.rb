@@ -118,6 +118,10 @@
 #           "example": 86,
 #           "type": "integer"
 #         },
+#         "graded_at" : {
+#           "example": "2012-01-02T03:05:34Z",
+#           "type": "datetime"
+#         },
 #         "user": {
 #           "description": "The submissions user (see user API) (optional)",
 #           "example": "User",
