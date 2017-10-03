@@ -2171,7 +2171,8 @@ test('when user is not ignoring warnings, the dialog has a onClose property whic
 QUnit.module('Gradebook#showNotesColumn', {
   setup () {
     this.stub(DataLoader, 'getDataForColumn');
-    this.gradebook = createGradebook();
+    const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true };
+    this.gradebook = createGradebook({ teacher_notes: teacherNotes });
     this.stub(this.gradebook, 'toggleNotesColumn');
   }
 });
@@ -2180,6 +2181,13 @@ test('loads the notes if they have not yet been loaded', function () {
   this.gradebook.teacherNotesNotYetLoaded = true;
   this.gradebook.showNotesColumn();
   equal(DataLoader.getDataForColumn.callCount, 1);
+});
+
+test('loads the notes using the teacher notes column id', function () {
+  this.gradebook.teacherNotesNotYetLoaded = true;
+  this.gradebook.showNotesColumn();
+  const [columnId] = DataLoader.getDataForColumn.lastCall.args;
+  strictEqual(columnId, '2401');
 });
 
 test('does not load the notes if they are already loaded', function () {

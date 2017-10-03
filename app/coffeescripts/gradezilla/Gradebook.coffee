@@ -1973,7 +1973,7 @@ define [
     showNotesColumn: =>
       if @teacherNotesNotYetLoaded
         @teacherNotesNotYetLoaded = false
-        DataLoader.getDataForColumn(@getTeacherNotesColumn(), @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
+        DataLoader.getDataForColumn(@getTeacherNotesColumn().id, @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
 
       @getTeacherNotesColumn()?.hidden = false
       @toggleNotesColumn()
