@@ -112,15 +112,10 @@ class UsersToolbar extends React.Component {
                 <IcInput
                   value={this.props.search_term}
                   placeholder={I18n.t('Search people...')}
-                  onChange={e => onUpdateFilters({search_term: e.target.value})}
+                  onChange={e => onUpdateFilters({ search_term: e.target.value })}
                   error={errors.search_term}
+                  type="search"
                 />
-                &nbsp;
-                <div className="ic-Form-control">
-                  <button className="Button">
-                    {I18n.t('Go')}
-                  </button>
-                </div>
               </div>
             </div>
             <div className="col-xs-12 col-md-3">

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { debounce } from 'underscore'
 import I18n from 'i18n!account_course_user_search'
 import CoursesStore from './CoursesStore'
 import TermsStore from './TermsStore'
@@ -58,6 +59,9 @@ class CoursesPane extends React.Component {
       errors: {},
       previousCourses: {data: []},
     }
+
+    // Doing this here because the class property version didn't work :(
+    this.debouncedApplyFilters = debounce(this.onApplyFilters, 250)
   }
 
   componentWillMount () {
@@ -86,7 +90,7 @@ class CoursesPane extends React.Component {
     this.setState({
       errors: {},
       draftFilters: Object.assign({}, this.state.draftFilters, newFilters)
-    })
+    }, this.debouncedApplyFilters)
   }
 
   onApplyFilters = () => {

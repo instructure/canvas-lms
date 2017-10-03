@@ -123,12 +123,8 @@ class CoursesToolbar extends React.Component {
                 placeholder={I18n.t('Search courses...')}
                 onChange={e => onUpdateFilters({search_term: e.target.value})}
                 error={errors.search_term}
+                type="search"
               />
-              <div className="ic-Form-control">
-                <button className="btn">
-                  {I18n.t('Go')}
-                </button>
-              </div>
             </div>
             <div className="ic-Form-action-box__Actions">
               {addCourseButton}

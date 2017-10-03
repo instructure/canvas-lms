@@ -104,7 +104,7 @@ describe "new account course search" do
 
     get "/accounts/#{@account.id}"
 
-    f('.course_search_bar input[type=text]').send_keys('search')
+    f('.course_search_bar input[type=search]').send_keys('search')
     f('.course_search_bar button').click
     wait_for_ajaximations
 
