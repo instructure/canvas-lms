@@ -64,7 +64,16 @@ class CalendarEvent < ActiveRecord::Base
 
   before_save :sync_google_calendar
 
+  def gcal_config
+    File.join(Rails.root, "config", "google_calendar_auth.json")
+  end
+
+  def gcal_enabled?
+    File.exist?(gcal_config)
+  end
+
   def kill_google_calendar
+    return if !gcal_enabled?
     return if google_calendar_id.nil? || google_calendar_id.empty?
 
     BZDebug.log("Kill: " + self.id.to_s)
@@ -74,7 +83,7 @@ class CalendarEvent < ActiveRecord::Base
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
-    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    file_store = Google::APIClient::FileStore.new(gcal_config)
     storage = Google::APIClient::Storage.new(file_store)
     client.authorization = storage.authorize
     calendar_api = client.discovered_api('calendar', 'v3')
@@ -96,6 +105,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def sync_google_calendar
+    return if !gcal_enabled?
     # If we already deleted it on gcal (through a destroy call below), it will
     # try to save again in Rails which triggers this function. We do NOT want to
     # resync because that would recreate it.
@@ -109,7 +119,7 @@ class CalendarEvent < ActiveRecord::Base
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
-    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    file_store = Google::APIClient::FileStore.new(gcal_config)
     storage = Google::APIClient::Storage.new(file_store)
     client.authorization = storage.authorize
     calendar_api = client.discovered_api('calendar', 'v3')
@@ -219,11 +229,12 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def get_gcal_rsvp_status
+    return [] if !gcal_enabled?
     return [] if !google_calendar_id || google_calendar_id.empty?
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
-    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    file_store = Google::APIClient::FileStore.new(gcal_config)
     storage = Google::APIClient::Storage.new(file_store)
     client.authorization = storage.authorize
     calendar_api = client.discovered_api('calendar', 'v3')

@@ -24,6 +24,8 @@ CanvasRails::Application.routes.draw do
 
   get 'bz/user_linkedin_url' => 'bz#user_linkedin_url'
 
+  get 'bz/grades_download' => 'bz#grades_download', defaults: { format: 'csv' }
+
   get 'bz/linked_in_auth' => 'bz#linked_in_auth'
   get 'bz/linked_in_export' => 'bz#linked_in_export'
   post 'bz/linked_in_export' => 'bz#do_linked_in_export'
