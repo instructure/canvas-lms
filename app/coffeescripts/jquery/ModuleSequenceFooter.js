@@ -69,29 +69,21 @@ $.fn.moduleSequenceFooter = function (options = {}) {
       const showModule = items.length > 0
       const currentItem = _.findWhere(items, {id: this.msfInstance.item.current.id})
       
-      console.log("currentItem", currentItem)
       if (currentItem) {
         const lessons = _.where(items, {indent: 0})
         var nextLesson, previousLesson
   
         var lessonBookendStart = _.last(lessons.filter((l) => {
-          console.log("lesson", l)
           return currentItem.position >= l.position
         }))
   
         var lessonBookendEnd = _.first(lessons.filter((l) => {
-          console.log("lesson", l)
           return currentItem.position <= l.position
         }))
-  
-        console.log("lessonBookendStart", lessonBookendStart)
-        console.log("lessonBookendEnd", lessonBookendEnd)
-  
-        // lessons.findIndex((i) => {return i.id == lessonBookendEnd.id})
+
         var next
         if (lessonBookendEnd) {
           next = ( lessonBookendStart.id === lessonBookendEnd.id ) ? lessons[lessons.findIndex((i) => {return i.id == lessonBookendEnd.id}) + 1] : lessonBookendEnd;
-          console.log("next", next)
         } else {
           next = false
         }
@@ -105,8 +97,6 @@ $.fn.moduleSequenceFooter = function (options = {}) {
             return lessonBookendStart.position < i.position
           })
         }
-        console.log("lessons", lessons)
-        console.log("lessonArray", lessonArray)
       }
 
       if (this.msfInstance.hide) {
