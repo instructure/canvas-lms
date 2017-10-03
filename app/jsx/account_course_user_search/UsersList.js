@@ -58,7 +58,6 @@ export default class UsersList extends React.Component {
       order: newOrder,
       role_filter_id: this.props.userList.searchFilter.role_filter_id
     })
-    this.props.onApplyFilters()
   }
 
   renderHeader ({id, label, tipDesc, tipAsc}) {

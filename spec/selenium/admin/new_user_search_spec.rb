@@ -113,7 +113,7 @@ describe "new account user search" do
     get "/accounts/#{@account.id}"
     click_tab
 
-    f('.user_search_bar input[type=text]').send_keys('search')
+    f('.user_search_bar input[type=search]').send_keys('search')
     f('.user_search_bar button').click
     wait_for_ajaximations
 
