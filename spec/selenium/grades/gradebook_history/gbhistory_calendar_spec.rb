@@ -48,7 +48,7 @@ describe "Gradebook History Page" do
       GradeBookHistory.enter_end_date(:tab)
       filter_button_updated=GradeBookHistory.filter_button_for_aria
       aria_disabled_attribute_value = filter_button_updated.attribute('aria-disabled')
-      expect(filter_button_updated).to be_disabled
+      expect(aria_disabled_attribute_value).to eq('true')
      end
   end
 end
