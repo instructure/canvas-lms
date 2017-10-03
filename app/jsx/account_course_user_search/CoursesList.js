@@ -17,9 +17,9 @@
  */
 
 import preventDefault from 'compiled/fn/preventDefault'
-import IconArrowUpSolid from 'instructure-icons/lib/Solid/IconArrowUpSolid'
-import IconArrowDownSolid from 'instructure-icons/lib/Solid/IconArrowDownSolid'
-import Typography from 'instructure-ui/lib/components/Typography'
+import IconMiniArrowUpSolid from 'instructure-icons/lib/Solid/IconMiniArrowUpSolid'
+import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
+import Link from 'instructure-ui/lib/components/Link'
 import Tooltip from 'instructure-ui/lib/components/Tooltip'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -68,91 +68,24 @@ class CoursesList extends React.Component {
     })
   }
 
+  renderHeader ({id, label, tipDesc, tipAsc}) {
+    return (
+
+      <Tooltip
+        as={Link}
+        tip={(this.props.sort === id && this.props.order === 'asc') ? tipAsc : tipDesc}
+        onClick={preventDefault(() => this.props.onChangeSort(id))}
+      >
+        {label}
+        {this.props.sort === id ?
+          (this.props.order === 'asc' ? <IconMiniArrowDownSolid /> : <IconMiniArrowUpSolid />) :
+          ''
+        }
+      </Tooltip>
+    )
+  }
+
   render () {
-    const sort = this.props.sort
-    const order = this.props.order
-
-    const courseLabel = I18n.t('Course')
-    const idLabel = I18n.t('SIS ID')
-    const teacherLabel = I18n.t('Teacher')
-    const enrollmentsLabel = I18n.t('Enrollments')
-    const subaccountLabel = I18n.t('Sub-Account')
-
-    let courseTip
-    let idTip
-    let teacherTip
-    let enrollmentsTip
-    let subaccountTip
-
-    let courseArrow = ''
-    let idArrow = ''
-    let teacherArrow = ''
-    let enrollmentsArrow = ''
-    let subaccountArrow = ''
-
-    if (sort === 'course_name') {
-      idTip = I18n.t('Click to sort by SIS ID ascending')
-      teacherTip = I18n.t('Click to sort by teacher ascending')
-      enrollmentsTip = I18n.t('Click to sort by enrollments ascending')
-      subaccountTip = I18n.t('Click to sort by subaccount ascending')
-      if (order === 'asc') {
-        courseTip = I18n.t('Click to sort by name descending')
-        courseArrow = <IconArrowDownSolid />
-      } else {
-        courseTip = I18n.t('Click to sort by name ascending')
-        courseArrow = <IconArrowUpSolid />
-      }
-    } else if (sort === 'sis_course_id') {
-      courseTip = I18n.t('Click to sort by name ascending')
-      teacherTip = I18n.t('Click to sort by teacher ascending')
-      enrollmentsTip = I18n.t('Click to sort by enrollments ascending')
-      subaccountTip = I18n.t('Click to sort by subaccount ascending')
-      if (order === 'asc') {
-        idTip = I18n.t('Click to sort by SIS ID descending')
-        idArrow = <IconArrowDownSolid />
-      } else {
-        idTip = I18n.t('Click to sort by SIS ID ascending')
-        idArrow = <IconArrowUpSolid />
-      }
-    } else if (sort === 'teacher') {
-      courseTip = I18n.t('Click to sort by name ascending')
-      idTip = I18n.t('Click to sort by SIS ID ascending')
-      enrollmentsTip = I18n.t('Click to sort by enrollments ascending')
-      subaccountTip = I18n.t('Click to sort by subaccount ascending')
-      if (order === 'asc') {
-        teacherTip = I18n.t('Click to sort by teacher descending')
-        teacherArrow = <IconArrowDownSolid />
-      } else {
-        teacherTip = I18n.t('Click to sort by teacher ascending')
-        teacherArrow = <IconArrowUpSolid />
-      }
-    } else if (sort === 'enrollments') {
-      courseTip = I18n.t('Click to sort by name ascending')
-      idTip = I18n.t('Click to sort by SIS ID ascending')
-      teacherTip = I18n.t('Click to sort by teacher ascending')
-      subaccountTip = I18n.t('Click to sort by subaccount ascending')
-      if (order === 'asc') {
-        enrollmentsTip = I18n.t('Click to sort by enrollments descending')
-        enrollmentsArrow = <IconArrowDownSolid />
-      } else {
-        enrollmentsTip = I18n.t('Click to sort by enrollments ascending')
-        enrollmentsArrow = <IconArrowUpSolid />
-      }
-    } else if (sort === 'subaccount') {
-      courseTip = I18n.t('Click to sort by name ascending')
-      idTip = I18n.t('Click to sort by SIS ID ascending')
-      teacherTip = I18n.t('Click to sort by teacher ascending')
-      enrollmentsTip = I18n.t('Click to sort by enrollments ascending')
-      if (order === 'asc') {
-        subaccountTip = I18n.t('Click to sort by subaccount descending')
-        subaccountArrow = <IconArrowDownSolid />
-      } else {
-        subaccountTip = I18n.t('Click to sort by subaccount ascending')
-        subaccountArrow = <IconArrowUpSolid />
-      }
-    }
-
-
     const courses = this.props.courses
 
     return (
@@ -162,71 +95,54 @@ class CoursesList extends React.Component {
             <div className="grid-row">
               <div className="col-xs-2" />
               <div className="col-xs-10" role="columnheader">
-                <a
-                  role="button"
-                  href=""
-                  className="courses-user-list-header"
-                  onClick={preventDefault(() => this.props.onChangeSort('course_name'))}
-                >
-                  <Tooltip as={Typography} tip={courseTip}>
-                    {courseLabel}
-                    {courseArrow}
-                  </Tooltip>
-                </a>
+              {this.renderHeader({
+                id: 'course_name',
+                label: I18n.t('Course'),
+                tipDesc: I18n.t('Click to sort by name ascending'),
+                tipAsc: I18n.t('Click to sort by name descending')
+              })}
               </div>
             </div>
           </div>
           <div role="columnheader" className="col-xs-1">
-            <a
-              role="button"
-              href=""
-              className="courses-user-list-header"
-              onClick={preventDefault(() => this.props.onChangeSort('sis_course_id'))}
-            >
-              <Tooltip as={Typography} tip={idTip}>
-                {idLabel}
-                {idArrow}
-              </Tooltip>
-            </a>
-          </div>
-          <div role="columnheader" className="col-xs-2">
-            <a
-              role="button"
-              href=""
-              className="courses-user-list-header"
-              onClick={preventDefault(() => this.props.onChangeSort('teacher'))}
-            >
-              <Tooltip as={Typography} tip={teacherTip}>
-                {teacherLabel}
-                {teacherArrow}
-              </Tooltip>
-            </a>
-          </div>
-          <div role="columnheader" className="col-xs-2">
-            <a
-              role="button"
-              href=""
-              className="courses-user-list-header"
-              onClick={preventDefault(() => this.props.onChangeSort('subaccount'))}
-            >
-              <Tooltip as={Typography} tip={subaccountTip}>
-                {subaccountLabel}
-                {subaccountArrow}
-              </Tooltip>
-            </a>
+            {this.renderHeader({
+              id: 'sis_course_id',
+              label: I18n.t('SIS ID'),
+              tipDesc: I18n.t('Click to sort by SIS ID ascending'),
+              tipAsc: I18n.t('Click to sort by SIS ID descending')
+            })}
           </div>
           <div role="columnheader" className="col-xs-1">
-            <a
-              role="button"
-              href=""
-              className="courses-user-list-header"
-              onClick={preventDefault(() => this.props.onChangeSort('enrollments'))}
-            >
-              <Tooltip as={Typography} tip={enrollmentsTip}>
-                {enrollmentsLabel}
-                {enrollmentsArrow}
-              </Tooltip>
-            </a>
+            {this.renderHeader({
+              id: 'term',
+              label: I18n.t('Term'),
+              tipDesc: I18n.t('Click to sort by term ascending'),
+              tipAsc: I18n.t('Click to sort by term descending')
+            })}
+          </div>
+          <div role="columnheader" className="col-xs-2">
+            {this.renderHeader({
+              id: 'teacher',
+              label: I18n.t('Teacher'),
+              tipDesc: I18n.t('Click to sort by teacher ascending'),
+              tipAsc: I18n.t('Click to sort by teacher descending')
+            })}
+          </div>
+          <div role="columnheader" className="col-xs-2">
+            {this.renderHeader({
+              id: 'subaccount',
+              label: I18n.t('Sub-Account'),
+              tipDesc: I18n.t('Click to sort by sub-account ascending'),
+              tipAsc: I18n.t('Click to sort by sub-account descending')
+            })}
+          </div>
+          <div role="columnheader" className="col-xs-1">
+            {this.renderHeader({
+              id: 'enrollments',
+              label: I18n.t('Enrollments'),
+              tipDesc: I18n.t('Click to sort by enrollments ascending'),
+              tipAsc: I18n.t('Click to sort by enrollments descending')
+            })}
           </div>
           <div role="columnheader" className="col-xs-2">
             <span className="screenreader-only">{I18n.t('Course option links')}</span>

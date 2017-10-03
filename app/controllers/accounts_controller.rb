@@ -378,6 +378,10 @@ class AccountsController < ApplicationController
               "(SELECT #{name_col} FROM #{Account.quoted_table_name}
                 WHERE #{Account.quoted_table_name}.id
                 = #{Course.quoted_table_name}.account_id)"
+            elsif params[:sort] == 'term'
+              "(SELECT #{EnrollmentTerm.quoted_table_name}.name FROM #{EnrollmentTerm.quoted_table_name}
+                WHERE #{EnrollmentTerm.quoted_table_name}.id
+                = #{Course.quoted_table_name}.enrollment_term_id)"
             else
               "id"
             end

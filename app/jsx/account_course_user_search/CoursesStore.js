@@ -31,7 +31,7 @@ const CoursesStore = createStore({
     if (params.sort) payload.sort = params.sort
     if (params.order) payload.order = params.order
     if (params.search_by) payload.search_by = params.search_by
-    payload.include = ['total_students', 'teachers', 'subaccount']
+    payload.include = ['total_students', 'teachers', 'subaccount', 'term']
 
     return payload
   }

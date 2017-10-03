@@ -921,6 +921,33 @@ describe AccountsController do
       expect(response.body).to match(/\"sis_course_id\":\"30\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"52\"/)
     end
 
+    context "sorting by term" do
+      let(:letters_in_random_order) { 'daqwds'.split('') }
+      before do
+        @account = Account.create!
+        create_courses(letters_in_random_order.map { |i|
+          {enrollment_term_id: @account.enrollment_terms.create!(name: i).id}
+        }, account: @account)
+        admin_logged_in(@account)
+      end
+
+      it "should be able to sort courses by term ascending" do
+        get 'courses_api', params: {account_id: @account.id, sort: "term", order: "asc", include: ['term']}
+
+        expect(response).to be_success
+        term_names = json_parse(response.body).map{|c| c['term']['name']}
+        expect(term_names).to eq(letters_in_random_order.sort)
+      end
+
+      it "should be able to sort courses by term descending" do
+        get 'courses_api', params: {account_id: @account.id, sort: "term", order: "desc", include: ['term']}
+
+        expect(response).to be_success
+        term_names = json_parse(response.body).map{|c| c['term']['name']}
+        expect(term_names).to eq(letters_in_random_order.sort.reverse)
+      end
+    end
+
     it "should be able to sort courses by enrollments ascending" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
