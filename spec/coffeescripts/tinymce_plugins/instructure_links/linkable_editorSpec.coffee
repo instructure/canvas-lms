@@ -108,3 +108,31 @@ define [
     equal($iframe.attr('width'), 300)
     equal($iframe.attr('height'), 600)
 
+  test "links initEditor PreProcess event doesn't use width/height attributes if style is present and contains those items", ->
+    $('#fixtures').html('<div id="some_editor" data-value="42"><img class="iframe_placeholder" _iframe_style="height: 500px; width: 800px;" src="some_img.png" style="height: 500px; width: 800px;"></div>')
+    $editor = $(new LinkableEditor(rawEditor))
+    links.initEditor($editor)
+    event = $.Event('PreProcess')
+    event.node = $('#fixtures')[0]
+    $editor.trigger(event)
+    $iframe = $('#fixtures').find('iframe')
+    equal($iframe.attr('style'), "height: 500px; width: 800px;")
+    ok(!$iframe.attr('width'))
+    ok(!$iframe.attr('height'))
+
+  QUnit.module "updateLinks",
+    setup: ->
+      $('#fixtures').html('<div id="some_editor" data-value="42"><p><span contenteditable="false" data-mce-object="iframe" class="mce-preview-object mce-object-iframe" data-mce-p-src="//simplydiffrient.com"><iframe style="width: 800px; height: 600px;" src="//simplydiffrient.com" frameborder="0"></iframe><span class="mce-shim"></span></span></p></div>')
+    teardown: ->
+      $("#fixtures").empty()
+
+  test "it sets up the placeholder with attributes from the iframe's style property if it exists", ->
+    $editor = $(new LinkableEditor(rawEditor))
+    links.initEditor($editor)
+    mockEditor =
+      contentAreaContainer: $('<span>')
+      getBody: ->
+        $('#fixtures')[0]
+    links.updateLinks(mockEditor)
+    equal($('.iframe_placeholder').height(), 600, 'Height should be correct')
+    equal($('.iframe_placeholder').width(), 800, 'Width should be correct')

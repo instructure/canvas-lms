@@ -352,19 +352,23 @@ import YouTubeApi from './youtube_api'
     $(ed.getBody()).find("iframe").each(function() {
       var $frame = $(this);
       var $link = $("<img/>");
+      var $parent = $frame.parent();
       $link.addClass('iframe_placeholder');
       $link.attr('rel', $frame.attr('src'));
-      $link.attr('style', $frame.attr('style'));
+      $link.attr('style', $frame.attr('style') || $parent.attr('style'));
       $link.css('display', 'block');
-      $link.attr('_iframe_style', $frame.attr('style'));
+      $link.attr('_iframe_style', $frame.attr('style') || $parent.attr('style'));
       var width = ($frame.attr('width') || $frame.css('width'));
       if(width == 'auto') { width = null; }
+      if ($frame.attr('style') || $parent.attr('style')) {
+        width = $frame[0].style.width || $parent[0].style.width || width
+      }
       if(!width || width == '100%' || width == 'auto') {
         var edWidth = $(ed.contentAreaContainer).width();
         $link.attr('width', edWidth - 15);
         $link.css('width', edWidth - 15);
         $link.addClass('fullWidth');
-      } else {
+      } else if (!$link[0].style.width) {
         $link.attr('width', width);
         $link.css('width', width);
       }
@@ -385,10 +389,13 @@ import YouTubeApi from './youtube_api'
       $link.attr('title', "This frame will embed the url:\r\n" + split.join("\r\n"));
       var height = $frame.attr('height') || $frame.css('height');
       if(height == 'auto') { height = null; }
+      if ($frame.attr('style') || $parent.attr('style')) {
+        height = $frame[0].style.height || $parent[0].style.height || height
+      }
       if(!height) {
         $link.attr('height', 300);
         $link.css('height', 300);
-      } else {
+      } else if (!$link[0].style.height) {
         $link.attr('height', height);
         $link.css('height', height);
       }
@@ -432,10 +439,14 @@ import YouTubeApi from './youtube_api'
         $holder.css('width', width);
         $frame.attr('src', $holder.attr('rel'));
         $frame.attr('style', $holder.attr('_iframe_style'));
-        $frame.attr('height', height);
-        $frame.css('height', height);
-        $frame.attr('width', width);
-        $frame.css('width', width);
+        if (!$frame[0].style.height.length) {
+          $frame.attr('height', height);
+          $frame.css('height', height);
+        }
+        if (!$frame[0].style.width.length) {
+          $frame.attr('width', width);
+          $frame.css('width', width);
+        }
         $(this).after($frame);
         $(this).remove();
       });
