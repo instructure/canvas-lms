@@ -278,7 +278,7 @@ class ProfileController < ApplicationController
   #     },
   #     {
   #       "type":"attachment",
-  #       "url":"https://<canvas>/images/thumbnails/12/gpLWJ...",
+  #       "url":<url to fetch thumbnail of attachment>,
   #       "token":<opaque_token>,
   #       "display_name":"profile.jpg",
   #       "id":12,

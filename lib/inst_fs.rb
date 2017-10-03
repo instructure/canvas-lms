@@ -27,6 +27,12 @@ module InstFS
       access_url(attachment, query_params)
     end
 
+    def authenticated_thumbnail_url(attachment, options={})
+      query_params = { token: access_jwt(attachment, options) }
+      query_params[:geometry] = options[:geometry] if options[:geometry]
+      thumbnail_url(attachment, query_params)
+    end
+
     def app_host
       setting("app-host")
     end
@@ -64,6 +70,10 @@ module InstFS
 
     def access_url(attachment, query_params)
       "#{app_host}/files/#{attachment.instfs_uuid}/#{attachment.filename}?#{query_params.to_query}"
+    end
+
+    def thumbnail_url(attachment, query_params)
+      "#{app_host}/thumbnails/#{attachment.instfs_uuid}?#{query_params.to_query}"
     end
 
     def upload_url(token=nil)

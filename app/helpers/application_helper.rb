@@ -904,4 +904,15 @@ module ApplicationHelper
     @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?
   end
 
+  def thumbnail_image_url(attachment)
+    if InstFS.enabled? && attachment.instfs_uuid
+      attachment.thumbnail_url
+    else
+      # this thumbnail url is a route that redirects to local/s3 appropriately.
+      # deferred redirect through route because computing
+      # attachment.thumbnail_url for non-InstFS attachments may cause immediate
+      # generation of a dynamic thumbnail
+      super(attachment, attachment.uuid)
+    end
+  end
 end

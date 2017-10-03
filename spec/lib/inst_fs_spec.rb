@@ -44,7 +44,8 @@ describe InstFS do
     end
 
     it "constructs url properly" do
-      expect(InstFS.authenticated_url(@attachment, {})).to match("#{@app_host}/files/#{@attachment.instfs_uuid}")
+      expect(InstFS.authenticated_url(@attachment, {}))
+        .to match("#{@app_host}/files/#{@attachment.instfs_uuid}")
     end
 
     it "passes download param" do
@@ -62,6 +63,43 @@ describe InstFS do
 
     it "includes an expiration on the token" do
       url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
+      token = url.split(/token=/).last
+      Timecop.freeze(2.hours.from_now) do
+        expect(->{
+          Canvas::Security.decode_jwt(token, [ @secret ])
+        }).to raise_error(Canvas::Security::TokenExpired)
+      end
+    end
+  end
+
+  context "authenticated_thumbnail_url" do
+    before :each do
+      @attachment = attachment_with_context(user_model)
+      @attachment.instfs_uuid = 1
+      @attachment.filename = "test.txt"
+    end
+
+    it "constructs url properly" do
+      expect(InstFS.authenticated_thumbnail_url(@attachment))
+        .to match("#{@app_host}/thumbnails/#{@attachment.instfs_uuid}")
+    end
+
+    it "passes geometry param" do
+      expect(InstFS.authenticated_thumbnail_url(@attachment, geometry: '256x256'))
+        .to match(/geometry=256x256/)
+    end
+
+    it "includes a properly signed token" do
+      url = InstFS.authenticated_thumbnail_url(@attachment)
+      expect(url).to match(/token=/)
+      token = url.split(/token=/).last
+      expect(->{
+        Canvas::Security.decode_jwt(token, [ @secret ])
+      }).not_to raise_error
+    end
+
+    it "includes an expiration on the token" do
+      url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
       token = url.split(/token=/).last
       Timecop.freeze(2.hours.from_now) do
         expect(->{

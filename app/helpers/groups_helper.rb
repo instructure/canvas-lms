@@ -20,7 +20,7 @@ module GroupsHelper
   def group_avatar_url(group)
     attachment = group.avatar_attachment
     attachment ?
-      thumbnail_image_url(attachment, attachment.uuid) :
+      thumbnail_image_url(attachment) :
       "/images/group-placeholder.png"
   end
 end
