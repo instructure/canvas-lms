@@ -53,8 +53,8 @@ class BzController < ApplicationController
 
     sections_points_available = []
     criteria.each do |c|
-      sections_points_available[c["section"].to_i - 1] = 0.0 if sections_points_available[c["section"].to_i - 1].nil?
-      sections_points_available[c["section"].to_i - 1] += c["points_available"].to_f # zero-based index of one-based index
+      sections_points_available[c["section"].to_i] = 0.0 if sections_points_available[c["section"].to_i].nil?
+      sections_points_available[c["section"].to_i] += c["points_available"].to_f
     end
 
     assignment_info = {}
@@ -163,10 +163,10 @@ class BzController < ApplicationController
                 points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
               end
             end
-            if section_scores[criterion["section"].to_i - 1].nil?
-              section_scores[criterion["section"].to_i - 1] = 0.0
+            if section_scores[criterion["section"].to_i].nil?
+              section_scores[criterion["section"].to_i] = 0.0
             end
-            section_scores[criterion["section"].to_i - 1] += points # zero-based array of one-based sections
+            section_scores[criterion["section"].to_i] += points # zero-based array of one-based sections
           end
 
 
