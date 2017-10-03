@@ -33,7 +33,8 @@
          editable,
          edit_view,
          assessing,
-         show_grading].join('/')) do %>
+         show_grading,
+         @domain_root_account.feature_enabled?(:rubric_criterion_range)].join('/')) do %>
 <div
   class="rubric_container rubric <%= "assessing" if assessing %> <%= "for_grading" if rubric_association.try(:use_for_grading) %>"
   id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>"

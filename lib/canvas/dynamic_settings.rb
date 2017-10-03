@@ -101,7 +101,8 @@ module Canvas
             kv_client: kv_client)
         else
           proxy = root_fallback_proxy
-          proxy = proxy.for_prefix(service) if service && service != :canvas
+          proxy = proxy.for_prefix(tree)
+          proxy = proxy.for_prefix(service)
           proxy = proxy.for_prefix(prefix) if prefix
           proxy
         end

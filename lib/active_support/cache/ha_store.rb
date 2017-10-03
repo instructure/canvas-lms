@@ -27,6 +27,22 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
 
   protected
 
+  def delete_entry(key, options)
+    # do it locally
+    result = super
+    # then if so configured, trigger consul
+    if options[:consul_event] && !options[:from_event]
+      datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
+      datacenters.each do |dc|
+        Imperium::Events.fire(options[:consul_event], key, dc: dc)
+      end
+      # no idea if we actually cleared anything
+      false
+    else
+      result
+    end
+  end
+
   def handle_expired_entry(entry, key, options)
     return super unless options[:race_condition_ttl]
     lock_key = "lock:#{key}"

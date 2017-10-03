@@ -352,7 +352,7 @@ class ExternalToolsController < ApplicationController
       Canvas.redis.del(redis_key)
     end
     unless launch_settings
-      render :text => t(:cannot_locate_launch_request, 'Cannot locate launch request, please try again.'), :status => :not_found
+      render :plain => t(:cannot_locate_launch_request, 'Cannot locate launch request, please try again.'), :status => :not_found
       return
     end
 

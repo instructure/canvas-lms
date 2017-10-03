@@ -245,7 +245,7 @@ class CollaborationsController < ApplicationController
 
     set_tutorial_js_env
 
-    render :text => "".html_safe, :layout => true
+    render :html => "".html_safe, :layout => true
   end
 
   def create

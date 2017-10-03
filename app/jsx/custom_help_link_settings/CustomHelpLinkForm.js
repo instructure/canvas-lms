@@ -131,7 +131,6 @@ import CustomHelpLinkConstants from './CustomHelpLinkConstants'
                 type="text"
                 required
                 aria-required="true"
-                disabled={this.props.link.type === 'default'}
                 name={`${namePrefix}[text]`}
                 className="ic-Input"
                 defaultValue={text}
@@ -145,7 +144,6 @@ import CustomHelpLinkConstants from './CustomHelpLinkConstants'
               </span>
               <textarea
                 className="ic-Input"
-                disabled={this.props.link.type === 'default'}
                 name={`${namePrefix}[subtext]`}
                 defaultValue={subtext}
                 onKeyDown={(e) => this.handleKeyDown(e, 'subtext')}

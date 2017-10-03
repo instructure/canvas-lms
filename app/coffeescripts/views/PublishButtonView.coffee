@@ -177,7 +177,7 @@ define [
         text:        I18n.t 'buttons.published', 'Published'
         label:       @unpublishLabel()
         buttonClass: @publishedClass
-        iconClass:   'icon-publish'
+        iconClass:   'icon-publish icon-Solid'
 
     renderUnpublish: ->
       text = I18n.t 'buttons.unpublish', 'Unpublish'
@@ -192,7 +192,7 @@ define [
       @renderState
         text:        text
         buttonClass: @publishClass
-        iconClass:   'icon-publish'
+        iconClass:   'icon-publish icon-Solid'
 
     renderUnpublishing: ->
       @disable()
