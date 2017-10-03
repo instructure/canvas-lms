@@ -52,7 +52,9 @@
                 <a href="{{html_url}}" data-tooltip="top"
               data-html-tooltip-title="{{title}}" class="{{#ifEqual id ../currentItem.id }}current{{/ifEqual}}">
                 </a>
-                <span class="sm-progress-connector {{#ifEqual id ../currentItem.id }}current{{/ifEqual}}"></span>
+                {{#unless @last }}
+                  <span class="sm-progress-connector {{#ifEqual id ../currentItem.id }}current{{/ifEqual}}"></span>
+                {{/unless}}
               </div>
           </li>
           {{/each}}

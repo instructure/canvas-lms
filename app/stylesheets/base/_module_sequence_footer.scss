@@ -108,14 +108,14 @@ ul.sm-module-footer__nav{
       a{
         display: block;
         background-color: $sm-footer-progress-background;
-        width: 10px;
-        height: 10px;
+        width: 15px;
+        height: 15px;
         border-radius: 50%;
         z-index: 500;
 
         &.current{
-          width: 20px;
-          height: 20px;
+          width: 24px;
+          height: 24px;
           background-color: $sm-footer-progress-background-current;
 
           &:hover{
@@ -140,6 +140,8 @@ ul.sm-module-footer__nav{
     }
 
     &:last-child{
+      max-width: 24px;
+
       span.sm-progress-connector {
         background-color: transparent;
         flex: 0 0 0px;

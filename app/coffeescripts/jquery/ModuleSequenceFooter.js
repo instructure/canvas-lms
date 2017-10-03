@@ -64,45 +64,50 @@ $.fn.moduleSequenceFooter = function (options = {}) {
   this.msfInstance = new $.fn.moduleSequenceFooter.MSFClass(options)
   this.msfInstance.fetch().done(() => {
     this.msfInstance.fetch_module_items(this.msfInstance.moduleID).done(() => {
-      let module = JSON.parse(window.localStorage.getItem(`module|${this.msfInstance.moduleID}`)) || {}
-      let items = module.items || []
-      let showModule = items.length > 0
-      let currentItem = _.findWhere(items, {id: this.msfInstance.item.current.id})
-
-      var lessons = _.where(items, {indent: 0})
-      var nextLesson, previousLesson
-
-      let lessonBookendStart = _.last(lessons.filter((l) => {
-        console.log("lesson", l)
-        return currentItem.position >= l.position
-      }))
-
-      let lessonBookendEnd = _.first(lessons.filter((l) => {
-        console.log("lesson", l)
-        return currentItem.position <= l.position
-      }))
-
-      console.log("lessonBookendStart", lessonBookendStart)
-      console.log("lessonBookendEnd", lessonBookendEnd)
-
-      // lessons.findIndex((i) => {return i.id == lessonBookendEnd.id})
-
-      let next = ( lessonBookendStart.id === lessonBookendEnd.id ) ? lessons[lessons.findIndex((i) => {return i.id == lessonBookendEnd.id}) + 1] : lessonBookendEnd;
-      console.log("next", next)
-
-      let lessonArray = items.filter((i) => {
-        return lessonBookendStart.position < i.position && i.position < next.position
-      })
-
-
-
-
-      // whil
-
-      console.log("lessons", lessons)
-      console.log("lessonArray", lessonArray)
-      // let lessonArray = items.slice(_.indexOf())
-
+      const module = JSON.parse(window.localStorage.getItem(`module|${this.msfInstance.moduleID}`)) || {}
+      const items = module.items || []
+      const showModule = items.length > 0
+      const currentItem = _.findWhere(items, {id: this.msfInstance.item.current.id})
+      
+      console.log("currentItem", currentItem)
+      if (currentItem) {
+        const lessons = _.where(items, {indent: 0})
+        var nextLesson, previousLesson
+  
+        var lessonBookendStart = _.last(lessons.filter((l) => {
+          console.log("lesson", l)
+          return currentItem.position >= l.position
+        }))
+  
+        var lessonBookendEnd = _.first(lessons.filter((l) => {
+          console.log("lesson", l)
+          return currentItem.position <= l.position
+        }))
+  
+        console.log("lessonBookendStart", lessonBookendStart)
+        console.log("lessonBookendEnd", lessonBookendEnd)
+  
+        // lessons.findIndex((i) => {return i.id == lessonBookendEnd.id})
+        var next
+        if (lessonBookendEnd) {
+          next = ( lessonBookendStart.id === lessonBookendEnd.id ) ? lessons[lessons.findIndex((i) => {return i.id == lessonBookendEnd.id}) + 1] : lessonBookendEnd;
+          console.log("next", next)
+        } else {
+          next = false
+        }
+        var lessonArray
+        if (next) {
+          lessonArray = items.filter((i) => {
+            return lessonBookendStart.position < i.position && i.position < next.position
+          })
+        } else {
+          lessonArray = items.filter((i) => {
+            return lessonBookendStart.position < i.position
+          })
+        }
+        console.log("lessons", lessons)
+        console.log("lessonArray", lessonArray)
+      }
 
       if (this.msfInstance.hide) {
         this.hide()
@@ -111,9 +116,9 @@ $.fn.moduleSequenceFooter = function (options = {}) {
 
       this.html(template({
         showModule: showModule,
-        items: lessonArray,
+        items: lessonArray || [],
         module: module,
-        currentItem: currentItem,
+        currentItem: currentItem || false,
         currentID: this.msfInstance.assetID,
         instanceNumber: this.msfInstance.instanceNumber,
         previous: this.msfInstance.previous,
@@ -294,7 +299,7 @@ export default class ModuleSequenceFooter {
         }</strong> <br> ${htmlEscape(module.name)}`
       this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {wrapper: module.name})
     }
-  }
+  } 
 }
 
 $.fn.moduleSequenceFooter.MSFClass = ModuleSequenceFooter
