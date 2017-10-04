@@ -63,22 +63,67 @@ $.fn.moduleSequenceFooter = function (options = {}) {
   // @next : Object
   this.msfInstance = new $.fn.moduleSequenceFooter.MSFClass(options)
   this.msfInstance.fetch().done(() => {
-    if (this.msfInstance.hide) {
-      this.hide()
-      return
-    }
+    this.msfInstance.fetch_module_items(this.msfInstance.moduleID).done(() => {
+      const module = JSON.parse(window.localStorage.getItem(`module|${this.msfInstance.moduleID}`)) || {}
+      const items = module.items || []
+      const showModule = items.length > 0
+      const currentItem = _.findWhere(items, {id: this.msfInstance.item.current.id})
+      
+      if (currentItem) {
+        const lessons = _.where(items, {indent: 0})
+        var nextLesson, previousLesson
+  
+        var lessonBookendStart = _.last(lessons.filter((l) => {
+          return currentItem.position >= l.position
+        }))
+  
+        var lessonBookendEnd = _.first(lessons.filter((l) => {
+          return currentItem.position <= l.position
+        }))
 
-    this.html(template({
-      instanceNumber: this.msfInstance.instanceNumber,
-      previous: this.msfInstance.previous,
-      next: this.msfInstance.next,
-    }))
-    if (options && options.animation !== undefined) {
-      this.msfAnimation(options.animation)
-    }
-    this.show()
-    $(window).triggerHandler('resize')
+        var next
+        if (lessonBookendEnd) {
+          next = ( lessonBookendStart.id === lessonBookendEnd.id ) ? lessons[lessons.findIndex((i) => {return i.id == lessonBookendEnd.id}) + 1] : lessonBookendEnd;
+        } else {
+          next = false
+        }
+        var lessonArray
+        if (next) {
+          lessonArray = items.filter((i) => {
+            return lessonBookendStart.position < i.position && i.position < next.position
+          })
+        } else {
+          lessonArray = items.filter((i) => {
+            return lessonBookendStart.position < i.position
+          })
+        }
+      }
+
+      if (this.msfInstance.hide) {
+        this.hide()
+        return
+      }
+
+      this.html(template({
+        showModule: showModule,
+        items: lessonArray || [],
+        module: module,
+        currentItem: currentItem || false,
+        currentID: this.msfInstance.assetID,
+        instanceNumber: this.msfInstance.instanceNumber,
+        previous: this.msfInstance.previous,
+        next: this.msfInstance.next,
+      }))
+      if (options && options.animation !== undefined) {
+        this.msfAnimation(options.animation)
+      }
+      this.show()
+      $(window).triggerHandler('resize')
+
+    })
   })
+
+
   return this
 }
 
@@ -111,6 +156,7 @@ export default class ModuleSequenceFooter {
     this.previous = {}
     this.next = {}
     this.url = `/api/v1/courses/${this.courseID}/module_item_sequence`
+    this.module_items_url = `/api/v1/courses/${this.courseID}/modules/`
   }
 
   getQueryParams (qs) {
@@ -118,11 +164,9 @@ export default class ModuleSequenceFooter {
     qs = qs.split('+').join(' ')
     const params = {}
     const re = /[?&]?([^=]+)=([^&]*)/g
-
     while ((tokens = re.exec(qs))) {
       params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2])
     }
-
     return params
   }
 
@@ -132,9 +176,11 @@ export default class ModuleSequenceFooter {
 
   fetch () {
     const params = this.getQueryParams(this.location.search)
+
     if (params.module_item_id) {
       return $.ajaxJSON(this.url, 'GET', {
         asset_type: 'ModuleItem',
+        include: 'items',
         asset_id: params.module_item_id,
         frame_external_urls: true
       }, this.success, null, {})
@@ -142,9 +188,16 @@ export default class ModuleSequenceFooter {
       return $.ajaxJSON(this.url, 'GET', {
         asset_type: this.assetType,
         asset_id: this.assetID,
+        include: 'items',
         frame_external_urls: true
       }, this.success, null, {})
     }
+  }
+
+  fetch_module_items (id) {
+    return $.ajaxJSON(`${this.module_items_url}${id}`, 'GET', {
+      include: 'items',
+    }, this.success_module_items, null, {})
   }
 
   // Determines if the data retrieved should be used to generate a buttom bar or hide it. We
@@ -153,17 +206,23 @@ export default class ModuleSequenceFooter {
 
   success = (data) => {
     this.modules = data.modules
+    this.moduleID = this.modules[0].id
 
     // Currently only supports 1 item in the items array
     if (!(data && data.items && data.items.length === 1)) {
       this.hide = true
       return
     }
-
+    this.current = data.current
     this.item = data.items[0]
     // Show the buttons if they aren't null
     if ((this.next.show = this.item.next)) this.buildNextData()
     if ((this.previous.show = this.item.prev)) this.buildPreviousData()
+  }
+
+  success_module_items = (data) => {
+    this.moduleID = data.id
+    window.localStorage.setItem(`module|${data.id}`, JSON.stringify(data))
   }
 
   // Each button needs to build a data that the handlebars template can use. For example, data for
@@ -230,7 +289,7 @@ export default class ModuleSequenceFooter {
         }</strong> <br> ${htmlEscape(module.name)}`
       this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {wrapper: module.name})
     }
-  }
+  } 
 }
 
 $.fn.moduleSequenceFooter.MSFClass = ModuleSequenceFooter
