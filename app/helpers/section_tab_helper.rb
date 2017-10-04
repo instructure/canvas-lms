@@ -45,7 +45,9 @@ module SectionTabHelper
         }) do
           concat(content_tag(:ul, id: 'section-tabs') do
             available_section_tabs(@context).map do |tab|
-              section_tab_tag(tab, @context, @active_tab)
+              if !tab["hidden"] or !tab["hidden_unused"]
+                section_tab_tag(tab, @context, @active_tab)
+              end
             end
           end)
         end
@@ -54,8 +56,30 @@ module SectionTabHelper
     raw(@section_tabs)
   end
 
+  def hidden_section_tabs
+    @hidden_section_tabs ||= begin
+      if @context && available_section_tabs(@context).any?
+        content_tag(:ul, {
+            class: "dropdown-menu dropdown-menu-right",
+            id: "sm-teacher-tools",
+            }) do
+            available_section_tabs(@context).map do |tab|
+              if tab["hidden"]
+                hidden_section_tab_tag(tab, @context, @active_tab)
+              end
+            end
+          end
+      end
+    end
+    raw(@hidden_section_tabs)
+  end
+
   def section_tab_tag(tab, context, active_tab)
     concat(SectionTabTag.new(tab, context, active_tab).to_html)
+  end
+
+  def hidden_section_tab_tag(tab, context, active_tab)
+    concat(SectionTabTag.new(tab, context, active_tab).to_dropdown_html)
   end
 
   class AvailableSectionTabs
@@ -160,6 +184,10 @@ module SectionTabHelper
       content_tag(:li, a_tag, {
         class: li_classes
       })
+    end
+
+    def to_dropdown_html
+      content_tag(:li, a_tag)
     end
   end
 end

@@ -207,16 +207,21 @@ import 'compiled/jquery.rails_flash_notifications'
 
         function calculateUnitProgress(item){
           if(item.items_count){
-            let total_items = item.items_count;
+            let total_items = 0;
             var total_completed = [];
 
             item.items.map(function(module){
+              if (module.completion_requirement) {
+                total_items++;
+              }
               let cr = module.completion_requirement || {};
               if(cr.completed){
                 total_completed.push(module);
               }
             });
-            return Math.floor((total_completed.length / total_items) * 100);
+            if (total_items) {
+              return Math.floor((total_completed.length / total_items) * 100);
+            }
           }
           return 0;
         }
@@ -1762,12 +1767,100 @@ import 'compiled/jquery.rails_flash_notifications'
       return content_type + '_' + content_id;
     }
   }
-
+  function update_icon_status(button){
+      if (button.hasClass('icon-arrow-open-right')) {
+        button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+      } else if (button.hasClass('icon-arrow-open-down')) {
+        button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
+      }
+      else {
+        console.log("else")
+      };
+  };
+  function init_icon_status(button){
+    button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+  };
   $(document).ready(function() {
+
+
    if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
+
+
+     $('.context_module_sub_header').each(function () {
+        var header = $(this);
+        var activities = header.nextUntil('.context_module_sub_header').detach();
+        var activity_container = $('<div style="display: none;"></div>').append(activities);
+
+        $(this).after(activity_container);
+        header.find('.context_module_sub_header_expander').click(function (event) {
+          var button = $(this);
+          activity_container.slideToggle();
+          update_icon_status(button);
+        });
+      });
     }
+
+    var course_items = JSON.parse(window.localStorage.getItem("course_items")) || [];
+
+    course_items.forEach(function (unit){
+      var current_activity_container, last_was_subheader, current_lesson_state;
+      var completions = [];
+      var last_lesson_state = "complete"; // because we want the first lesson to open by default if none of its activities are complete
+      function evaluate_lesson () {
+        if (_.every(completions)) {
+          // if the container is complete, close it by default.
+          current_lesson_state = "complete";
+          if (current_activity_container) current_activity_container.hide();
+        } else if (_.some(completions)) {
+          // in this case, always open the lesson
+          current_lesson_state = "started";
+          if (current_activity_container) current_activity_container.show();
+          current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+        } else {
+          current_lesson_state = "unstarted";
+          if (last_lesson_state == "complete") {
+            // in this case, open the lesson, *if* the last lesson is complete
+            if (current_activity_container) current_activity_container.show();
+            current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+          }
+        }
+        ;
+      }
+
+      unit.items.forEach(function (item) {
+        // console.log("Item:", item.id, item);
+
+        if (last_was_subheader && item.type != "SubHeader") {
+          current_activity_container = $('#context_module_item_' + item.id).parent();
+        };
+        if (item.type == "SubHeader") {
+          // This is a subheader - if we have a current activity,
+          // evaluate if it is complete, partially complete or undone
+          evaluate_lesson()
+          if (current_lesson_state) {
+            last_lesson_state = current_lesson_state;
+          }
+          completions = [];
+          current_activity_container = false;
+          last_was_subheader = true;
+          current_lesson_state = "unstarted";
+        } else {
+          last_was_subheader = false;
+        };
+
+        if (current_activity_container && item.type != "SubHeader") {
+          if (item.completion_requirement) {
+            // console.log(item.id, item.title);
+            completions.push(item.completion_requirement.completed);
+          }
+        };
+
+      });
+      evaluate_lesson()
+    });
+
 
     $('.external_url_link').click(function(event) {
       Helper.externalUrlLinkClick(event, $(this))
@@ -2032,8 +2125,14 @@ import 'compiled/jquery.rails_flash_notifications'
     // from context_modules/_content
     var foundExpanded = false;
     var collapsedModules = ENV.COLLAPSED_MODULES;
-
     var currentModules = ENV.CURRENT_MODULES;
+    var workflow_modules = ENV.WORKFLOW_MODULES;
+    if(currentModules.length < 1){
+      var new_module = workflow_modules.find(function (flow) {
+        return flow[1] != "completed" ;
+      });
+      currentModules.push(new_module[0]);
+    }
     for(var idx in currentModules) {
       $("#context_module_" + currentModules[idx]).addClass('sm-started').removeClass('collapsed_module');
     }
@@ -2041,7 +2140,6 @@ import 'compiled/jquery.rails_flash_notifications'
     if(ENV.IS_STUDENT){
       modules.getCourseItems(modules.updateCourseProgress);
     }
-
 
     var foundModules = [];
     var $contextModules = $("#context_modules .context_module");

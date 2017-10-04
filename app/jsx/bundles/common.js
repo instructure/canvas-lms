@@ -45,6 +45,7 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'LtiThumbnailLauncher'
 import 'compiled/badge_counts'
+import 'vendor/bootstrap/bootstrap-dropdown'
 
 // Other stuff several bundles use.
 // If any of these really arn't used on most pages,
@@ -117,6 +118,18 @@ if (
   }, 'NewUserTutorialsAsyncChunk')
 }
 
+if(!window.ENV.IS_STUDENT){
+  $(document).ready(function(){
+    let showTeacherTools = $("#sm-teacher-tools").find("a").length;
+    if (showTeacherTools > 0 ){
+      $(".sm-teacher-tools-container").show();
+    }
+    let activeDropdown = $("#sm-teacher-tools").find("a").hasClass("active")
+    if(activeDropdown){
+        $('.sm-left-nav-toggler').addClass("active");
+    }
+  })
+}
 // edge < 15 does not support css vars
 // edge >= 15 claims to, but is currently broken
 const edge = window.navigator.userAgent.indexOf("Edge") > -1

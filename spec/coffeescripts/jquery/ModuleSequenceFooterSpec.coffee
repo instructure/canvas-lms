@@ -111,7 +111,7 @@ define [
      }
 
   test 'there is no button when next or prev data is null', ->
-    @server.respondWith "GET", 
+    @server.respondWith "GET",
                         "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
                         [
                           200, { "Content-Type": "application/json" }, JSON.stringify(nullButtonData)
