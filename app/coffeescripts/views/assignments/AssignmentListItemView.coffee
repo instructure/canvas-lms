@@ -311,7 +311,7 @@ define [
       (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
 
     isDuplicableAssignment: ->
-      !@model.is_quiz_assignment()
+      !@model.is_quiz_assignment() && !@model.isQuiz()
 
     canDuplicate: ->
       # For now, forbid duplicating quizzes. We will implement that later.
