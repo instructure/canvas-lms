@@ -282,7 +282,7 @@
 .ig-list .ig-row {
   position: relative;
   display: block;
-  padding: $ic-sp $ic-sp/2 $ic-sp ($ic-sp/2 + 4); // add 4px for width of published-state border
+  padding: $ic-sp $ic-sp+3 $ic-sp ($ic-sp/2 + 4); // add 4px for width of published-state border
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
   color: $ic-font-color--subdued;
