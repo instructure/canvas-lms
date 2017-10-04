@@ -764,7 +764,7 @@ import 'compiled/jquery.rails_flash_notifications'
           } else if ($mod_item.data('past_due') != null) {
             $icon_container.fadeIn(500);
             $mod_item.addClass('overdue_item');
-            addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'));
+            addIcon($icon_container, 'icon-overdue', I18n.t('This assignment is overdue'));
           } else {
             var incomplete_req = null;
             for (var idx in incomplete_reqs) {
@@ -813,7 +813,7 @@ import 'compiled/jquery.rails_flash_notifications'
           } else if (overdue_items_count > 0) {
             $subheader.addClass('overdue_item');
             $icon_container.fadeIn(500);
-            addIcon($icon_container, 'icon-overdue', I18n.t('This assignment is overdue'));
+            addIcon($icon_container, 'icon-overdue', I18n.t('One of your assignments is overdue'));
           } else {
             $subheader.addClass('unstarted_item');
             $icon_container.fadeIn(500);
