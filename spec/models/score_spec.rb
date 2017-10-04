@@ -136,6 +136,13 @@ describe Score do
     end
   end
 
+  describe '#destroy' do
+    it 'destroys its metadata too' do
+      score.create_score_metadata!(calculation_details: '{}')
+      expect{score.destroy}.to change{ScoreMetadata.count}.by(-1)
+    end
+  end
+
   describe '#current_grade' do
     it 'delegates the grade conversion to the course' do
       expect(score.course).to receive(:score_to_grade).once.with(score.current_score)

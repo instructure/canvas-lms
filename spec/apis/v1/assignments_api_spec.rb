@@ -3484,7 +3484,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "returns the dates for assignment as they apply to the user" do
-        Score.where(enrollment_id: @student.enrollments).delete_all
+        Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
         @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
@@ -3502,7 +3502,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "returns original assignment due dates" do
-        Score.where(enrollment_id: @student.enrollments).delete_all
+        Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
         @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",

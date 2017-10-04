@@ -37,7 +37,7 @@ describe Enrollment do
     expect(@enrollment.state).to eql(:active)
     @enrollment.reject
     expect(@enrollment.state).to eql(:rejected)
-    Score.where(enrollment_id: @enrollment).delete_all
+    Score.where(enrollment_id: @enrollment).each(&:destroy_permanently!)
     @enrollment.destroy_permanently!
     enrollment_model
     @enrollment.complete
