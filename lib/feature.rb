@@ -417,9 +417,8 @@ END
       display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
       applies_to: 'Account',
-      state: 'hidden_in_prod',
+      state: 'allowed',
       beta: true,
-      development: true,
       root_opt_in: true,
       touch_context: true
     },
