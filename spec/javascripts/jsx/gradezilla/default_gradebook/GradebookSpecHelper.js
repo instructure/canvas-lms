@@ -24,6 +24,7 @@ export function createGradebook (options = {}) {
     context_allows_gradebook_uploads: true,
     context_id: '1',
     context_url: '/courses/1/',
+    currentUserId: '1',
     export_gradebook_csv_url: 'http://example.com/export',
     gradebook_import_url: 'http://example.com/import',
     gradebook_is_editable: true,

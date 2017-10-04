@@ -33,7 +33,7 @@ import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/Comin
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
 import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem';
-import SubmissionCommentForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentForm';
+import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
 import SubmissionStatus from 'jsx/gradezilla/default_gradebook/components/SubmissionStatus';
 import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 
@@ -90,6 +90,9 @@ export default class SubmissionTray extends React.Component {
       published: bool.isRequired
     }).isRequired,
     contentRef: func,
+    currentUserId: string.isRequired,
+    editedCommentId: string,
+    editSubmissionComment: func.isRequired,
     isOpen: bool.isRequired,
     colors: shape({
       late: string.isRequired,
@@ -127,6 +130,7 @@ export default class SubmissionTray extends React.Component {
     speedGraderEnabled: bool.isRequired,
     submissionUpdating: bool.isRequired,
     updateSubmission: func.isRequired,
+    updateSubmissionComment: func.isRequired,
     locale: string.isRequired,
     latePolicy: shape({
       lateSubmissionInterval: string
@@ -135,7 +139,6 @@ export default class SubmissionTray extends React.Component {
     submissionCommentsLoaded: bool.isRequired,
     createSubmissionComment: func.isRequired,
     deleteSubmissionComment: func.isRequired,
-    updateSubmissionComments: func.isRequired,
     processing: bool.isRequired,
     setProcessing: func.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
@@ -144,38 +147,48 @@ export default class SubmissionTray extends React.Component {
   };
 
   renderSubmissionCommentList () {
-    return this.props.submissionComments.map(comment =>
+    return this.props.submissionComments.map(comment => (
       <SubmissionCommentListItem
         author={comment.author}
+        currentUserIsAuthor={this.props.currentUserId === comment.authorId}
         authorUrl={comment.authorUrl}
         authorAvatarUrl={comment.authorAvatarUrl}
         comment={comment.comment}
         createdAt={comment.createdAt}
+        editedAt={comment.editedAt}
+        editing={!!this.props.editedCommentId && this.props.editedCommentId === comment.id}
         id={comment.id}
         key={comment.id}
         last={this.props.submissionComments[this.props.submissionComments.length - 1].id === comment.id}
         deleteSubmissionComment={this.props.deleteSubmissionComment}
+        editSubmissionComment={this.props.editSubmissionComment}
+        updateSubmissionComment={this.props.updateSubmissionComment}
+        processing={this.props.processing}
+        setProcessing={this.props.setProcessing}
       />
-    );
+    ));
   }
 
   renderSubmissionComments () {
-    if(this.props.submissionCommentsLoaded) {
+    if (this.props.submissionCommentsLoaded) {
       return (
         <div>
           {renderTraySubHeading('Comments')}
 
           {this.renderSubmissionCommentList()}
 
-          <SubmissionCommentForm
-            createSubmissionComment={this.props.createSubmissionComment}
-            updateSubmissionComments={this.props.updateSubmissionComments}
-            processing={this.props.processing}
-            setProcessing={this.props.setProcessing}
-          />
+          {
+            !this.props.editedCommentId &&
+              <SubmissionCommentCreateForm
+                createSubmissionComment={this.props.createSubmissionComment}
+                processing={this.props.processing}
+                setProcessing={this.props.setProcessing}
+              />
+          }
         </div>
       );
     }
+
     return (
       <div style={{ textAlign: 'center' }}>
         <Spinner title={I18n.t('Loading comments')} size="large" />
@@ -185,20 +198,18 @@ export default class SubmissionTray extends React.Component {
 
   render () {
     const { name, avatarUrl } = this.props.student;
-
     const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`;
     const studentParam = `#%7B%22student_id%22%3A${this.props.student.id}%7D`;
     const speedGraderUrl = `/courses/${this.props.courseId}/gradebook/speed_grader?${assignmentParam}${studentParam}`;
-
     const submissionCommentsProps = {
       submissionComments: this.props.submissionComments,
       submissionCommentsLoaded: this.props.submissionCommentsLoaded,
       deleteSubmissionComment: this.props.deleteSubmissionComment,
       createSubmissionComment: this.props.createSubmissionComment,
-      updateSubmissionComments: this.props.updateSubmissionComments,
       processing: this.props.processing,
-      setProcessing: this.props.setProcessing
+      setProcessing: this.props.setProcessing,
     };
+
     let carouselContainerStyleOverride = '0 0 0 0';
 
     if (!avatarUrl) {

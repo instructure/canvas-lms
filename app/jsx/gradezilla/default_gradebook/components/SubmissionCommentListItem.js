@@ -22,12 +22,13 @@ import I18n from 'i18n!gradebook';
 import Avatar from 'instructure-ui/lib/components/Avatar';
 import Button from 'instructure-ui/lib/components/Button';
 import Link from 'instructure-ui/lib/components/Link';
+import IconEditLine from 'instructure-icons/lib/Line/IconEditLine';
 import IconTrashLine from 'instructure-icons/lib/Line/IconTrashLine';
 import Typography from 'instructure-ui/lib/components/Typography';
 import DateHelper from 'jsx/shared/helpers/dateHelper';
 import TextHelper from 'compiled/str/TextHelper';
 import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
-
+import SubmissionCommentUpdateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentUpdateForm';
 
 function submissionCommentDate (date) {
   return DateHelper.formatDatetimeForDisplay(date, 'short');
@@ -36,16 +37,63 @@ function submissionCommentDate (date) {
 export default class SubmissionCommentListItem extends React.Component {
   static propTypes = {
     ...CommentPropTypes,
+    editing: bool.isRequired,
     last: bool.isRequired,
-    deleteSubmissionComment: func.isRequired
+    currentUserIsAuthor: bool.isRequired,
+    deleteSubmissionComment: func.isRequired,
+    editSubmissionComment: func.isRequired,
+    updateSubmissionComment: func.isRequired,
+    processing: bool.isRequired,
+    setProcessing: func.isRequired
   };
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.editing && !this.props.editing) {
+      this.editButton.focus();
+    }
+  }
 
   handleDeleteComment = () => {
     const message = I18n.t('Are you sure you want to delete this comment?');
-    if(confirm(message)) {
+    if (confirm(message)) {
       this.props.deleteSubmissionComment(this.props.id);
     }
-  };
+  }
+
+  handleEditComment = () => {
+    this.props.editSubmissionComment(this.props.id);
+  }
+
+  bindEditButton = (ref) => {
+    this.editButton = ref;
+  }
+
+  commentBody () {
+    if (this.props.editing) {
+      return (
+        <SubmissionCommentUpdateForm
+          comment={this.props.comment}
+          id={this.props.id}
+          processing={this.props.processing}
+          setProcessing={this.props.setProcessing}
+          updateSubmissionComment={this.props.updateSubmissionComment}
+        />
+      );
+    }
+
+    return (
+      <div>
+        <Typography size="small" lineHeight="condensed">
+          <p style={{ margin: '0 0 0.75rem' }}>{this.props.comment}</p>
+        </Typography>
+      </div>
+    );
+  }
+
+  commentTimestamp () {
+    const date = submissionCommentDate(this.props.editedAt || this.props.createdAt);
+    return this.props.editedAt ? I18n.t('(Edited) %{date}', { date }) : date;
+  }
 
   render () {
     return (
@@ -65,35 +113,39 @@ export default class SubmissionCommentListItem extends React.Component {
             <div>
               <div style={{ margin: '0 0 0 0.375rem' }}>
                 <Typography weight="bold" size="small" lineHeight="fit">
-                  <Link href={this.props.authorUrl}>{TextHelper.truncateText(this.props.author, { max: 25 })}</Link>
+                  <Link href={this.props.authorUrl}>{TextHelper.truncateText(this.props.author, { max: 22 })}</Link>
                 </Typography>
               </div>
 
               <div style={{ margin: '0 0 0 0.375rem' }}>
                 <Typography size="small" lineHeight="fit">
-                  {submissionCommentDate(this.props.createdAt)}
+                  {this.commentTimestamp()}
                 </Typography>
               </div>
             </div>
           </div>
 
-          <div>
-            <Button
-              size="small"
-              variant="icon"
-              onClick={this.handleDeleteComment}
-            >
-              <IconTrashLine title={I18n.t('Delete Comment: %{comment}', { comment: this.props.comment })}/>
-            </Button>
+          <div style={{minWidth: '60px'}}>
+            {
+              this.props.currentUserIsAuthor &&
+                <Button
+                  size="small"
+                  variant="icon"
+                  onClick={this.handleEditComment}
+                  buttonRef={this.bindEditButton}
+                >
+                  <IconEditLine title={I18n.t('Edit Comment: %{comment}', { comment: this.props.comment })}/>
+                </Button>
+            }
+            <span style={{ float: 'right' }}>
+              <Button size="small" variant="icon" onClick={this.handleDeleteComment}>
+                <IconTrashLine title={I18n.t('Delete Comment: %{comment}', { comment: this.props.comment })}/>
+              </Button>
+            </span>
           </div>
         </div>
 
-        <div>
-          <Typography size="small" lineHeight="condensed">
-            <p style={{ margin: '0 0 0.75rem' }}>{this.props.comment}</p>
-          </Typography>
-        </div>
-
+        { this.commentBody() }
         { !this.props.last && <hr style={{ margin: '1rem 0', borderTop: 'dashed 0.063rem' }} /> }
       </div>
     );

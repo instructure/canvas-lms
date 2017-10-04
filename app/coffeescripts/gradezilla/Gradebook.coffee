@@ -191,6 +191,7 @@ define [
         comments: []
         commentsLoaded: false
         commentsUpdating: false
+        editedCommentId: null
     }
 
   ## Gradebook Application State
@@ -1333,7 +1334,7 @@ define [
         gradebookIsEditable: @options.gradebook_is_editable
         contextAllowsGradebookUploads: @options.context_allows_gradebook_uploads
         gradebookImportUrl: @options.gradebook_import_url
-        currentUserId: ENV.current_user_id
+        currentUserId: @options.currentUserId
         gradebookExportUrl: @options.export_gradebook_csv_url
         postGradesLtis: @postGradesLtis
         postGradesFeature:
@@ -2156,7 +2157,8 @@ define [
       @updateRowAndRenderSubmissionTray(studentId)
 
     getSubmissionTrayProps: (student) =>
-      { open, studentId, assignmentId, comments } = @getSubmissionTrayState()
+      { open, studentId, assignmentId, comments, editedCommentId } = @getSubmissionTrayState()
+      student ||= @student(studentId)
       # get the student's submission, or use a fake submission object in case the
       # submission has not yet loaded
       fakeSubmission = { assignment_id: assignmentId, late: false, missing: false, excused: false, seconds_late: 0 }
@@ -2183,6 +2185,7 @@ define [
       colors: @getGridColors()
       comments: comments
       courseId: @options.context_id
+      currentUserId: @options.currentUserId
       isFirstAssignment: isFirstAssignment
       isInOtherGradingPeriod: !!submissionState?.inOtherGradingPeriod
       isInClosedGradingPeriod: !!submissionState?.inClosedGradingPeriod
@@ -2212,11 +2215,13 @@ define [
       updateSubmission: @updateSubmissionAndRenderSubmissionTray
       processing: @getCommentsUpdating()
       setProcessing: @setCommentsUpdating
-      updateSubmissionComments: @updateSubmissionComments
-      createSubmissionComment: @createSubmissionComment
-      deleteSubmissionComment: @deleteSubmissionComment
+      createSubmissionComment: @apiCreateSubmissionComment
+      updateSubmissionComment: @apiUpdateSubmissionComment
+      deleteSubmissionComment: @apiDeleteSubmissionComment
+      editSubmissionComment: @editSubmissionComment
       submissionComments: @getSubmissionComments()
       submissionCommentsLoaded: @getSubmissionCommentsLoaded()
+      editedCommentId: editedCommentId
 
     renderSubmissionTray: (student) =>
       { open, studentId, assignmentId } = @getSubmissionTrayState()
@@ -2273,15 +2278,15 @@ define [
 
     updateSubmissionComments: (comments) =>
       @setSubmissionComments(comments)
+      @setEditedCommentId(null)
       @setCommentsUpdating(false)
-      { studentId } = @getSubmissionTrayState()
-      @renderSubmissionTray(@student(studentId))
+      @renderSubmissionTray()
 
     unloadSubmissionComments: =>
       @setSubmissionComments([])
       @setSubmissionCommentsLoaded(false)
 
-    createSubmissionComment: (comment) =>
+    apiCreateSubmissionComment: (comment) =>
       { assignmentId, studentId } = @getSubmissionTrayState()
       SubmissionCommentApi.createSubmissionComment(@options.context_id, assignmentId, studentId, comment)
         .then(@updateSubmissionComments)
@@ -2289,18 +2294,39 @@ define [
         .catch(=> @setCommentsUpdating(false))
         .catch(FlashAlert.showFlashError I18n.t 'There was a problem posting the comment')
 
-    deleteSubmissionComment: (commentId) =>
+    apiUpdateSubmissionComment: (updatedComment, commentId) =>
+      SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
+        .then((response) =>
+          { id, comment, editedAt } = response.data
+          comments = @getSubmissionComments().map((submissionComment) =>
+            if submissionComment.id == id
+              Object.assign({}, submissionComment, { comment, editedAt })
+            else
+              submissionComment
+          )
+          @updateSubmissionComments(comments)
+          FlashAlert.showFlashSuccess(I18n.t('Successfully updated the comment'))()
+        ).catch(FlashAlert.showFlashError(I18n.t('There was a problem updating the comment')))
+
+    apiDeleteSubmissionComment: (commentId) =>
       SubmissionCommentApi.deleteSubmissionComment(commentId)
-        .then(=> @removeSubmissionComment commentId)
+        .then(@removeSubmissionComment commentId)
         .then(FlashAlert.showFlashSuccess I18n.t 'Successfully deleted the comment')
         .catch(FlashAlert.showFlashError I18n.t 'There was a problem deleting the comment')
 
-    getSubmissionComments: () =>
+    editSubmissionComment: (commentId) =>
+      @setEditedCommentId(commentId)
+      @renderSubmissionTray()
+
+    setEditedCommentId: (id) =>
+      @gridDisplaySettings.submissionTray.editedCommentId = id
+
+    getSubmissionComments: =>
       @gridDisplaySettings.submissionTray.comments
 
     removeSubmissionComment: (commentId) =>
       comments = _.reject(@getSubmissionComments(), (c) => c.id == commentId)
-      @updateSubmissionComments(comments, { deserialize: false })
+      @updateSubmissionComments(comments)
 
     setSubmissionCommentsLoaded: (loaded) =>
       @gridDisplaySettings.submissionTray.commentsLoaded = loaded

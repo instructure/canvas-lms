@@ -18,35 +18,26 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import SubmissionCommentForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentForm';
+import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
 
-QUnit.module('SubmissionCommentForm', function (hooks) {
+QUnit.module('SubmissionCommentCreateForm', function (hooks) {
+  let props;
   let wrapper;
-  let setProcessing = () => {};
-  let createSubmissionComment;
-  let processing;
 
-  function mountComponent (props) {
-    return mount(
-      <SubmissionCommentForm
-        createSubmissionComment={createSubmissionComment}
-        updateSubmissionComments={() => {}}
-        setProcessing={setProcessing}
-        processing={processing}
-        {...props}
-      />
-    );
+  function mountComponent () {
+    return mount(<SubmissionCommentCreateForm {...props} />);
   }
 
   hooks.beforeEach(function () {
-    createSubmissionComment = sinon.stub().resolves();
-    processing = false;
+    props = {
+      createSubmissionComment () {},
+      processing: false,
+      setProcessing () {}
+    };
   });
 
   hooks.afterEach(function () {
     wrapper.unmount();
-    createSubmissionComment = null;
-    processing = null;
   });
 
   test('Button is not present if there is no text entered in the comment area', function () {
@@ -93,18 +84,8 @@ QUnit.module('SubmissionCommentForm', function (hooks) {
     ok(wrapper.find('label').contains(<ScreenReaderContent>Leave a comment</ScreenReaderContent>));
   });
 
-  test('TextArea does not have an error message', function () {
-    wrapper = mountComponent();
-    strictEqual(wrapper.find('TextArea').prop('messages').length, 0);
-  });
-
-  test('TextArea does not display an error when a message is present', function () {
-    wrapper = mountComponent();
-    wrapper.find('textarea').simulate('change', { target: { value: 'a message' } });
-    strictEqual(wrapper.find('TextArea').prop('messages').length, 0);
-  });
-
-  test('handlePostComment prevents default', function () {
+  test('the default action is prevented when the button is clicked', function () {
+    props.createSubmissionComment = sinon.stub().resolves();
     wrapper = mountComponent();
     const event = {
       preventDefault: sinon.stub(),
@@ -114,37 +95,56 @@ QUnit.module('SubmissionCommentForm', function (hooks) {
     strictEqual(event.preventDefault.callCount, 1);
   });
 
+  test('focuses on the textarea after a successful comment post', function () {
+    props.createSubmissionComment = sinon.stub().resolves();
+    wrapper = mountComponent();
+    const focusTextArea = sinon.stub(wrapper.instance().textarea, 'focus');
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    wrapper.find('button').simulate('click', event);
+    strictEqual(focusTextArea.callCount, 1);
+  });
+
   test('Button is disabled while processing', function () {
-    processing = true;
+    props.processing = true;
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
     strictEqual(wrapper.find('Button').prop('disabled'), true);
   });
 
+  test('Button label reads "Submit Comment"', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    strictEqual(wrapper.find('Button').prop('label'), 'Submit Comment');
+  });
+
   test('clicking the Button calls setProcessing', function () {
-    setProcessing = sinon.stub();
+    props.createSubmissionComment = sinon.stub().resolves();
+    props.setProcessing = sinon.stub();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
     wrapper.find('button').simulate('click', event);
-    strictEqual(setProcessing.callCount, 1);
+    strictEqual(props.setProcessing.callCount, 1);
   });
 
   test('clicking the Button calls setProcessing with true', function () {
-    setProcessing = sinon.stub();
+    props.createSubmissionComment = sinon.stub().resolves();
+    props.setProcessing = sinon.stub();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
     wrapper.find('button').simulate('click', event);
-    strictEqual(setProcessing.firstCall.args[0], true);
+    strictEqual(props.setProcessing.firstCall.args[0], true);
   });
 
-  test('handlePostComment calls createSubmissionComment when comment is valid', function () {
+  test('createSubmissionComment is called when the comment is valid and the button is clicked', function () {
+    props.createSubmissionComment = sinon.stub().resolves();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
     wrapper.find('button').simulate('click');
-    strictEqual(createSubmissionComment.callCount, 1);
+    strictEqual(props.createSubmissionComment.callCount, 1);
   });
 
-  test('handlePostComment clears the comment field', function () {
+  test('clicking the button clears the comment field', function () {
+    props.createSubmissionComment = sinon.stub().resolves();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'a message' } });
     wrapper.find('button').simulate('click');

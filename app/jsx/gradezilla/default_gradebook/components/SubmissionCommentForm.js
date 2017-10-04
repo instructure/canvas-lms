@@ -19,43 +19,44 @@
 import $ from 'jquery';
 import 'compiled/jquery.rails_flash_notifications';
 import React from 'react';
-import { bool, func } from 'prop-types';
+import { bool, func, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
 import TextArea from 'instructure-ui/lib/components/TextArea';
 import Button from 'instructure-ui/lib/components/Button';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 
-function isValid (comment) {
-  return comment.trim().length > 0;
-}
-
 class SubmissionCommentForm extends React.Component {
   static propTypes = {
-    createSubmissionComment: func.isRequired,
+    comment: string,
     processing: bool.isRequired,
     setProcessing: func.isRequired
+  };
+
+  static defaultProps = {
+    comment: ''
   };
 
   constructor (props) {
     super(props);
     this.bindTextarea = this.bindTextarea.bind(this);
     this.handleCommentChange = this.handleCommentChange.bind(this);
-    this.handlePostComment = this.handlePostComment.bind(this);
-    this.state = { comment: '' };
+    this.handlePublishComment = this.handlePublishComment.bind(this);
+    this.state = { comment: props.comment };
   }
 
   handleCommentChange (event) {
     this.setState({ comment: event.target.value });
   }
 
-  handlePostComment (event) {
+  handlePublishComment (event) {
     event.preventDefault();
     this.props.setProcessing(true);
-    this.props.createSubmissionComment(this.state.comment)
-      .catch(() => this.props.setProcessing(false));
-    this.setState({ comment: '' }, () => {
-      this.textarea.focus();
-    });
+    this.publishComment().catch(() => this.props.setProcessing(false));
+  }
+
+  commentIsValid () {
+    const comment = this.state.comment.trim();
+    return comment.length > 0;
   }
 
   bindTextarea (ref) {
@@ -63,6 +64,7 @@ class SubmissionCommentForm extends React.Component {
   }
 
   render () {
+    const { submitButtonLabel } = this.buttonLabels();
     return (
       <div>
         <div>
@@ -76,15 +78,15 @@ class SubmissionCommentForm extends React.Component {
         </div>
 
         {
-          isValid(this.state.comment) &&
+          this.showButtons() &&
             <div
               style={{ textAlign: 'right', marginTop: '0rem', border: 'none', padding: '0rem', background: 'transparent' }}
             >
               <Button
-                disabled={this.props.processing}
-                label={<ScreenReaderContent>{I18n.t('Submit Comment')}</ScreenReaderContent>}
+                disabled={this.props.processing || !this.commentIsValid()}
+                label={submitButtonLabel}
                 margin="small 0"
-                onClick={this.handlePostComment}
+                onClick={this.handlePublishComment}
                 variant="primary"
               >
                 {I18n.t("Submit")}

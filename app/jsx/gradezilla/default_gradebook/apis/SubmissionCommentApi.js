@@ -17,18 +17,31 @@
  */
 
 import axios from 'axios';
+import timezone from 'timezone';
+
+function deserializeComment (comment) {
+  const baseComment = {
+    id: comment.id,
+    createdAt: timezone.parse(comment.created_at),
+    comment: comment.comment,
+    editedAt: comment.edited_at && timezone.parse(comment.edited_at)
+  };
+
+  if (!comment.author) {
+    return baseComment;
+  }
+
+  return {
+    ...baseComment,
+    authorId: comment.author.id,
+    author: comment.author.display_name,
+    authorAvatarUrl: comment.author.avatar_image_url,
+    authorUrl: comment.author.html_url
+  };
+}
 
 function deserializeComments (comments) {
-  return comments.map(comment => (
-    {
-      id: comment.id,
-      author: comment.author.display_name,
-      authorAvatarUrl: comment.author.avatar_image_url,
-      authorUrl: comment.author.html_url,
-      createdAt: Date.parse(comment.created_at),
-      comment: comment.comment
-    }
-  ));
+  return comments.map(deserializeComment);
 }
 
 export function getSubmissionComments (courseId, assignmentId, studentId) {
@@ -48,4 +61,12 @@ export function createSubmissionComment (courseId, assignmentId, studentId, comm
 export function deleteSubmissionComment (commentId) {
   const url = `/submission_comments/${commentId}`;
   return axios.delete(url);
+}
+
+export function updateSubmissionComment (commentId, comment) {
+  const url = `/submission_comments/${commentId}`;
+  const data = { id: commentId, submission_comment: { comment } };
+  return axios.put(url, data).then(response => (
+    { data: deserializeComment(response.data.submission_comment) }
+  ));
 }

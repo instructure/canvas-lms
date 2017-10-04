@@ -18,6 +18,7 @@
 
 import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
+import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
 import SubmissionTray from 'jsx/gradezilla/default_gradebook/components/SubmissionTray';
 
 QUnit.module('SubmissionTray', function (hooks) {
@@ -48,6 +49,8 @@ QUnit.module('SubmissionTray', function (hooks) {
         missing: '#F99',
         excused: '#E5F3FC'
       },
+      editedCommentId: null,
+      editSubmissionComment () {},
       locale: 'en',
       onRequestClose () {},
       onClose () {},
@@ -55,6 +58,7 @@ QUnit.module('SubmissionTray', function (hooks) {
       submissionUpdating: false,
       isOpen: true,
       courseId: '1',
+      currentUserId: '2',
       speedGraderEnabled: true,
       student: {
         id: '27',
@@ -71,6 +75,7 @@ QUnit.module('SubmissionTray', function (hooks) {
         assignmentId: '30'
       },
       updateSubmission () {},
+      updateSubmissionComment () {},
       assignment: {
         name: 'Book Report',
         htmlUrl: 'http://htmlUrl/',
@@ -85,7 +90,6 @@ QUnit.module('SubmissionTray', function (hooks) {
       isLastStudent: true,
       selectNextStudent () {},
       selectPreviousStudent () {},
-      updateSubmissionComments () {},
       submissionCommentsLoaded: true,
       createSubmissionComment () {},
       deleteSubmissionComment () {},
@@ -402,5 +406,17 @@ QUnit.module('SubmissionTray', function (hooks) {
     });
 
     strictEqual(wrapContent().find('#SubmissionTray__Content').find('Container').at(0).prop('padding'), 'small 0 0 0');
+  });
+
+  test('renders the new comment form if the editedCommentId is null', function () {
+    mountComponent();
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 1);
+  });
+
+  test('does not render the new comment form if the editedCommentId is not null', function () {
+    mountComponent({ editedCommentId: '5' });
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 0);
   });
 });
