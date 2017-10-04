@@ -134,7 +134,7 @@ class Gradezilla
       end
 
       def comment_save_button
-        fj("button:contains('Post')")
+        fj("button:contains('Submit')")
       end
 
       # methods

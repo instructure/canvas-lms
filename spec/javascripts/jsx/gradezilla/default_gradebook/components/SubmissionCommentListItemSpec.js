@@ -77,6 +77,19 @@ test("include the comment", function () {
   ok(this.wrapper.text().includes(this.props().comment));
 });
 
+test("the comment timestamp includes the year if it does not match the current year", function () {
+  this.wrapper.setProps({ createdAt: new Date('Jan 8, 2003') });
+  const dateText = this.wrapper.find('Typography').at(1).text();
+  strictEqual(/, 2003/.test(dateText), true);
+});
+
+test("the comment timestamp excludes the year if it matches the current year", function () {
+  const dateText = this.wrapper.find('Typography').at(1).text();
+  const year = this.wrapper.instance().props.createdAt.getFullYear();
+  const includesYear = new RegExp(`, ${year}`);
+  strictEqual(includesYear.test(dateText), false);
+});
+
 QUnit.module('SubmissionCommentListItem#deleteSubmissionComment', {
   defaultProps () {
     return {

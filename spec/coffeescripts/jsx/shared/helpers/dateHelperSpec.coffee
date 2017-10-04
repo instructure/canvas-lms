@@ -75,6 +75,20 @@ define [
     formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
     equal formattedDate, "Jul 14, 2015 at 10:35am"
 
+  test "by default, includes the year if it matches the current year", ->
+    now = new Date()
+    year = now.getFullYear()
+    formattedDate = DateHelper.formatDatetimeForDisplay(now)
+    includesYear = new RegExp(", #{year}")
+    strictEqual(includesYear.test(formattedDate), true)
+
+  test "can specify 'short' format which excludes the year if it matches the current year", ->
+    now = new Date()
+    year = now.getFullYear()
+    formattedDate = DateHelper.formatDatetimeForDisplay(now, "short")
+    includesYear = new RegExp(", #{year}")
+    strictEqual(includesYear.test(formattedDate), false)
+
   QUnit.module 'DateHelper#formatDateForDisplay',
     setup: ->
       @snapshot = tz.snapshot()

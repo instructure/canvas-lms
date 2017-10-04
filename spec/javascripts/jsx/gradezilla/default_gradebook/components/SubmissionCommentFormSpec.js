@@ -72,10 +72,10 @@ QUnit.module('SubmissionCommentForm', function (hooks) {
     strictEqual(wrapper.find('Button').props().disabled, false);
   });
 
-  test('Button has the text "Post"', function () {
+  test('Button has the text "Submit"', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(wrapper.find('Button').text(), 'Post');
+    strictEqual(wrapper.find('Button').text(), 'Submit');
   });
 
   test('TextArea is empty', function () {

@@ -37,6 +37,10 @@ function handledeleteComment (id, deleteSubmissionComment) {
   };
 }
 
+function submissionCommentDate (date) {
+  return DateHelper.formatDatetimeForDisplay(date, 'short');
+}
+
 export default function SubmissionCommentListItem (props) {
   const {
     author,
@@ -71,7 +75,7 @@ export default function SubmissionCommentListItem (props) {
 
             <div style={{ margin: '0 0 0 0.375rem' }}>
               <Typography size="small" lineHeight="fit">
-                {DateHelper.formatDatetimeForDisplay(createdAt)}
+                {submissionCommentDate(createdAt)}
               </Typography>
             </div>
           </div>

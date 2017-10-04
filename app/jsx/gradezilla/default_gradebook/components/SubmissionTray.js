@@ -224,9 +224,9 @@ export default function SubmissionTray (props) {
                   />
                 </Container>
 
-                <div id="SubmissionTray__Comments">
+                <Container as="div" id="SubmissionTray__Comments" padding="xx-small">
                   {renderSubmissionComments(submissionCommentsProps)}
-                </div>
+                </Container>
               </Container>
             </div>
         }

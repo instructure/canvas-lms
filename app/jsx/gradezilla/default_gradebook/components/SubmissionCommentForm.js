@@ -70,12 +70,12 @@ class SubmissionCommentForm extends React.Component {
             >
               <Button
                 disabled={this.props.processing}
-                label={<ScreenReaderContent>{I18n.t('Post Comment')}</ScreenReaderContent>}
+                label={<ScreenReaderContent>{I18n.t('Submit Comment')}</ScreenReaderContent>}
                 margin="small 0"
                 onClick={this.handlePostComment}
                 variant="primary"
               >
-                {I18n.t("Post")}
+                {I18n.t("Submit")}
               </Button>
             </div>
         }
