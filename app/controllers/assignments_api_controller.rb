@@ -546,7 +546,7 @@
 #           "items": { "$ref": "AssignmentOverride" }
 #         },
 #         "omit_from_final_grade": {
-#           "description": "(Optional) If true, the assignment will be ommitted from the student's final grade",
+#           "description": "(Optional) If true, the assignment will be omitted from the student's final grade",
 #           "example": true,
 #           "type": "boolean"
 #         }
