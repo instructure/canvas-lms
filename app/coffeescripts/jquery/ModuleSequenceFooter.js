@@ -68,6 +68,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
       const items = module.items || []
       const showModule = items.length > 0
       const currentItem = _.findWhere(items, {id: this.msfInstance.item.current.id})
+
       
       if (currentItem) {
         const lessons = _.where(items, {indent: 0})
@@ -87,6 +88,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
         } else {
           next = false
         }
+
         var lessonArray
         if (next) {
           lessonArray = items.filter((i) => {
@@ -155,6 +157,7 @@ export default class ModuleSequenceFooter {
     this.location = options.location || document.location
     this.previous = {}
     this.next = {}
+    this.current = {}
     this.url = `/api/v1/courses/${this.courseID}/module_item_sequence`
     this.module_items_url = `/api/v1/courses/${this.courseID}/modules/`
   }
@@ -196,7 +199,7 @@ export default class ModuleSequenceFooter {
 
   fetch_module_items (id) {
     return $.ajaxJSON(`${this.module_items_url}${id}`, 'GET', {
-      include: 'items',
+      include: ['items', 'content_details'],
     }, this.success_module_items, null, {})
   }
 
@@ -206,8 +209,6 @@ export default class ModuleSequenceFooter {
 
   success = (data) => {
     this.modules = data.modules
-    this.moduleID = this.modules[0].id
-
     // Currently only supports 1 item in the items array
     if (!(data && data.items && data.items.length === 1)) {
       this.hide = true
@@ -215,6 +216,9 @@ export default class ModuleSequenceFooter {
     }
     this.current = data.current
     this.item = data.items[0]
+    this.current = this.item.current || {}
+    this.currentModule = _.findWhere(this.modules, {id: this.current.module_id}) || {}
+    this.moduleID = this.currentModule.id || null
     // Show the buttons if they aren't null
     if ((this.next.show = this.item.next)) this.buildNextData()
     if ((this.previous.show = this.item.prev)) this.buildPreviousData()
