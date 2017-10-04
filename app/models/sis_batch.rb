@@ -480,6 +480,7 @@ class SisBatch < ActiveRecord::Base
       "data" => self.data,
       "batch_mode" => self.batch_mode,
       "batch_mode_term_id" => self.batch_mode_term ? self.batch_mode_term.id : nil,
+      "multi_term_batch_mode" => self.options[:multi_term_batch_mode],
       "override_sis_stickiness" => self.options[:override_sis_stickiness],
       "add_sis_stickiness" => self.options[:add_sis_stickiness],
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
