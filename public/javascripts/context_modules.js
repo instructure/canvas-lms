@@ -786,7 +786,7 @@ import 'compiled/jquery.rails_flash_notifications'
             } else {
               if ($mod_item.hasClass('progression_requirement')) {
                 $icon_container.fadeIn(500);
-                addIcon($icon_container, 'icon-mark-as-read', criterionMessage($mod_item));
+                addNoIcon($icon_container, I18n.t('This assignment has not been started'));
               }
             }
           }
@@ -809,7 +809,7 @@ import 'compiled/jquery.rails_flash_notifications'
           } else if (completed_items_count > 0 && overdue_items_count === 0) {
             $subheader.addClass('incomplete_item');
             $icon_container.fadeIn(500);
-            addIcon($icon_container, 'icon-in-progress', I18n.t('Not completed'));
+            addIcon($icon_container, 'icon-in-progress', I18n.t('In progress'));
           } else if (overdue_items_count > 0) {
             $subheader.addClass('overdue_item');
             $icon_container.fadeIn(500);
@@ -817,9 +817,8 @@ import 'compiled/jquery.rails_flash_notifications'
           } else {
             $subheader.addClass('unstarted_item');
             $icon_container.fadeIn(500);
-            addIcon($icon_container, 'icon-mark-as-read', I18n.t('This assignment has not been started'));
+            addNoIcon($icon_container, I18n.t('This assignment has not been started'));
           }
-
         });
 
       },
@@ -865,6 +864,12 @@ import 'compiled/jquery.rails_flash_notifications'
     var $icon = $("<i data-tooltip></i>");
     $icon.attr('class', css_class).attr('title', message).attr('aria-label', message);
     $icon_container.empty().append($icon);
+  }
+
+  var addNoIcon = function($icon_container, message) {
+    $icon_container.addClass('unstarted-icon');
+    $icon_container.attr("title", message).attr("aria-label", message);
+    $icon_container.wrap("<i data-tooltip></i>");
   }
 
   var criterionMessage = function($mod_item) {

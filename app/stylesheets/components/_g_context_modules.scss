@@ -69,9 +69,17 @@ $context_module_bg_color: #f2f3f4;
       width: 24px;
       height: 24px;
       padding: 5px;
-      background-color: #B4B6B9;
+      background-color: $ic-brand-primary;
       border-radius: 50%;
       display: flex;
+      &.unstarted-icon {
+        background-color: white;
+        border-radius: 50%;
+        border: 3px solid $ic-brand-primary;
+        box-sizing: border-box;
+        height: 34px;
+        width: 34px;
+      }
 
       i{
         color: #FFF;
