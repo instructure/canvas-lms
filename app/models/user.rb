@@ -2624,7 +2624,6 @@ class User < ActiveRecord::Base
         sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
-    p @menu_courses
     @menu_courses
   end
 
