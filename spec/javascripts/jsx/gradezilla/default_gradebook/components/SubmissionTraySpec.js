@@ -324,4 +324,37 @@ QUnit.module('SubmissionTray', function (hooks) {
     });
     strictEqual(wrapContent().find('#student-carousel .left-arrow-button-container button').length, 0);
   });
+
+  test('does not add padding to the carousel container when an avatar is present', function () {
+    const student = {
+      id: '27',
+      name: 'Jane Doe',
+      gradesUrl: 'http://gradeUrl/',
+      avatarUrl: 'http://avatarUrl/'
+    };
+
+    mountComponent({
+      student,
+      isFirstStudent: false,
+      isLastStudent: false
+    });
+
+    strictEqual(wrapContent().find('#SubmissionTray__Content').find('Container').at(0).prop('padding'), '0 0 0 0');
+  });
+
+  test('adds padding to the carousel container when no avatar is present', function () {
+    const student = {
+      id: '27',
+      name: 'Jane Doe',
+      gradesUrl: 'http://gradeUrl/',
+    };
+
+    mountComponent({
+      student,
+      isFirstStudent: false,
+      isLastStudent: false
+    });
+
+    strictEqual(wrapContent().find('#SubmissionTray__Content').find('Container').at(0).prop('padding'), 'small 0 0 0');
+  });
 });

@@ -140,6 +140,13 @@ export default function SubmissionTray (props) {
     processing: props.processing,
     setProcessing: props.setProcessing
   };
+  let carouselContainerStyleOverride = '0 0 0 0';
+
+  if (!avatarUrl) {
+    // When we don't have an avatar, let's ensure there's enough space between the tray close button and the student
+    // carousel's previous student arrow
+    carouselContainerStyleOverride = 'small 0 0 0';
+  }
 
   return (
     <Tray
@@ -157,7 +164,7 @@ export default function SubmissionTray (props) {
         { props.showContentComingSoon ?
             renderComingSoon(props.speedGraderEnabled, speedGraderUrl) :
             <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div>
+              <Container as="div" padding={carouselContainerStyleOverride}>
                 {avatarUrl && renderAvatar(name, avatarUrl)}
 
                 <Carousel
@@ -195,7 +202,7 @@ export default function SubmissionTray (props) {
                 { props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
 
                 <Container as="div" margin="small 0" className="hr" />
-              </div>
+              </Container>
 
               <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
                 {!!props.submission.pointsDeducted &&
