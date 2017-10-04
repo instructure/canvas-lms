@@ -167,7 +167,7 @@ body:not(.course-menu-expanded) {
   }
 
   body:not(.no-headers) & {
-    margin-left: $ic-header-primary-width - 30;
+    margin-left: $ic-header-primary-width;
   }
 
   body:not(.no-headers).primary-nav-expanded & {

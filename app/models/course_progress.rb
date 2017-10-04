@@ -92,8 +92,6 @@ class CourseProgress
             :page_visibilities => true, # fm.page_visibilities_for_users(user_ids),
             :quiz_visibilities => true # fm.quiz_visibilities_for_users(user_ids)
           }
-          p "HELOOOOOOO HJIOIOO(OOHHHHBBNBBBB)"
-          p fm
           modules.flat_map { |m| m.completion_requirements_visible_to(@user, opts) }.uniq
         end
       end

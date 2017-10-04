@@ -167,10 +167,10 @@ class ContextModulesController < ApplicationController
     end
   end
 
-  def item_redirect
+  def item_redirect    
     if authorized_action(@context, @current_user, :read)
       @tag = @context.context_module_tags.not_deleted.find(params[:id])
-
+      @distraction_free = true
       if !(@tag.unpublished? || @tag.context_module.unpublished?) || authorized_action(@tag.context_module, @current_user, :view_unpublished_items)
         reevaluate_modules_if_locked(@tag)
         @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
@@ -211,6 +211,7 @@ class ContextModulesController < ApplicationController
   end
 
   def module_redirect
+    
     if authorized_action(@context, @current_user, :read)
       @module = @context.context_modules.not_deleted.find(params[:context_module_id])
       @tags = @module.content_tags_visible_to(@current_user)
@@ -463,7 +464,7 @@ class ContextModulesController < ApplicationController
   end
 
 
-  def item_details
+  def item_details   
     if authorized_action(@context, @current_user, :read)
       # namespaced models are separated by : in the url
       code = params[:id].gsub(":", "/").split("_")
@@ -509,6 +510,7 @@ class ContextModulesController < ApplicationController
 
   include ContextModulesHelper
   def add_item
+    
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
@@ -556,7 +558,7 @@ class ContextModulesController < ApplicationController
     end
   end
 
-  def progressions
+  def progressions    
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
         if @context.grants_right?(@current_user, session, :view_all_grades)
