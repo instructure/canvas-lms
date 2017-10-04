@@ -134,6 +134,12 @@ class Checker extends React.Component {
     return error && error.node
   }
 
+  errorRootNode() {
+    const rule = this.errorRule()
+    const rootNode = rule && rule.rootNode && rule.rootNode(this.errorNode())
+    return rootNode || this.errorNode()
+  }
+
   updateErrorNode(elem) {
     const error = this.error()
     if (error) {
@@ -199,9 +205,11 @@ class Checker extends React.Component {
 
   tempNode(refresh = false) {
     if (!this._tempNode || refresh) {
-      const node = this.errorNode()
+      const node = this.errorRootNode()
       if (node) {
         const newTempNode = node.cloneNode(true)
+        const path = dom.pathForNode(node, this.errorNode())
+        this._tempTestNode = dom.nodeByPath(newTempNode, path)
         if (refresh && this._tempNode) {
           const parent = this._tempNode.parentNode
           parent.insertBefore(newTempNode, this._tempNode)
@@ -214,16 +222,17 @@ class Checker extends React.Component {
         this._tempNode = newTempNode
       }
     }
-    return this._tempNode
+    return this._tempTestNode
   }
 
   removeTempNode() {
-    const node = this.errorNode()
+    const node = this.errorRootNode()
     if (this._tempNode && node) {
       const parent = this._tempNode.parentNode
       parent.insertBefore(node, this._tempNode)
       parent.removeChild(this._tempNode)
       this._tempNode = null
+      this._tempTestNode = null
     }
   }
 

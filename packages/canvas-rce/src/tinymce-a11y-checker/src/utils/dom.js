@@ -1,6 +1,8 @@
 const ELEMENT_NODE = 1
 const WALK_BATCH_SIZE = 25
 
+const _indexOf = Array.prototype.indexOf
+
 function walk(node, fn, done) {
   const stack = [{ node, index: 0 }]
   const processBatch = () => {
@@ -63,4 +65,32 @@ function changeTag(elem, tagName) {
   return newElem
 }
 
-module.exports = { walk, select, prepend, changeTag }
+function pathForNode(ancestor, decendant) {
+  const path = []
+  let node = decendant
+  while (true) {
+    if (node == ancestor) {
+      return path
+    }
+    const parent = node.parentNode
+    if (parent == null) {
+      return null
+    }
+    path.push(_indexOf.call(parent.childNodes, node))
+    node = parent
+  }
+}
+
+function nodeByPath(ancestor, path) {
+  let node = ancestor
+  let index
+  while ((index = path.pop())) {
+    node = node.childNodes[index]
+    if (node == null) {
+      return null
+    }
+  }
+  return node
+}
+
+module.exports = { walk, select, prepend, changeTag, pathForNode, nodeByPath }
