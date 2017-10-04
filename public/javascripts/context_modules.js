@@ -809,11 +809,11 @@ import 'compiled/jquery.rails_flash_notifications'
           } else if (completed_items_count > 0 && overdue_items_count === 0) {
             $subheader.addClass('incomplete_item');
             $icon_container.fadeIn(500);
-            addIcon($icon_container, 'no-icon', I18n.t('Not completed'));
+            addIcon($icon_container, 'icon-in-progress', I18n.t('Not completed'));
           } else if (overdue_items_count > 0) {
             $subheader.addClass('overdue_item');
             $icon_container.fadeIn(500);
-            addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'));
+            addIcon($icon_container, 'icon-overdue', I18n.t('This assignment is overdue'));
           } else {
             $subheader.addClass('unstarted_item');
             $icon_container.fadeIn(500);

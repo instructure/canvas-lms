@@ -10,6 +10,7 @@
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
 
+*/.DS_Store
 .idea/
 .bundle/
 .byebug_history
