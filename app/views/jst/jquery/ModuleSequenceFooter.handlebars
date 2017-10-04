@@ -21,8 +21,25 @@
 
           {{/if}}
         </div>
-
-        <h2>{{currentItem.title}}</h2>
+        
+        {{#if showModule}}
+          <div class="sm-module-footer">
+            <ul class="sm-module-footer__nav">
+              {{#each items}}
+                <li id="{{id}}">
+                  <div class="sm-footer-progress-container">
+                    <a href="{{html_url}}" data-tooltip="top"
+                  data-html-tooltip-title="{{title}}" class="{{#ifEqual id ../currentItem.id }}current{{/ifEqual}}">
+                    </a>
+                    {{#unless @last }}
+                      <span class="sm-progress-connector {{#ifEqual id ../currentItem.id }}current{{/ifEqual}}"></span>
+                    {{/unless}}
+                  </div>
+              </li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
 
         <div class="sm-flow-control-cotainer">
           {{#if next.show}}
@@ -43,23 +60,5 @@
       </div>
 
     </div>
-    {{#if showModule}}
-      <div class="sm-module-footer">
-        <ul class="sm-module-footer__nav">
-          {{#each items}}
-            <li id="{{id}}">
-              <div class="sm-footer-progress-container">
-                <a href="{{html_url}}" data-tooltip="top"
-              data-html-tooltip-title="{{title}}" class="{{#ifEqual id ../currentItem.id }}current{{/ifEqual}}">
-                </a>
-                {{#unless @last }}
-                  <span class="sm-progress-connector {{#ifEqual id ../currentItem.id }}current{{/ifEqual}}"></span>
-                {{/unless}}
-              </div>
-          </li>
-          {{/each}}
-        </ul>
-      </div>
-    {{/if}}
   </div>
 </div>
