@@ -322,6 +322,15 @@ returns the URL to retrieve the brand config JSON for the launching context.
 ```
 http://example.url/path.json
 ```
+## com.instructure.brandConfigJSON
+returns the brand config JSON itself for the launching context.
+
+**Availability**: *always*  
+
+
+```
+{"ic-brand-primary-darkened-5":"#0087D7"}
+```
 ## com.instructure.brandConfigJS.url
 returns the URL to retrieve the brand config javascript for the launching context.
 This URL should be used as the src attribute for a script tag on the external tool

@@ -352,6 +352,15 @@ module Lti
                        -> { @controller.active_brand_config_json_url },
                        CONTROLLER_GUARD
 
+    # returns the brand config JSON itself for the launching context.
+    # @example
+    #   ```
+    #   {"ic-brand-primary-darkened-5":"#0087D7"}
+    #   ```
+    register_expansion 'com.instructure.brandConfigJSON', [],
+                       -> { @controller.active_brand_config.try(:to_json) },
+                       CONTROLLER_GUARD
+
     # returns the URL to retrieve the brand config javascript for the launching context.
     # This URL should be used as the src attribute for a script tag on the external tool
     # provider's web page. It is configured to be used with the [instructure-ui node module](https://github.com/instructure/instructure-ui).

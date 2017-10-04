@@ -63,6 +63,7 @@ module Lti
       allow(m).to receive(:named_context_url).and_return('url')
       allow(m).to receive(:active_brand_config_json_url).and_return('http://example.com/brand_config.json')
       allow(m).to receive(:active_brand_config_js_url).and_return('http://example.com/brand_config.js')
+      allow(m).to receive(:active_brand_config).and_return(double(to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'))
       allow(m).to receive(:polymorphic_url).and_return('url')
       view_context_mock = double('view_context')
       allow(view_context_mock).to receive(:stylesheet_path)
@@ -415,6 +416,20 @@ module Lti
         exp_hash = {test: '$com.instructure.brandConfigJSON.url'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq '$com.instructure.brandConfigJSON.url'
+      end
+
+      it 'has substitution for $com.instructure.brandConfigJSON' do
+        exp_hash = {test: '$com.instructure.brandConfigJSON'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '{"ic-brand-primary-darkened-5":"#0087D7"}'
+      end
+
+      it 'does not expand $com.instructure.brandConfigJSON when the controller is unset' do
+        variable_expander.instance_variable_set(:@controller, nil)
+        variable_expander.instance_variable_set(:@request, nil)
+        exp_hash = {test: '$com.instructure.brandConfigJSON'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '$com.instructure.brandConfigJSON'
       end
 
       it 'has substitution for $com.instructure.brandConfigJS.url' do
