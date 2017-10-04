@@ -427,6 +427,18 @@ describe AccountsController do
       expect(@account.admins_can_view_notifications?).to be_truthy
     end
 
+    it 'does not allow anyone to set unexpected settings' do
+      user_factory
+      user_session(@user)
+      @account = Account.create!
+      Account.site_admin.account_users.create!(user: @user)
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :product_name => 'blah'
+      }}}
+      @account.reload
+      expect(@account.settings[:product_name]).to be_nil
+    end
+
     it "doesn't break I18n by setting the help_link_name unnecessarily" do
       account_with_admin_logged_in
 

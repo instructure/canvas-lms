@@ -1192,13 +1192,46 @@ class AccountsController < ApplicationController
     end
   end
 
+
+  PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,
+                                   :allow_invitation_previews, :allow_sending_scores_in_emails,
+                                   :author_email_in_notifications, :canvadocs_prefer_office_online,
+                                   :consortium_parent_account, :consortium_can_create_own_accounts,
+                                   :shard_per_account, :consortium_autocreate_web_of_trust,
+                                   :consortium_autocreate_reverse_trust,
+                                   :default_storage_quota, :default_storage_quota_mb,
+                                   :default_group_storage_quota, :default_group_storage_quota_mb,
+                                   :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
+                                   :edit_institution_email, :enable_alerts, :enable_eportfolios,
+                                   {:enable_offline_web_export => [:value]}.freeze,
+                                   :enable_profiles, :enable_turnitin, :equella_endpoint, :equella_teaser,
+                                   :external_notification_warning, :global_includes, :google_docs_domain,
+                                   :help_link_icon, :help_link_name, :include_students_in_global_survey, :license_type,
+                                   {:lock_all_announcements => [:value, :locked]}.freeze,
+                                   :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
+                                   :open_registration, :outgoing_email_default_name,
+                                   :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
+                                   {:restrict_student_future_listing => [:value, :locked]}.freeze,
+                                   {:restrict_student_future_view => [:value, :locked]}.freeze,
+                                   {:restrict_student_past_view => [:value, :locked]}.freeze,
+                                   :self_enrollment, :show_scheduler, :sis_app_token, :sis_app_url,
+                                   {:sis_assignment_name_length => [:value]}.freeze,
+                                   {:sis_assignment_name_length_input => [:value]}.freeze,
+                                   {:sis_default_grade_export => [:value]}.freeze,
+                                   :sis_name,
+                                   {:sis_require_assignment_due_date => [:value]}.freeze,
+                                   {:sis_syncing => [:value, :locked]}.freeze,
+                                   :strict_sis_check, :storage_quota, :students_can_create_courses,
+                                   :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
+                                   :turnitin_host, :turnitin_account_id, :users_can_edit_name].freeze
+
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret,
       :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
       :default_time_zone, :parent_account, :default_storage_quota,
       :default_storage_quota_mb, :storage_quota, :default_locale,
       :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5,
-      :settings => strong_anything, :ip_filters => strong_anything
+      :settings => PERMITTED_SETTINGS_FOR_UPDATE, :ip_filters => strong_anything
     ]
   end
 
