@@ -3714,6 +3714,10 @@ describe User do
       expect(@student.group_memberships_for(@course).size).to eq 0
     end
 
+    it 'should show if user has group_membership' do
+      expect(@student.current_groups_in_region?).to eq true
+    end
+
   end
 
   describe 'visible_groups' do

@@ -2903,6 +2903,12 @@ class User < ActiveRecord::Base
     !!@all_active_pseudonyms
   end
 
+  def current_groups_in_region?
+    return true if self.current_groups.exists?
+    return true if self.current_groups.shard(self.in_region_associated_shards).exists?
+    false
+  end
+
   def all_active_pseudonyms(reload=false)
     @all_active_pseudonyms = nil if reload
     @all_active_pseudonyms ||= self.pseudonyms.shard(self).active.to_a
