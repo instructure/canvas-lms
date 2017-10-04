@@ -7779,9 +7779,9 @@ strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
-strongmind-icons@0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/strongmind-icons/-/strongmind-icons-0.0.4.tgz#1e02325d8c3f517a45ab1e6f20926f7badcc0ebe"
+strongmind-icons@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strongmind-icons/-/strongmind-icons-6.0.1.tgz#7ff6bded95096ad0e4217e2746d3296ac8da9b00"
   dependencies:
     prop-types "^15.5.8"
     shortid "^2.2.8"
