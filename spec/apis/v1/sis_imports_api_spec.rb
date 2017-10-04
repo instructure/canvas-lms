@@ -68,6 +68,7 @@ describe SisImportsApiController, type: :request do
           "override_sis_stickiness" => opts[:override_sis_stickiness] ? true : nil,
           "add_sis_stickiness" => opts[:add_sis_stickiness] ? true : nil,
           "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
+          "multi_term_batch_mode" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
@@ -104,6 +105,7 @@ describe SisImportsApiController, type: :request do
           "workflow_state"=>"created",
           "batch_mode" => nil,
           "batch_mode_term_id" => nil,
+          "multi_term_batch_mode" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
@@ -153,6 +155,7 @@ describe SisImportsApiController, type: :request do
           "workflow_state"=>"imported",
           "batch_mode" => nil,
           "batch_mode_term_id" => nil,
+          "multi_term_batch_mode" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
@@ -270,6 +273,7 @@ describe SisImportsApiController, type: :request do
             multi_term_batch_mode: '1',
             change_threshold: 7,})
     batch = SisBatch.find(json["id"])
+    expect(json['multi_term_batch_mode']).to eq true
     expect(batch.options[:multi_term_batch_mode]).to be_truthy
   end
 
@@ -664,6 +668,7 @@ describe SisImportsApiController, type: :request do
                       "workflow_state"=>"imported",
           "batch_mode" => nil,
           "batch_mode_term_id" => nil,
+          "multi_term_batch_mode" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,

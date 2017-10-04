@@ -192,6 +192,11 @@
 #           "example": "1234",
 #           "type": "string"
 #         },
+#         "multi_term_batch_mode": {
+#           "description": "Enables batch mode against all terms in term file. Requires change_threshold to be set.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
 #         "override_sis_stickiness": {
 #           "description": "Whether UI changes were overridden.",
 #           "example": "false",
@@ -315,6 +320,9 @@ class SisImportsApiController < ApplicationController
   # @argument batch_mode_term_id [String]
   #   Limit deletions to only this term. Required if batch mode is enabled.
   #
+  # @argument multi_term_batch_mode [Boolean]
+  #   Runs batch mode against all terms in terms file. Requires change_threshold.
+  #
   # @argument override_sis_stickiness [Boolean]
   #   Many fields on records in Canvas can be marked "sticky," which means that
   #   when something changes in the UI apart from the SIS, that field gets
@@ -362,6 +370,7 @@ class SisImportsApiController < ApplicationController
   #   compared to, diffing will not be performed. If the files are less than 5%,
   #   diffing will be performed. See the SIS CSV Format documentation for more
   #   details.
+  #   Required for multi_term_batch_mode.
   #
   # @returns SisImport
   def create
