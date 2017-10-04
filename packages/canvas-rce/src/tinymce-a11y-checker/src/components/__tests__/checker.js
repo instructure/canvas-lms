@@ -15,6 +15,30 @@ beforeEach(() => {
   instance = component.instance()
 })
 
+describe("errorRootNode", () => {
+  beforeEach(async () => {
+    await promisify(instance.check.bind(instance))()
+    component.update()
+  })
+
+  test("returns error node if rule rootNode returns null", () => {
+    expect(instance.errorRootNode()).toBe(instance.errorNode())
+  })
+
+  test("returns error node if rule does not define rootNode", () => {
+    instance.error().rule = Object.assign({}, instance.errorRule(), {
+      rootNode: undefined
+    })
+    expect(instance.errorRootNode()).toBe(instance.errorNode())
+  })
+
+  test("returns root node if rule rootNode returns non-null value", () => {
+    const rootNode = document.createElement("div")
+    instance.errorRule().rootNode.mockReturnValueOnce(rootNode)
+    expect(instance.errorRootNode()).toBe(rootNode)
+  })
+})
+
 describe("updateFormState", () => {
   let target
 
@@ -22,21 +46,21 @@ describe("updateFormState", () => {
     target = { name: "foo", value: "bar" }
   })
 
-  it("sets state to true if target is a checkbox and checked", () => {
+  test("sets state to true if target is a checkbox and checked", () => {
     target.type = "checkbox"
     target.checked = true
     instance.updateFormState({ target })
     expect(instance.state.formState.foo).toBe(true)
   })
 
-  it("sets state to false if target is a checkbox and not checked", () => {
+  test("sets state to false if target is a checkbox and not checked", () => {
     target.type = "checkbox"
     target.checked = false
     instance.updateFormState({ target })
     expect(instance.state.formState.foo).toBe(false)
   })
 
-  it("sets state to value", () => {
+  test("sets state to value", () => {
     instance.updateFormState({ target })
     expect(instance.state.formState.foo).toBe(target.value)
   })
@@ -67,6 +91,16 @@ describe("formStateValid", () => {
     instance.formStateValid(formState)
     const secondTempNode = instance._tempNode
     expect(firstTempNode).not.toBe(secondTempNode)
+  })
+
+  test("clones root node if defined by rule", () => {
+    const parent = document.createElement("div")
+    const rootNode = document.createElement("div")
+    rootNode.appendChild(instance.state.errors[0].node)
+    parent.appendChild(rootNode)
+    rule.rootNode.mockReturnValueOnce(rootNode)
+    instance.formStateValid(formState)
+    expect(instance._tempNode).toEqual(rootNode)
   })
 })
 

@@ -29,6 +29,7 @@ module.exports = [
         disabledIf: () => true
       }
     ]),
+    rootNode: jest.fn(),
     update: jest.fn(),
     message: jest.fn().mockReturnValue("Error Message"),
     why: jest.fn().mockReturnValue("Why Text"),
