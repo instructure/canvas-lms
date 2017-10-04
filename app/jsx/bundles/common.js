@@ -91,12 +91,13 @@ function resetMenuItemTabIndexes () {
 
 $(resetMenuItemTabIndexes)
 $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
-$('body').on('click', '#courseMenuToggle', () => {
-  $('body').toggleClass('course-menu-expanded')
-  updateSubnavMenuToggle()
-  $('#left-side').css({
-    display: $('body').hasClass('course-menu-expanded') ? 'block' : 'none'
-  })
+$('body').on('click', '#distractionFreeToggle', () => {
+  // $('#header').toggleClass('hide')
+  $('body').toggleClass('no-headers distraction-free')
+  // updateSubnavMenuToggle()
+  // $('#left-side').css({
+  //   display: $('body').hasClass('course-menu-expanded') ? 'block' : 'none'
+  // })
 
   resetMenuItemTabIndexes()
 })
