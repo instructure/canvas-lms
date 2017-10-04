@@ -365,6 +365,23 @@ describe ContentMigration do
       expect(bank2.assessment_questions.size).to eq 2
     end
 
+    it "should not restore deleted questions when restoring a bank" do
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      q1 = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      q2 = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question 2', 'question_type' => 'essay_question'})
+
+      run_course_copy
+
+      bank_to = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
+      bank_to.destroy
+      q2.destroy
+
+      run_course_copy
+
+      expect(bank_to.reload).to be_active
+      expect(bank_to.assessment_questions.active.count).to eq 1
+    end
+
     it "should not copy plain text question comments as html" do
       bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
       q = bank1.assessment_questions.create!(:question_data => {
