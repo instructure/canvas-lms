@@ -6212,7 +6212,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     this.gradebook.students = {
       1101: {
         id: '1101',
-        name: 'Adam Jones',
+        name: 'J&#x27;onn J&#x27;onzz',
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         },
@@ -6277,12 +6277,23 @@ test('shows a submission tray when the related submission has not loaded for the
 
 test('SubmissionTray props have student with valid gradesUrl', function () {
   sinon.spy(React, 'createElement');
-  sinon.stub(this.gradebook, 'isInNoGradingPeriod').returns(true);
 
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
 
   strictEqual(React.createElement.getCall(0).args[1].student.gradesUrl, 'http://gradesUrl/#tab-assignments');
+
+  React.createElement.restore();
+});
+
+test('SubmissionTray props have student with html decoded name', function () {
+  sinon.spy(React, 'createElement');
+
+  this.gradebook.students[1101].name = 'J&#x27;onn J&#x27;onzz';
+  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
+  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
+
+  strictEqual(React.createElement.getCall(0).args[1].student.name, "J'onn J'onzz");
 
   React.createElement.restore();
 });

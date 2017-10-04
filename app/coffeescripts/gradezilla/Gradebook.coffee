@@ -2200,7 +2200,7 @@ define [
         speedGraderEnabled: @options.speed_grader_enabled
         student:
           id: student.id
-          name: student.name
+          name: htmlDecode(student.name)
           avatarUrl: htmlDecode(student.avatar_url)
           gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
         submission: ConvertCase.camelize(submission)
