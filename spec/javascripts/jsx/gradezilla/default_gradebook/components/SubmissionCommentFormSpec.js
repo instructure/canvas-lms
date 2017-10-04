@@ -17,7 +17,6 @@
 
 import React from 'react';
 import { mount } from 'enzyme';
-import I18n from 'i18n!gradebook';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import SubmissionCommentForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentForm';
 
@@ -50,13 +49,32 @@ QUnit.module('SubmissionCommentForm', function (hooks) {
     processing = null;
   });
 
+  test('Button is not present if there is no text entered in the comment area', function () {
+    wrapper = mountComponent();
+    strictEqual(wrapper.find('Button').length, 0);
+  });
+
+  test('Button is not present if the content is all spaces', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: '   ' } });
+    strictEqual(wrapper.find('Button').length, 0);
+  });
+
+  test('Button is present if there is text entered in the comment area', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    strictEqual(wrapper.find('Button').length, 1);
+  });
+
   test('Button is not disabled', function () {
     wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
     strictEqual(wrapper.find('Button').props().disabled, false);
   });
 
   test('Button has the text "Post"', function () {
     wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
     strictEqual(wrapper.find('Button').text(), 'Post');
   });
 
@@ -86,19 +104,6 @@ QUnit.module('SubmissionCommentForm', function (hooks) {
     strictEqual(wrapper.find('TextArea').prop('messages').length, 0);
   });
 
-  test('TextArea displays an error when blank message is present', function () {
-    setProcessing = value => {
-      processing = value
-    };
-    wrapper = mountComponent();
-    wrapper.find('textarea').simulate('change', { target: { value: ' ' } });
-    wrapper.find('button').simulate('click');
-    const messages = wrapper.find('TextArea').prop('messages').filter(message =>
-      message.text === I18n.t('No message present')
-    );
-    strictEqual(messages.length, 1)
-  });
-
   test('handlePostComment prevents default', function () {
     wrapper = mountComponent();
     const event = {
@@ -109,16 +114,27 @@ QUnit.module('SubmissionCommentForm', function (hooks) {
     strictEqual(event.preventDefault.callCount, 1);
   });
 
-  test('handlePostComment disables Button', function () {
-    setProcessing = value => {
-      processing = value
-      wrapper = mountComponent();
-    };
+  test('Button is disabled while processing', function () {
+    processing = true;
     wrapper = mountComponent();
-
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    wrapper.find('button').simulate('click');
     strictEqual(wrapper.find('Button').prop('disabled'), true);
+  });
+
+  test('clicking the Button calls setProcessing', function () {
+    setProcessing = sinon.stub();
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    wrapper.find('button').simulate('click', event);
+    strictEqual(setProcessing.callCount, 1);
+  });
+
+  test('clicking the Button calls setProcessing with true', function () {
+    setProcessing = sinon.stub();
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    wrapper.find('button').simulate('click', event);
+    strictEqual(setProcessing.firstCall.args[0], true);
   });
 
   test('handlePostComment calls createSubmissionComment when comment is valid', function () {
@@ -126,26 +142,6 @@ QUnit.module('SubmissionCommentForm', function (hooks) {
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
     wrapper.find('button').simulate('click');
     strictEqual(createSubmissionComment.callCount, 1);
-  });
-
-  test('handlePostComment displays a warning when comment is invalid', function () {
-    setProcessing = value => {
-      processing = value
-    };
-    wrapper = mountComponent();
-    wrapper.find('textarea').simulate('change', { target: { value: ' ' } });
-    wrapper.find('button').simulate('click');
-    const messages = wrapper.find('TextArea').prop('messages').filter(message =>
-      message.text === I18n.t('No message present')
-    );
-    strictEqual(messages.length, 1);
-  });
-
-  test('handlePostComment reenables the button when comment is invalid', function () {
-    wrapper = mountComponent();
-    wrapper.find('textarea').simulate('change', { target: { value: ' ' } });
-    wrapper.find('button').simulate('click');
-    strictEqual(wrapper.find('Button').prop('disabled'), false);
   });
 
   test('handlePostComment clears the comment field', function () {

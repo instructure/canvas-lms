@@ -30,65 +30,55 @@ function isValid (comment) {
 }
 
 class SubmissionCommentForm extends React.Component {
-  state = { comment: '', textAreaWarning: false };
+  state = { comment: '' };
 
   handleCommentChange = (event) => {
-    const comment = event.target.value;
-    const wasInvalid = () => !isValid(this.state.comment);
-    const nowValid = () => isValid(comment);
-    // only change the warning to false if the comment was invalid and is now valid
-    const textAreaWarning = wasInvalid() && nowValid() ? false : this.state.textAreaWarning;
-    this.setState({ comment, textAreaWarning });
-  }
+    this.setState({ comment: event.target.value });
+  };
 
-  handlePostComment = event => {
+  handlePostComment = (event) => {
     event.preventDefault();
     this.props.setProcessing(true);
-    if (isValid(this.state.comment)) {
-      this.props.createSubmissionComment(this.state.comment)
-        .catch(() => this.props.setProcessing(false));
-      this.setState({ comment: '' })
-    } else {
-      this.setState({ textAreaWarning: true }, () => {
-        $.screenReaderFlashError(this.messages().map(message => message.text).join(', '));
-        this.props.setProcessing(false);
-      });
-    }
-  }
+    this.props.createSubmissionComment(this.state.comment)
+      .catch(() => this.props.setProcessing(false));
+    this.setState({ comment: '' }, () => {
+      this.textarea.focus();
+    });
+  };
 
-  messages () {
-    if (this.state.textAreaWarning) {
-      return [{ text: I18n.t('No message present'), type: 'error' }];
-    }
-    return [];
-  }
+  bindTextarea = (ref) => {
+    this.textarea = ref;
+  };
 
   render () {
     return (
       <div>
         <div>
           <TextArea
-            messages={this.messages()}
             label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
             placeholder={I18n.t("Leave a comment")}
             onChange={this.handleCommentChange}
             value={this.state.comment}
+            textareaRef={this.bindTextarea}
           />
         </div>
 
-        <div
-          style={{ textAlign: 'right', marginTop: '0rem', border: 'none', padding: '0rem', background: 'transparent' }}
-        >
-          <Button
-            disabled={this.props.processing}
-            label={<ScreenReaderContent>{I18n.t('Post Comment')}</ScreenReaderContent>}
-            margin="small 0"
-            onClick={this.handlePostComment}
-            variant="primary"
-          >
-            {I18n.t("Post")}
-          </Button>
-        </div>
+        {
+          isValid(this.state.comment) &&
+            <div
+              style={{ textAlign: 'right', marginTop: '0rem', border: 'none', padding: '0rem', background: 'transparent' }}
+            >
+              <Button
+                disabled={this.props.processing}
+                label={<ScreenReaderContent>{I18n.t('Post Comment')}</ScreenReaderContent>}
+                margin="small 0"
+                onClick={this.handlePostComment}
+                variant="primary"
+              >
+                {I18n.t("Post")}
+              </Button>
+            </div>
+        }
       </div>
     );
   }
