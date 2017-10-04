@@ -154,7 +154,6 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .ic-DashboardCard__action-badge {
   @include ic-badge-maker(18px, var(--ic-brand-primary), $ic-color-light);
-  box-shadow: 0 0 0 1px $ic-color-light;
   transition: all 0.2s;
   position: absolute;
   top: -0.5rem; right: -0.875rem;
