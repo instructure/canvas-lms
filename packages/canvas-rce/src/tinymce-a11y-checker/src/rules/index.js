@@ -5,6 +5,7 @@ const tableHeader = require("./table-header")
 const tableHeaderScope = require("./table-header-scope")
 const smallTextContrast = require("./small-text-contrast")
 const largeTextContrast = require("./large-text-contrast")
+const adjacentSameLinks = require("./adjacent-links")
 
 module.exports = [
   imgAlt,
@@ -13,5 +14,6 @@ module.exports = [
   tableHeader,
   tableHeaderScope,
   smallTextContrast,
-  largeTextContrast
+  largeTextContrast,
+  adjacentSameLinks
 ]
