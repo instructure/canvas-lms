@@ -301,9 +301,7 @@ export default class DashboardCard extends Component {
     var completed = progress.requirement_completed_count || 0;
     var currentProgress = ((completed / required) * 100) + "%";
     let grades = this.state.grades || {};
-    console.log("Grades", grades);
     var current_score = (!grades.computed_current_score) ?  "-" : grades.computed_current_score + "%";
-    console.log("Current Score", current_score);
     var current_grade = grades.computed_current_grade;
 
     const dashboardCard = (
