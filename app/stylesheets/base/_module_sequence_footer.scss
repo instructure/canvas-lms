@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$bar-height: 130px;
+$bar-height: 80px;
 
 .module-sequence-footer {
   position: relative;
@@ -88,9 +88,8 @@ $bar-height: 130px;
 ul.sm-module-footer__nav{
   display: flex;
   flex-direction: row;
-  padding: 0;
+  padding: 0 10px;
   margin: 0 auto;
-  margin-top: 10px;
   justify-content: center;
   flex: 1 0 auto;
 

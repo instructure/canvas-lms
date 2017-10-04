@@ -109,6 +109,7 @@ class WikiPagesController < ApplicationController
         set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
+        @distraction_free = true
       end
     end
   end

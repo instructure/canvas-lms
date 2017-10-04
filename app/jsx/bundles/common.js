@@ -92,13 +92,13 @@ function resetMenuItemTabIndexes () {
 $(resetMenuItemTabIndexes)
 $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
 $('body').on('click', '#distractionFreeToggle', () => {
-  // $('#header').toggleClass('hide')
   $('body').toggleClass('no-headers distraction-free')
-  // updateSubnavMenuToggle()
-  // $('#left-side').css({
-  //   display: $('body').hasClass('course-menu-expanded') ? 'block' : 'none'
-  // })
-
+  
+  if($('body').hasClass('no-headers distraction-free')){
+    window.localStorage.setItem("distraction_free", true)
+  }else{
+    window.localStorage.removeItem("distraction_free")
+  }
   resetMenuItemTabIndexes()
 })
 
@@ -145,4 +145,15 @@ $(document).ready(() => {
   if (mathml.isMathMLOnPage()) {
     mathml.loadMathJax('MML_HTMLorMML.js')
   }
+
+  let distractionFree = window.localStorage.getItem("distraction_free");
+  let toggleButton = $("#distractionFreeToggle").length === 0
+
+  if (distractionFree && !toggleButton){
+    $('body').toggleClass('no-headers distraction-free')
+  }
+  $('body').fadeIn(500)
+  
+
+
 })
