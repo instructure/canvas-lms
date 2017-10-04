@@ -39,7 +39,6 @@
     :wiki_page_menu => WikiPage
   }
 %>
-
 <li
   id="context_module_item_<%= module_item ? module_item.id : "blank" %>"
   style="<%= hidden unless module_item %>"
@@ -196,7 +195,7 @@
       </div>
     </div>
     <% if !editable %>
-      <div class="module-item-status-icon"></div> <%# going to set this in JS-land, not here %>
+      <div class="module-item-status-icon" style="display: none"></div> <%# going to set this in JS-land, not here %>
     <% end %>
     <% if editable || module_item.nil? %>
       <div class="ig-admin">

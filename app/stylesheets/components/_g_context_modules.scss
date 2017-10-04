@@ -66,8 +66,26 @@ $context_module_bg_color: #f2f3f4;
     align-items: center;
 
     .module-item-status-icon {
-      width: 16px;
-      padding-right: 10px;
+      width: 24px;
+      height: 24px;
+      padding: 5px;
+      background-color: $ic-brand-primary;
+      border-radius: 50%;
+      display: flex;
+      &.unstarted-icon {
+        background-color: white;
+        border-radius: 50%;
+        border: 3px solid $ic-brand-primary;
+        box-sizing: border-box;
+        height: 34px;
+        width: 34px;
+      }
+
+      i{
+        color: #FFF;
+        margin: auto;
+      }
+
 
       .icon-mark-as-read {
         opacity: 0.4;
