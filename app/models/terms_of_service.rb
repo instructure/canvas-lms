@@ -21,4 +21,27 @@ class TermsOfService < ActiveRecord::Base
   belongs_to :account
   belongs_to :terms_of_service_content
   validates :terms_type, :passive, presence: true
+
+  validate :validate_account_is_root
+
+  cattr_accessor :skip_automatic_terms_creation
+
+  def validate_account_is_root
+    if self.account_id_changed? && !self.account.root_account?
+      self.errors.add(:account, "must be root account")
+    end
+  end
+
+  def self.ensure_terms_for_account(account)
+    unless !self.table_exists? || self.skip_automatic_terms_creation || account.terms_of_service
+      account.shard.activate do
+        account.create_terms_of_service!(term_options_for_account(account))
+      end
+    end
+  end
+
+  DEFAULT_OPTIONS = {:terms_type => "default_url"}.freeze
+  def self.term_options_for_account(account)
+    DEFAULT_OPTIONS
+  end
 end
