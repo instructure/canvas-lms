@@ -519,6 +519,52 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
     end
 
+    context 'similarity detection tool associations' do
+      include_context "lti2_course_spec_helper"
+
+      before(:each) do
+        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { SecureRandom.uuid }
+        allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
+        tool_proxy.context = @course
+        tool_proxy.save!
+
+        assignment = @course.assignments.create! name: 'test assignment', submission_types: 'online_upload'
+        assignment.tool_settings_tool = message_handler
+        assignment.save!
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+      end
+
+      describe 'attributes' do
+        let(:assignment_xml_doc) do
+          run_export
+          assignment_xml_file = @manifest_doc.at_css("resource[href*='test-assignment.html'] file[href*='.xml']").attr('href')
+          Nokogiri::XML(@zip_file.read(assignment_xml_file))
+        end
+
+        let(:similarity_tool_el) do
+          assignment_xml_doc.elements.first.elements.find { |e| e.name == 'similarity_detection_tool' }
+        end
+
+        it 'exports the vendor code' do
+          expect(similarity_tool_el.attr('vendor_code')).to eq product_family.vendor_code
+        end
+
+        it 'exports the product code' do
+          expect(similarity_tool_el.attr('product_code')).to eq product_family.product_code
+        end
+
+        it 'exports the resource type code' do
+          expect(similarity_tool_el.attr('resource_type_code')).to eq resource_handler.resource_type_code
+        end
+
+        it 'exports the originality report visibility setting' do
+          expect(similarity_tool_el.attr('visibility')).to eq 'immediate'
+        end
+      end
+    end
+
     it "should export unpublished modules and items" do
       cm1 = @course.context_modules.create!(name: "published module")
       cm1.publish
