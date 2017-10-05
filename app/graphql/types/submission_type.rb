@@ -23,6 +23,18 @@ module Types
 
     field :submittedAt, TimeType, property: :submitted_at
     field :gradedAt, TimeType, property: :graded_at
+
+    field :submissionStatus, types.String, resolve: ->(submission, _, _) {
+      if submission.submission_type == "online_quiz"
+        Loaders::AssociationLoader.for(Submission, :quiz_submission).
+          load(submission).
+          then { submission.submission_status }
+      else
+        submission.submission_status
+      end
+    }
+
+    field :gradingStatus, types.String, property: :grading_status
   end
 
   class SubmissionHelper

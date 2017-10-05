@@ -2312,4 +2312,35 @@ class Submission < ActiveRecord::Base
     Rails.logger.info "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
     context.recompute_student_scores(user_ids)
   end
+
+  def submission_status
+    if resubmitted?
+      :resubmitted
+    elsif missing?
+      :missing
+    elsif late?
+      :late
+    elsif submitted? ||
+      (submission_type.present? && submission_type != 'online_quiz') ||
+      (submission_type == 'online_quiz' && quiz_submission.completed?)
+      :submitted
+    else
+      :unsubmitted
+    end
+  end
+
+  def grading_status
+    if excused?
+      :excused
+    elsif needs_review?
+      :needs_review
+    elsif needs_grading?
+      :needs_grading
+    elsif graded?
+      :graded
+    else
+      nil
+    end
+  end
+
 end

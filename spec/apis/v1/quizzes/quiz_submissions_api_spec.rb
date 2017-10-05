@@ -265,16 +265,16 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       expect(json).to have_key 'submissions'
     end
 
-    it 'includes submission mobile_teacher_state' do
+    it 'includes submission grading_status' do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ['submission', 'mobile_teacher_state'] })
-      expect(json.fetch('submissions')).to all have_key 'mobile_teacher_state'
+      json = qs_api_index(false, { include: ['submission', 'grading_status'] })
+      expect(json.fetch('submissions')).to all have_key 'grading_status'
     end
 
-    it 'includes submission mobile_student_label' do
+    it 'includes submission submission_status' do
       enroll_student_and_submit
-      json = qs_api_index(false, { include: ['submission', 'mobile_student_label'] })
-      expect(json.fetch('submissions')).to all have_key 'mobile_student_label'
+      json = qs_api_index(false, { include: ['submission', 'submission_status'] })
+      expect(json.fetch('submissions')).to all have_key 'submission_status'
     end
   end
 

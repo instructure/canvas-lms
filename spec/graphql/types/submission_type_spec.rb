@@ -62,4 +62,25 @@ describe Types::SubmissionType do
       end
     end
   end
+
+  describe "submission and grading status" do
+    before do
+      @quiz_assignment = @course.assignments.create! name: "asdf", points_possible: 10
+      @quiz_submission, _ = @quiz_assignment.grade_student(@student, score: 0, grader: @teacher)
+      @quiz_submission.update_attribute(:submission_type, "online_quiz")
+      @quiz_submission.quiz_submission = Quizzes::QuizSubmission.new(quiz_id: 1)
+    end
+
+    let(:submission_type_quiz) { GraphQLTypeTester.new(Types::SubmissionType, @quiz_submission) }
+
+    it "should contain submissionStatus and gradingStatus fields" do
+      expect(submission_type.submissionStatus).to eq :unsubmitted
+      expect(submission_type.gradingStatus).to eq :graded
+    end
+
+    it "should preload quiz type assignments" do 
+      expect(submission_type_quiz.submissionStatus).to eq :unsubmitted
+      expect(submission_type_quiz.gradingStatus).to eq :graded
+    end
+  end
 end
