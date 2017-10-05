@@ -10538,13 +10538,13 @@ is:
   number: 
     currency: 
       format: 
-        delimiter: ","
+        delimiter: "."
         format: "%u%n"
-        separator: "."
+        separator: ","
         unit: $
     format: 
-      delimiter: ","
-      separator: "."
+      delimiter: "."
+      separator: ","
     human: 
       decimal_units: 
         format: "%n %u"
