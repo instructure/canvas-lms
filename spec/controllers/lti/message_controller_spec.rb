@@ -519,6 +519,15 @@ module Lti
           expect(params['ext_lti_assignment_id']).to eq lti_assignment_id
         end
 
+        it 'uses the lti_assignment_id as the resource_link_id' do
+          lti_assignment_id = SecureRandom.uuid
+          jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
+          get 'basic_lti_launch_request', params: {account_id: account.id,
+                                                   message_handler_id: message_handler.id, secure_params: jwt}
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['resource_link_id']).to eq lti_assignment_id
+        end
+
         it 'does only adds non-required params if they are present in enabled_capability' do
           allow_any_instance_of(IMS::LTI::Models::ToolProxy).to receive(:enabled_capability) {{}}
 
