@@ -121,6 +121,10 @@
       </div>
     <% end %>
     <div id="main" class="ic-Layout-columns">
+      <% if @display_header_image %>
+      <div class="sm-course-header-image" style="background-image: url('<%= @context.image_url %>')">
+      <% end %>
+      
       <% if @show_left_side %>
         <div id="left-side"
           class="ic-app-course-menu sm-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
@@ -161,6 +165,11 @@
           <div class="sm-course-menu-clear"></div>
         </div>
       <% end %>
+
+      <% if @display_header_image %>
+      </div>
+      <% end %>
+      
       <div id="not_right_side" class="ic-app-main-content">
         <div id="content-wrapper" class="ic-Layout-contentWrapper">
             <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>

@@ -105,6 +105,14 @@ class ContextModulesController < ApplicationController
       log_asset_access([ "modules", @context ], "modules", "other")
       load_modules
 
+      if @context.image_url != ""
+        @display_header_image = true
+      else
+        @display_header_image = false
+      end
+      
+      
+
       set_tutorial_js_env
 
       if @is_student && tab_enabled?(@context.class::TAB_MODULES)

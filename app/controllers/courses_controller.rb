@@ -1663,7 +1663,6 @@ class CoursesController < ApplicationController
       check_for_readonly_enrollment_state
 
       log_asset_access([ "home", @context ], "home", "other")
-
       check_incomplete_registration
 
       add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
@@ -1691,7 +1690,14 @@ class CoursesController < ApplicationController
         js_env(:SHOW_ANNOUNCEMENTS => true, :ANNOUNCEMENT_COURSE_ID => @context.id, :ANNOUNCEMENT_LIMIT => @context.home_page_announcement_limit)
       end
 
+      if @context.image_url != ""
+        @display_header_image = true
+      else
+        @display_header_image = false
+      end
+
       @contexts = [@context]
+
       case @course_home_view
       when "wiki"
         @wiki = @context.wiki
