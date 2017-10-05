@@ -1308,6 +1308,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :sub_accounts) do
       post 'accounts/:account_id/sub_accounts', action: :create
+      delete 'accounts/:account_id/sub_accounts/:id', action: :destroy
     end
 
     scope(controller: :role_overrides) do

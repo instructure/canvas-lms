@@ -127,7 +127,9 @@ class Account < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
-  validates_presence_of :workflow_state
+  validates :workflow_state, presence: true
+  validate :no_active_courses, if: lambda { |a| a.workflow_state_changed? && !a.active? }
+  validate :no_active_sub_accounts, if: lambda { |a| a.workflow_state_changed? && !a.active? }
 
   include StickySisFields
   are_sis_sticky :name
@@ -1105,6 +1107,20 @@ class Account < ActiveRecord::Base
       self.auth_discovery_url = value
     rescue URI::Error, ArgumentError
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
+    end
+  end
+
+  def no_active_courses
+    return true if root_account?
+    if associated_courses.not_deleted.exists?
+      errors.add(:workflow_state, "Can't delete an account with active courses.")
+    end
+  end
+
+  def no_active_sub_accounts
+    return true if root_account?
+    if sub_accounts.exists?
+      errors.add(:workflow_state, "Can't delete an account with active sub_accounts.")
     end
   end
 

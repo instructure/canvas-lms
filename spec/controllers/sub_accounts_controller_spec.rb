@@ -178,5 +178,13 @@ describe SubAccountsController do
       expect(response.status).to eq(409)
       expect(@sub_account.reload).not_to be_deleted
     end
+
+    it "should not delete a sub-account that contains a sub-account" do
+      @sub_sub_account = @sub_account.sub_accounts.create!
+      user_session(@user)
+      delete 'destroy', params: {account_id: @root_account, id: @sub_account}
+      expect(response.status).to eq(409)
+      expect(@sub_account.reload).not_to be_deleted
+    end
   end
 end

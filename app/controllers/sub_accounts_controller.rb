@@ -150,13 +150,24 @@ class SubAccountsController < ApplicationController
     end
   end
 
+  # @API Delete a sub-account
+  # Cannot delete an account with active courses or active sub_accounts.
+  # Cannot delete a root_account
+  #
+  # @returns Account
   def destroy
     @sub_account = subaccount_or_self(params[:id])
     if @sub_account.associated_courses.not_deleted.exists?
-      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: 409
+      return render json: {message: I18n.t("You can't delete a sub-account that has courses in it.")}, status: 409
+    end
+    if @sub_account.sub_accounts.exists?
+      return render json: {message: I18n.t("You can't delete a sub-account that has sub-accounts in it.")}, status: 409
+    end
+    if @sub_account.root_account?
+      return render json: {message: I18n.t("You can't delete a root_account.")}, status: 401
     end
     @sub_account.destroy
-    render :json => @sub_account
+    render json: account_json(@sub_account, @current_user, session, [])
   end
 
   protected
