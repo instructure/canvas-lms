@@ -9734,8 +9734,8 @@ nb:
           verify: Bekreft
         details: 
           mfa_enrollment: |-
-              Multifaktorautentisering øker sikkerheten ved å kreve at du har noe i din fysiske besittelse, i tillegg til å vite passordet for å logge deg på lerretet. Dette kan være en enhet som kan generere bekreftelseskoder eller en telefon som kan motta tekstmeldinger. Google autentiseringsappen for [iPhone](%{iphone_url}) eller
-              [Android](%{android_url}) kan konfigureres ved å skanne QR-koden nedenfor. Andre tegn kan konfigureres ved å legge inn den hemmelige nøkkelen **%{secret_key}**. Når du har konfigurert multifaktorautentisering er det anbefalt at du går til profilsiden og skriver ut et sett med reservekoder, i tilfelle din vanlige multifaktorenhet er utilgjengelig.
+              Multi-faktor autentisering øker sikkerheten ved å kreve at du har noe i fysisk besittelse,
+              samtidig som du kan passordet ditt, for å logge inn på Canvas. Dette kan være en enhet som kan generere bekreftelsekoder, eller en telefon som kan motta tekstmeldinger. Google Autentiserings-appen for [iPhone](%{iphone_url}) eller [Android](%{android_url}) kan bli konfigurert ved å skanne QR-koden under. Andre symboler kan bli konfigurert ved å skrive inn det hemmelige tegnet **%{secret_key}**. Når du har konfigurert multi-faktor autentisering, anbefales det at du går til din profil-side og printer ut ett sett av back-up koder, i tilfelle din multi-faktor enhet er utilgjengelig.
           mfa_required: "Du må sette opp flerfaktors autentisering"
           otp_on_device: "Skriv inn bekretelseskoden som vises av symbolet ditt."
           otp_sent_to_phone: "En bekreftelseskode har blitt sendt til telefonen din. Skriv den inn her."
