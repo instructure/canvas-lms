@@ -88,12 +88,12 @@ export default class NestedMoveItemTray extends React.Component {
 
     if(e.target.value === "bottom") {
       currentMoveList.push(this.props.currentItem.id);
-      this.props.onMoveTraySubmit(currentMoveList, this.state.currentGroup);
+      this.props.onMoveTraySubmit({ movedItems: currentMoveList, itemID: e.target.value, groupID: this.state.currentGroup});
     } else {
       const index = currentMoveList.indexOf(e.target.value);
       if(index === -1) return;
       currentMoveList.splice(index, 0, this.props.currentItem.id);
-      this.props.onMoveTraySubmit(currentMoveList, this.state.currentGroup)
+      this.props.onMoveTraySubmit({ movedItems: currentMoveList, itemID: e.target.value, groupID: this.state.currentGroup})
     }
   };
 

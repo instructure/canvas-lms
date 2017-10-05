@@ -341,25 +341,27 @@ import 'compiled/jquery.rails_flash_notifications'
       hideMoveModule: function (remove) {
         $('#move_context_module_form:visible').dialog('close');
       },
-      submitMoveModuleItem: function () {
-        var beforeOrAfterVal = $('[name="item_move_location"]:checked').val();
-        var $currentItem = $('#move_module_item_form').data('current_item');
-        var relativeToId = $('#move_module_item_select').val();
-        var selectedModuleId = $('#move_module_item_module_select').val();
+      submitMoveModuleItem(responseData, options) {
+        const $currentItem = $('#move_module_item_form').data('current_item');
+        const relativeToID = options.itemID;
+        const selectedModuleID = options.groupID;
 
-        if (beforeOrAfterVal === 'before') {
-          $('#context_module_item_' + relativeToId).before($currentItem);
+        if (relativeToID === 'bottom') {
+          $(`#context_module_content_${selectedModuleID} .context_module_items`).append($currentItem);
+        } else {
+          $(`#context_module_item_${relativeToID}`).before($currentItem);
         }
-        if (beforeOrAfterVal === 'after') {
-          $('#context_module_item_' + relativeToId).after($currentItem);
-        }
-        if ($('#move_module_item_select').children().length === 0) {
-          // In this case, we are moving it into a currently empty module.
-          $('#context_module_content_' + selectedModuleId + ' .context_module_items').append($currentItem);
+        const $currentModule = $(`#context_module_${selectedModuleID}`)
+
+        if(responseData && responseData.context_module && responseData.context_module.content_tags) {
+          responseData.context_module.content_tags.forEach((tag) => {
+            $currentModule.find(`#context_module_item_${tag.id}`).fillTemplateData({
+              data: {position: tag.position}
+            });
+          })
         }
 
-        modules.hideMoveModuleItem();
-        modules.updateModuleItemPositions(null, {item: $currentItem});
+        $currentModule.find(".context_module_items.ui-sortable").sortable('enable');
       },
       submitMoveModule (movedItemsIDList, { action, relativeID }) {
         const currentModule = $('#move_context_module_form').data('current_module');
@@ -1305,8 +1307,47 @@ import 'compiled/jquery.rails_flash_notifications'
 
     $('.move_module_item_link').on('click keyclick', function (event) {
       event.preventDefault();
-      var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
-      modules.showMoveModuleItem($(this).parents(".context_module_item"), $cogLink);
+      const $currentSelectedItem = $(this).parents(".context_module_item")
+      const $currentModule = $currentSelectedItem.closest(".context_module");
+      const reorderUrl = $currentModule.find(".reorder_items_url").attr('href').substring(0, 11);
+      const $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
+
+      const currentItem = {
+        attributes: {
+          id:  $currentSelectedItem.attr('id').substring('context_module_item_'.length),
+          name: $currentSelectedItem.find(".title").attr('title')
+        }
+      }
+
+      const moveModuleItemsCollection = {
+        models: []
+      }
+      $("#context_modules .context_module").each(function() {
+        const id = $(this).attr('id').substring('context_module_'.length);
+        const name = $(this).children('.header').find('.collapse_module_link .name').text();
+        // Get all the modules
+        const moduleSelectOptions = [];
+        $(this).find(".context_module_items .context_module_item").each(function() {
+          const itemID = $(this).attr('id').substring('context_module_item_'.length)
+          if(itemID !== currentItem.attributes.id) {
+            moduleSelectOptions.push({ attributes: {
+              id: itemID,
+              name: $(this).find(".title").attr('title')
+            }});
+          }
+        });
+        moveModuleItemsCollection.models.push({ groupId: id, name: htmlEscape(name), children: moduleSelectOptions });
+      });
+
+      const $form = $('#move_module_item_form');
+      $form.data('current_module', $currentModule);
+      $form.data('current_item', $currentSelectedItem);
+
+      // Set the name of the item being moved.
+      const moveDialog = new NewMoveDialogView({ movePanelParent: document.getElementById("not_right_side"), parentTitleLabel: I18n.t("Module Groups"), model: currentItem,
+        modalTitle: I18n.t("Move Modules Group"), modules: true, saveURL: reorderUrl, onSuccessfulMove: modules.submitMoveModuleItem, parentCollection: moveModuleItemsCollection,
+        closeTarget: $cogLink, nested: true});
+        moveDialog.renderOpenMoveDialog();
     });
 
     $('#move_module_item_form').on('submit', function (event) {

@@ -256,7 +256,8 @@ test('correctly for calls item with first spot', () => {
       value : '18'
     }
   })
-  ok(spy.calledWith(['10', '18', '12', '15'], '42'));
+  deepEqual(spy.args[0][0].movedItems, ['10', '18', '12', '15'])
+  deepEqual(spy.args[0][0].groupID, '42')
 })
 
 test('correctly for calls item with bottom spot', () => {
@@ -311,7 +312,8 @@ test('correctly for calls item with bottom spot', () => {
       value : 'bottom'
     }
   })
-  ok(spy.calledWith(['18', '12', '15', '10'], '42'));
+  deepEqual(spy.args[0][0].movedItems, ['18', '12', '15', '10'])
+  deepEqual(spy.args[0][0].groupID, '42')
 })
 
 test('correctly for calls item with last spot', () => {
@@ -366,7 +368,8 @@ test('correctly for calls item with last spot', () => {
       value : '15'
     }
   })
-  ok(spy.calledWith(['18', '12', '10', '15'], '42'));
+  deepEqual(spy.args[0][0].movedItems, ['18', '12', '10', '15'])
+  deepEqual(spy.args[0][0].groupID, '42')
 })
 
 test('correctly for calls item with middle spot', () => {
@@ -421,7 +424,8 @@ test('correctly for calls item with middle spot', () => {
       value : '12'
     }
   })
-  ok(spy.calledWith(['18', '10', '12', '15'], '42'));
+  deepEqual(spy.args[0][0].movedItems, ['18', '10', '12', '15'])
+  deepEqual(spy.args[0][0].groupID, '42')
 })
 
 
@@ -489,5 +493,6 @@ test('correctly for calls item with first group', () => {
       value : '55'
     }
   })
-  ok(spy.calledWith(['18', '10', '55', '54'], '34'));
+  deepEqual(spy.args[0][0].movedItems, ['18', '10', '55', '54'])
+  deepEqual(spy.args[0][0].groupID, '34')
 })

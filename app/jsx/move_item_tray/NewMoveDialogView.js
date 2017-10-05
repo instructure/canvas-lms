@@ -55,12 +55,20 @@ export default class NewMoveDialogView {
     }
 
     if(this.nested) {
-      const parentGroups = this.parentCollection.models.map((item) => {
-        return {groupId: item.id, name: item.attributes.name || item.attributes.title,
-          children: item.get(this.childKey).models.filter(child => child.id !== this.model.attributes.id)}
-      });
-      renderNestedMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemNestedTray, closeFunction:
-        this.moveTrayClose, trayTitle: this.modalTitle, parentGroups, parentTitleLabel: this.parentTitleLabel, childKey: this.childKey } );
+      let parentGroups = this.parentCollection.models;
+      if (!this.modules) {
+        parentGroups = this.parentCollection.models.map((item) => {
+          return {groupId: item.id, name: item.attributes.name || item.attributes.title,
+            children: item.get(this.childKey).models.filter(child => child.id !== this.model.attributes.id)}
+        });
+        renderNestedMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemNestedTray, closeFunction:
+          this.moveTrayClose, trayTitle: this.modalTitle, parentGroups, parentTitleLabel: this.parentTitleLabel,
+          childKey: this.childKey } );
+      } else {
+        renderNestedMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemModulesNestedTray, closeFunction:
+          this.moveTrayClose, trayTitle: this.modalTitle, parentGroups, parentTitleLabel: this.parentTitleLabel,
+          childKey: this.childKey } );
+      }
     } else if(this.modules) {
       renderMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveModuleGroupsTray,
         closeFunction: this.moveTrayClose, trayTitle: this.modalTitle });
@@ -79,12 +87,20 @@ export default class NewMoveDialogView {
     }).catch(showFlashError(I18n.t('Failed to Move Items')))
   }
 
-  onMoveItemNestedTray = (movedItems, groupId) => {
+  onMoveItemNestedTray = ({ movedItems, groupID } ) => {
     // this.saveURL can apparently be a function
-    axios.post(`${this.saveURL}/${groupId}/reorder`, {
+    axios.post(`${this.saveURL}/${groupID}/reorder`, {
       order: movedItems.join(',')}
     ).then((response) => {
-      this.onSuccessfulMove(response.data.order, groupId);
+      this.onSuccessfulMove(response.data.order, groupID);
+    }).catch(showFlashError(I18n.t('Failed to Move Items')))
+  }
+
+  onMoveItemModulesNestedTray = ({ movedItems, itemID, groupID }) => {
+    axios.post(`${this.saveURL}/modules/${groupID}/reorder`, {
+      order: movedItems.join(',')}
+    ).then((response) => {
+      this.onSuccessfulMove(response.data, { groupID, itemID});
     }).catch(showFlashError(I18n.t('Failed to Move Items')))
   }
 
