@@ -111,6 +111,13 @@ module Importers
         end
       end
 
+      if migration.context.is_a?(Course)
+        imported_aq_ids = question_data[:aq_data].values.map{|aq| aq['assessment_question_id']}.compact
+        imported_aq_ids.each_slice(100) do |sliced_aq_ids|
+          migration.context.quiz_questions.generated.where(:assessment_question_id => sliced_aq_ids).update_all(:assessment_question_version => nil)
+        end
+      end
+
       question_data
     end
 
