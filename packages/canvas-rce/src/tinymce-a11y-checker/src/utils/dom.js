@@ -84,7 +84,7 @@ function pathForNode(ancestor, decendant) {
 function nodeByPath(ancestor, path) {
   let node = ancestor
   let index
-  while ((index = path.pop())) {
+  while ((index = path.pop()) !== undefined) {
     node = node.childNodes[index]
     if (node == null) {
       return null
