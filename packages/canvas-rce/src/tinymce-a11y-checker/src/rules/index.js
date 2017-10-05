@@ -8,6 +8,7 @@ const largeTextContrast = require("./large-text-contrast")
 const adjacentSameLinks = require("./adjacent-links")
 const headingsSequence = require("./headings-sequence")
 const imageAltLength = require("./img-alt-length")
+const paragraphsForHeadings = require("./paragraphs-for-headings")
 
 module.exports = [
   imgAlt,
@@ -19,5 +20,6 @@ module.exports = [
   largeTextContrast,
   adjacentSameLinks,
   headingsSequence,
-  imageAltLength
+  imageAltLength,
+  paragraphsForHeadings
 ]
