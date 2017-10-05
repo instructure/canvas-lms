@@ -5,10 +5,12 @@ const { promisify } = require("util")
 
 jest.mock("../../rules/index")
 
-let component, instance, node, child
+let component, instance, node, child, body
 
 beforeEach(() => {
+  body = document.createElement("body")
   node = document.createElement("div")
+  body.appendChild(node)
   child = node.appendChild(document.createElement("div"))
   node.appendChild(document.createElement("div"))
   component = shallow(<Checker getBody={() => node} />)
@@ -71,7 +73,9 @@ describe("formStateValid", () => {
 
   beforeEach(async () => {
     formState = { a: 1 }
-    updatedNode = "updated node"
+    updatedNode = document.createElement("p")
+    updatedNode.appendChild(document.createTextNode("updated node"))
+    body.appendChild(updatedNode)
     await promisify(instance.check.bind(instance))()
     component.update()
     rule = instance.state.errors[0].rule
@@ -88,8 +92,11 @@ describe("formStateValid", () => {
   test("calls update with a new clone of the error node", () => {
     instance.formStateValid(formState)
     const firstTempNode = instance._tempNode
+    let secondTempNode
+    rule.update.mockImplementation((elem, data) => {
+      secondTempNode = elem
+    })
     instance.formStateValid(formState)
-    const secondTempNode = instance._tempNode
     expect(firstTempNode).not.toBe(secondTempNode)
   })
 
