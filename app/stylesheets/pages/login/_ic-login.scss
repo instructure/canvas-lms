@@ -371,3 +371,13 @@ body.body--login-confirmation {
   vertical-align: middle;
   margin-right: $ic-sp;
 }
+
+.sm-end-user-license-agreement{
+  background-color: #FFF;
+  margin: 35px 0;
+  padding: 10px;
+  border: 1px solid $sm-gray-1;
+  max-height: 200px;
+  overflow: auto;
+  box-shadow: inset 0px 2px 2px rgba(0, 0, 0, .2);
+}

@@ -819,11 +819,7 @@ module ApplicationHelper
   def agree_to_terms
     # may be overridden by a plugin
     @agree_to_terms ||
-    t("I agree to the *terms of use* and **privacy policy**.",
-      wrapper: {
-        '*' => link_to('\1', terms_of_use_url, target: '_blank'),
-        '**' => link_to('\1', privacy_policy_url, target: '_blank')
-      }
+    t("I agree to the end user license agreement.",
     )
   end
 
