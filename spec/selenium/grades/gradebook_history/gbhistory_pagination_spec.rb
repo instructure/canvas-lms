@@ -16,62 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../pages/gradebook_history_page'
-require_relative '../setup/gradebook_setup'
+require_relative '../setup/gb_history_search_setup'
 
 describe "Gradebook History Page" do
   include_context "in-process server selenium tests"
-  include GradebookSetup
+  include GradebookHistorySetup
   include CustomScreenActions
 
-
   before(:once) do
-    # init_course_with_students(3)
-    now = Time.zone.now
-
-    # create course with teacher and student
-    course_factory(active_all: true)
-    student_in_course
-
-
-    # create 1 assignments due in the past,
-    # and 2 in future
-    @assignment_past_due_day = @course.assignments.create!(
-      title: 'assignment one',
-      grading_type: 'points',
-      points_possible: 100,
-      due_at: 1.day.ago(now),
-      submission_types: 'online_text_entry'
-    )
-
-    @assignment_due_one_day = @course.assignments.create!(
-      title: 'assignment two',
-      grading_type: 'points',
-      points_possible: 100,
-      due_at: 1.day.from_now(now),
-      submission_types: 'online_text_entry'
-    )
-
-    @assignment_due_one_week = @course.assignments.create!(
-      title: 'assignment three',
-      grading_type: 'points',
-      points_possible: 10,
-      due_at: 1.week.from_now(now),
-      submission_types: 'online_text_entry'
-    )
-
-    # as a student submit all assignments
-    Timecop.freeze(now) do
-      @assignment_past_due_day.submit_homework(@student, body: 'submitting my homework')
-      @assignment_due_one_day.submit_homework(@student, body: 'submitting my homework')
-      @assignment_due_one_week.submit_homework(@student, body: 'submitting my homework')
-    end
-
-    # as a teacher grade the assignments
-    50.times do
-      @assignment_past_due_day.grade_student(@student, grade: String(Random.rand(1...100)), grader: @teacher)
-      @assignment_due_one_day.grade_student(@student, grade: String(Random.rand(1...100)), grader: @teacher)
-      @assignment_due_one_week.grade_student(@student, grade: String(Random.rand(1...10)), grader: @teacher)
-    end
+    gb_history_setup(50)
   end
 
   before(:each) do
@@ -83,7 +36,7 @@ describe "Gradebook History Page" do
     GradeBookHistory.click_filter_button
     initial_row_count=GradeBookHistory.fetch_results_table_row_count
     scroll_page_to_bottom
-    # wait_for_ajaximations fails, adding sleep temporarily, will refactor in future
+    # different waits failed adding sleep temporarily, will refactor in future
     sleep 1 # sorry :'(
     final_row_count=GradeBookHistory.fetch_results_table_row_count
     paginated_rows_displayed=final_row_count-initial_row_count
