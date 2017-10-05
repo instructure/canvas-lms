@@ -1,4 +1,5 @@
 const imgAlt = require("./img-alt")
+const imgAltFilename = require("./img-alt-filename")
 const tableCaption = require("./table-caption")
 const tableHeader = require("./table-header")
 const tableHeaderScope = require("./table-header-scope")
@@ -7,6 +8,7 @@ const largeTextContrast = require("./large-text-contrast")
 
 module.exports = [
   imgAlt,
+  imgAltFilename,
   tableCaption,
   tableHeader,
   tableHeaderScope,

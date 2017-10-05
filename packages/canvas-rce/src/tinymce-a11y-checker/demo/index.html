@@ -1,19 +1,28 @@
 <!doctype html>
 <html>
-  <head>
-    <title>TinyMCE Accessibility Plugin Demo</title>
-    <style>
-    body {width: 900px; margin: 2em auto; background-color: #eee;} 
-    .mce-i-a11y:before { content: "\e900"; }
-    </style>
-  </head>
-  <body>
-    <div class="main">
-      <h1>TinyMCE Accessibility Plugin Demo</h1>
-      <div id="editor1">
-        <textarea id="textarea1">
+
+<head>
+  <title>TinyMCE Accessibility Plugin Demo</title>
+  <style>
+    body {
+      width: 900px;
+      margin: 2em auto;
+      background-color: #eee;
+    }
+
+    .mce-i-a11y:before {
+      content: "\e900";
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main">
+    <h1>TinyMCE Accessibility Plugin Demo</h1>
+    <div id="editor1">
+      <textarea id="textarea1">
           <h1>Test Document</h1>
-          <img src="http://lorempixel.com/output/animals-q-c-640-480-6.jpg" width=300px alt=""/>
+          <img src="http://lorempixel.com/output/animals-q-c-640-480-6.jpg" width="300" alt=""/>
           <table width="100%">
             <tr>
               <td>A</td>
@@ -26,15 +35,16 @@
               <td>3</td>
             </tr>
           </table>
+          <img src="http://lorempixel.com/output/animals-q-c-640-480-3.jpg" alt="animals-q-c-640-480-3.jpg" width="300" />
           <p style="color: #ccc">
             Fusce id ligula rhoncus, consequat augue aliquam, sagittis ligula.
             Morbi euismod rutrum dignissim. Ut sed elementum mi. Pellentesque
             condimentum nisl non eros pretium, ut pharetra urna sodales.
           </p>
         </textarea>
-      </div>
     </div>
-    <script src="demo.bundle.js"></script>
-  </body>
-</html>
+  </div>
+  <script src="demo.bundle.js"></script>
+</body>
 
+</html>
