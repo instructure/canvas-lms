@@ -4116,8 +4116,8 @@ describe 'Submissions API', type: :request do
         end
       end
 
-      describe 'mobile_student_label' do
-        let(:field) { 'mobile_student_label' }
+      describe 'submission_status' do
+        let(:field) { 'submission_status' }
 
         it "does not include label" do
           json = api_call_as_user(teacher, :get, path, params)
@@ -4144,8 +4144,8 @@ describe 'Submissions API', type: :request do
         end
       end
 
-      describe 'mobile_teacher_state' do
-        let(:field) { 'mobile_teacher_state' }
+      describe 'grading_status' do
+        let(:field) { 'grading_status' }
 
         it "does not include action" do
           json = api_call_as_user(teacher, :get, path, params)
