@@ -186,6 +186,10 @@ class Checker extends React.Component {
       return false
     }
     node = rule.update(node, formState)
+    if (this._tempNode === this._tempTestNode) {
+      this._tempNode = node
+    }
+    this._tempTestNode = node
     return rule.test(node)
   }
 
@@ -203,23 +207,28 @@ class Checker extends React.Component {
     }
   }
 
+  newTempRootNode(rootNode) {
+    const newTempRootNode = rootNode.cloneNode(true)
+    const path = dom.pathForNode(rootNode, this.errorNode())
+    this._tempTestNode = dom.nodeByPath(newTempRootNode, path)
+    return newTempRootNode
+  }
+
   tempNode(refresh = false) {
     if (!this._tempNode || refresh) {
-      const node = this.errorRootNode()
-      if (node) {
-        const newTempNode = node.cloneNode(true)
-        const path = dom.pathForNode(node, this.errorNode())
-        this._tempTestNode = dom.nodeByPath(newTempNode, path)
+      const rootNode = this.errorRootNode()
+      if (rootNode) {
+        const newTempRtNode = this.newTempRootNode(rootNode)
         if (refresh && this._tempNode) {
           const parent = this._tempNode.parentNode
-          parent.insertBefore(newTempNode, this._tempNode)
+          parent.insertBefore(newTempRtNode, this._tempNode)
           parent.removeChild(this._tempNode)
         } else {
-          const parent = node.parentNode
-          parent.insertBefore(newTempNode, node)
-          parent.removeChild(node)
+          const parent = rootNode.parentNode
+          parent.insertBefore(newTempRtNode, rootNode)
+          parent.removeChild(rootNode)
         }
-        this._tempNode = newTempNode
+        this._tempNode = newTempRtNode
       }
     }
     return this._tempTestNode
