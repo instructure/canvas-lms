@@ -545,9 +545,8 @@ END
       display_name: -> { I18n.t("GraphQL API") },
       description: -> { I18n.t("EXPERIMENTAL GraphQL API.") },
       applies_to: "RootAccount",
-      state: "hidden",
+      state: "hidden_in_prod",
       beta: true,
-      development: true,
     },
     'rubric_criterion_range' =>
     {
