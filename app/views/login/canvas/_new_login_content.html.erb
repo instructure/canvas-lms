@@ -31,17 +31,12 @@
     <div class="ic-Login__content">
       <div class="ic-Login__innerContent">
 
+      <a href="https://www.strongmind.com">
         <div class="ic-Login-header">
           <%= render :partial => 'login/shared/header_logo' %>
-          <div class="ic-Login-header__links">
-            <%= render "login/canvas/login_banner" %>
-            <% if @domain_root_account.feature_enabled?(:course_catalog) %>
-              <a href="/search/all_courses" class="ic-Login__link">
-                <%= t('browse_courses', 'Browse courses') %>
-              </a>
-            <% end %>
-          </div>
         </div>
+      </a>
+      <h3 style="text-align: center;">Courseware</h3>
 
         <div class="ic-Login__body">
           <%= form_for :pseudonym_session, :url => url_for({ action: :create }.merge(params.slice(:id).to_unsafe_h)), :html => {:id => "login_form"} do |f| %>
@@ -52,29 +47,41 @@
             <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>
             <input type="hidden" name="redirect_to_ssl" value="1"/>
             <div class="ic-Form-control ic-Form-control--login">
-              <%= f.label :unique_id, login_handle_name, :class => "ic-Label" %>
-              <%= f.text_field :unique_id, :class => "ic-Input text", :value => params[:pseudonym_session].try(:[], :unique_id), :autofocus => !params[:previewing_from_themeeditor] %>
+              <input
+                class="ic-Input sm-Input--login"
+                autocomplete="off"
+                autocorrect="off"
+                placeholder="<%= t :email, "Email" %>"
+                type="<%= @login_handle_is_email ? 'email' : 'text' %>"
+                name="pseudonym_session[unique_id]"
+                value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" >
             </div>
             <div class="ic-Form-control ic-Form-control--login">
-              <%= f.label :password, :en => "Password", :class => "ic-Label" %>
-              <%= f.password_field :password, :class => "ic-Input text" %>
+              <input
+                class="ic-Input sm-Input--login"
+                type="password"
+                name="pseudonym_session[password]"
+                autocomplete="off"
+                autocorrect="off"
+                placeholder="<%= t :password, "Password" %>" />
+            </div>
+            <div class="ic-Login__actions-timeout">
+              <% unless session_timeout_enabled? %>
+                  <%= f.check_box :remember_me, :checked => session[:used_remember_me_token] %>
+                  <%= f.label :remember_me, :en => "Remember me" %>
+              <% end %>
             </div>
             <div class="ic-Login__actions">
-              <div class="ic-Login__actions-timeout">
-                <% unless session_timeout_enabled? %>
-                    <%= f.check_box :remember_me, :checked => session[:used_remember_me_token] %>
-                    <%= f.label :remember_me, :en => "Stay signed in" %>
-                <% end %>
+              <div class="ic-Form-control ic-Form-control--login">
+                <button type="<%= login_btn_type %>" class="Button Button--login">
+                  <%= t('log_in', 'Log in') %>
+                </button>
+              </div>
+
 
                 <div class="ic-Login__forgot">
                   <%= render "login/canvas/forgot_password_link" %>
                 </div>
-              </div>
-              <div class="ic-Form-control ic-Form-control--login">
-                <button type="<%= login_btn_type %>" class="Button Button--login">
-                  <%= t('log_in', 'Log In') %>
-                </button>
-              </div>
             </div> <!-- ic-Login__actions -->
             <%= render partial: "sso_buttons", locals: { aacs: @aacs_with_buttons } %>
           <% end %>
@@ -83,18 +90,17 @@
               <%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => login_handle_name) %>
             </p>
             <div class="ic-Form-control ic-Form-control--login">
-              <label for="pseudonym_session_unique_id_forgot" class="ic-Label">
-                <%= login_handle_name %>
-              </label>
-              <input aria-describedby="forgot_password_instructions" class="ic-Input email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" />
+              <input aria-describedby="forgot_password_instructions" class="ic-Input sm-Input--login email_address text" type="text" placeholder= "<%= login_handle_name %>" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" />
 
             </div>
             <div class="ic-Form-control ic-Form-control--login">
               <div class="ic-Login__actions">
-                <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "ic-Login__actions--left ic-Login__link login_link"%>
                 <button type="<%= forgot_password_btn_type %>" class="Button Button--login">
-                  <%= t('buttons.request_password', 'Request Password') %>
+                  <%= t('buttons.request_password', 'Request password') %>
                 </button>
+                <div class="ic-Login__forgot">
+                <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "ic-Login__actions--left ic-Login__link login_link"%>
+              </div>
               </div> <!-- end ic-Login__actions -->
             </div>
           <% end %>
@@ -102,9 +108,6 @@
       </div> <!-- end ic-Login__innerContent  -->
       <footer role="contentinfo" id="footer" class="ic-Login-footer">
 
-        <a href="https://strongmind.com" class="ic-Login-footer__logo-link">
-          <%= render "login/canvas/instructure_logo.svg" %>
-        </a>
 
         <div id="footer-links" class="ic-Login-footer__links">
           <a href="https://github.com/strongmind/canvas-lms">

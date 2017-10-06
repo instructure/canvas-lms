@@ -43,7 +43,7 @@
 // ic-brand-Login-footer-link-color-hover
 // ic-brand-Login-instructure-logo
 
-$ic-Login-border-radius: 5px;
+$ic-Login-border-radius: 4px;
 $modal_box_width: 623px;
 $modal_box_padding: 20px;
 $ic-Login-confirmation-bgd: $ic-brand-white;
@@ -56,7 +56,7 @@ $ic-Login-confirmation-bgd: $ic-brand-white;
 }
 
 body.ic-Login-Body { // apply the background to the body element so that you don't see white bg as you scroll
-  background-color: var(--ic-brand-Login-body-bgd-color);
+  background-color: var(--ic-brand-primary);
   background-image:
     linear-gradient(transparent, transparent 80%, var(--ic-brand-Login-body-bgd-shadow-color)),
     var(--ic-brand-Login-body-bgd-image); // if there is a custom image
@@ -70,10 +70,10 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   color: $ic-color-light;
 }
 .ic-Login__container {
-  margin-top: $ic-sp*2;
+  margin-top: $ic-sp*5;
 }
 .ic-Login__content {
-  width: 400px;
+  width: 280px;
   margin: 0 auto;
   background: var(--ic-brand-Login-Content-bgd-color);
   border: 5px solid var(--ic-brand-Login-Content-border-color);
@@ -98,16 +98,16 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__body {
   background: var(--ic-brand-Login-Content-inner-body-bgd);
   border: 2px solid var(--ic-brand-Login-Content-inner-body-border);
-  padding: $ic-sp*1.5 $ic-sp*1.5 $ic-sp $ic-sp*1.5;
-  margin-top: $ic-sp;
+  padding: $ic-sp*1.5 $ic-sp $ic-sp $ic-sp;
+  margin-top: $ic-sp*2;
 }
 // these have !important because Canvas specificity on labels and
 // links will override these if we don't
 .ic-Form-control--login .ic-Label {
-  color: var(--ic-brand-Login-Content-label-text-color) !important;
+  color: var(--ic-brand-white) !important;
 }
 .ic-Login__link {
-  color: var(--ic-brand-Login-Content-password-text-color) !important;
+  color: var(--ic-brand-white) !important;
   text-decoration: underline;
 }
 .ic-Login__body__error {
@@ -129,7 +129,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 }
 
 .ic-Login-header__logo {
-  flex: 0 0 160px;
+  flex: 0 0 400px;
   // Fix Firefox bug where flexed container doesn't
   // constrain its contents
   min-width: 1px;
@@ -153,22 +153,22 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   }
 }
 
+.sm-Input--login{
+  height: 46px !important;
+
+}
+
 .ic-Login__actions {
-  display: flex;
-  align-items: center;
   .ic-Login__actions-timeout {
-    flex: 1;
+    margin-top: $ic-sp;
     label {
-      color: var(--ic-brand-Login-Content-label-text-color);
+      color: var(--ic-brand-white);
     }
   }
   .ic-Login__actions--right {
-    flex: 1;
-    display: flex;
     justify-content: flex-end;
   }
   .ic-Login__actions--left {
-    flex: 1;
     text-align: left;
   }
   .ic-Form-control {
@@ -176,8 +176,10 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   }
   // simulating a ghost button to work for default high contrast login screen
   .Button--login {
-    padding: $ic-sp/2 $ic-sp*3;
-    background: transparent;
+    width: 100%;
+    margin: $ic-sp 0 $ic-sp 0;
+    padding: $ic-sp $ic-sp*3;
+    background-color: var(--ic-brand-secondary);
     color: var(--ic-brand-Login-Content-password-text-color);
     border: 1px solid var(--ic-brand-Login-Content-password-text-color);
     overflow: visible;
@@ -220,12 +222,18 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 //////////
 // Forgot Password
 //////////
+.ic-Login__forgot{
+  text-align: center;
+  margin-top: $ic-sp;
+}
+
 .ic-Login__forgot-text {
-  color: var(--ic-brand-Login-Content-password-text-color);
+  color: var(--ic-brand-white);
   @include fontSize($ic-font-size--small);
   padding: 0 0 $ic-sp*2 0;
   margin: 0;
   line-height: $ic-sp*2;
+  text-align: center;
 }
 //////////
 // Enrollment Links
@@ -259,8 +267,12 @@ body.ic-Login-Body #footer.ic-Login-footer {
   // hide icon that gets added thru jquery
   span.ui-icon.ui-icon-extlink.ui-icon-inline {display: none;}
   .ic-Login-footer__links {
-    padding: $ic-sp;
+    padding: $ic-sp*3;
     text-align: center;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
     a, .menu-item__text {
       color: var(--ic-brand-Login-footer-link-color);
       @include fontSize(11px);
@@ -269,7 +281,7 @@ body.ic-Login-Body #footer.ic-Login-footer {
       text-decoration: underline;
       &:hover {
         background-color: none;
-        color: var(--ic-brand-Login-footer-link-color-hover);
+        color: var(--ic-brand-button--secondary-bgd-darkened-15);
       }
     }
   }

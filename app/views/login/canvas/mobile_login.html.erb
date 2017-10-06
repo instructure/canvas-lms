@@ -17,15 +17,32 @@
 %>
 
   <div class="mobileLogin-Header">
+
     <span class="screenreader-only">
       <%= t 'Canvas by Instructure' %>
     </span>
+    <a href="https://www.strongmind.com">
+      <div class="ic-Login-header">
+        <%= render :partial => 'login/shared/header_logo' %>
+        <div class="ic-Login-header__links">
+          <!-- <%= render "login/canvas/login_banner" %>
+          <% if @domain_root_account.feature_enabled?(:course_catalog) %>
+            <a href="/search/all_courses" class="ic-Login__link">
+              <%= t('browse_courses', 'Browse courses') %>
+            </a>
+          <% end %> -->
+        </div>
+      </div>
+    </a>
+    <div class="mobile_courseware">
+    <h3>Courseware</h3>
+  </div>
   </div>
 <%= form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate', :autocomplete => "off" } do |f| %>
 
   <div class="ic-Form-control">
     <input
-      class="ic-Input"
+      class="sm-form"
       autocomplete="off"
       autocorrect="off"
       placeholder="<%= @login_handle_name%>"
@@ -35,7 +52,7 @@
   </div>
   <div class="ic-Form-control">
     <input
-      class="ic-Input"
+      class="sm-form"
       type="password"
       name="pseudonym_session[password]"
       autocomplete="off"
@@ -44,7 +61,7 @@
   </div>
   <button
     type="submit"
-    class="Button Button--primary Button--block"><%= t('log_in', 'Log In') %>
+    class="Button Button--primary Button--block sm-button"><%= t('log_in', 'Log in') %>
   </button>
 
   <% if request.post? && flash[:error] %>
@@ -63,7 +80,7 @@
   <div class="ic-Form-control">
     <label for="pseudonym_session_unique_id_forgot" class="screenreader-only"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
     <input
-      class="ic-Input"
+      class="sm-form"
       autocomplete="off"
       autocorrect="off"
       type="<%= @login_handle_is_email ? 'email' : 'text' %>"
@@ -74,8 +91,8 @@
   </div>
   <button
     type="submit"
-    class="Button Button--primary Button--block"
-    data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %>
+    class="Button Button--primary Button--block sm-button"
+    data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request password') %>
   </button>
   <div class="forgotBlock">
     <a class="flip-to-front"><%= t('back_to_login', "Back to Login") %></a>

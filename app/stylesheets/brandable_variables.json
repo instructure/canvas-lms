@@ -175,7 +175,7 @@
     "variable_name": "ic-brand-Login-logo",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg, image/svg",
-    "default": "/images/login/canvas-logo.svg"
+    "default": "/images/login/strongmind_logo.svg"
   },
   {
     "variable_name": "ic-brand-Login-Content-bgd-color",
