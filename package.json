@@ -30,7 +30,7 @@
     "babel-register": "^6.9.0",
     "backbone": "1.1.1",
     "canvas-planner": "1.0.7",
-    "canvas-rce": "2.2.2",
+    "canvas-rce": "2.2.3",
     "classnames": "^2.2.5",
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.12.7",
