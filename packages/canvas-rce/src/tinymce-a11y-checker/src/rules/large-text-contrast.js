@@ -18,11 +18,13 @@ module.exports = {
 
   message: () =>
     formatMessage(
-      "Text 18pt (14pt if bold) or larger should have a minimum contrast ratio of 3:1."
+      "Text larger than 18pt (or bold 14pt) should display a minimum contrast ratio of 3:1."
     ),
 
-  why: () => formatMessage(`Paragraph about why color contrast is important.`),
+  why: () =>
+    formatMessage(
+      "Text is difficult to read without suffcient contrast between the text and the background, especially for those with low vision."
+    ),
 
-  link:
-    "https://www.w3.org/TR/UNDERSTANDING-WCAG20/visual-audio-contrast-contrast.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/G17.html"
 }

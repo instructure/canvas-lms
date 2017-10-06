@@ -29,7 +29,7 @@ module.exports = {
 
   form: () => [
     {
-      label: formatMessage("Change Heading tag to P"),
+      label: formatMessage("Change Heading tag to Paragraph"),
       checkbox: true,
       dataKey: "change"
     }
@@ -44,11 +44,11 @@ module.exports = {
   },
 
   message: () =>
-    formatMessage("Heading tags should not be used for paragraphs"),
+    formatMessage("Headings should not contain more than 120 characters."),
 
   why: () =>
     formatMessage(
-      "paragraph on why headings tags should not be used for paragraphs"
+      "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should be concise within the proper structure."
     ),
 
   link: ""

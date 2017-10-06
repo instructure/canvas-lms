@@ -60,9 +60,12 @@ module.exports = {
     return elem
   },
 
-  message: () => formatMessage("Tables should have at least one header"),
+  message: () => formatMessage("Tables should include at least one header."),
 
-  why: () => formatMessage(`Paragraph about why table headers are important.`),
+  why: () =>
+    formatMessage(
+      "Screen readers cannot interpret tables without the proper structure. Table headers provide direction and overview of the content."
+    ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/G95.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H43.html"
 }

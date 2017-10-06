@@ -39,10 +39,12 @@ module.exports = {
     return elem
   },
 
-  message: () => formatMessage("Tables headers should have scope specified"),
+  message: () => formatMessage("Tables headers should specify scope."),
 
   why: () =>
-    formatMessage(`Paragraph about why table header scope is important.`),
+    formatMessage(
+      "Screen readers cannot interpret tables without the proper structure. Table headers provide direction and content scope."
+    ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/G95.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H63.html"
 }
