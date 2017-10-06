@@ -28,13 +28,44 @@
 }
 html, body {
   height: 100%;
-  background: $ic-color-light;
+  background-color: $ic-brand-primary;
   margin: 0;
   padding: 0;
   color: $ic-font-color-dark;
   font-weight: normal;
   @include fontSize(16px);
   font-family: $ic-font-family !important;
+}
+
+.sm-button{
+    background-color: $ic-brand-secondary;
+    width: 100%;
+    margin: $ic-sp 0 $ic-sp 0;
+    padding: $ic-sp $ic-sp*3;
+    background-color: $ic-brand-secondary;
+    color: $ic-brand-Login-Content-password-text-color;
+    border: 1px solid $ic-brand-Login-Content-password-text-color;
+    overflow: visible;
+}
+
+.sm-form{
+  height: 46px;
+  border-radius: 4px;
+  width: 100%;
+    display: block;
+    box-shadow: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease-out;
+    border-width: 1px;
+    border-style: solid;
+    outline-color: transparent;
+    outline-offset: -12px;
+    background: #FFFFFF;
+    padding: 8px 12px;
+    -webkit-appearance: none;
+    border-color: #d8e0e6;
+    outline-style: solid;
+    outline-width: $ic-sp;
 }
 
 #f1_container {
@@ -44,20 +75,25 @@ html, body {
 }
 
 #f1_card {
-  width: 296px;
+  width: 280px;
   height: 100%;
 }
 
 .mobileLogin-Header {
   z-index: 1;
-  background-image: url("/images/login/canvas-logo.svg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 156px 108px;
-  min-height: 156px;
+  margin-top: $ic-sp*5;
 }
 .face {
-  margin-top: 15px;
+  margin-top: $ic-sp*3;
+  padding: 0 $ic-sp 0 $ic-sp;
+}
+.mobile_courseware{
+  color: $ic-brand-white;
+  text-align: center;
+  margin-top: $ic-sp*-1
 }
 
 .face.back {
@@ -80,7 +116,7 @@ p {
   margin: 0;
 }
 .forgotBlock {
-  color: $ic-brand-primary;
+  color: $ic-brand-white;
   margin: $ic-sp*2 auto 0;
   text-align: center;
 }
