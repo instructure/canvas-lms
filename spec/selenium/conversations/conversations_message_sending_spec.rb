@@ -127,11 +127,20 @@ describe "conversations new" do
     it "should allow admins to message users from their profiles", priority: "2", test_id: 201940 do
       user = account_admin_user
       user_logged_in({:user => user})
+
+      # TODO: delete these lines when we remove the :course_user_search feature flag
       get "/accounts/#{Account.default.id}/users"
       wait_for_ajaximations
       f('li.user a').click
       wait_for_ajaximations
       f('.icon-email').click
+      wait_for_ajaximations
+      expect(f('.ac-token')).not_to be_nil
+      Account.default.enable_feature!(:course_user_search)
+
+      get "/accounts/#{Account.default.id}/users"
+      wait_for_ajaximations
+      f('.users-list [role=row] .Button .icon-message').click
       wait_for_ajaximations
       expect(f('.ac-token')).not_to be_nil
     end

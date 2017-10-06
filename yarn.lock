@@ -4777,10 +4777,6 @@ js-base64@^2.1.8, js-base64@^2.1.9, js-base64@~2.1.8:
   version "2.1.9"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.1.9.tgz#f0e80ae039a4bd654b5f281fc93f04a914a7fcce"
 
-js-stylesheet@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/js-stylesheet/-/js-stylesheet-0.0.1.tgz#12cc1451220e454184b46de3b098c0d154762c38"
-
 js-tokens@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-1.0.1.tgz#cc435a5c8b94ad15acb7983140fc80182c89aeae"
@@ -7051,13 +7047,6 @@ react-redux@^5.0.3:
 "react-select-box@https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f":
   version "2.0.1"
   resolved "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f"
-
-react-tabs@0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/react-tabs/-/react-tabs-0.8.2.tgz#7928e822361b61eb7f53164daf86ad7ee98ef539"
-  dependencies:
-    classnames "^2.2.0"
-    js-stylesheet "^0.0.1"
 
 react-tinymce@0.6.0:
   version "0.6.0"

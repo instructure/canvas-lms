@@ -34,33 +34,47 @@ describe "new account user search" do
     ff('.users-list div[role=row]')
   end
 
-  def click_tab
-    ff(".react-tabs > ul li").detect{|tab| tab.text.include?("People")}.click
-    wait_for_ajaximations
+  it "should be able to toggle between 'People' and 'Courses' tabs" do
+    user_with_pseudonym(:account => @account, :name => "Test User")
+    course_factory(:account => @account, :course_name => "Test Course")
+
+    get "/accounts/#{@account.id}"
+    2.times do
+      expect(f("#breadcrumbs")).not_to include_text("People")
+      expect(f("#breadcrumbs")).to include_text("Courses")
+      expect(f('.courses-list')).to include_text("Test Course")
+
+      f('#section-tabs .users').click
+      expect(driver.current_url).to include("/accounts/#{@account.id}/users")
+      expect(f("#breadcrumbs")).to include_text("People")
+      expect(f("#breadcrumbs")).not_to include_text("Courses")
+      expect(f('.users-list')).to include_text("Test User")
+
+      f('#section-tabs .courses').click
+    end
+
   end
+
+
 
   it "should not show the people tab without permission" do
     @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
 
     get "/accounts/#{@account.id}"
 
-    expect(f(".react-tabs > ul")).to_not include_text("People")
+    expect(f("#left-side #section-tabs")).not_to include_text("People")
   end
 
   it "should not show the create users button for non-root acocunts" do
     sub_account = Account.create!(:name => "sub", :parent_account => @account)
 
-    get "/accounts/#{sub_account.id}"
-
-    click_tab
+    get "/accounts/#{sub_account.id}/users"
 
     expect(f("#content")).not_to contain_css('button.add_user')
   end
 
   it "should be able to create users" do
-    get "/accounts/#{@account.id}"
-
-    click_tab
+    get "/accounts/#{@account.id}/users"
 
     f('button.add_user').click
 
@@ -94,8 +108,7 @@ describe "new account user search" do
       user_with_pseudonym(:account => @account, :name => "Test User #{x + 1}")
     end
 
-    get "/accounts/#{@account.id}"
-    click_tab
+    get "/accounts/#{@account.id}/users"
 
     expect(get_rows.count).to eq 10
 
@@ -110,8 +123,7 @@ describe "new account user search" do
     match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
     user_with_pseudonym(:account => @account, :name => "diffrient user")
 
-    get "/accounts/#{@account.id}"
-    click_tab
+    get "/accounts/#{@account.id}/users"
 
     f('.user_search_bar input[type=search]').send_keys('search')
 
@@ -125,8 +137,7 @@ describe "new account user search" do
     match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
     user_with_pseudonym(:account => @account, :name => "diffrient user")
 
-    get "/accounts/#{@account.id}"
-    click_tab
+    get "/accounts/#{@account.id}/users"
 
     f('#peopleOptionsBtn').click
     f('#manageStudentsLink').click
@@ -138,8 +149,7 @@ describe "new account user search" do
     match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
     user_with_pseudonym(:account => @account, :name => "diffrient user")
 
-    get "/accounts/#{@account.id}"
-    click_tab
+    get "/accounts/#{@account.id}/users"
 
     f('#peopleOptionsBtn').click
     f('#viewUserGroupLink').click

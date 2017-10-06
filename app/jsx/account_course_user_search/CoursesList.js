@@ -150,7 +150,7 @@ class CoursesList extends React.Component {
         </div>
 
         <div className="courses-list" role="rowgroup">
-          {courses.map((course) => {
+          {(courses || []).map((course) => {
             const urlsForCourse = {
               USER_LISTS_URL: $.replaceTags(this.props.addUserUrls.USER_LISTS_URL, 'id', course.id),
               ENROLL_USERS_URL: $.replaceTags(this.props.addUserUrls.ENROLL_USERS_URL, 'id', course.id)

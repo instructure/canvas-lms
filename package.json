@@ -46,7 +46,6 @@
     "react-modal": "1.6.5",
     "react-redux": "4.4.5",
     "react-select-box": "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
-    "react-tabs": "0.8.2",
     "react-tokeninput": "2.4.0",
     "react-tray": "2.0.4",
     "redux": "^3.5.2",

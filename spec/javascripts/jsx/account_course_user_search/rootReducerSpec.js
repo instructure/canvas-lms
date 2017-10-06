@@ -327,7 +327,7 @@ define(['jsx/account_course_user_search/reducers/rootReducer'], (reducer) => {
     const action = {
       type: 'SELECT_TAB',
       payload: {
-        tabIndex: 1
+        selected: 1
       }
     };
 

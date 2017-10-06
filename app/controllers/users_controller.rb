@@ -390,6 +390,11 @@ class UsersController < ApplicationController
   # @returns [User]
   def index
     get_context
+    if !api_request? && @context.feature_enabled?(:course_user_search)
+      @account ||= @context
+      return course_user_search
+    end
+
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account
       @query = (params[:user] && params[:user][:name]) || params[:term]

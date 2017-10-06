@@ -2279,4 +2279,57 @@ class ApplicationController < ActionController::Base
   def teardown_live_events_context
     LiveEvents.clear_context!
   end
+
+  # TODO: this belongs in AccountsController but while :course_user_search is still behind a feature flag we
+  # have to let UsersController::index own the /accounts/x/users route so it responds as it used to if the
+  # feature isn't enabled but `return course_user_search` if the feature is enabled. you can't `return` an
+  # action from another controller but you can from a controller you inherit from. Hence why this can be
+  # here in ApplicationController but not AccountsController for now. Once we remove the feature flag,
+  # we should move this back to AccountsController and just change conf/routes.rb to let
+  # AccountsController::users own /accounts/x/users instead UsersController::index
+  def course_user_search
+    return unless authorized_action(@account, @current_user, :read)
+    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
+    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
+    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
+
+    unless can_read_course_list || can_read_roster
+      return render_unauthorized_action
+    end
+
+    def localized_timezones(zones)
+      zones.map { |tz| {name: tz.name, localized_name: tz.to_s} }
+    end
+
+    js_env({
+      TIMEZONES: {
+        priority_zones: localized_timezones(I18nTimeZone.us_zones),
+        timezones: localized_timezones(I18nTimeZone.all)
+      },
+      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user),
+      URLS: {
+        USER_LISTS_URL: course_user_lists_url("{{ id }}"),
+        ENROLL_USERS_URL: course_enroll_users_url("{{ id }}", :format => :json)
+      }
+    })
+    js_bundle :account_course_user_search
+    css_bundle :account_course_user_search
+    @page_title = @account.name
+    add_crumb '', '?' # the text for this will be set by javascript
+    js_env({
+      ACCOUNT_ID: @account.id,
+      PERMISSIONS: {
+        can_read_course_list: can_read_course_list,
+        can_read_roster: can_read_roster,
+        can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+        can_create_users: @account.root_account? && @account.grants_right?(@current_user, session, :manage_user_logins),
+        analytics: @account.service_enabled?(:analytics),
+        can_masquerade: @account.grants_right?(@current_user, session, :become_user),
+        can_message_users: @account.grants_right?(@current_user, session, :send_messages),
+        can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins)
+      }
+    })
+    render html: '', layout: true
+  end
+
 end

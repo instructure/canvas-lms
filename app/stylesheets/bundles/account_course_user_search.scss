@@ -41,36 +41,6 @@
   margin: 0;
 }
 
-.react-tabs ul[role=tablist] {
-  padding-left: 10px;
-  margin-bottom: 20px;
-  border-color: $ic-border-light;
-
-  li[role=tab] {
-    font-size: 1.1em;
-    color: var(--ic-link-color);
-    padding: 0;
-
-    a {
-        padding: 10px 25px;
-        display: block;
-        color: inherit;
-    }
-
-    &[selected] {
-      font-weight: bold;
-      border-color: $ic-border-light;
-
-      a:link,
-      a:visited,
-      a:hover {
-        text-decoration: none;
-        color: $ic-font-color-dark;
-      }
-    }
-  }
-}
-
 .button-group {
   margin-right: 10px;
   &:last-of-type {

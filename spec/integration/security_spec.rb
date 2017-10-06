@@ -636,7 +636,6 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/settings"
         expect(response).to be_success
-        expect(response.body).not_to match /Find A User/
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_success
@@ -649,7 +648,6 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/settings"
         expect(response).to be_success
-        expect(response.body).to match /Find A User/
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_success
@@ -660,13 +658,9 @@ describe "security" do
         add_permission :view_statistics
 
         course_factory
-        get "/accounts/#{Account.default.id}"
-        expect(response).to be_redirect
 
         get "/accounts/#{Account.default.id}/settings"
         expect(response).to be_success
-        expect(response.body).not_to match /Course Filtering/
-        expect(response.body).not_to match /Find a Course/
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_success
@@ -678,8 +672,6 @@ describe "security" do
         get "/accounts/#{Account.default.id}"
         expect(response).to be_success
         expect(response.body).to match /Courses/
-        expect(response.body).to match /Course Filtering/
-        expect(response.body).to match /Find a Course/
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_success

@@ -195,43 +195,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  def course_user_search
-    return unless authorized_action(@account, @current_user, :read)
-    can_read_course_list = !@account.site_admin? && @account.grants_right?(@current_user, session, :read_course_list)
-    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
-    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
-
-    unless can_read_course_list || can_read_roster
-      return render_unauthorized_action
-    end
-
-    @permissions = {
-      theme_editor: can_manage_account && @account.branding_allowed?,
-      can_read_course_list: can_read_course_list,
-      can_read_roster: can_read_roster,
-      can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
-      can_create_users: @account.root_account? && @account.grants_right?(@current_user, session, :manage_user_logins),
-      analytics: @account.service_enabled?(:analytics),
-      can_masquerade: @account.grants_right?(@current_user, session, :become_user),
-      can_message_users: @account.grants_right?(@current_user, session, :send_messages),
-      can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins)
-    }
-
-    js_env({
-      TIMEZONES: {
-        priority_zones: localized_timezones(I18nTimeZone.us_zones),
-        timezones: localized_timezones(I18nTimeZone.all)
-      },
-      BASE_PATH: request.env['PATH_INFO'].sub(/\/search.*/, '') + '/search',
-      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user),
-      URLS: {
-        USER_LISTS_URL: course_user_lists_url("{{ id }}"),
-        ENROLL_USERS_URL: course_enroll_users_url("{{ id }}", :format => :json)
-      }
-    })
-    render template: "accounts/course_user_search"
-  end
-
   # @API Get the sub-accounts of an account
   #
   # List accounts that are sub-accounts of the given account.
@@ -1168,16 +1131,6 @@ class AccountsController < ApplicationController
   def rich_content_service_config
     rce_js_env(:basic)
   end
-
-  def localized_timezones(timezones)
-    timezones.map do |timezone|
-      {
-        name: timezone.name,
-        localized_name: timezone.to_s
-      }
-    end
-  end
-  private :localized_timezones
 
   private
 

@@ -38,8 +38,7 @@ describe "new account course search" do
     @account.role_overrides.create! :role => admin_role, :permission => 'read_course_list', :enabled => false
 
     get "/accounts/#{@account.id}"
-
-    expect(f(".react-tabs > ul")).to_not include_text("Courses")
+    expect(f("#left-side #section-tabs")).not_to include_text("Courses")
   end
 
   it "should hide courses without enrollments if checked" do
