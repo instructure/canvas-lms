@@ -342,6 +342,7 @@ by `asset_type` and `asset_id`.
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
 | `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
+| `group_id` | The submissions’s group ID if the assignment is a group assignment. |
 
 
 #### `submission_updated`
@@ -361,6 +362,7 @@ by `asset_type` and `asset_id`.
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
 | `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
+| `group_id` | The submissions’s group ID if the assignment is a group assignment. |
 
 
 #### `plagiarism_resubmit`
@@ -380,6 +382,7 @@ by `asset_type` and `asset_id`.
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
 | `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
+| `group_id` | The submissions’s group ID if the assignment is a group assignment. |
 
 #### `user_created`
 
