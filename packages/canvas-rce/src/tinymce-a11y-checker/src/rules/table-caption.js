@@ -36,10 +36,13 @@ module.exports = {
 
   message: () =>
     formatMessage(
-      "Tables should have a caption describing the contents of the table"
+      "Tables should include a caption describing the contents of the table."
     ),
 
-  why: () => formatMessage(`Paragraph about why table captions are important.`),
+  why: () =>
+    formatMessage(
+      "Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table."
+    ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/G95.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H39.html"
 }

@@ -24,7 +24,7 @@ module.exports = {
 
   form: () => [
     {
-      label: formatMessage("Combine anchor tags"),
+      label: formatMessage("Merge links"),
       checkbox: true,
       dataKey: "combine"
     }
@@ -45,12 +45,12 @@ module.exports = {
   },
 
   message: () =>
-    formatMessage(
-      "Adjacent links that link to the same place should be one link"
-    ),
+    formatMessage("Adjacent links with the same URL should be a single link."),
 
   why: () =>
-    formatMessage("Paragraph about why adjacent-same links are not desired"),
+    formatMessage(
+      "Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users."
+    ),
 
   link: "https://www.w3.org/TR/WCAG20-TECHS/H2.html"
 }

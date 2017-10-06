@@ -160,13 +160,12 @@ module.exports = {
     }
   },
 
-  message: () =>
-    formatMessage("Heading should have a prior heading one size bigger"),
+  message: () => formatMessage("Heading levels should not be skipped."),
 
   why: () =>
     formatMessage(
-      `Paragraph about why heading hierarchy sequences are important.`
+      "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."
     ),
 
-  link: "http://accessiblehtmlheadings.com/"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/G141.html"
 }
