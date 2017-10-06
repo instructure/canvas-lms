@@ -1,4 +1,4 @@
-const dom = require("../dom")
+import * as dom from "../dom"
 
 test("walk calls function with each child element depth first", () => {
   document.body.innerHTML = `

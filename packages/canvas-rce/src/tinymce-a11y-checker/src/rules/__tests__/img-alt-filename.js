@@ -1,4 +1,4 @@
-const rule = require("../img-alt-filename")
+import rule from "../img-alt-filename"
 
 let el
 

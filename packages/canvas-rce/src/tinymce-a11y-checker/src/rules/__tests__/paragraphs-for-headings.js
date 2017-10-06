@@ -1,4 +1,4 @@
-const rule = require("../paragraphs-for-headings")
+import rule from "../paragraphs-for-headings"
 
 let el
 

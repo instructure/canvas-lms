@@ -1,5 +1,5 @@
-const formatMessage = require("../format-message")
-const dom = require("../utils/dom")
+import formatMessage from "format-message"
+import { changeTag } from "../utils/dom"
 
 /* Headings Sequence rule
  * this rule is ensuring that heading tags (H1-H6) are layed out in sequential
@@ -106,7 +106,7 @@ const getValidHeadings = elem => {
   return ret
 }
 
-module.exports = {
+export default {
   test: elem => {
     const testTags = {
       H2: true,
@@ -152,10 +152,10 @@ module.exports = {
       case "elem": {
         const priorH = getPriorHeading(elem)
         const hIdx = priorH ? +priorH.tagName.substring(1) : 0
-        return dom.changeTag(elem, `H${hIdx + 1}`)
+        return changeTag(elem, `H${hIdx + 1}`)
       }
       case "modify": {
-        return dom.changeTag(elem, "div")
+        return changeTag(elem, "div")
       }
     }
   },

@@ -1,4 +1,4 @@
-module.exports = [
+export default [
   {
     test: jest.fn().mockReturnValue(false),
     data: jest.fn().mockReturnValue({

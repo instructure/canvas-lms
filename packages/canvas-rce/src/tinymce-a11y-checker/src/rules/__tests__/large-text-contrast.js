@@ -1,4 +1,4 @@
-const rule = require("../large-text-contrast")
+import rule from "../large-text-contrast"
 
 let el
 

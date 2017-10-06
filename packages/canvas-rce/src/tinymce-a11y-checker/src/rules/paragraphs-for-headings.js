@@ -1,5 +1,5 @@
-const formatMessage = require("../format-message")
-const dom = require("../utils/dom")
+import formatMessage from "format-message"
+import { changeTag } from "../utils/dom"
 
 const MAX_HEADING_LENGTH = 125
 const IS_HEADING = {
@@ -11,7 +11,7 @@ const IS_HEADING = {
   H6: true
 }
 
-module.exports = {
+export default {
   "max-heading-length": MAX_HEADING_LENGTH,
 
   test: elem => {
@@ -38,7 +38,7 @@ module.exports = {
   update: (elem, data) => {
     let ret = elem
     if (data.change) {
-      ret = dom.changeTag(elem, "p")
+      ret = changeTag(elem, "p")
     }
     return ret
   },

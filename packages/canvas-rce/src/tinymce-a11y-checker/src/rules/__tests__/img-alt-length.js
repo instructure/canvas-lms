@@ -1,4 +1,4 @@
-const rule = require("../img-alt-length")
+import rule from "../img-alt-length"
 
 let el
 

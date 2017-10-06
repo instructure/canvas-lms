@@ -1,5 +1,4 @@
-const formatMessage = require("../format-message")
-const dom = require("../utils/dom")
+import formatMessage from "format-message"
 
 const shouldMergeAnchors = (elem1, elem2) => {
   if (!elem1 || !elem2 || elem1.tagName !== "A" || elem2.tagName !== "A") {
@@ -8,7 +7,7 @@ const shouldMergeAnchors = (elem1, elem2) => {
   return elem1.getAttribute("href") === elem2.getAttribute("href")
 }
 
-module.exports = {
+export default {
   test: function(elem) {
     if (elem.tagName != "A") {
       return true

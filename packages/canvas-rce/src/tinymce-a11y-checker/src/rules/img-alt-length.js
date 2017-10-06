@@ -1,8 +1,8 @@
-const formatMessage = require("../format-message")
+import formatMessage from "format-message"
 
 const MAX_ALT_LENGTH = 120
 
-module.exports = {
+export default {
   "max-alt-length": MAX_ALT_LENGTH,
 
   test: elem => {

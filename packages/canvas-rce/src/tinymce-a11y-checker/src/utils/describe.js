@@ -1,9 +1,9 @@
-const formatMessage = require("../format-message")
-const strings = require("./strings")
+import formatMessage from "format-message"
+import * as strings from "./strings"
 
 const WORD_COUNT = 4
 
-module.exports = function describe(elem) {
+export default function describe(elem) {
   switch (elem.tagName) {
     case "IMG":
       return formatMessage("Image with filename {file}", {

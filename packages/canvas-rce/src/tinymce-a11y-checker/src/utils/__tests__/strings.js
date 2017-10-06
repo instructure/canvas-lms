@@ -1,4 +1,4 @@
-const strings = require("../strings")
+import * as strings from "../strings"
 
 describe("firstWords", () => {
   test("returns first words with an elipsis if longer", () => {

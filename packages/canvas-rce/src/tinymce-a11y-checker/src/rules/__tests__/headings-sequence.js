@@ -1,4 +1,4 @@
-const rule = require("../headings-sequence")
+import rule from "../headings-sequence"
 
 let h2
 let body

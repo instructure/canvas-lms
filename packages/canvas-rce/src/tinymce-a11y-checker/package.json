@@ -1,57 +1,55 @@
 {
-  "name": "tinymce-a11y",
+  "name": "tinymce-a11y-checker",
   "version": "1.0.0",
   "description": "An accessibility checker plugin for TinyMCE.",
-  "main": "index.js",
+  "main": "lib/en/plugin.js",
+  "module": "lib/en/modules/plugin.js",
   "scripts": {
-    "test": "jest",
-    "test-watch": "jest -w",
+    "test": "jest src",
+    "test-watch": "jest --watch src",
     "dev": "webpack-dev-server --open",
     "extract": "format-message extract \"src/**/*.js\" > locales/en.json",
     "fmt": "prettier --no-semi --write \"src/**/*.js\"",
-    "fmt-check": "prettier --no-semi -l \"src/**/*.js\""
+    "fmt-check": "prettier --no-semi -l \"src/**/*.js\"",
+    "build": "scripts/build",
+    "prepublish": "npm test && npm run build"
   },
-  "keywords": [
-    "tinymce",
-    "accessibility",
-    "plugin",
-    "a11y"
-  ],
+  "keywords": ["tinymce", "accessibility", "plugin", "a11y"],
   "author": "Brent Burgoyne",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.25.0",
+    "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1",
     "canvas-rce": "^2.2.1",
     "enzyme": "^3.0.0",
     "enzyme-adapter-react-15": "^1.0.0",
     "enzyme-to-json": "^3.0.1",
+    "format-message": "^5.2.0",
     "format-message-cli": "^5.2.0",
-    "jest": "^20.0.4",
+    "jest": "^21.2.1",
     "prettier": "^1.7.3",
+    "quiz-presets": "^2.0.0",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
     "react-test-renderer": "^15.6.2",
+    "regenerator-runtime": "^0.11.0",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.6.1"
   },
   "dependencies": {
-    "format-message": "^5.2.0",
-    "instructure-icons": "^4.2.0",
-    "instructure-ui": "^2.5.1",
-    "react": "^15.6.1",
+    "instructure-icons": "3 || 4",
+    "instructure-ui": "^2.1.0 || 3",
+    "react": "^0.14.8 || ^15.0.0",
     "react-aria-live": "^1.0.4",
     "react-color": "^2.13.4",
-    "react-dom": "^15.6.1",
+    "react-dom": "^0.14.8 || ^15.0.0",
     "wcag-element-contrast": "^1.0.1"
   },
   "jest": {
-    "setupFiles": [
-      "./jest-setup.js"
-    ],
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/enzyme-to-json/serializer"
-    ]
+    "setupFiles": ["./jest-setup.js"],
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"]
   }
 }

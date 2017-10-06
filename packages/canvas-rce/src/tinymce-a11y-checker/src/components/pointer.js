@@ -1,6 +1,10 @@
-const React = require("react")
+import React from "react"
 
-class Pointer extends React.PureComponent {
+export default class Pointer extends React.PureComponent {
+  static get displayName() {
+    return "Pointer"
+  }
+
   render() {
     const styles = {
       width: "10px",
@@ -15,5 +19,3 @@ class Pointer extends React.PureComponent {
     return <div style={styles} />
   }
 }
-
-module.exports = Pointer

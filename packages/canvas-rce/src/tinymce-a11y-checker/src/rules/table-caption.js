@@ -1,7 +1,7 @@
-const formatMessage = require("../format-message")
-const dom = require("../utils/dom")
+import formatMessage from "format-message"
+import { prepend } from "../utils/dom"
 
-module.exports = {
+export default {
   test: elem => {
     if (elem.tagName !== "TABLE") {
       return true
@@ -28,7 +28,7 @@ module.exports = {
     let caption = elem.querySelector("caption")
     if (!caption) {
       caption = elem.ownerDocument.createElement("caption")
-      dom.prepend(elem, caption)
+      prepend(elem, caption)
     }
     caption.textContent = data.caption
     return elem

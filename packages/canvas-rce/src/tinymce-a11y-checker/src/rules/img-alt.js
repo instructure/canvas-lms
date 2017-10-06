@@ -1,6 +1,6 @@
-const formatMessage = require("../format-message")
+import formatMessage from "format-message"
 
-module.exports = {
+export default {
   test: elem => {
     if (elem.tagName !== "IMG") {
       return true
