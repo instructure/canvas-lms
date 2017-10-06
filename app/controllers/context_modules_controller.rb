@@ -105,12 +105,22 @@ class ContextModulesController < ApplicationController
       log_asset_access([ "modules", @context ], "modules", "other")
       load_modules
 
-      if @context.image_url != ""
+      def image
+        if @context.image_id.present?
+          @context.shard.activate do
+            @context.attachments.active.where(id: @context.image_id).first.download_url rescue nil
+          end
+        elsif @context.image_url
+          @context.image_url
+        end
+      end
+
+      @image = image
+      if @image != ""
         @display_header_image = true
       else
         @display_header_image = false
       end
-      
       
 
       set_tutorial_js_env
