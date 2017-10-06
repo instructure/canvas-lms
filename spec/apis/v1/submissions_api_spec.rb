@@ -3587,6 +3587,26 @@ describe 'Submissions API', type: :request do
     )
   end
 
+  it "includes canvadoc_document_id when specified" do
+    allow(Canvadocs).to receive(:config).and_return({a: 1})
+
+    course_with_teacher_logged_in active_all: true
+    student_in_course active_all: true
+    @user = @teacher
+    a = @course.assignments.create!
+    a.submit_homework(@student, submission_type: 'online_upload',
+                      attachments: [canvadocable_attachment_model(context: @student)])
+    canvadoc_params = { :attachment_id => a.submissions[0].attachments[0].id, :document_id => 'testing_doc_id' }
+    a.submissions[0].attachments[0].canvadoc = Canvadoc.new(canvadoc_params)
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=canvadoc_document_id",
+                    { course_id: @course.id.to_s, assignment_id: a.id.to_s,
+                      action: 'index', controller: 'submissions_api', format: 'json',
+                      include: %w[canvadoc_document_id] })
+    canvadoc_document_id = a.submissions[0].attachments[0].canvadoc.document_id
+    expect(json[0]["attachments"][0]["canvadoc_document_id"]).to eq canvadoc_document_id
+  end
+
   it "includes crocodoc whitelist ids in the preview url for attachments" do
     allow(Canvas::Crocodoc).to receive(:config).and_return({a: 1})
 
