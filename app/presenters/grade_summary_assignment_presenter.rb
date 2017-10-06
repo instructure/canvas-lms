@@ -24,7 +24,7 @@ class GradeSummaryAssignmentPresenter
     @current_user = current_user
     @assignment = assignment
     @submission = submission
-    @originality_reports = @submission.originality_reports if @submission
+    @originality_reports = OriginalityReport.where(attachment_id: @submission.attachment_ids) if @submission
   end
 
   def originality_report?
@@ -176,14 +176,14 @@ class GradeSummaryAssignmentPresenter
 
   def plagiarism(type)
     if type == 'vericite'
-      plagData = submission.vericite_data(true)
+      plag_data = submission.vericite_data(true)
     else
-      plagData = submission.originality_data
+      plag_data = submission.originality_data
     end
     t = if is_text_entry?
-          plagData[submission.asset_string]
+          plag_data[submission.asset_string]
         elsif is_online_upload? && file
-          plagData[file.asset_string]
+          plag_data[file.asset_string]
         end
     t.try(:[], :state) ? t : nil
   end
@@ -209,7 +209,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_plagiarism_attachment?(a)
-    @originality_reports.find_by(attachment: a, submission: submission) ||
+    @originality_reports.find_by(attachment: a) ||
     (submission.turnitin_data && submission.turnitin_data[a.asset_string]) ||
     (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string])
   end

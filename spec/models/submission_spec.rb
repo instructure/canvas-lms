@@ -1750,11 +1750,14 @@ describe Submission do
   end
 
   context "OriginalityReport" do
-    let(:attachment) { attachment_model }
+    let(:attachment) { attachment_model(context: group) }
     let(:course) { course_model }
     let(:submission) { submission_model }
+    let(:group) { Group.create!(name: 'test group', context: course) }
 
     let(:originality_report) do
+      AttachmentAssociation.create!(context: submission, attachment_id: attachment)
+      submission.update_attributes(attachment_ids: attachment.id.to_s)
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
     end
 
@@ -1763,13 +1766,13 @@ describe Submission do
         originality_report.originality_report_url = 'http://example.com'
         originality_report.save!
         expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state
-                                                    }
-                                                  })
+          attachment.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
       end
 
       it "includes tii data" do
@@ -1781,8 +1784,8 @@ describe Submission do
         }
         submission.turnitin_data[attachment.asset_string] = tii_data
         expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => tii_data
-                                                  })
+          attachment.asset_string => tii_data
+        })
       end
 
       it "overrites the tii data with the originality data" do
@@ -1796,13 +1799,13 @@ describe Submission do
         }
         submission.turnitin_data[attachment.asset_string] = tii_data
         expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state
-                                                    }
-                                                  })
+          attachment.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
       end
 
       it 'does not cause error if originality score is nil' do
@@ -1817,7 +1820,7 @@ describe Submission do
       end
 
       it "filters out :provider key and value" do
-         originality_report.originality_report_url = 'http://example.com'
+        originality_report.originality_report_url = 'http://example.com'
         originality_report.save!
         tii_data = {
           provider: 'vericite',
@@ -1830,6 +1833,20 @@ describe Submission do
         expect(submission.originality_data).not_to include :vericite
       end
 
+      it "finds originality data for group assignment submissions" do
+        submission.update_attributes!(attachment_ids: attachment.id.to_s)
+        originality_report
+        submission_two = submission.dup
+        submission_two.update_attributes!(user: User.create!(name: 'second student'))
+        expect(submission_two.originality_data).to eq({
+          attachment.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
+      end
     end
 
     describe '#attachment_ids_for_version' do
