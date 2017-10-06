@@ -1,33 +1,31 @@
-const React = require("react")
+import React from "react"
 
-const { LiveAnnouncer, LiveMessage } = require("react-aria-live")
-const Tray = require("instructure-ui/lib/components/Tray").default
-const Container = require("instructure-ui/lib/components/Container").default
-const Heading = require("instructure-ui/lib/components/Heading").default
-const Button = require("instructure-ui/lib/components/Button").default
-const Link = require("instructure-ui/lib/components/Link").default
-const Alert = require("instructure-ui/lib/components/Alert").default
-const Checkbox = require("instructure-ui/lib/components/Checkbox").default
-const TextInput = require("instructure-ui/lib/components/TextInput").default
-const Select = require("instructure-ui/lib/components/Select").default
-const ContextBox = require("instructure-ui/lib/components/ContextBox").default
-const Grid = require("instructure-ui/lib/components/Grid").default
-const GridRow = require("instructure-ui/lib/components/Grid/GridRow").default
-const GridCol = require("instructure-ui/lib/components/Grid/GridCol").default
-const Spinner = require("instructure-ui/lib/components/Spinner").default
-const ColorField = require("./color-field")
-const Typography = require("instructure-ui/lib/components/Typography").default
-const IconCompleteSolid = require("instructure-icons/lib/Solid/IconCompleteSolid")
-  .default
-const IconQuestionSolid = require("instructure-icons/lib/Solid/IconQuestionSolid")
-  .default
+import { LiveAnnouncer, LiveMessage } from "react-aria-live"
+import Tray from "instructure-ui/lib/components/Tray"
+import Container from "instructure-ui/lib/components/Container"
+import Heading from "instructure-ui/lib/components/Heading"
+import Button from "instructure-ui/lib/components/Button"
+import Link from "instructure-ui/lib/components/Link"
+import Alert from "instructure-ui/lib/components/Alert"
+import Checkbox from "instructure-ui/lib/components/Checkbox"
+import TextInput from "instructure-ui/lib/components/TextInput"
+import Select from "instructure-ui/lib/components/Select"
+import ContextBox from "instructure-ui/lib/components/ContextBox"
+import Grid from "instructure-ui/lib/components/Grid"
+import GridRow from "instructure-ui/lib/components/Grid/GridRow"
+import GridCol from "instructure-ui/lib/components/Grid/GridCol"
+import Spinner from "instructure-ui/lib/components/Spinner"
+import Typography from "instructure-ui/lib/components/Typography"
+import IconCompleteSolid from "instructure-icons/lib/Solid/IconCompleteSolid"
+import IconQuestionSolid from "instructure-icons/lib/Solid/IconQuestionSolid"
+import ColorField from "./color-field"
 
-const describe = require("../utils/describe")
-const dom = require("../utils/dom")
-const rules = require("../rules")
-const formatMessage = require("../format-message")
+import describe from "../utils/describe"
+import * as dom from "../utils/dom"
+import rules from "../rules"
+import formatMessage from "format-message"
 
-class Checker extends React.Component {
+export default class Checker extends React.Component {
   constructor() {
     super()
 
@@ -47,6 +45,10 @@ class Checker extends React.Component {
     this.updateFormState = this.updateFormState.bind(this)
     this.fixIssue = this.fixIssue.bind(this)
     this.handleClose = this.handleClose.bind(this)
+  }
+
+  static get displayName() {
+    return "Checker"
   }
 
   componentWillUnmount() {
@@ -437,5 +439,3 @@ class Checker extends React.Component {
     }
   }
 }
-
-module.exports = Checker

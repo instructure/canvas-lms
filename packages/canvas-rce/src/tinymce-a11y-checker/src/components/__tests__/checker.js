@@ -1,7 +1,9 @@
-const React = require("react")
-const Checker = require("../checker")
-const { shallow } = require("enzyme")
-const { promisify } = require("util")
+import React from "react"
+import Checker from "../checker"
+import { shallow } from "enzyme"
+import util from "util"
+
+const promisify = util.promisify
 
 jest.mock("../../rules/index")
 

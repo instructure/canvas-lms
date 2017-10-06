@@ -51,10 +51,10 @@ exports[`render matches snapshot with errors 1`] = `
         <LiveMessage
           aria-live="polite"
           message="
-                          Issue 1 of 2
-                          Element starting with 
-                          Error Message
-                        "
+                  Issue 1 of 2
+                  Element starting with 
+                  Error Message
+                "
         />
         <Typography
           as="span"

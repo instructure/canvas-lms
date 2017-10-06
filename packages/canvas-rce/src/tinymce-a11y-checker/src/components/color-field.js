@@ -1,11 +1,11 @@
-const React = require("react")
-const ReactDOM = require("react-dom")
-const contrast = require("wcag-element-contrast")
-const TextInput = require("instructure-ui/lib/components/TextInput").default
-const Container = require("instructure-ui/lib/components/Container").default
-const ColorPicker = require("./color-picker")
+import React from "react"
+import ReactDOM from "react-dom"
+import contrast from "wcag-element-contrast"
+import TextInput from "instructure-ui/lib/components/TextInput"
+import Container from "instructure-ui/lib/components/Container"
+import ColorPicker from "./color-picker"
 
-class ColorField extends React.Component {
+export default class ColorField extends React.Component {
   static stringifyRGBA(rgba) {
     if (rgba.a === 1) {
       return `rgb(${rgba.r}, ${rgba.g}, ${rgba.b})`
@@ -17,6 +17,10 @@ class ColorField extends React.Component {
     super()
     this.state = { width: 200 }
     this.handlePickerChange = this.handlePickerChange.bind(this)
+  }
+
+  static get displayName() {
+    return "ColorField"
   }
 
   componentDidMount() {
@@ -44,5 +48,3 @@ class ColorField extends React.Component {
     )
   }
 }
-
-module.exports = ColorField

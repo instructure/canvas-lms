@@ -1,7 +1,7 @@
-const formatMessage = require("../format-message")
-const { filename } = require("../utils/strings")
+import formatMessage from "format-message"
+import { filename } from "../utils/strings"
 
-module.exports = {
+export default {
   test: elem => {
     if (elem.tagName !== "IMG") {
       return true

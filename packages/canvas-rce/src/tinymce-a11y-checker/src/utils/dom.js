@@ -3,7 +3,7 @@ const WALK_BATCH_SIZE = 25
 
 const _indexOf = Array.prototype.indexOf
 
-function walk(node, fn, done) {
+export function walk(node, fn, done) {
   const stack = [{ node, index: 0 }]
   const processBatch = () => {
     let batchRemaining = WALK_BATCH_SIZE
@@ -26,7 +26,7 @@ function walk(node, fn, done) {
   processBatch()
 }
 
-function select(elem) {
+export function select(elem) {
   if (elem == null) {
     return
   }
@@ -45,7 +45,7 @@ function select(elem) {
   elem.scrollIntoView()
 }
 
-function prepend(parent, child) {
+export function prepend(parent, child) {
   if (parent.childNodes.length > 0) {
     parent.insertBefore(child, parent.childNodes[0])
   } else {
@@ -53,7 +53,7 @@ function prepend(parent, child) {
   }
 }
 
-function changeTag(elem, tagName) {
+export function changeTag(elem, tagName) {
   const newElem = elem.ownerDocument.createElement(tagName)
   while (elem.firstChild) {
     newElem.appendChild(elem.firstChild)
@@ -65,7 +65,7 @@ function changeTag(elem, tagName) {
   return newElem
 }
 
-function pathForNode(ancestor, decendant) {
+export function pathForNode(ancestor, decendant) {
   const path = []
   let node = decendant
   while (true) {
@@ -81,7 +81,7 @@ function pathForNode(ancestor, decendant) {
   }
 }
 
-function nodeByPath(ancestor, path) {
+export function nodeByPath(ancestor, path) {
   let node = ancestor
   let index
   while ((index = path.pop()) !== undefined) {
@@ -92,5 +92,3 @@ function nodeByPath(ancestor, path) {
   }
   return node
 }
-
-module.exports = { walk, select, prepend, changeTag, pathForNode, nodeByPath }

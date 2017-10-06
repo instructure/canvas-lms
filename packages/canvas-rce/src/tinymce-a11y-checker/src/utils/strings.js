@@ -1,10 +1,10 @@
-function filename(url) {
+export function filename(url) {
   const pattern = /([^\/]*?)(\?.*)?$/
   const result = pattern.exec(url)
   return result && result[1]
 }
 
-function firstWords(text, num) {
+export function firstWords(text, num) {
   const pattern = /\w+/g
   const words = []
   let result
@@ -18,5 +18,3 @@ function firstWords(text, num) {
   }
   return ret
 }
-
-module.exports = { filename, firstWords }

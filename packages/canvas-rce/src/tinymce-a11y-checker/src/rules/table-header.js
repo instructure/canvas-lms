@@ -1,9 +1,9 @@
-const formatMessage = require("../format-message")
-const dom = require("../utils/dom")
+import formatMessage from "format-message"
+import { changeTag } from "../utils/dom"
 
 const _forEach = Array.prototype.forEach
 
-module.exports = {
+export default {
   test: elem => {
     if (elem.tagName !== "TABLE") {
       return true
@@ -32,7 +32,7 @@ module.exports = {
 
   update: (elem, data) => {
     _forEach.call(elem.querySelectorAll("th"), th => {
-      dom.changeTag(th, "td")
+      changeTag(th, "td")
     })
     if (data.header === "none") {
       return elem
@@ -43,7 +43,7 @@ module.exports = {
     for (let i = 0; i < tableRows.length; ++i) {
       if (i === 0 && row) {
         _forEach.call(tableRows[i].querySelectorAll("td"), td => {
-          const th = dom.changeTag(td, "th")
+          const th = changeTag(td, "th")
           th.setAttribute("scope", "col")
         })
         continue
@@ -53,7 +53,7 @@ module.exports = {
       }
       const td = tableRows[i].querySelector("td")
       if (td) {
-        const th = dom.changeTag(td, "th")
+        const th = changeTag(td, "th")
         th.setAttribute("scope", "row")
       }
     }

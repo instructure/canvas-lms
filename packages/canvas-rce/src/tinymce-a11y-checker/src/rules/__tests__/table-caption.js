@@ -1,4 +1,4 @@
-const rule = require("../table-caption")
+import rule from "../table-caption"
 
 let el
 

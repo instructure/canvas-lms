@@ -1,7 +1,7 @@
-const React = require("react")
-const ReactDOM = require("react-dom")
-const Checker = require("./components/checker")
-const formatMessage = require("./format-message")
+import React from "react"
+import ReactDOM from "react-dom"
+import Checker from "./components/checker"
+import formatMessage from "format-message"
 
 tinymce.create("tinymce.plugins.AccessibilityChecker", {
   init: function(ed) {

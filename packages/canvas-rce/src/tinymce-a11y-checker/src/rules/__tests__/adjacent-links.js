@@ -1,4 +1,4 @@
-const rule = require("../adjacent-links")
+import rule from "../adjacent-links"
 
 let body, a1, a2
 

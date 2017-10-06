@@ -1,4 +1,4 @@
-const rule = require("../table-header")
+import rule from "../table-header"
 
 let el
 

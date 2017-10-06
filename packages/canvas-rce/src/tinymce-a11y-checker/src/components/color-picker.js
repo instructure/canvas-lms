@@ -1,15 +1,18 @@
-const React = require("react")
-const {
+import React from "react"
+import {
   ColorWrap,
   Saturation,
   Hue,
   Alpha
-} = require("react-color/lib/components/common")
-const Pointer = require("./pointer")
-const PointerCircle = require("react-color/lib/components/photoshop/PhotoshopPointerCircle")
-  .default
+} from "react-color/lib/components/common"
+import Pointer from "./pointer"
+import PointerCircle from "react-color/lib/components/photoshop/PhotoshopPointerCircle"
 
 class ColorPicker extends React.Component {
+  static get displayName() {
+    return "ColorPicker"
+  }
+
   render() {
     return (
       <div>
@@ -27,4 +30,4 @@ class ColorPicker extends React.Component {
   }
 }
 
-module.exports = ColorWrap(ColorPicker)
+export default ColorWrap(ColorPicker)

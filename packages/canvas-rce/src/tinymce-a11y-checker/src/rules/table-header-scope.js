@@ -1,8 +1,8 @@
-const formatMessage = require("../format-message")
+import formatMessage from "format-message"
 
 const VALID_SCOPES = ["row", "col", "rowgroup", "colgroup"]
 
-module.exports = {
+export default {
   test: elem => {
     if (elem.tagName !== "TH") {
       return true

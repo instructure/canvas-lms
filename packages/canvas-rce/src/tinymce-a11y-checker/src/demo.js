@@ -1,12 +1,13 @@
-const rce = require("canvas-rce")
-const canvasTheme = require("instructure-ui/lib/themes/canvas").default
-require("./plugin")
-require("tinymce/plugins/image")
+import { renderIntoDiv } from "canvas-rce"
+import canvasTheme from "instructure-ui/lib/themes/canvas"
+
+import "./plugin"
+import "tinymce/plugins/image"
 
 canvasTheme.use()
 
 function renderEditor(editorEl, textareaId) {
-  rce.renderIntoDiv(editorEl, {
+  renderIntoDiv(editorEl, {
     defaultContent: document.getElementById("textarea1").value,
     editorOptions: () => {
       return {

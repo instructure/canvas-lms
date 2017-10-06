@@ -1,4 +1,4 @@
-const rule = require("../table-header-scope")
+import rule from "../table-header-scope"
 
 let el
 

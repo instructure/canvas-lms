@@ -1,16 +1,16 @@
-const imgAlt = require("./img-alt")
-const imgAltFilename = require("./img-alt-filename")
-const tableCaption = require("./table-caption")
-const tableHeader = require("./table-header")
-const tableHeaderScope = require("./table-header-scope")
-const smallTextContrast = require("./small-text-contrast")
-const largeTextContrast = require("./large-text-contrast")
-const adjacentSameLinks = require("./adjacent-links")
-const headingsSequence = require("./headings-sequence")
-const imageAltLength = require("./img-alt-length")
-const paragraphsForHeadings = require("./paragraphs-for-headings")
+import imgAlt from "./img-alt"
+import imgAltFilename from "./img-alt-filename"
+import tableCaption from "./table-caption"
+import tableHeader from "./table-header"
+import tableHeaderScope from "./table-header-scope"
+import smallTextContrast from "./small-text-contrast"
+import largeTextContrast from "./large-text-contrast"
+import adjacentSameLinks from "./adjacent-links"
+import headingsSequence from "./headings-sequence"
+import imageAltLength from "./img-alt-length"
+import paragraphsForHeadings from "./paragraphs-for-headings"
 
-module.exports = [
+export default [
   imgAlt,
   imgAltFilename,
   tableCaption,

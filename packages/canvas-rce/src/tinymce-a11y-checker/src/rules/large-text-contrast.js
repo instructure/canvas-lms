@@ -1,8 +1,8 @@
-const formatMessage = require("../format-message")
-const contrast = require("wcag-element-contrast")
-const smallTextContrast = require("./small-text-contrast")
+import formatMessage from "format-message"
+import contrast from "wcag-element-contrast"
+import smallTextContrast from "./small-text-contrast"
 
-module.exports = {
+export default {
   test: elem => {
     if (!contrast.isLargeText(elem)) {
       return true

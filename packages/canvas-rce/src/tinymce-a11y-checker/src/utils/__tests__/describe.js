@@ -1,4 +1,4 @@
-const fn = require("../describe")
+import fn from "../describe"
 
 test("describes an image", () => {
   const elem = document.createElement("img")
