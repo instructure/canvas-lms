@@ -18,9 +18,10 @@
 #
 class TermsOfServiceContent < ActiveRecord::Base
   include Canvas::SoftDeletable
-
-  validates :content, presence: true
+  sanitize_field :content, CanvasSanitize::SANITIZE
   validates :terms_updated_at, presence: true
+
+  belongs_to :account
 
   before_validation :ensure_terms_updated_at
   before_save :set_terms_updated_at
@@ -31,5 +32,12 @@ class TermsOfServiceContent < ActiveRecord::Base
 
   def set_terms_updated_at
     self.terms_updated_at = Time.now.utc if self.content_changed?
+  end
+
+  def self.ensure_content_for_account(account)
+    self.unique_constraint_retry do |retry_count|
+      account.reload_terms_of_service_content if retry_count > 0
+      account.terms_of_service_content || account.create_terms_of_service_content!(content: "")
+    end
   end
 end

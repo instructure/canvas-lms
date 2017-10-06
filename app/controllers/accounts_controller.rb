@@ -636,9 +636,13 @@ class AccountsController < ApplicationController
   # @returns Account
   def update
     return update_api if api_request?
-
     if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
+
+        if @account.root_account?
+          terms_attrs = params[:account][:terms_of_service]
+          @account.update_terms_of_service(terms_attrs) if terms_attrs.present?
+        end
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links

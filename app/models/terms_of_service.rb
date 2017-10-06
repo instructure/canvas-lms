@@ -20,7 +20,9 @@ class TermsOfService < ActiveRecord::Base
   include Canvas::SoftDeletable
   belongs_to :account
   belongs_to :terms_of_service_content
-  validates :terms_type, :passive, presence: true
+  validates :terms_type, presence: true
+
+  before_save :set_content_on_type_change, :if => :terms_type_changed?
 
   validate :validate_account_is_root
 
@@ -32,16 +34,33 @@ class TermsOfService < ActiveRecord::Base
     end
   end
 
+  def set_content_on_type_change
+    self.terms_of_service_content = self.custom? ? self.account.terms_of_service_content : nil
+  end
+
+  def custom?
+    self.terms_type == "custom"
+  end
+
   def self.ensure_terms_for_account(account)
-    unless !self.table_exists? || self.skip_automatic_terms_creation || account.terms_of_service
-      account.shard.activate do
-        account.create_terms_of_service!(term_options_for_account(account))
-      end
+    return unless self.table_exists?
+
+    self.unique_constraint_retry do |retry_count|
+      account.reload_terms_of_service if retry_count > 0
+      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account))
     end
   end
 
-  DEFAULT_OPTIONS = {:terms_type => "default_url"}.freeze
+  DEFAULT_OPTIONS = {:terms_type => "default"}.freeze
   def self.term_options_for_account(account)
     DEFAULT_OPTIONS
+  end
+
+  def self.type_dropdown_options
+    [
+      [t('Default'), "default"],
+      [t('Custom'), "custom"],
+      [t('No Terms'), "no_terms"]
+    ]
   end
 end

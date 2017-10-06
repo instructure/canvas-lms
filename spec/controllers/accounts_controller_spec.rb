@@ -630,6 +630,27 @@ describe AccountsController do
         expect(response).not_to be_success
       end
     end
+
+    context "terms of service settings" do
+      before(:once) {account_with_admin}
+      before(:each) {user_session(@admin)}
+
+      it "should be able to set and update a custom terms of service" do
+        post 'update', params: {:id => @account.id, :account => {
+          :terms_of_service => {:terms_type => "custom", :content => "stuff"}
+        }}
+        tos = @account.reload.terms_of_service
+        expect(tos.terms_type).to eq 'custom'
+        expect(tos.terms_of_service_content.content).to eq "stuff"
+      end
+
+      it "should be able to configure the 'passive' setting" do
+        post 'update', params: {:id => @account.id, :account => {:terms_of_service => {:passive => "0"}}}
+        expect(@account.reload.terms_of_service.passive).to eq false
+        post 'update', params: {:id => @account.id, :account => {:terms_of_service => {:passive => "1"}}}
+        expect(@account.reload.terms_of_service.passive).to eq true
+      end
+    end
   end
 
   describe "#settings" do

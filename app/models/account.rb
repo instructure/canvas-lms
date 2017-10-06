@@ -31,6 +31,7 @@ class Account < ActiveRecord::Base
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_one :terms_of_service, :dependent => :destroy
+  has_one :terms_of_service_content, :dependent => :destroy
   has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
   has_many :groups, :as => :context, :inverse_of => :context
@@ -1649,7 +1650,7 @@ class Account < ActiveRecord::Base
     work = -> do
       default_enrollment_term
       enable_canvas_authentication
-      TermsOfService.ensure_terms_for_account(self) if self.root_account?
+      TermsOfService.ensure_terms_for_account(self) if self.root_account? && !TermsOfService.skip_automatic_terms_creation
     end
     return work.call if Rails.env.test?
     self.class.connection.after_transaction_commit(&work)
@@ -1657,5 +1658,22 @@ class Account < ActiveRecord::Base
 
   def migrate_to_canvadocs?
     Canvadocs.hijack_crocodoc_sessions? && feature_enabled?(:new_annotations)
+  end
+
+  def update_terms_of_service(terms_params)
+    terms = TermsOfService.ensure_terms_for_account(self)
+    terms.terms_type = terms_params[:terms_type] if terms_params[:terms_type]
+    terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.has_key?(:passive)
+
+    if terms.custom?
+      TermsOfServiceContent.ensure_content_for_account(self)
+      self.terms_of_service_content.update_attribute(:content, terms_params[:content]) if terms_params[:content]
+    end
+
+    if terms.changed?
+      unless terms.save
+        self.errors.add(:terms_of_service, t("Terms of Service attributes not valid"))
+      end
+    end
   end
 end
