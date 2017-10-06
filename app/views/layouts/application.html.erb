@@ -242,7 +242,6 @@
   <% end %>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </div> <!-- #application -->
-<% if Rails.env.production? %>
 <script>
   (function(apiKey){
     (function(p,e,n,d,o){var v,w,x,y,z;o=p[d]=p[d]||{};o._q=[];
@@ -253,29 +252,21 @@
 
     // Call this whenever information about your visitors becomes available
     // Please use Strings, Numbers, or Bools for value types.
+
     pendo.initialize({
       visitor: {
-        id:              '<%= @current_user.id %>', // Required if user is logged in
-        school_name:     '<%= @current_user.school_name %>',
-        course_id:       '<%= @context.id %>', 
-        is_student:      '<%= @is_student %>'  
-        // You can add any additional visitor level key-values here,
-        // as long as it's not one of the above reserved names.
+        id:              '<% if @current_user %><%= @current_user.id %><%end%>',
+        school_name:     '<% if @current_user %><%= @current_user.school_name %><%end%>',
+        course_id:       '<% if @context %><%= @context.id %><%end%>', 
+        is_student:      '<%= @is_student %>',
+        rails_env:       '<%= Rails.env %>'  
       },
 
       account: {
-        // id:           'ACCOUNT-UNIQUE-ID' // Highly recommended
-        // name:         // Optional
-        // planLevel:    // Optional
-        // planPrice:    // Optional
-        // creationDate: // Optional
-
-        // You can add any additional account level key-values here,
-        // as long as it's not one of the above reserved names.
+        id:           '',
       }
     });
   })('18d9cdc9-0b28-4f89-7c87-e4d3802e665f');
 </script>
-<% end %>
 </body>
 </html>
