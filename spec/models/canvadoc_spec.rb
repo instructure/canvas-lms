@@ -121,4 +121,16 @@ describe 'Canvadoc' do
       expect(@doc).not_to be_available
     end
   end
+
+  describe "#has_annotations?" do
+    it "has annotations when true and new annotations are not enabled" do
+      @doc.has_annotations = true
+      expect(@doc).to have_annotations
+    end
+
+    it "does not have annotations when false and new annotations are not enabled" do
+      @doc.has_annotations = false
+      expect(@doc).not_to have_annotations
+    end
+  end
 end
