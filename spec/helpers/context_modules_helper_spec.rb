@@ -87,72 +87,92 @@ describe ContextModulesHelper do
     end
 
     it "should not set mastery_paths if cyoe is disabled" do
+      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       expect(ConditionalRelease::Service).to receive(:rules_for).never
-      module_data = process_module_data(t_module, true, false, @student, @session)
+      module_data = process_module_data(t_module, true, @student, @session)
       item_data = module_data[:items_data][item.id]
       expect(item_data[:mastery_paths]).to be nil
     end
 
-    it "should set mastery_paths for a cyoe trigger assignment module item" do
-      module_data = process_module_data(t_module, true, true, @student, @session)
-      item_data = module_data[:items_data][item.id]
-      expect(item_data[:mastery_paths][:locked]).to eq false
-      expect(item_data[:mastery_paths][:assignment_sets]).to eq [{}, {}]
-    end
+    describe "show_cyoe_placeholder with cyoe enabled" do
+      before do
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+      end
 
-    it "should return the correct choose_url for a cyoe trigger assignment module item" do
-      module_data = process_module_data(t_module, true, true, @student, @session)
-      item_data = module_data[:items_data][item.id]
-      expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
-    end
+      it "should set mastery_paths for a cyoe trigger assignment module item" do
+        module_data = process_module_data(t_module, true, @student, @session)
+        item_data = module_data[:items_data][item.id]
+        expect(item_data[:mastery_paths][:locked]).to eq false
+        expect(item_data[:mastery_paths][:assignment_sets]).to eq [{}, {}]
+      end
 
-    it "should set show_cyoe_placeholder to true if no set has been selected and the rule is locked" do
-      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-        {
-          trigger_assignment: assg.id,
-          locked: true,
-          assignment_sets: [],
-        }
-      ])
-      module_data = process_module_data(t_module, true, true, @student, @session)
-      item_data = module_data[:items_data][item.id]
-      expect(item_data[:show_cyoe_placeholder]).to eq true
-    end
+      it "should return the correct choose_url for a cyoe trigger assignment module item" do
+        module_data = process_module_data(t_module, true, @student, @session)
+        item_data = module_data[:items_data][item.id]
+        expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
+      end
 
-    it "should set show_cyoe_placeholder to true if no set has been selected and sets are available" do
-      module_data = process_module_data(t_module, true, true, @student, @session)
-      item_data = module_data[:items_data][item.id]
-      expect(item_data[:show_cyoe_placeholder]).to eq true
+      it "should be true if no set has been selected and the rule is locked" do
+        allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
+          {
+            trigger_assignment: assg.id,
+            locked: true,
+            assignment_sets: [],
+          }
+        ])
+        module_data = process_module_data(t_module, true, @student, @session)
+        item_data = module_data[:items_data][item.id]
+        expect(item_data[:show_cyoe_placeholder]).to eq true
+      end
 
-    end
+      it "should be true if no set has been selected and sets are available" do
+        module_data = process_module_data(t_module, true, @student, @session)
+        item_data = module_data[:items_data][item.id]
+        expect(item_data[:show_cyoe_placeholder]).to eq true
+      end
 
-    it "should set show_cyoe_placeholder to false if no set has been selected and no sets are available" do
-      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-        {
-          trigger_assignment: assg.id,
-          locked: false,
-          assignment_sets: [],
-        }
-      ])
-      module_data = process_module_data(t_module, true, true, @student, @session)
-      item_data = module_data[:items_data][item.id]
-      expect(item_data[:show_cyoe_placeholder]).to eq false
+      it "should be true if still processing results" do
+        allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
+          {
+            trigger_assignment: assg.id,
+            locked: false,
+            assignment_sets: [],
+            still_processing: true
+          }
+        ])
+        module_data = process_module_data(t_module, true, @student, @session)
+        item_data = module_data[:items_data][item.id]
+        expect(item_data[:show_cyoe_placeholder]).to eq false
+      end
 
-    end
+      it "should be false if no set has been selected and no sets are available" do
+        allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
+          {
+            trigger_assignment: assg.id,
+            locked: false,
+            assignment_sets: [],
+          }
+        ])
+        module_data = process_module_data(t_module, true, @student, @session)
+        item_data = module_data[:items_data][item.id]
+        expect(item_data[:show_cyoe_placeholder]).to eq false
 
-    it "should set show_cyoe_placeholder to false if set has been selected for a cyoe trigger assignment module item" do
-      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-        {
-          selected_set_id: 1,
-          trigger_assignment: assg.id,
-          locked: false,
-          assignment_sets: [{}, {}],
-        }
-      ])
+      end
 
-      module_data = process_module_data(t_module, true, true, @student, @session)
-      item_data = module_data[:items_data][item.id]
-      expect(item_data[:show_cyoe_placeholder]).to eq false
+      it "should be false if set has been selected for a cyoe trigger assignment module item" do
+        allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
+          {
+            selected_set_id: 1,
+            trigger_assignment: assg.id,
+            locked: false,
+            assignment_sets: [{}, {}],
+          }
+        ])
+
+        module_data = process_module_data(t_module, true, @student, @session)
+        item_data = module_data[:items_data][item.id]
+        expect(item_data[:show_cyoe_placeholder]).to eq false
+      end
     end
   end
 

@@ -58,7 +58,10 @@ const view = new EditView({
 })
 
 if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT) {
-  (view.assignmentGroupCollection = new AssignmentGroupCollection()).contextAssetString = ENV.context_asset_string
+  const agc = new AssignmentGroupCollection();
+  agc.options.params = {};
+  agc.contextAssetString = ENV.context_asset_string;
+  view.assignmentGroupCollection = agc;
 }
 
 $(() => {

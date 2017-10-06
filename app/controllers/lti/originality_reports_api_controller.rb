@@ -109,10 +109,15 @@ module Lti
       }.freeze
     ].freeze
 
+    rescue_from Lti::Errors::UnauthorizedToolError do |e|
+      Lti::Errors::ErrorLogger.log_error(e)
+      render_unauthorized_action
+    end
+
     skip_before_action :load_user
     before_action :authorized_lti2_tool, :plagiarism_feature_flag_enabled
     before_action :attachment_in_context, only: [:create]
-    before_action :report_in_context, only: [:update, :show]
+    before_action :report_in_context, only: [:show]
 
     # @API Create an Originality Report
     # Create a new OriginalityReport for the specified file
@@ -151,18 +156,22 @@ module Lti
     #
     # @returns OriginalityReport
     def create
-      render_unauthorized_action and return unless tool_proxy_associated?
-      @report = OriginalityReport.create!(create_report_params)
-      render json: api_json(@report, @current_user, session), status: :created
-    rescue ActiveRecord::RecordInvalid
-      return render json: @report.errors, status: :bad_request
-    rescue ActiveRecord::RecordNotUnique
-      return render json: {error: {message: I18n.t('the specified file with file_id already has an originality report'),
-                                   type: 'RecordNotUnique'}}, status: :bad_request
+      raise Lti::Errors::UnauthorizedToolError unless tool_proxy_associated?
+      if originality_report.present?
+        update
+      else
+        @report = OriginalityReport.new(create_report_params)
+        if @report.save
+          render json: api_json(@report, @current_user, session), status: :created
+        else
+          render json: @report.errors, status: :bad_request
+        end
+      end
     end
 
     # @API Edit an Originality Report
-    # Modify an existing originality report
+    # Modify an existing originality report. An alternative to this endpoint is
+    # to POST the same parameters listed below to the CREATE endpoint.
     #
     # @argument originality_report[originality_score] [Float]
     #   A number between 0 and 100 representing the measure of the
@@ -195,11 +204,12 @@ module Lti
     #
     # @returns OriginalityReport
     def update
-      render_unauthorized_action and return unless tool_proxy_associated?
-      if @report.update_attributes(update_report_params)
-        render json: api_json(@report, @current_user, session)
+      report_in_context
+      raise Lti::Errors::UnauthorizedToolError unless tool_proxy_associated?
+      if originality_report.update_attributes(update_report_params)
+        render json: api_json(originality_report, @current_user, session)
       else
-        render json: @report.errors, status: :bad_request
+        render json: originality_report.errors, status: :bad_request
       end
     end
 
@@ -208,8 +218,8 @@ module Lti
     #
     # @returns OriginalityReport
     def show
-      render_unauthorized_action and return unless tool_proxy_associated?
-      render json: api_json(@report, @current_user, session)
+      raise Lti::Errors::UnauthorizedToolError unless tool_proxy_associated?
+      render json: api_json(originality_report, @current_user, session)
     end
 
     def lti2_service_name
@@ -288,7 +298,7 @@ module Lti
 
     def attachment_association
       @_attachment_association ||= begin
-        file = @report&.attachment || attachment
+        file = originality_report&.attachment || attachment
         file.attachment_associations.find { |a| a.context == submission }
       end
     end
@@ -315,15 +325,22 @@ module Lti
       verify_submission_attachment(attachment, submission)
     end
 
+    def originality_report
+      @_originality_report ||= begin
+        OriginalityReport.find_by(id: params[:id]) ||
+        OriginalityReport.find_by(attachment_id: attachment&.id)
+      end
+    end
+
     def report_in_context
-      @report = OriginalityReport.find_by(id: params[:id]) || OriginalityReport.find_by!(attachment_id: attachment&.id)
-      verify_submission_attachment(@report.attachment, submission)
+      raise ActiveRecord::RecordNotFound if originality_report.blank?
+      verify_submission_attachment(originality_report.attachment, submission)
     end
 
     def verify_submission_attachment(attachment, submission)
-      head :not_found and return unless attachment.present? && submission.present?
+      raise ActiveRecord::RecordNotFound unless attachment.present? && submission.present?
       unless submission.assignment == assignment && submission.attachments.include?(attachment)
-        head :unauthorized
+        raise Lti::Errors::UnauthorizedToolError
       end
     end
 

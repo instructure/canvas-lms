@@ -20,7 +20,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
-import StudentCardStore from './StudentCardStore'
 import Avatar from './Avatar'
 import LastActivity from './LastActivity'
 import MetricsList from './MetricsList'
@@ -36,14 +35,28 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import Tray from 'instructure-ui/lib/components/Tray'
 
+const courseShape = PropTypes.shape({
+  permissions: PropTypes.shape({}).isRequired,
+  submissionsConnection: PropTypes.shape({
+    edges: PropTypes.arrayOf(PropTypes.shape({}))
+  }).isRequired
+});
+const userShape = PropTypes.shape({
+  enrollments: PropTypes.arrayOf(PropTypes.object).isRequired
+});
+const dataShape = PropTypes.shape({
+  loading: PropTypes.bool.isRequired,
+  course: courseShape,
+  user: userShape
+});
+
 export default class StudentContextTray extends React.Component {
 
     static propTypes = {
       courseId: PropTypes.string.isRequired,
       studentId: PropTypes.string.isRequired,
-      store: PropTypes.instanceOf(StudentCardStore).isRequired,
-      onClose: PropTypes.func.isRequired,
-      returnFocusTo: PropTypes.func.isRequired
+      returnFocusTo: PropTypes.func.isRequired,
+      data: dataShape.isRequired,
     }
 
     static renderQuickLink (label, srLabel, url, showIf) {
@@ -65,14 +78,8 @@ export default class StudentContextTray extends React.Component {
     constructor (props) {
       super(props)
       this.state = {
-        analytics: {},
-        course: {},
-        isLoading: this.props.store.isLoading,
         isOpen: true,
         messageFormOpen: false,
-        permissions: {},
-        submissions: [],
-        user: {}
       }
     }
 
@@ -80,45 +87,15 @@ export default class StudentContextTray extends React.Component {
      * Lifecycle
      */
 
-    componentDidMount () {
-      this.props.store.onChange = this.onChange
-    }
-
     componentWillReceiveProps (nextProps) {
-      if (nextProps.store !== this.props.store) {
-        this.props.store.onChange = null
-        nextProps.store.onChange = this.onChange
-        const newState = {
-          isLoading: true
-        };
-        if (!this.state.isOpen) {
-          newState.isOpen = true
-        }
-        this.setState(newState)
+      if (!this.state.isOpen) {
+        this.setState({isOpen: true})
       }
     }
 
     /**
      * Handlers
      */
-
-    onChange = () => {
-      const {store} = this.props;
-      this.setState({
-        analytics: store.state.analytics,
-        course: store.state.course,
-        isLoading: store.state.loading,
-        permissions: store.state.permissions,
-        submissions: store.state.submissions,
-        user: store.state.user
-      }, () => {
-        if (!store.state.loading && this.state.isOpen) {
-          if (this.closeButtonRef) {
-            this.closeButtonRef.focus()
-          }
-        }
-      })
-    }
 
     getCloseButtonRef = (ref) => {
       this.closeButtonRef = ref
@@ -159,46 +136,46 @@ export default class StudentContextTray extends React.Component {
      * Renderers
      */
 
-    renderQuickLinks () {
-      return (this.state.user.short_name && (
-        this.state.permissions.manage_grades ||
-        this.state.permissions.view_all_grades ||
-        this.state.permissions.view_analytics
+    renderQuickLinks (user, course) {
+      return (user.short_name && (
+        course.permissions.manage_grades ||
+        course.permissions.view_all_grades ||
+        course.permissions.view_analytics
       )) ? (
         <section
           className="StudentContextTray__Section StudentContextTray-QuickLinks"
         >
           {StudentContextTray.renderQuickLink(
             I18n.t('Grades'),
-            I18n.t('View grades for %{name}', { name: this.state.user.short_name }),
+            I18n.t('View grades for %{name}', { name: user.short_name }),
             `/courses/${this.props.courseId}/grades/${this.props.studentId}`,
             () =>
-              this.state.permissions.manage_grades ||
-              this.state.permissions.view_all_grades
+              course.permissions.manage_grades ||
+              course.permissions.view_all_grades
           )}
           {StudentContextTray.renderQuickLink(
             I18n.t('Analytics'),
-            I18n.t('View analytics for %{name}', { name: this.state.user.short_name }),
+            I18n.t('View analytics for %{name}', { name: user.short_name }),
             `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
-            () => (
-              this.state.permissions.view_analytics && Object.keys(this.state.analytics).length > 0
-            )
+            () => course.permissions.view_analytics && user.analytics
           )}
         </section>
       ) : null
     }
 
     render () {
+      const { data: { loading, course, user } } = this.props
+
       return (
         <div>
           {this.state.messageFormOpen ? (
             <MessageStudents
-              contextCode={`course_${this.state.course.id}`}
+              contextCode={`course_${course._id}`}
               onRequestClose={this.handleMessageFormClose}
               open={this.state.messageFormOpen}
               recipients={[{
-                id: this.state.user.id,
-                displayName: this.state.user.short_name
+                id: user._id,
+                displayName: user.short_name
               }]}
               title='Send a message'
             />
@@ -206,22 +183,21 @@ export default class StudentContextTray extends React.Component {
 
           <Tray
             label={I18n.t('Student Details')}
-            dismissable={!this.state.isLoading}
             closeButtonLabel={I18n.t('Close')}
             closeButtonRef={this.getCloseButtonRef}
-            isOpen={this.state.isOpen}
-            onRequestClose={this.handleRequestClose}
+            applicationElement={() => document.getElementById('application')}
+            open={this.state.isOpen}
+            onDismiss={this.handleRequestClose}
             placement='end'
             zIndex='1000'
-            onClose={this.props.onClose}
           >
             <aside
-              className={(Object.keys(this.state.user).includes('avatar_url'))
+              className={user && user.avatar_url
                 ? 'StudentContextTray StudentContextTray--withAvatar'
                 : 'StudentContextTray'
               }
             >
-              {this.state.isLoading ? (
+              {loading ? (
                 <div className='StudentContextTray__Spinner'>
                   <Spinner title={I18n.t('Loading')}
                     size='large'
@@ -230,22 +206,22 @@ export default class StudentContextTray extends React.Component {
               ) : (
                 <div>
                   <header className="StudentContextTray-Header">
-                    <Avatar user={this.state.user}
-                      canMasquerade={!!this.state.permissions.become_user}
+                    <Avatar user={user}
+                      canMasquerade={course.permissions.become_user}
                       courseId={this.props.courseId}
                     />
 
                     <div className="StudentContextTray-Header__Layout">
                       <div className="StudentContextTray-Header__Content">
-                        {this.state.user.short_name  ? (
+                        {user.short_name ? (
                           <div className="StudentContextTray-Header__Name">
                             <Heading level="h3" as="h2">
                               <span className="StudentContextTray-Header__NameLink">
                                 <Link
                                   href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
-                                  aria-label={I18n.t('Go to %{name}\'s profile', {name: this.state.user.short_name})}
+                                  aria-label={I18n.t('Go to %{name}\'s profile', {name: user.short_name})}
                                 >
-                                  {this.state.user.short_name}
+                                  {user.short_name}
                                 </Link>
                               </span>
                             </Heading>
@@ -253,17 +229,17 @@ export default class StudentContextTray extends React.Component {
                         ) : null}
                         <div className="StudentContextTray-Header__CourseName">
                           <Typography size="medium" as="div" lineHeight="condensed">
-                            {this.state.course.name}
+                            {course.name}
                           </Typography>
                         </div>
                         <Typography size="x-small" color="secondary" as="div">
-                          <SectionInfo course={this.state.course} user={this.state.user} />
+                          <SectionInfo user={user} />
                         </Typography>
                         <Typography size="x-small" color="secondary" as="div">
-                          <LastActivity user={this.state.user} />
+                          <LastActivity user={user} />
                         </Typography>
                       </div>
-                      {this.state.permissions.send_messages ? (
+                      {course.permissions.send_messages ? (
                         <div className="StudentContextTray-Header__Actions">
                           <Button
                             ref={ (b) => this.messageStudentsButton = b }
@@ -271,7 +247,7 @@ export default class StudentContextTray extends React.Component {
                             onClick={this.handleMessageButtonClick}
                           >
                             <ScreenReaderContent>
-                              {I18n.t('Send a message to %{student}', {student: this.state.user.short_name})}
+                              {I18n.t('Send a message to %{student}', {student: user.short_name})}
                             </ScreenReaderContent>
 
                             {/* Note: replace with instructure-icon */}
@@ -282,23 +258,21 @@ export default class StudentContextTray extends React.Component {
                       ) : null }
                     </div>
                   </header>
-                  {this.renderQuickLinks()}
-                  <MetricsList user={this.state.user} analytics={this.state.analytics} />
-                  <SubmissionProgressBars submissions={this.state.submissions} />
+                  {this.renderQuickLinks(user, course)}
+                  <MetricsList user={user} analytics={user.analytics} />
+                  <SubmissionProgressBars submissions={course.submissionsConnection.edges.map(n => n.submission)} />
 
-                  {Object.keys(this.state.analytics).length > 0 ? (
+                  {user.analytics ? (
                     <section
                       className="StudentContextTray__Section StudentContextTray-Ratings">
                       <Heading level="h4" as="h3" border="bottom">
                         {I18n.t("Activity Compared to Class")}
                       </Heading>
                       <div className="StudentContextTray-Ratings__Layout">
-                        <Rating analytics={this.state.analytics}
-                          label={I18n.t('Participation')}
-                          metricName='participations_level' />
-                        <Rating analytics={this.state.analytics}
-                          label={I18n.t('Page Views')}
-                          metricName='page_views_level' />
+                        <Rating metric={user.analytics.participations}
+                          label={I18n.t('Participation')} />
+                        <Rating metric={user.analytics.page_views}
+                          label={I18n.t('Page Views')} />
                       </div>
                     </section>
                   ) : null}
@@ -307,6 +281,6 @@ export default class StudentContextTray extends React.Component {
             </aside>
           </Tray>
         </div>
-      )
+      );
     }
   }

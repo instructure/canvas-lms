@@ -587,6 +587,17 @@ describe GroupCategory do
       expect(@category.distribute_members_among_groups_by_section).to be_truthy
       expect(groups.map(&:users).flatten).to eq [@student]
     end
+
+    it "should auto-assign leaders if necessary" do
+      student_in_course(:course => @course)
+
+      group = @category.groups.create(:name => "Group", :context => @course)
+      @category.update_attribute(:auto_leader, 'first')
+
+      @category.assign_unassigned_members(true)
+      expect(group.reload.users).to eq [@student]
+      expect(group.leader).to eq @student
+    end
   end
 end
 

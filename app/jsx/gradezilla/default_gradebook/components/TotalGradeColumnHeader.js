@@ -111,7 +111,7 @@ class TotalGradeColumnHeader extends ColumnHeader {
         <PopoverMenu
           ref={this.bindOptionsMenu}
           contentRef={this.bindOptionsMenuContent}
-          focusTriggerOnClose={false}
+          shouldFocusTriggerOnClose={false}
           trigger={renderTrigger(menuShown, this.bindOptionsMenuTrigger)}
           onToggle={this.onToggle}
           onClose={this.props.onMenuClose}

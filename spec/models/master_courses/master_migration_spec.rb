@@ -311,6 +311,42 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "should sync deleted quiz questions (unless changed downstream)" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!
+      qq1 = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      qq2 = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question 2', 'question_type' => 'essay_question'})
+      qgroup = quiz.quiz_groups.create!(:name => "group", :pick_count => 1)
+      qq3 = qgroup.quiz_questions.create!(:quiz => quiz, :question_data => {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      qq1_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq1)).first
+      qq2_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq2)).first
+      qq3_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq3)).first
+
+      new_text = "new text"
+      qq1_to.update_attribute(:question_data, qq1_to.question_data.merge('question_text' => new_text))
+      Timecop.freeze(2.minutes.from_now) do
+        qq2.destroy
+      end
+      run_master_migration
+
+      expect(qq1_to.reload.question_data['question_text']).to eq new_text
+      expect(qq2_to.reload).to_not be_deleted # should not have overwritten because downstream changes
+
+      Timecop.freeze(4.minutes.from_now) do
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true})
+      end
+      run_master_migration
+
+      expect(qq1_to.reload.question_data['question_text']).to_not eq new_text # should overwrite now because locked
+      expect(qq2_to.reload).to be_deleted
+      expect(qq3_to.reload).to_not be_deleted
+    end
+
     it "tracks creations and updates in selective migrations" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
@@ -920,6 +956,47 @@ describe MasterCourses::MasterMigration do
       end
       run_master_migration
       expect(tag.reload).to_not be_deleted
+    end
+
+    it "should be able to delete modules" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      mod = @copy_from.context_modules.create!(:name => "module")
+
+      run_master_migration
+
+      mod_to = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      expect(mod_to).to be_active
+
+      mod.destroy
+
+      run_master_migration
+      expect(@migration).to be_completed
+      expect(mod_to.reload).to be_deleted
+    end
+
+    it "should copy outcomes in selective copies" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      default = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.create!(:context => @copy_from, :title => "outcome groupd")
+      default.adopt_outcome_group(log)
+
+      run_master_migration # get the full sync out of the way
+
+      Timecop.freeze(1.minute.from_now) do
+        @lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
+        @lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2},
+          {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+        @lo.save!
+        log.reload.add_outcome(@lo)
+      end
+
+      run_master_migration
+      expect(@migration).to be_completed
+      lo_to = @copy_to.learning_outcomes.where(:migration_id => mig_id(@lo)).first
+      expect(lo_to).to be_present
     end
 
     it "sends notifications", priority: "2", test_id: 3211103 do

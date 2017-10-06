@@ -59,6 +59,8 @@ define [
       json.CAN =
         MANAGE: !!@WIKI_RIGHTS.manage
         PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
+        # TODO: Consider allowing duplicating pages in other contexts
+        DUPLICATE: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
 
       json.cannot_edit_by_master_course = json.is_master_course_child_content && json.restricted_by_master_course
 
@@ -76,7 +78,10 @@ define [
 
       # attach/re-attach the icons
       unless @publishIconView
-        @publishIconView = new PublishIconView model: @model
+        @publishIconView = new PublishIconView(
+          model: @model,
+          title: @model.get('title')
+        )
         @model.view = @
       @publishIconView.$el.appendTo(@$publishCell)
       @publishIconView.render()
@@ -132,7 +137,8 @@ define [
         # We were at the top, or there wasn't another page item cog
         $focusOnDelete = $('.new_page')
       else
-        $focusOnDelete = $allCogs[newIndex]
+        $allTitles = $('.collectionViewItems').children().find('.wiki-page-link')
+        $focusOnDelete = $allTitles[newIndex]
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model

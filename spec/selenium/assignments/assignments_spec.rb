@@ -26,6 +26,8 @@ describe "assignments" do
   include FilesCommon
   include AssignmentsCommon
   include AdminSettingsCommon
+  include CustomScreenActions
+  include CustomSeleniumActions
 
   # note: due date testing can be found in assignments_overrides_spec
 
@@ -307,28 +309,32 @@ describe "assignments" do
         expect(section_row.text.split("\n").first).to eq due_date
       end
 
+      def click_assign_to_dropdown_option(date_container_el, section_name_given)
+        input_el = f('[aria-label^="Add students"]', date_container_el)
+        list_id = input_el.attribute('aria-owns')
+        input_el.click
+        f('[id="' + list_id + '"] [value="' + section_name_given + '"]', date_container_el).click
+      end
+
       def assign_to_section(date_container, section_name)
-        unless f(".ic-tokeninput-is-open", date_container).enabled?
-          f(".ic-tokeninput", date_container).click
-        end
-        section = ff('.ic-tokeninput-option', date_container).select{ |h| h.attribute(:value) == section_name }.first
-        section.click
+        scroll_to(f('[aria-label^="Add students"]', date_container))
+        click_assign_to_dropdown_option(date_container, section_name)
       end
 
       context 'assignment name length' do
         let(:error) { "Name is too long, must be under 11 characters" }
-        
+
         let(:name_length_invalid) { true }
         let(:settings_enable) { length_settings }
 
         def length_settings
-          { 
+          {
             :sis_assignment_name_length       => { :value=> true },
-            :sis_assignment_name_length_input => { :value => name_length_limit.to_s } 
+            :sis_assignment_name_length_input => { :value => name_length_limit.to_s }
           }
         end
 
-        it 'validates name length while sis is on' do 
+        it 'validates name length while sis is on' do
           submit_blocked_with_errors
           set_value(f("#assignment_name"), valid_name)
           submit_assignment_form

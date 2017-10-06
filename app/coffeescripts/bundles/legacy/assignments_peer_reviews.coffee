@@ -33,8 +33,20 @@ define [
     ), ->
       $(this).removeClass "submission-hover"
 
+    $(".peer_review").focusin (->
+      $(this).addClass "focusWithin"
+    )
+    $(".peer_review").focusout (event) ->
+      $parent = $(this).closest(".peer_review")
+      $newFocus = $(event.related).closest(".peer_review")
+      unless ($newFocus.is($parent))
+        $parent.removeClass "focusWithin"
+
     $(".peer_review .delete_review_link").click (event) ->
       event.preventDefault()
+      next = $(this).parents(".peer_review").next().find("a").add(
+        $(this).parents(".student_reviews").find(".assign_peer_review_link")
+      ).first()
       $(this).parents(".peer_review").confirmDelete
         url: $(this).attr("href")
         message: I18n.t("messages.cancel_peer_review", "Cancel this peer review?")
@@ -44,6 +56,7 @@ define [
             $(this).remove()
             if $parent.find(".assigned").length is 0
               $parent.find(".no_requests_message").show()
+            next.focus()
 
     $(".assign_peer_review_link").click (event) ->
       event.preventDefault()
@@ -77,6 +90,7 @@ define [
           hrefValues: ["id", "user_id"]
         $(this).parents(".student_reviews").find(".no_requests_message").slideUp().end().find(".peer_reviews").append $review
         $review.slideDown()
+        $review.find("a").first().focus()
         assessor_name = $(this).parents(".student_reviews").find(".assessor_name").text()
         time = $.datetimeString(data.assessment_request.updated_at)
         $review.find(".reminder_peer_review_link").attr "title", I18n.t("titles.reminder", "Remind %{assessor} about Assessment, last notified %{time}", { assessor: assessor_name, time: time })

@@ -271,13 +271,14 @@ describe "Wiki Pages" do
         check_element_has_focus(f('.al-trigger'))
       end
 
-      it "returns focus to the previous item cog if it was deleted" do
+      it "returns focus to the previous item title if it was deleted" do
         triggers = ff('.al-trigger')
+        titles = ff('.wiki-page-link')
         triggers.last.click
         ff('.delete-menu-item').last.click
         f('.ui-dialog-buttonset .btn-danger').click
         wait_for_ajaximations
-        check_element_has_focus(triggers[-2])
+        check_element_has_focus(titles[-2])
       end
 
       it "returns focus to the + Page button if there are no previous item cogs" do

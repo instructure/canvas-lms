@@ -291,7 +291,8 @@ class Assignment < ActiveRecord::Base
     grades_published_at
     omit_from_final_grade
     grading_standard_id
-  )
+    anonymous_instructor_annotations
+  ).freeze
 
   def external_tool?
     self.submission_types == 'external_tool'

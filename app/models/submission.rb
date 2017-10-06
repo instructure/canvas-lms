@@ -46,6 +46,10 @@ class Submission < ActiveRecord::Base
     assignment_in_closed_grading_period: {
       status: false,
       message: I18n.t('This assignment is in a closed grading period for this student')
+    }.freeze,
+    not_applicable: {
+      status: false,
+      message: I18n.t('This assignment is not applicable to this student')
     }.freeze
   }.freeze
 
@@ -208,6 +212,7 @@ class Submission < ActiveRecord::Base
     state :graded
     state :deleted
   end
+  alias needs_review? pending_review?
 
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
@@ -236,6 +241,10 @@ class Submission < ActiveRecord::Base
       (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
      )
     )
+  end
+
+  def resubmitted?
+    needs_grading? && grade_matches_current_submission == false
   end
 
   def needs_grading_changed?
@@ -1368,10 +1377,9 @@ class Submission < ActiveRecord::Base
   private :can_autograde?
 
   def can_autograde_symbolic_status
+    return :not_applicable if deleted?
     return :unpublished unless assignment.published?
     return :not_autograded if grader_id >= 0
-
-    student_id = user_id || self.user.try(:id)
 
     if grading_period&.closed?
       :assignment_in_closed_grading_period
@@ -1395,11 +1403,10 @@ class Submission < ActiveRecord::Base
   def can_grade_symbolic_status(user = nil)
     user ||= grader
 
+    return :not_applicable if deleted?
     return :unpublished unless assignment.published?
     return :cant_manage_grades unless context.grants_right?(user, nil, :manage_grades)
     return :account_admin if context.account_membership_allows(user)
-
-    student_id = self.user_id || self.user.try(:id)
 
     if grading_period&.closed?
       :assignment_in_closed_grading_period
@@ -1953,27 +1960,17 @@ class Submission < ActiveRecord::Base
 
     def late?
       return false if excused?
-      return late_policy_status == 'late' unless late_policy_status.nil?
+      return late_policy_status == 'late' if late_policy_status.present?
       submitted_at.present? && past_due?
     end
     alias late late?
 
     def missing?
       return false if excused?
-      # It's missing if the teacher said it was missing
       return late_policy_status == 'missing' if late_policy_status.present?
-
-      # Teacher didn't say it was missing
-      # It's not missing if it has already been submitted
       return false if submitted_at.present?
-
-      # It hasn't been submitted yet
-      # It's not missing if it's not past due
       return false unless past_due?
 
-      # It isn't excused
-      # It is missing if the assignment expects a submission
-      # It is not missing if the assignment does not expect a submission
       assignment.expects_submission?
     end
     alias missing missing?

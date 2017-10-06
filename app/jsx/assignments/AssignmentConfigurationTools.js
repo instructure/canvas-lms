@@ -22,6 +22,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!moderated_grading'
 import 'compiled/jquery.rails_flash_notifications'
+import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPicker'
 
   const AssignmentConfigurationTools = React.createClass({
     displayName: 'AssignmentConfigurationTools',
@@ -30,7 +31,8 @@ import 'compiled/jquery.rails_flash_notifications'
       courseId: PropTypes.number.isRequired,
       secureParams: PropTypes.string.isRequired,
       selectedTool: PropTypes.number,
-      selectedToolType: PropTypes.string
+      selectedToolType: PropTypes.string,
+      visibilitySetting: PropTypes.string
     },
 
     componentWillMount() {
@@ -49,7 +51,8 @@ import 'compiled/jquery.rails_flash_notifications'
         selectedToolValue: `${this.props.selectedToolType}_${this.props.selectedTool}`,
         beforeExternalContentAlertClass: 'screenreader-only',
         afterExternalContentAlertClass: 'screenreader-only',
-        iframeStyle: {}
+        iframeStyle: {},
+        visibilityEnabled: !!this.props.selectedTool
       };
     },
 
@@ -120,6 +123,7 @@ import 'compiled/jquery.rails_flash_notifications'
       event.preventDefault();
       this.setState({
         selectedToolValue: event.target.value,
+        visibilityEnabled: event.target.value.toLowerCase().indexOf('none') === -1
       }, () => this.setToolLaunchUrl());
     },
 
@@ -156,7 +160,7 @@ import 'compiled/jquery.rails_flash_notifications'
           ref={(c) => { this.similarityDetectionTool = c; }}
           value={this.state.selectedToolValue}
         >
-          <option title="Plagiarism Review Tool" data-launch="none">
+          <option title="Plagiarism Review Tool" data-launch="none" data-type="none">
             None
           </option>
           {
@@ -244,6 +248,10 @@ import 'compiled/jquery.rails_flash_notifications'
               {this.renderOptions()}
               {this.renderToolType()}
               {this.renderConfigTool()}
+              <OriginalityReportVisibilityPicker
+                isEnabled={ !!this.state.visibilityEnabled }
+                selectedOption={ this.props.visibilitySetting }
+              />
             </div>
           </div>
         </div>
@@ -251,13 +259,14 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   });
 
-  const attach = function(element, courseId, secureParams, selectedTool, selectedToolType) {
+  const attach = function(element, courseId, secureParams, selectedTool, selectedToolType, visibilitySetting) {
     const configTools = (
       <AssignmentConfigurationTools
         courseId ={courseId}
         secureParams={secureParams}
         selectedTool={selectedTool}
-        selectedToolType={selectedToolType}/>
+        selectedToolType={selectedToolType}
+        visibilitySetting={visibilitySetting} />
     );
     return ReactDOM.render(configTools, element);
   };

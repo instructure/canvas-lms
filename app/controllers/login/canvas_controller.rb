@@ -19,6 +19,7 @@
 class Login::CanvasController < ApplicationController
   include Login::Shared
 
+  before_action :validate_auth_type
   before_action :forbid_on_files_domain
   before_action :run_login_hooks, only: [:new, :create]
   before_action :fix_ms_office_redirects, only: :new
@@ -125,6 +126,10 @@ class Login::CanvasController < ApplicationController
   end
 
   protected
+
+  def validate_auth_type
+    @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, '')).active.take!
+  end
 
   def unsuccessful_login(message)
     if request.format.json?

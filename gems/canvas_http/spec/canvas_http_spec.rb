@@ -41,7 +41,6 @@ describe "CanvasHttp" do
         to_return(status: 200)
       expect(CanvasHttp.post(url, body: body, content_type: content_type).code).to eq "200"
     end
-
   end
 
   describe ".get" do
@@ -118,6 +117,25 @@ describe "CanvasHttp" do
       expect(res.body).to eq("Hello")
     end
 
+    it "should check host before running" do
+      res = nil
+      stub_request(:get, "http://www.example.com/a/b").
+        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+      expect(CanvasHttp).to receive(:insecure_host?).with("www.example.com").and_return(true)
+      expect{ CanvasHttp.get("http://www.example.com/a/b") }.to raise_error(CanvasHttp::InsecureUriError)
+    end
+  end
+
+  describe '#insecure_host?' do
+    it "should check for insecure hosts" do
+      CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
+      expect(CanvasHttp.insecure_host?('www.example.com')).to eq false
+      expect(CanvasHttp.insecure_host?('localhost')).to eq true
+      expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
+      expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
+      expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
+      expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
+    end
   end
 
   describe ".tempfile_for_url" do

@@ -29,7 +29,7 @@ class Avatar extends React.Component {
       name: PropTypes.string,
       avatar_url: PropTypes.string,
       short_name: PropTypes.string,
-      id: PropTypes.string
+      _id: PropTypes.string
     }).isRequired,
     courseId: PropTypes.oneOfType([
       PropTypes.string,
@@ -45,10 +45,10 @@ class Avatar extends React.Component {
       const name = user.short_name || user.name || 'user';
       return (
         <div className="StudentContextTray__Avatar">
-          <Link href={`/courses/${this.props.courseId}/users/${user.id}`} aria-label={I18n.t('Go to %{name}\'s profile', {name})}>
+          <Link href={`/courses/${this.props.courseId}/users/${user._id}`} aria-label={I18n.t('Go to %{name}\'s profile', {name})}>
             <InstUIAvatar
               size="x-large"
-              name={user.name}
+              name={name}
               src={user.avatar_url}
             />
           </Link>
@@ -56,7 +56,7 @@ class Avatar extends React.Component {
             canMasquerade && (
               <Typography size="x-small" weight="bold" as="div">
                 <a
-                  href={`/courses/${courseId}?become_user_id=${user.id}`}
+                  href={`/courses/${courseId}?become_user_id=${user._id}`}
                   aria-label={I18n.t('Act as %{name}', { name: user.short_name })}
                 >
                   {I18n.t('Act as User')}

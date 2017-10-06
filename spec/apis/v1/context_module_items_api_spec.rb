@@ -1210,6 +1210,15 @@ describe "Module Items API", type: :request do
         end
       end
 
+      describe "module item sequence response data" do
+        it "should include mastery path information" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Quiz&asset_id=#{@quiz.id}",
+                          :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                          :course_id => @course.to_param, :asset_type => 'Quiz', :asset_id => @quiz.to_param)
+          expect(json['items'][0]['mastery_path']).to be_present
+        end
+      end
+
       describe "caching CYOE data" do
         it "uses the cache when requested again" do
           expect(ConditionalRelease::Service).to receive(:request_rules).never

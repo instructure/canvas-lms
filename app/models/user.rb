@@ -1595,9 +1595,9 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").distinct.select(:assignment_id)).
-        preload(:context).
-        need_grading_info
+        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").
+          where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
+        preload(:context)
       if options[:scope_only]
         scope # Also need to check the rights like below
       else
@@ -2016,6 +2016,7 @@ class User < ActiveRecord::Base
           subs_with_comment_scope = Submission.active.where(user_id: self).for_context_codes(context_codes).
             joins(:submission_comments, :assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
+            where('submission_comments.created_at>?', opts[:start_at]).
             where.not(:submission_comments => {:author_id => self, :draft => true}).
             distinct_on("submissions.id").
             order("submissions.id, submission_comments.created_at DESC"). # get the last created comment

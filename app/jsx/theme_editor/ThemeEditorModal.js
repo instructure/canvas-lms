@@ -139,6 +139,6 @@ export default React.createClass({
         >
           {this.modalContent()}
         </Modal>
-      )
+      );
     }
   })

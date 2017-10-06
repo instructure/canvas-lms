@@ -296,6 +296,7 @@ class GroupsController < ApplicationController
           @js_env[:IS_LARGE_ROSTER] ||= @context.is_a?(Account)
           render :context_manage_groups
         else
+          return render_unauthorized_action if @context.is_a?(Account)
           @groups = @user_groups = @groups & (@user_groups || [])
           @available_groups = (all_groups - @user_groups).select do |group|
             group.grants_right?(@current_user, :join)

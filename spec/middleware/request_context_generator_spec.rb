@@ -115,8 +115,12 @@ describe "RequestContextGenerator" do
       Thread.current[:context] = nil
       Canvas::DynamicSettings.reset_cache!
       Canvas::DynamicSettings.fallback_data = {
-        canvas: {
-          'signing-secret' => shared_secret
+        config: {
+          canvas: {
+            canvas: {
+              'signing-secret' => shared_secret
+            }
+          }
         }
       }
       env['HTTP_X_REQUEST_CONTEXT_ID'] = Canvas::Security.base64_encode(remote_request_context_id)

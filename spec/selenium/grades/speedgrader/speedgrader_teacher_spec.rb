@@ -155,6 +155,73 @@ describe "speed grader" do
     expect(f('#enrollment_concluded_notice')).to include_text 'Notice: Concluded Student'
   end
 
+  context 'when student names are hidden' do
+    before(:each) do
+      student_in_course(active_all: true, name: 'student b')
+      @student1 = @student
+      student_in_course(active_all: true, name: 'student a')
+      @student2 = @student
+      student_in_course(active_all: true, name: 'student c')
+      @student3 = @student
+
+      @assignment.submission_types = 'online_text_entry'
+      @assignment.save!
+    end
+
+    it 'sorts by submission date when eg_sort_by is submitted_at' do
+      @submission1 = @assignment.submit_homework(@student1, submission_type: 'online_text_entry', body: 'student one')
+      @submission1.update!(submitted_at: 3.minutes.ago)
+      @submission2 = @assignment.submit_homework(@student3, submission_type: 'online_text_entry', body: 'student three')
+      @submission2.update!(submitted_at: 2.minutes.ago)
+      @submission3 = @assignment.submit_homework(@student2, submission_type: 'online_text_entry', body: 'student two')
+      @submission3.update!(submitted_at: 1.minute.ago)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+      Speedgrader.click_settings_link
+      click_option('#eg_sort_by', 'submitted_at', :value)
+      Speedgrader.select_hide_student_names.click
+
+      expect_new_page_load do
+        Speedgrader.submit_settings_form
+      end
+
+      list_items = ff('#students_selectmenu option')
+      expect(list_items[0]['value']).to eq(@student1.id.to_s)
+      expect(list_items[1]['value']).to eq(@student3.id.to_s)
+      expect(list_items[2]['value']).to eq(@student2.id.to_s)
+    end
+
+    it 'sorts by submission status when eg_sort_by is submission_status' do
+      @submission1 = @assignment.submit_homework(@student1, submission_type: 'online_text_entry', body: 'student one')
+      @submission2 = @assignment.submit_homework(@student2, submission_type: 'online_text_entry', body: 'student three')
+      @submission2.update(
+        grade: '90', score: 90, workflow_state: 'graded', grade_matches_current_submission: true,
+        published_score: 90, published_grade: 90
+      )
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+      Speedgrader.click_settings_link
+      click_option('#eg_sort_by', 'submission_status', :value)
+      Speedgrader.select_hide_student_names.click
+
+      expect_new_page_load do
+        Speedgrader.submit_settings_form
+      end
+
+      list_items = ff('#students_selectmenu option')
+
+      list_items.each do |item|
+        puts item.text
+      end
+
+      expect(list_items[0]['value']).to eq(@student2.id.to_s)
+      expect(list_items[1]['value']).to eq(@student1.id.to_s)
+      expect(list_items[2]['value']).to eq(@student3.id.to_s)
+    end
+  end
+
   context "multiple enrollments" do
     before(:each) do
       student_in_course
@@ -168,7 +235,7 @@ describe "speed grader" do
     it "does not duplicate students", priority: "1", test_id: 283985 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      expect(ff("#students_selectmenu option")).to have_size 1
+      expect(ff("#students_selectmenu > option")).to have_size 1
     end
 
     it "filters by section properly", priority: "1", test_id: 283986 do
@@ -178,9 +245,9 @@ describe "speed grader" do
       section_options_text = f("#section-menu ul")[:textContent] # hidden
       expect(section_options_text).to include(@course_section.name)
       goto_section(sections[0].id)
-      expect(ff("#students_selectmenu option")).to have_size 1
+      expect(ff("#students_selectmenu > option")).to have_size 1
       goto_section(sections[1].id)
-      expect(ff("#students_selectmenu option")).to have_size 1
+      expect(ff("#students_selectmenu > option")).to have_size 1
     end
   end
 

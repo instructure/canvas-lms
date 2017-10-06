@@ -99,9 +99,10 @@
                       (isCurrent ? ' checked="checked"' : '') +
                       ' aria-selected="' + isCurrent + '"' +
                       ' aria-label="' + getSpeedNameFromValue(speeds[i].value) + '"' +
+                      ' tabindex=-1' +
                       ' />' +
                 '<label for="' + inputId + '" ' + 'aria-hidden="true"' +
-                      (isCurrent ? ' class="mejs-speed-selected"' : '') +
+                      (isCurrent ? ' class="mejs-selected"' : '') +
                       '>' + speeds[i].name + '</label>' +
               '</li>';
         }
@@ -130,8 +131,8 @@
             speedButton.find('button')
               .html(getSpeedNameFromValue(newSpeed))
               .attr('aria-label', speedLabel(newSpeed));
-            speedButton.find('.mejs-speed-selected').removeClass('mejs-speed-selected');
-            speedButton.find('input[type="radio"]:checked').next().addClass('mejs-speed-selected');
+            speedButton.find('.mejs-selected').removeClass('mejs-selected');
+            speedButton.find('input[type="radio"]:checked').next().addClass('mejs-selected');
           });
         speedButton
         // set size on demand

@@ -26,6 +26,7 @@ import MigrationStates from 'jsx/blueprint_courses/migrationStates'
 import sampleData from '../sampleData'
 import mockStore from '../mockStore'
 
+let clock
 let sidebarContentRef = null
 
 const initialState = {
@@ -53,6 +54,10 @@ function connect (props = defaultProps(), storeState = initialState) {
 
 QUnit.module('Course Sidebar component', {
   setup () {
+    clock = sinon.useFakeTimers()
+    const appElement = document.createElement('div')
+    appElement.id = 'application'
+    document.getElementById('fixtures').appendChild(appElement)
     sidebarContentRef = null
     moxios.install()
     moxios.stubRequest('/api/v1/courses/4/blueprint_templates/default/migrations', {
@@ -62,6 +67,8 @@ QUnit.module('Course Sidebar component', {
   },
   teardown () {
     moxios.uninstall()
+    document.getElementById('fixtures').innerHTML = ''
+    clock.restore()
   }
 })
 
@@ -75,6 +82,7 @@ test('renders the closed CourseSidebar component', () => {
 test('renders the open CourseSidebar component', () => {
   const tree = enzyme.mount(connect())
   tree.find('button').simulate('click')
+  clock.tick(500)
   ok(sidebarContentRef, 'sidebar contents')
 
   const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
@@ -159,6 +167,7 @@ test('renders Sync button if has associations and sync is active and no unsyced 
   state.migrationStatus = MigrationStates.states.imports_queued
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
+  clock.tick(500)
   ok(sidebarContentRef)
   const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
 
@@ -171,6 +180,7 @@ test('renders Sync button if has associations and has unsynced changes', () => {
   const state = {...initialState}
   const tree = enzyme.mount(connect(props, state))
   tree.find('button').simulate('click')
+  clock.tick(500)
   ok(sidebarContentRef)
   const sidebar = new enzyme.ReactWrapper(sidebarContentRef, sidebarContentRef)
 

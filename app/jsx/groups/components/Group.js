@@ -89,7 +89,7 @@ import natcompare from 'compiled/util/natcompare'
       var hasUsers = this.props.group.users.length > 0;
       var shouldSwitch = this.props.group.group_category.is_member && this.props.group.group_category.role !== 'student_organized';
 
-      var visitLink = isMember ? <a href={`/groups/${this.props.group.id}`}
+      var visitLink = (ENV.CAN_VIEW_PAGES || isMember) ? <a href={`/groups/${this.props.group.id}`}
                                     aria-label={I18n.t('Visit group %{group_name}', {group_name: groupName})}
                                     onClick={(e) => e.stopPropagation()}>{I18n.t('Visit')}</a> : null;
 

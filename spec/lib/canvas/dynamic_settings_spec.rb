@@ -23,6 +23,7 @@ module Canvas
   describe DynamicSettings do
     before do
       @cached_config = DynamicSettings.config
+      @cached_fallback_data = DynamicSettings.fallback_data
     end
 
     after do
@@ -31,8 +32,8 @@ module Canvas
       rescue Imperium::UnableToConnectError, Imperium::TimeoutError
         # don't fail the test if there is no consul running
       end
+      Canvas::DynamicSettings.fallback_data = @cached_fallback_data
       Canvas::DynamicSettings.reset_cache!
-      Canvas::DynamicSettings.fallback_data = nil
     end
 
     let(:parent_key){ 'rich-content-service' }
@@ -77,54 +78,91 @@ module Canvas
     end
 
     describe '.fallback_data =' do
-      before(:each) do
-        @original_fallback = DynamicSettings.fallback_data
+      it 'must provide indifferent access on resulting proxy' do
+        DynamicSettings.fallback_data = {foo: 'bar'}
+        proxy = DynamicSettings.root_fallback_proxy
+        expect(proxy['foo']).to eq 'bar'
+        expect(proxy[:foo]).to eq 'bar'
       end
 
-      after(:each) do
-        DynamicSettings.fallback_data = @original_fallback
-      end
-
-      it 'must convert the supplied hash to one with indifferent access' do
-        DynamicSettings.fallback_data = {}
-        expect(DynamicSettings.fallback_data).to be_a(ActiveSupport::HashWithIndifferentAccess)
-      end
-
-      it 'must clear the fallback data when passed nil' do
-        DynamicSettings.fallback_data = {}
+      it 'must clear the fallback when passed nil' do
+        DynamicSettings.fallback_data = {foo: 'bar'}
         DynamicSettings.fallback_data = nil
-        expect(DynamicSettings.fallback_data).to be_nil
+        proxy = DynamicSettings.root_fallback_proxy
+        expect(proxy['foo']).to be_nil
       end
     end
 
     describe '.find' do
-      before(:each) do
-        @original_fallback = DynamicSettings.fallback_data
+      context "when consul is configured" do
+        before do
+          DynamicSettings.config = valid_config
+        end
+
+        it 'must return a PrefixProxy when consul is configured' do
+          proxy = DynamicSettings.find('foo')
+          expect(proxy).to be_a(DynamicSettings::PrefixProxy)
+        end
       end
 
-      after(:each) do
-        DynamicSettings.config = nil
-        DynamicSettings.fallback_data = @original_fallback
-      end
+      context "when consul is not configured" do
+        let(:data) {
+          {
+            config: {
+              canvas: {foo: {bar: 'baz'}},
+              frobozz: {some: {thing: 'magic'}}
+            },
+            private: {
+              canvas: {zab: {rab: 'oof'}}
+            }
+          }
+        }
 
-      it 'must return a PrefixProxy when consul is configured' do
-        DynamicSettings.config = valid_config
-        proxy = DynamicSettings.find('foo')
-        expect(proxy).to be_a(DynamicSettings::PrefixProxy)
-      end
+        before do
+          DynamicSettings.config = nil
+          DynamicSettings.fallback_data = data
+        end
 
-      it 'must return a FallbackProxy when neither consul or fallback data have been configured' do
-        allow(DynamicSettings).to receive(:kv_client).and_return(nil)
-        DynamicSettings.fallback_data = nil
-        expect(DynamicSettings.find('foo')).to be_a(DynamicSettings::FallbackProxy)
-        expect(DynamicSettings.find('foo')['bar']).to eq nil
-      end
+        after do
+          DynamicSettings.fallback_data = nil
+        end
 
-      it 'must return a FallbackProxy when consul is not configured' do
-        allow(DynamicSettings).to receive(:kv_client).and_return(nil)
-        DynamicSettings.fallback_data = {'foo' => {bar: 'baz'}}
-        proxy = DynamicSettings.find('foo')
-        expect(proxy).to be_a(DynamicSettings::FallbackProxy)
+        it 'must return an empty FallbackProxy when fallback data is also unconfigured' do
+          DynamicSettings.fallback_data = nil
+          expect(DynamicSettings.find('foo')).to be_a(DynamicSettings::FallbackProxy)
+          expect(DynamicSettings.find('foo')['bar']).to eq nil
+        end
+
+        it 'must return a FallbackProxy with configured fallback data' do
+          proxy = DynamicSettings.find('foo', tree: 'config', service: 'canvas')
+          expect(proxy).to be_a(DynamicSettings::FallbackProxy)
+          expect(proxy[:bar]).to eq 'baz'
+        end
+
+        it 'must default the the config tree' do
+          proxy = DynamicSettings.find('foo', service: 'canvas')
+          expect(proxy['bar']).to eq 'baz'
+        end
+
+        it 'must handle an alternate tree' do
+          proxy = DynamicSettings.find('zab', tree: 'private', service: 'canvas')
+          expect(proxy['rab']).to eq 'oof'
+        end
+
+        it 'must default to the canvas service' do
+          proxy = DynamicSettings.find('foo', tree: 'config')
+          expect(proxy['bar']).to eq 'baz'
+        end
+
+        it 'must accept an alternate service' do
+          proxy = DynamicSettings.find('some', tree: 'config', service: 'frobozz')
+          expect(proxy['thing']).to eq 'magic'
+        end
+
+        it 'must ignore a nil prefix' do
+          proxy = DynamicSettings.find(tree: 'config', service: 'canvas')
+          expect(proxy.for_prefix('foo')['bar']).to eq 'baz'
+        end
       end
     end
   end

@@ -402,7 +402,7 @@ import 'compiled/badge_counts'
               .loadDocPreview({
                 canvadoc_session_url: attachment.canvadoc_session_url,
                 mimeType: attachment.content_type,
-                public_url: attachment.authenticated_s3_url,
+                public_url: attachment.authenticated_url,
                 attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
               })
               .prepend(

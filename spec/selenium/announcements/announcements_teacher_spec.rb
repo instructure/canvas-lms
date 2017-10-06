@@ -232,6 +232,18 @@ describe "announcements" do
       expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
     end
 
+    it "allows delay post date edit with disabled comments", priority: "2", test_id: 3035859 do
+      time_new = format_time_for_view(Time.zone.today + 1.day)
+      disable_comments_on_announcements
+      announcement = @course.announcements.create!(
+        title: 'Hello there!', message: 'Hi!', delayed_post_at: time_new
+      )
+      get [@course, announcement]
+      click_edit_btn
+      submit_form(f('.form-horizontal'))
+      expect(f('.discussion-fyi')).to include_text(time_new)
+    end
+
     it "should add and remove an external feed to announcements", priority: "1", test_id: 220370 do
       get "/courses/#{@course.id}/announcements"
 

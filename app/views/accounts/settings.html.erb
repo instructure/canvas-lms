@@ -314,8 +314,13 @@ TEXT
 
         <% unless @account.site_admin? %>
           <fieldset>
-            <legend><%= t(:quiz_ip_filters_title, "Quiz IP Address Filters")%>
-              <%= link_to("<i class='icon-question standalone-icon'></i>".html_safe, '#', :class => 'ip_help_link no-hover', :title => t(:quiz_ip_filters_help_tooltip, "What are Quiz IP Filters?")) %></legend>
+            <h2 class="screenreader-only"><%= t('Quiz IP Address Filters') %></h2>
+            <legend><%= t('Quiz IP Address Filters') %>
+              <button class='Button Button--icon-action ip_help_link' type='button'>
+                <i class='icon-question'></i>
+                <span class='screenreader-only'><%= t(:quiz_ip_filters_help_tooltip, "What are Quiz IP Filters?") %></span>
+              </button>
+            </legend>
 
             <div id="ip_filters_dialog" style="display: none;">
               <h2><%= t(:quiz_ip_filters_help_title, "What are Quiz IP Filters?") %></h2>
@@ -348,6 +353,7 @@ TEXT
         <% end %>
 
         <fieldset>
+          <h2 class="screenreader-only"><%= t('Features') %></h2>
           <legend><%= t(:features_title, "Features") %></legend>
           <%= f.fields_for :settings do |settings| %>
             <% if @account.root_account? %>
@@ -575,7 +581,8 @@ TEXT
 
         <% if @account.root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>
           <fieldset>
-            <legend><%= t(:enabled_web_serices_title, "Enabled Web Services") %></legend>
+            <h2 class="screenreader-only"><%= t('Enabled Web Services') %></h2>
+            <legend><%= t('Enabled Web Services') %></legend>
             <%= f.fields_for :services do |services| %>
               <% exposed_services.sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
                 <div>
@@ -608,6 +615,7 @@ acknowledge that you have read and agreed to the
 
         <% if @account.root_account? && !@account.site_admin? %>
           <fieldset>
+            <h2 class="screenreader-only"><%= t('Who Can Create New Courses') %></h2>
             <legend><%= t(:create_courses_title, "Who Can Create New Courses") %></legend>
             <div style="font-size: 0.8em;"><%= t(:create_courses_description, "(Account Administrators can always create courses)") %></div>
             <%= f.fields_for :settings do |settings| %>

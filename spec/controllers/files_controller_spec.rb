@@ -1184,9 +1184,8 @@ describe FilesController do
   describe "POST api_capture" do
     before :each do
       allow(InstFS).to receive(:enabled?).and_return(true)
-      key = "jwt signing key"
-      allow(InstFS).to receive(:jwt_secret).and_return(Base64.encode64(key))
-      @token = Canvas::Security.create_jwt({}, nil, key)
+      allow(InstFS).to receive(:jwt_secret).and_return("jwt signing key")
+      @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
     end
 
     it "rejects if InstFS integration is disabled" do
@@ -1245,7 +1244,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url(secure: false) })
+        expect(data).to eq({ "public_url" => @attachment.authenticated_url(secure: false) })
       end
     end
 
@@ -1263,7 +1262,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url(secure: false) })
+        expect(data).to eq({ "public_url" => @attachment.authenticated_url(secure: false) })
       end
 
       it "should verify that the requested file belongs to the submission" do
@@ -1279,7 +1278,7 @@ describe FilesController do
         get "public_url", params: {:id => old_file.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => old_file.authenticated_s3_url(secure: false) })
+        expect(data).to eq({ "public_url" => old_file.authenticated_url(secure: false) })
       end
     end
   end

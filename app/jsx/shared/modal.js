@@ -42,16 +42,16 @@ import ModalButtons from './modal-buttons'
 
   const Modal = React.createClass({
 
-    getInitialState() {
-      return {
-        modalIsOpen: this.props.isOpen
-      }
-    },
     getDefaultProps(){
       return {
         className: "ReactModal__Content--canvas", // Override with "ReactModal__Content--canvas ReactModal__Content--mini-modal" for a mini modal
         style: {},
       };
+    },
+    getInitialState() {
+      return {
+        modalIsOpen: this.props.isOpen
+      }
     },
     componentWillReceiveProps(props){
       let callback
@@ -80,6 +80,9 @@ import ModalButtons from './modal-buttons'
     onSubmit(){
       const promise = this.props.onSubmit();
       $(this.modal).disableWhileLoading(promise);
+    },
+    onAfterOpen() {
+      this.closeBtn.focus()
     },
     getAppElement () {
       // Need to wait for the dom to load before we can get the default #application dom element
@@ -127,6 +130,7 @@ import ModalButtons from './modal-buttons'
             onRequestClose={this.closeModal}
             className={this.props.className}
             style={modalOverrides}
+            onAfterOpen={this.onAfterOpen}
             overlayClassName={this.props.overlayClassName}
             contentLabel={this.props.contentLabel}
             appElement={this.getAppElement()}>

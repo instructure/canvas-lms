@@ -26,7 +26,8 @@ body {
   background: $ic-color-light;
   font-weight: 300;
 
-  &:not(.is-inside-submission-frame):not(.embedded) {
+  &:not(.is-inside-submission-frame),
+  &:not(.embedded) {
     min-width: 768px;
   }
 

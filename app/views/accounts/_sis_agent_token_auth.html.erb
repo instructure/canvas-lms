@@ -20,6 +20,7 @@
     @account.root_account? &&
     @account.grants_right?(@current_user, :manage_site_settings) %>
     <fieldset id="add_sis_app_token">
+        <h2 class="screenreader-only"><%= t('SIS Agent Token Authentication') %></h2>
         <legend><%= t("SIS Agent Token Authentication") %></legend>
         <p style="font-size: 0.9em;"><%= t("This will allow you to authenticate Canvas for posting grades to SIS") %></p>
         <%= f.fields_for :settings do |settings| %>

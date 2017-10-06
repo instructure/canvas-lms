@@ -116,7 +116,7 @@ class SearchFormComponent extends Component {
     }
   }
 
-  setSelectedFrom = (from) => {
+  setSelectedFrom = (_, from) => {
     const startOfFrom = from ? moment(from).startOf('day').format() : '';
     this.setState(prevState => ({
       selected: {
@@ -126,7 +126,7 @@ class SearchFormComponent extends Component {
     }));
   }
 
-  setSelectedTo = (to) => {
+  setSelectedTo = (_, to) => {
     const endOfTo = to ? moment(to).endOf('day').format() : '';
     this.setState(prevState => ({
       selected: {

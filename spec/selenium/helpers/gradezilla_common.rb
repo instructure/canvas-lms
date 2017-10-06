@@ -271,4 +271,75 @@ module GradezillaCommon
       :assignment_group => @group
     )
   end
+
+  shared_context 'late_policy_course_setup' do
+    let(:now) { Time.zone.now }
+
+    def create_course_late_policy
+      # create late/missing policies on backend
+      @course.create_late_policy!(
+        missing_submission_deduction_enabled: true,
+        missing_submission_deduction: 50.0,
+        late_submission_deduction_enabled: true,
+        late_submission_deduction: 10.0,
+        late_submission_interval: 'day',
+        late_submission_minimum_percent_enabled: true,
+        late_submission_minimum_percent: 50.0,
+      )
+    end
+
+    def create_assignments
+      # create 2 assignments due in the past
+      @a1 = @course.assignments.create!(
+        title: 'assignment one',
+        grading_type: 'points',
+        points_possible: 100,
+        due_at: 1.day.ago(now),
+        submission_types: 'online_text_entry'
+      )
+
+      @a2 = @course.assignments.create!(
+        title: 'assignment two',
+        grading_type: 'points',
+        points_possible: 100,
+        due_at: 1.day.ago(now),
+        submission_types: 'online_text_entry'
+      )
+
+      # create 1 assignment due in the future
+      @a3 = @course.assignments.create!(
+        title: 'assignment three',
+        grading_type: 'points',
+        points_possible: 10,
+        due_at: 2.days.from_now,
+        submission_types: 'online_text_entry'
+      )
+
+      # create 1 assignment that will be Excused for Student1
+      @a4 = @course.assignments.create!(
+        title: 'assignment four',
+        grading_type: 'points',
+        points_possible: 10,
+        due_at: 2.days.from_now,
+        submission_types: 'online_text_entry'
+      )
+    end
+
+    def make_submissions
+      # submit a1(late) and a3(on-time) so a2(missing)
+      Timecop.freeze(now) do
+        @a1.submit_homework(@course.students.first, body: 'submitting my homework')
+        @a3.submit_homework(@course.students.first, body: 'submitting my homework')
+      end
+    end
+
+    def grade_assignments
+      # as a teacher grade the assignments
+      @a1.grade_student(@course.students.first, grade: 90, grader: @teacher)
+      @a2.grade_student(@course.students.first, grade: 10, grader: @teacher)
+      @a3.grade_student(@course.students.first, grade: 9, grader: @teacher)
+      @a4.grade_student(@course.students.first, excuse: true, grader: @teacher)
+    end
+  end
 end
+

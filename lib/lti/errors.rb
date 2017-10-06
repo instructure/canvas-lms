@@ -21,5 +21,6 @@ module Lti
     class UnsupportedExportTypeError < StandardError; end
     class UnsupportedMessageTypeError < StandardError; end
     class InvalidMediaTypeError < StandardError; end
+    class UnauthorizedToolError < StandardError; end
   end
 end

@@ -1226,7 +1226,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # marks a quiz as having unpublished changes
   def self.mark_quiz_edited(id)
-    where(:id => id).update_all(:last_edited_at => Time.now.utc)
+    now = Time.now.utc
+    where(:id => id).update_all(:last_edited_at => now, :updated_at => now)
   end
 
   def mark_edited!

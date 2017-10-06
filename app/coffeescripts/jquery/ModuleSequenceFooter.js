@@ -212,23 +212,42 @@ export default class ModuleSequenceFooter {
   // to display the module name instead of the item title.
   // @api private
 
-  buildNextData () {
-    this.next.url = this.item.next.html_url
-
-    if (this.item.current.module_id === this.item.next.module_id) {
-      this.next.tooltip =
-        `<i class='${htmlEscape(this.iconClasses[this.item.next.type])}'></i> ${
-          htmlEscape(this.item.next.title)
-        }`
-      this.next.tooltipText = I18n.t('next_module_item_desc', 'Next: *item*', {wrapper: this.item.next.title})
+  buildNextPathData (masteryPath) {
+    if (masteryPath.awaiting_choice) {
+      this.next.url = masteryPath.choose_url
+      this.next.tooltipText = I18n.t('Choose the next mastery path')
     } else {
-      // module id is different
-      const module = _.find(this.modules, m => m.id === this.item.next.module_id)
-      this.next.tooltip =
-        `<strong style='float:left'>${
-          htmlEscape(I18n.t('next_module', 'Next Module:'))
-        }</strong> <br> ${htmlEscape(module.name)}`
-      this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {wrapper: module.name})
+      const lockedMessage = I18n.t('Next mastery path is currently locked')
+      const processingMessage = I18n.t('Next mastery path is currently processing')
+      const tooltipText = masteryPath.locked ? lockedMessage : processingMessage
+      this.next.modules_tab_disabled = masteryPath.modules_tab_disabled
+      this.next.url = masteryPath.modules_url
+      this.next.tooltipText = tooltipText
+    }
+    this.next.tooltip = `<i class='${htmlEscape(this.iconClasses.ModuleItem)}'/> ${this.next.tooltipText}`
+  }
+
+  buildNextData () {
+    const masteryPath = this.item.mastery_path
+    if (masteryPath && (masteryPath.awaiting_choice || masteryPath.locked || masteryPath.still_processing)) {
+      this.buildNextPathData(masteryPath)
+    } else {
+      this.next.url = this.item.next.html_url
+      if (this.item.current.module_id === this.item.next.module_id) {
+        this.next.tooltip =
+          `<i class='${htmlEscape(this.iconClasses[this.item.next.type])}'></i> ${
+            htmlEscape(this.item.next.title)
+          }`
+        this.next.tooltipText = I18n.t('Next: *item*', {wrapper: this.item.next.title})
+      } else {
+        // module id is different
+        const module = _.find(this.modules, m => m.id === this.item.next.module_id)
+        this.next.tooltip =
+          `<strong style='float:left'>${
+            htmlEscape(I18n.t('next_module', 'Next Module:'))
+          }</strong> <br> ${htmlEscape(module.name)}`
+        this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {wrapper: module.name})
+      }
     }
   }
 }

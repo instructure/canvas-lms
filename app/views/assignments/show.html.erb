@@ -234,7 +234,7 @@
 
 <% end %>
 
-<% if can_do(@assignment, @current_user, :submit) && !@locked %>
+<% if !@locked && can_do(@assignment, @current_user, :submit) %>
   <%= render :partial => "submit_assignment" %>
 <% end %>
 

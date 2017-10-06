@@ -1,0 +1,55 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+code,
+pre {
+  font-family: $ic-font-family-monospace;
+  font-size: 0.75rem;
+  border-radius: $ic-border-radius;
+  background-color: $ic-bg-light-neutral;
+  border: 1px solid $ic-border-color;
+}
+
+code {
+  padding: 0.125rem 0.25rem;
+  color: $ic-color-danger;
+}
+
+pre {
+  color: $ic-color-dark;
+  display: block;
+  padding: $ic-sp * 0.75;
+  margin: 0 0 $ic-sp;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre;
+  white-space: pre-wrap;
+
+  // Make prettyprint styles more spaced out for readability
+  &.prettyprint {
+    margin-bottom: $ic-sp * 2;
+  }
+
+  // Account for some code outputs that place code tags in pre tags
+  code {
+    padding: 0;
+    color: inherit;
+    background-color: transparent;
+    border: 0;
+  }
+}

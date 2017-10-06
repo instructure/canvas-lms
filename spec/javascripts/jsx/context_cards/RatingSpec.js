@@ -27,25 +27,9 @@ define([
     let subject
     const participationsLevel = 2
 
-    QUnit.module('valueNow', () => {
-      test('returns value associated with metricName', () => {
-        subject = TestUtils.renderIntoDocument(
-          <Rating
-            label='Participation'
-            metricName='participations_level'
-            analytics={{
-              participations_level: participationsLevel
-            }}
-          />
-        )
-
-        equal(subject.valueNow, participationsLevel)
-      })
-    })
-
     QUnit.module('formatValueText', () => {
       subject = TestUtils.renderIntoDocument(
-        <Rating />
+        <Rating metric={{level: 1}} />
       )
       const valueText = [
         'None', 'Low', 'Moderate', 'High'
@@ -62,9 +46,8 @@ define([
         subject = TestUtils.renderIntoDocument(
           <Rating
             label='Participation'
-            metricName='participations_level'
-            analytics={{
-              participations_level: participationsLevel
+            metric={{
+              level: participationsLevel
             }}
           />
         )

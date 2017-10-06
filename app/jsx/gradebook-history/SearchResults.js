@@ -37,7 +37,8 @@ const colHeaders = [
   I18n.t('Grader'),
   I18n.t('Assignment'),
   I18n.t('Before'),
-  I18n.t('After')
+  I18n.t('After'),
+  I18n.t('Current')
 ];
 
 const nearPageBottom = () => (
@@ -57,9 +58,11 @@ class SearchResultsComponent extends Component {
       grader: string.isRequired,
       gradeAfter: string.isRequired,
       gradeBefore: string.isRequired,
+      gradeCurrent: string.isRequired,
       id: string.isRequired,
       pointsPossibleAfter: string.isRequired,
       pointsPossibleBefore: string.isRequired,
+      pointsPossibleCurrent: string.isRequired,
       student: string.isRequired
     })).isRequired,
     nextPage: string.isRequired,

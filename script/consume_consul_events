@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+expanded_path = Pathname.new(__FILE__).realpath
+require File.expand_path('../../config/boot',  expanded_path)
+
+require 'base64'
+require 'json'
+require 'redis-store'
+
+# this purposely has no config so that it can spin up quickly;
+# just copy this script elsewhere and modify if you have a
+# non-default configuration
+cache = Redis::Store::Factory.create
+
+data = JSON.load(STDIN.read)
+data.each do |event|
+  id = event['ID']
+  # only invalidate events we haven't seen yet
+  if cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
+    key = Base64.decode64(event['Payload'])
+    cache.del(key)
+  end
+end
+# limit the set to the 256 newest elements
+cache.zremrangebyrank("consul_events", 0, -257)

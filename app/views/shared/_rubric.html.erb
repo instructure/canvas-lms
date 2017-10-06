@@ -22,7 +22,7 @@
    for_context ||= false
    context = @context
    context = context.context if context.is_a?(Group)
-   show_grading = !@assignment || @assignment.submission_types != 'online_quiz'
+   show_grading = !@assignment || !%w{online_quiz not_graded}.include?(@assignment.submission_types)
    rubric_association = assessment.rubric_association if assessment
 %>
 <% cache(['rubric_render3',
@@ -33,7 +33,8 @@
          editable,
          edit_view,
          assessing,
-         show_grading].join('/')) do %>
+         show_grading,
+         @domain_root_account.feature_enabled?(:rubric_criterion_range)].join('/')) do %>
 <div
   class="rubric_container rubric <%= "assessing" if assessing %> <%= "for_grading" if rubric_association.try(:use_for_grading) %>"
   id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>"

@@ -20,6 +20,7 @@ require_relative '../api_spec_helper'
 require_relative '../locked_spec'
 require_relative '../../sharding_spec_helper'
 require_relative '../../lti_spec_helper'
+require_relative '../../lti2_spec_helper'
 
 describe AssignmentsApiController, type: :request do
   include Api
@@ -720,7 +721,9 @@ describe AssignmentsApiController, type: :request do
              )
       assign = json.first
       expect(assign['submission']).to eq(
-        json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
+        json_parse(
+          controller.submission_json(submission, assignment, @user, session, { include: ['submission'] }).to_json
+        )
       )
     end
 
@@ -1331,98 +1334,105 @@ describe AssignmentsApiController, type: :request do
       expect(a.tool_settings_tool).to eq(tool)
     end
 
-    it "sets the configuration LTI 2 tool in account context" do
-      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
-      account = @course.account
-      product_family = Lti::ProductFamily.create(
-        vendor_code: '123',
-        product_code: 'abc',
-        vendor_name: 'acme',
-        root_account: account
-      )
-
-      tool_proxy = Lti:: ToolProxy.create(
-        shared_secret: 'shared_secret',
-        guid: 'guid',
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        context: account,
-        workflow_state: 'active',
-        raw_data: 'some raw data'
-      )
-
-      resource_handler = Lti::ResourceHandler.create(
-        resource_type_code: 'code',
-        name: 'resource name',
-        tool_proxy: tool_proxy
-      )
-
-      message_handler = Lti::MessageHandler.create(
-        message_type: 'basic-lti-launch-request',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler
-      )
-
-      Lti::ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
-
-      api_create_assignment_in_course(@course, {
+    it "does set the visibility settings" do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      response = api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'similarityDetectionTool' => message_handler.id,
-        'configuration_tool_type' => 'Lti::MessageHandler',
+        'similarityDetectionTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool',
         'submission_type' => 'online',
-        'submission_types' => ['online_upload']
+        'submission_types' => ['online_upload'],
+        'report_visibility' => 'after_grading'
       })
-
-      a = Assignment.last
-      expect(a.tool_settings_tool).to eq(message_handler)
+      a = Assignment.find response['id']
+      expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
     end
 
-    it "sets the configuration an LTI 2 tool in course context" do
-      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
-      account = @course.account
-      product_family = Lti::ProductFamily.create(
-        vendor_code: '123',
-        product_code: 'abc',
-        vendor_name: 'acme',
-        root_account: account
-      )
+    context 'LTI 2.x' do
+      include_context 'lti2_spec_helper'
 
-      tool_proxy = Lti:: ToolProxy.create(
-        shared_secret: 'shared_secret',
-        guid: 'guid',
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        context: @course,
-        workflow_state: 'active',
-        raw_data: 'some raw data'
-      )
+      let(:root_account) { Account.create!(name: 'root account') }
+      let(:course) { Course.create!(name: 'test course', account: account) }
+      let(:teacher) { teacher_in_course(course: course) }
 
-      resource_handler = Lti::ResourceHandler.create(
-        resource_type_code: 'code',
-        name: 'resource name',
-        tool_proxy: tool_proxy
-      )
+      before { account.update_attributes(root_account: root_account) }
 
-      message_handler = Lti::MessageHandler.create(
-        message_type: 'basic-lti-launch-request',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler
-      )
+      it "checks for tool installation in entire account chain" do
+        user_session teacher
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
+        api_create_assignment_in_course(course, {
+          'description' => 'description',
+          'similarityDetectionTool' => message_handler.id,
+          'configuration_tool_type' => 'Lti::MessageHandler',
+          'submission_type' => 'online',
+          'submission_types' => ['online_upload']
+        })
+        new_assignment = Assignment.find(JSON.parse(response.body)['id'])
+        expect(new_assignment.tool_settings_tool).to eq message_handler
+      end
 
-      Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
+      it "sets the configuration LTI 2 tool in account context" do
+        account = @course.account
+        tool_proxy.update_attributes(context: account)
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
+        Lti::ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
+        api_create_assignment_in_course(@course, {
+          'description' => 'description',
+          'similarityDetectionTool' => message_handler.id,
+          'configuration_tool_type' => 'Lti::MessageHandler',
+          'submission_type' => 'online',
+          'submission_types' => ['online_upload']
+        })
+        a = Assignment.last
+        expect(a.tool_settings_tool).to eq(message_handler)
+      end
 
-      api_create_assignment_in_course(@course, {
-        'description' => 'description',
-        'similarityDetectionTool' => message_handler.id,
-        'configuration_tool_type' => 'Lti::MessageHandler',
-        'submission_type' => 'online',
-        'submission_types' => ['online_upload']
-      })
+      it "sets the configuration an LTI 2 tool in course context" do
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
+        account = @course.account
+        product_family = Lti::ProductFamily.create(
+          vendor_code: '123',
+          product_code: 'abc',
+          vendor_name: 'acme',
+          root_account: account
+        )
 
-      a = Assignment.last
-      expect(a.tool_settings_tool).to eq(message_handler)
+        tool_proxy = Lti:: ToolProxy.create(
+          shared_secret: 'shared_secret',
+          guid: 'guid',
+          product_version: '1.0beta',
+          lti_version: 'LTI-2p0',
+          product_family: product_family,
+          context: @course,
+          workflow_state: 'active',
+          raw_data: 'some raw data'
+        )
+
+        resource_handler = Lti::ResourceHandler.create(
+          resource_type_code: 'code',
+          name: 'resource name',
+          tool_proxy: tool_proxy
+        )
+
+        message_handler = Lti::MessageHandler.create(
+          message_type: 'basic-lti-launch-request',
+          launch_path: 'https://samplelaunch/blti',
+          resource_handler: resource_handler
+        )
+
+        Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
+
+        api_create_assignment_in_course(@course, {
+          'description' => 'description',
+          'similarityDetectionTool' => message_handler.id,
+          'configuration_tool_type' => 'Lti::MessageHandler',
+          'submission_type' => 'online',
+          'submission_types' => ['online_upload']
+        })
+
+        a = Assignment.last
+        expect(a.tool_settings_tool).to eq(message_handler)
+      end
     end
 
     it "does not set the configuration tool if the submission type is not online with uploads" do
@@ -3500,7 +3510,9 @@ describe AssignmentsApiController, type: :request do
           :id => assignment.id.to_s},
           {:include => ['submission']})
         expect(json['submission']).to eq(
-          json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
+          json_parse(
+            controller.submission_json(submission, assignment, @user, session, { include: ['submission'] }).to_json
+          )
         )
       end
 

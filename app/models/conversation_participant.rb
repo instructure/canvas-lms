@@ -211,21 +211,11 @@ class ConversationParticipant < ActiveRecord::Base
 
   def all_messages
     self.conversation.shard.activate do
-      if self.conversation.shard == self.shard
-        # use a slightly more forgiving backcompat query (since the migration may not have
-        # fully filled in user_id yet)
-        ConversationMessage.shard(self.conversation.shard).
-          select("conversation_messages.*, conversation_message_participants.tags").
-          joins(:conversation_message_participants).
-          where("conversation_id=? AND (user_id=? OR (conversation_participant_id=? AND user_id IS NULL))", self.conversation_id, self.user_id, self).
-          order("created_at DESC, id DESC")
-      else
-        ConversationMessage.shard(self.conversation.shard).
-          select("conversation_messages.*, conversation_message_participants.tags").
-          joins(:conversation_message_participants).
-          where("conversation_id=? AND user_id=?", self.conversation_id, self.user_id).
-          order("created_at DESC, id DESC")
-      end
+      ConversationMessage.shard(self.conversation.shard).
+        select("conversation_messages.*, conversation_message_participants.tags").
+        joins(:conversation_message_participants).
+        where("conversation_id=? AND user_id=?", self.conversation_id, self.user_id).
+        order("created_at DESC, id DESC")
     end
   end
 
@@ -235,16 +225,17 @@ class ConversationParticipant < ActiveRecord::Base
 
   def participants(options = {})
     participants = shard.activate do
-      include_indirect_participants = options[:include_indirect_participants] || false
-      Rails.cache.fetch([conversation, user, 'participants', include_indirect_participants].cache_key) do
-        participants = conversation.participants
-        if include_indirect_participants
+      key = [conversation, 'participants'].cache_key
+      participants = Rails.cache.fetch(key) { conversation.participants }
+      if options[:include_indirect_participants]
+        indirect_key = [conversation, user, 'indirect_participants'].cache_key
+        participants += Rails.cache.fetch(indirect_key) do
           user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
           user_ids -= participants.map(&:id)
-          participants += AddressBook.available(user_ids)
+          AddressBook.available(user_ids)
         end
-        participants
       end
+      participants
     end
 
     if options[:include_participant_contexts]

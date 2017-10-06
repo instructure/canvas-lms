@@ -17,84 +17,20 @@
  */
 
 body.modal {
-  #modal-box {
-    max-width: $modal_box_width - (2 * $modal_box_padding);
-    width: auto;
-  }
-
-  #login-box .btn {
-    float: none;
-  }
-
-  li.used_otp {
-    text-decoration: line-through;
-  }
+  min-width: 0;
 }
-@media (max-width: 767px) {
-  body {
-    @include fontSize($ic-font-size--medium);
-    line-height: 1.6;
-  }
-  body,
-  body.no-headers .ic-Layout-wrapper,
-  body.embedded .ic-Layout-wrapper
-  {
-    min-width: 0;
-    padding: 0;
-  }
-  .modal {
-    top: auto;
-    right: auto;
-    bottom: auto;
-    left: auto;
-    position: relative;
-  }
-  body.modal #modal-box,
-  body.modal #login-box {
-    margin: 0 auto;
-    .btn {
-      width: 100%;
-      margin: 0;
-      display: block;
-    }
-  }
-  body.modal #modal-box {
-    padding: 20px;
-    box-shadow: 0 4px 8px -2px black;
-    h2, .h2 {
-      margin: 0 0 1em 0;
-      position: relative;
-      &:after {
-        margin: 0;
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: -.5em;
-      }
-    }
 
-    input[type="text"],
-    input[type="password"],
-    input[type="search"],
-    select {
-      height: 32px;
-      @include fontSize($ic-font-size--medium);
-      width: 95%;
-    }
-    .bootstrap-form {
-      margin: 0;
-    }
-  }
-  body.no-headers .ic-Layout-contentMain,
-  body.embedded .ic-Layout-contentMain {
-    padding: 10px;
-  }
-  #login_form {
-    width: auto;
-  }
-  #footer {
-    padding: 0 20px;
-  }
+li.used_otp {
+  text-decoration: line-through;
+}
+
+.ic-Login-confirmation {
+  width: auto;
+  max-width: 696px;
+}
+
+.otp-qr-code {
+  text-align: center;
 }
 
 @media print {

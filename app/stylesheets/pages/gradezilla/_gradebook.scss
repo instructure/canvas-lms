@@ -732,6 +732,10 @@ $gradebook_checkbox_size: 16px;
     @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
     @else { color: $ic-hint-text; }
   }
+
+  .total_grade & {
+    position: static;
+  }
 }
 
 .final-warning {

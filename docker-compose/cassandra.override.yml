@@ -11,5 +11,10 @@ services:
 
   cassandra:
     image: cassandra:2.2
+    volumes:
+      - cassandra_data:/var/lib/cassandra
     environment:
       CASSANDRA_START_RPC: 'true'
+
+volumes:
+  cassandra_data: {}

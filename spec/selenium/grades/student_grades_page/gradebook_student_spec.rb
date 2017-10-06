@@ -18,7 +18,7 @@
 require_relative '../../helpers/gradebook_common'
 require_relative './gradebook_student_common'
 require_relative '../setup/gradebook_setup'
-require_relative '../page_objects/student_grades_page'
+require_relative '../pages/student_grades_page'
 
 
 describe 'Student Gradebook' do

@@ -471,9 +471,6 @@ import 'compiled/jquery.rails_flash_notifications'
               $('#context_modules_sortable_container').removeClass('item-group-container--is-empty');
             }
           },
-          open: function(){
-            $(this).find('input[type=text],textarea,select').first().focus();
-          }
         }).dialog('open');
         $module.removeClass('dont_remove');
       },
@@ -1336,12 +1333,13 @@ import 'compiled/jquery.rails_flash_notifications'
       modules.hideMoveModuleItem();
     });
 
-    $('.icon-drag-handle').on('focus', function (event) {
-      $(event.currentTarget).siblings('.drag_and_drop_warning').show();
-    });
-    $('.icon-drag-handle').on('blur', function (event) {
-      $(event.currentTarget).siblings('.drag_and_drop_warning').hide();
-    });
+    $('.drag_and_drop_warning').on('focus', function (event) {
+      $(event.currentTarget).removeClass('screenreader-only');
+    })
+
+    $('.drag_and_drop_warning').on('blur', function (event) {
+      $(event.currentTarget).addClass('screenreader-only');
+    })
 
     $(".edit_module_link").live('click', function(event) {
       event.preventDefault();
@@ -1392,6 +1390,8 @@ import 'compiled/jquery.rails_flash_notifications'
               $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
               initNewItemPublishButton($item, data.content_tag);
               modules.updateAssignmentData();
+
+              $item.find('.lock-icon').data({moduleType: data.content_tag.type, contentId: data.content_tag.id});
               modules.loadMasterCourseData(data.content_tag.id);
             }), { onComplete: function() {
               $module.find('.add_module_item_link').focus();
@@ -1582,15 +1582,10 @@ import 'compiled/jquery.rails_flash_notifications'
 
       var viewOptions = {
         model: model,
+        title: data.publishTitle,
         el: $el[0]
       };
 
-      if (data.publishMessage) {
-        viewOptions.publishText = data.publishMessage;
-      }
-      if (data.unpublishMessage) {
-        viewOptions.unpublishText = data.unpublishMessage;
-      }
 
       var view = new PublishIconView(viewOptions);
       var row = $el.closest('.ig-row');

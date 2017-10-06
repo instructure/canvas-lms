@@ -145,6 +145,13 @@ describe Login::CanvasController do
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
   end
 
+  it "rejects canvas auth if Canvas auth is disabled" do
+    aac = Account.default.authentication_providers.create!(:auth_type => 'ldap')
+    Account.default.canvas_authentication_provider.destroy
+    get 'new'
+    assert_status(404)
+  end
+
   context "ldap" do
     it "should log in a user with a identifier_format" do
       user_with_pseudonym(:username => '12345', :active_all => 1)

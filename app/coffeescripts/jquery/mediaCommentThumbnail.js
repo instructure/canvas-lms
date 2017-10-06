@@ -46,6 +46,8 @@ function createMediaCommentThumbnail (elem, size, keepOriginalText) {
     ((idAttr = $link.attr('id')) && idAttr.match(/^media_comment_/) && idAttr.substring(14)) ||
     $.trim($link.parent().find('.media_comment_id:first').text())
 
+  const altText = $link.data('alt')
+
   if (id) {
     const domain = `https://${INST.kalturaSettings.resource_domain}`
 
@@ -61,10 +63,16 @@ function createMediaCommentThumbnail (elem, size, keepOriginalText) {
         <span class='media_comment_thumbnail_play_button'>
           <span class='screenreader-only'>
             ${htmlEscape(I18n.t('click_to_view', 'Click to view'))}
+            ${htmlEscape(altText)}
           </span>
         </span>
       </span>`
     )
+
+    const $p = $link.closest('p')
+    if (!$p.attr('title')) {
+      $p.attr('title', htmlEscape(altText))
+    }
 
     let $a = $link
     if (keepOriginalText) {

@@ -37,7 +37,7 @@ gem 'authlogic', '3.6.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.11.2'
+gem 'switchman', '1.11.3'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -45,10 +45,10 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 
 gem 'addressable', '2.5.1', require: false
 gem "after_transaction_commit", '2.0.0'
-gem "aws-sdk-kinesis", '1.0.0.rc9', require: false
-gem "aws-sdk-s3", '1.0.0.rc13', require: false
-gem "aws-sdk-sns", '1.0.0.rc9', require: false
-gem "aws-sdk-sqs", '1.0.0.rc11', require: false
+gem "aws-sdk-kinesis", '1.0.0', require: false
+gem "aws-sdk-s3", '1.0.0', require: false
+gem "aws-sdk-sns", '1.0.0', require: false
+gem "aws-sdk-sqs", '1.0.0', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
@@ -56,9 +56,11 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.6', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.13.5'
+gem 'inst-jobs', '0.13.6'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.5', require: false
+gem 'inst-jobs-autoscaling', '1.0.2'
+  gem 'aws-sdk-autoscaling', '1.0.0', require: false
 gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
@@ -112,10 +114,10 @@ gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.5', require: false
 gem 'gepub', '0.7.0beta4'
-gem 'imperium', '0.1.3', require: false
+gem 'imperium', '0.2.2', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
-gem 'graphql', '1.6.6'
+gem 'graphql', '1.6.7'
 gem 'graphql-batch', '~>0.3.1'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'

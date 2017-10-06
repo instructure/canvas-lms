@@ -132,7 +132,7 @@ class CoursesListRow extends React.Component {
       <div role="row" className="grid-row pad-box-mini border border-b">
         <div className="col-xs-3">
           <div role="gridcell" className="grid-row middle-xs">
-            <div className="col-xs-2">{isPublished && (<i className="icon-publish courses-list__published-icon" />)}</div>
+            <div className="col-xs-2">{isPublished && (<i className="icon-publish icon-Solid courses-list__published-icon" />)}</div>
             <div className="col-xs-10">
               <div className="courseName">
                 <a href={url}>{name}</a>

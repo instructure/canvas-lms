@@ -90,7 +90,11 @@ define [
           content_id: @model.get('id'),
           content_type: 'discussion_topic'
         })
-      options.publishIcon = new PublishIconView(model: @model) if ENV.permissions.publish
+      if ENV.permissions.publish
+        options.publishIcon = new PublishIconView({
+          model: @model,
+          title: @model.get('title')
+        })
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       if @model.get('assignment')
         options.dateDueColumnView = new DateDueColumnView(model: @model.get('assignment'))

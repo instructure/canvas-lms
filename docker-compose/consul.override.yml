@@ -8,8 +8,13 @@ services:
       - consul
 
   consul:
-    image: consul:0.7.2
-    command: agent -dev -client 0.0.0.0 -datacenter canvas-dev -node canvas-consul -bootstrap
+    image: consul:0.7.5
+    command: agent -server -client 0.0.0.0 -datacenter canvas-dev -node canvas-consul -bootstrap -ui
     environment:
       GOMAXPROCS: "2"
       VIRTUAL_PORT: 8500
+    volumes:
+      - consul_data:/consul/data
+
+volumes:
+  consul_data: {}

@@ -5,21 +5,45 @@
 # shaped like the example below, one key for the related set of data,
 # and a hash of key/value pairs (no nesting)
 development:
-  address-book:
-    app-host: "http://address-book.docker"
-    secret: "opensesame"
-  live-events-subscription-service:
-    app-host: "http://les.docker"
-    sad-panda: null
-  rich-content-service:
-    app-host: "rce.docker"
-  canvas:
-    encryption-secret: "astringthatisactually32byteslong"
-    signing-secret: "astringthatisactually32byteslong"
-  live-events:
-    aws_endpoint: http://kinesis.canvaslms.docker
-    kinesis_stream_name: live-events
-  math-man:
-    base_url: 'http://mathman.docker'
-    use_for_svg: 'false'
-    use_for_mml: 'false'
+  # tree
+  config:
+    # service
+    canvas:
+      # prefix
+      address-book:
+        app-host: "http://address-book.docker"
+        secret: "opensesame"
+      canvas:
+        encryption-secret: "astringthatisactually32byteslong"
+        signing-secret: "astringthatisactually32byteslong"
+      live-events:
+        aws_endpoint: http://kinesis.canvaslms.docker
+        kinesis_stream_name: live-events
+      live-events-subscription-service:
+        app-host: "http://les.docker"
+        sad-panda: null
+      math-man:
+        base_url: 'http://mathman.docker'
+        use_for_svg: 'false'
+        use_for_mml: 'false'
+      rich-content-service:
+        app-host: "rce.docker"
+    # another service
+    inst-fs:
+      app-host: "http://inst-fs.docker"
+      secret: "super-sekret-value"
+
+  private:
+    canvas:
+      ha_cache.yml: |
+        cache_store: ha_store
+        servers:
+         - redis://redis/2
+        # keep stale data for up to 1 week in the cache
+        race_condition_ttl: 604800
+        # how long it might take to recompute a cache value
+        # before the lock times out and another process is
+        # allowed to write it
+        lock_timeout: 5
+        # how long before a cache entry is considered stale
+        expires_in: 300

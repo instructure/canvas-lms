@@ -817,7 +817,6 @@ CanvasRails::Application.routes.draw do
   post 'users/toggle_hide_dashcard_color_overlays' => 'users#toggle_hide_dashcard_color_overlays'
   get 'styleguide' => 'info#styleguide'
   get 'accounts/:account_id/theme-preview' => 'brand_configs#show'
-  get 'old_styleguide' => 'info#old_styleguide'
   root to: 'users#user_dashboard', as: 'root', via: :get
   # backwards compatibility with the old /dashboard url
   get 'dashboard' => 'users#user_dashboard', as: :dashboard_redirect
@@ -1380,8 +1379,8 @@ CanvasRails::Application.routes.draw do
       get 'users/:user_id/communication_channels', action: :index, as: 'communication_channels'
       post 'users/:user_id/communication_channels', action: :create
       post 'users/:user_id/communication_channels/:id', action: :reset_bounce_count, as: 'reset_bounce_count'
-      get 'accounts/:account_id/bouncing_communication_channels.csv', action: :bouncing_channel_report
-      post 'accounts/:account_id/bouncing_communication_channels/reset', action: :bulk_reset_bounce_counts
+      get 'accounts/:account_id/bounced_communication_channels.csv', action: :bouncing_channel_report
+      post 'accounts/:account_id/bounced_communication_channels/reset', action: :bulk_reset_bounce_counts
       get 'accounts/:account_id/unconfirmed_communication_channels.csv', action: :unconfirmed_channel_report
       post 'accounts/:account_id/unconfirmed_communication_channels/confirm', action: :bulk_confirm
       delete 'users/:user_id/communication_channels/:id', action: :destroy

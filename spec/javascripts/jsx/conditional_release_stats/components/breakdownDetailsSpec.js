@@ -21,11 +21,24 @@ define([
   'react-dom',
   'jsx/conditional_release_stats/components/breakdown-details',
 ], (React, ReactDOM, BreakdownDetails) => {
-  const container = document.getElementById('fixtures')
+  let clock;
+  let container;
 
   QUnit.module('Breakdown Details', {
+    setup () {
+      const applicationElement = document.createElement('div');
+      applicationElement.id = 'application';
+      document.getElementById('fixtures').appendChild(applicationElement);
+      container = document.createElement('div');
+      document.getElementById('fixtures').appendChild(container);
+
+      clock = sinon.useFakeTimers();
+    },
+
     teardown() {
       ReactDOM.unmountComponentAtNode(container);
+      document.getElementById('fixtures').innerHTML = '';
+      clock.restore();
     }
   })
 
@@ -172,6 +185,7 @@ define([
 
   test('renders component correctly', () => {
     const component = renderComponent(defaultProps())
+    clock.tick(500);
 
     const rendered = document.querySelectorAll('.crs-breakdown-details')
     equal(rendered.length, 1)
@@ -182,6 +196,7 @@ define([
     props.selectedPath.student = 0
     props.selectStudent = sinon.spy()
     const component = renderComponent(props)
+    clock.tick(500);
 
     const nextBtn = document.querySelector('.student-details__next-student')
     nextBtn.click()
@@ -194,6 +209,7 @@ define([
     props.selectedPath.student = 1
     props.selectStudent = sinon.spy()
     const component = renderComponent(props)
+    clock.tick(500);
 
     const nextBtn = document.querySelector('.student-details__next-student')
     nextBtn.click()
@@ -206,6 +222,7 @@ define([
     props.selectedPath.student = 1
     props.selectStudent = sinon.spy()
     const component = renderComponent(props)
+    clock.tick(500);
 
     const prevBtn = document.querySelector('.student-details__prev-student')
     prevBtn.click()
@@ -218,6 +235,7 @@ define([
     props.selectedPath.student = 0
     props.selectStudent = sinon.spy()
     const component = renderComponent(props)
+    clock.tick(500);
 
     const prevBtn = document.querySelector('.student-details__prev-student')
     prevBtn.click()
@@ -230,6 +248,7 @@ define([
     props.selectedPath.student = 0
     props.selectStudent = sinon.spy()
     const component = renderComponent(props)
+    clock.tick(500);
 
     const backBtn = document.querySelector('.crs-back-button')
     backBtn.click()

@@ -96,12 +96,13 @@ import Select from 'instructure-ui/lib/components/Select'
         source: this.props.source.label
       })
       return (
-        <Modal ref='modal' isOpen={this.state.isOpen}
+        <Modal ref='modal' open={this.state.isOpen}
           modalSize='small'
           label={dialogLabel}
           closeButtonLabel={I18n.t('Cancel')}
-          onReady={this.handleReady}
-          onRequestClose={this.handleRequestClose}
+          applicationElement={() => document.getElementById('application')}
+          onOpen={this.handleReady}
+          onDismiss={this.handleRequestClose}
           onClose={this.handleClose}
         >
           <ModalHeader>
@@ -115,7 +116,7 @@ import Select from 'instructure-ui/lib/components/Select'
             <Button id='MoveToDialog__move' variant='primary' onClick={this.handleMove}>{I18n.t('Move')}</Button>
           </ModalFooter>
         </Modal>
-      )
+      );
     }
   });
 export default MoveToDialog

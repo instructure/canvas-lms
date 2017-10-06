@@ -1,7 +1,7 @@
 /*
     Built by: build_media_element_js.rake
     from https://github.com/instructure/mediaelement.git
-    revision: 1a177ed2cc3d51689a210d5c034c88112d5a2e42
+    revision: e4e415b5093855eddbf310d07ddb3a12e81ae1d4
 
     YOU SHOULDN'T EDIT ME DIRECTLY
   */
@@ -438,7 +438,6 @@
 }
 
 .mejs-controls .mejs-volume-button .mejs-volume-slider {
-	display: none;
 	height: 115px;
 	width: 25px;
 	background: url("/images/mediaelement/background.png");
@@ -571,7 +570,6 @@
 	background-position: -48px 0;
 }
 .mejs-controls .mejs-captions-button .mejs-captions-selector {
-	visibility: hidden;
 	position: absolute;
 	bottom: 26px;
 	right: -51px;
@@ -587,9 +585,11 @@
 	border-radius: 0;
 }
 
+/*
 .mejs-controls .mejs-captions-button:hover  .mejs-captions-selector {
 	visibility: visible;
 }
+*/
 
 .mejs-controls .mejs-captions-button .mejs-captions-selector ul {
 	margin: 0;
@@ -729,7 +729,7 @@
 	bottom: 35px;
 }
 
-.mejs-captions-text {
+.mejs-captions-text, .mejs__captions-text * {
 	padding: 0;
 	background: url("/images/mediaelement/background.png");
 	background: rgba(20, 20, 20, 0.5);
@@ -947,6 +947,7 @@ div.mejs-speed-button {
 
 .mejs-controls .mejs-speed-button .mejs-speed-selector ul li {
 	margin: 0 0 6px 0;
+	padding: 0 10px;
 	list-style-type: none !important;
 	display: block;
 	color: #fff;
@@ -960,6 +961,7 @@ div.mejs-speed-button {
 }
 
 .mejs-controls .mejs-speed-button .mejs-speed-selector ul li label {
+	width: 60px;
 	float: left;
 	padding: 4px 0 0 0;
 	line-height: 15px;

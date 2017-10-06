@@ -49,6 +49,8 @@ define [
     events:
       'keyup #search_term': 'search'
       'change #grading_period_selector': 'filterResults'
+      'focus .drag_and_drop_warning': 'show_dnd_warning'
+      'blur .drag_and_drop_warning': 'hide_dnd_warning'
 
     els:
       '#addGroup': '$addGroupButton'
@@ -124,6 +126,12 @@ define [
     , 200
 
     gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
+
+    show_dnd_warning: (event) =>
+      @$(event.currentTarget).removeClass('screenreader-only')
+
+    hide_dnd_warning: (event) =>
+      @$(event.currentTarget).addClass('screenreader-only')
 
     filterResults: =>
       term = $('#search_term').val()

@@ -37,17 +37,18 @@ export default React.createClass({
     render: function () {
       return (
         <Modal
-          isOpen={this.state.isOpen}
+          open={this.state.isOpen}
           shouldCloseOnOverlayClick={true}
-          onRequestClose={this.close}
+          onDismiss={this.close}
           transition="fade"
           size="auto"
           label={I18n.t("Modal Dialog: Add to course")}
           closeButtonLabel={I18n.t("Close")}
+          applicationElement={() => document.getElementById('application')}
           ref={this._saveModal}
           onEntering={this._fixFocus}
           onClose={this.props.onClose}
-          onReady={this.props.onReady}
+          onOpen={this.props.onReady}
         >
           <ModalHeader>
             <Heading>{I18n.t("Add to course...")}</Heading>

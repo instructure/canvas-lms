@@ -1040,8 +1040,8 @@ class DiscussionTopicsController < ApplicationController
 
   def prefer_assignment_availability_dates(discussion_topic_hash)
     return unless params[:assignment]
-    discussion_topic_hash['delayed_post_at'] = nil if params[:assignment][:unlock_at].present?
-    discussion_topic_hash['lock_at'] = nil if params[:assignment][:lock_at].present?
+    discussion_topic_hash['delayed_post_at'] = nil if params[:assignment].has_key?(:unlock_at)
+    discussion_topic_hash['lock_at'] = nil if params[:assignment].has_key?(:lock_at)
   end
 
   # Internal: detetermines if the delayed_post_at or lock_at dates were changed

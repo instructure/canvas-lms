@@ -43,7 +43,7 @@ describe Attachment do
 
   end
 
-  context "authenticated_s3_url" do
+  context "authenticated_url" do
     before :each do
       local_storage!
     end
@@ -54,12 +54,12 @@ describe Attachment do
 
     it "should return http as the protocol by default" do
       attachment_with_context(@course)
-      expect(@attachment.authenticated_s3_url).to match(/^http:\/\//)
+      expect(@attachment.authenticated_url).to match(/^http:\/\//)
     end
 
     it "should return the protocol if specified" do
       attachment_with_context(@course)
-      expect(@attachment.authenticated_s3_url(:secure => true)).to match(/^https:\/\//)
+      expect(@attachment.authenticated_url(:secure => true)).to match(/^https:\/\//)
     end
 
     context "for a quiz submission upload" do
@@ -67,12 +67,35 @@ describe Attachment do
         quiz = @course.quizzes.create
         submission = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(user_model)
         attachment = attachment_with_context(submission)
-        expect(get(attachment.authenticated_s3_url)).to be_routable
+        expect(get(attachment.authenticated_url)).to be_routable
       end
     end
   end
 
-  context "authenticated_s3_url s3_storage" do
+  context "authenticated_url InstFS storage" do
+    before :once do
+      user_model
+    end
+
+    before :each do
+      attachment_with_context(@user)
+      @attachment.instfs_uuid = 1
+      allow(InstFS).to receive(:enabled?).and_return true
+      allow(InstFS).to receive(:authenticated_url)
+    end
+
+    it "should get url from InstFS when attachment has instfs_uuid" do
+      @attachment.authenticated_url
+      expect(InstFS).to have_received(:authenticated_url)
+    end
+
+    it "only passes keyword arguments to InstFS" do
+      @attachment.authenticated_url("doesn't pass", :test => "this")
+      expect(InstFS).to have_received(:authenticated_url).with(@attachment, { :test => "this" })
+    end
+  end
+
+  context "authenticated_url s3_storage" do
     before :each do
       s3_storage!
     end
@@ -80,7 +103,7 @@ describe Attachment do
     it "should give back a signed s3 url" do
       a = attachment_model
       s3object = a.s3object
-      expect(a.authenticated_s3_url(expires_in: 1.day)).to match(/^https:\/\//)
+      expect(a.authenticated_url(expires_in: 1.day)).to match(/^https:\/\//)
       a.destroy_permanently!
     end
   end
@@ -965,12 +988,19 @@ describe Attachment do
       course_model
     end
 
+    it "should work with s3 storage" do
+      s3_storage!
+      attachment = attachment_with_context(@course, :display_name => 'foo')
+      expect(attachment.download_url).to match(/response-content-disposition=attachment/)
+      expect(attachment.inline_url).to match(/response-content-disposition=inline/)
+    end
+
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
-      allow(attachment).to receive(:authenticated_s3_url) # allow other calls due to, e.g., save
-      expect(attachment).to receive(:authenticated_s3_url).with(include(:expires_in => 86400))
+      allow(attachment).to receive(:authenticated_url) # allow other calls due to, e.g., save
+      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 86400))
       attachment.download_url
-      expect(attachment).to receive(:authenticated_s3_url).with(include(:expires_in => 172800))
+      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 172800))
       attachment.download_url(2.days.to_i)
     end
 

@@ -217,7 +217,7 @@ class SplitUsers
 
     def handle_submissions(courses, source_user, target_user, target_user_id)
       source_user.submissions.where(assignment_id: Assignment.where(context_id: courses)).
-        where.not(assignment_id: target_user.submissions.select(:assignment_id)).
+        where.not(assignment_id: target_user.all_submissions.select(:assignment_id)).
         update_all(user_id: target_user_id)
       source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: courses)).
         where.not(quiz_id: target_user.quiz_submissions.select(:quiz_id)).

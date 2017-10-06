@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../helpers/gradezilla_common'
-require_relative '../page_objects/gradezilla_page'
+require_relative '../pages/gradezilla_page'
 
 describe "Gradezilla - total column menu options" do
   include_context "in-process server selenium tests"
@@ -39,7 +39,7 @@ describe "Gradezilla - total column menu options" do
       ff(".slick-row .slick-cell:nth-child(5)").each do |total|
         raise Error "Total text is missing." unless total.text
         total.text.strip!
-        expect(total.text).to match(/\A#{expected_points.shift}$/) unless total.text.length < 1
+        expect(total.text).to include("#{expected_points.shift}") unless total.text.length < 1
       end
     end
 

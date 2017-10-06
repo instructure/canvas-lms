@@ -783,6 +783,16 @@ define [
     json = assignment.toView()
     ok json.omitFromFinalGrade
 
+  test "returns true when anonymousInstructorAnnotations is true", ->
+    assignment = new Assignment(name: 'foo')
+    assignment.anonymousInstructorAnnotations(true);
+    strictEqual(assignment.toView().anonymousInstructorAnnotations, true)
+
+  test "returns false when anonymousInstructorAnnotations is false", ->
+    assignment = new Assignment(name: 'foo')
+    assignment.anonymousInstructorAnnotations(false);
+    strictEqual(assignment.toView().anonymousInstructorAnnotations, false)
+
   QUnit.module "Assignment#isQuizLTIAssignment"
 
   test "returns true if record uses quizzes 2", ->

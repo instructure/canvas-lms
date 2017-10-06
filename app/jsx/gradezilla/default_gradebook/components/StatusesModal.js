@@ -135,11 +135,12 @@ class StatusesModal extends React.Component {
 
     return (
       <Modal
-        isOpen={isOpen}
+        open={isOpen}
         label={I18n.t('Statuses')}
         closeButtonLabel={I18n.t('Close')}
         closeButtonRef={bindCloseButton}
-        onRequestClose={close}
+        applicationElement={() => document.getElementById('application')}
+        onDismiss={close}
         onExited={onClose}
         contentRef={bindContentRef}
       >

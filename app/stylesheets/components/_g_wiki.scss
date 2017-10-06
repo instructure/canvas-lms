@@ -331,6 +331,7 @@ $revision-button-color: $ic-color-dark;
     margin: 4px 0 6px 25px;
   }
   .show-content {
+    word-wrap: break-word;
     overflow-x: auto;
     box-sizing: border-box;
     padding: 0 $ic-sp;

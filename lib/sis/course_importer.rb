@@ -69,7 +69,7 @@ module SIS
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed)/i
+        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished)/i
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended)/i
 
         course = @root_account.all_courses.where(sis_source_id: course_id).take
@@ -97,7 +97,7 @@ module SIS
         course.integration_id = integration_id
         course.sis_source_id = course_id
         if !course.stuck_sis_fields.include?(:workflow_state)
-          if status =~ /active/i
+          if status =~ /active/i || status == 'unpublished'
             case course.workflow_state
             when 'completed'
               course.workflow_state = 'available'

@@ -215,4 +215,4 @@ Simple/NewErbLinter:
         js_bundle :your_js_bundle
         css_bundle :any_css_bundles_you_want
         js_env({whatever: 'you need to put in window.ENV'})
-        render :text => "".html_safe, :layout => true
+        render :html => "".html_safe, :layout => true

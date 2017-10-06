@@ -459,11 +459,9 @@ class DiscussionEntry < ActiveRecord::Base
 
     DiscussionEntry.where(id: id). update_all([
       'rating_count = COALESCE(rating_count, 0) + ?,
-        rating_sum = COALESCE(rating_sum, 0) + ?,
-        updated_at = ?',
+        rating_sum = COALESCE(rating_sum, 0) + ?',
       count_delta,
-      sum_delta,
-      Time.current
+      sum_delta
     ])
     self.discussion_topic.update_materialized_view
   end

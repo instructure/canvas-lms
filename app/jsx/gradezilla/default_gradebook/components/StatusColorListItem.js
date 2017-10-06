@@ -98,6 +98,7 @@ class StatusColorListItem extends React.Component {
                 show={isColorPickerShown}
                 onToggle={colorPickerOnToggle}
                 contentRef={colorPickerContentRef}
+                applicationElement={() => document.getElementById('application')}
               >
                 <PopoverTrigger>
 

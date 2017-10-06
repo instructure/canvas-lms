@@ -124,7 +124,7 @@ class AssignmentOverride < ActiveRecord::Base
     if due_at_overridden_changed? || set_id_changed? ||
       (set_type_changed? && set_type != 'ADHOC') ||
       (due_at_overridden && due_at_changed?) ||
-      (due_at_overridden && workflow_state_changed?)
+      workflow_state_changed?
       DueDateCacher.recompute(assignment)
     end
   end

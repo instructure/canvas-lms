@@ -83,7 +83,7 @@ module Canvas
       require_dependency 'canvas/redis'
       Canvas::Redis.patch
       # if cache and redis data are configured identically, we want to share connections
-      if config == {}
+      if config == {} && cluster == Rails.env && Canvas.redis_enabled?
         # A bit of gymnastics to wrap an existing Redis::Store into an ActiveSupport::Cache::RedisStore
         store = ActiveSupport::Cache::RedisStore.new([])
         store.instance_variable_set(:@data, Canvas.redis.__getobj__)

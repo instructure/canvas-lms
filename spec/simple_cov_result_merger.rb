@@ -32,7 +32,7 @@ SimpleCov.add_filter '/db_imports/'
 SimpleCov.add_filter '/distributed_ci/'
 SimpleCov.add_filter '/spec_canvas/'
 SimpleCov.add_filter '/db/'
-SimpleCov.add_filter '._cache/'
+SimpleCov.add_filter %r{^_cache/} # https://github.com/colszowka/simplecov/pull/617
 
 SimpleCov.add_group 'Controllers', 'app/controllers'
 SimpleCov.add_group 'Models', 'app/models'

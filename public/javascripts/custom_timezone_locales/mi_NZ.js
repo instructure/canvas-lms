@@ -42,7 +42,7 @@ module.exports = { // eslint-disable-line import/no-commonjs
       'Hakihea'
     ]
   },
-  meridiem: ['', ''],
+  meridiem: ['ahau', 'pm'],
   date: '%d/%m/%y',
   time24: '%T',
   dateTime: 'Te %A, te %d o %B, %Y %T %Z',

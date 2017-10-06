@@ -7,7 +7,7 @@ module Canvadocs
       enable_annotations = opts.delete(:enable_annotations)
       moderated_grading_whitelist = opts.delete(:moderated_grading_whitelist)
       opts.merge! canvadoc_permissions_for_user(user, enable_annotations, moderated_grading_whitelist)
-      opts[:url] = attachment.authenticated_s3_url(expires_in: 7.days)
+      opts[:url] = attachment.authenticated_url(expires_in: 7.days)
       opts[:locale] = I18n.locale || I18n.default_locale
 
       Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do

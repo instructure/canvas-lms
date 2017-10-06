@@ -119,6 +119,22 @@ namespace :canvas do
     ENV["COMPILE_ASSETS_API_DOCS"] = "0"
     Rake::Task['canvas:compile_assets'].invoke
   end
+
+  desc "Load config/dynamic_settings.yml into the configured consul cluster"
+  task :seed_consul => [:environment] do
+    def load_tree(root, tree)
+      tree.each do |node, subtree|
+        key = [root, node].compact.join('/')
+        if Hash === subtree
+          load_tree(key, subtree)
+        else
+          Imperium::KV.put(key, subtree, cas: 0)
+        end
+      end
+    end
+
+    load_tree(nil, ConfigFile.load('dynamic_settings'))
+  end
 end
 
 namespace :lint do

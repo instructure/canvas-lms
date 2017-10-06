@@ -51,9 +51,8 @@ class FileInContext
 
       uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
-      @attachment = context.attachments.new(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
+      @attachment = Attachment.new(:context => context, :uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
       @attachment.filename = explicit_filename if explicit_filename
-      @attachment.context = context
       @attachment.set_publish_state_for_usage_rights
       @attachment.save!
 

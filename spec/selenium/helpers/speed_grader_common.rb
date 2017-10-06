@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
-require_relative "../grades/page_objects/speedgrader_page"
+require_relative "../grades/pages/speedgrader_page"
 
 module SpeedGraderCommon
 

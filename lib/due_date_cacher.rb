@@ -33,14 +33,16 @@ class DueDateCacher
   def initialize(course, assignments)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
+    @accepted_students_ids = accepted_students.pluck(:id)
   end
 
   def recompute
     # in a transaction on the correct shard:
     @course.shard.activate do
       values = []
-      effective_due_dates.to_hash.each do |assignment_id, students|
-        students.each do |student_id, submission_info|
+      effective_due_dates.to_hash.each do |assignment_id, student_due_dates|
+        (student_due_dates.keys - prior_student_ids).each do |student_id|
+          submission_info = student_due_dates[student_id]
           due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : 'NULL'
           grading_period_id = submission_info[:grading_period_id] || 'NULL'
           values << [assignment_id, student_id, due_date, grading_period_id]
@@ -48,11 +50,27 @@ class DueDateCacher
       end
       # Delete submissions for students who don't have visibility to this assignment anymore
       @assignment_ids.each do |assignment_id|
-        students = effective_due_dates.find_effective_due_dates_for_assignment(assignment_id).keys
-        deletable_submissions = Submission.active.where(assignment_id: assignment_id)
-        deletable_submissions = deletable_submissions.where.not(user_id: students) unless students.blank?
-        deletable_submissions.update_all(workflow_state: :deleted)
+        assigned_student_ids = effective_due_dates.find_effective_due_dates_for_assignment(assignment_id).keys
+        submission_scope = Submission.active.where(assignment_id: assignment_id)
+
+        if assigned_student_ids.blank? && prior_student_ids.blank?
+          submission_scope.in_batches.update_all(workflow_state: :deleted)
+        else
+          # Delete the users we KNOW we need to delete in batches (it makes the database happier this way)
+          deletable_student_ids = @accepted_students_ids - assigned_student_ids - prior_student_ids
+          deletable_student_ids.each_slice(1000) do |deletable_student_ids_chunk|
+            # using this approach instead of using .in_batches because we want to limit the IDs in the IN clause to 1k
+            submission_scope.where(user_id: deletable_student_ids_chunk).update_all(workflow_state: :deleted)
+          end
+        end
       end
+
+      # Get any stragglers that might have had their enrollment removed from the course
+      Submission.active.
+        where(assignment_id: @assignment_ids).
+        where.not(user_id: accepted_students).
+        in_batches.
+        update_all(workflow_state: :deleted)
 
       return if values.empty?
 
@@ -120,6 +138,14 @@ class DueDateCacher
   end
 
   private
+
+  def accepted_students
+    @accepted_students ||= @course.all_accepted_students
+  end
+
+  def prior_student_ids
+    @prior_student_ids ||= @course.prior_students.pluck(:id)
+  end
 
   def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignment_ids)

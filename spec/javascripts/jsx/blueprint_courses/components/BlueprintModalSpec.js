@@ -20,7 +20,17 @@ import React from 'react'
 import * as enzyme from 'enzyme'
 import BlueprintModal from 'jsx/blueprint_courses/components/BlueprintModal'
 
-QUnit.module('BlueprintModal component')
+QUnit.module('BlueprintModal component', {
+  setup () {
+    const appElement = document.createElement('div')
+    appElement.id = 'application'
+    document.getElementById('fixtures').appendChild(appElement)
+  },
+
+  teardown () {
+    document.getElementById('fixtures').innerHTML = ''
+  }
+})
 
 const defaultProps = () => ({
   isOpen: true,

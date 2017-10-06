@@ -87,13 +87,11 @@ export default class BreakdownDetails extends React.Component {
 
       return (
         <Tray
-          isOpen={this.props.showDetails}
+          open={this.props.showDetails}
           placement="end"
-          dismissable={false}
-          trapFocus
-          getDefaultFocusElement={() => this.closeButton}
-          onReady={() => document.getElementById('application').setAttribute('aria-hidden', true)}
-          onClose={() => document.getElementById('application').setAttribute('aria-hidden', false)}
+          shouldContainFocus
+          defaultFocusElement={() => this.closeButton}
+          applicationElement={() => document.getElementById('application')}
         >
           <div className="crs-breakdown-details">
             <div className="crs-breakdown-details__content">
@@ -128,6 +126,6 @@ export default class BreakdownDetails extends React.Component {
             </div>
           </div>
         </Tray>
-      )
+      );
     }
   }

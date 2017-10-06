@@ -93,7 +93,7 @@ class AssignmentGroupColumnHeader extends ColumnHeader {
 
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
-          focusTriggerOnClose={false}
+          shouldFocusTriggerOnClose={false}
           trigger={renderTrigger(this.props.assignmentGroup, menuShown, this.bindOptionsMenuTrigger)}
           onToggle={this.onToggle}
           onClose={this.props.onMenuClose}

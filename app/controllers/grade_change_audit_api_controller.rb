@@ -268,6 +268,23 @@ class GradeChangeAuditApiController < AuditorApiController
 
   def render_events(events, route)
     events = Api.paginate(events, self, route)
+
+    if params.fetch(:include, []).include?("current_grade")
+      grades = current_grades(events)
+      events.each { |event| event.grade_current = current_grade_for_event(event, grades) }
+    end
+
     render :json => grade_change_events_compound_json(events, @current_user, session)
+  end
+
+  def current_grade_for_event(event, grades)
+    submission_id = Shard.relative_id_for(event.submission_id, Shard.current, Shard.current)
+    grades.fetch(submission_id, I18n.t("N/A"))
+  end
+
+  def current_grades(events)
+    submission_ids = events.map(&:submission_id)
+    grades = Submission.where(id: submission_ids).pluck(:id, :grade)
+    grades.each_with_object({}) { |(key, value), hsh| hsh[key] = value }
   end
 end

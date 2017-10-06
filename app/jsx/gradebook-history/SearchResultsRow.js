@@ -22,6 +22,7 @@ import $ from 'jquery';
 import 'jquery.instructure_date_and_time'
 import environment from 'jsx/gradebook-history/environment';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import NumberHelper from 'jsx/shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook_history';
 import IconOffLine from 'instructure-icons/lib/Line/IconOffLine';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
@@ -41,11 +42,13 @@ function anonymouslyGraded (anonymous) {
 }
 
 function displayGrade (grade, possible, displayAsPoints) {
-  if (displayAsPoints) {
-    return `${GradeFormatHelper.formatGrade(grade, { defaultValue: '-' })}/${GradeFormatHelper.formatGrade(possible)}`;
+  // show the points possible if the assignment is set to display grades as
+  // "points" and the grade can be parsed as a number
+  if (displayAsPoints && NumberHelper.validate(grade)) {
+    return `${GradeFormatHelper.formatGrade(grade, { defaultValue: '–' })}/${GradeFormatHelper.formatGrade(possible)}`;
   }
 
-  return GradeFormatHelper.formatGrade(grade, { defaultValue: '-' });
+  return GradeFormatHelper.formatGrade(grade, { defaultValue: '–' });
 }
 
 function SearchResultsRow (props) {
@@ -59,6 +62,7 @@ function SearchResultsRow (props) {
       <td>{item.assignment || I18n.t('Not available')}</td>
       <td>{displayGrade(item.gradeBefore, item.pointsPossibleBefore, item.displayAsPoints)}</td>
       <td>{displayGrade(item.gradeAfter, item.pointsPossibleAfter, item.displayAsPoints)}</td>
+      <td>{displayGrade(item.gradeCurrent, item.pointsPossibleCurrent, item.displayAsPoints)}</td>
     </tr>
   );
 }
@@ -72,8 +76,10 @@ SearchResultsRow.propTypes = {
     grader: string.isRequired,
     gradeAfter: string.isRequired,
     gradeBefore: string.isRequired,
+    gradeCurrent: string.isRequired,
     pointsPossibleAfter: string.isRequired,
     pointsPossibleBefore: string.isRequired,
+    pointsPossibleCurrent: string.isRequired,
     student: string.isRequired
   }).isRequired
 };

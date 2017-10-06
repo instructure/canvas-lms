@@ -326,21 +326,34 @@ describe Course do
       )
     end
 
-    it "should not adjust for unauthorized user" do
-      Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
-      expect(@course.storage_quota).to eq 1
+    context "with unauthorized user" do
+      it "should not adjust in course import" do
+        Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
+        expect(@course.storage_quota).to eq 1
+      end
+
+      it "should not adjust in course copy" do
+        @cm.migration_type = 'course_copy_importer'
+        Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
+        expect(@course.storage_quota).to eq 1
+      end
     end
 
-    it "should adjust for authorized user" do
-      account_admin_user(:user => @user)
-      Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
-      expect(@course.storage_quota).to eq 4
-    end
+    context "with account admin" do
+      before :once do
+        account_admin_user(:user => @user)
+      end
 
-    it "should be set for course copy" do
-      @cm.migration_type = 'course_copy_importer'
-      Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
-      expect(@course.storage_quota).to eq 4
+      it "should adjust in course import" do
+        Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
+        expect(@course.storage_quota).to eq 4
+      end
+
+      it "should adjust in course copy" do
+        @cm.migration_type = 'course_copy_importer'
+        Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
+        expect(@course.storage_quota).to eq 4
+      end
     end
   end
 

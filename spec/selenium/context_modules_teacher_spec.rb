@@ -570,9 +570,9 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
-      m1_a = fj('#context_modules .context_module:first-child .reorder_module_link a')
-      m2_a = fj('#context_modules .context_module:last-child .reorder_module_link a')
-      driver.action.drag_and_drop(m2_a, m1_a).perform
+      m1_handle = fj('#context_modules .context_module:first-child .reorder_module_link .icon-drag-handle')
+      m2_handle = fj('#context_modules .context_module:last-child .reorder_module_link .icon-drag-handle')
+      driver.action.drag_and_drop(m2_handle, m1_handle).perform
       wait_for_ajax_requests
 
       m1.reload
@@ -795,15 +795,8 @@ describe "context modules" do
         driver.switch_to.active_element.send_keys(*keys)
       end
 
-      let(:context_modules) { ff('.context_module .icon-drag-handle') }
+      let(:context_modules) { ff('.context_module .collapse_module_link') }
       let(:context_module_items) { ff('.context_module_item a.title') }
-
-      it "should set focus to the first drag handle after the + Module button" do
-        add_module_link = f('.add_module_link')
-        add_module_link.send_keys("\t")
-        first_handle = f('.icon-drag-handle')
-        check_element_has_focus(first_handle)
-      end
 
       # Test these shortcuts (access menu by pressing comma key):
       # Up : Previous Module/Item

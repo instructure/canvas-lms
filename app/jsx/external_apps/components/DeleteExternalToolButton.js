@@ -124,7 +124,7 @@ export default React.createClass({
               </div>
             </Modal>
           </li>
-        )
+        );
       }
       return false;
     }

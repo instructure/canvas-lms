@@ -153,6 +153,9 @@
       &:last-child .add_rating_link_after {
         display: none;
       }
+      &.infinitesimal .range_rating {
+        display: none;
+      }
     }
   }
   @include mode-visibility($edit: none, $disp: block, $igno: none);

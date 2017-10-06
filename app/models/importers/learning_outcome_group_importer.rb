@@ -71,6 +71,7 @@ module Importers
         root_outcome_group.adopt_outcome_group(item)
       end
 
+      item.skip_parent_group_touch = true
       migration.add_imported_item(item)
 
       if hash[:outcomes]

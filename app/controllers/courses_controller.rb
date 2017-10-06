@@ -544,9 +544,7 @@ class CoursesController < ApplicationController
   #
   # @returns [Course]
   def user_index
-    @user.shard.activate do
-      render json: courses_for_user(@user, paginate_url: api_v1_user_courses_url(@user))
-    end
+    render json: courses_for_user(@user, paginate_url: api_v1_user_courses_url(@user))
   end
 
   # @API Create a new course
@@ -760,7 +758,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :update)
       backup_json = @context.backup_to_json
       send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Time.zone.today}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
-      render :text => proc {|response, output|
+      render :json => proc {|response, output|
         output.write backup_json
       }
     end
@@ -2861,10 +2859,18 @@ class CoursesController < ApplicationController
     end
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
-    preloads = [:account, :root_account]
+    preloads = %i/account root_account/
     preloads << :teachers if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
+    if includes.include?('current_grading_period_scores')
+      preloads << { enrollment_term: { grading_period_group: :grading_periods } }
+      preloads << { grading_period_groups: :grading_periods }
+    end
     ActiveRecord::Associations::Preloader.new.preload(courses, preloads)
+
+    if includes.include?('total_scores') || includes.include?('current_grading_period_scores')
+      ActiveRecord::Associations::Preloader.new.preload(enrollments, scores: :course)
+    end
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
@@ -2917,7 +2923,7 @@ class CoursesController < ApplicationController
       add_crumb(title)
       js_bundle :webzip_export
       css_bundle :webzip_export
-      render :text => '<div id="course-webzip-export-app"></div>'.html_safe, :layout => true
+      render :html => '<div id="course-webzip-export-app"></div>'.html_safe, :layout => true
     end
   end
 

@@ -27,7 +27,13 @@ module Canvas::Reloader
       @pending_reload = false
       Setting.reset_cache!
       RequestThrottle.reload!
-      to_reload.each(&:call)
+      to_reload.each do |block|
+        begin
+          block.call
+        rescue => e
+          Canvas::Errors.capture_exception(:reloader, e)
+        end
+      end
     end
 
     def on_reload(&block)

@@ -28,7 +28,19 @@ import Link from 'instructure-ui/lib/components/Link'
 
   class SubmissionProgressBars extends React.Component {
     static propTypes = {
-      submissions: PropTypes.array.isRequired
+      submissions: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          score: PropTypes.number,
+          user: PropTypes.shape({
+            _id: PropTypes.string.isRequired
+          }).isRequired,
+          assignment: PropTypes.shape({
+            html_url: PropTypes.string.isRequired,
+            points_possible: PropTypes.number,
+          })
+        }).isRequired
+      ).isRequired,
     }
 
     static displayGrade (submission) {
@@ -101,7 +113,7 @@ import Link from 'instructure-ui/lib/components/Link'
                   <Tooltip
                     tip={submission.assignment.name}
                     as={Link}
-                    href={`${submission.assignment.html_url}/submissions/${submission.user_id}`}
+                    href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
                     placement="start"
                   >
                     <Progress

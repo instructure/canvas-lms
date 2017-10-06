@@ -68,6 +68,7 @@ describe SisImportsApiController, type: :request do
           "override_sis_stickiness" => opts[:override_sis_stickiness] ? true : nil,
           "add_sis_stickiness" => opts[:add_sis_stickiness] ? true : nil,
           "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
+          "multi_term_batch_mode" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
           "change_threshold" => nil,
@@ -103,6 +104,7 @@ describe SisImportsApiController, type: :request do
           "workflow_state"=>"created",
           "batch_mode" => nil,
           "batch_mode_term_id" => nil,
+          "multi_term_batch_mode" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
@@ -151,6 +153,7 @@ describe SisImportsApiController, type: :request do
           "workflow_state"=>"imported",
           "batch_mode" => nil,
           "batch_mode_term_id" => nil,
+          "multi_term_batch_mode" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
@@ -229,6 +232,46 @@ describe SisImportsApiController, type: :request do
     batch = SisBatch.find(json["id"])
     expect(batch.batch_mode).to be_truthy
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
+  end
+
+  it "should use change threshold for batch mode" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { controller: 'sis_imports_api', action: 'create',
+            format: 'json', account_id: @account.id.to_s },
+          { import_type: 'instructure_csv',
+            attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            batch_mode: '1',
+            change_threshold: 7,
+            batch_mode_term_id: @account.default_enrollment_term.id })
+    batch = SisBatch.find(json["id"])
+    expect(batch.change_threshold).to eq 7
+  end
+
+  it "should requre change threshold for multi_term_batch_mode" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { controller: 'sis_imports_api', action: 'create',
+            format: 'json', account_id: @account.id.to_s },
+          { import_type: 'instructure_csv',
+            attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            multi_term_batch_mode: '1'})
+    expect(json['message']).to eq 'change_threshold is required to use multi term_batch mode.'
+  end
+
+  it "should use multi_term_batch_mode" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json",
+          { controller: 'sis_imports_api', action: 'create',
+            format: 'json', account_id: @account.id.to_s },
+          { import_type: 'instructure_csv',
+            attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+            batch_mode: '1',
+            multi_term_batch_mode: '1',
+            change_threshold: 7,})
+    batch = SisBatch.find(json["id"])
+    expect(json['multi_term_batch_mode']).to eq true
+    expect(batch.options[:multi_term_batch_mode]).to be_truthy
   end
 
   it "should enable batch with sis stickyness" do
@@ -606,6 +649,7 @@ describe SisImportsApiController, type: :request do
                       "workflow_state"=>"imported",
           "batch_mode" => nil,
           "batch_mode_term_id" => nil,
+          "multi_term_batch_mode" => nil,
           "override_sis_stickiness" => nil,
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,

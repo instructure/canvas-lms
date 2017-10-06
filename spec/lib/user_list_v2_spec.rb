@@ -231,6 +231,26 @@ describe UserListV2 do
       expect(r[:account_id]).to eq Account.default.id
     end
 
+    it "finds a user whose home shard is not the target shard" do
+      @shard1.activate do
+        @account = Account.create!(name: "non-local")
+        user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: @account)
+        @pseudonym.destroy
+      end
+      Account.default.pseudonyms.create!(user: @user, unique_id: 'bob')
+
+      # strictly speaking we don't want this to be necessary,
+      # but I'm not ready to rely on globallookups exclusively
+      # for finding appropriate shards
+      allow(Account.default).to receive(:trusted_account_ids).and_return([@account.id])
+
+      ul = UserListV2.new('jt@instructure.com', search_type: 'cc_path')
+      expect(ul.resolved_results.count).to eq 1
+      r = ul.resolved_results.first
+      expect(r[:user_id]).to eq @user.id
+      expect(r[:account_id]).to eq Account.default.id
+    end
+
     context "global lookups" do
       before do
         @shard1.activate do

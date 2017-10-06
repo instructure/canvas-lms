@@ -102,8 +102,7 @@ define [
       if @canManage()
         @publishIconView = new PublishIconView({
           model: @model,
-          publishText: I18n.t("Unpublished. Click to publish %{name}", name: @model.get('name')),
-          unpublishText: I18n.t("Published. Click to unpublish %{name}", name: @model.get('name'))
+          title: @model.get('name')
         })
         @lockIconView = new LockIconView({
           model: @model,

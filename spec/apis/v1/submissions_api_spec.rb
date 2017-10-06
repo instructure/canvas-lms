@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -134,6 +134,17 @@ describe 'Submissions API', type: :request do
       end
     end
 
+    context 'active enrollment_state with active and concluded enrollments' do
+      include_examples 'enrollment_state'
+      before do
+        e = @course.enroll_user(@student1, 'StudentEnrollment', section: @default_section)
+        e.conclude
+        @enrollment_state = 'concluded'
+        @active_count = 1
+        @concluded_count = 1
+      end
+    end
+
     context 'active enrollment_state' do
       include_examples 'enrollment_state'
       before do
@@ -150,6 +161,24 @@ describe 'Submissions API', type: :request do
         @active_count = 0
         @concluded_count = 1
       end
+    end
+
+    context 'empty enrollment_state' do
+      include_examples 'enrollment_state'
+      before do
+        @enrollment_state = ''
+        @active_count = 1
+        @concluded_count = 1
+      end
+    end
+
+    it 'should raise on invalid enrollment_state' do
+      json = api_call(:get,
+                      '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      {enrollment_state: 'invalid', student_ids: [@student1.id]}, {}, expected_status: 400)
+      expect(json['error']).to eq 'invalid enrollment_state'
     end
 
     it 'returns submissions based on assignments.post_to_sis' do
@@ -1483,6 +1512,24 @@ describe 'Submissions API', type: :request do
       expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id, @a3.id]
     end
 
+    it "errors when asking for assignments in other courses" do
+      # second course
+      course_with_teacher(:active_all => true)
+      @course.enroll_student(@student1).accept!
+      @course.enroll_student(@student2).accept!
+
+      # call the api on the new course, passing assignment ids from the old course
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students',
+              format: 'json', course_id: @course.to_param },
+            { student_ids: 'all',
+              assignment_ids: [@a1.id, @a2.id],
+              grouped: true,
+              total_scores: true })
+      expect(response).to be_forbidden
+    end
+
     context 'OriginalityReport' do
       it 'includes has_originality_report if the submission has an originality_report' do
         attachment_model
@@ -1748,18 +1795,6 @@ describe 'Submissions API', type: :request do
           json = call_to_for_students(as_student: false)
 
           expect(json.size).to eq 0
-        end
-
-        it "returns the graded submisson even if the student is not in the overriden section" do
-          @assignment.grade_student(@student, grade: 5, grader: @teacher)
-          Score.where(enrollment_id: @student.enrollments).delete_all
-          @student.enrollments.each(&:destroy_permanently!)
-          student_in_section(@section2, user: @student)
-
-          json = call_to_for_students(as_student: false)
-
-          expect(json.size).to eq 1
-          json.each { |submission| expect(submission['user_id']).to eq @student.id }
         end
       end
     end
@@ -2265,6 +2300,33 @@ describe 'Submissions API', type: :request do
       expect(Submission.count).to eq 1
       expect(json['grade']).to eq 'B'
       expect(json['score']).to eq 12.9
+    end
+
+    it "doesn't allow grading a deleted submission" do
+      submission = @assignment.submissions.find_by(user: @student)
+      submission.destroy
+
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B'
+          },
+        }, {
+          expected_status: :unauthorized
+        }
+      )
+
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "can excuse assignments" do
@@ -2881,6 +2943,26 @@ describe 'Submissions API', type: :request do
         :comments=>"Rock on",
         :comments_html=>"Rock on"}]
     )
+  end
+
+  it "validates the rubric assessment" do
+    student = user_factory(active_all: true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    rubric = rubric_model(:user => @user, :context => @course,
+      :data => larger_rubric_data)
+    a1.create_rubric_association(:rubric => rubric, :purpose => 'grading', :context => @course)
+
+    json = api_call(:put,
+      "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+      { :controller => 'submissions_api', :action => 'update',
+        :format => 'json', :course_id => @course.id.to_s,
+        :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
+      { :rubric_assessment => { :crit42 => { :points => 7 } } },
+    {}, {:expected_status => 400})
+
+    expect(json['message']).to eq "invalid rubric_assessment"
   end
 
   it "allows posting a comment on a submission" do
@@ -3953,16 +4035,16 @@ describe 'Submissions API', type: :request do
 
   describe '#index' do
     context 'grouped_submissions' do
-      let(:test_course) { course_factory() }
+      let(:course) { course_factory }
       let(:teacher)   { user_factory(active_all: true) }
       let(:student1)  { user_factory(active_all: true) }
       let(:student2)  { user_factory(active_all: true) }
       let(:group) do
-        group_category = test_course.group_categories.create(name: 'Engineering')
-        test_course.groups.create(name: 'Group1', group_category: group_category)
+        group_category = course.group_categories.create(name: 'Engineering')
+        course.groups.create(name: 'Group1', group_category: group_category)
       end
       let(:assignment) do
-        test_course.assignments.create!(
+        course.assignments.create!(
           title: 'group assignment',
           grading_type: 'points',
           points_possible: 10,
@@ -3972,9 +4054,9 @@ describe 'Submissions API', type: :request do
       end
 
       let!(:enroll_teacher_and_students) do
-        test_course.enroll_teacher(teacher).accept!
-        test_course.enroll_student(student1, enrollment_state: 'active')
-        test_course.enroll_student(student2, enrollment_state: 'active')
+        course.enroll_teacher(teacher).accept!
+        course.enroll_student(student1, enrollment_state: 'active')
+        course.enroll_student(student2, enrollment_state: 'active')
       end
       let!(:add_students_to_group) do
         group.add_user(student1)
@@ -3982,11 +4064,11 @@ describe 'Submissions API', type: :request do
       end
       let!(:submit_homework) { assignment.submit_homework(student1, submission_type: 'online_text_entry') }
 
-      let(:path) { "/api/v1/courses/#{test_course.id}/assignments/#{assignment.id}/submissions" }
+      let(:path) { "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions" }
       let(:params) do
         {
           controller: 'submissions_api', action: 'index',
-          format: 'json', course_id: test_course.id.to_s,
+          format: 'json', course_id: course.id.to_s,
           assignment_id: assignment.id.to_s
         }
       end
@@ -4013,7 +4095,7 @@ describe 'Submissions API', type: :request do
       context "submission of type basic_lti_launch" do
         let(:external_tool_url) { 'http://www.test.com/basic-launch' }
         let(:assignment) do
-          test_course.assignments.create!(
+          course.assignments.create!(
             title: 'group assignment',
             grading_type: 'points',
             points_possible: 10,
@@ -4032,6 +4114,50 @@ describe 'Submissions API', type: :request do
         it 'includes the external tool URL' do
           submission_json = api_call_as_user(teacher, :get, path, params)
           expect(submission_json.first['external_tool_url']).to eq external_tool_url
+        end
+      end
+
+      describe 'mobile_student_label' do
+        let(:field) { 'mobile_student_label' }
+
+        it "does not include label" do
+          json = api_call_as_user(teacher, :get, path, params)
+          json.each do |entry| # can't use `.not_to all`
+            expect(entry).not_to include field
+          end
+        end
+
+        it "includes label when label is passed to the include param" do
+          json = api_call_as_user(teacher, :get, path, params.merge(include: field))
+          expect(json).to all include field
+        end
+
+        it "defaults to unsubmitted for newly created assignment" do
+          assignment = course.assignments.create!(
+            title: 'new_assignment',
+            grading_type: 'points',
+            points_possible: 10,
+            submission_types: 'online_text_entry'
+          )
+          path = "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions"
+          json = api_call_as_user(teacher, :get, path, params.merge(assignment_id: assignment.id, include: field))
+          expect(json).to all include("#{field}" => 'unsubmitted')
+        end
+      end
+
+      describe 'mobile_teacher_state' do
+        let(:field) { 'mobile_teacher_state' }
+
+        it "does not include action" do
+          json = api_call_as_user(teacher, :get, path, params)
+          json.each do |entry| # can't use `.not_to all`
+            expect(entry).not_to include field
+          end
+        end
+
+        it "includes action when action is passed to the include param" do
+          json = api_call_as_user(teacher, :get, path, params.merge(include: field))
+          expect(json).to all include field
         end
       end
     end

@@ -31,37 +31,41 @@
 </h2>
 
 <% if @plugins.any? %>
-  <table class="table table-striped">
-    <tr>
-      <th><%= t :name, "Name" %></th>
-      <th><%= t :description, "Description" %></th>
-      <th><%= t :tag, "Tag" %></th>
-      <th><%= t :website, "Website" %></th>
-      <th><%= t :author, "Author" %></th>
-      <th><%= t :version, "Version" %></th>
-      <th>&nbsp;</th>
-    </tr>
-    <% @plugins.each do |plugin| %>
-      <tr class="<%= cycle('odd', 'even') %>">
-        <td class='name' nowrap="nowrap">
-          <% if plugin.has_settings_partial? %>
-            <a class="name" href="<%= plugin_path(plugin.id) %>"><%= h plugin.name %></a>
-          <% else %>
-            <span class="name"><%= h plugin.name %></span>
-          <% end %>
-        </td>
-        <td class='description'><%= content_tag('span', h(plugin.description), :class => 'description') unless plugin.description.blank? %></td>
-        <td class='tag'><%= h plugin.tag %></td>
-        <td class='website'>
-          <% if plugin.website.present? %>
-            <a href="<%= plugin.website %>" class="icon-link not_external"></a>
-          <% end %>
-      </td>
-        <td class="author"><%= plugin.author_website.blank? ? h(plugin.author) : link_to(h(plugin.author), plugin.author_website) %></td>
-        <td class="version"><%= h plugin.version %></td>
-        <td class="configure"><%= link_to("", plugin_path(plugin.id), :class => "btn btn-mini icon-settings") if plugin.has_settings_partial? %></td>
+  <table class="ic-Table ic-Table--striped">
+  <thead>
+      <tr>
+        <th><%= t :name, "Name" %></th>
+        <th><%= t :description, "Description" %></th>
+        <th><%= t :tag, "Tag" %></th>
+        <th><%= t :website, "Website" %></th>
+        <th><%= t :author, "Author" %></th>
+        <th><%= t :version, "Version" %></th>
+        <th>&nbsp;</th>
       </tr>
-    <% end %>
+    </thead>
+    <tbody>
+      <% @plugins.each do |plugin| %>
+        <tr class="<%= cycle('odd', 'even') %>">
+          <td class='name' nowrap="nowrap">
+            <% if plugin.has_settings_partial? %>
+              <a class="name" href="<%= plugin_path(plugin.id) %>"><%= h plugin.name %></a>
+            <% else %>
+              <span class="name"><%= h plugin.name %></span>
+            <% end %>
+          </td>
+          <td class='description'><%= content_tag('span', h(plugin.description), :class => 'description') unless plugin.description.blank? %></td>
+          <td class='tag'><%= h plugin.tag %></td>
+          <td class='website'>
+            <% if plugin.website.present? %>
+              <a href="<%= plugin.website %>" class="icon-link not_external"></a>
+            <% end %>
+        </td>
+          <td class="author"><%= plugin.author_website.blank? ? h(plugin.author) : link_to(h(plugin.author), plugin.author_website) %></td>
+          <td class="version"><%= h plugin.version %></td>
+          <td class="configure"><%= link_to("", plugin_path(plugin.id), :class => "Button Button--small icon-settings") if plugin.has_settings_partial? %></td>
+        </tr>
+      <% end %>
+    </tbody>
   </table>
 <% else %>
     <p class="nodata"><%= t :no_plugins, "There are no Canvas plugins installed" %></p>

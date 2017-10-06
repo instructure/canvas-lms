@@ -222,7 +222,7 @@ define [
         max: 400
       total:
         min: 95
-        max: 110
+        max: 400
 
     hasSections: $.Deferred()
     gridReady: $.Deferred()
@@ -387,6 +387,11 @@ define [
         submissionsURL: @options.submissions_url
         submissionsChunkCb: @gotSubmissionsChunk
         submissionsChunkSize: @options.chunk_size
+        customColumnIds: @gradebookContent.customColumns.map((column) -> column.id)
+        customColumnDataURL: @options.custom_column_data_url
+        customColumnDataPageCb: @gotCustomColumnDataChunk
+        customColumnDataParams:
+          include_hidden: true
       )
 
       dataLoader.gotStudentIds.then (response) =>
@@ -466,13 +471,13 @@ define [
         customColumn = @buildCustomColumn(column)
         @gradebookGrid.columns.definitions[customColumn.id] = customColumn
 
-    gotCustomColumnDataChunk: (column, columnData) =>
+    gotCustomColumnDataChunk: (customColumnId, columnData) =>
       studentIds = []
 
       for datum in columnData
         student = @student(datum.user_id)
         if student? #ignore filtered students
-          student["custom_col_#{column.id}"] = datum.content
+          student["custom_col_#{customColumnId}"] = datum.content
           studentIds.push(student.id)
 
       @invalidateRowsForStudentIds(_.uniq(studentIds))
@@ -928,7 +933,7 @@ define [
           @submissionsForStudent(student),
           @assignmentGroups,
           @options.group_weighting_scheme,
-          @gradingPeriodSet if hasGradingPeriods,
+          (@gradingPeriodSet if hasGradingPeriods),
           EffectiveDueDates.scopeToUser(@effectiveDueDates, student.id) if hasGradingPeriods
         )
 
@@ -1499,7 +1504,6 @@ define [
 
       id: columnId
       type: 'custom_column'
-      name: htmlEscape customColumn.title
       field: "custom_col_#{customColumn.id}"
       width: 100
       cssClass: "meta-cell custom_column #{columnId}"
@@ -1527,7 +1531,6 @@ define [
       columnDef =
         id: columnId
         field: fieldName
-        name: assignment.name
         object: assignment
         getGridSupport: => @gridSupport
         propFactory: new AssignmentRowCellPropFactory(assignment, @)
@@ -1536,7 +1539,7 @@ define [
         width: assignmentWidth
         cssClass: "assignment #{columnId}"
         headerCssClass: "assignment #{columnId}"
-        toolTip: assignment.name
+        toolTip: htmlEscape(assignment.name)
         type: 'assignment'
         assignmentId: assignment.id
 
@@ -1566,8 +1569,7 @@ define [
       {
         id: columnId
         field: fieldName
-        name: assignmentGroup.name
-        toolTip: assignmentGroup.name
+        toolTip: htmlEscape(assignmentGroup.name)
         object: assignmentGroup
         minWidth: columnWidths.assignmentGroup.min
         maxWidth: columnWidths.assignmentGroup.max

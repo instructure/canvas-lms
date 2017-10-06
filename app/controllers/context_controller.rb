@@ -59,7 +59,7 @@ class ContextController < ApplicationController
     if config
       redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
     else
-      render :text => t(:media_objects_not_configured, "Media Objects not configured")
+      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
 
@@ -81,7 +81,7 @@ class ContextController < ApplicationController
                                                       :type => type),
                   :status => 301
     else
-      render :text => t(:media_objects_not_configured, "Media Objects not configured")
+      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
 
@@ -137,16 +137,16 @@ class ContextController < ApplicationController
         end
       end
       logger.info(notifications.to_yaml)
-      render :text => "ok"
+      render :plain => "ok"
     else
       logger.info("md5 should have been #{hash} but was #{params[:sig]}")
-      render :text => "failure"
+      render :plain => "failure"
     end
   rescue => e
     logger.warn("=== KALTURA NOTIFICATON ERROR ===")
     logger.warn(e.to_s)
     logger.warn(e.backtrace.join("\n"))
-    render :text => "failure"
+    render :plain => "failure"
   end
 
   # safely render object and embed tags as part of user content, by using a

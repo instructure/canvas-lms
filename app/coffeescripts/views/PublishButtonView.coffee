@@ -30,6 +30,9 @@ define [
     publishedClass: 'btn-published'
     unpublishClass: 'btn-unpublish'
 
+    # This value allows the text to include the item title
+    @optionProperty 'title'
+
     # These values allow the default text to be overridden if necessary
     @optionProperty 'publishText'
     @optionProperty 'unpublishText'
@@ -135,6 +138,16 @@ define [
       @$icon.removeClass 'icon-publish icon-unpublish icon-unpublished'
       @$el.removeAttr 'aria-label'
 
+    publishLabel: ->
+      return @publishText if @publishText
+      return I18n.t('Unpublished.  Click to publish %{title}.', title: @title) if @title
+      I18n.t('Unpublished.  Click to publish.')
+
+    unpublishLabel: ->
+      return @unpublishText if @unpublishText
+      return I18n.t('Published.  Click to unpublish %{title}.', title: @title) if @title
+      I18n.t('Published.  Click to unpublish.')
+
     # render
 
     render: ->
@@ -155,16 +168,16 @@ define [
     renderPublish: ->
       @renderState
         text:        I18n.t 'buttons.publish', 'Publish'
-        label:       @publishText || I18n.t 'Unpublished. Click to publish.'
+        label:       @publishLabel()
         buttonClass: @publishClass
         iconClass:   'icon-unpublish'
 
     renderPublished: ->
       @renderState
         text:        I18n.t 'buttons.published', 'Published'
-        label:       @unpublishText || I18n.t 'Published. Click to unpublish.'
+        label:       @unpublishLabel()
         buttonClass: @publishedClass
-        iconClass:   'icon-publish'
+        iconClass:   'icon-publish icon-Solid'
 
     renderUnpublish: ->
       text = I18n.t 'buttons.unpublish', 'Unpublish'
@@ -179,7 +192,7 @@ define [
       @renderState
         text:        text
         buttonClass: @publishClass
-        iconClass:   'icon-publish'
+        iconClass:   'icon-publish icon-Solid'
 
     renderUnpublishing: ->
       @disable()

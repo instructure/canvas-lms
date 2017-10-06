@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook, setFixtureHtml } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory';
+
+let fixture;
 
 QUnit.module('AssignmentRowCellPropFactory#getProps', {
   setup () {
+    fixture = document.createElement('div');
+    document.body.appendChild(fixture);
+    setFixtureHtml(fixture);
     this.assignment = { id: '2301' };
     this.gradebook = createGradebook({ context_id: '1201' });
     this.gradebook.gridSupport = {
@@ -31,6 +36,10 @@ QUnit.module('AssignmentRowCellPropFactory#getProps', {
     };
     this.factory = new AssignmentRowCellPropFactory(this.assignment, this.gradebook);
     this.student = { id: '1101', isConcluded: false };
+  },
+
+  teardown () {
+    fixture.remove();
   }
 });
 

@@ -60,7 +60,16 @@ module Canvas
       # This isn't really meant for use in production, but as a convenience for
       # development where most won't want to run a consul agent/server.
       def fallback_data=(value)
-        @fallback_data = value&.with_indifferent_access
+        @fallback_data = value
+        if @fallback_data
+          @root_fallback_proxy = DynamicSettings::FallbackProxy.new(@fallback_data.with_indifferent_access)
+        else
+          @root_fallback_proxy = nil
+        end
+      end
+
+      def root_fallback_proxy
+        @root_fallback_proxy ||= DynamicSettings::FallbackProxy.new
       end
 
       # Build an object used to interacting with consul for the given
@@ -90,10 +99,12 @@ module Canvas
             cluster: cluster,
             default_ttl: default_ttl,
             kv_client: kv_client)
-        elsif @fallback_data.present?
-          DynamicSettings::FallbackProxy.new(@fallback_data[prefix])
         else
-          DynamicSettings::FallbackProxy.new({})
+          proxy = root_fallback_proxy
+          proxy = proxy.for_prefix(tree)
+          proxy = proxy.for_prefix(service)
+          proxy = proxy.for_prefix(prefix) if prefix
+          proxy
         end
       end
 

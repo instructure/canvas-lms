@@ -59,8 +59,6 @@ define [
       super
       # reset the form contents
       @render()
-      # auto-focus the first input
-      @$('input:first').focus()
 
     setAutoLeadershipFormState: ->
       if @model.get('auto_leader')?

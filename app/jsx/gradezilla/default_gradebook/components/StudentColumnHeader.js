@@ -120,7 +120,7 @@ export default class StudentColumnHeader extends ColumnHeader {
 
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
-          focusTriggerOnClose={false}
+          shouldFocusTriggerOnClose={false}
           trigger={
             <span ref={this.bindOptionsMenuTrigger} className={classes}>
               <Typography weight="bold" fontStyle="normal" size="large" color="brand">

@@ -38,6 +38,10 @@ define [
       return @get 'due_at' unless arguments.length > 0
       @set 'due_at', date
 
+    allDates: (alldate) =>
+      return @get 'all_dates' unless arguments.length > 0
+      @set 'all_dates', alldate
+
   QUnit.module "SisValidationHelper"
 
   test 'nameTooLong returns true if name is too long AND postToSIS is true', ->
@@ -71,3 +75,53 @@ define [
                                 postToSIS: true
                                 dueDateRequired: false)
     ok !@helper.dueDateMissing()
+
+  test 'dueDateMissing returns true if dueAt is null with multiple sections AND postToSIS is true', ->
+    @helper = new SisValidationHelper(
+                                model: new AssignmentStub()
+                                postToSIS: true
+                                allDates: [{ dueAt: "Something" }, { dueAt: null}]
+                                dueDateRequired: true)
+    ok @helper.dueDateMissing()
+
+  test 'dueDateMissing returns true if dueAt is null with multiple sections AND postToSIS is true', ->
+    @helper = new SisValidationHelper(
+                                model: new AssignmentStub()
+                                postToSIS: true
+                                allDates: [{ dueAt: "Something" }, { dueAt: "Something2"}]
+                                dueDateRequired: true)
+    ok !@helper.dueDateMissing()
+
+  test 'dueDateMissing returns false if dueAt is valid AND postToSIS is true', ->
+    @helper = new SisValidationHelper(
+                                model: new AssignmentStub()
+                                postToSIS: true
+                                dueDate: "Due Date"
+                                dueDateRequired: true)
+    ok !@helper.dueDateMissing()
+
+  test 'dueDateMissing returns false if dueAt is valid AND postToSIS is false', ->
+    @helper = new SisValidationHelper(
+                                model: new AssignmentStub()
+                                postToSIS: false
+                                dueDate: "Due Date"
+                                dueDateRequired: true)
+    ok !@helper.dueDateMissing()
+
+  test 'dueDateMissing returns false if dueAt is valid with multiple section overrides AND postToSIS is true', ->
+    @helper = new SisValidationHelper(
+                              model: new AssignmentStub()
+                              postToSIS: true
+                              dueDate: "Due Date"
+                              allDates: [{ dueAt: "Something" }, { dueAt: "Something2"}]
+                              dueDateRequired: true)
+    ok !@helper.dueDateMissing()
+
+  test 'dueDateMissing returns true if dueAt is valid with multiple section overrides as null AND postToSIS is true', ->
+    @helper = new SisValidationHelper(
+                              model: new AssignmentStub()
+                              postToSIS: true
+                              dueDate: "Due Date"
+                              allDates: [{ dueAt: null }, { dueAt: null}]
+                              dueDateRequired: true)
+    ok @helper.dueDateMissing()

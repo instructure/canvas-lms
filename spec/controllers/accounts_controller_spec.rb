@@ -29,20 +29,6 @@ describe AccountsController do
     account_admin_user(account: @account)
   end
 
-  def cross_listed_course
-    account_with_admin_logged_in
-    @account1 = Account.create!
-    @account1.account_users.create!(user: @user)
-    @course1 = @course
-    @course1.account = @account1
-    @course1.save!
-    @account2 = Account.create!
-    @course2 = course
-    @course2.account = @account2
-    @course2.save!
-    @course2.course_sections.first.crosslist_to_course(@course1)
-  end
-
   context "confirm_delete_user" do
     before(:once) {account_with_admin}
     before(:each) {user_session(@admin)}
@@ -219,6 +205,31 @@ describe AccountsController do
 
       expect(assigns[:associated_courses_count]).to eq 1
     end
+
+    describe "check crosslisting" do
+      before :once do
+        @root_account = Account.create!
+        @account1 = Account.create!({ :root_account => @root_account })
+        @account2 = Account.create!({ :root_account => @root_account })
+        @course1 = course_factory({ :account => @account1, :course_name => "course1" })
+        @course2 = course_factory({ :account => @account2, :course_name => "course2" })
+        @course2.course_sections.create!
+        @course2.course_sections.first.crosslist_to_course(@course1)
+      end
+
+      it "if crosslisted a section to another account's course, don't show that other course" do
+        account_with_admin_logged_in(account: @account2)
+        get 'show', params: {:id => @account2.id }, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
+
+      it "if crosslisted a section to this account, do *not* show other account's course" do
+        account_with_admin_logged_in(account: @account1)
+        get 'show', params: {:id => @account1.id }, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
+    end
+
     # Check that both published and un-published courses have the correct count
     it "should count course's student enrollments" do
       account_with_admin_logged_in
@@ -242,6 +253,7 @@ describe AccountsController do
       expect(assigns[:courses].find {|c| c.id == c1.id}.student_count).to eq c1.student_enrollments.count
       expect(assigns[:courses].find {|c| c.id == c2.id}.student_count).to eq c2.student_enrollments.count
     end
+
 
     it "should list student counts in unclaimed courses" do
       account_with_admin_logged_in
@@ -413,6 +425,46 @@ describe AccountsController do
       expect(@account.enable_turnitin?).to be_truthy
       expect(@account.admins_can_change_passwords?).to be_truthy
       expect(@account.admins_can_view_notifications?).to be_truthy
+    end
+
+    it "doesn't break I18n by setting the help_link_name unnecessarily" do
+      account_with_admin_logged_in
+
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :help_link_name  => 'Help'
+      }}}
+      @account.reload
+      expect(@account.settings[:help_link_name]).to be_nil
+
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :help_link_name => 'Halp'
+      }}}
+      @account.reload
+      expect(@account.settings[:help_link_name]).to eq 'Halp'
+    end
+
+    it "doesn't break I18n by setting customized text for default help links unnecessarily" do
+      account_with_admin_logged_in
+      post 'update', params: {:id => @account.id, :account => { :custom_help_links => { '0' =>
+        { :id => 'instructor_question', :text => 'Ask Your Instructor a Question',
+          :subtext => 'Questions are submitted to your instructor', :type => 'default',
+          :url => '#teacher_feedback', :available_to => ['student'] }
+      }}}
+      @account.reload
+      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
+      expect(link).not_to have_key('text')
+      expect(link).not_to have_key('subtext')
+      expect(link).not_to have_key('url')
+
+      post 'update', params: {:id => @account.id, :account => { :custom_help_links => { '0' =>
+        { :id => 'instructor_question', :text => 'yo', :subtext => 'wiggity', :type => 'default',
+          :url => '#dawg', :available_to => ['student'] }
+      }}}
+      @account.reload
+      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
+      expect(link['text']).to eq 'yo'
+      expect(link['subtext']).to eq 'wiggity'
+      expect(link['url']).to eq '#dawg'
     end
 
     it "should allow updating services that appear in the ui for the current user" do

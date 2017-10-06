@@ -18,6 +18,7 @@
 export default class SisValidationHelper {
   constructor (params) {
     this.postToSIS = params.postToSIS
+    this.allDates = params.allDates
     this.dueDateRequired = params.dueDateRequired
     this.maxNameLengthRequired = params.maxNameLengthRequired
     this.dueDate = params.dueDate
@@ -38,8 +39,22 @@ export default class SisValidationHelper {
     return this.modelName.length > this.maxNameLength
   }
 
+  dueAtNotValid (date) {
+    if(!date) return true
+    return (date.dueAt === null || date.dueAt === undefined || date.dueAt === '')
+  }
+
+  dueDateMissingDifferentiated () {
+    if (!this.allDates) return false
+    return (this.allDates.map(this.dueAtNotValid).indexOf(true) !== -1)
+  }
+
+  baseDueDateMissing () {
+    return ((!this.allDates || this.allDates.length === 0) && !this.dueDate)
+  }
+
   dueDateMissing () {
     if (!this.postToSIS) return false
-    return this.dueDateRequired && (this.dueDate === null || this.dueDate === undefined || this.dueDate === '')
+    return this.dueDateRequired && (this.baseDueDateMissing() || this.dueDateMissingDifferentiated())
   }
 }

@@ -65,7 +65,10 @@ define [
       @sisButtonView = false
 
       if @canManage()
-        @publishIconView = new PublishIconView(model: @model)
+        @publishIconView = new PublishIconView({
+          model: @model,
+          title: @model.get('title')
+        })
         @lockIconView = new LockIconView({
           model: @model,
           unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('title')),

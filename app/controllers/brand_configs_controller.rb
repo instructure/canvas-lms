@@ -226,7 +226,7 @@ class BrandConfigsController < ApplicationController
     if Attachment.s3_storage?
       attachment.s3_url
     else
-      attachment.authenticated_s3_url
+      attachment.authenticated_url
     end
   end
 end

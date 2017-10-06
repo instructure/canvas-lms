@@ -187,12 +187,12 @@ describe "differentiated_assignments" do
           @student = @user
           teacher_in_course(course: @course)
         end
-        it "should keep the quiz visible if there is a grade" do
+        it "should not keep the quiz visible even if there is a grade" do
           @quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
           Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @student})
-          ensure_user_sees_quiz
+          ensure_user_does_not_see_quiz
         end
 
         it "should not keep the quiz visible if there is no score, even if it has a grade" do
@@ -205,12 +205,12 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
 
-        it "should keep the quiz visible if the grade is zero" do
+        it "should not keep the quiz visible even if the grade is zero" do
           @quiz.assignment.grade_student(@student, grade: 0, grader: @teacher)
           Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @student})
-          ensure_user_sees_quiz
+          ensure_user_does_not_see_quiz
         end
       end
 
@@ -233,7 +233,7 @@ describe "differentiated_assignments" do
         end
         it "should update when the override is deleted" do
           ensure_user_sees_quiz
-          @quiz.assignment_overrides.to_a.each(&:destroy_permanently!)
+          @quiz.assignment_overrides.to_a.each(&:destroy!)
           ensure_user_does_not_see_quiz
         end
       end

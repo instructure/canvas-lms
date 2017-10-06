@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook, setFixtureHtml } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 import AssignmentCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/AssignmentCellFormatter';
 
 QUnit.module('AssignmentCellFormatter', function (hooks) {
@@ -30,6 +30,7 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
   hooks.beforeEach(function () {
     $fixture = document.createElement('div');
     document.body.appendChild($fixture);
+    setFixtureHtml($fixture);
 
     gradebook = createGradebook();
     formatter = new AssignmentCellFormatter(gradebook);

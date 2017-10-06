@@ -178,7 +178,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def export_object?(obj)
     return false unless obj
-    last_export_at.nil? || obj.updated_at >= last_export_at
+    last_export_at.nil? || obj.updated_at.nil? || obj.updated_at >= last_export_at
   end
 
   def detect_updated_attachments(type)

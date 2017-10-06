@@ -78,6 +78,22 @@ describe Course do
       end.and_return(nil)
       @course.recompute_student_scores
     end
+
+    it "should not use student ids for deleted enrollments, even if they are explicitly passed" do
+      @course.save!
+      enrollment = course_with_student(course: @course, active_all: true)
+      enrollment.destroy
+      expect(Enrollment).to receive(:recompute_final_score).with([], any_args)
+      @course.recompute_student_scores([enrollment.user_id])
+    end
+
+    it "should not use student ids for users enrolled in other courses, even if they are explicitly passed" do
+      @course.save!
+      first_course = @course
+      enrollment = course_with_student(active_all: true)
+      expect(Enrollment).to receive(:recompute_final_score).with([], any_args)
+      first_course.recompute_student_scores([enrollment.user_id])
+    end
   end
 
   it "should properly determine if group weights are active" do
@@ -245,6 +261,34 @@ describe Course do
 
     it "should return false if neither course nor account have grading periods" do
       expect(@course.grading_periods?).to be false
+    end
+  end
+
+  describe "#relevant_grading_period_group" do
+    it "favors legacy over enrollment term grading_period_groups" do
+      @course.save!
+      account_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      account_group.enrollment_terms << @course.enrollment_term
+      grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      expect(@course.relevant_grading_period_group).to eq(grading_period_group)
+    end
+
+    it "returns a legacy grading_period_group" do
+      @course.save!
+      grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      expect(@course.relevant_grading_period_group).to eq(grading_period_group)
+    end
+
+    it "returns an enrollment term grading_period_group" do
+      @course.save!
+      grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      grading_period_group.enrollment_terms << @course.enrollment_term
+      expect(@course.relevant_grading_period_group).to eq(grading_period_group)
+    end
+
+    it "returns nil when there are no relevant grading_period_group" do
+      @course.save!
+      expect(@course.relevant_grading_period_group).to be nil
     end
   end
 

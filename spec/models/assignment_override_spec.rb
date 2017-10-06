@@ -727,24 +727,24 @@ describe AssignmentOverride do
       @override.save
     end
 
-    it "does not trigger when non-applicable override is created" do
-      expect(DueDateCacher).to receive(:recompute).never
+    it "triggers when override without a due_date is created" do
+      expect(DueDateCacher).to receive(:recompute)
       @assignment.assignment_overrides.create
     end
 
-    it "does not trigger when non-applicable override deleted" do
+    it "triggers when override without a due_date deleted" do
       @override.clear_due_at_override
       @override.save
 
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute)
       @override.destroy
     end
 
-    it "does not trigger when non-applicable override undeleted" do
+    it "triggers when override without a due_date undeleted" do
       @override.clear_due_at_override
       @override.destroy
 
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute)
       @override.workflow_state = 'active'
       @override.save
     end

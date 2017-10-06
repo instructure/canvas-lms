@@ -68,27 +68,31 @@ define [
 
       @$el.disableWhileLoading dfd
 
+    close: ->
+      if @dialog?.isOpen()
+        @dialog.close()
+      if @buttonClicked == 'delete'
+        @focusOnDelete?.focus()
+      else
+        @focusOnCancel?.focus()
+
     setupDialog: ->
       super
 
       form = @
 
-      # Add a close event for focus handling
-      form.$el.on('dialogclose', (event, ui) =>
-        @focusOnCancel?.focus()
-      )
-
       buttons = [
         class: 'btn'
         text: I18n.t 'cancel_button', 'Cancel'
         click: =>
+          @buttonClicked = 'cancel'
           form.$el.dialog 'close'
       ,
         class: 'btn btn-danger'
         text: I18n.t 'delete_button', 'Delete'
         'data-text-while-loading': I18n.t 'deleting_button', 'Deleting...'
         click: =>
+          @buttonClicked = 'delete'
           form.submit()
-          @focusOnDelete.focus()
       ]
       @$el.dialog 'option', 'buttons', buttons

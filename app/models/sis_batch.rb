@@ -104,7 +104,6 @@ class SisBatch < ActiveRecord::Base
   def enable_diffing(data_set_id, opts = {})
     if data[:import_type] == "instructure_csv"
       self.diffing_data_set_identifier = data_set_id
-      self.change_threshold = opts[:change_threshold]
       if opts[:remaster]
         self.diffing_remaster = true
       end
@@ -189,6 +188,12 @@ class SisBatch < ActiveRecord::Base
 
   def abort_batch
     SisBatch.not_completed.where(id: self).update_all(workflow_state: 'aborted')
+  end
+
+  def batch_aborted(message)
+    add_errors([[message]])
+    self.save!
+    raise SisBatch::Aborted
   end
 
   def self.abort_all_pending_for_account(account)
@@ -303,10 +308,23 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
+  def batch_mode_terms
+    if self.options[:multi_term_batch_mode]
+      @terms ||= EnrollmentTerm.where(sis_batch_id: self)
+      unless @terms.exists?
+        abort_batch
+        batch_aborted(t('Terms not found. Terms must be included with multi_term_batch_mode'))
+      end
+      @terms
+    else
+      self.batch_mode_term
+    end
+  end
+
   def term_course_scope
     if data[:supplied_batches].include?(:course)
       scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil)
-      scope.where(enrollment_term_id: self.batch_mode_term)
+      scope.where(enrollment_term_id: batch_mode_terms)
     end
   end
 
@@ -335,7 +353,7 @@ class SisBatch < ActiveRecord::Base
 
   def term_sections_scope
     if data[:supplied_batches].include?(:section)
-      scope = self.account.course_sections.active.where(courses: {enrollment_term_id: self.batch_mode_term})
+      scope = self.account.course_sections.active.where(courses: {enrollment_term_id: batch_mode_terms})
       scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil)
       scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
     end
@@ -364,7 +382,7 @@ class SisBatch < ActiveRecord::Base
   def term_enrollments_scope
     if data[:supplied_batches].include?(:enrollment)
       scope = self.account.enrollments.active.joins(:course).readonly(false).where.not(sis_batch_id: nil)
-      scope.where(courses: {enrollment_term_id: self.batch_mode_term})
+      scope.where(courses: {enrollment_term_id: batch_mode_terms})
     end
   end
 
@@ -389,17 +407,18 @@ class SisBatch < ActiveRecord::Base
 
   def remove_previous_imports
     # we shouldn't be able to get here without a term, but if we do, skip
-    return unless self.batch_mode_term
+    return unless self.batch_mode_term || options[:multi_term_batch_mode]
     supplied_batches = data[:supplied_batches].dup.keep_if { |i| [:course, :section, :enrollment].include? i }
     return unless supplied_batches.present?
-    SisBatch.where(id: self).update_all(workflow_state: 'cleanup_batch')
-
-    count = 0
-    courses = non_batch_courses_scope
-    sections = non_batch_sections_scope
-    enrollments = non_batch_enrollments_scope
-
     begin
+      batch_mode_terms if options[:multi_term_batch_mode]
+      SisBatch.where(id: self).update_all(workflow_state: 'cleanup_batch')
+
+      count = 0
+      courses = non_batch_courses_scope
+      sections = non_batch_sections_scope
+      enrollments = non_batch_enrollments_scope
+
       count = detect_changes(count, courses, enrollments, sections)
       row = remove_non_batch_courses(courses, count) if courses
       row = remove_non_batch_sections(sections, count, row) if sections
@@ -415,31 +434,37 @@ class SisBatch < ActiveRecord::Base
     if courses
       count += courses.count
       all_count += term_course_scope.count
+      detect_change_item(count, all_count, 'courses')
     end
 
     if sections
-      count += sections.count
-      all_count += term_sections_scope.count
+      s_count = sections.count
+      count += s_count
+      s_all_count = term_sections_scope.count
+      detect_change_item(s_count, s_all_count, 'sections')
     end
 
     if enrollments
-      count += enrollments.count
-      all_count += term_enrollments_scope.count
+      e_count = enrollments.count
+      count += e_count
+      e_all_count = term_enrollments_scope.count
+      detect_change_item(e_count, e_all_count, 'enrollments')
     end
 
-    if change_threshold && count.to_f/all_count*100 > change_threshold
-      change_detected(count)
-    end
     count
   end
 
-  def change_detected(count)
-    abort_batch
-    processing_errors ||= []
-    processing_errors << [t("%{count} items would be deleted and exceeds the set threshold of %{change_threshold}%",
-                            count: count, change_threshold: change_threshold)]
-    SisBatch.where(id: self).update_all(processing_errors: processing_errors)
-    raise SisBatch::Aborted
+  def detect_change_item(count, all_count, type)
+    if change_threshold && count.to_f/all_count*100 > change_threshold
+      abort_batch
+      message = change_detected_message(count, type)
+      batch_aborted(message)
+    end
+  end
+
+  def change_detected_message(count, type)
+    t("%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%",
+      count: count, type: type, change_threshold: change_threshold)
   end
 
   def as_json(options={})
@@ -455,6 +480,7 @@ class SisBatch < ActiveRecord::Base
       "data" => self.data,
       "batch_mode" => self.batch_mode,
       "batch_mode_term_id" => self.batch_mode_term ? self.batch_mode_term.id : nil,
+      "multi_term_batch_mode" => self.options[:multi_term_batch_mode],
       "override_sis_stickiness" => self.options[:override_sis_stickiness],
       "add_sis_stickiness" => self.options[:add_sis_stickiness],
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],

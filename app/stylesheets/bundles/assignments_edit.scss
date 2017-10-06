@@ -50,7 +50,7 @@
 
 /* for labels */
 div.form-column-left {
-  min-width: 145px;
+  width: 145px;
   text-align: right;
   margin-top: 20px;
   display: inline-block;
@@ -131,6 +131,9 @@ div.form-column-right, div.overrides-column-right {
 }
 
 #similarity_detection_tools .form-column-right {
+  #report_visibility_picker_label {
+    padding: 0px 0px 10px 17px !important;
+  }
   padding-left: 4px;
   iframe.tool_launch {
     margin: 15px 0px 0px 0px;
@@ -142,14 +145,15 @@ div.form-column-right, div.overrides-column-right {
   margin: 15px 20px 0;
 }
 
+#discussion-edit-view {
+  @include readonly-input;
+}
 
 /* support for master class locked input fields */
 #edit_assignment_form, #discussion-edit-view {
    h1.title {
      clear: both;
    }
-
-   @include readonly-input;
 
    .to .ic-Form-control.readonly,
    .from .ic-Form-control.readonly {  // locked availability dates

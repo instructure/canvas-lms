@@ -116,7 +116,10 @@ class ApplicationController < ActionController::Base
     return {} unless request.format.html?
     # set some defaults
     unless @js_env
-      editor_css = view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
+      editor_css = [
+        active_brand_config_css_url,
+        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
+      ]
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
         active_brand_config: active_brand_config.try(:md5),
@@ -146,6 +149,7 @@ class ApplicationController < ActionController::Base
       @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
       @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
       @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+      @js_env[:GRAPHQL_ENABLED] = @domain_root_account.try(:feature_enabled?, :graphql)
       unless @js_env[:LOCALE]
         @js_env[:LOCALE] = I18n.locale.to_s
         @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
@@ -1535,7 +1539,8 @@ class ApplicationController < ActionController::Base
         if @assignment
           return unless require_user
           add_crumb(@resource_title)
-          @prepend_template = 'assignments/description'
+          @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
+          @prepend_template = 'assignments/lti_header'
           @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))
         else
           @lti_launch.params = adapter.generate_post_payload

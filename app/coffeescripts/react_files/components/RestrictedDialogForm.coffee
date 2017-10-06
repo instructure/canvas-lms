@@ -67,9 +67,14 @@ define [
           $(ReactDOM.findDOMNode(@refs.usageSelection.refs.usageRightSelection)).errorBox(I18n.t('You must specify a usage right.'))
           return false
 
+        usageRightValue =
+          use_justification: values.use_justification
+          legal_copyright: values.copyright
+          license: values.cc_license
+
         # We need to first set usage rights before handling the setting of
         # restricted access things.
-        setUsageRights(@props.models, values, (success, data) =>
+        setUsageRights(@props.models, usageRightValue, (success, data) =>
           if success
             updateModelsUsageRights(data, @props.models)
             @setRestrictedAccess()

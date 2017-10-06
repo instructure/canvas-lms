@@ -35,19 +35,6 @@ import axios from 'axios'
       isOpen: false
     }
 
-    constructor (props) {
-      super(props);
-      this.appElement = document.getElementById('application');
-    }
-
-    handleModalReady = () => {
-      this.appElement.setAttribute('aria-hidden', 'true');
-    }
-
-    handleModalClose = () => {
-      this.appElement.removeAttribute('aria-hidden');
-    }
-
     handleOkayButtonClick = (e, onSuccessFunc = window.location.reload) => {
       const API_URL = '/api/v1/users/self/features/flags/new_user_tutorial_on_off';
       axios.put(API_URL, {
@@ -62,13 +49,12 @@ import axios from 'axios'
     render () {
       return (
         <Modal
-          isOpen={this.props.isOpen}
+          open={this.props.isOpen}
           size="small"
-          onReady={this.handleModalReady}
-          onClose={this.handleModalClose}
-          onRequestClose={this.props.handleRequestClose}
+          onDismiss={this.props.handleRequestClose}
           label={I18n.t('End Course Set-up Tutorial Dialog')}
           closeButtonLabel={I18n.t('Close')}
+          applicationElement={() => document.getElementById('application')}
         >
           <ModalHeader>
             <Heading>{I18n.t('End Course Set-up Tutorial')}</Heading>

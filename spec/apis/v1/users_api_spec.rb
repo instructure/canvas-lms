@@ -240,6 +240,10 @@ describe Api::V1::User do
           'sortable_name' => 'User',
           'id' => @user.id,
           'short_name' => 'User',
+          'integration_id' => nil,
+          'sis_import_id' => nil,
+          'sis_login_id' => 'xyz',
+          'sis_user_id' => nil,
           'login_id' => 'xyz',
         })
     end
@@ -677,9 +681,13 @@ describe "Users API", type: :request do
 
           expect(json).to eq({
             "id"            => user.id,
+            "integration_id"=> nil,
             "name"          => "",
             "sortable_name" => "",
             "short_name"    => "",
+            "sis_import_id" => nil,
+            "sis_login_id"  => "bademail@",
+            "sis_user_id"   => nil,
             "login_id"      => "bademail@",
             "locale"        => nil
           })

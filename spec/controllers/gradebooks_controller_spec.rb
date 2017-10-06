@@ -924,25 +924,46 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
-    it "includes assignment_visibility" do
-      user_session(@teacher)
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @student = @course.enroll_user(User.create!(:name => "some user"))
-      post(
-        'update_submission',
-        params: {
-          course_id: @course.id,
-          submission: {
-            assignment_id: @assignment.id,
-            user_id: @student.user_id,
-            grade: 10
-          }
-        },
-        format: :json
-      )
+    describe "returned JSON" do
+      before(:once) do
+        @assignment = @course.assignments.create!(title: "Math 1.1")
+        @student = @course.enroll_user(User.create!(name: "Adam Jones"))
+      end
 
-      submissions = JSON.parse(response.body).map{ |sub| sub['submission']}
-      expect(submissions).to all include('assignment_visible' => true)
+      before(:each) do
+        user_session(@teacher)
+        post(
+          'update_submission',
+          params: {
+            course_id: @course.id,
+            submission: {
+              assignment_id: @assignment.id,
+              user_id: @student.user_id,
+              grade: 10
+            }
+          },
+          format: :json
+        )
+      end
+
+      let(:json) { JSON.parse(response.body) }
+
+      it "includes assignment_visibility" do
+        submissions = json.map {|submission| submission['submission']}
+        expect(submissions).to all include('assignment_visible' => true)
+      end
+
+      it "includes missing in submission history" do
+        submission_history = json.first['submission']['submission_history']
+        submissions = submission_history.map {|submission| submission['submission']}
+        expect(submissions).to all include('missing' => false)
+      end
+
+      it "includes late in submission history" do
+        submission_history = json.first['submission']['submission_history']
+        submissions = submission_history.map {|submission| submission['submission']}
+        expect(submissions).to all include('late' => false)
+      end
     end
 
     it "allows adding comments for submission" do

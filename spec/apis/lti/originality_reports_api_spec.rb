@@ -26,8 +26,8 @@ module Lti
     include_context 'lti2_api_spec_helper'
     let(:service_name) { OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE }
     let(:aud) { host }
+    before(:once) { attachment_model }
     before :each do
-      attachment_model
       message_handler.update_attributes(message_type: 'basic-lti-launch-request')
       course_factory(active_all: true)
       student_in_course active_all: true
@@ -123,7 +123,6 @@ module Lti
         ].freeze
 
         get @endpoints[:show], headers: request_headers
-
         expect(response).to be_success
         expect(JSON.parse(response.body).keys).to match_array(expected_keys)
       end
@@ -356,11 +355,9 @@ module Lti
       end
 
       it "verifies the report is in the same context as the assignment" do
-
         @submission.attachments = []
         @submission.save!
         put @endpoints[:update], params: {originality_report: {originality_report_lti_url: "http://www.lti-test.com"}}, headers: request_headers
-
         expect(response.status).to eq 401
       end
 
@@ -645,8 +642,6 @@ module Lti
       end
 
       it "checks for required params" do
-
-
         post @endpoints[:create], headers: request_headers
         expect(response.status).to eq 400
 
@@ -658,7 +653,6 @@ module Lti
       end
 
       it "checks that the specified assignment exists" do
-
         invalid_attach_url = "/api/lti/assignments/#{@assignment.id + 1}/submissions/#{@submission.id}/originality_report"
         post invalid_attach_url, params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}
         expect(response).not_to be_success
@@ -674,16 +668,6 @@ module Lti
         @assignment.save!
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
         expect(response.code).to eq '401'
-      end
-
-      it "gives useful error message on non unique tool/file combinations" do
-
-        post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
-        expect(response.status).to eq 201
-
-        post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
-        expect(response.status).to eq 400
-        expect(JSON.parse(response.body)['error']['type']).to eq 'RecordNotUnique'
       end
 
       it "requires the plagiarism feature flag" do
@@ -777,6 +761,30 @@ module Lti
              headers: request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['tool_setting']['resource_url']).to eq launch_url
+      end
+
+      it 'updates the originality report if it has already been created' do
+        originality_score = 50
+        post @endpoints[:create],
+             params: {
+               originality_report: {
+                 file_id: @attachment.id,
+                 workflow_state: 'pending'
+               }
+             },
+             headers: request_headers
+
+        post @endpoints[:create],
+             params: {
+               originality_report: {
+                 file_id: @attachment.id,
+                 originality_score: originality_score
+               }
+             },
+             headers: request_headers
+
+        response_body = JSON.parse(response.body)
+        expect(response_body['originality_score']).to eq 50
       end
 
       context "optional params" do

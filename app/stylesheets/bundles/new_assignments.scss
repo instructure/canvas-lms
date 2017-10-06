@@ -20,12 +20,11 @@
 @import "pages/shared/move_dialog";
 @import "base/mixins/misc";
 
-.accessibility-warning {
-  @include accessibility-prompt;
-  @include fontSize(12px);
-  position: absolute;
-  left: 0px;
-  top: -16px;
+.drag_and_drop_warning {
+  @include accessibility-prompt($is-link: false);
+  &:focus {
+    margin-bottom: 8px;
+  }
 }
 
 .ag-header-controls {

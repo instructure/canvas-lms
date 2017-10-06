@@ -842,9 +842,6 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :delete and can :read and can :attach
 
-    given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
-    can :update
-
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
     can :delete
 
@@ -935,7 +932,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
-    p.to { users_with_permissions(active_participants_with_visibility - [user]) }
+    p.to { users_with_permissions(active_participants_with_visibility) }
     p.whenever { |record|
       record.send_notification_for_context? and
       ((record.just_created && record.active?) || record.changed_state(:active, !record.is_announcement ? :unpublished : :post_delayed))

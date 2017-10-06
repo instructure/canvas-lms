@@ -898,6 +898,22 @@ describe ContextExternalTool do
     it "should raise RecordNotFound if the id is invalid" do
       expect { ContextExternalTool.find_for("horseshoes", @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it "should not find a course tool with workflow_state deleted" do
+      tool = new_external_tool @course
+      tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.workflow_state = 'deleted'
+      tool.save!
+      expect { ContextExternalTool.find_for(tool.id, @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "should not find an account tool with workflow_state deleted" do
+      tool = new_external_tool @account
+      tool.account_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.workflow_state = 'deleted'
+      tool.save!
+      expect { ContextExternalTool.find_for(tool.id, @account, :account_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   describe "opaque_identifier_for" do

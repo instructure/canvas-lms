@@ -351,21 +351,23 @@ class GroupCategory < ActiveRecord::Base
       sprinkle_count -= 1
     end
 
+    finish_group_member_assignment
+    complete_progress
+    new_memberships
+  end
+
+  def finish_group_member_assignment
+    return unless self.reload.groups.any?
+
     if self.auto_leader
-      groups.each do |group|
-        group.users.reload
+      self.groups.each do |group|
         GroupLeadership.new(group).auto_assign!(auto_leader)
       end
     end
-
-    if !groups.empty?
-      Group.where(id: groups).touch_all
-      if context_type == 'Course'
-        DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
-      end
+    Group.where(id: groups).touch_all
+    if context_type == 'Course'
+      DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
     end
-    complete_progress
-    new_memberships
   end
 
   def distribute_members_among_groups_by_section
@@ -421,6 +423,7 @@ class GroupCategory < ActiveRecord::Base
     Delayed::Batch.serial_batch do
       if by_section
         distribute_members_among_groups_by_section
+        finish_group_member_assignment
         if current_progress
           if self.errors.any?
             current_progress.message = self.errors.full_messages

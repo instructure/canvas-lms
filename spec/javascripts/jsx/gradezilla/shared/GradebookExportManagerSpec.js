@@ -202,10 +202,11 @@ define([
     });
   });
 
-  test('starts polling for progress and returns a rejected promise on progress failure', function () {
+  test('starts polling for progress and returns a rejected promise on progress failure', function (assert) {
+    const done = assert.async();
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
 
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
 
     moxios.stubRequest(expectedMonitoringUrl, {
       status: 200,
@@ -217,13 +218,15 @@ define([
 
     return this.subject.startExport().catch((reason) => {
       equal(reason, 'Error exporting gradebook: Arbitrary failure');
+      done();
     });
   });
 
-  test('starts polling for progress and returns a rejected promise on unknown progress status', function () {
+  test('starts polling for progress and returns a rejected promise on unknown progress status', function (assert) {
+    const done = assert.async();
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
 
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
 
     moxios.stubRequest(expectedMonitoringUrl, {
       status: 200,
@@ -235,14 +238,16 @@ define([
 
     return this.subject.startExport().catch((reason) => {
       equal(reason, 'Error exporting gradebook: Pattern buffer degradation');
+      done();
     });
   });
 
-  test('starts polling for progress and returns a fulfilled promise on progress completion', function () {
+  test('starts polling for progress and returns a fulfilled promise on progress completion', function (assert) {
+    const done = assert.async();
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`;
     const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`;
 
-    this.subject = new GradebookExportManager(exportingUrl, currentUserId);
+    this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1);
 
     moxios.stubRequest(expectedMonitoringUrl, {
       status: 200,
@@ -267,6 +272,7 @@ define([
         updatedAt: '2009-01-20T17:00:00Z'
       };
       deepEqual(resolution, expectedResolution);
+      done();
     });
   });
 });

@@ -101,8 +101,8 @@ class UserListV2
     rows.uniq!{|r| r[1]} # unique on user_id
     rows.each do |address, user_id, account_id, user_name, account_name|
       if Shard.current != original_shard
-        user_id = Shard.global_id_for(user_id)
-        account_id = Shard.global_id_for(account_id)
+        user_id = Shard.relative_id_for(user_id, Shard.current, original_shard)
+        account_id = Shard.relative_id_for(account_id, Shard.current, original_shard)
       end
       @all_results << {:address => address, :user_id => user_id, :user_name => user_name,
         :account_id => account_id, :account_name => account_name}
@@ -195,6 +195,11 @@ class UserListV2
   end
 
   def resolve_by_cc_path
+    # strictly speaking, when searching via e-mail address we should
+    # be looking at all shards that have a user with that e-mail, since
+    # they don't necessarily have to exist on a shard with a trusted
+    # account. but we need to clean up GlobalLookups a bit before we
+    # do that. (i.e. don't call restrict_shards here)
     restricted_shards = restrict_shards do |address|
       CommunicationChannel.associated_shards(address)
     end
@@ -212,19 +217,30 @@ class UserListV2
       end
     end
 
-    search_for_results(restricted_shards) do |account_ids|
-      rows = []
+    search_for_results(restricted_shards) do
+      ccs = []
       if sms_paths.any?
-        sms_rows = Pseudonym.active.where(:account_id => account_ids).joins(:user => :communication_channels).joins(:account).
-          where("communication_channels.workflow_state<>'retired' AND path_type='sms' AND (#{(["path LIKE ?"] * sms_paths.count).join(" OR ")})", *sms_paths).
-          pluck('communication_channels.path', :user_id, :account_id, 'users.name', 'accounts.name')
-        sms_rows.each{|r| r[0] = sms_path_header_map[r[0].split("@").first]} # replace the actual path with the original address
-        rows += sms_rows
+        ccs = CommunicationChannel.
+          sms.
+          unretired.
+          preload(user: :pseudonyms).
+          where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths).
+          to_a
       end
-      rows += Pseudonym.active.where(:account_id => account_ids).joins(:user => :communication_channels).joins(:account).
-        where("communication_channels.workflow_state<>'retired' AND path_type='email' AND LOWER(path) IN (?)", email_paths).
-        pluck('communication_channels.path', :user_id, :account_id, 'users.name', 'accounts.name') if email_paths.any?
-      rows
+      ccs += CommunicationChannel.
+        email.
+        unretired.
+        preload(user: :pseudonyms).
+        where("LOWER(path) IN (?)", email_paths).
+        to_a
+
+      ccs.map do |cc|
+        next unless (p = SisPseudonym.for(cc.user, @root_account, type: :trusted, require_sis: false))
+        path = cc.path
+        # replace the actual path with the original address for SMS
+        path = sms_path_header_map[path.split("@").first] if cc.path_type == 'sms'
+        [path, cc.user_id, p.account_id, cc.user.name, p.account.name]
+      end.compact
     end
     @lowercase = true
   end

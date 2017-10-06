@@ -168,12 +168,11 @@ export default class FlashAlert extends React.Component {
         <Alert
           variant={this.props.variant}
           closeButtonLabel={I18n.t('Close')}
-          onClose={this.closeAlert}
-          dismissable
+          onDismiss={this.closeAlert}
           margin="small auto"
           timeout={timeout}
           liveRegion={this.getLiveRegion}
-          transitionType="fade"
+          transition="fade"
         >
           <div>
             <p style={{margin: '0 -5px'}}>
@@ -183,7 +182,7 @@ export default class FlashAlert extends React.Component {
           </div>
         </Alert>
       </Transition>
-    )
+    );
   }
 }
 

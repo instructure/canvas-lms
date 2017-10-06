@@ -18,7 +18,7 @@ class GraphQLController < ApplicationController
 
   def graphiql
     if Rails.env.production?
-       render text: "unauthorized", status: :unauthorized
+       render plain: "unauthorized", status: :unauthorized
     else
       render :graphiql, layout: 'bare'
     end

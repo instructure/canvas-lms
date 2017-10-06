@@ -66,7 +66,7 @@ define [
       @collection.on 'sync', @notificationsFound
 
     resultsFound: =>
-      $.screenReaderFlashMessage(I18n.t('results_found', "%{length} results found", { length: @usersView.collection.length }))
+      $.screenReaderFlashMessage(I18n.t('%{length} results found', { length: @usersView.collection.length }))
 
     notificationsFound: =>
       $.screenReaderFlashMessage(I18n.t('%{length} notifications found', { length: @collection.length }))
@@ -91,15 +91,6 @@ define [
 
       valid = true
       errors = {}
-      if !json.user_id
-        valid = false
-        errors['user_id'] =
-          [
-            {
-            type: 'required'
-            message: I18n.t('cant_be_blank', "Canvas User ID can't be blank")
-            }
-          ]
       # If have both start and end, check for values to make sense together.
       if json.start_time && json.end_time && (json.start_time > json.end_time)
         valid = false
@@ -107,7 +98,7 @@ define [
           [
             {
             type: 'invalid'
-            message: I18n.t('cant_come_before_from', "'To Date' can't come before 'From Date'")
+            message: I18n.t('"To Date" can\'t come before "From Date"')
             }
           ]
       # Show any errors

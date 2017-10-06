@@ -77,7 +77,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def pending?
-    %w{pending_active pending_invited}.include?(self.state)
+    %w{pending_active pending_invited creation_pending}.include?(self.state)
   end
 
   def recalculate_state
@@ -158,10 +158,9 @@ class EnrollmentState < ActiveRecord::Base
   def recalculate_access
     if self.enrollment.view_restrictable?
       self.restricted_access =
-        case self.state
-        when 'pending_invited', 'pending_active'
+        if self.pending?
           self.enrollment.restrict_future_view?
-        when 'completed'
+        elsif self.state == 'completed'
           self.enrollment.restrict_past_view?
         else
           false

@@ -17,11 +17,7 @@
 
 last_cache_config = {}
 load_cache_config = -> do
-  Switchman.config[:cache_map] = {}
-
-  Switchman::DatabaseServer.all.each do |db|
-    db.instance_variable_set(:@cache_store, nil)
-  end
+  cache_map = {}
 
   searched = Set.new
   clusters_to_search = Switchman::DatabaseServer.all.map(&:id)
@@ -34,12 +30,12 @@ load_cache_config = -> do
     # link to another cluster
     if config.is_a?(String)
       clusters_to_search << config
-      Switchman.config[:cache_map][cluster] = config
+      cache_map[cluster] = config
       next
     end
 
     unless config.present?
-      Switchman.config[:cache_map].delete(cluster)
+      cache_map.delete(cluster)
       next
     end
 
@@ -47,21 +43,29 @@ load_cache_config = -> do
     last_cache_config[cluster] = config
 
     if last_cluster_cache_config != config
-      Switchman.config[:cache_map][cluster] = Canvas.lookup_cache_store(config, cluster)
+      cache_map[cluster] = Canvas.lookup_cache_store(config, cluster)
+    else
+      cache_map[cluster] = Switchman.config[:cache_map][cluster]
     end
   end
 
   # resolve links
-  Switchman.config[:cache_map].each_key do |cluster|
+  cache_map.each_key do |cluster|
     value = cluster
     while value.is_a?(String)
-      value = Switchman.config[:cache_map][value]
+      value = cache_map[value]
     end
-    Switchman.config[:cache_map][cluster] = value
+    cache_map[cluster] = value
   end
 
   # fallback for no configuration whatsoever
-  Switchman.config[:cache_map][Rails.env] ||= ActiveSupport::Cache.lookup_store(:null_store)
+  cache_map[Rails.env] ||= ActiveSupport::Cache.lookup_store(:null_store)
+
+  Switchman::DatabaseServer.all.each do |db|
+    db.instance_variable_set(:@cache_store, nil)
+  end
+
+  Switchman.config[:cache_map] = cache_map
 end
 load_cache_config.call
 Canvas::Reloader.on_reload(&load_cache_config)

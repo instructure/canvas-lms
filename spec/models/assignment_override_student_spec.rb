@@ -83,7 +83,11 @@ describe AssignmentOverrideStudent do
 
     it 'on destroy, recalculates cached due dates on the assignment' do
       override_student = @assignment_override.assignment_override_students.create!(user: @student)
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+
+      # Expect DueDateCacher to be called once from AssignmentOverrideStudent after it's destroyed and another time
+      # after it realizes that its corresponding AssignmentOverride can also be destroyed because it now has an empty
+      # set of students.  Hence the specific nature of this expectation.
+      expect(DueDateCacher).to receive(:recompute).with(@assignment).twice
       override_student.destroy
     end
   end

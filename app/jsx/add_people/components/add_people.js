@@ -98,16 +98,10 @@ import APIError from './api_error'
     }
     componentDidMount () {
       this.manageFocus();
-      document.getElementById('application').setAttribute('aria-hidden', 'true')
     }
     componentWillReceiveProps (nextProps) {
       if (nextProps.usersEnrolled) {
         this.close();
-      }
-      if (nextProps.isOpen) {
-        document.getElementById('application').setAttribute('aria-hidden', 'true')
-      } else {
-        document.getElementById('application').removeAttribute('aria-hidden')
       }
     }
     componentDidUpdate () {
@@ -295,13 +289,14 @@ import APIError from './api_error'
         <Modal
           closeButtonLabel={cancelLabel}
           id="add_people_modal"
-          isOpen={this.props.isOpen}
+          open={this.props.isOpen}
           label={I18n.t('Modal Dialog: Add People')}
-          onRequestClose={this.close}
+          applicationElement={() => document.getElementById('application')}
+          onDismiss={this.close}
           ref={(node) => { this.node = node; }}
           shouldCloseOnOverlayClick={false}
           size="medium"
-          tabindex="-1"
+          tabIndex="-1"
         >
           <ModalHeader>
             <Heading tabIndex="-1">{I18n.t('Add People')}</Heading>

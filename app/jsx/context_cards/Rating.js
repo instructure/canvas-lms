@@ -26,17 +26,10 @@ import Typography from 'instructure-ui/lib/components/Typography'
 
   class Rating extends React.Component {
     static propTypes = {
-      analytics: PropTypes.object,
-      label: PropTypes.string,
-      metricName: PropTypes.string
-    }
-
-    static defaultProps = {
-      analytics: {}
-    }
-
-    get valueNow () {
-      return this.props.analytics[this.props.metricName]
+      metric: PropTypes.shape({
+        level: PropTypes.number
+      }).isRequired,
+      label: PropTypes.string.isRequired,
     }
 
     formatValueText (currentRating, maxRating) {
@@ -49,29 +42,28 @@ import Typography from 'instructure-ui/lib/components/Typography'
     }
 
     render () {
-      if (typeof this.valueNow !== 'undefined') {
-        return (
-          <div
-            className="StudentContextTray-Rating">
-            <Heading level="h5" as="h4">
-              {this.props.label}
-            </Heading>
-            <div className="StudentContextTray-Rating__Stars">
-              <InstUIRating
-                formatValueText={this.formatValueText}
-                label={this.props.label}
-                valueNow={this.valueNow}
-                valueMax={3}
-              />
-              <div>
-                <Typography size="small" color="brand">
-                  {this.formatValueText(this.valueNow, 3)}
-                </Typography>
-              </div>
+      const {label, metric} = this.props;
+      return (
+        <div
+          className="StudentContextTray-Rating">
+          <Heading level="h5" as="h4">
+            {label}
+          </Heading>
+          <div className="StudentContextTray-Rating__Stars">
+            <InstUIRating
+              formatValueText={this.formatValueText}
+              label={this.props.label}
+              valueNow={metric.level}
+              valueMax={3}
+            />
+            <div>
+              <Typography size="small" color="brand">
+                {this.formatValueText(metric.level, 3)}
+              </Typography>
             </div>
           </div>
-        )
-      } else { return null }
+        </div>
+      )
     }
   }
 

@@ -78,7 +78,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, :only => [:create, :destroy]
+  before_action :require_user, :only => [:create, :destroy, :re_send_confirmation]
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
@@ -418,6 +418,13 @@ class CommunicationChannelsController < ApplicationController
     @user = User.find(params[:user_id])
     # the active shard needs to be searched for the enrollment (not the user's shard)
     @enrollment = params[:enrollment_id] && Enrollment.where(id: params[:enrollment_id], user_id: @user).first!
+
+    if @enrollment
+      return render_unauthorized_action unless @current_user.can_create_enrollment_for?(@enrollment.course, session, @enrollment.type)
+    else
+      return render_unauthorized_action unless @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
+    end
+
     if @enrollment && (@enrollment.invited? || @enrollment.active?)
       @enrollment.re_send_confirmation!
     else

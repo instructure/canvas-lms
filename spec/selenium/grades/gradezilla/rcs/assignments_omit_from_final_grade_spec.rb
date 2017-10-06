@@ -17,7 +17,7 @@
 
 require_relative '../../../common'
 require_relative '../../../helpers/assignments_common'
-require_relative '../../page_objects/gradezilla_page'
+require_relative '../../pages/gradezilla_page'
 
 describe 'Gradezilla omit from final grade assignments' do
   include_context "in-process server selenium tests"

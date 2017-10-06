@@ -17,7 +17,7 @@
 #
 
 require_relative '../../common'
-require_relative '../page_objects/speedgrader_page'
+require_relative '../pages/speedgrader_page'
 require_relative '../setup/gradebook_setup'
 
 describe "speedgrader with grading periods" do

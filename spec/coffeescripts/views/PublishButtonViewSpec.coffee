@@ -85,6 +85,20 @@ define [
 
     equal btnView.$('.screenreader-only.accessible_label').text(), testText
 
+  test 'should render title in publish text when given', ->
+    btnView = new PublishButtonView({
+      model: @publish,
+      title: 'My Published Thing'
+    }).render()
+    equal btnView.$('.screenreader-only.accessible_label').text().match(/My Published Thing/).length, 1
+
+  test 'should render title in unpublish test when given', ->
+    btnView = new PublishButtonView({
+      model: @published,
+      title: 'My Unpublished Thing'
+    }).render()
+    equal btnView.$('.screenreader-only.accessible_label').text().match(/My Unpublished Thing/).length, 1
+
   # state
   test 'disable should add disabled state', ->
     btnView = new PublishButtonView(model: @publish).render()

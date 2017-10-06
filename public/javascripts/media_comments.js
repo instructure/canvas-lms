@@ -76,7 +76,7 @@ import 'jqueryui/tabs'
         pubsub.publish('media_object_created', data);
       }, $.noop);
     }
-    pubsub.publish('media_comment_created', {id: entry.entryId, mediaType: mediaType});
+    pubsub.publish('media_comment_created', {id: entry.entryId, mediaType: mediaType, title: entry.userTitle});
   }
 
   var addedEntryIds = {};

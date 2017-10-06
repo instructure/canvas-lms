@@ -237,8 +237,8 @@ class Rubric < ActiveRecord::Base
       criterion_data[:id].strip! if criterion_data[:id]
       criterion_data[:id] = nil if criterion_data[:id] && criterion_data[:id].empty?
       criterion[:id] = unique_item_id(criterion_data[:id])
+      criterion[:criterion_use_range] = [true, 'true'].include?(criterion_data[:criterion_use_range])
       ratings = []
-      points = 0
       if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.where(id: criterion_data[:learning_outcome_id]).first
         if outcome

@@ -5364,10 +5364,10 @@ nn:
       tomorrow: "I morgon"
       yesterday: "I går"
     formats: 
-      date_at_time: "%b %-d %l:%M%P"
+      date_at_time: "%b %-d %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      full: "%b %-d, %Y %-k:%M"
+      full_with_weekday: "%a %b %-d, %Y %-k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A %-d. %B"
       medium: "%-d %b %Y"
@@ -15848,8 +15848,8 @@ nn:
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "mindre enn eit minutt sidan"
     pm: pm
     ranges: 

@@ -17,8 +17,8 @@
 #
 
 require_relative '../../helpers/gradezilla_common'
-require_relative '../page_objects/gradezilla_page'
-require_relative '../page_objects/gradezilla_cells_page'
+require_relative '../pages/gradezilla_page'
+require_relative '../pages/gradezilla_cells_page'
 require_relative '../../helpers/groups_common'
 
 describe "Gradezilla" do
@@ -337,69 +337,6 @@ describe "Gradezilla" do
       replace_value('#gradebook_grid input.grade', '10')
       f('#gradebook_grid input.grade').send_keys(:enter)
       expect(f('#gradebook_grid')).not_to contain_css('.icon-quiz')
-    end
-  end
-
-  context 'submission tray assignment navigation' do
-    before(:each) { ENV['GRADEBOOK_DEVELOPMENT'] = 'true' }
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
-
-    context 'with default ordering' do
-      before(:each) do
-        Gradezilla.visit(@course)
-      end
-
-      it 'clicking the right arrow loads the next assignment in the tray' do
-        Gradezilla::Cells.send_keyboard_shortcut(@student_1, @first_assignment, 'c')
-        expect(Gradezilla.assignment_carousel).to include_text @first_assignment.name
-        Gradezilla.click_submission_tray_right_arrow
-        expect(Gradezilla.assignment_carousel).to include_text @second_assignment.name
-      end
-
-      it 'clicking the left arrow loads the previous assignment in the tray' do
-        Gradezilla::Cells.send_keyboard_shortcut(@student_1, @second_assignment, 'c')
-        expect(Gradezilla.assignment_carousel).to include_text @second_assignment.name
-        Gradezilla.click_submission_tray_left_arrow
-        expect(Gradezilla.assignment_carousel).to include_text @first_assignment.name
-      end
-
-      it 'left arrow button is not present when leftmost assignment is selected' do
-        Gradezilla::Cells.send_keyboard_shortcut(@student_1, @first_assignment, 'c')
-        expect(Gradezilla.body).not_to contain_css(Gradezilla.submission_tray_left_arrow_selector)
-      end
-
-      it 'right arrow button is not present when rightmost assignment is selected' do
-        Gradezilla::Cells.send_keyboard_shortcut(@student_1, @third_assignment, 'c')
-        expect(Gradezilla.body).not_to contain_css(Gradezilla.submission_tray_right_arrow_selector)
-      end
-    end
-
-    context 'when the rightmost column is an assignment column' do
-      before(:each) do
-        unless @teacher.preferences.key?(:gradebook_column_order)
-          @teacher.preferences[:gradebook_column_order] = {}
-        end
-
-        @teacher.preferences[:gradebook_column_order][@course.id] = {
-          sortType: 'custom',
-          customOrder: [
-            "assignment_#{@first_assignment.id}",
-            "assignment_#{@second_assignment.id}",
-            "assignment_group_#{@first_assignment.assignment_group_id}",
-            'total_grade',
-            "assignment_#{@third_assignment.id}"
-          ]
-        }
-        @teacher.save!
-        Gradezilla.visit(@course)
-      end
-
-      it 'clicking the left arrow loads the previous assignment in the tray' do
-        Gradezilla::Cells.send_keyboard_shortcut(@student_1, @third_assignment, 'c')
-        expect(Gradezilla.assignment_carousel).to include_text @third_assignment.name
-        Gradezilla.click_submission_tray_left_arrow
-        expect(Gradezilla.assignment_carousel).to include_text @second_assignment.name
-      end
     end
   end
 end

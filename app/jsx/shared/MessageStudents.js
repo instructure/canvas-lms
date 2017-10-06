@@ -216,13 +216,12 @@ import Alert from 'instructure-ui/lib/components/Alert'
           <div className="MessageStudents__Alert">
             <Alert variant={variant}
               closeButtonLabel={I18n.t('Close')}
-              dismissable
-              onClose={this.handleAlertClose}
+              onDismiss={this.handleAlertClose}
             >
               {message}
             </Alert>
           </div>
-        )
+        );
       } else { return null }
     }
 
@@ -244,11 +243,12 @@ import Alert from 'instructure-ui/lib/components/Alert'
       return (
         <div className="MessageStudents">
           <Modal
-            isOpen={this.state.open}
+            open={this.state.open}
             transition="fade"
             label={this.props.title}
-            onRequestClose={this.props.onRequestClose}
+            onDismiss={this.props.onRequestClose}
             closeButtonLabel={I18n.t('Close')}
+            applicationElement={() => document.getElementById('application')}
             size='medium'
             onExited={this.props.onExited}
           >
@@ -305,7 +305,7 @@ import Alert from 'instructure-ui/lib/components/Alert'
             </ModalFooter>
           </Modal>
         </div>
-      )
+      );
     }
   }
 

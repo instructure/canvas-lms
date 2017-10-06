@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 
@@ -25,7 +24,7 @@ export default React.createClass({
 
     render() {
 
-      var paragraph = I18n.t(
+      const paragraph = I18n.t(
         '*See some LTI tools* that work great with Canvas.',
         { wrappers: [
           '<a href="https://www.eduappcenter.com/">$1</a>',

@@ -120,7 +120,7 @@ class ContextModulesController < ApplicationController
 
       if item.present? && item.published? && item.context_module.published?
         rules = ConditionalRelease::Service.rules_for(@context, @current_user, item, session)
-        rule = conditional_release(item, conditional_release_rules: rules)
+        rule = conditional_release_rule_for_module_item(item, conditional_release_rules: rules)
 
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
         # but instead progress forward and return a warning message if is locked later on

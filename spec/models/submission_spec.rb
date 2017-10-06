@@ -74,6 +74,29 @@ describe Submission do
       end
 
       describe "grade" do
+        context "the submission is deleted" do
+          before(:once) do
+            @assignment.due_at = in_open_grading_period
+            @assignment.save!
+            submission_spec_model
+            @submission.update(workflow_state: 'deleted')
+          end
+
+          it "does not have grade permissions if the user is a root account admin" do
+            expect(@submission.grants_right?(@admin, :grade)).to eq(false)
+          end
+
+          it "does not have grade permissions if the user is non-root account admin with manage_grades permissions" do
+            expect(@submission.grants_right?(@teacher, :grade)).to eq(false)
+          end
+
+          it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
+            @student = user_factory(active_all: true)
+            @context.enroll_student(@student)
+            expect(@submission.grants_right?(@student, :grade)).to eq(false)
+          end
+        end
+
         context "the submission is due in an open grading period" do
           before(:once) do
             @assignment.due_at = in_open_grading_period
@@ -89,7 +112,7 @@ describe Submission do
             expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
           end
 
-          it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
+          it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
             @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
@@ -111,7 +134,7 @@ describe Submission do
             expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
           end
 
-          it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
+          it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
             @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)

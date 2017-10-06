@@ -559,7 +559,8 @@ class GradebooksController < ApplicationController
 
   def submissions_json
     @submissions.map do |sub|
-      json = sub.as_json(Submission.json_serialization_full_parameters)
+      submission_history_methods = { include: { submission_history: { methods: %i[late missing] } } }
+      json = sub.as_json(Submission.json_serialization_full_parameters.merge(submission_history_methods))
       json['submission']['assignment_visible'] = sub.assignment_visible_to_user?(sub.user)
       json['submission']['provisional_grade_id'] = sub.provisional_grade_id if sub.provisional_grade_id
       json

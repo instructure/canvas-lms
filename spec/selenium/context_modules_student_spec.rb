@@ -207,7 +207,7 @@ describe "context modules" do
 
       # Should go to the next module
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
-      nxt = f('.module-sequence-footer-button--next')
+      nxt = f('.module-sequence-footer-button--next a')
       expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}")
 
       # Should redirect to the published item
@@ -379,13 +379,13 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
         prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
-        nxt = f('.module-sequence-footer-button--next')
+        nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
         prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
-        nxt = f('.module-sequence-footer-button--next')
+        nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after2.id}")
 
         # if the user didn't get here from a module link, we show no nav,
@@ -403,11 +403,11 @@ describe "context modules" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
-        nxt = f('.module-sequence-footer-button--next')
+        nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
       end
 
-      # TODO reimplement per CNVS-29600, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29600, but make sure we're testing at the right level
       it "should show module navigation for group assignment discussions"
     end
 
@@ -471,6 +471,26 @@ describe "context modules" do
         prog = mod.evaluate_for(@user)
         expect(prog).to be_completed
       end
+    end
+
+    it "shows Mark as Done button for assignments with external tool submission", priority: "2", test_id: 3340306 do
+      tool = @course.context_external_tools.create!(name: "a",
+                                                    url: "example.com",
+                                                    consumer_key: '12345',
+                                                    shared_secret: 'secret')
+      @assignment = @course.assignments.create!
+      @assignment.tool_settings_tool = tool
+      @assignment.submission_types = "external_tool"
+      @assignment.external_tool_tag_attributes = {url: tool.url}
+      @assignment.save!
+
+      @mark_done_module = create_context_module('Mark Done Module')
+      @tag = @mark_done_module.add_item({id: @assignment.id, type: 'assignment'})
+      @mark_done_module.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+      @mark_done_module.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f('#content')).to contain_css('#mark-as-done-checkbox')
     end
 
     describe "module header icons" do

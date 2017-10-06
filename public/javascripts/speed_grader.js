@@ -172,25 +172,81 @@ utils = {
   }
 };
 
+function sectionSelectionOptions (courseSections, groupGradingModeEnabled = false, selectedSectionId = null) {
+  if (courseSections.length <= 1 || groupGradingModeEnabled) {
+    return [];
+  }
+
+  let selectedSectionName = I18n.t('All Sections');
+  const sectionOptions = [
+    {
+      id: 'section_0',
+      data: {
+        'section-id': 0
+      },
+      name: I18n.t('Show all sections'),
+      className: {
+        raw: 'section_0'
+      }
+    }
+  ];
+
+  courseSections.forEach((section) => {
+    if (section.id === selectedSectionId) {
+      selectedSectionName = section.name;
+    }
+
+    sectionOptions.push({
+      id: `section_${section.id}`,
+      data: {
+        "section-id": section.id
+      },
+      name: I18n.t('Change section to %{sectionName}', { sectionName: section.name }),
+      className: {
+        raw: `section_${section.id} ${ selectedSectionId === section.id ? 'selected' : '' }`
+      }
+    });
+  });
+
+  return [
+    {
+      name: `Showing: ${selectedSectionName}`,
+      options: sectionOptions
+    }
+  ];
+}
+
 function mergeStudentsAndSubmission() {
   jsonData.studentsWithSubmissions = jsonData.context.students;
   jsonData.studentMap = {};
-  $.each(jsonData.studentsWithSubmissions, function(_, student){
-    jsonData.studentMap[student.id] = student;
-    jsonData.studentMap[student.id].enrollments = [];
-    this.section_ids = $.map($.grep(jsonData.context.enrollments, function(enrollment, _){
-      if(enrollment.user_id === student.id) {
-        jsonData.studentMap[student.id].enrollments.push(enrollment);
-        return true;
-      }
-    }), function(enrollment){
-      return enrollment.course_section_id;
-    });
-    this.submission = $.grep(jsonData.submissions, function(submission, _){
-      return submission.user_id === student.id;
-    })[0];
+  jsonData.studentEnrollmentMap = {};
+  jsonData.studentSectionIdsMap = {};
+  jsonData.submissionsMap = {};
 
-    this.submission_state = SpeedgraderHelpers.submissionState(this, ENV.grading_role);
+  jsonData.context.enrollments.forEach((enrollment) => {
+    const userId = enrollment.user_id;
+
+    jsonData.studentEnrollmentMap[userId] = jsonData.studentEnrollmentMap[userId] || [];
+    jsonData.studentSectionIdsMap[userId] = jsonData.studentSectionIdsMap[userId] || {};
+
+    jsonData.studentEnrollmentMap[userId].push(enrollment);
+    jsonData.studentSectionIdsMap[userId][enrollment.course_section_id] = true;
+  });
+
+  jsonData.submissions.forEach((submission) => {
+    jsonData.submissionsMap[submission.user_id] = submission;
+  });
+
+  jsonData.studentsWithSubmissions.forEach((student, index) => {
+    /* eslint-disable no-param-reassign */
+    student.enrollments = jsonData.studentEnrollmentMap[student.id];
+    student.section_ids = Object.keys(jsonData.studentSectionIdsMap[student.id]);
+    student.submission = jsonData.submissionsMap[student.id];
+    student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role);
+    student.index = index;
+    /* eslint-enable no-param-reassign */
+
+    jsonData.studentMap[student.id] = student;
   });
 
   // handle showing students only in a certain section.
@@ -216,7 +272,7 @@ function mergeStudentsAndSubmission() {
   // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
   var hideStudentNames = utils.shouldHideStudentNames();
 
-  if(hideStudentNames) {
+  if(hideStudentNames && userSettings.get('eg_sort_by') === 'alphabetically') {
     window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
       return student &&
         student.submission &&
@@ -249,26 +305,44 @@ function mergeStudentsAndSubmission() {
   }
 }
 
-// xsslint safeString.identifier MENU_PARTS_DELIMITER
-var MENU_PARTS_DELIMITER = '----☃----'; // something random and unlikely to be in a person's name
+function changeToSection (sectionId) {
+  if (sectionId === '0') {
+    // We're removing all filters and resetting to default
+    userSettings.contextRemove('grading_show_only_section');
+  } else {
+    userSettings.contextSet('grading_show_only_section', sectionId);
+  }
+
+  window.location.reload();
+}
 
 function initDropdown(){
   var hideStudentNames = utils.shouldHideStudentNames();
   $("#hide_student_names").attr('checked', hideStudentNames);
-  var optionsHtml = $.map(jsonData.studentsWithSubmissions, function(s, idx){
-    var name = s.name.replace(MENU_PARTS_DELIMITER, ""),
-        className = SpeedgraderHelpers.classNameBasedOnStudent(s);
+  const optionsArray = jsonData.studentsWithSubmissions.map((s, idx) => {
+    const className = SpeedgraderHelpers.classNameBasedOnStudent(s);
+    const name = hideStudentNames ? I18n.t('nth_student', "Student %{n}", {'n': idx + 1}) : s.name;
 
-    if(hideStudentNames) {
-      name = I18n.t('nth_student', "Student %{n}", {'n': idx + 1});
+    return {
+      id: s.id,
+      name,
+      className
+    };
+  });
+
+  const sectionSelectionOptionList = sectionSelectionOptions(
+    jsonData.context.active_course_sections, jsonData.GROUP_GRADING_MODE, sectionToShow
+  );
+  $selectmenu = new SpeedgraderSelectMenu(sectionSelectionOptionList.concat(optionsArray));
+  $selectmenu.appendTo("#combo_box_container", (event) => {
+    const newStudentOrSection = $(event.target).val()
+
+    if (newStudentOrSection && newStudentOrSection.match(/^section_\d+$/)) {
+      const sectionId = newStudentOrSection.replace(/^section_/, '');
+      changeToSection(sectionId);
+    } else {
+      EG.handleStudentChanged();
     }
-
-    return '<option value="' + s.id + '" class="' + htmlEscape(className.raw) + ' ui-selectmenu-hasIcon">' + htmlEscape(name) + MENU_PARTS_DELIMITER + htmlEscape(className.formatted) + MENU_PARTS_DELIMITER + htmlEscape(className.raw) + '</option>';
-  }).join("");
-
-  $selectmenu = new SpeedgraderSelectMenu(optionsHtml, MENU_PARTS_DELIMITER);
-  $selectmenu.appendTo("#combo_box_container", function(){
-    EG.handleStudentChanged();
   });
 
   if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
@@ -289,8 +363,7 @@ function initDropdown(){
       .hide()
       .menu()
       .delegate('a', 'click mousedown', function(){
-        userSettings[$(this).data('section-id') == 'all' ? 'contextRemove' : 'contextSet']('grading_show_only_section', $(this).data('section-id'));
-        window.location.reload();
+        changeToSection($(this).data('section-id'));
       });
 
     if (sectionToShow) {
@@ -790,6 +863,7 @@ function refreshGrades (cb) {
       EG.currentStudent.submission = submission;
       EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
       EG.showGrade();
+      EG.updateSelectMenuStatus(EG.currentStudent);
       if (cb) {
         cb(submission)
       }
@@ -1017,11 +1091,16 @@ EG = {
     $("#aria_name_alert").text(studentInfo);
   },
 
-  getStudentNameAndGrade: function(){
-    var hideStudentNames = utils.shouldHideStudentNames();
-    var studentName = hideStudentNames ? I18n.t('student_index', "Student %{index}", { index: EG.currentIndex() + 1 }) : EG.currentStudent.name;
-    var submissionStatus = SpeedgraderHelpers.classNameBasedOnStudent(EG.currentStudent);
-    return studentName + " - " + submissionStatus.formatted;
+  getStudentNameAndGrade: (student = EG.currentStudent) => {
+    let studentName;
+    if (utils.shouldHideStudentNames()) {
+      studentName = I18n.t('student_index', "Student %{index}", { index: student.index + 1 });
+    } else {
+      studentName = student.name;
+    }
+
+    const submissionStatus = SpeedgraderHelpers.classNameBasedOnStudent(student);
+    return `${studentName} - ${submissionStatus.formatted}`;
   },
 
   toggleFullRubric: function(force){
@@ -1118,6 +1197,9 @@ EG = {
     }
 
     var id = $selectmenu.jquerySelectMenu().val();
+    // This call on the or side of the street is probably
+    // non-performant at scale (4000 students) if we just want the
+    // first value
     this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
     document.location.hash = "#" + encodeURIComponent(JSON.stringify({
       "student_id": this.currentStudent.id
@@ -1466,11 +1548,11 @@ EG = {
       var $turnitinInfo = $(turnitinInfoTemplate({
         assetString: assetString,
         message: (turnitinAsset.status == 'error' ? (turnitinAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
-        showResubmit: turnitinAsset.status == 'error' && isMostRecent
+        showResubmit: isMostRecent
       }));
       $turnitinInfoContainer.append($turnitinInfo);
 
-      if (turnitinAsset.status == 'error' && isMostRecent) {
+      if (isMostRecent) {
         var resubmitUrl = $.replaceTags($assignment_submission_resubmit_to_turnitin_url.attr('href'), { user_id: submission.user_id });
         $turnitinInfo.find('.turnitin_resubmit_button').click(function(event) {
           event.preventDefault();
@@ -1904,19 +1986,6 @@ EG = {
       allowfullscreen: true
     });
     $iframe_holder.html($.raw(iframe)).show();
-    this.fitImgToIframe();
-  },
-
-  // if the iframe is only an img, set its max-width and height to 100%
-  fitImgToIframe: function () {
-    $iframe_holder.find('iframe').load(this.resizeImg);
-  },
-
-  resizeImg: function () {
-    var iframeContent = $(this).contents().find('body').children();
-    if (iframeContent.length === 1 && iframeContent.first().is('img')) {
-      iframeContent.attr('style', 'max-width: 100vw; max-height: 100vh;');
-    }
   },
 
   renderLtiLaunch: function($div, urlBase, externalToolUrl) {
@@ -2009,18 +2078,26 @@ EG = {
         },this)});
       $iframe_holder.show().loadDocPreview(previewOptions);
     } else if (browserableCssClasses.test(attachment.mime_class)) {
-      var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
-        .replace("{{submissionId}}", this.currentStudent.submission.user_id)
-        .replace("{{attachmentId}}", attachment.id);
-      var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(src), {
-        frameborder: 0,
-        allowfullscreen: true
-      });
-      $iframe_holder.html(
-        $.raw(iframe)
-      ).show();
-      this.fitImgToIframe();
+      // xsslint safeString.identifier iFrameHolderContents
+      const iFrameHolderContents = this.attachmentIFrameContents(attachment);
+      $iframe_holder.html(iFrameHolderContents).show();
     }
+  },
+
+  attachmentIFrameContents (attachment) {
+    let contents;
+    const genericSrc = unescape($submission_file_hidden.find('.display_name').attr('href'));
+    const src = genericSrc
+      .replace('{{submissionId}}', this.currentStudent.submission.user_id)
+      .replace('{{attachmentId}}', attachment.id);
+
+    if (attachment.mime_class === 'image') {
+      contents = `<img src="${htmlEscape(src)}" style="max-width:100%;max-height:100%;">`;
+    } else {
+      contents = SpeedgraderHelpers.buildIframe(htmlEscape(src), { frameborder: 0, allowfullscreen: true });
+    }
+
+    return $.raw(contents);
   },
 
   showRubric: function(){
@@ -2393,6 +2470,7 @@ EG = {
 
     return student;
   },
+
   // If the second argument is passed as true, the grade used will
   // be the existing score from the previous submission.  This
   // should only be called from the anonymous function attached so
@@ -2446,7 +2524,11 @@ EG = {
       }
 
       $.each(submissions, function(){
-        EG.setOrUpdateSubmission(this.submission);
+        // setOrUpdateSubmission returns the student it just updated.
+        // This is only operating on a subset of people, so it should
+        // be fairly fast to call updateSelectMenuStatus for each one.
+        const student = EG.setOrUpdateSubmission(this.submission);
+        EG.updateSelectMenuStatus(student);
       });
       EG.refreshSubmissionsToView();
       $multiple_submissions.change();
@@ -2487,53 +2569,52 @@ EG = {
     }
 
     EG.updateStatsInHeader();
+  },
 
-    // go through all the students and change the class of for each person in the selectmenu to reflect it has / has not been graded.
-    // for the current student, you have to do it for both the li as well as the one that shows which was selected (AKA $selectmenu.data('selectmenu').newelement ).
-    // this might be the wrong spot for this, it could be refactored into its own method and you could tell pass only certain students that you want to update
-    // (ie the current student or all of the students in the group that just got graded)
-    $.each(jsonData.studentsWithSubmissions, function(index, val) {
-      var $query = $selectmenu.jquerySelectMenu().data('selectmenu').list.find("li:eq("+ index +")"),
-      className = SpeedgraderHelpers.classNameBasedOnStudent(this),
-      submissionStates = 'not_graded not_submitted graded resubmitted';
+  updateSelectMenuStatus: function (student = null, selectmenu = $selectmenu) {
+    let $query = selectmenu.jquerySelectMenu().data('selectmenu').list.find(`li:eq(${student.index})`);
+    const className = SpeedgraderHelpers.classNameBasedOnStudent(student);
+    const submissionStates = 'not_graded not_submitted graded resubmitted';
 
-      if (this == EG.currentStudent) {
-        $query = $query.add($selectmenu.jquerySelectMenu().data('selectmenu').newelement);
-      }
-      $query
-        .removeClass(submissionStates)
-        .addClass(className.raw)
+    if (student == EG.currentStudent) {
+      $query = $query.add(selectmenu.jquerySelectMenu().data('selectmenu').newelement);
+    }
+    $query
+      .removeClass(submissionStates)
+      .addClass(className.raw);
 
-      var $status = $(".ui-selectmenu-status");
-      var $statusIcon = $status.find(".speedgrader-selectmenu-icon");
-      var $queryIcon = $query.find(".speedgrader-selectmenu-icon");
+    const $status = $('.ui-selectmenu-status');
+    const $statusIcon = $status.find('.speedgrader-selectmenu-icon');
+    const $queryIcon = $query.find('.speedgrader-selectmenu-icon');
 
-      if(this == EG.currentStudent && (className.raw == "graded" || className.raw == "not_gradeable")){
-        var studentInfo = EG.getStudentNameAndGrade()
-        $("#students_selectmenu > option[value=" + this.id + "]").text(studentInfo);
-        $queryIcon.text("").append("<i class='icon-check'></i>");
-        $status.addClass("graded");
-        $statusIcon.text("").append("<i class='icon-check'></i>");
-      }else if(className.raw == "not_graded" && this == EG.currentStudent){
-        var studentInfo = EG.getStudentNameAndGrade();
-        $("#students_selectmenu > option[value=" + this.id + "]").text(studentInfo);
-        $queryIcon.text("").append("&#9679;");
-        $status.removeClass("graded");
-        $statusIcon.text("").append("&#9679;");
-      }else{
-        $status.removeClass("graded");
-      }
+    const studentInfo = EG.getStudentNameAndGrade(student);
+    const option = $(selectmenu.option_tag_array[student.index]);
+    option.text(studentInfo).removeClass(submissionStates).addClass(className.raw);
 
-      // this is because selectmenu.js uses .data('optionClasses' on the li to keep track
-      // of what class to put on the selected option ( aka: $selectmenu.data('selectmenu').newelement )
-      // when this li is selected.  so even though we set the class of the li and the
-      // $selectmenu.data('selectmenu').newelement when it is graded, we need to also set the data()
-      // so that if you skip back to this student it doesnt show the old checkbox status.
-      $.each(submissionStates.split(' '), function(){
-        $query.data('optionClasses', $query.data('optionClasses').replace(this, ''));
-      });
+    if(className.raw == "graded" || className.raw == "not_gradeable"){
+      $queryIcon.text("").append("<i class='icon-check'></i>");
+      $status.addClass("graded");
+      $statusIcon.text("").append("<i class='icon-check'></i>");
+    }else if(className.raw == "not_graded"){
+      $queryIcon.text("").append("&#9679;");
+      $status.removeClass("graded");
+      $statusIcon.text("").append("&#9679;");
+    }else{
+      $queryIcon.text("");
+      $status.removeClass("graded");
+      $statusIcon.text("");
+    }
+
+    // this is because selectmenu.js uses .data('optionClasses' on the
+    // li to keep track of what class to put on the selected option (
+    // aka: $selectmenu.data('selectmenu').newelement ) when this li
+    // is selected.  so even though we set the class of the li and the
+    // $selectmenu.data('selectmenu').newelement when it is graded, we
+    // need to also set the data() so that if you skip back to this
+    // student it doesnt show the old checkbox status.
+    $.each(submissionStates.split(' '), function(){
+      $query.data('optionClasses', $query.data('optionClasses').replace(this, ''));
     });
-
   },
 
   isGradingTypePercent: function () {

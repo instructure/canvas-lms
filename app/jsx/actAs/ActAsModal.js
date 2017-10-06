@@ -146,12 +146,13 @@ export default class ActAsModal extends React.Component {
     return (
       <span>
         <Modal
-          onRequestClose={this.handleModalRequestClose}
+          onDismiss={this.handleModalRequestClose}
           transition="fade"
           size="fullscreen"
           label={I18n.t('Act as User')}
           closeButtonLabel={I18n.t('Close')}
-          isOpen
+          applicationElement={() => document.getElementById('application')}
+          open
         >
           <ModalHeader>
             <Typography size="large">

@@ -25,22 +25,6 @@ import ModalButtons from 'jsx/shared/modal-buttons'
 import BBTreeBrowser from 'jsx/files/BBTreeBrowser'
 import classnames from 'classnames'
 
-  const modalOverrides = {
-    overlay : {
-      backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
-    content : {
-      position: 'static',
-      top: '0',
-      left: '0',
-      right: 'auto',
-      bottom: 'auto',
-      borderRadius: '0',
-      border: 'none',
-      padding: '0'
-    }
-  };
-
   MoveDialog.renderMoveButton = function () {
     const buttonClassNames = classnames({
       'disabled': !this.state.destinationFolder,
@@ -77,7 +61,6 @@ import classnames from 'classnames'
       <Modal
         className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
         overlayClassName='ReactModal__Overlay--canvas'
-        style={modalOverrides}
         ref='canvasModal'
         isOpen={this.state.isOpen}
         title={this.getTitle()}

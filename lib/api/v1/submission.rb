@@ -25,15 +25,18 @@ module Api::V1::Submission
   include Api::V1::User
   include Api::V1::SubmissionComment
 
-  def submission_json(submission, assignment, current_user, session, context = nil, includes = [])
+  MOBILE_STUDENT_LABEL = 'mobile_student_label'.freeze
+  MOBILE_TEACHER_STATE = 'mobile_teacher_state'.freeze
+
+  def submission_json(submission, assignment, current_user, session, context = nil, includes = [], params)
     context ||= assignment.context
-    hash = submission_attempt_json(submission, assignment, current_user, session, context)
+    hash = submission_attempt_json(submission, assignment, current_user, session, context, params)
 
     if includes.include?("submission_history")
       if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
         hash['submission_history'] = submission.quiz_submission.versions.map do |ver|
           ver.model.submission && ver.model.submission.without_versioned_attachments do
-            quiz_submission_attempt_json(ver.model, assignment, current_user, session, context)
+            quiz_submission_attempt_json(ver.model, assignment, current_user, session, context, params)
           end
         end
       else
@@ -43,7 +46,7 @@ module Api::V1::Submission
         end
         hash['submission_history'] = histories.map do |ver|
           ver.without_versioned_attachments do
-            submission_attempt_json(ver, assignment, current_user, session, context)
+            submission_attempt_json(ver, assignment, current_user, session, context, params)
           end
         end
       end
@@ -86,6 +89,14 @@ module Api::V1::Submission
       hash['assignment_visible'] = submission.assignment_visible_to_user?(submission.user)
     end
 
+    if includes.include?(MOBILE_STUDENT_LABEL)
+      hash[MOBILE_STUDENT_LABEL] = label(submission)
+    end
+
+    if includes.include?(MOBILE_TEACHER_STATE)
+      hash[MOBILE_TEACHER_STATE] = action(submission)
+    end
+
     hash
   end
 
@@ -95,7 +106,7 @@ module Api::V1::Submission
   SUBMISSION_JSON_METHODS = %w(late missing seconds_late entered_grade entered_score).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries).freeze
 
-  def submission_attempt_json(attempt, assignment, user, session, context = nil)
+  def submission_attempt_json(attempt, assignment, user, session, context = nil, params)
     context ||= assignment.context
     includes = Array.wrap(params[:include])
 
@@ -204,8 +215,8 @@ module Api::V1::Submission
     }
   end
 
-  def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil)
-    hash = submission_attempt_json(attempt.submission, assignment, user, session, context)
+  def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil, params)
+    hash = submission_attempt_json(attempt.submission, assignment, user, session, context, params)
     hash.each_key{|k| hash[k] = attempt[k] if attempt[k]}
     hash[:submission_data] = attempt[:submission_data]
     hash[:submitted_at] = attempt[:finished_at]
@@ -275,7 +286,7 @@ module Api::V1::Submission
 
   def rubric_assessment_json(rubric_assessment)
     hash = {}
-    rubric_assessment.data.each do |rating|
+    rubric_assessment.data&.each do |rating|
       hash[rating[:criterion_id]] = rating.slice(:points, :comments)
     end
     hash
@@ -324,5 +335,36 @@ module Api::V1::Submission
         provisional_grade_id: provisional_grade.id
       }.to_json
     )
+  end
+
+  def label(submission)
+    if submission.resubmitted?
+      :resubmitted
+    elsif submission.missing?
+      :missing
+    elsif submission.late?
+      :late
+    elsif submission.submitted? ||
+      (submission.submission_type.present? && submission.submission_type != 'online_quiz') ||
+      (submission.submission_type == 'online_quiz' && submission.quiz_submission.completed?)
+
+      :submitted
+    else
+      :unsubmitted
+    end
+  end
+
+  def action(submission)
+    if submission.excused?
+      :excused
+    elsif submission.needs_review?
+      :needs_review
+    elsif submission.needs_grading?
+      :needs_grading
+    elsif submission.graded?
+      :graded
+    else
+      nil
+    end
   end
 end

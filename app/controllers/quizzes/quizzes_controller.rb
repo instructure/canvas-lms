@@ -704,7 +704,10 @@ class Quizzes::QuizzesController < ApplicationController
           @current_version = (@current_submission.version_number == @submission.version_number)
           @version_number = "current" if @current_version
         end
-        @submission.submission&.mark_read(@current_user) if @submission
+        if @submission&.user_id == @current_user.id
+          @submission&.submission&.mark_read(@current_user)
+        end
+
         log_asset_access(@quiz, "quizzes", 'quizzes')
 
         if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]

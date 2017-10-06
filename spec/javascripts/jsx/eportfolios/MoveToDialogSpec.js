@@ -24,11 +24,9 @@ define([
   'jsx/eportfolios/MoveToDialog',
   'helpers/assertions'
 ], (React, ReactDOM, TestUtils, _, MoveToDialog, assertions) => {
-
-  const fixtures = document.getElementById('fixtures')
-  fixtures.innerHTML = '<div id="modalRoot"></div><div id="appRoot"></div>'
-  const root = document.getElementById('modalRoot')
-  const appRoot= document.getElementById('appRoot')
+  let root
+  let appRoot
+  let applicationElement
 
   const mountDialog = (opts = {}) => {
     opts = _.extend({}, {
@@ -43,12 +41,20 @@ define([
   }
 
   QUnit.module('MoveToDialog', {
-    setup() {
+    setup () {
+      root = document.createElement('div')
+      appRoot = document.createElement('div')
+      applicationElement = document.createElement('div')
+      applicationElement.id = 'application'
+      document.getElementById('fixtures').appendChild(root)
+      document.getElementById('fixtures').appendChild(appRoot)
+      document.getElementById('fixtures').appendChild(applicationElement)
     },
 
-    teardown() {
+    teardown () {
       ReactDOM.unmountComponentAtNode(root)
       appRoot.removeAttribute('aria-hidden')
+      document.getElementById('fixtures').innerHTML = ''
     }
   })
 
@@ -102,22 +108,5 @@ define([
     })
     const button = document.getElementById('MoveToDialog__move')
     TestUtils.Simulate.click(button)
-  })
-
-  test('handles aria-hides app element on open and close', (assert) => {
-    const done = assert.async()
-    notOk(appRoot.getAttribute('aria-hidden'))
-    mountDialog({
-      appElement: appRoot
-    })
-
-    setTimeout(() => {
-      ok(appRoot.getAttribute('aria-hidden'))
-
-      const button = document.getElementById('MoveToDialog__cancel')
-      TestUtils.Simulate.click(button)
-      notOk(appRoot.getAttribute('aria-hidden'))
-      done()
-    }, 1)
   })
 })

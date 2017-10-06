@@ -306,7 +306,7 @@ module Importers
         end
         course.tab_configuration = tab_config
       end
-      if settings[:storage_quota] && ( migration.for_course_copy? || course.account.grants_right?(migration.user, :manage_courses))
+      if settings[:storage_quota] && course.account.grants_right?(migration.user, :manage_storage_quotas)
         course.storage_quota = settings[:storage_quota]
       end
       atts = Course.clonable_attributes

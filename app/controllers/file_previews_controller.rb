@@ -75,7 +75,7 @@ class FilePreviewsController < ApplicationController
         redirect_to url and return
       # google docs
       elsif service_enabled?(:google_docs_previews) && GOOGLE_PREVIEWABLE_TYPES.include?(@file.content_type)
-        redirect_to('//docs.google.com/viewer?' + { embedded: true, url: @file.authenticated_s3_url }.to_query) and return
+        redirect_to('//docs.google.com/viewer?' + { embedded: true, url: @file.authenticated_url }.to_query) and return
       # images
       elsif @file.content_type =~ %r{\Aimage/}
         return render template: 'file_previews/img_preview', layout: false

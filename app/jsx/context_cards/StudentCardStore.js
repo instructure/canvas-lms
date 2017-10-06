@@ -26,7 +26,7 @@ import axios from 'axios'
         user: {},
         course: {},
         submissions: [],
-        analytics: {},
+        analytics: null,
         permissions: {
           manage_grades: false,
           send_messages: false,

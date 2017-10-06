@@ -91,7 +91,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             title={I18n.t('Published')}
             aria-label={I18n.t('%{fileName} is Published - Click to modify', {fileName})}
           >
-            <i className='icon-publish' />
+            <i className='icon-publish icon-Solid' />
           </button>
         );
       } else {

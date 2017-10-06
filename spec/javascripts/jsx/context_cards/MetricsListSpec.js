@@ -94,13 +94,6 @@ define([
     })
 
     QUnit.module('missingCount', (hooks) => {
-      test('returns null by default', () => {
-        subject = TestUtils.renderIntoDocument(
-          <MetricsList />
-        )
-        notOk(subject.missingCount)
-      })
-
       test('returns count from analytics data when present', () => {
         const missingCount = 3
         subject = TestUtils.renderIntoDocument(
@@ -118,13 +111,6 @@ define([
     })
 
     QUnit.module('lateCount', () => {
-      test('returns null by default', () => {
-        subject = TestUtils.renderIntoDocument(
-          <MetricsList />
-        )
-        notOk(subject.lateCount)
-      })
-
       test('returns value from analytics when present', () => {
         const lateCount = 5
         subject = TestUtils.renderIntoDocument(

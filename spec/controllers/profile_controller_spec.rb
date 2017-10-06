@@ -76,7 +76,7 @@ describe ProfileController do
     it "should allow changing the default e-mail address and nothing else" do
       user_session(@user, @pseudonym)
       expect(@cc.position).to eq 1
-      @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
+      @cc2 = @user.communication_channels.create!(:path => 'email2@example.com', :workflow_state => 'active')
       expect(@cc2.position).to eq 2
       put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
       expect(response).to be_success
@@ -88,7 +88,7 @@ describe ProfileController do
       enable_cache do
         @user.email # prime cache
         user_session(@user, @pseudonym)
-        @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
+        @cc2 = @user.communication_channels.create!(:path => 'email2@example.com', :workflow_state => 'active')
         put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
         expect(response).to be_success
         expect(@user.email).to eq @cc2.path
@@ -101,12 +101,19 @@ describe ProfileController do
       @account.save!
       user_session(@user, @pseudonym)
       expect(@cc.position).to eq 1
-      @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
+      @cc2 = @user.communication_channels.create!(:path => 'email2@example.com', :workflow_state => 'active')
       expect(@cc2.position).to eq 2
       put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
       expect(response).to be_success
       expect(@cc2.reload.position).to eq 1
       expect(@cc.reload.position).to eq 2
+    end
+
+    it "should not let an unconfirmed e-mail address be set as default" do
+      user_session(@user, @pseudonym)
+      @cc2 = @user.communication_channels.create!(:path => 'email2@example.com', :workflow_state => 'unconfirmed')
+      put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
+      expect(@user.email).to eq @cc.path
     end
 
     it "should not allow a student view student profile to be edited" do

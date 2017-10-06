@@ -17,7 +17,7 @@
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/assignment_overrides'
-require_relative '../page_objects/gradezilla_page'
+require_relative '../pages/gradezilla_page'
 
 describe "Gradezilla - arrange by due date" do
   include_context "in-process server selenium tests"

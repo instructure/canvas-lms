@@ -269,6 +269,6 @@ export default React.createClass({
 
           </Modal>
         </div>
-      )
+      );
     }
   });

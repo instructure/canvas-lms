@@ -49,6 +49,29 @@ const initialFocusInnerhold = (e) => {
   $(e.target).find('div.mejs-audio').focus()
 }
 
+const minTdWidth = 300
+
+const isVideoInTd = ($link) => {
+  const $closestTd = $link.closest('td')
+  return $closestTd.length > 0
+}
+
+const isContainingTdSmall = ($link) => {
+  const tdWidth = $link.closest('td').css('width').replace('px', '')
+  return tdWidth < minTdWidth
+}
+
+const shouldResizeTd = ($link) => {
+  return isVideoInTd($link) && isContainingTdSmall($link)
+}
+
+const resizeContainingTd = ($link) => {
+  const $closestTd = $link.closest('td')
+  const tdWidth = $closestTd.css('width')
+  $closestTd.data('orig-width', tdWidth)
+  $closestTd.css('width', `${minTdWidth}px`)
+}
+
 $(document).on('click', 'a.instructure_inline_media_comment', preventDefault(function () {
   if (!INST.kalturaSettings) {
     alert(I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'))
@@ -60,6 +83,11 @@ $(document).on('click', 'a.instructure_inline_media_comment', preventDefault(fun
   let mediaType = 'video'
   const id = inlineMediaComment.getMediaCommentId($link)
   const $holder = inlineMediaComment.buildCommentHolder($link)
+
+  if (shouldResizeTd($link)) {
+    resizeContainingTd($link)
+  }
+
   $link.after($holder)
   $link.hide()
 
@@ -72,7 +100,9 @@ $(document).on('click', 'a.instructure_inline_media_comment', preventDefault(fun
   const $minimizer = inlineMediaComment.buildMinimizerLink()
 
   $minimizer.appendTo($holder).click(preventDefault(() => {
+    const $closestTd = $link.closest('td')
     $link.show().focus()
+    $closestTd.css('width', $closestTd.data('orig-width'))
     inlineMediaComment.collapseComment($holder)
   }))
 

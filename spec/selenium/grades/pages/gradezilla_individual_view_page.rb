@@ -83,6 +83,18 @@ class GradezillaIndividualViewPage
       f('#curve_grades')
     end
 
+    def status_pill(status)
+      fj(".#{status}-pill:contains('#{status}')")
+    end
+
+    def late_penalty_text
+      f(".deduction-box-values .submission_late_penalty").text
+    end
+
+    def late_policy_final_grade_text
+      f(".deduction-box-values .submission_final_grade").text
+    end
+
     # global checkboxes
     def ungraded_as_zero
       f('#ungraded')
@@ -132,7 +144,7 @@ class GradezillaIndividualViewPage
 
     def visit(course_id)
       Account.default.enable_feature!(:new_gradebook)
-      get "/courses/#{course_id}/gradebook/change_gradebook_version?version=individual"
+      get "/courses/#{course_id}/gradebook/change_gradebook_version?version=srgb"
     end
 
     def sort_assignments_by(sort_order)

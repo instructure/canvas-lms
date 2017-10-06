@@ -42,7 +42,11 @@ module Api::V1::Conversation
     explicit_participants = conversation.participants
     audience = conversation.other_participants(explicit_participants)
     result[:messages] = options[:messages].map{ |m| conversation_message_json(m, current_user, session) } if options[:messages]
-    result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
+    if options[:submissions]
+      result[:submissions] = options[:submissions].map do |s|
+        submission_json(s, s.assignment, current_user, session, nil, ['assignment', 'submission_comments'], params)
+      end
+    end
     result[:audience] = audience.map(&:id)
     result[:audience].map!(&:to_s) if stringify_json_ids?
     result[:audience_contexts] = contexts_for(audience, conversation.local_context_tags)
@@ -66,7 +70,12 @@ module Api::V1::Conversation
     result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
     result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment, current_user) }
     result['forwarded_messages'] = result['forwarded_messages'].map{ |m| conversation_message_json(m, current_user, session) }
-    result['submission'] = submission_json(message.submission, message.submission.assignment, current_user, session, nil, ['assignment', 'submission_comments']) if message.submission
+    if message.submission
+      submission = message.submission
+      assignment = submission.assignment
+      includes = %w|assignment submission_comments|
+      result['submission'] = submission_json(submission, assignment, current_user, session, nil, includes, params)
+    end
     result
   end
 

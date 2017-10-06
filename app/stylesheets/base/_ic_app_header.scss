@@ -278,10 +278,6 @@ button.ic-app-header__menu-list-link {
   background: var(--ic-brand-global-nav-menu-item__badge-bgd);
   color: var(--ic-brand-global-nav-menu-item__badge-text);
   @include primary-nav-badge-border(var(--ic-brand-global-nav-bgd));
-
-  @if $use_high_contrast {
-    box-shadow: 0 0 0 2px $ic-color-light;
-  }
 }
 
 .ic-app-header__logomark-container {

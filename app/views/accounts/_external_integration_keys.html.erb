@@ -22,6 +22,7 @@
 %>
 <% unless external_integration_keys.empty? %>
   <fieldset id="external_integration_keys">
+    <h2 class="screenreader-only"><%= t('External Integration Keys') %></h2>
     <legend><%= t("External Integration Keys") %></legend>
     <% external_integration_keys.each do |key_type, key| %>
       <%= f.fields_for :external_integration_keys do |external_integration_key| %>

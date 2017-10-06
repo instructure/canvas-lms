@@ -227,7 +227,7 @@ class AssignmentColumnHeader extends ColumnHeader {
     return (
       <PopoverMenu
         contentRef={this.bindOptionsMenuContent}
-        focusTriggerOnClose={false}
+        shouldFocusTriggerOnClose={false}
         trigger={this.renderTrigger()}
         onToggle={this.onToggle}
         onClose={this.props.onMenuClose}

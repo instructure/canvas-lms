@@ -192,6 +192,11 @@
 #           "example": "1234",
 #           "type": "string"
 #         },
+#         "multi_term_batch_mode": {
+#           "description": "Enables batch mode against all terms in term file. Requires change_threshold to be set.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
 #         "override_sis_stickiness": {
 #           "description": "Whether UI changes were overridden.",
 #           "example": "false",
@@ -310,9 +315,13 @@ class SisImportsApiController < ApplicationController
   #   If set, this SIS import will be run in batch mode, deleting any data
   #   previously imported via SIS that is not present in this latest import.
   #   See the SIS CSV Format page for details.
+  #   Batch mode cannot be used with diffing.
   #
   # @argument batch_mode_term_id [String]
   #   Limit deletions to only this term. Required if batch mode is enabled.
+  #
+  # @argument multi_term_batch_mode [Boolean]
+  #   Runs batch mode against all terms in terms file. Requires change_threshold.
   #
   # @argument override_sis_stickiness [Boolean]
   #   Many fields on records in Canvas can be marked "sticky," which means that
@@ -337,6 +346,7 @@ class SisImportsApiController < ApplicationController
   #   comparing this set of CSVs to the previous set that has the same data set
   #   identifier, and only applying the difference between the two. See the
   #   SIS CSV Format documentation for more details.
+  #   Diffing cannot be used with batch_mode
   #
   # @argument diffing_remaster_data_set [Boolean]
   #   If true, and diffing_data_set_identifier is sent, this SIS import will be
@@ -348,14 +358,15 @@ class SisImportsApiController < ApplicationController
   #   number of items deleted is higher than the percentage set. If set to 10
   #   and a term has 200 enrollments, and batch would delete more than 20 of
   #   the enrollments the batch will abort before the enrollments are deleted.
+  #   The change_threshold will be evaluated for course, sections, and
+  #   enrollments independently.
   #   If set with diffing, diffing  will not be performed if the files are
   #   greater than the threshold as a percent. If set to 5 and the file is more
   #   than 5% smaller or more than 5% larger than the file that is being
   #   compared to, diffing will not be performed. If the files are less than 5%,
   #   diffing will be performed. See the SIS CSV Format documentation for more
   #   details.
-  #   If set with batch_mode and diffing, the same threshold is used for both
-  #   steps of the import.
+  #   Required for multi_term_batch_mode.
   #
   # @returns SisImport
   def create
@@ -414,22 +425,28 @@ class SisImportsApiController < ApplicationController
           batch_mode_term = api_find(@account.enrollment_terms.active,
                                      params[:batch_mode_term_id])
         end
-        unless batch_mode_term
+        unless batch_mode_term || params[:multi_term_batch_mode]
           return render :json => {:message => "Batch mode specified, but the given batch_mode_term_id cannot be found."}, :status => :bad_request
         end
       end
 
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch|
+        batch.change_threshold = params[:change_threshold]
+        batch.options ||= {}
         if batch_mode_term
           batch.batch_mode = true
           batch.batch_mode_term = batch_mode_term
+        elsif params[:multi_term_batch_mode]
+          batch.batch_mode=true
+          batch.options[:multi_term_batch_mode] = value_to_boolean(params[:multi_term_batch_mode])
+          unless batch.change_threshold
+            return render json: {message: "change_threshold is required to use multi term_batch mode."}, status: :bad_request
+          end
         elsif params[:diffing_data_set_identifier].present?
           batch.enable_diffing(params[:diffing_data_set_identifier],
-                               change_threshold: params[:change_threshold],
                                remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
 
-        batch.options ||= {}
         if value_to_boolean(params[:override_sis_stickiness])
           batch.options[:override_sis_stickiness] = true
           [:add_sis_stickiness, :clear_sis_stickiness].each do |option|

@@ -19,6 +19,33 @@ define [
   'jquery'
   'compiled/jquery/ModuleSequenceFooter'
 ], ($) ->
+
+  default_course_url = "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true"
+
+  server_200_response = (data) ->
+    [200, { "Content-Type": "application/json" }, JSON.stringify(data)]
+
+  path_urls = {choose_url: 'chew-z', modules_url: 'mod.module.mod'}
+
+  nextButton = (el) ->
+    el.find('.module-sequence-footer-button--next').last()
+
+  moduleData = (args = {}) ->
+    Object.assign({
+      items:
+        [
+          {
+            current: { id: 768, module_id: 123, title: "A lonely page", type: "Page" },
+            next: { id: 111, module_id: 123, title: "Project 33", type: "Assignment" },
+            mastery_path: args['mastery_path']
+          }
+        ]
+      modules:
+        [
+          { id: 123, name: "Module A" }
+        ]
+    }, args)
+
   QUnit.module 'ModuleSequenceFooter: init',
     setup: ->
       @$testEl = $('<div>')
@@ -111,11 +138,7 @@ define [
      }
 
   test 'there is no button when next or prev data is null', ->
-    @server.respondWith "GET", 
-                        "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
-                        [
-                          200, { "Content-Type": "application/json" }, JSON.stringify(nullButtonData)
-                        ]
+    @server.respondWith "GET", default_course_url, server_200_response(nullButtonData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
@@ -167,16 +190,12 @@ define [
          ]
      }
   test 'buttons show modules tooltip when current module id != next or prev module id', ->
-    @server.respondWith "GET",
-                        "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
-                        [
-                          200, { "Content-Type": "application/json" }, JSON.stringify(moduleTooltipData)
-                        ]
+    @server.respondWith "GET", default_course_url, server_200_response(moduleTooltipData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
     ok this.$testEl.find('a').first().data('html-tooltip-title').match('Module C'), "displays previous module tooltip"
-    ok this.$testEl.find('a').last().data('html-tooltip-title').match('Module B'), "displays next module tooltip"
+    ok nextButton(this.$testEl).data('html-tooltip-title').match('Module B'), "displays next module tooltip"
 
   itemTooltipData =
      {
@@ -217,34 +236,24 @@ define [
      }
 
   test 'buttons show item tooltip when current module id == next or prev module id', ->
-    @server.respondWith "GET",
-                        "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
-                        [
-                          200, { "Content-Type": "application/json" }, JSON.stringify(itemTooltipData)
-                        ]
+    @server.respondWith "GET", default_course_url, server_200_response(itemTooltipData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
     ok this.$testEl.find('a').first().data('html-tooltip-title').match('Project 1'), "displays previous item tooltip"
-    ok this.$testEl.find('a').last().data('html-tooltip-title').match('Project 33'), "displays next item tooltip"
+    ok nextButton(this.$testEl).data('html-tooltip-title').match('Project 33'), "displays next item tooltip"
 
   test 'if url has a module_item_id use that as the assetID and ModuleItem as the type instead', ->
     @server.respondWith "GET",
-                        "/api/v1/courses/42/module_item_sequence?asset_type=ModuleItem&asset_id=999&frame_external_urls=true",
-                        [
-                          200, { "Content-Type": "application/json" }, JSON.stringify({})
-                        ]
+                        "/api/v1/courses/42/module_item_sequence?asset_type=ModuleItem&asset_id=999&frame_external_urls=true", server_200_response({})
+
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123, location: {search:"?module_item_id=999" }})
     @server.respond()
     equal @server.requests[0].status, '200', 'Request was successful'
 
   test 'show gets called when rendering', ->
     @stub(@$testEl, 'show')
-    @server.respondWith "GET",
-                        "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
-                        [
-                          200, { "Content-Type": "application/json" }, JSON.stringify(itemTooltipData)
-                        ]
+    @server.respondWith "GET", default_course_url, server_200_response(itemTooltipData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
@@ -252,10 +261,60 @@ define [
 
   test 'resize event gets triggered', ->
     $(window).resize(() -> ok( true, "resize event triggered" ))
-    @server.respondWith "GET",
-      "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
-      [
-        200, { "Content-Type": "application/json" }, JSON.stringify(itemTooltipData)
-      ]
+    @server.respondWith "GET", default_course_url, server_200_response(itemTooltipData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
+
+  test 'provides correct tooltip for mastery path when awaiting choice', ->
+    pathData = moduleData({mastery_path: Object.assign({awaiting_choice: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Choose the next mastery path'), "indicates a user needs to choose the next mastery path"
+    ok btn.find('a').attr('href').match('chew-z'), "displays the correct link"
+
+  test 'provides correct tooltip for mastery path when sequence is locked', ->
+    pathData = moduleData({mastery_path: Object.assign({locked: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Next mastery path is currently locked'), "indicates there are locked mastery path items"
+    ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
+
+  test 'provides correct tooltip for mastery path when processing', ->
+    pathData = moduleData({mastery_path: Object.assign({still_processing: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Next mastery path is currently processing'), "indicates path is processing"
+    ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
+
+  test 'properly disables the next button when path locked and modules tab disabled', ->
+    pathData = moduleData({mastery_path: Object.assign({locked: true, modules_tab_disabled: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+
+    ok nextButton(this.$testEl).find('a').attr('disabled'), "disables the button"
+
+  test 'properly disables the next button when path processing and modules tab disabled', ->
+    pathData = moduleData({mastery_path: Object.assign({still_processing: true, modules_tab_disabled: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+
+    ok nextButton(this.$testEl).find('a').attr('disabled'), "disables the button"
+
+  test 'does not disables the next button when awaiting choice and modules tab disabled', ->
+    pathData = moduleData({mastery_path: Object.assign({awaiting_choice: true, modules_tab_disabled: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+
+    ok !nextButton(this.$testEl).find('a').attr('disabled'), "disables the button"

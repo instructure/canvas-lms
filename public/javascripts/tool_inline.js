@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import './jquery.google-analytics'
 import 'compiled/jquery/ModuleSequenceFooter'
+import MarkAsDone from 'compiled/util/markAsDone'
 import ToolLaunchResizer from './lti/tool_launch_resizer'
 
 var $toolForm = $("#tool_form")
@@ -130,6 +131,9 @@ $(function() {
     });
   }
 
+  $('#content').on('click', '#mark-as-done-checkbox', function () {
+    MarkAsDone.toggle(this)
+  })
 });
 
 window.addEventListener('message', function(e) {

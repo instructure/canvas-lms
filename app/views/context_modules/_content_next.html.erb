@@ -36,6 +36,13 @@
   <h1 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h1>
 <% end %>
 
+<% if @can_edit %>
+  <div tabindex="0" class="drag_and_drop_warning screenreader-only" >
+    <%= t('modules_keyboard_hint_updated',
+          'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
+  </div>
+<% end %>
+
 <div class="header-bar">
   <div class="header-bar-right header-bar__module-layout">
     <div class="header-bar-right__buttons">
@@ -68,13 +75,6 @@
     <% end %>
   </div>
 </div>
-
-<% if @can_edit %>
-  <div class="hidden-readable screenreader-only" aria-label="<%= t('keyboard instructions') %>">
-    <%= t('modules_keyboard_hint_updated',
-          'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
-  </div>
-<% end %>
 
 <div class="item-group-container" id="context_modules_sortable_container">
   <div id="no_context_modules_message" style="display:none;">

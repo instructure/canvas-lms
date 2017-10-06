@@ -92,6 +92,6 @@ export default [
         title: I18n.t("Publish the Course"),
         text: I18n.t("All finished?  Time to publish your course!  Click the button below to make it official! Publishing will allow the users to begin participating in the course."),
         non_registered_text: I18n.t("This course is claimed and ready, but you'll need to finish the registration process before you can publish the course.  You should have received an email from Canvas with a link to finish the process.  Be sure to check your spam box."),
-        iconClass: 'icon-publish'
+        iconClass: 'icon-publish icon-Solid'
       }
     ]

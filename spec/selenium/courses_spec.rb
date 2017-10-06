@@ -80,7 +80,7 @@ describe "courses" do
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
         expect(course_status_buttons.first).not_to have_class('disabled')
-        expect(course_status_buttons.first.text).to eq 'Unpublish'
+        expect(course_status_buttons.first.text).to eq ' Unpublish'
         expect(course_status_buttons.last).to have_class('disabled')
         expect(course_status_buttons.last.text).to eq 'Published'
         expect_new_page_load { course_status_buttons.first.click }

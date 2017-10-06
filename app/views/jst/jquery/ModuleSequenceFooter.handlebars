@@ -16,17 +16,19 @@
     {{/if}}
 
     {{#if next.show}}
-      <a
-        href="{{next.url}}"
-        role="button"
-        class="Button module-sequence-footer-button--next"
-        data-tooltip="left"
-        data-html-tooltip-title="{{next.tooltip}}"
-        aria-describedby="msf{{instanceNumber}}-next-desc"
-      >
-        {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>
-        <span id="msf{{instanceNumber}}-next-desc" class="hidden" hidden>{{next.tooltipText}}</span>
-      </a>
+      <span class="module-sequence-footer-button--next" data-tooltip="left" data-html-tooltip-title="{{next.tooltip}}">
+        <a
+          href="{{next.url}}"
+          role="button"
+          class="Button"
+          aria-describedby="msf{{instanceNumber}}-next-desc"
+          aria-disabled={{next.modules_tab_disabled}}
+          {{ disabledIf next.modules_tab_disabled }}
+        >
+          {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>
+          <span id="msf{{instanceNumber}}-next-desc" class="hidden" hidden>{{next.tooltipText}}</span>
+        </a>
+      </span>
     {{/if}}
   </div>
 </div>

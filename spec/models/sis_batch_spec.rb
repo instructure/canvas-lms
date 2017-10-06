@@ -668,7 +668,7 @@ test_1,u1,student,active}
         expect(batch.workflow_state).to eq 'aborted'
         expect(@e1.reload).to be_active
         expect(@e2.reload).to be_active
-        expect(batch.processing_errors.first).to eq ["1 items would be deleted and exceeds the set threshold of 20%"]
+        expect(batch.processing_errors.first).to eq ["1 enrollments would be deleted and exceeds the set threshold of 20%"]
       end
 
       it 'should delete batch mode below threshold' do
@@ -699,6 +699,55 @@ test_1,u1,student,active}
         expect(@e1.reload).to be_deleted
         expect(@e2.reload).to be_active
         expect(b1.processing_errors.size).to eq 0
+      end
+
+      describe 'multi_term_batch_mode' do
+        before :once do
+          @term2 = @account.enrollment_terms.first
+          @term2.update_attribute(:sis_source_id, 'term2')
+
+          @c2 = factory_with_protected_attributes(@account.courses, name: "delete me", enrollment_term: @term2,
+                                                  sis_source_id: 'test_2', sis_batch_id: @old_batch.id)
+        end
+
+        it 'should use multi_term_batch_mode' do
+          batch = create_csv_data([
+                                    %{term_id,name,status
+                                      term1,term1,active
+                                      term2,term2,active},
+                                    %{course_id,short_name,long_name,account_id,term_id,status},
+                                    %{course_id,user_id,role,status},
+                                  ]) do |batch|
+            batch.options = {}
+            batch.batch_mode = true
+            batch.options[:multi_term_batch_mode] = true
+            batch.save!
+            batch.process_without_send_later
+          end
+          expect(@e1.reload).to be_deleted
+          expect(@e2.reload).to be_deleted
+          expect(@c1.reload).to be_deleted
+          expect(@c2.reload).to be_deleted
+          expect(batch.workflow_state).to eq 'imported'
+        end
+
+        it 'should not use multi_term_batch_mode if no terms are passed' do
+          batch = create_csv_data([
+                                    %{course_id,short_name,long_name,account_id,term_id,status},
+                                    %{course_id,user_id,role,status},
+                                  ]) do |batch|
+            batch.options = {}
+            batch.batch_mode = true
+            batch.options[:multi_term_batch_mode] = true
+            batch.save!
+            batch.process_without_send_later
+          end
+          expect(@e1.reload).to be_active
+          expect(@e2.reload).to be_active
+          expect(@c1.reload.workflow_state).to eq 'created'
+          expect(@c2.reload.workflow_state).to eq 'created'
+          expect(batch.workflow_state).to eq 'aborted'
+        end
       end
 
     end

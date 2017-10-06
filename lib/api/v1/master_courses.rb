@@ -53,6 +53,8 @@ module Api::V1::MasterCourses
       asset.display_name
     elsif asset.respond_to?(:title)
       asset.title
+     elsif asset.respond_to?(:short_description)
+       asset.short_description
     else
       asset.name
     end

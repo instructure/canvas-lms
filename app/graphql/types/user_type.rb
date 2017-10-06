@@ -21,7 +21,7 @@ module Types
       "A short name the user has selected, for use in conversations or other less formal places through the site.",
       property: :short_name
 
-    field :avatarUrl, types.String do
+    field :avatarUrl, UrlType do
       resolve ->(user, _, ctx) {
         user.account.service_enabled?(:avatars) ?
           AvatarHelper.avatar_url_for_user(user, ctx[:request]) :

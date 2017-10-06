@@ -118,7 +118,9 @@ class SubmissionsController < ApplicationController
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
     @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
     if authorized_action(@submission, @current_user, :read)
-      @submission&.mark_read(@current_user)
+      if @submission&.user_id == @current_user.id
+        @submission&.mark_read(@current_user)
+      end
       respond_to do |format|
         @submission.limit_comments(@current_user, session)
         format.html
@@ -273,8 +275,11 @@ class SubmissionsController < ApplicationController
         end
         format.json do
           if api_request?
-            render :json => submission_json(@submission, @assignment, @current_user, session, @context, %{submission_comments attachments}),
-              :status => :created, :location => api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
+            includes = %|submission_comments attachments|
+            json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
+            render json: json,
+              status: :created,
+              location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
           else
             render :json => @submission.as_json(:include => :submission_comments), :status => :created,
               :location => course_gradebook_url(@submission.assignment.context)

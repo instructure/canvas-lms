@@ -38,6 +38,10 @@ define [
       return @get 'due_at' unless arguments.length > 0
       @set 'due_at', date
 
+    allDates: (alldate) =>
+      return @get 'all_dates' unless arguments.length > 0
+      @set 'all_dates', alldate
+
     sisIntegrationSettingsEnabled: =>
       return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
 
@@ -57,6 +61,10 @@ define [
     dueAt: (date) =>
       return @get 'due_at' unless arguments.length > 0
       @set 'due_at', date
+
+    allDates: (alldate) =>
+      return @get 'all_dates' unless arguments.length > 0
+      @set 'all_dates', alldate
 
     sisIntegrationSettingsEnabled: =>
       return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
@@ -147,6 +155,102 @@ define [
     @view.render()
     @view.$el.click()
     ok !@assignment.postToSIS()
+
+  test 'model saves if there are overrides but not base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @assignment.set('post_to_sis', false)
+    @assignment.set('name', 'Too Much Tuna')
+    @assignment.set('all_dates', [{dueAt: 'Test'}, {dueAt: 'Test2'}])
+    @assignment.set('due_at', null)
+    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok @assignment.postToSIS()
+
+  test 'model does not save if there are no due date overrides and no base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @assignment.set('post_to_sis', false)
+    @assignment.set('name', 'Too Much Tuna')
+    @assignment.set('all_dates', [])
+    @assignment.set('due_at', null)
+    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok !@assignment.postToSIS()
+
+  test 'model does not save if there is only one due date override and no base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @assignment.set('post_to_sis', false)
+    @assignment.set('name', 'Too Much Tuna')
+    @assignment.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
+    @assignment.set('due_at', null)
+    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok !@assignment.postToSIS()
+
+  test 'model does not save if there are no due dates on overrides assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @assignment.set('post_to_sis', false)
+    @assignment.set('name', 'Too Much Tuna')
+    @assignment.set('all_dates', [{dueAt: null}, {dueAt: null}])
+    @assignment.set('due_at', "I am a date")
+    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok !@assignment.postToSIS()
+
+  test 'model saves if there are overrides but not base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @quiz.set('post_to_sis', false)
+    @quiz.set('title', 'Too Much Tuna')
+    @quiz.set('all_dates', [{dueAt: 'Test'}, {dueAt: 'Test2'}])
+    @quiz.set('due_at', null)
+    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok @quiz.postToSIS()
+
+  test 'model does not save if there are no due date overrides and no base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @quiz.set('post_to_sis', false)
+    @quiz.set('title', 'Too Much Tuna')
+    @quiz.set('all_dates', [])
+    @quiz.set('due_at', null)
+    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok !@quiz.postToSIS()
+
+  test 'model does not save if there is only one due date override and no base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @quiz.set('post_to_sis', false)
+    @quiz.set('title', 'Too Much Tuna')
+    @quiz.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
+    @quiz.set('due_at', null)
+    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok !@quiz.postToSIS()
+
+  test 'model saves if there are no due date overrides and base for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
+    ENV.MAX_NAME_LENGTH = 5
+    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+    @quiz.set('post_to_sis', false)
+    @quiz.set('title', 'Too Much Tuna')
+    @quiz.set('all_dates', [{dueAt: null}, {dueAt: null}])
+    @quiz.set('due_at', "I am a date")
+    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
+    @view.render()
+    @view.$el.click()
+    ok !@quiz.postToSIS()
 
   test 'model saves if there are due date errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
     ENV.MAX_NAME_LENGTH = 5

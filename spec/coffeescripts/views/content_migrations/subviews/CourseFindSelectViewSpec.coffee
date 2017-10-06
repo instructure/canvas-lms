@@ -81,6 +81,7 @@ define [
     courseFindSelectView = new CourseFindSelectView
       model: new Backbone.Model,
       current_user_id: 101
+      show_select: true
 
     courseFindSelectView.courses = @courses
     courseFindSelectView.render()
