@@ -66,7 +66,7 @@ import htmlEscape from 'str/htmlEscape'
               />
             </div>
             <div className="UploadArea__FileTypes">
-              {I18n.t('For best results crop image to 262px wide by 146px tall. JPG, PNG or GIF file types accepted')}
+              {I18n.t('For best results crop image to 900px wide by 300px tall. JPG, PNG or GIF file types accepted')}
             </div>
           </div>
         </div>
