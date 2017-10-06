@@ -167,9 +167,10 @@ module Api::V1::Submission
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
       hash['attachments'] = attachments.map do |attachment|
         attachment.skip_submission_attachment_lock_checks = true
+        includes = includes.include?('canvadoc_document_id') ? ['preview_url', 'canvadoc_document_id'] : ['preview_url']
         atjson = attachment_json(attachment, user, {},
                                  submission_attachment: true,
-                                 include: ['preview_url'],
+                                 include: includes,
                                  enable_annotations: true, # we want annotations on submission's attachment preview_urls
                                  moderated_grading_whitelist: attempt.moderated_grading_whitelist)
         attachment.skip_submission_attachment_lock_checks = false

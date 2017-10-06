@@ -198,6 +198,7 @@ class SubmissionsApiController < ApplicationController
   # @response_field assignment_id The unique identifier for the assignment.
   # @response_field user_id The id of the user who submitted the assignment.
   # @response_field grader_id The id of the user who graded the submission. This will be null for submissions that haven't been graded yet. It will be a positive number if a real user has graded the submission and a negative number if the submission was graded by a process (e.g. Quiz autograder and autograding LTI tools).  Specifically autograded quizzes set grader_id to the negative of the quiz id.  Submissions autograded by LTI tools set grader_id to the negative of the tool id.
+  # @response_field canvadoc_document_id The id for the canvadoc document associated with this submission, if it was a file upload.
   # @response_field submitted_at The timestamp when the assignment was submitted, if an actual submission has been made.
   # @response_field score The raw score for the assignment submission.
   # @response_field attempt If multiple submissions have been made, this is the attempt number.
