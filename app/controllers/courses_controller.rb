@@ -1690,7 +1690,18 @@ class CoursesController < ApplicationController
         js_env(:SHOW_ANNOUNCEMENTS => true, :ANNOUNCEMENT_COURSE_ID => @context.id, :ANNOUNCEMENT_LIMIT => @context.home_page_announcement_limit)
       end
 
-      if @context.image_url != ""
+      def image
+        if @context.image_id.present?
+          @context.shard.activate do
+            @context.attachments.active.where(id: @context.image_id).first.download_url rescue nil
+          end
+        elsif @context.image_url
+          @context.image_url
+        end
+      end
+      @image = image
+
+      if @image != ""
         @display_header_image = true
       else
         @display_header_image = false
