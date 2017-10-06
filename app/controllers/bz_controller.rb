@@ -577,6 +577,11 @@ class BzController < ApplicationController
         next if params[:type] == 'magic' && rd.name.starts_with?('instant-survey-')
         next if params[:type] == 'survey' && !rd.name.starts_with?('instant-survey-')
 
+        # only keep generic or fields set specifically on this course...
+        # the problem is if the same user is in two courses with the content bank,
+        # it will only export the most recent ones set.
+        next if !rd.path.blank? && rd.path.match("courses/#{course.id}").nil?
+
         item[rd.name] = rd.value
         all_fields[rd.name] = rd.name
       end
