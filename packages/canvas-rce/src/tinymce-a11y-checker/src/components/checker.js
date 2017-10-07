@@ -271,6 +271,16 @@ export default class Checker extends React.Component {
     this.setState({ open: false })
   }
 
+  applicationElements() {
+    const _filter = Array.prototype.filter
+    return _filter.call(
+      document.body.childNodes,
+      node =>
+        node.nodeType == 1 &&
+        node.className !== "tinymce-a11y-checker-container"
+    )
+  }
+
   render() {
     const rule = this.errorRule()
     const issueNumberMessage = formatMessage("Issue { num } of { total }", {
@@ -283,11 +293,12 @@ export default class Checker extends React.Component {
         <Tray
           label={formatMessage("Accessibility Checker")}
           isDismissable
-          trapFocus
-          isOpen={this.state.open}
-          onRequestClose={this.handleClose}
+          shouldContainFocus
+          open={this.state.open}
+          onDismiss={this.handleClose}
           placement="end"
           closeButtonLabel={formatMessage("Close Accessibility Checker")}
+          applicationElement={this.applicationElements}
         >
           <Container as="div" style={{ width: "20rem" }} padding="medium">
             <Heading level="h3" as="h2" margin="medium 0" color="brand">

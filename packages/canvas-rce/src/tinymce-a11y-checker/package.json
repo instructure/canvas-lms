@@ -23,7 +23,7 @@
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-polyfill": "^6.23.0",
-    "canvas-rce": "^2.2.1",
+    "canvas-rce": "^2.5.4",
     "enzyme": "^3.0.0",
     "enzyme-adapter-react-15": "^1.0.0",
     "enzyme-to-json": "^3.0.1",
@@ -40,8 +40,8 @@
     "webpack-dev-server": "^2.6.1"
   },
   "dependencies": {
-    "instructure-icons": "3 || 4",
-    "instructure-ui": "^2.1.0 || 3",
+    "instructure-icons": "4.x",
+    "instructure-ui": "3.x",
     "react": "^0.14.8 || ^15.0.0",
     "react-aria-live": "^1.0.4",
     "react-color": "^2.13.4",
