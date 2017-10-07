@@ -125,7 +125,7 @@ module ConditionalRelease
     end
 
     def self.enabled_in_context?(context)
-      !!(configured? && context.feature_enabled?(:conditional_release))
+      !!(configured? && context&.feature_enabled?(:conditional_release))
     end
 
     def self.protocol
