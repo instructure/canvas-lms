@@ -2051,10 +2051,16 @@ CanvasRails::Application.routes.draw do
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :create,
            as: "create_#{context}_lti_tool_proxy"
       get "#{prefix}/jwt_token", controller: 'external_tools', action: :jwt_token
+      get "tool_proxy/:tool_proxy_guid/#{prefix}/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: "show_#{context}_tool_setting"
+      get "tool_proxy/:tool_proxy_guid/#{prefix}/resource_link_id/:resource_link_id/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: "show_#{context}_resource_link_id_tool_setting"
+      put "tool_proxy/:tool_proxy_guid/#{prefix}/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: "update_#{context}_tool_setting"
+      put "tool_proxy/:tool_proxy_guid/#{prefix}/resource_link_id/:resource_link_id/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: "update_#{context}_update_resource_link_id_tool_setting"
     end
     #Tool Setting Services
-    get "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :show, as: 'show_lti_tool_settings'
-    put "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :update, as: 'update_lti_tool_settings'
+    get "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :show, as: :show_lti_tool_settings
+    get "tool_proxy/:tool_proxy_guid/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: :show_tool_proxy_lti_tool_settings
+    put "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :update, as: :update_lti_tool_settings
+    put "tool_proxy/:tool_proxy_guid/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: :update_tool_proxy_lti_tool_settings
 
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
