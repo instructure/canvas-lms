@@ -3,18 +3,33 @@
 exports[`render matches snapshot with errors 1`] = `
 <LiveAnnouncer>
   <Tray
+    applicationElement={[Function]}
     border={false}
     closeButtonLabel="Close Accessibility Checker"
     closeButtonRef={[Function]}
     closeButtonVariant="icon"
     contentRef={[Function]}
+    defaultFocusElement={null}
+    insertAt="bottom"
     isDismissable={true}
-    isOpen={true}
     label="Accessibility Checker"
-    onRequestClose={[Function]}
+    mountNode={null}
+    onClose={[Function]}
+    onDismiss={[Function]}
+    onEnter={[Function]}
+    onEntered={[Function]}
+    onEntering={[Function]}
+    onExit={[Function]}
+    onExited={[Function]}
+    onExiting={[Function]}
+    onOpen={[Function]}
+    open={true}
     placement="end"
     shadow={true}
-    trapFocus={true}
+    shouldCloseOnDocumentClick={false}
+    shouldContainFocus={true}
+    shouldReturnFocus={true}
+    size="small"
   >
     <Container
       as="div"
@@ -130,14 +145,10 @@ exports[`render matches snapshot with errors 1`] = `
             </Grid>
           </Container>
           <Alert
-            closeButtonLabel=""
-            dismissable={false}
-            isOpen={true}
-            liveRegion={null}
             margin="x-small 0"
-            onClose={null}
+            open={true}
             timeout={0}
-            transitionType="fade"
+            transition="fade"
             variant="warning"
           >
             Error Message
@@ -257,6 +268,7 @@ exports[`render matches snapshot with errors 1`] = `
               href="http://some-url"
               linkRef={[Function]}
               target="_blank"
+              variant="default"
             >
               Learn more
             </Link>
@@ -271,18 +283,33 @@ exports[`render matches snapshot with errors 1`] = `
 exports[`render matches snapshot without errors 1`] = `
 <LiveAnnouncer>
   <Tray
+    applicationElement={[Function]}
     border={false}
     closeButtonLabel="Close Accessibility Checker"
     closeButtonRef={[Function]}
     closeButtonVariant="icon"
     contentRef={[Function]}
+    defaultFocusElement={null}
+    insertAt="bottom"
     isDismissable={true}
-    isOpen={false}
     label="Accessibility Checker"
-    onRequestClose={[Function]}
+    mountNode={null}
+    onClose={[Function]}
+    onDismiss={[Function]}
+    onEnter={[Function]}
+    onEntered={[Function]}
+    onEntering={[Function]}
+    onExit={[Function]}
+    onExited={[Function]}
+    onExiting={[Function]}
+    onOpen={[Function]}
+    open={false}
     placement="end"
     shadow={true}
-    trapFocus={true}
+    shouldCloseOnDocumentClick={false}
+    shouldContainFocus={true}
+    shouldReturnFocus={true}
+    size="small"
   >
     <Container
       as="div"
@@ -313,14 +340,10 @@ exports[`render matches snapshot without errors 1`] = `
          Accessibility Checker
       </Heading>
       <Alert
-        closeButtonLabel=""
-        dismissable={false}
-        isOpen={true}
-        liveRegion={null}
         margin="x-small 0"
-        onClose={null}
+        open={true}
         timeout={0}
-        transitionType="fade"
+        transition="fade"
         variant="success"
       >
         No accessibility issues were detected.

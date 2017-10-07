@@ -6,6 +6,7 @@ import formatMessage from "format-message"
 tinymce.create("tinymce.plugins.AccessibilityChecker", {
   init: function(ed) {
     const container = document.createElement("div")
+    container.className = "tinymce-a11y-checker-container"
     document.body.appendChild(container)
     const checker = ReactDOM.render(
       <Checker getBody={ed.getBody.bind(ed)} />,
