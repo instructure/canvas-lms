@@ -22,7 +22,7 @@
 @import "components/ic-badge";
 
 
-$ic-DashboardCard-width: 262px;
+$ic-DashboardCard-width: 302px;
 $ic-DashboardCard-action-height: 40px;
 $ic-DashboardCard-action-width: floor($ic-DashboardCard-width / 4);
 $ic-DashboardCard-icon-size: 24px;
@@ -85,7 +85,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .ic-DashboardCard__header_hero {
   box-sizing: border-box;
-  height: 146px;
+  height: 181px;
   border: 1px solid rgba(black, 0.1);
 }
 
@@ -101,20 +101,16 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 .sm-DashboardCard__course_grade{
   position: absolute;
   padding: 10px;
-  background-color: #FFF;
-  left: 198px;
-  top: -31px;
-  border-radius: 50%;
+  left: 229px;
+  top: -50px;
   width: 38px;
   height: 29px;
-  @include fontSize(14px);
+  @include fontSize(15px);
   line-height: 32px;
-  color: var(--ic-brand-primary);
+  color: #FFF;
   font-weight: 500;
   z-index: 1000;
   text-align: center;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
 }
 
 .ic-DashboardCard__header_content {
@@ -125,7 +121,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 @mixin dashcardHeaderButton {
   position: absolute;
-  top: $ic-sp; right: $ic-sp;
+  top: $ic-sp; right: 23px;
   width: $ic-sp*3;
   height: $ic-sp*3;
   border-radius: 50%;
