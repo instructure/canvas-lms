@@ -69,41 +69,44 @@ class Gradezilla
         fj("a:contains('SpeedGrader')")
       end
 
-      def submission_tray_left_arrow_selector
+      def assignment_left_arrow_selector
         '#assignment-carousel .left-arrow-button-container button'
       end
 
-      def submission_tray_right_arrow_selector
+      def assignment_right_arrow_selector
         '#assignment-carousel .right-arrow-button-container button'
       end
 
-      def submission_tray_right_arrow_button
-        f(submission_tray_right_arrow_selector)
+      def next_assignment_button
+        f(assignment_right_arrow_selector)
       end
 
-      def submission_tray_left_arrow_button
-        f(submission_tray_left_arrow_selector)
+      def previous_assignment_button
+        f(assignment_left_arrow_selector)
       end
 
       def assignment_link(assignment_name)
         fj("a:contains('#{assignment_name}')")
       end
 
-      # to-do's ---start
-      def navigate_to_next_student
-        fj(".student_nav button:contains('>')")
+      def student_link(student_name)
+        fj("a:contains(#{student_name})")
       end
 
-      def navigate_to_previous_student
-        fj(".student_nav button:contains('<')")
+      def navigate_to_next_student_selector
+        "#student-carousel .right-arrow-button-container button"
       end
 
-      def navigate_to_next_assignment
-        fj(".right-arrow-button-container button")
+      def navigate_to_previous_student_selector
+        "#student-carousel .left-arrow-button-container button"
       end
 
-      def navigate_to_previous_assignment
-        fj(".left-arrow-button-container button")
+      def next_student_button
+        fj(navigate_to_next_student_selector)
+      end
+
+      def previous_student_button
+        fj(navigate_to_previous_student_selector)
       end
 
       def grade_input
@@ -133,7 +136,6 @@ class Gradezilla
       def comment_save_button
         fj("button:contains('Post')")
       end
-      # to-do's ---end
 
       # methods
       def change_status_to(type)
