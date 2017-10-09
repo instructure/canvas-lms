@@ -25,6 +25,8 @@ import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
 import splitAssetString from 'compiled/str/splitAssetString'
 import * as mathml from 'mathml'
 
+import ToolLaunchResizer from '../../../public/javascripts/lti/tool_launch_resizer'
+
 // modules that do their own thing on every page that simply need to be required
 import 'translations/_core_en'
 import 'jquery.ajaxJSON'
@@ -100,6 +102,18 @@ $('body').on('click', '#distractionFreeToggle', () => {
     window.localStorage.removeItem("distraction_free")
   }
   resetMenuItemTabIndexes()
+  var $tool_content_wrapper = $('.tool_content_wrapper');
+
+  var min_tool_height, canvas_chrome_height;
+  const toolResizer = new ToolLaunchResizer(min_tool_height);
+
+  if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
+    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
+  }
+
+  if (!$tool_content_wrapper.data('height_overridden')) {
+    toolResizer.resize_tool_content_wrapper($(window).height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
+  }
 })
 
 // Backbone routes
