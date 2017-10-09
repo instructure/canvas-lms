@@ -6041,6 +6041,7 @@ QUnit.module('Gradebook#onGridBlur', {
     }]
     this.gradebook.gotChunkOfStudents(students);
     this.gradebook.initGrid();
+    this.gradebook.assignments = { 2301: { name: 'An Assignment', html_url: 'http://assignmentUrl' } };
     this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
     this.spy(this.gradebook.gridSupport.state, 'blur');
   },
@@ -6209,6 +6210,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     this.mountPointId = 'StudentTray__Container';
     $fixtures.innerHTML = `<div id="${this.mountPointId}"></div><div id="application"></div>`;
     this.gradebook = createGradebook();
+    this.gradebook.assignments = { 2301: { name: 'Some Assignment', html_url: 'http://assignmentUrl' } };
     this.gradebook.students = {
       1101: {
         id: '1101',
@@ -6326,9 +6328,15 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   let clock;
 
   hooks.beforeEach(() => {
+    moxios.install();
+    const url = '/api/v1/courses/1/assignments/2301/submissions/1101?include=submission_comments';
+    moxios.stubRequest(url, { status: 200, response: { submission_comments: [] }});
     mountPointId = 'StudentTray__Container';
     $fixtures.innerHTML = `<div id="${mountPointId}"></div><div id="application"></div>`;
     gradebook = createGradebook();
+    gradebook.assignments = {
+      2301: { name: 'Some Assignment', html_url: 'http://assignmentUrl' }
+    }
     gradebook.students = {
       1100: {
         id: '1100',
@@ -6336,13 +6344,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         },
-        enrollments: [
-          {
-            grades: {
-              html_url: 'http://gradesUrl/'
-            }
-          }
-        ]
+        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }]
       },
       1101: {
         id: '1101',
@@ -6350,13 +6352,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         },
-        enrollments: [
-          {
-            grades: {
-              html_url: 'http://gradesUrl/'
-            }
-          }
-        ]
+        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }]
       },
       1102: {
         id: '1100',
@@ -6364,13 +6360,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         },
-        enrollments: [
-          {
-            grades: {
-              html_url: 'http://gradesUrl/'
-            }
-          }
-        ]
+        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }]
       }
     };
     sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]));
@@ -6396,6 +6386,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
     const node = document.getElementById(mountPointId);
     ReactDOM.unmountComponentAtNode(node);
     $fixtures.innerHTML = '';
+    moxios.uninstall();
   });
 
   test('does not show the previous student arrow for the first student', function () {
