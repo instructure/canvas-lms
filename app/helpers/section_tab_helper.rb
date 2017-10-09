@@ -45,7 +45,7 @@ module SectionTabHelper
         }) do
           concat(content_tag(:ul, id: 'section-tabs') do
             available_section_tabs(@context).map do |tab|
-              if !tab["hidden"] or !tab["hidden_unused"]
+              if !tab["hidden"]
                 section_tab_tag(tab, @context, @active_tab)
               end
             end
