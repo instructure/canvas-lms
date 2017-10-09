@@ -68,9 +68,8 @@ describe "calendar2" do
         expect(f('#editCalendarEventFull .btn-primary').text).to eq "Create Event"
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
-        expect_new_page_load { submit_form(f('#editCalendarEventFull')) }
-        wait = Selenium::WebDriver::Wait.new(timeout: 5)
-        wait.until { !fj('.fc-event:visible').nil? }
+        # submit_form makes the spec fragile
+        expect_new_page_load { f('#editCalendarEventFull').submit }
         fj('.fc-event:visible').click
         event_content = fj('.event-details-content:visible')
         expect(event_content).to include_text(location_name)
@@ -104,10 +103,11 @@ describe "calendar2" do
 
       it "should create a recurring event", priority: "1", test_id: 223510 do
         Account.default.enable_feature!(:recurring_calendar_events)
+        make_full_screen
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
-        fj('.calendar .fc-week .fc-today').click
+        f('.calendar .fc-week .fc-today').click
         edit_event_dialog = f('#edit_event_tabs')
         expect(edit_event_dialog).to be_displayed
         edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
@@ -118,9 +118,9 @@ describe "calendar2" do
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
         expect(f('.title')).to have_value "Test Event"
-        f('#duplicate_event').click
+        move_to_click('#duplicate_event')
         replace_content(f("input[type=number][name='duplicate_count']"), 2)
-        expect_new_page_load{f('button[type="submit"]').click}
+        expect_new_page_load { f('#editCalendarEventFull').submit }
         expect(CalendarEvent.count).to eq(3)
         repeat_event = CalendarEvent.where(title: "Test Event")
         first_start_date = repeat_event[0].start_at.to_date
@@ -163,13 +163,16 @@ describe "calendar2" do
         f('#duplicate_event').click
         replace_content(f("input[type=number][name='duplicate_count']"), 1)
 
-        expect_new_page_load{f('button[type="submit"]').click}
+        form = f('#editCalendarEventFull')
+        expect_new_page_load{form.submit}
 
         expect(CalendarEvent.count).to eq(6) # 2 parent events each with 2 child events
-        s1_events = CalendarEvent.where(:context_code => section1.asset_string).where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        s1_events = CalendarEvent.where(:context_code => section1.asset_string).
+          where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
         expect(s1_events[1].start_at.to_date).to eq (s1_events[0].start_at.to_date + 1.week)
 
-        s2_events = CalendarEvent.where(:context_code => section2.asset_string).where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        s2_events = CalendarEvent.where(:context_code => section2.asset_string).
+          where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
         expect(s2_events[1].start_at.to_date).to eq (s2_events[0].start_at.to_date + 1.week)
       end
 
@@ -184,6 +187,61 @@ describe "calendar2" do
 
         num_rows = ff(".show_if_using_sections .row_header").length
         expect(num_rows).to be_equal(num_sections)
+      end
+    end
+  end
+
+  context "to-do dates" do
+    before :once do
+      Account.default.enable_feature!(:student_planner)
+      @course = Course.create!(name: "Course 1")
+      @course.offer!
+      @student1 = User.create!(name: 'Student 1')
+      @course.enroll_student(@student1).accept!
+    end
+
+    before(:each) do
+      user_session(@student1)
+    end
+
+    context "student to-do event" do
+      before :once do
+        @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Student to do")
+      end
+
+      it "shows student to-do events in the calendar", priority: "1", test_id: 3357313 do
+        get "/calendar2"
+        expect(f('.fc-content .fc-title')).to include_text(@student_to_do.title)
+      end
+
+      it "shows the correct date and context for student to-do item in calendar", priority: "1", test_id: 3357315 do
+        get "/calendar2"
+        f('.fc-content .fc-title').click
+        event_content = fj('.event-details-content:visible')
+        expect(event_content.find_element(:css, '.event-details-timestring').text).
+          to eq format_date_for_view(Time.zone.now, :short)
+        expect(event_content).to contain_link('Student 1')
+      end
+    end
+
+    context "course to-do event" do
+      before :once do
+        @course_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Course to do",
+                                                        course_id: @course.id)
+      end
+
+      it "shows course to do events in the calendar", priority: "1", test_id: 3357314 do
+        get "/calendar2"
+        expect(f('.fc-content .fc-title')).to include_text(@course_to_do.title)
+      end
+
+      it "shows the correct date and context for courseto-do item in calendar", priority: "1", test_id: 3357316 do
+        get "/calendar2"
+        f('.fc-content .fc-title').click
+        event_content = fj('.event-details-content:visible')
+        expect(event_content.find_element(:css, '.event-details-timestring').text).
+          to eq format_date_for_view(Time.zone.now, :short)
+        expect(event_content).to contain_link('Course 1')
       end
     end
   end
