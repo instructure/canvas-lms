@@ -4070,6 +4070,55 @@ test('does not skip SlickGrid default behavior when pressing "enter" off the gri
   notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied');
 });
 
+QUnit.module('Gradebook Grid Events', () => {
+  QUnit.module('#onBeforeEditCell', (hooks) => {
+    let gradebook;
+    let eventObject;
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      gradebook.initSubmissionStateMap();
+      gradebook.students = { 1101: { id: '1101', isConcluded: false } };
+      eventObject = {
+        column: { assignmentId: '2301', type: 'assignment' },
+        item: { id: '1101' }
+      };
+      sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({ locked: false });
+    });
+
+    test('returns true to allow editing the cell', () => {
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
+    });
+
+    test('returns false when the student does not exist', () => {
+      delete gradebook.students[1101];
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
+    });
+
+    test('returns false when the student enrollment is concluded', () => {
+      gradebook.students[1101].isConcluded = true;
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
+    });
+
+    test('returns false when the submission is locked', () => {
+      gradebook.submissionStateMap.getSubmissionState
+        .withArgs({ user_id: '1101', assignment_id: '2301' }).returns({ locked: true });
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
+    });
+
+    test('returns true when the submission state is undefined', () => {
+      gradebook.submissionStateMap.getSubmissionState
+        .withArgs({ user_id: '1101', assignment_id: '2301' }).returns(undefined);
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
+    });
+
+    test('returns true when the cell is not in an assignment column', () => {
+      eventObject.column = { type: 'custom_column' };
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
+    });
+  });
+});
+
 QUnit.module('Gradebook#getCustomColumnId');
 
 test('returns a unique key for the custom column', function () {
@@ -4796,6 +4845,14 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
       2301: { id: '2301', grading_type: 'points', name: 'Math Assignment', published: true },
       2302: { id: '2302', grading_type: 'points', name: 'English Assignment', published: false }
     });
+    gradebook.grid = {
+      invalidate () {}
+    };
+    gradebook.gridSupport = {
+      columns: {
+        updateColumnHeaders () {}
+      }
+    };
   });
 
   QUnit.module('#getEnterGradesAsSetting', function () {
@@ -4861,7 +4918,9 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
 
   QUnit.module('#updateEnterGradesAsSetting', function (hooks) {
     hooks.beforeEach(function () {
-      sinon.stub(gradebook, 'saveSettings');
+      sinon.stub(gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
+      sinon.stub(gradebook.grid, 'invalidate');
+      sinon.stub(gradebook.gridSupport.columns, 'updateColumnHeaders');
     });
 
     hooks.afterEach(function () {
@@ -4883,6 +4942,126 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
         equal(gradebook.getEnterGradesAsSetting('2301'), 'percent');
       });
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
+    });
+
+    test('updates the column header for the related assignment column', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+      strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+    });
+
+    test('updates the column header with the assignment column id', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+      const [columnIds] = gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+      deepEqual(columnIds, ['assignment_2301']);
+    });
+
+    test('updates the column header after settings have been saved', function () {
+      gradebook.saveSettings.callsFake((_data, callback) => {
+        strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 0);
+        callback();
+        strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+      });
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+    });
+
+    test('invalidates the grid', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+      strictEqual(gradebook.grid.invalidate.callCount, 1);
+    });
+
+    test('invalidates the grid after updating the column header', function () {
+      gradebook.grid.invalidate.callsFake(() => {
+        strictEqual(gradebook.grid.invalidate.callCount, 1);
+      });
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+    });
+  });
+});
+
+QUnit.module('Gradebook Grading Schemes', (suiteHooks) => {
+  const defaultGradingScheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]];
+  const gradingScheme = {
+    id: '2801',
+    data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]],
+    title: 'Emoji Grades'
+  };
+
+  let gradebook;
+
+  function createInitializedGradebook (options) {
+    gradebook = createGradebook({
+      default_grading_standard: defaultGradingScheme,
+      grading_schemes: [gradingScheme],
+      ...options
+    });
+    gradebook.initialize();
+    gradebook.setAssignments({
+      2301: {
+        grading_standard_id: '2801',
+        grading_type: 'points',
+        id: '2301',
+        name: 'Math Assignment',
+        published: true
+      },
+      2302: {
+        grading_standard_id: null,
+        grading_type: 'points',
+        id: '2302',
+        name: 'English Assignment',
+        published: false
+      }
+    });
+  }
+
+  suiteHooks.beforeEach(() => {
+    sinon.stub(DataLoader, 'loadGradebookData').returns({
+      gotAssignmentGroups: $.Deferred(),
+      gotContextModules: $.Deferred(),
+      gotCustomColumns: $.Deferred(),
+      gotStudentIds: $.Deferred(),
+      gotStudents: $.Deferred(),
+      gotSubmissions: $.Deferred(),
+      gotCustomColumnData: $.Deferred()
+    });
+  });
+
+  suiteHooks.afterEach(() => {
+    DataLoader.loadGradebookData.restore();
+  });
+
+  QUnit.module('#getDefaultGradingScheme', () => {
+    test('returns the default grading scheme when present', () => {
+      createInitializedGradebook();
+      deepEqual(gradebook.getDefaultGradingScheme().data, defaultGradingScheme);
+    });
+
+    test('returns null when the default grading scheme is not present', () => {
+      createInitializedGradebook({ default_grading_standard: undefined });
+      strictEqual(gradebook.getDefaultGradingScheme(), null);
+    });
+  });
+
+  QUnit.module('#getGradingScheme', () => {
+    test('returns the grading scheme matching the given id', () => {
+      createInitializedGradebook();
+      deepEqual(gradebook.getGradingScheme('2801'), gradingScheme);
+    });
+
+    test('returns undefined when no grading scheme exists with the given id', () => {
+      createInitializedGradebook();
+      strictEqual(gradebook.getGradingScheme('2802'), undefined);
+    });
+  });
+
+  QUnit.module('#getAssignmentGradingScheme', () => {
+    test('returns the grading scheme associated with the assignment', () => {
+      createInitializedGradebook();
+      deepEqual(gradebook.getAssignmentGradingScheme('2301'), gradingScheme);
+    });
+
+    test('returns the default grading scheme when the assignment does not use a specific scheme', () => {
+      createInitializedGradebook();
+      deepEqual(gradebook.getAssignmentGradingScheme('2302').data, defaultGradingScheme);
     });
   });
 });

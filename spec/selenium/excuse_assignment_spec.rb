@@ -68,6 +68,7 @@ describe 'Excuse an Assignment' do
 
   it 'Gradebook import accounts for excused assignment', priority: "1", test_id: 223509 do
     skip_if_chrome('fragile upload process')
+    excused_text = @course.feature_enabled?(:new_gradebook) ? 'Excused' : 'EX'
     @course.assignments.create! title: 'Excuse Me', points_possible: 20
     rows = ['Student Name,ID,Section,Excuse Me',
             "Student,#{@student.id},,EX"]
@@ -79,7 +80,7 @@ describe 'Excuse an Assignment' do
     f('#new_gradebook_upload').submit
     run_jobs
     wait_for_ajaximations
-    expect(f('.canvas_1 .new-grade').text).to eq 'EX'
+    expect(f('.canvas_1 .new-grade').text).to eq 'Excused'
 
     submit_form('#gradebook_grid_form')
     driver.switch_to.alert.accept
@@ -87,7 +88,7 @@ describe 'Excuse an Assignment' do
     run_jobs
 
     get "/courses/#{@course.id}/gradebook"
-    expect(f('.canvas_1 .slick-row .slick-cell:first-child').text).to eq 'EX'
+    expect(f('.canvas_1 .slick-row .slick-cell:first-child').text).to eq excused_text
 
     # Test case insensitivity on 'EX'
     assign = @course.assignments.create! title: 'Excuse Me 2', points_possible: 20
@@ -186,13 +187,14 @@ describe 'Excuse an Assignment' do
             wait_for_ajaximations
             score_values << f('#student_and_assignment_grade').attribute('value')
           end
+          expect(score_values).to eq ['15', 'Excused', '15', '15']
         else
           get "/courses/#{@course.id}/gradebook/"
           wait_for_ajaximations
           score_values = ff('.canvas_1 .slick-row .slick-cell:first-child').map(& :text)
+          excused_text = @course.feature_enabled?(:new_gradebook) ? 'Excused' : 'EX'
+          expect(score_values).to eq ['15', excused_text, '15', '15']
         end
-
-        expect(score_values).to eq ['15', 'EX', '15', '15']
       end
 
       it 'excuses assignments on individual basis', priority: "1", test_id: view == 'srgb' ? 209405 : 209384 do

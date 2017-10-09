@@ -19,14 +19,15 @@
 import I18n from 'i18n!gradebook'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import round from 'compiled/util/round'
+import { scoreToGrade } from 'jsx/gradebook/GradingSchemeHelper';
 
 const POINTS = 'points';
 const PERCENT = 'percent';
-const COMPLETION = 'completion';
+const PASS_FAIL = 'pass_fail';
 
-function isCompletion (grade, gradeType) {
+function isPassFail (grade, gradeType) {
   if (gradeType) {
-    return gradeType === COMPLETION;
+    return gradeType === PASS_FAIL;
   }
 
   return grade === 'complete' || grade === 'incomplete';
@@ -40,8 +41,12 @@ function isPercent (grade, gradeType) {
   return /%/g.test(grade);
 }
 
+function isExcused (grade) {
+  return grade === 'EX';
+}
+
 function shouldFormatGradingType (gradingType) {
-  return gradingType === POINTS || gradingType === PERCENT || gradingType === COMPLETION;
+  return gradingType === POINTS || gradingType === PERCENT || gradingType === PASS_FAIL;
 }
 
 function shouldFormatGrade (grade, gradingType) {
@@ -49,7 +54,7 @@ function shouldFormatGrade (grade, gradingType) {
     return shouldFormatGradingType(gradingType);
   }
 
-  return typeof grade === 'number' || isCompletion(grade);
+  return typeof grade === 'number' || isPassFail(grade);
 }
 
 const GradeFormatHelper = {
@@ -62,7 +67,7 @@ const GradeFormatHelper = {
    * @param {object} options - An optional hash of arguments. The following optional arguments are supported:
    *  gradingType {string} - If present will be used to determine whether or not to
    *    format given grade. A value of 'points' or 'percent' will result in the grade
-   *    being formatted. A value of 'completion' will result in internationalization.
+   *    being formatted. A value of 'pass_fail' will result in internationalization.
    *    Any other value will result in the grade not being formatted.
    *  precision {number} - If present grade will be rounded to given precision. Default is two decimals.
    *  defaultValue - If present will be the return value when the grade is undefined, null, or empty string.
@@ -77,10 +82,14 @@ const GradeFormatHelper = {
       return ('defaultValue' in options) ? options.defaultValue : grade;
     }
 
+    if (isExcused(grade)) {
+      return I18n.t('Excused');
+    }
+
     const parsedGrade = GradeFormatHelper.parseGrade(grade, options);
 
     if (shouldFormatGrade(parsedGrade, options.gradingType)) {
-      if (isCompletion(parsedGrade, options.gradingType)) {
+      if (isPassFail(parsedGrade, options.gradingType)) {
         formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete');
       } else {
         const roundedGrade = round(parsedGrade, options.precision || 2);
@@ -131,6 +140,55 @@ const GradeFormatHelper = {
     }
 
     return parsedGrade;
+  },
+
+  isExcused,
+
+  formatSubmissionGrade (submission, options = { version: 'final' }) {
+    if (submission.excused) {
+      return I18n.t('Excused');
+    }
+
+    const score = options.version === 'entered' ? submission.enteredScore : submission.score;
+
+    if (score == null) {
+      return options.formatType === 'passFail' ? I18n.t('ungraded') : '–';
+    }
+
+    if (options.formatType === 'percent') {
+      if (options.pointsPossible) {
+        const percent = score / options.pointsPossible * 100;
+        return I18n.n(round(percent, 2), { percentage: true, precision: 2, strip_insignificant_zeros: true });
+      }
+      return I18n.n(round(score, 2), { percentage: true, precision: 2, strip_insignificant_zeros: true });
+    }
+
+    if (options.formatType === 'gradingScheme') {
+      if (options.pointsPossible) {
+        const percent = score / options.pointsPossible * 100;
+        return scoreToGrade(percent, options.gradingScheme);
+      } else if (submission.enteredGrade != null && options.version === 'entered') {
+        return submission.enteredGrade;
+      } else if (submission.grade != null) {
+        return submission.grade;
+      } else {
+        return scoreToGrade(score, options.gradingScheme);
+      }
+    }
+
+    if (options.formatType === 'passFail') {
+      let passed = false;
+      if (options.pointsPossible) {
+        passed = score > 0;
+      } else if (options.version === 'entered') {
+        passed = submission.enteredGrade === 'complete';
+      } else {
+        passed = submission.grade === 'complete';
+      }
+      return passed ? I18n.t('complete') : I18n.t('incomplete');
+    }
+
+    return I18n.n(score, { precision: 2, strip_insignificant_zeros: true });
   }
 };
 

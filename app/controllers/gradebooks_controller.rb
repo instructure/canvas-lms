@@ -713,6 +713,7 @@ class GradebooksController < ApplicationController
       GRADEBOOK_OPTIONS: {
         colors: gradebook_settings.fetch(:colors, {}),
         graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
+        grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
         gradezilla: true,
         new_gradebook_development_enabled: new_gradebook_development_enabled?,
         late_policy: @context.late_policy.as_json(include_root: false)

@@ -127,7 +127,7 @@ describe 'Late Policies:' do
     end
 
     it 'missing/late deductions dont affect paper assignments', test_id: 3354104, priority: '1' do
-      expect(Gradezilla::Cells.get_grade(@student, @a4)).to eq "-"
+      expect(Gradezilla::Cells.get_grade(@student, @a4)).to eq "–"
     end
 
     it 'missing policy adjusts pass/fail assignment', test_id: 3354099, priority: '1' do
@@ -135,7 +135,7 @@ describe 'Late Policies:' do
     end
 
     it 'late & missing policy wont affect no-submission assignment', test_id: 3354106, priority: '2' do
-      expect(Gradezilla::Cells.get_grade(@student, @a6)).to eq "-"
+      expect(Gradezilla::Cells.get_grade(@student, @a6)).to eq "–"
     end
 
     it 'late penalty re-applied if submission graded same as its effective grade', test_id: 3354105, priority: '2' do

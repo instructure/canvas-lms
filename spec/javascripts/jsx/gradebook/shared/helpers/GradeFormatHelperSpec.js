@@ -22,7 +22,9 @@ import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup () {
+    this.translateString = I18n.t;
     this.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)));
+    this.stub(I18n, 't').callsFake(this.translateString);
   }
 });
 
@@ -38,16 +40,19 @@ test('uses I18n#n to format numerical decimal grades', function () {
   equal(I18n.n.callCount, 1);
 });
 
-test('uses I18n#t to format completion based grades: complete', function () {
-  this.stub(I18n, 't').withArgs('complete').returns('* complete');
+test('uses I18n#t to format pass_fail based grades: complete', function () {
+  I18n.t.withArgs('complete').returns('* complete');
   equal(GradeFormatHelper.formatGrade('complete'), '* complete');
-  equal(I18n.t.callCount, 1);
 });
 
-test('uses I18n#t to format completion based grades: incomplete', function () {
-  this.stub(I18n, 't').withArgs('incomplete').returns('* incomplete');
+test('uses I18n#t to format pass_fail based grades: incomplete', function () {
+  I18n.t.withArgs('incomplete').returns('* incomplete');
   equal(GradeFormatHelper.formatGrade('incomplete'), '* incomplete');
-  equal(I18n.t.callCount, 1);
+});
+
+test('returns "Excused" when the grade is "EX"', function () {
+  // this is for backwards compatibility for users who depend on this behavior
+  equal('Excused', GradeFormatHelper.formatGrade('EX'));
 });
 
 test('parses a stringified integer percentage grade when it is a valid number', function () {
@@ -262,4 +267,338 @@ test('parses stringified integer percentages without delocalizing', function () 
 
 test('parses stringified decimal percentages without delocalizing', function () {
   strictEqual(GradeFormatHelper.parseGrade('123.456%', { delocalize: false }), 123.456);
+});
+
+QUnit.module('GradeFormatHelper', (suiteHooks) => {
+  const translateString = I18n.t;
+
+  suiteHooks.beforeEach(() => {
+    sinon.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)));
+    sinon.stub(I18n, 't').callsFake(translateString);
+  });
+
+  suiteHooks.afterEach(() => {
+    I18n.t.restore();
+    numberHelper.validate.restore();
+  });
+
+  QUnit.module('.isExcused', () => {
+    test('returns true when given "EX"', () => {
+      strictEqual(GradeFormatHelper.isExcused('EX'), true);
+    });
+
+    test('returns false when given point values', () => {
+      strictEqual(GradeFormatHelper.isExcused('7'), false);
+    });
+
+    test('returns false when given percentage values', () => {
+      strictEqual(GradeFormatHelper.isExcused('7%'), false);
+    });
+
+    test('returns false when given letter grades', () => {
+      strictEqual(GradeFormatHelper.isExcused('A'), false);
+    });
+  });
+
+  QUnit.module('.formatSubmissionGrade', (hooks) => {
+    let options;
+    let submission;
+
+    hooks.beforeEach(() => {
+      options = {
+        pointsPossible: 10,
+        version: 'final'
+      };
+      submission = {
+        enteredGrade: '7.8',
+        enteredScore: 7.8,
+        excused: false,
+        grade: '6.8',
+        gradingType: 'points',
+        score: 6.8
+      };
+    });
+
+    test('returns "Excused" when the submission is excused', () => {
+      submission.excused = true;
+      equal(GradeFormatHelper.formatSubmissionGrade(submission), 'Excused');
+    });
+
+    test('translates "Excused"', () => {
+      submission.excused = true;
+      I18n.t.withArgs('Excused').returns('EXCUSED');
+      equal(GradeFormatHelper.formatSubmissionGrade(submission), 'EXCUSED');
+    });
+
+    test('formats as "points" by default', () => {
+      submission.score = 7.8;
+      equal(GradeFormatHelper.formatSubmissionGrade(submission), '7.8');
+    });
+
+    test('uses the "final" score by default', () => {
+      equal(GradeFormatHelper.formatSubmissionGrade(submission), '6.8');
+    });
+
+    QUnit.module('when formatting as "points"', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        options.formatType = 'points';
+      });
+
+      test('returns the score as a string value', () => {
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '6.8');
+      });
+
+      test('uses the "final" score when explicitly specified', () => {
+        options.version = 'final';
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '6.8');
+      });
+
+      test('optionally uses the "entered" score', () => {
+        options.version = 'entered';
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '7.8');
+      });
+
+      test('uses the "final" score when given an unknown version', () => {
+        options.version = 'unknown';
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '6.8');
+      });
+
+      test('rounds scores to two decimal places', () => {
+        submission.score = 7.321;
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '7.32');
+      });
+
+      test('rounds scores to the nearest', () => {
+        submission.score = 7.325;
+        strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '7.33');
+      });
+
+      test('returns "–" (emdash) when the score is null', () => {
+        submission.score = null;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
+      });
+
+      test('returns "–" (emdash) for the "entered" version when the entered score is null', () => {
+        submission.enteredScore = null;
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
+      });
+    });
+
+    QUnit.module('when formatting as "percentage"', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        options.formatType = 'percent';
+      });
+
+      test('divides the score from the assignment points possible', () => {
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '68%');
+      });
+
+      test('uses the "final" score when explicitly specified', () => {
+        options.version = 'final';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '68%');
+      });
+
+      test('optionally uses the "entered" score', () => {
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '78%');
+      });
+
+      test('uses the "final" score when given an unknown version', () => {
+        options.version = 'unknown';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '68%');
+      });
+
+      test('rounds percentages to two decimal places', () => {
+        submission.score = 7.8321;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '78.32%');
+      });
+
+      test('rounds percentages to the nearest two places', () => {
+        submission.score = 7.8835; // example specifically requires correct rounding
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '78.84%');
+      });
+
+      test('returns "–" (emdash) when the score is null', () => {
+        submission.score = null;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
+      });
+
+      test('returns "–" (emdash) for the "entered" version when the entered score is null', () => {
+        submission.enteredScore = null;
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
+      });
+
+      test('uses the score as the percentage when the assignment has no points possible', () => {
+        options.pointsPossible = 0;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '6.8%');
+      });
+
+      test('optionally uses the "entered" score when using the score as the percentage', () => {
+        options.pointsPossible = null;
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '7.8%');
+      });
+
+      test('rounds the score percentage to the nearest two places', () => {
+        options.pointsPossible = 0;
+        submission.score = 7.835; // example specifically requires correct rounding
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '7.84%');
+      });
+    });
+
+    QUnit.module('when formatting as "gradingScheme"', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        options.formatType = 'gradingScheme';
+        options.gradingScheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0.50]];
+      });
+
+      test('returns the matching scheme grade for the "final" score', () => {
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'D');
+      });
+
+      test('uses the "final" score when explicitly specified', () => {
+        options.version = 'final';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'D');
+      });
+
+      test('optionally uses the "entered" score', () => {
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'C');
+      });
+
+      test('uses the "final" score when given an unknown version', () => {
+        options.version = 'unknown';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'D');
+      });
+
+      test('returns "–" (emdash) when the score is null', () => {
+        submission.score = null;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
+      });
+
+      test('returns "–" (emdash) for the "entered" version when the entered score is null', () => {
+        submission.enteredScore = null;
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
+      });
+    });
+
+    QUnit.module('when formatting as "gradingScheme" for an assignment with no points possible', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        options.formatType = 'gradingScheme';
+        options.gradingScheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0.50]];
+        options.pointsPossible = 0;
+      });
+
+      test('returns the "final" grade when the submission has been graded', () => {
+        submission.enteredGrade = 'B';
+        submission.enteredScore = 7.8;
+        submission.grade = 'C';
+        submission.score = 6.8;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'C');
+      });
+
+      test('optionally uses the "entered" grade', () => {
+        options.version = 'entered';
+        submission.enteredGrade = 'B';
+        submission.enteredScore = 7.8;
+        submission.grade = 'C';
+        submission.score = 6.8;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'B');
+      });
+
+      test('returns a matching grading scheme grade when the submission has not explicitly graded', () => {
+        submission.enteredGrade = null;
+        submission.enteredScore = 78;
+        submission.grade = null;
+        submission.score = 68;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'D');
+      });
+
+      test('optionally uses the "entered" score when resorting to a matching grading scheme grade', () => {
+        options.version = 'entered';
+        submission.enteredGrade = null;
+        submission.enteredScore = 78;
+        submission.grade = null;
+        submission.score = 68;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'C');
+      });
+
+      test('typically results in an arbitrarily bad grade when resorting to a matching grading scheme grade', () => {
+        // the score might have been a small point value, which simply converts
+        // to a small percentage when comparing to the grading scheme
+        submission.enteredGrade = null;
+        submission.enteredScore = 7.8; // 7.8%
+        submission.grade = null;
+        submission.score = 6.8; // 6.8%
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'F');
+      });
+    });
+
+    QUnit.module('when formatting as "passFail"', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        options.formatType = 'passFail';
+      });
+
+      test('returns "complete" when the "final" score is not zero', () => {
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'complete');
+      });
+
+      test('returns "incomplete" when the "final" score is zero', () => {
+        submission.score = 0;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+      });
+
+      test('uses the "final" score when explicitly specified', () => {
+        options.version = 'final';
+        submission.score = 0;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+      });
+
+      test('optionally uses the "entered" score', () => {
+        options.version = 'entered';
+        submission.score = 0; // "final" score is made "incomplete"
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'complete');
+      });
+
+      test('uses the "final" score when given an unknown version', () => {
+        options.version = 'unknown';
+        submission.score = 0; // "final" score is made "incomplete"
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+      });
+
+      test('returns "ungraded" when the score is null', () => {
+        submission.score = null;
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'ungraded');
+      });
+
+      test('returns "ungraded" for the "entered" version when the entered score is null', () => {
+        submission.enteredScore = null;
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'ungraded');
+      });
+    });
+
+    QUnit.module('when formatting as "passFail" for an assignment with no points possible', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        options.formatType = 'passFail';
+        options.pointsPossible = 0;
+        submission.enteredGrade = 'complete';
+        submission.enteredScore = 10;
+        submission.grade = 'incomplete';
+        submission.score = 0;
+      });
+
+      test('returns the "final" grade when the submission has been graded', () => {
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'incomplete');
+      });
+
+      test('optionally uses the "entered" grade', () => {
+        options.version = 'entered';
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'complete');
+      });
+    });
+  });
 });

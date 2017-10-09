@@ -36,7 +36,7 @@ describe "Gradezilla view menu" do
     it "defaults arrange by to assignment group in the grid", priority: "1", test_id: 220028 do
       expect(Gradezilla::Cells.get_grade(@student_1, @first_assignment)).to eq @assignment_1_points
       expect(Gradezilla::Cells.get_grade(@student_1, @second_assignment)).to eq @assignment_2_points
-      expect(Gradezilla::Cells.get_grade(@student_1, @third_assignment)).to eq "-"
+      expect(Gradezilla::Cells.get_grade(@student_1, @third_assignment)).to eq "–"
     end
 
     it "shows default arrange by in the menu" do
@@ -51,7 +51,7 @@ describe "Gradezilla view menu" do
 
       expect(Gradezilla::Cells.get_grade(@student_1, @first_assignment)).to eq @assignment_1_points
       expect(Gradezilla::Cells.get_grade(@student_1, @second_assignment)).to eq @assignment_2_points
-      expect(Gradezilla::Cells.get_grade(@student_1, @third_assignment)).to eq "-"
+      expect(Gradezilla::Cells.get_grade(@student_1, @third_assignment)).to eq "–"
     end
   end
 

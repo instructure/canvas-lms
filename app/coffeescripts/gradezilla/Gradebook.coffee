@@ -206,8 +206,17 @@ define [
     }
 
   getInitialCourseContent = (options) ->
+    defaultGradingScheme = null
+    if options.default_grading_standard
+      defaultGradingScheme = {
+        title: I18n.t('Default Grading Scheme')
+        data: options.default_grading_standard
+      }
+
     {
       contextModules: []
+      defaultGradingScheme
+      gradingSchemes: options.grading_schemes.map(ConvertCase.camelize)
       gradingPeriodAssignments: {}
       assignmentStudentVisibility: {}
       latePolicy: ConvertCase.camelize(options.late_policy) if options.late_policy
@@ -1733,9 +1742,14 @@ define [
 
     # The target cell will enter editing mode
     onBeforeEditCell: (event, obj) =>
-      { row, cell } = obj
-      $cell = @grid.getCellNode(row, cell)
-      return false if $($cell).hasClass("cannot_edit") || $($cell).find(".gradebook-cell").hasClass("cannot_edit")
+      return true if obj.column.type != 'assignment'
+      return false unless student = @student(obj.item.id)
+      return false if student.isConcluded
+      submissionState = @submissionStateMap.getSubmissionState({
+        user_id: obj.item.id,
+        assignment_id: obj.column.assignmentId
+      })
+      not submissionState?.locked
 
     # The current cell editor has been changed and is valid
     onCellChange: (event, obj) =>
@@ -2519,7 +2533,20 @@ define [
       @setEnterGradesAsSetting(assignmentId, value)
       @saveSettings({}, =>
         @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
+        @grid.invalidate()
       )
+
+    ## Course Settings Access Methods
+
+    getDefaultGradingScheme: ->
+      @courseContent.defaultGradingScheme
+
+    getGradingScheme: (gradingSchemeId) ->
+      @courseContent.gradingSchemes.find((scheme) => scheme.id == gradingSchemeId)
+
+    getAssignmentGradingScheme: (assignmentId) ->
+      assignment = @getAssignment(assignmentId)
+      @getGradingScheme(assignment.grading_standard_id) || @getDefaultGradingScheme()
 
     ## Gradebook Content Access Methods
 
