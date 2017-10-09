@@ -29,6 +29,19 @@ describe CanvasCassandra do
     end
   end
 
+  describe "#tables" do
+    before do
+      allow(conn).to receive(:use_cql3?).and_return(true)
+      allow(db).to receive(:keyspace).and_return('page_views')
+      allow(conn).to receive(:connection).and_return(double(describe_version: '19'))
+    end
+
+    it 'queries for all column family names in the keyspace' do
+      expect(conn).to receive(:execute).with("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", 'page_views').and_return([])
+      db.tables
+    end
+  end
+
   describe "#execute" do
     # I'm using %CONSISTENCY% as a query parameter here to make sure that the
     # execute code doesn't accidentally replace the string in those params
@@ -255,6 +268,13 @@ describe CanvasCassandra do
 
       expect(db.db).to receive(:keyspace) { keyspace_name }
       expect(db.name).to eq keyspace_name
+    end
+
+    it 'uses utf-8 encoding' do
+      keyspace_name = 'keyspace'
+
+      expect(db.db).to receive(:keyspace) { keyspace_name }
+      expect(db.keyspace.encoding.name).to eq 'UTF-8'
     end
   end
 
