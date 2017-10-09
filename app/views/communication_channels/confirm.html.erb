@@ -177,13 +177,17 @@ Which is you?", :count => @merge_opportunities.length %>
       <% end %>
       <div class="control-group">
         <div class="controls">
-          <% if require_terms? %>
-            <label for="user_terms_of_use" class="checkbox">
-              <%= check_box :user, :terms_of_use %>
-              <%= agree_to_terms %>
-            </label>
-          <% else %>
-            <a href="<%= privacy_policy_url %>" target="_blank"><%= t "#site.view_privacy_policy", "View Privacy Policy" %></a>
+          <% if @root_account.require_acceptance_of_terms?(@user) %>
+            <% TermsOfService.ensure_terms_for_account(@root_account) %>
+            <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @root_account.terms_of_service.terms_of_service_content&.content) %>
+            <% js_bundle :terms_of_service_modal %>
+            <div class="terms-of-service__register">
+              <label for="user_terms_of_use" class="checkbox">
+                <%= check_box :user, :terms_of_use %>
+                <%= t("I agree to the")%>
+              </label>
+              <a href="#" class="terms_of_service_link terms-of-service__link"></a>
+            </div>
           <% end %>
         </div>
       </div>

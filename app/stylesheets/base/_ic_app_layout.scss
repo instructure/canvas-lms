@@ -114,6 +114,12 @@ body:not(.course-menu-expanded) {
 }
 
 .ic-app-footer {
+  .terms-of-service__link {
+    button {
+      margin-top: -2px !important;
+      color: var(--ic-brand-font-color-dark-lightened-15) !important;
+    }
+  }
   box-sizing: border-box;
   padding: $ic-sp 0;
   margin: 0 $ic-sp*2;
@@ -127,7 +133,6 @@ body:not(.course-menu-expanded) {
     padding: $ic-sp $ic-sp*2;
   }
 }
-
 .ic-app-footer__links {
   flex: 1;
   display: flex;

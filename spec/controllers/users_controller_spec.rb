@@ -378,21 +378,22 @@ describe UsersController do
       end
 
       it "should validate acceptance of the terms" do
+        Account.default.create_terms_of_service!(terms_type: "default", passive: false)
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json["errors"]["user"]["terms_of_use"]).to be_present
       end
 
-      it "should not validate acceptance of the terms if not required by system" do
-        Setting.set('terms_required', 'false')
+      it "should not validate acceptance of the terms if terms are passive" do
+        Account.default.create_terms_of_service!(terms_type: "default")
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}
         expect(response).to be_success
       end
 
       it "should not validate acceptance of the terms if not required by account" do
         default_account = Account.default
-        default_account.settings[:account_terms_required] = false
+        Account.default.create_terms_of_service!(terms_type: "default")
         default_account.save!
 
         post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}

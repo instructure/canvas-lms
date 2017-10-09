@@ -324,20 +324,15 @@ class Account < ActiveRecord::Base
   end
 
   def terms_required?
-    Setting.get('terms_required', 'true') == 'true' && root_account.account_terms_required?
+    terms = TermsOfService.ensure_terms_for_account(root_account)
+    !(terms.terms_type == 'no_terms' || terms.passive)
   end
 
   def require_acceptance_of_terms?(user)
-    soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
-
     return false if !terms_required?
-    return true if user.nil? || user.new_record?
-    terms_changed_at = settings[:terms_changed_at]
+    return true if (user.nil? || user.new_record?)
+    terms_changed_at = root_account.terms_of_service.terms_of_service_content&.terms_updated_at || settings[:terms_changed_at]
     last_accepted = user.preferences[:accepted_terms]
-
-    # make sure existing users are grandfathered in
-    return false if terms_changed_at.nil? && user.registered? && user.created_at < soc2_start_date
-
     return false if last_accepted && (terms_changed_at.nil? || last_accepted > terms_changed_at)
     true
   end

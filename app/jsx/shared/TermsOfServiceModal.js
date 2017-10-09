@@ -57,7 +57,7 @@ export default class TermsOfServiceModal extends React.Component {
 
   render() {
     return (
-      <div id="terms_of_service_modal">
+      <span id="terms_of_service_modal">
        <Link ref={(c) => { this.link = c; }} onClick={this.handleLinkClick}>
          {this.props.preview ? I18n.t('Preview') : I18n.t('Terms Of Service')}
        </Link>
@@ -77,7 +77,7 @@ export default class TermsOfServiceModal extends React.Component {
            <div dangerouslySetInnerHTML={{__html: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT}} />
          </ModalBody>
        </Modal>
-      </div>
+      </span>
     )
   }
 }
