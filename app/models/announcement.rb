@@ -102,7 +102,7 @@ class Announcement < DiscussionTopic
     can :create
 
     given { |user, session| self.context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } #admins.include?(user) }
-    can :update and can :delete and can :reply and can :create and can :read and can :attach
+    can :update and can :read_as_admin and can :delete and can :reply and can :create and can :read and can :attach
 
     given do |user, session|
       self.allow_rating && (!self.only_graders_can_rate ||
