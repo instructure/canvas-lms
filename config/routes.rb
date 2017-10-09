@@ -296,6 +296,7 @@ CanvasRails::Application.routes.draw do
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do
       get :resource_selection
+      post :resource_selection
       get :homework_submission
       get :finished
       collection do

@@ -97,7 +97,14 @@ import Links from 'tinymce_plugins/instructure_links/links'
                 htmlEscape(I18n.t('The following content is partner provided')) +
               '</div>' +
             '</div>' +
-            "<iframe id='external_tool_button_frame' style='width: 800px; height: " + frameHeight +"px; border: 0;' src='/images/ajax-loader-medium-444.gif' borderstyle='0' tabindex='0'/>" +
+            '<form id="external_tool_button_form" method="POST" target="external_tool_launch">' +
+              '<input type="hidden" name="editor" value="1" />' +
+              '<input id="selection_input" type="hidden" name="selection" />' +
+              '<input id="editor_contents_input" type="hidden" name="editor_contents" />' +
+            '</form>' +
+            "<iframe name='external_tool_launch' src='/images/ajax-loader-medium-444.gif' id='external_tool_button_frame' style='width: 800px; height: " +
+            frameHeight +
+            "px; border: 0;' borderstyle='0' tabindex='0'/>" +
             '<div class="after_external_content_info_alert screenreader-only" tabindex="0">' +
               '<div class="ic-flash-info">' +
                 '<div class="ic-flash__icon" aria-hidden="true">' +
@@ -174,31 +181,26 @@ import Links from 'tinymce_plugins/instructure_links/links'
         $dialog.off("dialogbeforeclose", ExternalToolsPlugin.dialogCancelHandler);
         $dialog.dialog('close')
       });
+
       $dialog.dialog({
         title: button.name,
         width: (button.width || 800),
         height: (button.height || frameHeight || 400),
-        close: function(){
-          $dialog.find("iframe").attr('src', '/images/ajax-loader-medium-444.gif');
-          $(window).off('beforeunload', ExternalToolsPlugin.beforeUnloadHandler);
-          $(window).unbind("externalContentReady");
-        }
+        close: () => ExternalToolsHelper.contentItemDialogClose($dialog, ExternalToolsPlugin),
+        open: () => ExternalToolsHelper.contentItemDialogOpen(
+          button,
+          ed,
+          ENV.context_asset_string,
+          $('#external_tool_button_form')
+        )
       });
+
       $(window).on('beforeunload', ExternalToolsPlugin.beforeUnloadHandler);
       $dialog.on("dialogbeforeclose", ExternalToolsPlugin.dialogCancelHandler);
       $dialog.dialog('close').dialog('open');
       $dialog.triggerHandler('dialogresize')
       $dialog.data('editor', ed);
-      var url = $.replaceTags($("#context_external_tool_resource_selection_url").attr('href'), 'id', button.id);
-      if (url === null || typeof url === 'undefined') {
-        // if we don't have a url on the page, build one using the current context.
-        // url should look like: /courses/2/external_tools/15/resoruce_selection?editor=1
-        var asset = ENV.context_asset_string.split('_');
-        url = '/' + asset[0] + 's/' + asset[1] + '/external_tools/' + button.id + '/resource_selection?editor=1';
-      }
-      var selection = ed.selection.getContent() || "";
-      url += (url.indexOf('?') > -1 ? '&' : '?') + "selection=" + encodeURIComponent(selection)
-      $dialog.find("iframe").attr('src', url);
+
       return $dialog;
     },
   }

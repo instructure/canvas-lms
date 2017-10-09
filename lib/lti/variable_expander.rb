@@ -68,6 +68,8 @@ module Lti
     MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch&.instance_of?(Lti::Launch) }
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
+    EDITOR_CONTENTS_GAURD = -> { @editor_contents.present? }
+    EDITOR_SELECTION_GAURD = -> { @editor_contents.present? }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -123,6 +125,29 @@ module Lti
     register_expansion 'Context.title', [],
                        -> { @context.name },
                        default_name: 'context_title'
+
+    # The contents of the text editor associated with the content item launch.
+    # @launch_parameter com_instructure_editor_contents
+    # @example
+    #   ```
+    #   "This text was in the editor"
+    #   ```
+    register_expansion 'com.instructure.Editor.contents', [],
+                      -> { @editor_contents},
+                      EDITOR_CONTENTS_GAURD,
+                      default_name: 'com_instructure_editor_contents'
+
+    # The contents the user has selected in the text editor associated
+    # with the content item launch.
+    # @launch_parameter com_instructure_editor_selection
+    # @example
+    #   ```
+    #   "this text was selected by the user"
+    #   ```
+    register_expansion 'com.instructure.Editor.selection', [],
+                      -> { @editor_selection },
+                      EDITOR_SELECTION_GAURD,
+                      default_name: 'com_instructure_editor_selection'
 
     # A token that can be used for frontend communication between an LTI tool
     # and Canvas via the Window.postMessage API

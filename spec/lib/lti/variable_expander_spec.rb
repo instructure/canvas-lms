@@ -79,7 +79,20 @@ module Lti
                                 submission: submission,
                                 link_id: resource_link_id)
     end
-    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, originality_report: originality_report) }
+    let(:editor_contents) { '<p>This is the contents of the editor</p>' }
+    let(:editor_selection) { 'is the contents' }
+    let(:variable_expander) do
+      VariableExpander.new(
+        root_account,
+        account,
+        controller,
+        current_user: user,
+        tool: tool,
+        originality_report: originality_report,
+        editor_contents: editor_contents,
+        editor_selection: editor_selection
+      )
+    end
 
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
@@ -333,6 +346,18 @@ module Lti
         exp_hash = {test: '$com.instructure.Assignment.lti.id'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq lti_assignment_id
+      end
+
+      it 'has substitution for com.instructure.Editor.contents' do
+        exp_hash = {test: '$com.instructure.Editor.contents'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq editor_contents
+      end
+
+      it 'has substitution for com.instructure.Editor.selection' do
+        exp_hash = {test: '$com.instructure.Editor.selection'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq editor_selection
       end
 
       it 'has a substitution for Context.title' do
