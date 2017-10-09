@@ -8769,8 +8769,8 @@ watchpack@^1.4.0:
     graceful-fs "^4.1.2"
 
 wcag-element-contrast@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/wcag-element-contrast/-/wcag-element-contrast-1.0.1.tgz#5d0570d771d4b374a967915e7f69be2daf7485ff"
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/wcag-element-contrast/-/wcag-element-contrast-1.0.2.tgz#5a90cb7cdc252979cf3e2bd27161e1bf9ad4c2f6"
 
 webpack-cleanup-plugin@^0.5.1:
   version "0.5.1"
