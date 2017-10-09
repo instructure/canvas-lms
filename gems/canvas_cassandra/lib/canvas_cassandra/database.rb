@@ -183,11 +183,11 @@ module CanvasCassandra
 
     def tables
       if @db.connection.describe_version >= '20.1.0'
-        @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", @db.keyspace).map do |row|
+        @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row|
           row['table_name']
         end
       elsif @db.use_cql3?
-        @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", @db.keyspace).map do |row|
+        @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", keyspace).map do |row|
           row['columnfamily_name']
         end
       else
@@ -210,7 +210,7 @@ module CanvasCassandra
     end
 
     def keyspace
-      db.keyspace
+      db.keyspace.to_s.dup.force_encoding('UTF-8')
     end
     alias :name :keyspace
 
