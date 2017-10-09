@@ -174,7 +174,7 @@ class Assignment < ActiveRecord::Base
     # override later.  Just helps to avoid duplicate positions.
     result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
     result.title =
-      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
+      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
 
     if self.wiki_page && opts_with_default[:duplicate_wiki_page]
       result.wiki_page = self.wiki_page.duplicate({

@@ -72,6 +72,66 @@ describe "Modules API", type: :request do
       course_with_teacher(:course => @course, :active_all => true)
     end
 
+    describe "duplicating" do
+      it "can duplicate if no quiz" do
+        @course.account.enable_feature!(:duplicate_modules)
+        course_module = @course.context_modules.create!(:name => "empty module", :workflow_state => "published")
+        assignment = @course.assignments.create!(
+          :name => "some assignment to duplicate",
+          :workflow_state => "published"
+        )
+        course_module.add_item(:id => assignment.id, :type => 'assignment')
+        course_module.add_item(:type => 'context_module_sub_header', :title => 'some header')
+        course_module.save!
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{course_module.id}/duplicate",
+                 { :controller => "context_modules_api", :action => "duplicate", :format => "json",
+                   :course_id => @course.id.to_s, :module_id => course_module.id.to_s },
+                 {}, {},
+                 {:expected_status => 200})
+        expect(json['context_module']['name']).to eq('empty module Copy')
+        expect(json['context_module']['workflow_state']).to eq('unpublished')
+        expect(json['context_module']['content_tags'].length).to eq(2)
+        content_tags = json['context_module']['content_tags']
+        expect(content_tags[0]['content_tag']['title']).to eq('some assignment to duplicate Copy')
+        expect(content_tags[0]['content_tag']['content_type']).to eq('Assignment')
+        expect(content_tags[0]['content_tag']['workflow_state']).to eq('unpublished')
+        expect(content_tags[1]['content_tag']['title']).to eq('some header')
+        expect(content_tags[1]['content_tag']['content_type']).to eq('ContextModuleSubHeader')
+      end
+
+      it "cannot duplicate module with quiz" do
+        @course.account.enable_feature!(:duplicate_modules)
+        course_module = @course.context_modules.create!(:name => "empty module", :workflow_state => "published")
+        # To be rigorous, make a quiz and add it as an *assignment*
+        quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+        quiz.save!
+        course_module.add_item(:id => quiz.assignment_id, :type => 'assignment')
+        course_module.save!
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{course_module.id}/duplicate",
+          { :controller => "context_modules_api", :action => "duplicate", :format => "json",
+            :course_id => @course.id.to_s, :module_id => course_module.id.to_s }, {}, {},
+          { :expected_status => 400 })
+      end
+
+      it "cannot duplicate nonexistent module" do
+        @course.account.enable_feature!(:duplicate_modules)
+        bad_module_id = ContextModule.maximum(:id) + 1
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{bad_module_id}/duplicate",
+          { :controller => "context_modules_api", :action => "duplicate", :format => "json",
+            :course_id => @course.id.to_s, :module_id => bad_module_id.to_s }, {}, {},
+          { :expected_status => 404 })
+      end
+
+      it "cannot duplicate if feature disabled" do
+        @course.account.disable_feature!(:duplicate_modules)
+        course_module = @course.context_modules.create!(:name => "empty module", :workflow_state => "published")
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{course_module.id}/duplicate",
+          { :controller => "context_modules_api", :action => "duplicate", :format => "json",
+            :course_id => @course.id.to_s, :module_id => course_module.id.to_s }, {}, {},
+          { :expected_status => 400 })
+      end
+    end
+
     describe "index" do
       it "should list published and unpublished modules" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
@@ -701,6 +761,16 @@ describe "Modules API", type: :request do
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module2.id}")
       expect(json['state']).to eq 'locked'
+    end
+
+    it "cannot duplicate" do
+      @course.account.enable_feature!(:duplicate_modules)
+      course_module = @course.context_modules.create!(:name => "empty module")
+      api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{course_module.id}/duplicate",
+               { :controller => "context_modules_api", :action => "duplicate", :format => "json",
+                 :course_id => @course.id.to_s, :module_id => course_module.id.to_s },
+               {}, {},
+               {:expected_status => 401})
     end
 
     it "should show module progress" do

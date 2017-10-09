@@ -415,6 +415,36 @@ class ContextModulesApiController < ApplicationController
     end
   end
 
+  def duplicate
+    if authorized_action(@context, @current_user, :manage_content)
+      old_module = @context.modules_visible_to(@current_user).find(params[:module_id])
+      if !@context.root_account.feature_enabled?(:duplicate_modules)
+        return render json: { error: 'duplicating objects not enabled' }, status: :bad_request
+      end
+      return render json: { error: 'unable to find module to duplicate' }, status: :bad_request unless old_module
+      return render json: { error: 'cannot duplicate this module' }, status: :bad_request unless old_module.can_be_duplicated?
+
+      new_module = old_module.duplicate
+      new_module.save!
+      new_module.insert_at(old_module.position + 1)
+      if new_module
+        result_json = new_module.as_json(include: :content_tags, methods: :workflow_state)
+        attachment_tags = new_module.content_tags.select do |content_tag|
+          content_tag.content_type == 'Attachment'
+        end
+        result_json['ENV_UPDATE'] = attachment_tags.map do |attachment_tag|
+          { :id => attachment_tag.id.to_s,
+            :content_id => attachment_tag.content_id,
+            :content_details => content_details(attachment_tag, @current_user, :for_admin => true)
+          }
+        end
+        render :json => result_json
+      else
+        render :json => { error: 'cannot save new module' }, status: :bad_request
+      end
+    end
+  end
+
   # @note API Update multiple modules
   #
   # Update multiple modules in an account.

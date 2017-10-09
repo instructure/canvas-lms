@@ -155,6 +155,13 @@
               class="delete_module_link icon-trash"
               title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
           </li>
+          <li role="presentation" class="duplicate_module_menu_item">
+            <a
+              href="/api/v1<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/duplicate"
+              class="duplicate_module_link icon-copy-course"
+              aria-label="<%= t('Duplicate Module %{module_name}') %>"
+              title="<%= t(%{Delete this module}) %>"><%= t(%{Duplicate}) %></a>
+          </li>
           <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
         </ul>
       <% end %>

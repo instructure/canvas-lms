@@ -244,6 +244,15 @@ END
       root_opt_in: true,
       beta: true
     },
+    'duplicate_modules' =>
+    {
+      display_name: -> { I18n.t('Duplicate Modules') },
+      description: -> { I18n.t("Allows the duplicating of modules in Canvas") },
+      applies_to: 'Account',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
     'allow_opt_out_of_inbox' =>
     {
       display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow Users to Opt-out of the Inbox") },

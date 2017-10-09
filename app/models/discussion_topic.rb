@@ -331,7 +331,8 @@ class DiscussionTopic < ActiveRecord::Base
       :user => nil
     }
     opts_with_default = default_opts.merge(opts)
-    copy_title = opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
+    copy_title =
+      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
     result = self.duplicate_base_model(copy_title, opts_with_default)
 
     if self.assignment && opts_with_default[:duplicate_assignment]

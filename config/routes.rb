@@ -1556,6 +1556,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/modules", action: :index, as: 'course_context_modules'
       get "courses/:course_id/modules/:id", action: :show, as: 'course_context_module'
       put "courses/:course_id/modules", action: :batch_update
+      post "courses/:course_id/modules/:module_id/duplicate", action: :duplicate
       post "courses/:course_id/modules", action: :create, as: 'course_context_module_create'
       put "courses/:course_id/modules/:id", action: :update, as: 'course_context_module_update'
       delete "courses/:course_id/modules/:id", action: :destroy

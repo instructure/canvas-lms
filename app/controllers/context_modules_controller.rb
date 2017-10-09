@@ -75,6 +75,7 @@ class ContextModulesController < ApplicationController
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env :course_id => @context.id,
         :CONTEXT_URL_ROOT => polymorphic_path([@context]),
+        :DUPLICATE_ENABLED => @domain_root_account.feature_enabled?(:duplicate_modules),
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
