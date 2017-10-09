@@ -30,7 +30,7 @@ define [
   toolbar2 = "outdent,indent,superscript,subscript,bullist,numlist,table," +
                "media,instructure_links,unlink,instructure_image," +
                "instructure_equation"
-  toolbar3 = "ltr,rtl,fontsizeselect,formatselect"
+  toolbar3 = "ltr,rtl,fontsizeselect,formatselect,check_a11y"
 
   QUnit.module "EditorConfig",
     setup: ->

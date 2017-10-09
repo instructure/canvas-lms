@@ -65,7 +65,7 @@ export default class EditorConfig {
       toolbar: this.toolbar(),
       theme: 'modern',
       skin: false,
-      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists',
+      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists,a11y_checker',
       external_plugins: {
         instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
         instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
@@ -143,7 +143,7 @@ export default class EditorConfig {
    */
   formatBtnGroup = 'bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright';
   positionBtnGroup = 'outdent,indent,superscript,subscript,bullist,numlist';
-  fontBtnGroup = 'ltr,rtl,fontsizeselect,formatselect';
+  fontBtnGroup = 'ltr,rtl,fontsizeselect,formatselect,check_a11y';
 
 
   /**
