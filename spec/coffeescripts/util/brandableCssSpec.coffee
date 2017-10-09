@@ -36,11 +36,22 @@ define [
 
   QUnit.module 'brandableCss.getCssVariant'
   test 'should be new_styles_normal_contrast by default', ->
+    window.ENV.use_new_typography = undefined
     equal brandableCss.getCssVariant(), 'new_styles_normal_contrast'
 
+  test 'should be new_typography_normal_contrast by if env var from feature flag is set', ->
+    window.ENV.use_new_typography = true
+    equal brandableCss.getCssVariant(), 'new_typography_normal_contrast'
+
   test 'should pick up ENV settings', ->
+    window.ENV.use_new_typography = undefined
     stubENV()
     equal brandableCss.getCssVariant(), 'new_styles_high_contrast'
+
+  test 'should pick up ENV & new_typography', ->
+    stubENV()
+    window.ENV.use_new_typography = true
+    equal brandableCss.getCssVariant(), 'new_typography_high_contrast'
 
   QUnit.module 'brandableCss.urlFor'
   test 'should have right default', ->
@@ -58,4 +69,10 @@ define [
     stubENV()
     window.ENV.use_high_contrast = false
     expected = "http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
+    equal brandableCss.urlFor(testBundleId,{combinedChecksum: testFingerprint}), expected
+
+  test 'should pick up ENV settings & new typography feature flag', ->
+    stubENV()
+    window.ENV.use_new_typography = true
+    expected = "http://cdn.example.com/dist/brandable_css/new_typography_high_contrast/#{testBundleId}-#{testFingerprint}.css"
     equal brandableCss.urlFor(testBundleId,{combinedChecksum: testFingerprint}), expected

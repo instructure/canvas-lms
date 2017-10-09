@@ -245,8 +245,9 @@ module ApplicationHelper
   end
 
   def css_variant
+    variant = use_new_typography? ? 'new_typography' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast?
-    'new_styles' + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
   end
 
   def css_url_for(bundle_name, plugin=false)

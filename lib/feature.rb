@@ -400,6 +400,15 @@ END
       development: true,
       root_opt_in: false
     },
+    'new_typography' =>
+    {
+      display_name: -> { I18n.t('New Typography') },
+      description: -> { I18n.t('This is a feature to allow product design to remove all the various font-size overrides throughout the application.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+      root_opt_in: false
+    },
     'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
       description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },

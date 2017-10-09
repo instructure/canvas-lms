@@ -131,6 +131,7 @@ class ApplicationController < ActionController::Base
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         k12: k12?,
+        use_new_typography: use_new_typography?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -236,6 +237,11 @@ class ApplicationController < ActionController::Base
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
   helper_method :k12?
+
+  def use_new_typography?
+    @domain_root_account && @domain_root_account.feature_enabled?(:new_typography)
+  end
+  helper_method :use_new_typography?
 
   def grading_periods?
     !!@context.try(:grading_periods?)
