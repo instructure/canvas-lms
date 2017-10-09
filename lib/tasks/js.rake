@@ -36,6 +36,7 @@ namespace :js do
 
   desc "Build webpack js"
   task :webpack do
+    require 'config/initializers/plugin_symlinks'
     if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       puts "--> Building PRODUCTION webpack bundles"
       system "yarn run webpack-production"
