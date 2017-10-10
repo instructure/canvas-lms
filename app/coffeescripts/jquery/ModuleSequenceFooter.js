@@ -161,9 +161,13 @@ export default class ModuleSequenceFooter {
     }
 
     this.item = data.items[0]
-    // Show the buttons if they aren't null
-    if ((this.next.show = this.item.next)) this.buildNextData()
+    // Show the buttons if they aren't null or paths are locked/processing
     if ((this.previous.show = this.item.prev)) this.buildPreviousData()
+    if (this.item.next || this.awaitingPathProgress()) {
+      this.next.show = true
+      const awaitingPathProgress = this.awaitingPathProgress()
+      awaitingPathProgress ? this.buildNextPathData() : this.buildNextData()
+    }
   }
 
   // Each button needs to build a data that the handlebars template can use. For example, data for
@@ -212,7 +216,8 @@ export default class ModuleSequenceFooter {
   // to display the module name instead of the item title.
   // @api private
 
-  buildNextPathData (masteryPath) {
+  buildNextPathData () {
+    const masteryPath = this.item.mastery_path
     if (masteryPath.awaiting_choice) {
       this.next.url = masteryPath.choose_url
       this.next.tooltipText = I18n.t('Choose the next mastery path')
@@ -228,27 +233,27 @@ export default class ModuleSequenceFooter {
   }
 
   buildNextData () {
-    const masteryPath = this.item.mastery_path
-    if (masteryPath && (masteryPath.awaiting_choice || masteryPath.locked || masteryPath.still_processing)) {
-      this.buildNextPathData(masteryPath)
+    this.next.url = this.item.next.html_url
+    if (this.item.current.module_id === this.item.next.module_id) {
+      this.next.tooltip =
+        `<i class='${htmlEscape(this.iconClasses[this.item.next.type])}'></i> ${
+          htmlEscape(this.item.next.title)
+        }`
+      this.next.tooltipText = I18n.t('Next: *item*', {wrapper: this.item.next.title})
     } else {
-      this.next.url = this.item.next.html_url
-      if (this.item.current.module_id === this.item.next.module_id) {
-        this.next.tooltip =
-          `<i class='${htmlEscape(this.iconClasses[this.item.next.type])}'></i> ${
-            htmlEscape(this.item.next.title)
-          }`
-        this.next.tooltipText = I18n.t('Next: *item*', {wrapper: this.item.next.title})
-      } else {
-        // module id is different
-        const module = _.find(this.modules, m => m.id === this.item.next.module_id)
-        this.next.tooltip =
-          `<strong style='float:left'>${
-            htmlEscape(I18n.t('next_module', 'Next Module:'))
-          }</strong> <br> ${htmlEscape(module.name)}`
-        this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {wrapper: module.name})
-      }
+      // module id is different
+      const module = _.find(this.modules, m => m.id === this.item.next.module_id)
+      this.next.tooltip =
+        `<strong style='float:left'>${
+          htmlEscape(I18n.t('next_module', 'Next Module:'))
+        }</strong> <br> ${htmlEscape(module.name)}`
+      this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {wrapper: module.name})
     }
+  }
+
+  awaitingPathProgress () {
+    const masteryPath = this.item.mastery_path
+    return masteryPath && (masteryPath.awaiting_choice || masteryPath.locked || masteryPath.still_processing)
   }
 }
 
