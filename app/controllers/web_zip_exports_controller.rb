@@ -107,7 +107,7 @@ class WebZipExportsController < ApplicationController
 
   # @API List all web zip exports in a course
   #
-  # Lists all web zip exports in a course for the current user
+  # A paginated list of all web zip exports in a course for the current user
   #
   # @example_request
   #

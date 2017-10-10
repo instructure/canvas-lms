@@ -40,9 +40,11 @@ end
 
 settings = ConfigFile.load("consul")
 ConsulInitializer.configure_with(settings)
-fallback_settings = ConfigFile.load("dynamic_settings")
-ConsulInitializer.fallback_to(fallback_settings)
 
-Canvas::Reloader.on_reload do
+handle_fallbacks = -> do
   Canvas::DynamicSettings.reset_cache!
+  fallback_settings = ConfigFile.load("dynamic_settings")
+  ConsulInitializer.fallback_to(fallback_settings)
 end
+handle_fallbacks.call
+Canvas::Reloader.on_reload(&handle_fallbacks)

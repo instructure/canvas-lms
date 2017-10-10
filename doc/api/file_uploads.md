@@ -115,12 +115,18 @@ current directory.
 
 ### Step 3: Confirm the upload's success
 
-If Step 2 is successful, the response will be a 3XX redirect with a
-Location header set as normal. The application needs to perform a POST to
-this location in order to complete the upload, otherwise the new file may
-not be marked as available. This request is back against Canvas again,
-and needs to be authenticated using the normal API access token
+If Step 2 is successful, the response will be either a 3XX redirect or
+201 Created with a Location header set as normal.
+
+In the case of a 3XX redirect, the application needs to perform a POST
+to this location in order to complete the upload, otherwise the new file
+may not be marked as available. This request is back against Canvas
+again, and needs to be authenticated using the normal API access token
 authentication.
+
+In the case of a 201 Created, the upload has been complete and the
+Canvas JSON representation of the file can be retrieved with a GET from
+the provided Location.
 
 Example Request:
 

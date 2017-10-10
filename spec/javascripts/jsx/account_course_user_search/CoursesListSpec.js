@@ -32,7 +32,10 @@ const props = {
     teachers: [{
       id: '1',
       display_name: 'Testing Teacher'
-    }]
+    }],
+    term:{
+      name: "Testing Term"
+    }
   }],
   addUserUrls: {
     USER_LISTS_URL: 'http://courses/{{id}}/users',
@@ -45,7 +48,7 @@ const props = {
       base_role_type: 'StudentEnrollment'
     }]
   }]
-};
+}
 
 test('renders with the proper urls and roles', () => {
   const wrapper = shallow(<CoursesList {...props} />)
@@ -69,9 +72,11 @@ const coursesProps = {
     teachers: [{
       id: '1',
       display_name: 'Testing Teacher'
-    }]
-  },
-  {
+    }],
+    term: {
+      name: "A Term"
+    }
+  }, {
     id: '2',
     name: 'Ba',
     workflow_state: 'alive',
@@ -79,9 +84,11 @@ const coursesProps = {
     teachers: [{
       id: '1',
       display_name: 'Testing Teacher'
-    }]
-  },
-  {
+    }],
+    term: {
+      name: "Ba Term"
+    }
+  }, {
     id: '3',
     name: 'Bb',
     workflow_state: 'alive',
@@ -89,9 +96,11 @@ const coursesProps = {
     teachers: [{
       id: '1',
       display_name: 'Testing Teacher'
-    }]
-  },
-  {
+    }],
+    term: {
+      name: "Bb Term"
+    }
+  }, {
     id: '4',
     name: 'C',
     workflow_state: 'alive',
@@ -99,9 +108,11 @@ const coursesProps = {
     teachers: [{
       id: '1',
       display_name: 'Testing Teacher'
-    }]
-  },
-  {
+    }],
+    term: {
+      name: "C Term"
+    }
+  }, {
     id: '5',
     name: 'De',
     workflow_state: 'alive',
@@ -109,9 +120,11 @@ const coursesProps = {
     teachers: [{
       id: '1',
       display_name: 'Testing Teacher'
-    }]
-  },
-  {
+    }],
+    term: {
+      name: "De Term"
+    }
+  }, {
     id: '6',
     name: 'Dz',
     workflow_state: 'alive',
@@ -119,7 +132,10 @@ const coursesProps = {
     teachers: [{
       id: '1',
       display_name: 'Testing Teacher'
-    }]
+    }],
+    term: {
+      name: "Dz Term"
+    }
   }],
   addUserUrls: {
     USER_LISTS_URL: 'http://courses/{{id}}/users',
@@ -136,10 +152,66 @@ const coursesProps = {
   order: 'asc'
 };
 
-test('displays courses that are passed in as props', () => {
+Object.entries({
+  course_name: 'Course',
+  sis_course_id: 'SIS ID',
+  term: 'Term',
+  teacher: 'Teacher',
+  subaccount: 'Sub-Account',
+  enrollments: 'Enrollments'
+}).forEach(([columnID, label]) => {
 
+  test(`sorting by ${columnID} asc puts down-arrow on ${label} only`, () => {
+    const wrapper = shallow(<CoursesList {...{
+      ...coursesProps,
+      sort: columnID,
+      order: 'asc'
+    }} />)
+    equal(wrapper.find('IconMiniArrowUpSolid').length, 0, 'no columns have an up arrow')
+    const icons = wrapper.find('IconMiniArrowDownSolid')
+    equal(icons.length, 1, 'only one down arrow')
+    const header = icons.first().parents('Tooltip')
+    let expectedTip = `Click to sort by ${label} descending`
+    if (columnID === 'course_name') {
+      expectedTip = 'Click to sort by name descending'
+    }
+    ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
+    ok(header.contains(label), `${label} is the one that has the down arrow`)
+  })
+
+  test(`sorting by ${columnID} desc puts up-arrow on ${label} only`, () => {
+    const wrapper = shallow(<CoursesList {...{
+      ...coursesProps,
+      sort: columnID,
+      order: 'desc'
+    }} />)
+    equal(wrapper.find('IconMiniArrowDownSolid').length, 0)
+    const icons = wrapper.find('IconMiniArrowUpSolid', 'no columns have a down arrow')
+    equal(icons.length, 1, 'only one up arrow')
+    const header = icons.first().parents('Tooltip')
+    let expectedTip = `Click to sort by ${label} ascending`
+    if (columnID === 'course_name') {
+      expectedTip = 'Click to sort by name ascending'
+    }
+    ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
+    ok(header.contains(label), `${label} is the one that has the up arrow`)
+  })
+
+  test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, function() {
+    const sortSpy = this.spy()
+    const wrapper = shallow(<CoursesList {...{
+      ...coursesProps,
+      onChangeSort: sortSpy
+    }} />)
+    const header = wrapper.findWhere(n => n.text() === label).first().parents('Tooltip')
+    header.simulate('click')
+    ok(sortSpy.calledOnce)
+    ok(sortSpy.calledWith(columnID))
+  })
+})
+
+test('displays courses in the right order', () => {
   const wrapper = shallow(<CoursesList {...coursesProps} />)
-
   const renderedList = wrapper.find(CoursesListRow)
 
   equal(renderedList.nodes[0].props.name, 'A')
@@ -157,186 +229,13 @@ test('displays courses that are passed in as props', () => {
   equal(renderedList.nodes[5].props.id, '6')
 });
 
-test('sorting by course name ascending puts down-arrow on Name', () => {
-  const wrapper = shallow(<CoursesList {...coursesProps} />)
-  const header = wrapper.find('a')
-  equal(header.nodes[0].props.children.props.children[1].type.name, 'IconArrowDownSolid')
-});
+test('displays Terms in right order', () => {
+  const renderedList = shallow(<CoursesList {...coursesProps} />).find(CoursesListRow)
 
-
-const descIdSinonProps = {
-  courses: [{
-    id: '1',
-    name: 'A',
-    workflow_state: 'alive',
-    total_students: 6,
-    teachers: [{
-      id: '1',
-      display_name: 'Testing Teacher'
-    }]
-  }],
-  addUserUrls: {
-    USER_LISTS_URL: 'http://courses/{{id}}/users',
-    ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
-  },
-  sort: 'sis_course_id',
-  order: 'desc',
-  onChangeSort: sinon.spy(),
-};
-
-test('sorting by id descending puts up-arrow on SIS ID', () => {
-  const wrapper = shallow(<CoursesList {...descIdSinonProps} />)
-  const header = wrapper.find('a')
-  equal(header.nodes[1].props.children.props.children[1].type.name, 'IconArrowUpSolid')
-});
-
-test('clicking the Courses column header calls onChangeSort with course_name', () => {
-  const wrapper = shallow(<CoursesList {...descIdSinonProps} />)
-  const header = wrapper.find('a').first()
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onChangeSort
-  ok(sinonCallback.calledOnce)
-  ok(sinonCallback.calledWith('course_name'))
-});
-
-
-const moreSinonProps = {
-  courses: [{
-    id: '1',
-    name: 'A',
-    workflow_state: 'alive',
-    total_students: 6,
-    teachers: [{
-      id: '1',
-      display_name: 'Testing Teacher'
-    }]
-  }],
-  addUserUrls: {
-    USER_LISTS_URL: 'http://courses/{{id}}/users',
-    ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
-  },
-  sort: 'sis_course_id',
-  order: 'desc',
-  onChangeSort: sinon.spy(),
-};
-
-test('clicking the SIS ID column header calls onChangeSort with sis_source_id', () => {
-  const wrapper = shallow(<CoursesList {...moreSinonProps} />)
-  const header = wrapper.find('a').slice(1, 2)
-  header.simulate('click')
-  header.simulate('click')
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onChangeSort
-  ok(sinonCallback.callCount === 3)
-  ok(sinonCallback.calledWith('sis_course_id'))
-});
-
-const teacherSinonProps = {
-  courses: [{
-    id: '1',
-    name: 'A',
-    workflow_state: 'alive',
-    total_students: 6,
-    teachers: [{
-      id: '1',
-      display_name: 'Testing Teacher'
-    }]
-  }],
-  addUserUrls: {
-    USER_LISTS_URL: 'http://courses/{{id}}/users',
-    ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
-  },
-  sort: 'teacher',
-  order: 'asc',
-  onChangeSort: sinon.spy(),
-};
-
-test('sorting by teacher ascending puts down-arrow on Teacher', () => {
-  const wrapper = shallow(<CoursesList {...teacherSinonProps} />)
-  const header = wrapper.find('a')
-  equal(header.nodes[2].props.children.props.children[1].type.name, 'IconArrowDownSolid')
-});
-
-test('clicking the Teacher column header calls onChangeSort with teacher', () => {
-  const wrapper = shallow(<CoursesList {...teacherSinonProps} />)
-  const header = wrapper.find('a').slice(2, 3)
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onChangeSort
-  ok(sinonCallback.calledOnce)
-  ok(sinonCallback.calledWith('teacher'))
-});
-
-const subaccountSinonProps = {
-  courses: [{
-    id: '1',
-    name: 'A',
-    workflow_state: 'alive',
-    total_students: 6,
-    teachers: [{
-      id: '1',
-      display_name: 'Testing Teacher'
-    }]
-  }],
-  addUserUrls: {
-    USER_LISTS_URL: 'http://courses/{{id}}/users',
-    ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
-  },
-  sort: 'subaccount',
-  order: 'asc',
-  onChangeSort: sinon.spy(),
-};
-
-test('sorting by subaccount ascending puts down-arrow on Enrollments', () => {
-  const wrapper = shallow(<CoursesList {...subaccountSinonProps} />)
-  const header = wrapper.find('a')
-  equal(header.nodes[3].props.children.props.children[1].type.name, 'IconArrowDownSolid')
-});
-
-test('clicking the Enrollments column header calls onChangeSort with enrollments', () => {
-  const wrapper = shallow(<CoursesList {...subaccountSinonProps} />)
-  const header = wrapper.find('a').slice(3, 4)
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onChangeSort
-  ok(sinonCallback.calledOnce)
-  ok(sinonCallback.calledWith('subaccount'))
-});
-
-const enrollmentsSinonProps = {
-  courses: [{
-    id: '1',
-    name: 'A',
-    workflow_state: 'alive',
-    total_students: 6,
-    teachers: [{
-      id: '1',
-      display_name: 'Testing Teacher'
-    }]
-  }],
-  addUserUrls: {
-    USER_LISTS_URL: 'http://courses/{{id}}/users',
-    ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
-  },
-  sort: 'enrollments',
-  order: 'asc',
-  onChangeSort: sinon.spy(),
-};
-
-test('sorting by enrollments ascending puts down-arrow on Enrollments', () => {
-  const wrapper = shallow(<CoursesList {...enrollmentsSinonProps} />)
-  const header = wrapper.find('a')
-  equal(header.nodes[4].props.children.props.children[1].type.name, 'IconArrowDownSolid')
-});
-
-test('clicking the Enrollments column header calls onChangeSort with enrollments', () => {
-  const wrapper = shallow(<CoursesList {...enrollmentsSinonProps} />)
-  const header = wrapper.find('a').slice(4, 5)
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onChangeSort
-  ok(sinonCallback.calledOnce)
-  ok(sinonCallback.calledWith('enrollments'))
-});
+  equal(renderedList.nodes[0].props.term.name, 'A Term')
+  equal(renderedList.nodes[1].props.term.name, 'Ba Term')
+  equal(renderedList.nodes[2].props.term.name, 'Bb Term')
+  equal(renderedList.nodes[3].props.term.name, 'C Term')
+  equal(renderedList.nodes[4].props.term.name, 'De Term')
+  equal(renderedList.nodes[5].props.term.name, 'Dz Term')
+})

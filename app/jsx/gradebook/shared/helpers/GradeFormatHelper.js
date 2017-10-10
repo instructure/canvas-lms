@@ -119,10 +119,11 @@ const GradeFormatHelper = {
       return grade;
     }
 
-    if ('delocalize' in options && !options.delocalize) {
-      parsedGrade = parseFloat(grade.replace('%', ''));
+    const gradeNoPercent = grade.replace('%', '')
+    if ( 'delocalize' in options && !options.delocalize && !isNaN(gradeNoPercent) ) {
+      parsedGrade = parseFloat(gradeNoPercent);
     } else {
-      parsedGrade = numberHelper.parse(grade.replace('%', ''));
+      parsedGrade = numberHelper.parse(gradeNoPercent);
     }
 
     if (isNaN(parsedGrade)) {

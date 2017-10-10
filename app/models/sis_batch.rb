@@ -486,6 +486,7 @@ class SisBatch < ActiveRecord::Base
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
       "diffing_data_set_identifier" => self.diffing_data_set_identifier,
       "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
+      "diffing_drop_status" => self.options[:diffing_drop_status],
       "change_threshold" => self.change_threshold,
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?

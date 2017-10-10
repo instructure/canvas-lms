@@ -208,20 +208,18 @@ module Lti
 
       let(:link_id) {SecureRandom.uuid}
 
-      let(:tool_setting) do
-        ToolSetting.new(tool_proxy: tool_proxy,
-                        context: course,
-                        resource_link_id: link_id,
-                        vendor_code: product_family.vendor_code,
-                        product_code: product_family.product_code,
-                        resource_type_code: resource_handler.resource_type_code)
+      let(:lti_link) do
+        Link.new(resource_link_id: link_id,
+                 vendor_code: product_family.vendor_code,
+                 product_code: product_family.product_code,
+                 resource_type_code: resource_handler.resource_type_code)
       end
 
       before do
         message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
         resource_handler.message_handlers = [message_handler]
         resource_handler.save!
-        tool_setting.save!
+        lti_link.save!
         user_session(account_admin_user)
       end
 
@@ -245,14 +243,12 @@ module Lti
       context 'resource_url' do
         let(:custom_url) {'http://www.samplelaunch.com/custom-resource-url'}
         let(:link_id) {SecureRandom.uuid}
-        let(:tool_setting) do
-          ToolSetting.create!(tool_proxy: tool_proxy,
-                              context: course,
-                              resource_link_id: link_id,
-                              vendor_code: product_family.vendor_code,
-                              product_code: product_family.product_code,
-                              resource_type_code: resource_handler.resource_type_code,
-                              resource_url: custom_url)
+        let(:lti_link) do
+          Link.create!(resource_link_id: link_id,
+                       vendor_code: product_family.vendor_code,
+                       product_code: product_family.product_code,
+                       resource_type_code: resource_handler.resource_type_code,
+                       resource_url: custom_url)
         end
 
         it "uses the 'resource_url' if provided in the 'link_id'" do
@@ -521,6 +517,15 @@ module Lti
               message_handler_id: message_handler.id, secure_params: jwt}
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['ext_lti_assignment_id']).to eq lti_assignment_id
+        end
+
+        it 'uses the lti_assignment_id as the resource_link_id' do
+          lti_assignment_id = SecureRandom.uuid
+          jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
+          get 'basic_lti_launch_request', params: {account_id: account.id,
+                                                   message_handler_id: message_handler.id, secure_params: jwt}
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['resource_link_id']).to eq lti_assignment_id
         end
 
         it 'does only adds non-required params if they are present in enabled_capability' do

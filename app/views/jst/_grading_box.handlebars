@@ -61,9 +61,15 @@
 {{#if showPointsPossible}}
   <label>
     <span id="default_grade_points" style="font-size: 0.9em;" >
-      {{#t}}
-        out of {{n assignment.points_possible}}
-      {{/t}}
+      {{#if assignment_grading_type_is_percent}}
+        {{#t}}
+          %
+        {{/t}}
+      {{else}}
+        {{#t}}
+          out of {{n assignment.points_possible}}
+        {{/t}}
+      {{/if}}
     </span>
   </label>
 {{/if}}

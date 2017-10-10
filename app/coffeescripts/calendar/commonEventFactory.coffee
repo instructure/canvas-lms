@@ -21,8 +21,9 @@ define [
   'compiled/calendar/CommonEvent.Assignment',
   'compiled/calendar/CommonEvent.AssignmentOverride'
   'compiled/calendar/CommonEvent.CalendarEvent'
+  'compiled/calendar/CommonEvent.PlannerNote'
   'compiled/str/splitAssetString'
-], ($, CommonEvent, Assignment, AssignmentOverride, CalendarEvent, splitAssetString) ->
+], ($, CommonEvent, Assignment, AssignmentOverride, CalendarEvent, PlannerNote, splitAssetString) ->
 
   (data, contexts) ->
     if data == null
@@ -38,6 +39,8 @@ define [
       'assignment_override'
     else if  data.assignment || data.assignment_group_id
       'assignment'
+    else if data.type == 'planner_note'
+      'planner_note'
     else
       'calendar_event'
 
@@ -76,6 +79,8 @@ define [
       obj = new Assignment(data, contextInfo)
     else if type == 'assignment_override'
       obj = new AssignmentOverride(data, contextInfo)
+    else if type == 'planner_note'
+      obj = new PlannerNote(data, contextInfo, actualContextInfo)
     else
       obj = new CalendarEvent(data, contextInfo, actualContextInfo)
 
@@ -107,6 +112,11 @@ define [
     # frozen assignments can't be deleted
     if obj.assignment?.frozen
       obj.can_delete = false
+
+    # TODO: can't edit yet. above, can_create_calendar_events could have made true
+    if obj.eventType == 'planner_note'
+      obj.can_edit = false
+      obj.can_delete = false  # even though this works, seems wrong to del if can't edit
 
     # events can be moved to a different calendar in limited circumstances
     if type == 'calendar_event'

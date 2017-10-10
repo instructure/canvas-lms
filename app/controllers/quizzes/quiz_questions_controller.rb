@@ -193,7 +193,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @API List questions in a quiz or a submission
   # @beta
   #
-  # Returns the list of QuizQuestions in this quiz.
+  # Returns the paginated list of QuizQuestions in this quiz.
   #
   # @argument quiz_submission_id [Integer]
   #  If specified, the endpoint will return the questions that were presented

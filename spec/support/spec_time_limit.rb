@@ -64,7 +64,7 @@ module SpecTimeLimit
     end
 
     ABSOLUTE_TIMEOUT = ENV.fetch("SPEC_TIME_LIMIT_ABSOLUTE", 60).to_i
-    TARGET_TIMEOUT = ENV.fetch("SPEC_TIME_LIMIT_TARGET", 30).to_i
+    TARGET_TIMEOUT = ENV.fetch("SPEC_TIME_LIMIT_TARGET", 15).to_i
 
     def typical_time_for(example)
       return unless defined?(TestQueue::Runner::RSpec::GroupQueue)

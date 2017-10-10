@@ -80,7 +80,7 @@ p {
   margin: 0;
 }
 .forgotBlock {
-  color: $ic-brand-primary;
+  color: var(--ic-brand-primary);
   margin: $ic-sp*2 auto 0;
   text-align: center;
 }

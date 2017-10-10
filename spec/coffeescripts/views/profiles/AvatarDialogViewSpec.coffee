@@ -22,15 +22,18 @@ define [
 
   QUnit.module 'AvatarDialogView#onPreflight',
     setup: ->
+      @server = sinon.fakeServer.create()
       @avatarDialogView = new AvatarDialogView()
     teardown: ->
+      @server.restore()
       @avatarDialogView = null
 
   test 'calls flashError with base error message when errors are present', ->
     errorMessage = "User storage quota exceeded"
     @stub(@avatarDialogView, 'enableSelectButton')
     mock = @mock($).expects('flashError').withArgs(errorMessage)
-    @avatarDialogView.onPreflight({}, [{responseText:'{"errors":{"base":[{"message":"User storage quota exceeded"}]}}'}])
+    @avatarDialogView.preflightRequest()
+    @server.respond 'POST', '/files/pending', [400, {'Content-Type': 'application/json'}, "{\"errors\":{\"base\":\"#{errorMessage}\"}}"]
     ok(mock.verify())
 
   QUnit.module 'AvatarDialogView#postAvatar',

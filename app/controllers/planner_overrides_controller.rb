@@ -92,8 +92,9 @@ class PlannerOverridesController < ApplicationController
               :include_concluded, :only_favorites
   # @API List planner items
   #
-  # Retrieve the list of objects to be shown on the planner for the current user
-  # with the associated planner override to override an item's visibility if set.
+  # Retrieve the paginated list of objects to be shown on the planner for the
+  # current user with the associated planner override to override an item's
+  # visibility if set.
   #
   # @argument start_date [Date]
   #   Only return items starting from the given date.
@@ -171,7 +172,7 @@ class PlannerOverridesController < ApplicationController
   def items_index
     ensure_valid_params or return
 
-    items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, raw: true, expires_in: 120.minutes) do
+    items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, expires_in: 120.minutes) do
       items = params[:filter] == 'new_activity' ? unread_items : planner_items
       items = Api.paginate(items, self, api_v1_planner_items_url)
       planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date})

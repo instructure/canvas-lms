@@ -24,9 +24,9 @@ import { actions } from './actions'
   const CyoeStats = {
     init: (graphsRoot, detailsParent) => {
       const ENV = window.ENV
-      if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
-          (ENV.current_user_roles.indexOf('teacher') != -1 || ENV.current_user_roles.indexOf('admin') != -1) &&
-          ENV.CONDITIONAL_RELEASE_ENV.rule != null)
+      if (graphsRoot != null &&
+        ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+        ENV.CONDITIONAL_RELEASE_ENV.rule != null)
       {
         const { assignment, jwt, stats_url } = ENV.CONDITIONAL_RELEASE_ENV
 

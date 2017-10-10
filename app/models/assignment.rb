@@ -99,6 +99,7 @@ class Assignment < ActiveRecord::Base
     false
   }
   before_validation do |assignment|
+    assignment.points_possible = nil unless assignment.graded?
     assignment.lti_context_id ||= SecureRandom.uuid
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
@@ -152,19 +153,21 @@ class Assignment < ActiveRecord::Base
 
     default_opts = {
       :duplicate_wiki_page => true,
-      :copy_title => nil
+      :duplicate_discussion_topic => true,
+      :copy_title => nil,
+      :user => nil
     }
     opts_with_default = default_opts.merge(opts)
 
     result = self.clone
-    result.migration_id = nil
     result.all_submissions.clear
     result.attachments.clear
     result.ignores.clear
     result.moderated_grading_selections.clear
-    result.lti_context_id = nil
-    result.turnitin_id = nil
-    result.discussion_topic = nil
+    [:migration_id, :lti_context_id, :turnitin_id,
+      :discussion_topic, :integration_id, :integration_data].each do |attr|
+      result.send(:"#{attr}=", nil)
+    end
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
     # Default to the last position of all active assignments in the group.  Clients can still
@@ -173,14 +176,23 @@ class Assignment < ActiveRecord::Base
     result.title =
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
 
-    if self.wiki_page
-      if opts_with_default[:duplicate_wiki_page]
-        result.wiki_page = self.wiki_page.duplicate({
-          :duplicate_assignment => false,
-          :copy_title => result.title
-        })
-      end
+    if self.wiki_page && opts_with_default[:duplicate_wiki_page]
+      result.wiki_page = self.wiki_page.duplicate({
+        :duplicate_assignment => false,
+        :copy_title => result.title
+      })
     end
+
+    if self.discussion_topic && opts_with_default[:duplicate_discussion_topic]
+      result.discussion_topic = self.discussion_topic.duplicate({
+        :duplicate_assignment => false,
+        :copy_title => result.title,
+        :user => opts_with_default[:user]
+      })
+    end
+
+    result.discussion_topic&.assignment = result
+
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric
     result.rubric_association = self.rubric_association.clone
@@ -616,7 +628,6 @@ class Assignment < ActiveRecord::Base
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
     # have to use peer_reviews_due_at here because it's the column name
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
-    self.points_possible = nil unless self.graded?
     [
       :all_day, :could_be_locked, :grade_group_students_individually,
       :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
@@ -969,11 +980,11 @@ class Assignment < ActiveRecord::Base
 
   def interpret_grade(grade)
     case grade.to_s
-    when %r{%$}
+    when %r{^[+-]?\d*\.?\d+%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
       points_possible.to_f * percentage
-    when %r{[\d\.]+}
+    when %r{^[+-]?\d*\.?\d+$}
       if grading_type == "gpa_scale"
         # if it matches something in a scheme, take that, else return nil
         return nil unless standard_based_score = grading_standard_or_default.grade_to_score(grade)
@@ -1656,7 +1667,7 @@ class Assignment < ActiveRecord::Base
           :group => group
         })
         homework.submitted_at = Time.zone.now
-
+        homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             if student == original_student

@@ -23,6 +23,7 @@ define [
   'compiled/views/ValidatedMixin'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
+  'jqueryui/dialog'
   'compiled/jquery.rails_flash_notifications'
 ], (Backbone, $, I18n, template, ValidatedMixin) ->
   class UserDateRangeSearchFormView extends Backbone.View
@@ -40,6 +41,8 @@ define [
 
     els:
       '.userIdField':          '$userIdField'
+      '.hiddenDateStart':      '$hiddenDateStart'
+      '.hiddenDateEnd':        '$hiddenDateEnd'
       '.dateStartSearchField': '$dateStartSearchField'
       '.dateEndSearchField':   '$dateEndSearchField'
       '.search-controls':      '$searchControls'
@@ -66,7 +69,9 @@ define [
       @collection.on 'sync', @notificationsFound
 
     resultsFound: =>
-      $.screenReaderFlashMessage(I18n.t('%{length} results found', { length: @usersView.collection.length }))
+      setTimeout(() =>
+        $.screenReaderFlashMessageExclusive(I18n.t('%{length} results found', { length: @usersView.collection.length }))
+      , 500)
 
     notificationsFound: =>
       $.screenReaderFlashMessage(I18n.t('%{length} notifications found', { length: @collection.length }))
@@ -80,11 +85,36 @@ define [
       @usersView.$el.find('tr').each () -> $(this).removeClass('selected')
       if e
         @model.set e.attributes
-        @$userIdField.val(e.get 'id')
-        @$searchControls.show()
+        id = e.get 'id'
+        @$userIdField.val(id)
+        self = this
+        @$searchControls.show().dialog
+          title:  I18n.t('Generate Activity for %{user}', user: e.get 'name')
+          resizable: false
+          height: 'auto'
+          width: 400
+          modal: true
+          dialogClass: 'userDateRangeSearchModal'
+          close: ->
+            self.$el.find('.roster_user_name[data-user-id=' +id + ']').focus()
+          buttons: [
+            {
+              text: I18n.t('Cancel')
+              click: ->
+                $(this).dialog('close')
+            }
+            {
+              text: I18n.t('Find')
+              'class': 'btn btn-primary userDateRangeSearchBtn'
+              click: ->
+                self.$hiddenDateStart.val(if self.$dateStartSearchField.attr('aria-invalid') == 'true' then '' else self.$dateStartSearchField.val())
+                self.$hiddenDateEnd.val(if self.$dateEndSearchField.attr('aria-invalid') == 'true' then '' else self.$dateEndSearchField.val())
+                self.$el.submit()
+                $(this).dialog('close')
+            }
+          ]
       else
         @$userIdField.val('')
-        @$searchControls.hide()
 
     validityCheck: ->
       json = @$el.toJSON()

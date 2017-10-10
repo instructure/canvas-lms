@@ -1018,34 +1018,36 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def computed_current_grade(grading_period_id: nil)
-    cached_score_or_grade(:current, :grade, grading_period_id: grading_period_id)
+  def computed_current_grade(id_opts=nil)
+    cached_score_or_grade(:current, :grade, id_opts)
   end
 
-  def computed_final_grade(grading_period_id: nil)
-    cached_score_or_grade(:final, :grade, grading_period_id: grading_period_id)
+  def computed_final_grade(id_opts=nil)
+    cached_score_or_grade(:final, :grade, id_opts)
   end
 
-  def computed_current_score(grading_period_id: nil)
-    cached_score_or_grade(:current, :score, grading_period_id: grading_period_id)
+  def computed_current_score(id_opts=nil)
+    cached_score_or_grade(:current, :score, id_opts)
   end
 
-  def computed_final_score(grading_period_id: nil)
-    cached_score_or_grade(:final, :score, grading_period_id: grading_period_id)
+  def computed_final_score(id_opts=nil)
+    cached_score_or_grade(:final, :score, id_opts)
   end
 
-  def cached_score_or_grade(current_or_final, score_or_grade, grading_period_id: nil)
-    score = find_score(grading_period_id: grading_period_id)
+  def cached_score_or_grade(current_or_final, score_or_grade, id_opts=nil)
+    score = find_score(id_opts)
     score&.send("#{current_or_final}_#{score_or_grade}")
   end
   private :cached_score_or_grade
 
-  # when grading period is nil, we are fetching the overall course score
-  def find_score(grading_period_id: nil)
+  def find_score(id_opts=nil)
+    id_opts ||= Score.params_for_course
+    valid_keys = %i(course_score grading_period grading_period_id assignment_group assignment_group_id)
+    return nil if id_opts.except(*valid_keys).any?
     if scores.loaded?
-      scores.find { |score| score.grading_period_id == grading_period_id }
+      scores.detect { |score| score.attributes >= id_opts.with_indifferent_access }
     else
-      scores.where(grading_period_id: grading_period_id).first
+      scores.where(id_opts).first
     end
   end
 

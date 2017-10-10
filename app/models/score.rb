@@ -20,19 +20,23 @@ class Score < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   belongs_to :enrollment
-  belongs_to :grading_period
+  belongs_to :grading_period, optional: true
+  belongs_to :assignment_group, optional: true
   has_one :course, through: :enrollment
 
   validates :enrollment, presence: true
-  validates :current_score, :final_score, numericality: true, allow_nil: true
-  validates_uniqueness_of :enrollment_id, scope: :grading_period_id
+  validates :current_score, :unposted_current_score, :final_score, :unposted_final_score, numericality: true, allow_nil: true
+
+  validate :scorable_association_check, if: -> { Score.course_score_populated? }
+
+  before_validation :set_course_score, unless: :course_score_changed?
 
   set_policy do
-    given { |user, session|
+    given do |user, _session|
       (user&.id == enrollment.user_id && !course.hide_final_grades?) ||
         course.grants_any_right?(user, :manage_grades, :view_all_grades) ||
         enrollment.user.grants_right?(user, :read_as_parent)
-    }
+    end
     can :read
   end
 
@@ -40,9 +44,56 @@ class Score < ActiveRecord::Base
     score_to_grade(current_score)
   end
 
+  def unposted_current_grade
+    score_to_grade(unposted_current_score)
+  end
+
   def final_grade
     score_to_grade(final_score)
   end
 
+  def unposted_final_grade
+    score_to_grade(unposted_final_score)
+  end
+
+  def scorable
+    # if you're calling this method, you might want to preload objects to avoid N+1
+    grading_period || assignment_group || enrollment.course
+  end
+
+  def self.course_score_populated?
+    ENV['GRADEBOOK_COURSE_SCORE_POPULATED'].present?
+  end
+
+  def self.params_for_course
+    Score.course_score_populated? ? { course_score: true } : { grading_period_id: nil }
+  end
+
   delegate :score_to_grade, to: :course
+
+  private
+
+  def set_course_score
+    gpid = read_attribute(:grading_period_id)
+    agid = read_attribute(:assignment_group_id)
+    write_attribute(:course_score, (gpid || agid).nil?)
+    true
+  end
+
+  def scorable_association_check
+    scc = scorable_association_count
+    if scc == 0 && !course_score
+      errors.add(:course_score, "should be true when there are no scorable associations")
+    elsif scc == 1 && course_score
+      errors.add(:course_score, "should be false when there is a scorable association")
+    elsif scc > 1
+      errors.add(:base, "may not have multiple scorable associations")
+    else
+      return true
+    end
+  end
+
+  def scorable_association_count
+    [grading_period_id, assignment_group_id].compact.length
+  end
 end

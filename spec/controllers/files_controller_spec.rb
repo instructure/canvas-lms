@@ -626,6 +626,19 @@ describe FilesController do
         expect(response).to redirect_to("https://s3/myfile")
       end
 
+      it "prioritizes matches on display name vs. filename" do
+        display_name = "file.txt"
+        # make a file with an original filename matching the other file's display_name
+        file1 = Attachment.create!(:context => @course, :uploaded_data => StringIO.new("blah1"), :folder => Folder.root_folders(@course).first,
+          :filename => display_name, :display_name => "something_else.txt")
+        file2 = Attachment.create!(:context => @course, :uploaded_data => StringIO.new("blah2"), :folder => Folder.root_folders(@course).first,
+          :filename => "still_something_else.txt", :display_name => display_name)
+        other_file = Attachment.create!(:context => @course, :uploaded_data => StringIO.new("blah3"), :folder => Folder.root_folders(@course).first,
+          :filename => "totallydifferent.html")
+
+        get "show_relative", params: {:file_id => other_file.id, :course_id => @course.id, :file_path => file2.full_display_path}
+        expect(assigns[:attachment]).to eq file2
+      end
     end
 
     context "unauthenticated user" do
@@ -1008,8 +1021,7 @@ describe FilesController do
       expect(response.status).to eq 401
     end
 
-    it "creates a file in the submissions folder if intent=='submit' and the feature is enabled" do
-      @course.root_account.enable_feature! :submissions_folder
+    it "creates a file in the submissions folder if intent=='submit'" do
       user_session(@student)
       assignment = @course.assignments.create!(:submission_types => 'online_upload')
       post 'create_pending', params: {:attachment => {
@@ -1022,8 +1034,7 @@ describe FilesController do
       expect(f.submission_context_code).to eq @course.asset_string
     end
 
-    it "uses a submissions folder for group assignments when the feature is enabled" do
-      @course.root_account.enable_feature! :submissions_folder
+    it "uses a submissions folder for group assignments" do
       user_session(@student)
       category = group_category
       assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
@@ -1043,7 +1054,6 @@ describe FilesController do
     end
 
     it "does not require usage rights for group submissions to be visible to students" do
-      @course.root_account.enable_feature! :submissions_folder
       @course.root_account.enable_feature! :usage_rights_required
       user_session(@student)
       category = group_category

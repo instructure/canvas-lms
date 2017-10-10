@@ -150,8 +150,7 @@
     margin-left: 0;
   }
   // Hide everything in the navbar save .brand and toggle button */
-  .nav-collapse,
-  .nav-collapse.collapse {
+  .nav-collapse {
     overflow: hidden;
     height: 0;
   }
@@ -167,19 +166,5 @@
     padding-right: 10px;
   }
 
-
-}
-
-
-// DEFAULT DESKTOP
-// ---------------
-
-@media (min-width: $navbarCollapseDesktopWidth) {
-
-  // Required to make the collapsing navbar work on regular desktops
-  .nav-collapse.collapse {
-    height: auto !important;
-    overflow: visible !important;
-  }
 
 }

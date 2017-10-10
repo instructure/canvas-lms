@@ -617,6 +617,16 @@ describe SIS::CSV::CourseImporter do
       )
     end
 
+    it "should allow destroying" do
+      ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
+      child = @template.add_child_course!(ac)
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{ac.sis_source_id},shortname,long name,active,dissociate"
+      )
+      expect(child.reload.workflow_state).to eq 'deleted'
+    end
+
     it "should be able to associate courses in bulk" do
       c1 = @account.courses.create!(:sis_source_id => "acourse1")
       c2 = @account.courses.create!(:sis_source_id => "acourse2")

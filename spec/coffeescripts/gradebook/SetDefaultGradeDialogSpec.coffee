@@ -24,7 +24,10 @@ define [
 
   QUnit.module 'SetDefaultGradeDialog',
     setup: ->
-      @assignment = new Assignment(id: 1, points_possible: 10)
+      @assignment = new Assignment
+        id: 1
+        points_possible: 10
+        name: 'an Assignment'
 
     teardown: ->
       $(".ui-dialog").remove()
@@ -46,3 +49,14 @@ define [
     deepEqual dialog.gradeIsExcused('F'), false
     #this test documents that we do not consider 'excused' to return true
     deepEqual dialog.gradeIsExcused('excused'), false
+
+  test '#show text', ->
+    dialog = new SetDefaultGradeDialog({ @assignment })
+    dialog.show()
+    ok document.getElementById('default_grade_description').innerText.includes('same grade')
+
+  test '#show changes text for grading percent', ->
+    @assignment.grading_type = 'percent'
+    dialog = new SetDefaultGradeDialog({ @assignment })
+    dialog.show()
+    ok document.getElementById('default_grade_description').innerText.includes('same percent grade')

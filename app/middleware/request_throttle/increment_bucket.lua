@@ -21,9 +21,11 @@ count = tonumber(count or 0)
 last_touched = tonumber(last_touched or current_time)
 
 count, last_touched = leak(count, last_touched, current_time, outflow)
-count = count + amount
-if count > maximum then count = maximum end
 if count < 0 then count = 0 end
+
+count = count + amount
+if count < 0 then count = 0 end
+if count > maximum then count = maximum end
 
 redis.call('HMSET', cache_key, 'count', count, 'last_touched', current_time)
 -- reset expiration to 1 hour from now each time we write

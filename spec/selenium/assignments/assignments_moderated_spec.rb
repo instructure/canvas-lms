@@ -43,4 +43,19 @@ describe "moderated grading assignments" do
     assert_flash_notice_message("Success! Grades were published to the grade book")
   end
 
+  context "student tray" do
+
+    before(:each) do
+      @account = Account.default
+      @account.enable_feature!(:student_context_cards)
+    end
+
+    it "moderated assignment should display student name in tray", priority: "1", test_id: 3022071 do
+      course_with_teacher_logged_in course: @course
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
+      f("a[data-student_id='#{@student.id}']").click
+      expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
+    end
+  end
+
 end

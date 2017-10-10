@@ -657,11 +657,23 @@ class Submission < ActiveRecord::Base
   def originality_report_url(asset_string, user)
     url = nil
     if self.grants_right?(user, :view_turnitin_report)
-      attachment = self.attachments.find_by_asset_string(asset_string)
-      report = self.originality_reports.find_by(attachment: attachment)
+      requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
+      report = self.originality_reports.find_by(attachment: requested_attachment)
       url = report&.report_launch_url
     end
     url
+  end
+
+  def all_versioned_attachments
+    attachment_ids = submission_history.map(&:attachment_ids_for_version).flatten.uniq
+    Attachment.where(id: attachment_ids)
+  end
+  private :all_versioned_attachments
+
+  def attachment_ids_for_version
+    ids = (attachment_ids || '').split(',').map(&:to_i)
+    ids << attachment_id if attachment_id
+    ids
   end
 
   def delete_turnitin_errors
@@ -1432,21 +1444,17 @@ class Submission < ActiveRecord::Base
 
   def versioned_originality_reports
     @versioned_originality_reports ||= begin
-      ids = (attachment_ids || "").split(",")
-      ids << attachment_id if attachment_id
-      ids.empty? ? [] : OriginalityReport.where(submission_id: id, attachment_id: ids)
+      attachment_ids = attachment_ids_for_version
+      return [] if attachment_ids.empty?
+      OriginalityReport.where(submission_id: id, attachment_id: attachment_ids)
     end
   end
 
   def versioned_attachments
-    if @versioned_attachments
-      @versioned_attachments
-    else
-      ids = (attachment_ids || "").split(",")
-      ids << attachment_id if attachment_id
-      self.versioned_attachments = (ids.empty? ? [] : Attachment.where(:id => ids))
-      @versioned_attachments
-    end
+    return @versioned_attachments if @versioned_attachments
+    attachment_ids = attachment_ids_for_version
+    self.versioned_attachments = (attachment_ids.empty? ? [] : Attachment.where(:id => attachment_ids))
+    @versioned_attachments
   end
 
   def versioned_attachments=(attachments)
@@ -1649,7 +1657,7 @@ class Submission < ActiveRecord::Base
 
   scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
 
-  scope :graded, -> { where("submissions.grade IS NOT NULL") }
+  scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
 
   scope :ungraded, -> { where(:grade => nil).preload(:assignment) }
 
@@ -2210,12 +2218,6 @@ class Submission < ActiveRecord::Base
       else
         [CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)]
       end
-    end
-  end
-
-  def rubric_association_with_assessing_user_id
-    self.assignment.rubric_association.tap do |association|
-      association.assessing_user_id = self.user_id if association
     end
   end
 

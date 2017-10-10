@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@mixin primary-nav-badge-border($border-color) { box-shadow: 0 0 0 2px $border-color; }
+// @mixin primary-nav-badge-border($border-color) { box-shadow: 0 0 0 2px $border-color; }
 
 
 /// These are editable variables from the theme editor.
@@ -97,10 +97,6 @@ $ic-tooltip-arrow-size: 0.375rem;
     }
     .menu-item-icon-container {
       color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
-
-      .menu-item__badge {
-        @include primary-nav-badge-border($ic-color-light);
-      }
     }
   }
 }
@@ -277,7 +273,6 @@ button.ic-app-header__menu-list-link {
   top: -0.5em; right: 0;
   background: var(--ic-brand-global-nav-menu-item__badge-bgd);
   color: var(--ic-brand-global-nav-menu-item__badge-text);
-  @include primary-nav-badge-border(var(--ic-brand-global-nav-bgd));
 }
 
 .ic-app-header__logomark-container {

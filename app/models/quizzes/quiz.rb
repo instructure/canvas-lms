@@ -811,6 +811,8 @@ class Quizzes::Quiz < ActiveRecord::Base
       else
         val = nil
       end
+    elsif val == ""
+      val = nil
     end
     write_attribute(:hide_results, val)
   end

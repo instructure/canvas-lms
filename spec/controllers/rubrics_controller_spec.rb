@@ -62,7 +62,25 @@ describe RubricsController do
       course_with_teacher_logged_in(:active_all => true)
       association = @course.assignments.create!(assignment_valid_attributes)
       request.content_type = 'application/json'
-      post 'create', params: {:course_id => @course.id, :rubric => {}, :rubric_association => {:association_type => association.class.to_s, :association_id => association.id}}
+      post 'create', params: {:course_id => @course.id,
+                              :rubric => {},
+                              :rubric_association => {:association_type => association.class.to_s,
+                                                      :association_id => association.id}}
+      expect(assigns[:rubric]).not_to be_nil
+      expect(assigns[:rubric]).not_to be_new_record
+      expect(assigns[:rubric].rubric_associations.length).to eql(1)
+      expect(response).to be_success
+    end
+
+    it "should create an association if specified without manage_rubrics permission " do
+      course_with_teacher_logged_in(:active_all => true)
+      allow(@course).to receive(:grants_any_rights?).and_return(false)
+      association = @course.assignments.create!(assignment_valid_attributes)
+      request.content_type = 'application/json'
+      post 'create', params: {:course_id => @course.id,
+                              :rubric => {},
+                              :rubric_association => {:association_type => association.class.to_s,
+                                                      :association_id => association.id}}
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_new_record
       expect(assigns[:rubric].rubric_associations.length).to eql(1)

@@ -41,6 +41,7 @@ class CoursesListRow extends React.Component {
     teachers: arrayOf(shape(UserLink.propTypes)).isRequired,
     sis_course_id: string.isRequired,
     subaccount_name: string.isRequired,
+    term: shape({name: string.isRequired}).isRequired,
     urls: shape({ ENROLL_USERS_URL: string.isRequired, USER_LISTS_URL: string.isRequired }),
     roles: arrayOf(shape({ id: string.isRequired })),
     sections: arrayOf(shape(UserLink.propTypes)),
@@ -143,6 +144,10 @@ class CoursesListRow extends React.Component {
 
         <div className="col-xs-1" role="gridcell">
           <div className="courseSIS">{sis_course_id}</div>
+        </div>
+
+        <div className="col-xs-1" role="gridcell">
+          <div className="courseSIS">{this.props.term.name}</div>
         </div>
 
         <div className="col-xs-2" role="gridcell">

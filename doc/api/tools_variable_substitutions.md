@@ -313,6 +313,27 @@ returns the URL for the external tool that was launched. Only available for LTI 
 ```
 http://example.url/path
 ```
+## com.instructure.brandConfigJSON.url
+returns the URL to retrieve the brand config JSON for the launching context.
+
+**Availability**: *always*  
+
+
+```
+http://example.url/path.json
+```
+## com.instructure.brandConfigJS.url
+returns the URL to retrieve the brand config javascript for the launching context.
+This URL should be used as the src attribute for a script tag on the external tool
+provider's web page. It is configured to be used with the [instructure-ui node module](https://github.com/instructure/instructure-ui).
+More information on on how to use instructure ui react components can be found [here](http://instructure.github.io/instructure-ui/).
+
+**Availability**: *always*  
+
+
+```
+http://example.url/path.js
+```
 ## Canvas.css.common
 returns the URL for the common css file.
 

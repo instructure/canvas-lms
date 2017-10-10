@@ -40,6 +40,15 @@
 #         "description": "Time when the last export was completed",
 #         "example": "2013-08-28T23:59:00-06:00",
 #         "type": "datetime"
+#        },
+#       "associated_course_count": {
+#         "description": "Number of associated courses for the template",
+#         "example": 3,
+#         "type": "integer"
+#        },
+#       "latest_migration": {
+#         "description": "Details of the latest migration",
+#         "type": "BlueprintMigration"
 #        }
 #     }
 #   }
@@ -462,7 +471,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @API List blueprint migrations
   # @subtopic Blueprint Course History
   #
-  # Shows migrations for the template, starting with the most recent. This endpoint can be called on a
+  # Shows a paginated list of migrations for the template, starting with the most recent. This endpoint can be called on a
   # blueprint course. See also {api:MasterCourses::MasterTemplatesController#imports_index the associated course side}.
   #
   # @example_request
@@ -516,7 +525,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @API List blueprint imports
   # @subtopic Associated Course History
   #
-  # Shows migrations imported into a course associated with a blueprint, starting with the most recent. See also
+  # Shows a paginated list of migrations imported into a course associated with a blueprint, starting with the most recent. See also
   # {api:MasterCourses::MasterTemplatesController#migrations_index the blueprint course side}.
   #
   # Use 'default' as the subscription_id to use the currently active blueprint subscription.

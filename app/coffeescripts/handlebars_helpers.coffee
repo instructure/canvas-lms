@@ -15,6 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# NOTE: depending on 'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...),
+# while 'i18n!handlebars_helpers' sets the scope for the I18n.t calls.
+# 'i18nObj!handlebars_helpers' does not compile
+# and leaving out 'i18n!handlebars_helpers' trips errors in the translation extract process
+# This is why the former is bound to a name, and the latter is not.
+
 define [
   'timezone'
   'compiled/util/enrollmentName'
@@ -33,6 +39,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
+  'i18n!handlebars_helpers'
 ], (tz, enrollmentName, {default: Handlebars}, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper, numberFormat) ->
 
   Handlebars.registerHelper name, fn for name, fn of {

@@ -49,7 +49,7 @@ define [
 
     loadValue: () ->
       @val = if @opts.item[@opts.column.field].excused
-        "EX"
+        I18n.t('Excused')
       else
         submission = @opts.item[@opts.column.field]
         grade = submission.entered_grade || submission.grade || ""
@@ -100,7 +100,7 @@ define [
     # default formatter (points, percent)
     @formatter: (row, col, submission, assignment, student, opts = {}) ->
       if submission.excused
-        grade = "EX"
+        grade = I18n.t("Excused")
       else
         grade = GradeFormatHelper.formatGrade(
           submission.grade,
@@ -223,7 +223,7 @@ define [
     # Letter Grade formatter
     @formatter: (row, col, submission, assignment, student, opts={}) ->
       innerContents = if submission.excused
-        "EX"
+        I18n.t("Excused")
       else if submission.score?
         "#{htmlEscape submission.grade}<span class='letter-grade-points'>#{htmlEscape(I18n.n(submission.score))}</span>"
       else
@@ -235,7 +235,7 @@ define [
     # GPA Scale formatter
     @formatter: (row, col, submission, assignment, student, opts={}) ->
       innerContents = if submission.excused
-        "EX"
+        I18n.t("Excused")
       else
         submission.grade
 

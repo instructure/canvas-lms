@@ -999,6 +999,39 @@ describe MasterCourses::MasterMigration do
       expect(lo_to).to be_present
     end
 
+    it "preserves account question bank references" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!(:title => 'quiz')
+      bank = @copy_from.account.assessment_question_banks.create!(:title => 'bank')
+      bank.assessment_question_bank_users.create!(:user => @user)
+      group = quiz.quiz_groups.create!(:name => "group", :pick_count => 5, :question_points => 2.0)
+      group.assessment_question_bank = bank
+      group.save
+
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      group_to = quiz_to.quiz_groups.first
+      expect(group_to.assessment_question_bank_id).to eq bank.id
+    end
+
+    it "copies tab configurations for account-level external tools" do
+      @tool_from = @copy_from.account.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
+      @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      @tool_from.save!
+
+      @copy_from.tab_configuration = [{"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}", "hidden" => true}, {"id" => 14}]
+      @copy_from.save!
+
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      run_master_migration
+      expect(@copy_to.reload.tab_configuration).to eq @copy_from.tab_configuration
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")

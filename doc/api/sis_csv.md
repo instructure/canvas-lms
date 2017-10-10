@@ -107,6 +107,10 @@ as source system, data type, and term id. Some examples of good identifiers:
  * users:fall-2015
  * source-system-1:all-data:spring-2016
 
+Diffing mode by default marks objects as "deleted" when they are not included
+for an import, but enrollments can be marked as 'completed' or 'inactive' if the
+`diffing_drop_status` is passed.
+
 If changes are made to SIS-managed objects outside of the normal import
 process, as in the example given above, it may be necessary to process a SIS
 import with the same data set identifier, but apply the entire import
@@ -276,8 +280,10 @@ still be provided.</td>
 <p>The user's name (either first_name and last_name, or full_name) should always
 be provided. Otherwise, the name will be blanked out.</p>
 
-<p>When a student is 'deleted' all of its enrollments will also be deleted and
-they won't be able to log in to the school's account. If you still want the
+
+<p>When a user is 'deleted' it will delete the login tied to the sis_id.
+If the login is the last one, all of the users enrollments will also be deleted
+and they won't be able to log in to the school's account. If you still want the
 student to be able to log in but just not participate, leave the student
 'active' but set the enrollments to 'completed'.</p>
 
@@ -496,6 +502,7 @@ YYYY-MM-DDTHH:MM:SSZ</td>
 <td>The SIS id of a pre-existing Blueprint course. When provided, 
 the current course will be set up to receive updates from the blueprint course.
 Requires Blueprint Courses feature.
+To remove the Blueprint Course link you can pass 'dissociate' in place of the id.
 </td>
 </tr>
 </table>

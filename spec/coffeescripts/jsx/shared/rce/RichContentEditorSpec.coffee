@@ -23,6 +23,7 @@ define [
   'helpers/fakeENV'
   'helpers/editorUtils'
   'helpers/fixtures'
+  'tinymce.editor_box'
 ], (RichContentEditor, RceCommandShim, RCELoader, Sidebar, fakeENV, editorUtils, fixtures) ->
 
   QUnit.module 'RichContentEditor - helper function:'
@@ -105,12 +106,15 @@ define [
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
     sinon.stub(@$target, 'editorBox')
     @$target.editorBox.onCall(0).returns(@$target)
-    RichContentEditor.loadNewEditor(@$target, {defaultContent: "content"})
-    Promise.resolve().then =>
-      ok @$target.editorBox.calledTwice
-      ok @$target.editorBox.firstCall.calledWith()
-      ok @$target.editorBox.secondCall.calledWith('set_code', "content")
-      done()
+    RichContentEditor.loadNewEditor(@$target, {defaultContent: "content"}, =>
+      try
+        ok @$target.editorBox.calledTwice, "called twice"
+        ok @$target.editorBox.firstCall.calledWith(), "first called with nothing"
+        ok @$target.editorBox.secondCall.calledWith('set_code', "content")
+        done()
+      catch err
+        done(err)
+    )
 
   test 'skips instantiation when called with empty target', ->
     RichContentEditor.loadNewEditor($("#fixtures .invalidTarget"), {})
@@ -121,33 +125,32 @@ define [
     # false so we don't have to stub out freshNode or RCELoader.loadOnTarget
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
     sinon.stub(RceCommandShim, 'focus')
-    RichContentEditor.loadNewEditor(@$target, {focus: true})
-    Promise.resolve().then =>
-      ok RceCommandShim.focus.calledWith(@$target)
-      RceCommandShim.focus.restore()
-      done()
+    RichContentEditor.loadNewEditor(@$target, {focus: true}, =>
+      try
+        ok RceCommandShim.focus.calledWith(@$target)
+        RceCommandShim.focus.restore()
+        done()
+      catch err
+        done(err)
+    )
 
   test 'with focus:true tries to show sidebar', (assert) ->
     done = assert.async()
     # false so we don't have to stub out RCELoader.loadOnTarget
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
     RichContentEditor.initSidebar()
-    RichContentEditor.loadNewEditor(@$target, {focus: true})
-    Promise.resolve().then =>
-      ok Sidebar.show.called
-      done()
+    RichContentEditor.loadNewEditor(@$target, {focus: true}, =>
+      try
+        ok Sidebar.show.called
+        done()
+      catch err
+        done(err)
+    )
 
   test 'hides resize handle when called', ->
     $resize = fixtures.create('<div class="mce-resizehandle"></div>')
     RichContentEditor.loadNewEditor(@$target, {})
     equal $resize.attr('aria-hidden'), "true"
-
-  test 'passes onFocus to loadOnTarget', ->
-    options = {}
-    RichContentEditor.loadNewEditor(@$target, options)
-    onFocus = RCELoader.loadOnTarget.firstCall.args[1].onFocus
-    onFocus()
-    ok Sidebar.show.called
 
   test 'onFocus calls options.onFocus if exists', ->
     options = {onFocus: @spy()}

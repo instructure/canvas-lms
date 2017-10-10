@@ -137,7 +137,7 @@ module LiveAssessments
     # @API List live assessment results
     # @beta
     #
-    # Returns a list of live assessment results
+    # Returns a paginated list of live assessment results
     #
     # @argument user_id [Integer]
     #   If set, restrict results to those for this user

@@ -417,9 +417,8 @@ END
       display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
       applies_to: 'Account',
-      state: 'hidden',
+      state: 'allowed',
       beta: true,
-      development: true,
       root_opt_in: true,
       touch_context: true
     },
@@ -507,15 +506,6 @@ END
       state: "allowed",
       beta: true
     },
-    'new_gradebook_history' =>
-    {
-      display_name: -> { I18n.t('New Gradebook History') },
-      description: -> { I18n.t('Enable New Gradebook History page.') },
-      applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true,
-    },
     'new_user_tutorial' =>
     {
       display_name: -> { I18n.t('New User Tutorial')},
@@ -554,9 +544,8 @@ END
       display_name: -> { I18n.t("GraphQL API") },
       description: -> { I18n.t("EXPERIMENTAL GraphQL API.") },
       applies_to: "RootAccount",
-      state: "hidden",
+      state: "hidden_in_prod",
       beta: true,
-      development: true,
     },
     'rubric_criterion_range' =>
     {

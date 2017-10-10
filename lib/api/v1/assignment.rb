@@ -633,6 +633,8 @@ module Api::V1::Assignment
       assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
     end
 
+    apply_report_visibility_options!(assignment_params, assignment)
+
     assignment.updating_user = user
     assignment.attributes = update_params
     assignment.infer_times
@@ -698,6 +700,15 @@ module Api::V1::Assignment
   end
 
   private
+
+  def apply_report_visibility_options!(assignment_params, assignment)
+    if assignment_params[:report_visibility].present?
+      settings = assignment.turnitin_settings
+      settings[:originality_report_visibility] = assignment_params[:report_visibility]
+      assignment.turnitin_settings = settings
+    end
+  end
+
 
   def prepare_assignment_create_or_update(assignment, assignment_params, user, context = assignment.context)
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
@@ -784,11 +795,6 @@ module Api::V1::Assignment
     if plagiarism_capable?(assignment_params)
       tool = assignment_configuration_tool(assignment_params)
       assignment.tool_settings_tool = tool
-      if assignment_params[:report_visibility].present?
-        settings = assignment.turnitin_settings
-        settings[:originality_report_visibility] = assignment_params[:report_visibility]
-        assignment.turnitin_settings = settings
-      end
     end
   end
 

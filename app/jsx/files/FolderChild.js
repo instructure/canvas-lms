@@ -122,14 +122,20 @@ FolderChild.isFolder = function () {
           ref= 'nameLink'
           href={`${filesEnv.baseUrl}/folder/${this.props.model.urlPath()}`}
           className= 'ef-name-col__link'
-          onClick= {this.checkForAccess}
           params= {{splat: this.props.model.urlPath()}}
         >
-          <span className='ef-big-icon-container'>
-            <FilesystemObjectThumbnail model= {this.props.model} />
-          </span>
-          <span className='ef-name-col__text'>
-            {this.props.model.displayName()}
+          {/* we use an internal click wrapper span and handle a native js click event so we can
+              intercept the link click event before page.js gets it. We want to prevent page.js from
+              getting the click event if there is an error and we don't actually want to navigate.
+              React's simulated events happen after the native event has been fully dispatched, so
+              we can't use react events to intercept the event before page.js processes it. */}
+          <span className="ef-name-col__click-wrapper" ref={elt => { if (elt) elt.addEventListener('click', this.checkForAccess) }}>
+            <span className='ef-big-icon-container'>
+              <FilesystemObjectThumbnail model= {this.props.model} />
+            </span>
+            <span className='ef-name-col__text'>
+              {this.props.model.displayName()}
+            </span>
           </span>
         </a>
       );

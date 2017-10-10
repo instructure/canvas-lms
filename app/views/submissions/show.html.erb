@@ -128,9 +128,9 @@
           </span>
         <% end %>
       <% end %>
-      <% if @rubric_association && (
+      <% if @assignment.rubric_association && (
            @submission.user_can_read_grade?(@current_user, session) ||
-           can_do(@rubric_association, @current_user, :assess) ||
+           @assignment.rubric_association.user_can_assess_for?(assessor: @current_user, assessee: @submission.user) ||
            can_do(@assignment.rubric, @current_user, :read)
          )
       %>
@@ -191,19 +191,19 @@
       aria-label="<%= t('hide_rubric_button', 'Hide Rubric') %>"
       tabindex='0'
     ><i class="icon-x standalone-icon"></i></a>
-    <div id="rubric_assessments_list" style="text-align: right; margin-bottom: 5px; <%= hidden if @visible_rubric_assessments.empty? %>">
+    <div id="rubric_assessments_list" style="text-align: right; margin-bottom: 5px; <%= hidden if @assessment_request || @visible_rubric_assessments.empty? %>">
       <%= before_label('show_assessment_by', 'Show Assessment By') %>
       <select id="rubric_assessments_select">
         <% @visible_rubric_assessments.each do |assessment| %>
           <option id="rubric_assessment_option_<%= assessment.id %>" value="<%= assessment.id %>">
-            <% if can_do(assessment, @current_user, :read_assessor) -%>
+            <% if can_do(assessment, @current_user, :read_assessor) %>
               <%= assessment.assessor_name %>
-            <% else -%>
+            <% else %>
               <%= t(:anonymous_user, "Anonymous User") %>
-            <% end -%>
+            <% end %>
           </option>
         <% end %>
-        <% if can_do(@assignment.rubric_association, @current_user, :assess) && @submission.user != @current_user %>
+        <% if can_do(@context, @current_user, :manage_grades) && @submission.user != @current_user %>
         <% unless @visible_rubric_assessments.map{|a| a.assessor_id}.include?(@current_user.id) %>
           <option value="new" id="new_rubric_assessment_option"><%= t('options.new_assessment', '[New Assessment]') %></option>
         <% end %>
@@ -217,10 +217,10 @@
         locals: {
           assessing: @submission.grants_right?(@current_user, :grade) || currently_peer_reviewing
         }}) %>
-    <% end -%>
+    <% end %>
     <%= render :partial => "shared/rubric_criterion_dialog" %>
     <div class="button-container">
-      <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
+      <% if @assignment.rubric_association.user_can_assess_for?(assessor: @current_user, assessee: @submission.user) %>
         <button type="button" class="save_rubric_button btn btn-small"><%= t('buttons.save_comment', 'Save Comment') %></button>
       <% end %>
     </div>
@@ -240,7 +240,7 @@
     <div class="submission-details-frame">
       <iframe id="preview_frame" src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :preview => 1, :rand => rand(999999)) %>" allowfullscreen="true" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
-    <div class="submission-details-comments">
+    <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">
       <div style="background-color: #fff;">
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
         <div class="comments">

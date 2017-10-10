@@ -56,22 +56,22 @@ describe "Canvas::Redis" do
     end
 
     it "should protect against errnos" do
-      expect(Canvas.redis.client).to receive(:write).and_raise(Errno::ETIMEDOUT).once
+      expect(Canvas.redis._client).to receive(:write).and_raise(Errno::ETIMEDOUT).once
       expect(Canvas.redis.set('blah', 'blah')).to eq nil
     end
 
     it "should protect against max # of client errors" do
-      expect(Canvas.redis.client).to receive(:write).and_raise(Redis::CommandError.new("ERR max number of clients reached")).once
+      expect(Canvas.redis._client).to receive(:write).and_raise(Redis::CommandError.new("ERR max number of clients reached")).once
       expect(Canvas.redis.set('blah', 'blah')).to eq nil
     end
 
     it "should pass through other command errors" do
       expect(CanvasStatsd::Statsd).to receive(:increment).never
 
-      expect(Canvas.redis.client).to receive(:write).and_raise(Redis::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
+      expect(Canvas.redis._client).to receive(:write).and_raise(Redis::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
       expect { Canvas.redis.evalsha('xxx') }.to raise_error(Redis::CommandError)
 
-      expect(Canvas.redis.client).to receive(:write).and_raise(Redis::CommandError.new("ERR no such key")).once
+      expect(Canvas.redis._client).to receive(:write).and_raise(Redis::CommandError.new("ERR no such key")).once
       expect { Canvas.redis.get('no-such-key') }.to raise_error(Redis::CommandError)
     end
 
@@ -79,7 +79,7 @@ describe "Canvas::Redis" do
       let(:cache) { ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234']) }
 
       before do
-        allow(cache.data.client).to receive(:ensure_connected).and_raise(Redis::TimeoutError)
+        allow(cache.data._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError)
       end
 
       it "should fail if not ignore_redis_failures" do
@@ -137,7 +137,7 @@ describe "Canvas::Redis" do
 
       it "should fail separate servers separately" do
         cache = ActiveSupport::Cache::RedisStore.new([Canvas.redis.id, 'redis://nonexistent:1234/0'])
-        client = cache.instance_variable_get(:@data)
+        client = cache.data
         key2 = 2
         while client.node_for('1') == client.node_for(key2.to_s)
           key2 += 1
@@ -145,7 +145,7 @@ describe "Canvas::Redis" do
         key2 = key2.to_s
         expect(client.node_for('1')).not_to eq client.node_for(key2)
         expect(client.nodes.last.id).to eq 'redis://nonexistent:1234/0'
-        expect(client.nodes.last.client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
+        expect(client.nodes.last._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
 
         cache.write('1', true, :use_new_rails => false)
         cache.write(key2, true, :use_new_rails => false)
@@ -157,7 +157,7 @@ describe "Canvas::Redis" do
       end
 
       it "should not fail raw redis commands" do
-        expect(Canvas.redis.client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
+        expect(Canvas.redis._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
         expect(Canvas.redis.setnx('my_key', 5)).to eq nil
       end
 
@@ -165,7 +165,7 @@ describe "Canvas::Redis" do
         Canvas.redis.del('my_key')
         expect(Canvas.redis.set('my_key', 5, nx: true)).to eq true
         expect(Canvas.redis.set('my_key', 5, nx: true)).to eq false
-        expect(Canvas.redis.client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
+        expect(Canvas.redis._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
         expect(Canvas.redis.set('my_key', 5, nx: true)).to eq nil
       end
 

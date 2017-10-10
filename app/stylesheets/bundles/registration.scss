@@ -96,8 +96,7 @@ a {
   height: 100px;
   position: absolute;
   content: " ";
-  @include gradient-vertical(#ffffff, rgba(255, 255, 255, 0));
-  background-color: transparent;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
   opacity: 0.5;
 }
 
@@ -180,8 +179,7 @@ a {
     font-weight: bold;
     text-align: center;
     margin-bottom: 1em;
-    background-image: none;
-    @include gradient-vertical(#0abcfe, #0090d7);
+    background: linear-gradient(to bottom, #0abcfe 0%, #0090d7 100%);
     border-width: 1px;
     border-style: solid;
     border-color: #0abcfe #238fe4 #1974c9 #238fe4;
@@ -190,7 +188,7 @@ a {
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 1px rgba(0, 0, 0, 0.3);
     &:hover, &:focus {
-      @include gradient-vertical(#09aae5, #0080c0);
+      background: linear-gradient(to bottom, #09aae5 0%, #0080c0 100%);
       outline: none;
     }
   }

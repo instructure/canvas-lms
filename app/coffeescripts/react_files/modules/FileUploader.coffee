@@ -30,7 +30,11 @@ define [
         @deferred.reject(event.target.status)
         return
 
-      url = @uploadData.upload_params.success_url
+      url = if event.target.status == 201
+        $.parseJSON(event.target.response).location
+      else
+        @uploadData.upload_params.success_url
+
       if url
         $.getJSON(url).then (results) =>
           f = @addFileToCollection(results)

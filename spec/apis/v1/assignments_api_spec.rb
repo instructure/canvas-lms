@@ -1024,7 +1024,7 @@ describe AssignmentsApiController, type: :request do
           { :expected_status => 400 })
     end
 
-    it "should require non-discussion topic" do
+    it "should duplicate discussion topic" do
       assignment = group_discussion_assignment.assignment
       api_call_as_user(@teacher, :post,
         "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
@@ -1035,7 +1035,7 @@ describe AssignmentsApiController, type: :request do
           :assignment_id => assignment.id.to_s },
         {},
         {},
-        { :expected_status => 400 })
+        { :expected_status => 200 })
     end
 
     it "should duplicate wiki page assignment" do
@@ -1343,6 +1343,46 @@ describe AssignmentsApiController, type: :request do
         'submission_type' => 'online',
         'submission_types' => ['online_upload'],
         'report_visibility' => 'after_grading'
+      })
+      a = Assignment.find response['id']
+      expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
+    end
+
+    it 'gives plagiarism platform settings priority of plagiarism plugins for Vericite' do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      response = api_create_assignment_in_course(@course, {
+        'description' => 'description',
+        'similarityDetectionTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool',
+        'submission_type' => 'online',
+        'submission_types' => ['online_upload'],
+        'report_visibility' => 'after_grading',
+        "vericite_settings" => {  
+          "originality_report_visibility" => "immediately",
+          "exclude_quoted" => true,
+          "exclude_self_plag" => true,
+          "store_in_index" =>true
+        }
+      })
+      a = Assignment.find response['id']
+      expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
+    end
+
+    it 'gives plagiarism platform settings priority of plagiarism plugins for TII' do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      response = api_create_assignment_in_course(@course, {
+        'description' => 'description',
+        'similarityDetectionTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool',
+        'submission_type' => 'online',
+        'submission_types' => ['online_upload'],
+        'report_visibility' => 'after_grading',
+        "turnitin_settings" => {  
+          "originality_report_visibility" => "immediately",
+          "exclude_quoted" => true,
+          "exclude_self_plag" => true,
+          "store_in_index" =>true
+        }
       })
       a = Assignment.find response['id']
       expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
@@ -2233,6 +2273,27 @@ describe AssignmentsApiController, type: :request do
       )
     end
 
+    it 'allows trying to update points (that get ignored) on an ungraded assignment when locked' do
+      other_course = Account.default.courses.create!
+      template = MasterCourses::MasterTemplate.set_as_master_course(other_course)
+      original_assmt = other_course.assignments.create!(:title => "blah", :description => "bloo")
+      tag = template.create_content_tag_for!(original_assmt, :restrictions => {:points => true})
+
+      course_with_teacher(:active_all => true)
+      @assignment = @course.assignments.create!(:name => "something", :migration_id => tag.migration_id, :submission_types => "not_graded")
+
+      api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+        {
+          :controller => 'assignments_api',
+          :action => 'update',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :id => @assignment.id.to_s
+        },
+        { :assignment => {:points_possible => 0} },
+        {}, {:expected_status => 200})
+    end
+
     context "without overrides or frozen attributes" do
       before :once do
         @start_group = @course.assignment_groups.create!({:name => "start group"})
@@ -2465,6 +2526,42 @@ describe AssignmentsApiController, type: :request do
             }
           )
           expect(response['due_at']).to eq(@section_due_at.iso8601)
+        end
+
+        it 'updates overrides for inactive students' do
+          @enrollment.deactivate
+          update_assignment
+          expect(@assignment.assignment_overrides.count).to eq 4
+          @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
+          expect(@adhoc_override).not_to be_nil
+          expect(@adhoc_override.set).to eq [@student]
+          expect(@adhoc_override.due_at_overridden).to be_truthy
+          expect(@adhoc_override.due_at.to_i).to eq @adhoc_due_at.to_i
+        end
+
+        it 'updates overrides for concluded students' do
+          @enrollment.conclude
+          update_assignment
+          expect(@assignment.assignment_overrides.count).to eq 4
+          @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
+          expect(@adhoc_override).not_to be_nil
+          expect(@adhoc_override.set).to eq [@student]
+          expect(@adhoc_override.due_at_overridden).to be_truthy
+          expect(@adhoc_override.due_at.to_i).to eq @adhoc_due_at.to_i
+        end
+
+        it 'does not create overrides when student_ids is invalid' do
+          api_update_assignment_call(@course, @assignment, {
+            'name' => 'Assignment With Overrides',
+            'assignment_overrides' => {
+              '0' => {
+                'student_ids' => 'bad parameter',
+                'title' => 'adhoc override',
+                'due_at' => @adhoc_due_at.iso8601
+              }
+            }
+          })
+          expect(@assignment.assignment_overrides.count).to eq 0
         end
 
         it 'does not override the assignment for the user if passed false for override_dates' do

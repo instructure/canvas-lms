@@ -94,10 +94,6 @@ require 'atom'
 #           "type": "integer",
 #           "format": "int64"
 #         },
-#         "sis_login_id": {
-#           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
-#           "type": "string"
-#         },
 #         "integration_id": {
 #           "description": "The integration_id associated with the user.  This field is only included if the user came from a SIS import and has permissions to view SIS information.",
 #           "example": "ABC59802",
@@ -367,7 +363,7 @@ class UsersController < ApplicationController
   end
 
   # @API List users in account
-  # Retrieve the list of users associated with this account.
+  # A paginated list of of users associated with this account.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
@@ -487,9 +483,11 @@ class UsersController < ApplicationController
           avatar_image_url: @user.avatar_image_url,
           sortable_name: @user.sortable_name,
           email: @user.email,
-          login_id: @user.pseudonym.login,
-          sis_id: @user.pseudonym.sis_user_id,
-          integration_id: @user.pseudonym.integration_id
+          pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
+            { login_id: pseudonym.login,
+              sis_id: pseudonym.sis_user_id,
+              integration_id: pseudonym.integration_id }
+          end
         }
       }
       render :html => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
@@ -788,7 +786,7 @@ class UsersController < ApplicationController
 
   include Api::V1::TodoItem
   # @API List the TODO items
-  # Returns the current user's list of todo items, as seen on the user dashboard.
+  # A paginated list of the current user's list of todo items, as seen on the user dashboard.
   #
   # @argument include[] [String, "ungraded_quizzes"]
   #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
@@ -853,7 +851,7 @@ class UsersController < ApplicationController
   include Api::V1::CalendarEvent
 
   # @API List upcoming assignments, calendar events
-  # Returns the current user's upcoming events, i.e. the same things shown
+  # A paginated list of the current user's upcoming events, i.e. the same things shown
   # in the dashboard 'Coming Up' sidebar.
   #
   # @example_response
@@ -932,7 +930,7 @@ class UsersController < ApplicationController
   end
 
   # @API List Missing Submissions
-  # returns past-due assignments for which the student does not have a submission.
+  # A paginated list of past-due assignments for which the student does not have a submission.
   # The user sending the request must either be an admin or a parent observer using the parent app
   #
   # @argument user_id
@@ -1994,8 +1992,8 @@ class UsersController < ApplicationController
       user_id = User.user_id_from_avatar_key(params[:user_id])
     end
     account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
-    user_id, user_shard = Shard.local_id_for(user_id)
-    user_shard ||= Shard.current
+    user_id = Shard.global_id_for(user_id)
+    user_shard = Shard.shard_for(user_id)
     url = user_shard.activate do
       Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
         user = User.where(id: user_id).first if user_id.present?

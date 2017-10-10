@@ -265,6 +265,7 @@ describe "dashboard" do
 
       it "should display course name in course menu", priority: "1", test_id: 215586 do
         f('#global_nav_courses_link').click
+        expect(driver.current_url).not_to match(/\/courses$/)
         expect(fj(".ic-NavMenu__headline:contains('Courses')")).to be_displayed
         wait_for_ajax_requests
         expect(fj(".ic-NavMenu-list-item a:contains('#{@course.name}')")).to be_displayed
@@ -291,11 +292,6 @@ describe "dashboard" do
 
       it "should present /courses as the href of the courses nav item", priority: "2", test_id: 215612 do
         expect(f('#global_nav_courses_link').attribute('href')).to match(/\/courses$/)
-      end
-
-      it "should only open the courses menu when clicking the courses nav item", priority: "1", test_id: 215613 do
-        f('#global_nav_courses_link').click
-        expect(driver.current_url).not_to match(/\/courses$/)
       end
 
       it "should go to a course when clicking a course link from the menu", priority: "1", test_id: 215614 do

@@ -20,7 +20,8 @@ define [
   'underscore'
   'Backbone'
   'jst/roles/permissionButton'
-], ($, _, Backbone, template) ->
+  'i18n!roles'
+], ($, _, Backbone, template, I18n, h) ->
   class PermissionButtonView extends Backbone.View
     template: template
     tagName: 'td'
@@ -68,7 +69,7 @@ define [
       json['systemDefaultChecked'] = @isDefault()
       json['readOnly'] = @isReadOnly()
       json['default'] = @isDefault()
-      json['addDefaultTitle'] = @isDefault() && !@isReadOnly()
+      json['titleText'] = @titleText()
       json
 
     # Method Summary
@@ -82,7 +83,6 @@ define [
     afterRender: ->
       @setPreviewIcons()
       @setDataAttributes()
-      @setTooltips()
 
     # Method Summary
     #   After the button loads, this adds data attribute to each button
@@ -92,16 +92,6 @@ define [
     setDataAttributes: ->
       @$el.attr 'data-role_id', @model.id
       @$el.attr 'data-permission_name', @permission_name
-
-    # Method Summary
-    #   After the button loads, this adds tooltips to each of the icons
-    #   so when you hover over the icons it will tell you what it's set
-    #   to.
-    # @api private
-    setTooltips: ->
-      @$el.find('.icon-check').attr('title', 'Enabled').attr('data-tooltip', "") if !@isReadOnly()
-      @$el.find('.icon-x').attr('title', 'Disabled').attr('data-tooltip', "") if !@isReadOnly()
-      @$el.find('.icon-lock').attr('title', 'Locked').attr('data-tooltip', "") if !@isReadOnly()
 
     # Method Summary
     #   Preview Icons are set based on the model attributes, not what is
@@ -149,6 +139,7 @@ define [
           @$el.find('a.btn').addClass 'default_permission'
           @setSystemDefault()
           break
+      @updateTitleText()
       return
 
     handleKeydown: (event) ->
@@ -342,7 +333,10 @@ define [
     # @api private
     setButtonPreview: (selected_radio) ->
       $icons = @$el.find("label[for=button-#{@cid}-#{selected_radio}] i").clone()
-      @$el.find('a.dropdown-toggle').html $icons
+      $a = @$el.find('a.dropdown-toggle')
+      $a.html $icons
+      $sr = $('<span class="screenreader-only"></span>').text(@titleText())
+      $a.append($sr)
 
     # Method Summary
     #   Sets the button preview for an dropdown button to the enabled icons
@@ -369,21 +363,46 @@ define [
       @setButtonPreview 3
 
     # Method Summary
+    #   Return title text to use for this element, based on its state.
+    # @api private
+    titleText: ->
+      text = if @isEnabled()
+        I18n.t('Enabled')
+      else if @isEnabledAndLocked()
+        I18n.t('Enabled and Locked')
+      else if @isDisabled()
+        I18n.t('Disabled')
+      else if @isDisabledAndLocked()
+        I18n.t('Disabled and Locked')
+      else
+        if @inheritedEnabled() then I18n.t('Enabled by Default') else I18n.t('Disabled by Default')
+
+      if @isReadOnly()
+        text += "\n"
+        text += I18n.t('You do not have permission to change this')
+
+      text
+
+    # Method Summary
+    #   Update the title text to match the current state.
+    #   Less intrusive than a full @render(), which causes a11y problems.
+    # @api private
+    updateTitleText: ->
+      @$el.find('a.btn').attr('title', @titleText())
+
+    # Method Summary
+    #   Set the proper icon from an inherited permission
+    # @api private
+    setDefaultIcon: ->
+      if @inheritedEnabled() then @setEnabledIcon() else @setDisabledIcon()
+
+    # Method Summary
     #   Check to see if there is a prior_set because if there is one set, we should always
     #   use that setting to show what the default is. If that setting is not set, we can
     #   assume its just the enabled value.
     # @api private
-    setDefaultIcon: ->
+    inheritedEnabled: ->
       if _.isUndefined @model.get('permissions')[@permission_name].prior_default
-        if @model.get('permissions')[@permission_name].enabled then @setEnabledIcon() else @setDisabledIcon()
+        @model.get('permissions')[@permission_name].enabled
       else
-        if @model.get('permissions')[@permission_name].prior_default then @setEnabledIcon() else @setDisabledIcon()
-
-    # Method Summary
-    #   Same as setDefaultIcon except everything has a lock applied to it.
-    # @api private
-    setDefaultAndLockedIcon: ->
-      if _.isUndefined @model.get('permissions')[@permission_name].prior_default
-        if @model.get('permissions')[@permission_name].enabled then @setEnabledLockedIcon() else @setDisabledLockedIcon()
-      else
-        if @model.get('permissions')[@permission_name].prior_default then @setEnabledLockedIcon() else @setDisabledLockedIcon()
+        @model.get('permissions')[@permission_name].prior_default

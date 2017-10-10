@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,9 +22,14 @@ describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
+  before(:once) do
+    # or some stuff we need to click is "below the fold"
+    driver.manage.window.maximize
+  end
+
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -384,6 +389,7 @@ describe "calendar2" do
         wait_for_ajaximations
         find_appointment_button.click
         f('.ReactModalPortal button[type="submit"]').click
+        wait_for_ajaximations
         agenda_item.click
         f('.reserve_event_link').click
         wait_for_ajaximations

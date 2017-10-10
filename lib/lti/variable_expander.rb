@@ -65,9 +65,9 @@ module Lti
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
     LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
-    ATTACHMENT_ASSOCIATION_GUARD = -> { @tool_setting&.context&.is_a?(AttachmentAssociation) }
-    LTI_ASSIGN_ID = -> { @assignment.present? || @tool_setting&.context&.is_a?(AttachmentAssociation) || @secure_params.present? }
     MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch&.instance_of?(Lti::Launch) }
+    ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
+    LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -147,8 +147,8 @@ module Lti
                        -> do
                         if @assignment
                           @assignment.lti_context_id
-                        elsif @tool_setting&.context&.is_a?(AttachmentAssociation)
-                          @tool_setting.context.context.assignment.lti_context_id
+                        elsif @originality_report
+                          @originality_report.submission.assignment.lti_context_id
                         elsif @secure_params.present?
                           Lti::Security.decoded_lti_assignment_id(@secure_params)
                         end
@@ -165,11 +165,9 @@ module Lti
     #   ```
     register_expansion 'com.instructure.OriginalityReport.id', [],
                        -> do
-                        @tool_setting.context.context.originality_reports.find do |r|
-                          r.attachment_id == @tool_setting.context.attachment_id
-                        end.id
+                        @originality_report.id
                        end,
-                       ATTACHMENT_ASSOCIATION_GUARD,
+                       ORIGINALITY_REPORT_GUARD,
                        default_name: 'com_instructure_originality_report_id'
 
     # The Canvas id of the submission associated with the
@@ -180,8 +178,8 @@ module Lti
     #   23
     #   ```
     register_expansion 'com.instructure.Submission.id', [],
-                      -> { @tool_setting.context.context_id },
-                      ATTACHMENT_ASSOCIATION_GUARD,
+                      -> { @originality_report.submission.id },
+                      ORIGINALITY_REPORT_GUARD,
                       default_name: 'com_instructure_submission_id'
 
     # The Canvas id of the file associated with the submission
@@ -192,8 +190,8 @@ module Lti
     #   23
     #   ```
     register_expansion 'com.instructure.File.id', [],
-                     -> { @tool_setting.context.attachment_id },
-                     ATTACHMENT_ASSOCIATION_GUARD,
+                     -> { @originality_report.attachment.id },
+                     ORIGINALITY_REPORT_GUARD,
                      default_name: 'com_instructure_file_id'
 
     # the LIS identifier for the course offering
@@ -344,6 +342,27 @@ module Lti
                                                           @tool.id, include_host:true) },
                        CONTROLLER_GUARD,
                        LTI1_GUARD
+
+    # returns the URL to retrieve the brand config JSON for the launching context.
+    # @example
+    #   ```
+    #   http://example.url/path.json
+    #   ```
+    register_expansion 'com.instructure.brandConfigJSON.url', [],
+                       -> { @controller.active_brand_config_json_url },
+                       CONTROLLER_GUARD
+
+    # returns the URL to retrieve the brand config javascript for the launching context.
+    # This URL should be used as the src attribute for a script tag on the external tool
+    # provider's web page. It is configured to be used with the [instructure-ui node module](https://github.com/instructure/instructure-ui).
+    # More information on on how to use instructure ui react components can be found [here](http://instructure.github.io/instructure-ui/).
+    # @example
+    #   ```
+    #   http://example.url/path.js
+    #   ```
+    register_expansion 'com.instructure.brandConfigJS.url', [],
+                       -> { @controller.active_brand_config_js_url },
+                       CONTROLLER_GUARD
 
     # returns the URL for the common css file.
     # @example

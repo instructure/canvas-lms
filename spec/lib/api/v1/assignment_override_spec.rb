@@ -38,7 +38,7 @@ describe Api::V1::AssignmentOverride do
                   :lock_at => nil
       }
       allow(subject).to receive(:api_find_all).and_return []
-      assignment = double(:context => double(:students => double(active: nil)))
+      assignment = double(context: double(all_students: []))
       result = subject.interpret_assignment_override_data(assignment, override,'ADHOC')
       expect(result.first[:due_at]).to eq nil
       expect(result.first[:unlock_at]).to eq nil
@@ -58,7 +58,7 @@ describe Api::V1::AssignmentOverride do
         override = { :student_ids => [@student.global_id] }
 
         allow(subject).to receive(:api_find_all).and_return [@student]
-        assignment = double(:context => double(:students => double(active: nil)))
+        assignment = double(context: double(all_students: []))
         result = subject.interpret_assignment_override_data(assignment, override,'ADHOC')
         expect(result[1]).to be_nil
         expect(result.first[:students]).to eq [@student]
@@ -256,6 +256,23 @@ describe Api::V1::AssignmentOverride do
     it 'delegates to AssignmentOverride.visible_enrollments_for' do
       expect(AssignmentOverride).to receive(:visible_enrollments_for).once.and_return(Enrollment.none)
       assignment_overrides_json
+    end
+  end
+
+  describe "perform_batch_update_assignment_overrides" do
+    before :once do
+      course_with_teacher(active_all: true)
+      assignment_model(course: @course)
+    end
+
+    it "touches the assignment" do
+      expect(@assignment).to receive(:touch)
+      subject.perform_batch_update_assignment_overrides(@assignment, {
+        overrides_to_create: [],
+        overrides_to_update: [],
+        overrides_to_delete: [],
+        override_errors: []
+      })
     end
   end
 end

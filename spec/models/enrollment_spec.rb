@@ -187,6 +187,8 @@ describe Enrollment do
         )
       end
 
+      let(:a_group) { @course.assignment_groups.create!(name: 'a group') }
+
       describe '#computed_current_score' do
         it 'uses the value from the associated score object, if one exists' do
           @enrollment.scores.create!(current_score: 80.3)
@@ -253,6 +255,41 @@ describe Enrollment do
         it 'returns nil if a grading period grade is requested and does not exist' do
           current_grade = @enrollment.computed_current_grade(grading_period_id: period.id)
           expect(current_grade).to be_nil
+        end
+      end
+
+      describe '#find_score' do
+        before(:each) do
+          @course.update!(grading_standard_enabled: true)
+          allow(GradeCalculator).to receive(:recompute_final_score) {}
+          @enrollment.scores.create!(current_score: 85.3)
+          @enrollment.scores.create!(grading_period: period, current_score: 99.1)
+          @enrollment.scores.create!(assignment_group: a_group, current_score: 66.3)
+          allow(GradeCalculator).to receive(:recompute_final_score).and_call_original
+        end
+
+        it 'returns the course score' do
+          expect(@enrollment.find_score.current_score).to be 85.3
+        end
+
+        it 'returns grading period scores' do
+          expect(@enrollment.find_score(grading_period_id: period.id).current_score).to be 99.1
+        end
+
+        it 'returns assignment group scores' do
+          expect(@enrollment.find_score(assignment_group_id: a_group.id).current_score).to be 66.3
+        end
+
+        it 'returns no score when given an invalid grading period id' do
+          expect(@enrollment.find_score(grading_period_id: 99999)).to be nil
+        end
+
+        it 'returns no score when given an invalid assignment group id' do
+          expect(@enrollment.find_score(assignment_group_id: 8888888)).to be nil
+        end
+
+        it 'returns no score when given unrecognized id keys' do
+          expect(@enrollment.find_score(flavor: 'Anchovied Caramel')).to be nil
         end
       end
 

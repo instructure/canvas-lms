@@ -31,32 +31,36 @@
   description = criterion.try(:description) || t('defaults.description', "Description of criterion")
 %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
-  <td class="criterion_description hover-container">
+  <td class="criterion_description hover-container pad-box-micro">
     <div class="container">
-      <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
-      <span class="screenreader-only"><%= t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %></span>
-      <span class="description criterion_description_value"><%= description %></span>
-      <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
-      <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
-      <div class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
-        <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
-        <textarea class="long_description" aria-label="<%= t 'labels.long_description', "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
+      <div class="links editing">
+        <% if !learning_outcome_criterion %>
+          <a href="#" class="edit_criterion_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
+        <% end %>
+        <a href="#" class="delete_criterion_link"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
       </div>
-      <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
-        <div class="criterion_use_range_div editing">
-          <label><%= t 'Range' %>
-            <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/></label>
+      <div class="description_content">
+        <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
+        <span class="screenreader-only"><%= t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %></span>
+        <span class="description criterion_description_value"><%= description %></span>
+        <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
+        <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
+        <div class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
+          <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
+          <textarea class="long_description" aria-label="<%= t 'labels.long_description', "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
+        </div>
+        <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
+          <div class="criterion_use_range_div editing">
+            <label><%= t 'Range' %>
+              <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/></label>
+          </div>
+        </div>
+        <div class="threshold">
+          <%= before_label :threshold, "threshold" %>
+          <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{n((criterion.mastery_points rescue 5))}</span>}.html_safe %>
         </div>
       </div>
-      <div class="threshold">
-        <%= before_label :threshold, "threshold" %>
-        <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{n((criterion.mastery_points rescue 5))}</span>}.html_safe %>
-      </div>
-      <% if !learning_outcome_criterion %>
-        <div class="links editing">
-          <a href="#" class="edit_criterion_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit_description', 'Edit criterion description' %></span></a>
-        </div>
-      <% end %>
+
     </div>
     <% if rubric && !rubric.free_form_criterion_comments && assessment_rating && assessment_rating[:comments] %>
       <div class="assessment-comments">
@@ -98,19 +102,23 @@
           %>
           <td id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %> <%= "infinitesimal" if rating_min.try(:to_f) == rating.points.try(:to_f) %>">
           <div class="container">
-            <div class="description rating_description_value"><%= rating.description %></div>
+            <% if !learning_outcome_criterion %>
+              <div class="editing links">
+                <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit rating' %></span></a>
+                <a href="#" class="delete_rating_link"><i class="icon-trash standalone-icon" ></i><span class="screenreader-only"><%= t 'Delete rating' %></span></a>
+              </div>
+              <div class="clear"></div>
+            <% end %>
             <span class="nobr">
-              <%= t "%{points}%{range_rating} pts",
-                :points => %{<span class="points">#{n(rating.points)}</span>}.html_safe,
-                :range_rating => %{<span class="range_rating" style="#{hidden if !use_range}"> to ><span class="min_points">#{n(rating_min)}</span></span>}.html_safe %>
+              <span class="points"><%= n(rating.points) %></span>
+              <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
             </span>
+            <div class="description rating_description_value"><%= rating.description %></div>
+            <div class="rating_long_description small_description"><%= rating.long_description %></div>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <% if !learning_outcome_criterion %>
-              <div class="links">
-                <a href="#" class="edit_rating_link"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'icons.edit', 'Edit rating' %></span></a>
-                <a href="#" class="delete_rating_link"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t 'icons.delete', 'Delete rating' %></span></a>
-                <!-- Hidden if last -->
-                <a href="#" class="add_rating_link_after"><i class="icon-add standalone-icon"></i><span class="screenreader-only"><%= t 'icons.add_new_rating_after', 'Add new rating category after current rating' %></span></a>
+              <div class="editing links add_rating_link">
+                <a href="#" class="add_rating_link_after" aria-label="<%= t 'Add rating' %>"><i class="icon-add icon-Solid"></i></a>
               </div>
             <% end %>
           </div>
@@ -168,14 +176,5 @@
         <div class="custom_rating" style="display: none;"><%= assessment_rating ? assessment_rating[:comments] : '' %></div>
       <% end %>
     </div>
-  </td>
-  <td class="editing">
-    <a
-      href="#"
-      class="delete_criterion_link"
-      title="<%= t(:delete_criterion_row, 'Delete Criterion Row') %>"
-      role="button"
-      aria-label="<%= t(:delete_criterion_row, 'Delete Criterion Row') %>"
-    ><i class="icon-end"></i></a>
   </td>
 </tr>

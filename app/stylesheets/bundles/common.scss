@@ -30,6 +30,9 @@
 @import "base/custom_bootstrap";
 @import "vendor/flexboxgrid";
 
+// Utility classes
+@import "base/ic_utilities";
+
 // Canvas components and area-specific styles
 @import "components/alerts";
 @import "components/buttons";

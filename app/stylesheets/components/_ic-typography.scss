@@ -259,7 +259,9 @@ dd {
     width: $horizontalComponentOffset - 20;
     clear: left;
     text-align: right;
-    @include text-overflow();
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   dd {
     margin-left: $horizontalComponentOffset;
@@ -466,7 +468,9 @@ blockquote {
   border-left: 5px solid $ic-border-color;
   p {
     margin-bottom: 0;
-    @include font-shorthand(16px,300, 25px);
+    @include fontSize(16px);
+    font-weight: 300;
+    line-height: 25px;
   }
   small {
     display: block;

@@ -60,7 +60,15 @@ export default function processSheet (element) {
   if (cached) {
     replaceCssVariablesWithStaticValues(cached)
   } else {
-    get(url).then((cssText) => {
+    // Edge tries to reuse the cached resource it downloaded for the <link... tag for this,
+    // but since when it made that request it didn't include an `origin:` request header,
+    // cloudfront won't include the `access-control-allow-origin: *` response header.
+    // so when it tries to reuse that response it fails with "No access-control-allow-origin header".
+    // I wish Edge would either treat it as a new request (because the new request has different request headers)
+    // and issue a new http request or that cloudfront would include `access-control-allow-origin: *` even
+    // when an `origin:` header is not present, then we wouldn't need this.
+    const urlWithCacheBuster = `${url}?forceEdgeToDownloadNewResourceSoItHasAccessControlAllowOriginHeader`
+    get(urlWithCacheBuster).then((cssText) => {
       replaceCssVariablesWithStaticValues(cssText)
       sessionStorage.setItem(cacheKey, cssText)
     })

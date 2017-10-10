@@ -296,9 +296,9 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('i.icon-text').length, 1);
   });
 
-  test('renders "EX" when the submission is excused', function () {
+  test('renders "Excused" when the submission is excused', function () {
     excuseSubmission();
-    strictEqual(renderCell().innerHTML.trim(), 'EX');
+    strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
 
   QUnit.module('#render with a "percent" assignment submission', {
@@ -329,9 +329,9 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('i.icon-text').length, 1);
   });
 
-  test('renders "EX" when the submission is excused', function () {
+  test('renders "Excused" when the submission is excused', function () {
     excuseSubmission();
-    strictEqual(renderCell().innerHTML.trim(), 'EX');
+    strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
 
   QUnit.module('#render with a "letter grade" assignment submission', {
@@ -367,9 +367,9 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('i.icon-text').length, 1);
   });
 
-  test('renders "EX" when the submission is excused', function () {
+  test('renders "Excused" when the submission is excused', function () {
     excuseSubmission();
-    strictEqual(renderCell().innerHTML.trim(), 'EX');
+    strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
 
   QUnit.module('#render with a "complete/incomplete" assignment submission', {
@@ -406,9 +406,9 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('i.icon-text').length, 1);
   });
 
-  test('renders "EX" when the submission is excused', function () {
+  test('renders "Excused" when the submission is excused', function () {
     excuseSubmission();
-    equal(renderCell().innerHTML.trim(), 'EX');
+    equal(renderCell().innerHTML.trim(), 'Excused');
   });
 
   QUnit.module('#render with a "GPA Scale" assignment submission', {
@@ -435,9 +435,9 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('i.icon-text').length, 1);
   });
 
-  test('renders "EX" when the submission is excused', function () {
+  test('renders "Excused" when the submission is excused', function () {
     excuseSubmission();
-    strictEqual(renderCell().innerHTML.trim(), 'EX');
+    strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
 
   QUnit.module('#render with a quiz submission', {
@@ -475,8 +475,8 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('i.icon-quiz').length, 1);
   });
 
-  test('renders "EX" when the submission is excused', function () {
+  test('renders "Excused" when the submission is excused', function () {
     excuseSubmission();
-    strictEqual(renderCell().innerHTML.trim(), 'EX');
+    strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
 });

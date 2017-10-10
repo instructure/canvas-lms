@@ -66,7 +66,7 @@ import I18n from 'i18n!gradebook'
     selectGradeHistory () { this.setLocation(`${this.props.courseUrl}/gradebook/history`); }
 
     selectDefaultGradebook () {
-      this.setLocation(`${this.props.courseUrl}/gradebook/change_gradebook_version?version=gradezilla`);
+      this.setLocation(`${this.props.courseUrl}/gradebook/change_gradebook_version?version=default`);
     }
 
     handleOnChange (e) {

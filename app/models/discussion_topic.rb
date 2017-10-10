@@ -35,6 +35,8 @@ class DiscussionTopic < ActiveRecord::Base
   include Submittable
   include Plannable
   include MasterCourses::Restrictor
+  include DuplicatingObjects
+
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
@@ -282,6 +284,66 @@ class DiscussionTopic < ActiveRecord::Base
 
   def group_category_deleted_with_entries?
     self.group_category.try(:deleted_at?) && !can_group?
+  end
+
+  def get_potentially_conflicting_titles(title_base)
+    result = DiscussionTopic.active.where(context_id: self.context_id)
+      .starting_with_title(title_base).pluck("title").to_set
+    result
+  end
+
+  # This is a guess of what to copy over.
+  def duplicate_base_model(title, opts)
+    DiscussionTopic.new({
+      :title => title,
+      :message => self.message,
+      :context_id => self.context_id,
+      :context_type => self.context_type,
+      :user_id => opts[:user] ? opts[:user].id : self.user_id,
+      :type => self.type,
+      :workflow_state => "unpublished",
+      :could_be_locked => self.could_be_locked,
+      :context_code => self.context_code,
+      :podcast_enabled => self.podcast_enabled,
+      :require_initial_post => self.require_initial_post,
+      :podcast_has_student_posts => self.podcast_has_student_posts,
+      :discussion_type => self.discussion_type,
+      :delayed_post_at => self.delayed_post_at,
+      :lock_at => self.lock_at,
+      :pinned => self.pinned,
+      :locked => self.locked,
+      :group_category_id => self.group_category_id,
+      :allow_rating => self.allow_rating,
+      :only_graders_can_rate => self.only_graders_can_rate,
+      :sort_by_rating => self.sort_by_rating,
+      :todo_date => self.todo_date
+    })
+  end
+
+  # Presumes that self has no parents
+  # Does not duplicate the child topics; the hooks take care of that for us.
+  def duplicate(opts = {})
+    # Don't clone a new record
+    return self if self.new_record?
+    default_opts = {
+      :duplicate_assignment => true,
+      :copy_title => nil,
+      :user => nil
+    }
+    opts_with_default = default_opts.merge(opts)
+    copy_title = opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
+    result = self.duplicate_base_model(copy_title, opts_with_default)
+
+    if self.assignment && opts_with_default[:duplicate_assignment]
+      result.assignment = self.assignment.duplicate({
+        :duplicate_discussion_topic => false,
+        :copy_title => result.title
+      })
+    end
+    # For some reason, the relation doesn't take care of this for us. Don't understand why.
+    # Without this line, *two* discussion topic duplicates appear when a save is performed.
+    result.assignment&.discussion_topic = result
+    result
   end
 
   # If no join record exists, assume all discussion enrties are unread, and
@@ -533,6 +595,12 @@ class DiscussionTopic < ActiveRecord::Base
   }
   scope :published, -> { where("discussion_topics.workflow_state = 'active'") }
 
+  # TODO: this scope is appearing in a few models now with identical code.
+  # Can this be extracted somewhere?
+  scope :starting_with_title, lambda { |title|
+    where('title ILIKE ?', "#{title}%")
+  }
+
   alias_attribute :available_from, :delayed_post_at
   alias_attribute :unlock_at, :delayed_post_at
   alias_attribute :available_until, :lock_at
@@ -741,16 +809,18 @@ class DiscussionTopic < ActiveRecord::Base
     elsif !self.grants_right?(user, :read)
       nil
     else
-      entry = DiscussionEntry.new({
-        :message => message,
-        :discussion_topic => self,
-        :user => user,
-      })
-      if !entry.grants_right?(user, :create)
-        raise IncomingMail::Errors::ReplyToLockedTopic
-      else
-        entry.save!
-        entry
+      self.shard.activate do
+        entry = DiscussionEntry.new({
+          :message => message,
+          :discussion_topic => self,
+          :user => user,
+        })
+        if !entry.grants_right?(user, :create)
+          raise IncomingMail::Errors::ReplyToLockedTopic
+        else
+          entry.save!
+          entry
+        end
       end
     end
   end

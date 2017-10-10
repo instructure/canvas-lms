@@ -39,6 +39,7 @@ npm-debug.log
 /public/javascripts/translations/
 /tmp/
 /vendor/bundle
+yarn-error.log
 
 # generated plugin stuff
 /app/coffeescripts/plugins/

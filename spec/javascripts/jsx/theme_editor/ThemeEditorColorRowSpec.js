@@ -53,24 +53,55 @@ define([
   })
 
   test('changedColor', () => {
-    const cssStub = sinon.stub()
-    sinon.stub(jQuery.fn, 'css').returns({css: cssStub})
     const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
-    cssStub.returns('transparent')
     equal(
       component.changedColor('foo'),
       null,
-      'returns null if backgroud-color is transparent and value is not'
+      'returns null if background color is invalid string'
     )
-    const expected = '#047'
-    const ret = '#004477'
-    cssStub.returns(ret)
-    equal(component.changedColor(expected), ret, 'return background-color')
-    ok(
-      jQuery.fn.css.calledWith('background-color', expected),
-      'sets background color of element to value'
+
+    equal(
+      component.changedColor('#fff'),
+      'rgb(255, 255, 255)',
+      'accepts and returns valid values in rgb'
     )
-    jQuery.fn.css.restore()
+
+    equal(
+      component.changedColor('red'),
+      'red',
+      'accepts valid color words'
+    )
+
+    equal(
+      component.changedColor('transparent'),
+      'transparent',
+      'accepts transparent as a value'
+    )
+
+    equal(
+      component.changedColor(undefined),
+      null,
+      'rejects undefined params'
+    )
+
+    equal(
+      component.changedColor('rgb(123,123,123)'),
+      'rgb(123, 123, 123)',
+      'accepts valid rgb values'
+    )
+
+    equal(
+      component.changedColor('rgba(255, 255, 255, 255)'),
+      'rgb(255, 255, 255)',
+      'accepts and compresses rgba values'
+    )
+
+    equal(
+      component.changedColor('rgba(foo)'),
+      null,
+      'rejects bad rgba values'
+    )
+
   })
 
   test('invalidHexString', () => {

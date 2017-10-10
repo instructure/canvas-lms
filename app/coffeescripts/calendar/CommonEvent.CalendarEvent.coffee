@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -26,15 +26,13 @@ define [
   'jquery.instructure_misc_helpers'
 ], (I18n, $, fcUtil, semanticDateRange, CommonEvent, natcompare) ->
 
-  deleteConfirmation = I18n.t('prompts.delete_event', "Are you sure you want to delete this event?")
-
   class CalendarEvent extends CommonEvent
     constructor: (data, contextInfo, actualContextInfo) ->
       super data, contextInfo, actualContextInfo
       @eventType = 'calendar_event'
       @appointmentGroupEventStatus = @calculateAppointmentGroupEventStatus()
       @reservedUsers = @getListOfReservedPeople(5).join('; ')
-      @deleteConfirmation = deleteConfirmation
+      @deleteConfirmation = I18n.t("Are you sure you want to delete this event?")
       @deleteURL = contextInfo.calendar_event_url
 
     copyDataFromObject: (data) ->

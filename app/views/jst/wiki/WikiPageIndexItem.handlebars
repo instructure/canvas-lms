@@ -20,6 +20,8 @@
       <ul class="al-options">
         {{#unless cannot_edit_by_master_course}}
           <li><a href="#" class="icon-edit edit-menu-item" title="{{#t}}Edit{{/t}}">{{#t}}Edit{{/t}}</a></li>
+        {{/unless}}
+        {{#unless cannot_delete_by_master_course}}
           <li>
             <a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}"
                title="{{#t}}Delete {{title}}{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>

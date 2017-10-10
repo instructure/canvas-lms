@@ -19,7 +19,7 @@ import $ from 'jquery'
 import I18n from 'i18n!site'
 
 export default function addPrivacyLinkToDialog ($dialog) {
-  if (!ENV.ACCOUNT.privacy_policy_url) return
+  if (!(ENV.ACCOUNT && ENV.ACCOUNT.privacy_policy_url)) return
 
   const $privacy = $('<a>', {
     href: ENV.ACCOUNT.privacy_policy_url,

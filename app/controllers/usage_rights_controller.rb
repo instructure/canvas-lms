@@ -139,7 +139,7 @@ class UsageRightsController < ApplicationController
   end
 
   # @API List licenses
-  # Lists licenses that can be applied
+  # A paginated list of licenses that can be applied
   #
   # @returns [License]
   def licenses

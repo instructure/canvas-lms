@@ -58,6 +58,7 @@ describe SisImportsApiController, type: :request do
       expect(json["batch_mode_term_id"]).not_to be_nil
     end
     json.delete("batch_mode_term_id")
+    json.delete("user")
     batch = SisBatch.last
     expect(json).to eq({
           "data" => { "import_type"=>"instructure_csv"},
@@ -71,6 +72,7 @@ describe SisImportsApiController, type: :request do
           "multi_term_batch_mode" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "diffing_drop_status" => nil,
           "change_threshold" => nil,
     })
     batch.process_without_send_later
@@ -96,6 +98,7 @@ describe SisImportsApiController, type: :request do
     json.delete("ended_at")
     expect(json.has_key?("started_at")).to eq true
     json.delete("started_at")
+    json.delete("user")
     batch = SisBatch.last
     expect(json).to eq({
           "data" => { "import_type"=>"instructure_csv"},
@@ -110,6 +113,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "diffing_drop_status" => nil,
           "change_threshold" => nil,
     })
 
@@ -131,6 +135,7 @@ describe SisImportsApiController, type: :request do
     json.delete("ended_at")
     expect(json.has_key?("started_at")).to eq true
     json.delete("started_at")
+    json.delete("user")
     expect(json).to eq({
           "data" => { "import_type" => "instructure_csv",
                       "supplied_batches" => ["user"],
@@ -159,6 +164,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "diffing_drop_status" => nil,
           "change_threshold" => nil,
     })
   end
@@ -300,13 +306,29 @@ describe SisImportsApiController, type: :request do
       { import_type: 'instructure_csv',
         attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
         diffing_data_set_identifier: 'my-users-data',
+        diffing_drop_status: 'inactive',
         change_threshold: 7,
       })
     batch = SisBatch.find(json["id"])
     expect(batch.batch_mode).to be_falsey
     expect(batch.change_threshold).to eq 7
+    expect(batch.options[:diffing_drop_status]).to eq 'inactive'
     expect(json['change_threshold']).to eq 7
     expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
+  end
+
+  it "should error for invalid diffing_drop_status" do
+    json = api_call(:post,
+      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      { controller: 'sis_imports_api', action: 'create',
+        format: 'json', account_id: @account.id.to_s },
+      { import_type: 'instructure_csv',
+        attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+        diffing_data_set_identifier: 'my-users-data',
+        diffing_drop_status: 'invalid',
+        change_threshold: 7,
+      }, {}, expected_status: 400)
+    expect(json['message']).to eq 'Invalid diffing_drop_status'
   end
 
   it "should error if batch mode and the term can't be found" do
@@ -626,6 +648,7 @@ describe SisImportsApiController, type: :request do
     json["sis_imports"].first.delete("updated_at")
     json["sis_imports"].first.delete("ended_at")
     json["sis_imports"].first.delete("started_at")
+    json["sis_imports"].first.delete("user")
 
     expect(json).to eq({"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
@@ -655,6 +678,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "diffing_drop_status" => nil,
           "change_threshold" => nil,
       }]
     })

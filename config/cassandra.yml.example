@@ -15,11 +15,15 @@
 #
 #   For Cassandra 1.1 run `cqlsh -3` and:
 #     CREATE KEYSPACE page_views WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
+#     CREATE KEYSPACE page_views_test WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
 #     CREATE KEYSPACE auditors WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
+#     CREATE KEYSPACE auditors_test WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
 #
 #   For Cassandra 1.2 and 2.0 run `cqlsh` and:
 #     CREATE KEYSPACE page_views WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+#     CREATE KEYSPACE page_views_test WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 #     CREATE KEYSPACE auditors WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+#     CREATE KEYSPACE auditors_test WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 #
 # To create the keyspace in production you'll need to determine the appropriate
 # placement strategy and options.

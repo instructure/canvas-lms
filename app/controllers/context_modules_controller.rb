@@ -273,8 +273,11 @@ class ContextModulesController < ApplicationController
       # I'd like to get rid of this saving every module, but we have to
       # update the list of prerequisites since a reorder can cause
       # prerequisites to no longer be valid
-      @modules = @context.context_modules.not_deleted
-      @modules.each{|m| m.save_without_touching_context }
+      @modules = @context.context_modules.not_deleted.to_a
+      @modules.each do |m|
+        m.updated_at = Time.now
+        m.save_without_touching_context
+      end
       @context.touch
 
       # # Background this, not essential that it happen right away

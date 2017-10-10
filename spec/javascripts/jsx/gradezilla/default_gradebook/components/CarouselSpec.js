@@ -26,7 +26,8 @@ function mountComponent (props) {
     displayLeftArrow: false,
     displayRightArrow: false,
     onLeftArrowClick () {},
-    onRightArrowClick () {}
+    onRightArrowClick () {},
+    disabled: false
   };
 
   const tbody = document.createElement('div');
@@ -110,4 +111,34 @@ test('focuses right arrow when transitioning from displaying both arrows to only
   const rightArrow = instance.rightArrow;
   this.wrapper.setProps({ displayLeftArrow: false });
   strictEqual(rightArrow.focused, true);
+});
+
+test('left button is not disabled', function () {
+  this.wrapper = mountComponent({ displayLeftArrow: true, disabled: false });
+  strictEqual(this.wrapper.find('Button').prop('disabled'), false);
+});
+
+test('right button is not disabled', function () {
+  this.wrapper = mountComponent({ displayRightArrow: true, disabled: false });
+  strictEqual(this.wrapper.find('Button').prop('disabled'), false);
+});
+
+test('left button can be disabled', function () {
+  this.wrapper = mountComponent({ displayLeftArrow: true, disabled: true });
+  strictEqual(this.wrapper.find('Button').prop('disabled'), true);
+});
+
+test('right button is not disabled', function () {
+  this.wrapper = mountComponent({ displayRightArrow: true, disabled: true });
+  strictEqual(this.wrapper.find('Button').prop('disabled'), true );
+});
+
+test('adds a VO description for the left arrow button', function () {
+  this.wrapper = mountComponent({ displayLeftArrow: true, leftArrowDescription: 'Previous record' });
+  strictEqual(this.wrapper.find('IconArrowOpenLeftLine').prop('title'), 'Previous record');
+});
+
+test('adds a VO description for the right arrow button', function () {
+  this.wrapper = mountComponent({ displayRightArrow: true, rightArrowDescription: 'Next record' });
+  strictEqual(this.wrapper.find('IconArrowOpenRightLine').prop('title'), 'Next record');
 });

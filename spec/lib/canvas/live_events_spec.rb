@@ -77,15 +77,45 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe '.group_category_created' do
+    it 'should include the context' do
+      course = course_model
+      group_category = group_category(context: course, group_limit: 2)
+      expect_event('group_category_created',
+        hash_including(
+          context_type: 'Course',
+          context_id: course.global_id.to_s,
+          group_limit: 2
+        ))
+      Canvas::LiveEvents.group_category_created(group_category)
+    end
+  end
+
+  describe '.group_category_updated' do
+    it 'should include the context' do
+      course = course_model
+      group_category = group_category(context: course, group_limit: 2)
+      expect_event('group_category_updated',
+        hash_including(
+          context_type: 'Course',
+          context_id: course.global_id.to_s,
+          group_limit: 2
+        ))
+      Canvas::LiveEvents.group_category_updated(group_category)
+    end
+  end
+
+
   describe ".group_updated" do
     it "should include the context" do
       course = course_model
-      group = group_model(context: course)
+      group = group_model(context: course, max_membership: 2)
       expect_event('group_updated',
         hash_including(
           group_id: group.global_id.to_s,
           context_type: 'Course',
-          context_id: course.global_id.to_s
+          context_id: course.global_id.to_s,
+          max_membership: 2
         ))
       Canvas::LiveEvents.group_updated(group)
     end
@@ -345,6 +375,7 @@ describe Canvas::LiveEvents do
       expect_event('submission_created',
         hash_including(
           user_id: @student.global_id.to_s,
+          lti_user_id: @student.lti_context_id,
           assignment_id: submission.global_assignment_id.to_s,
           lti_assignment_id: submission.assignment.lti_context_id.to_s
         ))
@@ -360,6 +391,7 @@ describe Canvas::LiveEvents do
       expect_event('submission_updated',
         hash_including(
           user_id: @student.global_id.to_s,
+          lti_user_id: @student.lti_context_id,
           assignment_id: submission.global_assignment_id.to_s,
           lti_assignment_id: submission.assignment.lti_context_id.to_s
         ))
@@ -374,6 +406,7 @@ describe Canvas::LiveEvents do
       expect_event('plagiarism_resubmit',
         hash_including(
           user_id: @student.global_id.to_s,
+          lti_user_id: @student.lti_context_id,
           assignment_id: submission.global_assignment_id.to_s,
           lti_assignment_id: submission.assignment.lti_context_id.to_s
         ))
@@ -497,6 +530,64 @@ describe Canvas::LiveEvents do
       ).once
 
       Canvas::LiveEvents.quiz_export_complete(content_export)
+    end
+  end
+
+  describe '.course_section_created' do
+    it 'should trigger a course section creation live event' do
+      course_with_student_submissions
+      section = @course.course_sections.first
+
+      expect_event('course_section_created',
+        {
+          course_section_id: section.id.to_s,
+          sis_source_id: nil,
+          sis_batch_id: nil,
+          course_id: section.course_id.to_s,
+          root_account_id: section.root_account_id.to_s,
+          enrollment_term_id: nil,
+          name: section.name,
+          default_section: section.default_section,
+          accepting_enrollments: section.accepting_enrollments,
+          can_manually_enroll: section.can_manually_enroll,
+          start_at: section.start_at,
+          end_at: section.end_at,
+          workflow_state: section.workflow_state,
+          restrict_enrollments_to_section_dates: section.restrict_enrollments_to_section_dates,
+          nonxlist_course_id: nil,
+          stuck_sis_fields: section.stuck_sis_fields,
+          integration_id: nil
+        }).once
+      Canvas::LiveEvents.course_section_created(section)
+    end
+  end
+
+  describe '.course_section_updated' do
+    it 'should trigger a course section creation live event' do
+      course_with_student_submissions
+      section = @course.course_sections.first
+
+      expect_event('course_section_updated',
+        {
+          course_section_id: section.id.to_s,
+          sis_source_id: nil,
+          sis_batch_id: nil,
+          course_id: section.course_id.to_s,
+          root_account_id: section.root_account_id.to_s,
+          enrollment_term_id: nil,
+          name: section.name,
+          default_section: section.default_section,
+          accepting_enrollments: section.accepting_enrollments,
+          can_manually_enroll: section.can_manually_enroll,
+          start_at: section.start_at,
+          end_at: section.end_at,
+          workflow_state: section.workflow_state,
+          restrict_enrollments_to_section_dates: section.restrict_enrollments_to_section_dates,
+          nonxlist_course_id: nil,
+          stuck_sis_fields: section.stuck_sis_fields,
+          integration_id: nil
+        }).once
+      Canvas::LiveEvents.course_section_updated(section)
     end
   end
 

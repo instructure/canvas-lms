@@ -321,7 +321,7 @@ class CoursesController < ApplicationController
   include Api::V1::Progress
 
   # @API List your courses
-  # Returns the list of active courses for the current user.
+  # Returns the paginated list of active courses for the current user.
   #
   # @argument enrollment_type [String, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return courses where the user is enrolled as this type. For
@@ -464,7 +464,7 @@ class CoursesController < ApplicationController
   end
 
   # @API List courses for a user
-  # Returns a list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
+  # Returns a paginated list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
   #
   # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
   #   - "needs_grading_count": Optional information to include with each Course.
@@ -753,32 +753,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def backup
-    get_context
-    if authorized_action(@context, @current_user, :update)
-      backup_json = @context.backup_to_json
-      send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Time.zone.today}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
-      render :json => proc {|response, output|
-        output.write backup_json
-      }
-    end
-  end
-
-  def restore
-    get_context
-    if authorized_action(@context, @current_user, :update)
-      respond_to do |format|
-        if params[:restore]
-          @context.restore_from_json_backup(params[:restore])
-          flash[:notice] = t('notices.backup_restored', "Backup Successfully Restored!")
-          format.html { redirect_to named_context_url(@context, :context_url) }
-        else
-          format.html
-        end
-      end
-    end
-  end
-
   def unconclude
     get_context
     if authorized_action(@context, @current_user, :change_course_state)
@@ -793,7 +767,7 @@ class CoursesController < ApplicationController
 
   # @API List students
   #
-  # Returns the list of students enrolled in this course.
+  # Returns the paginated list of students enrolled in this course.
   #
   # DEPRECATED: Please use the {api:CoursesController#users course users} endpoint
   # and pass "student" as the enrollment_type.
@@ -810,7 +784,7 @@ class CoursesController < ApplicationController
   end
 
   # @API List users in course
-  # Returns the list of users in this course. And optionally the user's enrollments in the course.
+  # Returns the paginated list of users in this course. And optionally the user's enrollments in the course.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results list.
@@ -941,7 +915,7 @@ class CoursesController < ApplicationController
 
   # @API List recently logged in students
   #
-  # Returns the list of users in this course, ordered by how recently they have
+  # Returns the paginated list of users in this course, ordered by how recently they have
   # logged in. The records include the 'last_login' field which contains
   # a timestamp of the last time that user logged into canvas.  The querying
   # user must have the 'View usage reports' permission.
@@ -1609,9 +1583,11 @@ class CoursesController < ApplicationController
       if !includes.member?("all_courses")
         scope = scope.not_deleted
       end
-      @course = api_find(scope, params[:id])
+      @context = @course = api_find(scope, params[:id])
+      @context_membership = @context.enrollments.where(user_id: @current_user).except(:preload).first # for AUA
 
       if authorized_action(@course, @current_user, :read)
+        log_asset_access([ "home", @context ], "home", "other")
         enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
         if includes.include?("observed_users") &&
             enrollments.any?(&:assigned_observer?)

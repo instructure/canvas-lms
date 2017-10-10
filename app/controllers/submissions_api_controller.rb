@@ -118,6 +118,10 @@
 #           "example": 86,
 #           "type": "integer"
 #         },
+#         "graded_at" : {
+#           "example": "2012-01-02T03:05:34Z",
+#           "type": "datetime"
+#         },
 #         "user": {
 #           "description": "The submissions user (see user API) (optional)",
 #           "example": "User",
@@ -183,7 +187,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List assignment submissions
   #
-  # Get all existing submissions for an assignment.
+  # A paginated list of all existing submissions for an assignment.
   #
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"]
   #   Associations to include with the group.  "group" will add group_id and group_name.
@@ -232,7 +236,7 @@ class SubmissionsApiController < ApplicationController
         submissions = submissions.preload(:group) if includes.include?("group")
 
         submissions = Api.paginate(submissions, self,
-                                   api_v1_course_assignment_submissions_url(@context, @assignment))
+                                   polymorphic_url([:api_v1, @section || @context, @assignment, :submissions]))
         bulk_load_attachments_and_previews(submissions)
 
         submissions.map do |s|
@@ -247,7 +251,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List submissions for multiple assignments
   #
-  # Get all existing submissions for a given set of students and assignments.
+  # A paginated list of all existing submissions for a given set of students and assignments.
   #
   # @argument student_ids[] [String]
   #   List of student ids to return submissions for. If this argument is
@@ -520,9 +524,12 @@ class SubmissionsApiController < ApplicationController
     # teachers will be able to do that for any submission they can grade, so
     # they need to be able to specify the target user.
     permission = :nothing if @user != @current_user
-    # we don't check quota when uploading a file for assignment submission
     if authorized_action(@assignment, @current_user, permission)
-      api_attachment_preflight(@user, request, :check_quota => false, :submission_context => @context)
+      api_attachment_preflight(
+        @user, request,
+        check_quota: false, # we don't check quota when uploading a file for assignment submission
+        folder: @user.submissions_folder(@context) # organize attachment into the course submissions folder
+      )
     end
   end
 
@@ -776,7 +783,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List gradeable students
   #
-  # List students eligible to submit the assignment. The caller must have permission to view grades.
+  # A paginated list of students eligible to submit the assignment. The caller must have permission to view grades.
   #
   # Section-limited instructors will only see students in their own sections.
   #
@@ -818,7 +825,7 @@ class SubmissionsApiController < ApplicationController
   # @argument assignment_ids[] [String]
   #   Assignments being requested
   #
-  # List students eligible to submit a list of assignments. The caller must have
+  # A paginated list of students eligible to submit a list of assignments. The caller must have
   # permission to view grades for the requested course.
   #
   # Section-limited instructors will only see students in their own sections.
@@ -984,7 +991,7 @@ class SubmissionsApiController < ApplicationController
       student_scope = @assignment.students_with_visibility(student_scope)
       student_ids = student_scope.pluck(:id)
 
-      graded = @context.submissions.in_workflow_state('graded').where(user_id: student_ids, assignment_id: @assignment).count
+      graded = @context.submissions.graded.where(user_id: student_ids, assignment_id: @assignment).count
       ungraded = @context.submissions.
         needs_grading.having_submission.
         where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).

@@ -25,10 +25,11 @@ define [
 
   class
     readableTypes:
-      assignment: I18n.t('event_type.assignment', 'Assignment')
-      discussion: I18n.t('event_type.discussion', 'Discussion')
-      event: I18n.t('event_type.event', 'Event')
-      quiz: I18n.t('event_type.quiz', 'Quiz')
+      assignment: I18n.t('Assignment')
+      discussion: I18n.t('Discussion')
+      event: I18n.t('Event')
+      quiz: I18n.t('Quiz')
+      note: I18n.t('To Do')
 
     constructor: (data, contextInfo, actualContextInfo) ->
       @eventType = 'generic'
@@ -150,6 +151,8 @@ define [
     iconType: ->
       if type = @assignmentType()
         type
+      else if  @eventType == 'planner_note'
+        'note-light'
       else if ENV.CALENDAR.BETTER_SCHEDULER
         if @isAppointmentGroupEvent() && (@isAppointmentGroupFilledEvent() || @appointmentGroupEventStatus == "Reserved")
           'calendar-reserved'

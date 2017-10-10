@@ -120,5 +120,16 @@ module Lti
         vendor_code: product_family.vendor_code
       }
     end
+
+    def configured_assignments
+      message_handler = resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
+        mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
+      end
+      AssignmentConfigurationToolLookup.where(
+        tool_product_code: product_family.product_code,
+        tool_vendor_code: product_family.vendor_code,
+        tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
+      ).preload(:assignment).map(&:assignment)
+    end
   end
 end

@@ -43,7 +43,7 @@ describe "master courses - child courses - wiki page locking" do
   end
 
   it "should not show the edit/delete cog-menu options on the index when locked" do
-    @tag.update(restrictions: {:all => true})
+    @tag.update(restrictions: {:content => true})
 
     get "/courses/#{@copy_to.id}/pages"
 
@@ -65,7 +65,7 @@ describe "master courses - child courses - wiki page locking" do
   end
 
   it "should not show the delete option on the show page when locked" do
-    @tag.update(restrictions: {:all => true})
+    @tag.update(restrictions: {:points => true})
 
     get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 

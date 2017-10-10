@@ -20,10 +20,10 @@ class ContextController < ApplicationController
   include SearchHelper
   include CustomSidebarLinksHelper
 
-  before_action :require_context, :except => [:inbox, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet]
+  before_action :require_context, :except => [:inbox, :create_media_object, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet]
   before_action :require_user, :only => [:inbox, :report_avatar_image]
   before_action :reject_student_view_student, :only => [:inbox]
-  protect_from_forgery :except => [:kaltura_notifications, :object_snippet], with: :exception
+  protect_from_forgery :except => [:object_snippet], with: :exception
 
   def create_media_object
     @context = Context.find_by_asset_string(params[:context_code])
@@ -83,70 +83,6 @@ class ContextController < ApplicationController
     else
       render :plain => t(:media_objects_not_configured, "Media Objects not configured")
     end
-  end
-
-  def kaltura_notifications
-    request_params = request.request_parameters.to_a.sort_by{|k, v| k }.select{|k, v| k != 'sig' }
-    logger.info('=== KALTURA NOTIFICATON ===')
-    logger.info(request_params.to_yaml)
-    if params[:signed_fields]
-      valid_fields = params[:signed_fields].split(",")
-      request_params = request_params.select{|k, v| valid_fields.include?(k.to_s) }
-    end
-    str = ""
-    request_params.each do |k, v|
-      str += k.to_s + v.to_s
-    end
-    hash = Digest::MD5.hexdigest(CanvasKaltura::ClientV3.config['secret_key'] + str)
-    if hash == params[:sig]
-      notifications = {}
-      if params[:multi_notification] != 'true'
-        notifications[0] = request.request_parameters
-      else
-        request.request_parameters.each do |k, value|
-          key = k.to_s
-          if match = key.match(/\Anot([^_]*)_(.*)\z/)
-            num = match[1].to_s
-            property = match[2].to_s
-            notifications[num] ||= {}
-            notifications[num][property] = value
-          end
-        end
-      end
-      notifications.each do |key, notification|
-        if notification[:notification_type] == 'entry_add'
-          entry_id = notification[:entry_id]
-          mo = MediaObject.where(media_id: entry_id).first_or_initialize
-          if !mo.new_record? || (notification[:partner_data] && !notification[:partner_data].empty?)
-            data = JSON.parse(notification[:partner_data]) rescue nil
-            if data && data['root_account_id'] && data['context_code']
-              context = Context.find_by_asset_string(data['context_code'])
-              context = nil unless context.respond_to?(:is_a_context?) && context.is_a_context?
-              user = User.where(id: data['puser_id'].split("_").first).first if data['puser_id'].present?
-
-              mo.context ||= context
-              mo.user ||= user
-              mo.save!
-              mo.send_later(:retrieve_details)
-            end
-          end
-        elsif notification[:notification_type] == 'entry_delete'
-          entry_id = notification[:entry_id]
-          mo = MediaObject.by_media_id(entry_id).first
-          mo.destroy_without_destroying_attachment
-        end
-      end
-      logger.info(notifications.to_yaml)
-      render :plain => "ok"
-    else
-      logger.info("md5 should have been #{hash} but was #{params[:sig]}")
-      render :plain => "failure"
-    end
-  rescue => e
-    logger.warn("=== KALTURA NOTIFICATON ERROR ===")
-    logger.warn(e.to_s)
-    logger.warn(e.backtrace.join("\n"))
-    render :plain => "failure"
   end
 
   # safely render object and embed tags as part of user content, by using a

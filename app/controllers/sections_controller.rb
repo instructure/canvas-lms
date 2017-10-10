@@ -92,7 +92,7 @@ class SectionsController < ApplicationController
   include Api::V1::Section
 
   # @API List course sections
-  # Returns the list of sections for this course.
+  # A paginated list of the list of sections for this course.
   #
   # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"]
   #   - "students": Associations to include with the group. Note: this is only

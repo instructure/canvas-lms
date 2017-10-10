@@ -478,7 +478,6 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .gradebook-cell-comment-label {
-  @include hide-text;
   display: inline-block;
 }
 
@@ -550,7 +549,7 @@ $gradebook_cell_padding_top: 8px;
       background: transparent;
     }
     .outof {
-      @include user-select(none);
+      user-select: none;
       text-align: left;
       // if high contrast, no color value (default to regular dark text color)
       @if $use_high_contrast == false { color: #888888; }

@@ -175,7 +175,7 @@ class SearchController < ApplicationController
   end
 
   # @API List all courses
-  # List all courses visible in the public index
+  # A paginated list of all courses visible in the public index
   #
   # @argument search [String]
   #   Search terms used for matching users/courses/groups (e.g. "bob smith"). If

@@ -62,7 +62,7 @@ module Polling
     # @API List poll choices in a poll
     # @beta
     #
-    # Returns the list of PollChoices in this poll.
+    # Returns the paginated list of PollChoices in this poll.
     #
     # @example_response
     #   {

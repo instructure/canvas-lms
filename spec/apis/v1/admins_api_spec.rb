@@ -87,7 +87,6 @@ describe "Admins API", type: :request do
                              "short_name" => @new_user.short_name,
                              "sis_user_id"=>nil,
                              "integration_id"=>nil,
-                             "sis_login_id"=>'user',
                              "sis_import_id"=>nil,
                              "sortable_name" => @new_user.sortable_name,
                              "login_id" => "user",
@@ -288,7 +287,6 @@ describe "Admins API", type: :request do
                                        "short_name" => @admin.short_name,
                                        "sis_user_id"=>nil,
                                        "integration_id"=>nil,
-                                       "sis_login_id"=>@admin.pseudonym.unique_id,
                                        "sis_import_id"=>nil,
                                        "login_id" => @admin.pseudonym.unique_id},
                                     "workflow_state" => 'active'})
@@ -306,7 +304,6 @@ describe "Admins API", type: :request do
                                 "short_name" => @admin.short_name,
                                 "sis_user_id"=>nil,
                                 "integration_id"=>nil,
-                                "sis_login_id"=>@admin.pseudonym.unique_id,
                                 "sis_import_id"=>nil,
                                 "login_id" => @admin.pseudonym.unique_id},
                              "workflow_state" => 'active'}]
@@ -324,7 +321,6 @@ describe "Admins API", type: :request do
                                 "short_name" => @admin.short_name,
                                 "sis_user_id"=>nil,
                                 "integration_id"=>nil,
-                                "sis_login_id"=>@admin.pseudonym.unique_id,
                                 "sis_import_id"=>nil,
                                 "login_id" => @admin.pseudonym.unique_id},
                              "workflow_state" => 'active'},
@@ -337,7 +333,6 @@ describe "Admins API", type: :request do
                                 "sortable_name" => @another_admin.sortable_name,
                                 "sis_user_id"=>nil,
                                 "integration_id"=>nil,
-                                "sis_login_id"=>nil,
                                 "sis_import_id"=>nil,
                                 "short_name" => @another_admin.short_name},
                              "workflow_state" => 'active'}]

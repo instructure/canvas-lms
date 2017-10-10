@@ -19,6 +19,6 @@ group :redis do
   gem 'redis-rails', '5.0.2'
   gem 'redis-store', '1.3.0'
 
-  gem 'redis', '3.3.1'
+  gem 'redis', '4.0.0'
   gem 'redis-scripting', '1.0.1'
 end

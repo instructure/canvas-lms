@@ -209,7 +209,10 @@ module Importers
             event.reload
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
-            event.all_day_date = shift_date(event.all_day_date.to_datetime, shift_options).try(:to_date) if event.all_day_date
+            if event.all_day_date
+              ad_time = event.all_day_date.in_time_zone(shift_options[:time_zone] || Time.zone)
+              event.all_day_date = shift_date(ad_time, shift_options).try(:to_date)
+            end
             event.save_without_broadcasting
           end
 

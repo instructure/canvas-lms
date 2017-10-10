@@ -24,16 +24,3 @@
     </div>
   </form>
 </div>
-<div id="edit_rating" style="display: none; text-align: center;">
-  <form id="edit_rating_form" class="no-margin-bottom">
-    <input type="text" class="rating_description" style="min-width: 100px; width: 90%;" name="description"/>
-    <div>
-      <%= t "%{points}%{range_rating} pts",
-        :points => '<input type="text" size="2" name="points" class="no-margin-bottom span1" placeholder="max"/>'.html_safe,
-        :range_rating => %{<span class="range_rating"> to
-          <input type="text" size="2" name="min_points" class="no-margin-bottom span1 min_points" placeholder="min"/></span>}.html_safe %>
-      <button type="button" class="cancel_button btn btn-mini button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
-      <button type="submit" class="ok_button btn btn-mini btn-primary"><%= t '#buttons.ok', "OK" %></button>
-    </div>
-  </form>
-</div>

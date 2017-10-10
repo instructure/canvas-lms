@@ -164,9 +164,9 @@ class PageViewsController < ApplicationController
   end
 
   # @API List user page views
-  # Return the user's page view history in json format, similar to the
-  # available CSV download. Pagination is used as described in API basics
-  # section. Page views are returned in descending order, newest to oldest.
+  # Return a paginated list of the user's page view history in json format,
+  # similar to the available CSV download. Page views are returned in
+  # descending order, newest to oldest.
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want page views.

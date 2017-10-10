@@ -21,6 +21,7 @@ define [
   'jquery'
   'underscore'
   'jsx/shared/conditional_release/CyoeHelper'
+  'jsx/move_item_tray/NewMoveDialogView'
   'compiled/models/Assignment'
   'compiled/views/PublishIconView'
   'compiled/views/LockIconView'
@@ -37,7 +38,7 @@ define [
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, Backbone, $, _, CyoeHelper, Assignment, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+], (I18n, Backbone, $, _, CyoeHelper, NewMoveDialogView, Assignment, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -54,7 +55,6 @@ define [
     @child 'dateAvailableColumnView', '[data-view=date-available]'
     @child 'editAssignmentView',      '[data-view=edit-assignment]'
     @child 'sisButtonView',           '[data-view=sis-button]'
-    @child 'moveAssignmentView',      '[data-view=moveAssignment]'
 
     els:
       '.edit_assignment': '$editAssignmentButton'
@@ -68,6 +68,7 @@ define [
       'mousedown': 'stopMoveIfProtected'
       'click .icon-lock': 'onUnlockAssignment'
       'click .icon-unlock': 'onLockAssignment'
+      'click .move_assignment': 'onMove'
 
     messages:
       confirm: I18n.t('Are you sure you want to delete this assignment?')
@@ -113,15 +114,18 @@ define [
           content_type: 'assignment'
         })
         @editAssignmentView = new CreateAssignmentView(model: @model)
-        @moveAssignmentView = new MoveDialogView
+
+        @moveAssignmentView = new NewMoveDialogView
           model: @model
           nested: true
           parentCollection: @model.collection.view?.parentCollection
-          parentLabelText: @messages.ag_move_label
-          parentKey: 'assignment_group_id'
+          parentTitleLabel: @messages.ag_move_label
           childKey: 'assignments'
           closeTarget: @$el.find('a[id*=manage_link]')
-          saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
+          saveURL: "#{ENV.URLS.assignment_sort_base_url}"
+          onSuccessfulMove: @onMoveSuccess
+          movePanelParent: document.getElementById('not_right_side')
+          modalTitle: I18n.t('Move Assignment')
 
         if @isGraded() && @model.postToSISEnabled() && @model.published()
           @sisButtonView = new SisButtonView
@@ -132,6 +136,40 @@ define [
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
+
+    # Public: Called when move menu item is selected
+    #
+    # Returns nothing.
+    onMove: () =>
+      @moveAssignmentView.renderOpenMoveDialog();
+
+    onMoveSuccess: (movedItems, groupId) ->
+      # collID must be a string
+      collID = groupId
+      newCollection = @parentCollection?.get(collID).get(@childKey)
+
+      # there is a currentCollection, but it doesn't match the model's collection
+      if newCollection and newCollection != @model.collection
+        #we need to remove the model from the previous collection
+        #and add it to to the new one
+        @model.collection.remove @model
+        newCollection.add @model
+        # also update the relationship to the collection
+        # if we know how
+        if @parentKey
+          @model.set 'assignment_group_id', collID
+      else
+        newCollection = @model.collection
+
+      #update all of the position attributes
+      positions = [1..newCollection.length]
+
+      movedItems.forEach (id, index) ->
+        newCollection.get(id)?.set 'position', positions[index]
+
+      newCollection.sort()
+      # finally, call reset to trigger a re-render
+      newCollection.reset newCollection.models
 
     updatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
@@ -145,7 +183,6 @@ define [
       @editAssignmentView.remove()      if @editAssignmentView
       @dateDueColumnView.remove()       if @dateDueColumnView
       @dateAvailableColumnView.remove() if @dateAvailableColumnView
-      @moveAssignmentView.remove() if @moveAssignmentView
 
       super
       # reset the model's view property; it got overwritten by child views
@@ -159,9 +196,8 @@ define [
         @editAssignmentView.setTrigger @$editAssignmentButton
 
       if @moveAssignmentView
-        @moveAssignmentView.hide()
         if @canMove()
-          @moveAssignmentView.setTrigger @$moveAssignmentButton
+          @moveAssignmentView.setCloseFocus @$moveAssignmentButton
 
       @updateScore() if @canReadGrades()
 
@@ -275,7 +311,7 @@ define [
       (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
 
     isDuplicableAssignment: ->
-      !@model.is_quiz_assignment() && !@model.isDiscussionTopic()
+      !@model.is_quiz_assignment()
 
     canDuplicate: ->
       # For now, forbid duplicating quizzes. We will implement that later.

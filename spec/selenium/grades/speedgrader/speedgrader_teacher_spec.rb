@@ -378,6 +378,7 @@ describe "speed grader" do
     # Switch to the right panel
     # Verify that the grade is .5
     driver.switch_to.default_content
+    wait_for_ajaximations
     expect(f('#grading-box-extended')['value']).to eq('0.5')
     expect(f("#students_selectmenu-button")).to_not have_class("not_graded")
     expect(f("#students_selectmenu-button")).to have_class("graded")

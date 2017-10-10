@@ -490,38 +490,194 @@ describe GradebooksController do
   end
 
   describe "GET 'show'" do
-    context "as an admin" do
-      it "renders successfully" do
-        account_admin_user(account: @course.root_account)
-        user_session(@admin)
-        get "show", params: {:course_id => @course.id}
-        expect(response).to render_template("gradebook")
-      end
-    end
+    let(:gradebook_options) { controller.js_env.fetch(:GRADEBOOK_OPTIONS) }
 
-    context "as an admin with new gradebook available" do
+    context "as an admin with new gradebook disabled" do
       before :each do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
       end
 
-      it "renders new gradebook when enabled" do
+      it "renders default gradebook when preferred with 'default'" do
+        @admin.preferences[:gradebook_version] = "default"
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("gradebook")
+      end
+
+      it "renders default gradebook when preferred with '2'" do
+        # most users will have this set from before New Gradebook existed
+        @admin.preferences[:gradebook_version] = "2"
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("gradebook")
+      end
+
+      it "renders screenreader gradebook when preferred with 'individual'" do
+        @admin.preferences[:gradebook_version] = "individual"
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("screenreader")
+      end
+
+      it "renders screenreader gradebook when preferred with 'srgb'" do
+        # most users will have this set from before New Gradebook existed
+        @admin.preferences[:gradebook_version] = "srgb"
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("screenreader")
+      end
+
+      it "renders default gradebook when user has no preference" do
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("gradebook")
+      end
+
+      it "ignores the parameter version when not in development" do
+        allow(Rails.env).to receive(:development?).and_return(false)
+        @admin.preferences[:gradebook_version] = "default"
+        get "show", params: { course_id: @course.id, version: "individual" }
+        expect(response).to render_template("gradebook")
+      end
+    end
+
+    context "as an admin with new gradebook enabled" do
+      before :each do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
         @course.enable_feature!(:new_gradebook)
-        get "show", params: {course_id: @course.id}
+      end
+
+      it "renders new default gradebook when preferred with 'default'" do
+        @admin.preferences[:gradebook_version] = "default"
+        get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/gradezilla/gradebook")
       end
 
-      it "renders new indidivual view when enabled" do
-        @course.enable_feature!(:new_gradebook)
-        allow(@admin).to receive(:preferred_gradebook_version).and_return('individual')
-        get "show", params: {course_id: @course.id}
+      it "renders new default gradebook when preferred with '2'" do
+        # most users will have this set from before New Gradebook existed
+        @admin.preferences[:gradebook_version] = "2"
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+
+      it "renders new screenreader gradebook when preferred with 'individual'" do
+        @admin.preferences[:gradebook_version] = "individual"
+        get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/gradezilla/individual")
       end
 
-      it "ignores the version parameter outside development environments" do
+      it "renders new screenreader gradebook when preferred with 'srgb'" do
+        # most a11y users will have this set from before New Gradebook existed
+        @admin.preferences[:gradebook_version] = "srgb"
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("gradebooks/gradezilla/individual")
+      end
+
+      it "renders new default gradebook when user has no preference" do
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+
+      it "ignores the parameter version when not in development" do
         allow(Rails.env).to receive(:development?).and_return(false)
-        get "show", params: {course_id: @course.id, version: 'gradezilla-gradebook'}
-        expect(response).to render_template(:gradebook)
+        @admin.preferences[:gradebook_version] = "default"
+        get "show", params: { course_id: @course.id, version: "individual" }
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+    end
+
+    context "in development with new gradebook disabled and requested version is 'default'" do
+      before :each do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+        @admin.preferences[:gradebook_version] = "individual"
+        allow(Rails.env).to receive(:development?).and_return(true)
+      end
+
+      it "renders new default gradebook when new_gradebook param is 'true'" do
+        get "show", params: { course_id: @course.id, version: "default", new_gradebook: "true" }
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+
+      it "renders old default gradebook when new_gradebook param is 'false'" do
+        get "show", params: { course_id: @course.id, version: "default", new_gradebook: "false" }
+        expect(response).to render_template("gradebook")
+      end
+
+      it "renders old default gradebook when new_gradebook param is not provided" do
+        get "show", params: { course_id: @course.id, version: "default" }
+        expect(response).to render_template("gradebook")
+      end
+    end
+
+    context "in development with new gradebook disabled and requested version is 'individual'" do
+      before :each do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+        @admin.preferences[:gradebook_version] = "default"
+        allow(Rails.env).to receive(:development?).and_return(true)
+      end
+
+      it "renders new screenreader gradebook when new_gradebook param is 'true'" do
+        get "show", params: { course_id: @course.id, version: "individual", new_gradebook: "true" }
+        expect(response).to render_template("gradebooks/gradezilla/individual")
+      end
+
+      it "renders old screenreader gradebook when new_gradebook param is 'false'" do
+        get "show", params: { course_id: @course.id, version: "individual", new_gradebook: "false" }
+        expect(response).to render_template("screenreader")
+      end
+
+      it "renders old screenreader gradebook when new_gradebook param is not provided" do
+        get "show", params: { course_id: @course.id, version: "individual" }
+        expect(response).to render_template("screenreader")
+      end
+    end
+
+    context "in development with new gradebook enabled and requested version is 'default'" do
+      before :each do
+        @course.enable_feature!(:new_gradebook)
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+        @admin.preferences[:gradebook_version] = "individual"
+        allow(Rails.env).to receive(:development?).and_return(true)
+      end
+
+      it "renders new default gradebook when new_gradebook param is 'true'" do
+        get "show", params: { course_id: @course.id, version: "default", new_gradebook: "true" }
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+
+      it "renders old default gradebook when new_gradebook param is 'false'" do
+        get "show", params: { course_id: @course.id, version: "default", new_gradebook: "false" }
+        expect(response).to render_template("gradebook")
+      end
+
+      it "renders new default gradebook when new_gradebook param is not provided" do
+        get "show", params: { course_id: @course.id, version: "default" }
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+    end
+
+    context "in development with new gradebook enabled and requested version is 'individual'" do
+      before :each do
+        @course.enable_feature!(:new_gradebook)
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+        @admin.preferences[:gradebook_version] = "default"
+        allow(Rails.env).to receive(:development?).and_return(true)
+      end
+
+      it "renders new screenreader gradebook when new_gradebook param is 'true'" do
+        get "show", params: { course_id: @course.id, version: "individual", new_gradebook: "true" }
+        expect(response).to render_template("gradebooks/gradezilla/individual")
+      end
+
+      it "renders old screenreader gradebook when new_gradebook param is 'false'" do
+        get "show", params: { course_id: @course.id, version: "individual", new_gradebook: "false" }
+        expect(response).to render_template("screenreader")
+      end
+
+      it "renders new screenreader gradebook when new_gradebook param is not provided" do
+        get "show", params: { course_id: @course.id, version: "individual" }
+        expect(response).to render_template("gradebooks/gradezilla/individual")
       end
     end
 
@@ -529,8 +685,6 @@ describe GradebooksController do
       before :each do
         user_session(@teacher)
       end
-
-      let(:gradebook_options) { controller.js_env.fetch(:GRADEBOOK_OPTIONS) }
 
       it "includes colors if New Gradebook is enabled" do
         @course.enable_feature!(:new_gradebook)
@@ -559,6 +713,13 @@ describe GradebooksController do
         get :show, params: {course_id: @course.id}
         api_max_per_page = assigns[:js_env][:GRADEBOOK_OPTIONS][:api_max_per_page]
         expect(api_max_per_page).to eq(50)
+      end
+
+      it "includes sis_section_id on the sections even if the teacher doesn't have 'Read SIS Data' permissions" do
+        @course.root_account.role_overrides.create!(permission: :read_sis, enabled: false, role: teacher_role)
+        get :show, params: { course_id: @course.id }
+        section = gradebook_options.fetch(:sections).first
+        expect(section).to have_key :sis_section_id
       end
 
       describe "graded_late_or_missing_submissions_exist" do

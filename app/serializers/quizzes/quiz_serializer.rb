@@ -193,7 +193,7 @@ module Quizzes
     end
 
     def include_unpublishable?
-      quiz.grants_right?(current_user, session, :manage)
+      quiz.grants_right?(current_user, :manage)
     end
 
     def filter(keys)
@@ -239,7 +239,7 @@ module Quizzes
     alias_method :unpublishable, :can_unpublish
 
     def can_update
-      quiz.grants_right?(current_user, session, :update)
+      quiz.grants_right?(current_user, :update)
     end
 
     def question_count
@@ -346,11 +346,11 @@ module Quizzes
     end
 
     def user_may_grade?
-      quiz.grants_right?(current_user, session, :grade)
+      quiz.grants_right?(current_user, :grade)
     end
 
     def user_may_manage?
-      quiz.grants_right?(current_user, session, :manage)
+      quiz.grants_right?(current_user, :manage)
     end
 
     def user_finder

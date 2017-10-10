@@ -57,3 +57,32 @@
     </div>
   </div>
 </div>
+<div id="rubric_rating_dialog" style="display: none;">
+  <div class="description" style="border-bottom: 1px solid #ccc; padding: 5px 0; font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">
+    <span id="edit_rating_form_criterion_description"></span>
+  </div>
+  <div class="editing">
+    <form id="edit_rating_form" class="no-margin-bottom">
+      <div>
+        <div><label id='rating_form_score_label' class="rating_form_label"><%= t "Rating Score" %></label></div>
+        <span id='rating_form_max_score_label' hidden><%= t('Rating max score') %></span>
+        <input id="points" aria-labelledby="rating_form_score_label" type="text" size="2" name="points" class="no-margin-bottom span1" />
+        <span class="range_rating"><%= t('to') %> >
+          <input aria-label="<%= t('Rating min score') %>" type="text" size="2" name="min_points" class="no-margin-bottom span1 min_points" placeholder="<%= t('min') %>"/>
+        </span><%= t('pts') %>
+      </div>
+      <div>
+        <label for="rating_form_title" class="rating_form_label"><%= t "Rating Title" %></label>
+        <input id="rating_form_title" type="text" class="rating_description" style="width: 90%;" name="description"/>
+      </div>
+      <div>
+        <label for="rating_form_description" class="rating_form_label"><%= t "Rating Description" %></label>
+        <textarea id="rating_form_description" rows="4" style="width: 90%;" class="rating_long_description" name="rating_long_description" form="edit_rating_form"></textarea>
+      </div>
+      <div class="button-container">
+        <button type="button" class="btn button-secondary cancel_button"><%= t "Cancel" %></button>
+        <button type="button" class="btn btn-primary save_button ok_button"><%= t "Update Rating" %></button>
+      </div>
+    </form>
+  </div>
+</div>

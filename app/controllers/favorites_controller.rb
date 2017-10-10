@@ -52,7 +52,7 @@ class FavoritesController < ApplicationController
   include Api::V1::Group
 
   # @API List favorite courses
-  # Retrieve the list of favorite courses for the current user. If the user has not chosen
+  # Retrieve the paginated list of favorite courses for the current user. If the user has not chosen
   # any favorites, then a selection of currently enrolled courses will be returned.
   #
   # @argument exclude_blueprint_courses [Boolean]
@@ -90,7 +90,7 @@ class FavoritesController < ApplicationController
   end
 
   # @API List favorite groups
-  # Retrieve the list of favorite groups for the current user. If the user has not chosen
+  # Retrieve the paginated list of favorite groups for the current user. If the user has not chosen
   # any favorites, then a selection of groups that the user is a member of will be returned.
   #
   #

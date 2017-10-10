@@ -74,7 +74,6 @@ describe SubmissionsController do
 
     it "should copy attachments to the submissions folder if that feature is enabled" do
       course_with_student_logged_in(:active_all => true)
-      @course.root_account.enable_feature! :submissions_folder
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
       att = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => { "0" => { :uploaded_data => "" }, "-1" => { :uploaded_data => "" } }}

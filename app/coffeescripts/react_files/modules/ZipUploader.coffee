@@ -58,7 +58,6 @@ define [
         $.getJSON(url).then (results) =>
           @getContentMigration()
       else
-        results = $.parseJSON(uploadResults.target.response)
         @getContentMigration()
 
     # get the content migration when ready and use progress api to pull migration progress

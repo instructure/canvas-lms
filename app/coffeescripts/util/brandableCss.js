@@ -29,7 +29,7 @@ const brandableCss = {
   urlFor (bundleName, {combinedChecksum, includesNoVariables}) {
     const brandAndVariant = includesNoVariables
       ? 'no_variables'
-      : (window.ENV.active_brand_config ? `${window.ENV.active_brand_config}/` : '') + brandableCss.getCssVariant()
+      : brandableCss.getCssVariant()
 
     return [
       window.ENV.ASSET_HOST || '',

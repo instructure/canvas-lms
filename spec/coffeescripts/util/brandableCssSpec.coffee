@@ -25,7 +25,6 @@ define [
 
   stubENV = ->
     window.ENV ||= {}
-    window.ENV.active_brand_config = "brand_config_id"
     window.ENV.ASSET_HOST = 'http://cdn.example.com'
     window.ENV.use_high_contrast = true
 
@@ -58,5 +57,5 @@ define [
   test 'should pick up ENV settings', ->
     stubENV()
     window.ENV.use_high_contrast = false
-    expected = "http://cdn.example.com/dist/brandable_css/#{window.ENV.active_brand_config}/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
+    expected = "http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
     equal brandableCss.urlFor(testBundleId,{combinedChecksum: testFingerprint}), expected

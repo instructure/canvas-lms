@@ -122,7 +122,6 @@ class ApplicationController < ActionController::Base
       ]
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
-        active_brand_config: active_brand_config.try(:md5),
         active_brand_config_json_url: active_brand_config_json_url,
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
@@ -248,8 +247,8 @@ class ApplicationController < ActionController::Base
   end
   helper_method :master_courses?
 
-  def setup_master_course_restrictions(objects, course)
-    return unless master_courses? && course.is_a?(Course) && course.grants_right?(@current_user, session, :read_as_admin)
+  def setup_master_course_restrictions(objects, course, user_can_edit: false)
+    return unless master_courses? && course.is_a?(Course) && (user_can_edit || course.grants_right?(@current_user, session, :read_as_admin))
 
     if MasterCourses::MasterTemplate.is_master_course?(course)
       MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)
@@ -285,18 +284,23 @@ class ApplicationController < ActionController::Base
     js_bundle :blueprint_courses
     css_bundle :blueprint_courses
 
-    master_course = is_master ? @context : @context.master_course_subscriptions.active.first.master_template.course
+    master_course = is_master ? @context : MasterCourses::MasterTemplate.master_course_for_child_course(@context)
     js_env :DEBUG_BLUEPRINT_COURSES => Rails.env.development? || Rails.env.test?
-    js_env :BLUEPRINT_COURSES_DATA => {
+    bc_data = {
       isMasterCourse: is_master,
       isChildCourse: is_child,
       accountId: @context.account.id,
       masterCourse: master_course.slice(:id, :name, :enrollment_term_id),
       course: @context.slice(:id, :name, :enrollment_term_id),
-      subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-      terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-      canManageCourse: MasterCourses::MasterTemplate.is_master_course?(@context) && @context.account.grants_right?(@current_user, :manage_master_courses)
     }
+    if is_master
+      bc_data.merge!(
+        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        canManageCourse: @context.account.grants_right?(@current_user, :manage_master_courses)
+      )
+    end
+    js_env :BLUEPRINT_COURSES_DATA => bc_data
     if is_master && js_env.key?(:NEW_USER_TUTORIALS)
       js_env[:NEW_USER_TUTORIALS][:is_enabled] = false
     end
@@ -1478,7 +1482,9 @@ class ApplicationController < ActionController::Base
       if @tag.context.is_a?(Assignment)
         @assignment = @tag.context
         @resource_title = @assignment.title
-        @module_tag = @context.context_module_tags.not_deleted.find(params[:module_item_id]) if params[:module_item_id]
+        @module_tag = params[:module_item_id] ?
+          @context.context_module_tags.not_deleted.find(params[:module_item_id]) :
+          @assignment.context_module_tags.first
       else
         @module_tag = @tag
         @resource_title = @tag.title
@@ -2102,8 +2108,8 @@ class ApplicationController < ActionController::Base
     end
 
     if @page
-      if @context.wiki.grants_right?(@current_user, :manage)
-        mc_status = setup_master_course_restrictions(@page, @context)
+      if @page.grants_any_right?(@current_user, session, :update, :update_content)
+        mc_status = setup_master_course_restrictions(@page, @context, user_can_edit: true)
       end
 
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true, :master_course_status => mc_status)

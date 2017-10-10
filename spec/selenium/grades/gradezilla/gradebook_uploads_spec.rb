@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative '../pages/gradezilla_page'
 
 describe "Gradezilla - uploads" do
   include_context "in-process server selenium tests"
@@ -25,9 +26,7 @@ describe "Gradezilla - uploads" do
     @student = user_factory(:username => 'student@example.com', :active_all => 1)
     @course.enroll_student(@student).accept!
 
-    get "/courses/#{@course.id}/gradebook_uploads/new"
-    @upload_element = f('#gradebook_upload_uploaded_data')
-    @upload_form = f('#new_gradebook_upload')
+    Gradezilla.visit_upload(@course)
   end
 
   def gradebook_file(filename, *rows)
@@ -51,8 +50,8 @@ describe "Gradezilla - uploads" do
     _filename, fullpath, _data = gradebook_file("gradebook0.csv",
       "Student Name,ID,Section,GPA Scale Assignment",
       "User,#{@student.id},,B-")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     run_jobs
     wait_for_ajaximations
     expect(f("#spinner")).not_to be_displayed
@@ -67,11 +66,11 @@ describe "Gradezilla - uploads" do
     assignment = @course.assignments.create!(:title => "Assignment 1")
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook1.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook1.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,10")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -84,11 +83,11 @@ describe "Gradezilla - uploads" do
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
     assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1,Assignment 2",
           "User,#{@student.id},,10,9")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -100,11 +99,11 @@ describe "Gradezilla - uploads" do
   end
 
   it "should show a new assignment", priority: "1", test_id: 209975 do
-    filename, fullpath, data = gradebook_file("gradebook3.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook3.csv",
       "Student Name,ID,Section,New Assignment",
       "User,#{@student.id},,0")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -142,8 +141,8 @@ describe "Gradezilla - uploads" do
     _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 2,Assignment 1",
           "User,#{@student.id},,,10")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -175,11 +174,11 @@ describe "Gradezilla - uploads" do
     assignment = @course.assignments.create!(:title => "Assignment 1")
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook4.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook4.csv",
           "Student Name,ID,Section,Assignment 2",
           "User,#{@student.id},,10")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -202,11 +201,11 @@ describe "Gradezilla - uploads" do
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
     assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook5.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook5.csv",
           "Student Name,ID,Section,Assignment 1,Assignment 3",
           "User,#{@student.id},,10,9")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -231,11 +230,11 @@ describe "Gradezilla - uploads" do
     assignment = @course.assignments.create!(:title => "Assignment 1")
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook6.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook6.csv",
           "Student Name,ID,Section,Assignment 1",
           "Student,,,10")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -258,11 +257,11 @@ describe "Gradezilla - uploads" do
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
     assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook7.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook7.csv",
           "Student Name,ID,Section,Assignment 1,Assignment 2",
           "Student,,,10,9")
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
 
@@ -286,15 +285,14 @@ describe "Gradezilla - uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,9")
 
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
-    expect(f("#spinner")).not_to be_displayed
 
     assert_assignment_is_highlighted
   end
@@ -303,15 +301,14 @@ describe "Gradezilla - uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,")
 
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
-    expect(f("#spinner")).not_to be_displayed
 
     assert_assignment_is_highlighted
   end
@@ -320,15 +317,14 @@ describe "Gradezilla - uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,100")
 
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
-    expect(f("#spinner")).not_to be_displayed
 
     assert_assignment_is_not_highlighted
   end
@@ -337,12 +333,12 @@ describe "Gradezilla - uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,EX")
 
-    @upload_element.send_keys(fullpath)
-    @upload_form.submit
+    Gradezilla.grades_uploaded_data.send_keys(fullpath)
+    Gradezilla.grades_new_upload.submit
     wait_for_ajaximations
     run_jobs
     expect(f("#spinner")).not_to be_displayed

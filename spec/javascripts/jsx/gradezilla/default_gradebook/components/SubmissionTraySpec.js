@@ -58,7 +58,8 @@ QUnit.module('SubmissionTray', function (hooks) {
       speedGraderEnabled: true,
       student: {
         id: '27',
-        name: 'Jane Doe'
+        name: 'Jane Doe',
+        gradesUrl: 'http://gradeUrl/'
       },
       submission: {
         grade: '100%',
@@ -72,12 +73,23 @@ QUnit.module('SubmissionTray', function (hooks) {
       updateSubmission () {},
       assignment: {
         name: 'Book Report',
-        htmlUrl: 'http://example.com/theassignment'
+        htmlUrl: 'http://htmlUrl/'
       },
       isFirstAssignment: true,
       isLastAssignment: true,
-      selectNextAssignment: () => {},
-      selectPreviousAssignment: () => {}
+      selectNextAssignment () {},
+      selectPreviousAssignment () {},
+      isFirstStudent: true,
+      isLastStudent: true,
+      selectNextStudent () {},
+      selectPreviousStudent () {},
+      updateSubmissionComments () {},
+      submissionCommentsLoaded: true,
+      createSubmissionComment () {},
+      deleteSubmissionComment () {},
+      processing: false,
+      setProcessing () {},
+      submissionComments: []
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
     clock.tick(50); // wait for Tray to transition open
@@ -88,7 +100,7 @@ QUnit.module('SubmissionTray', function (hooks) {
   }
 
   function studentNameDiv () {
-    return document.querySelector('#SubmissionTray__StudentName');
+    return document.querySelector('#student-carousel a');
   }
 
   function wrapContent () {
@@ -124,18 +136,19 @@ QUnit.module('SubmissionTray', function (hooks) {
 
   test('shows avatar if showContentComingSoon is false and avatar is not null', function () {
     const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty';
-    mountComponent({ student: { id: '27', name: 'Bob', avatarUrl } });
+    const gradesUrl = 'http://gradesUrl/';
+    mountComponent({ student: { id: '27', name: 'Bob', avatarUrl, gradesUrl } });
     const avatarBackground = avatarDiv().firstChild.style.getPropertyValue('background-image');
     strictEqual(avatarBackground, `url("${avatarUrl}")`);
   });
 
   test('shows no avatar if showContentComingSoon is false and avatar is null', function () {
-    mountComponent({ student: { id: '27', name: 'Joe' } });
+    mountComponent({ student: { id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/' } });
     notOk(avatarDiv());
   });
 
   test('shows name if showContentComingSoon is false', function () {
-    mountComponent({ student: { id: '27', name: 'Sara' } });
+    mountComponent({ student: { id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/' } });
     strictEqual(studentNameDiv().innerHTML, 'Sara');
   });
 
@@ -167,8 +180,13 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('does not show a radio input group if showContentComingSoon is true', function () {
+    const server = sinon.fakeServer.create({ respondImmediately: true });
+    server.respondWith('GET', /^\/images\/.*\.svg$/, [
+      200, { 'Content-Type': 'img/svg+xml' }, '{}'
+    ]);
     mountComponent({ showContentComingSoon: true });
     notOk(radioInputGroupDiv());
+    server.restore();
   });
 
   test('shows assignment carousel', function () {
@@ -181,18 +199,29 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(wrapContent().find('#assignment-carousel').text(), 'Book Report');
   });
 
-  test('shows assignment carousel with no arrows when isFirstAssignment and isLastAssignment are true', function () {
+  test('shows assignment carousel with no left arrow when isFirstAssignment and isLastAssignment are true', function () {
     mountComponent();
     strictEqual(wrapContent().find('#assignment-carousel .left-arrow-button-container button').length, 0);
+  });
+
+  test('shows assignment carousel with no right arrow when isFirstAssignment and isLastAssignment are true', function () {
+    mountComponent();
     strictEqual(wrapContent().find('#assignment-carousel .right-arrow-button-container button').length, 0);
   });
 
-  test('shows assignment carousel with both arrows when isFirstAssignment and isLastAssignment are false', function () {
+  test('shows assignment carousel with left arrow when isFirstAssignment and isLastAssignment are false', function () {
     mountComponent({
       isFirstAssignment: false,
       isLastAssignment: false
     });
     strictEqual(wrapContent().find('#assignment-carousel .left-arrow-button-container button').length, 1);
+  });
+
+  test('shows assignment carousel with right arrow when isFirstAssignment and isLastAssignment are false', function () {
+    mountComponent({
+      isFirstAssignment: false,
+      isLastAssignment: false
+    });
     strictEqual(wrapContent().find('#assignment-carousel .right-arrow-button-container button').length, 1);
   });
 
@@ -202,6 +231,13 @@ QUnit.module('SubmissionTray', function (hooks) {
       isLastAssignment: true
     });
     strictEqual(wrapContent().find('#assignment-carousel .left-arrow-button-container button').length, 1);
+  });
+
+  test('shows assignment carousel with no right arrow when isFirstAssignment is false', function () {
+    mountComponent({
+      isFirstAssignment: false,
+      isLastAssignment: true
+    });
     strictEqual(wrapContent().find('#assignment-carousel .right-arrow-button-container button').length, 0);
   });
 
@@ -210,7 +246,115 @@ QUnit.module('SubmissionTray', function (hooks) {
       isFirstAssignment: true,
       isLastAssignment: false
     });
-    strictEqual(wrapContent().find('#assignment-carousel .left-arrow-button-container button').length, 0);
     strictEqual(wrapContent().find('#assignment-carousel .right-arrow-button-container button').length, 1);
+  });
+
+  test('shows assignment carousel with no left arrow when isLastAssignment is false', function () {
+    mountComponent({
+      isFirstAssignment: true,
+      isLastAssignment: false
+    });
+    strictEqual(wrapContent().find('#assignment-carousel .left-arrow-button-container button').length, 0);
+  });
+
+  test('shows student carousel', function () {
+    mountComponent();
+    strictEqual(wrapContent().find('#student-carousel').length, 1);
+  });
+
+  test('shows student carousel containing given student name', function () {
+    mountComponent();
+    strictEqual(wrapContent().find('#student-carousel').text(), 'Jane Doe');
+  });
+
+  test('shows student carousel with no left arrow when isFirstStudent and isLastStudent are true', function () {
+    mountComponent();
+    strictEqual(wrapContent().find('#student-carousel .left-arrow-button-container button').length, 0);
+  });
+
+  test('shows student carousel with no right arrow when isFirstStudent and isLastStudent are true', function () {
+    mountComponent();
+    strictEqual(wrapContent().find('#student-carousel .left-arrow-button-container button').length, 0);
+  });
+
+  test('shows student carousel with left arrow when isFirstStudent and isLastStudent are false', function () {
+    mountComponent({
+      isFirstStudent: false,
+      isLastStudent: false
+    });
+    strictEqual(wrapContent().find('#student-carousel .left-arrow-button-container button').length, 1);
+  });
+
+  test('shows student carousel with right arrow when isFirstStudent and isLastStudent are false', function () {
+    mountComponent({
+      isFirstStudent: false,
+      isLastStudent: false
+    });
+    strictEqual(wrapContent().find('#student-carousel .right-arrow-button-container button').length, 1);
+  });
+
+  test('shows student carousel with left arrow when isFirstStudent is false', function () {
+    mountComponent({
+      isFirstStudent: false,
+      isLastStudent: true
+    });
+    strictEqual(wrapContent().find('#student-carousel .left-arrow-button-container button').length, 1);
+  });
+
+  test('shows student carousel with no right arrow when isFirstStudent is false', function () {
+    mountComponent({
+      isFirstStudent: false,
+      isLastStudent: true
+    });
+    strictEqual(wrapContent().find('#student-carousel .right-arrow-button-container button').length, 0);
+  });
+
+  test('shows student carousel with right arrow when isLastStudent is false', function () {
+    mountComponent({
+      isFirstStudent: true,
+      isLastStudent: false
+    });
+    strictEqual(wrapContent().find('#student-carousel .right-arrow-button-container button').length, 1);
+  });
+
+  test('shows student carousel with no left arrow when isLastStudent is false', function () {
+    mountComponent({
+      isFirstStudent: true,
+      isLastStudent: false
+    });
+    strictEqual(wrapContent().find('#student-carousel .left-arrow-button-container button').length, 0);
+  });
+
+  test('does not add padding to the carousel container when an avatar is present', function () {
+    const student = {
+      id: '27',
+      name: 'Jane Doe',
+      gradesUrl: 'http://gradeUrl/',
+      avatarUrl: 'http://avatarUrl/'
+    };
+
+    mountComponent({
+      student,
+      isFirstStudent: false,
+      isLastStudent: false
+    });
+
+    strictEqual(wrapContent().find('#SubmissionTray__Content').find('Container').at(0).prop('padding'), '0 0 0 0');
+  });
+
+  test('adds padding to the carousel container when no avatar is present', function () {
+    const student = {
+      id: '27',
+      name: 'Jane Doe',
+      gradesUrl: 'http://gradeUrl/',
+    };
+
+    mountComponent({
+      student,
+      isFirstStudent: false,
+      isLastStudent: false
+    });
+
+    strictEqual(wrapContent().find('#SubmissionTray__Content').find('Container').at(0).prop('padding'), 'small 0 0 0');
   });
 });

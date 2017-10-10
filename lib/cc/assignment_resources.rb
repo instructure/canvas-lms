@@ -230,7 +230,17 @@ module CC
         node.external_tool_url assignment.external_tool_tag.url
         node.external_tool_new_tab assignment.external_tool_tag.new_tab
       end
+
       node.tag!(:turnitin_settings, (assignment.send(:turnitin_settings).to_json)) if assignment.turnitin_enabled || assignment.vericite_enabled
+      if assignment.assignment_configuration_tool_lookup_ids.present?
+        resource_codes = assignment.tool_settings_tool.try(:resource_codes) || {}
+        node.similarity_detection_tool({
+          resource_type_code: resource_codes[:resource_type_code],
+          vendor_code: resource_codes[:vendor_code],
+          product_code: resource_codes[:product_code],
+          visibility: assignment.turnitin_settings.with_indifferent_access[:originality_report_visibility]
+        })
+      end
     end
 
   end

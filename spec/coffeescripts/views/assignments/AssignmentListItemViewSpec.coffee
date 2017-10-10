@@ -140,7 +140,10 @@ define [
   genSetup = (model=assignment1()) ->
     fakeENV.setup(
       current_user_roles: ['teacher'],
-      PERMISSIONS: {manage: false}
+      PERMISSIONS: {manage: false},
+      URLS: {
+        assignment_sort_base_url : "test"
+      }
     )
     @model = model
     @submission = new Submission
@@ -157,7 +160,10 @@ define [
   QUnit.module 'AssignmentListItemViewSpec',
     setup: ->
       fakeENV.setup({
-        current_user_roles: ['teacher']
+        current_user_roles: ['teacher'],
+        URLS: {
+          assignment_sort_base_url : "test"
+        }
       })
       genSetup.call @
       @snapshot = tz.snapshot()
@@ -551,7 +557,7 @@ define [
     notOk json.canDuplicate
     equal view.$('.duplicate_assignment').length, 0
 
-  test 'cannot duplicate when assignment is discussion topic', ->
+  test 'can duplicate when assignment is discussion topic', ->
     model = buildAssignment
       id: 1
       title: 'Foo'
@@ -559,8 +565,8 @@ define [
 
     view = createView(model, userIsAdmin: true, canManage: true, duplicateEnabled: true)
     json = view.toJSON()
-    notOk json.canDuplicate
-    equal view.$('.duplicate_assignment').length, 0
+    ok json.canDuplicate
+    equal view.$('.duplicate_assignment').length, 1
 
   test 'can duplicate when assignment is wiki page', ->
     model = buildAssignment
@@ -677,7 +683,10 @@ define [
     setup: ->
       fakeENV.setup({
         current_user_roles: ['teacher'],
-        CONDITIONAL_RELEASE_SERVICE_ENABLED: true
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        URLS: {
+          assignment_sort_base_url : "test"
+        }
       })
     teardown: ->
       fakeENV.teardown()
@@ -764,6 +773,9 @@ define [
               },
             ],
           }],
+        },
+        URLS: {
+          assignment_sort_base_url : "test"
         }
       })
       CyoeHelper.reloadEnv()
@@ -814,6 +826,9 @@ define [
               },
             ],
           }],
+        },
+        URLS: {
+          assignment_sort_base_url : "test"
         }
       })
       CyoeHelper.reloadEnv()

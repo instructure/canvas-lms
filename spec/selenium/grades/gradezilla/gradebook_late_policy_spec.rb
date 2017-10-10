@@ -35,7 +35,7 @@ describe 'Late Policies:' do
       # create late/missing policies on backend
       @course.create_late_policy(
         missing_submission_deduction_enabled: true,
-        missing_submission_deduction: 50.0,
+        missing_submission_deduction: 25.0,
         late_submission_deduction_enabled: true,
         late_submission_deduction: 10.0,
         late_submission_interval: 'day',
@@ -68,6 +68,33 @@ describe 'Late Policies:' do
         submission_types: 'online_text_entry'
       )
 
+      # paper assignment
+      @a4 = @course.assignments.create!(
+        title: 'assignment four',
+        grading_type: 'pass_fail',
+        points_possible: 10,
+        due_at: 1.day.ago(now),
+        submission_types: 'on_paper'
+      )
+
+      # pass/fail assignment
+      @a5 = @course.assignments.create!(
+        title: 'assignment five',
+        grading_type: 'pass_fail',
+        points_possible: 10,
+        due_at: 1.day.ago(now),
+        submission_types: 'online_text_entry'
+      )
+
+      # no-submission assignment
+      @a6 = @course.assignments.create!(
+        title: 'assignment six',
+        grading_type: 'points',
+        points_possible: 0,
+        due_at: 1.day.ago(now),
+        submission_types: 'none'
+      )
+
       # as a student submit 2 assignments late
       Timecop.freeze(2.hours.ago(now)) do
         @a1.submit_homework(@student, body: 'submitting my homework')
@@ -92,11 +119,43 @@ describe 'Late Policies:' do
     end
 
     it 'missing policy adjusts grades correctly', test_id: 3196972, priority: '1' do
-      expect(Gradezilla::Cells.get_grade(@student, @a2)).to eq "50"
+      expect(Gradezilla::Cells.get_grade(@student, @a2)).to eq "75"
     end
 
     it 'late policy with floor adjust the grades correctly', test_id: 3196974, priority: '1' do
       expect(Gradezilla::Cells.get_grade(@student, @a3)).to eq "5"
+    end
+
+    it 'missing/late deductions dont affect paper assignments', test_id: 3354104, priority: '1' do
+      expect(Gradezilla::Cells.get_grade(@student, @a4)).to eq "-"
+    end
+
+    it 'missing policy adjusts pass/fail assignment', test_id: 3354099, priority: '1' do
+      expect(Gradezilla::Cells.get_grade(@student, @a5)).to eq "fail"
+    end
+
+    it 'late & missing policy wont affect no-submission assignment', test_id: 3354106, priority: '2' do
+      expect(Gradezilla::Cells.get_grade(@student, @a6)).to eq "-"
+    end
+
+    it 'late penalty re-applied if submission graded same as its effective grade', test_id: 3354105, priority: '2' do
+      # re-grade student's @a1 assignment that is late and has previous deductions
+      Gradezilla::Cells.edit_grade(@student, @a1, "80")
+      expect(Gradezilla::Cells.get_grade(@student, @a1)).to eq "70"
+    end
+
+    it 'updates score when late policy changes', test_id: 3354108, priority: '1' do
+      @course.late_policy.update(late_submission_deduction: 20.0)
+      refresh_page
+      expect(Gradezilla::Cells.get_grade(@student, @a1)).to eq "70"
+    end
+
+    it 'once applied, missing policy change does not re-trigger score change', test_id: 3354107, priority: '2' do
+      @course.late_policy.update(missing_submission_deduction: 50.0, missing_submission_deduction_enabled: false)
+      # disable and then re-enable updated missing policy
+      @course.late_policy.update(missing_submission_deduction_enabled: true)
+      refresh_page
+      expect(Gradezilla::Cells.get_grade(@student, @a2)).to eq "75"
     end
   end
 

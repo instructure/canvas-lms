@@ -69,6 +69,10 @@ test('returns the given grade when it is a mix of letters and numbers', function
   equal(GradeFormatHelper.formatGrade('A3'), 'A3');
 });
 
+test('returns the given grade when it is numbers followed by letters', function () {
+  equal(GradeFormatHelper.formatGrade('1E', { delocalize: false }), '1E');
+});
+
 test('does not format letter grades', function () {
   this.spy(I18n, 'n');
   GradeFormatHelper.formatGrade('A');
