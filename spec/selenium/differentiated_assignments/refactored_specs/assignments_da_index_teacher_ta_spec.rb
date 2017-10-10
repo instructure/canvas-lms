@@ -27,9 +27,9 @@ describe 'Viewing differentiated assignments' do
       it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618802 do
         go_to(urls.assignments_index_page)
         expect(list_of_assignments.text).to include(
-          *assignments.all.map(&:title),
-          *discussions.all.map(&:title),
-          *quizzes.all.map(&:title)
+          *assignments.short_list.map(&:title),
+          *discussions.short_list.map(&:title),
+          *quizzes.short_list.map(&:title)
         )
       end
     end
@@ -42,9 +42,9 @@ describe 'Viewing differentiated assignments' do
       it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618803 do
         go_to(urls.assignments_index_page)
         expect(list_of_assignments.text).to include(
-          *assignments.all.map(&:title),
-          *discussions.all.map(&:title),
-          *quizzes.all.map(&:title)
+          *assignments.short_list.map(&:title),
+          *discussions.short_list.map(&:title),
+          *quizzes.short_list.map(&:title)
         )
       end
     end

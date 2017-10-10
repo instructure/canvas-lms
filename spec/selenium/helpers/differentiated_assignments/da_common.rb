@@ -22,7 +22,7 @@ shared_context 'differentiated assignments' do
   include DifferentiatedAssignments
   include_context 'in-process server selenium tests'
 
-  before(:once) { DifferentiatedAssignments.initialize }
+  before(:once) { DifferentiatedAssignments.short_list_initialize }
 
   let(:assignments) { DifferentiatedAssignments::Homework::Assignments }
   let(:discussions) { DifferentiatedAssignments::Homework::Discussions }

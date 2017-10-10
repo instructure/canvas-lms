@@ -30,12 +30,22 @@ module DifferentiatedAssignments
           @assignment_for_everyone                  = create_assignment_for(HomeworkAssignee::EVERYONE)
           @assignment_for_section_a                 = create_assignment_for(HomeworkAssignee::Section::SECTION_A)
           @assignment_for_section_b                 = create_assignment_for(HomeworkAssignee::Section::SECTION_B)
-          @assignment_for_sections_a_and_b          = create_assignment_for([ HomeworkAssignee::Section::SECTION_A, HomeworkAssignee::Section::SECTION_B ])
+          @assignment_for_sections_a_and_b          = create_assignment_for([HomeworkAssignee::Section::SECTION_A,
+                                                                             HomeworkAssignee::Section::SECTION_B ])
           @assignment_for_section_c                 = create_assignment_for(HomeworkAssignee::Section::SECTION_C)
           @assignment_for_first_student             = create_assignment_for(HomeworkAssignee::Student::FIRST_STUDENT)
-          @assignment_for_second_and_third_students = create_assignment_for([ HomeworkAssignee::Student::SECOND_STUDENT, HomeworkAssignee::Student::THIRD_STUDENT ])
+          @assignment_for_second_and_third_students = create_assignment_for([HomeworkAssignee::Student::SECOND_STUDENT,
+                                                                             HomeworkAssignee::Student::THIRD_STUDENT ])
           assign_assignment_overrides
           submit_assignments
+        end
+
+        def short_list_initialize
+          @assignment_for_sections_a_and_b          = create_assignment_for([HomeworkAssignee::Section::SECTION_A,
+                                                                             HomeworkAssignee::Section::SECTION_B ])
+          @assignment_for_second_and_third_students = create_assignment_for([HomeworkAssignee::Student::SECOND_STUDENT,
+                                                                             HomeworkAssignee::Student::THIRD_STUDENT ])
+          assign_assignment_overrides(short: true)
         end
 
         def all
@@ -50,14 +60,25 @@ module DifferentiatedAssignments
           ]
         end
 
+        def short_list
+          [
+            self.assignment_for_sections_a_and_b,
+            self.assignment_for_second_and_third_students
+          ]
+        end
+
         private
 
           def create_assignment_for(assignee)
             DifferentiatedAssignments::Assignment.new(assignee)
           end
 
-          def assign_assignment_overrides
-            self.all.each(&:assign_overrides)
+          def assign_assignment_overrides(short=false)
+            if short
+              self.short_list.each(&:assign_overrides)
+            else
+              self.all.each(&:assign_overrides)
+            end
           end
 
           def submit_assignments
