@@ -145,6 +145,9 @@ describe "calendar2" do
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
 
+        # tiny can steal focus from one of the date inputs when it initializes
+        wait_for_tiny(f('#calendar-description'))
+
         f('#use_section_dates').click
 
         f("#section_#{section1.id}_start_date").send_keys(day1.to_s)
