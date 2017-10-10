@@ -350,6 +350,7 @@ describe "student planner" do
     end
 
     it "loads more items at the bottom of the page", priority: "1", test_id: 3263149 do
+      skip('functionality has changed need to rework ADMIN-276')
       go_to_list_view
       current_last_item = items_displayed.last
       current_items = items_displayed.count
