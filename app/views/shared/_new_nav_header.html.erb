@@ -65,6 +65,14 @@
               </a>
             </li>
           <% end %>
+          <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">		
+            <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">		
+              <div class="menu-item-icon-container" aria-hidden="true">		
+                  <%= svg_icon :sm_dashboard %>		
+              </div>		
+              <div class="menu-item__text"><%= t('Dashboard') %></div>		
+            </a>		
+         </li>
           <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
             <a id="global_nav_courses_link" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
@@ -109,9 +117,9 @@
             </a>
           </li>
           <% if @current_user %>
-          <li class="ic-app-header__menu-list-item ic-app-header__menu-list-item--active">
-            <a id="global_nav_pendo_feedback_link" href="" class="ic-app-header__menu-list-link">
-              <div class="menu-item-icon-container" aria-hidden="true">
+          <li class="menu-item ic-app-header__menu-list-item" >
+            <a id="global_nav_pendo_feedback_link" href="#" class="ic-app-header__menu-list-link">
+              <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
                   <%= svg_icon :sm_feedback %>
               </div>
               <div class="menu-item__text"><%= t('Feedback') %></div>
