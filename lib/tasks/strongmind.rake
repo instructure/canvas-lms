@@ -5,7 +5,6 @@ namespace :strongmind do
     ::Rake::Task['canvas:compile_assets'].invoke
     puts "[Finished] canvas:compile_assets\n\n"
     sleep(10)
-    _svg_icon_sm_feedback.svg
     puts "[Starting] brand_configs:generate_and_upload_all"
     ::Rake::Task['brand_configs:generate_and_upload_all'].invoke    
     sleep(10)
@@ -14,6 +13,6 @@ namespace :strongmind do
     puts "canvas:compile_assets and brand_configs:generate_and_upload_all ran successfully." 
 
     puts "running the rails server"     
-    exec("rails c")
+    exec("rails server")
   end
 end
