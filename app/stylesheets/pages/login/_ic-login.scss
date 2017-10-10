@@ -107,8 +107,18 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   color: var(--ic-brand-white) !important;
 }
 .ic-Login__link {
-  color: var(--ic-brand-white) !important;
+  color: var(--ic-brand-white);
   text-decoration: underline;
+  @include fontSize($ic-font-size--small);
+  transition-duration: .3s;
+  transition-timing-function: ease-in-out;
+  transition-property: color;
+  &:hover{
+    color: var(--ic-brand-secondary);
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+    transition-property: color;
+  }
 }
 .ic-Login__body__error {
   display: block;
@@ -275,21 +285,27 @@ body.ic-Login-Body #footer.ic-Login-footer {
   // hide icon that gets added thru jquery
   span.ui-icon.ui-icon-extlink.ui-icon-inline {display: none;}
   .ic-Login-footer__links {
-    padding: $ic-sp*3;
+    padding: $ic-sp*2;
     text-align: center;
     position: absolute;
     right: 0;
     bottom: 0;
     left: 0;
     a, .menu-item__text {
-      color: var(--ic-brand-Login-footer-link-color);
+      color: var(--ic-brand-white);
       @include fontSize(11px);
       padding: 0 $ic-sp/2;
       white-space: nowrap;
       text-decoration: underline;
+      transition-duration: .3s;
+      transition-timing-function: ease-in-out;
+      transition-property: color;
       &:hover {
         background-color: none;
-        color: var(--ic-brand-button--secondary-bgd-darkened-15);
+        color: var(--ic-brand-secondary);
+        transition-duration: .3s;
+        transition-timing-function: ease-in-out;
+        transition-property: color;
       }
     }
   }
