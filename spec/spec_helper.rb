@@ -467,7 +467,7 @@ RSpec.configure do |config|
   #****************************************************************
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
-    post "/login",
+    post "/login/canvas",
                       params: {"pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password}
     follow_redirect! while response.redirect?
