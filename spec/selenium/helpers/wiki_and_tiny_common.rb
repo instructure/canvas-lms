@@ -25,6 +25,7 @@ module WikiAndTinyCommon
 
   def clear_wiki_rce
     element = wiki_page_body
+    wait_for_tiny(element)
     clear_tiny(element)
     element
   end
