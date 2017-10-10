@@ -322,19 +322,19 @@ export default class DashboardCard extends Component {
           </span>
           {this.renderHeaderHero()}
           <a href={this.props.href} className="ic-DashboardCard__link">
-            <div className="sm-DashboardCard__course_grade">
+            <div className="sm-DashboardCard__course_grade" style={{borderColor: this.props.backgroundColor}}>
               { (current_grade)? current_grade : current_score }
             </div>
             <div
               className="ic-DashboardCard__header_content"
               style={{height: (this.props.term ? '75px' : '65px')}}
             >
+              <p className="ic-DashboardCard__header-subtitle ellipsis" title={this.props.courseCode}>{this.props.courseCode}</p>
               <h2 className="ic-DashboardCard__header-title ellipsis" title={this.props.originalName}>
                 <span style={{color: this.props.backgroundColor}}>
                   {this.state.nicknameInfo.nickname}
                 </span>
               </h2>
-              <p className="ic-DashboardCard__header-subtitle ellipsis" title={this.props.courseCode}>{this.props.courseCode}</p>
               {
                 this.props.term ? (
                   <p className="ic-DashboardCard__header-term ellipsis" title={this.props.term}>

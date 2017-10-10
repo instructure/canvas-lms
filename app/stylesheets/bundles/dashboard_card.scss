@@ -22,7 +22,7 @@
 @import "components/ic-badge";
 
 
-$ic-DashboardCard-width: 302px;
+$ic-DashboardCard-width: 262px;
 $ic-DashboardCard-action-height: 40px;
 $ic-DashboardCard-action-width: floor($ic-DashboardCard-width / 4);
 $ic-DashboardCard-icon-size: 24px;
@@ -85,7 +85,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .ic-DashboardCard__header_hero {
   box-sizing: border-box;
-  height: 181px;
+  height: 146px;
   border: 1px solid rgba(black, 0.1);
 }
 
@@ -100,17 +100,20 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .sm-DashboardCard__course_grade{
   position: absolute;
-  padding: 10px;
-  left: 229px;
-  top: -50px;
-  width: 38px;
-  height: 29px;
-  @include fontSize(15px);
-  line-height: 32px;
-  color: #FFF;
+  padding: 8px;
+  background-color: #FFF;
+  border: 2px solid #FFF;
+  left: 185px;
+  top: -45px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  @include fontSize(14px);
+  color: var(--ic-brand-primary);
   font-weight: 500;
   z-index: 1000;
   text-align: center;
+  line-height: 51px;
 }
 
 .ic-DashboardCard__header_content {
@@ -145,7 +148,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   transition: all 0.2s ease-out;
   transform: translate3d(0,0,0);
   padding: 0;
-  margin: 0;
+  margin: 5px 0 0 0;
   line-height: 1.3;
   font-size: $baseFontSize + 2;
   font-weight: 500;
