@@ -2234,7 +2234,7 @@ class CoursesController < ApplicationController
 
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
-      if enrollment_term_id && @course.root_account.grants_right?(@current_user, session, :manage_courses)
+      if enrollment_term_id && @course.account.grants_right?(@current_user, session, :manage_courses)
         enrollment_term = api_find(@course.root_account.enrollment_terms, enrollment_term_id)
         @course.enrollment_term = enrollment_term if enrollment_term && enrollment_term != @course.enrollment_term
       end

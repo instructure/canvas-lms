@@ -357,6 +357,22 @@ describe "course settings" do
     expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
   end
 
+  it "should let a sub-account admin edit enrollment term" do
+    term = Account.default.enrollment_terms.create!(:name => "some term")
+    sub_a = Account.default.sub_accounts.create!
+    account_admin_user(:active_all => true, :account => sub_a)
+    user_session(@admin)
+
+    @course = sub_a.courses.create!
+    get "/courses/#{@course.id}/settings"
+
+    click_option('#course_enrollment_term_id', term.name)
+
+    submit_form('#course_form')
+
+    expect(@course.reload.enrollment_term).to eq term
+  end
+
   context "link validator" do
     it "should validate all the links" do
       allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
