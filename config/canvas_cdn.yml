@@ -7,7 +7,7 @@ defaults: &defaults
   enabled: <%= ENV['CDN_ENABLED'] %> #set false to not push anything to s3 and serve assets from same hostname as rails
 
 development:
-  <<: *defaults
+  enabled: false
 
 test:
   <<: *defaults
