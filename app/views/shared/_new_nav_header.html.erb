@@ -116,16 +116,6 @@
               </div>
             </a>
           </li>
-          <% if @current_user %>
-          <li class="menu-item ic-app-header__menu-list-item" >
-            <a id="global_nav_pendo_feedback_link" href="#" class="ic-app-header__menu-list-link">
-              <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
-                  <%= svg_icon :sm_feedback %>
-              </div>
-              <div class="menu-item__text"><%= t('Feedback') %></div>
-            </a>
-          </li>
-          <%end%>
           <% unless @current_user.nil? %>
             <%= render(:partial => 'external_tools/global_nav_menu_items') %>
           <% end %>
@@ -147,10 +137,18 @@
         </ul>
       </div>
       <div class="ic-app-header__secondary-navigation">
-        <ul class="ic-app-header__menu-list">
-          <li class="menu-item ic-app-header__menu-list-item">
-          </li>
-        </ul>
+        <% if @current_user %>
+          <ul class="ic-app-header__menu-list">
+            <li class="menu-item ic-app-header__menu-list-item">
+              <a id="global_nav_pendo_feedback_link" href="#feedback" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
+                    <%= svg_icon :sm_feedback %>
+                </div>
+                <div class="menu-item__text"><%= t('Feedback') %></div>
+              </a>
+            </li>
+          </ul>
+        <%end%>
       </div>
     <div id="global_nav_tray_container"></div>
   </header>
