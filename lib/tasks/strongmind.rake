@@ -1,7 +1,7 @@
 namespace :strongmind do
   desc "Build process for canvas:compile_assets etc\n\n"
   task :run do |t, args|
-    puts "TESLA, MASTER OF LIGHTING WILL INVOKE ASSET COMPILATION FOR THIS FORSAKEN PROJECT!!!"
+    puts "TESLA, MASTER OF LIGHTING WILL INVOKE ASSET COMPILATION/GENERATE FOR PROJECT AND RUN IT."
     ::Rake::Task['canvas:compile_assets'].invoke
     puts "[Finished] canvas:compile_assets\n\n"
     sleep(10)
