@@ -16,10 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
+  'i18n!course_navigation'
   'jquery'
   'Backbone'
   'str/htmlEscape'
-], ($, Backbone, htmlEscape) ->
+  'jsx/move_item_tray/NewMoveDialogView'
+], (I18n, $, Backbone, htmlEscape, NewMoveDialogView) ->
   ###
   xsslint jqueryObject.identifier dragObject current_item
   ###
@@ -66,29 +68,47 @@ define [
       dialog = @$move_dialog
       which_list = $(e.currentTarget).closest '.nav_list'
       which_item = $(e.currentTarget).closest '.navitem'
-      options = []
+      navigationSelectOptions = []
       which_list.children('.navitem').each (key, item) ->
         if $(item).attr('aria-label') is which_item.attr('aria-label')
           return
-        options.push('<option value="' + htmlEscape($(item).attr('id')) + '">' + htmlEscape($(item).attr('aria-label')) + '</option>')
-      $select = @$move_dialog.children().find('#move_nav_item_select')
-      # Clear the options first
-      $('#move_nav_item_form').attr('aria-hidden', 'false')
-      $select.empty()
-      $select.append($.raw(options.join('')))
-      # Set the name in the dialog
-      @$move_name.text which_item.attr('aria-label')
+        navigationSelectOptions.push({ attributes: { id: htmlEscape($(item).attr('id')), name: htmlEscape($(item).attr('aria-label')) } })
       @$move_dialog.data 'current_item', which_item
 
+      currentSelectionModel = {
+        attributes: {
+          id:  htmlEscape(which_item.attr('id')),
+          name: htmlEscape(which_item.attr('aria-label'))
+        },
+        collection: {
+          models: navigationSelectOptions
+        }
+      }
 
-      @$move_dialog.dialog(
-        modal: true
-        width: 600
-        height: 300
-        close: ->
-          dialog.dialog('close')
-          which_item.find('a.al-trigger').focus()
-        )
+      @newModalView = new NewMoveDialogView
+        model: currentSelectionModel
+        nested: false
+        closeTarget: which_item.find('a.al-trigger')
+        saveURL: ""
+        onSuccessfulMove: @onSuccessfulMove
+        movePanelParent: document.getElementById('not_right_side')
+        modalTitle: I18n.t('Move Navigation Item')
+        navigationList: which_list
+
+      @newModalView.renderOpenMoveDialog();
+
+    onSuccessfulMove: (items, action, relativeID) ->
+      current_item = $('#move_nav_item_form').data 'current_item'
+      before_or_after = action
+      selected_item = $('#' + relativeID);
+      if action is 'before'
+        selected_item.before current_item
+      else if action is 'after'
+        selected_item.after current_item
+      else if action is 'first'
+        selected_item.before current_item
+      else if action is 'last'
+        selected_item.after current_item
 
     moveSubmit: (e) ->
       e.preventDefault()

@@ -196,33 +196,6 @@ describe "course settings" do
     end
 
     describe "move dialog" do
-      it "should return focus to cog menu button when closing move dialog" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".move_nav_item_link")[2].click    # click "Move"
-        f(".ui-dialog-titlebar-close").click  # click the 'x' close button
-        check_element_has_focus(cog_menu_button)
-      end
-
-      it "should return focus to cog menu button when cancelling move dialog" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".move_nav_item_link")[2].click    # click "Move"
-        f("#move_nav_item_cancel_btn").click  # click "Cancel"
-        check_element_has_focus(cog_menu_button)
-      end
-
-      it "should return focus to cog menu button when moving an item" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".move_nav_item_link")[2].click    # click "Move"
-        f("#move_nav_item_form button[type='submit']").click  # click "Move"
-        check_element_has_focus(cog_menu_button)
-      end
-
       it "should return focus to cog menu button when disabling an item" do
         get "/courses/#{@course.id}/settings#tab-navigation"
         cog_menu_button = ff(".al-trigger")[2]

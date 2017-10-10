@@ -31,6 +31,10 @@ export default class NewMoveDialogView {
     this.onSuccessfulMove = options.onSuccessfulMove;
     this.movePanelParent = options.movePanelParent;
 
+    if(options.navigationList) {
+      this.navigationList = options.navigationList
+    }
+
     if(options.modules) {
       this.modules = options.modules
     }
@@ -69,6 +73,9 @@ export default class NewMoveDialogView {
           this.moveTrayClose, trayTitle: this.modalTitle, parentGroups, parentTitleLabel: this.parentTitleLabel,
           childKey: this.childKey } );
       }
+    } else if(this.navigationList) {
+      renderMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveNavigationItem,
+        closeFunction: this.moveTrayClose, trayTitle: this.modalTitle });
     } else if(this.modules) {
       renderMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveModuleGroupsTray,
         closeFunction: this.moveTrayClose, trayTitle: this.modalTitle });
@@ -76,6 +83,10 @@ export default class NewMoveDialogView {
       renderMoveItemsTray({ movePanelRoot, model: this.model, moveTraySubmit: this.onMoveItemTray,
         closeFunction: this.moveTrayClose, trayTitle: this.modalTitle });
     }
+  }
+
+  onMoveNavigationItem = ({ movedItems, action, relativeID }) => {
+    this.onSuccessfulMove(movedItems, action, relativeID);
   }
 
   onMoveItemTray = ({ movedItems }) => {
@@ -118,6 +129,8 @@ export default class NewMoveDialogView {
   }
 
   moveTrayClose = () => {
-    this.closeTarget.focus()
+    setTimeout(() => {
+      this.closeTarget.focus()
+    }, 100)
   }
 }
