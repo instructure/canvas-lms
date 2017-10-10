@@ -37,6 +37,65 @@ type AssignmentEdge {
   node: Assignment
 }
 
+type AssignmentGroup implements Node, Timestamped {
+  # legacy canvas id
+  _id: ID!
+  assignmentsConnection(
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): AssignmentConnection
+  createdAt: Time
+  groupWeight: Float
+  id: ID!
+  name: String
+  position: Int
+  rules: AssignmentGroupRules
+  state: AssignmentGroupState!
+  updatedAt: Time
+}
+
+# The connection type for AssignmentGroup.
+type AssignmentGroupConnection {
+  # A list of edges.
+  edges: [AssignmentGroupEdge]
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+}
+
+# An edge in a connection.
+type AssignmentGroupEdge {
+  # A cursor for use in pagination.
+  cursor: String!
+
+  # The item at the end of the edge.
+  node: AssignmentGroup
+}
+
+type AssignmentGroupRules {
+  # The highest N assignments are not included in grade calculations
+  dropHighest: Int
+
+  # The lowest N assignments are not included in grade calculations
+  dropLowest: Int
+  neverDrop: [Assignment]
+}
+
+# States that Assignment Group can be in
+enum AssignmentGroupState {
+  available
+  deleted
+}
+
 input AssignmentInput {
   courseId: ID!
   name: String!
@@ -45,6 +104,19 @@ input AssignmentInput {
 type Course implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
+  assignmentGroupsConnection(
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): AssignmentGroupConnection
   assignmentsConnection(
     # Returns the elements in the list that come after the specified global ID.
     after: String
