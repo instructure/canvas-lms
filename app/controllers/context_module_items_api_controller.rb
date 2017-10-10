@@ -685,7 +685,7 @@ class ContextModuleItemsApiController < ApplicationController
           hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session)
         end
         if cyoe_enabled?(@context)
-          is_student = @context.user_is_student?(@current_user)
+          is_student = @context.grants_right?(@current_user, session, :participate_as_student)
           opts = { context: @context, user: @current_user, session: session, is_student: is_student }
           hash[:mastery_path] = conditional_release_rule_for_module_item(needed_tags[tag_ids[ix]], opts)
         end
