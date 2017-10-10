@@ -1254,8 +1254,6 @@ input[type="tel"], input[type="color"], .uneditable-input {
     // Remove the webkit gloss in iOS
     -webkit-appearance: none;
 
-    @include ic-input-variant($ic-Input-border, var(--ic-brand-primary), var(--ic-brand-primary-lightened-15));
-
     @if $use_high_contrast {
       outline-style: dotted;
       outline-width: 1px;
