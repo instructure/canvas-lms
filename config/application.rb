@@ -148,7 +148,7 @@ module CanvasRails
             break
           rescue ::PG::Error => error
             if error.message.include?("does not exist")
-              raise ActiveRecord::NoDatabaseError.new(error.message, error)
+              raise ActiveRecord::NoDatabaseError.new(error.message)
             elsif index == hosts.length - 1
               raise
             end
