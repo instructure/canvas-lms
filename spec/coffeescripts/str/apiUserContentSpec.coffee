@@ -41,3 +41,14 @@ define ['compiled/str/apiUserContent'], (apiUserContent) ->
     output = apiUserContent.convert(html)
     expected = "<div><a id=\"media_comment_42\" data-media_comment_type=\"audio\" class=\"instructure_inline_media_comment audio_comment\" data-alt=\"audio file\"><span>24</span></a></div>"
     equal(output, expected)
+
+  test "removes embed tag from within object tag", ->
+    object_html = "<div><object class=\"instructure_user_content\"><embed></embed></object></div>"
+    expected = "<div><object class=\"instructure_user_content\"></object></div>"
+    output = apiUserContent.convert(object_html, {forEditing: true})
+    equal(output, expected)
+
+  test "does not remove embed tag from within object#kaltura_player tag", ->
+    object_html = "<div><object class=\"instructure_user_content\" id=\"kaltura_player\"><embed></object></div>"
+    output = apiUserContent.convert(object_html, {forEditing: true})
+    equal(output, object_html)
