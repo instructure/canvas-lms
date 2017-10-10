@@ -153,8 +153,16 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   }
 }
 
-.sm-Input--login{
-  height: 46px !important;
+input[type="text"].ic-Input.sm-Input--login,
+input[type="password"].ic-Input.sm-Input--login{
+
+  height: 46px;
+  outline-style: none;
+
+  &:focus{
+    box-shadow: inset 0 0 0 2px $ic-brand-secondary;
+    border: none;
+  }
 
 }
 
