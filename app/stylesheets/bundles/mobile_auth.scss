@@ -38,7 +38,6 @@ html, body {
 }
 
 .sm-button{
-    background-color: $ic-brand-secondary;
     width: 100%;
     margin: $ic-sp 0 $ic-sp 0;
     padding: $ic-sp $ic-sp*3;
@@ -46,6 +45,9 @@ html, body {
     color: $ic-brand-Login-Content-password-text-color;
     border: 1px solid $ic-brand-Login-Content-password-text-color;
     overflow: visible;
+      &:hover{
+      background-color: darken($sm-yellow-4, 10%);
+      }
 }
 
 .sm-form{

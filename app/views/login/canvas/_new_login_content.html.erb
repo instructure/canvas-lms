@@ -51,7 +51,7 @@
                 class="ic-Input sm-Input--login"
                 autocomplete="off"
                 autocorrect="off"
-                placeholder="<%= t :email, "Email" %>"
+                placeholder="<%= t :email, "Username or Email" %>"
                 type="<%= @login_handle_is_email ? 'email' : 'text' %>"
                 name="pseudonym_session[unique_id]"
                 value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" >
