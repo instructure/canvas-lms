@@ -242,12 +242,16 @@ describe "discussions" do
 
           3.times do |n|
             topic = topics[2-n]
-            fj("[data-id=#{topic.id}] .al-trigger").click
-            fj('.icon-updown:visible').click
-            click_option 'select', "At the bottom"
-            fj('button', '.move-item-tray__button-container').click
-            expect(f('body')).not_to contain_css('.move-item-tray')
+            fj("[data-id=#{topic.id}] .al-trigger .icon-settings").click
+            wait_for_ajaximations
+            fj('.move_item:visible').click
+            wait_for_ajaximations
+            click_option '.move-select .move-select__position select', "Last"
+            wait_for_ajaximations
+            fj('.move-select button').click
+            wait_for_ajaximations
             topics.each(&:reload)
+            sleep 1
           end
           expect(topics.map(&:position)).to eq [4, 3, 2, 1]
         end
@@ -262,11 +266,14 @@ describe "discussions" do
           get url
 
           fj("[data-id=#{topic.id}] .al-trigger").click
-          fj('.icon-updown:visible').click
-          fj('select')
-          click_option 'select', "Before..."
-          click_option 'select:nth(1)', topics[2].title
-          fj('button', '.move-item-tray__button-container').click
+          wait_for_ajaximations
+          fj('.move_item:visible').click
+          wait_for_ajaximations
+          click_option '.move-select .move-select__position select', "Before.."
+          wait_for_ajaximations
+          click_option '.move-select .move-select__sibling select', topics[2].title
+          wait_for_ajaximations
+          fj('.move-select button').click
           wait_for_ajaximations
           topics.each &:reload
           expect(topics.map(&:position)).to eq [2, 1, 3]

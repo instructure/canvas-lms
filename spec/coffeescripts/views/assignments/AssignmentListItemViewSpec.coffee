@@ -180,7 +180,6 @@ define [
     ok view.publishIconView
     ok view.dateDueColumnView
     ok view.dateAvailableColumnView
-    ok view.moveAssignmentView
     ok view.editAssignmentView
 
   test "initializes no child views if can't manage", ->

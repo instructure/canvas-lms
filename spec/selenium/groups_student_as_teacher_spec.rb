@@ -93,7 +93,7 @@ describe "student groups" do
         wait_for_ajaximations
 
         # Looks for student to have a group leader icon
-        expect(f('.icon-user.group-leader')).to be_displayed
+        expect(f('.group-leader .icon-user')).to be_displayed
         # Verifies group leader silhouette and leader's name appear in the group header
         expect(f('.span3.ellipsis.group-leader')).to be_displayed
         expect(f('.span3.ellipsis.group-leader')).to include_text("Test Student 1")

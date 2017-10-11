@@ -89,35 +89,28 @@ import ModalButtons from './modal-buttons'
       return this.props.appElement || document.getElementById('application');
     },
     processMultipleChildren(props){
-      let content = null;
-      let buttons = null;
+      let content = null
+      let buttons = null
 
       React.Children.forEach(props.children, function(child){
-        if(child.type == ModalContent){
-          content = child;
+        if (child.type === ModalContent) {
+          content = child
+        } else if (child.type === ModalButtons) {
+          buttons = child
+        } else {
+          // Warning if you don't include a component of the right type
+          console.warn('Modal chilren must be wrapped in either a modal-content or modal-buttons component.')
         }
-        if(child.type == ModalButtons){
-          buttons = child;
-        }
-      });
+      })
 
-      // Warning if you don't include a component of the right type
-      if(content == null){
-        console.warn('You should wrap your content in the modal-content component');
-      }
-      if(buttons == null){
-        console.warn('You should wrap your buttons in the modal-buttons component');
-      }
-
-      if(this.props.onSubmit){
+      if (this.props.onSubmit) {
         return (
           <form className="ModalForm" onSubmit={preventDefault(this.onSubmit)}>
-            { [content, buttons] }
+            {[content, buttons]}
           </form>
         )
       }
-      else
-      {
+      else {
         return [content, buttons]; // This order needs to be maintained
       }
     },
@@ -149,15 +142,12 @@ import ModalButtons from './modal-buttons'
                   </button>
                 </div>
               </div>
-
               {this.processMultipleChildren(this.props)}
-
             </div>
           </ReactModal>
         </div>
       );
     }
-
   });
 
 export default Modal

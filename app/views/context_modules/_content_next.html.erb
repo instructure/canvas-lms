@@ -103,49 +103,6 @@
 <%= render :partial => 'context_modules/module_item_next', :object => nil, :as => :module_item, :locals => { :editable => @can_edit } %>
 
 <% if @can_edit %>
-  <form id="move_context_module_form" style="display:none" class="form-dialog" title="Move Module">
-    <div class="form-dialog-content">
-      <h4><%= t("Place ") %> <span id="move_module_name"></span></h4>
-      <div class="move-module-before-after-container">
-        <input type="radio" name="move_location" value="before" id="move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_before"><%= t("Move Module Before") %></label>
-          <strong class="move-module-or"><%= t('move_module.or', "OR") %></strong>
-        <input type="radio" name="move_location" value="after" id="move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_after"><%= t("Move Module After") %></label>
-      </div>
-      <div class="move-module-select-spacer">
-        <label class="screenreader-only" for="move_context_module_select"><%= t('Select module to move before or after') %></label>
-        <select name="move_context_module_select" id="move_context_module_select"></select>
-      </div>
-
-    </div>
-    <div class="form-controls">
-      <button type="button" id="move_module_cancel_btn" class="btn"">Cancel</button>
-      <button type="submit" class="btn btn-primary">Move</button>
-    </div>
-  </form>
-
-  <form id="move_module_item_form" style="display:none" class="form-dialog" title="Move Item">
-    <div class="form-dialog-content">
-      <h4><%= t('move_module_item.place', "Place ") %><span id="move_module_item_name"></span></h4>
-      <p><%= t('move_module_item.into', "into") %>
-      <label class="screenreader-only" for="move_module_item_module_select"><%= t('Select module to move item into') %></label>
-      <select name="move_module_item_module_select" id="move_module_item_module_select"></select>
-      <div class="move-module-before-after-container">
-        <input type="radio" name="item_move_location" value="before" id="item_move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_before"><%= t("Move Module Item Before") %></label>
-          <strong class="move-module-or"><%= t('move_module_item.or', "OR") %></strong>
-        <input type="radio" name="item_move_location" value="after" id="item_move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_after"><%= t("Move Module Item After") %></label>
-      </div>
-      <div class="move-module-select-spacer">
-        <label class="screenreader-only" for="move_module_item_select"><%= t('Select module item to place item before or after') %></label>
-        <select name="move_module_item_select" id="move_module_item_select"></select>
-      </div>
-
-    </div>
-    <div class="form-controls">
-      <button type="button" id="move_module_item_cancel_btn" class="btn">Cancel</button>
-      <button type="submit" class="btn btn-primary">Move</button>
-    </div>
-  </form>
-
   <%= render :partial => "context_modules/add_context_module_form" %>
 
   <div id="add_module_prerequisite_dialog" style="display: none;">
@@ -267,7 +224,6 @@
   <%= image_tag "text_entry_dim.png", :id => "criterion_image_must_submit", :class => "image not_blank", :alt => t('images.alt.must_submit', "must submit"), :title => t('images.title.must_submit', "Students must submit this assignment before the module is considered complete") %>
   <%= image_tag "text_entry_dim.png", :id => "criterion_image_must_contribute", :class => "image not_blank", :alt => t('images.alt.must_contribute', "must contribute"), :title => t('images.title.must_contribute', "Students must contribute to this item before the module is considered complete") %>
   <%= image_tag "blank.png", :id => "criterion_image_blank", :class => "image", :alt => "" %>
-  <a href="<%= context_url(@context, :reorder_context_context_modules_url) %>" class="reorder_modules_url">&nbsp;</a>
 </div>
 <div id="current_user_progression_list" class="user_<%= @current_user && @current_user.id %>" style="display: none;">
   <div class="progression progression_blank">

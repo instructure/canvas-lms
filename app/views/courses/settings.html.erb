@@ -674,25 +674,6 @@
         <button type="submit" class="btn btn-primary"><%= t('#buttons.save', %{Save}) %></button>
       </p>
     <% end %>
-    <form id="move_nav_item_form" style="display:none" class="form-dialog" title="Move Navigation Item" aria-hidden='true'>
-      <div class="form-dialog-content">
-        <h2><%= t('move_module.place', "Place ") %> <span id="move_nav_item_name"> </span></h2>
-        <div class="move-nav-item-before-after-container">
-          <input type="radio" name="move_location" value="before" id="move_location_before" class="move-nav-item-label-spacer" /><label class="move-nav-item-label-width" for="move_location_before"><%= t('move_nav_item.before', "Before") %></label>
-            <strong class="move-nav-item-or"><%= t('move_nav_item.or', "OR") %></strong>
-          <input type="radio" name="move_location" value="after" id="move_location_after" class="move-nav-item-label-spacer" /><label class="move-nav-item-label-width" for="move_location_after"><%= t('move_nav_item.after', "After") %></label>
-        </div>
-        <div class="move-nav-item-select-spacer">
-          <label class="move-nav-item-label-width" for="move_nav_item_select"><%= t("Move Item") %></label>
-          <select name="move_nav_item_select" aria-label="<%= t("Move Item") %>" id="move_nav_item_select"></select>
-        </div>
-
-      </div>
-      <div class="form-controls">
-        <button type="button" id="move_nav_item_cancel_btn" class="btn cancel_move_dialog">Cancel</button>
-        <button type="submit" class="btn btn-primary">Move</button>
-      </div>
-    </form>
   </div>
 
   <% end %>
