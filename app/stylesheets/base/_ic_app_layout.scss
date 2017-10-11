@@ -335,6 +335,13 @@ body:not(.course-menu-expanded) {
    }
 }
 
+.sm-spacer{
+  display: block;
+  width: 100%;
+  padding-bottom: 10px;
+  box-sizing: border-box;
+}
+
 .sm-course-menu-clear{
   clear: both;
 }

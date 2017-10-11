@@ -147,7 +147,11 @@
             <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
               <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
             <% end %>
-            <%= section_tabs %>
+            <% if !@distraction_free %>
+              <%= section_tabs %>
+            <% else %>
+              <div class="sm-spacer"></div>
+            <% end %>
             <% if defined? @context.grants_any_right? && !can_do(@context, @current_user, :participate_as_student) %>
               <div class="sm-teacher-tools-container" style="display: none">
                 <a href="#" type="button" aria-haspopup="true" class="sm-left-nav-toggler" data-toggle="dropdown" data-id="teacher-tools" aria-owns="sm-teacher-tools" aria-labelledby="type-filter-description" aria-expanded="false">
