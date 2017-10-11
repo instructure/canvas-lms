@@ -31,10 +31,12 @@ import Tooltip from 'instructure-ui/lib/components/Tooltip';
 function anonymouslyGraded (anonymous) {
   return anonymous ? (
     <div>
-      <Tooltip tip={I18n.t('Anonymously graded')}>
-        <IconOffLine />
+      <Tooltip tip={I18n.t('Anonymously graded')} on={['focus', 'hover']}>
+        <span role="presentation" tabIndex="0">
+          <IconOffLine />
+          <ScreenReaderContent>{I18n.t('Anonymously graded')}</ScreenReaderContent>
+        </span>
       </Tooltip>
-      <ScreenReaderContent>{I18n.t('Anonymously graded')}</ScreenReaderContent>
     </div>
   ) : (
     <ScreenReaderContent>{I18n.t('Not anonymously graded')}</ScreenReaderContent>
