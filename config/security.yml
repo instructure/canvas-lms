@@ -1,0 +1,9 @@
+production:
+  # replace this with a random string of at least 20 characters
+  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>
+
+development:
+  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>
+
+test:
+  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>
