@@ -18,7 +18,12 @@
     "react",
     "stage-1"
   ],
-  "plugins": ["add-module-exports"],
+  "plugins": [
+    "add-module-exports",
+    ["transform-runtime", {
+      "polyfill": false
+    }]
+  ],
   "env": {
     "production": {
       "plugins": [
