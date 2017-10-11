@@ -102,6 +102,8 @@ module Api::V1::Course
 
       hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
 
+      apply_master_course_settings(hash, course, user)
+
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash
     end
@@ -140,4 +142,18 @@ module Api::V1::Course
     hash
   end
 
+  def apply_master_course_settings(hash, course, user)
+    return unless respond_to?(:master_courses?) && master_courses?
+    is_mc = MasterCourses::MasterTemplate.is_master_course?(course)
+    hash['blueprint'] = is_mc
+
+    if is_mc
+      template = MasterCourses::MasterTemplate.full_template_for(course)
+      if template.use_default_restrictions_by_type
+        hash['blueprint_restrictions_by_object_type'] = template.default_restrictions_by_type_for_api
+      else
+        hash['blueprint_restrictions'] = template.default_restrictions
+      end
+    end
+  end
 end
