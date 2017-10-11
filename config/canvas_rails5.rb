@@ -16,11 +16,39 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # You can enable the Rails 5.1 support by either defining a
-# CANVAS_RAILS5_1=1 env var, or create an empty RAILS5_1 file in the canvas config dir
+# CANVAS_RAILS5_1=1 env var, creating an empty RAILS5_1 file in the canvas config dir,
+# or setting `private/canvas/rails5.1` to `true` in a locally accessible consul
 if !defined?(CANVAS_RAILS5_0)
   if ENV['CANVAS_RAILS5_1']
     CANVAS_RAILS5_0 = ENV['CANVAS_RAILS5_1'] != '1'
+  elsif File.exist?(File.expand_path("../RAILS5_1", __FILE__))
+    CANVAS_RAILS5_0 = false
   else
-    CANVAS_RAILS5_0 = !File.exist?(File.expand_path("../RAILS5_1", __FILE__))
+    begin
+      # have to do the consul communication without any gems, because
+      # we're in the context of loading the gemfile
+      require 'base64'
+      require 'json'
+      require 'net/http'
+      require 'yaml'
+
+      environment = YAML.load(File.read(File.expand_path("../consul.yml", __FILE__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
+
+      keys = [
+        ["private/canvas", environment, $canvas_cluster, "rails5.1"].compact.join("/"),
+        ["private/canvas", environment, "rails5.1"].compact.join("/"),
+        ["global/private/canvas", environment, "rails5.1"].compact.join("/")
+      ].uniq
+
+      result = nil
+      keys.each do |key|
+        result = Net::HTTP.get_response(URI("http://localhost:8500/v1/kv/#{key}"))
+        result = nil unless result.is_a?(Net::HTTPSuccess)
+        break if result
+      end
+      CANVAS_RAILS5_0 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'true')
+    rescue
+      CANVAS_RAILS5_0 = true
+    end
   end
 end
