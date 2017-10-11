@@ -79,7 +79,6 @@ describe "new account course search" do
   end
 
   it "should search by term" do
-
     term = @account.enrollment_terms.create!(:name => "some term")
     term_course = course_factory(:account => @account, :course_name => "term course_factory")
     term_course.enrollment_term = term
@@ -90,8 +89,7 @@ describe "new account course search" do
     get "/accounts/#{@account.id}"
 
     click_option(".course_search_bar select", term.name)
-    f('.course_search_bar button').click
-    wait_for_ajaximations
+    expect(f('.courses-list')).not_to contain_jqcss('div[role=row]:nth-child(2)')
 
     rows = get_rows
     expect(rows.count).to eq 1
