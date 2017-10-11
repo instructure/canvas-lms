@@ -19,11 +19,11 @@
 require_relative '../../spec_helper'
 
 describe Canvadocs::Session do
+  include Canvadocs::Session
   def submissions
     [@submission]
   end
   describe ".observing?" do
-    include Canvadocs::Session
     it "should return true if the user is acting as an observer" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
@@ -37,7 +37,7 @@ describe Canvadocs::Session do
         section: section
       )
       observer_enrollment.update!(associated_user_id: student.id)
-      assignment.update_attributes(submission_types: 'online_upload')
+      assignment.update!(submission_types: 'online_upload')
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(observing?(observer)).to eq true
     end
@@ -58,8 +58,43 @@ describe Canvadocs::Session do
       expect(observing?(not_observer)).to eq false
     end
   end
+
+  describe ".managing?" do
+    it "should return true if the user has TeacherEnrollment" do
+      course = course_factory(active_all: true)
+      student = user_factory(active_all: true, active_state: 'active')
+      teacher = user_factory(active_all: true, active_state: 'active')
+      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
+      section = course.course_sections.create!(name: 'Section A')
+      course.enroll_user(
+        teacher,
+        'TeacherEnrollment',
+        enrollment_state: 'active',
+        section: section
+      )
+      assignment.update!(submission_types: 'online_upload')
+      @submission = submission_model(user: student, course: course, assignment: assignment)
+      expect(managing?(teacher)).to eq true
+    end
+    it "should return false if the user does not have a TeacherEnrollment" do
+      course = course_factory(active_all: true)
+      student = user_factory(active_all: true, active_state: 'active')
+      not_teacher = user_factory(active_all: true, active_state: 'active')
+      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
+      section = course.course_sections.create!(name: 'Section A')
+      course.enroll_user(
+        not_teacher,
+        'DesignerEnrollment',
+        enrollment_state: 'active',
+        section: section
+      )
+      assignment.update!(submission_types: 'online_upload')
+      @submission = submission_model(user: student, course: course, assignment: assignment)
+      expect(managing?(not_teacher)).to eq false
+    end
+  end
+
   describe ".canvadoc_permissions_for_user" do
-    include Canvadocs::Session
     it "should return read permissions for observers" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
@@ -73,7 +108,7 @@ describe Canvadocs::Session do
         section: section
       )
       observer_enrollment.update!(associated_user_id: student.id)
-      assignment.update_attributes(submission_types: 'online_upload')
+      assignment.update!(submission_types: 'online_upload')
       @submission = submission_model(user: student, course: course, assignment: assignment)
       permissions = canvadoc_permissions_for_user(observer, true)
       expect(permissions[:permissions]).to eq "read"
@@ -82,10 +117,27 @@ describe Canvadocs::Session do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
       assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      assignment.update_attributes(submission_types: 'online_upload')
+      assignment.update!(submission_types: 'online_upload')
       @submission = submission_model(user: student, course: course, assignment: assignment)
       permissions = canvadoc_permissions_for_user(student, true)
       expect(permissions[:permissions]).to eq "readwrite"
+    end
+    it "should return readwritemanage permissions for teacher" do
+      course = course_factory(active_all: true)
+      student = user_factory(active_all: true, active_state: 'active')
+      teacher = user_factory(active_all: true, active_state: 'active')
+      assignment = course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
+      section = course.course_sections.create!(name: 'Section A')
+      course.enroll_user(
+        teacher,
+        'TeacherEnrollment',
+        enrollment_state: 'active',
+        section: section
+      )
+      assignment.update!(submission_types: 'online_upload')
+      @submission = submission_model(user: student, course: course, assignment: assignment)
+      permissions = canvadoc_permissions_for_user(teacher, true)
+      expect(permissions[:permissions]).to eq "readwritemanage"
     end
   end
 end
