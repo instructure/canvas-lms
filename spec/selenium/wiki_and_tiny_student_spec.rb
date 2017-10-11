@@ -84,6 +84,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/pages"
       wait_for_ajax_requests
       f('.new_page').click
+      wait_for_tiny(f('#wiki_page_body'))
       f("#title").send_keys("new page")
 
       expect_new_page_load { f('form.edit-form button.submit').click }
