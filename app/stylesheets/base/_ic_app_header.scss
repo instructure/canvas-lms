@@ -585,3 +585,56 @@ body.primary-nav-expanded {
   display: flex;
   justify-content: flex-end;
 }
+
+.sm-menu-item{
+  display: flex;
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+
+  a{
+    &:hover{
+      .ic-avatar{
+        box-shadow: 0px 0px 2px 0 rgba(0,0,0,.4);
+      }
+    }
+  }
+}
+
+.sm-menu-item-icon-container {
+  transform: translate3d(0,0,0);
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+
+  .ic-avatar {
+    transform: translate3d(0,0,0);
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.sm-invisible-form{
+  margin: 0;
+}
+
+.dropdown-menu li a.sm-profile-dropdown-link,
+.dropdown-menu li button.sm-profile-dropdown-link{
+  display: block;
+  padding: 6px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: $baseLineHeight;
+  color: $dropdownLinkColor;
+  white-space: nowrap;
+  border: none;
+  background-color: transparent;
+  @include fontSize(16px);
+
+  &:hover, &:focus{
+    text-decoration: none;
+    color: $dropdownLinkColorHover;
+    background: var(--ic-brand-primary);
+  }
+}

@@ -104,22 +104,80 @@
   <%= yield :leading_content %>
 
   <div id="wrapper" class="ic-Layout-wrapper">
-    <% if crumbs.length > 1 %>
-      <div class="ic-app-nav-toggle-and-crumbs no-print">
-        <% if @distraction_free %>
-        <button type="button" id="distractionFreeToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="Distraction Free Toggle" title="Distraction Free Toggle">
-          <i class="icon-hamburger" aria-hidden="true"></i>
-        </button>
-        <% end %>
-        <div class="ic-app-crumbs">
-        <%= render_crumbs %>
-        </div>
+  <div class="ic-app-nav-toggle-and-crumbs no-print">
+      <% if crumbs.length > 1 %>
+          <% if @distraction_free %>
+          <button type="button" id="distractionFreeToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="Distraction Free Toggle" title="Distraction Free Toggle">
+            <i class="icon-hamburger" aria-hidden="true"></i>
+          </button>
+          <% end %>
+          <div class="ic-app-crumbs">
+          <%= render_crumbs %>
+          </div>
 
-        <% if tutorials_enabled? %>
-          <div class="TutorialToggleHolder"></div>
+          <% if tutorials_enabled? %>
+            <div class="TutorialToggleHolder"></div>
+          <% end %>
+      <% end %>
+      
+      <% if @current_user %>
+          <div class="sm-menu-item dropdown">
+            <a id="sm-profile-dropdown" href="/profile" type="button" aria-haspopup="true" data-toggle="dropdown" data-id="profile-dropdown" aria-owns="sm-profile-dropdown" aria-labelledby="type-filter-description" aria-expanded="false">
+              <div class="sm-menu-item-icon-container" aria-hidden="true">
+                <div class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
+                  <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" alt="<%= @current_user.short_name %>" />
+                </div>
+              </div>
+            </a>
+            <ul class="dropdown-menu pull-right" aria-labelledby="sm-profile-dropdown">
+              <li class="ic-NavMenu-list-item">
+                <form
+                    ref="logoutForm"
+                    action="/logout"
+                    method="post"
+                    class="sm-invisible-form"
+                  >
+                    <input name="utf8" value="✓" type="hidden"/>
+                    <input name="_method" value="delete" type="hidden"/>
+                    <input name="authenticity_token" value="<%= cookies[:_csrf_token] %>" type="hidden"/>
+                    <button
+                      type="submit"
+                      class="sm-profile-dropdown-link">
+                      <%= t('Logout') %>
+                    </button>
+                  </form>
+              </li>
+              <% if js_env[:SETTINGS][:enable_profiles] %>
+                <li class="ic-NavMenu-list-item">
+                  <a href="/profile" class="sm-profile-dropdown-link"><%= t('Profile') %></a>
+                </li>
+              <% end %>
+              <li class="ic-NavMenu-list-item">
+                <a href="/profile/settings" class="sm-profile-dropdown-link"><%= t('Settings') %></a>
+              </li>
+              <li class="ic-NavMenu-list-item">
+                <a href="/profile/communication" class="sm-profile-dropdown-link"><%= t('Notifications') %></a>
+              </li>
+              <li class="ic-NavMenu-list-item">
+                <a href="/files" class="sm-profile-dropdown-link"><%= t('Files') %></a>
+              </li>
+              <% if js_env[:SETTINGS][:enable_profiles] %>
+                <li class="ic-NavMenu-list-item">
+                  <a href="/dashboard/eportfolios" class="sm-profile-dropdown-link"><%= t('ePortfolios') %></a>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% else %>
+          <div class="sm-menu-item">
+            <a id="global_nav_login_link" href="/login" class="ic-app-header__menu-list-link">
+              <div class="sm-menu-item-icon-container" aria-hidden="true">
+                <%= render(:partial => "shared/svg/svg_login_new_styles.svg") %>
+              </div>
+            </a>
+          </div>
         <% end %>
-      </div>
-    <% end %>
+    </div>
     <div id="main" class="ic-Layout-columns">
       <% if @display_header_image %>
       <div class="sm-course-header-image" style="background-image: url('<%= @image %>')">
