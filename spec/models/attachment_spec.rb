@@ -88,6 +88,18 @@ describe Attachment do
       @attachment.authenticated_url
       expect(InstFS).to have_received(:authenticated_url)
     end
+
+    it "should still get url from InstFS when attachment has instfs_uuid and instfs is later disabled" do
+      allow(InstFS).to receive(:enabled?).and_return false
+      @attachment.authenticated_url
+      expect(InstFS).to have_received(:authenticated_url)
+    end
+
+    it "should not get url from InstFS when instfs is enabled but attachment lacks instfs_uuid" do
+      @attachment.instfs_uuid = nil
+      @attachment.authenticated_url
+      expect(InstFS).not_to have_received(:authenticated_url)
+    end
   end
 
   context "authenticated_url s3_storage" do
@@ -1251,7 +1263,21 @@ describe Attachment do
   context "has_thumbnail?" do
     context "non-instfs attachment" do
       it "should be false when it doesn't have a thumbnail object (yet?)" do
-        attachment_model(uploaded_data: stub_file_data('file.txt', nil, 'text/html'))
+        attachment_model(uploaded_data: stub_png_data)
+        if @attachment.thumbnail
+          @attachment.thumbnail.destroy!
+          @attachment.thumbnail = nil
+        end
+        expect(@attachment.has_thumbnail?).to be false
+      end
+
+      it "should be false when it doesn't have a thumbnail object even if instfs is enabled" do
+        attachment_model(uploaded_data: stub_png_data)
+        if @attachment.thumbnail
+          @attachment.thumbnail.destroy!
+          @attachment.thumbnail = nil
+        end
+        allow(InstFS).to receive(:enabled?).and_return true
         expect(@attachment.has_thumbnail?).to be false
       end
 
@@ -1278,6 +1304,12 @@ describe Attachment do
         attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
         expect(@attachment.has_thumbnail?).to be true
       end
+
+      it "should be true when thumbnailable and instfs is later disabled" do
+        attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
+        allow(InstFS).to receive(:enabled?).and_return false
+        expect(@attachment.has_thumbnail?).to be true
+      end
     end
   end
 
@@ -1286,6 +1318,13 @@ describe Attachment do
       it "should be the thumbnail's url" do
         attachment_model(uploaded_data: stub_png_data)
         @attachment.thumbnail || @attachment.build_thumbnail.save!
+        expect(@attachment.thumbnail_url).to eq @attachment.thumbnail.cached_s3_url
+      end
+
+      it "should be the thumbnail's url when instfs is enabled" do
+        attachment_model(uploaded_data: stub_png_data)
+        @attachment.thumbnail || @attachment.build_thumbnail.save!
+        allow(InstFS).to receive(:enabled?).and_return true
         expect(@attachment.thumbnail_url).to eq @attachment.thumbnail.cached_s3_url
       end
     end
@@ -1299,6 +1338,12 @@ describe Attachment do
 
       it "should be an instfs thumbnail link when thumbnailable" do
         attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
+        expect(@attachment.thumbnail_url).to match(%r{/thumbnails/abc})
+      end
+
+      it "should still be an instfs thumbnail link when thumbnailable and instfs is later disabled" do
+        attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
+        allow(InstFS).to receive(:enabled?).and_return false
         expect(@attachment.thumbnail_url).to match(%r{/thumbnails/abc})
       end
 

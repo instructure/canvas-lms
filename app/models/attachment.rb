@@ -740,16 +740,16 @@ class Attachment < ActiveRecord::Base
     store.shared_secret(datetime)
   end
 
+  def instfs_hosted?
+    !!instfs_uuid
+  end
+
   def downloadable?
-   if InstFS.enabled?
-      !!self.instfs_uuid
-   else
-    !!(self.authenticated_s3_url rescue false)
-   end
+    instfs_hosted? || !!(authenticated_s3_url rescue false)
   end
 
   def authenticated_url(**options)
-    if InstFS.enabled? && self.instfs_uuid
+    if instfs_hosted?
       InstFS.authenticated_url(self, options)
     else
       # attachment_fu doesn't like the extra option when building s3 urls
@@ -763,14 +763,14 @@ class Attachment < ActiveRecord::Base
   def stored_locally?
     # if the file exists in inst-fs, it won't be in local storage even if
     # that's what Canvas otherwise thinks it's configured for
-    return false if instfs_uuid
+    return false if instfs_hosted?
     Attachment.local_storage?
   end
 
   def can_be_proxied?
     # we don't support proxying from instfs yet (no equivalent to
     # s3object.get.body)
-    return false if instfs_uuid
+    return false if instfs_hosted?
     mime_class == 'html' && size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
     mime_class == 'flash' && size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
     content_type == 'text/css' && size < Setting.get('max_css_proxy_size', 64 * 1024).to_i
@@ -814,11 +814,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def has_thumbnail?
-    if InstFS.enabled? && instfs_uuid
-      thumbnailable?
-    else
-      thumbnailable? && !thumbnail.nil?
-    end
+    thumbnailable? && (instfs_hosted? || thumbnail.present?)
   end
 
   # you should be able to pass an optional width, height, and page_number/video_seconds to this method for media objects
@@ -827,7 +823,7 @@ class Attachment < ActiveRecord::Base
     return nil if Attachment.skip_thumbnails
 
     geometry = options[:size]
-    if InstFS.enabled? && instfs_uuid && thumbnailable?
+    if instfs_hosted? && thumbnailable?
       InstFS.authenticated_thumbnail_url(self, geometry: geometry)
     elsif self.thumbnail || geometry.present?
       to_use = thumbnail_for_size(geometry) || self.thumbnail
@@ -1626,7 +1622,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def automatic_thumbnail_sizes
-    if thumbnailable? && instfs_uuid.nil?
+    if thumbnailable? && !instfs_hosted?
       self.class.automatic_thumbnail_sizes
     else
       []

@@ -905,7 +905,7 @@ module ApplicationHelper
   end
 
   def thumbnail_image_url(attachment)
-    if InstFS.enabled? && attachment.instfs_uuid
+    if attachment.instfs_hosted?
       attachment.thumbnail_url
     else
       # this thumbnail url is a route that redirects to local/s3 appropriately.
