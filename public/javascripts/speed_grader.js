@@ -802,6 +802,7 @@ function initRubricStuff(){
         // submissionAndAssessment comes back with :include_root => true, so we have to get rid of the root
         var student = EG.setOrUpdateSubmission(response.artifact);
         student.rubric_assessments = $.map(submissionAndAssessment.rubric_assessments, function(ra){return ra.rubric_assessment;});
+        EG.updateSelectMenuStatus(student);
       });
 
       $(".rubric_summary").loadingImage('remove');
