@@ -301,6 +301,14 @@ $context_module_bg_color: #f2f3f4;
   text-align: center;
 }
 
+.module-item-title{
+  padding-left: 15px;
+}
+
+.context_module_sub_header_expander{
+  cursor: pointer;
+}
+
 .sm-unit-header_progress-background{
     background-color: var(--ic-brand-button--secondary-bgd-darkened-15);
     position: absolute;

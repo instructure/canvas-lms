@@ -19,17 +19,17 @@
 // this is responsible for gluing all the calendar parts together into a complete page
 // the only thing on the erb page should be `calendarApp.init(<contexts>, <manageContexts>);`
 import $ from 'jquery'
-import Calendar from 'compiled/calendar/Calendar'
+import Calendar from '../../coffeescripts/calendar/Calendar'
 import ReactDOM from 'react-dom'
 import React from 'react'
-import MiniCalendar from 'compiled/calendar/MiniCalendar'
+import MiniCalendar from '../../coffeescripts/calendar/MiniCalendar'
 import FindAppointment from 'jsx/calendar/scheduler/components/FindAppointment'
-import CalendarHeader from 'compiled/views/calendar/CalendarHeader'
-import drawSidebar from 'compiled/calendar/sidebar'
-import EventDataSource from 'compiled/calendar/EventDataSource'
-import UndatedEventsList from 'compiled/calendar/UndatedEventsList'
+import CalendarHeader from '../../coffeescripts/views/calendar/CalendarHeader'
+import drawSidebar from '../../coffeescripts/calendar/sidebar'
+import EventDataSource from '../../coffeescripts/calendar/EventDataSource'
+import UndatedEventsList from '../../coffeescripts/calendar/UndatedEventsList'
 import configureSchedulerStore from 'jsx/calendar/scheduler/store/configureStore'
-import 'compiled/jquery.kylemenu'
+import '../../coffeescripts/jquery.kylemenu'
 
 const eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
 
