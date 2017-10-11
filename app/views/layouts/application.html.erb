@@ -233,6 +233,7 @@
             <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
           <div id="content" class="ic-Layout-contentMain" role="main">
             <%= yield %>
+            <div id="files-app"></div>
           </div>
         </div>
         <div id="right-side-wrapper" class="ic-app-main-content__secondary">

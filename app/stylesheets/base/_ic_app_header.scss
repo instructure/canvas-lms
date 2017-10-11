@@ -638,3 +638,8 @@ body.primary-nav-expanded {
     background: var(--ic-brand-primary);
   }
 }
+
+.dropdown-menu li button.sm-profile-dropdown-link{
+  width: 100%;
+  text-align: left;
+}
