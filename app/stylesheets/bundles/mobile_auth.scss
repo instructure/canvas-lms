@@ -70,6 +70,17 @@ html, body {
     outline-width: $ic-sp;
 }
 
+.ic-Login-footer .ic-Login-footer__links {
+    padding: 36px;
+    text-align: center;
+    position: absolute;
+    color: $ic-brand-white;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    @include fontSize($ic-font-size--xsmall);
+  }
+
 #f1_container {
   display: flex;
   justify-content: center;
@@ -86,7 +97,7 @@ html, body {
   background-position: center;
   background-repeat: no-repeat;
   background-size: 156px 108px;
-  margin-top: $ic-sp*5;
+  margin-top: $ic-sp*4;
 }
 .face {
   margin-top: $ic-sp*3;
@@ -116,6 +127,11 @@ p {
 
 .flip-to-back, .flip-to-front {
   margin: 0;
+  padding: $ic-sp;
+  @include fontSize($ic-font-size--small);
+}
+.open-source-link{
+  padding: $ic-sp;
 }
 .forgotBlock {
   color: $ic-brand-white;
@@ -124,7 +140,7 @@ p {
 }
 input[type="text"], [type="email"], [type="password"] {
   padding: 0px 12px;
-  @include fontSize(16px);
+  @include fontSize($ic-font-size--small);
 }
 input::-webkit-input-placeholder {
   color: $ic-color-medium;

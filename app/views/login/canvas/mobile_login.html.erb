@@ -75,6 +75,15 @@
       <a class="forgot-password flip-to-back"><%= t('dont_know_password', "Forgot Password?") %></a>
     <% end %>
   </div>
+  <footer role="contentinfo" id="footer" class="ic-Login-footer">
+    <div id="footer-links" class="ic-Login-footer__links">
+      <a class="open-source-link" href="https://github.com/strongmind/canvas-lms">
+        <%= t('open_source_learning_management_system', 'Modified Open Source LMS') %>
+      </a>
+      <%= help_link %>
+      <%= render :partial => 'shared/footer_links' %>
+    </div>
+  </footer>
 <% end %>
 <%= form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face', :autocomplete => "off" } do |f| %>
   <div class="ic-Form-control">
