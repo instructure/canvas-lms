@@ -257,11 +257,14 @@ describe "discussions" do
 
       it "should not show keyboard shortcut modal during html editing", priority: "2", test_id: 846539 do
         get url
+        make_full_screen
         f('.discussion-reply-action').click
-        wait_for_tiny(fj('.discussion-reply-form:visible textarea'))
+        # wait_for_tiny(fj('.discussion-reply-form:visible textarea'))
         fln('HTML Editor').click
-        fj('.reply-textarea:visible').send_keys("< , > , ?, /")
+        f("textarea#root_reply_message_for_#{topic.id}").send_keys("< , > , ?, /")
+        # there are two different shortcut containers based on editor type
         expect(f('.ui-dialog')).not_to be_displayed
+        expect(f('.ReactModalPortal')).not_to be_displayed
       end
 
       it "should strip embed tags inside user content object tags", priority: "2", test_id: 345485 do
