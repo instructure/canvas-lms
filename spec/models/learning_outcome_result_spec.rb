@@ -97,7 +97,7 @@ describe LearningOutcomeResult do
     end
 
     it 'returns #submitted_at when present' do
-      learning_outcome_result.update_attribute(:submitted_at, @submitted_at)
+      learning_outcome_result.update_attributes(submitted_at: @submitted_at)
       expect(learning_outcome_result.submitted_or_assessed_at).to eq(@submitted_at)
     end
 
@@ -122,8 +122,8 @@ describe LearningOutcomeResult do
 
   describe "#calculate percent!" do
     it "properly calculates percent" do
-      learning_outcome_result.update_attribute(:score, 6)
-      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.update_attributes(score: 6)
+      learning_outcome_result.update_attributes(possible: 10)
       learning_outcome_result.calculate_percent!
 
       expect(learning_outcome_result.percent).to eq 0.60
@@ -135,8 +135,8 @@ describe LearningOutcomeResult do
         points_possible: points_possible, mastery_points: 3.5
       })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.6)
-      learning_outcome_result.update_attribute(:score, 6)
-      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.update_attributes(score: 6)
+      learning_outcome_result.update_attributes(possible: 10)
       learning_outcome_result.calculate_percent!
       mastery_score = (learning_outcome_result.percent * points_possible).round(2)
       expect(mastery_score).to eq 3.5
@@ -147,8 +147,8 @@ describe LearningOutcomeResult do
         points_possible: 5.0, mastery_points: 3.0
       })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
-      learning_outcome_result.update_attribute(:score, 6)
-      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.update_attributes(score: 6)
+      learning_outcome_result.update_attributes(possible: 10)
       learning_outcome_result.calculate_percent!
 
       expect(learning_outcome_result.percent).to eq 0.5143
@@ -159,11 +159,35 @@ describe LearningOutcomeResult do
         points_possible: 5, mastery_points: 3
       })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
-      learning_outcome_result.update_attribute(:score, 6)
-      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.update_attributes(score: 6)
+      learning_outcome_result.update_attributes(possible: 10)
       learning_outcome_result.calculate_percent!
 
       expect(learning_outcome_result.percent).to eq 0.5143
+    end
+
+    it "does not use a scale if outcome has 0 mastery points" do
+      allow(learning_outcome_result.learning_outcome).to receive_messages({
+        points_possible: 5, mastery_points: 0
+      })
+      allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
+      learning_outcome_result.update_attributes(score: 6)
+      learning_outcome_result.update_attributes(possible: 10)
+      learning_outcome_result.calculate_percent!
+
+      expect(learning_outcome_result.percent).to eq 0.60
+    end
+
+    it "does not use a scale if outcome has 0 points possible" do
+      allow(learning_outcome_result.learning_outcome).to receive_messages({
+        points_possible: 0, mastery_points: 3
+      })
+      allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
+      learning_outcome_result.update_attributes(score: 6)
+      learning_outcome_result.update_attributes(possible: 10)
+      learning_outcome_result.calculate_percent!
+
+      expect(learning_outcome_result.percent).to eq 0.60
     end
   end
 
