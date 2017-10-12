@@ -1112,6 +1112,11 @@ QUnit.module('SpeedGrader#updateSelectMenuStatus', {
   }
 });
 
+test('ignores null students', function () {
+  SpeedGrader.EG.updateSelectMenuStatus(null, this.selectmenu);
+  ok(true, 'does not error');
+});
+
 test('updates to graded', function () {
   const student = window.jsonData.studentsWithSubmissions[0];
   student.submission_state = 'graded';
