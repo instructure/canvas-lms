@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../sharding_spec_helper'
+require_relative '../spec_helper'
 describe TermsOfService do
   before :once do
     @ac = account_model
@@ -42,18 +42,5 @@ describe TermsOfService do
                                                terms_of_service_content: @terms_of_service_content,
                                                account: ac2)
     expect(tos.passive).to eq true
-  end
-
-  describe "#ensure_terms_for_account" do
-    before :each do
-      TermsOfService.skip_automatic_terms_creation = false
-    end
-
-    it "should create a default terms_of_service on root account creation" do
-      ac2 = account_model
-      expect(ac2.terms_of_service.terms_type).to eq TermsOfService.term_options_for_account(ac2)[:terms_type]
-      sub = ac2.sub_accounts.create!
-      expect(sub.terms_of_service).to be nil
-    end
   end
 end
