@@ -44,3 +44,20 @@
   vertical-align: middle;
   margin-right: 2em;
 }
+
+#bz-offline-warning {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  z-index: 1500;
+  background-color: yellow;
+  height: 3em;
+  width: 100%;
+  margin: 0px;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14pt;
+  padding: 0.25em;
+  padding-top: 0.5em;
+}

@@ -467,11 +467,19 @@ function BZ_GoToMasterPage(master_page_id) {
     req.send('');
 }
 
+var BZ_MagicFieldSaveTimeouts = {};
+
 function BZ_SaveMagicField(field_name, field_value, optional, type) {
   if(optional == null)
     optional = true; // the default is to skip grading; assume api updates are optional fields
   if(type == null)
     type = "api";
+
+  // if there's an existing retry, cancel it so it doesn't
+  // race condition overwrite a subsequent write; we only
+  // want to retry the most recent content
+  if(BZ_MagicFieldSaveTimeouts[field_name])
+    clearTimeout(BZ_MagicFieldSaveTimeouts[field_name]);
 
   var http = new XMLHttpRequest();
   http.open("POST", "/bz/user_retained_data", true);
@@ -479,6 +487,34 @@ function BZ_SaveMagicField(field_name, field_value, optional, type) {
   if (optional)
     data += "&optional=true";
   http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.onreadystatechange = function() {
+    if(http.readyState == 4) {
+      if(http.status != 200) {
+        if(http.status == 0) {
+          // network error
+          var offlineWarning = document.getElementById("bz-offline-warning");
+          if(offlineWarning)
+            offlineWarning.style.display = "";
+          // automatically retry in a little while
+          var timeout = setTimeout(function() {
+            BZ_MagicFieldSaveTimeouts[field_name] = null;
+            BZ_SaveMagicField(field_name, field_value, optional, type);
+          }, 5000);
+          BZ_MagicFieldSaveTimeouts[field_name] = timeout;
+        } else {
+          // returned error from Canvas...
+          // should be a code error on our side
+          // so just gonna log
+          console.log("Magic error: " + http.status + " " + field_name + "=" + field_value);
+        }
+      } else {
+        // success, we can hide the warning again if it is showing
+        var offlineWarning = document.getElementById("bz-offline-warning");
+        if(offlineWarning)
+          offlineWarning.style.display = "none";
+      }
+    }
+  };
   http.send(data);
 }
 
