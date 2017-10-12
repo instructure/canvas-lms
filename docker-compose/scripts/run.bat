@@ -31,4 +31,5 @@ bundle exec rake db:reset_encryption_key_hash
 #echo "    bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup"
 #echo "    bundle exec rake canvas:compile_assets"
 
+echo "Starting the rails app"
 bundle exec bin/rails s -p 3000 -b '0.0.0.0'
