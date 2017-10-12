@@ -21,7 +21,7 @@
       <%= t 'Canvas by Instructure' %>
     </span>
   </div>
-<%= form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate', :autocomplete => "off" } do |f| %>
+<%= form_for :pseudonym_session, :url => url_for({ action: :create }.merge(params.slice(:id).to_unsafe_h)), :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate', :autocomplete => "off" } do |f| %>
 
   <div class="ic-Form-control">
     <input

@@ -57,7 +57,7 @@ const apiUserContent = {
     })
 
     // remove any embed tags inside an object tag, to avoid repeated translations
-    $dummy.find('object.instructure_user_content embed').remove()
+    $dummy.find('object.instructure_user_content:not(#kaltura_player) embed').remove()
 
     // if we aren't actually displaying this content but are instead putting
     // it into a RTE, we want to preserve the object/embed tags

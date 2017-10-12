@@ -557,10 +557,14 @@ describe Assignment::SpeedGrader do
       student_in_course(:course => @course, :user => @other_student, :active_all => true)
     end
 
+    def find_real_submission(json)
+      json['submissions'].find { |s| s['workflow_state'] != 'unsubmitted' }
+    end
+
     it "returns submission comments with null provisional grade" do
       course_with_ta :course => @course, :active_all => true
       json = Assignment::SpeedGrader.new(@assignment, @ta, :grading_role => :provisional_grader).json
-      expect(json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to match_array ['real comment']
+      expect(find_real_submission(json)['submission_comments'].map { |comment| comment['comment'] }).to match_array ['real comment']
     end
 
     describe "for provisional grader" do
@@ -569,12 +573,13 @@ describe Assignment::SpeedGrader do
       end
 
       it "includes only the grader's provisional grades" do
-        expect(@json['submissions'][0]['score']).to eq 3
-        expect(@json['submissions'][0]['provisional_grades']).to be_nil
+        s = find_real_submission(@json)
+        expect(s['score']).to eq 3
+        expect(s['provisional_grades']).to be_nil
       end
 
       it "includes only the grader's provisional comments (and the real ones)" do
-        expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to match_array ['other provisional comment', 'real comment']
+        expect(find_real_submission(@json)['submission_comments'].map { |comment| comment['comment'] }).to match_array ['other provisional comment', 'real comment']
       end
 
       it "only includes the grader's provisional rubric assessments" do
@@ -595,8 +600,9 @@ describe Assignment::SpeedGrader do
       end
 
       it "includes the moderator's provisional grades and comments" do
-        expect(@json['submissions'][0]['score']).to eq 2
-        expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to match_array ['provisional comment', 'real comment']
+        s = find_real_submission(@json)
+        expect(s['score']).to eq 2
+        expect(s['submission_comments'].map { |comment| comment['comment'] }).to match_array ['provisional comment', 'real comment']
       end
 
       it "includes the moderator's provisional rubric assessments" do
@@ -606,7 +612,7 @@ describe Assignment::SpeedGrader do
       end
 
       it "lists all provisional grades" do
-        pgs = @json['submissions'][0]['provisional_grades']
+        pgs = find_real_submission(@json)['provisional_grades']
         expect(pgs.size).to eq 2
         expect(pgs.map { |pg| [pg['score'], pg['scorer_id'], pg['submission_comments'].map{|c| c['comment']}.sort] }).to match_array(
           [
@@ -617,14 +623,15 @@ describe Assignment::SpeedGrader do
       end
 
       it "includes all the other provisional rubric assessments in their respective grades" do
-        ta_pras = @json['submissions'][0]['provisional_grades'][1]['rubric_assessments']
+        ta_pras = find_real_submission(@json)['provisional_grades'][1]['rubric_assessments']
         expect(ta_pras.count).to eq 1
         expect(ta_pras[0]['assessor_id']).to eq @ta.id.to_s
       end
 
       it "includes whether the provisional grade is selected" do
-        expect(@json['submissions'][0]['provisional_grades'][0]['selected']).to be_truthy
-        expect(@json['submissions'][0]['provisional_grades'][1]['selected']).to be_falsey
+        s = find_real_submission(@json)
+        expect(s['provisional_grades'][0]['selected']).to be_truthy
+        expect(s['provisional_grades'][1]['selected']).to be_falsey
       end
     end
   end
