@@ -87,6 +87,7 @@ describe "course syllabus" do
 
     describe "Accessibility" do
       it "should set focus to the Jump to Today link after clicking Edit the Description", priority:"2", test_id: 237019 do
+        skip('see CNVS-39931')
         f('.edit_syllabus_link').click
         check_element_has_focus(f('.jump_to_today_link'))
       end
