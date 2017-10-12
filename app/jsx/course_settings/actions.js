@@ -189,12 +189,25 @@ import 'compiled/jquery.rails_flash_notifications'
                  .then((response) => {
                     const formData = Helpers.createFormData(response.data.upload_params);
                     const successUrl = response.data.upload_params.success_url
+                    const config = { responseType: (successUrl ? 'xml' : 'json') }
                     formData.append('file', file);
-                    ajaxLib.post(response.data.upload_url, formData)
+                    ajaxLib.post(response.data.upload_url, formData, config)
                            .then((response) => {
-                             return ajaxLib.get(successUrl).then((successResp) => {
-                               dispatch(this.prepareSetImage(successResp.data.url, successResp.data.id, courseId, ajaxLib));
-                             })
+                             if (successUrl) {
+                               // s3 upload, need to ping success_url to
+                               // finalize and get back attachment information
+                               return ajaxLib.get(successUrl)
+                             } else if (response.status === 201) {
+                               // inst-fs upload, need to request attachment
+                               // information from location
+                               return ajaxLib.get(response.data.location)
+                             } else {
+                               // local-storage upload, this _is_ the attachment information
+                               return response
+                             }
+                           })
+                           .then((successResp) => {
+                             dispatch(this.prepareSetImage(successResp.data.url, successResp.data.id, courseId, ajaxLib));
                            })
                            .catch((response) => {
                               dispatch(this.errorUploadingImage());
