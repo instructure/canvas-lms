@@ -231,6 +231,7 @@ describe "discussions" do
           topic.save!
 
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed
 
@@ -253,6 +254,7 @@ describe "discussions" do
           topic.save!
 
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           delayed_post_at = Time.zone.now - 10.days
           lock_at = Time.zone.now - 5.days
@@ -277,6 +279,7 @@ describe "discussions" do
           topic.save!
 
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           delayed_post_at = Time.zone.now - 5.days
 
