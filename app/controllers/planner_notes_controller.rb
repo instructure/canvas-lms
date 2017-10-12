@@ -60,6 +60,26 @@
 #           "description": "The datetime of when the planner note should show up on their planner",
 #           "example": "2017-05-09T10:12:00Z",
 #           "type": "datetime"
+#         },
+#         "linked_object_type": {
+#           "description": "the type of the linked learning object",
+#           "example": "assignment",
+#           "type": "string"
+#         },
+#         "linked_object_id": {
+#           "description": "the id of the linked learning object",
+#           "example": 131072,
+#           "type": "integer"
+#         },
+#         "linked_object_html_url": {
+#           "description": "the Canvas web URL of the linked learning object",
+#           "example": "https://canvas.example.com/courses/1578941/assignments/131072",
+#           "type": "string"
+#         },
+#         "linked_object_url": {
+#           "description": "the API URL of the linked learning object",
+#           "example": "https://canvas.example.com/api/v1/courses/1578941/assignments/131072",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -179,21 +199,55 @@ class PlannerNotesController < ApplicationController
   # @API Create a planner note
   #
   # Create a planner note for the current user
-  # @example_request
-  #
+  # @argument title [String]
+  #   The title of the planner note.
+  # @argument details [String]
+  #   Text of the planner note.
+  # @argument todo_date [Date]
+  #   The date where this planner note should appear in the planner.
+  #   The value should be formatted as: yyyy-mm-dd.
+  # @argument course_id [Optional, Integer]
+  #   The ID of the course to associate with the planner note. The caller must be able to view the course in order to
+  #   associate it with a planner note.
+  # @argument linked_object_type [Optional, String]
+  #   The type of a learning object to link to this planner note. Must be used in conjunction wtih linked_object_id
+  #   and course_id. Valid linked_object_type values are:
+  #   'announcement', 'assignment', 'discussion_topic', 'wiki_page', 'quiz'
+  # @argument linked_object_id [Optional, Integer]
+  #   The id of a learning object to link to this planner note. Must be used in conjunction with linked_object_type
+  #   and course_id. The object must be in the same course as specified by course_id. If the title argument is not
+  #   provided, the planner note will use the learning object's title as its title. Only one planner note may be
+  #   linked to a specific learning object.
   # @returns PlannerNote
   def create
-    create_params = params.permit(:title, :details, :course_id, :todo_date)
+    create_params = params.permit(:title, :details, :course_id, :todo_date, :linked_object_type, :linked_object_id)
     if (course_id = create_params.delete(:course_id))
       course = Course.find(course_id)
       return unless authorized_action(course, @current_user, :read)
       create_params[:course] = course
     end
+
+    asset_id = create_params.delete(:linked_object_id)
+    asset_type = create_params.delete(:linked_object_type)
+    if asset_id.present? && asset_type.present?
+      return render(json: { message: 'must specify course_id' }, status: :bad_request) unless course_id
+      asset_klass = LINKED_OBJECT_TYPES[asset_type]&.constantize
+      return render(json: { message: 'invalid linked_object_type' }, status: :bad_request) unless asset_klass
+      asset = asset_klass.find_by!(id: asset_id, context_id: course_id, context_type: 'Course')
+      return unless authorized_action(asset, @current_user, :read)
+      create_params[:linked_object] = asset
+      create_params[:title] ||= Context.asset_name(asset)
+    end
+
     note = @current_user.planner_notes.new(create_params)
-    if note.save
-      render json: planner_note_json(note, @current_user, session), status: :created
-    else
-      render json: note.errors, status: :bad_request
+    begin
+      if note.save
+        render json: planner_note_json(note, @current_user, session), status: :created
+      else
+        render json: note.errors, status: :bad_request
+      end
+    rescue ActiveRecord::RecordNotUnique
+      render json: { message: 'a planner note linked to that object already exists' }, status: :bad_request
     end
   end
 
