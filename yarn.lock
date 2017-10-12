@@ -606,6 +606,10 @@ babel-helper-explode-class@^6.24.1:
     babel-traverse "^6.24.1"
     babel-types "^6.24.1"
 
+babel-helper-flip-expressions@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/babel-helper-flip-expressions/-/babel-helper-flip-expressions-0.2.0.tgz#160d2090a3d9f9c64a750905321a0bc218f884ec"
+
 babel-helper-function-name@^6.24.1:
   version "6.24.1"
   resolved "https://registry.yarnpkg.com/babel-helper-function-name/-/babel-helper-function-name-6.24.1.tgz#d3475b8c03ed98242a25b48351ab18399d3580a9"
@@ -731,6 +735,12 @@ babel-plugin-jscript@^1.0.4:
 babel-plugin-member-expression-literals@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-member-expression-literals/-/babel-plugin-member-expression-literals-1.0.1.tgz#cc5edb0faa8dc927170e74d6d1c02440021624d3"
+
+babel-plugin-minify-guarded-expressions@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-minify-guarded-expressions/-/babel-plugin-minify-guarded-expressions-0.2.0.tgz#8a8c950040fce3e258a12e6eb21eab94ad7235ab"
+  dependencies:
+    babel-helper-flip-expressions "^0.2.0"
 
 babel-plugin-property-literals@^1.0.1:
   version "1.0.1"
@@ -1639,17 +1649,22 @@ canvas-planner@1.0.7:
     reselect "^3.0.1"
     velocity-animate "^1.5.0"
 
-canvas-rce@2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.2.2.tgz#4998d87c8d4fee9bd1430dd63f3a2f718fa4d886"
+canvas-rce@2.5.4:
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.5.4.tgz#144cafd7c9a7402bb752825a70c715ee7668fd8d"
   dependencies:
     aphrodite "^1.1.0"
+    babel-plugin-minify-guarded-expressions "^0.2.0"
     bloody-offset "0.0.0"
     escape-html "1.0.3"
     format-message "^5.1.0"
     format-message-generate-id "^5.1.0"
+    instructure-icons "3 || 4"
+    instructure-ui "^2.1.0 || 3"
     isomorphic-fetch "2.2.1"
     load-css "0.1.0"
+    react "^0.14.8 || ^15.0.0"
+    react-dom "^0.14.8 || ^15.0.0"
     react-redux "~4.4.5"
     react-tinymce "0.6.0"
     react-transition-group "1.1.3"
@@ -1657,7 +1672,7 @@ canvas-rce@2.2.2:
     redux-batch-middleware "0.2.0"
     redux-thunk "~2.1.0"
     scroll-into-view "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab"
-    tinymce "~4.5.7"
+    tinymce "~4.5.7 || ~4.6.6"
     tinymce-light-skin "~1.3.0"
 
 "canvas_offline_course_viewer@https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0":
@@ -4420,7 +4435,7 @@ install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
 
-instructure-icons@4.3.0, instructure-icons@4.x, instructure-icons@^4.1.0:
+instructure-icons@4.3.0, instructure-icons@4.x, instructure-icons@^4.1.0, "instructure-icons@3 || 4":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-4.3.0.tgz#3905d721b0aff37fc300f02f4c6baf5d308c891c"
   dependencies:
@@ -4446,7 +4461,7 @@ instructure-ui@2.3.0:
     shortid "2.2.8"
     tinycolor2 "1.4.1"
 
-instructure-ui@3.3.1, instructure-ui@3.x:
+instructure-ui@3.3.1, instructure-ui@3.x, "instructure-ui@^2.1.0 || 3":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-3.3.1.tgz#28351c0e6c5f8499ad51575f3a6ae5676a70dd04"
   dependencies:
@@ -8412,7 +8427,7 @@ tinymce-light-skin@1.3.1, tinymce-light-skin@~1.3.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.3.1.tgz#fcce7a8b5761716a381f756e1ac7f47c7a41ea88"
 
-tinymce@4.5.7, tinymce@~4.5.7:
+tinymce@4.5.7, "tinymce@~4.5.7 || ~4.6.6":
   version "4.5.7"
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.5.7.tgz#e1f5cd286ec3c9977bd672a4c14e496f63bc4fef"
 
