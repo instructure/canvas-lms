@@ -313,9 +313,16 @@ import './vendor/jquery.scrollTo'
           var post_params = data.upload_params;
           $(file).attr('name', data.file_param);
           $.ajaxJSONFiles(data.upload_url, 'POST', post_params, $(file), function(data) {
-            if (data.location) {
+            if (post_params.success_url) {
+              // s3 upload, need to ping success_url to finalize and get back
+              // attachment information
+              $.ajaxJSON(post_params.success_url, 'GET', {}, onUpload, onError);
+            } else if (data.location) {
+              // inst-fs upload, need to request attachment information from
+              // location
               $.ajaxJSON(data.location, 'GET', {}, onUpload, onError);
             } else {
+              // local-storage upload, this _is_ the attachment information
               onUpload(data)
             }
           }, onError, {onlyGivenParameters: true });

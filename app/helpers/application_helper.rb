@@ -905,14 +905,9 @@ module ApplicationHelper
   end
 
   def thumbnail_image_url(attachment)
-    if InstFS.enabled? && attachment.instfs_uuid
-      attachment.thumbnail_url
-    else
-      # this thumbnail url is a route that redirects to local/s3 appropriately.
-      # deferred redirect through route because computing
-      # attachment.thumbnail_url for non-InstFS attachments may cause immediate
-      # generation of a dynamic thumbnail
-      super(attachment, attachment.uuid)
-    end
+    # this thumbnail url is a route that redirects to local/s3 appropriately.
+    # deferred redirect through route because it may be saved for later use
+    # after a direct link to attachment.thumbnail_url would have expired
+    super(attachment, attachment.uuid)
   end
 end
