@@ -87,8 +87,14 @@
     align-items: center;
   }
 
-  .ig-header-title {
+  .sm-ig-header-title {
     flex: 1 1 auto;
+    text-decoration: none;
+    @include fontSize(16px);
+    font-weight: 500;
+    line-height: 20px;
+    margin: auto;
+    display: flex;
   }
 
   .prerequisites {
@@ -172,8 +178,23 @@
   color: $ic-font-color-dark;
 }
 
-.sm-header{
-  padding: 20px;
+.sm-unit-header{
+  padding: 15px;
+  display: flex;
+}
+
+.sm-header-column{
+  display: flex;
+  flex-direction: column;
+
+  &.right{
+    margin-left: auto;
+  }
+}
+
+.sm-header-row{
+  display: flex;
+  flex-direction: row;
 }
 
 .sm-context_module.context_module.sm-started .sm-header.ig-header{

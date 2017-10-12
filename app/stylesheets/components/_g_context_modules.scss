@@ -183,7 +183,7 @@ $context_module_bg_color: #f2f3f4;
   }
   &.collapsed_module {
     .expand_module_link {
-      display: inline;
+      display: flex;
     }
     .collapse_module_link,
     .content {

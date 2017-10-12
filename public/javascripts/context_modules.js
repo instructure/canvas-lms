@@ -2084,8 +2084,8 @@ import 'compiled/jquery.rails_flash_notifications'
       var reload_entries = $module.find(".content .context_module_items").children().length === 0;
       var toggle = function(show) {
         var callback = function() {
-          $module.find(".collapse_module_link").css('display', $module.find(".content:visible").length > 0 ? 'inline-block' : 'none');
-          $module.find(".expand_module_link").css('display', $module.find(".content:visible").length === 0 ? 'inline-block' : 'none');
+          $module.find(".collapse_module_link").css('display', $module.find(".content:visible").length > 0 ? 'flex' : 'none');
+          $module.find(".expand_module_link").css('display', $module.find(".content:visible").length === 0 ? 'flex' : 'none');
           if($module.find(".content:visible").length > 0) {
             $module.find(".footer .manage_module").css('display', '');
             $module.toggleClass('collapsed_module', false);

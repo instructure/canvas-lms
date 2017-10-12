@@ -39,7 +39,7 @@
     style="<%= hidden unless context_module %>"
 >
   <a id="module_<%= context_module.id if context_module %>"></a>
-  <div class="ig-header header sm-header" id="<%= context_module.id if context_module %>">
+  <div class="ig-header header" id="<%= context_module.id if context_module %>">
     <span
       class="sortable-handle reorder_module_link"
       title="<%= t('reorder_modules', %{Drag to reorder modules}) %>"
@@ -58,47 +58,70 @@
       style="display: none;">&nbsp;
     </a>
     <h2 class='screenreader-only'><%= context_module.try_rescue(:name) || nbsp %></h2>
-    <span
+    <div
       role="button"
       tabindex="0"
       href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse"
-      class="ig-header-title collapse_module_link ellipsis"
+      class="sm-ig-header-title collapse_module_link ellipsis sm-unit-header"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
       aria-expanded="true"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
-      <i class="icon-arrow-open-down"></i>
-      <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
-      <br>
-      <% if context_module && context_module.completion_requirements.present? %>
-          <% count = context_module.requirement_count %>
-          <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
-          <span class="sm-data-requirement-text" aria-label="<%= completion_label %>" data-requirement-count="<%= count %>">
-            <%= completion_label %>
+    <div class="sm-header-column">
+        <div class="sm-header-row">
+          <i class="icon-arrow-open-right"></i>
+          <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
+          <br>
+          <% if context_module && context_module.completion_requirements.present? %>
+              <% count = context_module.requirement_count %>
+              <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
+              <span class="sm-data-requirement-text" aria-label="<%= completion_label %>" data-requirement-count="<%= count %>">
+                <%= completion_label %>
+              </span>
+          <% end %>
+        </div>
+      </div>
+      <div class="sm-header-column right">
+        <div class="sm-header-row">
+          <span class="sm-unit-header_progress-container" style="display:none">
+              <span class="sm-progress-title">Progress: <span class="sm-progress-percentage">0%</span></span>
+              <br>
+              <span class="sm-unit-header_progress-background">
+                <span class="sm-unit-header_progress-bar"></span>
+              </span>
           </span>
-      <% end %>
-
-    </span>
-    <span
+        </div>
+      </div>
+    </div>
+    <div
       role="button"
       tabindex="0"
       href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse"
-      class="ig-header-title expand_module_link ellipsis"
+      class="sm-ig-header-title expand_module_link ellipsis sm-unit-header"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
       aria-expanded="false"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
-      <i class="icon-arrow-open-right"></i>
-      <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
-    </span>
+      <div class="sm-header-column">
+        <div class="sm-header-row">
+          <i class="icon-arrow-open-right"></i>
+          <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
+        </div>
+      </div>
+      <div class="sm-header-column right">
+        <div class="sm-header-row">
+          <span class="sm-unit-header_progress-container" style="display:none">
+              <span class="sm-progress-title">Progress: <span class="sm-progress-percentage">0%</span></span>
+              <br>
+              <span class="sm-unit-header_progress-background">
+                <span class="sm-unit-header_progress-bar"></span>
+              </span>
+          </span>
+        </div>
+      </div>
+    </div>
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
-    <span class="sm-unit-header_progress-container" style="display:none">
-      <span class="sm-progress-title">Progress: <span class="sm-progress-percentage">0%</span></span>
-      <br>
-      <span class="sm-unit-header_progress-background">
-        <span class="sm-unit-header_progress-bar"></span>
-      </span>
-    </span>
+    
 
     <div class="ig-header-admin">
 
