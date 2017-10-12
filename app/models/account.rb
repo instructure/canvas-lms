@@ -1650,7 +1650,7 @@ class Account < ActiveRecord::Base
     work = -> do
       default_enrollment_term
       enable_canvas_authentication
-      TermsOfService.ensure_terms_for_account(self) if self.root_account? && !TermsOfService.skip_automatic_terms_creation
+      TermsOfService.ensure_terms_for_account(self, true) if self.root_account? && !TermsOfService.skip_automatic_terms_creation
     end
     return work.call if Rails.env.test?
     self.class.connection.after_transaction_commit(&work)

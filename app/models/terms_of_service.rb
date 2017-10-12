@@ -42,12 +42,12 @@ class TermsOfService < ActiveRecord::Base
     self.terms_type == "custom"
   end
 
-  def self.ensure_terms_for_account(account)
+  def self.ensure_terms_for_account(account, is_new_account=false)
     return unless self.table_exists?
 
     self.unique_constraint_retry do |retry_count|
       account.reload_terms_of_service if retry_count > 0
-      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account))
+      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account).merge(:passive => is_new_account))
     end
   end
 
