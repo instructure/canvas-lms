@@ -201,7 +201,7 @@ module Importers
     end
 
     def self.matching_settings?(hash, tool, settings, preexisting_tool=false)
-      return unless tool.privacy_level == (hash[:privacy_level] || 'name_only')
+      return if hash[:privacy_level] && tool.privacy_level != hash[:privacy_level]
 
       if preexisting_tool
         # we're matching to existing tools; go with their config if we don't have a real one
@@ -211,7 +211,7 @@ module Importers
 
       tool_settings = tool.settings.with_indifferent_access.except(:custom_fields, :vendor_extensions)
       if preexisting_tool
-        settings.all? {|k, v| tool_settings[k] == v }
+        settings.all? {|k, v| tool_settings[k].presence == v.presence }
       else
         settings == tool_settings
       end
