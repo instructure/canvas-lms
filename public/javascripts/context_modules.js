@@ -1902,9 +1902,9 @@ import 'compiled/jquery.rails_flash_notifications'
         });
         evaluate_lesson()
       });
-
-      $("#context_modules").fadeIn(500)
     }
+
+    $("#context_modules").fadeIn(500)
 
     $('.external_url_link').click(function(event) {
       Helper.externalUrlLinkClick(event, $(this))
