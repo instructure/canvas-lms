@@ -156,6 +156,7 @@ describe "announcements" do
       it "should add an attachment to a new topic", priority: "1", test_id: 150529 do
         topic_title = 'new topic with file'
         get new_url
+        wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
 
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
