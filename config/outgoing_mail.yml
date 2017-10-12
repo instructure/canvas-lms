@@ -7,7 +7,7 @@ production: &production
   domain: <%= ENV['OUTGOING_MAIL_DOMAIN'] %>
   outgoing_address: <%= ENV['OUTGOING_MAIL_OUTGOING_ADDRESS'] %>
   default_name: <%= ENV['OUTGOING_MAIL_DEFAULT_NAME'] %>
-  enable_starttls_auto: <%= ENV['OUTGOING_MAIL_DEFAULT_AUTO_STARTTLS'] %>
+  enable_starttls_auto: <%= ENV['OUTGOING_MAIL_DEFAULT_AUTO_STARTTLS'] %> 
 
 development:
   <<: *production
