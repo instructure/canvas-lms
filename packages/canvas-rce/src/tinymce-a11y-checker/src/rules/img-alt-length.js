@@ -10,7 +10,7 @@ export default {
       return true
     }
     const alt = elem.getAttribute("alt")
-    return alt.length <= MAX_ALT_LENGTH
+    return alt == null || alt.length <= MAX_ALT_LENGTH
   },
 
   data: elem => {

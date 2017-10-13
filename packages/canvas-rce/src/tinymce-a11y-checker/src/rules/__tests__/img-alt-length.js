@@ -17,6 +17,10 @@ describe("test", () => {
     expect(rule.test(div)).toBeTruthy()
   })
 
+  test("returns true if element has no alt attribute", () => {
+    expect(rule.test(el)).toBeTruthy()
+  })
+
   test("returns false if alt is longer than max length", () => {
     const moreThanMaxString = Array(rule["max-alt-length"] + 2).join("x")
     el.setAttribute("alt", moreThanMaxString)
