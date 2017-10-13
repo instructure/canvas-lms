@@ -32,12 +32,23 @@
             next if assignments_shown[tag.content_id]
             assignments_shown[tag.content_id] = true
             obj = Assignment.find(tag.content_id)
+            next if obj.nil?
+
+            submission = obj.find_or_create_submission(@current_user)
+            # user already submitted, it isn't a todo anymore
+            if submission
+              next if submission.workflow_state == 'submitted' || submitted.workflow_state == 'graded'
+            end
           elsif tag.content_type == 'Quizzes::Quiz'
             text = 'Take'
             icon = 'quiz'
             next if quizzes_shown[tag.content_id]
             quizzes_shown[tag.content_id] = true
             obj = Quizzes::Quiz.find(tag.content_id)
+            next if obj.nil?
+
+            # already submitted, we can move on
+            next if obj.quiz_submissions.not_settings_only.where("user_id = ?", @current_user.id).exists?
           end
 
           link = "/courses/#{@course.id}/modules/items/#{tag.id}"
@@ -68,6 +79,20 @@
       @course.assignments.active.each do |obj|
         text = ''
         if obj.title.starts_with? "Course Participation - "
+
+          submission = obj.find_or_create_submission(@current_user)
+          if submission
+            existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
+            possible = obj.points_possible.nil? ? 0 : obj.points_possible.to_f
+
+            # They have already completed the vast majority of the module per
+            # course participation grade; enough to say they are likely done here
+            # and it no longer needs to be a todo
+            if possible > 0
+              next if (existing_grade / possible) >= 0.95
+            end
+          end
+
           text = 'Complete Module'
           disp_name = obj.title["Course Participation - ".length .. -1]
           icon = 'document'
