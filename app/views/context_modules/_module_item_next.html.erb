@@ -53,7 +53,7 @@
     <%= module_item.item_class if module_item %>
   "
 >
-  <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>">
+  <div class="sm-ig-row context_module_sub_header_expander <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>">
     <a
       aria-label='<%= module_item && module_item.title %>'
       tabindex="-1"
@@ -73,7 +73,7 @@
     </div>
     <% end %>
     <% if module_item && module_item.content_type_class == 'context_module_sub_header' %>
-        <i class="context_module_sub_header_expander_<%= module_item ? module_item.id : "blank" %> context_module_sub_header_expander icon-arrow-open-right"></i>
+        <i class="context_module_sub_header_expander_<%= module_item ? module_item.id : "blank" %> icon-arrow-open-right sm-unit-dropdown-icon"></i>
     <% end %>
 
     <span class="type_icon" title="<%= module_item_translated_content_type(module_item) %>">

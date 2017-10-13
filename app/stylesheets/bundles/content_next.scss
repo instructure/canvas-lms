@@ -210,17 +210,16 @@
 }
 
 .sm-context_module.context_module.sm-started .sm-header.ig-header{
-  background-color: #FFFFFF;
   border-bottom: 2px solid var(--ic-brand-button--secondary-bgd-darkened-15);
 }
 
 .sm-context_module.context_module.collapsed_module.sm-started .sm-header.ig-header{
-  background-color: #FFFFFF;
+  // background-color: #FFFFFF;
   border-bottom: none;
 }
 
 .sm-context_module.context_module.collapsed_module .sm-header.ig-header{
-  background-color: #FFFFFF;
+  // background-color: #FFFFFF;
   border-bottom: none;
 }
 

@@ -1806,10 +1806,11 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   }
   function update_icon_status(button){
-    if (button.hasClass('icon-arrow-open-right')) {
-      button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
-    } else if (button.hasClass('icon-arrow-open-down')) {
-      button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
+    let $icon = button.find('i.sm-unit-dropdown-icon')
+    if ($icon.hasClass('icon-arrow-open-right')) {
+      $icon.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+    } else if ($icon.hasClass('icon-arrow-open-down')) {
+      $icon.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
     }   
   };
   function init_icon_status(button){
@@ -1856,7 +1857,7 @@ import 'compiled/jquery.rails_flash_notifications'
             if (current_activity_container) {
               current_activity_container.show();
             }
-            current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+            current_activity_container.prev().find('.context_module_sub_header_expander').find('.sm-unit-dropdown-icon').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
           } else {
             current_lesson_state = "unstarted";
             if (last_lesson_state === "complete") {
@@ -1864,13 +1865,12 @@ import 'compiled/jquery.rails_flash_notifications'
               if (current_activity_container) {
                 current_activity_container.show();
               }
-              current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+              current_activity_container.prev().find('.context_module_sub_header_expander').find('.sm-unit-dropdown-icon').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
             }
           }
         }
 
         unit.items.forEach(function (item) {
-          // console.log("Item:", item.id, item);
 
           if (last_was_subheader && item.type != "SubHeader") {
             current_activity_container = $('#context_module_item_' + item.id).parent();
@@ -1880,7 +1880,6 @@ import 'compiled/jquery.rails_flash_notifications'
             // This is a subheader - if we have a current activity,
             // evaluate if it is complete, partially complete or undone
             evaluate_lesson();
-            //console.log($('#context_module_item_' + item.id))
             if (current_lesson_state) {
               last_lesson_state = current_lesson_state;
             }
@@ -1894,7 +1893,6 @@ import 'compiled/jquery.rails_flash_notifications'
 
           if (current_activity_container && item.type != "SubHeader") {
             if (item.completion_requirement) {
-              // console.log(item.id, item.title);
               completions.push(item.completion_requirement.completed);
             }
           }
@@ -2089,18 +2087,7 @@ import 'compiled/jquery.rails_flash_notifications'
           if($module.find(".content:visible").length > 0) {
             $module.find(".footer .manage_module").css('display', '');
             $module.toggleClass('collapsed_module', false);
-            console.log("$module icon", $module.find('.sm-unit-dropdown-icon'))
-
-            let $toggleIcon = $module.find('.sm-unit-dropdown-icon')
-            if ($toggleIcon.hasClass('icon-arrow-open-right')){
-              $toggleIcon.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down')
-            }
-            
-            // if (button.hasClass('icon-arrow-open-right')) {
-            //   button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
-            // } else if (button.hasClass('icon-arrow-open-down')) {
-            //   button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
-            // } 
+            update_icon_status($module.find('.sm-header-row.sm-header-middle'));
 
             // Makes sure the resulting item has focus.
             $module.find(".collapse_module_link").focus();
@@ -2109,6 +2096,7 @@ import 'compiled/jquery.rails_flash_notifications'
           } else {
             $module.find(".footer .manage_module").css('display', ''); //'none');
             $module.toggleClass('collapsed_module', true);
+            update_icon_status($module.find('.sm-header-row.sm-header-middle'));
             // Makes sure the resulting item has focus.
             $module.find(".expand_module_link").focus();
             $.screenReaderFlashMessage(I18n.t('Collapsed'));
@@ -2191,7 +2179,9 @@ import 'compiled/jquery.rails_flash_notifications'
       currentModules.push(new_module[0]);
     }
     for(var idx in currentModules) {
-      $("#context_module_" + currentModules[idx]).addClass('sm-started').removeClass('collapsed_module');
+      let $cm = $("#context_module_" + currentModules[idx])
+      $cm.addClass('sm-started').removeClass('collapsed_module');
+      update_icon_status($cm.find('.ig-header'));
     }
 
     if(ENV.IS_STUDENT){

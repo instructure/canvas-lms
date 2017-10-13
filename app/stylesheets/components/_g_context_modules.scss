@@ -19,7 +19,7 @@
 @import "pages/shared/menu_tools.scss";
 
 $context_module_border_color: #aaa;
-$context_module_bg_color: #f2f3f4;
+$context_module_bg_color: #FFF;
 
 #context_modules {
   min-width: 20px;
@@ -61,9 +61,10 @@ $context_module_bg_color: #f2f3f4;
     color: $ic-color-success;
   }
 
-  .ig-row {
+  .sm-ig-row {
     display: flex;
     align-items: center;
+    padding: 15px;
 
     .module-item-status-icon {
       width: 24px;
@@ -267,9 +268,9 @@ $context_module_bg_color: #f2f3f4;
     color: #666;
   }
 
-  div.footer.sm-footer{
-    background-color: #FFF;
-  }
+  // div.footer.sm-footer{
+  //   background-color: #FFF;
+  // }
 
   .prerequisites .criterion {
     float: left;
@@ -575,7 +576,7 @@ $context_module_bg_color: #f2f3f4;
     padding-top: 2px;
   }
   &.context_module_item_hover, &:hover {
-    background-color: darken($context_module_bg_color, 2.5%);
+    background-color: darken($context_module_bg_color, 15%);
     .move_item_link, .links a {
       visibility: visible;
     }
