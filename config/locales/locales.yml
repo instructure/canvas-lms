@@ -74,6 +74,11 @@ is:
     is: Íslenska
   bigeasy_locale: is_IS
   dow_offset: 1
+it:
+  locales:
+    it: Italiano
+  bigeasy_locale: it_IT
+  dow_offset: 1
 ja:
   locales:
     ja: 日本語
