@@ -252,10 +252,16 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def recompute_scores_for_each_course(dates_or_workflow_state_changed)
-    courses = Course.active.joins(:enrollment_term).where(
-      "enrollment_terms.grading_period_group_id = ?",
-      grading_period_group_id
-    )
+    if grading_period_group.deleted?
+      # when the group is deleted, it disassociates all enrollment terms, so we have to use the workaround
+      # to find affected courses
+      courses = Course.active.joins(:submissions).where("submissions.grading_period_id = ?", id).distinct
+    else
+      courses = Course.active.joins(:enrollment_term).where(
+        "enrollment_terms.grading_period_group_id = ?",
+        grading_period_group_id
+      )
+    end
 
     courses.find_each { |course| recompute_scores_for_course(course, dates_or_workflow_state_changed) }
   end
