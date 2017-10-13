@@ -51,6 +51,7 @@ describe "discussions" do
       it "should add an attachment to a new topic", priority: "1", test_id: 150466 do
         topic_title = 'new topic with file'
         get url
+        wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
         expect(DiscussionTopic.where(title: topic_title).first.attachment_id).to be_present
