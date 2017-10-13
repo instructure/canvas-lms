@@ -31,7 +31,16 @@ function getTurnitinState (submission) {
 }
 
 function needsGrading (submission) {
-  return (!submission.excused && (submission.grade == null || submission.workflow_state === 'pending_review'));
+  if (submission.excused || !submission.submission_type) {
+    return false;
+  }
+
+  return submission.workflow_state === 'pending_review' || (
+    // the submission exists and/or has been graded
+    ['submitted', 'graded'].includes(submission.workflow_state) &&
+    // the score has been cleared, or the submission has been resubmitted
+    (submission.score == null || submission.grade_matches_current_submission === false)
+  );
 }
 
 function formatGrade (submissionData, assignment, options) {
@@ -106,9 +115,12 @@ export default class AssignmentCellFormatter {
 
     const assignment = this.options.getAssignment(submission.assignment_id);
     if (assignment.grading_type === 'pass_fail') {
+      const options = {
+        needsGrading: needsGrading(submission)
+      };
       const GradingTypeSubmissionCell = SubmissionCell.pass_fail;
       const gradingTypeFormatter = GradingTypeSubmissionCell.formatter.bind(GradingTypeSubmissionCell);
-      return gradingTypeFormatter(row, cell, submission, assignment, student);
+      return gradingTypeFormatter(row, cell, submission, assignment, student, options);
     }
 
     const assignmentData = {
@@ -138,8 +150,8 @@ export default class AssignmentCellFormatter {
       turnitinState: getTurnitinState(submission)
     };
 
-    if (needsGrading(submission) && submission.submission_type) {
-      return renderTemplate(SubmissionCell.submissionIcon(submission.submission_type), options);
+    if (needsGrading(submission)) {
+      return renderTemplate('<i class="icon-not-graded"></i>', options);
     }
 
     const grade = formatGrade(submissionData, assignment, this.options);
