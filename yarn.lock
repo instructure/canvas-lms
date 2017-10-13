@@ -8302,9 +8302,9 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
-tinymce-a11y-checker@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.0.2.tgz#4ea3c6e2aa0bbb0f3d244e38515fd84cc6358a9a"
+tinymce-a11y-checker@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.0.3.tgz#be21e620858776b623ce208e787a882770d9572d"
   dependencies:
     instructure-icons "4.x"
     instructure-ui "3.x"
