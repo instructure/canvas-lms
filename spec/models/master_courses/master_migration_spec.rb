@@ -175,32 +175,6 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should continue to work with the old import_results format" do
-      @copy_to = course_factory
-      @sub = @template.add_child_course!(@copy_to)
-
-      topic = @copy_from.discussion_topics.create!(:title => "some title")
-
-      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
-      run_job(Delayed::Job.where(:tag => "MasterCourses::MasterMigration#perform_exports").first) # only run the export job right now
-
-      @migration.reload
-      result = @migration.migration_results.first
-      expect(result.state).to eq 'queued'
-
-      import_results = {result.content_migration_id => {
-        :state => 'queued', :import_type => result.import_type.to_sym, :subscription_id => result.child_subscription_id, :skipped => []
-      }}
-      @migration.update_attribute(:import_results, import_results)
-      MasterCourses::MigrationResult.where(:master_migration_id => @migration).delete_all # make sure they're gone
-
-      run_jobs
-
-      expect(@migration.reload).to be_completed
-      expect(@migration.imports_completed_at).to be_present
-      expect(@sub.reload.use_selective_copy?).to be_truthy # should have been marked as up-to-date now
-    end
-
     it "should copy selectively on second time" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
