@@ -33,6 +33,7 @@ ActiveRecord::Base::DROPPED_COLUMNS = {
     'account_notification_roles' => %w(role_type).freeze,
     'account_users' => %w(membership_type).freeze,
     'access_tokens' => %w(token).freeze,
+    'appointment_groups' => %w{context_id context_type sub_context_id sub_context_type}.freeze,
     'assessment_question_bank_users' => %w{deleted_at permissions workflow_state}.freeze,
     'assessment_requests' => %w{comments}.freeze,
     'asset_user_accesses' => %w(asset_access_stat_id
