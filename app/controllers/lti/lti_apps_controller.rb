@@ -41,7 +41,8 @@ module Lti
         pagination_args = {max_per_page: 100}
         respond_to do |format|
           launch_defs = Api.paginate(
-            collection, self,
+            collection,
+            self,
             named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true),
             pagination_args
           )
@@ -59,18 +60,18 @@ module Lti
 
     def authorized_for_launch_definitions(context, user, placements)
       # This is a special case to allow any user (students especially) to access the
-      # lauunch definitions for global navigation specifically. This is requested in
-      # the context of an account, not a course, so a student would normoally not
+      # launch definitions for global navigation specifically. This is requested in
+      # the context of an account, not a course, so a student would normally not
       # have any account-level permissions. So instead, just ensure that the user
       # is associated with the current account (not sure how it could be otherwise?)
       return true if context.is_a?(Account) && \
         placements == ['global_navigation'] && \
-        user_in_account(user, context)
+        user_in_account?(user, context)
 
       authorized_action(context, user, :read_as_admin)
     end
 
-    def user_in_account(user, account)
+    def user_in_account?(user, account)
       user.associated_accounts.include? account
     end
   end
