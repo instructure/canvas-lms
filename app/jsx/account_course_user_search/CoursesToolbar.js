@@ -84,7 +84,7 @@ class CoursesToolbar extends React.Component {
 
     const addCourseButton = window.ENV.PERMISSIONS.can_create_courses ?
         (<div>
-          <button className="btn" type="button" onClick={this.addCourse}>
+          <button className="Button selenium-spec-add-course-button" type="button" onClick={this.addCourse}>
             <i className="icon-plus" />
             {' '}
             {I18n.t('Course')}
