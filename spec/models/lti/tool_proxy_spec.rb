@@ -496,6 +496,45 @@ module Lti
       end
     end
 
+    describe "#find_service" do
+      let(:service_one_id) { "http://originality.docker/lti/v2/services#vnd.Canvas.SubmissionEvent" }
+      let(:service_one_endpoint) { "http://originality.docker/event/submission" }
+      let(:service_two_id) { "http://originality.docker/lti/v2/services#vnd.Canvas.Eula" }
+      let(:service_two_endpoint) { "http://originality.docker/eula" }
+      let(:tool_proxy) do
+        create_tool_proxy(raw_data: {
+          'tool_profile' => {
+            'service_offered' => [
+              {
+                "endpoint" => service_one_endpoint,
+                "action" => ["POST", "GET"],
+                "@id" => service_one_id,
+                "@type" => "RestService"
+              },
+              {
+                "endpoint" => service_two_endpoint,
+                "action" => ["GET"],
+                "@id" => service_two_id,
+                "@type" => "RestService"
+              }
+            ]
+          }
+        })
+      end
+
+      it 'returns the service for the specified id/action pair' do
+        expect(tool_proxy.find_service(service_one_id, 'POST').endpoint).to eq service_one_endpoint
+      end
+
+      it 'considers all actions of potential services' do
+        expect(tool_proxy.find_service(service_one_id, 'GET').endpoint).to eq service_one_endpoint
+      end
+
+      it 'does not return a service if no matching action is found' do
+        expect(tool_proxy.find_service(service_one_id, 'PUT')).to be_nil
+      end
+    end
+
     describe "#ims_tool_proxy" do
       it 'gets the ims-lti gem version of the tool proxy' do
         tool_proxy_guid = '123'

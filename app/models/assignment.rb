@@ -42,6 +42,8 @@ class Assignment < ActiveRecord::Base
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
 
+  Lti::EULA_SERVICE = 'vnd.Canvas.Eula'.freeze
+
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
   attr_reader :assignment_changed

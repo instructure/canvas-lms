@@ -164,7 +164,14 @@ class AssignmentsController < ApplicationController
       @similarity_pledge = pledge_text
 
       respond_to do |format|
-        format.html { render }
+        format.html do
+          render locals: {
+            eula_url: @assignment.tool_settings_tool
+                      &.try(:tool_proxy)
+                      &.find_service(Assignment::Lti::EULA_SERVICE, 'GET')
+                      &.endpoint
+          }
+        end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end

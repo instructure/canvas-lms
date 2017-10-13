@@ -122,7 +122,12 @@
           <td colspan="2">
             <label class='checkbox'>
               <input type="checkbox" class='turnitin_pledge' name="turnitin_pledge" value="1"/>
-              <%= @similarity_pledge %>
+              <% if eula_url.present? %>
+                <%= t "I agree to the tool's" %>
+                <%= raw("<a href='#{eula_url}'>#{t 'End-User License Agreement.'}</a>") %>
+              <% else %>
+                <%= @similarity_pledge %>
+              <% end %>
             </label>
           </td>
         </tr>

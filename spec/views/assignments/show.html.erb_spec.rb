@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/assignments/show" do
@@ -33,5 +34,41 @@ describe "/assignments/show" do
     render 'assignments/show'
     expect(response).not_to be_nil # have_tag()
   end
-end
 
+  context 'plagiarism platform' do
+    include_context 'lti2_spec_helper'
+
+    let(:eula_url) { 'https://www.test.com/eula' }
+    let(:eula_service) do
+      {
+        "endpoint" => eula_url,
+        "action" => ["GET"],
+        "@id" => 'http://www.test.com/lti/v2/services#vnd.Canvas.Eula',
+        "@type" => "RestService"
+      }
+    end
+
+    before do
+      allow_any_instance_of(Assignment).to receive(:multiple_due_dates?) { true }
+      allow(view).to receive(:eula_url) { eula_url }
+    end
+
+    it 'renders the eula url if present' do
+      tool_proxy.raw_data['tool_profile']['service_offered'] << eula_service
+      tool_proxy.resources << resource_handler
+      tool_proxy.save!
+
+      course_with_student(active_all: true)
+      view_context(@course, @student)
+
+      a = @course.assignments.create!(:title => "some assignment", :submission_types => 'online_upload')
+      allow(a).to receive(:tool_settings_tool) { message_handler }
+      assign(:assignment, a)
+      assign(:current_user_rubrics, [])
+      assign(:external_tools, [])
+
+      render 'assignments/show'
+      expect(rendered).to include "<a href='https://www.test.com/eula'>End-User License Agreement.</a>"
+    end
+  end
+end

@@ -138,5 +138,11 @@ module Lti
         tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
       ).preload(:assignment).map(&:assignment)
     end
+
+    def find_service(service_id, action)
+      ims_tool_proxy.tool_profile&.service_offered&.find do |s|
+        s.id.include?(service_id) && s.action.include?(action)
+      end
+    end
   end
 end
