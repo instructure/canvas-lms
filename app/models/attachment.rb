@@ -260,9 +260,12 @@ class Attachment < ActiveRecord::Base
       Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
     end
     existing = context.attachments.active.find_by_id(self)
-    existing ||= self.cloned_item_id ? context.attachments.active.where(cloned_item_id: self.cloned_item_id).first : nil
+
+    options[:cloned_item_id] ||= self.cloned_item_id
+    existing ||= Attachment.find_existing_attachment_for_clone(context, options.merge(:active_only => true))
     return existing if existing && !options[:overwrite] && !options[:force_copy]
-    existing ||= self.cloned_item_id ? context.attachments.where(cloned_item_id: self.cloned_item_id).first : nil
+    existing ||= Attachment.find_existing_attachment_for_clone(context, options)
+
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
 
@@ -290,6 +293,16 @@ class Attachment < ActiveRecord::Base
     dup.clone_updated = true
     dup.set_publish_state_for_usage_rights unless self.locked?
     dup
+  end
+
+  def self.find_existing_attachment_for_clone(context, options={})
+    scope = context.attachments
+    scope = scope.active if options[:active_only]
+    if options[:migration_id] && options[:match_on_migration_id]
+      scope.where(migration_id: options[:migration_id]).first
+    elsif options[:cloned_item_id]
+      scope.where(cloned_item_id: options[:cloned_item_id]).first
+    end
   end
 
   def copy_to_folder!(folder, on_duplicate = :rename)

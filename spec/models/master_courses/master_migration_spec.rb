@@ -1006,6 +1006,34 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.reload.tab_configuration).to eq @copy_from.tab_configuration
     end
 
+    it "should not break trying to match existing attachments on cloned_item_id" do
+      # this was 'fun' to debug - i'm still not quite sure how it came about
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      att1 = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
+        :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+
+      run_master_migration
+
+      att_to = @copy_to.attachments.where(:migration_id => mig_id(att1)).first
+      expect(att_to.cloned_item_id).to eq att1.reload.cloned_item_id # i still don't know why we set this
+
+      sub.destroy
+
+      @copy_from2 = course_factory
+      @template2 = MasterCourses::MasterTemplate.set_as_master_course(@copy_from2)
+      att2 = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
+        :folder => Folder.unfiled_folder(@copy_from2), :context => @copy_from2, :cloned_item_id => att1.cloned_item_id)
+      sub2 = @template2.add_child_course!(@copy_to)
+
+      MasterCourses::MasterMigration.start_new_migration!(@template2, @admin)
+      run_jobs
+
+      expect(@copy_to.content_migrations.last.migration_issues).to_not be_exists
+      att2_to = @copy_to.attachments.where(:migration_id => @template2.migration_id_for(att2)).first
+      expect(att2_to).to be_present
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")
