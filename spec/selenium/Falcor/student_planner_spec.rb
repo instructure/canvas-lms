@@ -253,7 +253,7 @@ describe "student planner" do
       fj("a:contains('Title Text')", todo_item).click
 
       # gives the To Do a new name and saves it
-      modal = f("div[aria-label = 'Edit Title Text']")
+      modal = todo_sidebar_modal("Title Text")
       element = f('input', modal)
       element.send_keys(8.chr * 10)
       element.send_keys("New Text")
