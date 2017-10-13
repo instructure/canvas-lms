@@ -18,6 +18,9 @@ en:
 en-AU:
   locales:
     en-AU: English (Australia)
+en-CA:
+  locales:
+    en-CA: English (Canada)
 en-GB:
   locales:
     en-GB: English (United Kingdom)
