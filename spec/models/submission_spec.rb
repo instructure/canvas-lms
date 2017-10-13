@@ -1526,9 +1526,17 @@ describe Submission do
       scores.where.not(grading_period_id: nil)
     end
 
+    let(:course_scores) do
+      scores.where(course_score: true)
+    end
+
+    let(:course_and_grading_period_scores) do
+      scores.where(course_score: true).or(scores.where.not(grading_period_id: nil).where(assignment_group_id: nil))
+    end
+
     it 'recomputes course scores when the submission score changes' do
       expect { @submission.update!(score: 5) }.to change {
-        scores.pluck(:current_score)
+        course_scores.pluck(:current_score)
       }.from([nil]).to([50.0])
     end
 
@@ -1555,7 +1563,7 @@ describe Submission do
       it 'updates the course score and grading period score if a submission ' \
       'in a grading period is graded' do
         expect { @submission.update!(score: 5) }.to change {
-          scores.pluck(:current_score)
+          course_and_grading_period_scores.pluck(:current_score)
         }.from([nil, 80.0]).to([50.0, 65.0])
       end
 
@@ -1564,7 +1572,7 @@ describe Submission do
         day_after_grading_period_ends = 1.day.from_now(@grading_period.end_date)
         @assignment.update!(due_at: day_after_grading_period_ends)
         expect { @submission.update!(score: 5) }.to change {
-          scores.pluck(:current_score)
+          course_and_grading_period_scores.pluck(:current_score)
         }.from([nil, 80.0]).to([nil, 65.0])
       end
     end

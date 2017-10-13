@@ -332,7 +332,7 @@ class GradeCalculator
       @course.shard.activate do
         save_course_and_grading_period_scores
         rows = group_rows
-        if @grading_period.nil? && rows.any? && Score.course_score_populated?
+        if @grading_period.nil? && rows.any?
           save_assignment_group_scores(rows.join(','))
         end
       end
