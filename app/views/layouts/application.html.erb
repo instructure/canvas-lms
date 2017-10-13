@@ -127,9 +127,31 @@
                 <div class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
                   <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" alt="<%= @current_user.short_name %>" />
                 </div>
+                <div class="sm-profile-dropdown-icon-container">
+                  <i class="icon-arrow-open-down"></i>
+                </div>
               </div>
             </a>
             <ul class="dropdown-menu pull-right" aria-labelledby="sm-profile-dropdown">
+              <% if js_env[:SETTINGS][:enable_profiles] %>
+                <li class="ic-NavMenu-list-item">
+                  <a href="/profile" class="sm-profile-dropdown-link"><%= t('Profile') %></a>
+                </li>
+              <% end %>
+              <li class="ic-NavMenu-list-item">
+                <a href="/profile/communication" class="sm-profile-dropdown-link"><%= t('Notifications') %></a>
+              </li>
+              <li class="ic-NavMenu-list-item">
+                <a href="/files" class="sm-profile-dropdown-link"><%= t('Files') %></a>
+              </li>
+              <% if js_env[:SETTINGS][:enable_profiles] %>
+              <li class="ic-NavMenu-list-item">
+                <a href="/dashboard/eportfolios" class="sm-profile-dropdown-link"><%= t('ePortfolios') %></a>
+              </li>
+              <% end %>
+              <li class="ic-NavMenu-list-item">
+                <a href="/profile/settings" class="sm-profile-dropdown-link"><%= t('Settings') %></a>
+              </li>
               <li class="ic-NavMenu-list-item">
                 <form
                     ref="logoutForm"
@@ -147,25 +169,6 @@
                     </button>
                   </form>
               </li>
-              <% if js_env[:SETTINGS][:enable_profiles] %>
-                <li class="ic-NavMenu-list-item">
-                  <a href="/profile" class="sm-profile-dropdown-link"><%= t('Profile') %></a>
-                </li>
-              <% end %>
-              <li class="ic-NavMenu-list-item">
-                <a href="/profile/settings" class="sm-profile-dropdown-link"><%= t('Settings') %></a>
-              </li>
-              <li class="ic-NavMenu-list-item">
-                <a href="/profile/communication" class="sm-profile-dropdown-link"><%= t('Notifications') %></a>
-              </li>
-              <li class="ic-NavMenu-list-item">
-                <a href="/files" class="sm-profile-dropdown-link"><%= t('Files') %></a>
-              </li>
-              <% if js_env[:SETTINGS][:enable_profiles] %>
-                <li class="ic-NavMenu-list-item">
-                  <a href="/dashboard/eportfolios" class="sm-profile-dropdown-link"><%= t('ePortfolios') %></a>
-                </li>
-              <% end %>
             </ul>
           </div>
         <% else %>
@@ -210,7 +213,7 @@
             <% else %>
               <div class="sm-spacer"></div>
             <% end %>
-            <% if defined? @context.grants_any_right? && !can_do(@context, @current_user, :participate_as_student) %>
+            <% if !@distraction_free && defined? @context.grants_any_right? && !can_do(@context, @current_user, :participate_as_student) %>
               <div class="sm-teacher-tools-container" style="display: none">
                 <a href="#" type="button" aria-haspopup="true" class="sm-left-nav-toggler" data-toggle="dropdown" data-id="teacher-tools" aria-owns="sm-teacher-tools" aria-labelledby="type-filter-description" aria-expanded="false">
                   <div class="filter-option pull-left"><%= t("Teacher Tools")%></div>
