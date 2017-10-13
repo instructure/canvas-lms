@@ -282,17 +282,10 @@ $context_module_bg_color: #f2f3f4;
   }
 }
 
-.ig-header-title.collapse_module_link .sm-data-requirement-text{
-  font-size: 12px;
-  color: var(--ic-brand-shade-3);
-  font-style: italic;
-  margin-top: 10px;
-  margin-left: 35px;
-}
-
 .sm-unit-header_progress-container{
   width: 150px;
   position: relative;
+  height: 40px;
 }
 
 .sm-progress-title{

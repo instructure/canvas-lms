@@ -1806,11 +1806,11 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   }
   function update_icon_status(button){
-      if (button.hasClass('icon-arrow-open-right')) {
-        button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
-      } else if (button.hasClass('icon-arrow-open-down')) {
-        button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
-      }
+    if (button.hasClass('icon-arrow-open-right')) {
+      button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+    } else if (button.hasClass('icon-arrow-open-down')) {
+      button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
+    }   
   };
   function init_icon_status(button){
     button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
@@ -2089,6 +2089,19 @@ import 'compiled/jquery.rails_flash_notifications'
           if($module.find(".content:visible").length > 0) {
             $module.find(".footer .manage_module").css('display', '');
             $module.toggleClass('collapsed_module', false);
+            console.log("$module icon", $module.find('.sm-unit-dropdown-icon'))
+
+            let $toggleIcon = $module.find('.sm-unit-dropdown-icon')
+            if ($toggleIcon.hasClass('icon-arrow-open-right')){
+              $toggleIcon.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down')
+            }
+            
+            // if (button.hasClass('icon-arrow-open-right')) {
+            //   button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+            // } else if (button.hasClass('icon-arrow-open-down')) {
+            //   button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
+            // } 
+
             // Makes sure the resulting item has focus.
             $module.find(".collapse_module_link").focus();
             $.screenReaderFlashMessage(I18n.t('Expanded'));

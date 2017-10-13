@@ -94,7 +94,14 @@
     font-weight: 500;
     line-height: 20px;
     margin: auto;
-    display: flex;
+  }
+
+  .sm-data-requirement-text{
+    font-size: 12px;
+    color: var(--ic-brand-shade-3);
+    font-style: italic;
+    margin-top: 0px;
+    margin-left: 30px;
   }
 
   .prerequisites {
@@ -195,6 +202,11 @@
 .sm-header-row{
   display: flex;
   flex-direction: row;
+}
+
+.sm-header-middle{
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .sm-context_module.context_module.sm-started .sm-header.ig-header{
