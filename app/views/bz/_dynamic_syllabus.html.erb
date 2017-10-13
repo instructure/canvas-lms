@@ -72,7 +72,9 @@
           disp_name = obj.title["Course Participation - ".length .. -1]
           icon = 'document'
           # need the page for the direct link
-          page = @course.wiki_pages.active.where(:title => disp_name).first
+          mod = @course.context_modules.active.where(:name => disp_name).first
+          next if mod.nil?
+          page = WikiPage.find(mod.content_tags.active.first.content_id)
           next if page.nil?
           # need the module for the unlock date
           mod = @course.context_modules.active.where(:name => disp_name).first
