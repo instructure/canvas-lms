@@ -228,8 +228,8 @@ module AccountReports::ReportHelper
     Shackles.activate(:master) { send_report(file) }
   end
 
-  def generate_and_run_report(headers = nil, extention = 'csv')
-    file = AccountReports.generate_file(@account_report, extention)
+  def generate_and_run_report(headers = nil, extension = 'csv')
+    file = AccountReports.generate_file(@account_report, extension)
     ExtendedCSV.open(file, "w") do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
