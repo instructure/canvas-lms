@@ -25,7 +25,9 @@ if (container) {
   ReactDOM.render(<TermsOfServiceModal preview/>, container)
 } else {
   container = document.querySelectorAll('.terms_of_service_link')
-  container.forEach((link) => {
-    ReactDOM.render(<TermsOfServiceModal />, link)
-  })
+  if (container.length) {
+    for(let i = 0; i < container.length; i++) {
+      ReactDOM.render(<TermsOfServiceModal />, container[i])
+    }
+  }
 }
