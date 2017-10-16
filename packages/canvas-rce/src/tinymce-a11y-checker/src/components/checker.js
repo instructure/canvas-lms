@@ -75,7 +75,10 @@ export default class Checker extends React.Component {
         node,
         child => {
           for (let rule of rules) {
-            if (!rule.test(child)) {
+            if (
+              !child.hasAttribute("data-ignore-a11y-check") &&
+              !rule.test(child)
+            ) {
               errors.push({ node: child, rule })
             }
           }
