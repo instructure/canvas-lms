@@ -8,7 +8,7 @@ export default {
 
     const alt = elem.getAttribute("alt")
     const isDecorative = elem.hasAttribute("data-decorative")
-    return alt || isDecorative
+    return (alt && alt.replace(/\s/g, "") !== "") || isDecorative
   },
 
   data: elem => {
