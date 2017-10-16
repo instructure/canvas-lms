@@ -205,8 +205,12 @@ module BrandableCSS
       end
     end
 
+    def all_brand_variable_values_as_json(active_brand_config=nil)
+      all_brand_variable_values(active_brand_config).to_json
+    end
+
     def all_brand_variable_values_as_js(active_brand_config=nil)
-      "CANVAS_ACTIVE_BRAND_VARIABLES = #{all_brand_variable_values(active_brand_config).to_json};"
+      "CANVAS_ACTIVE_BRAND_VARIABLES = #{all_brand_variable_values_as_json(active_brand_config)};"
     end
 
     def all_brand_variable_values_as_css(active_brand_config=nil)
@@ -223,77 +227,40 @@ module BrandableCSS
       public_brandable_css_folder.join('default')
     end
 
-    def default_brand_json_file
-      default_brand_folder.join("variables-#{default_variables_md5}.json")
+    def default_brand_file(type, high_contrast=false)
+      default_brand_folder.join("variables#{high_contrast ? '-high_contrast' : ''}-#{default_variables_md5}.#{type}")
     end
 
-    def default_brand_js_file
-      default_brand_folder.join("variables-#{default_variables_md5}.js")
+    def high_contrast_overrides
+      Class.new do
+        def get_value(variable_name)
+          {"ic-brand-primary" => "#0770A3", "ic-link-color" => "#0073A7"}[variable_name]
+        end
+      end.new
     end
 
-    def default_brand_css_file
-      default_brand_folder.join("variables-#{default_variables_md5}.css")
+    def default(type, high_contrast=false)
+      bc = high_contrast ? high_contrast_overrides : nil
+      send("all_brand_variable_values_as_#{type}", bc)
     end
 
-    def default_json
-      all_brand_variable_values.to_json
-    end
-
-    def default_js
-      all_brand_variable_values_as_js
-    end
-
-    def default_css
-      all_brand_variable_values_as_css
-    end
-
-    def save_default_json!
+    def save_default!(type, high_contrast=false)
       default_brand_folder.mkpath
-      default_brand_json_file.write(default_json)
-      move_default_json_to_s3_if_enabled!
-    end
-
-    def save_default_js!
-      default_brand_folder.mkpath
-      default_brand_js_file.write(default_js)
-      move_default_js_to_s3_if_enabled!
-    end
-
-    def save_default_css!
-      default_brand_folder.mkpath
-      default_brand_css_file.write(default_css)
-      move_default_css_to_s3_if_enabled!
+      default_brand_file(type, high_contrast).write(default(type, high_contrast))
+      move_default_to_s3_if_enabled!(type, high_contrast)
     end
 
     def save_default_files!
-      save_default_json!
-      save_default_js!
-      save_default_css!
-    end
-
-    def move_default_json_to_s3_if_enabled!
-      return unless defined?(Canvas) && Canvas::Cdn.enabled?
-      s3_uploader.upload_file(public_default_json_path)
-      begin
-        File.delete(default_brand_json_file)
-      rescue Errno::ENOENT # continue if something else deleted it in another process
+      [true, false].each do |high_contrast|
+        ['js', 'css', 'json'].each { |type| save_default!(type, high_contrast) }
       end
     end
 
-    def move_default_js_to_s3_if_enabled!
+    def move_default_to_s3_if_enabled!(type, high_contrast=false)
       return unless defined?(Canvas) && Canvas::Cdn.enabled?
-      s3_uploader.upload_file(public_default_js_path)
+      s3_uploader.upload_file(public_default_path(type, high_contrast))
       begin
-        File.delete(default_brand_js_file)
-      rescue Errno::ENOENT # continue if something else deleted it in another process
-      end
-    end
-
-    def move_default_css_to_s3_if_enabled!
-      return unless defined?(Canvas) && Canvas::Cdn.enabled?
-      s3_uploader.upload_file(public_default_css_path)
-      begin
-        File.delete(default_brand_css_file)
+        File.delete(default_brand_file(type, high_contrast))
       rescue Errno::ENOENT # continue if something else deleted it in another process
       end
     end
@@ -302,16 +269,8 @@ module BrandableCSS
       @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
     end
 
-    def public_default_json_path
-      "dist/brandable_css/default/variables-#{default_variables_md5}.json"
-    end
-
-    def public_default_js_path
-      "dist/brandable_css/default/variables-#{default_variables_md5}.js"
-    end
-
-    def public_default_css_path
-      "dist/brandable_css/default/variables-#{default_variables_md5}.css"
+    def public_default_path(type, high_contrast=false)
+      "dist/brandable_css/default/variables#{high_contrast ? '-high_contrast' : ''}-#{default_variables_md5}.#{type}"
     end
 
     def variants

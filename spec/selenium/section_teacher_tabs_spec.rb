@@ -23,7 +23,7 @@ describe "section tabs on the left side" do
   context "as a teacher" do
 
     it "should highlight which tab is active" do
-      BrandableCSS.save_default_css! # make sure variable css file is up to date
+      BrandableCSS.save_default!('css') # make sure variable css file is up to date
       course_with_teacher_logged_in
       %w{assignments quizzes settings}.each do |feature|
         get "/courses/#{@course.id}/#{feature}"

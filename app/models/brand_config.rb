@@ -113,18 +113,6 @@ class BrandConfig < ActiveRecord::Base
     BrandableCSS.all_brand_variable_values_as_css(self)
   end
 
-  def json_file
-    public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.json")
-  end
-
-  def js_file
-    public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.js")
-  end
-
-  def css_file
-    public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.css")
-  end
-
   def public_brand_dir
     BrandableCSS.public_brandable_css_folder.join(md5)
   end
@@ -133,63 +121,30 @@ class BrandConfig < ActiveRecord::Base
     "dist/brandable_css/#{md5}"
   end
 
-  def public_json_path
-    "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.json"
-  end
-
-  def public_js_path
-    "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.js"
-  end
-
-  def public_css_path
-    "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.css"
-  end
-
-  def save_json_file!
-    logger.info "saving brand variables json file: #{json_file}"
-    public_brand_dir.mkpath
-    json_file.write(to_json)
-    move_json_to_s3_if_enabled!
-  end
-
-  def save_js_file!
-    logger.info "saving brand variables js file: #{js_file}"
-    public_brand_dir.mkpath
-    js_file.write(to_js)
-    move_js_to_s3_if_enabled!
-  end
-
-  def save_css_file!
-    logger.info "saving brand variables css file: #{css_file}"
-    public_brand_dir.mkpath
-    css_file.write(to_css)
-    move_css_to_s3_if_enabled!
-  end
-
-  def move_json_to_s3_if_enabled!
-    return unless Canvas::Cdn.enabled?
-    s3_uploader.upload_file(public_json_path)
-    begin
-      File.delete(json_file)
-    rescue Errno::ENOENT # continue if something else deleted it in another process
+  [:json, :js, :css].each do |type|
+    define_method :"public_#{type}_path" do
+      "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.#{type}"
     end
-  end
 
-  def move_js_to_s3_if_enabled!
-    return unless Canvas::Cdn.enabled?
-    s3_uploader.upload_file(public_js_path)
-    begin
-      File.delete(json_file)
-    rescue Errno::ENOENT # continue if something else deleted it in another process
+    define_method :"#{type}_file" do
+      public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.#{type}")
     end
-  end
 
-  def move_css_to_s3_if_enabled!
-    return unless Canvas::Cdn.enabled?
-    s3_uploader.upload_file(public_css_path)
-    begin
-      File.delete(css_file)
-    rescue Errno::ENOENT # continue if something else deleted it in another process
+    define_method :"save_#{type}_file!" do
+      file = send(:"#{type}_file")
+      logger.info "saving brand variables #{type} file: #{file}"
+      public_brand_dir.mkpath
+      file.write(send(:"to_#{type}"))
+      send :"move_#{type}_to_s3_if_enabled!"
+    end
+
+    define_method :"move_#{type}_to_s3_if_enabled!" do
+      return unless Canvas::Cdn.enabled?
+      s3_uploader.upload_file(send(:"public_#{type}_path"))
+      begin
+        File.delete(send(:"#{type}_file"))
+      rescue Errno::ENOENT # continue if something else deleted it in another process
+      end
     end
   end
 

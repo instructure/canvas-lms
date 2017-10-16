@@ -117,12 +117,12 @@ class ApplicationController < ActionController::Base
     # set some defaults
     unless @js_env
       editor_css = [
-        active_brand_config_css_url,
+        active_brand_config_url('css'),
         view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
       ]
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
-        active_brand_config_json_url: active_brand_config_json_url,
+        active_brand_config_json_url: active_brand_config_url('json'),
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
         current_user: Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile) },

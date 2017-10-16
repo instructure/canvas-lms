@@ -31,7 +31,7 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 
 .mce-container .mce-primary {
   @if $use_high_contrast {
-    @include canvas-button($ic-brand-primary-high-contrast, $ic-color-light);
+    @include canvas-button(#0770A3, $ic-color-light);
   } @else {
     @include canvas-button(
       var(--ic-brand-button--primary-bgd),
