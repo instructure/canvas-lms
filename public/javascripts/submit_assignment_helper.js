@@ -20,18 +20,22 @@ import I18n from 'i18n!assignments'
 import './jquery.instructure_misc_plugins'
 import 'compiled/jquery.rails_flash_notifications'
 
-  var validFileSubmission = function(ext, contentItem) {
-    return !ENV.SUBMIT_ASSIGNMENT ||
-           !ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS ||
-           ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length <= 0 ||
-           (contentItem.url.match(/\./) && $.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) >= 0);
-  };
+var validFileSubmission = function(ext, contentItem) {
+  return !ENV.SUBMIT_ASSIGNMENT ||
+         !ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS ||
+         ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length <= 0 ||
+         (contentItem.url.match(/\./) && $.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) >= 0);
+};
 
-  var invalidToolReturn = function(message) {
-      $.flashError(I18n.t("The launched tool returned an invalid resource for this assignment"));
-      console.log(message);
-      return false;
-  };
+var invalidToolReturn = function(message) {
+    $.flashError(I18n.t("The launched tool returned an invalid resource for this assignment"));
+    console.log(message);
+    return false;
+};
+
+export function recordEulaAgreement (input, checked) {
+  input.value = checked ? new Date().getTime() : '';
+}
 
 export function submitContentItem (contentItem) {
     if (!contentItem) {

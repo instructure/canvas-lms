@@ -67,6 +67,11 @@
 #           "example": 134,
 #           "type": "integer"
 #         },
+#         "eula_agreement_timestamp": {
+#           "description": "UTC timestamp showing when the user agreed to the EULA (if given by the tool provider)",
+#           "example": "1508250487578",
+#           "type": "string"
+#         },
 #         "workflow_state": {
 #           "description": "The current state of the submission",
 #           "example": "submitted",
@@ -218,6 +223,9 @@ module Lti
       submission_attributes = %w(id body url submitted_at assignment_id user_id submission_type workflow_state attempt attachments)
       sub_hash = filtered_json(model: submission, whitelist: submission_attributes)
       sub_hash[:user_id] = Lti::Asset.opaque_identifier_for(User.find(sub_hash[:user_id]))
+      if submission.turnitin_data[:eula_agreement_timestamp].present?
+        sub_hash[:eula_agreement_timestamp] = submission.turnitin_data[:eula_agreement_timestamp]
+      end
       attachments = submission.versioned_attachments
       sub_hash[:attachments] = attachments.map { |a| attachment_json(a) }
       sub_hash

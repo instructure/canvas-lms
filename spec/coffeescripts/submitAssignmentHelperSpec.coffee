@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['submit_assignment_helper','jquery'], ({submitContentItem}, $) ->
+define ['submit_assignment_helper','jquery'], ({submitContentItem, recordEulaAgreement}, $) ->
   formHtml = """
             <div id="form-container">
             <form accept-charset="UTF-8" action="/courses/2/assignments/1/submissions" id="submit_online_url_form" method="post">
@@ -125,8 +125,12 @@ define ['submit_assignment_helper','jquery'], ({submitContentItem}, $) ->
     result = submitContentItem(undefined)
     equal result, false
 
-
-
-
-
-
+  test "Sets the input value to the current time if checked is true", ->
+    now = new Date();
+    clock = sinon.useFakeTimers(now.getTime());
+    inputHtml = "<input type='checkbox' name='test' id='checkbox-test'></input>"
+    $('#fixtures').append(inputHtml)
+    input = document.querySelector('#checkbox-test')
+    recordEulaAgreement(input, true)
+    equal document.querySelector('#checkbox-test').value, now.getTime()
+    clock.restore();

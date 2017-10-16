@@ -25,7 +25,7 @@ import homework_submission_tool from 'jst/assignments/homework_submission_tool'
 import HomeworkSubmissionLtiContainer from 'compiled/external_tools/HomeworkSubmissionLtiContainer'
 import RCEKeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
-import {submitContentItem} from './submit_assignment_helper'
+import {submitContentItem, recordEulaAgreement} from './submit_assignment_helper'
 import 'compiled/jquery.rails_flash_notifications'
 import './jquery.ajaxJSON'
 import './jquery.inst_tree'
@@ -250,6 +250,11 @@ import 'jqueryui/tabs'
         }
       }
     });
+
+    $('input.turnitin_pledge').click((e) => {
+      recordEulaAgreement(document.querySelector('#eula_agreement_timestamp'),
+                          e.target.checked);
+    })
 
     $(".submit_assignment_link").click(function(event, skipConfirmation) {
       event.preventDefault();

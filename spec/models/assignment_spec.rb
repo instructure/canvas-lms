@@ -1407,6 +1407,13 @@ describe Assignment do
         points_possible: 10
     end
 
+    it "sets the 'eula_agreement_timestamp'" do
+      setup_assignment_without_submission
+      timestamp = Time.now.to_i.to_s
+      @a.submit_homework(@user, {eula_agreement_timestamp: timestamp})
+      expect(@a.submissions.first.turnitin_data[:eula_agreement_timestamp]).to eq timestamp
+    end
+
     it "creates a new version for each submission" do
       setup_assignment_without_submission
       @a.submit_homework(@user)

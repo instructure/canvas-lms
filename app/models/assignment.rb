@@ -1628,6 +1628,7 @@ class Assignment < ActiveRecord::Base
                                     %w[comment group_comment attachments]).to_set
 
   def submit_homework(original_student, opts={})
+    eula_timestamp = opts[:eula_agreement_timestamp]
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
     opts.keys.each { |k|
@@ -1669,6 +1670,7 @@ class Assignment < ActiveRecord::Base
         })
         homework.submitted_at = Time.zone.now
         homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
+        homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             if student == original_student
