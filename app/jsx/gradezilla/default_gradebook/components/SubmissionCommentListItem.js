@@ -28,83 +28,74 @@ import DateHelper from 'jsx/shared/helpers/dateHelper';
 import TextHelper from 'compiled/str/TextHelper';
 import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
 
-function handledeleteComment (id, deleteSubmissionComment) {
-  return () => {
-    const message = I18n.t('Are you sure you want to delete this comment?');
-    if(confirm(message)) {
-      deleteSubmissionComment(id);
-    }
-  };
-}
 
 function submissionCommentDate (date) {
   return DateHelper.formatDatetimeForDisplay(date, 'short');
 }
 
-export default function SubmissionCommentListItem (props) {
-  const {
-    author,
-    authorAvatarUrl,
-    authorUrl ,
-    comment,
-    createdAt,
-    id,
-    last,
-    deleteSubmissionComment
-  } = props;
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', margin: '0 0 0.75rem' }}>
-        <div style={{ display: 'flex' }}>
-          <Link href={authorUrl}>
-            <Avatar
-              size="small"
-              name={author}
-              alt={I18n.t('Avatar for %{author}', { author })}
-              src={authorAvatarUrl}
-              margin="0 x-small 0 0"
-            />
-          </Link>
+export default class SubmissionCommentListItem extends React.Component {
+  static propTypes = {
+    ...CommentPropTypes,
+    last: bool.isRequired,
+    deleteSubmissionComment: func.isRequired
+  };
+
+  handleDeleteComment = () => {
+    const message = I18n.t('Are you sure you want to delete this comment?');
+    if(confirm(message)) {
+      this.props.deleteSubmissionComment(this.props.id);
+    }
+  };
+
+  render () {
+    return (
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', margin: '0 0 0.75rem' }}>
+          <div style={{ display: 'flex' }}>
+            <Link href={this.props.authorUrl}>
+              <Avatar
+                size="small"
+                name={this.props.author}
+                alt={I18n.t('Avatar for %{author}', { author: this.props.author })}
+                src={this.props.authorAvatarUrl}
+                margin="0 x-small 0 0"
+              />
+            </Link>
+
+            <div>
+              <div style={{ margin: '0 0 0 0.375rem' }}>
+                <Typography weight="bold" size="small" lineHeight="fit">
+                  <Link href={this.props.authorUrl}>{TextHelper.truncateText(this.props.author, { max: 25 })}</Link>
+                </Typography>
+              </div>
+
+              <div style={{ margin: '0 0 0 0.375rem' }}>
+                <Typography size="small" lineHeight="fit">
+                  {submissionCommentDate(this.props.createdAt)}
+                </Typography>
+              </div>
+            </div>
+          </div>
 
           <div>
-            <div style={{ margin: '0 0 0 0.375rem' }}>
-              <Typography weight="bold" size="small" lineHeight="fit">
-                <Link href={authorUrl}>{TextHelper.truncateText(author, { max: 25 })}</Link>
-              </Typography>
-            </div>
-
-            <div style={{ margin: '0 0 0 0.375rem' }}>
-              <Typography size="small" lineHeight="fit">
-                {submissionCommentDate(createdAt)}
-              </Typography>
-            </div>
+            <Button
+              size="small"
+              variant="icon"
+              onClick={this.handleDeleteComment}
+            >
+              <IconTrashLine title={I18n.t('Delete Comment: %{comment}', { comment: this.props.comment })}/>
+            </Button>
           </div>
         </div>
 
         <div>
-          <Button
-            size="small"
-            variant="icon"
-            onClick={handledeleteComment(id, deleteSubmissionComment)}
-          >
-            <IconTrashLine title={I18n.t('Delete Comment: %{comment}', { comment })}/>
-          </Button>
+          <Typography size="small" lineHeight="condensed">
+            <p style={{ margin: '0 0 0.75rem' }}>{this.props.comment}</p>
+          </Typography>
         </div>
-      </div>
 
-      <div>
-        <Typography size="small" lineHeight="condensed">
-          <p style={{ margin: '0 0 0.75rem' }}>{comment}</p>
-        </Typography>
+        { !this.props.last && <hr style={{ margin: '1rem 0', borderTop: 'dashed 0.063rem' }} /> }
       </div>
-
-      { !last && <hr style={{ margin: '1rem 0', borderTop: 'dashed 0.063rem' }} /> }
-    </div>
-  );
+    );
+  }
 }
-
-SubmissionCommentListItem.propTypes = {
-  ...CommentPropTypes,
-  last: bool.isRequired,
-  deleteSubmissionComment: func.isRequired
-};

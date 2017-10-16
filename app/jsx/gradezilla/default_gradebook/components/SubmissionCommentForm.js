@@ -30,13 +30,25 @@ function isValid (comment) {
 }
 
 class SubmissionCommentForm extends React.Component {
-  state = { comment: '' };
-
-  handleCommentChange = (event) => {
-    this.setState({ comment: event.target.value });
+  static propTypes = {
+    createSubmissionComment: func.isRequired,
+    processing: bool.isRequired,
+    setProcessing: func.isRequired
   };
 
-  handlePostComment = (event) => {
+  constructor (props) {
+    super(props);
+    this.bindTextarea = this.bindTextarea.bind(this);
+    this.handleCommentChange = this.handleCommentChange.bind(this);
+    this.handlePostComment = this.handlePostComment.bind(this);
+    this.state = { comment: '' };
+  }
+
+  handleCommentChange (event) {
+    this.setState({ comment: event.target.value });
+  }
+
+  handlePostComment (event) {
     event.preventDefault();
     this.props.setProcessing(true);
     this.props.createSubmissionComment(this.state.comment)
@@ -44,11 +56,11 @@ class SubmissionCommentForm extends React.Component {
     this.setState({ comment: '' }, () => {
       this.textarea.focus();
     });
-  };
+  }
 
-  bindTextarea = (ref) => {
+  bindTextarea (ref) {
     this.textarea = ref;
-  };
+  }
 
   render () {
     return (
@@ -83,11 +95,5 @@ class SubmissionCommentForm extends React.Component {
     );
   }
 }
-
-SubmissionCommentForm.propTypes = {
-  createSubmissionComment: func.isRequired,
-  processing: bool.isRequired,
-  setProcessing: func.isRequired
-};
 
 export default SubmissionCommentForm;
