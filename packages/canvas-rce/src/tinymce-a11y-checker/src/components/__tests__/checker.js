@@ -7,16 +7,30 @@ const promisify = util.promisify
 
 jest.mock("../../rules/index")
 
-let component, instance, node, child, body
+let component, instance, node, child, child2, body
 
 beforeEach(() => {
   body = document.createElement("body")
   node = document.createElement("div")
   body.appendChild(node)
   child = node.appendChild(document.createElement("div"))
-  node.appendChild(document.createElement("div"))
+  child2 = node.appendChild(document.createElement("div"))
   component = shallow(<Checker getBody={() => node} />)
   instance = component.instance()
+})
+
+describe("check", () => {
+  test("doesn't check nodes with data-ignore-a11y-check", async () => {
+    child.setAttribute("data-ignore-a11y-check", "")
+    node.removeChild(child2)
+    await promisify(instance.check.bind(instance))()
+    expect(instance.state.errors.length).toBe(0)
+  })
+
+  test("checks nodes without data-ignore-a11y-check", async () => {
+    await promisify(instance.check.bind(instance))()
+    expect(instance.state.errors.length).toBe(2)
+  })
 })
 
 describe("errorRootNode", () => {
