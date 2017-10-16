@@ -179,15 +179,34 @@ class PlannerNotesController < ApplicationController
   # @API Update a PlannerNote
   #
   # Update a planner note for the current user
+  # @argument title [Optional, String]
+  #   The title of the planner note.
+  # @argument details [Optional, String]
+  #   Text of the planner note.
+  # @argument todo_date [Optional, Date]
+  #   The date where this planner note should appear in the planner.
+  #   The value should be formatted as: yyyy-mm-dd.
+  # @argument course_id [Optional, Integer]
+  #   The ID of the course to associate with the planner note. The caller must be able to view the course in order to
+  #   associate it with a planner note. Use a null or empty value to remove a planner note from a course. Note that if
+  #   the planner note is linked to a learning object, its course_id cannot be changed.
   #
   # @returns PlannerNote
   def update
     update_params = params.permit(:title, :details, :course_id, :todo_date)
     note = @current_user.planner_notes.find(params[:id])
-    if (course_id = update_params.delete(:course_id))
-      course = Course.find(course_id)
-      return unless authorized_action(course, @current_user, :read)
-      update_params[:course] = course
+    if update_params.key?(:course_id)
+      course_id = update_params.delete(:course_id)
+      if note.linked_object_id.present? && note.course_id != course_id
+        return render json: { message: 'course_id cannot be changed for linked planner notes' }, status: :bad_request
+      end
+      if course_id.present?
+        course = Course.find(course_id)
+        return unless authorized_action(course, @current_user, :read)
+        update_params[:course] = course
+      else
+        update_params[:course] = nil
+      end
     end
     if note.update_attributes(update_params)
       render json: planner_note_json(note, @current_user, session), status: :ok
