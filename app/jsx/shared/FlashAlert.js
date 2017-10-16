@@ -154,7 +154,9 @@ export default class FlashAlert extends React.Component {
       } else {
         details = (
           <span>
-            <PresentationContent><Button variant="link" onClick={this.showDetails}>Details</Button></PresentationContent>
+            <PresentationContent>
+              <Button variant="link" onClick={this.showDetails}>{I18n.t('Details')}</Button>
+            </PresentationContent>
             <ScreenReaderContent>{this.renderDetailMessage()}</ScreenReaderContent>
           </span>
         )
@@ -231,5 +233,5 @@ export function showFlashError (message = I18n.t('An error occurred making a net
 }
 
 export function showFlashSuccess (message) {
-  return err => showFlashAlert({ message, err, type: 'success' })
+  return () => showFlashAlert({ message, type: 'success' })
 }
