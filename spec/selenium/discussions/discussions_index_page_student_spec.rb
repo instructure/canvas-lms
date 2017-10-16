@@ -61,6 +61,7 @@ describe "discussions" do
         get url
         expect_new_page_load { f('#new-discussion-btn').click }
         wait_for_ajax_requests
+        wait_for_tiny(f('textarea[name=message]'))
 
         edit_topic("from a student", "tell me a story")
       end
