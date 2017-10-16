@@ -419,4 +419,19 @@ QUnit.module('SubmissionTray', function (hooks) {
     const form = wrapContent().find(SubmissionCommentCreateForm);
     strictEqual(form.length, 0);
   });
+
+  test('cancelCommenting calls editSubmissionComment', function () {
+    const editSubmissionComment = sinon.stub();
+    mountComponent({ editedCommentId: '5', editSubmissionComment });
+    wrapper.instance().cancelCommenting();
+    strictEqual(editSubmissionComment.callCount, 1);
+  });
+
+  test('cancelCommenting sets the edited submission comment id to null', function () {
+    const editSubmissionComment = sinon.stub();
+    mountComponent({ editedCommentId: '5', editSubmissionComment });
+    wrapper.instance().cancelCommenting();
+    const editedCommentId = editSubmissionComment.firstCall.args[0];
+    strictEqual(editedCommentId, null);
+  });
 });

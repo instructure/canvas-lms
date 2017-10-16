@@ -28,8 +28,17 @@ QUnit.module('SubmissionCommentCreateForm', function (hooks) {
     return mount(<SubmissionCommentCreateForm {...props} />);
   }
 
+  function cancelButton () {
+    return wrapper.find('button').at(0);
+  }
+
+  function submitButton () {
+    return wrapper.find('button').at(1);
+  }
+
   hooks.beforeEach(function () {
     props = {
+      cancelCommenting () {},
       createSubmissionComment () {},
       processing: false,
       setProcessing () {}
@@ -40,33 +49,62 @@ QUnit.module('SubmissionCommentCreateForm', function (hooks) {
     wrapper.unmount();
   });
 
-  test('Button is not present if there is no text entered in the comment area', function () {
+  test('"Submit" button is not present if there is no text entered in the comment area', function () {
     wrapper = mountComponent();
-    strictEqual(wrapper.find('Button').length, 0);
+    strictEqual(submitButton().length, 0);
   });
 
-  test('Button is not present if the content is all spaces', function () {
+  test('"Cancel" button is not present if there is no text entered in the comment area', function () {
+    wrapper = mountComponent();
+    strictEqual(cancelButton().length, 0);
+  });
+
+  test('"Submit" button is not present if the content is all spaces', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '   ' } });
-    strictEqual(wrapper.find('Button').length, 0);
+    strictEqual(submitButton().length, 0);
   });
 
-  test('Button is present if there is text entered in the comment area', function () {
+  test('"Cancel" button is not present if the content is all spaces', function () {
     wrapper = mountComponent();
-    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(wrapper.find('Button').length, 1);
+    wrapper.find('textarea').simulate('change', { target: { value: '   ' } });
+    strictEqual(cancelButton().length, 0);
   });
 
-  test('Button is not disabled', function () {
+  test('"Submit" button is present if there is text entered in the comment area', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(wrapper.find('Button').props().disabled, false);
+    strictEqual(submitButton().length, 1);
   });
 
-  test('Button has the text "Submit"', function () {
+  test('"Cancel" button is present if there is text entered in the comment area', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(wrapper.find('Button').text(), 'Submit');
+    strictEqual(cancelButton().length, 1);
+  });
+
+  test('"Submit" button is not disabled', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    strictEqual(submitButton().prop('aria-disabled'), null);
+  });
+
+  test('"Cancel" button is not disabled', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    strictEqual(cancelButton().prop('aria-disabled'), null);
+  });
+
+  test('"Submit" button has the text "Submit"', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    strictEqual(submitButton().text(), 'Submit');
+  });
+
+  test('"Cancel" button has the text "Cancel"', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
+    strictEqual(cancelButton().text(), 'Cancel');
   });
 
   test('TextArea is empty', function () {
@@ -91,7 +129,7 @@ QUnit.module('SubmissionCommentCreateForm', function (hooks) {
       preventDefault: sinon.stub(),
     };
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    wrapper.find('button').simulate('click', event);
+    submitButton().simulate('click', event);
     strictEqual(event.preventDefault.callCount, 1);
   });
 
@@ -100,54 +138,62 @@ QUnit.module('SubmissionCommentCreateForm', function (hooks) {
     wrapper = mountComponent();
     const focusTextArea = sinon.stub(wrapper.instance().textarea, 'focus');
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    wrapper.find('button').simulate('click', event);
+    submitButton().simulate('click');
     strictEqual(focusTextArea.callCount, 1);
   });
 
-  test('Button is disabled while processing', function () {
+  test('"Submit" button is disabled while processing', function () {
     props.processing = true;
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(wrapper.find('Button').prop('disabled'), true);
+    strictEqual(submitButton().prop('aria-disabled'), 'true');
   });
 
-  test('Button label reads "Submit Comment"', function () {
+  test('"Submit" button label reads "Submit Comment"', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(wrapper.find('Button').prop('label'), 'Submit Comment');
+    strictEqual(submitButton().prop('label'), 'Submit Comment');
   });
 
-  test('clicking the Button calls setProcessing', function () {
+  test('clicking the "Submit" button calls setProcessing', function () {
     props.createSubmissionComment = sinon.stub().resolves();
     props.setProcessing = sinon.stub();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    wrapper.find('button').simulate('click', event);
+    submitButton().simulate('click');
     strictEqual(props.setProcessing.callCount, 1);
   });
 
-  test('clicking the Button calls setProcessing with true', function () {
+  test('clicking the "Submit" button calls setProcessing with true', function () {
     props.createSubmissionComment = sinon.stub().resolves();
     props.setProcessing = sinon.stub();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    wrapper.find('button').simulate('click', event);
+    submitButton().simulate('click');
     strictEqual(props.setProcessing.firstCall.args[0], true);
   });
 
-  test('createSubmissionComment is called when the comment is valid and the button is clicked', function () {
+  test('createSubmissionComment is called when the comment is valid and the "Submit" button is clicked', function () {
     props.createSubmissionComment = sinon.stub().resolves();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    wrapper.find('button').simulate('click');
+    submitButton().simulate('click');
     strictEqual(props.createSubmissionComment.callCount, 1);
   });
 
-  test('clicking the button clears the comment field', function () {
+  test('clicking the "Submit" button clears the comment field', function () {
     props.createSubmissionComment = sinon.stub().resolves();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'a message' } });
-    wrapper.find('button').simulate('click');
+    submitButton().simulate('click');
     strictEqual(wrapper.find('textarea').prop('value'), '');
+  });
+
+   test('clicking the "Cancel" button triggers cancelCommenting', function () {
+    props.cancelCommenting = sinon.stub();
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'a message' } });
+    cancelButton().simulate('click');
+    strictEqual(props.cancelCommenting.callCount, 1);
   });
 });

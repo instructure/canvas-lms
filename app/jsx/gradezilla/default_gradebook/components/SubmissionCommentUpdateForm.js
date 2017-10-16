@@ -28,7 +28,7 @@ export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
   };
 
   componentDidMount () {
-    this.textarea.focus();
+    this.focusTextarea();
   }
 
   commentHasChanged () {
@@ -41,7 +41,10 @@ export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
   }
 
   buttonLabels () {
-    return { submitButtonLabel: I18n.t('Update Comment') };
+    return {
+      cancelButtonLabel: I18n.t('Cancel Updating Comment'),
+      submitButtonLabel: I18n.t('Update Comment')
+    };
   }
 
   publishComment () {

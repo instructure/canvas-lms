@@ -39,6 +39,7 @@ export default class SubmissionCommentListItem extends React.Component {
     ...CommentPropTypes,
     editing: bool.isRequired,
     last: bool.isRequired,
+    cancelCommenting: func.isRequired,
     currentUserIsAuthor: bool.isRequired,
     deleteSubmissionComment: func.isRequired,
     editSubmissionComment: func.isRequired,
@@ -72,6 +73,7 @@ export default class SubmissionCommentListItem extends React.Component {
     if (this.props.editing) {
       return (
         <SubmissionCommentUpdateForm
+          cancelCommenting={this.props.cancelCommenting}
           comment={this.props.comment}
           id={this.props.id}
           processing={this.props.processing}

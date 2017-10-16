@@ -26,13 +26,20 @@ export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
     createSubmissionComment: func.isRequired
   };
 
+  handleCancel (event) {
+    super.handleCancel(event, this.focusTextarea);
+  }
+
   handlePublishComment (event) {
     super.handlePublishComment(event);
-    this.setState({ comment: '' }, () => { this.textarea.focus(); });
+    this.setState({ comment: '' }, this.focusTextarea);
   }
 
   buttonLabels () {
-    return { submitButtonLabel: I18n.t('Submit Comment') };
+    return {
+      cancelButtonLabel: I18n.t('Cancel Submitting Comment'),
+      submitButtonLabel: I18n.t('Submit Comment')
+    };
   }
 
   publishComment () {

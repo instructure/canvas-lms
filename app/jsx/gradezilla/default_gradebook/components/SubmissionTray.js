@@ -146,10 +146,15 @@ export default class SubmissionTray extends React.Component {
     isInNoGradingPeriod: bool.isRequired
   };
 
+  cancelCommenting = () => {
+    this.props.editSubmissionComment(null);
+  };
+
   renderSubmissionCommentList () {
     return this.props.submissionComments.map(comment => (
       <SubmissionCommentListItem
         author={comment.author}
+        cancelCommenting={this.cancelCommenting}
         currentUserIsAuthor={this.props.currentUserId === comment.authorId}
         authorUrl={comment.authorUrl}
         authorAvatarUrl={comment.authorAvatarUrl}
@@ -180,6 +185,7 @@ export default class SubmissionTray extends React.Component {
           {
             !this.props.editedCommentId &&
               <SubmissionCommentCreateForm
+                cancelCommenting={this.cancelCommenting}
                 createSubmissionComment={this.props.createSubmissionComment}
                 processing={this.props.processing}
                 setProcessing={this.props.setProcessing}

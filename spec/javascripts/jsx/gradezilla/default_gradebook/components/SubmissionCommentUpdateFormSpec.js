@@ -28,8 +28,17 @@ QUnit.module('SubmissionCommentUpdateForm', function (hooks) {
     return mount(<SubmissionCommentUpdateForm {...props} />);
   }
 
+  function cancelButton () {
+    return wrapper.find('button').at(0);
+  }
+
+  function submitButton () {
+    return wrapper.find('button').at(1);
+  }
+
   hooks.beforeEach(function () {
     props = {
+      cancelCommenting () {},
       comment: 'A comment',
       id: '23',
       updateSubmissionComment () {},
@@ -47,67 +56,130 @@ QUnit.module('SubmissionCommentUpdateForm', function (hooks) {
     strictEqual(wrapper.find('textarea').node.innerText, 'A comment');
   });
 
-  test('Button is present even if there is no text entered in the comment area', function () {
+  test('"Submit" button is present even if there is no text entered in the comment area', function () {
     props.comment = '';
     wrapper = mountComponent();
-    strictEqual(wrapper.find('Button').length, 1);
+    strictEqual(submitButton().length, 1);
   });
 
-  test('Button is present if the content is all spaces', function () {
+  test('"Cancel" button is present even if there is no text entered in the comment area', function () {
+    props.comment = '';
+    wrapper = mountComponent();
+    strictEqual(cancelButton().length, 1);
+  });
+
+  test('"Submit" button is present if the content is all spaces', function () {
     props.comment = '    ';
     wrapper = mountComponent();
-    strictEqual(wrapper.find('Button').length, 1);
+    strictEqual(submitButton().length, 1);
   });
 
-  test('Button is present if there is text entered in the comment area', function () {
+  test('"Cancel" button is present if the content is all spaces', function () {
+    props.comment = '    ';
     wrapper = mountComponent();
-    strictEqual(wrapper.find('Button').length, 1);
+    strictEqual(cancelButton().length, 1);
   });
 
-  test('Button is disabled if the current comment is the same as the comment prop passed in', function () {
+  test('"Submit" button is present if there is text entered in the comment area', function () {
     wrapper = mountComponent();
-    strictEqual(wrapper.find('Button').props().disabled, true);
+    strictEqual(submitButton().length, 1);
   });
 
-  test('Button is disabled if the current comment after trimming is the same as the comment prop passed', function () {
+  test('"Cancel" button is present if there is text entered in the comment area', function () {
+    wrapper = mountComponent();
+    strictEqual(cancelButton().length, 1);
+  });
+
+  test('"Submit" button is disabled if the current comment is the same as the comment prop passed in', function () {
+    wrapper = mountComponent();
+    strictEqual(submitButton().prop('aria-disabled'), 'true');
+  });
+
+  test('"Cancel" button is enabled if the current comment is the same as the comment prop passed in', function () {
+    wrapper = mountComponent();
+    strictEqual(cancelButton().prop('aria-disabled'), null);
+  });
+
+  test('"Submit" button is disabled if the current comment after trimming is the same as the comment prop passed', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '    A comment    ' } });
-    strictEqual(wrapper.find('Button').props().disabled, true);
+    strictEqual(submitButton().prop('aria-disabled'), 'true');
   });
 
-  test('Button is disabled if the all the content in the comment is removed', function () {
+  test('"Cancel" button is enabled if the current comment after trimming is the same as the comment prop passed', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: '    A comment    ' } });
+    strictEqual(cancelButton().prop('aria-disabled'), null);
+  });
+
+  test('"Submit" button is disabled if the all the content in the comment is removed', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '' } });
-    strictEqual(wrapper.find('Button').props().disabled, true);
+    strictEqual(submitButton().prop('aria-disabled'), 'true');
   });
 
-  test('Button is disabled if the all the content in the comment is removed except for spaces', function () {
+  test('"Cancel" button is enabled if the all the content in the comment is removed', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: '' } });
+    strictEqual(cancelButton().prop('aria-disabled'), null);
+  });
+
+  test('"Submit" button is disabled if the all the content in the comment is removed except for spaces', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '     ' } });
-    strictEqual(wrapper.find('Button').props().disabled, true);
+    strictEqual(submitButton().prop('aria-disabled'), 'true');
   });
 
-  test('Button is disabled while processing', function () {
+  test('"Cancel" button is enabled if the all the content in the comment is removed except for spaces', function () {
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: '     ' } });
+    strictEqual(cancelButton().prop('aria-disabled'), null);
+  });
+
+  test('"Submit" button is disabled while processing', function () {
     props.processing = true;
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    strictEqual(wrapper.find('Button').prop('disabled'), true);
+    strictEqual(submitButton().prop('aria-disabled'), 'true');
   });
 
-  test('Button is enabled if the comment is changed and is not empty', function () {
+  test('"Cancel" button is disabled while processing', function () {
+    props.processing = true;
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    strictEqual(wrapper.find('Button').props().disabled, false);
+    strictEqual(cancelButton().prop('aria-disabled'), 'true');
   });
 
-  test('Button has the text "Submit"', function () {
+  test('"Submit" button is enabled if the comment is changed and is not empty', function () {
     wrapper = mountComponent();
-    strictEqual(wrapper.find('Button').text(), 'Submit');
+    wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
+    strictEqual(submitButton().prop('aria-disabled'), null);
   });
 
-  test('Button label reads "Update Comment"', function () {
+  test('"Cancel" button is enabled if the comment is changed and is not empty', function () {
     wrapper = mountComponent();
-    strictEqual(wrapper.find('Button').prop('label'), 'Update Comment');
+    wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
+    strictEqual(cancelButton().prop('aria-disabled'), null);
+  });
+
+  test('"Submit" button has the text "Submit"', function () {
+    wrapper = mountComponent();
+    strictEqual(submitButton().text(), 'Submit');
+  });
+
+  test('"Cancel" button has the text "Cancel"', function () {
+    wrapper = mountComponent();
+    strictEqual(cancelButton().text(), 'Cancel');
+  });
+
+  test('"Submit" button label reads "Update Comment"', function () {
+    wrapper = mountComponent();
+    strictEqual(submitButton().prop('label'), 'Update Comment');
+  });
+
+  test('"Cancel" button label reads "Cancel Updating Comment"', function () {
+    wrapper = mountComponent();
+    strictEqual(cancelButton().prop('label'), 'Cancel Updating Comment');
   });
 
   test('TextArea has a placeholder message', function () {
@@ -134,25 +206,25 @@ QUnit.module('SubmissionCommentUpdateForm', function (hooks) {
       preventDefault: sinon.stub(),
     };
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    wrapper.find('button').simulate('click', event);
+    submitButton().simulate('click', event);
     strictEqual(event.preventDefault.callCount, 1);
   });
 
-  test('clicking the Button calls setProcessing', function () {
+  test('clicking the "Submit" button calls setProcessing', function () {
     props.updateSubmissionComment = sinon.stub().resolves();
     props.setProcessing = sinon.stub();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    wrapper.find('button').simulate('click', event);
+    submitButton().simulate('click');
     strictEqual(props.setProcessing.callCount, 1);
   });
 
-  test('clicking the Button calls setProcessing with true', function () {
+  test('clicking the "Submit" button calls setProcessing with true', function () {
     props.updateSubmissionComment = sinon.stub().resolves();
     props.setProcessing = sinon.stub();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    wrapper.find('button').simulate('click', event);
+    submitButton().simulate('click');
     strictEqual(props.setProcessing.firstCall.args[0], true);
   });
 
@@ -160,7 +232,7 @@ QUnit.module('SubmissionCommentUpdateForm', function (hooks) {
     props.updateSubmissionComment = sinon.stub().resolves();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    wrapper.find('button').simulate('click');
+    submitButton().simulate('click');
     strictEqual(props.updateSubmissionComment.callCount, 1);
   });
 
@@ -168,7 +240,15 @@ QUnit.module('SubmissionCommentUpdateForm', function (hooks) {
     props.updateSubmissionComment = sinon.stub().resolves();
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    wrapper.find('button').simulate('click');
+    submitButton().simulate('click');
     strictEqual(props.updateSubmissionComment.firstCall.args[1], '23');
+  });
+
+  test('clicking the "Cancel" button triggers cancelCommenting', function () {
+    props.cancelCommenting = sinon.stub();
+    wrapper = mountComponent();
+    wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
+    cancelButton().simulate('click');
+    strictEqual(props.cancelCommenting.callCount, 1);
   });
 });

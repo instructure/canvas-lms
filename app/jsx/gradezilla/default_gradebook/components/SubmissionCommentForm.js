@@ -25,8 +25,9 @@ import TextArea from 'instructure-ui/lib/components/TextArea';
 import Button from 'instructure-ui/lib/components/Button';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 
-class SubmissionCommentForm extends React.Component {
+export default class SubmissionCommentForm extends React.Component {
   static propTypes = {
+    cancelCommenting: func.isRequired,
     comment: string,
     processing: bool.isRequired,
     setProcessing: func.isRequired
@@ -38,10 +39,26 @@ class SubmissionCommentForm extends React.Component {
 
   constructor (props) {
     super(props);
-    this.bindTextarea = this.bindTextarea.bind(this);
-    this.handleCommentChange = this.handleCommentChange.bind(this);
-    this.handlePublishComment = this.handlePublishComment.bind(this);
+    const methodsToBind = [
+      'bindTextarea', 'handleCancel', 'handleCommentChange', 'handlePublishComment', 'focusTextarea'
+    ];
+    methodsToBind.forEach((method) => { this[method] = this[method].bind(this); });
     this.state = { comment: props.comment };
+  }
+
+  focusTextarea () {
+    this.textarea.focus();
+  };
+
+  handleCancel (event, callback) {
+    event.preventDefault();
+
+    this.setState({ comment: this.props.comment }, () => {
+      this.props.cancelCommenting();
+      if (callback) {
+        callback();
+      }
+    });
   }
 
   handleCommentChange (event) {
@@ -64,7 +81,7 @@ class SubmissionCommentForm extends React.Component {
   }
 
   render () {
-    const { submitButtonLabel } = this.buttonLabels();
+    const { cancelButtonLabel, submitButtonLabel } = this.buttonLabels();
     return (
       <div>
         <div>
@@ -83,6 +100,15 @@ class SubmissionCommentForm extends React.Component {
               style={{ textAlign: 'right', marginTop: '0rem', border: 'none', padding: '0rem', background: 'transparent' }}
             >
               <Button
+                disabled={this.props.processing}
+                label={cancelButtonLabel}
+                margin="small small small 0"
+                onClick={this.handleCancel}
+              >
+                {I18n.t("Cancel")}
+              </Button>
+
+              <Button
                 disabled={this.props.processing || !this.commentIsValid()}
                 label={submitButtonLabel}
                 margin="small 0"
@@ -97,5 +123,3 @@ class SubmissionCommentForm extends React.Component {
     );
   }
 }
-
-export default SubmissionCommentForm;
