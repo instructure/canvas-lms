@@ -89,6 +89,7 @@ class BzController < ApplicationController
       row = []
       row << "Student ID"
       row << "Student Name"
+      row << "Student Email"
 
       assignments_info.each do |assignment_info|
         assignment = assignment_info[:assignment]
@@ -119,6 +120,7 @@ class BzController < ApplicationController
         # name
         row << student_obj.id
         row << student_obj.name
+        row << student_obj.email
 
         assignments_info.each do |assignment_info|
           sg = assignment_info[:sg]
@@ -170,11 +172,12 @@ class BzController < ApplicationController
           end
 
 
-          section_scores.each_with_index do |ss, idx|
-            if sections_points_available[idx].nil?
+          sections.each do |idx|
+            ss = section_scores[idx.to_i]
+            if sections_points_available[idx.to_i].nil?
               row << ss
             else
-              row << "#{(ss * 100 / sections_points_available[idx]).round(2)}%"
+              row << "#{(ss * 100 / sections_points_available[idx.to_i]).round(2)}%"
             end
           end
 
