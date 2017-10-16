@@ -25,6 +25,11 @@ describe("test", () => {
     el.setAttribute("alt", "")
     expect(rule.test(el)).toBeFalsy()
   })
+
+  test("returns false for alt containing only white space", () => {
+    el.setAttribute("alt", "   ")
+    expect(rule.test(el)).toBeFalsy()
+  })
 })
 
 describe("data", () => {
