@@ -6,7 +6,7 @@ RUN apt-get update -qq \
       build-essential \
       ca-certificates \
       libicu-dev \
-      postgresql-server-dev-all \
+      postgresql-server-dev-9.3 \
       pgxnclient \
   && rm -rf /var/lib/apt/lists/*
 # Install postgres extension for I8n sorting
