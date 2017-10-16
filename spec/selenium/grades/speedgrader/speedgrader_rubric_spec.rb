@@ -17,6 +17,7 @@
 
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
+require_relative "../pages/speedgrader_page"
 
 describe "speed grader - rubrics" do
   include_context "in-process server selenium tests"
@@ -64,6 +65,24 @@ describe "speed grader - rubrics" do
     expect(f('#rubric_summary_container')).to include_text(@rubric.title)
     expect(f('#rubric_summary_container .rubric_total')).to include_text('8')
     expect(f('#grade_container input')).to have_attribute(:value, '8')
+  end
+
+  it "updates grading status icon when rubric assignment is graded" do
+    student_submission
+    @association.use_for_grading = true
+    @association.save!
+
+    Speedgrader.visit(@course.id, @assignment.id)
+    make_full_screen
+    Speedgrader.view_rubric_button.click
+    expand_right_pane
+    # grade both criteria
+    Speedgrader.grade_rubric_criteria(@rubric.criteria.first[:id], 3)
+    Speedgrader.grade_rubric_criteria(@rubric.criteria.second[:id], 5)
+    Speedgrader.save_rubric_button.click
+    wait_for_ajaximations
+
+    expect(Speedgrader.student_grading_status_icon(@student.name)).to have_class('graded')
   end
 
   it "allows commenting using rubric", priority: "1", test_id: 283750 do
