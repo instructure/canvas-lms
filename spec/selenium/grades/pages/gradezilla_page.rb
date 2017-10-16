@@ -29,7 +29,7 @@ class Gradezilla
     # Gradebook Menu
     GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'.freeze
     INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'.freeze
-    GRADE_HISTORY_ITEM_SELECTOR = 'grade-history'.freeze
+    GRADE_HISTORY_ITEM_SELECTOR = 'gradebook-history'.freeze
     LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'.freeze
 
     # Action Menu
@@ -158,8 +158,8 @@ class Gradezilla
       ff('.gradebook-cell .icon-warning')
     end
 
-    def grade_history
-      f('[data-menu-item-id="grade-history"]')
+    def gradebook_history
+      f('[data-menu-item-id="gradebook-history"]')
     end
 
     def gradebook_menu_element

@@ -110,10 +110,10 @@ QUnit.module('SearchFormActions', function () {
   });
 });
 
-QUnit.module('SearchFormActions getGradeHistory', {
+QUnit.module('SearchFormActions getGradebookHistory', {
   setup () {
     this.response = Fixtures.historyResponse();
-    this.getGradeHistoryStub = this.stub(HistoryApi, 'getGradeHistory')
+    this.getGradebookHistoryStub = this.stub(HistoryApi, 'getGradebookHistory')
       .returns(Promise.resolve(this.response));
 
     this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
@@ -122,7 +122,7 @@ QUnit.module('SearchFormActions getGradeHistory', {
 
 test('dispatches fetchHistoryStart', function () {
   const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
-  const promise = this.dispatchSpy(SearchFormActions.getGradeHistory({}));
+  const promise = this.dispatchSpy(SearchFormActions.getGradebookHistory({}));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
   });
@@ -130,7 +130,7 @@ test('dispatches fetchHistoryStart', function () {
 
 test('dispatches fetchHistorySuccess on success', function () {
   const fetchSpy = this.spy(HistoryActions, 'fetchHistorySuccess');
-  const promise = this.dispatchSpy(SearchFormActions.getGradeHistory({}));
+  const promise = this.dispatchSpy(SearchFormActions.getGradebookHistory({}));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
     deepEqual(fetchSpy.firstCall.args[0], this.response.data);
@@ -139,9 +139,9 @@ test('dispatches fetchHistorySuccess on success', function () {
 });
 
 test('dispatches fetchHistoryFailure on failure', function () {
-  this.getGradeHistoryStub.returns(Promise.reject(new Error('FAIL')));
+  this.getGradebookHistoryStub.returns(Promise.reject(new Error('FAIL')));
   const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
-  const promise = this.dispatchSpy(SearchFormActions.getGradeHistory({}));
+  const promise = this.dispatchSpy(SearchFormActions.getGradebookHistory({}));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
   });

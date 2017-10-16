@@ -29,7 +29,7 @@ import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 const defaultProps = () => (
   {
     fetchHistoryStatus: 'started',
-    getGradeHistory () {},
+    getGradebookHistory () {},
     clearSearchOptions () {},
     getSearchOptions () {},
     getSearchOptionsNextPage () {},
@@ -152,16 +152,16 @@ test('does not disable the submit button when only to date is entered', function
   });
 });
 
-test('calls getGradeHistory prop on mount', function () {
-  const props = { getGradeHistory: this.stub() };
+test('calls getGradebookHistory prop on mount', function () {
+  const props = { getGradebookHistory: this.stub() };
   const wrapper = mount(<SearchFormComponent {...defaultProps()} {...props} />);
-  strictEqual(props.getGradeHistory.callCount, 1);
+  strictEqual(props.getGradebookHistory.callCount, 1);
   wrapper.unmount();
 });
 
 QUnit.module('SearchForm when button is clicked', {
   setup () {
-    this.props = { getGradeHistory: this.stub() };
+    this.props = { getGradebookHistory: this.stub() };
     this.wrapper = mountComponent(this.props);
   },
 
@@ -183,7 +183,7 @@ test('dispatches with the state of input', function () {
     selected
   }, () => {
     this.wrapper.find(Button).simulate('click');
-    deepEqual(this.props.getGradeHistory.firstCall.args[0], selected);
+    deepEqual(this.props.getGradebookHistory.firstCall.args[0], selected);
   });
 });
 
