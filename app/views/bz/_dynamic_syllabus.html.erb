@@ -109,6 +109,12 @@
           icon = 'assignment'
           disp_name = obj.title
           link = "/courses/#{@course.id}/assignments/#{obj.id}"
+
+          submission = obj.find_or_create_submission(@current_user)
+          # user already submitted, it isn't a todo anymore
+          if submission
+            next if submission.workflow_state == 'submitted' || submission.workflow_state == 'graded'
+          end
         end
 
         next if assignments_shown[obj.id]
