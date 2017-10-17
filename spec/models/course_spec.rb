@@ -934,6 +934,7 @@ describe Course do
     end
 
     it "should preserve sticky fields" do
+      sub = @course.root_account.sub_accounts.create
       @course.sis_source_id = 'sis_id'
       @course.course_code = "cid"
       @course.save!
@@ -943,20 +944,21 @@ describe Course do
       profile = @course.profile
       profile.description = "description"
       profile.save!
+      @course.account = sub
       @course.save!
-      expect(@course.stuck_sis_fields).to eq [:name].to_set
+      expect(@course.stuck_sis_fields).to eq [:name, :account_id].to_set
 
       @course.reload
 
       @new_course = @course.reset_content
 
       @course.reload
-      expect(@course.stuck_sis_fields).to eq [:workflow_state, :name].to_set
+      expect(@course.stuck_sis_fields).to eq [:workflow_state, :name, :account_id].to_set
       expect(@course.sis_source_id).to be_nil
 
       @new_course.reload
       expect(@new_course.sis_source_id).to eq 'sis_id'
-      expect(@new_course.stuck_sis_fields).to eq [:name].to_set
+      expect(@new_course.stuck_sis_fields).to eq [:name, :account_id].to_set
 
       expect(@course.uuid).not_to eq @new_course.uuid
       expect(@course.replacement_course_id).to eq @new_course.id

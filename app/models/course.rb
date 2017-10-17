@@ -223,7 +223,9 @@ class Course < ActiveRecord::Base
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
   include StickySisFields
-  are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id, :workflow_state
+  are_sis_sticky :name, :course_code, :start_at, :conclude_at,
+                 :restrict_enrollments_to_course_dates, :enrollment_term_id,
+                 :workflow_state, :account_id
 
   include FeatureFlags
 
