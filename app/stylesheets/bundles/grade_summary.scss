@@ -90,6 +90,31 @@
   }
 }
 
+#grades_summary tr.student_assignment.dropped td,
+#grades_summary tr.student_assignment.excused td {
+  opacity: 0.7;
+
+  @if $use_high-contrast {
+    opacity: 1;
+  }
+  @media print {
+    color: black;
+  }
+}
+
+#grades_summary tr.student_assignment.dropped,
+#grades_summary tr.student_assignment.excused {
+  & td.points_possible {
+    position: relative;
+    &::after {
+      content: '\00d7';
+      position: absolute;
+      right: 0;
+      padding-left: $ic-sp;
+    }
+  }
+}
+
 #grades_summary td.assignment_score {
   cursor: pointer;
   white-space: nowrap;
@@ -101,7 +126,6 @@
 
 #grades_summary td a, #grades_summary th a {
   @if $use_high-contrast {
-    color: $ic-font-color-dark;
     text-decoration: underline;
     &:hover, &:focus {
       text-decoration: none;
@@ -188,8 +212,8 @@
 
 .revert_score_link {
   position: absolute;
-  top: 2px;
-  left: 0px;
+  top: 0px;
+  left: -5px;
   display: none;
   &:hover, &:focus {
     opacity: 0.7;
