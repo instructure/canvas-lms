@@ -218,7 +218,7 @@ No extra data.
 | `quiz_id` | The Canvas id of the quiz. |
 
 
-#### `grade_changed`
+#### `grade_change`
 
 `grade_change` events are posted every time a grade changes. These can
 happen as the result of a teacher changing a grade in the gradebook or

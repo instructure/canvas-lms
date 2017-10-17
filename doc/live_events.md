@@ -4,7 +4,7 @@ Canvas includes the ability to push a subset of real-time events to a
 Kinesis stream, which can then be consumed for various analytics
 purposes. This is not a full-fidelity feed of all changes to the
 database, but a targetted set of interesting actions such as
-`grade_changed`, `login`, etc.
+`grade_change`, `login`, etc.
 
 ## Development and Testing
 
