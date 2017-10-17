@@ -468,18 +468,27 @@
                       <%= t(:disabled_for_student_view, "Test Student scores are not included in grade statistics.") %>
                     </td>
                   <% else %>
-                    <% high, low, mean = assignment_presenter.grade_distribution %>
+                    <% high, low, mean, median, low_q, high_q = assignment_presenter.grade_distribution %>
                     <td>
                       <%= before_label(:mean, "Mean") %>
                       <%= n(round_if_whole(mean)) %>
+                      <br/>
+                      <%= before_label(:median, "Median") %>
+                      <%= n(round_if_whole(median)) %>
                     </td>
                     <td>
                       <%= before_label(:high, "High") %>
                       <%= n(round_if_whole(high)) %>
+                      <br/>
+                      <%= before_label(:high_q, "Upper Quartile") %>
+                      <%= n(round_if_whole(high_q)) %>
                     </td>
                     <td>
                       <%= before_label(:low, "Low") %>
                       <%= n(round_if_whole(low)) %>
+                      <br/>
+                      <%= before_label(:low_q, "Lower Quartile") %>
+                      <%= n(round_if_whole(low_q)) %>
                     </td>
                     <% if assignment_presenter.deduction_present? %>
                       <td>
@@ -496,14 +505,17 @@
                     <td colspan="<%= assignment_presenter.deduction_present? ? 1 : 3 %>">
                       <% graph = assignment_presenter.graph %>
                       <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" aria-hidden="true" title="<%= graph.title %>">
-                        <div class="grade-summary-graph-component" style="height: 10px; margin: 5px 0px; border-width: 2px; border-right-width: 0;">&nbsp;</div>
-                        <div class="grade-summary-graph-component" style="width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
-                        <div class="grade-summary-graph-component" style="left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
-                        <div class="grade-summary-graph-component" style="left: <%= graph.low_width %>px; width: <%= graph.mean_low_width %>px; height: 20px; border-width: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
-                        <div class="grade-summary-graph-component" style="left: <%= graph.mean_left%>px; width: <%= graph.mean_high_width%>px; height: 20px; border-width: 2px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; background: #fff;">&nbsp;</div>
-                        <div class="grade-summary-graph-component" style="left: <%= graph.max_left %>px; height: 10px; margin: 5px 0px; border-width: 2px; border-left-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="height: 24px; margin: 0px 0px; border-width: 1px; border-right-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.low_left %>px; height: 18px; margin: 3px 0px; border-width: 2px; border-left-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.low_left %>px; width: <%= graph.low_lq_width %>px; height: 0px; margin-top: 10px; border-width: 2px; border-right-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.lq_left %>px; width: <%= graph.median_low_width %>px; height: 24px; border-width: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.median_left%>px; width: <%= graph.median_high_width%>px; height: 24px; border-width: 2px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; background: #fff;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.uq_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.high_left %>px; height: 14px; height: 18px; margin: 3px 0px; border-width: 2px; border-left-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.max_left %>px; height: 14px; height: 24px; margin: 0px 1px; border-width: 1px; border-left-width: 0;">&nbsp;</div>
+                        
                         <% if submission && submission.score %>
-                          <div class="grade-summary-graph-component" style="top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background: #abd; border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
+                          <div class="grade-summary-graph-component" style="top: 5px; height: 14px; width: 14px; left: <%= graph.score_left %>px; border: 2px solid #248; background: #abd; border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
                             <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => n(submission.score), :possible => n(round_if_whole(assignment.points_possible))) %>">&nbsp;
                           </div>
                         <% end %>
