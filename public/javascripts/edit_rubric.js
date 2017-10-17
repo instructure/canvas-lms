@@ -143,6 +143,7 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.toggleClass('ignore_criterion_for_scoring', !outcome.useForScoring);
       $criterion.find('.mastery_points').val(outcome.get('mastery_points'));
       $criterion.addClass('learning_outcome_criterion');
+      $criterion.find('.outcome_sr_content').attr('aria-hidden', false)
       $criterion.find('.learning_outcome_id').text(outcome.id);
       $criterion.find('.hide_when_learning_outcome').hide();
       $criterion.find(".criterion_points").val(outcome.get('ratings')[0].points).blur();
@@ -466,6 +467,7 @@ import 'compiled/jquery/fixDialogButtons'
         $criterion.find('.hide_when_learning_outcome').showIf(!criterion.learning_outcome_id);
         $criterion.toggleClass('learning_outcome_criterion', !!criterion.learning_outcome_id);
         $criterion.toggleClass('ignore_criterion_for_scoring', !!criterion.ignore_for_scoring);
+        $criterion.find('.outcome_sr_content').attr('aria-hidden', !criterion.learning_outcome_id);
         if (criterion.learning_outcome_id) {
           $criterion.find(".long_description_holder").show();
           $criterion.find("div.long_description").remove();
