@@ -43,6 +43,7 @@ import 'compiled/behaviors/tooltip'
 import 'compiled/behaviors/ic-super-toggle'
 import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
+import 'compiled/behaviors/broken-images'
 import 'LtiThumbnailLauncher'
 import 'compiled/badge_counts'
 
