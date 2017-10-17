@@ -67,7 +67,7 @@ describe "speed grader - rubrics" do
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 
-  it "updates grading status icon when rubric assignment is graded" do
+  it "updates grading status icon when rubric assignment is graded", priority: "1", test_id: 3368679 do
     student_submission
     @association.use_for_grading = true
     @association.save!
