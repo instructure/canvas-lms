@@ -182,12 +182,15 @@ describe 'Submissions API', type: :request do
     end
 
     it 'returns submissions based on assignments.post_to_sis' do
+      batch = @course.root_account.sis_batches.create
+      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch)
+
       json = api_call(:get,
         "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
         { controller: 'submissions_api', action: 'for_students',
           format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
           post_to_sis: 'true',
-          student_ids: [@student1.id])
+          student_ids: 'all')
       expect(json.size).to eq 0
 
       @a1.post_to_sis = true
@@ -197,7 +200,31 @@ describe 'Submissions API', type: :request do
         { controller: 'submissions_api', action: 'for_students',
           format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
           post_to_sis: 'true',
-          student_ids: [@student1.id])
+          student_ids: 'all')
+      expect(json.size).to eq 1
+    end
+
+    it 'returns filter submissions to enrollments from sis for post_to_sis' do
+      @a1.post_to_sis = true
+      @a1.save!
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                      post_to_sis: 'true',
+                      student_ids: 'all')
+      expect(json.size).to eq 0
+
+      batch = @course.root_account.sis_batches.create
+      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch)
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                      post_to_sis: 'true',
+                      student_ids: 'all')
       expect(json.size).to eq 1
     end
 

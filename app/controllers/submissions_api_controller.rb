@@ -271,7 +271,8 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument post_to_sis [Boolean]
   #   If this argument is set to true, the response will only include
-  #   assignments that have the post_to_sis flag set to true.
+  #   submissions for assignments that have the post_to_sis flag set to true and
+  #   user enrollments that were added through sis.
   #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
@@ -325,7 +326,7 @@ class SubmissionsApiController < ApplicationController
     can_view_all = @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     if all && can_view_all
       # this is a scope, and will generate subqueries
-      student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids).select(:user_id)
+      students = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids)
     elsif can_view_all
       visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids).pluck(:user_id)
       inaccessible_students = student_ids - visible_student_ids
@@ -362,12 +363,17 @@ class SubmissionsApiController < ApplicationController
     if (enrollment_state = params[:enrollment_state].presence)
       case enrollment_state
       when 'active'
-        student_ids = (@section || @context).all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
+        students = (@section || @context).all_student_enrollments.active_by_date.where(user_id: student_ids)
       when 'concluded'
-        student_ids = (@section || @context).all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
+        students = (@section || @context).all_student_enrollments.completed_by_date.where(user_id: student_ids)
       else
         return render json: {error: 'invalid enrollment_state'}, status: :bad_request
       end
+    end
+
+    if students
+      students = students.where.not(sis_batch_id: nil) if value_to_boolean(params[:post_to_sis])
+      student_ids = students.select(:user_id)
     end
 
     includes = Array(params[:include])
