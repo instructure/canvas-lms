@@ -1,12 +1,16 @@
 <div id="assignment-details-dialog" title="{{#t "grading_statistics_for_assignment"}}Grade statistics for: {{assignment.name}}{{/t}}">
   {{#if showDistribution}}
-    <div class="distribution" style="display: block; ">
-      <div class="bar-left"></div>
-      <div class="none-left" title="{{#t "no_one_scored_lower"}}No one scored lower than {{min}}{{/t}}" style="width: {{noneLeftWidth}}%; left: {{noneLeftLeft}}%; "></div>
-      <div class="some-left" title="{{#t "scores_lower_than_the_average"}}Scores lower than the average of {{average}}{{/t}}" style="width: {{someLeftWidth}}%; left: {{someLeftLeft}}%; "></div>
-      <div class="some-right" title="{{#t "scores_higher_than_the_average"}}Scores higher than the average of {{average}}{{/t}}" style="width: {{someRightWidth}}%; left: {{someRightLeft}}%; "></div>
-      <div class="none-right" title="{{#t "no_one_scored_higher"}}No one scored higher than {{max}}{{/t}}" style="width: {{noneRightWidth}}%; left: {{noneRightLeft}}%; "></div>
-      <div class="bar-right"></div>
+    <div class="distribution" style="display: block; " aria-hidden="true">
+      <div class="zero">0</div>
+      <div class="zero-point">&nbsp;</div>
+      <div class="min-point" style="left: {{lowLeft}}%;">&nbsp;</div>
+      <div class="whisker" style="left: {{lowLeft}}%; width: {{lowLqWidth}}%;">&nbsp;</div>
+      <div class="left-box" style="left: {{lqLeft}}%; width: {{medianLowWidth}}%;">&nbsp;</div>
+      <div class="right-box" style="left: {{medianLeft}}%; width: {{medianHighWidth}}%;">&nbsp;</div>
+      <div class="whisker" style="left: {{uqLeft}}%; width: {{highWidth}}%;">&nbsp;</div>
+      <div class="max-point" style="left: {{highLeft}}%;">&nbsp;</div>
+      <div class="total-point" style="left: {{maxLeft}}%;">&nbsp;</div>
+      <div class="points-possible">{{assignment.points_possible}}</div>
     </div>
   {{/if}}
   <table id="assignment-details-dialog-stats-table">
@@ -17,6 +21,18 @@
     <tr>
       <th scope="row">{{#t "high_score"}}High Score:{{/t}}</th>
       <td>{{max}}</td>
+    </tr>
+    <tr>
+      <th scope="row">{{#t "upper_quartile"}}Upper Quartile:{{/t}}</th>
+      <td>{{upperQuartile}}</td>
+    </tr>
+    <tr>
+      <th scope="row">{{#t "median"}}Median Score:{{/t}}</th>
+      <td>{{median}}</td>
+    </tr>
+    <tr>
+      <th scope="row">{{#t "lower_quartile"}}Lower Quartile:{{/t}}</th>
+      <td>{{lowerQuartile}}</td>
     </tr>
     <tr>
       <th scope="row">{{#t "low_score"}}Low Score:{{/t}}</th>

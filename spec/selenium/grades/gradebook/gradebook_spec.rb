@@ -159,7 +159,7 @@ describe "gradebook" do
     details_dialog = f('#assignment-details-dialog')
     expect(details_dialog).to be_displayed
     table_rows = ff('#assignment-details-dialog-stats-table tr')
-    expect(table_rows[3].find_element(:css, 'td')).to include_text submissions_count
+    expect(table_rows[6].find_element(:css, 'td')).to include_text submissions_count
   end
 
   it "should include student view student for grading" do

@@ -191,16 +191,17 @@ class GradeSummaryAssignmentPresenter
   def grade_distribution
     @grade_distribution ||= begin
       if stats = @summary.assignment_stats[assignment.id]
-        [stats.max, stats.min, stats.avg].map { |stat| stat.to_f.round(1) }
+        [stats.max, stats.min, stats.avg, stats.median, stats.lower_q, stats.upper_q]
+          .map { |stat| stat.to_f.round(1) }
       end
     end
   end
 
   def graph
     @graph ||= begin
-      high, low, mean = grade_distribution
+      high, low, mean, median, lower_q, upper_q = grade_distribution
       score = submission && submission.score
-      GradeSummaryGraph.new(high, low, mean, assignment.points_possible, score)
+      GradeSummaryGraph.new(high, low, lower_q, upper_q, median, assignment.points_possible, score)
     end
   end
 
@@ -242,40 +243,55 @@ end
 class GradeSummaryGraph
   FULLWIDTH = 150.0
 
-  def initialize(high, low, mean, points_possible, score)
+  def initialize(high, low, lower_q, upper_q, median, points_possible, score)
     @high = high.to_f
-    @mean = mean.to_f
+    @upper_q = upper_q.to_f
+    @median = median.to_f
+    @lower_q = lower_q.to_f
     @low = low.to_f
     @points_possible = points_possible.to_f
     @score = score
   end
 
-  def low_width
+  def low_left
     pixels_for(@low)
   end
+
+  def low_lq_width
+    pixels_for(@lower_q - @low)
+  end
+
+  def lq_left
+    pixels_for(@lower_q)
+  end
+
+  def uq_left
+    pixels_for(@upper_q)
+  end
+
+  def high_width
+    pixels_for(@high - @upper_q)
+  end
+
+  def median_left
+    pixels_for(@median)
+  end
+
+  def median_low_width
+    pixels_for(@median - @lower_q) + 1
+  end
+
+  def median_high_width
+    pixels_for(@upper_q - @median)
+  end
+
 
   def high_left
     pixels_for(@high)
   end
 
-  def high_width
-    pixels_for(@points_possible - @high)
-  end
-
-  def mean_left
-    pixels_for(@mean)
-  end
-
-  def mean_low_width
-    pixels_for(@mean - @low)
-  end
-
-  def mean_high_width
-    pixels_for(@high - @mean)
-  end
-
   def max_left
-    [FULLWIDTH.round, (pixels_for(@high) + 3)].max
+    FULLWIDTH.round
   end
 
   def score_left
@@ -283,8 +299,8 @@ class GradeSummaryGraph
   end
 
   def title
-    I18n.t('#grade_summary.graph_title', "Mean %{mean}, High %{high}, Low %{low}", {
-      mean: I18n.n(@mean), high: I18n.n(@high), low: I18n.n(@low)
+    I18n.t('#grade_summary.graph_title', "Median %{median}, High %{high}, Low %{low}", {
+      median: I18n.n(@median), high: I18n.n(@high), low: I18n.n(@low)
     })
   end
 
