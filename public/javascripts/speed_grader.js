@@ -1525,6 +1525,7 @@ EG = {
 
   populateTurnitin: function(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent) {
     var $turnitinSimilarityScore = null;
+    const showLegacyResubmit = isMostRecent && !submission.has_plagiarism_tool;
 
     // build up new values based on this asset
     if (turnitinAsset.status == 'scored' || (turnitinAsset.status == null && turnitinAsset.similarity_score != null)) {
@@ -1561,21 +1562,13 @@ EG = {
       var $turnitinInfo = $(turnitinInfoTemplate({
         assetString: assetString,
         message: (turnitinAsset.status == 'error' ? (turnitinAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
-        showResubmit: isMostRecent
+        showResubmit: showLegacyResubmit
       }));
       $turnitinInfoContainer.append($turnitinInfo);
 
-      if (isMostRecent) {
-        var resubmitUrl = $.replaceTags($assignment_submission_resubmit_to_turnitin_url.attr('href'), { user_id: submission.user_id });
-        $turnitinInfo.find('.turnitin_resubmit_button').click(function(event) {
-          event.preventDefault();
-          $(this).attr('disabled', true)
-            .text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
-
-          $.ajaxJSON(resubmitUrl, "POST", {}, function() {
-            window.location.reload();
-          });
-        });
+      if (showLegacyResubmit) {
+        var resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission)
+        $('.turnitin_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl) });
       }
     }
   },
@@ -1665,6 +1658,14 @@ EG = {
 
     var turnitinEnabled = submission.turnitin_data && (typeof submission.turnitin_data.provider === 'undefined');
     var vericiteEnabled = submission.turnitin_data && submission.turnitin_data.provider === 'vericite';
+
+    if (submission.has_originality_score) {
+      $('#plagiarism_platform_info_container').hide();
+    } else {
+      var resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission)
+      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl) })
+    }
+
     if(vericiteEnabled){
       var $vericiteScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
       $vericiteInfoContainer = $grade_container.find(".turnitin_info_container").empty(),

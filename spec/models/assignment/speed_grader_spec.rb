@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'spec_helper'
+require 'lti2_spec_helper'
 
 describe Assignment::SpeedGrader do
   before :once do
@@ -661,6 +662,8 @@ describe Assignment::SpeedGrader do
   end
 
   context "OriginalityReport" do
+    include_context 'lti2_spec_helper'
+
     let_once(:test_course) do
       test_course = course_factory(active_course: true)
       test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
@@ -671,12 +674,16 @@ describe Assignment::SpeedGrader do
     let_once(:test_teacher) { User.create }
     let_once(:test_student) { User.create }
 
-    it 'includes the OriginalityReport in the json' do
-      assignment = Assignment.create!(title: "title", context: test_course)
+    let(:assignment) { Assignment.create!(title: "title", context: test_course) }
+    let(:attachment) do
       attachment = test_student.attachments.new :filename => "homework.doc"
       attachment.content_type = "foo/bar"
       attachment.size = 10
       attachment.save!
+      attachment
+    end
+
+    it 'includes the OriginalityReport in the json' do
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
       submission.update_attribute(:turnitin_data, {blah: 1})
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
@@ -686,17 +693,38 @@ describe Assignment::SpeedGrader do
     end
 
     it "includes 'has_originality_report' in the json" do
-      assignment = Assignment.create!(title: "title", context: test_course)
-      attachment = test_student.attachments.new :filename => "homework.doc"
-      attachment.content_type = "foo/bar"
-      attachment.size = 10
-      attachment.save!
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
       submission.update_attribute(:turnitin_data, {blah: 1})
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
       json = Assignment::SpeedGrader.new(assignment, test_teacher).json
       has_report = json['submissions'].first['submission_history'].first['submission']['has_originality_report']
       expect(has_report).to be_truthy
+    end
+
+    it 'includes "has_plagiarism_tool" if the assignment has a plagiarism tool' do
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {blah: 1})
+
+      AssignmentConfigurationToolLookup.create!(
+        assignment: assignment,
+        tool_vendor_code: product_family.vendor_code,
+        tool_product_code: product_family.product_code,
+        tool_resource_type_code: resource_handler.resource_type_code,
+        tool_type: 'Lti::MessageHandler'
+      )
+
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      has_tool = json['submissions'].first['submission_history'].first['submission']['has_plagiarism_tool']
+      expect(has_tool).to be_truthy
+    end
+
+    it 'includes "has_originality_score" if the originality report includes an originality score' do
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {blah: 1})
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      has_score = json['submissions'].first['submission_history'].first['submission']['has_originality_score']
+      expect(has_score).to be_truthy
     end
   end
 

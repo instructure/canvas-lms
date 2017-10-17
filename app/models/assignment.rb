@@ -1409,6 +1409,15 @@ class Assignment < ActiveRecord::Base
     lookup.resource_codes
   end
 
+  def tool_settings_tool_name
+    tool = tool_settings_tool
+    return if tool.blank?
+    if tool.instance_of? Lti::MessageHandler
+      return tool_settings_tool.tool_proxy&.name
+    end
+    tool.name
+  end
+
   def tool_settings_tool
     self.tool_settings_tools.first
   end

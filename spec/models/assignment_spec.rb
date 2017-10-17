@@ -312,6 +312,34 @@ describe Assignment do
     end
   end
 
+  describe '#tool_settings_tool_name' do
+    let(:assignment) { Assignment.create!(name: 'assignment with tool settings', context: course) }
+
+    before do
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
+    end
+
+    it 'returns the name of the tool proxy' do
+      expected_name = 'test name'
+      message_handler.tool_proxy.update_attributes!(name: expected_name)
+      setup_assignment_with_homework
+      course.assignments << @assignment
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save!
+      expect(@assignment.tool_settings_tool_name).to eq expected_name
+    end
+
+    it 'returns the name of the context external tool' do
+      expected_name = 'test name'
+      setup_assignment_with_homework
+      tool = @course.context_external_tools.create!(name: expected_name, url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save
+      expect(@assignment.tool_settings_tool_name).to eq(expected_name)
+    end
+  end
+
   describe '#tool_settings_tool=' do
     let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
     let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
