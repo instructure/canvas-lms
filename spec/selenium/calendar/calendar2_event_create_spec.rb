@@ -244,5 +244,47 @@ describe "calendar2" do
         expect(event_content).to contain_link('Course 1')
       end
     end
+
+    context "edit to-do event" do
+      before :once do
+        @to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "A new to do")
+      end
+
+      it "respects the calendars checkboxes" do
+        get "/calendar2"
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
+
+        # turn it off
+        f("span.group_user_#{@student1.id}").click
+        expect(f('.fc-view-container')).not_to contain_css('.fc-content .fc-title')
+        # turn it back on
+        f("span.group_user_#{@student1.id}").click
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
+
+
+        # click to edit
+        f(".fc-event-container a.group_user_#{@student1.id}").click
+        # detial popup is displayed
+        expect(f('.event-details .event-details-header h3')).to include_text(@to_do.title)
+        # click edit button
+        f("button.event_button.edit_event_link").click
+        expect(f('#planner_note_context')).to be_displayed
+        # change the calendar
+        select_list = f('#planner_note_context')
+        options=select_list.find_elements(:tag_name => "option")
+        options[1].click
+        # save
+        scroll_into_view('#edit_planner_note_form_holder button[type="submit"]')
+        f('#edit_planner_note_form_holder button[type="submit"]').click
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
+
+        # turn it off
+        f("span.group_course_#{@course.id}").click
+        expect(f('.fc-view-container')).not_to contain_css('.fc-content .fc-title')
+        # turn it back on
+        f("span.group_course_#{@course.id}").click
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
+      end
+    end
   end
 end
