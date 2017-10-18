@@ -92,11 +92,11 @@ The following example security contract shows the services required to use the p
     },
     {
       "@type": "RestService",
-      "Service": "http://canvas.docker/api/lti/courses/3/tool_consumer_profile/339b6700-e4cb-47c5-a54f-3ee0064921a9#vnd.Canvas.submission",
+      "service": "http://canvas.docker/api/lti/courses/3/tool_consumer_profile/339b6700-e4cb-47c5-a54f-3ee0064921a9#vnd.Canvas.submission",
       "action": ["GET"]
     },
     {
-      "Service": "http://canvas.docker/api/lti/courses/3/tool_consumer_profile/339b6700-e4cb-47c5-a54f-3ee0064921a9#vnd.Canvas.submission.history",
+      "service": "http://canvas.docker/api/lti/courses/3/tool_consumer_profile/339b6700-e4cb-47c5-a54f-3ee0064921a9#vnd.Canvas.submission.history",
       "action": ["GET"]
     }]
   …
