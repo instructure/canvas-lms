@@ -2221,7 +2221,6 @@ define [
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
       selectPreviousStudent: => @loadTrayStudent('previous')
-      showContentComingSoon: !@options.new_gradebook_development_enabled
       speedGraderEnabled: @options.speed_grader_enabled
       student:
         id: student.id

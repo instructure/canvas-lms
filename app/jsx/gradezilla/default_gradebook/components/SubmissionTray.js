@@ -29,7 +29,6 @@ import Tray from 'instructure-ui/lib/components/Tray';
 import Typography from 'instructure-ui/lib/components/Typography';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
 import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
-import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import GradeInput from 'jsx/gradezilla/default_gradebook/components/GradeInput';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
@@ -54,15 +53,6 @@ function renderSpeedGraderLink (speedGraderUrl) {
         {I18n.t('SpeedGrader')}
       </Button>
     </Container>
-  );
-}
-
-function renderComingSoon (speedGraderEnabled, speedGraderUrl) {
-  return (
-    <div>
-      { speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
-      <ComingSoonContent />
-    </div>
   );
 }
 
@@ -105,7 +95,6 @@ export default class SubmissionTray extends React.Component {
     onClose: func.isRequired,
     onGradeSubmission: func.isRequired,
     onRequestClose: func.isRequired,
-    showContentComingSoon: bool.isRequired,
     student: shape({
       id: string.isRequired,
       name: string.isRequired,
@@ -242,93 +231,90 @@ export default class SubmissionTray extends React.Component {
         onClose={this.props.onClose}
       >
         <div className="SubmissionTray__Container">
-          { this.props.showContentComingSoon ?
-              renderComingSoon(this.props.speedGraderEnabled, speedGraderUrl) :
-              <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
-                <Container as="div" padding={carouselContainerStyleOverride}>
-                  {avatarUrl && renderAvatar(name, avatarUrl)}
+          <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
+            <Container as="div" padding={carouselContainerStyleOverride}>
+              {avatarUrl && renderAvatar(name, avatarUrl)}
 
-                  <Carousel
-                    id="student-carousel"
-                    disabled={trayIsBusy}
-                    displayLeftArrow={!this.props.isFirstStudent}
-                    displayRightArrow={!this.props.isLastStudent}
-                    leftArrowDescription={I18n.t('Previous student')}
-                    onLeftArrowClick={this.props.selectPreviousStudent}
-                    onRightArrowClick={this.props.selectNextStudent}
-                    rightArrowDescription={I18n.t('Next student')}
-                  >
-                    <Link href={this.props.student.gradesUrl}>
-                      {name}
-                    </Link>
-                  </Carousel>
+              <Carousel
+                id="student-carousel"
+                disabled={trayIsBusy}
+                displayLeftArrow={!this.props.isFirstStudent}
+                displayRightArrow={!this.props.isLastStudent}
+                leftArrowDescription={I18n.t('Previous student')}
+                onLeftArrowClick={this.props.selectPreviousStudent}
+                onRightArrowClick={this.props.selectNextStudent}
+                rightArrowDescription={I18n.t('Next student')}
+              >
+                <Link href={this.props.student.gradesUrl}>
+                  {name}
+                </Link>
+              </Carousel>
 
-                  <Container as="div" margin="small 0" className="hr" />
+              <Container as="div" margin="small 0" className="hr" />
 
-                  <Carousel
-                    id="assignment-carousel"
-                    disabled={trayIsBusy}
-                    displayLeftArrow={!this.props.isFirstAssignment}
-                    displayRightArrow={!this.props.isLastAssignment}
-                    leftArrowDescription={I18n.t('Previous assignment')}
-                    onLeftArrowClick={this.props.selectPreviousAssignment}
-                    onRightArrowClick={this.props.selectNextAssignment}
-                    rightArrowDescription={I18n.t('Next assignment')}
-                  >
-                    <Link href={this.props.assignment.htmlUrl}>
-                      {this.props.assignment.name}
-                    </Link>
-                  </Carousel>
+              <Carousel
+                id="assignment-carousel"
+                disabled={trayIsBusy}
+                displayLeftArrow={!this.props.isFirstAssignment}
+                displayRightArrow={!this.props.isLastAssignment}
+                leftArrowDescription={I18n.t('Previous assignment')}
+                onLeftArrowClick={this.props.selectPreviousAssignment}
+                onRightArrowClick={this.props.selectNextAssignment}
+                rightArrowDescription={I18n.t('Next assignment')}
+              >
+                <Link href={this.props.assignment.htmlUrl}>
+                  {this.props.assignment.name}
+                </Link>
+              </Carousel>
 
-                  { this.props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
+              { this.props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
 
-                  <Container as="div" margin="small 0" className="hr" />
+              <Container as="div" margin="small 0" className="hr" />
+            </Container>
+
+            <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+              <SubmissionStatus
+                assignment={this.props.assignment}
+                submission={this.props.submission}
+                isInOtherGradingPeriod={this.props.isInOtherGradingPeriod}
+                isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
+                isInNoGradingPeriod={this.props.isInNoGradingPeriod}
+              />
+
+              <GradeInput
+                assignment={this.props.assignment}
+                disabled={this.props.gradingDisabled}
+                onSubmissionUpdate={this.props.onGradeSubmission}
+                submission={this.props.submission}
+                submissionUpdating={this.props.submissionUpdating}
+              />
+
+              {!!this.props.submission.pointsDeducted &&
+                <Container as="div" margin="small 0 0 0">
+                  <LatePolicyGrade submission={this.props.submission} />
                 </Container>
+              }
 
-                <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
-                  <SubmissionStatus
-                    assignment={this.props.assignment}
-                    submission={this.props.submission}
-                    isInOtherGradingPeriod={this.props.isInOtherGradingPeriod}
-                    isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
-                    isInNoGradingPeriod={this.props.isInNoGradingPeriod}
-                  />
+              <Container as="div" margin="small 0" className="hr" />
 
-                  <GradeInput
-                    assignment={this.props.assignment}
-                    disabled={this.props.gradingDisabled}
-                    onSubmissionUpdate={this.props.onGradeSubmission}
-                    submission={this.props.submission}
-                    submissionUpdating={this.props.submissionUpdating}
-                  />
+              <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
+                <SubmissionTrayRadioInputGroup
+                  colors={this.props.colors}
+                  locale={this.props.locale}
+                  latePolicy={this.props.latePolicy}
+                  submission={this.props.submission}
+                  submissionUpdating={this.props.submissionUpdating}
+                  updateSubmission={this.props.updateSubmission}
+                />
+              </Container>
 
-                  {!!this.props.submission.pointsDeducted &&
-                    <Container as="div" margin="small 0 0 0">
-                      <LatePolicyGrade submission={this.props.submission} />
-                    </Container>
-                  }
+              <Container as="div" margin="small 0" className="hr" />
 
-                  <Container as="div" margin="small 0" className="hr" />
-
-                  <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
-                    <SubmissionTrayRadioInputGroup
-                      colors={this.props.colors}
-                      locale={this.props.locale}
-                      latePolicy={this.props.latePolicy}
-                      submission={this.props.submission}
-                      submissionUpdating={this.props.submissionUpdating}
-                      updateSubmission={this.props.updateSubmission}
-                    />
-                  </Container>
-
-                  <Container as="div" margin="small 0" className="hr" />
-
-                  <Container as="div" id="SubmissionTray__Comments" padding="xx-small">
-                    {this.renderSubmissionComments(submissionCommentsProps)}
-                  </Container>
-                </Container>
-              </div>
-          }
+              <Container as="div" id="SubmissionTray__Comments" padding="xx-small">
+                {this.renderSubmissionComments(submissionCommentsProps)}
+              </Container>
+            </Container>
+          </div>
         </div>
       </Tray>
     );

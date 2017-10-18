@@ -36,12 +36,9 @@ describe 'Grade Detail Tray:' do
 
   context "status" do
     before(:each) do
-      ENV["GRADEBOOK_DEVELOPMENT"] = 'true'
       user_session(@teacher)
       Gradezilla.visit(@course)
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it 'missing submission has missing-radiobutton selected', priority: "1", test_id: 3337205 do
       Gradezilla::Cells.open_tray(@course.students.first, @a2)
@@ -82,13 +79,10 @@ describe 'Grade Detail Tray:' do
 
   context 'late status' do
     before(:each) do
-      ENV["GRADEBOOK_DEVELOPMENT"] = 'true'
       user_session(@teacher)
       Gradezilla.visit(@course)
       Gradezilla::Cells.open_tray(@course.students.first, @a1)
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it 'late submission has late-radiobutton selected', test_id: 3337206, priority: '1' do
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('late')).to be true
@@ -126,11 +120,8 @@ describe 'Grade Detail Tray:' do
 
   context 'navigation' do
     before(:each) do
-      ENV['GRADEBOOK_DEVELOPMENT'] = 'true'
       user_session(@teacher)
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     context 'with default ordering' do
       before(:each) do
@@ -243,7 +234,6 @@ describe 'Grade Detail Tray:' do
     let(:comment_2) {"You are also late2"}
 
     before(:each) do
-      ENV['GRADEBOOK_DEVELOPMENT'] = 'true'
       user_session(@teacher)
 
       submission_comment_model({author: @teacher,
@@ -251,8 +241,6 @@ describe 'Grade Detail Tray:' do
                                 comment: comment_1})
       Gradezilla.visit(@course)
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it "add a comment", test_id: 3339965, priority: '1' do
       Gradezilla::Cells.open_tray(@course.students.first, @a1)

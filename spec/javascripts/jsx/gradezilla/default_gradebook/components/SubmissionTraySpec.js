@@ -56,7 +56,6 @@ QUnit.module('SubmissionTray', function (hooks) {
       onGradeSubmission () {},
       onRequestClose () {},
       onClose () {},
-      showContentComingSoon: false,
       submissionUpdating: false,
       isOpen: true,
       courseId: '1',
@@ -123,16 +122,6 @@ QUnit.module('SubmissionTray', function (hooks) {
   function radioInputGroupDiv () {
     return document.querySelector('#SubmissionTray__RadioInputGroup');
   }
-
-  test('shows "Content Coming Soon" content if showContentComingSoon is true', function () {
-    const server = sinon.fakeServer.create({ respondImmediately: true });
-    server.respondWith('GET', /^\/images\/.*\.svg$/, [
-      200, { 'Content-Type': 'img/svg+xml' }, '{}'
-    ]);
-    mountComponent({ showContentComingSoon: true });
-    ok(document.querySelector('.ComingSoonContent__Container'));
-    server.restore();
-  });
 
   QUnit.module('Student Carousel', function () {
     test('is disabled when the tray is "processing"', function () {
@@ -211,7 +200,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     notOk(speedGraderLink);
   });
 
-  test('shows avatar if showContentComingSoon is false and avatar is not null', function () {
+  test('shows avatar if avatar is not null', function () {
     const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty';
     const gradesUrl = 'http://gradesUrl/';
     mountComponent({ student: { id: '27', name: 'Bob', avatarUrl, gradesUrl } });
@@ -219,7 +208,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(avatarBackground, `url("${avatarUrl}")`);
   });
 
-  test('shows no avatar if showContentComingSoon is false and avatar is null', function () {
+  test('shows no avatar if avatar is null', function () {
     mountComponent({ student: { id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/' } });
     notOk(avatarDiv());
   });
@@ -265,7 +254,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     deepEqual(isInNoGradingPeriod, wrapper.prop('isInNoGradingPeriod'));
   });
 
-  test('shows name if showContentComingSoon is false', function () {
+  test('shows name', function () {
     mountComponent({ student: { id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/' } });
     strictEqual(studentNameDiv().innerHTML, 'Sara');
   });
@@ -300,19 +289,9 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
-  test('shows a radio input group if showContentComingSoon is false', function () {
+  test('shows a radio input group', function () {
     mountComponent();
     ok(radioInputGroupDiv());
-  });
-
-  test('does not show a radio input group if showContentComingSoon is true', function () {
-    const server = sinon.fakeServer.create({ respondImmediately: true });
-    server.respondWith('GET', /^\/images\/.*\.svg$/, [
-      200, { 'Content-Type': 'img/svg+xml' }, '{}'
-    ]);
-    mountComponent({ showContentComingSoon: true });
-    notOk(radioInputGroupDiv());
-    server.restore();
   });
 
   test('shows assignment carousel', function () {
