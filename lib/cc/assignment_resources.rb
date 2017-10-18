@@ -215,7 +215,7 @@ module CC
               :all_day, :submission_types, :position, :turnitin_enabled, :vericite_enabled, :peer_review_count,
               :peer_reviews, :automatic_peer_reviews, :moderated_grading,
               :anonymous_peer_reviews, :grade_group_students_individually, :freeze_on_copy, :muted,
-              :omit_from_final_grade, :intra_group_peer_reviews, :only_visible_to_overrides]
+              :omit_from_final_grade, :intra_group_peer_reviews, :only_visible_to_overrides, :post_to_sis]
       atts.each do |att|
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
       end
