@@ -321,7 +321,7 @@ class SubmissionsApiController < ApplicationController
     can_view_all = @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     if all && can_view_all
       # this is a scope, and will generate subqueries
-      students = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids)
+      student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids).select(:user_id)
     elsif can_view_all
       visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids).pluck(:user_id)
       inaccessible_students = student_ids - visible_student_ids
@@ -358,17 +358,21 @@ class SubmissionsApiController < ApplicationController
     if (enrollment_state = params[:enrollment_state].presence)
       case enrollment_state
       when 'active'
-        students = (@section || @context).all_student_enrollments.active_by_date.where(user_id: student_ids)
+        student_ids = (@section || @context).all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
       when 'concluded'
-        students = (@section || @context).all_student_enrollments.completed_by_date.where(user_id: student_ids)
+        student_ids = (@section || @context).all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
       else
         return render json: {error: 'invalid enrollment_state'}, status: :bad_request
       end
     end
 
-    if students
-      students = students.where.not(sis_batch_id: nil) if value_to_boolean(params[:post_to_sis])
-      student_ids = students.select(:user_id)
+    if value_to_boolean(params[:post_to_sis])
+      if student_ids.is_a?(Array)
+        student_ids = (@section || @context).all_student_enrollments.
+          where(user_id: student_ids).where.not(sis_batch_id: nil).select(:user_id)
+      else
+        student_ids = student_ids.where.not(sis_batch_id: nil)
+      end
     end
 
     includes = Array(params[:include])
