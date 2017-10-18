@@ -204,6 +204,20 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
     end
 
+    it 'should scope call to enrollment_state with post_to_sis' do
+      @a1.post_to_sis = true
+      @a1.save!
+      batch = @course.root_account.sis_batches.create
+      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch)
+
+      json = api_call(:get,
+                      '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                      enrollment_state: 'active', student_ids: 'all', post_to_sis: 'true')
+      expect(json.size).to eq 1
+    end
+
     it 'returns filter submissions to enrollments from sis for post_to_sis' do
       @a1.post_to_sis = true
       @a1.save!
