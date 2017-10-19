@@ -19,7 +19,7 @@
 import $ from 'jquery'
 
 export function loadMathJax (config_file, cb = null) {
-  if (!isMathJaxLoaded()) {
+  if (!isMathJaxLoaded() && shouldLoadMathJax()) {
     $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=${config_file}`, cb);
   }
 }
@@ -30,6 +30,10 @@ export function isMathMLOnPage () {
 
 export function isMathJaxLoaded () {
   return !(typeof MathJax === 'undefined')
+}
+
+export function shouldLoadMathJax() {
+  return ($(document.documentElement).find("img.equation_image").length <= 0)
 }
 
 /*

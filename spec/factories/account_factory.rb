@@ -24,11 +24,12 @@ module Factories
     # make sure this is loaded first
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
-      {
+      ActiveSupport::HashWithIndifferentAccess.new({
         "app-host":"",
         "cdn-host":"",
+        "skip-sidebar":"true",
         "sidebar-source":"fake"
-      }
+      })
     )
     allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
       {

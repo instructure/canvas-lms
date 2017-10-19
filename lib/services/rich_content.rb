@@ -53,7 +53,8 @@ module Services
         settings = Canvas::DynamicSettings.find("rich-content-service", default_ttl: 5.minutes)
         {
           RICH_CONTENT_APP_HOST: settings['app-host'],
-          RICH_CONTENT_CDN_HOST: settings['cdn-host']
+          RICH_CONTENT_CDN_HOST: settings['cdn-host'],
+          RICH_CONTENT_SKIP_SIDEBAR: settings['skip-sidebar']
         }
       rescue Imperium::TimeoutError,
         Imperium::UnableToConnectError,
