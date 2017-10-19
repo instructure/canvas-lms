@@ -80,7 +80,7 @@ module SIS
       def add_remove_observer(observer, student, observer_id, student_id, status)
         case status
         when 'active'
-          user_observer = observer.user_observees.create_or_restore(user_id: student)
+          user_observer = UserObserver.create_or_restore(observer: observer, observee: student)
         when 'deleted'
           user_observer = observer.user_observees.active.where(user_id: student).take
           if user_observer

@@ -2476,7 +2476,7 @@ class UsersController < ApplicationController
       end
       @user.save!
       if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        @user.user_observees << @user.user_observees.create_or_restore(user_id: @observee)
+        UserObserver.create_or_restore(observee: @observee, observer: @user)
       end
 
       if notify_policy.is_self_registration?

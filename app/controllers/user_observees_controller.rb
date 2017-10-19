@@ -177,11 +177,9 @@ class UserObserveesController < ApplicationController
   end
 
   def add_observee(observee)
-    @current_user.shard.activate do
-      unless has_observee?(observee)
-        user.user_observees.create_or_restore(user_id: observee)
-        user.touch
-      end
+    unless has_observee?(observee)
+      UserObserver.create_or_restore(observee: observee, observer: user)
+      user.touch
     end
   end
 

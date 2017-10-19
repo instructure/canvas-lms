@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe UserObserver do
   let_once(:student) { user_factory }
@@ -31,7 +31,7 @@ describe UserObserver do
     observee = observer.user_observees.first
     observee.destroy
 
-    re_observee = student.user_observers.create_or_restore(observer_id: observer)
+    re_observee = UserObserver.create_or_restore(observer: observer, observee: student)
     expect(observee.id).to eq re_observee.id
     expect(re_observee.workflow_state).to eq 'active'
   end
@@ -45,13 +45,13 @@ describe UserObserver do
     observer_enroll = observer.observer_enrollments.first
     observer_enroll.destroy
 
-    student.user_observers.create_or_restore(observer_id: observer)
+    UserObserver.create_or_restore(observer: observer, observee: student)
     expect(observer_enroll.reload).to_not be_deleted
   end
 
   it 'should create an observees when one does not exist' do
     observer = user_with_pseudonym
-    re_observee = observer.user_observees.create_or_restore(user_id: student)
+    re_observee = UserObserver.create_or_restore(observer: observer, observee: student)
     expect(re_observee).to eq student.user_observers.first
   end
 
@@ -78,7 +78,7 @@ describe UserObserver do
     p = observer.pseudonyms.first
     p.workflow_state = 'active'
     p.save!
-    observer.user_observees.create_or_restore(user_id: student)
+    UserObserver.create_or_restore(observer: observer, observee: student)
     observer.reload
     expect(enrollments.reload.map(&:workflow_state)).to eql ["active", "active"]
   end
@@ -163,6 +163,22 @@ describe UserObserver do
         @course.enroll_student student, role: @custom_student_role
       }.not_to raise_error
       expect(@observer_enrollment.reload).to be_active
+    end
+  end
+
+  context "sharding" do
+    specs_require_sharding
+
+    it "creates enrollments for cross-shard users" do
+      course = course_factory(active_all: true)
+      student_in_course(course: @course, user: student, active_all: true)
+
+      parent = nil
+      @shard2.activate do
+        parent = user_with_pseudonym(account: course.account, active_all: true)
+        UserObserver.create_or_restore(observer: parent, observee: student)
+      end
+      expect(parent.enrollments.shard(parent).first.course).to eq course
     end
   end
 end
