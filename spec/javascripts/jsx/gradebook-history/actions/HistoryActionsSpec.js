@@ -100,6 +100,62 @@ test('fetchHistorySuccess creates an action with history items in payload', func
   deepEqual(fetchHistorySuccess(response.data, response.headers).payload.items, expectedItems);
 });
 
+test('fetchHistorySuccess returns "0" pointsPossibleCurrent when an assignment is zero', function () {
+  const response = {
+    data: {
+      events: [{ links: {} }],
+      linked: {
+        assignments: [{ points_possible: 0 }]
+      }
+    },
+    headers: {}
+  };
+  const { pointsPossibleCurrent } = fetchHistorySuccess(response.data, response.headers).payload.items[0]
+  strictEqual(pointsPossibleCurrent, '0');
+});
+
+test('fetchHistorySuccess returns "–" pointsPossibleCurrent when an assignment has no points possible', function () {
+  const response = {
+    data: {
+      events: [{ links: {} }],
+      linked: {
+        assignments: [{ points_possible: null }]
+      }
+    },
+    headers: {}
+  };
+  const { pointsPossibleCurrent } = fetchHistorySuccess(response.data, response.headers).payload.items[0]
+  strictEqual(pointsPossibleCurrent, '–');
+});
+
+test('fetchHistorySuccess returns "–" pointsPossibleAfter when an assignment now has no points possible', function () {
+  const response = {
+    data: {
+      events: [{ points_possible_after: null, links: {} }],
+      linked: {
+        assignments: [{ points_possible: null }]
+      }
+    },
+    headers: {}
+  };
+  const { pointsPossibleAfter } = fetchHistorySuccess(response.data, response.headers).payload.items[0];
+  strictEqual(pointsPossibleAfter, '–');
+});
+
+test('fetchHistorySuccess returns "–" pointsPossibleBefore when an assignment had no points possible', function () {
+  const response = {
+    data: {
+      events: [{ points_possible_before: null, links: {} }],
+      linked: {
+        assignments: [{ points_possible: null }]
+      }
+    },
+    headers: {}
+  };
+  const { pointsPossibleBefore } = fetchHistorySuccess(response.data, response.headers).payload.items[0];
+  strictEqual(pointsPossibleBefore, '–');
+});
+
 test('fetchHistorySuccess creates an action with history next page link in payload', function () {
   const response = defaultResponse();
   const expectedUrl = 'http://example.com/3?&page=bookmark:asdf';

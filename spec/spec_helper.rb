@@ -349,7 +349,6 @@ RSpec.configure do |config|
     RequestStore.clear!
     MultiCache.reset
     Course.enroll_user_call_count = 0
-    TermsOfService.skip_automatic_terms_creation = true
     $spec_api_tokens = {}
   end
 

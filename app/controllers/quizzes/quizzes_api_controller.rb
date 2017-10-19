@@ -232,6 +232,11 @@
 #           "example": ["multiple_choice", "essay"],
 #           "type": "array",
 #           "items": {"type": "string"}
+#         },
+#         "anonymous_submissions": {
+#           "description": "Whether survey submissions will be kept anonymous (only applicable to 'graded_survey', 'survey' quiz types)",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }

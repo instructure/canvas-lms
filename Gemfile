@@ -12,6 +12,11 @@
 # these gems to prevent regression, and the indentation serves to alert us to the relationship between the gem and canvas-lms
 source 'https://rubygems.org/'
 
+
+Dir[File.join(File.dirname(__FILE__), 'gems/plugins/*/Gemfile.d/_before.rb')].each do |file|
+  eval(File.read(file), nil, file)
+end
+
 require File.expand_path("../config/canvas_rails5", __FILE__)
 
 Dir.glob(File.join(File.dirname(__FILE__), 'Gemfile.d', '*.rb')).sort.each do |file|

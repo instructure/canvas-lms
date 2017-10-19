@@ -127,7 +127,7 @@ module SIS
         @account_roles_by_account_id[@account.id] ||= @account.available_account_roles
 
         @role = nil
-        @role = @account_roles_by_account_id[@account.id].detect {|r| r.id == role_id} if role_id
+        @role = @account_roles_by_account_id[@account.id].detect {|r| r.id.to_s == role_id} if role_id
         @role ||= @account_roles_by_account_id[@account.id].detect {|r| r.name == role}
       end
     end

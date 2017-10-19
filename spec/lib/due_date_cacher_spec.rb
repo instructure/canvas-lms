@@ -104,6 +104,14 @@ describe DueDateCacher do
         }.from(0).to(1)
       end
 
+      it "should delete submissions for enrollments that are deleted" do
+        @course.student_enrollments.update_all(workflow_state: 'deleted')
+
+        expect { @cacher.recompute }.to change {
+          Submission.active.where(assignment_id: @assignment.id).count
+        }.from(1).to(0)
+      end
+
       it "should create submissions for enrollments that are overridden" do
         assignment_override_model(assignment: @assignment, set: @course.default_section)
         @override.override_due_at(@assignment.due_at + 1.day)

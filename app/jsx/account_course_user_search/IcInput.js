@@ -30,7 +30,8 @@ const IcInputPropTypes = {
   elementType: any,
   controlClassName: string,
   appendLabel: bool,
-  noClassName: bool
+  noClassName: bool,
+  type: string
 }
 
   /**
@@ -55,6 +56,9 @@ const IcInputPropTypes = {
       const inputProps = Object.assign({}, _.omit(this.props, Object.keys(IcInputPropTypes)), {id: this.id})
       if (elementType === "input" && !this.props.type) {
         inputProps.type = "text";
+      }
+      if (this.props.type) {
+        inputProps.type = this.props.type
       }
       if (!noClassName) {
         inputProps.className = classnames(inputProps.className, "ic-Input");

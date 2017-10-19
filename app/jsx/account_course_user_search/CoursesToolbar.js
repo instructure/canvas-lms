@@ -84,7 +84,7 @@ class CoursesToolbar extends React.Component {
 
     const addCourseButton = window.ENV.PERMISSIONS.can_create_courses ?
         (<div>
-          <button className="btn" type="button" onClick={this.addCourse}>
+          <button className="Button selenium-spec-add-course-button" type="button" onClick={this.addCourse}>
             <i className="icon-plus" />
             {' '}
             {I18n.t('Course')}
@@ -123,12 +123,8 @@ class CoursesToolbar extends React.Component {
                 placeholder={I18n.t('Search courses...')}
                 onChange={e => onUpdateFilters({search_term: e.target.value})}
                 error={errors.search_term}
+                type="search"
               />
-              <div className="ic-Form-control">
-                <button className="btn">
-                  {I18n.t('Go')}
-                </button>
-              </div>
             </div>
             <div className="ic-Form-action-box__Actions">
               {addCourseButton}

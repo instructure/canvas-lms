@@ -104,7 +104,7 @@ describe "new account course search" do
 
     get "/accounts/#{@account.id}"
 
-    f('.course_search_bar input[type=text]').send_keys('search')
+    f('.course_search_bar input[type=search]').send_keys('search')
     f('.course_search_bar button').click
     wait_for_ajaximations
 
@@ -139,5 +139,32 @@ describe "new account course search" do
     expect(dialog).to be_displayed
     role_options = dialog.find_elements(:css, '#role_id option')
     expect(role_options.map{|r| r.text}).to match_array(["Student", "Observer", custom_name])
+  end
+
+  it "should create a new course from the 'Add a New Course' dialog" do
+    @account.enrollment_terms.create!(:name => "Test Enrollment Term")
+    subaccount = @account.sub_accounts.create!(name: "Test Sub Account")
+
+    get "/accounts/#{@account.id}"
+
+    # fill out the form
+    f('.selenium-spec-add-course-button').click
+    dialog = f('.ReactModal__Content--canvas')
+    expect(dialog).to be_displayed
+    set_value(f('.name', dialog), 'Test Course Name')
+    set_value(f('.course_code', dialog), 'TCN 101')
+    click_option(".account_id", subaccount.to_param, :value)
+    click_option(".enrollment_term_id", "Test Enrollment Term")
+    submit_form(dialog)
+
+    # make sure it got saved to db correctly
+    new_course = Course.last
+    expect(new_course.name).to eq('Test Course Name')
+    expect(new_course.course_code).to eq('TCN 101')
+    expect(new_course.account.name).to eq('Test Sub Account')
+    expect(new_course.enrollment_term.name).to eq('Test Enrollment Term')
+
+    # make sure it shows up on the page
+    expect(f('.courses-list')).to include_text('Test Course Name')
   end
 end

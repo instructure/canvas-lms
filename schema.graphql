@@ -338,8 +338,10 @@ type Submission implements Node, Timestamped {
   excused: Boolean
   grade: String
   gradedAt: Time
+  gradingStatus: String
   id: ID!
   score: Float
+  submissionStatus: String
   submittedAt: Time
   updatedAt: Time
   user: User
