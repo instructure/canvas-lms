@@ -719,7 +719,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_can_see_posts?(user, session=nil, associated_user_ids=[])
     return false unless user
-    !self.require_initial_post? || self.grants_right?(user, session, :update) ||
+    !self.require_initial_post? || self.grants_right?(user, session, :read_as_admin) ||
       (([user.id] + associated_user_ids) & user_ids_who_have_posted_and_admins).any?
   end
 
@@ -836,11 +836,14 @@ class DiscussionTopic < ActiveRecord::Base
     can :attach
 
     given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) && self.available_for?(user) }
-    can :update and can :delete and can :create and can :read and can :attach
+    can :update and can :read_as_admin and can :delete and can :create and can :read and can :attach
 
     # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
     given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
-    can :update and can :delete and can :read and can :attach
+    can :update and can :read_as_admin and can :delete and can :read and can :attach
+
+    given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
     can :delete
@@ -1099,7 +1102,7 @@ class DiscussionTopic < ActiveRecord::Base
   #         delayed_post_at is in the future or the group assignment is locked. This does not determine
   #         the visibility of the topic to the user, only that they are unable to reply.
   def locked_for?(user, opts={})
-    return false if opts[:check_policies] && self.grants_right?(user, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :read_as_admin)
 
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false

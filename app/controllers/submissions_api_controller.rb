@@ -266,7 +266,8 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument post_to_sis [Boolean]
   #   If this argument is set to true, the response will only include
-  #   assignments that have the post_to_sis flag set to true.
+  #   submissions for assignments that have the post_to_sis flag set to true and
+  #   user enrollments that were added through sis.
   #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which submissions are being requested
@@ -362,6 +363,15 @@ class SubmissionsApiController < ApplicationController
         student_ids = (@section || @context).all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
       else
         return render json: {error: 'invalid enrollment_state'}, status: :bad_request
+      end
+    end
+
+    if value_to_boolean(params[:post_to_sis])
+      if student_ids.is_a?(Array)
+        student_ids = (@section || @context).all_student_enrollments.
+          where(user_id: student_ids).where.not(sis_batch_id: nil).select(:user_id)
+      else
+        student_ids = student_ids.where.not(sis_batch_id: nil)
       end
     end
 

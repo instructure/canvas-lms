@@ -1032,6 +1032,15 @@ describe DiscussionTopic do
       expect(ct.user_can_see_posts?(@student)).to be_truthy
     end
 
+    it "should let account admins see group discussions with require_initial_post" do
+      group_discussion_assignment
+      @topic.require_initial_post = true
+      @topic.save!
+      ct = @topic.child_topics.first
+      account_admin_user(:active_all => true)
+      expect(ct.user_can_see_posts?(@admin)).to be_truthy
+    end
+
     describe "observers" do
       before :once do
         @other_student = user_factory(:active_all => true)

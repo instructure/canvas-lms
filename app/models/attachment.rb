@@ -1506,13 +1506,11 @@ class Attachment < ActiveRecord::Base
     false
   end
 
-  def matches_filename?(match)
-    filename == match || display_name == match ||
-      URI.unescape(filename) == match || URI.unescape(display_name) == match ||
-      filename.downcase == match.downcase || display_name.downcase == match.downcase ||
-      URI.unescape(filename).downcase == match.downcase || URI.unescape(display_name).downcase == match.downcase
+  def self.matches_name?(name, match)
+    return false unless name
+    name == match || URI.unescape(name) == match || name.downcase == match.downcase || URI.unescape(name).downcase == match.downcase
   rescue
-    false
+     false
   end
 
   def self.attachment_list_from_migration(context, ids)
