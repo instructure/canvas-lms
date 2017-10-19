@@ -272,11 +272,11 @@ define [
     addAssignmentToList: (response) =>
       return unless response
       assignment = new Assignment(response)
-      # The positions here are not always consistent with what is in the DB,
-      # so treat the position here as "canonical" to make the UI behave properly.
-      targetPosition = @model.get('position') + 1
-      assignment.set('position', targetPosition)
-      @model.collection.insertModel(assignment)
+      # Force the positions to match what is in the db.
+      @model.collection.forEach((a) =>
+        a.set('position', response.new_positions[a.get('id')])
+      )
+      @model.collection.add(assignment)
       @focusOnAssignment(response)
 
     onDuplicate: (e) =>
