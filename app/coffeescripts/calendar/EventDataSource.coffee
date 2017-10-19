@@ -90,6 +90,13 @@ define [
           fetchedUndated: false,
         }
 
+    removeCachedReservation: (event) =>
+      cached_ag = @cache.appointmentGroups[event.appointment_group_id]
+      if cached_ag
+        cached_ag.reserved_times = _.reject cached_ag.reserved_times, (reservation) ->
+          reservation.id == event.id
+        cached_ag.requiring_action = true if cached_ag.reserved_times.length == 0
+
     requiredDateRangeForContext: (start, end, context) =>
       unless contextInfo = @cache.contexts[context]
         return [ start, end ]
