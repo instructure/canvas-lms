@@ -109,10 +109,6 @@ class Gradezilla
         fj(navigate_to_previous_student_selector)
       end
 
-      def grade_input
-        "#grade-input"
-      end
-
       def all_comments
         f("#SubmissionTray__Comments")
       end
@@ -137,6 +133,10 @@ class Gradezilla
         fj("button:contains('Submit')")
       end
 
+      def grade_input
+        f('#grade-detail-tray--grade-input')
+      end
+
       # methods
       def change_status_to(type)
         status_radio_button(type).click
@@ -153,34 +153,30 @@ class Gradezilla
 
       def edit_late_by_input(value)
         fj(late_by_input_css).click
-
-        new_value = fj(late_by_input_css)
-        set_value(new_value, value)
-        new_value.send_keys(:return)
-
+        set_value(fj(late_by_input_css), value)
         # shifting focus from input = saving the changes
-        driver.execute_script('$(".SubmissionTray__RadioInput input[value=\'late\']").focus()')
+        driver.action.send_keys(:tab).perform
+        wait_for_ajax_requests
       end
 
-      def edit_grade_input(new_grade)
-        fj(grade_input).click
-
-        edit_grade = fj(grade_input)
-        set_value(edit_grade, new_grade)
-
-        edit_grade.send_keys(:return)
+      def edit_grade(new_grade)
+        grade_input.click
+        set_value(grade_input, new_grade)
+        # focus outside the input to save
+        driver.action.send_keys(:tab).perform
+        wait_for_ajax_requests
       end
 
       def add_new_comment(new_comment)
         set_value(new_comment_input, new_comment)
         comment_save_button.click
+        wait_for_ajax_requests
       end
 
       def delete_comment(comment)
         delete_comment_button(comment).click
         accept_alert
       end
-
     end
   end
 end

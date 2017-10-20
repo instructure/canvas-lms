@@ -75,6 +75,13 @@ describe 'Grade Detail Tray:' do
 
       expect(late_policy_status).to eq 'none'
     end
+
+    it 'grade input is saved', priority: "1", test_id: 3369723 do
+      Gradezilla::Cells.open_tray(@course.students.second, @a3)
+      Gradezilla::GradeDetailTray.edit_grade(7)
+
+      expect(Gradezilla::Cells.get_grade(@course.students.second, @a3)).to eq "7"
+    end
   end
 
   context 'late status' do
@@ -102,7 +109,7 @@ describe 'Grade Detail Tray:' do
       expect(Gradezilla::GradeDetailTray.late_penalty_text.to_f.to_s).to eq late_penalty_value
     end
 
-    it 'late submission has final grade', test_id: 3337211, priority: '2' do
+    it 'late submission has final grade', test_id: 3337210, priority: '2' do
       final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
 
       expect(Gradezilla::GradeDetailTray.final_grade_text).to eq final_grade_value
