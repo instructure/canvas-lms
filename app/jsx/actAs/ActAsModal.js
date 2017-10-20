@@ -214,7 +214,10 @@ export default class ActAsModal extends React.Component {
                         {I18n.t('"Act as" is essentially logging in as this user ' +
                           'without a password. You will be able to take any action ' +
                           'as if you were this user, and from other users\' points ' +
-                          'of views, it will be as if this user performed them.')}
+                          'of views, it will be as if this user performed them. However, ' +
+                          'audit logs record that you were the one who performed the ' +
+                          'actions on behalf of this user.'
+                        )}
                       </Typography>
                     </Container>
                     <Container
