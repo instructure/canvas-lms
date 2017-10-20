@@ -17,7 +17,7 @@
 %>
 
 <form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="ic-Self-enrollment-form">
-  <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
+  <%= registration_summary || content_tag(:div, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
 
   <p><%= t("Please enter your %{label_name} and password:", :label_name => @login_label_name) %></p>
   <input type="hidden" name="initial_action" value="log_in">
