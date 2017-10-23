@@ -1065,6 +1065,41 @@ describe MasterCourses::MasterMigration do
       expect(att2_to).to be_present
     end
 
+    it "should link to existing outcomes even when some weird migration_id thing happens" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true) # what is this
+
+      lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2},
+        {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+      from_root = @copy_from.root_outcome_group
+      from_root.add_outcome(lo)
+
+      LearningOutcome.where(:id => lo).update_all(:updated_at => 1.minute.ago)
+
+      run_master_migration
+
+      lo_to = @copy_to.created_learning_outcomes.where(:migration_id_2 => mig_id(lo)).first # what is that
+
+      rub = Rubric.new(:context => @copy_from)
+      rub.data = [{
+        :points => 3, :description => "Outcome row", :id => 2,
+        :ratings => [{:points => 3,:description => "meep",:criterion_id => 2,:id => 3}], :ignore_for_scoring => true,
+        :learning_outcome_id => lo.id
+      }]
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+
+      run_master_migration
+
+      rub_to = @copy_to.rubrics.where(:migration_id => mig_id(rub)).first
+      expect(rub_to.data.first["learning_outcome_id"]).to eq lo_to.id
+      expect(rub_to.learning_outcome_alignments.first.learning_outcome_id).to eq lo_to.id
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")

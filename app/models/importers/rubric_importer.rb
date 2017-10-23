@@ -20,6 +20,8 @@ require_dependency 'importers'
 module Importers
   class RubricImporter < Importer
 
+    extend OutcomeImporter
+
     self.item_class = Rubric
 
     def self.process_migration(data, migration)
@@ -73,7 +75,7 @@ module Importers
           if crit[:learning_outcome_migration_id]
             if migration.respond_to?(:outcome_to_id_map) && id = migration.outcome_to_id_map[crit[:learning_outcome_migration_id]]
               crit[:learning_outcome_id] = id
-            elsif lo = context.created_learning_outcomes.where(migration_id: crit[:learning_outcome_migration_id]).first
+            elsif lo = context.created_learning_outcomes.where(migration_clause(crit[:learning_outcome_migration_id])).first
               crit[:learning_outcome_id] = lo.id
             end
             crit.delete :learning_outcome_migration_id
