@@ -4,7 +4,8 @@ import smallTextContrast from "./small-text-contrast"
 
 export default {
   test: elem => {
-    if (!contrast.isLargeText(elem)) {
+    const noText = elem.textContent.replace(/\s/g, "") === ""
+    if (noText || !contrast.isLargeText(elem)) {
       return true
     }
     return contrast(elem)
