@@ -34,6 +34,14 @@ beforeEach(() => {
   instance = component.instance()
 })
 
+describe("setConfig", () => {
+  test("sets config state", () => {
+    const conf = { disableContrastCheck: true }
+    instance.setConfig(conf)
+    expect(instance.state.config).toEqual(conf)
+  })
+})
+
 describe("check", () => {
   test("doesn't check nodes with data-ignore-a11y-check", async () => {
     child.setAttribute("data-ignore-a11y-check", "")
@@ -45,6 +53,14 @@ describe("check", () => {
   test("checks nodes without data-ignore-a11y-check", async () => {
     await promisify(instance.check.bind(instance))()
     expect(instance.state.errors.length).toBe(2)
+  })
+
+  test("passes config to rule test functions", async () => {
+    const conf = { disableContrastCheck: true }
+    instance.setConfig(conf)
+    await promisify(instance.check.bind(instance))()
+    const error = instance.state.errors[0]
+    expect(error.rule.test).toHaveBeenCalledWith(error.node, conf)
   })
 })
 

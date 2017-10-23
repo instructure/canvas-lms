@@ -3,9 +3,10 @@ import contrast from "wcag-element-contrast"
 import smallTextContrast from "./small-text-contrast"
 
 export default {
-  test: elem => {
+  test: (elem, config = {}) => {
+    const disabled = config.disableContrastCheck == true
     const noText = elem.textContent.replace(/\s/g, "") === ""
-    if (noText || !contrast.isLargeText(elem)) {
+    if (disabled || noText || !contrast.isLargeText(elem)) {
       return true
     }
     return contrast(elem)
