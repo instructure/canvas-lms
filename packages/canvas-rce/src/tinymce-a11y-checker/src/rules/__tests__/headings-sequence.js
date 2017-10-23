@@ -16,8 +16,8 @@ describe("test", () => {
     expect(rule.test(h4)).toBeFalsy()
   })
 
-  test("returns false if H2-H6 and top of document", () => {
-    expect(rule.test(h2)).toBeFalsy()
+  test("returns true if H2-H6 and top of document", () => {
+    expect(rule.test(h2)).toBeTruthy()
   })
 
   test("return true if previous heading is sequential", () => {

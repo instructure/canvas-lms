@@ -123,7 +123,7 @@ export default {
     if (priorHeading) {
       return validHeadings[priorHeading.tagName]
     }
-    return false
+    return true
   },
 
   data: elem => {
