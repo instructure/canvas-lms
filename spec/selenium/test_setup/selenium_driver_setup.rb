@@ -147,7 +147,7 @@ module SeleniumDriverSetup
 
       @driver = create_driver
 
-      focus_viewport if run_headless?
+      focus_viewport if run_headless? && driver.browser != :safari
 
       set_timeouts(TIMEOUTS)
 
