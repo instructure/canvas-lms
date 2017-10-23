@@ -966,28 +966,32 @@ change_sis_id.csv
 <tr>
 <td>new_id</td>
 <td>text</td>
-<td>✓</td>
+<td>✓&#42;</td>
 <td></td>
 <td>The desired sis_id of the object. This id must be currently unique to the
-object type and the root_account</td>
+object type and the root_account. When passing an empty value for type
+user_integration_id it will remove the integration_id from the user.</td>
 </tr>
 <tr>
 <td>type</td>
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>account, term, course, section, group, user</td>
+<td>account, term, course, section, group, user, user_integration_id</td>
 </tr>
 </table>
 
 change_sis_id.csv is optional. The goal of change_sis_id.csv is to provide a
 way to change sis_ids of existing objects. If included in a zip file this file
-will process first. All other files should include the new ids.
+will process first. All other files should include the new ids. New ids are
+required except for user_integration_id. Integration ids can be removed if they
+are not included.
 
 Sample:
 
 <pre>old_id,new_id,type
 u001,u001a,user
+int003,,user_integration_id
 couse1,old_course1,course
 term1,fall17,term
 </pre>

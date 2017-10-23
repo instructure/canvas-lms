@@ -77,4 +77,16 @@ describe SIS::CSV::ChangeSisIdImporter do
                             "A new_id, 'c001', referenced an existing course and the course with sis_source_id 'c002' was not updated",
                             "Invalid type 'invalid' for change_sis_id"]
   end
+
+  it 'should allow removing user.integration_ids' do
+    u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    p1 = u1.pseudonym
+    p1.integration_id = 'int1'
+    p1.save!
+    process_csv_data_cleanly(
+      'old_id,new_id,type',
+      'int1,,user_integration_id'
+    )
+    expect(p1.reload.integration_id).to be_nil
+  end
 end
