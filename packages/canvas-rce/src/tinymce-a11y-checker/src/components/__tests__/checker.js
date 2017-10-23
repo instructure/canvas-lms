@@ -9,6 +9,21 @@ jest.mock("../../rules/index")
 
 let component, instance, node, child, child2, body
 
+beforeAll(() => {
+  // jsdom doesn't support selection apis
+  const mockSelection = {
+    removeAllRanges: jest.fn(),
+    addRange: jest.fn()
+  }
+  document.getSelection = jest.fn().mockReturnValue(mockSelection)
+  const mockRange = {
+    selectNodeContents: jest.fn(),
+    selectNode: jest.fn()
+  }
+  document.createRange = jest.fn().mockReturnValue(mockRange)
+  Element.prototype.scrollIntoView = jest.fn()
+})
+
 beforeEach(() => {
   body = document.createElement("body")
   node = document.createElement("div")
@@ -30,6 +45,29 @@ describe("check", () => {
   test("checks nodes without data-ignore-a11y-check", async () => {
     await promisify(instance.check.bind(instance))()
     expect(instance.state.errors.length).toBe(2)
+  })
+})
+
+describe("setErrorIndex", () => {
+  beforeEach(async () => {
+    await promisify(instance.check.bind(instance))()
+    component.update()
+  })
+
+  test("runs clean up", () => {
+    jest.spyOn(instance, "onLeaveError")
+    instance.setErrorIndex(0)
+    expect(instance.onLeaveError).toHaveBeenCalled()
+  })
+
+  test("sets error index if in range", () => {
+    instance.setErrorIndex(1)
+    expect(instance.state.errorIndex).toBe(1)
+  })
+
+  test("sets index to zero if out of range", () => {
+    instance.setErrorIndex(2)
+    expect(instance.state.errorIndex).toBe(0)
   })
 })
 
@@ -128,20 +166,25 @@ describe("formStateValid", () => {
 })
 
 describe("fixIssue", () => {
-  let updatedNode, ev, error
+  let ev, error
 
   beforeEach(async () => {
-    updatedNode = "updated node"
     await promisify(instance.check.bind(instance))()
     component.update()
     error = instance.state.errors[0]
-    error.rule.update.mockReturnValue(updatedNode)
     ev = { preventDefault: jest.fn() }
+    jest.spyOn(instance, "_check")
   })
 
-  test("replaces error node with elem returned from update", () => {
+  test("updates the real node", () => {
     instance.fixIssue(ev)
-    expect(error.node).toBe(updatedNode)
+    const formState = instance.state.formState
+    expect(error.rule.update).toHaveBeenCalledWith(error.node, formState)
+  })
+
+  test("checks everything after applying a fix", () => {
+    instance.fixIssue(ev)
+    expect(instance._check).toHaveBeenCalled()
   })
 })
 

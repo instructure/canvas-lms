@@ -117,6 +117,9 @@ export default class Checker extends React.Component {
 
   setErrorIndex(errorIndex) {
     this.onLeaveError()
+    if (errorIndex >= this.state.errors.length) {
+      errorIndex = 0
+    }
     this.setState({ errorIndex }, this.selectCurrent)
   }
 
@@ -204,11 +207,10 @@ export default class Checker extends React.Component {
     let node = this.errorNode()
     if (rule && node) {
       this.removeTempNode()
-      node = rule.update(node, this.state.formState)
+      rule.update(node, this.state.formState)
       this.updateErrorNode(node)
-      if (rule.test(node)) {
-        this.removeError()
-      }
+      const errorIndex = this.state.errorIndex
+      this._check(() => this.setErrorIndex(errorIndex))
     }
   }
 
@@ -252,21 +254,6 @@ export default class Checker extends React.Component {
 
   onLeaveError() {
     this.removeTempNode()
-  }
-
-  removeError() {
-    const errors = this.state.errors.slice(0)
-    errors.splice(this.state.errorIndex, 1)
-    let errorIndex = this.state.errorIndex
-    if (errorIndex >= errors.length) {
-      errorIndex = 0
-    }
-    this.onLeaveError()
-    if (errors.length === 0) {
-      this.check()
-    } else {
-      this.setState({ errors, errorIndex }, this.selectCurrent)
-    }
   }
 
   handleClose() {
