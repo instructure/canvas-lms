@@ -16,6 +16,15 @@ describe("test", () => {
     expect(rule.test(elem)).toBe(true)
   })
 
+  test("returns true if disabled by the config", () => {
+    const elem = document.createElement("div")
+    elem.style.fontSize = "30px"
+    elem.style.backgroundColor = "#fff"
+    elem.style.color = "#fff"
+    elem.textContent = "disabled"
+    expect(rule.test(elem, { disableContrastCheck: true })).toBe(true)
+  })
+
   test("returns false if large text does not have high enough contrast", () => {
     const elem = document.createElement("div")
     elem.style.fontSize = "30px"

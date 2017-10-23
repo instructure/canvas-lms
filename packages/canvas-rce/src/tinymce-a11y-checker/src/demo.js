@@ -1,8 +1,10 @@
 import { renderIntoDiv } from "canvas-rce"
 import canvasTheme from "instructure-ui/lib/themes/canvas"
 
-import "./plugin"
+import { getInstance } from "./plugin"
 import "tinymce/plugins/image"
+
+getInstance(instance => instance.setConfig({ disableContrastCheck: false }))
 
 canvasTheme.use()
 

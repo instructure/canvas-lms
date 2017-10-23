@@ -35,7 +35,8 @@ export default class Checker extends React.Component {
       errors: [],
       formState: {},
       formStateValid: false,
-      errorIndex: 0
+      errorIndex: 0,
+      config: {}
     }
 
     this.firstError = this.firstError.bind(this)
@@ -53,6 +54,10 @@ export default class Checker extends React.Component {
 
   componentWillUnmount() {
     clearTimeout(this._closeTimout)
+  }
+
+  setConfig(config) {
+    this.setState({ config })
   }
 
   check(done) {
@@ -77,7 +82,7 @@ export default class Checker extends React.Component {
           for (let rule of rules) {
             if (
               !child.hasAttribute("data-ignore-a11y-check") &&
-              !rule.test(child)
+              !rule.test(child, this.state.config)
             ) {
               errors.push({ node: child, rule })
             }
