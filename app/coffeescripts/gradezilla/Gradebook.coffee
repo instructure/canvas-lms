@@ -864,11 +864,6 @@ define [
 
       return unless @gradebookGrid.grid
 
-      for id, column of @gradebookGrid.grid.getColumns() when ''+column.object?.submission_types is "attendance"
-        column.unselectable = !@show_attendance
-        column.cssClass = if @show_attendance then '' else 'completely-hidden'
-        @$grid.find("##{@uid}#{column.id}").showIf(@show_attendance)
-
       @gradebookGrid.grid.invalidateAllRows()
       @gradebookGrid.grid.updateRowCount()
       @gradebookGrid.render()
@@ -991,7 +986,6 @@ define [
       columnDef = $columnHeader.data('column')
       colIndex = @gradebookGrid.grid.getColumnIndex(columnDef.id)
       columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '') + ' minimized'
-      columnDef.unselectable = true
       columnDef.unminimizedName = columnDef.name
       columnDef.name = ''
       columnDef.minimized = true
@@ -1003,7 +997,6 @@ define [
       columnDef = $columnHeader.data('column')
       colIndex = @gradebookGrid.grid.getColumnIndex(columnDef.id)
       columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '')
-      columnDef.unselectable = false
       columnDef.name = columnDef.unminimizedName
       columnDef.minimized = false
       @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
