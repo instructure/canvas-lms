@@ -170,6 +170,7 @@ exports[`render matches snapshot with errors 1`] = `
               selectRef={[Function]}
               size="medium"
               type="text"
+              value="a"
             >
               <option
                 key="a"
@@ -192,6 +193,7 @@ exports[`render matches snapshot with errors 1`] = `
             margin="medium 0 0"
           >
             <Checkbox
+              checked={true}
               disabled={false}
               inline={false}
               label="Select Field"
@@ -211,6 +213,7 @@ exports[`render matches snapshot with errors 1`] = `
               label="Select Field"
               name="color"
               onChange={[Function]}
+              value="rgba(40, 100, 200, 0.6)"
             />
           </Container>
           <Container
@@ -230,6 +233,7 @@ exports[`render matches snapshot with errors 1`] = `
               onChange={[Function]}
               size="medium"
               type="text"
+              value="Text"
             />
           </Container>
         </form>
