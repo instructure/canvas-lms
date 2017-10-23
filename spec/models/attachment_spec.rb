@@ -1012,6 +1012,15 @@ describe Attachment do
       attachment.download_url(2.days)
     end
 
+    it 'should allow custom ttl for root_account' do
+      attachment = attachment_with_context(@course, :display_name => 'foo')
+      root = @course.root_account
+      root.settings[:s3_url_ttl_seconds] = 3.days.seconds.to_s
+      root.save!
+      expect(attachment).to receive(:authenticated_url).with(include(expires_in: 3.days.to_i.seconds))
+      attachment.download_url
+    end
+
     it "should include response-content-disposition" do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       allow(attachment).to receive(:authenticated_s3_url) # allow other calls due to, e.g., save

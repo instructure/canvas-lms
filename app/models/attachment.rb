@@ -961,7 +961,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def url_ttl
-    Setting.get('attachment_url_ttl', 1.day.to_s).to_i.seconds
+    default = Setting.get('attachment_url_ttl', 1.day.to_s).to_i.seconds
+    Account.find_cached(root_account_id)&.settings[:s3_url_ttl_seconds]&.to_i&.seconds || default
   end
   protected :url_ttl
 

@@ -527,7 +527,7 @@ END
       display_name: -> { I18n.t('Export to Quizzes 2 format') },
       description: -> { I18n.t('Export an existing quiz to new Quizzes 2 format') },
       applies_to: "RootAccount",
-      state: "hidden_in_prod",
+      state: "hidden",
       root_opt_in: true
     },
     'lti_2_auth_url_registration' =>
