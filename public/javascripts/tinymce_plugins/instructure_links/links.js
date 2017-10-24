@@ -356,6 +356,7 @@ import YouTubeApi from './youtube_api'
       $link.addClass('iframe_placeholder');
       $link.attr('rel', $frame.attr('src'));
       $link.attr('style', $frame.attr('style') || $parent.attr('style'));
+      $link[0].setAttribute("data-ignore-a11y-check", "")
       $link.css('display', 'block');
       $link.attr('_iframe_style', $frame.attr('style') || $parent.attr('style'));
       var width = ($frame.attr('width') || $frame.css('width'));
