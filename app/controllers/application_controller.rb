@@ -2154,6 +2154,7 @@ class ApplicationController < ActionController::Base
     js_env({
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
+        :new_quiz_url => context_url(@context, :context_quizzes_new_url),
         :course_url => api_v1_course_url(@context),
         :sort_url => reorder_course_assignment_groups_url(@context),
         :assignment_sort_base_url => course_assignment_groups_url(@context),

@@ -33,7 +33,8 @@ describe 'quizzes regressions' do
   end
 
   it 'calendar pops up on top of #main', priority: "1", test_id: 209957 do
-    get "/courses/#{@course.id}/quizzes/new"
+    get "/courses/#{@course.id}/quizzes"
+    click_new_quiz_button
     wait_for_ajaximations
     fj('.ui-datepicker-trigger:first').click
     cal = f('#ui-datepicker-div')

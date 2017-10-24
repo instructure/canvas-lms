@@ -186,68 +186,36 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  describe "GET 'new'" do
-    it "should require authorization" do
-      get 'new', params: {:course_id => @course.id}
-      assert_unauthorized
+  describe "POST 'new'" do
+    context "when unauthorized" do
+      it "should require authorization" do
+        post 'new', params: {:course_id => @course.id}
+        assert_unauthorized
+      end
     end
 
-    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
-      user_session(@teacher)
-      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
-    end
+    context "when authorized" do
+      before { user_session(@teacher) }
 
-    it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
-      user_session(@teacher)
-      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
-    end
+      it "creates a quiz" do
+        expect { post 'new', params: {:course_id => @course.id} }
+          .to change { Quizzes::Quiz.count }
+          .from(0).to(1)
+      end
 
-    it "should assign variables" do
-      user_session(@teacher)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:quiz]).not_to be_nil
-      q = assigns[:quiz]
-    end
+      it "redirects to the new quiz" do
+        post 'new', params: {:course_id => @course.id}
+        expect(response).to have_http_status :redirect
+        expect(response.headers['Location']).to match(%r{/courses/\w+/quizzes/\w+/edit$})
+      end
 
-    it "subsequent requests should return the same quiz unless ?fresh=1" do
-      user_session(@teacher)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:quiz]).not_to be_nil
-      q = assigns[:quiz]
-
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:quiz]).not_to be_nil
-      expect(assigns[:quiz]).not_to eql(q)
-
-      get 'new', params: {:course_id => @course.id, :fresh => 1}
-
-      expect(assigns[:quiz]).not_to be_nil
-      expect(assigns[:quiz]).not_to eql(q)
-    end
-
-    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
-      user_session(@teacher)
-      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
-    end
-
-    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
-      user_session(@teacher)
-      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
-    end
-
-    it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
-      user_session(@teacher)
-      allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
+      context "if xhr request" do
+        it "returns the new quiz's edit url" do
+          post 'new', params: {:course_id => @course.id}, xhr: true
+          expect(response).to have_http_status :success
+          expect(JSON.parse(response.body)['url']).to match(%r{/courses/\w+/quizzes/\w+/edit$})
+        end
+      end
     end
   end
 

@@ -157,7 +157,8 @@ describe 'quizzes question banks' do
       bank = AssessmentQuestionBank.create!(context: @course)
       3.times { assessment_question_model(bank: bank) }
 
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       click_questions_tab
 
       f('.add_question_group_link').click
@@ -186,7 +187,8 @@ describe 'quizzes question banks' do
     it 'creates a question group from a question bank from within the Find Quiz Question modal', priority: "1", test_id: 140590 do
       assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
 
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       click_questions_tab
       wait_for_ajaximations
 

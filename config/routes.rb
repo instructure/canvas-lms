@@ -328,7 +328,8 @@ CanvasRails::Application.routes.draw do
     post 'quizzes/unpublish' => 'quizzes/quizzes#unpublish'
     post 'quizzes/:id/toggle_post_to_sis' => "quizzes/quizzes#toggle_post_to_sis"
 
-    resources :quizzes, controller: 'quizzes/quizzes' do
+    post 'quizzes/new' => 'quizzes/quizzes#new' # use POST instead of GET (not idempotent)
+    resources :quizzes, controller: 'quizzes/quizzes', except: :new do
       get :managed_quiz_data
       get :submission_versions
       get :history

@@ -237,6 +237,22 @@ define [
 
     ok view.redirectTo.called
 
+  test "moreOptions creates a quiz if submission_types is online_quiz", ->
+    newQuizUrl = 'http://example.com/course/1/quizzes/new'
+    formData = { submission_types: 'online_quiz' }
+    @stub(CreateAssignmentView.prototype, "getFormData").returns(formData)
+    @stub(CreateAssignmentView.prototype, "newQuizUrl").returns(newQuizUrl)
+    @stub(CreateAssignmentView.prototype, "redirectTo")
+
+    quizEditUrl = 'http://example.com/course/1/quizzes/42/edit'
+    @stub($, "post").returns($.Deferred().resolve({ url: quizEditUrl }))
+
+    view = createView(@assignment1)
+    view.moreOptions()
+
+    ok $.post.calledWith(newQuizUrl, formData)
+    ok view.redirectTo.calledWith(quizEditUrl)
+
   test "generateNewAssignment builds new assignment model", ->
     view = createView(@group)
     assign = view.generateNewAssignment()

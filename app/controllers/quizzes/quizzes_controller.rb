@@ -118,7 +118,7 @@ class Quizzes::QuizzesController < ApplicationController
         options: quiz_options
       },
       :URLS => {
-        new_quiz_url: context_url(@context, :new_context_quiz_url, :fresh => 1),
+        new_quiz_url: context_url(@context, :context_quizzes_new_url, :fresh => 1),
         question_banks_url: context_url(@context, :context_question_banks_url),
         assignment_overrides: api_v1_course_quiz_assignment_overrides_url(@context)
       },
@@ -269,29 +269,16 @@ class Quizzes::QuizzesController < ApplicationController
 
   def new
     if authorized_action(@context.quizzes.temp_record, @current_user, :create)
-      @assignment = nil
-      @assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
-      @quiz = @context.quizzes.build
-      @quiz.title = params[:title] if params[:title]
-      @quiz.due_at = params[:due_at] if params[:due_at]
-      @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
-      @quiz.save!
-      # this is a weird check... who can create but not update???
-      if authorized_action(@quiz, @current_user, :update)
-        @assignment = @quiz.assignment
-      end
+      quiz = @context.quizzes.build
+      title = params[:title] || params[:name]
+      quiz.title = title if title
+      quiz.due_at = params[:due_at] if params[:due_at]
+      quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
+      quiz.save!
 
-      max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
-      max_name_length = AssignmentUtil.assignment_max_name_length(@context)
-
-      hash = {
-        :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
-        :MAX_NAME_LENGTH => max_name_length,
-        :DUE_DATE_REQUIRED_FOR_ACCOUNT => AssignmentUtil.due_date_required_for_account?(@context),
-      }
-
-      js_env(hash)
-      redirect_to(named_context_url(@context, :edit_context_quiz_url, @quiz))
+      quiz_edit_url = named_context_url(@context, :edit_context_quiz_url, quiz)
+      return render json: { url: quiz_edit_url } if request.xhr?
+      redirect_to(quiz_edit_url)
     end
   end
 

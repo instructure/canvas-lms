@@ -99,7 +99,7 @@ module CustomValidators
 
   def wait_for_new_page_load(accept_alert = false)
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
-    yield
+    yield if block_given?
     wait_for(method: :wait_for_new_page_load) do
       begin
         driver.execute_script("return window.INST && INST.still_on_old_page !== true;")

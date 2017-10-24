@@ -405,9 +405,7 @@ class AssignmentsController < ApplicationController
     @assignment.workflow_state = 'unpublished'
     add_crumb t "Create new"
 
-    if params[:submission_types] == 'online_quiz'
-      redirect_to new_course_quiz_url(@context, index_edit_params)
-    elsif params[:submission_types] == 'discussion_topic'
+    if params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
     elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == 'wiki_page'
       redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
