@@ -66,6 +66,10 @@ $context_module_bg_color: #FFF;
     align-items: center;
     padding: 15px;
 
+    &:hover{
+      background-color: $sm-gray-1;
+    }
+
     .module-item-status-icon {
       width: 24px;
       height: 24px;
@@ -572,7 +576,7 @@ $context_module_bg_color: #FFF;
     padding-top: 2px;
   }
   &.context_module_item_hover, &:hover {
-    background-color: darken($context_module_bg_color, 15%);
+    background-color: $sm-gray-1;
     .move_item_link, .links a {
       visibility: visible;
     }
