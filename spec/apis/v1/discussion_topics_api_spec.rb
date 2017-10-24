@@ -661,6 +661,24 @@ describe DiscussionTopicsController, type: :request do
         expect(gtopic.require_initial_post).to_not be_truthy
       end
 
+      it "should not allow updating certain attributes for group sub-discussions" do
+        # but should allow them to pin/unpin them
+        group_category = @course.group_categories.create(:name => 'watup')
+        group = group_category.groups.create!(:name => "group1", :context => @course)
+        rtopic = @course.discussion_topics.create!(:group_category => group_category)
+        gtopic = rtopic.child_topics.first
+
+        api_call(:put, "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :group_id => group.to_param, :topic_id => gtopic.to_param},
+          {:message => 'new message'}, {}, {:expected_status => 401})
+
+        api_call(:put, "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :group_id => group.to_param, :topic_id => gtopic.to_param},
+          {:pinned => '1'}, {}, {:expected_status => 200})
+
+        expect(gtopic.reload.pinned).to be_truthy
+      end
+
       context "publishing" do
         it "should publish a draft state topic" do
           @topic.workflow_state = 'unpublished'

@@ -939,16 +939,18 @@ class DiscussionTopicsController < ApplicationController
       prior_version = DiscussionTopic.find(@topic.id)
     end
 
-    return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
-
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
+    only_pinning = discussion_topic_hash.except(*%w{pinned}).blank?
+
+    topic_to_check = only_pinning && @topic.root_topic ? @topic.root_topic : @topic # allow pinning/unpinning if a subtopic and we can update the root
+    return unless authorized_action(topic_to_check, @current_user, (is_new ? :create : :update))
 
     process_podcast_parameters(discussion_topic_hash)
 
     if is_new
       @topic.user = @current_user
-    elsif discussion_topic_hash.except(*%w{pinned}).present? # don't update editor if the only thing that changed was the pinned status
+    elsif !only_pinning # don't update editor if the only thing that changed was the pinned status
       @topic.editor = @current_user
     end
     @topic.current_user = @current_user
