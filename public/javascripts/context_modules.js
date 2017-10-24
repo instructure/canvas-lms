@@ -423,6 +423,16 @@ import 'compiled/jquery.rails_flash_notifications'
 
       },
 
+      goToActivity: function () {
+        $('.sm-activity-row').click(function(e){
+          let $t = $(e.target);
+          let $this = $(this);
+          if(!($t.closest('.ig-admin').length >= 1) && !($this.closest('.context_module_sub_header').length >= 1)){
+            window.location = $this.attr('href');
+          }
+        });
+      },
+
       editModule: function($module) {
         var $form = $("#add_context_module_form");
         $form.data('current_module', $module);
@@ -496,8 +506,7 @@ import 'compiled/jquery.rails_flash_notifications'
         }
 
 
-        $module.fadeIn('fast', function() {
-        });
+        // $module.fadeIn('fast', function() {});
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
         var $toFocus = $('.ig-header-admin .al-trigger', $module);
@@ -543,7 +552,7 @@ import 'compiled/jquery.rails_flash_notifications'
           if ($admin.length) { $admin.detach(); }
           $item = $olditem.clone(true);
           if ($admin.length) {
-            $item.find('.ig-row').append($admin)
+            $item.find('.sm-ig-row').append($admin)
           }
         } else {
           $item = $('#context_module_item_blank').clone(true).removeAttr('id');
@@ -1277,12 +1286,10 @@ import 'compiled/jquery.rails_flash_notifications'
             var $activeElemClass = "." + $(activeElem).attr('class').split(' ').join(".");
             $(elemID).find($activeElemClass).focus();
           }, 0);
-
         } else {
           $cogLink.focus();
         }
       })
-
     });
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
@@ -1438,6 +1445,7 @@ import 'compiled/jquery.rails_flash_notifications'
       event.preventDefault();
       modules.addModule();
     });
+
 
     $(".add_module_item_link").on('click', function(event) {
       event.preventDefault();
@@ -1903,6 +1911,8 @@ import 'compiled/jquery.rails_flash_notifications'
     }
 
     $("#context_modules").fadeIn(500)
+
+    modules.goToActivity()
 
     $('.external_url_link').click(function(event) {
       Helper.externalUrlLinkClick(event, $(this))

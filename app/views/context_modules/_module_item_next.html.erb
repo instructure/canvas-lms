@@ -53,7 +53,7 @@
     <%= module_item.item_class if module_item %>
   "
 >
-  <div class="sm-ig-row context_module_sub_header_expander <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>">
+  <div class="sm-ig-row sm-activity-row context_module_sub_header_expander <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>"  href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>">
     <a
       aria-label='<%= module_item && module_item.title %>'
       tabindex="-1"
@@ -61,7 +61,9 @@
       href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>">
       <%= module_item && module_item.title %>
     </a>
-
+    <span class="for-nvda">
+      <%= module_item && module_item.title %>    
+    </span>
     <% if editable || module_item.nil? %>
     <div class="ig-handle">
       <span
