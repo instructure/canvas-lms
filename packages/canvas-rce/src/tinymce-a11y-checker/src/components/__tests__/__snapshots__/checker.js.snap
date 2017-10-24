@@ -1,289 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`render matches snapshot with errors 1`] = `
-<LiveAnnouncer>
-  <Tray
-    applicationElement={[Function]}
-    border={false}
-    closeButtonLabel="Close Accessibility Checker"
-    closeButtonRef={[Function]}
-    closeButtonVariant="icon"
-    contentRef={[Function]}
-    defaultFocusElement={null}
-    insertAt="bottom"
-    isDismissable={true}
-    label="Accessibility Checker"
-    mountNode={null}
-    onClose={[Function]}
-    onDismiss={[Function]}
-    onEnter={[Function]}
-    onEntered={[Function]}
-    onEntering={[Function]}
-    onExit={[Function]}
-    onExited={[Function]}
-    onExiting={[Function]}
-    onOpen={[Function]}
-    open={true}
-    placement="end"
-    shadow={true}
-    shouldCloseOnDocumentClick={false}
-    shouldContainFocus={true}
-    shouldReturnFocus={true}
-    size="small"
-  >
-    <Container
-      as="div"
-      display={null}
-      padding="medium"
-      style={
-        Object {
-          "width": "20rem",
-        }
-      }
-    >
-      <Heading
-        as="h2"
-        border="none"
-        color="brand"
-        ellipsis={false}
-        level="h3"
-        margin="medium 0"
-      >
-        <IconCompleteSolid
-          style={
-            Object {
-              "paddingBottom": "0.1em",
-              "verticalAlign": "middle",
-            }
-          }
-        />
-         Accessibility Checker
-      </Heading>
-      <Container
-        as="div"
-        display={null}
-      >
-        <LiveMessage
-          aria-live="polite"
-          message="
-                  Issue 1 of 2
-                  Element starting with 
-                  Error Message
-                "
-        />
-        <Typography
-          as="span"
-          letterSpacing="normal"
-          size="small"
-        >
-          Issue 1 of 2
-        </Typography>
-        <form
-          onSubmit={[Function]}
-        >
-          <Container
-            as="div"
-            display={null}
-            margin="x-small 0 medium"
-          >
-            <Grid
-              colSpacing="none"
-              hAlign="space-between"
-              rowSpacing="medium"
-              startAt="small"
-              vAlign="middle"
-              visualDebug={false}
-            >
-              <GridRow>
-                <GridCol
-                  textAlign="inherit"
-                >
-                  <Button
-                    as="button"
-                    buttonRef={[Function]}
-                    fluidWidth={false}
-                    margin="0"
-                    onClick={[Function]}
-                    size="medium"
-                    type="button"
-                    variant="default"
-                  >
-                    Prev
-                  </Button>
-                   
-                  <Button
-                    as="button"
-                    buttonRef={[Function]}
-                    fluidWidth={false}
-                    margin="0"
-                    onClick={[Function]}
-                    size="medium"
-                    type="button"
-                    variant="primary"
-                  >
-                    Next
-                  </Button>
-                </GridCol>
-                <GridCol
-                  textAlign="inherit"
-                  width="auto"
-                >
-                  <Button
-                    as="button"
-                    buttonRef={[Function]}
-                    disabled={true}
-                    fluidWidth={false}
-                    margin="0"
-                    size="medium"
-                    type="submit"
-                    variant="success"
-                  >
-                    Apply Fix
-                  </Button>
-                </GridCol>
-              </GridRow>
-            </Grid>
-          </Container>
-          <Alert
-            margin="x-small 0"
-            open={true}
-            timeout={0}
-            transition="fade"
-            variant="warning"
-          >
-            Error Message
-          </Alert>
-          <Container
-            as="div"
-            display={null}
-            key="select"
-            margin="medium 0 0"
-          >
-            <Select
-              disabled={false}
-              inline={false}
-              label="Select Field"
-              layout="stacked"
-              messages={Array []}
-              name="select"
-              onChange={[Function]}
-              selectRef={[Function]}
-              size="medium"
-              type="text"
-              value="a"
-            >
-              <option
-                key="a"
-                value="a"
-              >
-                A
-              </option>
-              <option
-                key="b"
-                value="b"
-              >
-                B
-              </option>
-            </Select>
-          </Container>
-          <Container
-            as="div"
-            display={null}
-            key="checkbox"
-            margin="medium 0 0"
-          >
-            <Checkbox
-              checked={true}
-              disabled={false}
-              inline={false}
-              label="Select Field"
-              name="checkbox"
-              onChange={[Function]}
-              size="medium"
-              variant="simple"
-            />
-          </Container>
-          <Container
-            as="div"
-            display={null}
-            key="color"
-            margin="medium 0 0"
-          >
-            <ColorField
-              label="Select Field"
-              name="color"
-              onChange={[Function]}
-              value="rgba(40, 100, 200, 0.6)"
-            />
-          </Container>
-          <Container
-            as="div"
-            display={null}
-            key="text"
-            margin="medium 0 0"
-          >
-            <TextInput
-              disabled={true}
-              inline={false}
-              inputRef={[Function]}
-              label="Text Field"
-              layout="stacked"
-              messages={Array []}
-              name="text"
-              onChange={[Function]}
-              size="medium"
-              type="text"
-              value="Text"
-            />
-          </Container>
-        </form>
-        <Container
-          as="div"
-          display={null}
-          margin="large 0 0"
-        >
-          <Heading
-            as="h3"
-            border="none"
-            color="inherit"
-            ellipsis={false}
-            level="h4"
-            padding="0 0 x-small"
-          >
-            <IconQuestionSolid
-              style={
-                Object {
-                  "paddingBottom": "0.1em",
-                  "verticalAlign": "middle",
-                }
-              }
-            />
-             Why
-          </Heading>
-          <Typography
-            as="span"
-            letterSpacing="normal"
-            size="small"
-          >
-            Why Text 
-            <Link
-              as="button"
-              ellipsis={false}
-              href="http://some-url"
-              linkRef={[Function]}
-              target="_blank"
-              variant="default"
-            >
-              Learn more
-            </Link>
-          </Typography>
-        </Container>
-      </Container>
-    </Container>
-  </Tray>
-</LiveAnnouncer>
-`;
-
 exports[`render matches snapshot without errors 1`] = `
 <LiveAnnouncer>
   <Tray
@@ -297,7 +13,7 @@ exports[`render matches snapshot without errors 1`] = `
     insertAt="bottom"
     isDismissable={true}
     label="Accessibility Checker"
-    mountNode={null}
+    mountNode={[Function]}
     onClose={[Function]}
     onDismiss={[Function]}
     onEnter={[Function]}
@@ -328,30 +44,27 @@ exports[`render matches snapshot without errors 1`] = `
       <Heading
         as="h2"
         border="none"
-        color="brand"
+        color="inherit"
         ellipsis={false}
         level="h3"
         margin="medium 0"
       >
-        <IconCompleteSolid
-          style={
-            Object {
-              "paddingBottom": "0.1em",
-              "verticalAlign": "middle",
-            }
-          }
-        />
          Accessibility Checker
       </Heading>
-      <Alert
-        margin="x-small 0"
-        open={true}
-        timeout={0}
-        transition="fade"
-        variant="success"
+      <Container
+        display={null}
       >
-        No accessibility issues were detected.
-      </Alert>
+        <Typography
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+        >
+          <p>
+            No accessibility issues were detected.
+          </p>
+        </Typography>
+        <PlaceholderSVG />
+      </Container>
     </Container>
   </Tray>
 </LiveAnnouncer>

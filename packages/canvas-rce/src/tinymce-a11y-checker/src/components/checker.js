@@ -9,16 +9,21 @@ import Link from "instructure-ui/lib/components/Link"
 import Alert from "instructure-ui/lib/components/Alert"
 import Checkbox from "instructure-ui/lib/components/Checkbox"
 import TextInput from "instructure-ui/lib/components/TextInput"
+import TextArea from "instructure-ui/lib/components/TextArea"
 import Select from "instructure-ui/lib/components/Select"
 import ContextBox from "instructure-ui/lib/components/ContextBox"
 import Grid from "instructure-ui/lib/components/Grid"
 import GridRow from "instructure-ui/lib/components/Grid/GridRow"
 import GridCol from "instructure-ui/lib/components/Grid/GridCol"
 import Spinner from "instructure-ui/lib/components/Spinner"
+import Popover, {
+  PopoverTrigger,
+  PopoverContent
+} from "instructure-ui/lib/components/Popover"
 import Typography from "instructure-ui/lib/components/Typography"
-import IconCompleteSolid from "instructure-icons/lib/Solid/IconCompleteSolid"
-import IconQuestionSolid from "instructure-icons/lib/Solid/IconQuestionSolid"
+import IconQuestionLine from "instructure-icons/lib/Line/IconQuestionLine"
 import ColorField from "./color-field"
+import PlaceholderSVG from "./placeholder-svg"
 
 import describe from "../utils/describe"
 import * as dom from "../utils/dom"
@@ -278,7 +283,7 @@ export default class Checker extends React.Component {
 
   render() {
     const rule = this.errorRule()
-    const issueNumberMessage = formatMessage("Issue { num } of { total }", {
+    const issueNumberMessage = formatMessage("Issue { num }/{ total }", {
       num: this.state.errorIndex + 1,
       total: this.state.errors.length
     })
@@ -292,17 +297,15 @@ export default class Checker extends React.Component {
           open={this.state.open}
           onDismiss={this.handleClose}
           placement="end"
+          mountNode={() =>
+            document.getElementsByClassName(
+              "tinymce-a11y-checker-container"
+            )[0]}
           closeButtonLabel={formatMessage("Close Accessibility Checker")}
           applicationElement={this.applicationElements}
         >
           <Container as="div" style={{ width: "20rem" }} padding="medium">
-            <Heading level="h3" as="h2" margin="medium 0" color="brand">
-              <IconCompleteSolid
-                style={{
-                  verticalAlign: "middle",
-                  paddingBottom: "0.1em"
-                }}
-              />
+            <Heading level="h3" as="h2" margin="medium 0">
               {" " + formatMessage("Accessibility Checker")}
             </Heading>
             {this.state.errors.length > 0 && (
@@ -315,66 +318,102 @@ export default class Checker extends React.Component {
                   ${this.errorMessage()}
                 `}
                 />
-                <Typography size="small">{issueNumberMessage}</Typography>
+                <Container as="div" margin="large 0 medium 0">
+                  <Grid
+                    vAlign="middle"
+                    hAlign="space-between"
+                    colSpacing="none"
+                  >
+                    <GridRow>
+                      <GridCol>
+                        <Typography weight="bold">
+                          {issueNumberMessage}
+                        </Typography>
+                      </GridCol>
+                      <GridCol width="auto">
+                        <Popover
+                          on="click"
+                          shouldContainFocus
+                          shouldReturnFocus
+                          closeButtonLabel="Close"
+                          applicationElement={() =>
+                            document.getElementsByClassName(
+                              "tinymce-a11y-checker-container"
+                            )[0]}
+                        >
+                          <PopoverTrigger>
+                            <Button variant="icon">
+                              <IconQuestionLine title={formatMessage("Why")} />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent>
+                            <Container
+                              padding="medium"
+                              display="block"
+                              style={{ width: "16rem" }}
+                            >
+                              <Typography>
+                                <p>
+                                  {rule.why() + " "}
+                                  <Link href={rule.link} target="_blank">
+                                    {formatMessage("Learn more")}
+                                  </Link>
+                                </p>
+                              </Typography>
+                            </Container>
+                          </PopoverContent>
+                        </Popover>
+                      </GridCol>
+                    </GridRow>
+                  </Grid>
+                </Container>
                 <form onSubmit={this.fixIssue}>
-                  <Container as="div" margin="x-small 0 medium">
-                    <Grid
-                      vAlign="middle"
-                      hAlign="space-between"
-                      colSpacing="none"
-                    >
-                      <GridRow>
-                        <GridCol>
-                          <Button onClick={this.prevError}>
-                            {formatMessage("Prev")}
-                          </Button>{" "}
-                          <Button onClick={this.nextError} variant="primary">
-                            {formatMessage("Next")}
-                          </Button>
-                        </GridCol>
-                        <GridCol width="auto">
-                          <Button
-                            type="submit"
-                            variant="success"
-                            disabled={!this.state.formStateValid}
-                          >
-                            {formatMessage("Apply Fix")}
-                          </Button>
-                        </GridCol>
-                      </GridRow>
-                    </Grid>
-                  </Container>
-                  <Alert variant="warning">{this.errorMessage()}</Alert>
+                  <Typography as="div">{this.errorMessage()}</Typography>
                   {rule.form().map(f => (
                     <Container as="div" key={f.dataKey} margin="medium 0 0">
                       {this.renderField(f)}
                     </Container>
                   ))}
                 </form>
-                <Container as="div" margin="large 0 0">
-                  <Heading level="h4" as="h3" padding="0 0 x-small">
-                    <IconQuestionSolid
-                      style={{
-                        verticalAlign: "middle",
-                        paddingBottom: "0.1em"
-                      }}
-                    />
-                    {" " + formatMessage("Why")}
-                  </Heading>
-                  <Typography size="small">
-                    {rule.why() + " "}
-                    <Link href={rule.link} target="_blank">
-                      {formatMessage("Learn more")}
-                    </Link>
-                  </Typography>
+                <Container as="div" margin="medium 0">
+                  <Grid
+                    vAlign="middle"
+                    hAlign="space-between"
+                    colSpacing="none"
+                  >
+                    <GridRow>
+                      <GridCol>
+                        <Button onClick={this.prevError} margin="0 small 0 0">
+                          {formatMessage("Prev")}
+                        </Button>
+                        <Button onClick={this.nextError}>
+                          {formatMessage("Next")}
+                        </Button>
+                      </GridCol>
+                      <GridCol width="auto">
+                        <Button
+                          type="submit"
+                          variant="primary"
+                          disabled={!this.state.formStateValid}
+                        >
+                          {formatMessage("Apply")}
+                        </Button>
+                      </GridCol>
+                    </GridRow>
+                  </Grid>
                 </Container>
               </Container>
             )}
             {this.state.errors.length === 0 &&
               !this.state.checking && (
-                <Alert variant="success">
-                  {formatMessage("No accessibility issues were detected.")}
-                </Alert>
+                <Container>
+                  <Typography>
+                    <p>
+                      {formatMessage("No accessibility issues were detected.")}
+                    </p>
+                  </Typography>
+                  <PlaceholderSVG />
+                </Container>
               )}
             {this.state.checking && (
               <div>
@@ -430,6 +469,16 @@ export default class Checker extends React.Component {
             name={f.dataKey}
             value={this.state.formState[f.dataKey]}
             onChange={this.updateFormState}
+          />
+        )
+      case f.textarea:
+        return (
+          <TextArea
+            label={f.label}
+            name={f.dataKey}
+            value={this.state.formState[f.dataKey]}
+            onChange={this.updateFormState}
+            disabled={disabled}
           />
         )
       default:
