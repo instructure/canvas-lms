@@ -140,6 +140,7 @@
     flex: 0 0 auto;
     display: flex;
     align-self: center;
+    margin-right: 10px;
 
     .completion_status {
       margin: 0 16px;
@@ -174,6 +175,7 @@
   border-top: none;
   min-width: auto;
   margin-bottom: 20px;
+  background-color: #FFF;
 }
 
 .sm-context_module.context_module {
@@ -209,7 +211,7 @@
   margin-bottom: auto;
 }
 
-.sm-context_module.context_module.sm-started .sm-header.ig-header{
+.sm-context_module.context_module .sm-header.ig-header{
   border-bottom: 2px solid var(--ic-brand-button--secondary-bgd-darkened-15);
 }
 
