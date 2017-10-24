@@ -363,7 +363,7 @@ import 'compiled/jquery.rails_flash_notifications'
         var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
         $('#move_context_module_select').empty();
         $('#move_context_module_select').append($.raw(selectOptions.join('')));
-        //$form.fillFormData(data, {object_name: 'context_module'});
+
         $form.dialog({
           autoOpen: false,
           modal: true,
@@ -375,7 +375,6 @@ import 'compiled/jquery.rails_flash_notifications'
           }
         }).dialog('open');
         $module.removeClass('dont_remove');
-        // $form.find('.ui-dialog-titlebar-close').focus();
 
       },
       hideMoveModuleItem: function (remove) {
@@ -506,7 +505,6 @@ import 'compiled/jquery.rails_flash_notifications'
         }
 
 
-        // $module.fadeIn('fast', function() {});
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
         var $toFocus = $('.ig-header-admin .al-trigger', $module);
