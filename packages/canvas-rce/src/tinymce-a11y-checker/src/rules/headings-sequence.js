@@ -4,7 +4,7 @@ import { changeTag } from "../utils/dom"
 /* Headings Sequence rule
  * this rule is ensuring that heading tags (H1-H6) are layed out in sequential
  * order for organizing your site.
- * 
+ *
  * this rule only looks at H2-H6 headings. all other tags pass.
  * this rule will walk 'up-down' the dom to find the heading tag that is
  * laid out previous to the heading tag being checked.
@@ -134,12 +134,12 @@ export default {
 
   form: () => [
     {
-      label: formatMessage("Action to take"),
+      label: formatMessage("Action to take:"),
       dataKey: "action",
       options: [
-        ["nothing", formatMessage("Do nothing")],
-        ["elem", formatMessage("Conform this Heading tag")],
-        ["modify", formatMessage("Change this Heading tag to DIV")]
+        ["nothing", formatMessage("Leave as is")],
+        ["elem", formatMessage("Fix heading hierarchy")],
+        ["modify", formatMessage("Remove heading style")]
       ]
     }
   ],

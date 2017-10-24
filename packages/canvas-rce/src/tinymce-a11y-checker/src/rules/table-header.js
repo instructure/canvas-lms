@@ -22,10 +22,10 @@ export default {
       label: formatMessage("Set table header"),
       dataKey: "header",
       options: [
-        ["none", formatMessage("No Headers")],
-        ["row", formatMessage("Header Row")],
-        ["col", formatMessage("Header Column")],
-        ["both", formatMessage("Header Row and Column")]
+        ["none", formatMessage("No headers")],
+        ["row", formatMessage("Header row")],
+        ["col", formatMessage("Header column")],
+        ["both", formatMessage("Header row and column")]
       ]
     }
   ],

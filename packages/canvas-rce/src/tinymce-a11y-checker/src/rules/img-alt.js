@@ -27,7 +27,7 @@ export default {
       disabledIf: data => data.decorative
     },
     {
-      label: formatMessage("Decorative Image"),
+      label: formatMessage("Decorative image"),
       dataKey: "decorative",
       checkbox: true
     }

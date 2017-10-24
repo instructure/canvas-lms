@@ -29,7 +29,7 @@ export default {
 
   form: () => [
     {
-      label: formatMessage("Change Heading tag to Paragraph"),
+      label: formatMessage("Change heading tag to paragraph"),
       checkbox: true,
       dataKey: "change"
     }

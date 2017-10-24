@@ -24,8 +24,8 @@ export default {
         ["none", formatMessage("None")],
         ["row", formatMessage("Row")],
         ["col", formatMessage("Column")],
-        ["rowgroup", formatMessage("Row Group")],
-        ["colgroup", formatMessage("Column Group")]
+        ["rowgroup", formatMessage("Row group")],
+        ["colgroup", formatMessage("Column group")]
       ]
     }
   ],

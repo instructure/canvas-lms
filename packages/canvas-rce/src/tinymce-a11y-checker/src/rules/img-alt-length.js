@@ -21,7 +21,8 @@ export default {
   form: () => [
     {
       label: formatMessage("Change alt text"),
-      dataKey: "alt"
+      dataKey: "alt",
+      textarea: true
     }
   ],
 
