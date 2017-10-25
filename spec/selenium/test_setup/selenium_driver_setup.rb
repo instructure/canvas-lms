@@ -102,6 +102,8 @@ module SeleniumDriverSetup
           Thread.new { start_webserver },
           Thread.new { start_driver }
         ].each(&:join)
+      rescue Selenium::WebDriver::Error::WebDriverError
+        driver.quit if reset_driver_between_specs?
       rescue StandardError
         puts "selenium startup failed: #{$ERROR_INFO}"
         puts "exiting :'("
