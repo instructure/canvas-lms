@@ -112,7 +112,7 @@ describe "Wiki Pages" do
       @course.wiki_pages.create!(title: 'Garfield and Odie Food Preparation',
         body: '<a href="http://example.com/poc/" target="_blank" id="click_here_now">click_here</a>')
       get "/courses/#{@course.id}/pages/garfield-and-odie-food-preparation"
-      expect(f('#click_here_now').attribute("rel")).to eq "noreferrer"
+      expect(f('#click_here_now').attribute("rel")).to eq "noreferrer noopener"
     end
 
     it "does not mark valid links as invalid", priority: "2", test_id: 927788 do
