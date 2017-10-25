@@ -24,6 +24,7 @@ import _ from 'underscore'
 import tz from 'timezone'
 import userSettings from 'compiled/userSettings'
 import htmlEscape from './str/htmlEscape'
+import preventDefault from 'compiled/fn/preventDefault'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import './instructure_helper'
 import 'jqueryui/draggable'
@@ -48,6 +49,56 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import 'compiled/behaviors/trackEvent'
 import 'compiled/badge_counts'
+
+function handleYoutubeLink () {
+  const $link = $(this)
+  const href = $link.attr('href')
+  const id = $.youTubeID(href || "")
+
+  if (id && !$link.hasClass('inline_disabled')) {
+    const $after = $(`
+      <a
+        href="${ htmlEscape(href) }"
+        class="youtubed"
+      >
+        <img src="/images/play_overlay.png"
+          class="media_comment_thumbnail"
+          style="background-image: url(//img.youtube.com/vi/${ htmlEscape(id) }/2.jpg)"
+          alt="${ htmlEscape($link.data('preview-alt') || '') }"
+        />
+      </a>
+    `)
+    $after.click(preventDefault(function() {
+      const $video = $(`
+        <span class='youtube_holder' style='display: block;'>
+          <iframe
+            src='//www.youtube.com/embed/${  htmlEscape(id)  }?autoplay=1&rel=0&hl=en_US&fs=1'
+            frameborder='0'
+            width='425'
+            height='344'
+            allowfullscreen
+          ></iframe>
+          <br/>
+          <a
+            href='#'
+            style='font-size: 0.8em;'
+            class='hide_youtube_embed_link'
+          >
+            ${  htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video"))  }
+          </a>
+        </span>
+      `)
+      $video.find(".hide_youtube_embed_link").click(preventDefault(() => {
+        $video.remove()
+        $after.show()
+        $.trackEvent('hide_embedded_content', 'hide_you_tube')
+      }))
+      $(this).after($video).hide()
+    }))
+    $.trackEvent('show_embedded_content', 'show_you_tube')
+    $link.addClass('youtubed').after($after)
+  }
+}
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -133,34 +184,7 @@ import 'compiled/badge_counts'
       }).end()
       .filter(".instructure_inline_media_comment").removeClass('no-underline').mediaCommentThumbnail('normal').end()
       .filter(".instructure_video_link, .instructure_audio_link").mediaCommentThumbnail('normal', true).end()
-      .not(".youtubed").each(function() {
-        var $link = $(this),
-            href = $link.attr('href'),
-            id = $.youTubeID(href || "");
-        if($link.hasClass('inline_disabled')) {
-        } else if(id) {
-          var altHtml = "";
-          if ($link.data('preview-alt')) {
-            altHtml = ' alt="' + htmlEscape($link.data('preview-alt')) + '"';
-          }
-          var $after = $('<a href="'+ htmlEscape(href) +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + htmlEscape(id) + '/2.jpg)"' + altHtml + '/></a>')
-            .click(function(event) {
-              event.preventDefault();
-              var $video = $("<span class='youtube_holder' style='display: block;'><iframe src='//www.youtube.com/embed/" + htmlEscape(id) + "?autoplay=1&rel=0&hl=en_US&fs=1' frameborder='0' width='425' height='344' allowfullscreen></iframe><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
-              $video.find(".hide_youtube_embed_link").click(function(event) {
-                event.preventDefault();
-                $video.remove();
-                $after.show();
-                $.trackEvent('hide_embedded_content', 'hide_you_tube');
-              });
-              $(this).after($video).hide();
-            });
-          $.trackEvent('show_embedded_content', 'show_you_tube');
-          $link
-            .addClass('youtubed')
-            .after($after);
-        }
-      });
+      .not(".youtubed").each(handleYoutubeLink);
     $(".user_content.unenhanced").removeClass('unenhanced').addClass('enhanced');
 
     setTimeout(function() {
