@@ -20,7 +20,8 @@ define [
   'compiled/models/GroupCategory'
   'compiled/views/groups/manage/GroupCategoryEditView'
   'helpers/fakeENV'
-], ($, GroupCategory, GroupCategoryEditView, fakeENV) ->
+  'helpers/assertions'
+], ($, GroupCategory, GroupCategoryEditView, fakeENV, assertions) ->
 
   view = null
   groupCategory = null
@@ -37,6 +38,10 @@ define [
       fakeENV.teardown()
       view.remove()
       document.getElementById("fixtures").innerHTML = ""
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'auto leadership is unset without model state', ->
     groupCategory.set('auto_leader', null)

@@ -24,7 +24,8 @@ define [
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
   'helpers/fakeENV'
-], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group, fakeENV) ->
+  'helpers/assertions'
+], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group, fakeENV, assertions) ->
 
   view = null
   group = null
@@ -55,6 +56,10 @@ define [
       fakeENV.teardown()
       view.remove()
       document.getElementById("fixtures").innerHTML = ""
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   assertCollapsed = (view) ->
     ok view.$el.hasClass('group-collapsed'), 'expand visible'
