@@ -17,8 +17,8 @@
  */
 
 export default class SlickGridSpecHelper {
-  constructor (grid) {
-    this.grid = grid;
+  constructor (gradebookGrid) {
+    this.grid = gradebookGrid.grid;
   }
 
   listColumns () {
