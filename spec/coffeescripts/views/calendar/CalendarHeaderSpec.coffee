@@ -18,7 +18,8 @@
 define [
   'jquery'
   'compiled/views/calendar/CalendarHeader'
-], ($, CalendarHeader) ->
+  'helpers/assertions'
+], ($, CalendarHeader, assertions) ->
 
   QUnit.module 'CalendarHeader',
     setup: ->
@@ -28,6 +29,10 @@ define [
     teardown: ->
       @header.$el.remove()
       $("#fixtures").empty()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @header, done, {'a11yReport': true}
 
   test '#moveToCalendarViewButton clicks the next calendar view button', (assert) ->
     done = assert.async()
