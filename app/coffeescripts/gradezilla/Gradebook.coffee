@@ -280,14 +280,14 @@ define [
       @studentViewStudents = {}
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
-      @gradebookGrid = {
+      @gridData = {
         columns: {
           definitions: {}
           frozen: []
           scrollable: []
         }
+        rows: []
       }
-      @rows = []
 
       @initPostGradesStore()
       @initPostGradesLtis()
@@ -488,7 +488,7 @@ define [
       @gradebookContent.customColumns = columns
       columns.forEach (column) =>
         customColumn = @buildCustomColumn(column)
-        @gradebookGrid.columns.definitions[customColumn.id] = customColumn
+        @gridData.columns.definitions[customColumn.id] = customColumn
 
     gotCustomColumnDataChunk: (customColumnId, columnData) =>
       studentIds = []
@@ -598,9 +598,9 @@ define [
       student.cssClass = "student_#{student.id}"
 
     updateStudentRow: (student) =>
-      index = @rows.findIndex (row) => row.id == student.id
+      index = @gridData.rows.findIndex (row) => row.id == student.id
       if index != -1
-        @rows[index] = student
+        @gridData.rows[index] = student
         @grid?.invalidateRow(index)
 
     gotAllStudents: =>
@@ -655,12 +655,12 @@ define [
       # (this works because frozen columns and non-frozen columns are can't be
       # swapped)
       columns = @grid.getColumns()
-      currentIds = (m[1] for columnId in @gradebookGrid.columns.frozen when m = columnId.match /^custom_col_(\d+)/)
+      currentIds = (m[1] for columnId in @gridData.columns.frozen when m = columnId.match /^custom_col_(\d+)/)
       reorderedIds = (m[1] for c in columns when m = c.id.match /^custom_col_(\d+)/)
 
       frozenColumnCount = @grid.getOptions().numberOfColumnsToFreeze
-      @gradebookGrid.columns.frozen = columns.slice(0, frozenColumnCount).map((column) -> column.id)
-      @gradebookGrid.columns.scrollable = columns.slice(frozenColumnCount).map((column) -> column.id)
+      @gridData.columns.frozen = columns.slice(0, frozenColumnCount).map((column) -> column.id)
+      @gridData.columns.scrollable = columns.slice(frozenColumnCount).map((column) -> column.id)
 
       if !_.isEqual(reorderedIds, currentIds)
         @reorderCustomColumns(reorderedIds)
@@ -690,12 +690,12 @@ define [
       @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
       columns = @grid.getColumns()
-      frozen = columns.splice(0, @gradebookGrid.columns.frozen.length)
-      @gradebookGrid.columns.frozen = frozen.map((column) -> column.id)
+      frozen = columns.splice(0, @gridData.columns.frozen.length)
+      @gridData.columns.frozen = frozen.map((column) -> column.id)
 
-      columns = @gradebookGrid.columns.scrollable.map((columnId) => @gradebookGrid.columns.definitions[columnId])
+      columns = @gridData.columns.scrollable.map((columnId) => @gridData.columns.definitions[columnId])
       columns.sort @makeColumnSortFn(newSortOrder)
-      @gradebookGrid.columns.scrollable = columns.map((column) -> column.id)
+      @gridData.columns.scrollable = columns.map((column) -> column.id)
 
       @updateGrid()
       @renderViewOptionsMenu()
@@ -850,11 +850,11 @@ define [
     # filter, sort, and build the dataset for slickgrid to read from, then
     # force a full redraw
     buildRows: =>
-      @rows.length = 0 # empty the list of rows
+      @gridData.rows.length = 0 # empty the list of rows
 
       for student in @courseContent.students.listStudents()
         if @rowFilter(student)
-          @rows.push(student)
+          @gridData.rows.push(student)
           @calculateStudentGrade(student) # TODO: this may not be necessary
 
       return unless @grid
@@ -1472,28 +1472,28 @@ define [
     setVisibleGridColumns: ->
       assignments = @filterAssignments(Object.values(@assignments))
       scrollableColumns = assignments.map (assignment) =>
-        @gradebookGrid.columns.definitions[@getAssignmentColumnId(assignment.id)]
+        @gridData.columns.definitions[@getAssignmentColumnId(assignment.id)]
 
       unless @hideAggregateColumns()
         for assignmentGroupId of @assignmentGroups
-          scrollableColumns.push(@gradebookGrid.columns.definitions[@getAssignmentGroupColumnId(assignmentGroupId)])
-        scrollableColumns.push(@gradebookGrid.columns.definitions['total_grade'])
+          scrollableColumns.push(@gridData.columns.definitions[@getAssignmentGroupColumnId(assignmentGroupId)])
+        scrollableColumns.push(@gridData.columns.definitions['total_grade'])
 
       if @gradebookColumnOrderSettings?.sortType
         scrollableColumns.sort @makeColumnSortFn(@getStoredSortOrder())
 
-      parentColumnIds = @gradebookGrid.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
+      parentColumnIds = @gridData.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
       customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))
 
-      @gradebookGrid.columns.frozen = [parentColumnIds..., customColumnIds...]
-      @gradebookGrid.columns.scrollable = scrollableColumns.map((column) -> column.id)
+      @gridData.columns.frozen = [parentColumnIds..., customColumnIds...]
+      @gridData.columns.scrollable = scrollableColumns.map((column) -> column.id)
 
     getVisibleGradeGridColumns: ->
-      [@gradebookGrid.columns.frozen..., @gradebookGrid.columns.scrollable...].map (columnId) =>
-        @gradebookGrid.columns.definitions[columnId]
+      [@gridData.columns.frozen..., @gridData.columns.scrollable...].map (columnId) =>
+        @gridData.columns.definitions[columnId]
 
     updateGrid: ->
-      @grid.setNumberOfColumnsToFreeze(@gradebookGrid.columns.frozen.length)
+      @grid.setNumberOfColumnsToFreeze(@gridData.columns.frozen.length)
       @grid.setColumns(@getVisibleGradeGridColumns())
       @grid.invalidate()
 
@@ -1623,19 +1623,19 @@ define [
       @updateFilteredContentInfo()
 
       studentColumn = @buildStudentColumn()
-      @gradebookGrid.columns.definitions[studentColumn.id] = studentColumn
-      @gradebookGrid.columns.frozen.push(studentColumn.id)
+      @gridData.columns.definitions[studentColumn.id] = studentColumn
+      @gridData.columns.frozen.push(studentColumn.id)
 
       for id, assignment of @assignments
         assignmentColumn = @buildAssignmentColumn(assignment)
-        @gradebookGrid.columns.definitions[assignmentColumn.id] = assignmentColumn
+        @gridData.columns.definitions[assignmentColumn.id] = assignmentColumn
 
       for id, assignmentGroup of @assignmentGroups
         assignmentGroupColumn = @buildAssignmentGroupColumn(assignmentGroup)
-        @gradebookGrid.columns.definitions[assignmentGroupColumn.id] = assignmentGroupColumn
+        @gridData.columns.definitions[assignmentGroupColumn.id] = assignmentGroupColumn
 
       totalGradeColumn = @buildTotalGradeColumn()
-      @gradebookGrid.columns.definitions[totalGradeColumn.id] = totalGradeColumn
+      @gridData.columns.definitions[totalGradeColumn.id] = totalGradeColumn
 
       @renderGridColor()
       @createGrid()
@@ -1651,11 +1651,11 @@ define [
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
-        numberOfColumnsToFreeze: @gradebookGrid.columns.frozen.length
+        numberOfColumnsToFreeze: @gridData.columns.frozen.length
       }, @options)
 
       @setVisibleGridColumns()
-      @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
+      @grid = new Slick.Grid('#gradebook_grid', @gridData.rows, @getVisibleGradeGridColumns(), options)
       @grid.setSortColumn('student')
 
       # This is a faux blur event for SlickGrid.
@@ -1677,7 +1677,7 @@ define [
       gridSupportOptions = {
         activeBorderColor: '#1790DF' # $active-border-color
         columnHeaderRenderer: new ColumnHeaderRenderer(@)
-        rows: @rows
+        rows: @gridData.rows
       }
 
       if ENV.use_high_contrast
@@ -1834,8 +1834,8 @@ define [
         else
           sortFn
 
-      @rows.sort respectorOfPersonsSort()
-      @courseContent.students.setStudentIds(_.map(@rows, 'id'))
+      @gridData.rows.sort respectorOfPersonsSort()
+      @courseContent.students.setStudentIds(_.map(@gridData.rows, 'id'))
       @grid?.invalidate()
 
     getStudentGradeForColumn: (student, field) =>
@@ -1980,10 +1980,10 @@ define [
       @keyboardNav.handleMenuOrDialogClose()
 
     toggleNotesColumn: =>
-      parentColumnIds = @gradebookGrid.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
+      parentColumnIds = @gridData.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
       customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))
 
-      @gradebookGrid.columns.frozen = [parentColumnIds..., customColumnIds...]
+      @gridData.columns.frozen = [parentColumnIds..., customColumnIds...]
 
       @updateGrid()
 
@@ -2031,7 +2031,7 @@ define [
     ## SlickGrid Data Access Methods
 
     listRows: =>
-      @rows # currently the source of truth for filtered and sorted rows
+      @gridData.rows # currently the source of truth for filtered and sorted rows
 
     listRowIndicesForStudentIds: (studentIds) =>
       rowIndicesByStudentId = @listRows().reduce((map, row, index) =>
@@ -2102,9 +2102,9 @@ define [
     freezeTotalGradeColumn: =>
       @totalColumnPositionChanged = true
 
-      studentColumnPosition = @gradebookGrid.columns.frozen.indexOf('student')
-      @gradebookGrid.columns.frozen.splice(studentColumnPosition + 1, 0, 'total_grade')
-      @gradebookGrid.columns.scrollable = @gradebookGrid.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
+      studentColumnPosition = @gridData.columns.frozen.indexOf('student')
+      @gridData.columns.frozen.splice(studentColumnPosition + 1, 0, 'total_grade')
+      @gridData.columns.scrollable = @gridData.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
 
       @updateGrid()
       @updateColumnHeaders()
@@ -2112,9 +2112,9 @@ define [
     moveTotalGradeColumnToEnd: =>
       @totalColumnPositionChanged = true
 
-      @gradebookGrid.columns.frozen = @gradebookGrid.columns.frozen.filter((columnId) -> columnId != 'total_grade')
-      @gradebookGrid.columns.scrollable = @gradebookGrid.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
-      @gradebookGrid.columns.scrollable.push('total_grade')
+      @gridData.columns.frozen = @gridData.columns.frozen.filter((columnId) -> columnId != 'total_grade')
+      @gridData.columns.scrollable = @gridData.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
+      @gridData.columns.scrollable.push('total_grade')
 
       @updateGrid()
       @updateColumnHeaders()
@@ -2271,7 +2271,7 @@ define [
     closeSubmissionTray: =>
       @setSubmissionTrayState(false)
       rowIndex = @grid.getActiveCell().row
-      studentId = @rows[rowIndex].id
+      studentId = @gridData.rows[rowIndex].id
       @updateRowAndRenderSubmissionTray(studentId)
       @gridSupport.helper.beginEdit()
 
@@ -2694,7 +2694,7 @@ define [
         .then (response) =>
           @gradebookContent.customColumns.push(response.data)
           teacherNotesColumn = @buildCustomColumn(response.data)
-          @gradebookGrid.columns.definitions[teacherNotesColumn.id] = teacherNotesColumn
+          @gridData.columns.definitions[teacherNotesColumn.id] = teacherNotesColumn
           @showNotesColumn()
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
