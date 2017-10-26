@@ -512,7 +512,7 @@ class FilesController < ApplicationController
       else
         if @files_domain
           @headers = false
-          @show_left_side = false
+          @show_left_side = true
         end
         if attachment.content_type && attachment.content_type.match(/\Avideo\/|audio\//)
           attachment.context_module_action(@current_user, :read)

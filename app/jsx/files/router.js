@@ -39,7 +39,7 @@ import SearchResults from 'jsx/files/SearchResults'
       >
         <ShowFolder />
       </FilesApp>
-    , document.getElementById('content'));
+    , document.getElementById('files-app'));
   }
 
   function renderSearchResults (ctx) {
@@ -53,7 +53,7 @@ import SearchResults from 'jsx/files/SearchResults'
       >
         <SearchResults />
       </FilesApp>
-    , document.getElementById('content'));
+    , document.getElementById('files-app'));
   }
 
   /**
