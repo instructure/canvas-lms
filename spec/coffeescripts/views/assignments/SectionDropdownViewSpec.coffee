@@ -19,7 +19,8 @@ define [
   'compiled/views/assignments/SectionDropdownView'
   'compiled/models/AssignmentOverride'
   'compiled/models/Section'
-], ( SectionDropdownView, AssignmentOverride, Section ) ->
+  'helpers/assertions'
+], ( SectionDropdownView, AssignmentOverride, Section, assertions ) ->
 
   QUnit.module "SectionDropdownView",
     setup: ->
@@ -30,6 +31,10 @@ define [
       ]
       @view = new SectionDropdownView( sections: @sections, override: @override )
       @view.render()
+
+  test 'should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @view, done, {'a11yReport': true}
 
   test "updates the course_section_id when the form element changes", ->
     @view.$el.val('2').trigger 'change'

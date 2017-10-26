@@ -25,8 +25,9 @@ define [
   'compiled/views/assignments/ToggleShowByView'
   'jquery'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $, fakeENV) ->
+], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $, fakeENV, assertions) ->
 
 
   fixtures = $('#fixtures')
@@ -80,6 +81,11 @@ define [
       fakeENV.teardown()
       assignmentGroups = null
       fixtures.empty()
+
+  test 'should be accessible', (assert) ->
+    view = assignmentIndex()
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'should filter by search term', ->
 

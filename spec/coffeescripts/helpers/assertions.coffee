@@ -32,7 +32,7 @@ define ['jquery', 'underscore', 'axe-core'], ($, _, axe) ->
   isAccessible: ($el, done, options={}) ->
     if options.a11yReport
       if __A11Y_REPORT
-        options.ignores = ':html-lang, :document-title, :region, :meta-viewport, :skip-link'
+        options.ignores = ':html-has-lang, :document-title, :region, :meta-viewport, :skip-link'
       else
         ok(true)
         return done()
