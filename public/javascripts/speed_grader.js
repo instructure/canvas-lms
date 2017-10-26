@@ -346,8 +346,8 @@ function initDropdown(){
   });
 
   if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
-    var $selectmenu_list = $selectmenu.jquerySelectMenu().data('selectmenu').list,
-    $menu = $("#section-menu");
+    const $selectmenu_list = $selectmenu.data('selectmenu').list;
+    const $menu = $("#section-menu");
 
 
     $menu.find('ul').append($.raw($.map(jsonData.context.active_course_sections, function(section, i){
@@ -378,7 +378,7 @@ function initDropdown(){
         .addClass('selected');
     }
 
-    $selectmenu.jquerySelectMenu().selectmenu( 'option', 'open', function(){
+    $selectmenu.selectmenu( 'option', 'open', function(){
       $selectmenu_list.find('li:first').css('margin-top', $selectmenu_list.find('li').height() + 'px');
       $menu.show().css({
         'left'   : $selectmenu_list.css('left'),
@@ -800,7 +800,7 @@ function initRubricStuff(){
       $.each(response.related_group_submissions_and_assessments, function(i,submissionAndAssessment){
         //setOrUpdateSubmission returns the student. so we can set student.rubric_assesments
         // submissionAndAssessment comes back with :include_root => true, so we have to get rid of the root
-        var student = EG.setOrUpdateSubmission(response.artifact);
+        const student = EG.setOrUpdateSubmission(response.artifact);
         student.rubric_assessments = $.map(submissionAndAssessment.rubric_assessments, function(ra){return ra.rubric_assessment;});
         EG.updateSelectMenuStatus(student);
       });
@@ -1172,10 +1172,10 @@ EG = {
     var student = jsonData.studentMap[student_id];
 
     if (student) {
-      $selectmenu.jquerySelectMenu().selectmenu("value", student.id);
+      $selectmenu.selectmenu("value", student.id);
       // manually tell $selectmenu to fire the change event
       if (!this.currentStudent || (this.currentStudent.id != student.id)) {
-        $selectmenu.jquerySelectMenu().change();
+        $selectmenu.change();
       }
       if (student.avatar_path && !hideStudentNames) {
         // If there's any kind of delay in loading the user's avatar, it's
@@ -1201,7 +1201,7 @@ EG = {
       EG.addSubmissionComment(true);
     }
 
-    var id = $selectmenu.jquerySelectMenu().val();
+    const id = $selectmenu.val();
     // This call on the or side of the street is probably
     // non-performant at scale (4000 students) if we just want the
     // first value
@@ -2578,51 +2578,10 @@ EG = {
     EG.updateStatsInHeader();
   },
 
-  updateSelectMenuStatus: function (student, selectmenu = $selectmenu) {
+  updateSelectMenuStatus: function(student) {
     if (!student) return;
-    let $query = selectmenu.jquerySelectMenu().data('selectmenu').list.find(`li:eq(${student.index})`);
-    const className = SpeedgraderHelpers.classNameBasedOnStudent(student);
-    const submissionStates = 'not_graded not_submitted graded resubmitted';
-
-    if (student == EG.currentStudent) {
-      $query = $query.add(selectmenu.jquerySelectMenu().data('selectmenu').newelement);
-    }
-    $query
-      .removeClass(submissionStates)
-      .addClass(className.raw);
-
-    const $status = $('.ui-selectmenu-status');
-    const $statusIcon = $status.find('.speedgrader-selectmenu-icon');
-    const $queryIcon = $query.find('.speedgrader-selectmenu-icon');
-
-    const studentInfo = EG.getStudentNameAndGrade(student);
-    const option = $(selectmenu.option_tag_array[student.index]);
-    option.text(studentInfo).removeClass(submissionStates).addClass(className.raw);
-
-    if(className.raw == "graded" || className.raw == "not_gradeable"){
-      $queryIcon.text("").append("<i class='icon-check'></i>");
-      $status.addClass("graded");
-      $statusIcon.text("").append("<i class='icon-check'></i>");
-    }else if(className.raw == "not_graded"){
-      $queryIcon.text("").append("&#9679;");
-      $status.removeClass("graded");
-      $statusIcon.text("").append("&#9679;");
-    }else{
-      $queryIcon.text("");
-      $status.removeClass("graded");
-      $statusIcon.text("");
-    }
-
-    // this is because selectmenu.js uses .data('optionClasses' on the
-    // li to keep track of what class to put on the selected option (
-    // aka: $selectmenu.data('selectmenu').newelement ) when this li
-    // is selected.  so even though we set the class of the li and the
-    // $selectmenu.data('selectmenu').newelement when it is graded, we
-    // need to also set the data() so that if you skip back to this
-    // student it doesnt show the old checkbox status.
-    $.each(submissionStates.split(' '), function(){
-      $query.data('optionClasses', $query.data('optionClasses').replace(this, ''));
-    });
+    const isCurrentStudent = student === EG.currentStudent;
+    $selectmenu.updateSelectMenuStatus(student, isCurrentStudent, EG.getStudentNameAndGrade(student));
   },
 
   isGradingTypePercent: function () {
