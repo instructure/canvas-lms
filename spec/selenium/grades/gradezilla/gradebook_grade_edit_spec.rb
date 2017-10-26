@@ -158,6 +158,7 @@ describe "Gradezilla editing grades" do
 
   it "validates curving grades option", priority: "1", test_id: 220320 do
     skip_if_chrome('issue with set_value')
+    skip_if_safari(:alert)
     curved_grade_text = "8"
 
     Gradezilla.visit(@course)
@@ -172,6 +173,7 @@ describe "Gradezilla editing grades" do
   end
 
   it "assigns zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
+    skip_if_safari(:alert)
     Gradezilla.visit(@course)
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l1', '')

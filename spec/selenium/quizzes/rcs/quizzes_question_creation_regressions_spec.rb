@@ -100,6 +100,7 @@ describe 'quizzes question creation' do
     end
 
     it 'respects character limits on short answer questions', priority: "2", test_id: 197493 do
+      skip_if_safari(:alert)
       question = fj('.question_form:visible')
       click_option('.question_form:visible .question_type', 'Fill In the Blank')
 

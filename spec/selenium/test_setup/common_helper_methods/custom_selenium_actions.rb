@@ -29,6 +29,15 @@ module CustomSeleniumActions
     skip("skipping test, fails in Chrome: #{additional_error_text}") if driver.browser == :chrome
   end
 
+  def skip_if_safari(additional_error_text)
+    return unless driver.browser == :safari
+    case additional_error_text
+    when :alert
+      additional_error_text = "SafariDriver doesn't support alerts"
+    end
+    skip("skipping test, fails in Safari: #{additional_error_text}")
+  end
+
   def find_radio_button_by_value(value, scope = nil)
     fj("input[type=radio][value=#{value}]", scope)
   end

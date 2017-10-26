@@ -375,6 +375,7 @@ describe "Screenreader Gradebook" do
     end
 
     it "should focus on accessible elements when setting default grades", priority: '1', test_id: 209991 do
+      skip_if_safari(:alert)
       SRGB.visit(@course.id)
       SRGB.select_assignment(@second_assignment)
 
@@ -440,6 +441,7 @@ describe "Screenreader Gradebook" do
 
   context "curving grades" do
     it "curves grades", priority: '1',test_id: 615690 do
+      skip_if_safari(:alert)
       basic_point_setup 3
 
       grades = [12,10,11]
