@@ -423,7 +423,7 @@ import 'compiled/jquery.rails_flash_notifications'
         var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
         $('#move_context_module_select').empty();
         $('#move_context_module_select').append($.raw(selectOptions.join('')));
-        //$form.fillFormData(data, {object_name: 'context_module'});
+
         $form.dialog({
           autoOpen: false,
           modal: true,
@@ -435,7 +435,6 @@ import 'compiled/jquery.rails_flash_notifications'
           }
         }).dialog('open');
         $module.removeClass('dont_remove');
-        // $form.find('.ui-dialog-titlebar-close').focus();
 
       },
       hideMoveModuleItem: function (remove) {
@@ -481,6 +480,16 @@ import 'compiled/jquery.rails_flash_notifications'
         modules.hideMoveModule();
         modules.updateModulePositions();
 
+      },
+
+      goToActivity: function () {
+        $('.sm-activity-row').click(function(e){
+          let $t = $(e.target);
+          let $this = $(this);
+          if(!($t.closest('.ig-admin').length >= 1) && !($this.closest('.context_module_sub_header').length >= 1)){
+            window.location = $this.attr('href');
+          }
+        });
       },
 
       editModule: function($module) {
@@ -556,8 +565,6 @@ import 'compiled/jquery.rails_flash_notifications'
         }
 
 
-        $module.fadeIn('fast', function() {
-        });
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
         var $toFocus = $('.ig-header-admin .al-trigger', $module);
@@ -603,7 +610,7 @@ import 'compiled/jquery.rails_flash_notifications'
           if ($admin.length) { $admin.detach(); }
           $item = $olditem.clone(true);
           if ($admin.length) {
-            $item.find('.ig-row').append($admin)
+            $item.find('.sm-ig-row').append($admin)
           }
         } else {
           $item = $('#context_module_item_blank').clone(true).removeAttr('id');
@@ -1337,12 +1344,10 @@ import 'compiled/jquery.rails_flash_notifications'
             var $activeElemClass = "." + $(activeElem).attr('class').split(' ').join(".");
             $(elemID).find($activeElemClass).focus();
           }, 0);
-
         } else {
           $cogLink.focus();
         }
       })
-
     });
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
@@ -1498,6 +1503,7 @@ import 'compiled/jquery.rails_flash_notifications'
       event.preventDefault();
       modules.addModule();
     });
+
 
     $(".add_module_item_link").on('click', function(event) {
       event.preventDefault();
@@ -1866,11 +1872,12 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   }
   function update_icon_status(button){
-      if (button.hasClass('icon-arrow-open-right')) {
-        button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
-      } else if (button.hasClass('icon-arrow-open-down')) {
-        button.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
-      }
+    let $icon = button.find('i.sm-unit-dropdown-icon')
+    if ($icon.hasClass('icon-arrow-open-right')) {
+      $icon.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+    } else if ($icon.hasClass('icon-arrow-open-down')) {
+      $icon.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
+    }   
   };
   function init_icon_status(button){
     button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
@@ -1898,6 +1905,8 @@ import 'compiled/jquery.rails_flash_notifications'
     }
 
     $("#context_modules").fadeIn(500)
+
+    modules.goToActivity()
 
     $('.external_url_link').click(function(event) {
       Helper.externalUrlLinkClick(event, $(this))
@@ -2077,11 +2086,13 @@ import 'compiled/jquery.rails_flash_notifications'
       var reload_entries = $module.find(".content .context_module_items").children().length === 0;
       var toggle = function(show) {
         var callback = function() {
-          $module.find(".collapse_module_link").css('display', $module.find(".content:visible").length > 0 ? 'inline-block' : 'none');
-          $module.find(".expand_module_link").css('display', $module.find(".content:visible").length === 0 ? 'inline-block' : 'none');
+          $module.find(".collapse_module_link").css('display', $module.find(".content:visible").length > 0 ? 'flex' : 'none');
+          $module.find(".expand_module_link").css('display', $module.find(".content:visible").length === 0 ? 'flex' : 'none');
           if($module.find(".content:visible").length > 0) {
             $module.find(".footer .manage_module").css('display', '');
             $module.toggleClass('collapsed_module', false);
+            update_icon_status($module.find('.sm-header-row.sm-header-middle'));
+
             // Makes sure the resulting item has focus.
             $module.find(".collapse_module_link").focus();
             $.screenReaderFlashMessage(I18n.t('Expanded'));
@@ -2089,6 +2100,7 @@ import 'compiled/jquery.rails_flash_notifications'
           } else {
             $module.find(".footer .manage_module").css('display', ''); //'none');
             $module.toggleClass('collapsed_module', true);
+            update_icon_status($module.find('.sm-header-row.sm-header-middle'));
             // Makes sure the resulting item has focus.
             $module.find(".expand_module_link").focus();
             $.screenReaderFlashMessage(I18n.t('Collapsed'));
@@ -2171,7 +2183,9 @@ import 'compiled/jquery.rails_flash_notifications'
       currentModules.push(new_module[0]);
     }
     for(var idx in currentModules) {
-      $("#context_module_" + currentModules[idx]).addClass('sm-started').removeClass('collapsed_module');
+      let $cm = $("#context_module_" + currentModules[idx])
+      $cm.addClass('sm-started').removeClass('collapsed_module');
+      update_icon_status($cm.find('.ig-header'));
     }
 
     if(ENV.IS_STUDENT){

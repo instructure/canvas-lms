@@ -87,8 +87,21 @@
     align-items: center;
   }
 
-  .ig-header-title {
+  .sm-ig-header-title {
     flex: 1 1 auto;
+    text-decoration: none;
+    @include fontSize(16px);
+    font-weight: 500;
+    line-height: 20px;
+    margin: auto;
+  }
+
+  .sm-data-requirement-text{
+    font-size: 12px;
+    color: var(--ic-brand-shade-3);
+    font-style: italic;
+    margin-top: 0px;
+    margin-left: 30px;
   }
 
   .prerequisites {
@@ -127,6 +140,7 @@
     flex: 0 0 auto;
     display: flex;
     align-self: center;
+    margin-right: 10px;
 
     .completion_status {
       margin: 0 16px;
@@ -161,6 +175,7 @@
   border-top: none;
   min-width: auto;
   margin-bottom: 20px;
+  background-color: #FFF;
 }
 
 .sm-context_module.context_module {
@@ -172,22 +187,39 @@
   color: $ic-font-color-dark;
 }
 
-.sm-header{
-  padding: 20px;
+.sm-unit-header{
+  padding: 15px;
+  display: flex;
 }
 
-.sm-context_module.context_module.sm-started .sm-header.ig-header{
-  background-color: #FFFFFF;
+.sm-header-column{
+  display: flex;
+  flex-direction: column;
+
+  &.right{
+    margin-left: auto;
+  }
+}
+
+.sm-header-row{
+  display: flex;
+  flex-direction: row;
+}
+
+.sm-header-middle{
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.sm-context_module.context_module .sm-header.ig-header{
   border-bottom: 2px solid var(--ic-brand-button--secondary-bgd-darkened-15);
 }
 
 .sm-context_module.context_module.collapsed_module.sm-started .sm-header.ig-header{
-  background-color: #FFFFFF;
   border-bottom: none;
 }
 
 .sm-context_module.context_module.collapsed_module .sm-header.ig-header{
-  background-color: #FFFFFF;
   border-bottom: none;
 }
 
