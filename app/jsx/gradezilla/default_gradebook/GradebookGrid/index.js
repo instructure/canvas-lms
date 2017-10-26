@@ -18,7 +18,7 @@
 
 import { Grid } from 'vendor/slickgrid';
 import 'jqueryui/sortable';
-import GridSupport from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support';
+import GridSupport from './GridSupport';
 
 export default class GradebookGrid {
   constructor (options) {

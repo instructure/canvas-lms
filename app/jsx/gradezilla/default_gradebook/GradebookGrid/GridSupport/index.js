@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Columns from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Columns';
-import Events from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Events';
-import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
-import Navigation from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Navigation';
-import State from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/State';
-import Style from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Style';
+import Columns from './Columns';
+import Events from './Events';
+import GridHelper from './GridHelper';
+import Navigation from './Navigation';
+import State from './State';
+import Style from './Style';
 
 export default class GridSupport {
   constructor (grid, options = {}) {

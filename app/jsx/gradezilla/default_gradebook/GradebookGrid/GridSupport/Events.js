@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridEvent from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridEvent';
+import GridEvent from './GridEvent';
 
 export default class Events {
   // State Changes

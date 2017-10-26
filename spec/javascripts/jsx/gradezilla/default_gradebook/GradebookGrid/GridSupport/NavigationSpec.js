@@ -18,7 +18,7 @@
 
 import 'jquery.keycodes'; // used by some SlickGrid editors
 import { Grid, Editors } from 'vendor/slickgrid';
-import GridSupport from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support';
+import GridSupport from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport';
 
 const keyMap = {
   Tab: { which: 9, shiftKey: false },
