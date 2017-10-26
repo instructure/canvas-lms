@@ -28,31 +28,6 @@
         </div>
       <% end %>
         <ul id="menu" class="ic-app-header__menu-list">
-          <% if @current_user %>
-            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/profile') %>">
-              <a id="global_nav_profile_link" href="/profile" class="ic-app-header__menu-list-link">
-                <div class="menu-item-icon-container" aria-hidden="true">
-                  <div class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
-                    <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" alt="<%= @current_user.short_name %>" />
-                  </div>
-                </div>
-                <div class="menu-item__text">
-                  <%= t('Account') %>
-                </div>
-              </a>
-            </li>
-          <% else %>
-            <li class="menu-item ic-app-header__menu-list-item">
-              <a id="global_nav_login_link" href="/login" class="ic-app-header__menu-list-link">
-                <div class="menu-item-icon-container" aria-hidden="true">
-                  <%= render(:partial => "shared/svg/svg_login_new_styles.svg") %>
-                </div>
-                <div class="menu-item__text">
-                  <%= t('Login') %>
-                </div>
-              </a>
-            </li>
-          <% end %>
           <% if @current_user && @current_user.adminable_accounts.count > 0 %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
               <a id="global_nav_accounts_link" href="/accounts" class="ic-app-header__menu-list-link">
