@@ -1,47 +1,169 @@
+<!DOCTYPE html>
 <html>
-<body style="background-color: #FFFFFF;">
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <style type="text/css">
+      /* FONTS */
+        @media screen {
 
-<center>
-  <table cellpadding="8" cellspacing="0" style="margin: 0; padding: 0; width:728px;" border="0">
-    <tr>
-      <td valign="top">
-        <table cellpadding="0" cellspacing="0" align="center" style="background-color: #ffffff;">
-          <tr>
-            <td>
-              <table cellpadding="0" cellspacing="0" style="" border="0" align="center">
-                <tr>
-                  <td colspan="3" height="36"></td>
-                </tr>
-                <tr>
-                  <td width="36"></td>
-                  <td width="454" style="font-size: 14px; color: #444444; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif'; border-collapse: collapse;" align="left" valign="top">
+          /* latin-ext */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: italic;
+            font-weight: 400;
+            src: local('Open Sans Italic'), local('OpenSans-Italic'), url(https://fonts.gstatic.com/s/opensans/v15/xjAJXh38I15wypJXxuGMBqE8kM4xWR1_1bYURRojRGc.woff2) format('woff2');
+            unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+          }
+          /* latin */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: italic;
+            font-weight: 400;
+            src: local('Open Sans Italic'), local('OpenSans-Italic'), url(https://fonts.gstatic.com/s/opensans/v15/xjAJXh38I15wypJXxuGMBogp9Q8gbYrhqGlRav_IXfk.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+          }
 
-                    <%= inner_html %>
+          /* latin-ext */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: italic;
+            font-weight: 700;
+            src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(https://fonts.gstatic.com/s/opensans/v15/PRmiXeptR36kaC0GEAetxogd9OEPUCN3AdYW0e8tat4.woff2) format('woff2');
+            unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+          }
+          /* latin */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: italic;
+            font-weight: 700;
+            src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(https://fonts.gstatic.com/s/opensans/v15/PRmiXeptR36kaC0GEAetxv79_ZuUxCigM2DespTnFaw.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+          }
 
-                  </td>
-                  <td width="36"></td>
-                </tr>
-                <tr>
-                  <td colspan="3" height="36"></td>
-                </tr>
-              </table>
+          /* latin-ext */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/u-WUoqrET9fUeobQW7jkRYX0hVgzZQUfRDuZrPvH3D8.woff2) format('woff2');
+            unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+          }
+          /* latin */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/cJZKeOuBrn4kERxqtaUH3ZBw1xU1rKptJj_0jans920.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+          }
+          /* latin-ext */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: normal;
+            font-weight: 700;
+            src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v15/k3k702ZOKiLJc3WVjuplzIjoYw3YTyktCCer_ilOlhE.woff2) format('woff2');
+            unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+          }
+          /* latin */
+          @font-face {
+            font-family: 'Open Sans';
+            font-style: normal;
+            font-weight: 700;
+            src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v15/k3k702ZOKiLJc3WVjuplzBampu5_7CjHW5spxoeN3Vs.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+          }
+        }
+        
+        /* CLIENT-SPECIFIC STYLES */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; }
+
+        /* RESET STYLES */
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        /* iOS BLUE LINKS */
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+        
+      /* MOBILE STYLES */
+      @media screen and (max-width:600px){
+        h1 {
+          font-size: 32px !important;
+          line-height: 32px !important;
+        }
+        
+        .wrapper {
+          width: 100% !important;
+        }
+      }
+
+        /* ANDROID CENTER FIX */
+        div[style*="margin: 16px 0;"] { margin: 0 !important; }
+    </style>
+  </head>
+  <body style="background-color: #F6F6F6; margin: 0 !important; padding: 0 !important;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <!-- LOGO -->
+        <tr>
+            <td bgcolor="#33373F" align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper" >
+                    <tr>
+                        <td align="center" valign="top" style="padding: 40px 10px 40px 10px;">
+                            <a href="https://courseware.strongmind.com" target="_blank">
+                                <img alt="Logo" src="https://i.imgur.com/5ysurBs.png" width="66"  style="display: block; width: 66px; max-width: 66px; min-width: 66px; font-family: 'Open Sans', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
+                            </a>
+                        </td>
+                    </tr>
+                </table>
             </td>
-          </tr>
-        </table>
-        <table cellpadding="0" cellspacing="0" align="center" border="0" style="background-color: #ffffff;">
-          <tr>
-            <td height="60"></td>
-          </tr>
-          <tr>
-            <td align="center"> <img src="<%= custom_logo || "https://lh3.googleusercontent.com/D1pgZeJZrBFc_n_EnEWpj9BQpVUaQ6xj2FYl1ZaxhDN4c-x8X69DqfJ258Eb0u7sXyuvYI533FkaCouBv6131tpxMbd1CpjZDEMr2kN4t8_Epitm77c" %>" alt=""></td>
-          </tr>
-          <tr>
-            <td height="15"></td>
-          </tr>
-          <tr>
+        </tr>
+        <tr>
+            <td bgcolor="#33373F" align="center" style="padding: 0px 10px 0px 10px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper" >
+                    <tr>
+                        <td bgcolor="#ffffff" align="center" valign="top" style="padding: 30px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Open Sans', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 400;">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <!-- CONTENT BLOCK -->
+        <tr>
+            <td  align="center" style="padding: 0px 10px 0px 10px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper" >
+                    <tr>
+                        <td bgcolor="#ffffff" valign="top" style="padding: 20px 40px 40px 40px; border-radius: 0px 0px 4px 4px; color: #111111; font-family: 'Open Sans', Helvetica, Arial, sans-serif;">
+                          <%= inner_html %>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+          <td height="20"></td>
+        </tr>
+        <tr>
+          <td align="center"> <img src="https://i.imgur.com/47xeuRp.png" alt=""></td>
+        </tr>
+        <tr>
+          <td height="15"></td>
+        </tr>
+        <tr>
             <td style="padding: 0; border-collapse: collapse;">
               <table cellpadding="0" cellspacing="0" align="center" border="0">
-                <tr style="font-size: 11px; color: #a8b9c6; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
+                <tr style="font-size: 11px; color: #a8b9c6; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
                   <% if !content(:footer_link).blank? %>
                     <td width="375" align="center">
                     <%= content(:footer_link).html_safe %></td>
@@ -53,10 +175,9 @@
               </table>
             </td>
           </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</center>
-</body>
+        <tr>
+          <td style="height: 100px;"></td>
+        </tr>
+    </table>
+  </body>
 </html>
