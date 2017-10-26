@@ -20,7 +20,8 @@ define [
   'compiled/views/accounts/admin_tools/GradeChangeLoggingContentView'
   'jquery'
   'helpers/fakeENV'
-], (GradeChangeLoggingCollection, GradeChangeLoggingContentView, $, fakeENV) ->
+  'helpers/assertions'
+], (GradeChangeLoggingCollection, GradeChangeLoggingContentView, $, fakeENV, assertions) ->
   buildEvent = (options) =>
     options ?= {}
     base =
@@ -71,6 +72,11 @@ define [
     teardown: ->
       $('#fixtures').empty()
       fakeENV.teardown()
+
+  test 'it should be accessible', (assert) ->
+    view = createView([excusedEvent()])
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test "initializes", ->
     view = createView([])
