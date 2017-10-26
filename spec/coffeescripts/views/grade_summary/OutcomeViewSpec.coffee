@@ -22,7 +22,8 @@ define [
   'compiled/views/grade_summary/OutcomeDialogView'
   'compiled/views/grade_summary/OutcomeView'
   'compiled/views/grade_summary/ProgressBarView'
-], (_, Outcome, OutcomePopoverView, OutcomeDialogView, OutcomeView, ProgressBarView) ->
+  'helpers/assertions'
+], (_, Outcome, OutcomePopoverView, OutcomeDialogView, OutcomeView, ProgressBarView, assertions) ->
 
   QUnit.module 'OutcomeViewSpec',
     setup: ->
@@ -33,6 +34,10 @@ define [
       @e = (name, options={}) -> $.Event(name, _.extend(options, {
         currentTarget: @outcomeView.$el.find('a.more-details')
       }))
+
+  test 'should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @outcomeView, done, {'a11yReport': true}
 
   test 'assign instance of ProgressBarView on init', ->
     ok @outcomeView.progress instanceof ProgressBarView
