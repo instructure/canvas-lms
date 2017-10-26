@@ -45,7 +45,7 @@ function loadLegacyTinyMCE (callback) {
     legacyTinyMCELoaded = true
     require('tinymce.editor_box')
     require('compiled/tinymce')
-    require('tinymce-a11y-checker')
+    require('./initA11yChecker')
     callback()
   }, 'legacyTinymceAsyncChunk')
 }
