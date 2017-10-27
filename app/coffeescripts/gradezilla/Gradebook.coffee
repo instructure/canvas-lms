@@ -395,6 +395,20 @@ define [
         @updateColumnHeaders()
         @renderFilters()
 
+    # called from app/jsx/bundles/gradezilla.js
+    onShow: ->
+      $(".post-grades-button-placeholder").show()
+      return if @startedInitializing
+      @startedInitializing = true
+
+      @spinner = new Spinner() unless @spinner
+      $(@spinner.spin().el).css(
+        opacity: 0.5
+        top: '55px'
+        left: '50%'
+      ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
+      $('#gradebook-grid-wrapper').hide()
+
     reloadStudentData: =>
       @setStudentsLoaded(false)
       @setSubmissionsLoaded(false)
@@ -475,19 +489,6 @@ define [
       filteredVisibility = assignment.assignment_visibility.filter (id) -> id != hiddenSub.user_id
       assignment.assignment_visibility = filteredVisibility
 
-    onShow: ->
-      $(".post-grades-button-placeholder").show()
-      return if @startedInitializing
-      @startedInitializing = true
-
-      @spinner = new Spinner() unless @spinner
-      $(@spinner.spin().el).css(
-        opacity: 0.5
-        top: '55px'
-        left: '50%'
-      ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
-      $('#gradebook-grid-wrapper').hide()
-
     gotCustomColumns: (columns) =>
       @gradebookContent.customColumns = columns
       columns.forEach (column) =>
@@ -504,12 +505,6 @@ define [
           studentIds.push(student.id)
 
       @invalidateRowsForStudentIds(_.uniq(studentIds))
-
-    doSlickgridStuff: =>
-      @initGrid()
-      @initHeader()
-      @gridReady.resolve()
-      @loadOverridesForSIS()
 
     gotAllAssignmentGroups: (assignmentGroups) =>
       # purposely passing the @options and assignmentGroups by reference so it can update
@@ -531,7 +526,8 @@ define [
     gotChunkOfStudents: (students) =>
       @courseContent.assignmentStudentVisibility = {}
       for student in students
-        student.enrollments = _.filter student.enrollments, @isStudentEnrollment
+        student.enrollments = _.filter student.enrollments, (e) ->
+          e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
         isStudentView = student.enrollments[0].type == "StudentViewEnrollment"
         student.sections = student.enrollments.map (e) -> e.course_section_id
 
@@ -553,8 +549,13 @@ define [
       else
         @gradebookGrid.render()
 
-    isStudentEnrollment: (e) =>
-      e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
+    ## Post-Data Load Initialization
+
+    doSlickgridStuff: =>
+      @initGrid()
+      @initHeader()
+      @gridReady.resolve()
+      @loadOverridesForSIS()
 
     setupGrading: (students) =>
       # set up a submission for each student even if we didn't receive one
@@ -1050,51 +1051,6 @@ define [
       return if className.match(/cell|slick/)
 
       @gradebookGrid.gridSupport.state.blur()
-
-    onGridInit: () ->
-      tooltipTexts = {}
-      # TODO: this "if @spinner" crap is necessary because the outcome
-      # gradebook kicks off the gradebook (unnecessarily).  back when the
-      # gradebook was slow, this code worked, but now the spinner may never
-      # initialize.  fix the way outcome gradebook loads
-      $(@spinner.el).remove() if @spinner
-      $('#gradebook-grid-wrapper').show()
-      @uid = @gradebookGrid.grid.getUID()
-      $('#content').focus ->
-        $('#accessibility_warning').removeClass('screenreader-only')
-      $('#accessibility_warning').focus ->
-        $('#accessibility_warning').blur ->
-          $('#accessibility_warning').remove()
-      @$grid = grid = $('#gradebook_grid')
-        .fillWindowWithMe({
-          onResize: => @gradebookGrid.grid.resizeCanvas()
-        })
-        .delegate '.slick-cell',
-          'mouseenter.gradebook' : @highlightColumn
-          'mouseleave.gradebook' : @unhighlightColumns
-          'mouseenter' : (event) ->
-            grid.find('.hover, .focus').removeClass('hover focus')
-            $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
-          'mouseleave' : (event) ->
-            $(this).removeClass('hover focus')
-
-      @$grid.addClass('editable') if @options.gradebook_is_editable
-
-      @fixMaxHeaderWidth()
-      @gradebookGrid.grid.onColumnsResized.subscribe (e, data) =>
-        @$grid.find('.slick-header-column').each (i, elem) =>
-          $columnHeader = $(elem)
-          columnDef = $columnHeader.data('column')
-          return unless columnDef.type is "assignment"
-          if $columnHeader.outerWidth() <= columnWidths.assignment.min
-            @minimizeColumn($columnHeader) unless columnDef.minimized
-          else if columnDef.minimized
-            @unminimizeColumn($columnHeader)
-
-      @keyboardNav.init()
-      keyBindings = @keyboardNav.keyBindings
-      @kbDialog = new KeyboardNavDialog().render(KeyboardNavTemplate({keyBindings}))
-      $(document).trigger('gridready')
 
     sectionList: () ->
       _.values(@sections).sort((a, b) => (a.id - b.id))
@@ -1703,6 +1659,53 @@ define [
           @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
       @onGridInit()
+
+    onGridInit: () ->
+      tooltipTexts = {}
+      # TODO: this "if @spinner" crap is necessary because the outcome
+      # gradebook kicks off the gradebook (unnecessarily).  back when the
+      # gradebook was slow, this code worked, but now the spinner may never
+      # initialize.  fix the way outcome gradebook loads
+      $(@spinner.el).remove() if @spinner
+      $('#gradebook-grid-wrapper').show()
+      @uid = @gradebookGrid.grid.getUID()
+
+      $('#content').focus ->
+        $('#accessibility_warning').removeClass('screenreader-only')
+      $('#accessibility_warning').focus ->
+        $('#accessibility_warning').blur ->
+          $('#accessibility_warning').remove()
+
+      @$grid = grid = $('#gradebook_grid')
+        .fillWindowWithMe({
+          onResize: => @gradebookGrid.grid.resizeCanvas()
+        })
+        .delegate '.slick-cell',
+          'mouseenter.gradebook' : @highlightColumn
+          'mouseleave.gradebook' : @unhighlightColumns
+          'mouseenter' : (event) ->
+            grid.find('.hover, .focus').removeClass('hover focus')
+            $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
+          'mouseleave' : (event) ->
+            $(this).removeClass('hover focus')
+
+      @$grid.addClass('editable') if @options.gradebook_is_editable
+
+      @fixMaxHeaderWidth()
+      @gradebookGrid.grid.onColumnsResized.subscribe (e, data) =>
+        @$grid.find('.slick-header-column').each (i, elem) =>
+          $columnHeader = $(elem)
+          columnDef = $columnHeader.data('column')
+          return unless columnDef.type is "assignment"
+          if $columnHeader.outerWidth() <= columnWidths.assignment.min
+            @minimizeColumn($columnHeader) unless columnDef.minimized
+          else if columnDef.minimized
+            @unminimizeColumn($columnHeader)
+
+      @keyboardNav.init()
+      keyBindings = @keyboardNav.keyBindings
+      @kbDialog = new KeyboardNavDialog().render(KeyboardNavTemplate({keyBindings}))
+      $(document).trigger('gridready')
 
     # Grid Event Handlers
 
