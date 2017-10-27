@@ -1696,36 +1696,51 @@ test('returns the result of compareAssignmentPositions', function () {
   strictEqual(this.comparisonResult, -1);
 });
 
-QUnit.module('Gradebook#storeCustomColumnOrder');
+QUnit.module('Gradebook Column Ordering', () => {
+  let gradebook;
 
-test('stores the custom column order (ignoring frozen columns)', function () {
-  const columns = [
-    { id: 'student' },
-    { id: 'assignment_232' },
-    { id: 'total_grade' },
-    { id: 'assignment_group_12' }
-  ];
-  const gradeBook = createGradebook();
-  this.stub(gradeBook, 'setStoredSortOrder');
-  gradeBook.gradebookGrid.grid = {
-    getColumns () {
-      return columns;
-    },
+  QUnit.module('#saveCustomColumnOrder', (hooks) => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      const columns = [
+        { id: 'student' },
+        { id: 'custom_col_2401' },
+        { id: 'assignment_2301' },
+        { id: 'assignment_2302' },
+        { id: 'assignment_group_2201' },
+        { id: 'total_grade' }
+      ];
+      columns.forEach((column) => {
+        gradebook.gridData.columns.definitions[column.id] = column;
+      });
+      gradebook.gridData.columns.frozen = columns.slice(0, 2).map(column => column.id);
+      gradebook.gridData.columns.scrollable = columns.slice(2).map(column => column.id);
 
-    getOptions () {
-      return {
-        numberOfColumnsToFreeze: 1
-      }
-    }
-  };
+      sinon.stub(gradebook, 'setStoredSortOrder');
+    });
 
-  const expectedSortOrder = {
-    sortType: 'custom',
-    customOrder: ['assignment_232', 'total_grade', 'assignment_group_12']
-  };
+    hooks.afterEach(() => {
+      gradebook.destroy();
+    });
 
-  gradeBook.storeCustomColumnOrder();
-  ok(gradeBook.setStoredSortOrder.calledWith(expectedSortOrder));
+    test('stores the order of scrollable columns', () => {
+      gradebook.saveCustomColumnOrder();
+      strictEqual(gradebook.setStoredSortOrder.callCount, 1);
+    });
+
+    test('includes the "sortType" when storing the order', () => {
+      gradebook.saveCustomColumnOrder();
+      const [sortOrder] = gradebook.setStoredSortOrder.lastCall.args;
+      equal(sortOrder.sortType, 'custom');
+    });
+
+    test('includes the column order when storing the order', () => {
+      gradebook.saveCustomColumnOrder();
+      const [sortOrder] = gradebook.setStoredSortOrder.lastCall.args;
+      const expectedOrder = ['assignment_2301', 'assignment_2302', 'assignment_group_2201', 'total_grade'];
+      deepEqual(sortOrder.customOrder, expectedOrder);
+    });
+  });
 });
 
 QUnit.module('Gradebook#getStoredSortOrder', {
@@ -4058,7 +4073,7 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
       sinon.stub(gradebook, 'reorderCustomColumns').returns(Promise.resolve());
       sinon.stub(gradebook, 'renderViewOptionsMenu');
       sinon.stub(gradebook, 'updateColumnHeaders');
-      sinon.stub(gradebook, 'storeCustomColumnOrder');
+      sinon.stub(gradebook, 'saveCustomColumnOrder');
     });
 
     test('reorders custom columns when frozen columns were reordered', () => {
@@ -4072,7 +4087,7 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
       columns.frozen = allColumns.slice(0, 3);
       columns.scrollable = [allColumns[7], ...allColumns.slice(3, 7)];
       gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
-      strictEqual(gradebook.storeCustomColumnOrder.callCount, 1);
+      strictEqual(gradebook.saveCustomColumnOrder.callCount, 1);
     });
 
     test('re-renders the View options menu', () => {

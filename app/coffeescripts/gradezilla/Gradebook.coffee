@@ -346,7 +346,7 @@ define [
               colsById = _(@gradebookContent.customColumns).indexBy (c) -> c.id
               @gradebookContent.customColumns = _(customColumnIds).map (id) -> colsById[id]
         else
-          @storeCustomColumnOrder()
+          @saveCustomColumnOrder()
 
         @renderViewOptionsMenu()
         @updateColumnHeaders()
@@ -687,15 +687,11 @@ define [
     reorderCustomColumns: (ids) ->
       $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
 
-    storeCustomColumnOrder: =>
-      newSortOrder =
+    saveCustomColumnOrder: =>
+      @setStoredSortOrder(
+        customOrder: @gridData.columns.scrollable
         sortType: 'custom'
-        customOrder: []
-      columns = @gradebookGrid.grid.getColumns()
-      numberOfColumnsToFreeze = @gradebookGrid.grid.getOptions().numberOfColumnsToFreeze
-      scrollable_columns = columns.slice(numberOfColumnsToFreeze)
-      newSortOrder.customOrder = _.pluck(scrollable_columns, 'id')
-      @setStoredSortOrder(newSortOrder)
+      )
 
     arrangeColumnsBy: (newSortOrder, isFirstArrangement) =>
       @setStoredSortOrder(newSortOrder) unless isFirstArrangement

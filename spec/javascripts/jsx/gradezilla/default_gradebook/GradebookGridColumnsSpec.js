@@ -202,7 +202,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid);
       reorderApiResponse = $.Deferred();
       sinon.stub(gradebook, 'reorderCustomColumns').returns(reorderApiResponse);
-      sinon.stub(gradebook, 'storeCustomColumnOrder');
+      sinon.stub(gradebook, 'saveCustomColumnOrder');
       gradebook.gradebookGrid.events.onColumnsReordered.subscribe((_event, columns) => {
         reorderEventData = columns;
       });
@@ -223,7 +223,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
         'student', 'custom_col_2401', 'custom_col_2402', 'assignment_2302', 'assignment_2301',
         'assignment_group_2201', 'assignment_group_2202', 'total_grade'
       ]);
-      strictEqual(gradebook.storeCustomColumnOrder.callCount, 1);
+      strictEqual(gradebook.saveCustomColumnOrder.callCount, 1);
     });
 
     test('stores "custom" column order when assignment group columns were reordered', function () {
@@ -231,7 +231,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
         'student', 'custom_col_2401', 'custom_col_2402', 'assignment_2301', 'assignment_2302',
         'assignment_group_2202', 'assignment_group_2201', 'total_grade'
       ]);
-      strictEqual(gradebook.storeCustomColumnOrder.callCount, 1);
+      strictEqual(gradebook.saveCustomColumnOrder.callCount, 1);
     });
 
     test('triggers the "onColumnsReordered" event with updated frozen columns', function () {
