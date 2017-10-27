@@ -18,6 +18,7 @@
 
 import { Grid } from 'vendor/slickgrid';
 import 'jqueryui/sortable';
+import GridSupport from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support';
 
 export default class GradebookGrid {
   constructor (options) {
@@ -46,6 +47,14 @@ export default class GradebookGrid {
 
     this.grid = new Grid(this.options.$container, this.gridData.rows, columns, options);
     this.grid.setSortColumn('student');
+
+    const gridSupportOptions = {
+      activeBorderColor: this.options.activeBorderColor,
+      activeHeaderBackground: this.options.activeHeaderBackground,
+      columnHeaderRenderer: this.options.columnHeaderRenderer,
+      rows: this.gridData.rows
+    };
+    this.gridSupport = new GridSupport(this.grid, gridSupportOptions);
   }
 
   invalidate () {

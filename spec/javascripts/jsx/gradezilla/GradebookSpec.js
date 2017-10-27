@@ -2040,7 +2040,7 @@ QUnit.module('Gradebook#switchTotalDisplay', {
       show_total_grade_as_points: true,
       setting_update_url: 'http://settingUpdateUrl'
     });
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -2091,12 +2091,12 @@ test('invalidates the grid so it re-renders it', function () {
 
 test('updates the total grade column header', function () {
   this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['total_grade']);
 });
 
@@ -3861,7 +3861,7 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
   });
 
   this.triggerEvent = function (eventName, event, location) {
-    return this.gradebook.gridSupport.events[eventName].trigger(event, location);
+    return this.gradebook.gradebookGrid.gridSupport.events[eventName].trigger(event, location);
   };
 
   QUnit.module('onActiveLocationChanged', {
@@ -3871,7 +3871,7 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
   });
 
   test('sets focus on the student grades link when a "student" body cell becomes active', function () {
-    this.stub(this.gradebook.gridSupport.state, 'getActiveNode')
+    this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
     strictEqual(document.activeElement, this.$studentGradesLink);
@@ -3880,7 +3880,7 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
   test('does nothing when a "student" body cell without a student grades link becomes active', function () {
     const previousActiveElement = document.activeElement;
     $fixtures.querySelector('#example-gradebook-cell').innerHTML = 'Student Name';
-    this.stub(this.gradebook.gridSupport.state, 'getActiveNode')
+    this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
     strictEqual(document.activeElement, previousActiveElement);
@@ -4134,7 +4134,7 @@ QUnit.module('Gradebook#updateColumnHeaders', {
       { type: 'total_grade' }
     ];
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -4149,7 +4149,7 @@ QUnit.module('Gradebook#updateColumnHeaders', {
 
 test('uses Grid Support to update the column headers', function () {
   this.gradebook.updateColumnHeaders();
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 QUnit.module('Gradebook#freezeTotalGradeColumn', {
@@ -4311,7 +4311,7 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
 
       setNumberOfColumnsToFreeze () {}
     };
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       columns: {
         getColumns () {
           return {
@@ -4777,7 +4777,7 @@ test('returns array including multiple values when settings are on', function ()
 QUnit.module('Gradebook#toggleEnrollmentFilter', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -4803,12 +4803,12 @@ test('saves settings', function () {
 
 test('updates the student column header', function () {
   this.gradebook.toggleEnrollmentFilter('inactive');
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.toggleEnrollmentFilter('inactive');
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['student']);
 });
 
@@ -4829,7 +4829,7 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
     gradebook.gradebookGrid.grid = {
       invalidate () {}
     };
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders () {}
       }
@@ -4901,7 +4901,7 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
     hooks.beforeEach(function () {
       sinon.stub(gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
       sinon.stub(gradebook.gradebookGrid, 'invalidate');
-      sinon.stub(gradebook.gridSupport.columns, 'updateColumnHeaders');
+      sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders');
     });
 
     hooks.afterEach(function () {
@@ -4927,20 +4927,20 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
 
     test('updates the column header for the related assignment column', function () {
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
-      strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+      strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
     });
 
     test('updates the column header with the assignment column id', function () {
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
-      const [columnIds] = gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+      const [columnIds] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
       deepEqual(columnIds, ['assignment_2301']);
     });
 
     test('updates the column header after settings have been saved', function () {
       gradebook.saveSettings.callsFake((_data, callback) => {
-        strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 0);
+        strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 0);
         callback();
-        strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+        strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
       });
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
     });
@@ -6053,7 +6053,7 @@ test('returns the current_grading_period_id when set and the "filter columns by"
 QUnit.module('Gradebook#setSelectedPrimaryInfo', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -6084,19 +6084,19 @@ test('re-renders the grid unless asked not to do it', function () {
 test('updates the student column header', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false);
 
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false);
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['student']);
 });
 
 QUnit.module('Gradebook#setSelectedSecondaryInfo', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -6127,12 +6127,12 @@ test('re-renders the grid unless asked not to do it', function () {
 test('updates the student column header', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false);
 
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false);
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['student']);
 });
 
@@ -6205,8 +6205,8 @@ QUnit.module('Gradebook#onGridBlur', {
       }
     });
     this.gradebook.initGrid();
-    this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
-    this.spy(this.gradebook.gridSupport.state, 'blur');
+    this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
+    this.spy(this.gradebook.gradebookGrid.gridSupport.state, 'blur');
   },
 
   teardown () {
@@ -6229,20 +6229,20 @@ test('does not close grid details tray when not open', function () {
 
 test('blurs the grid when clicking off grid cells', function () {
   this.gradebook.onGridBlur({ target: document.body });
-  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 1);
 });
 
 test('does not blur the grid when clicking on the active cell', function () {
-  const $activeNode = this.gradebook.gridSupport.state.getActiveNode();
+  const $activeNode = this.gradebook.gradebookGrid.gridSupport.state.getActiveNode();
   this.gradebook.onGridBlur({ target: $activeNode });
-  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 0);
 });
 
 test('does not blur the grid when clicking on another grid cell', function () {
-  const $activeNode = this.gradebook.gridSupport.state.getActiveNode();
-  this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 1, row: 0 });
+  const $activeNode = this.gradebook.gradebookGrid.gridSupport.state.getActiveNode();
+  this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 1, row: 0 });
   this.gradebook.onGridBlur({ target: $activeNode });
-  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 0);
 });
 
 QUnit.module('GridColor', {
@@ -6315,7 +6315,7 @@ QUnit.module('Gradebook#updateSubmissionsFromExternal', {
       updateCell: this.stub(),
       getColumns () { return columns },
     };
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -6351,7 +6351,7 @@ test('updates column headers', function () {
     { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true }
   ];
   this.gradebook.updateSubmissionsFromExternal(submissions);
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the column ids for related assignments when updating column headers', function () {
@@ -6361,7 +6361,7 @@ test('includes the column ids for related assignments when updating column heade
     { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
   ];
   this.gradebook.updateSubmissionsFromExternal(submissions);
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds.sort(), ['assignment_201', 'assignment_202']);
 });
 
@@ -6392,7 +6392,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
         ]
       }
     };
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -6610,7 +6610,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         ]
       }
     };
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -6722,7 +6722,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
       }
     };
     sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]));
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -6748,7 +6748,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('does not show the previous student arrow for the first student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6757,7 +6757,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('shows the next student arrow for the first student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6766,7 +6766,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('does not show the next student arrow for the last student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6775,7 +6775,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('shows the previous student arrow for the last student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6784,7 +6784,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('clicking the next student arrow calls loadTrayStudent with "next"', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
     sinon.stub(gradebook, 'loadTrayStudent');
     sinon.stub(gradebook, 'getCommentsUpdating').returns(false);
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true);
@@ -6799,7 +6799,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('clicking the previous student arrow calls loadTrayStudent with "previous"', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
     sinon.stub(gradebook, 'loadTrayStudent');
     sinon.stub(gradebook, 'getCommentsUpdating').returns(false);
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true);
@@ -6841,7 +6841,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
 
   hooks.beforeEach(() => {
     gradebook = createGradebook();
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       state: {
         getActiveLocation: () => ({ region: 'body', cell: 0, row: 1 }),
         setActiveLocation: sinon.stub()
@@ -6882,7 +6882,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
     gradebook.loadTrayStudent('previous');
 
     const expectation = ['body', { cell: 0, row: 0}];
-    deepEqual(gradebook.gridSupport.state.setActiveLocation.firstCall.args, expectation);
+    deepEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args, expectation);
   });
 
   test('when called with "previous", updates the submission tray state', function () {
@@ -6905,14 +6905,14 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "previous" while on the first row, does not change the highlighted cell', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
     gradebook.loadTrayStudent('previous');
 
-    strictEqual(gradebook.gridSupport.state.setActiveLocation.callCount, 0);
+    strictEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount, 0);
   });
 
   test('when called with "previous" while on the first row, does not update the submission tray state', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
     sinon.stub(gradebook, 'setSubmissionTrayState');
     gradebook.loadTrayStudent('previous');
 
@@ -6920,7 +6920,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "previous" while on the first row, does not update and render the submission tray', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
     gradebook.loadTrayStudent('previous');
 
     strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0);
@@ -6930,7 +6930,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
     gradebook.loadTrayStudent('next');
 
     const expectation = ['body', { cell: 0, row: 2}];
-    deepEqual(gradebook.gridSupport.state.setActiveLocation.firstCall.args, expectation);
+    deepEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args, expectation);
   });
 
   test('when called with "next", updates the submission tray state', function () {
@@ -6953,14 +6953,14 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "next" while on the last row, does not change the highlighted cell', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
     gradebook.loadTrayStudent('next');
 
-    strictEqual(gradebook.gridSupport.state.setActiveLocation.callCount, 0);
+    strictEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount, 0);
   });
 
   test('when called with "next" while on the last row, does not update the submission tray state', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
     sinon.stub(gradebook, 'setSubmissionTrayState');
     gradebook.loadTrayStudent('next');
 
@@ -6968,7 +6968,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "next" while on the last row, does not update and render the submission tray', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
     gradebook.loadTrayStudent('next');
 
     strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0);
@@ -7007,7 +7007,7 @@ test('renders the submission tray', function () {
 QUnit.module('Gradebook#toggleSubmissionTrayOpen', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -7044,7 +7044,7 @@ QUnit.module('Gradebook#closeSubmissionTray', {
     this.activeStudentId = '1101';
     this.gradebook.gridData.rows = [{ id: this.activeStudentId }];
     this.gradebook.gradebookGrid.grid = { getActiveCell () { return { row: 0 } } };
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {},
@@ -7073,15 +7073,15 @@ test('calls updateRowAndRenderSubmissionTray with the student id for the active 
 });
 
 test('puts the active grid cell back into "editing" mode', function () {
-  this.stub(this.gradebook.gridSupport.helper, 'beginEdit');
+  this.stub(this.gradebook.gradebookGrid.gridSupport.helper, 'beginEdit');
   this.gradebook.closeSubmissionTray();
-  strictEqual(this.gradebook.gridSupport.helper.beginEdit.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.beginEdit.callCount, 1);
 });
 
 QUnit.module('Gradebook#setSubmissionTrayState', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit: this.stub(),
         focus: this.stub()
@@ -7107,12 +7107,12 @@ test('sets the state of the submission tray', function () {
 
 test('puts cell in view mode when tray is opened', function () {
   this.gradebook.setSubmissionTrayState(true, '1', '2');
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 1);
 });
 
 test('does not put cell in view mode when tray is closed', function () {
   this.gradebook.setSubmissionTrayState(false, '1', '2');
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 0);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 0);
 });
 
 QUnit.module('Gradebook#getSubmissionTrayState', {

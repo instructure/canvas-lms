@@ -145,7 +145,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
   });
 
   suiteHooks.afterEach(function () {
-    gradebook.gridSupport.destroy();
+    gradebook.gradebookGrid.gridSupport.destroy();
     gradebook.gradebookGrid.grid.destroy();
     DataLoader.loadGradebookData.restore();
     DataLoader.getDataForColumn.restore();

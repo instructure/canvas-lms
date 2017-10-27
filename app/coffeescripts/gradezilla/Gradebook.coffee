@@ -55,7 +55,6 @@ define [
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
   'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory'
   'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer'
-  'jsx/gradezilla/default_gradebook/slick-grid/grid-support'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
@@ -103,7 +102,7 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
-  GradebookGrid, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport, studentRowHeaderConstants,
+  GradebookGrid, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, studentRowHeaderConstants,
   AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter,
   GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
@@ -257,7 +256,10 @@ define [
 
       @gradebookGrid = new GradebookGrid({
         $container: document.getElementById('gradebook_grid')
+        activeBorderColor: '#1790DF' # $active-border-color
+        activeHeaderBackground: if ENV.use_high_contrast then '#E6F1F7' else '#E5F2F8' # $ic-bg-light-primary
         change_grade_url: @options.change_grade_url
+        columnHeaderRenderer: new ColumnHeaderRenderer(@)
         data: @gridData
         editable: @options.gradebook_is_editable
         editorFactory: new CellEditorFactory()
@@ -614,7 +616,7 @@ define [
     gotAllStudents: =>
       @setStudentsLoaded(true)
       @renderedGrid.then =>
-        @gridSupport.columns.updateColumnHeaders(['student'])
+        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
 
     studentsThatCanSeeAssignment: (assignmentId) ->
       @courseContent.assignmentStudentVisibility[assignmentId] ||= (
@@ -847,13 +849,13 @@ define [
     ## Course Content Event Handlers
 
     handleAssignmentMutingChange: (assignment) =>
-      @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignment.id)])
+      @gradebookGrid.gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignment.id)])
       @updateFilteredContentInfo()
       @buildRows()
 
     handleSubmissionsDownloading: (assignmentId) =>
       @getAssignment(assignmentId).hasDownloadedSubmissions = true
-      @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
+      @gradebookGrid.gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
 
     # filter, sort, and build the dataset for slickgrid to read from, then
     # force a full redraw
@@ -939,7 +941,7 @@ define [
         changedStudentIds.push(student.id)
 
       changedColumnIds = Object.keys(changedColumnHeaders).map(@getAssignmentColumnId)
-      @gridSupport.columns.updateColumnHeaders(changedColumnIds)
+      @gradebookGrid.gridSupport.columns.updateColumnHeaders(changedColumnIds)
 
       @updateRowCellsForStudentIds(_.uniq(changedStudentIds))
 
@@ -1029,15 +1031,15 @@ define [
       @closeSubmissionTray() if @getSubmissionTrayState().open
 
       # Prevent exiting the cell editor when clicking in the cell being edited.
-      editingNode = @gridSupport.state.getEditingNode()
+      editingNode = @gradebookGrid.gridSupport.state.getEditingNode()
       return if editingNode?.contains(e.target)
 
-      activeNode = @gridSupport.state.getActiveNode()
+      activeNode = @gradebookGrid.gridSupport.state.getActiveNode()
       return unless activeNode
 
       if activeNode.contains(e.target)
         # SlickGrid does not re-engage the editor for the active cell upon single click
-        @gridSupport.helper.beginEdit()
+        @gradebookGrid.gridSupport.helper.beginEdit()
         return
 
       className = e.target.className
@@ -1053,7 +1055,7 @@ define [
       # Do nothing if clicking on another cell
       return if className.match(/cell|slick/)
 
-      @gridSupport.state.blur()
+      @gradebookGrid.gridSupport.state.blur()
 
     onGridInit: () ->
       tooltipTexts = {}
@@ -1451,7 +1453,7 @@ define [
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @gradebookGrid.invalidate()
-      @gridSupport.columns.updateColumnHeaders(['total_grade'])
+      @gradebookGrid.gridSupport.columns.updateColumnHeaders(['total_grade'])
 
     togglePointsOrPercentTotals: (cb) =>
       if UserSettings.contextGet('warned_about_totals_display')
@@ -1559,7 +1561,7 @@ define [
         id: columnId
         field: fieldName
         object: assignment
-        getGridSupport: => @gridSupport
+        getGridSupport: => @gradebookGrid.gridSupport
         propFactory: new AssignmentRowCellPropFactory(assignment, @)
         minWidth: columnWidths.assignment.min
         maxWidth: columnWidths.assignment.max
@@ -1669,54 +1671,40 @@ define [
       @gradebookGrid.grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @gradebookGrid.grid.onCellChange.subscribe @onCellChange
 
-      gridSupportOptions = {
-        activeBorderColor: '#1790DF' # $active-border-color
-        columnHeaderRenderer: new ColumnHeaderRenderer(@)
-        rows: @gridData.rows
-      }
-
-      if ENV.use_high_contrast
-        gridSupportOptions.activeHeaderBackground = '#E6F1F7' # $ic-bg-light-primary
-      else
-        gridSupportOptions.activeHeaderBackground = '#E5F2F8' # $ic-bg-light-primary
-
-      # Improved SlickGrid Management
-      @gridSupport = new GridSupport(@gradebookGrid.grid, gridSupportOptions)
-
       @keyboardNav = new GradebookKeyboardNav({
-        gridSupport: @gridSupport,
+        gridSupport: @gradebookGrid.gridSupport,
         getColumnTypeForColumnId: @getColumnTypeForColumnId,
         toggleDefaultSort: @toggleDefaultSort,
         openSubmissionTray: @openSubmissionTray
       })
 
-      @gridSupport.initialize()
+      @gradebookGrid.gridSupport.initialize()
 
-      @gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>
+      @gradebookGrid.gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>
         if location.columnId == 'student' && location.region == 'body'
-          @gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
+          @gradebookGrid.gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
 
-      @gridSupport.events.onKeyDown.subscribe (event, location) =>
+      @gradebookGrid.gridSupport.events.onKeyDown.subscribe (event, location) =>
         if (location.region == 'header')
           @getHeaderComponentRef(location.columnId)?.handleKeyDown(event)
 
-      @gridSupport.events.onNavigatePrev.subscribe (event, location) =>
+      @gradebookGrid.gridSupport.events.onNavigatePrev.subscribe (event, location) =>
         if (location.region == 'header')
           @getHeaderComponentRef(location.columnId)?.focusAtEnd()
 
-      @gridSupport.events.onNavigateNext.subscribe (event, location) =>
+      @gradebookGrid.gridSupport.events.onNavigateNext.subscribe (event, location) =>
         if (location.region == 'header')
           @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
-      @gridSupport.events.onNavigateLeft.subscribe (event, location) =>
+      @gradebookGrid.gridSupport.events.onNavigateLeft.subscribe (event, location) =>
         if (location.region == 'header')
           @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
-      @gridSupport.events.onNavigateRight.subscribe (event, location) =>
+      @gradebookGrid.gridSupport.events.onNavigateRight.subscribe (event, location) =>
         if (location.region == 'header')
           @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
-      @gridSupport.events.onNavigateUp.subscribe (event, location) =>
+      @gradebookGrid.gridSupport.events.onNavigateUp.subscribe (event, location) =>
         if (location.region == 'header')
           @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
@@ -2081,11 +2069,11 @@ define [
     ## React Grid Component Rendering Methods
 
     updateColumnHeaders: ->
-      @gridSupport?.columns.updateColumnHeaders()
+      @gradebookGrid.gridSupport?.columns.updateColumnHeaders()
 
     # Column Header Helpers
     handleHeaderKeyDown: (e, columnId) =>
-      @gridSupport.navigation.handleHeaderKeyDown e,
+      @gradebookGrid.gridSupport.navigation.handleHeaderKeyDown e,
         region: 'header'
         cell: @gradebookGrid.grid.getColumnIndex(columnId)
         columnId: columnId
@@ -2122,11 +2110,11 @@ define [
     # Submission Tray
 
     assignmentColumns: =>
-      @gridSupport.grid.getColumns().filter (column) =>
+      @gradebookGrid.gridSupport.grid.getColumns().filter (column) =>
         column.type == 'assignment'
 
     navigateAssignment: (direction) =>
-      location = @gridSupport.state.getActiveLocation()
+      location = @gradebookGrid.gridSupport.state.getActiveLocation()
       columns = @gradebookGrid.grid.getColumns()
       range = if direction == 'next'
         [location.cell + 1 .. columns.length]
@@ -2138,21 +2126,21 @@ define [
         curAssignment = columns[i]
 
         if curAssignment.id.match(/^assignment_(?!group)/)
-          this.gridSupport.state.setActiveLocation('body', { row: location.row, cell: i })
+          @gradebookGrid.gridSupport.state.setActiveLocation('body', { row: location.row, cell: i })
           assignment = curAssignment
           break
 
       assignment
 
     loadTrayStudent: (direction) =>
-      location = @gridSupport.state.getActiveLocation()
+      location = @gradebookGrid.gridSupport.state.getActiveLocation()
       rowDelta = if direction == 'next' then 1 else -1
       newRowIdx = location.row + rowDelta
       student = @listRows()[newRowIdx]
 
       return unless student
 
-      @gridSupport.state.setActiveLocation('body', { row: newRowIdx, cell: location.cell })
+      @gradebookGrid.gridSupport.state.setActiveLocation('body', { row: newRowIdx, cell: location.cell })
       @setSubmissionTrayState(true, student.id)
       @updateRowAndRenderSubmissionTray(student.id)
 
@@ -2173,10 +2161,10 @@ define [
       fakeSubmission = { assignment_id: assignmentId, late: false, missing: false, excused: false, seconds_late: 0 }
       submission = @getSubmission(studentId, assignmentId) || fakeSubmission
       assignment = @getAssignment(assignmentId)
-      activeLocation = @gridSupport.state.getActiveLocation()
+      activeLocation = @gradebookGrid.gridSupport.state.getActiveLocation()
       cell = activeLocation.cell
 
-      columns = @gridSupport.grid.getColumns()
+      columns = @gradebookGrid.gridSupport.grid.getColumns()
       currentColumn = columns[cell]
 
       assignmentColumns = @assignmentColumns()
@@ -2207,7 +2195,7 @@ define [
       key: "grade_details_tray"
       latePolicy: @courseContent.latePolicy
       locale: @options.locale
-      onClose: => @gridSupport.helper.focus()
+      onClose: => @gradebookGrid.gridSupport.helper.focus()
       onGradeSubmission: @gradeSubmission
       onRequestClose: @closeSubmissionTray
       selectNextAssignment: => @loadTrayAssignment('next')
@@ -2266,7 +2254,7 @@ define [
       rowIndex = @gradebookGrid.grid.getActiveCell().row
       studentId = @gridData.rows[rowIndex].id
       @updateRowAndRenderSubmissionTray(studentId)
-      @gridSupport.helper.beginEdit()
+      @gradebookGrid.gridSupport.helper.beginEdit()
 
     getSubmissionTrayState: =>
       @gridDisplaySettings.submissionTray
@@ -2275,7 +2263,7 @@ define [
       @gridDisplaySettings.submissionTray.open = open
       @gridDisplaySettings.submissionTray.studentId = studentId if studentId
       @gridDisplaySettings.submissionTray.assignmentId = assignmentId if assignmentId
-      @gridSupport.helper.commitCurrentEdit() if open
+      @gradebookGrid.gridSupport.helper.commitCurrentEdit() if open
 
     setCommentsUpdating: (status) =>
       @gridDisplaySettings.submissionTray.commentsUpdating = !!status
@@ -2420,7 +2408,7 @@ define [
       @saveSettings()
       unless skipRedraw
         @buildRows()
-        @gridSupport.columns.updateColumnHeaders(['student'])
+        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
 
     toggleDefaultSort: (columnId) =>
       sortSettings = @getSortRowsBySetting()
@@ -2447,7 +2435,7 @@ define [
       @saveSettings()
       unless skipRedraw
         @buildRows()
-        @gridSupport.columns.updateColumnHeaders(['student'])
+        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
 
     getSelectedSecondaryInfo: () =>
       @gridDisplaySettings.selectedSecondaryInfo
@@ -2498,7 +2486,7 @@ define [
       showInactive = @getEnrollmentFilters().inactive
       showConcluded = @getEnrollmentFilters().concluded
       @saveSettings({ showInactive, showConcluded }, =>
-        @gridSupport.columns.updateColumnHeaders(['student'])
+        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
         @reloadStudentData()
       )
 
@@ -2528,7 +2516,7 @@ define [
     updateEnterGradesAsSetting: (assignmentId, value) =>
       @setEnterGradesAsSetting(assignmentId, value)
       @saveSettings({}, =>
-        @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
+        @gradebookGrid.gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
         @gradebookGrid.invalidate()
       )
 
