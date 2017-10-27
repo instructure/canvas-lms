@@ -208,7 +208,7 @@ import 'compiled/jquery.rails_flash_notifications'
           if (current_activity_container) {
             current_activity_container.show();
           }
-          current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+          current_activity_container.prev().find('.context_module_sub_header_expander').children('.sm-unit-dropdown-icon').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
         } else {
           current_lesson_state = "unstarted";
           if (last_lesson_state === "complete") {
@@ -216,7 +216,7 @@ import 'compiled/jquery.rails_flash_notifications'
             if (current_activity_container) {
               current_activity_container.show();
             }
-            current_activity_container.prev().find('.context_module_sub_header_expander').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
+            current_activity_container.prev().find('.context_module_sub_header_expander').children('.sm-unit-dropdown-icon').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
           }
         }
       },
