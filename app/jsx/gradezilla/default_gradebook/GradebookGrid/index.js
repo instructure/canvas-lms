@@ -18,6 +18,9 @@
 
 import { Grid } from 'vendor/slickgrid';
 import 'jqueryui/sortable';
+import CellEditorFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory';
+import CellFormatterFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory';
+import ColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer';
 import GridSupport from './GridSupport';
 
 export default class GradebookGrid {
@@ -31,10 +34,10 @@ export default class GradebookGrid {
       autoEdit: true, // whether to go into edit-mode as soon as you tab to a cell
       change_grade_url: this.options.change_grade_url, // used by SubmissionCell
       editable: this.options.editable,
-      editorFactory: this.options.editorFactory,
+      editorFactory: new CellEditorFactory(),
       enableCellNavigation: true,
       enableColumnReorder: true,
-      formatterFactory: this.options.formatterFactory,
+      formatterFactory: new CellFormatterFactory(this.options.gradebook),
       headerHeight: 38,
       numberOfColumnsToFreeze: this.gridData.columns.frozen.length,
       rowHeight: 35,
@@ -51,7 +54,7 @@ export default class GradebookGrid {
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,
       activeHeaderBackground: this.options.activeHeaderBackground,
-      columnHeaderRenderer: this.options.columnHeaderRenderer,
+      columnHeaderRenderer: new ColumnHeaderRenderer(this.options.gradebook),
       rows: this.gridData.rows
     };
     this.gridSupport = new GridSupport(this.grid, gridSupportOptions);

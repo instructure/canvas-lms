@@ -52,9 +52,6 @@ define [
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
   'jsx/gradezilla/default_gradebook/GradebookGrid'
-  'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
-  'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory'
-  'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
@@ -102,9 +99,8 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
-  GradebookGrid, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, studentRowHeaderConstants,
-  AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter,
-  GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
+  GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu,
+  AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
   AssignmentMuterDialogManager, assignmentHelper, TextMeasure, OutlierScoreHelper, LatePolicyApplicator, { default: Button },
@@ -259,11 +255,9 @@ define [
         activeBorderColor: '#1790DF' # $active-border-color
         activeHeaderBackground: if ENV.use_high_contrast then '#E6F1F7' else '#E5F2F8' # $ic-bg-light-primary
         change_grade_url: @options.change_grade_url
-        columnHeaderRenderer: new ColumnHeaderRenderer(@)
         data: @gridData
         editable: @options.gradebook_is_editable
-        editorFactory: new CellEditorFactory()
-        formatterFactory: new CellFormatterFactory(@)
+        gradebook: @
       })
 
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
