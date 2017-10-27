@@ -252,7 +252,6 @@ define [
       @gradebookGrid = new GradebookGrid({
         $container: document.getElementById('gradebook_grid')
         activeBorderColor: '#1790DF' # $active-border-color
-        activeHeaderBackground: if ENV.use_high_contrast then '#E6F1F7' else '#E5F2F8' # $ic-bg-light-primary
         change_grade_url: @options.change_grade_url
         data: @gridData
         editable: @options.gradebook_is_editable
@@ -966,16 +965,6 @@ define [
 
     ## Grid Styling Methods
 
-    highlightColumn: (event) =>
-      $headers = @$grid.find('.slick-header-column')
-      return if $headers.filter('.slick-sortable-placeholder').length
-      cell = @gradebookGrid.grid.getCellFromEvent(event)
-      col = @gradebookGrid.grid.getColumns()[cell.cell]
-      $headers.filter("##{@uid}#{col.id}").addClass('hovered-column')
-
-    unhighlightColumns: () =>
-      @$grid.find('.hovered-column').removeClass('hovered-column')
-
     minimizeColumn: ($columnHeader) =>
       columnDef = $columnHeader.data('column')
       colIndex = @gradebookGrid.grid.getColumnIndex(columnDef.id)
@@ -1662,18 +1651,10 @@ define [
         $('#accessibility_warning').blur ->
           $('#accessibility_warning').remove()
 
-      @$grid = grid = $('#gradebook_grid')
+      @$grid = $('#gradebook_grid')
         .fillWindowWithMe({
           onResize: => @gradebookGrid.grid.resizeCanvas()
         })
-        .delegate '.slick-cell',
-          'mouseenter.gradebook' : @highlightColumn
-          'mouseleave.gradebook' : @unhighlightColumns
-          'mouseenter' : (event) ->
-            grid.find('.hover, .focus').removeClass('hover focus')
-            $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
-          'mouseleave' : (event) ->
-            $(this).removeClass('hover focus')
 
       @$grid.addClass('editable') if @options.gradebook_is_editable
 

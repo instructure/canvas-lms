@@ -74,8 +74,7 @@ QUnit.module('GridSupport Style', (hooks) => {
     $fixtures.appendChild($gridContainer);
     grid = createGrid();
     gridSupport = new GridSupport(grid, {
-      activeBorderColor: 'rgb(12, 34, 56)',
-      activeHeaderBackground: 'rgb(23, 45, 67)'
+      activeBorderColor: 'rgb(12, 34, 56)'
     });
     gridSupport.initialize();
     grid.invalidate();
@@ -93,7 +92,6 @@ QUnit.module('GridSupport Style', (hooks) => {
       const $cell = gridSupport.state.getActiveColumnHeaderNode();
       const style = window.getComputedStyle($cell);
       equal(style.getPropertyValue('border-color'), 'rgb(12, 34, 56)', 'updates the border style');
-      equal(style.getPropertyValue('background-color'), 'rgb(23, 45, 67)', 'updates the background style');
     });
 
     test('removes styles for the previous active column', () => {
@@ -102,7 +100,6 @@ QUnit.module('GridSupport Style', (hooks) => {
       gridSupport.state.setActiveLocation('header', { cell: 1 });
       const style = window.getComputedStyle($cell);
       equal(style.getPropertyValue('border-color'), 'rgb(0, 0, 0)', 'removes the border style');
-      equal(style.getPropertyValue('background-color'), 'rgba(0, 0, 0, 0)', 'removes the background style');
     });
   });
 
@@ -112,7 +109,6 @@ QUnit.module('GridSupport Style', (hooks) => {
       const $cell = gridSupport.state.getActiveColumnHeaderNode();
       const style = window.getComputedStyle($cell);
       equal(style.getPropertyValue('border-color'), 'rgb(12, 34, 56)', 'updates the border style');
-      equal(style.getPropertyValue('background-color'), 'rgb(23, 45, 67)', 'updates the background style');
     });
 
     test('removes styles for the previous active column', () => {
@@ -121,7 +117,6 @@ QUnit.module('GridSupport Style', (hooks) => {
       gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
       const style = window.getComputedStyle($cell);
       equal(style.getPropertyValue('border-color'), 'rgb(0, 0, 0)', 'removes the border style');
-      equal(style.getPropertyValue('background-color'), 'rgba(0, 0, 0, 0)', 'removes the background style');
     });
   });
 
@@ -132,7 +127,6 @@ QUnit.module('GridSupport Style', (hooks) => {
       gridSupport.state.setActiveLocation('unknown');
       const style = window.getComputedStyle($cell);
       equal(style.getPropertyValue('border-color'), 'rgb(0, 0, 0)', 'removes the border style');
-      equal(style.getPropertyValue('background-color'), 'rgba(0, 0, 0, 0)', 'removes the background style');
     });
   });
 

@@ -58,7 +58,6 @@ export default class GradebookGrid {
 
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,
-      activeHeaderBackground: this.options.activeHeaderBackground,
       columnHeaderRenderer: new ColumnHeaderRenderer(this.options.gradebook),
       rows: this.gridData.rows
     };
