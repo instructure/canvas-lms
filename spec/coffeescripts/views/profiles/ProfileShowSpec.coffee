@@ -18,10 +18,12 @@
 define [
   'jquery'
   'compiled/views/profiles/ProfileShow'
-], ($, ProfileShow) ->
+  'helpers/assertions'
+], ($, ProfileShow, assertions) ->
 
   QUnit.module 'ProfileShow',
     setup: ->
+      @view = new ProfileShow
       @fixtures = document.getElementById('fixtures')
       @fixtures.innerHTML = "<div class='.profile-link'></div>"
       @fixtures.innerHTML += "<textarea id='profile_bio'></textarea>"
@@ -30,8 +32,11 @@ define [
     teardown: ->
       @fixtures.innerHTML = ""
 
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @view, done, {'a11yReport': true}
+
   test 'manages focus on link removal', ->
-    @view = new ProfileShow
     @view.addLinkField()
     $row1 = $('#profile_link_fields tr:last-child')
     @view.addLinkField()
@@ -44,11 +49,9 @@ define [
 
   test 'focuses the name input when it is available and edit is clicked', ->
     @fixtures.innerHTML += "<input id='name_input' />"
-    @view = new ProfileShow
     @view.showEditForm()
     equal(document.activeElement, $('#name_input')[0])
 
   test 'focuses the bio text area when the name input is not available and edit is clicked', ->
-    @view = new ProfileShow
     @view.showEditForm()
     equal(document.activeElement, $('#profile_bio')[0])

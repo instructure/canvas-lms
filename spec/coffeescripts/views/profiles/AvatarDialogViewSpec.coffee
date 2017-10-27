@@ -18,7 +18,8 @@
 define [
   'jquery'
   'compiled/views/profiles/AvatarDialogView'
-], ($, AvatarDialogView) ->
+  'helpers/assertions'
+], ($, AvatarDialogView, assertions) ->
 
   QUnit.module 'AvatarDialogView#onPreflight',
     setup: ->
@@ -28,6 +29,10 @@ define [
       @server.restore()
       @avatarDialogView = null
       $(".ui-dialog").remove()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @avatarDialogView, done, {'a11yReport': true}
 
   test 'calls flashError with base error message when errors are present', ->
     errorMessage = "User storage quota exceeded"
