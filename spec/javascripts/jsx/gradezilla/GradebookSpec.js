@@ -4437,6 +4437,18 @@ test('invalidates the grid, forcing a re-render', function () {
   strictEqual(this.gradebook.gradebookGrid.invalidate.callCount, 1);
 });
 
+QUnit.module('Gradebook Rows', function () {
+  QUnit.module('#buildRows', function () {
+    test('invalidates the grid', function () {
+      const gradebook = createGradebook();
+      sinon.spy(gradebook.gradebookGrid, 'invalidate');
+      gradebook.buildRows();
+      strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1);
+      gradebook.destroy();
+    });
+  });
+});
+
 QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
   let studentSubmissions;
 

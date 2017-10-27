@@ -696,10 +696,6 @@ define [
     arrangeColumnsBy: (newSortOrder, isFirstArrangement) =>
       @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
-      columns = @gradebookGrid.grid.getColumns()
-      frozen = columns.splice(0, @gridData.columns.frozen.length)
-      @gridData.columns.frozen = frozen.map((column) -> column.id)
-
       columns = @gridData.columns.scrollable.map((columnId) => @gridData.columns.definitions[columnId])
       columns.sort @makeColumnSortFn(newSortOrder)
       @gridData.columns.scrollable = columns.map((column) -> column.id)
@@ -864,11 +860,7 @@ define [
           @gridData.rows.push(student)
           @calculateStudentGrade(student) # TODO: this may not be necessary
 
-      return unless @gradebookGrid.grid
-
-      @gradebookGrid.grid.invalidateAllRows()
-      @gradebookGrid.grid.updateRowCount()
-      @gradebookGrid.render()
+      @gradebookGrid.invalidate()
 
     gotSubmissionsChunk: (student_submissions) =>
       changedStudentIds = []
