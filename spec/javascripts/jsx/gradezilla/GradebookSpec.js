@@ -4314,6 +4314,8 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
     gradebook.gradebookGrid.grid = {
       columns: [],
 
+      destroy () {},
+
       getColumns () {
         return this.columns;
       },
@@ -4332,7 +4334,9 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
             scrollable: []
           }
         }
-      }
+      },
+
+      destroy () {}
     };
 
     this.stub(gradebook.gradebookGrid, 'invalidate');

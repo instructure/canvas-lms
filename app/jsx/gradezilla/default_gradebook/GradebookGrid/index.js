@@ -60,6 +60,14 @@ export default class GradebookGrid {
     this.gridSupport = new GridSupport(this.grid, gridSupportOptions);
   }
 
+  destroy () {
+    if (this.grid) {
+      this.gridSupport.destroy();
+      this.grid.destroy();
+      this.grid = null;
+    }
+  }
+
   invalidate () {
     if (this.grid) {
       this.grid.invalidate();

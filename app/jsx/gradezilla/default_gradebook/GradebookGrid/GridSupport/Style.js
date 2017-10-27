@@ -33,8 +33,10 @@ export default class Style {
   }
 
   destroy () {
-    this.$styles.remove();
-    this.$styles = null;
+    if (this.$styles) {
+      this.$styles.remove();
+      this.$styles = null;
+    }
   }
 
   updateClassesForActiveLocation (location) {

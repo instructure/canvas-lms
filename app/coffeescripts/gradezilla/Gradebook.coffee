@@ -2731,3 +2731,4 @@ define [
 
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')
+      @gradebookGrid.destroy()
