@@ -116,7 +116,7 @@ import cx from 'classnames'
     },
 
     topPosition: function(){
-      return $(this.props.parentNode).position().top - 6;
+      return $(this.props.parentNode).position().top + 82;
     },
 
     leftPosition: function(){
