@@ -21,12 +21,17 @@ import 'jqueryui/sortable';
 import CellEditorFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory';
 import CellFormatterFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory';
 import ColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer';
+import Columns from './Columns';
+import Events from './Events';
 import GridSupport from './GridSupport';
 
 export default class GradebookGrid {
   constructor (options) {
     this.gridData = options.data;
     this.options = options;
+
+    this.columns = new Columns(this);
+    this.events = new Events();
   }
 
   initialize () {
@@ -58,6 +63,8 @@ export default class GradebookGrid {
       rows: this.gridData.rows
     };
     this.gridSupport = new GridSupport(this.grid, gridSupportOptions);
+
+    this.columns.initialize();
   }
 
   destroy () {

@@ -3843,8 +3843,8 @@ test('excludes assignments from other assignment groups when filtering by an ass
   deepEqual(_.map(assignments, 'id'), ['2302']);
 });
 
-QUnit.module('Gradebook Grid Events', function (hooks) {
-  hooks.beforeEach(function () {
+QUnit.module('Gradebook Grid Events', function (suiteHooks) {
+  suiteHooks.beforeEach(function () {
     $fixtures.innerHTML = `
       <div id="application">
         <span data-component="GridColor"></span>
@@ -3869,7 +3869,7 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
     this.gradebook.setHeaderComponentRef('student', this.studentColumnHeader);
   });
 
-  hooks.afterEach(function () {
+  suiteHooks.afterEach(function () {
     this.gradebook.destroy();
   });
 
@@ -4028,6 +4028,62 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
     this.gradebook.removeHeaderComponentRef('student');
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  QUnit.module('onColumnsReordered', (hooks) => {
+    let gradebook;
+    let allColumns;
+    let columns;
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      allColumns = [
+        { id: 'student' },
+        { id: 'custom_col_2401' },
+        { id: 'custom_col_2402' },
+        { id: 'assignment_2301' },
+        { id: 'assignment_2302' },
+        { id: 'assignment_group_2201' },
+        { id: 'assignment_group_2202' },
+        { id: 'total_grade' }
+      ];
+      columns = {
+        frozen: allColumns.slice(0, 3),
+        scrollable: allColumns.slice(3)
+      };
+
+      gradebook.gridData.columns.frozen = columns.frozen.map(column => column.id);
+      gradebook.gridData.columns.scrollable = columns.scrollable.map(column => column.id);
+
+      sinon.stub(gradebook, 'reorderCustomColumns').returns(Promise.resolve());
+      sinon.stub(gradebook, 'renderViewOptionsMenu');
+      sinon.stub(gradebook, 'updateColumnHeaders');
+      sinon.stub(gradebook, 'storeCustomColumnOrder');
+    });
+
+    test('reorders custom columns when frozen columns were reordered', () => {
+      columns.frozen = [allColumns[0], allColumns[2], allColumns[1]];
+      columns.scrollable = allColumns.slice(3, 8);
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.reorderCustomColumns.callCount, 1);
+    });
+
+    test('stores custom column order when scrollable columns were reordered', () => {
+      columns.frozen = allColumns.slice(0, 3);
+      columns.scrollable = [allColumns[7], ...allColumns.slice(3, 7)];
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.storeCustomColumnOrder.callCount, 1);
+    });
+
+    test('re-renders the View options menu', () => {
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.renderViewOptionsMenu.callCount, 1);
+    });
+
+    test('re-renders all column headers', () => {
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+    });
   });
 });
 
@@ -5551,66 +5607,6 @@ test('renders the view options menu', function () {
   this.gradebook.arrangeColumnsBy({ sortBy: 'due_date', direction: 'ascending' }, false);
 
   strictEqual(this.gradebook.renderViewOptionsMenu.callCount, 1);
-});
-
-QUnit.module('Gradebook#onColumnsReordered', function (hooks) {
-  let gradebook;
-  let columns;
-  let numberOfColumnsToFreeze;
-
-  hooks.beforeEach(function () {
-    gradebook = createGradebook();
-    columns = [
-      { id: 'student' },
-      { id: 'custom_col_2401' },
-      { id: 'custom_col_2402' },
-      { id: 'assignment_2301' },
-      { id: 'assignment_2302' },
-      { id: 'assignment_group_2201' },
-      { id: 'assignment_group_2202' },
-      { id: 'total_grade' }
-    ];
-    numberOfColumnsToFreeze = 3;
-    gradebook.gradebookGrid.grid = {
-      getColumns () {
-        return columns;
-      },
-      getOptions () {
-        return {
-          numberOfColumnsToFreeze
-        }
-      }
-    }
-    gradebook.gridData.columns.frozen = columns.slice(0, numberOfColumnsToFreeze).map(column => column.id);
-    gradebook.gridData.columns.scrollable = columns.slice(numberOfColumnsToFreeze).map(column => column.id);
-
-    sinon.stub(gradebook, 'reorderCustomColumns').returns(Promise.resolve());
-    sinon.stub(gradebook, 'renderViewOptionsMenu');
-    sinon.stub(gradebook, 'updateColumnHeaders');
-    sinon.stub(gradebook, 'storeCustomColumnOrder');
-  });
-
-  test('reorders custom columns when frozen columns were reordered', function () {
-    columns = [columns[0], columns[2], columns[1], ...columns.slice(3, 8)];
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.reorderCustomColumns.callCount, 1);
-  });
-
-  test('stores custom column order when scrollable columns were reordered', function () {
-    columns = [...columns.slice(0, 3), columns[7], ...columns.slice(3, 7)];
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.storeCustomColumnOrder.callCount, 1);
-  });
-
-  test('re-renders the View options menu', function () {
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.renderViewOptionsMenu.callCount, 1);
-  });
-
-  test('re-renders all column headers', function () {
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.updateColumnHeaders.callCount, 1);
-  });
 });
 
 QUnit.module('Gradebook#updateCurrentGradingPeriod', {

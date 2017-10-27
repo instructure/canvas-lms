@@ -272,6 +272,7 @@ define [
 
       @setInitialState()
       @loadSettings()
+      @bindGridEvents()
 
     # End of constructor
 
@@ -325,6 +326,30 @@ define [
             @gridDisplaySettings.selectedSecondaryInfo = 'section'
           else
             @gridDisplaySettings.selectedSecondaryInfo = 'none'
+
+    bindGridEvents: =>
+      @gradebookGrid.events.onColumnsReordered.subscribe (_event, columns) =>
+        # determine if assignment columns or custom columns were reordered
+        # (this works because frozen columns and non-frozen columns are can't be
+        # swapped)
+
+        currentFrozenIds = @gridData.columns.frozen
+        updatedFrozenIds = columns.frozen.map((column) => column.id)
+
+        @gridData.columns.frozen = updatedFrozenIds
+        @gridData.columns.scrollable = columns.scrollable.map((column) -> column.id)
+
+        if !_.isEqual(currentFrozenIds, updatedFrozenIds)
+          customColumnIds = (column.customColumnId for column in columns.frozen when column.type == 'custom_column')
+          @reorderCustomColumns(customColumnIds)
+            .then =>
+              colsById = _(@gradebookContent.customColumns).indexBy (c) -> c.id
+              @gradebookContent.customColumns = _(customColumnIds).map (id) -> colsById[id]
+        else
+          @storeCustomColumnOrder()
+
+        @renderViewOptionsMenu()
+        @updateColumnHeaders()
 
     initialize: ->
       @setStudentsLoaded(false)
@@ -658,29 +683,6 @@ define [
       unless @isInvalidSort()
         url = @options.gradebook_column_order_settings_url
         $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
-
-    onColumnsReordered: =>
-      # determine if assignment columns or custom columns were reordered
-      # (this works because frozen columns and non-frozen columns are can't be
-      # swapped)
-      columns = @gradebookGrid.grid.getColumns()
-      currentIds = (m[1] for columnId in @gridData.columns.frozen when m = columnId.match /^custom_col_(\d+)/)
-      reorderedIds = (m[1] for c in columns when m = c.id.match /^custom_col_(\d+)/)
-
-      frozenColumnCount = @gradebookGrid.grid.getOptions().numberOfColumnsToFreeze
-      @gridData.columns.frozen = columns.slice(0, frozenColumnCount).map((column) -> column.id)
-      @gridData.columns.scrollable = columns.slice(frozenColumnCount).map((column) -> column.id)
-
-      if !_.isEqual(reorderedIds, currentIds)
-        @reorderCustomColumns(reorderedIds)
-        .then =>
-          colsById = _(@gradebookContent.customColumns).indexBy (c) -> c.id
-          @gradebookContent.customColumns = _(reorderedIds).map (id) -> colsById[id]
-      else
-        @storeCustomColumnOrder()
-
-      @renderViewOptionsMenu()
-      @updateColumnHeaders()
 
     reorderCustomColumns: (ids) ->
       $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
@@ -1611,7 +1613,6 @@ define [
       @gradebookGrid.grid.onKeyDown.subscribe @onGridKeyDown
 
       # Grid Header Events
-      @gradebookGrid.grid.onColumnsReordered.subscribe @onColumnsReordered
       @gradebookGrid.grid.onColumnsResized.subscribe @onColumnsResized
 
       # Grid Body Cell Events
