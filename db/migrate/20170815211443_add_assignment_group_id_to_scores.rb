@@ -45,11 +45,15 @@ class AddAssignmentGroupIdToScores < ActiveRecord::Migration[5.0]
               algorithm: :concurrently,
               name: :index_course_scores
 
-    remove_index :scores, column: :enrollment_id,
-                 name: :index_scores_on_enrollment_id
+    if index_exists?(:scores, :enrollment_id, name: "index_scores_on_enrollment_id")
+      remove_index :scores, column: :enrollment_id,
+                   name: :index_scores_on_enrollment_id
+    end
 
-    remove_index :scores, column: [:enrollment_id, :grading_period_id],
-                 name: :index_scores_on_enrollment_id_and_grading_period_id
+    if index_exists?(:scores, [:enrollment_id, :grading_period_id], name: "index_scores_on_enrollment_id_and_grading_period_id")
+      remove_index :scores, column: [:enrollment_id, :grading_period_id],
+                   name: :index_scores_on_enrollment_id_and_grading_period_id
+    end
 
     reversible do |direction|
       direction.down { DataFixup::DeleteScoresForAssignmentGroups.run }
