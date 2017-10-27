@@ -24,7 +24,7 @@
 .ic-Layout-contentMain,
 .conversations {
   height: 100%;
-  margin-top: 73px;
+  margin-top: 0px;
   box-sizing: border-box;
 }
 
@@ -34,7 +34,7 @@
 
 .ic-Layout-columns {
   position: absolute;
-  top: 0; bottom: 0;
+  top: 72px; bottom: 0;
   margin-bottom: 0;
   display: none;
   width: 100%;
