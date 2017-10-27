@@ -175,7 +175,7 @@ module ErrorContext
     end
 
     def capture_screenshot?
-      selenium?
+      selenium? && !SeleniumDriverSetup.saucelabs_test_run?
     end
 
     def capture_video?

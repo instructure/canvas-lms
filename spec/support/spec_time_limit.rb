@@ -51,8 +51,7 @@ module SpecTimeLimit
 
     # find an appropriate timeout for this spec
     def timeout_for(example)
-      # todo: find a better way
-      if ENV.fetch("BROWSER", "") == 'safari'
+      if ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]
       elsif (timeout = typical_time_for(example))
         [:status_quo, [timeout, ABSOLUTE_TIMEOUT].min]

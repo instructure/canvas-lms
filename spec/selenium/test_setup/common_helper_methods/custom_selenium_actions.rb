@@ -285,7 +285,7 @@ module CustomSeleniumActions
   #
   # 3.) This function will likely have trouble clicking links. Use fln instead.
   def force_click(element_jquery_finder)
-    fj(element_jquery_finder) 
+    fj(element_jquery_finder)
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).click()})
   end
 
@@ -351,7 +351,7 @@ module CustomSeleniumActions
     when :chrome
       driver.execute_script("arguments[0].select()", el)
       keys = [:backspace]
-    when :safari
+    when :safari, :internet_explorer
       el.clear()
       keys = []
     end
