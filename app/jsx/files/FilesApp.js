@@ -86,33 +86,6 @@ import Toolbar from 'jsx/files/Toolbar'
 
     return (
       <div>
-        {/* For whatever reason, VO in Safari didn't like just the h1 tag.
-            Sometimes it worked, others it didn't, this makes it work always */}
-        <header>
-          <h1 className='screenreader-only'>
-            {I18n.t('Files')}
-          </h1>
-        </header>
-        <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print'>
-          <button
-            className='Button Button--link ic-app-course-nav-toggle'
-            type='button'
-            id='courseMenuToggle'
-            title={I18n.t("Show and hide courses menu")}
-            aria-hidden={true}
-          >
-            <i className='icon-hamburger' aria-hidden='true' />
-          </button>
-          <div className='ic-app-crumbs'>
-            <Breadcrumbs
-              rootTillCurrentFolder={this.state.rootTillCurrentFolder}
-              showingSearchResults={this.state.showingSearchResults}
-              query={this.props.query}
-              contextAssetString={this.props.contextAssetString}
-            />
-          </div>
-          <div className="TutorialToggleHolder" />
-        </div>
         <Toolbar
           currentFolder={this.state.currentFolder}
           query={this.props.query}
