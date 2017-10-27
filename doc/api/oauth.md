@@ -109,7 +109,7 @@ developer key based on the launch parameters (eg. custom_canvas_api_domain) sent
 launch.
 
 For [open source Canvas users](https://github.com/instructure/canvas-lms/wiki),
-you can [generate a client ID](https://community.canvaslms.com/docs/DOC-5141) 
+you can [generate a client ID](https://community.canvaslms.com/docs/DOC-5141)
 and secret in the Site Admin account of your Canvas install.
 
 <a name="oauth2-flow-1"></a>
@@ -209,6 +209,10 @@ with the following parameters:
     <tr>
       <td class="mono">code</td>
       <td><span class="label">code from canvas</span></td>
+    </tr>
+    <tr>
+      <td class="mono">replace_tokens</td>
+      <td>(optional) If this option is provided, existing access tokens issued for this developer key/secret will be destroyed and replaced with the new token that is returned from this request</td>
     </tr>
   </tbody>
 </table>
