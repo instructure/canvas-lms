@@ -22,8 +22,9 @@ define [
   'compiled/views/quizzes/QuizItemGroupView'
   'jquery'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (Backbone, Quiz, QuizCollection, QuizItemGroupView, $, fakeENV) ->
+], (Backbone, Quiz, QuizCollection, QuizItemGroupView, $, fakeENV, assertions) ->
 
   fixtures = $('#fixtures')
 
@@ -37,9 +38,13 @@ define [
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
+  test 'it should be accessible', (assert) ->
+    view = new createView()
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
+
   test '#isEmpty is false if any items arent hidden', ->
-    collection = new QuizCollection([{id: 1, title: 'Foo'}, {id: 2, title: 'Bar'}])
-    view = new createView(collection)
+    view = new createView()
     ok !view.isEmpty()
 
   test '#isEmpty is true if collection is empty', ->
