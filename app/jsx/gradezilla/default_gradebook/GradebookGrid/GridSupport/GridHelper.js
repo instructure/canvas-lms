@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class GridHelper {
+export default class GridHelper {
   constructor (grid) {
     this.grid = grid;
   }
@@ -58,5 +58,3 @@ class GridHelper {
     this.grid.focus();
   }
 }
-
-export default GridHelper;

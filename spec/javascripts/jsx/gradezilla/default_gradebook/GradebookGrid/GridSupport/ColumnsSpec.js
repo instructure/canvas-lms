@@ -57,7 +57,7 @@ function createGrid () {
   return new Grid('#example-grid', createRows(), createColumns(), options);
 }
 
-QUnit.module('GridSupport Columns', function (suiteHooks) {
+QUnit.module('GridSupport Columns', (suiteHooks) => {
   let $fixture;
   let grid;
   let gridSupport;
@@ -67,7 +67,7 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
     gridSupport.initialize();
   }
 
-  suiteHooks.beforeEach(function () {
+  suiteHooks.beforeEach(() => {
     $fixture = document.createElement('div');
     document.body.appendChild($fixture);
 
@@ -78,13 +78,13 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
     grid = createGrid();
   });
 
-  suiteHooks.afterEach(function () {
+  suiteHooks.afterEach(() => {
     gridSupport.destroy();
     grid.destroy();
     $fixture.remove();
   });
 
-  QUnit.module('#initialize', function () {
+  QUnit.module('#initialize', () => {
     let updatedColumns;
 
     const columnHeaderRenderer = {
@@ -95,35 +95,35 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
       destroyColumnHeader () {}
     };
 
-    test('updates all column headers when using a column header renderer', function () {
+    test('updates all column headers when using a column header renderer', () => {
       updatedColumns = [];
       createAndInitialize({ columnHeaderRenderer });
       deepEqual(updatedColumns, grid.getColumns());
     });
 
-    test('does not update column headers when not using a column header renderer', function () {
+    test('does not update column headers when not using a column header renderer', () => {
       updatedColumns = [];
       createAndInitialize();
       strictEqual(updatedColumns.length, 0);
     });
   });
 
-  QUnit.module('#getColumns', function () {
-    test('includes the frozen columns', function () {
+  QUnit.module('#getColumns', () => {
+    test('includes the frozen columns', () => {
       createAndInitialize();
       const columns = gridSupport.columns.getColumns();
       deepEqual(columns.frozen.map(column => column.id), ['column1', 'column2']);
     });
 
-    test('includes the scrollable columns', function () {
+    test('includes the scrollable columns', () => {
       createAndInitialize();
       const columns = gridSupport.columns.getColumns();
       deepEqual(columns.scrollable.map(column => column.id), ['column3', 'column4']);
     });
   });
 
-  QUnit.module('#getColumnsById', function () {
-    test('returns the columns with the given ids', function () {
+  QUnit.module('#getColumnsById', () => {
+    test('returns the columns with the given ids', () => {
       createAndInitialize();
       const allColumns = grid.getColumns();
       const columns = gridSupport.columns.getColumnsById(['column3', 'column1']);
@@ -131,11 +131,11 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
     });
   });
 
-  QUnit.module('#updateColumnHeaders', function (hooks) {
+  QUnit.module('#updateColumnHeaders', (hooks) => {
     let columnHeaderRenderer;
     let updatedColumns = [];
 
-    hooks.beforeEach(function () {
+    hooks.beforeEach(() => {
       columnHeaderRenderer = {
         renderColumnHeader (column, _$container, _localGridSupport) {
           updatedColumns.push(column);
@@ -148,30 +148,30 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
       updatedColumns = [];
     });
 
-    test('updates all column headers when given no ids', function () {
+    test('updates all column headers when given no ids', () => {
       gridSupport.columns.updateColumnHeaders();
       strictEqual(updatedColumns.length, 4);
     });
 
-    test('sends each column to the "renderColumnHeader" function', function () {
+    test('sends each column to the "renderColumnHeader" function', () => {
       gridSupport.columns.updateColumnHeaders();
       deepEqual(updatedColumns, grid.getColumns());
     });
 
-    test('updates only related column headers when given ids', function () {
+    test('updates only related column headers when given ids', () => {
       gridSupport.columns.updateColumnHeaders(['column3', 'column1']);
       const allColumns = grid.getColumns();
       deepEqual(updatedColumns, [allColumns[2], allColumns[0]]);
     });
 
-    test('sends the header element to the "renderColumnHeader" function', function () {
+    test('sends the header element to the "renderColumnHeader" function', () => {
       sinon.stub(columnHeaderRenderer, 'renderColumnHeader');
       gridSupport.columns.updateColumnHeaders(['column3']);
       const $container = columnHeaderRenderer.renderColumnHeader.lastCall.args[1];
       equal($container, gridSupport.helper.getColumnHeaderNode('column3'));
     });
 
-    test('sends gridSupport to the "renderColumnHeader" function', function () {
+    test('sends gridSupport to the "renderColumnHeader" function', () => {
       sinon.stub(columnHeaderRenderer, 'renderColumnHeader');
       gridSupport.columns.updateColumnHeaders(['column3']);
       const instance = columnHeaderRenderer.renderColumnHeader.lastCall.args[2];
@@ -179,11 +179,11 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
     });
   });
 
-  QUnit.module('onHeaderCellRendered', function (hooks) {
+  QUnit.module('onHeaderCellRendered', (hooks) => {
     const updateCounts = {};
     let columnHeaderRenderer;
 
-    hooks.beforeEach(function () {
+    hooks.beforeEach(() => {
       columnHeaderRenderer = {
         renderColumnHeader (column, $container, _localGridSupport) {
           updateCounts[column.id]++;
@@ -199,27 +199,27 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
       grid.getColumns().forEach((column) => { updateCounts[column.id] = 0 });
     });
 
-    test('renders column headers using the column header renderer', function () {
+    test('renders column headers using the column header renderer', () => {
       const $node = gridSupport.helper.getColumnHeaderNode('column3');
       equal($node.innerHTML, 'column3 updated');
     });
 
-    test('renders column headers on subsequent events', function () {
+    test('renders column headers on subsequent events', () => {
       grid.updateColumnHeader('column3');
       strictEqual(updateCounts.column3, 1);
     });
 
-    test('does not update headers unrelated to the event', function () {
+    test('does not update headers unrelated to the event', () => {
       grid.updateColumnHeader('column3');
       strictEqual(updateCounts.column2, 0);
     });
   });
 
-  QUnit.module('onBeforeHeaderCellDestroy', function (hooks) {
+  QUnit.module('onBeforeHeaderCellDestroy', (hooks) => {
     const destroyCounts = {};
     let columnHeaderRenderer;
 
-    hooks.beforeEach(function () {
+    hooks.beforeEach(() => {
       columnHeaderRenderer = {
         renderColumnHeader () {},
 
@@ -234,17 +234,17 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
       grid.getColumns().forEach((column) => { destroyCounts[column.id] = 0 });
     });
 
-    test('destroys column headers using the column header renderer', function () {
+    test('destroys column headers using the column header renderer', () => {
       grid.updateColumnHeader('column3');
       strictEqual(destroyCounts.column3, 1);
     });
 
-    test('does not destroy headers unrelated to the event', function () {
+    test('does not destroy headers unrelated to the event', () => {
       grid.updateColumnHeader('column3');
       strictEqual(destroyCounts.column2, 0);
     });
 
-    test('sends the header element to the "destroyColumnHeader" function', function () {
+    test('sends the header element to the "destroyColumnHeader" function', () => {
       const $originalContainer = gridSupport.helper.getColumnHeaderNode('column3');
       sinon.stub(columnHeaderRenderer, 'destroyColumnHeader');
       grid.updateColumnHeader('column3');
@@ -252,7 +252,7 @@ QUnit.module('GridSupport Columns', function (suiteHooks) {
       equal($container, $originalContainer);
     });
 
-    test('sends gridSupport to the "renderColumnHeader" function', function () {
+    test('sends gridSupport to the "renderColumnHeader" function', () => {
       sinon.stub(columnHeaderRenderer, 'destroyColumnHeader');
       grid.updateColumnHeader('column3');
       const instance = columnHeaderRenderer.destroyColumnHeader.lastCall.args[2];
