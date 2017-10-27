@@ -5363,20 +5363,8 @@ QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks)
 
   hooks.beforeEach(function () {
     gradebook = createGradebook();
-
-    let gridColumns;
-    gradebook.gradebookGrid.grid = {
-      getColumns () {
-        return gridColumns;
-      },
-
-      setColumns (columns) {
-        gridColumns = columns;
-      }
-    };
-
+    sinon.stub(gradebook.gradebookGrid, 'updateColumns');
     sinon.stub(gradebook, 'setVisibleGridColumns');
-    sinon.stub(gradebook, 'getVisibleGradeGridColumns').returns([{ id: 'student' }, { id: 'total_grade' }]);
     sinon.stub(gradebook, 'updateColumnHeaders');
     sinon.stub(gradebook, 'renderViewOptionsMenu');
   });
@@ -5388,7 +5376,14 @@ QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks)
 
   test('sets the columns on the grid', function () {
     gradebook.updateColumnsAndRenderViewOptionsMenu();
-    deepEqual(gradebook.gradebookGrid.grid.getColumns().map(column => column.id), ['student', 'total_grade']);
+    strictEqual(gradebook.gradebookGrid.updateColumns.callCount, 1);
+  });
+
+  test('sets the columns after updating the grid', function () {
+    gradebook.gradebookGrid.updateColumns.callsFake(() => {
+      strictEqual(gradebook.setVisibleGridColumns.callCount, 1, 'setVisibleGridColumns was already called');
+    });
+    gradebook.updateColumnsAndRenderViewOptionsMenu();
   });
 
   test('calls updateColumnHeaders', function () {
@@ -6309,7 +6304,6 @@ QUnit.module('GridColor', {
 test('is rendered on init', function () {
   const gradebook = createGradebook();
   const renderGridColorStub = this.stub(gradebook, 'renderGridColor');
-  this.stub(gradebook, 'getVisibleGradeGridColumns').returns([]);
   this.stub(gradebook, 'onGridInit');
   gradebook.initGrid();
   ok(renderGridColorStub.called);

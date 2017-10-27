@@ -57,6 +57,83 @@ QUnit.module('GradebookGrid', (suiteHooks) => {
     gradebookGrid.gridSupport.initialize();
   }
 
+  QUnit.module('#initialize', (hooks) => {
+    hooks.beforeEach(() => {
+      const columns = [
+        { id: 'student' },
+        { id: 'custom_col_2401' },
+        { id: 'assignment_2301' },
+        { id: 'assignment_2302' },
+        { id: 'assignment_group_2201' },
+        { id: 'total_grade' }
+      ];
+      columns.forEach((column) => {
+        gradebook.gridData.columns.definitions[column.id] = column;
+      });
+      gradebook.gridData.columns.frozen = columns.slice(0, 2).map(column => column.id);
+      gradebook.gridData.columns.scrollable = columns.slice(2).map(column => column.id);
+    });
+
+    test('sets the columns on the grid', () => {
+      initializeGradebookGrid();
+      strictEqual(gradebookGrid.grid.getColumns().length, 6);
+    });
+
+    test('sets the frozen columns before the scrollable columns', () => {
+      initializeGradebookGrid();
+      const columnIds = gradebookGrid.grid.getColumns().map(column => column.id);
+      const expected = ['student', 'custom_col_2401', 'assignment_2301', 'assignment_2302', 'assignment_group_2201', 'total_grade'];
+      deepEqual(columnIds, expected);
+    });
+
+    test('sets the number of frozen columns', () => {
+      initializeGradebookGrid();
+      strictEqual(gradebookGrid.grid.getOptions().numberOfColumnsToFreeze, 2);
+    });
+  });
+
+  QUnit.module('#updateColumns', (hooks) => {
+    hooks.beforeEach(() => {
+      initializeGradebookGrid();
+      const columns = [
+        { id: 'student' },
+        { id: 'custom_col_2401' },
+        { id: 'assignment_2301' },
+        { id: 'assignment_2302' },
+        { id: 'assignment_group_2201' },
+        { id: 'total_grade' }
+      ];
+      columns.forEach((column) => {
+        gradebook.gridData.columns.definitions[column.id] = column;
+      });
+      gradebook.gridData.columns.frozen = columns.slice(0, 2).map(column => column.id);
+      gradebook.gridData.columns.scrollable = columns.slice(2).map(column => column.id);
+    });
+
+    test('sets the columns on the grid', () => {
+      gradebookGrid.updateColumns();
+      strictEqual(gradebookGrid.grid.getColumns().length, 6);
+    });
+
+    test('sets the frozen columns before the scrollable columns', () => {
+      gradebookGrid.updateColumns();
+      const columnIds = gradebookGrid.grid.getColumns().map(column => column.id);
+      const expected = ['student', 'custom_col_2401', 'assignment_2301', 'assignment_2302', 'assignment_group_2201', 'total_grade'];
+      deepEqual(columnIds, expected);
+    });
+
+    test('sets the number of frozen columns', () => {
+      gradebookGrid.updateColumns();
+      strictEqual(gradebookGrid.grid.getOptions().numberOfColumnsToFreeze, 2);
+    });
+
+    test('has no effect when the grid has not been initialized', () => {
+      gradebookGrid.grid = null;
+      gradebookGrid.updateColumns();
+      ok(true, 'no error was thrown');
+    });
+  });
+
   QUnit.module('#destroy', (hooks) => {
     hooks.beforeEach(() => {
       initializeGradebookGrid();

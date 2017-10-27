@@ -91,4 +91,12 @@ export default class GradebookGrid {
       this.grid.render();
     }
   }
+
+  updateColumns () {
+    if (this.grid) {
+      this.grid.setNumberOfColumnsToFreeze(this.gridData.columns.frozen.length);
+      const columnIds = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable];
+      this.grid.setColumns(columnIds.map(columnId => this.gridData.columns.definitions[columnId]))
+    }
+  }
 }

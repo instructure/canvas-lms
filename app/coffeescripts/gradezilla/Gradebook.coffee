@@ -1424,13 +1424,8 @@ define [
       @gridData.columns.frozen = [parentColumnIds..., customColumnIds...]
       @gridData.columns.scrollable = scrollableColumns.map((column) -> column.id)
 
-    getVisibleGradeGridColumns: ->
-      [@gridData.columns.frozen..., @gridData.columns.scrollable...].map (columnId) =>
-        @gridData.columns.definitions[columnId]
-
     updateGrid: ->
-      @gradebookGrid.grid.setNumberOfColumnsToFreeze(@gridData.columns.frozen.length)
-      @gradebookGrid.grid.setColumns(@getVisibleGradeGridColumns())
+      @gradebookGrid.updateColumns()
       @gradebookGrid.invalidate()
 
     ## Grid Column Definitions
@@ -2015,7 +2010,7 @@ define [
 
     updateColumnsAndRenderViewOptionsMenu: =>
       @setVisibleGridColumns()
-      @gradebookGrid.grid.setColumns(@getVisibleGradeGridColumns())
+      @gradebookGrid.updateColumns()
       @updateColumnHeaders()
       @renderViewOptionsMenu()
 
