@@ -1021,8 +1021,7 @@ describe FilesController do
       expect(response.status).to eq 401
     end
 
-    it "creates a file in the submissions folder if intent=='submit' and the feature is enabled" do
-      @course.root_account.enable_feature! :submissions_folder
+    it "creates a file in the submissions folder if intent=='submit'" do
       user_session(@student)
       assignment = @course.assignments.create!(:submission_types => 'online_upload')
       post 'create_pending', params: {:attachment => {
@@ -1035,8 +1034,7 @@ describe FilesController do
       expect(f.submission_context_code).to eq @course.asset_string
     end
 
-    it "uses a submissions folder for group assignments when the feature is enabled" do
-      @course.root_account.enable_feature! :submissions_folder
+    it "uses a submissions folder for group assignments" do
       user_session(@student)
       category = group_category
       assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
@@ -1056,7 +1054,6 @@ describe FilesController do
     end
 
     it "does not require usage rights for group submissions to be visible to students" do
-      @course.root_account.enable_feature! :submissions_folder
       @course.root_account.enable_feature! :usage_rights_required
       user_session(@student)
       category = group_category

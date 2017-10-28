@@ -129,15 +129,17 @@ class DiscussionEntry < ActiveRecord::Base
     elsif !message || message.empty?
       raise "Message body cannot be blank"
     else
-      entry = DiscussionEntry.new(:message => message)
-      entry.discussion_topic_id = self.discussion_topic_id
-      entry.parent_entry = self
-      entry.user = user
-      if entry.grants_right?(user, :create)
-        entry.save!
-        entry
-      else
-        raise IncomingMail::Errors::ReplyToLockedTopic
+      self.shard.activate do
+        entry = DiscussionEntry.new(:message => message)
+        entry.discussion_topic_id = self.discussion_topic_id
+        entry.parent_entry = self
+        entry.user = user
+        if entry.grants_right?(user, :create)
+          entry.save!
+          entry
+        else
+          raise IncomingMail::Errors::ReplyToLockedTopic
+        end
       end
     end
   end

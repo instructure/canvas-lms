@@ -88,11 +88,6 @@ describe Attachment do
       @attachment.authenticated_url
       expect(InstFS).to have_received(:authenticated_url)
     end
-
-    it "only passes keyword arguments to InstFS" do
-      @attachment.authenticated_url("doesn't pass", :test => "this")
-      expect(InstFS).to have_received(:authenticated_url).with(@attachment, { :test => "this" })
-    end
   end
 
   context "authenticated_url s3_storage" do
@@ -474,6 +469,19 @@ describe Attachment do
       expect(a.content_type).to eq 'application/msword'
       a.destroy_content_and_replace
       expect(a.content_type).to eq 'unknown/unknown'
+    end
+
+    it "should destroy content and record on destroy_permanently_plus" do
+      a = attachment_model
+      a2 = attachment_model(root_attachment: a)
+      expect(a).to receive(:make_childless).once
+      expect(a).to receive(:destroy_content).once
+      expect(a2).to receive(:make_childless).never
+      expect(a2).to receive(:destroy_content).never
+      a2.destroy_permanently_plus
+      a.destroy_permanently_plus
+      expect { a.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { a2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'should not delete s3objects if it is not production for destroy_content' do
@@ -998,10 +1006,19 @@ describe Attachment do
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       allow(attachment).to receive(:authenticated_url) # allow other calls due to, e.g., save
-      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 86400))
+      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 86400.seconds))
       attachment.download_url
-      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 172800))
-      attachment.download_url(2.days.to_i)
+      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 2.days))
+      attachment.download_url(2.days)
+    end
+
+    it 'should allow custom ttl for root_account' do
+      attachment = attachment_with_context(@course, :display_name => 'foo')
+      root = @course.root_account
+      root.settings[:s3_url_ttl_seconds] = 3.days.seconds.to_s
+      root.save!
+      expect(attachment).to receive(:authenticated_url).with(include(expires_in: 3.days.to_i.seconds))
+      attachment.download_url
     end
 
     it "should include response-content-disposition" do
@@ -1236,6 +1253,67 @@ describe Attachment do
         # nil out namespace so we can make sure the url generating is working properly
         thumb.namespace = nil
         expect(thumb.authenticated_s3_url).not_to be_include @attachment.namespace
+      end
+    end
+  end
+
+  context "has_thumbnail?" do
+    context "non-instfs attachment" do
+      it "should be false when it doesn't have a thumbnail object (yet?)" do
+        attachment_model(uploaded_data: stub_file_data('file.txt', nil, 'text/html'))
+        expect(@attachment.has_thumbnail?).to be false
+      end
+
+      it "should be true when it has a thumbnail object" do
+        attachment_model(uploaded_data: stub_png_data)
+        @attachment.thumbnail || @attachment.build_thumbnail.save!
+        expect(@attachment.has_thumbnail?).to be true
+      end
+    end
+
+    context "instfs attachment" do
+      before do
+        allow(InstFS).to receive(:enabled?).and_return true
+        allow(InstFS).to receive(:jwt_secret).and_return 'secret'
+        allow(InstFS).to receive(:app_host).and_return 'instfs'
+      end
+
+      it "should be false when not thumbnailable" do
+        attachment_model(instfs_uuid: 'abc', content_type: 'text/plain')
+        expect(@attachment.has_thumbnail?).to be false
+      end
+
+      it "should be true when thumbnailable" do
+        attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
+        expect(@attachment.has_thumbnail?).to be true
+      end
+    end
+  end
+
+  context "thumbnail_url" do
+    context "non-instfs attachment" do
+      it "should be the thumbnail's url" do
+        attachment_model(uploaded_data: stub_png_data)
+        @attachment.thumbnail || @attachment.build_thumbnail.save!
+        expect(@attachment.thumbnail_url).to eq @attachment.thumbnail.cached_s3_url
+      end
+    end
+
+    context "instfs attachment" do
+      before do
+        allow(InstFS).to receive(:enabled?).and_return true
+        allow(InstFS).to receive(:jwt_secret).and_return 'secret'
+        allow(InstFS).to receive(:app_host).and_return 'instfs'
+      end
+
+      it "should be an instfs thumbnail link when thumbnailable" do
+        attachment_model(instfs_uuid: 'abc', content_type: 'image/png')
+        expect(@attachment.thumbnail_url).to match(%r{/thumbnails/abc})
+      end
+
+      it "should be blank when not thumbnailable" do
+        attachment_model(instfs_uuid: 'abc', content_type: 'text/plain')
+        expect(@attachment.thumbnail_url).to be_blank
       end
     end
   end

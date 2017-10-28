@@ -110,6 +110,7 @@ module Canvas::Oauth
 
     def self.final_redirect_params(oauth_session, current_user, options = {})
       options = {:scopes => oauth_session[:scopes], :remember_access => options[:remember_access], :purpose => oauth_session[:purpose]}
+      options[:remember_access] = nil if oauth_session[:scopes]
       code = Canvas::Oauth::Token.generate_code_for(current_user.global_id, oauth_session[:client_id], options)
       redirect_params = { :code => code }
       redirect_params[:state] = oauth_session[:state] if oauth_session[:state]

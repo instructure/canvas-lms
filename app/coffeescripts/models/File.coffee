@@ -69,14 +69,27 @@ define [
       @set @uploadParams
       el.name = data.file_param
       @url = -> data.upload_url
+      onUpload = (data) =>
+        dfrd.resolve(data)
+        options.success?(data)
+      onError = (error) =>
+        dfrd.reject(error)
+        options.error?(error)
       FilesystemObject::save.call this, null,
         multipart: true
         success: (data) =>
-          dfrd.resolve(data)
-          options.success?(data)
-        error: (error) =>
-          dfrd.reject(error)
-          options.error?(error)
+          if @uploadParams.success_url
+            # s3 upload, need to ping success_url to finalize and get back
+            # attachment information
+            $.ajaxJSON(@uploadParams.success_url, 'GET', {}, onUpload, onError)
+          else if data.location?
+            # inst-fs upload, need to request attachment information from
+            # location
+            $.ajaxJSON(data.location, 'GET', {}, onUpload, onError)
+          else
+            # local-storage upload, this _is_ the attachment information
+            onUpload(data)
+        error: onError
 
     toJSON: ->
       return super unless @get('file')

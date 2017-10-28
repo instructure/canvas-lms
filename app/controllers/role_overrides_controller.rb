@@ -114,7 +114,7 @@ class RoleOverridesController < ApplicationController
   before_action :set_js_env_for_current_account
 
   # @API List roles
-  # List the roles available to an account.
+  # A paginated list of the roles available to an account.
   #
   # @argument account_id [Required, String]
   #   The id of the account to retrieve roles for.

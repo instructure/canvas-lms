@@ -111,34 +111,35 @@ define [
       @server.restore()
       @$testEl.remove()
 
-  nullButtonData =
-     {
-       items:
-         [
-           {
-             prev: null,
-             current:
-               {
-                 id: 768,
-                 module_id: 123,
-                 title: "A lonely page",
-                 type: "Page",
-               }
-             next: null
-           }
-         ]
+  nullButtonData = (args = {}) ->
+    Object.assign({
+      items:
+        [
+          {
+            prev: null,
+            current:
+              {
+                id: 768,
+                module_id: 123,
+                title: "A lonely page",
+                type: "Page",
+              }
+            next: null,
+            mastery_path: args['mastery_path']
+          }
+        ]
 
-       modules:
-         [
-           {
-             id: 123,
-             name: "Module A",
-           }
-         ]
-     }
+      modules:
+        [
+          {
+            id: 123,
+            name: "Module A",
+          }
+        ]
+    }, args)
 
   test 'there is no button when next or prev data is null', ->
-    @server.respondWith "GET", default_course_url, server_200_response(nullButtonData)
+    @server.respondWith "GET", default_course_url, server_200_response(nullButtonData())
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
@@ -318,3 +319,31 @@ define [
     @server.respond()
 
     ok !nextButton(this.$testEl).find('a').attr('disabled'), "disables the button"
+
+  test 'properly shows next button when no next items yet exist and paths are locked', ->
+    pathData = nullButtonData({mastery_path: Object.assign({locked: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Next mastery path is currently locked'), "indicates there are locked mastery path items"
+    ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
+
+  test 'properly shows next button when no next items yet exist and paths are processing', ->
+    pathData = nullButtonData({mastery_path: Object.assign({still_processing: true}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Next mastery path is currently processing'), "indicates path is processing"
+    ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
+
+  test 'does not show next button when no next items exist and paths are unlocked', ->
+    pathData = nullButtonData({mastery_path: Object.assign({still_processing: false}, path_urls)})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+
+    ok @$testEl.find('a').length == 0, 'no buttons rendered'

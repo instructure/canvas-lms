@@ -21,14 +21,16 @@ module InstFS
       Canvas::Plugin.find('inst_fs').enabled?
     end
 
-    def authenticated_url(attachment, options)
-      expires_in = options[:expires_in] || 24.hours
-      download_query = options[:download] ? "&download=1" : ""
-      token = Canvas::Security.create_jwt({
-        user_id: attachment.user_id,
-        resource: attachment.instfs_uuid
-      }, expires_in, self.jwt_secret)
-      "#{app_host}/#{attachment.instfs_uuid}/#{attachment.filename}?token=#{token}#{download_query}"
+    def authenticated_url(attachment, options={})
+      query_params = { token: access_jwt(attachment, options) }
+      query_params[:download] = 1 if options[:download]
+      access_url(attachment, query_params)
+    end
+
+    def authenticated_thumbnail_url(attachment, options={})
+      query_params = { token: access_jwt(attachment, options) }
+      query_params[:geometry] = options[:geometry] if options[:geometry]
+      thumbnail_url(attachment, query_params)
     end
 
     def app_host
@@ -39,12 +41,67 @@ module InstFS
       Base64.decode64(setting("secret"))
     end
 
+    def upload_preflight_json(context:, user:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:)
+      token = upload_jwt(user, capture_url,
+        context_type: context.class.to_s,
+        context_id: context.global_id.to_s,
+        user_id: user.global_id.to_s,
+        folder_id: folder && folder.global_id.to_s,
+        quota_exempt: !!quota_exempt,
+        on_duplicate: on_duplicate)
+
+      {
+        file_param: 'file',
+        upload_url: upload_url(token),
+        upload_params: {
+          filename: filename,
+          content_type: content_type,
+        }
+      }
+    end
+
     private
     def setting(key)
       Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
     rescue Imperium::TimeoutError => e
       Canvas::Errors.capture_exception(:inst_fs, e)
       nil
+    end
+
+    def access_url(attachment, query_params)
+      "#{app_host}/files/#{attachment.instfs_uuid}/#{attachment.filename}?#{query_params.to_query}"
+    end
+
+    def thumbnail_url(attachment, query_params)
+      "#{app_host}/thumbnails/#{attachment.instfs_uuid}?#{query_params.to_query}"
+    end
+
+    def upload_url(token=nil)
+      query_string = { token: token }.to_query if token
+      url = "#{app_host}/files"
+      url += "?#{query_string}" if query_string
+      url
+    end
+
+    def access_jwt(attachment, options={})
+      expires_in = Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
+      expires_in = options[:expires_in] || expires_in
+      Canvas::Security.create_jwt({
+        iat: Time.now.utc.to_i,
+        user_id: attachment.user_id,
+        resource: attachment.instfs_uuid
+      }, expires_in.from_now, self.jwt_secret)
+    end
+
+    def upload_jwt(user, capture_url, capture_params)
+      expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
+      Canvas::Security.create_jwt({
+        iat: Time.now.utc.to_i,
+        user_id: user.global_id,
+        resource: upload_url,
+        capture_url: capture_url,
+        capture_params: capture_params
+      }, expires_in.from_now, self.jwt_secret)
     end
   end
 end

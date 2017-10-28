@@ -33,7 +33,7 @@
   <% end %>
 
   <div class="export_messages" style="<%= hidden %>">
-    <div class="ui-state-error error_message"></div>
+    <div class="alert-error error_message"></div>
   </div>
 
   <hr />
@@ -72,7 +72,7 @@
     <% if @context.is_a?(Course) %>
       <%= form_tag course_content_exports_path(@context.id), :id => "exporter_form" do %>
         <fieldset>
-          <legend><%= t :export_type, "Export Type" %></legend>
+          <h2><%= t :export_type, "Export Type" %></h2>
           <div>
             <input type="radio" name="export_type" value="common_cartridge" id="cc_export_radio" checked>
             <label for="cc_export_radio"><%= t 'labels.course', 'Course' %></label>

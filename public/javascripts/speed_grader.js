@@ -2572,7 +2572,8 @@ EG = {
     EG.updateStatsInHeader();
   },
 
-  updateSelectMenuStatus: function (student = null, selectmenu = $selectmenu) {
+  updateSelectMenuStatus: function (student, selectmenu = $selectmenu) {
+    if (!student) return;
     let $query = selectmenu.jquerySelectMenu().data('selectmenu').list.find(`li:eq(${student.index})`);
     const className = SpeedgraderHelpers.classNameBasedOnStudent(student);
     const submissionStates = 'not_graded not_submitted graded resubmitted';

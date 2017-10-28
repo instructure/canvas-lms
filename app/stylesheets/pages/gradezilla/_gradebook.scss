@@ -540,7 +540,7 @@ $gradebook_cell_padding_top: 8px;
       background: transparent;
     }
     .outof {
-      @include user-select(none);
+      user-select: none;
       text-align: left;
       // if high contrast, no color value (default to regular dark text color)
       @if $use_high_contrast == false { color: #888888; }
@@ -851,9 +851,9 @@ $gradebook_checkbox_size: 16px;
 }
 
 .SubmissionTray__Container {
+  box-sizing: border-box;
+  height: 100%;
   padding: 1.5rem;
-  width: 18.75rem;
-  font-size: 1.2rem;
 
   input[type="text"] {
     height: auto;
@@ -881,6 +881,7 @@ $gradebook_checkbox_size: 16px;
 #SubmissionTray__Content {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 #SubmissionTray__Avatar {
@@ -888,6 +889,10 @@ $gradebook_checkbox_size: 16px;
   padding: 0.7rem;
   text-align: center;
   font-size: 1.375rem;
+}
+
+#SubmissionTray__Comments {
+  line-height: 1;
 }
 
 #SubmissionTray__StudentName {

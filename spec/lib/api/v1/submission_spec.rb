@@ -31,9 +31,9 @@ describe Api::V1::Submission do
   let(:params) { { includes: [field]} }
   let(:submission) { assignment.submissions.build(user: user) }
 
-  describe "mobile student label" do
-    let(:field) { 'mobile_student_label' }
-    let(:mobile_student_label) do
+  describe "submission status" do
+    let(:field) { 'submission_status' }
+    let(:submission_status) do
       -> (submission) do
         json = submission_json(submission, assignment, user, session, context, [field], params)
         json.fetch(field)
@@ -44,13 +44,13 @@ describe Api::V1::Submission do
       submission.submission_type = 'online_text_entry'
       submission.grade_matches_current_submission = false
       submission.workflow_state = 'submitted'
-      expect(mobile_student_label.call(submission)).to be :resubmitted
+      expect(submission_status.call(submission)).to be :resubmitted
     end
 
     it "can be Missing" do
       assignment.update!(due_at: 1.week.ago, submission_types: 'online_text_entry')
       submission.cached_due_date = 1.week.ago
-      expect(mobile_student_label.call(submission)).to be :missing
+      expect(submission_status.call(submission)).to be :missing
     end
 
     it "can be Late" do
@@ -58,16 +58,16 @@ describe Api::V1::Submission do
       submission.submission_type = 'online_text_entry'
       submission.cached_due_date = assignment.due_at
       submission.submitted_at = Time.zone.now
-      expect(mobile_student_label.call(submission)).to be :late
+      expect(submission_status.call(submission)).to be :late
     end
 
     it "can be Unsubmitted by workflow state" do
       submission.workflow_state = 'unsubmitted'
-      expect(mobile_student_label.call(submission)).to be :unsubmitted
+      expect(submission_status.call(submission)).to be :unsubmitted
     end
 
     it "is Submitted by default" do
-      expect(mobile_student_label.call(submission)).to be :submitted
+      expect(submission_status.call(submission)).to be :submitted
     end
 
     it "can be Submitted by workflow state" do
@@ -75,13 +75,13 @@ describe Api::V1::Submission do
       submission.workflow_state = 'deleted'
       expect {
         submission.workflow_state = 'submitted'
-      }.to change { mobile_student_label.call(submission) }.from(:unsubmitted).to(:submitted)
+      }.to change { submission_status.call(submission) }.from(:unsubmitted).to(:submitted)
     end
 
     it "can be Submitted by submission type" do
       submission.workflow_state = 'deleted'
       submission.submission_type = 'online_text_entry'
-      expect(mobile_student_label.call(submission)).to be :submitted
+      expect(submission_status.call(submission)).to be :submitted
     end
 
     it "can be Submitted by quiz" do
@@ -89,7 +89,7 @@ describe Api::V1::Submission do
       submission.submission_type = 'online_quiz'
       quiz_submission = instance_double(Quizzes::QuizSubmission, completed?: true, versions: [])
       allow(submission).to receive(:quiz_submission).and_return(quiz_submission)
-      expect(mobile_student_label.call(submission)).to be :submitted
+      expect(submission_status.call(submission)).to be :submitted
     end
 
     describe "ordinality" do
@@ -102,7 +102,7 @@ describe Api::V1::Submission do
           submission.submission_type = 'online_text_entry'
           submission.grade_matches_current_submission = false
           submission.workflow_state = 'submitted'
-          expect(mobile_student_label.call(submission)).to be :resubmitted
+          expect(submission_status.call(submission)).to be :resubmitted
         end
 
         it "is Resubmitted when it was first Late" do
@@ -115,7 +115,7 @@ describe Api::V1::Submission do
           submission.submission_type = 'online_text_entry'
           submission.grade_matches_current_submission = false
           submission.workflow_state = 'submitted'
-          expect(mobile_student_label.call(submission)).to be :resubmitted
+          expect(submission_status.call(submission)).to be :resubmitted
         end
 
         it "is Resubmitted when it was first Submitted" do
@@ -125,7 +125,7 @@ describe Api::V1::Submission do
           submission.submission_type = 'online_text_entry'
           submission.grade_matches_current_submission = false
           submission.workflow_state = 'submitted'
-          expect(mobile_student_label.call(submission)).to be :resubmitted
+          expect(submission_status.call(submission)).to be :resubmitted
         end
 
         it "is Resubmitted when it was first Unsubmitted" do
@@ -135,7 +135,7 @@ describe Api::V1::Submission do
           submission.submission_type = 'online_text_entry'
           submission.grade_matches_current_submission = false
           submission.workflow_state = 'submitted'
-          expect(mobile_student_label.call(submission)).to be :resubmitted
+          expect(submission_status.call(submission)).to be :resubmitted
         end
       end
 
@@ -149,7 +149,7 @@ describe Api::V1::Submission do
           # make it missing
           submission.submitted_at = nil
           submission.submission_type = nil
-          expect(mobile_student_label.call(submission)).to be :missing
+          expect(submission_status.call(submission)).to be :missing
         end
 
         it "is Missing when it was first Submitted" do
@@ -159,7 +159,7 @@ describe Api::V1::Submission do
           assignment.update!(due_at: 1.week.ago, submission_types: 'online_text_entry')
           submission.assignment = assignment
           submission.cached_due_date = assignment.due_at
-          expect(mobile_student_label.call(submission)).to be :missing
+          expect(submission_status.call(submission)).to be :missing
         end
 
         it "is Missing when it was first Unsubmitted" do
@@ -169,7 +169,7 @@ describe Api::V1::Submission do
           assignment.update!(due_at: 1.week.ago, submission_types: 'online_text_entry')
           submission.assignment = assignment
           submission.cached_due_date = assignment.due_at
-          expect(mobile_student_label.call(submission)).to be :missing
+          expect(submission_status.call(submission)).to be :missing
         end
       end
 
@@ -183,7 +183,7 @@ describe Api::V1::Submission do
           submission.cached_due_date = assignment.due_at
           submission.submission_type ='online_text_entry'
           submission.submitted_at = Time.zone.now
-          expect(mobile_student_label.call(submission)).to be :late
+          expect(submission_status.call(submission)).to be :late
         end
 
         it "is Late when it was first Unsubmitted" do
@@ -195,7 +195,7 @@ describe Api::V1::Submission do
           submission.cached_due_date = assignment.due_at
           submission.submission_type ='online_text_entry'
           submission.submitted_at = Time.zone.now
-          expect(mobile_student_label.call(submission)).to be :late
+          expect(submission_status.call(submission)).to be :late
         end
       end
 
@@ -204,14 +204,14 @@ describe Api::V1::Submission do
         submission.workflow_state = 'submitted'
         # make it unsubmitted
         submission.workflow_state = 'unsubmitted'
-        expect(mobile_student_label.call(submission)).to be :unsubmitted
+        expect(submission_status.call(submission)).to be :unsubmitted
       end
     end
   end
 
-  describe "mobile teacher state" do
-    let(:field) { 'mobile_teacher_state' }
-    let(:mobile_teacher_state) do
+  describe "grading status" do
+    let(:field) { 'grading_status' }
+    let(:grading_status) do
       -> (submission) do
         json = submission_json(submission, assignment, user, session, context, [field], params)
         json.fetch(field)
@@ -220,29 +220,29 @@ describe Api::V1::Submission do
 
     it "can be Excused" do
       submission.excused = true
-      expect(mobile_teacher_state.call(submission)).to be :excused
+      expect(grading_status.call(submission)).to be :excused
     end
 
     it "can be Needs Review" do
       submission.workflow_state = 'pending_review'
-      expect(mobile_teacher_state.call(submission)).to be :needs_review
+      expect(grading_status.call(submission)).to be :needs_review
     end
 
     it "can be Needs Grading" do
       submission.submission_type = 'online_text_entry'
       submission.workflow_state = 'submitted'
-      expect(mobile_teacher_state.call(submission)).to be :needs_grading
+      expect(grading_status.call(submission)).to be :needs_grading
     end
 
     it "can be Graded" do
       submission.score = 10
       submission.workflow_state = 'graded'
-      expect(mobile_teacher_state.call(submission)).to be :graded
+      expect(grading_status.call(submission)).to be :graded
     end
 
     it "otherwise returns nil" do
       submission.workflow_state = 'deleted'
-      expect(mobile_teacher_state.call(submission)).to be_nil
+      expect(grading_status.call(submission)).to be_nil
     end
 
     describe "ordinality" do
@@ -252,7 +252,7 @@ describe Api::V1::Submission do
           submission.workflow_state = 'pending_review'
           # make it excused
           submission.excused = true
-          expect(mobile_teacher_state.call(submission)).to be :excused
+          expect(grading_status.call(submission)).to be :excused
         end
 
         it "is Excused when it was first Needs Grading" do
@@ -261,7 +261,7 @@ describe Api::V1::Submission do
           submission.workflow_state = 'submitted'
           # make it excused
           submission.excused = true
-          expect(mobile_teacher_state.call(submission)).to be :excused
+          expect(grading_status.call(submission)).to be :excused
         end
 
         it "is Excused when it was first graded" do
@@ -270,7 +270,7 @@ describe Api::V1::Submission do
           submission.score = 10
           # make it excused
           submission.excused = true
-          expect(mobile_teacher_state.call(submission)).to be :excused
+          expect(grading_status.call(submission)).to be :excused
         end
 
         it "is Excused when it was first nil" do
@@ -278,7 +278,7 @@ describe Api::V1::Submission do
           submission.workflow_state = 'deleted'
           # make it excused
           submission.excused = true
-          expect(mobile_teacher_state.call(submission)).to be :excused
+          expect(grading_status.call(submission)).to be :excused
         end
       end
 
@@ -289,7 +289,7 @@ describe Api::V1::Submission do
           submission.workflow_state = 'submitted'
           # make it needs_review
           submission.workflow_state = 'pending_review'
-          expect(mobile_teacher_state.call(submission)).to be :needs_review
+          expect(grading_status.call(submission)).to be :needs_review
         end
 
         it "is Needs Review when it was first graded" do
@@ -298,7 +298,7 @@ describe Api::V1::Submission do
           submission.score = 10
           # make it needs_review
           submission.workflow_state = 'pending_review'
-          expect(mobile_teacher_state.call(submission)).to be :needs_review
+          expect(grading_status.call(submission)).to be :needs_review
         end
 
         it "is Needs Review when it was first nil" do
@@ -306,7 +306,7 @@ describe Api::V1::Submission do
           submission.workflow_state = 'deleted'
           # make it needs_review
           submission.workflow_state = 'pending_review'
-          expect(mobile_teacher_state.call(submission)).to be :needs_review
+          expect(grading_status.call(submission)).to be :needs_review
         end
       end
 
@@ -318,7 +318,7 @@ describe Api::V1::Submission do
           # make it needs_grading
           submission.submission_type = 'online_text_entry'
           submission.workflow_state = 'submitted'
-          expect(mobile_teacher_state.call(submission)).to be :needs_grading
+          expect(grading_status.call(submission)).to be :needs_grading
         end
 
         it "is Needs Grading when it was first nil" do
@@ -327,7 +327,7 @@ describe Api::V1::Submission do
           # make it needs_grading
           submission.submission_type = 'online_text_entry'
           submission.workflow_state = 'submitted'
-          expect(mobile_teacher_state.call(submission)).to be :needs_grading
+          expect(grading_status.call(submission)).to be :needs_grading
         end
       end
 
@@ -337,7 +337,7 @@ describe Api::V1::Submission do
         # make it graded
         submission.workflow_state = 'graded'
         submission.score = 10
-        expect(mobile_teacher_state.call(submission)).to be :graded
+        expect(grading_status.call(submission)).to be :graded
       end
     end
   end

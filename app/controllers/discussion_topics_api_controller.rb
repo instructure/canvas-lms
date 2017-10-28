@@ -219,6 +219,27 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
+  def duplicate
+    return unless authorized_action(@topic, @current_user, :create)
+    # Require topic hook forbids duplicating of child, nonexistent, and deleted topics
+    # The only extra check we need is to prevent duplicating announcements.
+    if @topic.is_announcement
+      return render json: { error: 'announcements cannot be duplicated' }, status: :bad_request
+    end
+
+    new_topic = @topic.duplicate({ :user => @current_user })
+    if new_topic.save!
+      result = discussion_topic_api_json(new_topic, @context, @current_user, session)
+      if new_topic.assignment
+        new_topic.assignment.insert_at(@topic.assignment.position + 1)
+        result[:set_assignment] = true
+      end
+      render :json => result
+    else
+      render json: { error: 'unable to save new discussion topic' }, status: :bad_request
+    end
+  end
+
   # @API List topic entries
   # Retrieve the (paginated) top-level entries in a discussion topic.
   #

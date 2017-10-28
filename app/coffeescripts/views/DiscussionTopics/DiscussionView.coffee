@@ -21,13 +21,15 @@ define [
   'underscore'
   'Backbone'
   'jsx/shared/conditional_release/CyoeHelper'
+  'jsx/move_item_tray/NewMoveDialogView'
   'jst/DiscussionTopics/discussion'
+  'compiled/models/DiscussionTopic'
   'compiled/views/PublishIconView'
   'compiled/views/LockIconView'
   'compiled/views/ToggleableSubscriptionIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/MoveDialogView'
-], (I18n, $, _, {View}, CyoeHelper, template, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
+], (I18n, $, _, {View}, CyoeHelper, NewMoveDialogView, template, DiscussionTopic, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -49,10 +51,12 @@ define [
       deleteFail: I18n.t('flash.fail', 'Discussion Topic deletion failed.')
 
     events:
-      'click .icon-lock':  'toggleLocked'
-      'click .icon-pin':   'togglePinned'
-      'click .icon-trash': 'onDelete'
-      'click':             'onClick'
+      'click .icon-lock':            'toggleLocked'
+      'click .icon-pin':             'togglePinned'
+      'click .icon-trash':           'onDelete'
+      'click .icon-updown':          'onMove'
+      'click .duplicate-discussion': 'onDuplicate'
+      'click':                       'onClick'
 
     # Public: Option defaults.
     defaults:
@@ -62,6 +66,7 @@ define [
       '.screenreader-only': '$title'
       '.discussion-row': '$row'
       '.move_item': '$moveItemButton'
+      '.move_panel': '$movePanel'
       '.discussion-actions .al-trigger': '$gearButton'
 
     # Public: Topic is able to be locked/unlocked.
@@ -98,17 +103,20 @@ define [
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       if @model.get('assignment')
         options.dateDueColumnView = new DateDueColumnView(model: @model.get('assignment'))
-      @moveItemView = new MoveDialogView
+      @newModalView = new NewMoveDialogView
         model: @model
-        nested: true
+        nested: false
         closeTarget: @$el.find('a[id=manage_link]')
-        saveURL: -> @model.collection.reorderURL()
+        saveURL: @model.collection.reorderURL()
+        onSuccessfulMove: @onSuccessfulMove
+        movePanelParent: document.getElementById('not_right_side')
+        modalTitle: I18n.t('Move Discussion')
       super
 
     render: ->
       super
       @$el.attr('data-id', @model.get('id'))
-      @moveItemView.setTrigger @$moveItemButton
+      @newModalView.setCloseFocus @$gearButton
       this
 
     # Public: Lock or unlock the model and update it on the server.
@@ -137,6 +145,42 @@ define [
       else
         @$el.find('a[id=manage_link]').focus()
 
+    # Public: Called when move menu item is selected
+    #
+    # Returns nothing.
+    onMove: () =>
+      @newModalView.renderOpenMoveDialog();
+
+    # Public: Moves the items currently in the list to match backend
+    #
+    # movedItems - List of ID's of correct order
+    #
+    # Returns nothing.
+    onSuccessfulMove: (movedItems) =>
+      newCollection = @model.collection
+      #update all of the position attributes
+      positions = [1..newCollection.length]
+      movedItems.forEach (id, index) ->
+        newCollection.get(id)?.set 'position', positions[index]
+      newCollection.sort()
+      # finally, call reset to trigger a re-render
+      newCollection.reset newCollection.models
+
+    insertDuplicatedDiscussion: (response) =>
+      index = @model.collection.indexOf(@model) + 1
+      # TODO: Figure out how to get rid of this hack.  Don't understand why
+      # the Backbone models aren't reading the JSON properly.
+      topic = new DiscussionTopic(response.data)
+      fixedJSON = topic.parse(response.data)
+      topic = new DiscussionTopic(fixedJSON)
+
+      @model.collection.add(topic, { at: index })
+      @focusOnModel(@model.collection.at(index))
+
+    onDuplicate: (e) =>
+      e.preventDefault()
+      @model.duplicate(ENV.COURSE_ID, @insertDuplicatedDiscussion)
+
     # Public: Delete the model and update the server.
     #
     # Returns nothing.
@@ -149,7 +193,7 @@ define [
 
     goToPrevItem: =>
       if @previousDiscussionInGroup()?
-        $('#' + @previousDiscussionInGroup().id + '_discussion_content').attr("tabindex",-1).focus()
+        @focusOnModel(@previousDiscussionInGroup())
       else if @model.get('pinned')
         $('.pinned&.discussion-list').attr("tabindex",-1).focus()
       else if @model.get('locked')
@@ -160,6 +204,9 @@ define [
     previousDiscussionInGroup: =>
       current_index = @model.collection.models.indexOf(@model)
       @model.collection.models[current_index - 1]
+
+    focusOnModel: (discussionTopic) =>
+      $("##{discussionTopic.id}_discussion_content").attr("tabindex",-1).focus()
 
     # Public: Pin or unpin the model and update it on the server.
     #

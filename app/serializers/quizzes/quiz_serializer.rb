@@ -39,7 +39,7 @@ module Quizzes
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
                 :assignment_id, :one_time_results, :only_visible_to_overrides,
                 :assignment_group_id, :show_correct_answers_last_attempt, :version_number,
-                :question_types, :has_access_code, :post_to_sis
+                :question_types, :has_access_code, :post_to_sis, :anonymous_submissions
 
     def_delegators :@controller,
       # :api_v1_course_assignment_group_url,
@@ -193,7 +193,7 @@ module Quizzes
     end
 
     def include_unpublishable?
-      quiz.grants_right?(current_user, session, :manage)
+      quiz.grants_right?(current_user, :manage)
     end
 
     def filter(keys)
@@ -222,6 +222,8 @@ module Quizzes
           accepts_jsonapi? && user_may_grade? && user_may_manage?
         when :locked_for_user, :lock_info, :lock_explanation
           !serializer_option(:skip_lock_tests)
+        when :anonymous_submissions
+          quiz.survey?
         else true
         end
       end
@@ -239,7 +241,7 @@ module Quizzes
     alias_method :unpublishable, :can_unpublish
 
     def can_update
-      quiz.grants_right?(current_user, session, :update)
+      quiz.grants_right?(current_user, :update)
     end
 
     def question_count
@@ -346,11 +348,11 @@ module Quizzes
     end
 
     def user_may_grade?
-      quiz.grants_right?(current_user, session, :grade)
+      quiz.grants_right?(current_user, :grade)
     end
 
     def user_may_manage?
-      quiz.grants_right?(current_user, session, :manage)
+      quiz.grants_right?(current_user, :manage)
     end
 
     def user_finder

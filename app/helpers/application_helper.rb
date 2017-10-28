@@ -252,7 +252,7 @@ module ApplicationHelper
   def css_url_for(bundle_name, plugin=false)
     bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
     cache = BrandableCSS.cache_for(bundle_path, css_variant)
-    base_dir = cache[:includesNoVariables] ? 'no_variables' : File.join(active_brand_config.try(:md5).to_s, css_variant)
+    base_dir = cache[:includesNoVariables] ? 'no_variables' : css_variant
     File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
   end
 
@@ -904,4 +904,10 @@ module ApplicationHelper
     @domain_root_account&.feature_enabled?(:student_planner) && @current_user.has_student_enrollment?
   end
 
+  def thumbnail_image_url(attachment)
+    # this thumbnail url is a route that redirects to local/s3 appropriately.
+    # deferred redirect through route because it may be saved for later use
+    # after a direct link to attachment.thumbnail_url would have expired
+    super(attachment, attachment.uuid)
+  end
 end

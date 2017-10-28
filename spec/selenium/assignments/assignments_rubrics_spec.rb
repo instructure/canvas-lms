@@ -71,11 +71,11 @@ describe "assignment rubrics" do
        f(' .ok_button').click
        wait_for_ajaximations
        f('#criterion_2 .add_rating_link_after').click
-       f('#criterion_2 tbody tr td:nth-of-type(2) .edit_rating_link').click
 
        expect(f('#flash_screenreader_holder')).to have_attribute("textContent", "New Rating Created")
        set_value(f('.rating_description'), 'rating 1')
-       f(' .ok_button').click
+       f('.ui-dialog-buttonset .save_button').click
+       wait_for_ajaximations
        submit_form('#edit_rubric_form')
        wait_for_ajaximations
       end.to change(Rubric, :count).by(1)
@@ -307,6 +307,7 @@ describe "assignment rubrics" do
       expect(f('.total_points_holder .assessing')).to include_text "out of 5"
       f("#rubric_#{@rubric.id} tbody tr:nth-child(2) .ratings td:nth-child(1)").click
       expect(f('.rubric_total')).to include_text "5"
+      scroll_into_view('.save_rubric_button')
       f('.save_rubric_button').click
       expect(f('.grading_value')).to have_attribute(:value, '5')
     end
@@ -373,6 +374,27 @@ describe "assignment rubrics" do
       expect(is_checked(".grading_rubric_checkbox:visible")).to be_truthy
     end
 
+    it "allows user to set a long description", priority: "1", test_id: 220341 do
+      assignment_with_editable_rubric(10, 'Assignment Rubric')
+
+      get "/courses/#{@assignment.course.id}/assignments/#{@assignment.id}"
+
+      f('.rubric_title .icon-edit').click
+      wait_for_ajaximations
+
+      hover_and_click('.criterion:nth-of-type(1) tbody tr td:nth-of-type(1) .edit_rating_link')
+      wait_for_ajaximations
+
+      set_value(f('#edit_rating_form .rating_long_description'), 'long description')
+
+      f('.ui-dialog-buttonset .save_button').click
+      wait_for_ajaximations
+      submit_form('#edit_rubric_form')
+      wait_for_ajaximations
+
+      expect(fj('.criterion:visible .rating_long_description')).to include_text "long description"
+    end
+
     context "ranged ratings" do
       before(:each) do
         @course.account.root_account.enable_feature!(:rubric_criterion_range)
@@ -435,7 +457,8 @@ describe "assignment rubrics" do
 
         set_value(f('#edit_rating_form .min_points'), '2')
 
-        f(' .ok_button').click
+        f('.ui-dialog-buttonset .save_button').click
+        wait_for_ajaximations
         submit_form('#edit_rubric_form')
         wait_for_ajaximations
 
@@ -466,7 +489,7 @@ describe "assignment rubrics" do
         set_value(f('#edit_rating_form .min_points'), '2')
         set_value(f('#edit_rating_form input[name="points"]'), '2')
 
-        f('.ok_button').click
+        f('.ui-dialog-buttonset .save_button').click
         wait_for_ajaximations
 
         range_rating_element = '.criterion:nth-of-type(3) tbody tr td:nth-of-type(1) .range_rating'
@@ -488,7 +511,8 @@ describe "assignment rubrics" do
         set_value(f('#edit_rating_form .min_points'), '-1')
         set_value(f('#edit_rating_form input[name="points"]'), '100')
 
-        f(' .ok_button').click
+        f('.ui-dialog-buttonset .save_button').click
+        wait_for_ajaximations
         submit_form('#edit_rubric_form')
         wait_for_ajaximations
 

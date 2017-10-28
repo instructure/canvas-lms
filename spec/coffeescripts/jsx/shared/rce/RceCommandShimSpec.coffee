@@ -26,6 +26,7 @@ define [
     setup: ->
       fixtures.setup()
       @$target = fixtures.create('<textarea />')
+      @$target.editorBox = ()->{}
       remoteEditor = {
         hidden: false,
         isHidden: (()=> return remoteEditor.hidden)
@@ -89,6 +90,9 @@ define [
     setup: ->
       fixtures.setup()
       @$target = fixtures.create('<textarea />')
+      editor = {focus: ()->{}}
+      tinymce = {get: ()->editor}
+      RceCommandShim.setTinymce(tinymce)
 
     teardown: ->
       fixtures.teardown()
@@ -111,6 +115,7 @@ define [
     setup: ->
       fixtures.setup()
       @$target = fixtures.create('<textarea />')
+      @$target.editorBox = ()->{}
 
     teardown: ->
       fixtures.teardown()

@@ -68,7 +68,12 @@ define [
 
   QUnit.module 'assignmentIndex',
     setup: ->
-      fakeENV.setup(PERMISSIONS: {manage: true})
+      fakeENV.setup({
+        PERMISSIONS: {manage: true},
+        URLS: {
+          assignment_sort_base_url : "test"
+        }
+      })
       @enable_spy = @spy(IndexView.prototype, 'enableSearch')
 
     teardown: ->
@@ -136,7 +141,12 @@ define [
 
   QUnit.module 'student index view',
     setup: ->
-      fakeENV.setup(PERMISSIONS: {manage: false})
+      fakeENV.setup(
+        PERMISSIONS: {manage: false},
+        URLS: {
+          assignment_sort_base_url : "test"
+        }
+      )
 
     teardown: ->
       fakeENV.teardown()

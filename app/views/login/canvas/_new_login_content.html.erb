@@ -45,9 +45,9 @@
 
         <div class="ic-Login__body">
           <%= form_for :pseudonym_session, :url => url_for({ action: :create }.merge(params.slice(:id).to_unsafe_h)), :html => {:id => "login_form"} do |f| %>
-            <h2 class="ui-helper-hidden-accessible">
+            <h1 class="ui-helper-hidden-accessible">
               <%= t('log_in', 'Log In') %>
-            </h2>
+            </h1>
             <% login_inner_dialog = yield :login_inner_dialog %>
             <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>
             <input type="hidden" name="redirect_to_ssl" value="1"/>

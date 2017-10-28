@@ -36,6 +36,7 @@ namespace :js do
 
   desc "Build webpack js"
   task :webpack do
+    require 'config/initializers/plugin_symlinks'
     if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       puts "--> Building PRODUCTION webpack bundles"
       system "yarn run webpack-production"
@@ -56,8 +57,4 @@ namespace :js do
     end
   end
 
-  desc "Run Gulp Rev, for fingerprinting assets"
-  task :gulp_rev do
-    raise "Error reving files" unless system('node_modules/.bin/gulp rev')
-  end
 end

@@ -135,6 +135,15 @@
               </li>
             {{/if}}
           {{/if}}
+          {{#if ENV.permissions.manage_content}}
+            <li>
+              <a href="#" title="{{#t}}Duplicate Discussion {{title}}{{/t}}"
+              aria-label="{{#t}}Duplicate Discussion {{title}}{{/t}}"
+              class="icon-copy-course duplicate-discussion">
+                {{#t}}Duplicate{{/t}}
+              </a>
+            </li>
+          {{/if}}
           {{#if cyoe.isCyoeAble}}
           <li>
             <a href="discussion_topics/{{id}}/edit?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>

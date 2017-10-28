@@ -16,30 +16,6 @@ def parallel_processes
 end
 
 namespace :canvas do
-  desc "Compresses static assets"
-  task :compress_assets do
-    assets = FileList.new('public/**/*.js', 'public/**/*.css')
-    mutex = Mutex.new
-    before_bytes = 0
-    after_bytes = 0
-    processed = 0
-
-    require 'parallel'
-
-    Parallel.each(assets, in_threads: parallel_processes, progress: 'compressing assets') do |asset|
-      asset_compressed = "#{asset}.gz"
-      unless File.exists?(asset_compressed)
-        `gzip --best --stdout "#{asset}" > "#{asset_compressed}"`
-        mutex.synchronize do
-          before_bytes += File::Stat.new(asset).size
-          after_bytes += File::Stat.new(asset_compressed).size
-          processed += 1
-        end
-      end
-    end
-    puts "Compressed #{processed} assets, #{before_bytes} -> #{after_bytes} bytes (#{"%.0f" % ((before_bytes.to_f - after_bytes.to_f) / before_bytes * 100)}% reduction)"
-  end
-
   desc "Compile javascript and css assets."
   task :compile_assets do |t, args|
 
@@ -56,6 +32,8 @@ namespace :canvas do
       }
     end
 
+    raise "Error running gulp rev" unless system('yarn run gulp rev')
+
     if compile_css
       # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
       # to exist before we run handlebars stuff, so we have to do this first
@@ -63,7 +41,6 @@ namespace :canvas do
     end
 
     require 'parallel'
-
     tasks = Hash.new
 
     if build_styleguide
@@ -108,8 +85,6 @@ namespace :canvas do
     end
     combined_time = times.reduce(:+)
     puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
-
-    log_time("gulp rev") { Rake::Task['js:gulp_rev'].invoke }
   end
 
   desc "Just compile css and js for development"

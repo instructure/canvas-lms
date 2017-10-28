@@ -3343,21 +3343,22 @@ describe User do
   end
 
   describe "preferred_gradebook_version" do
-    let(:user) { User.new }
     subject { user.preferred_gradebook_version }
 
-    it "prefers gb2" do
-      user.preferences[:gradebook_version] = '2'
-      is_expected.to eq '2'
+    let(:user) { User.new }
+
+    it "returns default gradebook when preferred" do
+      user.preferences[:gradebook_version] = 'default'
+      is_expected.to eq 'default'
     end
 
-    it "prefers srgb " do
-      user.preferences[:gradebook_version] = 'srgb'
-      is_expected.to eq 'srgb'
+    it "returns individual gradebook when preferred" do
+      user.preferences[:gradebook_version] = 'individual'
+      is_expected.to eq 'individual'
     end
 
-    it "returns '2' when not set" do
-      is_expected.to eq '2'
+    it "returns default gradebook when not set" do
+      is_expected.to eq 'default'
     end
   end
 
@@ -3711,6 +3712,10 @@ describe User do
       expect(@student.group_memberships_for(@course).size).to eq 1
       @group.destroy
       expect(@student.group_memberships_for(@course).size).to eq 0
+    end
+
+    it 'should show if user has group_membership' do
+      expect(@student.current_groups_in_region?).to eq true
     end
 
   end

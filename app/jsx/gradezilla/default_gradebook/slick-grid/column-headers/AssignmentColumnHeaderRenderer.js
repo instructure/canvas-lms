@@ -19,6 +19,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import AssignmentColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader';
+import { optionsForGradingType } from 'jsx/gradezilla/shared/EnterGradesAsSetting';
 
 function getProps (column, gradebook, options) {
   const assignmentId = column.assignmentId;
@@ -73,6 +74,16 @@ function getProps (column, gradebook, options) {
 
     curveGradesAction: gradebook.getCurveGradesAction(assignmentId),
     downloadSubmissionsAction: gradebook.getDownloadSubmissionsAction(assignmentId),
+
+    enterGradesAsSetting: {
+      hidden: optionsForGradingType(assignment.grading_type).length < 2, // show only multiple options
+      onSelect (value) {
+        gradebook.updateEnterGradesAsSetting(assignmentId, value);
+      },
+      selected: gradebook.getEnterGradesAsSetting(assignmentId),
+      showGradingSchemeOption: optionsForGradingType(assignment.grading_type).includes('gradingScheme')
+    },
+
     muteAssignmentAction: gradebook.getMuteAssignmentAction(assignmentId),
     onHeaderKeyDown: (event) => {
       gradebook.handleHeaderKeyDown(event, columnId);

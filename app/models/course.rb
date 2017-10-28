@@ -618,7 +618,7 @@ class Course < ActiveRecord::Base
     distinct.joins("INNER JOIN (
          SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
          INNER JOIN #{Account.quoted_table_name} AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
-         INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
+         INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i} AND au.workflow_state = 'active'
        UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
          INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
@@ -2031,26 +2031,6 @@ class Course < ActiveRecord::Base
   attr_accessor :full_migration_hash, :external_url_hash,
                 :folder_name_lookups, :assignment_group_no_drop_assignments, :migration_results
 
-
-  def backup_to_json
-    backup.to_json
-  end
-
-  def backup
-    res = []
-    res += self.folders.active
-    res += self.attachments.active
-    res += self.assignment_groups.active
-    res += self.assignments.active
-    res += self.submissions
-    res += self.quizzes
-    res += self.discussion_topics.active
-    res += self.discussion_entries.active
-    res += self.wiki_pages.active
-    res += self.calendar_events.active
-    res
-  end
-
   def map_merge(old_item, new_item)
     @merge_mappings ||= {}
     @merge_mappings[old_item.asset_string] = new_item && new_item.id
@@ -2151,7 +2131,9 @@ class Course < ActiveRecord::Base
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
       :organize_epub_by_content_type, :show_announcements_on_home_page,
-      :home_page_announcement_limit, :enable_offline_web_export ]
+      :home_page_announcement_limit, :enable_offline_web_export,
+      :restrict_student_future_view, :restrict_student_past_view
+    ]
   end
 
   def set_course_dates_if_blank(shift_options)
@@ -2606,9 +2588,9 @@ class Course < ActiveRecord::Base
         end
 
         if !user || !self.grants_right?(user, :manage_content)
-          # remove some tabs for logged-out users or non-students
+          # remove outcomes tab for logged-out users or non-students
           unless grants_any_right?(user, :read_as_admin, :participate_as_student)
-            tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
+            tabs.delete_if { |t| t[:id] == TAB_OUTCOMES }
           end
 
           # remove hidden tabs from students

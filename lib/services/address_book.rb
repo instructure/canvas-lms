@@ -105,6 +105,7 @@ module Services
     end
 
     def self.count_recipients(params)
+      return {} if params[:contexts].blank?
       fetch("/recipients/counts", query_params(params))['counts'] || {}
     end
 

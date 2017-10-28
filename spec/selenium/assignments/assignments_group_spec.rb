@@ -361,7 +361,7 @@ describe "assignment groups" do
 
       run_assignment_edit(@frozen_assign) do
         # title isn't locked, should allow editing
-        f('#assignment_name').send_keys(' edit')
+        f('#assignment_name').send_keys('edit')
 
         expect(f('#assignment_group_id')).not_to be_disabled
         expect(f('#assignment_peer_reviews')).not_to be_disabled
@@ -369,7 +369,7 @@ describe "assignment groups" do
         click_option('#assignment_group_id', "other")
       end
 
-      expect(f('h1.title')).to include_text(orig_title + ' edit')
+      expect(f('h1.title')).to include_text('edit' + orig_title)
       expect(@frozen_assign.reload.assignment_group.name).to eq "other"
     end
   end

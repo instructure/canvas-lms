@@ -31,7 +31,10 @@
     &.active { background-color: $activeBG; }
   }
   li[aria-selected="true"] > a {
-    @include tab-focus();
+    outline: thin dotted #333;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+    text-decoration: none;
   }
   .preview-thumbnail-holder {
     display: inline-block;
@@ -54,4 +57,3 @@
   .icon-mini-arrow-right { transition: transform 0.2s }
   .expanded .icon-mini-arrow-right { transform: rotate(90deg) }
 }
-

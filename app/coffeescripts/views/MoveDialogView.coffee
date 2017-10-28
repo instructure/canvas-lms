@@ -20,9 +20,10 @@ define [
   'underscore'
   'compiled/views/DialogFormView'
   'compiled/views/MoveDialogSelect'
+  'jsx/move_item_tray/NewMoveDialogView'
   'jst/MoveDialog'
   'jst/EmptyDialogFormWrapper'
-], ($, _, DialogFormView, MoveDialogSelect, template, wrapper) ->
+], ($, _, DialogFormView, MoveDialogSelect, NewMoveDialogView, template, wrapper) ->
 
   class MoveDialogView extends DialogFormView
     setViewProperties: false
@@ -112,7 +113,6 @@ define [
 
       @attachChildViews()
 
-
     # attaches child views to @$childContainer
     attachChildViews: ->
       $container = @$childContainer.detach()
@@ -134,6 +134,8 @@ define [
     updateListView: (e)->
       return unless @nested
       groupId = $(e.currentTarget).val()
+
+
       group = @parentCollection.get(groupId)
       children = group.get(@childKey)
 

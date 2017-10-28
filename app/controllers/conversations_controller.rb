@@ -166,7 +166,8 @@ class ConversationsController < ApplicationController
   API_ALLOWED_FIELDS = %w{workflow_state subscribed starred}.freeze
 
   # @API List conversations
-  # Returns the list of conversations for the current user, most recent ones first.
+  # Returns the paginated list of conversations for the current user, most
+  # recent ones first.
   #
   # @argument scope [String, "unread"|"starred"|"archived"]
   #   When set, only return conversations of the specified type. For example,
@@ -410,12 +411,14 @@ class ConversationsController < ApplicationController
 
       # reload and preload stuff
       conversations = ConversationParticipant.where(:id => batch.conversations).preload(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
+      conversations.each{|c| c.conversation.recently_created = true}
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       visibility_map = infer_visibility(conversations)
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
+      @conversation.conversation.recently_created = true
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false, :cc_author => true)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end

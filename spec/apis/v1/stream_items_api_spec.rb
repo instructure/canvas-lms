@@ -393,35 +393,38 @@ describe UsersController, type: :request do
       'url' => nil,
       'user_id' => @sub.user_id,
 
-      'submission_comments' => [{
-        'body' => 'c1',
-        'comment' => 'c1',
-        'author' => {
-          'id' => @teacher.id,
-          'display_name' => 'teacher',
-          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-          'avatar_image_url' => User.avatar_fallback_url(nil, request)
+      'submission_comments' => [
+        {
+          'body' => 'c1',
+          'comment' => 'c1',
+          'author' => {
+            'id' => @teacher.id,
+            'display_name' => 'teacher',
+            'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
+            'avatar_image_url' => User.avatar_fallback_url(nil, request)
+          },
+          'author_name' => 'teacher',
+          'author_id' => @teacher.id,
+          'created_at' => @sub.submission_comments[0].created_at.as_json,
+          'edited_at' => nil,
+          'id' => @sub.submission_comments[0].id
         },
-        'author_name' => 'teacher',
-        'author_id' => @teacher.id,
-        'created_at' => @sub.submission_comments[0].created_at.as_json,
-        'id' => @sub.submission_comments[0].id
-      },
-      {
-        'body' => 'c2',
-        'comment' => 'c2',
-        'author' => {
-          'id' => @user.id,
-          'display_name' => 'User',
-          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
-          'avatar_image_url' => User.avatar_fallback_url(nil, request)
-        },
-        'author_name' => 'User',
-        'author_id' => @user.id,
-        'created_at' => @sub.submission_comments[1].created_at.as_json,
-        'id' => @sub.submission_comments[1].id
-      },],
-
+        {
+          'body' => 'c2',
+          'comment' => 'c2',
+          'author' => {
+            'id' => @user.id,
+            'display_name' => 'User',
+            'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+            'avatar_image_url' => User.avatar_fallback_url(nil, request)
+          },
+          'author_name' => 'User',
+          'author_id' => @user.id,
+          'created_at' => @sub.submission_comments[1].created_at.as_json,
+          'edited_at' => nil,
+          'id' => @sub.submission_comments[1].id
+        }
+      ],
       'course' => {
         'name' => @course.name,
         'end_at' => @course.end_at,
@@ -514,35 +517,38 @@ describe UsersController, type: :request do
       'url' => nil,
       'user_id' => @sub.user_id,
 
-      'submission_comments' => [{
-        'body' => 'c1',
-        'comment' => 'c1',
-        'author' => {
-          'id' => @teacher.id,
-          'display_name' => 'teacher',
-          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-          'avatar_image_url' => User.avatar_fallback_url(nil, request)
+      'submission_comments' => [
+        {
+          'body' => 'c1',
+          'comment' => 'c1',
+          'author' => {
+            'id' => @teacher.id,
+            'display_name' => 'teacher',
+            'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
+            'avatar_image_url' => User.avatar_fallback_url(nil, request)
+          },
+          'author_name' => 'teacher',
+          'author_id' => @teacher.id,
+          'created_at' => @sub.submission_comments[0].created_at.as_json,
+          'edited_at' => nil,
+          'id' => @sub.submission_comments[0].id
         },
-        'author_name' => 'teacher',
-        'author_id' => @teacher.id,
-        'created_at' => @sub.submission_comments[0].created_at.as_json,
-        'id' => @sub.submission_comments[0].id
-      },
-      {
-        'body' => 'c2',
-        'comment' => 'c2',
-        'author' => {
-          'id' => @user.id,
-          'display_name' => 'User',
-          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
-          'avatar_image_url' => User.avatar_fallback_url(nil, request)
-        },
-        'author_name' => 'User',
-        'author_id' => @user.id,
-        'created_at' => @sub.submission_comments[1].created_at.as_json,
-        'id' => @sub.submission_comments[1].id
-      },],
-
+        {
+          'body' => 'c2',
+          'comment' => 'c2',
+          'author' => {
+            'id' => @user.id,
+            'display_name' => 'User',
+            'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+            'avatar_image_url' => User.avatar_fallback_url(nil, request)
+          },
+          'author_name' => 'User',
+          'author_id' => @user.id,
+          'created_at' => @sub.submission_comments[1].created_at.as_json,
+          'edited_at' => nil,
+          'id' => @sub.submission_comments[1].id
+        }
+      ],
       'course' => {
         'name' => @course.name,
         'end_at' => @course.end_at,

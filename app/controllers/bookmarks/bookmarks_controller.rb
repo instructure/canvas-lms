@@ -49,7 +49,7 @@ class Bookmarks::BookmarksController < ApplicationController
   before_action :find_bookmark, :only => [:show, :update, :destroy]
 
   # @API List bookmarks
-  # Returns the list of bookmarks.
+  # Returns the paginated list of bookmarks.
   #
   # @example_request
   #

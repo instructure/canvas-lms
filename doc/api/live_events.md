@@ -332,6 +332,7 @@ by `asset_type` and `asset_id`.
 | `submission_id` | The Canvas id of the new submission. |
 | `assignment_id` | The Canvas id of the assignment being submitted. |
 | `user_id` | The Canvas id of the user associated with the submission. |
+| `lti_user_id` | The Lti id of the user associated with the submission. |
 | `submitted_at` | The timestamp when the assignment was submitted. |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `score` | The raw score |
@@ -350,6 +351,7 @@ by `asset_type` and `asset_id`.
 | `submission_id` | The Canvas id of the new submission. |
 | `assignment_id` | The Canvas id of the assignment being submitted. |
 | `user_id` | The Canvas id of the user associated with the submission. |
+| `lti_user_id` | The Lti id of the user associated with the submission. |
 | `submitted_at` | The timestamp when the assignment was submitted. |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `score` | The raw score |
@@ -368,6 +370,7 @@ by `asset_type` and `asset_id`.
 | `submission_id` | The Canvas id of the new submission. |
 | `assignment_id` | The Canvas id of the assignment being submitted. |
 | `user_id` | The Canvas id of the user associated with the submission. |
+| `lti_user_id` | The Lti id of the user associated with the submission. |
 | `submitted_at` | The timestamp when the assignment was submitted. |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `score` | The raw score |

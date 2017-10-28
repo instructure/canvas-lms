@@ -85,8 +85,8 @@ class CommunicationChannelsController < ApplicationController
 
   # @API List user communication channels
   #
-  # Returns a list of communication channels for the specified user, sorted by
-  # position.
+  # Returns a paginated list of communication channels for the specified user,
+  # sorted by position.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/users/12345/communication_channels \

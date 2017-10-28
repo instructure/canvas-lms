@@ -657,11 +657,23 @@ class Submission < ActiveRecord::Base
   def originality_report_url(asset_string, user)
     url = nil
     if self.grants_right?(user, :view_turnitin_report)
-      attachment = self.attachments.find_by_asset_string(asset_string)
-      report = self.originality_reports.find_by(attachment: attachment)
+      requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
+      report = self.originality_reports.find_by(attachment: requested_attachment)
       url = report&.report_launch_url
     end
     url
+  end
+
+  def all_versioned_attachments
+    attachment_ids = submission_history.map(&:attachment_ids_for_version).flatten.uniq
+    Attachment.where(id: attachment_ids)
+  end
+  private :all_versioned_attachments
+
+  def attachment_ids_for_version
+    ids = (attachment_ids || '').split(',').map(&:to_i)
+    ids << attachment_id if attachment_id
+    ids
   end
 
   def delete_turnitin_errors
@@ -1432,21 +1444,17 @@ class Submission < ActiveRecord::Base
 
   def versioned_originality_reports
     @versioned_originality_reports ||= begin
-      ids = (attachment_ids || "").split(",")
-      ids << attachment_id if attachment_id
-      ids.empty? ? [] : OriginalityReport.where(submission_id: id, attachment_id: ids)
+      attachment_ids = attachment_ids_for_version
+      return [] if attachment_ids.empty?
+      OriginalityReport.where(submission_id: id, attachment_id: attachment_ids)
     end
   end
 
   def versioned_attachments
-    if @versioned_attachments
-      @versioned_attachments
-    else
-      ids = (attachment_ids || "").split(",")
-      ids << attachment_id if attachment_id
-      self.versioned_attachments = (ids.empty? ? [] : Attachment.where(:id => ids))
-      @versioned_attachments
-    end
+    return @versioned_attachments if @versioned_attachments
+    attachment_ids = attachment_ids_for_version
+    self.versioned_attachments = (attachment_ids.empty? ? [] : Attachment.where(:id => attachment_ids))
+    @versioned_attachments
   end
 
   def versioned_attachments=(attachments)
@@ -1649,7 +1657,7 @@ class Submission < ActiveRecord::Base
 
   scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
 
-  scope :graded, -> { where("submissions.grade IS NOT NULL") }
+  scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
 
   scope :ungraded, -> { where(:grade => nil).preload(:assignment) }
 
@@ -2213,12 +2221,6 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def rubric_association_with_assessing_user_id
-    self.assignment.rubric_association.tap do |association|
-      association.assessing_user_id = self.user_id if association
-    end
-  end
-
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(:context => context, :tag => "submissions_update")
     progress.process_job(self, :process_bulk_update, {}, context, section, grader, grade_data)
@@ -2310,4 +2312,35 @@ class Submission < ActiveRecord::Base
     Rails.logger.info "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
     context.recompute_student_scores(user_ids)
   end
+
+  def submission_status
+    if resubmitted?
+      :resubmitted
+    elsif missing?
+      :missing
+    elsif late?
+      :late
+    elsif submitted? ||
+      (submission_type.present? && submission_type != 'online_quiz') ||
+      (submission_type == 'online_quiz' && quiz_submission.completed?)
+      :submitted
+    else
+      :unsubmitted
+    end
+  end
+
+  def grading_status
+    if excused?
+      :excused
+    elsif needs_review?
+      :needs_review
+    elsif needs_grading?
+      :needs_grading
+    elsif graded?
+      :graded
+    else
+      nil
+    end
+  end
+
 end

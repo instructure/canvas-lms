@@ -252,6 +252,7 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
       expect(json[0]['user']).not_to be_nil
       expect(json[0]['user']['id']).to eq(@student1.id)
+      expect(response.headers["Link"]).to include("/api/v1/sections/#{@section.id}")
     end
 
     it "returns assignment_visible" do
@@ -830,6 +831,7 @@ describe 'Submissions API', type: :request do
              "display_name" => nil
            },
            "created_at"=>comment.created_at.as_json,
+           "edited_at" => nil,
            "author"=>{
               "id" => @teacher.id,
               "display_name" => "User",
@@ -1142,6 +1144,7 @@ describe 'Submissions API', type: :request do
              "display_name" => nil
            },
            "created_at"=>comment.reload.created_at.as_json,
+           "edited_at" => nil,
            "author"=>{
              "id" => @teacher.id,
              "display_name" => "User",
@@ -3421,7 +3424,10 @@ describe 'Submissions API', type: :request do
         a1 = attachment_model(:context => @user)
         a2 = attachment_model(:context => @user)
         json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
-        expect(json['attachments'].map { |a| a['url'] }).to eq [ file_download_url(a1, :verifier => a1.uuid, :download => '1', :download_frd => '1'), file_download_url(a2, :verifier => a2.uuid, :download => '1', :download_frd => '1') ]
+        sub_a1 = Attachment.where(:root_attachment_id => a1).first
+        sub_a2 = Attachment.where(:root_attachment_id => a2).first
+        expect(json['attachments'].map { |a| a['url'] }).to eq [ file_download_url(sub_a1, :verifier => sub_a1.uuid, :download => '1', :download_frd => '1'),
+          file_download_url(sub_a2, :verifier => sub_a2.uuid, :download => '1', :download_frd => '1') ]
       end
 
       it "creates a media comment submission" do
@@ -3435,7 +3441,6 @@ describe 'Submissions API', type: :request do
       end
 
       it "copys files to the submissions folder if they're not there already" do
-        @course.root_account.enable_feature! :submissions_folder
         @assignment.update_attributes(:submission_types => 'online_upload')
         a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
         a2 = attachment_model(:context => @user)
@@ -3478,16 +3483,10 @@ describe 'Submissions API', type: :request do
                         { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })
       end
 
-      it "uploads to a student's Submissions folder if the feature is enabled" do
-        @course.root_account.enable_feature! :submissions_folder
+      it "uploads to a student's Submissions folder" do
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         f = Attachment.last.folder
         expect(f.submission_context_code).to eq @course.asset_string
-      end
-
-      it "does not do so otherwise" do
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
-        expect(Attachment.last.folder).not_to be_for_submissions
       end
     end
 
@@ -3586,6 +3585,26 @@ describe 'Submissions API', type: :request do
     expect(json[0]["submission_history"][0]["attachments"][0]["preview_url"]).to match(
       /canvadoc_session/
     )
+  end
+
+  it "includes canvadoc_document_id when specified" do
+    allow(Canvadocs).to receive(:config).and_return({a: 1})
+
+    course_with_teacher_logged_in active_all: true
+    student_in_course active_all: true
+    @user = @teacher
+    a = @course.assignments.create!
+    a.submit_homework(@student, submission_type: 'online_upload',
+                      attachments: [canvadocable_attachment_model(context: @student)])
+    canvadoc_params = { :attachment_id => a.submissions[0].attachments[0].id, :document_id => 'testing_doc_id' }
+    a.submissions[0].attachments[0].canvadoc = Canvadoc.new(canvadoc_params)
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=canvadoc_document_id",
+                    { course_id: @course.id.to_s, assignment_id: a.id.to_s,
+                      action: 'index', controller: 'submissions_api', format: 'json',
+                      include: %w[canvadoc_document_id] })
+    canvadoc_document_id = a.submissions[0].attachments[0].canvadoc.document_id
+    expect(json[0]["attachments"][0]["canvadoc_document_id"]).to eq canvadoc_document_id
   end
 
   it "includes crocodoc whitelist ids in the preview url for attachments" do
@@ -4158,8 +4177,8 @@ describe 'Submissions API', type: :request do
         end
       end
 
-      describe 'mobile_student_label' do
-        let(:field) { 'mobile_student_label' }
+      describe 'submission_status' do
+        let(:field) { 'submission_status' }
 
         it "does not include label" do
           json = api_call_as_user(teacher, :get, path, params)
@@ -4186,8 +4205,8 @@ describe 'Submissions API', type: :request do
         end
       end
 
-      describe 'mobile_teacher_state' do
-        let(:field) { 'mobile_teacher_state' }
+      describe 'grading_status' do
+        let(:field) { 'grading_status' }
 
         it "does not include action" do
           json = api_call_as_user(teacher, :get, path, params)
@@ -4257,6 +4276,16 @@ describe 'Submissions API', type: :request do
       @assignment.submit_homework @student2, :body => 'EHLO2'
       @assignment.grade_student @student2, score: 98, grader: @teacher
       @assignment.submit_homework @student2, :body => 'EHLO3'
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 1
+      expect(json['ungraded']).to eq 1
+      expect(json['not_submitted']).to eq 1
+    end
+
+    it 'doesnt count submissions where the grade was removed as graded' do
+      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.grade_student @student2, score: 98, grader: @teacher
+      @assignment.grade_student @student2, score: nil, grader: @teacher
       json = api_call_as_user(@teacher, :get, @path, @params)
       expect(json['graded']).to eq 1
       expect(json['ungraded']).to eq 1

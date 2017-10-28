@@ -37,9 +37,15 @@ QUnit.module('ActAsModal', {
         avatar_image_url: 'testImageUrl',
         sortable_name: 'bar, baz',
         email: 'testUser@test.com',
-        login_id: 'qux',
-        sis_id: 555,
-        integration_id: 222
+        pseudonyms: [{
+          login_id: 'qux',
+          sis_id: 555,
+          integration_id: 222
+        }, {
+          login_id: 'tic',
+          sis_id: 777,
+          integration_id: 888
+        }]
       }
     }
   }
@@ -66,12 +72,12 @@ test('it renders avatar with user image url', function () {
 
 test('it renders the table with correct user information', function () {
   const wrapper = shallow(<ActAsModal {...this.props} />)
-  const table = wrapper.find(Table)
+  const tables = wrapper.find(Table)
 
-  ok(table.exists())
+  ok(tables.length === 3)
 
   const textContent = []
-  table.find('tr').forEach((row) => {
+  tables.find('tr').forEach((row) => {
     row.find(Typography).forEach((rowContent) => {
       textContent.push(rowContent.props().children)
     })
@@ -83,9 +89,11 @@ test('it renders the table with correct user information', function () {
   ok(tableText.indexOf(user.short_name) > -1)
   ok(tableText.indexOf(user.sortable_name) > -1)
   ok(tableText.indexOf(user.email) > -1)
-  ok(tableText.indexOf(user.login_id) > -1)
-  ok(tableText.indexOf(user.sis_id) > -1)
-  ok(tableText.indexOf(user.integration_id) > -1)
+  user.pseudonyms.forEach((pseudonym) => {
+    ok(tableText.indexOf(pseudonym.login_id) > -1)
+    ok(tableText.indexOf(pseudonym.sis_id) > -1)
+    ok(tableText.indexOf(pseudonym.integration_id) > -1)
+  })
 })
 
 test('it should only display loading spinner if state is loading', function (assert) {

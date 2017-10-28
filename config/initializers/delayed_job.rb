@@ -128,16 +128,16 @@ Delayed::Worker.lifecycle.around(:work_queue_pop) do |worker, config, &block|
   end
 end
 
-Delayed::Worker.lifecycle.before(:perform) do |_job|
+Delayed::Worker.lifecycle.before(:perform) do |_worker, _job|
   # Since AdheresToPolicy::Cache uses an instance variable class cache lets clear
   # it so we start with a clean slate.
   AdheresToPolicy::Cache.clear
   LoadAccount.clear_shard_cache
 end
 
-Delayed::Worker.lifecycle.around(:perform) do |job, &block|
+Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   CanvasStatsd::Statsd.batch do
-    block.call(job)
+    block.call(worker, job)
   end
 end
 

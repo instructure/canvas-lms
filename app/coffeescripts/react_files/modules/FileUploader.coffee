@@ -30,15 +30,23 @@ define [
         @deferred.reject(event.target.status)
         return
 
-      url = @uploadData.upload_params.success_url
-      if url
-        $.getJSON(url).then (results) =>
-          f = @addFileToCollection(results)
-          @deferred.resolve(f)
+      if @uploadData.upload_params.success_url
+        # s3 upload, need to ping success_url to finalize and get back
+        # attachment information
+        $.getJSON(@uploadData.upload_params.success_url).then(@onUploadSuccess)
       else
-        results = $.parseJSON(event.target.response)
-        f = @addFileToCollection(results)
-        @deferred.resolve(f)
+        response = $.parseJSON(event.target.response)
+        if event.target.status == 201
+          # inst-fs upload, need to request attachment information from
+          # location
+          $.getJSON(response.location).then(@onUploadSuccess)
+        else
+          # local-storage upload, this _is_ the attachment information
+          @onUploadSuccess(response)
+
+    onUploadSuccess: (fileJson) =>
+      file = @addFileToCollection(fileJson)
+      @deferred.resolve(file)
 
     addFileToCollection: (attrs) =>
       uploadedFile = new BBFile(attrs, 'no/url/needed/') #we've already done the upload, no preflight needed

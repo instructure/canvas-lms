@@ -22,9 +22,14 @@ describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
+  before(:once) do
+    # or some stuff we need to click is "below the fold"
+    driver.manage.window.maximize
+  end
+
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -172,6 +177,8 @@ describe "calendar2" do
 
         get "/calendar2"
 
+        # navigate to the next month for end of month
+        f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
         open_edit_event_dialog
         description = 'description...'
         replace_content f('[name=description]'), description

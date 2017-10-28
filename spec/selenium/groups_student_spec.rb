@@ -187,11 +187,6 @@ describe "student groups" do
         f(".student-group-join a").click
 
         expect(f(".student-group-students")).to include_text("0 students")
-      end
-
-      it "leaving the group should change the dialog to join", priority:"2", test_id: 180683 do
-        f(".student-group-join a").click
-
         expect(f(".student-group-join a")).to include_text("JOIN")
       end
 

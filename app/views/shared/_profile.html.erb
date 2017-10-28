@@ -58,12 +58,12 @@
           <% if @user_data[:user_services].present? %>
             <ul class="social-links">
               <li>
-                <label for="social_message" class="social message ic-Label" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
+                <label for="social_message" class="social hide-text message ic-Label" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
               </li>
               <% @user_data[:user_services].each do |s| %>
                 <li>
                   <% service_name = s[:service_name] || s[:service].to_s.titleize %>
-                  <label for="social_<%= s[:service] %>" class="social <%= s[:service] %> ic-Label" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
+                  <label for="social_<%= s[:service] %>" class="social hide-text <%= s[:service] %> ic-Label" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
                   <input class="ic-Input" type="hidden" value="0" name="user_services[<%= s[:service] %>">
                   <%= check_box_tag "user_services[#{s[:service]}]", 1, s[:visible], :id => "social_#{s[:service]}" %>
                 </li>
@@ -87,12 +87,12 @@
         <% else %>
           <ul class="social-links">
             <% if current_user_is_account_admin && @user != @current_user %>
-              <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
+              <li><a href="<%= message_user_path(@user) %>" class="social hide-text message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
             <% end %>
             <% if @user_data[:user_services].present? && @user.show_user_services %>
               <% @user_data[:user_services].select{|s| s[:visible] }.each do |s| %>
                 <% service_name = s[:service_name] || s[:service].to_s.titleize %>
-                <li><a href="<%= s[:service_user_link] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>
+                <li><a href="<%= s[:service_user_link] %>" class="social hide-text <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>
               <% end %>
             <% end %>
           </ul>

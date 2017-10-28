@@ -65,6 +65,12 @@ shared_examples_for "permission tests" do
     role
   end
 
+  def verify_title_text(permission_name, role_id, expected_text)
+    el = f(%Q{td[data-role_id="#{role_id}"][data-permission_name="#{permission_name}"] a})
+    expect(el.attribute('title')).to eq expected_text
+    expect(f('.screenreader-only', el)).to include_text expected_text
+  end
+
   describe "Adding new roles" do
     before do
       get url
@@ -190,57 +196,56 @@ shared_examples_for "permission tests" do
       it "enables a permission" do
         select_enable(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_truthy
-          expect(role_override.locked).to be_falsey
-        end
+        wait_for_ajax_requests
+        verify_title_text(permission_name, role.id, "Enabled")
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_truthy
+        expect(role_override.locked).to be_falsey
       end
 
       it "locks and enables a permission" do
         select_enable_and_lock(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_truthy
-          expect(role_override.locked).to be_truthy
-        end
+        wait_for_ajax_requests
+        verify_title_text(permission_name, role.id, "Enabled and Locked")
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_truthy
+        expect(role_override.locked).to be_truthy
       end
 
       it "disables a permission" do
         select_disable(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_falsey
-          expect(role_override.locked).to be_falsey
-        end
+        wait_for_ajax_requests
+        verify_title_text(permission_name, role.id, "Disabled")
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_falsey
+        expect(role_override.locked).to be_falsey
       end
 
       it "locks and disables a permission" do
         select_disable_and_lock(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_falsey
-          expect(role_override.locked).to be_truthy
-        end
+        wait_for_ajax_requests
+        verify_title_text(permission_name, role.id, "Disabled and Locked")
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_falsey
+        expect(role_override.locked).to be_truthy
       end
 
       it "sets a permission to default" do
         select_disable(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.nil?).to be_falsey
-        end
+        wait_for_ajax_requests
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.nil?).to be_falsey
 
         select_default(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.nil?).to be_truthy
-        end
+        wait_for_ajax_requests
+        verify_title_text(permission_name, role.id, "Disabled by Default")
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.nil?).to be_truthy
       end
     end
 
@@ -257,57 +262,51 @@ shared_examples_for "permission tests" do
       it "enables a permission" do
         select_enable(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_truthy
-          expect(role_override.locked).to be_falsey
-        end
+        wait_for_ajax_requests
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_truthy
+        expect(role_override.locked).to be_falsey
       end
 
       it "locks and enables a permission" do
         select_enable_and_lock(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_truthy
-          expect(role_override.locked).to be_truthy
-        end
+        wait_for_ajax_requests
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_truthy
+        expect(role_override.locked).to be_truthy
       end
 
       it "disables a permission" do
         select_disable(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_falsey
-          expect(role_override.locked).to be_falsey
-        end
+        wait_for_ajax_requests
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_falsey
+        expect(role_override.locked).to be_falsey
       end
 
       it "locks and disables a permission" do
         select_disable_and_lock(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled).to be_falsey
-          expect(role_override.locked).to be_truthy
-        end
+        wait_for_ajax_requests
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.enabled).to be_falsey
+        expect(role_override.locked).to be_truthy
       end
 
       it "sets a permission to default" do
         select_disable(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.nil?).to be_falsey
-        end
+        wait_for_ajax_requests
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.nil?).to be_falsey
 
         select_default(permission_name, role)
 
-        keep_trying_until do
-          role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.nil?).to be_truthy
-        end
+        wait_for_ajax_requests
+        role_override = RoleOverride.where(:role_id => role.id).first
+        expect(role_override.nil?).to be_truthy
       end
 
       context "when using the keyboard" do

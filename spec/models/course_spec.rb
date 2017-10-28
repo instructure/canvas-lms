@@ -2134,77 +2134,6 @@ describe Course, "tabs_available" do
   end
 end
 
-describe Course, "backup" do
-  let_once :course_to_backup do
-    @course = course_factory
-    group = @course.assignment_groups.create!(:name => "Some Assignment Group")
-    @course.assignments.create!(:title => "Some Assignment", :assignment_group => group)
-    @course.calendar_events.create!(:title => "Some Event", :start_at => Time.now, :end_at => Time.now)
-    @course.wiki_pages.create!(:title => "Some Page")
-    topic = @course.discussion_topics.create!(:title => "Some Discussion")
-    topic.discussion_entries.create!(:message => "just a test")
-    @course
-  end
-
-  it "should backup to a valid data structure" do
-    data = course_to_backup.backup
-    expect(data).not_to be_nil
-    expect(data.length).to be > 0
-    expect(data.any?{|i| i.is_a?(Assignment)}).to eql(true)
-    expect(data.any?{|i| i.is_a?(WikiPage)}).to eql(true)
-    expect(data.any?{|i| i.is_a?(DiscussionTopic)}).to eql(true)
-    expect(data.any?{|i| i.is_a?(CalendarEvent)}).to eql(true)
-  end
-
-  it "should backup to a valid json string" do
-    data = course_to_backup.backup_to_json
-    expect(data).not_to be_nil
-    expect(data.length).to be > 0
-    parse = JSON.parse(data) rescue nil
-    expect(parse).not_to be_nil
-    expect(parse).to be_is_a(Array)
-    expect(parse.length).to be > 0
-  end
-
-  it "should not cross learning outcomes with learning outcome groups in the association" do
-    skip('fails when being run in the single thread rake task')
-    # set up two courses with two outcomes
-    course = course_model
-    default_group = course.root_outcome_group
-    outcome = course.created_learning_outcomes.create!
-    default_group.add_outcome(outcome)
-
-    other_course = course_model
-    other_default_group = other_course.root_outcome_group
-    other_outcome = other_course.created_learning_outcomes.create!
-    other_default_group.add_outcome(other_outcome)
-
-    # add another group to the first course, which "coincidentally" has the
-    # same id as the second course's outcome
-    other_group = course.learning_outcome_groups.build
-    other_group.id = other_outcome.id
-    other_group.save!
-    default_group.adopt_outcome_group(other_group)
-
-    # reload and check
-    course.reload
-    other_course.reload
-    expect(course.learning_outcomes).to be_include(outcome)
-    expect(course.learning_outcomes).not_to be_include(other_outcome)
-    expect(other_course.learning_outcomes).to be_include(other_outcome)
-  end
-
-  it "should not count learning outcome groups as having outcomes" do
-    course = course_model
-    default_group = course.root_outcome_group
-    other_group = course.learning_outcome_groups.create!(:title => 'other group')
-    default_group.adopt_outcome_group(other_group)
-
-    expect(course).not_to have_outcomes
-  end
-
-end
-
 describe Course, 'grade_publishing' do
   before :once do
     @course = Course.new
@@ -3511,6 +3440,9 @@ describe Course, "manageable_by_user" do
     course = Course.create!(:account => sub_sub_account)
 
     expect(Course.manageable_by_user(user.id).map{ |c| c.id }).to be_include(course.id)
+
+    user.account_users.first.destroy!
+    expect(Course.manageable_by_user(user.id)).to_not be_exists
   end
 
   it "should include courses the user is actively enrolled in as a teacher" do

@@ -153,11 +153,15 @@ class EportfoliosController < ApplicationController
     zip_filename = "eportfolio.zip"
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
-      @attachments = @portfolio.attachments.not_deleted.where(display_name: zip_filename, workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached']).order(:created_at).to_a
-      @attachment = @attachments.pop
-      @attachments.each{|a| a.related_attachments.exists? ? a.destroy : a.destroy_permanently! }
-      if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@portfolio.eportfolio_entries.map{|s| s.updated_at}.compact.max || @attachment.created_at))
-        @attachment.related_attachments.exists? ? @attachment.destroy : @attachment.destroy_permanently!
+      @attachments = @portfolio.attachments.not_deleted.
+        where(display_name: zip_filename,
+              workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached']).
+        order(:created_at)
+      @attachment = @attachments.last
+      @attachments.where.not(id: @attachment).find_each(&:destroy_permanently_plus)
+
+      if @attachment && stale_zip_file?
+        @attachment.destroy_permanently_plus
         @attachment = nil
       end
 
@@ -189,6 +193,11 @@ class EportfoliosController < ApplicationController
         end
       end
     end
+  end
+
+  def stale_zip_file?
+    @attachment.created_at < 1.hour.ago ||
+      @attachment.created_at < (@portfolio.eportfolio_entries.map(&:updated_at).compact.max || @attachment.created_at)
   end
 
   def public_feed

@@ -105,7 +105,7 @@ $(document).on('click', '.btn.dropdown-toggle', function (event) {
 
   if (previousState === false && !$(this).attr('disabled')) {
     $(this).parent().addClass('open')
-    $(this).siblings('.dropdown-menu').find('input').first().focus()
+    $(this).siblings('.dropdown-menu').find('input:checked').first().focus()
   }
 
   $(document).on('keyup', (event) => {

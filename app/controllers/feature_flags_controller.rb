@@ -142,7 +142,7 @@ class FeatureFlagsController < ApplicationController
 
   # @API List features
   #
-  # List all features that apply to a given Account, Course, or User.
+  # A paginated list of all features that apply to a given Account, Course, or User.
   #
   # @example_request
   #
@@ -164,7 +164,7 @@ class FeatureFlagsController < ApplicationController
 
   # @API List enabled features
   #
-  # List all features that are enabled on a given Account, Course, or User.
+  # A paginated list of all features that are enabled on a given Account, Course, or User.
   # Only the feature names are returned.
   #
   # @example_request

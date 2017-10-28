@@ -139,6 +139,15 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     course.master_course_templates.active.for_full_course.first
   end
 
+  def self.master_course_for_child_course(course_id)
+    course_id = course_id.id if course_id.is_a?(Course)
+    mt_table = self.table_name
+    cs_table = MasterCourses::ChildSubscription.table_name
+    Course.joins("INNER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} ON #{mt_table}.course_id=courses.id AND #{mt_table}.workflow_state='active'").
+      joins("INNER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} ON #{cs_table}.master_template_id=#{mt_table}.id AND #{cs_table}.workflow_state='active'").
+      where("#{cs_table}.child_course_id = ?", course_id).first
+  end
+
   def self.preload_index_data(templates)
     child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates).
       joins(:child_course).where.not(:courses => {:workflow_state => "deleted"}).group(:master_template_id).count
@@ -175,6 +184,10 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     self.shard.activate do
       Course.shard(self.shard).not_deleted.where(:id => self.child_subscriptions.active.select(:child_course_id))
     end
+  end
+
+  def associated_course_count
+    self.child_subscriptions.active.count
   end
 
   def active_migration_running?

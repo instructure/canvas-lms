@@ -207,6 +207,24 @@ class GroupCategory < ActiveRecord::Base
     self.save
   end
 
+  # We can't reassign existing group members, groups can have different maximum limits, and we want
+  # the groups to be as evenly sized as possible. Think of this like pouring water into an oddly
+  # shaped glass. The shape of the glass is determined by existing members and max group sizes,
+  # sorted by the current group sizes. New members should trickle down to the lowest points of the
+  # glass, but not fill any part of the glass higher than its limit.
+  #
+  # X = existing memberships: the bottom of the glass
+  # ----- = the max membership of the group: the top of the glass (might be open with no limit)
+  # blank = open space that we can fill with new memberships
+  #
+  #                         -----
+  #             ----- -----
+  #       -----               X     X
+  # -----               X     X     X
+  #               X     X     X     X
+  #   X     X     X     X     X     X
+  #  grp6  grp3  grp4  grp1  grp5  grp2
+  #
   def distribute_members_among_groups(members, groups)
     if groups.empty? || members.empty?
       complete_progress
@@ -214,146 +232,117 @@ class GroupCategory < ActiveRecord::Base
     end
     members = members.to_a
     groups = groups.to_a
-
-    ##
-    # new memberships to be returned
-    new_memberships = []
-    members_assigned_count = 0
-
-    ##
-    # shuffle for randomness
-    members.shuffle!
-
-    ##
-    # pool fill algorithm:
-    # 1) sort groups by member count
-    #
-    #  m   8  |
-    #  e   7  |
-    #  m   6  |                X  --- largest_group_size = 6
-    #  b   5  |                X  --- currently_assigned_count = 14
-    #  e   4  |             X  X  --- groups.size = 6
-    #  r   3  |          X  X  X  --- member_count = ???
-    #  s   2  |          X  X  X
-    #      1  |_______X__X__X__X
-    #           a  b  c  d  e  f
-    #                groups
-    groups.sort_by! {|group| group.users.size }
-
-    ##
-    # 2) ideally, the groups would have equal member counts,
-    #    which would enable us to simply partition the members
-    #    equally across each group.
-
-    #    the simplest case occurs when we have enough members
-    #    to fill the pool all the way to the largest group:
-    #
-    #    X: old member
-    #    O: new member
-    #
-    #  m   8  |                   --- largest_group_size = 6
-    #  e   7  |                   --- currently_assigned_count = 14
-    #  m   6  | O  O  O  O  O  X  --- groups.size = 6
-    #  b   5  | O  O  O  O  O  X  --- equalizing_count = largest_group_size * groups.size
-    #  e   4  | O  O  O  O  X  X                       = 6 * 6 = 36
-    #  r   3  | O  O  O  X  X  X  --- delta_required = equalizing_count - currently_assigned_count
-    #  s   2  | O  O  O  X  X  X                     = 36 - 14 = 22
-    #      1  |_O__O__X__X__X__X  --- member_count >= 22
-    #           a  b  c  d  e  f
-    #                groups
-    #
-    #   for member_counts > 22, partition extra members equally
-    #   amongst the now equal groups
-    member_count = members.size
-    currently_assigned_count = groups.inject(0) {|sum, group| sum += group.users.size}
-    largest_group_size = 0
-    delta_required = 0
-
-    ##
-    # 3) however, we may not be able to fill to the largest group
-    #    say member_count = 12
-    #
-    #    in this case, we should distribute the members like so:
-    #
-    #  m   8  |
-    #  e   7  |
-    #  m   6  |                X
-    #  b   5  |                X
-    #  e   4  | O  O  O  O  X  X
-    #  r   3  | O  O  O  X  X  X
-    #  s   2  | O  O  O  X  X  X
-    #      1  |_O__O__X__X__X__X
-    #           a  b  c  d  e  f
-    #                groups
-    #
-    #   with only 12 members, we are unable to bring all groups up
-    #   to 6 members each, the number of the users in the largest group (f)
-    #
-    #   that is, our member_count < delta_required
-    #
-    #   but fear not! we can pop off that last group and pretend it doesn't exist!
-    #
-    #  m   8  |                 --- largest_group_size = 4 (UPDATED to be the next largest)
-    #  e   7  |                 --- currently_assigned_count = 8 (UPDATED)
-    #  m   6  |                 --- groups.size = 5 (UPDATED -= 1)
-    #  b   5  |                 --- equalizing_count = largest_group_size * groups.size
-    #  e   4  | O  O  O  O  X                        = 4 * 5 = 20
-    #  r   3  | O  O  O  X  X   --- delta_required = equalizing_count - currently_assigned_count
-    #  s   2  | O  O  O  X  X                      = 20 - 8 = 12
-    #      1  |_O__O__X__X__X   --- member_count = 12
-    #           a  b  c  d  e
-    #              groups
-
-    ##
-    # to summarize:
-    #
-    # if there are enough new members to equalize the groups,
-    # equalize them and evenly distribute the surplus.
-    #
-    # if there are not enough, discard the fullest groups until there
-    # are. equalize the remaining groups and distribute the surplus
-    # members among them
-    #
-    # in all cases where things do not divide evenly, sprinkle the
-    # remainder around
-
-    loop do
-      largest_group = groups.last
-      largest_group_size = largest_group.users.size
-      equalizing_count = largest_group_size * groups.size
-      delta_required = equalizing_count - currently_assigned_count
-
-      break if member_count > delta_required
-      currently_assigned_count -= largest_group_size
-      groups.pop
-    end
-
-    chunk_count, sprinkle_count = (member_count - delta_required).divmod(groups.size)
-
-    groups.each do |group|
-      sprinkle = sprinkle_count > 0 ? 1 : 0
-      number_to_bring_base_equality = largest_group_size - group.users.size
-      number_of_users_to_add = number_to_bring_base_equality + chunk_count + sprinkle
-      ##
-      # respect group limits!
-      if group.max_membership
-        slots_remaining = group.max_membership - group.users.size
-        number_of_users_to_add = [slots_remaining, number_of_users_to_add].min
-      end
-      next if number_of_users_to_add <= 0
-
-      new_members_to_add = members.pop(number_of_users_to_add)
-      new_memberships.concat(group.bulk_add_users_to_group(new_members_to_add))
-      members_assigned_count += number_of_users_to_add
-
-      update_progress(members_assigned_count, member_count)
-      break if members.empty?
-      sprinkle_count -= 1
-    end
-
+    water_allocation = reserve_space_for_members_in_groups(members.size, groups)
+    new_memberships = randomly_add_allocated_members_to_groups(members, groups, water_allocation)
     finish_group_member_assignment
     complete_progress
     new_memberships
+  end
+
+  def reserve_space_for_members_in_groups(member_count, groups)
+    available_groups = groups.sort_by { |g| g.users.size }
+    water_allocation = {} # group.id => number of new members
+    groups.each { |g| water_allocation[g.id] = 0 }
+    remaining_member_count = member_count
+    while remaining_member_count > 0
+      next_watermark = get_next_rectangular_watermark(available_groups, water_allocation)
+      break if next_watermark[:height] == 0 # no more space for remaining members
+      remaining_member_count -= allocate_members_into_watermark(
+        remaining_member_count,
+        next_watermark,
+        water_allocation,
+      )
+    end
+    water_allocation
+  end
+
+  def get_next_rectangular_watermark(available_groups, water_allocation)
+    remove_full_groups(available_groups, water_allocation)
+    return {height: 0, groups: []} if available_groups.empty?
+
+    water_levels = chunk_groups_by_allocated_members(available_groups, water_allocation)
+
+    lowest_level = water_levels[0]
+    next_level = water_levels[1] # possibly nil
+    max_watermark_height = next_level_watermark_height(lowest_level, next_level, water_allocation)
+    capped_height = cap_height_with_max_membership_of_groups(lowest_level, max_watermark_height, water_allocation)
+    {groups: lowest_level, height: capped_height}
+  end
+
+  def remove_full_groups(available_groups, water_allocation)
+    available_groups.reject! do |grp|
+      grp.max_membership && members_allocated_to_group(grp, water_allocation) >= grp.max_membership
+    end
+  end
+
+  def chunk_groups_by_allocated_members(available_groups, water_allocation)
+    chunked = available_groups.chunk do |grp|
+      members_allocated_to_group(grp, water_allocation)
+    end
+    chunked.map { |_chunk_value, chunk| chunk }.to_a
+  end
+
+  def next_level_watermark_height(lowest_level, next_level, water_allocation)
+    if next_level
+      lowest_level_height = members_allocated_to_group(lowest_level[0], water_allocation)
+      next_level_height = members_allocated_to_group(next_level[0], water_allocation)
+      next_level_height - lowest_level_height
+    else
+      Float::INFINITY
+    end
+  end
+
+  def cap_height_with_max_membership_of_groups(groups, max_group_height, water_allocation)
+    groups.reduce(max_group_height) do |current_cap, grp|
+      if grp.max_membership
+        remaining_space_in_capped_group = grp.max_membership - members_allocated_to_group(grp, water_allocation)
+        [current_cap, remaining_space_in_capped_group].min
+      else
+        current_cap
+      end
+    end
+  end
+
+  def members_allocated_to_group(grp, water_allocation)
+    grp.users.size + water_allocation[grp.id]
+  end
+
+  def allocate_members_into_watermark(remaining_member_count, watermark, water_allocation)
+    watermark_volume = watermark[:groups].size * watermark[:height]
+    if watermark_volume < remaining_member_count
+      completely_fill_finite_volume_with_members(watermark, water_allocation)
+    else
+      partially_fill_large_volume_with_all_remaining_members(remaining_member_count, watermark, water_allocation)
+    end
+  end
+
+  def completely_fill_finite_volume_with_members(watermark, water_allocation)
+    watermark[:groups].each do |grp|
+      water_allocation[grp.id] += watermark[:height]
+    end
+    watermark[:groups].size * watermark[:height]
+  end
+
+  def partially_fill_large_volume_with_all_remaining_members(remaining_member_count, watermark, water_allocation)
+    base_member_height = remaining_member_count / watermark[:groups].size
+    leftover_count = remaining_member_count % watermark[:groups].size
+    watermark[:groups].each_with_index do |grp, grp_index|
+      water_allocation[grp.id] += base_member_height
+      water_allocation[grp.id] += 1 if grp_index < leftover_count
+    end
+    remaining_member_count
+  end
+
+  def randomly_add_allocated_members_to_groups(members, groups, water_allocation)
+    shuffled_members = members.shuffle
+    groups.each_with_object([]) do |grp, new_memberships|
+      new_group_member_count = water_allocation[grp.id]
+      next if new_group_member_count == 0
+      new_members = shuffled_members.pop(new_group_member_count)
+      memberships = grp.bulk_add_users_to_group(new_members)
+      new_memberships.concat(memberships)
+      update_progress(new_memberships.size, members.size)
+    end
   end
 
   def finish_group_member_assignment

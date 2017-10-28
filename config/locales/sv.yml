@@ -2146,7 +2146,7 @@ sv:
     available_date_description: 
       available_until: "Tillgänglig tills"
       closed: Stängda
-      not_available_until: "Inte tillgänglig förrens"
+      not_available_until: "Inte tillgänglig förrän"
     buttons: 
       add_group: "Lägg till grupp"
       delete_group: "Radera grupp"
@@ -3239,7 +3239,7 @@ sv:
       modal: 
         chooseDueDate: "VIll du gå tillbaka och välja en sista dag?"
         goBackToInclude: "VIll du gå tillbaka och inkludera:"
-        notAllSectionsAssigned: "Alla sektioner kommer inte tilldelas detta föremålet"
+        notAllSectionsAssigned: "Alla sektioner kommer inte tilldelas detta objekt"
     name_is_required: "Det krävs ett namn!"
     no_dates_error: "Du måste specificera åtminstone ett datum och tid"
     no_groups: "Inga grupper hittades"
@@ -3444,7 +3444,7 @@ sv:
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas omklassa alla svar efter att du har detta Quiz, det kan ta ett par minuter."
   card_movement_menu_for_title_b94c09af: "Kort förflyttningsmeny för %{title}"
   card_view_eaf73185: kortvy
-  careful_changes_to_group_membership_will_apply_to__19a9089c: "Försiktigt! Ändringar till gruppers medlemskap kommer tillämpas på grupper som redan har uppgiftsinlämningar. Det är inte säkert att Gruppuppgifts-inlämningar behålls som ett resultat. Vill du skapa en ny grupp för framtida uppgifter? "
+  careful_changes_to_group_membership_will_apply_to__19a9089c: "Försiktigt! Ändringar i gruppens medlemskap kommer tillämpas på grupper som redan har inlämningar. Det är inte säkert att betyg på redan bedömda inlämningar behålls. Vill du skapa en ny gruppuppsättning eller ändra grupper?"
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: "Katalogen är redan aktiverad"
   catalog_name_46d37909: Katalognamn
@@ -4900,10 +4900,10 @@ sv:
   course_content_download_from_3c8c6c01: "Kursinnehåll laddas ner från"
   course_content_downloads_6cb31802: "Kursinnehålls nedladdning"
   course_copy_argument_error: "En kurskopia kräver en kurskälla"
-  course_copy_description: "Migrerings-plugin för kopiering av canvas kurser"
+  course_copy_description: "Migrerings-plugin för kopiering av Canvas kurser"
   course_copy_display: Kurskopia
-  course_copy_file_description: "Kopiera en Canvas kurs"
-  course_copy_name: "Kopiera Canvas kurs"
+  course_copy_file_description: "Kopiera en Canvas-kurs"
+  course_copy_name: "Kopiera Canvas-kurs"
   course_copy_no_course_error: "Kurskällan hittades inte"
   course_copy_not_allowed_error: "Du får inte kopiera kurskällan"
   course_discussions_38c0b74f: Kursdiskussioner
@@ -12897,7 +12897,7 @@ sv:
     blank_override: "Du måste ha en student eller en sektion vald"
     everyone: Alla
     everyone_else: "Alla andra"
-    invalid_group_override: "Denna uppgift kan endast tilldelas grupper som ingår i den valda gruppsammansättning"
+    invalid_group_override: "Du kan inte tilldela en grupp utanför uppgiftens gruppsammansättning"
     overrides: 
       everyone: Alla
   own_copyright_cc59db55: Upphovsrättshavande
@@ -13643,7 +13643,7 @@ sv:
     please_select_an_option: "Vänligen välj ett alternativ"
     profile: 
       access_token_description: "Tillgångstokens kan användas för att tillåta att applikationer gör API calls i ditt namn. Du kan också generera tillgångstokens och *använda Canvas Open API* för att skapa dina egna integrationer."
-      approved_integrations: "Nedan syns externa tredjepartsapplikationer du har godkänt för Canvas:"
+      approved_integrations: "Nedan syns externa tredjepartsapplikationer som godkänts för Canvas:"
       buttons: 
         add_picture_file: "Lägg till fil"
         authorize_google_docs: "Tillåt tillgång för Google Docs"
@@ -15068,10 +15068,10 @@ sv:
           update_scores: "Uppdatera poäng"
         labels: 
           final_score: Slutpoäng
-          fudge_points: "Förfalskade poäng"
+          fudge_points: "Plus eller minuspoäng"
           fudge_points_changed_points_quiz: "Sen %{user} tog detta Quiz har antalet möjliga poäng ändrats med %{difference}. Du kan justera den här ändringen och manuellt lägga till positiva eller negativa poäng med den här boxen."
           fudge_points_changed_points_survey: "Sen %{user} tog den här undersökningen har antalet möjlig poäng ändrats med %{difference}. Du kan justera den här ändringen och manuellt lägga till positiva eller negativa poäng med den här boxen."
-          fudge_points_generic_explanation: "Du kan justera poängen manuellt genom att lägga till positiva eller negativa poäng i den här boxen."
+          fudge_points_generic_explanation: "Du kan justera poängen manuellt genom att lägga till plus eller minuspoäng i den här boxen."
           questions_need_review: "Den följande frågan måste ses över"
           quiz_score: Quizpoäng
           score_for_attempt: "Poäng för det här försöket"
@@ -18295,7 +18295,7 @@ sv:
   underline_all_links_description: |-
       Understrukna länkar visar hyperlänkar i navigeringsmenyerna, instrumentpanelen och sidans sidofält som
       *understruken text*. Det här funktionsalternativet gäller inte för användargenererade innehållslänkar i
-      ”Rich Content Editor”, visas som understrukna för alla användare.
+      ”Rich Content Editor”, som alltid visas som understrukna för alla användare.
   underline_links_e7cf9b4f: "Understrukna länkar"
   undo_a7be8fef: Ångra
   undo_remove_course_association_name_68eb4037: "Ångra borttagning av kursförbindelse %{name}"

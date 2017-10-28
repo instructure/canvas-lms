@@ -19,7 +19,7 @@
 define [
   'jquery'
   'underscore'
-  'Backbone'
+  'axios'
   'timezone'
   'jsx/gradezilla/DataLoader'
   'react'
@@ -46,9 +46,11 @@ define [
   'compiled/util/natcompare'
   'convert_case'
   'str/htmlEscape'
+  'jsx/gradezilla/shared/EnterGradesAsSetting'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
+  'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
   'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory'
   'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer'
@@ -80,6 +82,7 @@ define [
   'jsx/grading/LatePolicyApplicator'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
+  'jsx/shared/FlashAlert'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
@@ -94,18 +97,18 @@ define [
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
   'jsx/context_cards/StudentContextCardTrigger'
-], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
+], ($, _, axios, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
-  GradeDisplayWarningDialog, PostGradesFrameDialog,
-  NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
-  studentRowHeaderConstants, AssignmentRowCellPropFactory,
-  GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
-  GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
-  SubmissionStateMap,
-  DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }) ->
+  GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
+  EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
+  CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport, studentRowHeaderConstants,
+  AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter,
+  GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
+  GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
+  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, LatePolicyApplicator, { default: Button },
+  { default: IconSettingsSolid }, FlashAlert) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -167,6 +170,7 @@ define [
 
     {
       colors
+      enterGradesAs: settings.enter_grades_as || {}
       filterColumnsBy
       filterRowsBy
       selectedPrimaryInfo
@@ -184,6 +188,9 @@ define [
         open: false
         studentId: null
         assignmentId: null
+        comments: []
+        commentsLoaded: false
+        commentsUpdating: false
     }
 
   ## Gradebook Application State
@@ -1770,6 +1777,7 @@ define [
       selectedViewOptionsFilters.push('') unless selectedViewOptionsFilters.length > 0
       data =
         gradebook_settings:
+          enter_grades_as: @gridDisplaySettings.enterGradesAs
           filter_columns_by: ConvertCase.underscore(@gridDisplaySettings.filterColumnsBy)
           selected_view_options_filters: selectedViewOptionsFilters
           show_concluded_enrollments: showConcludedEnrollments
@@ -1965,7 +1973,7 @@ define [
     showNotesColumn: =>
       if @teacherNotesNotYetLoaded
         @teacherNotesNotYetLoaded = false
-        DataLoader.getDataForColumn(@getTeacherNotesColumn(), @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
+        DataLoader.getDataForColumn(@getTeacherNotesColumn().id, @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
 
       @getTeacherNotesColumn()?.hidden = false
       @toggleNotesColumn()
@@ -2126,6 +2134,18 @@ define [
 
       assignment
 
+    loadTrayStudent: (direction) =>
+      location = @gridSupport.state.getActiveLocation()
+      rowDelta = if direction == 'next' then 1 else -1
+      newRowIdx = location.row + rowDelta
+      student = @listRows()[newRowIdx]
+
+      return unless student
+
+      @gridSupport.state.setActiveLocation('body', { row: newRowIdx, cell: location.cell })
+      @setSubmissionTrayState(true, student.id)
+      @updateRowAndRenderSubmissionTray(student.id)
+
     loadTrayAssignment: (direction) =>
       studentId = @getSubmissionTrayState().studentId
       assignment = @navigateAssignment(direction)
@@ -2137,7 +2157,7 @@ define [
 
     renderSubmissionTray: (student) =>
       mountPoint = document.getElementById('StudentTray__Container')
-      { open, studentId, assignmentId } = @getSubmissionTrayState()
+      { open, studentId, assignmentId, comments } = @getSubmissionTrayState()
       # get the student's submission, or use a fake submission object in case the
       # submission has not yet loaded
       fakeSubmission = { assignment_id: assignmentId, late: false, missing: false, excused: false, seconds_late: 0 }
@@ -2150,37 +2170,64 @@ define [
       currentColumn = columns[cell]
 
       assignmentColumns = @assignmentColumns()
-      currentIndex = assignmentColumns.indexOf(currentColumn)
+      currentAssignmentIdx = assignmentColumns.indexOf(currentColumn)
 
-      isFirstAssignment = currentIndex == 0
-      isLastAssignment = currentIndex == assignmentColumns.length - 1
+      isFirstAssignment = currentAssignmentIdx == 0
+      isLastAssignment = currentAssignmentIdx == assignmentColumns.length - 1
+
+      isFirstStudent = activeLocation.row == 0
+      isLastStudent = activeLocation.row == (@listRows().length - 1)
 
       props =
-        key: "grade_details_tray"
-        colors: @getGridColors()
-        isOpen: open
-        latePolicy: @courseContent.latePolicy
-        locale: @options.locale
-        onRequestClose: @closeSubmissionTray
-        onClose: => @gridSupport.helper.focus()
-        showContentComingSoon: !@options.new_gradebook_development_enabled
-        student:
-          id: student.id,
-          name: student.name,
-          avatarUrl: htmlDecode(student.avatar_url)
         assignment: ConvertCase.camelize(assignment)
-        submission: ConvertCase.camelize(submission)
+        colors: @getGridColors()
+        courseId: @options.context_id
         isFirstAssignment: isFirstAssignment
         isLastAssignment: isLastAssignment
+        isFirstStudent: isFirstStudent
+        isLastStudent: isLastStudent
+        isOpen: open
+        key: "grade_details_tray"
+        latePolicy: @courseContent.latePolicy
+        locale: @options.locale
+        onClose: => @gridSupport.helper.focus()
+        onRequestClose: @closeSubmissionTray
         selectNextAssignment: => @loadTrayAssignment('next')
         selectPreviousAssignment: => @loadTrayAssignment('previous')
-        courseId: @options.context_id
+        selectNextStudent: => @loadTrayStudent('next')
+        selectPreviousStudent: => @loadTrayStudent('previous')
+        showContentComingSoon: !@options.new_gradebook_development_enabled
         speedGraderEnabled: @options.speed_grader_enabled
+        student:
+          id: student.id
+          name: htmlDecode(student.name)
+          avatarUrl: htmlDecode(student.avatar_url)
+          gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
+        submission: ConvertCase.camelize(submission)
         submissionUpdating: @contentLoadStates.submissionUpdating
         updateSubmission: @updateSubmissionAndRenderSubmissionTray
-      renderComponent(SubmissionTray, mountPoint, props)
+        processing: @getCommentsUpdating()
+        setProcessing: @setCommentsUpdating
+        updateSubmissionComments: @updateSubmissionComments
+        createSubmissionComment: @createSubmissionComment
+        deleteSubmissionComment: @deleteSubmissionComment
+        submissionComments: @getSubmissionComments()
+        submissionCommentsLoaded: @getSubmissionCommentsLoaded()
+
+      @loadSubmissionComments(assignmentId, studentId) if !@getSubmissionCommentsLoaded() and open
+
+      renderComponent(SubmissionTray, mountPoint, Object.assign(props, { comments: comments }))
+
+    loadSubmissionComments: (assignmentId, studentId) =>
+      SubmissionCommentApi.getSubmissionComments(@options.context_id, assignmentId, studentId)
+        .then((comments) =>
+          @setSubmissionCommentsLoaded(true)
+          @updateSubmissionComments(comments)
+        )
+        .catch(FlashAlert.showFlashError I18n.t 'There was an error fetching Submission Comments')
 
     updateRowAndRenderSubmissionTray: (studentId) =>
+      @unloadSubmissionComments()
       @updateRowCellsForStudentIds([studentId])
       @renderSubmissionTray(@student(studentId))
 
@@ -2197,6 +2244,7 @@ define [
       rowIndex = @grid.getActiveCell().row
       studentId = @rows[rowIndex].id
       @updateRowAndRenderSubmissionTray(studentId)
+      @gridSupport.helper.beginEdit()
 
     getSubmissionTrayState: =>
       @gridDisplaySettings.submissionTray
@@ -2206,6 +2254,52 @@ define [
       @gridDisplaySettings.submissionTray.studentId = studentId if studentId
       @gridDisplaySettings.submissionTray.assignmentId = assignmentId if assignmentId
       @gridSupport.helper.commitCurrentEdit() if open
+
+    setCommentsUpdating: (status) =>
+      @gridDisplaySettings.submissionTray.commentsUpdating = !!status
+
+    getCommentsUpdating: =>
+      @gridDisplaySettings.submissionTray.commentsUpdating
+
+    setSubmissionComments: (comments) =>
+      @gridDisplaySettings.submissionTray.comments = comments
+
+    updateSubmissionComments: (comments) =>
+      @setSubmissionComments(comments)
+      @setCommentsUpdating(false)
+      { studentId } = @getSubmissionTrayState()
+      @renderSubmissionTray(@student(studentId))
+
+    unloadSubmissionComments: =>
+      @setSubmissionComments([])
+      @setSubmissionCommentsLoaded(false)
+
+    createSubmissionComment: (comment) =>
+      { assignmentId, studentId } = @getSubmissionTrayState()
+      SubmissionCommentApi.createSubmissionComment(@options.context_id, assignmentId, studentId, comment)
+        .then(@updateSubmissionComments)
+        .then(FlashAlert.showFlashSuccess I18n.t 'Successfully posted the comment')
+        .catch(=> @setCommentsUpdating(false))
+        .catch(FlashAlert.showFlashError I18n.t 'There was a problem posting the comment')
+
+    deleteSubmissionComment: (commentId) =>
+      SubmissionCommentApi.deleteSubmissionComment(commentId)
+        .then(=> @removeSubmissionComment commentId)
+        .then(FlashAlert.showFlashSuccess I18n.t 'Successfully deleted the comment')
+        .catch(FlashAlert.showFlashError I18n.t 'There was a problem deleting the comment')
+
+    getSubmissionComments: () =>
+      @gridDisplaySettings.submissionTray.comments
+
+    removeSubmissionComment: (commentId) =>
+      comments = _.reject(@getSubmissionComments(), (c) => c.id == commentId)
+      @updateSubmissionComments(comments, { deserialize: false })
+
+    setSubmissionCommentsLoaded: (loaded) =>
+      @gridDisplaySettings.submissionTray.commentsLoaded = loaded
+
+    getSubmissionCommentsLoaded: =>
+      @gridDisplaySettings.submissionTray.commentsLoaded
 
     ## Gradebook Application State
 
@@ -2374,6 +2468,25 @@ define [
       for filter of filters
         selectedFilters.push filter if filters[filter]
       selectedFilters
+
+    setEnterGradesAsSetting: (assignmentId, setting) =>
+      @gridDisplaySettings.enterGradesAs[assignmentId] = setting
+
+    getEnterGradesAsSetting: (assignmentId) =>
+      gradingType = @getAssignment(assignmentId).grading_type
+      options = EnterGradesAsSetting.optionsForGradingType(gradingType)
+      return null unless options.length
+
+      setting = @gridDisplaySettings.enterGradesAs[assignmentId]
+      return setting if options.includes(setting)
+
+      EnterGradesAsSetting.defaultOptionForGradingType(gradingType)
+
+    updateEnterGradesAsSetting: (assignmentId, value) =>
+      @setEnterGradesAsSetting(assignmentId, value)
+      @saveSettings({}, =>
+        @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
+      )
 
     ## Gradebook Content Access Methods
 

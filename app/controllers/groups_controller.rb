@@ -185,7 +185,7 @@ class GroupsController < ApplicationController
 
   # @API List your groups
   #
-  # Returns a list of active groups for the current user.
+  # Returns a paginated list of active groups for the current user.
   #
   # @argument context_type [String, "Account"|"Course"]
   #  Only include groups that are in this type of context.
@@ -231,7 +231,7 @@ class GroupsController < ApplicationController
 
   # @API List the groups available in a context.
   #
-  # Returns the list of active groups in the given context that are visible to user.
+  # Returns the paginated list of active groups in the given context that are visible to user.
   #
   # @argument only_own_groups [Boolean]
   #  Will only include groups that the user belongs to if this is set
@@ -667,7 +667,7 @@ class GroupsController < ApplicationController
   include Api::V1::User
   # @API List group's users
   #
-  # Returns a list of users in the group.
+  # Returns a paginated list of users in the group.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the

@@ -77,10 +77,14 @@
       margin-left: auto;
       margin-top: .5rem;
       text-align: center;
+      &>div {
+        display: flex;
+        justify-content: center;
+      }
       .peoplesearch__selection {
         text-align: left;
         margin: 0 1em;
-        display: inline-block;
+        flex: 0 0 auto;
         width: 30%;
       }
     }

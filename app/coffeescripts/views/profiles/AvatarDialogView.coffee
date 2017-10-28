@@ -123,7 +123,9 @@ define [
           errorReducer = (errorString, currentError) ->
             errorString += currentError.message
 
-          message = if errors.base
+          message = if _.isString(errors.base)
+            errors.base
+          else if _.isArray(errors.base)
             errors.base.reduce(errorReducer, '')
           else
             I18n.t('Your profile photo could not be uploaded. You may have exceeded your upload limit.')
@@ -131,7 +133,7 @@ define [
           $.flashError(message)
           @enableSelectButton()
 
-    preflightRequest: ->
+    preflightRequest: =>
       $.post('/files/pending', {
         name: 'profile.jpg'
         format: 'text'
@@ -140,15 +142,12 @@ define [
         'attachment[folder_id]': ENV.folder_id
         'attachment[filename]': 'profile.jpg'
         'attachment[context_code]': 'user_'+ENV.current_user_id
-      })
+      }).fail((xhr) => @handleErrorUpdating(xhr.responseText))
 
     onPreflight: (image, response) =>
-      @handleErrorUpdating(response[0].responseText)
       @image = image
       preflightResponse = response[0]
       @postAvatar(preflightResponse).then(_.partial(@onPostAvatar, preflightResponse))
-
-
 
     postAvatar: (preflightResponse) =>
       image = @image
@@ -173,9 +172,18 @@ define [
 
     onPostAvatar: (preflightResponse, postAvatarResponse) =>
       if preflightResponse.success_url
-        @s3Success(preflightResponse, postAvatarResponse).then(@onS3Success)
+        # s3 upload, need to ping success_url to finalize and get back
+        # attachment information
+        @s3Success(preflightResponse, postAvatarResponse).then(@onUploadSuccess)
+      else if postAvatarResponse.location
+        # inst-fs upload, need to request attachment information from location
+        @getCanvasJSON(postAvatarResponse.location).then(@onUploadSuccess)
       else
-        @waitAndSaveUserAvatar(postAvatarResponse.avatar.token, postAvatarResponse.avatar.url)
+        # local-storage upload, this _is_ the attachment information
+        @onUploadSuccess(postAvatarResponse)
+
+    getCanvasJSON: (location) =>
+      $.getJSON("#{location}?include=avatar")
 
     s3Success: (preflightResponse, s3Response) =>
       $s3 = $(s3Response)
@@ -185,7 +193,7 @@ define [
         etag:   $s3.find('ETag').text()
       })
 
-    onS3Success: (response) =>
+    onUploadSuccess: (response) =>
       @waitAndSaveUserAvatar(response.avatar.token, response.avatar.url)
 
     # need to wait for the avatar to get processed by background jobs before

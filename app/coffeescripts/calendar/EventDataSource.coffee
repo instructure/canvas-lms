@@ -306,7 +306,13 @@ define [
       dataCB = (data, url, params) =>
         return unless data
         newEvents = []
-        key = 'type_'+params.type
+        # planner_notes are passing thru here too now
+        # detect and transform to look more like a calendar event
+        if data.length and 'todo_date' of data[0]
+          data = @transformPlannerNotes(data, url)
+          key = 'type_planner_note'
+        else
+          key = 'type_'+params.type
         requestResult = requestResults[key] or {events: []}
         requestResult.next = data.next
         for e in data
@@ -368,10 +374,12 @@ define [
         list.requestID = options.requestID
         donecb list
 
-      @startFetch [
+      eventDataSources = [
         [ '/api/v1/calendar_events', params ]
         [ '/api/v1/calendar_events', @assignmentParams(params) ]
-      ], dataCB, doneCB, options
+      ]
+      eventDataSources.push([ '/api/v1/planner_notes', params ]) if ENV.STUDENT_PLANNER_ENABLED
+      @startFetch eventDataSources, dataCB, doneCB, options
 
     assignmentParams: (params) ->
       p = $.extend({type: 'assignment'}, params)
@@ -461,3 +469,19 @@ define [
           return
 
         cb(data, true)
+
+    # Planner notes are getting pulled from the planner_notes api
+    # Make them look more like a calendar event to more easily integrate
+    # into the calendar's processing
+    transformPlannerNotes: (notes, url) ->
+      notes.forEach (note) ->
+        note.description = note.details
+        note.planner_note_id = note.id
+        note.type = "planner_note"
+        note.start_at = note.end_at = note.todo_date
+        note.url = "#{location.origin}#{url}/#{note.planner_note_id}"
+        note.context_code = if note.course_id then "course_#{note.course_id}" else "user_#{note.user_id}"
+        note.all_context_codes = note.context_code
+        note.all_day = true
+        note.can_edit = false  # TODO: change when we can edit in the calendar
+      notes

@@ -19,6 +19,7 @@
 module Api::V1::SisImport
   include Api::V1::Json
   include Api::V1::Attachment
+  include Api::V1::User
 
   def sis_imports_json(batches, user, session)
     batches.map do |f|
@@ -39,6 +40,7 @@ module Api::V1::SisImport
         {submission_attachment: true}
       )
     end
+    json[:user] = user_json(batch.user, user, session) if batch.user
     json
   end
 end

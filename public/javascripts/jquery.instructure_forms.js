@@ -299,20 +299,35 @@ import './vendor/jquery.scrollTo'
     var uploadFile = function(parameters, file) {
       $.ajaxJSON(options.uploadDataUrl || "/files/pending", 'POST', parameters, function(data) {
         try {
+        var old_name = $(file).attr('name');
+        var onError = function(error) {
+          $(file).attr('name', old_name);
+          (options.upload_error || options.error).call($this, error);
+        };
+        var onUpload = function(data) {
+          $(file).attr('name', old_name);
+          attachments.push(data);
+          next.call($this);
+        };
         if(data && data.upload_url) {
           var post_params = data.upload_params;
-          var old_name = $(file).attr('name');
           $(file).attr('name', data.file_param);
           $.ajaxJSONFiles(data.upload_url, 'POST', post_params, $(file), function(data) {
-            attachments.push(data);
-            $(file).attr('name', old_name);
-            next.call($this);
-          }, function(data) {
-            $(file).attr('name', old_name);
-            (options.upload_error || options.error).call($this, data);
-          }, {onlyGivenParameters: true });
+            if (post_params.success_url) {
+              // s3 upload, need to ping success_url to finalize and get back
+              // attachment information
+              $.ajaxJSON(post_params.success_url, 'GET', {}, onUpload, onError);
+            } else if (data.location) {
+              // inst-fs upload, need to request attachment information from
+              // location
+              $.ajaxJSON(data.location, 'GET', {}, onUpload, onError);
+            } else {
+              // local-storage upload, this _is_ the attachment information
+              onUpload(data)
+            }
+          }, onError, {onlyGivenParameters: true });
         } else {
-          (options.upload_error || options.error).call($this, data);
+          onError(data);
         }
         } finally {}
 

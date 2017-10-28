@@ -118,11 +118,22 @@ module Canvas::LiveEvents
     post_event_stringified('group_membership_updated', get_group_membership_data(membership))
   end
 
-  def self.group_category_created(group_category)
-    post_event_stringified('group_category_created', {
+  def self.get_group_category_data(group_category)
+    {
       group_category_id: group_category.global_id,
-      group_category_name: group_category.name
-    })
+      group_category_name: group_category.name,
+      context_id: group_category.context_id,
+      context_type: group_category.context_type,
+      group_limit: group_category.group_limit
+    }
+  end
+
+  def self.group_category_updated(group_category)
+    post_event_stringified('group_category_updated', get_group_category_data(group_category))
+  end
+
+  def self.group_category_created(group_category)
+    post_event_stringified('group_category_created', get_group_category_data(group_category))
   end
 
   def self.get_group_data(group)
@@ -135,7 +146,8 @@ module Canvas::LiveEvents
       context_type: group.context_type,
       context_id: group.global_context_id,
       account_id: group.global_account_id,
-      workflow_state: group.workflow_state
+      workflow_state: group.workflow_state,
+      max_membership: group.max_membership
     }
   end
 
@@ -178,6 +190,7 @@ module Canvas::LiveEvents
       assignment_id: submission.global_assignment_id,
       user_id: submission.global_user_id,
       submitted_at: submission.submitted_at,
+      lti_user_id: submission.lti_user_id,
       graded_at: submission.graded_at,
       updated_at: submission.updated_at,
       score: submission.score,
@@ -413,5 +426,35 @@ module Canvas::LiveEvents
   def self.quiz_export_complete(content_export)
     payload = content_export.settings[:quizzes2]
     post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
+  end
+
+  def self.course_section_created(section)
+    post_event_stringified('course_section_created', get_course_section_data(section))
+  end
+
+  def self.course_section_updated(section)
+    post_event_stringified('course_section_updated', get_course_section_data(section))
+  end
+
+  def self.get_course_section_data(section)
+    {
+      course_section_id: section.id,
+      sis_source_id: section.sis_source_id,
+      sis_batch_id: section.sis_batch_id,
+      course_id: section.course_id,
+      root_account_id: section.root_account_id,
+      enrollment_term_id: section.enrollment_term_id,
+      name: section.name,
+      default_section: section.default_section,
+      accepting_enrollments: section.accepting_enrollments,
+      can_manually_enroll: section.can_manually_enroll,
+      start_at: section.start_at,
+      end_at: section.end_at,
+      workflow_state: section.workflow_state,
+      restrict_enrollments_to_section_dates: section.restrict_enrollments_to_section_dates,
+      nonxlist_course_id: section.nonxlist_course_id,
+      stuck_sis_fields: section.stuck_sis_fields,
+      integration_id: section.integration_id
+    }
   end
 end

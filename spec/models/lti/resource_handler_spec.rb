@@ -138,32 +138,5 @@ module Lti
         expect(resource_handlers).to be_blank
       end
     end
-
-    describe '#find_or_create_tool_setting' do
-      before do
-        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
-        resource_handler.message_handlers = [message_handler]
-        resource_handler.save!
-        user_session(account_admin_user)
-      end
-
-      it 'creates a new tool setting if one with the existing resource_link_id does not exist' do
-        expected_id = message_handler.build_resource_link_id(context: tool_proxy.context)
-        expect(resource_handler.find_or_create_tool_setting.resource_link_id).to eq expected_id
-      end
-
-      it 'reuses a tool setting if one with the same resource_link_id exists' do
-        tool_setting = resource_handler.find_or_create_tool_setting
-        expect(resource_handler.find_or_create_tool_setting).to eq tool_setting
-      end
-
-      it 'allows changing the settings of an originality report without affecting others' do
-        link_fragment = SecureRandom.uuid
-        resource_handler.find_or_create_tool_setting
-        setting_two = resource_handler.find_or_create_tool_setting(link_fragment: link_fragment)
-        setting_two.update_attributes(resource_url: 'http://www.test.com')
-        expect(resource_handler.find_or_create_tool_setting.resource_url).to be_nil
-      end
-    end
   end
 end

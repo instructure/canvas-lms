@@ -219,4 +219,24 @@ describe "threaded discussions" do
     delete_entry(entry)
     expect(f("#entry-#{entry.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
   end
+
+  context "student tray" do
+
+    before(:each) do
+      @account = Account.default
+      @account.enable_feature!(:student_context_cards)
+    end
+
+    it "discussion page should display student name in tray", priority: "1", test_id: 3022069 do
+      topic = @course.discussion_topics.create!(user: @teacher,
+                                                             title: 'Non threaded discussion',
+                                                             message: 'discussion topic message')
+      topic.discussion_entries.create!(user: @student,
+                                                    message: "new threaded reply from student",
+                                                    parent_entry: DiscussionEntry.last)
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      f("a[data-student_id='#{@student.id}']").click
+      expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("student")
+    end
+  end
 end

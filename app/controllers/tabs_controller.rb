@@ -63,7 +63,7 @@ class TabsController < ApplicationController
 
   # @API List available tabs for a course or group
   #
-  # Returns a list of navigation tabs available in the current context.
+  # Returns a paginated list of navigation tabs available in the current context.
   #
   # @argument include[] [String, "external"]
   #   "external":: Optionally include external tool tabs in the returned list of tabs (Only has effect for courses, not groups)

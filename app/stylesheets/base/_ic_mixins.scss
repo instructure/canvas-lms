@@ -1,0 +1,162 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+//add variable modifications to the global _variables.scss
+//they will override bootstrap styles
+
+
+// Clearfix - Use to clear floats
+@mixin clearfix {
+  &:before,
+  &:after {
+    display: table;
+    content: "";
+    line-height: 0;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+
+// Accessibility prompts - visible through KO focus
+// If the prompt is not a clickable link, set $is-link: false
+@mixin accessibility-prompt($is-link: true) {
+  padding: 4px 8px;
+  background: var(--ic-link-color);
+  background-clip: border-box;
+  text-align: center;
+  color: $ic-color-light;
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px dashed rgba($ic-color-light, 0.8);
+  &:focus {
+    color: #fff;
+  }
+  @if $is-link {
+    &:focus { text-decoration: underline; }
+  }
+}
+
+
+// :focus style mixins
+@mixin ic-focus-base {
+  outline-width: 1px;
+  outline-color: transparent;
+  outline-style: solid;
+}
+
+@mixin ic-focus-variant($color: var(--ic-link-color), $offset: -1px) {
+  outline-offset: $offset;
+  outline-color: $color;
+}
+
+@mixin button-focus-light {
+  @if $use_high_contrast { box-shadow: inset 0 0 0 2px var(--ic-link-color); }
+  @else { box-shadow: inset 0 0 0 1px var(--ic-link-color); }
+}
+
+@mixin button-focus-dark {
+  @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-color-light; }
+  @else { box-shadow: inset 0 0 0 1px $ic-color-light;  }
+}
+
+
+// Bootstrap button background - DEPRECATED - DO NOT USE
+@mixin buttonBackground($startColor, $endColor, $textColor: #fff, $textShadow: 0 -1px 0 rgba(0,0,0,.25)) {
+  // gradientBar will set the background to a pleasing blend of these, to support IE<=9
+  @include gradientBar($startColor, $endColor, $textColor, $textShadow);
+
+  // in these cases the gradient won't cover the background, so we override
+  &:hover, &:active, &.active, &.disabled, &[disabled] {
+    color: $textColor;
+    background-color: $endColor;
+  }
+
+  &:focus {
+    color: $textColor;
+    background: $endColor;
+    text-decoration: none;
+  }
+}
+
+
+// Button styles for all non-InstUI buttons
+@mixin canvas-button(
+  $button-color,
+  $text-color,
+  $button-background-is-lighter-than-text:false,
+  $button-color-darkened-5:darken($button-color, 5),
+  $button-color-darkened-15:darken($button-color, 15)
+) {
+  background: $button-color;
+  color: $text-color;
+  border: 1px solid;
+
+  &:focus { color: $text-color; }
+  &:hover {
+    @if $use_high_contrast {
+      background: darken($ic-color-dark, 20%);
+      color: $ic-color-light;
+    }
+    @else  {
+      background: $button-color-darkened-5;
+      color: $text-color;
+    }
+
+    // handle jquery UI ui-button conflicts
+    &.ui-state-hover {
+      @if $use_high_contrast {
+        background: darken($ic-color-dark, 20%);
+        color: $ic-color-light;
+      }
+      @else {
+        background: $button-color-darkened-5;
+        color: $text-color;
+        border-color: $button-color-darkened-15;
+      }
+    }
+  }
+
+  @if $button-background-is-lighter-than-text {
+    border-color: $ic-border-color;
+
+    &.active, &.Button--active, &:active { box-shadow: none; }
+    &.active, &.Button--active {
+      background: darken($button-color, 55%);
+      border-color: darken($button-color, 65%);
+      color: $ic-color-light;
+    }
+    &:focus { @include button-focus-light; }
+    // handle jquery UI ui-button states
+    &.ui-state-focus.ui-state-active {
+      &:focus { @include button-focus-dark; }
+    }
+    &:active { background: darken($button-color, 8%); }
+  }
+
+  @else {
+    border-color: $button-color-darkened-15;
+
+    &:focus { @include button-focus-dark; }
+    &.active, &.Button--active, &:active {
+      background: $button-color-darkened-5;
+      box-shadow: none;
+    }
+  }
+}

@@ -25,9 +25,6 @@ module Api::V1::Submission
   include Api::V1::User
   include Api::V1::SubmissionComment
 
-  MOBILE_STUDENT_LABEL = 'mobile_student_label'.freeze
-  MOBILE_TEACHER_STATE = 'mobile_teacher_state'.freeze
-
   def submission_json(submission, assignment, current_user, session, context = nil, includes = [], params)
     context ||= assignment.context
     hash = submission_attempt_json(submission, assignment, current_user, session, context, params)
@@ -89,12 +86,12 @@ module Api::V1::Submission
       hash['assignment_visible'] = submission.assignment_visible_to_user?(submission.user)
     end
 
-    if includes.include?(MOBILE_STUDENT_LABEL)
-      hash[MOBILE_STUDENT_LABEL] = label(submission)
+    if includes.include?('submission_status')
+      hash['submission_status'] = submission.submission_status
     end
 
-    if includes.include?(MOBILE_TEACHER_STATE)
-      hash[MOBILE_TEACHER_STATE] = action(submission)
+    if includes.include?('grading_status')
+      hash['grading_status'] = submission.grading_status
     end
 
     hash
@@ -170,9 +167,10 @@ module Api::V1::Submission
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
       hash['attachments'] = attachments.map do |attachment|
         attachment.skip_submission_attachment_lock_checks = true
+        includes = includes.include?('canvadoc_document_id') ? ['preview_url', 'canvadoc_document_id'] : ['preview_url']
         atjson = attachment_json(attachment, user, {},
                                  submission_attachment: true,
-                                 include: ['preview_url'],
+                                 include: includes,
                                  enable_annotations: true, # we want annotations on submission's attachment preview_urls
                                  moderated_grading_whitelist: attempt.moderated_grading_whitelist)
         attachment.skip_submission_attachment_lock_checks = false
@@ -252,7 +250,7 @@ module Api::V1::Submission
     }).order(:created_at).to_a
 
     attachment = attachments.pop
-    attachments.each { |a| a.destroy_permanently! }
+    attachments.each(&:destroy_permanently_plus)
 
     anonymous = assignment.context.feature_enabled?(:anonymous_grading)
 
@@ -262,7 +260,7 @@ module Api::V1::Submission
       stale ||= (attachment.created_at < Setting.get('submission_zip_ttl_minutes', '60').to_i.minutes.ago)
       stale ||= (attachment.created_at < (updated_at || assignment.submissions.maximum(:submitted_at)))
       if stale
-        attachment.destroy_permanently!
+        attachment.destroy_permanently_plus
         attachment = nil
       end
     end
@@ -335,36 +333,5 @@ module Api::V1::Submission
         provisional_grade_id: provisional_grade.id
       }.to_json
     )
-  end
-
-  def label(submission)
-    if submission.resubmitted?
-      :resubmitted
-    elsif submission.missing?
-      :missing
-    elsif submission.late?
-      :late
-    elsif submission.submitted? ||
-      (submission.submission_type.present? && submission.submission_type != 'online_quiz') ||
-      (submission.submission_type == 'online_quiz' && submission.quiz_submission.completed?)
-
-      :submitted
-    else
-      :unsubmitted
-    end
-  end
-
-  def action(submission)
-    if submission.excused?
-      :excused
-    elsif submission.needs_review?
-      :needs_review
-    elsif submission.needs_grading?
-      :needs_grading
-    elsif submission.graded?
-      :graded
-    else
-      nil
-    end
   end
 end

@@ -422,7 +422,8 @@ shared_examples_for "file uploads api with folders" do
   end
 
   it "should reject other duplicate file handling params" do
-    expect { preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'killall' }) }.to raise_error("got non-json")
+    json = preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'killall' }, { expected_status: 400 })
+    expect(json['message']).to eq "invalid on_duplicate option"
   end
 end
 

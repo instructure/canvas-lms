@@ -2505,6 +2505,97 @@ describe DiscussionTopicsController, type: :request do
     expect(json['assignment']['due_at']).to eq override.due_at.iso8601.to_s
   end
 
+  describe "duplicate" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      student_in_course(:course => @course, :active_all => true)
+      group_discussion_topic_model()
+    end
+
+    it "should check permissions" do
+      @user = @student
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@group_topic.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => @group_topic.to_param },
+        {},
+        {},
+        :expected_status => 401)
+    end
+
+    it "cannot duplicate announcements" do
+      @user = @teacher
+      announcement_model()
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@a.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => @a.to_param },
+        {},
+        {},
+        :expected_status => 400)
+    end
+
+    it "should not duplicate child topics" do
+      @user = @teacher
+      child_topic = @group_topic.child_topics[0]
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{child_topic.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => child_topic.to_param },
+        {},
+        {},
+        :expected_status => 404)
+    end
+
+    it "should 404 if topic does not exist" do
+      @user = @teacher
+      bad_id = DiscussionTopic.maximum(:id) + 100
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{bad_id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => bad_id.to_s },
+        {},
+        {},
+        :expected_status => 404)
+    end
+
+    it "should 404 if deleted" do
+      @user = @teacher
+      discussion_topic_model()
+      @topic.destroy
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => @topic.to_param},
+        {},
+        {},
+        :expected_status => 404)
+    end
+
+    it "duplicate works if teacher" do
+      @user = @teacher
+      api_call(:post,"/api/v1/courses/#{@course.id}/discussion_topics/#{@group_topic.id}/duplicate",
+        { :controller => "discussion_topics_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.to_param,
+          :topic_id => @group_topic.to_param },
+        {},
+        {},
+        :expected_status => 200)
+    end
+  end
+
   context "public courses" do
     let(:announcements_view_api) {
       ->(user, course_id, announcement_id, status = 200) do

@@ -173,6 +173,10 @@
 #             "items": {"type": "string"}
 #           }
 #         },
+#         "user": {
+#           "description": "The user that initiated the sis_batch. See the Users API for details.",
+#           "$ref": "User"
+#         },
 #         "processing_errors": {
 #           "description": "An array of CSV_file/error_message pairs.",
 #           "example": [["students.csv","Error while importing CSV. Please contact support."]],
@@ -353,6 +357,10 @@ class SisImportsApiController < ApplicationController
   #   part of the data set, but diffing will not be performed. See the SIS CSV
   #   Format documentation for details.
   #
+  # @argument diffing_drop_status [String, "deleted"|"completed"|"inactive"]
+  #   If diffing_drop_status is passed, this SIS import will use this status for
+  #   enrollments that are not included in the sis_batch. Defaults to 'deleted'
+  #
   # @argument change_threshold [Integer]
   #   If set with batch_mode, the batch cleanup process will not run if the
   #   number of items deleted is higher than the percentage set. If set to 10
@@ -452,6 +460,10 @@ class SisImportsApiController < ApplicationController
           [:add_sis_stickiness, :clear_sis_stickiness].each do |option|
             batch.options[option] = true if value_to_boolean(params[option])
           end
+        end
+        if params[:diffing_drop_status].present?
+          batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&%w(deleted inactive completed)).first
+          return render json: {message: 'Invalid diffing_drop_status'}, status: :bad_request unless batch.options[:diffing_drop_status]
         end
       end
 

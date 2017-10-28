@@ -19,6 +19,7 @@ define [
   'i18n!assignments'
   'jquery'
   'underscore'
+  'jsx/move_item_tray/NewMoveDialogView'
   'compiled/class/cache'
   'compiled/util/hasLocalStorage'
   'compiled/views/DraggableCollectionView'
@@ -31,7 +32,7 @@ define [
   'jst/assignments/AssignmentGroupListItem'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
 ], (
-  I18n, $, _, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
+  I18n, $, _, NewMoveDialogView, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
   CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin
 ) ->
 
@@ -48,7 +49,6 @@ define [
     @child 'createAssignmentView', '[data-view=createAssignment]'
     @child 'editGroupView', '[data-view=editAssignmentGroup]'
     @child 'deleteGroupView', '[data-view=deleteAssignmentGroup]'
-    @child 'moveGroupView', '[data-view=moveAssignmentGroup]'
 
     els: _.extend({}, @::els, {
       '.add_assignment': '$addAssignmentButton'
@@ -62,6 +62,7 @@ define [
       'keyclick .element_toggler': 'toggleArrowWithKeyboard'
       'click .tooltip_link': preventDefault ->
       'keydown .assignment_group': 'handleKeys'
+      'click .move_group':  'onMoveGroup'
 
     messages:
       toggleMessage: I18n.t('toggle_message', "toggle assignment visibility")
@@ -74,7 +75,6 @@ define [
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
       @deleteGroupView.remove() if @deleteGroupView
-      @moveGroupView.remove() if @moveGroupView
       super(@canManage())
 
       # reset the model's view property; it got overwritten by child views
@@ -95,8 +95,7 @@ define [
         @deleteGroupView.setTrigger @$deleteGroupButton
 
       if @moveGroupView
-        @moveGroupView.hide()
-        @moveGroupView.setTrigger @$moveGroupButton
+        @moveGroupView.setCloseFocus @$moveGroupButton
 
       if @model.hasRules()
         @createRulesToolTip()
@@ -148,10 +147,24 @@ define [
         if @canDelete()
           @deleteGroupView = new DeleteGroupView
             model: @model
-        @moveGroupView = new MoveDialogView
+        @moveGroupView = new NewMoveDialogView
           model: @model
+          nested: false
           closeTarget: @$el.find('a[id*=manage_link]')
-          saveURL: -> ENV.URLS.sort_url
+          saveURL: ENV.URLS.sort_url
+          onSuccessfulMove: @onSuccessfulMove
+          movePanelParent: document.getElementById('not_right_side')
+          modalTitle: I18n.t('Move Assignment Group')
+
+    onSuccessfulMove: (movedItems) =>
+      newCollection = @model.collection
+      #update all of the position attributes
+      positions = [1..newCollection.length]
+      movedItems.forEach (id, index) ->
+        newCollection.get(id)?.set 'position', positions[index]
+      newCollection.sort()
+      # finally, call reset to trigger a re-render
+      newCollection.reset newCollection.models
 
     initCache: ->
       $.extend true, @, Cache
@@ -319,6 +332,9 @@ define [
       key = @cacheKey()
       expanded = !@cache.get(key)
       @cache.set(key, expanded)
+
+    onMoveGroup: () =>
+      @moveGroupView.renderOpenMoveDialog();
 
     hasMasterCourseRestrictedAssignments: ->
       @model.get('assignments').any (m) ->

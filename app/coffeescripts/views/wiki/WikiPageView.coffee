@@ -166,7 +166,9 @@ define [
         else
           $.datetimeString(json.lock_info.unlock_at)
 
-      json.cannot_edit_by_master_course = json.is_master_course_child_content && json.restricted_by_master_course
+      if json.is_master_course_child_content && json.restricted_by_master_course
+        json.cannot_delete_by_master_course = true
+        json.cannot_edit_by_master_course = json.master_course_restrictions.content
 
       json.wiki_page_menu_tools = ENV.wiki_page_menu_tools
       _.each json.wiki_page_menu_tools, (tool) =>

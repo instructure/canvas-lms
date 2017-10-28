@@ -112,19 +112,4 @@ define([
     equal(renderedAfterDragNDrop[0].getAttribute('aria-label'), 'Intermediate Dashcarding');
     equal(renderedAfterDragNDrop[1].getAttribute('aria-label'), 'Intro to Dashcards 1');
   });
-
-  test('DashboardCard renders a DashboardCardMovementMenu when reordering is enabled', () => {
-    const props = cards[0];
-    const card = TestUtils.renderIntoDocument(
-      <DashboardCard
-        connectDragSource={el => el}
-        connectDropTarget={el => el}
-        reorderingEnabled
-        {...props}
-      />
-    );
-
-    const menuComponent = TestUtils.findRenderedComponentWithType(card, DashboardCardMovementMenu);
-    ok(menuComponent);
-  });
 });

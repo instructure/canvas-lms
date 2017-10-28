@@ -321,6 +321,15 @@ describe Oauth2ProviderController do
       oauth_accept
     end
 
+    it 'should not pass remember_access if scopes is set' do
+      scopes = 'userinfo'
+      session_hash[:oauth2][:scopes] = scopes
+      expect(Canvas::Oauth::Token).to receive(:generate_code_for).
+        with(user.global_id, key.id, {scopes: scopes, remember_access: nil, purpose: nil}).
+        and_return('code')
+      post :accept, params: {remember_access: '1'}, session: session_hash
+    end
+
     it 'remembers the users access preference with the code' do
       expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1', :purpose => nil}).and_return('code')
       post :accept, params: {:remember_access => '1'}, session: session_hash

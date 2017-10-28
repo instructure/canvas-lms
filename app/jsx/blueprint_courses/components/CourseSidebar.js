@@ -22,6 +22,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import select from 'jsx/shared/select'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
@@ -167,6 +168,11 @@ export default class CourseSidebar extends Component {
         isModalOpen: true,
         modalId: 'associations',
       })
+    }).catch((/* err */) => {
+      showFlashAlert({
+        message: I18n.t('Failed loading Associations component. Is your network connection OK?'),
+        type: 'error'
+      })
     })
   }
 
@@ -185,6 +191,11 @@ export default class CourseSidebar extends Component {
       this.setState({
         isModalOpen: true,
         modalId: 'unsyncedChanges',
+      })
+    }).catch((/* err */) => {
+      showFlashAlert({
+        message: I18n.t('Failed loading Unsynced Changes component. Is your network connection OK?'),
+        type: 'error'
       })
     })
   }
@@ -209,6 +220,11 @@ export default class CourseSidebar extends Component {
       this.setState({
         isModalOpen: true,
         modalId: 'syncHistory',
+      })
+    }).catch((/* err */) => {
+      showFlashAlert({
+        message: I18n.t('Failed loading Sync History component. Is your network connection OK?'),
+        type: 'error'
       })
     })
   }

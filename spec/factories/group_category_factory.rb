@@ -16,8 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Factories
+  VALID_GROUP_CATEGORY_ATTRIBUTES = [:name, :context, :group_limit]
+
   def group_category(opts = {})
+    opts[:name] = opts[:name].present? ? opts[:name] : 'foo'
     context = opts[:context] || @course
-    @group_category = context.group_categories.create!(name: opts[:name] || 'foo')
+    @group_category = context.group_categories.create! opts.slice(*VALID_GROUP_CATEGORY_ATTRIBUTES)
   end
 end

@@ -98,6 +98,13 @@ describe Assignment do
 
   describe 'callbacks' do
     describe 'apply_late_policy' do
+      it "calls apply_late_policy for the assignment if points_possible changes" do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
+
+        assignment.update!(points_possible: 3.14)
+      end
+
       it 'invokes the LatePolicyApplicator for this assignment if grading type changes but due dates do not' do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
@@ -1345,6 +1352,51 @@ describe Assignment do
       @assignment.points_possible = 15
       expect(@assignment.interpret_grade("88.75%")).to eq 13.3125
     end
+
+    context "with alphanumeric grades" do
+      before(:once) do
+        @assignment.update!(grading_type: 'letter_grade', points_possible: 10.0)
+        grading_standard = @course.grading_standards.build(title: "Number Before Letter")
+        grading_standard.data = {
+          "1A" => 0.9,
+          "2B" => 0.8,
+          "3C" => 0.7,
+          "4D" => 0.6,
+          "5+" => 0.5,
+          "5F" => 0
+        }
+        grading_standard.assignments << @assignment
+        grading_standard.save!
+      end
+
+      it "does not treat maximum grade as a number" do
+        expect(@assignment.interpret_grade("1A")).to eq 10.0
+      end
+
+      it "does not treat lower grade as a number" do
+        expect(@assignment.interpret_grade("2B")).to eq 8.9
+      end
+
+      it "does not treat number followed by plus symbol as a number" do
+        expect(@assignment.interpret_grade("5+")).to eq 5.9
+      end
+
+      it "treats unsigned integer score as a number" do
+        expect(@assignment.interpret_grade("7")).to eq 7.0
+      end
+
+      it "treats negative score with decimals as a number" do
+        expect(@assignment.interpret_grade("-.2")).to eq (-0.2)
+      end
+
+      it "treats positive score with decimals as a number" do
+        expect(@assignment.interpret_grade("+0.35")).to eq 0.35
+      end
+
+      it "treats number with percent symbol as a percentage" do
+        expect(@assignment.interpret_grade("75.2%")).to eq 7.52
+      end
+    end
   end
 
   describe '#submit_homework' do
@@ -1399,6 +1451,12 @@ describe Assignment do
       expect(s3.submission_type).to eq "online_text_entry"
       expect(s3.late_policy_status).to eq "late"
       expect(s3.seconds_late_override).to eq 120
+    end
+
+    it "sets the submission's 'lti_user_id'" do
+      setup_assignment_without_submission
+      submission = @a.submit_homework(@user)
+      expect(submission.lti_user_id).to eq @user.lti_context_id
     end
   end
 

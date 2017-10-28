@@ -66,7 +66,9 @@ module SIS
           end
 
           begin
-            io = generate_diff(class_for_importer(import_type), previous_csv[:fullpath], current_csv[:fullpath])
+            status = @batch.options && @batch.options[:diffing_drop_status].presence
+            status = 'deleted' unless import_type == :enrollment && %w(deleted inactive completed).include?(status)
+            io = generate_diff(class_for_importer(import_type), previous_csv[:fullpath], current_csv[:fullpath], status)
             generated << {
               file: current_csv[:file],
               fullpath: io.path,
@@ -86,11 +88,11 @@ module SIS
         SIS::CSV.const_get(import_type.to_s.camelcase + 'Importer')
       end
 
-      def generate_diff(importer, previous_input, current_input)
+      def generate_diff(importer, previous_input, current_input, status = 'deleted')
         previous_csv = ::CSV.open(previous_input, CSVBaseImporter::PARSE_ARGS)
         current_csv = ::CSV.open(current_input, CSVBaseImporter::PARSE_ARGS)
         diff = CsvDiff::Diff.new(importer.identifying_fields)
-        diff.generate(previous_csv, current_csv, deletes: ->(row) { row['status'] = 'deleted' })
+        diff.generate(previous_csv, current_csv, deletes: ->(row) { row['status'] = status })
       end
 
       def add_warning(csv, message)

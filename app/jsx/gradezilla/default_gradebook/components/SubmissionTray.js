@@ -17,18 +17,24 @@
  */
 
 import React from 'react';
-import { bool, func, number, shape, string } from 'prop-types';
-import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
-import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
-import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
-import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
+import { arrayOf, bool, func, number, shape, string } from 'prop-types';
+import I18n from 'i18n!gradebook';
 import Avatar from 'instructure-ui/lib/components/Avatar';
 import Button from 'instructure-ui/lib/components/Button';
 import Container from 'instructure-ui/lib/components/Container';
+import Heading from 'instructure-ui/lib/components/Heading';
 import Link from 'instructure-ui/lib/components/Link';
+import Spinner from 'instructure-ui/lib/components/Spinner';
 import Tray from 'instructure-ui/lib/components/Tray';
+import Typography from 'instructure-ui/lib/components/Typography';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
-import I18n from 'i18n!gradebook';
+import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
+import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
+import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
+import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
+import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem';
+import SubmissionCommentForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentForm';
+import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 
 function renderAvatar (name, avatarUrl) {
   return (
@@ -58,9 +64,90 @@ function renderComingSoon (speedGraderEnabled, speedGraderUrl) {
   );
 }
 
+function renderTraySubHeading (headingText) {
+  return (
+    <Heading level="h4" as="h2" margin="auto auto small">
+      <Typography weight="bold">
+        {headingText}
+      </Typography>
+    </Heading>
+  );
+}
+
+function renderSubmissionCommentList (args) {
+  return args.submissionComments.map(comment =>
+    <SubmissionCommentListItem
+      author={comment.author}
+      authorUrl={comment.authorUrl}
+      authorAvatarUrl={comment.authorAvatarUrl}
+      comment={comment.comment}
+      createdAt={comment.createdAt}
+      id={comment.id}
+      key={comment.id}
+      last={args.submissionComments[args.submissionComments.length - 1].id === comment.id}
+      deleteSubmissionComment={args.deleteSubmissionComment}
+    />
+  );
+}
+
+function renderSubmissionComments (args) {
+  const {
+    submissionComments,
+    submissionCommentsLoaded,
+    deleteSubmissionComment,
+    createSubmissionComment,
+    updateSubmissionComments,
+    processing,
+    setProcessing
+  } = args;
+
+  if(submissionCommentsLoaded) {
+    return (
+      <div>
+        {renderTraySubHeading('Comments')}
+
+        {renderSubmissionCommentList({ submissionComments, submissionCommentsLoaded, deleteSubmissionComment })}
+
+        <SubmissionCommentForm
+          createSubmissionComment={createSubmissionComment}
+          updateSubmissionComments={updateSubmissionComments}
+          processing={processing}
+          setProcessing={setProcessing}
+        />
+      </div>
+    );
+  }
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <Spinner title={I18n.t('Loading comments')} size="large" />
+    </div>
+  );
+}
+
 export default function SubmissionTray (props) {
   const { name, avatarUrl } = props.student;
-  const speedGraderUrl = `/courses/${props.courseId}/gradebook/speed_grader?assignment_id=${props.submission.assignmentId}#%7B%22student_id%22%3A${props.student.id}%7D`;
+
+  const assignmentParam = `assignment_id=${props.submission.assignmentId}`;
+  const studentParam = `#%7B%22student_id%22%3A${props.student.id}%7D`;
+  const speedGraderUrl = `/courses/${props.courseId}/gradebook/speed_grader?${assignmentParam}${studentParam}`;
+
+  const submissionCommentsProps = {
+    submissionComments: props.submissionComments,
+    submissionCommentsLoaded: props.submissionCommentsLoaded,
+    deleteSubmissionComment: props.deleteSubmissionComment,
+    createSubmissionComment: props.createSubmissionComment,
+    updateSubmissionComments: props.updateSubmissionComments,
+    processing: props.processing,
+    setProcessing: props.setProcessing
+  };
+  let carouselContainerStyleOverride = '0 0 0 0';
+
+  if (!avatarUrl) {
+    // When we don't have an avatar, let's ensure there's enough space between the tray close button and the student
+    // carousel's previous student arrow
+    carouselContainerStyleOverride = 'small 0 0 0';
+  }
+
   return (
     <Tray
       contentRef={props.contentRef}
@@ -74,23 +161,38 @@ export default function SubmissionTray (props) {
       onClose={props.onClose}
     >
       <div className="SubmissionTray__Container">
-        {
-          props.showContentComingSoon ?
+        { props.showContentComingSoon ?
             renderComingSoon(props.speedGraderEnabled, speedGraderUrl) :
-            <div>
-              <div id="SubmissionTray__Content">
+            <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
+              <Container as="div" padding={carouselContainerStyleOverride}>
                 {avatarUrl && renderAvatar(name, avatarUrl)}
 
-                <div id="SubmissionTray__StudentName">
-                  {name}
-                </div>
+                <Carousel
+                  id="student-carousel"
+                  disabled={props.processing || !props.submissionCommentsLoaded}
+                  displayLeftArrow={!props.isFirstStudent}
+                  displayRightArrow={!props.isLastStudent}
+                  leftArrowDescription={I18n.t('Previous student')}
+                  onLeftArrowClick={props.selectPreviousStudent}
+                  onRightArrowClick={props.selectNextStudent}
+                  rightArrowDescription={I18n.t('Next student')}
+                >
+                  <Link href={props.student.gradesUrl}>
+                    {name}
+                  </Link>
+                </Carousel>
+
+                <Container as="div" margin="small 0" className="hr" />
 
                 <Carousel
                   id="assignment-carousel"
-                  onLeftArrowClick={props.selectPreviousAssignment}
-                  onRightArrowClick={props.selectNextAssignment}
+                  disabled={props.processing || !props.submissionCommentsLoaded}
                   displayLeftArrow={!props.isFirstAssignment}
                   displayRightArrow={!props.isLastAssignment}
+                  leftArrowDescription={I18n.t('Previous assignment')}
+                  onLeftArrowClick={props.selectPreviousAssignment}
+                  onRightArrowClick={props.selectNextAssignment}
+                  rightArrowDescription={I18n.t('Next assignment')}
                 >
                   <Link href={props.assignment.htmlUrl}>
                     {props.assignment.name}
@@ -99,9 +201,19 @@ export default function SubmissionTray (props) {
 
                 { props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
 
-                {!!props.submission.pointsDeducted && <LatePolicyGrade submission={props.submission} />}
+                <Container as="div" margin="small 0" className="hr" />
+              </Container>
 
-                <div id="SubmissionTray__RadioInputGroup">
+              <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+                {!!props.submission.pointsDeducted &&
+                  <div>
+                    <LatePolicyGrade submission={props.submission} />
+
+                    <Container as="div" margin="small 0" className="hr" />
+                  </div>
+                }
+
+                <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
                   <SubmissionTrayRadioInputGroup
                     colors={props.colors}
                     locale={props.locale}
@@ -110,8 +222,12 @@ export default function SubmissionTray (props) {
                     submissionUpdating={props.submissionUpdating}
                     updateSubmission={props.updateSubmission}
                   />
+                </Container>
+
+                <div id="SubmissionTray__Comments">
+                  {renderSubmissionComments(submissionCommentsProps)}
                 </div>
-              </div>
+              </Container>
             </div>
         }
       </div>
@@ -122,7 +238,7 @@ export default function SubmissionTray (props) {
 SubmissionTray.defaultProps = {
   contentRef: undefined,
   latePolicy: { lateSubmissionInterval: 'day' }
-}
+};
 
 SubmissionTray.propTypes = {
   assignment: shape({
@@ -142,7 +258,8 @@ SubmissionTray.propTypes = {
   student: shape({
     id: string.isRequired,
     name: string.isRequired,
-    avatarUrl: string
+    avatarUrl: string,
+    gradesUrl: string.isRequired
   }).isRequired,
   submission: shape({
     excused: bool.isRequired,
@@ -157,6 +274,10 @@ SubmissionTray.propTypes = {
   isLastAssignment: bool.isRequired,
   selectNextAssignment: func.isRequired,
   selectPreviousAssignment: func.isRequired,
+  isFirstStudent: bool.isRequired,
+  isLastStudent: bool.isRequired,
+  selectNextStudent: func.isRequired,
+  selectPreviousStudent: func.isRequired,
   courseId: string.isRequired,
   speedGraderEnabled: bool.isRequired,
   submissionUpdating: bool.isRequired,
@@ -164,5 +285,12 @@ SubmissionTray.propTypes = {
   locale: string.isRequired,
   latePolicy: shape({
     lateSubmissionInterval: string
-  }).isRequired
+  }).isRequired,
+  submissionComments: arrayOf(shape(CommentPropTypes).isRequired).isRequired,
+  submissionCommentsLoaded: bool.isRequired,
+  createSubmissionComment: func.isRequired,
+  deleteSubmissionComment: func.isRequired,
+  updateSubmissionComments: func.isRequired,
+  processing: bool.isRequired,
+  setProcessing: func.isRequired
 };

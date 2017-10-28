@@ -240,6 +240,17 @@ describe Quizzes::TakeQuizPresenter do
       allow(presenter).to receive(:current_question).and_return(question3)
       expect(presenter.question_seen?(question2)).to be_truthy
     end
+
+    it "returns true when all questions have been seen and quiz can't go back" do
+      allow(submission).to receive(:submission_data).and_return(
+        "_question_#{question1[:id]}_read" => true,
+        "_question_#{question2[:id]}_read" => true,
+        "_question_#{question3[:id]}_read" => true
+      )
+      allow(quiz).to receive(:cant_go_back?).and_return(true)
+      expect{ presenter.question_seen?(question1) }.not_to raise_error
+      expect(presenter.question_seen?(question3)).to be_truthy
+    end
   end
 
   describe "question_answered?" do

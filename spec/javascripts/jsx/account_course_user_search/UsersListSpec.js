@@ -75,49 +75,61 @@ test('displays users that are passed in as props', () => {
   equal(renderedList.nodes[2].props.user.name, 'UserC')
 });
 
-test('sorting by username ascending puts down-arrow on Name', () => {
-  const wrapper = shallow(<UsersList {...usersProps} />)
-  const header = wrapper.find('a').first()
-  equal(header.nodes[0].props.children.props.children[1].type.name, 'IconArrowDownSolid')
-});
+Object.entries({
+  username: 'Name',
+  email: 'Email',
+  sis_id: 'SIS ID',
+  last_login: 'Last Login'
+}).forEach(([columnID, label]) => {
+  Object.entries({
+    asc: {
+      expectedArrow: 'Down',
+      unexpectedArrow: 'Up',
+      expectedTip: `Click to sort by ${label} descending`
+    },
+    desc: {
+      expectedArrow: 'Up',
+      unexpectedArrow: 'Down',
+      expectedTip: `Click to sort by ${label} ascending`
+    }
+  }).forEach(([sortOrder, {expectedArrow, unexpectedArrow, expectedTip}]) => {
+    const props = {
+      ...usersProps,
+      userList: {
+        searchFilter: {
+          search_term: 'User',
+          sort: columnID,
+          order: sortOrder
+        }
+      }
+    }
 
-test('clicking the Name column header calls onUpdateFilters with username descending', () => {
-  const wrapper = shallow(<UsersList {...usersProps} />)
-  const header = wrapper.find('a').first()
-  header.simulate('click')
+    test(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
+      const wrapper = shallow(<UsersList {...props} />)
+      equal(wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length, 0, `no columns have an ${unexpectedArrow} arrow`)
+      const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
+      equal(icons.length, 1, `only one ${expectedArrow} arrow`)
+      const header = icons.first().parents('Tooltip')
+      if (expectedArrow == 'Down') debugger
+      ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
+      ok(header.contains(label), `${label} is the one that has the ${expectedArrow} arrow`)
+    })
 
-  const sinonCallback = wrapper.unrendered.props.onUpdateFilters
-
-  ok(sinonCallback.calledOnce)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'username', order: 'desc', role_filter_id: undefined}))
-});
-
-test('clicking the Email column header calls onUpdateFilters with email ascending', () => {
-  const wrapper = shallow(<UsersList {...usersProps} />)
-  const header = wrapper.find('a').slice(1, 2)
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onUpdateFilters
-  ok(sinonCallback.callCount === 2)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'email', order: 'asc', role_filter_id: undefined}))
-});
-
-test('clicking the SIS ID column header calls onUpdateFilters with sis_id ascending', () => {
-  const wrapper = shallow(<UsersList {...usersProps} />)
-  const header = wrapper.find('a').slice(2, 3)
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onUpdateFilters
-  ok(sinonCallback.callCount === 3)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'sis_id', order: 'asc', role_filter_id: undefined}))
-});
-
-test('clicking the Last Login column header calls onUpdateFilters with last_login ascending', () => {
-  const wrapper = shallow(<UsersList {...usersProps} />)
-  const header = wrapper.find('a').slice(3, 4)
-  header.simulate('click')
-
-  const sinonCallback = wrapper.unrendered.props.onUpdateFilters
-  ok(sinonCallback.callCount === 4)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'last_login', order: 'asc', role_filter_id: undefined}))
-});
+    test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, function() {
+      const sortSpy = this.spy()
+      const wrapper = shallow(<UsersList {...{
+        ...props,
+        onUpdateFilters: sortSpy
+      }} />)
+      const header = wrapper.findWhere(n => n.text() === label).first().parents('Tooltip')
+      header.simulate('click')
+      ok(sortSpy.calledOnce)
+      ok(sortSpy.calledWith({
+        search_term: 'User',
+        sort: columnID,
+        order: (sortOrder === 'asc' ? 'desc' : 'asc'),
+        role_filter_id: undefined
+      }))
+    })
+  })
+})

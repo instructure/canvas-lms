@@ -232,6 +232,11 @@
 #           "example": ["multiple_choice", "essay"],
 #           "type": "array",
 #           "items": {"type": "string"}
+#         },
+#         "anonymous_submissions": {
+#           "description": "Whether survey submissions will be kept anonymous (only applicable to 'graded_survey', 'survey' quiz types)",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -290,7 +295,7 @@ class Quizzes::QuizzesApiController < ApplicationController
 
   # @API List quizzes in a course
   #
-  # Returns the list of Quizzes in this course.
+  # Returns the paginated list of Quizzes in this course.
   #
   # @argument search_term [String]
   #   The partial title of the quizzes to match and return.

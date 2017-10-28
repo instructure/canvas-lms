@@ -41,7 +41,7 @@ define([
 
   test('#selectDefaultGradebook calls setLocation', function () {
     this.wrapper.find('select').simulate('change', { target: { value: 'default-gradebook' } });
-    const url = `${this.wrapper.props().courseUrl}/gradebook/change_gradebook_version?version=gradezilla`;
+    const url = `${this.wrapper.props().courseUrl}/gradebook/change_gradebook_version?version=default`;
     ok(this.setLocationStub.withArgs(url).calledOnce);
   });
 

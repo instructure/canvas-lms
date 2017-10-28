@@ -97,6 +97,23 @@ describe Api::V1::User do
           'short_name' => 'User',
           'sis_user_id' => 'xyz',
           'integration_id' => nil,
+          'login_id' => 'xyz'
+        })
+    end
+
+    it 'should return SIS login when setting is set' do
+      @user = User.create!(name: 'User')
+      Account.default.settings['return_sis_login_id'] = 'true'
+      Account.default.save!
+      @user.pseudonyms.create!(unique_id: 'xyz', account: Account.default) { |p| p.sis_user_id = 'xyz' }
+      expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
+          'name' => 'User',
+          'sortable_name' => 'User',
+          'sis_import_id' => nil,
+          'id' => @user.id,
+          'short_name' => 'User',
+          'sis_user_id' => 'xyz',
+          'integration_id' => nil,
           'login_id' => 'xyz',
           'sis_login_id' => 'xyz'
         })
@@ -118,8 +135,7 @@ describe Api::V1::User do
         'short_name' => 'User',
         'sis_user_id' => 'xyz',
         'integration_id' => nil,
-        'login_id' => 'xyz',
-        'sis_login_id' => 'xyz'
+        'login_id' => 'xyz'
       })
     end
 
@@ -140,8 +156,7 @@ describe Api::V1::User do
         'short_name' => 'User',
         'sis_user_id' => 'xyz',
         'integration_id' => nil,
-        'login_id' => 'xyz',
-        'sis_login_id' => 'xyz'
+        'login_id' => 'xyz'
       })
 
       expect(@test_api.user_json(student, teacher, {}, [], course2)).to eq({
@@ -172,8 +187,7 @@ describe Api::V1::User do
         'short_name' => 'User',
         'sis_user_id' => 'xyz',
         'integration_id' => nil,
-        'login_id' => 'xyz',
-        'sis_login_id' => 'xyz'
+        'login_id' => 'xyz'
       })
 
       expect(@test_api.user_json(student, teacher, {}, [], group2)).to eq({
@@ -201,8 +215,7 @@ describe Api::V1::User do
           'short_name' => 'User',
           'sis_user_id' => 'xyz',
           'integration_id' => nil,
-          'login_id' => 'xyz',
-          'sis_login_id' => 'xyz'
+          'login_id' => 'xyz'
         })
     end
 
@@ -221,7 +234,6 @@ describe Api::V1::User do
           'id' => @user.id,
           'short_name' => 'User',
           'login_id' => 'abc',
-          'sis_login_id' => 'abc',
           'sis_user_id' => 'a',
           'integration_id' => nil,
           'root_account' => 'school1',
@@ -242,7 +254,6 @@ describe Api::V1::User do
           'short_name' => 'User',
           'integration_id' => nil,
           'sis_import_id' => nil,
-          'sis_login_id' => 'xyz',
           'sis_user_id' => nil,
           'login_id' => 'xyz',
         })
@@ -292,7 +303,6 @@ describe Api::V1::User do
                       "sis_user_id"=>"sis-user-id",
                       "integration_id" => nil,
                       "sis_import_id"=>@student.pseudonym.sis_batch_id,
-                      "sis_login_id"=>"pvuser@example.com",
                       "login_id" => "pvuser@example.com"
       })
     end
@@ -481,7 +491,6 @@ describe "Users API", type: :request do
          'short_name' => @other_user.short_name,
          'sis_user_id' => @other_user.pseudonym.sis_user_id,
          'integration_id' => nil,
-         'sis_login_id' => @other_user.pseudonym.sis_user_id,
          'login_id' => @other_user.pseudonym.unique_id,
          'locale' => nil,
          'permissions' => {'can_update_name' => true, 'can_update_avatar' => false}
@@ -537,7 +546,6 @@ describe "Users API", type: :request do
           'short_name' => user.short_name,
           'sis_user_id' => user.pseudonym.sis_user_id,
           'integration_id' => nil,
-          'sis_login_id' => user.pseudonym.sis_user_id,
           'login_id' => user.pseudonym.unique_id
         }]
       end
@@ -686,7 +694,6 @@ describe "Users API", type: :request do
             "sortable_name" => "",
             "short_name"    => "",
             "sis_import_id" => nil,
-            "sis_login_id"  => "bademail@",
             "sis_user_id"   => nil,
             "login_id"      => "bademail@",
             "locale"        => nil
@@ -738,7 +745,6 @@ describe "Users API", type: :request do
           "sis_user_id"      => "12345",
           "sis_import_id"    => user.pseudonym.sis_batch_id,
           "login_id"         => "test@example.com",
-          "sis_login_id"     => "test@example.com",
           "integration_id"   => nil,
           "locale"           => "en",
           "confirmation_url" => user.communication_channels.email.first.confirmation_url
@@ -1103,7 +1109,6 @@ describe "Users API", type: :request do
           'integration_id' => nil,
           'login_id' => 'student@example.com',
           'email' => 'somenewemail@example.com',
-          'sis_login_id' => 'student@example.com',
           'locale' => 'en',
           'time_zone' => "Tijuana"
         })

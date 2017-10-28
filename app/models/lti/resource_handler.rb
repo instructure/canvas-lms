@@ -49,21 +49,5 @@ module Lti
       possible_handlers = ResourceHandler.by_product_family(product_families, context)
       possible_handlers.select { |rh| rh.resource_type_code == resource_type_code}
     end
-
-    def find_or_create_tool_setting(context: nil, resource_url: nil, link_fragment: nil)
-      context ||= tool_proxy.context
-      mh = message_handlers.find_by(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
-      resource_link_id = mh.build_resource_link_id(context: context, link_fragment: link_fragment)
-
-      tool_setting = Lti::ToolSetting.find_by(resource_link_id: resource_link_id)
-      tool_setting ||= ToolSetting.new
-      tool_setting.update_attributes(resource_link_id: resource_link_id,
-                                     context: context,
-                                     product_code: tool_proxy.product_family.product_code,
-                                     vendor_code: tool_proxy.product_family.vendor_code,
-                                     resource_type_code: resource_type_code,
-                                     resource_url: resource_url)
-      tool_setting
-    end
   end
 end

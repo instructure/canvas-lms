@@ -65,6 +65,17 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     )
   end
 
+  def self.by_tool_proxy(tool_proxy)
+    message_handler = tool_proxy.resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
+      mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
+    end
+    where(
+      tool_product_code: tool_proxy.product_family.product_code,
+      tool_vendor_code: tool_proxy.product_family.vendor_code,
+      tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
+    ).preload(:assignment).map(&:assignment)
+  end
+
   private
 
   def create_subscription

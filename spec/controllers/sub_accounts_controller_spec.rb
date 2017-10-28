@@ -120,6 +120,23 @@ describe SubAccountsController do
       expect(@accounts[sub_account_5.id][:sub_account_count]).to eq 150
       expect(@accounts[sub_account_2.id][:sub_account_ids]).to eq []
     end
+
+    it "should include a root account when searching if requested" do
+      root_account = Account.create(name: 'account')
+      sub_account = root_account.sub_accounts.create!(name: 'sub account')
+      account_admin_user(active_all: true, account: root_account)
+      user_session(@user)
+
+      get 'index', params: {:account_id => root_account.id, :term => "Acc"}, format: :json
+      res = json_parse
+      expect(res.count).to eq 1
+      expect(res.first["id"]).to eq sub_account.id
+
+      get 'index', params: {:account_id => root_account.id, :term => "Acc", :include_self => "1"}, format: :json
+      res = json_parse
+      expect(res.count).to eq 2
+      expect(res.map{|r| r["id"]}).to match_array [root_account.id, sub_account.id]
+    end
   end
 
   describe "DELETE 'destroy'" do

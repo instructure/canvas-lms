@@ -218,9 +218,12 @@ class Attachment < ActiveRecord::Base
 
     # try an infer encoding if it would be useful to do so
     send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
-    if respond_to?(:process_attachment, true) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
-      self.class.attachment_options[:thumbnails].each do |suffix, size|
-        send_later_if_production_enqueue_args(:create_thumbnail_size, {:singleton => "attachment_thumbnail_#{self.global_id}_#{suffix}"}, suffix)
+    if respond_to?(:process_attachment, true)
+      automatic_thumbnail_sizes.each do |suffix|
+        send_later_if_production_enqueue_args(
+          :create_thumbnail_size,
+          {singleton: "attachment_thumbnail_#{global_id}_#{suffix}"},
+          suffix)
       end
     end
   end
@@ -745,7 +748,7 @@ class Attachment < ActiveRecord::Base
    end
   end
 
-  def authenticated_url(*thumbnail, **options)
+  def authenticated_url(**options)
     if InstFS.enabled? && self.instfs_uuid
       InstFS.authenticated_url(self, options)
     else
@@ -753,8 +756,24 @@ class Attachment < ActiveRecord::Base
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
-      self.authenticated_s3_url(*thumbnail, **options)
+      self.authenticated_s3_url(**options)
     end
+  end
+
+  def stored_locally?
+    # if the file exists in inst-fs, it won't be in local storage even if
+    # that's what Canvas otherwise thinks it's configured for
+    return false if instfs_uuid
+    Attachment.local_storage?
+  end
+
+  def can_be_proxied?
+    # we don't support proxying from instfs yet (no equivalent to
+    # s3object.get.body)
+    return false if instfs_uuid
+    mime_class == 'html' && size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
+    mime_class == 'flash' && size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
+    content_type == 'text/css' && size < Setting.get('max_css_proxy_size', 64 * 1024).to_i
   end
 
   def local_storage_path
@@ -794,13 +813,23 @@ class Attachment < ActiveRecord::Base
     store.open(opts, &block)
   end
 
-  # you should be able to pass an optional width, height, and page_number/video_seconds to this method
-  # can't handle arbitrary thumbnails for our attachment_fu thumbnails on s3 though, we could handle a couple *predefined* sizes though
+  def has_thumbnail?
+    if InstFS.enabled? && instfs_uuid
+      thumbnailable?
+    else
+      thumbnailable? && !thumbnail.nil?
+    end
+  end
+
+  # you should be able to pass an optional width, height, and page_number/video_seconds to this method for media objects
+  # you should be able to pass an optional size (e.g. '64x64') to this method for other thumbnailable content types
   def thumbnail_url(options={})
     return nil if Attachment.skip_thumbnails
 
     geometry = options[:size]
-    if self.thumbnail || geometry.present?
+    if InstFS.enabled? && instfs_uuid && thumbnailable?
+      InstFS.authenticated_thumbnail_url(self, geometry: geometry)
+    elsif self.thumbnail || geometry.present?
       to_use = thumbnail_for_size(geometry) || self.thumbnail
       to_use.cached_s3_url
     elsif self.media_object && self.media_object.media_id
@@ -932,7 +961,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def url_ttl
-    Setting.get('attachment_url_ttl', 1.day.to_s).to_i
+    default = Setting.get('attachment_url_ttl', 1.day.to_s).to_i.seconds
+    Account.find_cached(root_account_id)&.settings[:s3_url_ttl_seconds]&.to_i&.seconds || default
   end
   protected :url_ttl
 
@@ -1324,6 +1354,14 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def destroy_permanently_plus
+    unless root_attachment_id
+      make_childless
+      destroy_content
+    end
+    destroy_permanently!
+  end
+
   def make_childless(preferred_child = nil)
     return if root_attachment_id
     child = preferred_child || children.take
@@ -1555,7 +1593,6 @@ class Attachment < ActiveRecord::Base
 
   scope :uploadable, -> { where(:workflow_state => 'pending_upload') }
   scope :active, -> { where(:file_state => 'available') }
-  scope :thumbnailable?, -> { where(:content_type => AttachmentFu.content_types) }
   scope :by_display_name, -> { order(display_name_order_by_clause('attachments')) }
   scope :by_position_then_display_name, -> { order("attachments.position, #{display_name_order_by_clause('attachments')}") }
   def self.serialization_excludes; [:uuid, :namespace]; end
@@ -1583,6 +1620,20 @@ class Attachment < ActiveRecord::Base
     end
     new_name
   end
+
+  # the list of thumbnail sizes to be pre-generated automatically
+  def self.automatic_thumbnail_sizes
+    attachment_options[:thumbnails].keys
+  end
+
+  def automatic_thumbnail_sizes
+    if thumbnailable? && instfs_uuid.nil?
+      self.class.automatic_thumbnail_sizes
+    else
+      []
+    end
+  end
+  protected :automatic_thumbnail_sizes
 
   DYNAMIC_THUMBNAIL_SIZES = %w(640x>)
 

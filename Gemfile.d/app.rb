@@ -18,7 +18,7 @@
 if CANVAS_RAILS5_0
   gem 'rails', '5.0.4'
 else
-  gem 'rails', '5.1.3'
+  gem 'rails', '5.1.4'
 end
 
 gem 'rack', '2.0.3'
@@ -37,7 +37,7 @@ gem 'authlogic', '3.6.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.11.3'
+gem 'switchman', '1.11.4'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -88,7 +88,7 @@ gem 'oauth', '0.5.3', require: false
 gem 'parallel', '1.12.0', require: false
   gem 'ruby-progressbar', '1.8.1', require: false #used to show progress of S3Uploader
 gem 'retriable', '1.4.1'
-gem 'rake', '12.0.0'
+gem 'rake', '12.1.0'
 gem 'ratom-nokogiri', '0.10.6', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
@@ -158,6 +158,6 @@ gem 'multipart', path: 'gems/multipart'
 gem 'paginated_collection', path: 'gems/paginated_collection'
 gem 'stringify_ids', path: 'gems/stringify_ids'
 gem 'twitter', path: 'gems/twitter'
-gem 'vericite_api', '1.5.1'
+gem 'vericite_api', '1.5.3'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'

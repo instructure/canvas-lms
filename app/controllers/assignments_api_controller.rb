@@ -546,7 +546,7 @@
 #           "items": { "$ref": "AssignmentOverride" }
 #         },
 #         "omit_from_final_grade": {
-#           "description": "(Optional) If true, the assignment will be ommitted from the student's final grade",
+#           "description": "(Optional) If true, the assignment will be omitted from the student's final grade",
 #           "example": true,
 #           "type": "boolean"
 #         }
@@ -560,7 +560,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::AssignmentOverride
 
   # @API List assignments
-  # Returns the list of assignments for the current context.
+  # Returns the paginated list of assignments for the current context.
   # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
@@ -581,7 +581,7 @@ class AssignmentsApiController < ApplicationController
   end
 
   # @API List assignments for user
-  # Returns the list of assignments for the specified user if the current user has rights to view.
+  # Returns the paginated list of assignments for the specified user if the current user has rights to view.
   # See {api:AssignmentsApiController#index List assignments} for valid arguments.
   def user_index
     @user.shard.activate do
@@ -602,15 +602,10 @@ class AssignmentsApiController < ApplicationController
       return render json: { error: 'quiz duplication not implemented' }, status: :bad_request
     end
 
-    if old_assignment.discussion_topic
-      return render json: { error: 'discussion topic duplication not implemented' }, status: :bad_request
-    end
-
     return unless authorized_action(old_assignment, @current_user, :create)
 
-    new_assignment = old_assignment.duplicate
-    # insert_at seems to do the right thing only on already saved entities, so
-    # save than insert into the proper position.
+    new_assignment = old_assignment.duplicate({ :user => @current_user })
+
     new_assignment.save!
     new_assignment.insert_at(old_assignment.position + 1)
     if new_assignment

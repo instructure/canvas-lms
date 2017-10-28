@@ -216,12 +216,25 @@ class Gradezilla
       f(expanded_popover_menu_selector)
     end
 
+    def grades_uploaded_data
+      f('#gradebook_upload_uploaded_data')
+    end
+
+    def grades_new_upload
+      f('#new_gradebook_upload')
+    end
+
     # actions
     def visit(course)
       Account.default.enable_feature!(:new_gradebook)
-      get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
+      get "/courses/#{course.id}/gradebook/change_gradebook_version?version=default"
       # the pop over menus is too lengthy so make screen bigger
       make_full_screen
+    end
+
+    def visit_upload(course)
+      Account.default.enable_feature!(:new_gradebook)
+      get "/courses/#{course.id}/gradebook_uploads/new"
     end
 
     def select_total_column_option(menu_item_id = nil, already_open: false)
@@ -318,10 +331,6 @@ class Gradezilla
 
     def select_menu_item(name)
       menu_item(name).click
-    end
-
-    def select_action_menu_item(name)
-      action_menu_item(name).click
     end
 
     def action_menu_item_selector(name)

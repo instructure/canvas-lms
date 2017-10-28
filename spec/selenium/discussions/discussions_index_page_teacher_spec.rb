@@ -244,9 +244,9 @@ describe "discussions" do
             topic = topics[2-n]
             fj("[data-id=#{topic.id}] .al-trigger").click
             fj('.icon-updown:visible').click
-            click_option '.ui-dialog:visible select', "-- At the bottom --"
-            fj('.ui-dialog:visible .btn-primary').click
-            wait_for_ajaximations
+            click_option 'select', "At the bottom"
+            fj('button', '.move-item-tray__button-container').click
+            expect(f('body')).not_to contain_css('.move-item-tray')
             topics.each(&:reload)
           end
           expect(topics.map(&:position)).to eq [4, 3, 2, 1]
@@ -263,8 +263,10 @@ describe "discussions" do
 
           fj("[data-id=#{topic.id}] .al-trigger").click
           fj('.icon-updown:visible').click
-          click_option '.ui-dialog:visible select', topics[2].title
-          fj('.ui-dialog:visible .btn-primary').click
+          fj('select')
+          click_option 'select', "Before..."
+          click_option 'select:nth(1)', topics[2].title
+          fj('button', '.move-item-tray__button-container').click
           wait_for_ajaximations
           topics.each &:reload
           expect(topics.map(&:position)).to eq [2, 1, 3]

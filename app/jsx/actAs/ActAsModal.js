@@ -41,9 +41,11 @@ export default class ActAsModal extends React.Component {
       avatar_image_url: React.PropTypes.string,
       sortable_name: React.PropTypes.string,
       email: React.PropTypes.string,
-      login_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-      sis_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-      integration_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string])
+      pseudonyms: React.PropTypes.arrayOf(React.PropTypes.shape({
+        login_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+        sis_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+        integration_id: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string])
+      }))
     }).isRequired
   }
 
@@ -93,29 +95,39 @@ export default class ActAsModal extends React.Component {
     this.setState({isLoading: true})
   }
 
-  renderUserTable () {
-    const user = this.props.user
+  renderInfoTable (caption, renderRows) {
     return (
-      <Table caption={<ScreenReaderContent>{I18n.t('User details')}</ScreenReaderContent>}>
+      <Table caption={<ScreenReaderContent>{caption}</ScreenReaderContent>}>
         <thead>
           <tr>
             <th><ScreenReaderContent>{I18n.t('Category')}</ScreenReaderContent></th>
             <th><ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent></th>
           </tr>
         </thead>
-        <tbody>
-          {this.renderUserRow(I18n.t('Full Name:'), user.name)}
-          {this.renderUserRow(I18n.t('Display Name:'), user.short_name)}
-          {this.renderUserRow(I18n.t('Sortable Name:'), user.sortable_name)}
-          {this.renderUserRow(I18n.t('Default Email:'), user.email)}
-          {this.renderUserRow(I18n.t('Login ID:'), user.login_id)}
-          {this.renderUserRow(I18n.t('SIS ID:'), user.sis_id)}
-          {this.renderUserRow(I18n.t('Integration ID:'), user.integration_id)}
-        </tbody>
+        {renderRows()}
       </Table>
-
     )
   }
+
+  renderUserInfoRows = () => {
+    const user = this.props.user
+    return (
+      <tbody>
+        {this.renderUserRow(I18n.t('Full Name:'), user.name)}
+        {this.renderUserRow(I18n.t('Display Name:'), user.short_name)}
+        {this.renderUserRow(I18n.t('Sortable Name:'), user.sortable_name)}
+        {this.renderUserRow(I18n.t('Default Email:'), user.email)}
+      </tbody>
+    )
+  }
+
+  renderLoginInfoRows = pseudonym => (
+    <tbody>
+      {this.renderUserRow(I18n.t('Login ID:'), pseudonym.login_id)}
+      {this.renderUserRow(I18n.t('SIS ID:'), pseudonym.sis_id)}
+      {this.renderUserRow(I18n.t('Integration ID:'), pseudonym.integration_id)}
+    </tbody>
+  )
 
   renderUserRow (category, info) {
     return (
@@ -220,8 +232,19 @@ export default class ActAsModal extends React.Component {
                       as="div"
                       textAlign="center"
                     >
-                      {this.renderUserTable()}
+                      {this.renderInfoTable(I18n.t('User details'), this.renderUserInfoRows)}
                     </Container>
+                    {user.pseudonyms.map(pseudonym => (
+                        <Container
+                          as="div"
+                          textAlign="center"
+                          margin="large 0 0 0"
+                          key={pseudonym.login_id}
+                        >
+                          {this.renderInfoTable(I18n.t('Login info'), () => this.renderLoginInfoRows(pseudonym))}
+                        </Container>
+                      )
+                    )}
                     <Container
                       as="div"
                       textAlign="center"

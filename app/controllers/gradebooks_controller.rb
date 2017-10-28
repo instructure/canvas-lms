@@ -181,42 +181,13 @@ class GradebooksController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
       set_current_grading_period if grading_periods?
-      set_js_env
+      set_gradebook_env
       set_tutorial_js_env
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
-      version = @current_user.preferred_gradebook_version
-      if @context.feature_enabled?(:new_gradebook)
-        if Rails.env.development?
-          # params[:version] is a temporary gradezilla feature to help devs flip back and forth
-          # between gradebook versions. This param should never be used in the UI.
-          case params[:version]
-          when 'srgb'
-            render :screenreader and return
-          when '2'
-            render :gradebook and return
-          when 'gradezilla-individual'
-            render 'gradebooks/gradezilla/individual' and return
-          when 'gradezilla-gradebook'
-            render 'gradebooks/gradezilla/gradebook' and return
-          else # fallback to the current user's preferences hash
-            render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
-            render 'gradebooks/gradezilla/gradebook' and return
-          end
-        else
-          render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
-          render 'gradebooks/gradezilla/gradebook' and return
-        end
-      else
-        render :screenreader and return if individual_view?(version)
-        render :gradebook and return
-      end
+      render_gradebook
     end
-  end
-
-  def individual_view?(version)
-    %w(individual srgb).include?(version)
   end
 
   def post_grades_ltis
@@ -313,7 +284,7 @@ class GradebooksController < ApplicationController
     @agp_json ||= GradingPeriod.periods_json(active_grading_periods, @current_user)
   end
 
-  def set_js_env
+  def old_gradebook_env
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
@@ -324,7 +295,7 @@ class GradebooksController < ApplicationController
                    Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
                  end
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
-    env = {
+    {
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: chunk_size,
@@ -410,7 +381,7 @@ class GradebooksController < ApplicationController
         gradebook_column_order_settings_url: save_gradebook_column_order_course_gradebook_url,
         post_grades_ltis: post_grades_ltis,
         post_grades_feature: post_grades_feature?,
-        sections: sections_json(@context.active_course_sections, @current_user, session),
+        sections: sections_json(@context.active_course_sections, @current_user, session, [], allow_sis_ids: true),
         settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
         settings: gradebook_settings.fetch(@context.id, {}),
         login_handle_name: @context.root_account.settings[:login_handle_name],
@@ -418,8 +389,15 @@ class GradebooksController < ApplicationController
         version: params.fetch(:version, nil)
       }
     }
+  end
 
-    env = new_gradebook_env(env) if @context.feature_enabled?(:new_gradebook)
+  def set_gradebook_env
+    env = old_gradebook_env
+
+    if new_gradebook_enabled?
+      env = env.deep_merge(new_gradebook_env)
+    end
+
     js_env(env)
   end
 
@@ -431,24 +409,15 @@ class GradebooksController < ApplicationController
 
   def history
     if authorized_action(@context, @current_user, :manage_grades)
-      return new_history if @context.root_account.feature_enabled?(:new_gradebook_history)
+      crumbs.delete_if { |crumb| crumb[0] == "Grades" }
+      add_crumb(t("Gradebook History"),
+                context_url(@context, controller: :gradebooks, action: :history))
+      @page_title = t("Gradebook History")
+      @body_classes << "full-width padless-content"
+      js_bundle :gradebook_history
+      js_env({})
 
-      #
-      # Temporary disabling of this page for large courses
-      # We need some reworking of the gradebook history to allow using it
-      # in large courses in a performant manner. Until that happens, we're
-      # disabling it over a certain threshold.
-      #
-      submissions_count = @context.submissions.not_placeholder.count
-      submissions_limit = Setting.get('gradebook_history_submission_count_threshold', '0').to_i
-      if submissions_limit == 0 || submissions_count <= submissions_limit
-        # TODO this whole thing could go a LOT faster if you just got ALL the versions of ALL the submissions in this course then did a ruby sort_by day then grader
-        @days = SubmissionList.days(@context)
-      end
-
-      respond_to do |format|
-        format.html
-      end
+      render html: "", layout: true
     end
   end
 
@@ -735,70 +704,74 @@ class GradebooksController < ApplicationController
 
   private
 
-  def new_gradebook_env(env)
-    development_mode_enabled = !!ENV['GRADEBOOK_DEVELOPMENT']
+  def new_gradebook_env
     graded_late_or_missing_submissions_exist =
-      development_mode_enabled &&
+      new_gradebook_development_enabled? &&
       (@context.submissions.graded.late.exists? || @context.submissions.graded.missing.exists?)
 
-    options = {
-      colors: gradebook_settings.fetch(:colors, {}),
-      graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
-      gradezilla: true,
-      new_gradebook_development_enabled: development_mode_enabled,
-      late_policy: @context.late_policy.as_json(include_root: false)
+    {
+      GRADEBOOK_OPTIONS: {
+        colors: gradebook_settings.fetch(:colors, {}),
+        graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
+        gradezilla: true,
+        new_gradebook_development_enabled: new_gradebook_development_enabled?,
+        late_policy: @context.late_policy.as_json(include_root: false)
+      }
     }
-    env.deep_merge({ GRADEBOOK_OPTIONS: options })
   end
 
-  def set_gradebook_warnings(groups, assignments)
-    @assignments_in_bad_groups = Set.new
-
-    if @context.group_weighting_scheme == "percent"
-      assignments_by_group = assignments.group_by(&:assignment_group_id)
-      bad_groups = groups.select do |group|
-        group_assignments = assignments_by_group[group.id] || []
-        points_in_group = group_assignments.map(&:points_possible).compact.sum
-        points_in_group.zero?
-      end
-
-      bad_group_ids = bad_groups.map(&:id)
-      bad_assignment_ids = assignments_by_group.
-        slice(*bad_group_ids).
-        values.
-        flatten
-
-      @assignments_in_bad_groups.replace bad_assignment_ids
-
-      warning = t('invalid_assignment_groups_warning',
-                  {:one => "Score does not include %{groups} because " \
-                           "it has no points possible",
-                   :other => "Score does not include %{groups} because " \
-                           "they have no points possible"},
-                  :groups => bad_groups.map(&:name).to_sentence,
-                  :count  => bad_groups.size)
+  def gradebook_version
+    # params[:version] is a development-only convenience for engineers.
+    # This param should never be used outside of development.
+    if Rails.env.development? && params.include?(:version)
+      params[:version]
     else
-      if assignments.all? { |a| (a.points_possible || 0).zero? }
-        warning = t(:no_assignments_have_points_warning,
-                    "Can't compute score until an assignment " \
-                    "has points possible")
-      end
+      @current_user.preferred_gradebook_version
     end
-
-    js_env :total_grade_warning => warning if warning
   end
 
-  def new_history
-    # remove Grades crumb added by default in this controller
-    crumbs.delete_if { |crumb| crumb[0] == "Grades" }
-    add_crumb(t("Gradebook History"),
-              context_url(@context, controller: :gradebooks, action: :history))
-    @page_title = t("Gradebook History")
-    @body_classes << "full-width padless-content"
-    js_bundle :react_gradebook_history
-    js_env({})
+  def new_gradebook_enabled?
+    # params[:new_gradebook] is a development-only convenience for engineers.
+    # This param should never be used outside of development.
+    if Rails.env.development? && params.include?(:new_gradebook)
+      params[:new_gradebook] == "true"
+    else
+      @context.feature_enabled?(:new_gradebook)
+    end
+  end
 
-    render html: "", layout: true
+  def new_gradebook_development_enabled?
+    # params[:new_gradebook_development] is a development-only convenience for engineers.
+    # This param should never be used outside of development.
+    if Rails.env.development? && params.include?(:new_gradebook_development)
+      params[:new_gradebook_development] == "true"
+    else
+      !!ENV['GRADEBOOK_DEVELOPMENT']
+    end
+  end
+
+  def render_gradebook
+    if ["srgb", "individual"].include?(gradebook_version)
+      render_individual_gradebook
+    else
+      render_default_gradebook
+    end
+  end
+
+  def render_default_gradebook
+    if new_gradebook_enabled?
+      render "gradebooks/gradezilla/gradebook"
+    else
+      render :gradebook
+    end
+  end
+
+  def render_individual_gradebook
+    if new_gradebook_enabled?
+      render "gradebooks/gradezilla/individual"
+    else
+      render :screenreader
+    end
   end
 
   def percentage(weight)

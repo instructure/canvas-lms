@@ -18,6 +18,11 @@
 
 @import "base/environment";
 
+.users-container {
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
 #adminToolsTabPanes {
   .search-controls {
     background-color: $lightBackground;
@@ -82,3 +87,13 @@
     }
   }
 }
+
+.admin-tool-well {
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: 20px;
+  background-color: $ic-color-light;
+  border: 1px solid $ic-border-light;
+  border-radius: $ic-border-radius;
+}
+

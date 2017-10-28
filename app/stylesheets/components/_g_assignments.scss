@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@import "components/move_item_tray";
 
 $listViewHeaderBackground:      $ic-color-neutral;
 $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
@@ -244,7 +245,8 @@ $listViewHeaderBackgroundLight: $ic-bg-light-neutral;
         padding-left: 25px;
         color: #666666;
         margin-bottom: 0px;
-        @include border-top-radius(3px);
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
         .group_name {
           font-size: 1.5em;
           font-weight: bold;

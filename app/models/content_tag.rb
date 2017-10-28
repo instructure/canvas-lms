@@ -191,7 +191,7 @@ class ContentTag < ActiveRecord::Base
     if self.content_type == 'Assignment'
       self.content
     elsif can_have_assignment?
-      self.content.assignment
+      self.content&.assignment
     else
       nil
     end

@@ -212,8 +212,13 @@ module SIS
         end
 
         if blueprint_course_id && !course.deleted?
-          @blueprint_associations[blueprint_course_id] ||= []
-          @blueprint_associations[blueprint_course_id] << course_id
+          case blueprint_course_id
+          when 'dissociate'
+            MasterCourses::ChildSubscription.active.where(child_course_id: course.id).take&.destroy
+          else
+            @blueprint_associations[blueprint_course_id] ||= []
+            @blueprint_associations[blueprint_course_id] << course_id
+          end
         end
 
         course.update_enrolled_users if update_enrollments

@@ -19,17 +19,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
-import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import Button from 'instructure-ui/lib/components/Button'
+import Menu, { MenuItem } from 'instructure-ui/lib/components/Menu'
+import Typography from 'instructure-ui/lib/components/Typography'
+import IconMoveUpTopSolid from 'instructure-icons/lib/Solid/IconMoveUpTopSolid'
+import IconMoveUpSolid from 'instructure-icons/lib/Solid/IconMoveUpSolid'
+import IconMoveDownSolid from 'instructure-icons/lib/Solid/IconMoveDownSolid'
+import IconMoveDownBottomSolid from 'instructure-icons/lib/Solid/IconMoveDownBottomSolid'
 
   class DashboardCardMovementMenu extends React.Component {
 
     static propTypes = {
-      cardTitle: PropTypes.string.isRequired,
       assetString: PropTypes.string.isRequired,
       handleMove: PropTypes.func.isRequired,
+      onMenuSelect: PropTypes.func,
       menuOptions: PropTypes.shape({
         canMoveLeft: PropTypes.bool,
         canMoveRight: PropTypes.bool,
@@ -40,27 +42,15 @@ import Button from 'instructure-ui/lib/components/Button'
       currentPosition: PropTypes.number
     };
 
+    static defaultProps = {
+      onMenuSelect: () => {},
+      lastPosition: 0,
+      currentPosition: 0
+    }
+
     handleMoveCard = positionToMoveTo => () => this.props.handleMove(this.props.assetString, positionToMoveTo);
 
     render () {
-      const menuLabel = (
-        <div>
-          <ScreenReaderContent>
-            {I18n.t('Card Movement Menu for %{title}', { title: this.props.cardTitle })}
-          </ScreenReaderContent>
-          <i className="icon-more" />
-        </div>
-      );
-
-      const popoverTrigger = (
-        <Button
-          variant="icon-inverse"
-          size="small"
-        >
-          {menuLabel}
-        </Button>
-      );
-
       const {
         canMoveLeft,
         canMoveRight,
@@ -69,43 +59,48 @@ import Button from 'instructure-ui/lib/components/Button'
       } = this.props.menuOptions;
 
       return (
-        <div className="DashboardCardMovementMenu">
-          <PopoverMenu
-            trigger={popoverTrigger}
-          >
-            {!!canMoveLeft && (
-              <MenuItem
-                onSelect={this.handleMoveCard(this.props.currentPosition - 1)}
-              >
-                {I18n.t('Move Left')}
-              </MenuItem>
-            )}
-            {!!canMoveRight && (
-              <MenuItem
-                onSelect={this.handleMoveCard(this.props.currentPosition + 1)}
-              >
-                {I18n.t('Move Right')}
-              </MenuItem>
-            )}
-            {(!!canMoveToBeginning || !!canMoveToEnd) && (
-              <MenuItemSeparator />
-            )}
-            {!!canMoveToBeginning && (
-              <MenuItem
-                onSelect={this.handleMoveCard(0)}
-              >
-                {I18n.t('Move to the Beginning')}
-              </MenuItem>
-            )}
-            {!!canMoveToEnd && (
-              <MenuItem
-                onSelect={this.handleMoveCard(this.props.lastPosition)}
-              >
-                {I18n.t('Move to the End')}
-              </MenuItem>
-            )}
-          </PopoverMenu>
-        </div>
+        <Menu onSelect={this.props.onMenuSelect}>
+          {!!canMoveToBeginning && (
+            <MenuItem
+              onSelect={this.handleMoveCard(0)}
+            >
+              <span className="DashboardCardMenu__MovementItem">
+                <IconMoveUpTopSolid className="DashboardCardMenu__MovementIcon" />
+                <Typography weight="bold" size="small">{I18n.t('Top')}</Typography>
+              </span>
+            </MenuItem>
+          )}
+          {!!canMoveLeft && (
+            <MenuItem
+              onSelect={this.handleMoveCard(this.props.currentPosition - 1)}
+            >
+              <span className="DashboardCardMenu__MovementItem">
+                <IconMoveUpSolid className="DashboardCardMenu__MovementIcon" />
+                <Typography weight="bold" size="small">{I18n.t('Ahead')}</Typography>
+              </span>
+            </MenuItem>
+          )}
+          {!!canMoveRight && (
+            <MenuItem
+              onSelect={this.handleMoveCard(this.props.currentPosition + 1)}
+            >
+              <span className="DashboardCardMenu__MovementItem">
+                <IconMoveDownSolid className="DashboardCardMenu__MovementIcon" />
+                <Typography weight="bold" size="small">{I18n.t('Behind')}</Typography>
+              </span>
+            </MenuItem>
+          )}
+          {!!canMoveToEnd && (
+            <MenuItem
+              onSelect={this.handleMoveCard(this.props.lastPosition)}
+            >
+              <span className="DashboardCardMenu__MovementItem">
+                <IconMoveDownBottomSolid className="DashboardCardMenu__MovementIcon"/>
+                <Typography weight="bold" size="small">{I18n.t('Bottom')}</Typography>
+              </span>
+            </MenuItem>
+          )}
+        </Menu>
       );
     }
   }

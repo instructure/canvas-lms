@@ -113,9 +113,9 @@ class AccountsController < ApplicationController
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
 
   # @API List accounts
-  # List accounts that the current user can view or manage.  Typically,
-  # students and even teachers will get an empty list in response, only
-  # account admins can view the accounts that they are in.
+  # A paginated list of accounts that the current user can view or manage.
+  # Typically, students and even teachers will get an empty list in response,
+  # only account admins can view the accounts that they are in.
   #
   # @argument include[] [String, "lti_guid"|"registration_settings"|"services"]
   #   Array of additional information to include.
@@ -146,8 +146,8 @@ class AccountsController < ApplicationController
   end
 
   # @API List accounts for course admins
-  # List accounts that the current user can view through their admin course enrollments.
-  # (Teacher, TA, or designer enrollments).
+  # A paginated list of accounts that the current user can view through their
+  # admin course enrollments. (Teacher, TA, or designer enrollments).
   # Only returns "id", "name", "workflow_state", "root_account_id" and "parent_account_id"
   #
   # @returns [Account]
@@ -275,7 +275,7 @@ class AccountsController < ApplicationController
   include Api::V1::Course
 
   # @API List active courses in an account
-  # Retrieve the list of courses in this account.
+  # Retrieve a paginated list of courses in this account.
   #
   # @argument with_enrollments [Boolean]
   #   If true, include only courses with at least one enrollment.  If false,
@@ -378,6 +378,10 @@ class AccountsController < ApplicationController
               "(SELECT #{name_col} FROM #{Account.quoted_table_name}
                 WHERE #{Account.quoted_table_name}.id
                 = #{Course.quoted_table_name}.account_id)"
+            elsif params[:sort] == 'term'
+              "(SELECT #{EnrollmentTerm.quoted_table_name}.name FROM #{EnrollmentTerm.quoted_table_name}
+                WHERE #{EnrollmentTerm.quoted_table_name}.id
+                = #{Course.quoted_table_name}.enrollment_term_id)"
             else
               "id"
             end

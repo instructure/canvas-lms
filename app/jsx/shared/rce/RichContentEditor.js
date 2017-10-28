@@ -45,6 +45,7 @@ function loadLegacyTinyMCE (callback) {
     legacyTinyMCELoaded = true
     require('tinymce.editor_box')
     require('compiled/tinymce')
+    require('./initA11yChecker')
     callback()
   }, 'legacyTinymceAsyncChunk')
 }
@@ -197,14 +198,6 @@ const RichContentEditor = {
       if (tinyMCEInitOptions.manageParent) {
         delete tinyMCEInitOptions.manageParent
         establishParentNode($target)
-      }
-
-      const originalOnFocus = tinyMCEInitOptions.onFocus
-      tinyMCEInitOptions.onFocus = (editor) => {
-        this.activateRCE($target)
-        if (typeof originalOnFocus === 'function') {
-          originalOnFocus(editor)
-        }
       }
 
       loadServiceRCE($target, tinyMCEInitOptions, callback)

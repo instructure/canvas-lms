@@ -43,38 +43,38 @@ describe 'Grade Detail Tray:' do
 
     after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
-    it 'missing submission has missing-radiobutton selected' do
-      Gradezilla::Cells.open_tray(@course.students[0], @a2)
+    it 'missing submission has missing-radiobutton selected', priority: "1", test_id: 3337205 do
+      Gradezilla::Cells.open_tray(@course.students.first, @a2)
 
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('missing')).to be true
     end
 
-    it 'on-time submission has none-radiobutton selected' do
-      Gradezilla::Cells.open_tray(@course.students[0], @a3)
+    it 'on-time submission has none-radiobutton selected', priority: "1", test_id: 3337203 do
+      Gradezilla::Cells.open_tray(@course.students.first, @a3)
 
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('none')).to be true
     end
 
-    it 'excused submission has excused-radiobutton selected' do
-      Gradezilla::Cells.open_tray(@course.students[0], @a4)
+    it 'excused submission has excused-radiobutton selected', priority: "1", test_id: 3337204 do
+      Gradezilla::Cells.open_tray(@course.students.first, @a4)
 
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('excused')).to be true
     end
 
-    it 'updates status when excused-option is selected' do
-      Gradezilla::Cells.open_tray(@course.students[0], @a2)
+    it 'updates status when excused-option is selected', priority: "1", test_id: 3337207 do
+      Gradezilla::Cells.open_tray(@course.students.first, @a2)
       Gradezilla::GradeDetailTray.change_status_to('excused')
 
-      excuse_status = @course.students[0].submissions.find_by(assignment_id:@a2.id).excused
+      excuse_status = @course.students.first.submissions.find_by(assignment_id:@a2.id).excused
 
       expect(excuse_status).to be true
     end
 
-    it 'updates status when none-option is selected' do
-      Gradezilla::Cells.open_tray(@course.students[0], @a2)
+    it 'updates status when none-option is selected', priority: "1", test_id: 3337208 do
+      Gradezilla::Cells.open_tray(@course.students.first, @a2)
       Gradezilla::GradeDetailTray.change_status_to('none')
 
-      late_policy_status = @course.students[0].submissions.find_by(assignment_id:@a2.id).late_policy_status
+      late_policy_status = @course.students.first.submissions.find_by(assignment_id:@a2.id).late_policy_status
 
       expect(late_policy_status).to eq 'none'
     end
@@ -85,37 +85,38 @@ describe 'Grade Detail Tray:' do
       ENV["GRADEBOOK_DEVELOPMENT"] = 'true'
       user_session(@teacher)
       Gradezilla.visit(@course)
-      Gradezilla::Cells.open_tray(@course.students[0], @a1)
+      Gradezilla::Cells.open_tray(@course.students.first, @a1)
     end
 
     after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
-    it 'late submission has late-radiobutton selected', test_id: 3196973, priority: '1' do
+    it 'late submission has late-radiobutton selected', test_id: 3337206, priority: '1' do
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('late')).to be true
     end
 
-    it 'late submission has late-by days/hours' do
-      late_by_days_value = ((@course.students[0].submissions.find_by(assignment_id:@a1.id).seconds_late)/86400.to_f).round(2)
+    it 'late submission has late-by days/hours', test_id: 3337209, priority: '1' do
+      late_by_days_value = (@course.students.first.submissions.find_by(assignment_id:@a1.id).
+                              seconds_late/86400.to_f).round(2)
 
       expect(Gradezilla::GradeDetailTray.fetch_late_by_value.to_f).to eq late_by_days_value
     end
 
-    it 'late submission has late penalty' do
-      late_penalty_value = "-" + @course.students[0].submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
+    it 'late submission has late penalty', test_id: 3337210, priority: '1' do
+      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
 
       # the data from rails and data from ui are not in the same format
       expect(Gradezilla::GradeDetailTray.late_penalty_text.to_f.to_s).to eq late_penalty_value
     end
 
-    it 'late submission has final grade' do
-      final_grade_value = @course.students[0].submissions.find_by(assignment_id:@a1.id).published_grade
+    it 'late submission has final grade', test_id: 3337211, priority: '1' do
+      final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
 
       expect(Gradezilla::GradeDetailTray.final_grade_text).to eq final_grade_value
     end
 
-    it 'updates score when late_by value changes' do
+    it 'updates score when late_by value changes', test_id: 3337212, priority: '1' do
       Gradezilla::GradeDetailTray.edit_late_by_input(3)
-      final_grade_value = @course.students[0].submissions.find_by(assignment_id:@a1.id).published_grade
+      final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
 
       expect(final_grade_value).to eq "60"
       expect(Gradezilla::GradeDetailTray.final_grade_text).to eq "60"
@@ -128,6 +129,7 @@ describe 'Grade Detail Tray:' do
       ENV['GRADEBOOK_DEVELOPMENT'] = 'true'
       user_session(@teacher)
     end
+
     after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     context 'with default ordering' do
@@ -135,43 +137,43 @@ describe 'Grade Detail Tray:' do
         Gradezilla.visit(@course)
       end
 
-      it 'speedgrader link navigates to speedgrader page' do
+      it 'speedgrader link navigates to speedgrader page', test_id: 3337215, priority: '1' do
         Gradezilla::Cells.open_tray(@course.students[0], @a1)
         Gradezilla::GradeDetailTray.speedgrader_link.click
 
         expect(driver.current_url).to include "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
       end
 
-      it 'clicking assignment name navigates to assignment page' do
-        Gradezilla::Cells.open_tray(@course.students[0], @a1)
+      it 'clicking assignment name navigates to assignment page', test_id: 3337214, priority: '1' do
+        Gradezilla::Cells.open_tray(@course.students.first, @a1)
         Gradezilla::GradeDetailTray.assignment_link(@a1.name).click
 
         expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@a1.id}"
       end
 
-      it 'assignment right arrow loads the next assignment in the tray' do
+      it 'assignment right arrow loads the next assignment in the tray', test_id: 3337216, priority: '1' do
         Gradezilla::Cells.open_tray(@course.students[0], @a1)
         Gradezilla::GradeDetailTray.submission_tray_right_arrow_button.click
 
         expect(Gradezilla::GradeDetailTray.assignment_link(@a2.name)).to be_displayed
       end
 
-      it 'assignment left arrow loads the previous assignment in the tray' do
+      it 'assignment left arrow loads the previous assignment in the tray', test_id: 3337217, priority: '1' do
         Gradezilla::Cells.open_tray(@course.students[0], @a2)
         Gradezilla::GradeDetailTray.submission_tray_left_arrow_button.click
 
         expect(Gradezilla::GradeDetailTray.assignment_link(@a1.name)).to be_displayed
       end
 
-      it 'left arrow button is not present when leftmost assignment is selected' do
-        Gradezilla::Cells.open_tray(@course.students[0], @a1)
+      it 'left arrow button is not present when leftmost assignment is selected', test_id: 3337219, priority: '1' do
+        Gradezilla::Cells.open_tray(@course.students.first, @a1)
 
         expect(Gradezilla::GradeDetailTray.submission_tray_full_content).
           not_to contain_css(Gradezilla::GradeDetailTray.submission_tray_left_arrow_selector)
       end
 
-      it 'right arrow button is not present when rightmost assignment is selected' do
-        Gradezilla::Cells.open_tray(@course.students[0], @a4)
+      it 'right arrow button is not present when rightmost assignment is selected', test_id: 3337218, priority: '1' do
+        Gradezilla::Cells.open_tray(@course.students.first, @a4)
 
         expect(Gradezilla::GradeDetailTray.submission_tray_full_content).
           not_to contain_css(Gradezilla::GradeDetailTray.submission_tray_right_arrow_selector)
@@ -199,12 +201,44 @@ describe 'Grade Detail Tray:' do
         Gradezilla.visit(@course)
       end
 
-      it 'clicking the left arrow loads the previous assignment in the tray' do
-        Gradezilla::Cells.open_tray(@course.students[0], @a4)
+      it 'clicking the left arrow loads the previous assignment in the tray', test_id: 3337220, priority: '2' do
+        Gradezilla::Cells.open_tray(@course.students.first, @a4)
         Gradezilla::GradeDetailTray.submission_tray_left_arrow_button.click
 
         expect(Gradezilla::GradeDetailTray.assignment_link(@a3.name)).to be_displayed
       end
+    end
+  end
+
+  context "comments" do
+    let(:comment_1) { "You are late1" }
+    let(:comment_2) {"You are also late2"}
+
+    before(:each) do
+      ENV['GRADEBOOK_DEVELOPMENT'] = 'true'
+      user_session(@teacher)
+
+      submission_comment_model({author: @teacher,
+                                submission: @a1.find_or_create_submission(@course.students.first),
+                                comment: comment_1})
+      Gradezilla.visit(@course)
+    end
+
+    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
+
+    it "add a comment", test_id: 3339965, priority: '1' do
+      Gradezilla::Cells.open_tray(@course.students.first, @a1)
+      Gradezilla::GradeDetailTray.add_new_comment(comment_2)
+
+      expect(Gradezilla::GradeDetailTray.comment(comment_2)).to be_displayed
+    end
+
+    it "delete a comment", test_id: 3339966, priority: '1' do
+      Gradezilla::Cells.open_tray(@course.students.first, @a1)
+      Gradezilla::GradeDetailTray.delete_comment(comment_1)
+
+      # comment text is in a paragraph element and there is only one comment seeded
+      expect(Gradezilla::GradeDetailTray.all_comments).not_to contain_css("p")
     end
   end
 end

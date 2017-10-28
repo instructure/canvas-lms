@@ -47,7 +47,7 @@
 }
 
 .ColorPicker__Container {
-  width: $ic-sp*20;
+  width: 174px;
   background: $ic-color-light;
   box-sizing: border-box;
   padding: $ic-sp;
@@ -103,6 +103,7 @@
 }
 
 .ColorPicker__ColorContainer {
+  margin-top: $ic-sp;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -112,9 +113,9 @@
   transition: all 0.2s;
   transform: translate3d(0,0,0);
   display: inline-block;
-  width: 34px;
-  height: 34px;
-  margin: 0 8px 8px 0;
+  width: 24px;
+  height: 24px;
+  margin: 0 7px 7px 0;
   padding: 0;
   appearance: none;
   box-shadow: none;
@@ -122,8 +123,29 @@
   color: $ic-color-light;
   border-radius: $baseBorderRadius;
   border-style: solid;
-  border-width: 1px;
-  border: 2px solid #73818C;
+  border: 2px solid $ic-border-color;
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 1px solid var(--ic-brand-primary);
+    border-radius: 5px;
+    transform: scale(0.01);
+    transition: all 0.2s;
+    opacity: 0;
+  }
+
+  &:focus {
+    outline: none;
+    &:before {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
   &:hover,
   &:focus {
@@ -144,6 +166,16 @@
   }
 }
 
+.ColorPicker__ColorBlock-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  stroke: red;
+  stroke-width: 1;
+}
+
 .ColorPicker__ColorBlock.with-dark-check {
   i[class*=icon-], i[class^=icon-] {
     color: $ic-color-dark;
@@ -158,38 +190,27 @@
   }
 }
 
-.ColorPicker__ColorBlock.white{
-  background-color: white;
-  border-color: #E4E4E4;
-  border-width: 1px;
-  overflow: hidden;
-
-  &:before {
-    content: "";
-    position: absolute;
-    border-left: 0.0625rem solid red;
-    width: 100%;
-    height: 100%;
-    transform: translateX(15px) translateY(-16px) rotate(45deg) scale(1.42857);
-    transform-origin: 0% 0%;
-    pointer-events: none;
-  }
-
-  .icon-check {
-    position: absolute;
-    color: $ic-color-dark;
-    padding: 9px;
-    top: -2px;
-    left: -2px;
-  }
-}
-
 .ColorPicker__CustomInputContainer {
-  margin: 0 0 $ic-sp;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
 }
 
 .ColorPicker__ColorPreview {
-  width: $ic-sp*3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-style: solid;
+  border-color: $ic-border-color;
+  border-radius: $baseBorderRadius;
+  border-width: 1px;
+  margin-right: 2px;
+  &:focus {
+    outline: none;
+  }
   i[class*=icon-], i[class^=icon-] {
     margin: 0 auto;
     color: $ic-color-alert;
@@ -197,7 +218,9 @@
 }
 
 .ColorPicker__Actions {
-  text-align: right;
+  margin-top: $ic-sp*.5;
+  display: flex;
+  justify-content: flex-end;
   body.chrome & {
     // fixes weird Chrome bug, where left border of first button gets cut off
     .Button:first-of-type { margin-left: 1px; }

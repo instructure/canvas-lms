@@ -103,4 +103,21 @@ describe "external tool assignments" do
     expect(a.external_tool_tag).to be_present
     expect(a.external_tool_tag.url).to eq @t1.url
   end
+
+  it "should show module sequence even without module_item_id param" do
+    a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
+    a.create_external_tool_tag(:url => @t1.url)
+    a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
+
+    mod = @course.context_modules.create!
+    t = mod.add_item(:id => a.id, :type => 'assignment')
+    page = @course.wiki_pages.create!(:title => "wiki title")
+    mod.add_item(:id => page.id, :type => 'wiki_page')
+
+    student_in_course(:course => @course, :active_all => true)
+    user_session(@student)
+
+    get "/courses/#{@course.id}/assignments/#{a.id}"
+    expect(f('.module-sequence-footer-button--next')).to be_displayed
+  end
 end

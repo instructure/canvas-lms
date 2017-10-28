@@ -1,13 +1,21 @@
 <form id="set_default_grade_form" action="{{url}}" method="POST" title="{{#t "dialog_title"}}Default grade for {{assignment.name}}{{/t}}">
   <input type="hidden" name="assignment_id" class="assignment_id" value="{{assignment.id}}"/>
   <div id="default_grade_description">
-    {{#t "default_grades"}}
-      Give all students the same grade for <b>{{assignment.name}}</b> by entering and submitting a grade value below:
-    {{/t}}
+    <p>
+      {{#if assignment_grading_type_is_percent}}
+        {{#t}}
+          Give all students the same <b>percent</b> grade for <i>{{assignment.name}}</i> by entering and submitting a grade value below:
+        {{/t}}
+      {{else}}
+        {{#t}}
+          Give all students the same grade for <i>{{assignment.name}}</i> by entering and submitting a grade value below:
+        {{/t}}
+      {{/if}}
+    </p>
   </div>
-  <p style="text-align: center;" class="grading_box_holder">
+  <div style="text-align: center;" class="grading_box_holder">
     {{> grading_box}}
-  </p>
+  </div>
   <div>
     <input type="checkbox" name="overwrite_existing_grades" id="overwrite_existing_grades_for_{{assignment.id}}"/>
     <label for="overwrite_existing_grades_for_{{assignment.id}}">{{#t "overwrite"}}Overwrite already-entered grades{{/t}}</label>

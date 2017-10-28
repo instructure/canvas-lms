@@ -360,6 +360,23 @@ describe ContextModulesController do
 
   end
 
+  describe "POST 'reorder'" do
+    it "should work" do
+      course_with_teacher_logged_in(active_all: true)
+      m1 = @course.context_modules.create!
+      m2 = @course.context_modules.create!
+      time = 1.minute.ago
+      ContextModule.where(:id => [m1, m2]).update_all(:updated_at => time)
+
+      post 'reorder', params: {:course_id => @course.id, :order => "#{m2.id},#{m1.id}"}
+      expect(response).to be_success
+      expect(m1.reload.position).to eq 2
+      expect(m1.updated_at > time).to be_truthy
+      expect(m2.reload.position).to eq 1
+      expect(m2.updated_at > time).to be_truthy
+    end
+  end
+
   describe "POST 'reorder_items'" do
     def make_content_tag(assignment, course, mod)
       ct = ContentTag.new

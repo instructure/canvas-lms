@@ -183,7 +183,7 @@
 #       "properties": {
 #         "items": {
 #           "description": "an array containing one hash for each appearence of the asset in the module sequence (up to 10 total)",
-#           "example": [{"prev": null, "current": {"id": 768, "module_id": 123, "title": "A lonely page", "type": "Page"}, "next": {"id": 769, "module_id": 127, "title": "Project 1", "type": "Assignment"}}],
+#           "example": [{"prev": null, "current": {"id": 768, "module_id": 123, "title": "A lonely page", "type": "Page"}, "next": {"id": 769, "module_id": 127, "title": "Project 1", "type": "Assignment"}, "mastery_path": {"locked": true, "assignment_sets": [], "selected_set_id": null, "awaiting_choice": false, "modules_url": "/courses/11/modules", "choose_url": "/courses/11/modules/items/9/choose", "modules_tab_disabled": false}}],
 #           "type": "array",
 #           "items": { "type": "object" }
 #         },
@@ -205,7 +205,7 @@ class ContextModuleItemsApiController < ApplicationController
 
   # @API List module items
   #
-  # List the items in a module
+  # A paginated list of the items in a module
   #
   # @argument include[] [String, "content_details"]
   #   If included, will return additional details specific to the content
@@ -685,7 +685,7 @@ class ContextModuleItemsApiController < ApplicationController
           hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session)
         end
         if cyoe_enabled?(@context)
-          is_student = @context.user_is_student?(@current_user)
+          is_student = @context.grants_right?(@current_user, session, :participate_as_student)
           opts = { context: @context, user: @current_user, session: session, is_student: is_student }
           hash[:mastery_path] = conditional_release_rule_for_module_item(needed_tags[tag_ids[ix]], opts)
         end

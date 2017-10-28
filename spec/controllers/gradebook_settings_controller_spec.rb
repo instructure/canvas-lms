@@ -35,6 +35,9 @@ RSpec.describe GradebookSettingsController, type: :controller do
     context "given valid params" do
       let(:show_settings) do
         {
+          "enter_grades_as" => {
+            "2301" => "points"
+          },
           "filter_columns_by" => {
             "grading_period_id" => "1401",
             "assignment_group_id" => "888"

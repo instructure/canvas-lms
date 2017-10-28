@@ -37,6 +37,8 @@
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_topics" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_editing" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="restrict_student_future_view" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="restrict_student_past_view" type="xs:boolean" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
@@ -124,6 +126,14 @@
       <xs:element name="muted" type="xs:boolean" minOccurs="0"/>
       <xs:element name="omit_from_final_grade" type="xs:boolean" minOccurs="0"/>
       <xs:element name="only_visible_to_overrides" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="similarity_detection_tool" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute  name="resource_type_code" type="xs:string" use="required"/>
+          <xs:attribute  name="vendor_code" type="xs:string" use="required"/>
+          <xs:attribute  name="product_code" type="xs:string" use="required"/>
+          <xs:attribute  name="visibility" type="xs:string" />
+        </xs:complexType>
+      </xs:element>
       <xs:element name="saved_rubric_comments" minOccurs="0">
         <xs:complexType>
           <xs:sequence minOccurs="0" maxOccurs="unbounded">

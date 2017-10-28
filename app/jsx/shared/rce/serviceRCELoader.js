@@ -32,7 +32,7 @@ function getSidebarSource(source_name) {
   return ret
 }
 
-  let RCELoader = {
+  const RCELoader = {
     preload() {
       this.loadRCE(function(){})
     },
@@ -89,6 +89,7 @@ function getSidebarSource(source_name) {
       require.ensure([], (require) => {
         const first = !this.RCE
         this.RCE = require('canvas-rce/lib/async')
+        require('./initA11yChecker')
         if (first) {
           this.loadEventListeners()
           this.loadingFlag = false

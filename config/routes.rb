@@ -181,8 +181,6 @@ CanvasRails::Application.routes.draw do
     # DEPRECATED
     get 'self_enrollment/:self_enrollment' => 'courses#self_enrollment', as: :self_enrollment
     post 'self_unenrollment/:self_unenrollment' => 'courses#self_unenrollment', as: :self_unenrollment
-    post :restore
-    post :backup
     post :unconclude
     get :students
     post :enrollment_invitation
@@ -440,7 +438,6 @@ CanvasRails::Application.routes.draw do
 
   resources :page_views, only: :update
   post 'media_objects' => 'context#create_media_object', as: :create_media_object
-  get 'media_objects/kaltura_notifications' => 'context#kaltura_notifications', as: :kaltura_notifications
   get 'media_objects/:id' => 'context#media_object_inline', as: :media_object
   get 'media_objects/:id/redirect' => 'context#media_object_redirect', as: :media_object_redirect
   get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail
@@ -1149,7 +1146,7 @@ CanvasRails::Application.routes.draw do
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", controller: :discussion_topics, action: :destroy
 
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/view", action: :view, as: "#{context}_discussion_topic_view"
-
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/duplicate", action: :duplicate
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", action: :entry_list, as: "#{context}_discussion_topic_entry_list"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", action: :add_entry, as: "#{context}_discussion_add_entry"
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", action: :entries, as: "#{context}_discussion_entries"
@@ -1490,7 +1487,7 @@ CanvasRails::Application.routes.draw do
       post 'files/:id/create_success', action: :api_create_success
       get 'files/:id/create_success', action: :api_create_success
       match '/api/v1/files/:id/create_success', via: [:options], action: :api_create_success_cors
-      post 'files/capture', action: :api_capture
+      post 'files/capture', action: :api_capture, as: 'files_capture'
 
 
       # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
@@ -2037,6 +2034,10 @@ CanvasRails::Application.routes.draw do
       get "subscriptions/:id", action: :show
       put "subscriptions/:id", action: :update
       get "subscriptions", action: :index
+    end
+
+    scope(controller: 'lti/users_api') do
+      get 'users/:id', action: :show
     end
 
     %w(course account).each do |context|

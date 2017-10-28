@@ -432,7 +432,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to eq []
       end
     end
- end
+  end
 
   describe "GET 'statistics'" do
     it 'does not break using new student_ids method from course' do
@@ -1158,6 +1158,16 @@ describe CoursesController do
       end
 
       it "should log an AUA with membership_type" do
+        user_session(@student)
+        get 'show', params: {:id => @course.id}
+        expect(response).to be_success
+        aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
+        expect(aua.asset_category).to eq 'home'
+        expect(aua.membership_type).to eq 'StudentEnrollment'
+      end
+
+      it "should log an asset user access for api requests" do
+        allow(@controller).to receive(:api_request?).and_return(true)
         user_session(@student)
         get 'show', params: {:id => @course.id}
         expect(response).to be_success

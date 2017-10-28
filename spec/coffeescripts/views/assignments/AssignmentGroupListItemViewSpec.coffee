@@ -141,6 +141,7 @@ define [
     assignmentGroupsView
 
   test "shows imported icon when integration_data is not empty", ->
+    ENV.URLS = { sort_url : "test" }
     model = createAssignmentGroup()
     model.set('integration_data', { property: 'value' })
     view = createView(model)
@@ -148,17 +149,20 @@ define [
 
   test "shows imported icon with custom SIS_NAME when integration_data is not empty", ->
     ENV.SIS_NAME = 'PowerSchool'
+    ENV.URLS = { sort_url : "test" }
     model = createAssignmentGroup()
     model.set('integration_data', { property: 'value' })
     view = createView(model)
     equal view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported")[0].title, 'Imported from PowerSchool'
 
   test "does not show imported icon when integration_data is not set", ->
+    ENV.URLS = { sort_url : "test" }
     model = createAssignmentGroup()
     view = createView(model)
     ok !view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
 
   test "does not show imported icon when integration_data is empty", ->
+    ENV.URLS = { sort_url : "test" }
     model = createAssignmentGroup()
     model.set('integration_data', { })
     view = createView(model)
@@ -167,8 +171,12 @@ define [
   QUnit.module 'AssignmentGroupListItemView as a teacher',
     setup: ->
       fakeENV.setup({
-        current_user_roles: ['teacher']
+        current_user_roles: ['teacher'],
+        URLS: {
+          sort_url : "test"
+        }
       })
+
       @model = createAssignmentGroup()
       $(document).off()
       elementToggler.bind()
@@ -336,6 +344,11 @@ define [
       @model = createAssignmentGroup()
       $(document).off()
       elementToggler.bind()
+      fakeENV.setup({
+        URLS: {
+          sort_url : "test"
+        }
+      })
 
     teardown: ->
       $("form.dialogFormView").remove()

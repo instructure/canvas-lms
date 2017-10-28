@@ -68,11 +68,21 @@ export default React.createClass({
     },
 
     changedColor(value) {
-      var color = $('<span>').css('background-color', value).css('background-color');
-       // FF returns 'transparent' for invalid colors, but we allow intentionally setting a value to 'transparent'
-      var isInvalid = (color === 'transparent' && value !== 'transparent');
+      // fail fast for no value
+      if (!value) return null
 
-      return  isInvalid ? null : color
+      // set and read color values from a dom node to get only valid values
+      const tempNode = document.createElement('span')
+      tempNode.style.backgroundColor = value
+      const color = tempNode.style.backgroundColor
+      
+      // reject invalid values
+      if (!color) return null
+      
+      // FF returns 'transparent' for invalid colors, but we allow intentionally setting a value to 'transparent'
+      if (color === 'transparent' && value !== 'transparent') return null
+
+      return color
     },
 
     hexVal(colorString) {
@@ -108,17 +118,18 @@ export default React.createClass({
         'Theme__editor-color-block_input': true,
         'Theme__editor-color-block_input--has-error': this.props.userInput.invalid
       });
-
+      
       var colorVal = this.props.userInput.val != null ? this.props.userInput.val : this.props.currentValue
 
       // 1st input is hidden and posts a valid hex value
       // 2nd input handles display, input events, and validation
+      const hexValue = this.hexVal(colorVal)
       return(
         <span>
           <input
               type="hidden"
               name={'brand_config[variables]['+ this.props.varDef.variable_name +']'}
-              value={this.hexVal(colorVal)} />
+              value={hexValue} />
           <input
               ref="textInput"
               type="text"

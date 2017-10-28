@@ -71,8 +71,11 @@ module.exports = {
   // In prod build, don't attempt to continue if there are any errors.
   bail: process.env.NODE_ENV === 'production',
 
-  // This makes the bundle appear split into separate modules in the devtools in dev/test.
-  devtool: process.env.NODE_ENV === 'production' ? undefined : 'eval',
+  // In production, and when not using JS_BUILD_NO_UGLIFY, generate separate sourcemap files.
+  // In development, generate `eval` sourcemaps.
+  devtool: process.env.NODE_ENV === 'production' ?
+    (process.env.JS_BUILD_NO_UGLIFY ? undefined : 'source-map')
+    : 'eval',
 
   entry: Object.assign({
     vendor: require('./modulesToIncludeInVendorBundle'),

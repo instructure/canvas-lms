@@ -67,8 +67,13 @@ class UsersPane extends React.Component {
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH));
   }
 
+  debouncedDispatchApplySearchFilter = _.debounce(() => {
+    this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH));
+  }, 250);
+
   handleUpdateSearchFilter = (searchFilter) => {
     this.props.store.dispatch(UserActions.updateSearchFilter(searchFilter));
+    this.debouncedDispatchApplySearchFilter();
   }
 
   handleSubmitEditUserForm = (attributes, id) => {

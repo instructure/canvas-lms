@@ -704,8 +704,7 @@ class FilesController < ApplicationController
           @folder = @context.folders.active.where(id: params[:attachment][:folder_id]).first
           return unless authorized_action(@folder, @current_user, :manage_contents)
         end
-        if intent == 'submit' && context.respond_to?(:submissions_folder) &&
-            @asset && @asset.context.root_account.feature_enabled?(:submissions_folder)
+        if intent == 'submit' && context.respond_to?(:submissions_folder) && @asset
           @folder ||= @context.submissions_folder(@asset.context)
         end
         @folder ||= Folder.unfiled_folder(@context)
@@ -797,24 +796,36 @@ class FilesController < ApplicationController
     @attachment.instfs_uuid = params[:instfs_uuid]
     @attachment.modified_at = Time.zone.now
 
+    # check non-exempt quota usage now that we have an actual size
+    return unless value_to_boolean(params[:quota_exempt]) || check_quota_after_attachment
+
     # capture params
     @attachment.folder = Folder.where(id: params[:folder_id]).first
     @attachment.user = api_find(User, params[:user_id])
-    @attachment.lock_at = params[:lock_at].presence
-    @attachment.unlock_at = params[:unlock_at].presence
-    @attachment.locked = Canvas::Plugin.value_to_boolean(params[:locked])
-    @attachment.hidden = Canvas::Plugin.value_to_boolean(params[:hidden])
-
+    @attachment.set_publish_state_for_usage_rights
     @attachment.save!
-    render plain: "OK", status: :created, location: api_v1_attachment_url(@attachment)
+
+    # apply duplicate handling
+    @attachment.handle_duplicates(params[:on_duplicate])
+
+    # trigger upload success callbacks
+    if @context.respond_to?(:file_upload_success_callback)
+      @context.file_upload_success_callback(@attachment)
+    end
+
+    url_params = {}
+    url_params[:include] = 'enhanced_preview_url' if @context.is_a?(User) || @context.is_a?(Course)
+    render json: {}, status: :created, location: api_v1_attachment_url(@attachment, url_params)
   end
 
   def api_create_success
     @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first
     return head :bad_request unless @attachment.try(:file_state) == 'deleted'
-    duplicate_handling = check_duplicate_handling_option(request.params)
-    return unless duplicate_handling
-    return unless check_quota_after_attachment(request)
+    return unless validate_on_duplicate(params)
+
+    quota_exempt = @attachment.verify_quota_exemption_key(params[:quota_exemption])
+    return unless quota_exempt || check_quota_after_attachment
+
     if Attachment.s3_storage?
       return head(:bad_request) unless @attachment.state == :unattached
       details = @attachment.s3object.data
@@ -823,7 +834,7 @@ class FilesController < ApplicationController
       @attachment.file_state = 'available'
       @attachment.save!
     end
-    @attachment.handle_duplicates(duplicate_handling)
+    @attachment.handle_duplicates(infer_on_duplicate(params))
 
     if @attachment.context.respond_to?(:file_upload_success_callback)
       @attachment.context.file_upload_success_callback(@attachment)
@@ -1039,7 +1050,12 @@ class FilesController < ApplicationController
         end
       end
 
-      @attachment.attributes = process_attachment_params(params)
+      @attachment.display_name = params[:name] if params.key?(:name)
+      @attachment.lock_at = params[:lock_at] if params.key?(:lock_at)
+      @attachment.unlock_at = params[:unlock_at] if params.key?(:unlock_at)
+      @attachment.locked = value_to_boolean(params[:locked]) if params.key?(:locked)
+      @attachment.hidden = value_to_boolean(params[:hidden]) if params.key?(:hidden)
+
       @attachment.set_publish_state_for_usage_rights if @attachment.context.is_a?(Group)
       if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?)  && @context.feature_enabled?(:usage_rights_required)
         return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request

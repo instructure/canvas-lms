@@ -488,6 +488,7 @@ describe ContentMigration do
       @cm.copy_options = options
       @cm.save!
 
+      Account.default.tap{|a| a.default_time_zone = "America/Denver"; a.save!}
       run_course_copy
 
       new_event = @copy_to.calendar_events.where(:migration_id => mig_id(all_day_event)).first

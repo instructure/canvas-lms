@@ -43,6 +43,8 @@ module Quizzes::QuizQuestion::AnswerSerializers
         return rc.reject :invalid_type, 'answer', Array
       end
 
+      selection = [] if selection == [""]
+
       selection.each_with_index do |answer_id, index|
         answer_id = Util.to_integer(answer_id)
 

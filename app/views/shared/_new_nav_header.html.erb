@@ -83,7 +83,7 @@
               </div>
             </a>
           </li>
-          <% if @current_user && @current_user.current_groups.count > 0 %>
+          <% if @current_user && @current_user.current_groups_in_region? %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/groups') %>">
               <a id="global_nav_groups_link" href="/groups" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
