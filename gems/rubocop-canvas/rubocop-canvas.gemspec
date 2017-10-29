@@ -14,13 +14,14 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "rubocop", "~> 0.49.1"
+  spec.add_runtime_dependency "rubocop", "~> 0.50.0"
   spec.add_runtime_dependency "jira_ref_parser", "1.0.1"
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "pry", "~> 0.10.1"
   spec.add_development_dependency "pry-nav", "~> 0.2.4"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.5.0"
-  spec.add_development_dependency "activesupport", "~> 4.2"
-  spec.add_development_dependency "activerecord","~> 4.2"
+  spec.add_development_dependency "activesupport", "~> 5.1"
+  spec.add_development_dependency "activerecord", "~> 5.1"
+  spec.add_development_dependency "byebug"
 end

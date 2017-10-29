@@ -19,7 +19,7 @@ describe RuboCop::Cop::Datafixup::EagerLoad do
   subject(:cop) { described_class.new }
 
   it 'disallows eager_load' do
-    inspect_source(cop, %{
+    inspect_source(%{
       module DataFixup::RecomputeRainbowAsteroidField
         def self.run
           AccountUser.eager_load(:account)

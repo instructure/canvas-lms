@@ -19,7 +19,7 @@ describe RuboCop::Cop::Specs::PreferFOverFj do
   subject(:cop) { described_class.new }
 
   it 'disallows fj' do
-    inspect_source(cop, %{
+    inspect_source(%{
       describe "admin_tools" do
         it "should hide tab if account setting disabled" do
           tab = fj('#adminToolsTabs .notifications > a')
@@ -32,7 +32,7 @@ describe RuboCop::Cop::Specs::PreferFOverFj do
   end
 
   it 'disallows ffj' do
-    inspect_source(cop, %{
+    inspect_source(%{
       describe "admin_tools" do
         it "should not include login activity option for revoked permission" do
           options = ffj("#loggingType > option")

@@ -19,7 +19,7 @@ describe RuboCop::Cop::Migration::PrimaryKey do
   subject(:cop) { described_class.new }
 
   it 'catches explicit id disabled' do
-    inspect_source(cop, %{
+    inspect_source(%{
       class CreateNotificationEndpoints < ActiveRecord::Migration
         tag :predeploy
 

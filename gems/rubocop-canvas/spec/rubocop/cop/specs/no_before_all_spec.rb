@@ -19,7 +19,7 @@ describe RuboCop::Cop::Specs::NoBeforeAll do
   subject(:cop) { described_class.new }
 
   it 'disallows before(:all)' do
-    inspect_source(cop, %{
+    inspect_source(%{
       before(:all) { puts "yarrr" }
     })
     expect(cop.offenses.size).to eq(1)
@@ -28,14 +28,14 @@ describe RuboCop::Cop::Specs::NoBeforeAll do
   end
 
   it 'allows before(:each)' do
-    inspect_source(cop, %{
+    inspect_source(%{
         before(:each) { puts "yarrr" }
       })
     expect(cop.offenses.size).to eq(0)
   end
 
   it 'allows before(:once)' do
-    inspect_source(cop, %{
+    inspect_source(%{
         before(:once) { puts "yarrr" }
       })
     expect(cop.offenses.size).to eq(0)

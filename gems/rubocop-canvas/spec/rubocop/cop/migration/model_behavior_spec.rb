@@ -33,10 +33,10 @@ describe RuboCop::Cop::Migration::ModelBehavior do
     )
   }
 
-  subject { described_class.new(config) }
+  subject(:cop) { described_class.new(config) }
 
   it "should find no offenses when calling whitelisted classes/methods" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class Foo < ActiveRecord::Migration
         def up
           Migrations::FooFix.run
@@ -47,7 +47,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
   end
 
   it "should find no offenses when calling whitelisted Receiver/method combination" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class Foo < ActiveRecord::Migration
         def up
           Account.default.lol.InstructureRules
@@ -58,7 +58,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
   end
 
   it "should find no offenses when a portion of the receiver is whitelisted" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class Foo < ActiveRecord::Migration
         def up
           DataFixup::Module1::Module2::DeleteInvalidCommunicationChannels.send_now.blah
@@ -69,7 +69,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
   end
 
   it "should find no offenses when calling methods on whitelisted classes/methods" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class Foo < ActiveRecord::Migration
         def up
           User.connection.execute "YOLO"
@@ -80,7 +80,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
   end
 
   it "should find no offenses when calling whitelisted methods" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class Foo < ActiveRecord::Migration
         def up
           User.update_all(name: "sally")
@@ -92,7 +92,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
   end
 
   it "should find no offenses when calling receiver-less methods" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class Foo < ActiveRecord::Migration
         module Lol
         end
@@ -104,7 +104,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
   end
 
   it "should find no offenses when referencing classes defined in the file itself" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class User < ActiveRecord::Base; end
       Course = Class.new(ActiveRecord::Base)
 
@@ -119,7 +119,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
   end
 
   it "should error if referencing unknown/auto-loaded classes" do
-    inspect_source(subject, %{
+    inspect_source(%{
       class Foo < ActiveRecord::Migration
         def up
           User.find_each { |u| u.save! }

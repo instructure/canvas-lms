@@ -40,7 +40,7 @@ module RuboCop
           (const
             (const
               (const
-                (const nil #{BAD_CONST_MATCHER}
+                (const ... #{BAD_CONST_MATCHER}
         PATTERN
 
         def on_const(node)

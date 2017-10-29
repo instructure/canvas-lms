@@ -19,7 +19,7 @@ describe RuboCop::Cop::Specs::NoWaitForNoSuchElement do
   subject(:cop) { described_class.new }
 
   it 'disallows wait_for_no_such_element' do
-    inspect_source(cop, %{
+    inspect_source(%{
       describe "sis imports ui" do
         it 'should properly show sis stickiness options' do
           wait_for_no_such_element(method: :contain_css) do

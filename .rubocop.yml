@@ -110,6 +110,10 @@ Style/VariableNumber:
   Enabled: false
 Style/SpaceInLambdaLiteral:
   Enabled: false
+Style/Dir:
+  Enabled: false
+Style/ReturnNil:
+  Enabled: false
 # We may want to enable this when we start working toward Ruby 3
 Style/FrozenStringLiteralComment:
   Enabled: false
@@ -140,6 +144,8 @@ Rails/ReadWriteAttribute:
   Enabled: false
 # we never bothered creating an ApplicationRecord
 Rails/ApplicationRecord:
+  Enabled: false
+Rails/HasManyOrHasOneDependent:
   Enabled: false
 
 # Lint changes
@@ -211,4 +217,6 @@ Style/HashSyntax:
 RSpec/MultipleExpectations:
   Enabled: false
 RSpec/ScatteredSetup:
+  Enabled: false
+Lint/RescueWithoutErrorClass:
   Enabled: false

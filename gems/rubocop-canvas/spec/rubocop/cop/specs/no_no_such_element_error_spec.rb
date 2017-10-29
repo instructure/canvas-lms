@@ -20,7 +20,7 @@ describe RuboCop::Cop::Specs::NoNoSuchElementError do
   let(:msg_regex) { /Avoid using Selenium::WebDriver::Error::NoSuchElementError/ }
 
   it 'disallows Selenium::WebDriver::Error::NoSuchElementError' do
-    inspect_source(cop, %{
+    inspect_source(%{
       describe "breaks all the things" do
         it 'is a bad spec' do
           Selenium::WebDriver::Error::NoSuchElementError
@@ -33,7 +33,7 @@ describe RuboCop::Cop::Specs::NoNoSuchElementError do
   end
 
   it 'disallows rescuing Selenium::WebDriver::Error::NoSuchElementError' do
-    inspect_source(cop, %{
+    inspect_source(%{
       def not_found?
         find("#yar")
         false
@@ -47,7 +47,7 @@ describe RuboCop::Cop::Specs::NoNoSuchElementError do
   end
 
   it 'disallows raising Selenium::WebDriver::Error::NoSuchElementError' do
-    inspect_source(cop, %{
+    inspect_source(%{
       def not_found?
         a = find("#yar")
         return true if a
