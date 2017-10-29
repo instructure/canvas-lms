@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery';
 import { Editors, Grid } from 'vendor/slickgrid';
 import GridSupport from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport';
+import SlickGridSpecHelper from 'spec/jsx/gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
 
 function createColumns () {
   return [1, 2, 3, 4].map(id => (
@@ -60,6 +62,7 @@ function createGrid () {
 QUnit.module('GridSupport Columns', (suiteHooks) => {
   let $fixture;
   let grid;
+  let gridSpecHelper;
   let gridSupport;
 
   function createAndInitialize (options = {}) {
@@ -76,6 +79,7 @@ QUnit.module('GridSupport Columns', (suiteHooks) => {
     $fixture.appendChild($gridContainer);
 
     grid = createGrid();
+    gridSpecHelper = new SlickGridSpecHelper({ grid });
   });
 
   suiteHooks.afterEach(() => {
@@ -257,6 +261,66 @@ QUnit.module('GridSupport Columns', (suiteHooks) => {
       grid.updateColumnHeader('column3');
       const instance = columnHeaderRenderer.destroyColumnHeader.lastCall.args[2];
       equal(instance, gridSupport);
+    });
+  });
+
+  QUnit.module('onColumnsResized', (hooks) => {
+    let resizedColumns;
+
+    function resizeHeader (columnId, widthChange) {
+      const columnIndex = grid.getColumns().findIndex(column => column.id === columnId);
+      const $container = grid.getContainerNode();
+      const handle = $container.querySelectorAll('.slick-resizable-handle')[columnIndex];
+      const header = $container.querySelectorAll('.slick-header-column')[columnIndex];
+      const dragStart = new $.Event('dragstart');
+      dragStart.pageX = 100;
+      dragStart.pageY = 50;
+      $(handle).trigger(dragStart);
+      const currentWidth = $(header).outerWidth();
+      header.style.setProperty('width', `${currentWidth + widthChange}px`);
+      const drag = new $.Event('drag');
+      drag.pageX = 100 + widthChange;
+      drag.pageY = 50;
+      $(handle).trigger(drag);
+      $(handle).trigger('dragend');
+    }
+
+    hooks.beforeEach(() => {
+      gridSupport = new GridSupport(grid);
+      gridSupport.initialize();
+
+      resizedColumns = [];
+
+      gridSupport.events.onColumnsResized.subscribe((_event, columns) => {
+        resizedColumns = columns;
+      });
+    });
+
+    test('updates the width of a scaled-down column', () => {
+      const originalWidth = gridSpecHelper.getColumn('column4').width;
+      resizeHeader('column4', -20);
+      strictEqual(gridSpecHelper.getColumn('column4').width, originalWidth - 20);
+    });
+
+    test('includes the updated column in the onColumnsResized event callback', () => {
+      resizeHeader('column4', -20);
+      deepEqual(resizedColumns, [gridSpecHelper.getColumn('column4')]);
+    });
+
+    test('updates the width of a scaled-up column', () => {
+      const originalWidth = gridSpecHelper.getColumn('column4').width;
+      resizeHeader('column4', 20);
+      strictEqual(gridSpecHelper.getColumn('column4').width, originalWidth + 20);
+    });
+
+    test('updates the widths of multiple columns when the minimum width is surpassed', () => {
+      resizeHeader('column4', -100);
+      deepEqual(resizedColumns.map(column => column.id), ['column3', 'column4']);
+    });
+
+    test('does not trigger onColumnsResized when column widths did not change', () => {
+      resizeHeader('column4', 0);
+      strictEqual(resizedColumns.length, 0);
     });
   });
 });

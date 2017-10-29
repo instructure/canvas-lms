@@ -4436,6 +4436,43 @@ QUnit.module('Gradebook Grid Events', () => {
       strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
     });
   });
+
+  QUnit.module('onColumnsResized', (hooks) => {
+    let gradebook;
+    let columns;
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      columns = [
+        { id: 'student', width: 120 },
+        { id: 'assignment_2301', width: 140 },
+        { id: 'total_grade', width: 100 }
+      ];
+      sinon.stub(gradebook, 'saveColumnWidthPreference');
+    });
+
+    test('saves the column width preference', () => {
+      gradebook.gradebookGrid.events.onColumnsResized.trigger(null, columns.slice(0, 1));
+      strictEqual(gradebook.saveColumnWidthPreference.callCount, 1);
+    });
+
+    test('saves the column width preference for multiple columns', () => {
+      gradebook.gradebookGrid.events.onColumnsResized.trigger(null, columns);
+      strictEqual(gradebook.saveColumnWidthPreference.callCount, 3);
+    });
+
+    test('includes the column id when saving the column width preference', () => {
+      gradebook.gradebookGrid.events.onColumnsResized.trigger(null, columns);
+      const ids = gradebook.saveColumnWidthPreference.getCalls().map(call => call.args[0]);
+      deepEqual(ids, ['student', 'assignment_2301', 'total_grade']);
+    });
+
+    test('includes the column width when saving the column width preference', () => {
+      gradebook.gradebookGrid.events.onColumnsResized.trigger(null, columns);
+      const widths = gradebook.saveColumnWidthPreference.getCalls().map(call => call.args[1]);
+      deepEqual(widths, [120, 140, 100]);
+    });
+  });
 });
 
 QUnit.module('Gradebook#getCustomColumnId');

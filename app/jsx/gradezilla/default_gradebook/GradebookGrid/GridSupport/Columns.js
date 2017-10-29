@@ -37,6 +37,23 @@ export default class Columns {
       destroyColumnHeader(object.column, object.node, this.gridSupport);
     });
 
+    this.grid.onColumnsResized.subscribe((sourceEvent, _object) => {
+      const event = sourceEvent.originalEvent || sourceEvent;
+      const columns = this.grid.getColumns();
+      const resizedColumns = [];
+
+      for (let i = 0; i < columns.length; i++) {
+        const column = columns[i];
+        if (column.previousWidth != null && column.previousWidth !== column.width) {
+          resizedColumns.push(column);
+        }
+      }
+
+      if (resizedColumns.length) {
+        this.gridSupport.events.onColumnsResized.trigger(event, resizedColumns);
+      }
+    });
+
     this.updateColumnHeaders();
   }
 

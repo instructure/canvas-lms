@@ -354,6 +354,10 @@ define [
         @renderViewOptionsMenu()
         @updateColumnHeaders()
 
+      @gradebookGrid.events.onColumnsResized.subscribe (_event, columns) =>
+        columns.forEach (column) =>
+          @saveColumnWidthPreference(column.id, column.width)
+
     initialize: ->
       @setStudentsLoaded(false)
       @setSubmissionsLoaded(false)
@@ -1610,9 +1614,6 @@ define [
       # Grid Events
       @gradebookGrid.grid.onKeyDown.subscribe @onGridKeyDown
 
-      # Grid Header Events
-      @gradebookGrid.grid.onColumnsResized.subscribe @onColumnsResized
-
       # Grid Body Cell Events
       @gradebookGrid.grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @gradebookGrid.grid.onCellChange.subscribe @onCellChange
@@ -1734,14 +1735,6 @@ define [
         # this is the magic that actually updates group and final grades when you edit a cell
         @calculateStudentGrade(item)
         @gradebookGrid.invalidate()
-
-    onColumnsResized: (event, obj) =>
-      grid = obj.grid
-      columns = grid.getColumns()
-
-      _.each columns, (column) =>
-        if column.previousWidth && column.width != column.previousWidth
-          @saveColumnWidthPreference(column.id, column.width)
 
     # Persisted Gradebook Settings
 
@@ -2731,4 +2724,5 @@ define [
 
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')
+      $(document).unbind('gridready')
       @gradebookGrid.destroy()

@@ -21,4 +21,5 @@ import GridEvent from './GridSupport/GridEvent';
 export default class Events {
   // Column Changes
   onColumnsReordered = new GridEvent();
+  onColumnsResized = new GridEvent();
 }

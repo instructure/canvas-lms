@@ -22,11 +22,18 @@ export default class Columns {
   }
 
   initialize () {
-    const { events, grid, gridSupport } = this.gradebookGrid;
+    const { events, grid, gridData, gridSupport } = this.gradebookGrid;
 
     grid.onColumnsReordered.subscribe((sourceEvent, _object) => {
       const event = sourceEvent.originalEvent || sourceEvent;
       events.onColumnsReordered.trigger(event, gridSupport.columns.getColumns());
+    });
+
+    gridSupport.events.onColumnsResized.subscribe((_event, columns) => {
+      for (let i = 0; i < columns.length; i++) {
+        gridData.columns.definitions[columns[i].id] = columns[i];
+      }
+      events.onColumnsResized.trigger(event, columns);
     });
   }
 }

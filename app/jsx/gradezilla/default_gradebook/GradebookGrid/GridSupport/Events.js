@@ -19,6 +19,9 @@
 import GridEvent from './GridEvent';
 
 export default class Events {
+  // Column Changes
+  onColumnsResized = new GridEvent();
+
   // State Changes
   onActiveLocationChanged = new GridEvent();
 
