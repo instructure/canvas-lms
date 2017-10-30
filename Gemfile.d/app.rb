@@ -65,10 +65,10 @@ gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
 gem 'httparty', '0.15.6'
-gem 'i18n', '0.8.6'
-gem 'i18nliner', '0.0.13'
-  gem 'ruby2ruby', '2.3.1', require: false
-  gem 'ruby_parser', '3.9.0', require: false
+gem 'i18n', '0.9.0'
+gem 'i18nliner', '0.0.14'
+  gem 'ruby2ruby', '2.4.0', require: false
+  gem 'ruby_parser', '3.10.1', require: false
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.2.1', require: 'ims'
 gem 'json', '2.1.0'
