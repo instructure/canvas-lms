@@ -25,7 +25,7 @@ import I18n from 'i18n!gradebook';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 
 function normalizeGrade (grade) {
-  return GradeFormatHelper.formatGrade(grade, { defaultValue: null });
+  return GradeFormatHelper.formatGrade(grade, { defaultValue: '' });
 }
 
 function normalizeSubmissionGrade (submission) {
@@ -198,7 +198,8 @@ export default class GradeInput extends React.Component {
         inline
         onChange={this.handleTextChange}
         onBlur={this.handleTextBlur}
-        value={this.state.grade == null ? '–' : this.state.grade}
+        placeholder="–"
+        value={this.state.grade}
         width="6em"
       />
     );

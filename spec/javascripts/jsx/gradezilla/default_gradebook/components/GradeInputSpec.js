@@ -89,11 +89,11 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.prop('value'), '8');
     });
 
-    test('displays an emdash as the input value when the submission is not graded', () => {
+    test('is blank when the submission is not graded', () => {
       submission.enteredGrade = null;
       mountComponent();
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('displays "Excused" as the input value when the submission is excused', () => {
@@ -156,6 +156,14 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(props.onSubmissionUpdate.callCount, 0);
     });
 
+    test('does not call the onSubmissionUpdate prop when the value has not changed from a null value', () => {
+      props.submission.enteredGrade = null;
+      props.onSubmissionUpdate = sinon.spy();
+      mountComponent();
+      wrapper.find('input').simulate('blur');
+      strictEqual(props.onSubmissionUpdate.callCount, 0);
+    });
+
     test('displays "Excused" as the input value when input blurs with a value of "EX"', () => {
       mountComponent();
       const input = wrapper.find('input');
@@ -213,12 +221,12 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.prop('value'), '8');
     });
 
-    test('displays an emdash as the input value when the updated submission is not graded', () => {
+    test('is blank when the updated submission is not graded', () => {
       props.submissionUpdating = true;
       mountComponent();
       wrapper.setProps({ submission: { ...submission, enteredGrade: null }, submissionUpdating: false });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('does not call the onSubmissionUpdate prop a submission update and the input has not changed', () => {
@@ -288,11 +296,11 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.prop('value'), '78%');
     });
 
-    test('displays an emdash as the input value when the submission is not graded', () => {
+    test('is blank when the submission is not graded', () => {
       submission.enteredGrade = null;
       mountComponent();
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('displays "Excused" as the input value when the submission is excused', () => {
@@ -403,12 +411,12 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.prop('value'), '89%');
     });
 
-    test('displays an emdash as the input value when the updated submission is not graded', () => {
+    test('is blank when the updated submission is not graded', () => {
       props.submissionUpdating = true;
       mountComponent();
       wrapper.setProps({ submission: { ...submission, enteredGrade: null }, submissionUpdating: false });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('does not call the onSubmissionUpdate prop a submission update and the input has not changed', () => {
@@ -464,11 +472,11 @@ QUnit.module('GradeInput', (suiteHooks) => {
       equal(input.prop('value'), 'B');
     });
 
-    test('displays an emdash as the input value when the submission is not graded', () => {
+    test('is blank when the submission is not graded', () => {
       submission.enteredGrade = null;
       mountComponent();
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('displays "Excused" as the input value when the submission is excused', () => {
@@ -563,12 +571,12 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.prop('value'), 'A');
     });
 
-    test('displays an emdash as the input value when the updated submission is not graded', () => {
+    test('is blank when the updated submission is not graded', () => {
       props.submissionUpdating = true;
       mountComponent();
       wrapper.setProps({ submission: { ...submission, enteredGrade: null }, submissionUpdating: false });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('does not call the onSubmissionUpdate prop a submission update and the input has not changed', () => {
@@ -638,11 +646,11 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.prop('value'), '3');
     });
 
-    test('displays an emdash as the input value when the submission is not graded', () => {
+    test('is blank when the submission is not graded', () => {
       submission.enteredGrade = null;
       mountComponent();
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('displays "Excused" as the input value when the submission is excused', () => {
@@ -753,12 +761,12 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.prop('value'), '3');
     });
 
-    test('displays an emdash as the input value when the updated submission is not graded', () => {
+    test('is blank when the updated submission is not graded', () => {
       props.submissionUpdating = true;
       mountComponent();
       wrapper.setProps({ submission: { ...submission, enteredGrade: null }, submissionUpdating: false });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '–');
+      strictEqual(input.prop('value'), '');
     });
 
     test('does not call the onSubmissionUpdate prop a submission update and the input has not changed', () => {
