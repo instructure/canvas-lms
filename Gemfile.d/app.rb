@@ -46,9 +46,9 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'addressable', '2.5.1', require: false
 gem "after_transaction_commit", '2.0.0'
 gem "aws-sdk-kinesis", '1.0.0', require: false
-gem "aws-sdk-s3", '1.0.0', require: false
-gem "aws-sdk-sns", '1.0.0', require: false
-gem "aws-sdk-sqs", '1.0.0', require: false
+gem "aws-sdk-s3", '1.5.0', require: false
+gem "aws-sdk-sns", '1.1.0', require: false
+gem "aws-sdk-sqs", '1.3.0', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
@@ -60,7 +60,7 @@ gem 'inst-jobs', '0.13.6'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.5', require: false
 gem 'inst-jobs-autoscaling', '1.0.2'
-  gem 'aws-sdk-autoscaling', '1.0.0', require: false
+  gem 'aws-sdk-autoscaling', '1.3.0', require: false
 gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
