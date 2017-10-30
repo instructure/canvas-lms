@@ -2335,4 +2335,43 @@ describe CoursesController do
       expect(response).to be_redirect
     end
   end
+
+  describe '#users' do
+    let(:course) { Course.create! }
+
+    let(:teacher) { teacher_in_course(course: course, active_all: true).user }
+
+    let(:student1) { student_in_course(course: course, active_all: true).user }
+
+    let(:student2) { student_in_course(course: course, active_all: true).user }
+
+    let!(:group1) do
+      group = course.groups.create!(name: "group one")
+      group.users << student1
+      group.users << student2
+      group.group_memberships.last.update!(workflow_state: 'deleted')
+      group.reload
+    end
+
+    let!(:group2) do
+      group = course.groups.create!(name: "group one")
+      group.users << student1
+      group.users << student2
+      group.group_memberships.first.update!(workflow_state: 'deleted')
+      group.reload
+    end
+
+    it 'only returns group_ids for active group memberships when requested' do
+      user_session(teacher)
+      get 'users', params: {
+        course_id: course.id,
+        format: 'json',
+        include: ['group_ids'],
+        enrollment_role: 'StudentEnrollment'
+      }
+      json = json_parse(response.body)
+      expect(json[0]).to include({ "id" => student1.id, "group_ids" => [group1.id] })
+      expect(json[1]).to include({ "id" => student2.id, "group_ids" => [group2.id] })
+    end
+  end
 end
