@@ -207,9 +207,9 @@ module GroupsCommon
   end
 
   def open_clone_group_set_option
-    f('.icon-settings').click
+    move_to_click('.icon-settings')
     wait_for_ajaximations
-    f('.clone-category').click
+    move_to_click('.clone-category')
     wait_for_ajaximations
   end
 
@@ -295,7 +295,7 @@ module GroupsCommon
   end
 
   def save_group_set
-    f('#newGroupSubmitButton').click
+    move_to_click('#newGroupSubmitButton')
     wait_for_ajaximations
   end
 
