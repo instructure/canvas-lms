@@ -3707,6 +3707,32 @@ describe Assignment do
   end
 
   describe "update_student_submissions" do
+    context "grade change events" do
+      before(:once) do
+        @assignment = @course.assignments.create!
+        @assignment.grade_student(@student, grade: 5, grader: @teacher)
+        @assistant = User.create!
+        @course.enroll_ta(@assistant, enrollment_state: "active")
+      end
+
+      it "triggers a grade change event with the grader_id as the updating_user" do
+        @assignment.updating_user = @assistant
+
+        expect(Auditors::GradeChange).to receive(:record).once do |submission|
+          expect(submission.grader_id).to eq @assistant.id
+        end
+        @assignment.update_student_submissions
+      end
+
+      it "triggers a grade change event using the grader_id on the submission if no updating_user is present" do
+        expect(Auditors::GradeChange).to receive(:record).once do |submission|
+          expect(submission.grader_id).to eq @teacher.id
+        end
+
+        @assignment.update_student_submissions
+      end
+    end
+
     context "pass/fail assignments" do
       before :once do
         @student1, @student2 = create_users_in_course(@course, 2, return_type: :record)
@@ -3770,7 +3796,6 @@ describe Assignment do
         submission.reload
         expect(submission.score).to eql(0.0)
       end
-
     end
   end
 
