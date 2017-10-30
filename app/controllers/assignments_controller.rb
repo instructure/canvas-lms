@@ -453,7 +453,6 @@ class AssignmentsController < ApplicationController
       end
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
-
       hash = {
         ASSIGNMENT_GROUPS: json_for_assignment_groups,
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
@@ -466,7 +465,10 @@ class AssignmentsController < ApplicationController
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
         HAS_GRADING_PERIODS: @context.grading_periods?,
-        PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
+        PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
+          @assignment.course,
+          Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2
+        ),
         POST_TO_SIS: post_to_sis,
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         SECTION_LIST: @context.course_sections.active.map do |section|

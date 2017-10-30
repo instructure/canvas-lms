@@ -61,7 +61,7 @@ module Lti
           expect(launch_params['ext_api_domain']).to eq HostUrl.context_host(course, request.host)
           account_tp_url_stub = course_tool_consumer_profile_url(course)
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
-          expect(launch_params['oauth2_access_token_url']).to be_nil
+          expect(launch_params['oauth2_access_token_url']).to eq "http://test.host/api/lti/courses/#{course.id}/authorize"
         end
 
         it "doesn't allow student to register an app" do

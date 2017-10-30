@@ -491,15 +491,6 @@ END
         end
       end
     },
-    'plagiarism_detection_platform' =>
-    {
-      display_name: -> { I18n.t('Plagiarism Detection Platform') },
-      description: -> { I18n.t('Enable the plagiarism detection platform') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true,
-      root_opt_in: true
-    },
     'master_courses' =>
     {
       display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
@@ -538,15 +529,6 @@ END
       description: -> { I18n.t('Export an existing quiz to new Quizzes 2 format') },
       applies_to: "RootAccount",
       state: "hidden",
-      root_opt_in: true
-    },
-    'lti_2_auth_url_registration' =>
-    {
-      display_name: -> { I18n.t('Send Authorization URL in LTI2 Registration') },
-      description: -> { I18n.t("If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch") },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: false,
       root_opt_in: true
     },
     'graphql' =>
