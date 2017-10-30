@@ -28,8 +28,6 @@ class Conversation < ActiveRecord::Base
 
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
-  attr_accessor :recently_created
-
   def participants(reload = false)
     if !@participants || reload
       Conversation.preload_participants([self])
@@ -649,8 +647,7 @@ class Conversation < ActiveRecord::Base
     # look up participants across all shards
     shards = conversations.map(&:associated_shards).flatten.uniq
     Shard.with_each_shard(shards) do
-
-      shackles_env = conversations.any?(&:recently_created) ? :master : :slave
+      shackles_env = conversations.any?{|c| c.updated_at > 10.seconds.ago} ? :master : :slave
       user_map = Shackles.activate(shackles_env) do
         User.select("users.id, users.updated_at, users.short_name, users.name, users.avatar_image_url, users.avatar_image_source, last_authored_at, conversation_id").
           joins(:all_conversations).
