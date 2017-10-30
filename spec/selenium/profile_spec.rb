@@ -259,6 +259,7 @@ describe "profile" do
     end
 
     it "should regenerate a new access token", priority: "2", test_id: 588920 do
+      skip_if_safari(:alert)
       get "/profile/settings"
       generate_access_token
       token = f('.visible_token').text
@@ -287,6 +288,7 @@ describe "profile" do
     end
 
     it "should delete an access token", priority: "2", test_id: 588921 do
+      skip_if_safari(:alert)
       get "/profile/settings"
       generate_access_token('testing', true)
       # had to use :visible because it was failing saying element wasn't visible

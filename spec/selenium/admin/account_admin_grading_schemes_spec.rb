@@ -42,6 +42,7 @@ describe "account admin grading schemes" do
     end
 
     it "should delete a grading scheme", priority: "1", test_id: 210111 do
+      skip_if_safari(:alert)
       should_delete_a_grading_scheme(account, url)
     end
   end
