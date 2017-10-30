@@ -303,7 +303,6 @@ define [
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
       else
         @gradingPeriodSet = null
-      @assignmentsToHide = UserSettings.contextGet('hidden_columns') || []
       @show_attendance = !!UserSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = UserSettings.contextGet 'include_ungraded_assignments'
       # preferences serialization causes these to always come
@@ -995,28 +994,6 @@ define [
 
     ## Grid Styling Methods
 
-    minimizeColumn: ($columnHeader) =>
-      columnDef = $columnHeader.data('column')
-      colIndex = @gradebookGrid.grid.getColumnIndex(columnDef.id)
-      columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '') + ' minimized'
-      columnDef.unminimizedName = columnDef.name
-      columnDef.name = ''
-      columnDef.minimized = true
-      @$grid.find(".l#{colIndex}").add($columnHeader).addClass('minimized')
-      @assignmentsToHide.push(columnDef.id)
-      UserSettings.contextSet('hidden_columns', _.uniq(@assignmentsToHide))
-
-    unminimizeColumn: ($columnHeader) =>
-      columnDef = $columnHeader.data('column')
-      colIndex = @gradebookGrid.grid.getColumnIndex(columnDef.id)
-      columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '')
-      columnDef.name = columnDef.unminimizedName
-      columnDef.minimized = false
-      @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
-      $columnHeader.find('.slick-column-name').html($.raw(columnDef.name))
-      @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
-      UserSettings.contextSet('hidden_columns', _.uniq(@assignmentsToHide))
-
     # this is because of a limitation with SlickGrid,
     # when it makes the header row it does this:
     # $("<div class='slick-header-columns' style='width:10000px; left:-1000px' />")
@@ -1523,15 +1500,9 @@ define [
         type: 'assignment'
         assignmentId: assignment.id
 
-      if fieldName in @assignmentsToHide
-        columnDef.width = 10
-        do (fieldName) =>
-          $(document)
-            .bind('gridready', =>
-              @minimizeColumn(@$grid.find("##{@uid}#{fieldName}"))
-            )
-            .unbind('gridready.render')
-            .bind('gridready.render', => @gradebookGrid.invalidate() )
+      unless columnDef.width > columnDef.minWidth
+        columnDef.cssClass += ' minimized'
+        columnDef.headerCssClass += ' minimized'
 
       columnDef
 
@@ -1681,15 +1652,6 @@ define [
       @$grid.addClass('editable') if @options.gradebook_is_editable
 
       @fixMaxHeaderWidth()
-      @gradebookGrid.grid.onColumnsResized.subscribe (e, data) =>
-        @$grid.find('.slick-header-column').each (i, elem) =>
-          $columnHeader = $(elem)
-          columnDef = $columnHeader.data('column')
-          return unless columnDef.type is "assignment"
-          if $columnHeader.outerWidth() <= columnWidths.assignment.min
-            @minimizeColumn($columnHeader) unless columnDef.minimized
-          else if columnDef.minimized
-            @unminimizeColumn($columnHeader)
 
       @keyboardNav.init()
       keyBindings = @keyboardNav.keyBindings
