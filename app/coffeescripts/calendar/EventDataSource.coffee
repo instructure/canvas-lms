@@ -307,9 +307,9 @@ define [
         return unless data
         newEvents = []
         # planner_notes are passing thru here too now
-        # detect and transform to look more like a calendar event
+        # detect and add some missing fields the calendar code needs
         if data.length and 'todo_date' of data[0]
-          data = @transformPlannerNotes(data, url)
+          data = @fillOutPlannerNotes(data, url)
           key = 'type_planner_note'
         else
           key = 'type_'+params.type
@@ -471,17 +471,10 @@ define [
         cb(data, true)
 
     # Planner notes are getting pulled from the planner_notes api
-    # Make them look more like a calendar event to more easily integrate
-    # into the calendar's processing
-    transformPlannerNotes: (notes, url) ->
+    # Add some necessary fields so they can be processed just like a calendar event
+    fillOutPlannerNotes: (notes, url) ->
       notes.forEach (note) ->
-        note.description = note.details
-        note.planner_note_id = note.id
         note.type = "planner_note"
-        note.start_at = note.end_at = note.todo_date
-        note.url = "#{location.origin}#{url}/#{note.planner_note_id}"
         note.context_code = if note.course_id then "course_#{note.course_id}" else "user_#{note.user_id}"
         note.all_context_codes = note.context_code
-        note.all_day = true
-        note.can_edit = false  # TODO: change when we can edit in the calendar
       notes

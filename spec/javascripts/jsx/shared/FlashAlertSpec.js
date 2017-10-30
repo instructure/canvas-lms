@@ -72,4 +72,10 @@ QUnit.module('FlashAlert', function (hooks) {
     clock.tick(600);
     ok(document.querySelector('#flashalert_message_holder').innerText.includes(expectedText));
   });
+
+  test('renders an alert without "Details"', function () {
+    showFlashSuccess('yay!')({ body: 'a body' });
+    clock.tick(600);
+    strictEqual(document.querySelector('#flashalert_message_holder').innerText.includes('Details'), false);
+  });
 });

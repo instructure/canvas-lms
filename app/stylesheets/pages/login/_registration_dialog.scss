@@ -27,3 +27,16 @@
     width: 100px;
   }
 }
+
+.terms-of-service__register {
+  .terms-of-service__link {
+    button: 14px !important;
+  }
+  display: flex;
+  flex-direction: row;
+  line-height: 1;
+}
+
+.terms-of-service__link {
+  padding-left: 4px;
+}

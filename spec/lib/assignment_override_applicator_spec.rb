@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../sharding_spec_helper'
 
 describe AssignmentOverrideApplicator do
   def create_group_override
@@ -248,6 +248,26 @@ describe AssignmentOverrideApplicator do
       end
 
       it "should order section overrides by position" # see TODO in implementation
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should not break when running for a teacher on a different shard" do
+          @shard1.activate do
+            @teacher = User.create!
+          end
+          teacher_in_course(:user => @teacher, :course => @course, :active_all => true)
+
+          @adhoc_override = assignment_override_model(:assignment => @assignment)
+          @adhoc_override.assignment_override_students.create!(:user => @student)
+          allow(ActiveRecord::Base.connection).to receive(:use_qualified_names?).and_return(true)
+
+          @shard1.activate do
+            ovs = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
+            expect(ovs).to eq [@adhoc_override]
+          end
+        end
+      end
     end
 
     context 'adhoc overrides' do

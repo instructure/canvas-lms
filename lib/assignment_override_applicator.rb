@@ -82,61 +82,63 @@ module AssignmentOverrideApplicator
     cache_key = [user, assignment_or_quiz, 'overrides'].cache_key
     Rails.cache.delete(cache_key) if assignment_or_quiz.reload_overrides_cache?
     RequestCache.cache("overrides_for_assignment_and_user", cache_key) do
-    Rails.cache.fetch(cache_key) do
-      next [] if self.has_invalid_args?(assignment_or_quiz, user)
-      context = assignment_or_quiz.context
+      Rails.cache.fetch(cache_key) do
+        next [] if self.has_invalid_args?(assignment_or_quiz, user)
+        context = assignment_or_quiz.context
 
-      if (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && context.grants_right?(user, :read_as_admin)
-        overrides = assignment_or_quiz.assignment_overrides
-        if assignment_or_quiz.current_version?
-          visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
+        context.shard.activate do
+          if (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && context.grants_right?(user, :read_as_admin)
+            overrides = assignment_or_quiz.assignment_overrides
+            if assignment_or_quiz.current_version?
+              visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
 
-          overrides = if overrides.loaded?
-                        ovs, adhoc_ovs = overrides.select{|ov| ov.workflow_state == 'active'}.
-                          partition {|ov| ov.set_type != 'ADHOC' }
+              overrides = if overrides.loaded?
+                            ovs, adhoc_ovs = overrides.select{|ov| ov.workflow_state == 'active'}.
+                              partition {|ov| ov.set_type != 'ADHOC' }
 
-                        preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
-                        ovs + adhoc_ovs.select{|ov| ov.preloaded_student_ids.any?}
-                      else
-                        ovs = overrides.active.where.not(set_type: 'ADHOC').to_a
-                        adhoc_ovs = overrides.active.visible_students_only(visible_user_ids).to_a
-                        preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
+                            preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
+                            ovs + adhoc_ovs.select{|ov| ov.preloaded_student_ids.any?}
+                          else
+                            ovs = overrides.active.where.not(set_type: 'ADHOC').to_a
+                            adhoc_ovs = overrides.active.visible_students_only(visible_user_ids).to_a
+                            preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
 
-                        ovs + adhoc_ovs
-                      end
-        else
-          overrides = current_override_version(assignment_or_quiz, overrides)
+                            ovs + adhoc_ovs
+                          end
+            else
+              overrides = current_override_version(assignment_or_quiz, overrides)
+            end
+
+            unless ConditionalRelease::Service.enabled_in_context?(assignment_or_quiz.context)
+              overrides = overrides.select { |override| override.try(:set_type) != 'Noop' }
+            end
+
+            return overrides
+          end
+
+          overrides = []
+
+          # priority: adhoc, group, section (do not exclude deleted)
+          adhoc = adhoc_override(assignment_or_quiz, user)
+          overrides << adhoc.assignment_override if adhoc
+
+          if ObserverEnrollment.observed_students(context, user).empty?
+            group = group_override(assignment_or_quiz, user)
+            overrides << group if group
+            sections = section_overrides(assignment_or_quiz, user)
+            overrides += sections if sections
+          else
+            observed = observer_overrides(assignment_or_quiz, user)
+            overrides += observed if observed
+          end
+
+          unless assignment_or_quiz.current_version?
+            overrides = current_override_version(assignment_or_quiz, overrides)
+          end
+
+          overrides.compact.select(&:active?)
         end
-
-        unless ConditionalRelease::Service.enabled_in_context?(assignment_or_quiz.context)
-          overrides = overrides.select { |override| override.try(:set_type) != 'Noop' }
-        end
-
-        return overrides
       end
-
-      overrides = []
-
-      # priority: adhoc, group, section (do not exclude deleted)
-      adhoc = adhoc_override(assignment_or_quiz, user)
-      overrides << adhoc.assignment_override if adhoc
-
-      if ObserverEnrollment.observed_students(context, user).empty?
-        group = group_override(assignment_or_quiz, user)
-        overrides << group if group
-        sections = section_overrides(assignment_or_quiz, user)
-        overrides += sections if sections
-      else
-        observed = observer_overrides(assignment_or_quiz, user)
-        overrides += observed if observed
-      end
-
-      unless assignment_or_quiz.current_version?
-        overrides = current_override_version(assignment_or_quiz, overrides)
-      end
-
-      overrides.compact.select(&:active?)
-    end
     end
   end
 

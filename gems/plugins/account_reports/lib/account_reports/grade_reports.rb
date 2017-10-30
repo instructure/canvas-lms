@@ -227,7 +227,7 @@ module AccountReports
                INNER JOIN #{Course.quoted_table_name} c ON c.id = e.course_id
                INNER JOIN #{EnrollmentTerm.quoted_table_name} t ON c.enrollment_term_id = t.id
                INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
-               LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = e.id AND sc.grading_period_id IS NULL")
+               LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = e.id AND sc.course_score IS TRUE")
 
       if @include_deleted
         students = students.where("e.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")

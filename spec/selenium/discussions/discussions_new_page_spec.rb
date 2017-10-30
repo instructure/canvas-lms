@@ -51,6 +51,7 @@ describe "discussions" do
       it "should add an attachment to a new topic", priority: "1", test_id: 150466 do
         topic_title = 'new topic with file'
         get url
+        wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
         expect(DiscussionTopic.where(title: topic_title).first.attachment_id).to be_present
@@ -58,6 +59,7 @@ describe "discussions" do
 
       it "should create a podcast enabled topic", priority: "1", test_id: 150467 do
         get url
+        wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), "This is my test title")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
 
@@ -75,6 +77,7 @@ describe "discussions" do
           group_category
           new_section
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
 
@@ -159,6 +162,7 @@ describe "discussions" do
 
       it "should create a delayed discussion", priority: "1", test_id: 150470 do
         get url
+        wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), "Student Delayed")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
         target_time = 1.day.from_now
@@ -173,6 +177,7 @@ describe "discussions" do
 
       it "should allow a student to create a discussion", priority: "1", test_id: 150471 do
         get url
+        wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), "Student Discussion")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
         expect(f("#discussion-edit-view")).to_not contain_css("#has_group_category")

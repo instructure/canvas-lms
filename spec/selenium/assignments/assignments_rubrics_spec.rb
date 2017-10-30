@@ -66,7 +66,8 @@ describe "assignment rubrics" do
       end
       expect do
        f('.add_rubric_link').click
-       f('.add_criterion_link').click
+       f('#add_criterion_container a:nth-of-type(1)').click
+       f('#add_criterion_button').click
        set_value(f('.criterion_description input[name = "description"]'), 'criterion 1')
        f(' .ok_button').click
        wait_for_ajaximations
@@ -521,6 +522,44 @@ describe "assignment rubrics" do
 
         # The min points of the cell being edited should now be 0.
         expect(ff('.criterion:nth-of-type(3) .min_points')[1]).to include_text "0"
+      end
+    end
+
+    context "criterion copy" do
+      before(:each) do
+        @course.account.root_account.enable_feature!(:rubric_criterion_range)
+        @assignment = @course.assignments.create(name: 'assignment with rubric')
+        outcome_with_rubric
+        @rubric.associate_with(@assignment, @course, purpose: 'grading')
+      end
+
+      it "should copy an existing criterion", priority: "1", test_id: 220342 do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        f('#add_criterion_container a:nth-of-type(1)').click
+        f('#criterion_duplicate_menu ul li:nth-of-type(2)').click
+        wait_for_ajaximations
+        f(' .ok_button').click
+
+        wait_for_ajaximations
+
+        expect(ffj('.criterion:visible .criterion_description_value')[2]).to include_text "no outcome row"
+      end
+
+      it "should copy an existing learning outcome", priority: "1", test_id: 220343 do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+
+        f('#add_criterion_container a:nth-of-type(1)').click
+        f('#criterion_duplicate_menu ul li:nth-of-type(1)').click
+        wait_for_ajaximations
+
+        expect(ffj('.criterion:visible .criterion_description_value')[2]).to include_text "Outcome row"
       end
     end
   end

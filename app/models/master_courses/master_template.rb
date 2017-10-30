@@ -257,6 +257,10 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     end
   end
 
+  def default_restrictions_by_type_for_api
+    default_restrictions_by_type.map{|k, v| [k.constantize.table_name.singularize, v] }.to_h
+  end
+
   def self.create_associations_from_sis(root_account, associations, messages, migrating_user=nil)
     associations.keys.each_slice(50) do |master_sis_ids|
       templates = self.active.for_full_course.joins(:course).

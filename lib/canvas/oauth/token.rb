@@ -103,9 +103,13 @@ module Canvas::Oauth
 
     def as_json(_options={})
       json = {
-          'access_token' => access_token.full_token,
-          'token_type' => 'Bearer',
-          'user' => user.as_json(:only => [:id, :name], :include_root => false)
+        'access_token' => access_token.full_token,
+        'token_type' => 'Bearer',
+        'user' => {
+          'id' => user.id,
+          'name' => user.name,
+          'global_id' => user.global_id.to_s
+        }
       }
 
       json['refresh_token'] = access_token.plaintext_refresh_token if access_token.plaintext_refresh_token

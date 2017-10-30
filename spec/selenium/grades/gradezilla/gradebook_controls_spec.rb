@@ -60,7 +60,7 @@ describe 'Gradebook Controls' do
       Gradezilla.select_view_dropdown
       Gradezilla.select_filters
       Gradezilla.select_view_filter("Grading Periods")
-      expect(Gradezilla.grading_period_dropdown).to be_displayed
+      expect(f(Gradezilla.grading_period_dropdown_selector)).to be_displayed
     end
 
     it 'shows Module dropdown', test_id: 3253275, priority: '1' do

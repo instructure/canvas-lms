@@ -43,7 +43,7 @@ module Api::V1::Section
           user_json(e.user, user, session, includes, @context, enrollments)
         }
     end
-    res['total_students'] = section.students.count if includes.include?('total_students')
+    res['total_students'] = section.students.not_fake_student.count if includes.include?('total_students')
 
     if includes.include?('passback_status')
       res['passback_status'] = post_grades_status_json(section)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,18 +27,34 @@ define [
 ], (I18n, $, fcUtil, semanticDateRange, CommonEvent, natcompare) ->
 
   deleteConfirmation = I18n.t("Are you sure you want to delete this To Do item?")
+  plannerNotesAPI = '/api/v1/planner_notes'
 
   class PlannerNote extends CommonEvent
     constructor: (data, contextInfo, actualContextInfo) ->
       super data, contextInfo, actualContextInfo
       @eventType = 'planner_note'
       @deleteConfirmation = deleteConfirmation
-      @plannerNotesAPI = '/api/v1/planner_notes'
-      @deleteURL = encodeURI("#{{@plannerNotesAPI}}/{{ id }}")
+      @deleteURL = encodeURI("#{plannerNotesAPI}/{{ id }}")
 
     # beware: copyDateFromObj is called before our constructor
     # because it's call from super's constructor comes here
+    # copyDataFromObject makes the incoming planner_note look like a calendar event
+    # if we get here via a request for the list of notes (see EventDataSource), some of the
+    # fields are already filled in, but if we get here because we just edited a planner_note
+    # they are not.
     copyDataFromObject: (data) ->
+      data.type = "planner_note"
+      data.description = data.details
+      data.planner_note_id = data.id
+      data.start_at = data.todo_date
+      data.end_at = null
+      data.all_day = true
+      data.url = "#{location.origin}#{plannerNotesAPI}/#{data.planner_note_id}"
+      data.context_code = if data.course_id then "course_#{data.course_id}" else "user_#{data.user_id}"
+      data.all_context_codes = data.context_code
+
+
+
       data = data.calendar_event if data.calendar_event
       @object = @calendarEvent = data
       @id = "planner_note_#{data.id}" if data.id
@@ -48,7 +64,7 @@ define [
       @allDay = data.all_day
       # see originalStart in super's copyDataFromObject
       @originalEndDate = fcUtil.clone(@end) if @end
-      @editable = false
+      @editable = true
       @lockedTitle = @object.parent_event_id?
       @description = data.description
       @addClass "group_#{@contextCode()}"
@@ -67,19 +83,20 @@ define [
       @readableTypes[@event_type]
 
     # called at the end of a drag and drop operation
-    # TODO: change when we can edit in the calendar
     saveDates: (success, error) ->
       @save {
-        # 'calendar_event[start_at]': if @start then fcUtil.unwrap(@start).toISOString() else ''
-        # 'calendar_event[end_at]': if @end then fcUtil.unwrap(@end).toISOString() else ''
-        # 'calendar_event[all_day]': @allDay
+        title: @title
+        details: @description
+        todo_date: fcUtil.unwrap(@start).toISOString()
+        id: @object.id
+        type: 'planner_note'
       }, success, error
 
     methodAndURLForSave: () ->
       if @isNewEvent()
         method = 'POST'
-        url = '/api/v1/planner_note'
+        url = plannerNotesAPI
       else
         method = 'PUT'
-        url = @calendarEvent.url
+        url = "#{plannerNotesAPI}/#{this.object.id}"
       [ method, url ]

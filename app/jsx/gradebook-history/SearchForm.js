@@ -46,7 +46,7 @@ class SearchFormComponent extends Component {
     assignments: recordShape.isRequired,
     graders: recordShape.isRequired,
     students: recordShape.isRequired,
-    getGradeHistory: func.isRequired,
+    getGradebookHistory: func.isRequired,
     clearSearchOptions: func.isRequired,
     getSearchOptions: func.isRequired,
     getSearchOptionsNextPage: func.isRequired,
@@ -68,7 +68,7 @@ class SearchFormComponent extends Component {
   };
 
   componentDidMount () {
-    this.props.getGradeHistory(this.state.selected);
+    this.props.getGradebookHistory(this.state.selected);
   }
 
   componentWillReceiveProps ({
@@ -78,7 +78,7 @@ class SearchFormComponent extends Component {
     students
   }) {
     if (this.props.fetchHistoryStatus === 'started' && fetchHistoryStatus === 'failure') {
-      showFlashAlert({ message: I18n.t('Error loading grade history. Try again?') });
+      showFlashAlert({ message: I18n.t('Error loading gradebook history. Try again?') });
     }
 
     if (assignments.fetchStatus === 'success' && assignments.items.length === 0) {
@@ -213,7 +213,7 @@ class SearchFormComponent extends Component {
   }
 
   handleSubmit = () => {
-    this.props.getGradeHistory(this.state.selected);
+    this.props.getGradebookHistory(this.state.selected);
   }
 
   filterNone = options => (
@@ -348,8 +348,8 @@ const mapStateToProps = state => (
 
 const mapDispatchToProps = dispatch => (
   {
-    getGradeHistory: (input) => {
-      dispatch(SearchFormActions.getGradeHistory(input));
+    getGradebookHistory: (input) => {
+      dispatch(SearchFormActions.getGradebookHistory(input));
     },
     getSearchOptions: (recordType, searchTerm) => {
       dispatch(SearchFormActions.getSearchOptions(recordType, searchTerm));

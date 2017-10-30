@@ -196,33 +196,6 @@ describe "course settings" do
     end
 
     describe "move dialog" do
-      it "should return focus to cog menu button when closing move dialog" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".move_nav_item_link")[2].click    # click "Move"
-        f(".ui-dialog-titlebar-close").click  # click the 'x' close button
-        check_element_has_focus(cog_menu_button)
-      end
-
-      it "should return focus to cog menu button when cancelling move dialog" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".move_nav_item_link")[2].click    # click "Move"
-        f("#move_nav_item_cancel_btn").click  # click "Cancel"
-        check_element_has_focus(cog_menu_button)
-      end
-
-      it "should return focus to cog menu button when moving an item" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".move_nav_item_link")[2].click    # click "Move"
-        f("#move_nav_item_form button[type='submit']").click  # click "Move"
-        check_element_has_focus(cog_menu_button)
-      end
-
       it "should return focus to cog menu button when disabling an item" do
         get "/courses/#{@course.id}/settings#tab-navigation"
         cog_menu_button = ff(".al-trigger")[2]
@@ -355,6 +328,22 @@ describe "course settings" do
       expect(input).to be_disabled
     end
     expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
+  end
+
+  it "should let a sub-account admin edit enrollment term" do
+    term = Account.default.enrollment_terms.create!(:name => "some term")
+    sub_a = Account.default.sub_accounts.create!
+    account_admin_user(:active_all => true, :account => sub_a)
+    user_session(@admin)
+
+    @course = sub_a.courses.create!
+    get "/courses/#{@course.id}/settings"
+
+    click_option('#course_enrollment_term_id', term.name)
+
+    submit_form('#course_form')
+
+    expect(@course.reload.enrollment_term).to eq term
   end
 
   context "link validator" do

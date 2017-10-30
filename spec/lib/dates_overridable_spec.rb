@@ -205,6 +205,11 @@ shared_examples_for "an object whose dates are overridable" do
       it { is_expected.to be_truthy }
     end
 
+    context "when it does but it's deleted" do
+      before { override.destroy }
+      it { is_expected.to be_falsey }
+    end
+
     context "when it doesn't" do
       it { is_expected.to be_falsey }
     end

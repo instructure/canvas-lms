@@ -16,29 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import $ from 'jquery'
-import tz from 'timezone'
-import 'jquery.instructure_date_and_time'
-  var DateHelper = {
-    parseDates: function(object, datesToParse) {
-      _.each(datesToParse, (dateString) => {
-        var propertyExists = !_.isUndefined(object[dateString]);
-        if (propertyExists) object[dateString] = tz.parse(object[dateString]);
-      });
-      return object;
-    },
+import _ from 'underscore';
+import $ from 'jquery';
+import tz from 'timezone';
+import 'jquery.instructure_date_and_time';
 
-    formatDatetimeForDisplay: function(date) {
-      return $.datetimeString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
-    },
+const DateHelper = {
+  parseDates (object, datesToParse) {
+    _.each(datesToParse, (dateString) => {
+      const propertyExists = !_.isUndefined(object[dateString]);
+      if (propertyExists) object[dateString] = tz.parse(object[dateString]);
+    });
+    return object;
+  },
 
-    formatDateForDisplay: function(date) {
-      return $.dateString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
-    },
+  formatDatetimeForDisplay (date, format = 'medium') {
+    return $.datetimeString(date, { format, timezone: ENV.CONTEXT_TIMEZONE });
+  },
 
-    isMidnight: function(date) {
-      return tz.isMidnight(date);
-    }
-  };
-export default DateHelper
+  formatDateForDisplay (date) {
+    return $.dateString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
+  },
+
+  isMidnight (date) {
+    return tz.isMidnight(date);
+  }
+};
+
+export default DateHelper;

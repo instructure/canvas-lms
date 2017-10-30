@@ -96,6 +96,7 @@ describe "discussions" do
 
         it "should allow editing the due dates", priority: "1", test_id: 270917 do
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           due_at = Time.zone.now + 3.days
           unlock_at = Time.zone.now + 2.days
@@ -117,6 +118,7 @@ describe "discussions" do
 
         it "should add an attachment to a graded topic", priority: "1", test_id: 270918 do
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           add_attachment_and_validate do
             # should correctly save changes to the assignment
@@ -138,6 +140,7 @@ describe "discussions" do
         it "should warn user when leaving page unsaved", priority: "1", test_id: 270919 do
           title = 'new title'
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           replace_content(f('input[name=title]'), title)
           fln('Home').click
@@ -231,6 +234,7 @@ describe "discussions" do
           topic.save!
 
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed
 
@@ -253,6 +257,7 @@ describe "discussions" do
           topic.save!
 
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           delayed_post_at = Time.zone.now - 10.days
           lock_at = Time.zone.now - 5.days
@@ -277,6 +282,7 @@ describe "discussions" do
           topic.save!
 
           get url
+          wait_for_tiny(f('textarea[name=message]'))
 
           delayed_post_at = Time.zone.now - 5.days
 

@@ -32,6 +32,7 @@ define [
     @fakeEditor = {
       addCommand: @commandSpy,
       addButton: @buttonSpy,
+      getContent: ->,
       selection: {getContent: -> }
     }
     @INST = INST

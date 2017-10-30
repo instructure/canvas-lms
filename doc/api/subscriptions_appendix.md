@@ -7,8 +7,8 @@ subscriptions of the associated type.
 * vnd.instructure.webhooks.root_account.quiz_submitted
 * vnd.instructure.webhooks.assignment.quiz_submitted
 
-### `GRADE_CHANGED` Event Type
-* vnd.instructure.webhooks.root_account.grade_changed
+### `GRADE_CHANGE` Event Type
+* vnd.instructure.webhooks.root_account.grade_change
 
 ### `ATTACHMENT_CREATED` Event Type
 * vnd.instructure.webhooks.root_account.attachment_created

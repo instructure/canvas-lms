@@ -33,6 +33,13 @@ module DifferentiatedAssignments
       DifferentiatedAssignments::CourseModules.initialize
     end
 
+    def short_list_initialize
+      @the_course = create_course
+      DifferentiatedAssignments::Sections.initialize
+      DifferentiatedAssignments::Users.initialize
+      DifferentiatedAssignments::Homework.short_list_initialize
+    end
+
     private
       include Factories
 

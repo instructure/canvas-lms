@@ -208,7 +208,7 @@ describe GradeCalculator do
         expect(Enrollment.shard(@course.shard).where(user_id: @user.global_id).first.computed_final_score(grading_period_id: @grading_period.id)).to eql(10.0)
       end
 
-      it("should update cross-shard scores with assignment groups", if: Score.course_score_populated?) do
+      it("should update cross-shard scores with assignment groups") do
         @user = User.create!
 
         allow(GradeCalculator).to receive(:recompute_final_score) {}
@@ -1072,13 +1072,7 @@ describe GradeCalculator do
       end
     end
 
-    it("does not save assignment group scores", unless: Score.course_score_populated?) do
-      @course.assignment_groups.create!(name: "some group")
-      GradeCalculator.new(@student.id, @course).compute_and_save_scores
-      expect(Score.where.not(assignment_group_id: nil).count).to be 0
-    end
-
-    context("assignment group scores", if: Score.course_score_populated?) do
+    context("assignment group scores") do
       before(:each) do
         @group1 = @course.assignment_groups.create!(name: "some group 1")
         @assignment1 = @course.assignments.create!(name: "assignment 1", points_possible: 20, assignment_group: @group1)
@@ -1417,7 +1411,7 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:total]).to eq 20
           expect(final_grade_info(@user, @course)[:possible]).to eq 40
         end
-        it("saves scores for all assignment group and enrollment combinations", if: Score.course_score_populated?) do
+        it("saves scores for all assignment group and enrollment combinations") do
           user_ids = @course.enrollments.map(&:user_id).uniq
           group_ids = @assignments.map(&:assignment_group_id).uniq
           GradeCalculator.new(user_ids, @course.id).compute_and_save_scores

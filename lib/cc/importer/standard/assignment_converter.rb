@@ -103,6 +103,12 @@ module CC::Importer::Standard
           assignment[:saved_rubric_comments][comment_node['criterion_id']] << comment_node.text.strip
         end
       end
+      if meta_doc.at_css("similarity_detection_tool")
+        node = meta_doc.at_css("similarity_detection_tool")
+        similarity_settings = node.attributes.each_with_object({}) { |(k,v), h| h[k] = v.value }
+        assignment[:similarity_detection_tool] = similarity_settings
+      end
+
       ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url", "turnitin_settings"].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
@@ -140,7 +146,6 @@ module CC::Importer::Standard
           assignment[:assignment_overrides] << override
         end
       end
-
       assignment
     end
   end

@@ -1533,6 +1533,28 @@ describe "Module Items API", type: :request do
     end
   end
 
+  describe 'POST duplicate' do
+    before :once do
+      course_with_teacher(:course => @course, :active_all => true)
+    end
+
+    it 'should duplicate module item' do
+      api_call(:post, "/api/v1/courses/#{@course.id}/modules/items/#{@assignment_tag.id}/duplicate",
+                      { controller: "context_module_items_api", action: 'duplicate', format: 'json',
+                        course_id: "#{@course.id}", id: "#{@assignment_tag.id}" },
+                      {}, {},
+                      {:expected_status => 200})
+    end
+
+    it 'should not duplicate invalid module item' do
+      api_call(:post, "/api/v1/courses/#{@course.id}/modules/items/#{@attachment_tag.id}/duplicate",
+                      { controller: "context_module_items_api", action: 'duplicate', format: 'json',
+                        course_id: "#{@course.id}", id: "#{@attachment_tag.id}" },
+                      {}, {},
+                      {:expected_status => 400})
+    end
+  end
+
   context "unauthorized user" do
     before :once do
       user_factory

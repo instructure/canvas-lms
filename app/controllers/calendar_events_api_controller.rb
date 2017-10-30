@@ -994,7 +994,12 @@ class CalendarEventsApiController < ApplicationController
     # only get pertinent contexts if there is a user
     if user
       joined_codes = codes && codes.join(",")
-      get_all_pertinent_contexts(include_groups: true, only_contexts: joined_codes, include_contexts: joined_codes)
+      get_all_pertinent_contexts(
+        include_groups: true,
+        cross_shard: true,
+        only_contexts: joined_codes,
+        include_contexts: joined_codes
+      )
     end
 
     if codes
@@ -1053,20 +1058,12 @@ class CalendarEventsApiController < ApplicationController
     contexts = @contexts.select { |c| @context_codes.include?(c.asset_string) }
     view_unpublished, other = contexts.partition { |c| c.grants_right?(user, session, :view_unpublished_items) }
 
-    sql = []
-    conditions = []
-    unless view_unpublished.empty?
-      sql << '(assignments.context_code IN (?))'
-      conditions << view_unpublished.map(&:asset_string)
-    end
+    base_scope = Assignment
+      .shard(user&.in_region_associated_shards || Shard.current)
 
-    unless other.empty?
-      sql << '(assignments.context_code IN (?) AND assignments.workflow_state = ?)'
-      conditions << other.map(&:asset_string)
-      conditions << 'published'
-    end
-
-    scope = Assignment.where([sql.join(' OR ')] + conditions)
+    scope = base_scope
+      .where(context: other, workflow_state: 'published')
+      .or(base_scope.where(context: view_unpublished))
     return scope if @public_to_auth || !user
 
     student_ids = [user.id]
@@ -1096,7 +1093,11 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_scope(user)
-    scope = CalendarEvent.active.order_by_start_at.order(:id)
+    scope = CalendarEvent
+      .shard(user&.in_region_associated_shards || Shard.current)
+      .active
+      .order_by_start_at
+      .order(:id)
     if user && !@public_to_auth
       scope = scope.for_user_and_context_codes(user, @context_codes, @section_codes)
     else

@@ -117,6 +117,25 @@ The title of the context.
 ```
 Example Course
 ```
+## com.instructure.Editor.contents
+The contents of the text editor associated with the content item launch.
+
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_editor_contents*  
+
+```
+"This text was in the editor"
+```
+## com.instructure.Editor.selection
+The contents the user has selected in the text editor associated
+with the content item launch.
+
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_editor_selection*  
+
+```
+"this text was selected by the user"
+```
 ## com.instructure.PostMessageToken
 A token that can be used for frontend communication between an LTI tool
 and Canvas via the Window.postMessage API.
@@ -321,6 +340,15 @@ returns the URL to retrieve the brand config JSON for the launching context.
 
 ```
 http://example.url/path.json
+```
+## com.instructure.brandConfigJSON
+returns the brand config JSON itself for the launching context.
+
+**Availability**: *always*  
+
+
+```
+{"ic-brand-primary-darkened-5":"#0087D7"}
 ```
 ## com.instructure.brandConfigJS.url
 returns the URL to retrieve the brand config javascript for the launching context.

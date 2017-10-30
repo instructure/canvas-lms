@@ -714,12 +714,6 @@ describe "context modules" do
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
-      it "should return focus to the module item cog when closing the move dialog" do
-        hover_and_click("#context_module_item_#{@tag.id} .move_module_item_link")
-        f('#move_module_item_cancel_btn').click
-        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
-      end
-
       it "should return focus to the module item cog when cancelling a delete" do
         hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
         expect(driver.switch_to.alert).not_to be_nil

@@ -70,7 +70,12 @@ module Api::V1::Attachment
     if downloadable
       thumbnail_url = attachment.thumbnail_url
       if options[:thumbnail_url]
-        url = thumbnail_url
+        # not the same as thumbnail_url above because:
+        # * that one's going to be a direct (and possibly signed) s3, inst-fs,
+        #   etc. link for immediate use.
+        # * this one's a more compact canvas link to be stored for later use;
+        #   it will resolve to the former when accessed
+        url = thumbnail_image_url(attachment)
       else
         h = { :download => '1', :download_frd => '1' }
         h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && respond_to?(:in_app?, true) && in_app?

@@ -163,28 +163,24 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     student.isInactive = true;
     const $cell = renderCell();
     ok($cell.classList.contains('grayed-out'), 'cell classes include "grayed-out"');
-    notOk($cell.classList.contains('cannot_edit'), 'cell classes do not include "cannot_edit"');
   });
 
   test('renders an uneditable cell when the student enrollment is concluded', function () {
     student.isConcluded = true;
     const $cell = renderCell();
     ok($cell.classList.contains('grayed-out'), 'cell classes include "grayed-out"');
-    ok($cell.classList.contains('cannot_edit'), 'cell classes include "cannot_edit"');
   });
 
   test('renders an uneditable cell when the submission has a hidden grade', function () {
     submissionState.hideGrade = true;
     const $cell = renderCell();
     ok($cell.classList.contains('grayed-out'), 'cell classes include "grayed-out"');
-    ok($cell.classList.contains('cannot_edit'), 'cell classes include "cannot_edit"');
   });
 
   test('renders an uneditable cell when the submission cannot be graded', function () {
     submissionState.locked = true;
     const $cell = renderCell();
     ok($cell.classList.contains('grayed-out'), 'cell classes include "grayed-out"');
-    ok($cell.classList.contains('cannot_edit'), 'cell classes include "cannot_edit"');
   });
 
   test('includes the "turnitin" class when the submission has Turnitin data', function () {
@@ -220,12 +216,8 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
   QUnit.module('#render with an ungraded submission', {
     setup () {
       submission.grade = null;
+      submission.score = null;
     }
-  });
-
-  test('includes the "no_grade_yet" class when the submission is pending review', function () {
-    submission.workflow_state = 'pending_review';
-    ok(renderCell().classList.contains('no_grade_yet'));
   });
 
   test('renders a "document" icon for "online_upload" a submission', function () {
@@ -263,9 +255,9 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('i.icon-document').length, 1);
   });
 
-  test('renders a dash "-" for a submission without a submission type', function () {
+  test('renders an emdash "–" for a submission without a submission type', function () {
     submission.submission_type = null;
-    strictEqual(renderCell().innerHTML.trim(), '-');
+    strictEqual(renderCell().innerHTML.trim(), '–');
   });
 
   QUnit.module('#render with a "points" assignment submission', {
@@ -274,13 +266,8 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     }
   });
 
-  test('renders the grade', function () {
+  test('renders the score converted to a points string', function () {
     strictEqual(renderCell().innerHTML.trim(), '8');
-  });
-
-  test('rounds the grade to two decimal places', function () {
-    submission.grade = '8.345';
-    strictEqual(renderCell().innerHTML.trim(), '8.35');
   });
 
   test('renders the submission type icon when the submission is ungraded', function () {
@@ -307,13 +294,8 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     }
   });
 
-  test('renders the grade as a percentage', function () {
-    strictEqual(renderCell().innerHTML.trim(), '8%');
-  });
-
-  test('rounds the percentage to two decimal places', function () {
-    submission.grade = '8.345';
-    strictEqual(renderCell().innerHTML.trim(), '8.35%');
+  test('renders the score converted to a percentage', function () {
+    strictEqual(renderCell().innerHTML.trim(), '80%');
   });
 
   test('renders the submission type icon when the submission is ungraded', function () {
@@ -337,21 +319,19 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
   QUnit.module('#render with a "letter grade" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'letter_grade';
-      submission.grade = 'A';
+      submission.score = 9;
     }
   });
 
-  test('renders the grade', function () {
+  test('renders the score converted to a letter grade', function () {
     strictEqual(renderCell().firstChild.wholeText.trim(), 'A');
   });
 
-  test('includes the score with the grade', function () {
-    strictEqual(renderCell().querySelector('.letter-grade-points').innerHTML, '8');
-  });
-
-  test('does not round the score', function () {
-    submission.score = 8.345;
-    strictEqual(renderCell().querySelector('.letter-grade-points').innerHTML, '8.345');
+  test('renders the grade when the assignment has no points possible', function () {
+    gradebook.getAssignment('2301').points_possible = 0;
+    submission.grade = 'A';
+    submission.score = 0;
+    strictEqual(renderCell().firstChild.wholeText.trim(), 'A');
   });
 
   test('renders the submission type icon when the submission is ungraded', function () {
@@ -392,6 +372,14 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().querySelectorAll('button i.icon-x').length, 1);
   });
 
+  test('renders an emdash "–" when the submission is unsubmitted', function () {
+    submission.grade = null;
+    submission.rawGrade = null;
+    submission.score = null;
+    submission.submission_type = null;
+    equal(renderCell().firstChild.wholeText.trim(), '–');
+  });
+
   test('renders the submission type icon when the submission is ungraded', function () {
     submission.grade = null;
     submission.rawGrade = null;
@@ -414,11 +402,11 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
   QUnit.module('#render with a "GPA Scale" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'gpa_scale';
-      submission.grade = 'A';
+      submission.score = 9;
     }
   });
 
-  test('renders the grade', function () {
+  test('renders the score converted to a letter grade', function () {
     strictEqual(renderCell().innerHTML.trim(), 'A');
   });
 
@@ -447,7 +435,7 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     }
   });
 
-  test('renders the grade', function () {
+  test('renders the score converted to a points string', function () {
     strictEqual(renderCell().innerHTML.trim(), '8');
   });
 

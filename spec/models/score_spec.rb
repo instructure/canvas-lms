@@ -75,7 +75,7 @@ describe Score do
       expect { student.scores.create!(grading_period_score_params) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
-    it('is invalid without unique enrollment for assignment group', if: Score.course_score_populated?) do
+    it('is invalid without unique enrollment for assignment group') do
       student.scores.create!(assignment_group_score_params)
       expect { student.scores.create!(assignment_group_score_params) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
@@ -100,7 +100,7 @@ describe Score do
     include_examples('score attribute') { let(:attribute) { :current_score } }
     include_examples('score attribute') { let(:attribute) { :final_score } }
 
-    context("scorable associations", if: Score.course_score_populated?) do
+    context("scorable associations") do
       before(:once) { grading_periods }
 
       it 'is valid with course_score true and no scorable associations' do
@@ -170,7 +170,7 @@ describe Score do
     end
   end
 
-  describe('#scorable', if: Score.course_score_populated?) do
+  describe('#scorable') do
     it 'returns course for course score' do
       expect(score.scorable).to be score.enrollment.course
     end
@@ -184,7 +184,7 @@ describe Score do
     end
   end
 
-  describe('#course_score', if: Score.course_score_populated?) do
+  describe('#course_score') do
     it 'sets course_score to true when there are no scorable associations' do
       expect(score.course_score).to be true
     end
@@ -199,12 +199,8 @@ describe Score do
   end
 
   describe('#params_for_course') do
-    it('uses course_score', if: Score.course_score_populated?) do
+    it('uses course_score') do
       expect(Score.params_for_course).to eq(course_score: true)
-    end
-
-    it('uses nil grading period id', unless: Score.course_score_populated?) do
-      expect(Score.params_for_course).to eq(grading_period_id: nil)
     end
   end
 

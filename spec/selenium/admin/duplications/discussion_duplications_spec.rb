@@ -35,11 +35,26 @@ describe "duplicate discussion" do
       )
     end
 
-    it "has duplication option for discussions", priority: "2", test_id: 3353071 do
-      user_session(@teacher)
-      get discussions_topic_page
-      f('.discussion-actions').click
-      expect(f('.al-options')).to contain_css('.icon-copy-course.duplicate-discussion.ui-corner-all')
+    context 'duplicating' do
+      before :each do
+        user_session(@teacher)
+        get discussions_topic_page
+        f('.discussion-actions').click
+      end
+
+      it "has duplication option for discussions", priority: "2", test_id: 3353071 do
+        expect(f('.al-options')).to contain_css('.icon-copy-course.duplicate-discussion.ui-corner-all')
+      end
+
+      it "duplicates a discussion", priority: "2", test_id: 3355802 do
+        f('.icon-copy-course.duplicate-discussion.ui-corner-all').click
+        expect(f('.open.discussion-list')).to contain_link('Discussion 1 Title Copy')
+      end
+
+      it "creates an unpublished duplicate", priority: "2", test_id: 3355803 do
+        f('.icon-copy-course.duplicate-discussion.ui-corner-all').click
+        expect(f('.open.discussion-list')).to contain_css('.icon-unpublish')
+      end
     end
   end
 end

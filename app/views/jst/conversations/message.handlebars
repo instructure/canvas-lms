@@ -1,63 +1,65 @@
-<h2 class="author">{{list participants propName="name" limit=2}}</h2>
-
-<span class="date pull-right">{{friendlyDatetime timestamp}}</span>
-
-<h3 class="subject">
-  {{#if subject}}
-    {{subject}}
-  {{else}}
-    ({{#t "no_subject"}}No subject{{/t}})
-  {{/if}}
-</h3>
-
-<span class="message-count label">
-  {{message_count}}
-  <span class="screenreader-only">{{#t "total_messages"}}Total messages{{/t}}</span>
-</span>
-
-<div class="summary">{{last_message}}</div>
-
-<ul class="message-actions unstyled">
-  {{#unless for_submission}}
-  <li>
-    <span class="StarButton-LabelContainer" id="star_button_{{id}}" style="display: none;">
-      {{#if starred}}
-        {{#if subject}}
-          {{#t}}Starred "{{subject}}", Click to unstar.{{/t}}
-        {{else}}
-          {{#t}}Starred "(No subject)", Click to unstar.{{/t}}
-        {{/if}}
-      {{else}}
-        {{#if subject}}
-          {{#t}}Not starred "{{subject}}", Click to star.{{/t}}
-        {{else}}
-          {{#t}}'Not starred "(No Subject)", Click to star.{{/t}}
-        {{/if}}
-      {{/if}}
+<div class="message-left-column">
+  <div class="select-checkbox" id="conversation-checkbox-{{id}}">
+    {{!-- <label for="conversation-checkbox-{{id}}">
+      <span class="screenreader-only">{{#t}}Select Conversation {{subject}}{{/t}}</span>
+      <input class="select-checkbox" id="conversation-checkbox-{{id}}" type="checkbox" />
+    </label> --}}
+  </div>
+  <a href="#"
+      class="read-state {{#unless unread}}read{{/unless}}"
+      role="checkbox"
+      aria-checked="{{#if unread}}true{{else}}false{{/if}}"
+      title="{{#if unread}}{{#t}}Mark as read{{/t}}{{else}}{{#t}}Mark as unread{{/t}}{{/if}}">
+    <span class="screenreader-only">
+      {{#t}}Unread{{/t}}
     </span>
-    <a href="#"
-       class="star-btn {{#if starred}}active{{/if}}"
-       title="{{#if starred}}{{#t "unstar_conversation"}}Unstar conversation{{/t}}{{else}}{{#t "star_conversation"}}Star conversation{{/t}}{{/if}}"
-       aria-checked="{{#if starred}}true{{else}}false{{/if}}"
-       aria-labelledby="star_button_{{id}}"
-       role="checkbox">
-      &#9734;
-    </a>
-  </li>
+  </a>
+</div>
+
+<div class="message-middle-column">
+  <div class="date">{{friendlyDatetime timestamp}}</div>
+  <h2 class="author">{{list participants propName="name" limit=2}}</h2>
+  <h3 class="subject">
+    {{#if subject}}
+      {{subject}}
+    {{else}}
+      ({{#t}}No subject{{/t}})
+    {{/if}}
+  </h3>
+  <div class="summary">{{#if last_message}}{{last_message}}{{else}}{{last_authored_message}}{{/if}}</div>
+</div>
+
+<div class="message-right-column">
+  <span class="message-count label">
+    {{message_count}}
+    <span class="screenreader-only">{{#t}}Total messages{{/t}}</span>
+  </span>
+
+  {{#unless for_submission}}
+  <span class="StarButton-LabelContainer" id="star_button_{{id}}" style="display: none;">
+    {{#if starred}}
+      {{#if subject}}
+        {{#t}}Starred "{{subject}}", Click to unstar.{{/t}}
+      {{else}}
+        {{#t}}Starred "(No subject)", Click to unstar.{{/t}}
+      {{/if}}
+    {{else}}
+      {{#if subject}}
+        {{#t}}Not starred "{{subject}}", Click to star.{{/t}}
+      {{else}}
+        {{#t}}'Not starred "(No Subject)", Click to star.{{/t}}
+      {{/if}}
+    {{/if}}
+  </span>
+  <a href="#"
+      class="star-btn {{#if starred}}active{{/if}}"
+      title="{{#if starred}}{{#t}}Unstar conversation{{/t}}{{else}}{{#t}}Star conversation{{/t}}{{/if}}"
+      aria-checked="{{#if starred}}true{{else}}false{{/if}}"
+      aria-labelledby="star_button_{{id}}"
+      role="checkbox"></a>
   {{/unless}}
-  <li>
-    <a href="#"
-       class="read-state {{#unless unread}}read{{/unless}}"
-       role="checkbox"
-       aria-checked="{{#if unread}}true{{else}}false{{/if}}"
-       title="{{#if unread}}{{#t "mark_as_read"}}Mark as read{{/t}}{{else}}{{#t "mark_as_unread"}}Mark as unread{{/t}}{{/if}}">
-      <span class="screenreader-only">
-        {{#t "unread"}}Unread{{/t}}
-      </span>
-    </a>
-  </li>
-</ul>
+</div>
 
 <a href="#" class="open-message" role="button">
-  {{#t "open_message"}}Open Message{{/t}}
+  {{#t}}Open Message{{/t}}
 </a>

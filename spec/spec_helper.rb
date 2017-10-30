@@ -349,6 +349,7 @@ RSpec.configure do |config|
     RequestStore.clear!
     MultiCache.reset
     Course.enroll_user_call_count = 0
+    TermsOfService.skip_automatic_terms_creation = true
     $spec_api_tokens = {}
   end
 
@@ -466,7 +467,7 @@ RSpec.configure do |config|
   #****************************************************************
 
   def login_as(username = "nobody@example.com", password = "asdfasdf")
-    post "/login",
+    post "/login/canvas",
                       params: {"pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password}
     follow_redirect! while response.redirect?

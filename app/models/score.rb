@@ -27,7 +27,7 @@ class Score < ActiveRecord::Base
   validates :enrollment, presence: true
   validates :current_score, :unposted_current_score, :final_score, :unposted_final_score, numericality: true, allow_nil: true
 
-  validate :scorable_association_check, if: -> { Score.course_score_populated? }
+  validate :scorable_association_check
 
   before_validation :set_course_score, unless: :course_score_changed?
 
@@ -61,12 +61,8 @@ class Score < ActiveRecord::Base
     grading_period || assignment_group || enrollment.course
   end
 
-  def self.course_score_populated?
-    ENV['GRADEBOOK_COURSE_SCORE_POPULATED'].present?
-  end
-
   def self.params_for_course
-    Score.course_score_populated? ? { course_score: true } : { grading_period_id: nil }
+    { course_score: true }
   end
 
   delegate :score_to_grade, to: :course

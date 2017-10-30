@@ -630,7 +630,7 @@ class Submission < ActiveRecord::Base
   # This method pulls data from the OriginalityReport table
   # Preload OriginalityReport before using this method in a collection of submissions
   def originality_data
-    data = self.originality_reports.each_with_object({}) do |originality_report, hash|
+    data = OriginalityReport.where(attachment_id: attachment_ids_for_version).each_with_object({}) do |originality_report, hash|
       hash[Attachment.asset_string(originality_report.attachment_id)] = {
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
@@ -1339,7 +1339,8 @@ class Submission < ActiveRecord::Base
   end
 
   def entered_grade
-    return grade if grading_type == 'pass_fail'
+    return grade if score == entered_score
+    return grade unless LatePolicy::POINT_DEDUCTIBLE_GRADING_TYPES.include?(grading_type)
     assignment.score_to_grade(entered_score) if entered_score
   end
 

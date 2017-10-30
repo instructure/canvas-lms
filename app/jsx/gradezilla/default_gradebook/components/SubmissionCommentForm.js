@@ -19,85 +19,107 @@
 import $ from 'jquery';
 import 'compiled/jquery.rails_flash_notifications';
 import React from 'react';
-import { bool, func } from 'prop-types';
+import { bool, func, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
 import TextArea from 'instructure-ui/lib/components/TextArea';
 import Button from 'instructure-ui/lib/components/Button';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 
-function isValid (comment) {
-  return comment.trim().length > 0;
-}
+export default class SubmissionCommentForm extends React.Component {
+  static propTypes = {
+    cancelCommenting: func.isRequired,
+    comment: string,
+    processing: bool.isRequired,
+    setProcessing: func.isRequired
+  };
 
-class SubmissionCommentForm extends React.Component {
-  state = { comment: '', textAreaWarning: false };
+  static defaultProps = {
+    comment: ''
+  };
 
-  handleCommentChange = (event) => {
-    const comment = event.target.value;
-    const wasInvalid = () => !isValid(this.state.comment);
-    const nowValid = () => isValid(comment);
-    // only change the warning to false if the comment was invalid and is now valid
-    const textAreaWarning = wasInvalid() && nowValid() ? false : this.state.textAreaWarning;
-    this.setState({ comment, textAreaWarning });
+  constructor (props) {
+    super(props);
+    const methodsToBind = [
+      'bindTextarea', 'handleCancel', 'handleCommentChange', 'handlePublishComment', 'focusTextarea'
+    ];
+    methodsToBind.forEach((method) => { this[method] = this[method].bind(this); });
+    this.state = { comment: props.comment };
   }
 
-  handlePostComment = event => {
+  focusTextarea () {
+    this.textarea.focus();
+  };
+
+  handleCancel (event, callback) {
+    event.preventDefault();
+
+    this.setState({ comment: this.props.comment }, () => {
+      this.props.cancelCommenting();
+      if (callback) {
+        callback();
+      }
+    });
+  }
+
+  handleCommentChange (event) {
+    this.setState({ comment: event.target.value });
+  }
+
+  handlePublishComment (event) {
     event.preventDefault();
     this.props.setProcessing(true);
-    if (isValid(this.state.comment)) {
-      this.props.createSubmissionComment(this.state.comment)
-        .catch(() => this.props.setProcessing(false));
-      this.setState({ comment: '' })
-    } else {
-      this.setState({ textAreaWarning: true }, () => {
-        $.screenReaderFlashError(this.messages().map(message => message.text).join(', '));
-        this.props.setProcessing(false);
-      });
-    }
+    this.publishComment().catch(() => this.props.setProcessing(false));
   }
 
-  messages () {
-    if (this.state.textAreaWarning) {
-      return [{ text: I18n.t('No message present'), type: 'error' }];
-    }
-    return [];
+  commentIsValid () {
+    const comment = this.state.comment.trim();
+    return comment.length > 0;
+  }
+
+  bindTextarea (ref) {
+    this.textarea = ref;
   }
 
   render () {
+    const { cancelButtonLabel, submitButtonLabel } = this.buttonLabels();
     return (
       <div>
         <div>
           <TextArea
-            messages={this.messages()}
             label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
             placeholder={I18n.t("Leave a comment")}
             onChange={this.handleCommentChange}
             value={this.state.comment}
+            textareaRef={this.bindTextarea}
           />
         </div>
 
-        <div
-          style={{ textAlign: 'right', marginTop: '0rem', border: 'none', padding: '0rem', background: 'transparent' }}
-        >
-          <Button
-            disabled={this.props.processing}
-            label={<ScreenReaderContent>{I18n.t('Post Comment')}</ScreenReaderContent>}
-            margin="small 0"
-            onClick={this.handlePostComment}
-            variant="primary"
-          >
-            {I18n.t("Post")}
-          </Button>
-        </div>
+        {
+          this.showButtons() &&
+            <div
+              style={{ textAlign: 'right', marginTop: '0rem', border: 'none', padding: '0rem', background: 'transparent' }}
+            >
+              <Button
+                disabled={this.props.processing}
+                label={cancelButtonLabel}
+                margin="small small small 0"
+                onClick={this.handleCancel}
+              >
+                {I18n.t("Cancel")}
+              </Button>
+
+              <Button
+                disabled={this.props.processing || !this.commentIsValid()}
+                label={submitButtonLabel}
+                margin="small 0"
+                onClick={this.handlePublishComment}
+                variant="primary"
+              >
+                {I18n.t("Submit")}
+              </Button>
+            </div>
+        }
       </div>
     );
   }
 }
-
-SubmissionCommentForm.propTypes = {
-  createSubmissionComment: func.isRequired,
-  processing: bool.isRequired,
-  setProcessing: func.isRequired
-};
-
-export default SubmissionCommentForm;

@@ -28,35 +28,32 @@ class GradeBookHistory
 
     def select_student_name(typeahead, student_name)
       enter_student_name(typeahead)
-      wait_for_ajaximations
       select_data_from_dropdown(student_name)
-      wait_for_ajaximations
     end
 
     def select_grader_name(grader_name)
       enter_grader_name(grader_name)
-      wait_for_ajaximations
       select_data_from_dropdown(grader_name)
-      wait_for_ajaximations
     end
 
     def select_assignment_name(assignment_name)
       enter_assignment_name(assignment_name)
-      wait_for_ajaximations
       select_data_from_dropdown(assignment_name)
-      wait_for_ajaximations
     end
 
     def enter_student_name(student_name)
       student_name_textfield.send_keys(student_name)
+      wait_for_ajaximations
     end
 
     def enter_grader_name(grader_name)
       grader_name_textfield.send_keys(grader_name)
+      wait_for_ajaximations
     end
 
     def enter_assignment_name(assignment_name)
       assignment_name_textfield.send_keys(assignment_name)
+      wait_for_ajaximations
     end
 
     def enter_start_date(from_date)
@@ -74,6 +71,7 @@ class GradeBookHistory
 
     def select_data_from_dropdown(text)
       fj("[id*=Autocomplete_Options_]li[role=option]:contains('#{text}')").click
+      wait_for_ajaximations
     end
 
     def edit_grade(grade)
@@ -107,7 +105,7 @@ class GradeBookHistory
     end
 
     def check_current_col_for_history(assignment_name)
-      row_elements= results_table_rows
+      row_elements = results_table_rows
       current_grade_arr=Array.[]
       for index in 1...row_elements.size
         if results_table_assignment_col(index).text == assignment_name
@@ -118,7 +116,7 @@ class GradeBookHistory
     end
 
     def check_table_for_assignment_name(string_in_row)
-      row_elements= results_table_rows
+      row_elements = results_table_rows
       test_passed = true
       for index in 1...row_elements.size
         if results_table_assignment_col(index).text != string_in_row
@@ -129,7 +127,7 @@ class GradeBookHistory
     end
 
     def check_table_for_grader_name(string_in_row)
-      row_elements= results_table_rows
+      row_elements = results_table_rows
       test_passed = true
       for index in 1...row_elements.size
         if results_table_grader_col(index).text != string_in_row
@@ -140,7 +138,7 @@ class GradeBookHistory
     end
 
     def check_table_for_student_name(string_in_row)
-      row_elements= results_table_rows
+      row_elements = results_table_rows
       test_passed = true
       for index in 1...row_elements.size
         if results_table_student_col(index).text != string_in_row

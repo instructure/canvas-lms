@@ -97,7 +97,9 @@ module Lti
          vnd.Canvas.submission.url
          Context.title
          com.instructure.Assignment.lti.id
-         com.instructure.PostMessageToken)
+         com.instructure.PostMessageToken
+         com.instructure.Editor.contents
+         com.instructure.Editor.selection)
     }
 
     describe '#supported_capabilities' do

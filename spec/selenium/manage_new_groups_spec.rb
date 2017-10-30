@@ -179,9 +179,9 @@ describe "manage groups" do
       wait_for_ajaximations
       fj(".edit-group-assignment:first").click
       wait_for_ajaximations
-      fj(".single-select:first option:first").click
+      ff(".move-select .move-select__group option").last.click
       wait_for_ajaximations
-      fj('.set-group:first').click
+      fj(".move-select button").click
       wait_for_ajaximations
       expect(fj(".group-summary:visible:first").text).to eq "0 students"
       expect(fj(".group-summary:visible:last").text).to eq "1 student"
@@ -189,11 +189,11 @@ describe "manage groups" do
       # Move the user back
       fj(".groups .group .group-user .group-user-actions").click
       wait_for_ajaximations
-      fj(".edit-group-assignment:last").click
+      fj(".edit-group-assignment:first").click
       wait_for_ajaximations
-      fj(".single-select:last option:first").click
+      ff(".move-select .move-select__group option").last.click
       wait_for_ajaximations
-      fj('.set-group:last').click
+      fj('.move-select button').click
       wait_for_ajaximations
       expect(fj(".group-summary:visible:first").text).to eq "1 student"
       expect(fj(".group-summary:visible:last").text).to eq "0 students"

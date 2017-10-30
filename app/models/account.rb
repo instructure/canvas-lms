@@ -31,6 +31,7 @@ class Account < ActiveRecord::Base
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_one :terms_of_service, :dependent => :destroy
+  has_one :terms_of_service_content, :dependent => :destroy
   has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
   has_many :groups, :as => :context, :inverse_of => :context
@@ -126,7 +127,9 @@ class Account < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
-  validates_presence_of :workflow_state
+  validates :workflow_state, presence: true
+  validate :no_active_courses, if: lambda { |a| a.workflow_state_changed? && !a.active? }
+  validate :no_active_sub_accounts, if: lambda { |a| a.workflow_state_changed? && !a.active? }
 
   include StickySisFields
   are_sis_sticky :name
@@ -323,20 +326,15 @@ class Account < ActiveRecord::Base
   end
 
   def terms_required?
-    Setting.get('terms_required', 'true') == 'true' && root_account.account_terms_required?
+    terms = TermsOfService.ensure_terms_for_account(root_account)
+    !(terms.terms_type == 'no_terms' || terms.passive)
   end
 
   def require_acceptance_of_terms?(user)
-    soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
-
     return false if !terms_required?
-    return true if user.nil? || user.new_record?
-    terms_changed_at = settings[:terms_changed_at]
+    return true if (user.nil? || user.new_record?)
+    terms_changed_at = root_account.terms_of_service.terms_of_service_content&.terms_updated_at || settings[:terms_changed_at]
     last_accepted = user.preferences[:accepted_terms]
-
-    # make sure existing users are grandfathered in
-    return false if terms_changed_at.nil? && user.registered? && user.created_at < soc2_start_date
-
     return false if last_accepted && (terms_changed_at.nil? || last_accepted > terms_changed_at)
     true
   end
@@ -1112,6 +1110,20 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def no_active_courses
+    return true if root_account?
+    if associated_courses.not_deleted.exists?
+      errors.add(:workflow_state, "Can't delete an account with active courses.")
+    end
+  end
+
+  def no_active_sub_accounts
+    return true if root_account?
+    if sub_accounts.exists?
+      errors.add(:workflow_state, "Can't delete an account with active sub_accounts.")
+    end
+  end
+
   def find_courses(string)
     self.all_courses.select{|c| c.name.match(string) }
   end
@@ -1649,6 +1661,7 @@ class Account < ActiveRecord::Base
     work = -> do
       default_enrollment_term
       enable_canvas_authentication
+      TermsOfService.ensure_terms_for_account(self, true) if self.root_account? && !TermsOfService.skip_automatic_terms_creation
     end
     return work.call if Rails.env.test?
     self.class.connection.after_transaction_commit(&work)
@@ -1656,5 +1669,22 @@ class Account < ActiveRecord::Base
 
   def migrate_to_canvadocs?
     Canvadocs.hijack_crocodoc_sessions? && feature_enabled?(:new_annotations)
+  end
+
+  def update_terms_of_service(terms_params)
+    terms = TermsOfService.ensure_terms_for_account(self)
+    terms.terms_type = terms_params[:terms_type] if terms_params[:terms_type]
+    terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.has_key?(:passive)
+
+    if terms.custom?
+      TermsOfServiceContent.ensure_content_for_account(self)
+      self.terms_of_service_content.update_attribute(:content, terms_params[:content]) if terms_params[:content]
+    end
+
+    if terms.changed?
+      unless terms.save
+        self.errors.add(:terms_of_service, t("Terms of Service attributes not valid"))
+      end
+    end
   end
 end

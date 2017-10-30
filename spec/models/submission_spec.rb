@@ -165,16 +165,28 @@ describe Submission do
   describe 'entered_grade' do
     let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
 
-    it 'returns grade if grading_type is pass_fail' do
-      @assignment.update(grading_type: 'pass_fail')
-      submission.update(score: 100)
-      expect(submission.entered_grade).to eql(submission.grade)
-    end
-
     it 'returns grade without deduction' do
       @assignment.update(grading_type: 'percent', points_possible: 100)
       submission.update(score: 25.5, points_deducted: 60)
       expect(submission.entered_grade).to eql('85.5%')
+    end
+
+    it 'returns grade if grading_type is pass_fail' do
+      @assignment.update(grading_type: 'pass_fail')
+      submission.update(grade: 'complete')
+      expect(submission.entered_grade).to eql('complete')
+    end
+
+    it 'returns the grade for a letter grade assignment with no points possible' do
+      @assignment.update(grading_type: 'letter_grade', points_possible: 0)
+      submission.update(grade: 'B')
+      expect(submission.entered_grade).to eql('B')
+    end
+
+    it 'returns the grade for a GPA scale assignment with no points possible' do
+      @assignment.update(grading_type: 'gpa_scale', points_possible: nil)
+      submission.update(grade: 'B')
+      expect(submission.entered_grade).to eql('B')
     end
   end
 
@@ -1526,9 +1538,17 @@ describe Submission do
       scores.where.not(grading_period_id: nil)
     end
 
+    let(:course_scores) do
+      scores.where(course_score: true)
+    end
+
+    let(:course_and_grading_period_scores) do
+      scores.where(course_score: true).or(scores.where.not(grading_period_id: nil).where(assignment_group_id: nil))
+    end
+
     it 'recomputes course scores when the submission score changes' do
       expect { @submission.update!(score: 5) }.to change {
-        scores.pluck(:current_score)
+        course_scores.pluck(:current_score)
       }.from([nil]).to([50.0])
     end
 
@@ -1555,7 +1575,7 @@ describe Submission do
       it 'updates the course score and grading period score if a submission ' \
       'in a grading period is graded' do
         expect { @submission.update!(score: 5) }.to change {
-          scores.pluck(:current_score)
+          course_and_grading_period_scores.pluck(:current_score)
         }.from([nil, 80.0]).to([50.0, 65.0])
       end
 
@@ -1564,7 +1584,7 @@ describe Submission do
         day_after_grading_period_ends = 1.day.from_now(@grading_period.end_date)
         @assignment.update!(due_at: day_after_grading_period_ends)
         expect { @submission.update!(score: 5) }.to change {
-          scores.pluck(:current_score)
+          course_and_grading_period_scores.pluck(:current_score)
         }.from([nil, 80.0]).to([nil, 65.0])
       end
     end
@@ -1750,11 +1770,14 @@ describe Submission do
   end
 
   context "OriginalityReport" do
-    let(:attachment) { attachment_model }
+    let(:attachment) { attachment_model(context: group) }
     let(:course) { course_model }
     let(:submission) { submission_model }
+    let(:group) { Group.create!(name: 'test group', context: course) }
 
     let(:originality_report) do
+      AttachmentAssociation.create!(context: submission, attachment_id: attachment)
+      submission.update_attributes(attachment_ids: attachment.id.to_s)
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
     end
 
@@ -1763,13 +1786,13 @@ describe Submission do
         originality_report.originality_report_url = 'http://example.com'
         originality_report.save!
         expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state
-                                                    }
-                                                  })
+          attachment.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
       end
 
       it "includes tii data" do
@@ -1781,8 +1804,8 @@ describe Submission do
         }
         submission.turnitin_data[attachment.asset_string] = tii_data
         expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => tii_data
-                                                  })
+          attachment.asset_string => tii_data
+        })
       end
 
       it "overrites the tii data with the originality data" do
@@ -1796,13 +1819,13 @@ describe Submission do
         }
         submission.turnitin_data[attachment.asset_string] = tii_data
         expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state
-                                                    }
-                                                  })
+          attachment.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
       end
 
       it 'does not cause error if originality score is nil' do
@@ -1817,7 +1840,7 @@ describe Submission do
       end
 
       it "filters out :provider key and value" do
-         originality_report.originality_report_url = 'http://example.com'
+        originality_report.originality_report_url = 'http://example.com'
         originality_report.save!
         tii_data = {
           provider: 'vericite',
@@ -1830,6 +1853,20 @@ describe Submission do
         expect(submission.originality_data).not_to include :vericite
       end
 
+      it "finds originality data for group assignment submissions" do
+        submission.update_attributes!(attachment_ids: attachment.id.to_s)
+        originality_report
+        submission_two = submission.dup
+        submission_two.update_attributes!(user: User.create!(name: 'second student'))
+        expect(submission_two.originality_data).to eq({
+          attachment.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
+      end
     end
 
     describe '#attachment_ids_for_version' do

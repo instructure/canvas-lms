@@ -45,7 +45,7 @@ describe AssignmentGroup do
   it "allows association with scores" do
     ag = @course.assignment_groups.create!(@valid_attributes)
     enrollment = @course.student_enrollments.first
-    score = ag.scores.create!(enrollment: enrollment, current_score: 9.0, final_score: 10.0)
+    score = ag.scores.first
     expect(score.assignment_group_id).to be ag.id
   end
 

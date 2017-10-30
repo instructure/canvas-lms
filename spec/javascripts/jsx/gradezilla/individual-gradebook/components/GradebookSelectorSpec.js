@@ -45,8 +45,8 @@ define([
     ok(this.setLocationStub.withArgs(url).calledOnce);
   });
 
-  test('#selectGradeHistory calls setLocation', function () {
-    this.wrapper.find('select').simulate('change', { target: { value: 'grade-history' } });
+  test('#selectGradebookHistory calls setLocation', function () {
+    this.wrapper.find('select').simulate('change', { target: { value: 'gradebook-history' } });
     const url = `${this.wrapper.props().courseUrl}/gradebook/history`;
     ok(this.setLocationStub.withArgs(url).calledOnce);
   });
@@ -144,8 +144,8 @@ define([
   });
 
 
-  test('Grade History is fourth', function () {
-    equal(this.menuItems[3].textContent, 'Grade History…');
+  test('Gradebook History is fourth', function () {
+    equal(this.menuItems[3].textContent, 'Gradebook History…');
   });
 
   QUnit.module('Menu Items Rendered with Learning Mastery Disabled', {
@@ -172,7 +172,7 @@ define([
     equal(this.menuItems[1].textContent, 'Gradebook…');
   });
 
-  test('Grade History Menu Item is third in the PopoverMenu', function () {
-    equal(this.menuItems[2].textContent, 'Grade History…');
+  test('Gradebook History Menu Item is third in the PopoverMenu', function () {
+    equal(this.menuItems[2].textContent, 'Gradebook History…');
   });
 });

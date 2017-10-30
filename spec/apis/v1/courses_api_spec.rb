@@ -27,6 +27,11 @@ class TestCourseApi
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
 
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
+
+  attr_accessor :master_courses
+  def master_courses?
+    master_courses
+  end
 end
 
 describe Api::V1::Course do
@@ -158,6 +163,36 @@ describe Api::V1::Course do
           "computed_current_grade" => "A",
           "computed_final_grade" => "B"
         }]
+      end
+    end
+
+    context "master course stuff" do
+      before do
+        @test_api.master_courses = true
+      end
+
+      let(:json) { @test_api.course_json(@course1, @me, {}, [], []) }
+
+      it "should return blueprint status" do
+        expect(json["blueprint"]).to eq false
+      end
+
+      it "should return blueprint restrictions" do
+        template = MasterCourses::MasterTemplate.set_as_master_course(@course1)
+        template.update_attribute(:default_restrictions, {:content => true})
+        expect(json["blueprint"]).to eq true
+        expect(json["blueprint_restrictions"]["content"]).to eq true
+      end
+
+      it "should return blueprint restrictions by type" do
+        template = MasterCourses::MasterTemplate.set_as_master_course(@course1)
+        template.update_attributes(:use_default_restrictions_by_type => true,
+          :default_restrictions_by_type =>
+            {"Assignment" => {:points => true},
+            "Quizzes::Quiz" => {:content => true}})
+        expect(json["blueprint"]).to eq true
+        expect(json["blueprint_restrictions_by_object_type"]["assignment"]["points"]).to eq true
+        expect(json["blueprint_restrictions_by_object_type"]["quiz"]["content"]).to eq true
       end
     end
   end

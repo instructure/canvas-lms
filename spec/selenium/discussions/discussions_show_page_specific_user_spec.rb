@@ -363,6 +363,7 @@ describe "discussions" do
         edit_name = 'edited discussion name'
         get url
         expect_new_page_load { f(".edit-btn").click }
+        wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), nil)
         edit(edit_name, 'edit message')
       end

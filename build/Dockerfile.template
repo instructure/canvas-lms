@@ -15,9 +15,13 @@ ENV DISABLE_V8_COMPILE_CACHE 1
 USER root
 WORKDIR /root
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
-  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
   && printf 'path-exclude /usr/share/doc/*\npath-exclude /usr/share/man/*' > /etc/dpkg/dpkg.cfg.d/01_nodoc \
+<% unless production? -%>
+  && echo "deb https://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+  && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+<% end -%>
   && apt-get update -qq \
   && apt-get install -qqy --no-install-recommends \
        nodejs \
@@ -26,7 +30,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
        python-lxml \
        libicu-dev \
 <% unless production? -%>
-       postgresql-client \
+       postgresql-client-9.5 \
        unzip \
        fontforge \
 <% end -%>

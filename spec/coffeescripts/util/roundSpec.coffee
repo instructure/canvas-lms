@@ -38,3 +38,8 @@ define ['compiled/util/round'], (round) ->
 
   test "round will convert non-numbers to a Number and round it", ->
     equal round("#{x}"), 1235
+
+  test "round will round decimals up when rounding off a 5", ->
+    # example specifically requires correct rounding
+    # naive rounding will otherwise result in 78.83
+    equal round(78.835, 2), 78.84

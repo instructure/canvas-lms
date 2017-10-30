@@ -200,8 +200,9 @@ class UsersController < ApplicationController
     return render_unauthorized_action unless enrollment.grants_right?(@current_user, session, :read_grades)
 
     grading_period_id = generate_grading_period_id(params[:grading_period_id])
+    opts = { grading_period_id: grading_period_id } if grading_period_id
     render json: {
-      grade: enrollment.computed_current_score(grading_period_id: grading_period_id),
+      grade: enrollment.computed_current_score(opts),
       hide_final_grades: enrollment.course.hide_final_grades?
     }
   end
@@ -2250,7 +2251,8 @@ class UsersController < ApplicationController
       grading_period_id = generate_grading_period_id(
         grading_periods.dig(course.id, :selected_period_id)
       )
-      computed_score = enrollment.computed_current_score(grading_period_id: grading_period_id)
+      opts = { grading_period_id: grading_period_id} if grading_period_id
+      computed_score = enrollment.computed_current_score(opts)
       grades[:student_enrollments][course.id] = computed_score
     end
     grades
@@ -2258,8 +2260,9 @@ class UsersController < ApplicationController
 
   def grades_from_enrollments(enrollments, grading_period_id: nil)
     grades = {}
+    opts = { grading_period_id: grading_period_id } if grading_period_id
     enrollments.each do |enrollment|
-      computed_score = enrollment.computed_current_score(grading_period_id: grading_period_id)
+      computed_score = enrollment.computed_current_score(opts)
       grades[enrollment.user_id] = computed_score
     end
     grades

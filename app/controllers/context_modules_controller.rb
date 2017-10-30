@@ -526,7 +526,8 @@ class ContextModulesController < ApplicationController
         graded: @tag.graded?,
         content_details: content_details(@tag, @current_user),
         assignment_id: @tag.assignment.try(:id),
-        is_cyoe_able: cyoe_able?(@tag)
+        is_cyoe_able: cyoe_able?(@tag),
+        is_duplicate_able: @tag.duplicate_able?,
       )
       render json: json
     end

@@ -104,7 +104,8 @@ describe "announcements" do
     end
 
     describe "shared main page topics specs" do
-      let(:url) { "/courses/#{@course.id}/announcements/" }
+      let(:url) { "/courses/#{@course.id}/announcements" }
+      let(:new_url) { "/courses/#{@course.id}/discussion_topics/new?is_announcement=true" }
       let(:what_to_create) { Announcement }
 
       before :once do
@@ -149,14 +150,14 @@ describe "announcements" do
         get url
 
         expect_new_page_load { f('.btn-primary').click }
-        edit(@topic_title, 'new topic')
+        edit_announcement(@topic_title, 'new topic')
       end
 
       it "should add an attachment to a new topic", priority: "1", test_id: 150529 do
         topic_title = 'new topic with file'
-        get url
+        get new_url
+        wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
 
-        expect_new_page_load { f('.btn-primary').click }
         replace_content(f('input[name=title]'), topic_title)
         add_attachment_and_validate
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
@@ -164,12 +165,10 @@ describe "announcements" do
 
       it "should perform front-end validation for message", priority: "1", test_id: 220366 do
         topic_title = 'new topic with file'
-        get url
+        get new_url
 
-        expect_new_page_load { f('.btn-primary').click }
+        wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
         replace_content(f('input[name=title]'), topic_title)
-        filename, fullpath, data = get_file("testfile5.zip")
-        f('input[name=attachment]').send_keys(fullpath)
         submit_form('.form-actions')
         wait_for_ajaximations
 
@@ -191,10 +190,10 @@ describe "announcements" do
       it "should edit a topic", priority: "1", test_id: 150530 do
         edit_name = 'edited discussion name'
         topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
-        get url + "#{topic.id}"
+        get "#{url}/#{topic.id}"
         expect_new_page_load { f(".edit-btn").click }
 
-        edit(edit_name, 'edit message')
+        edit_announcement(edit_name, 'edit message')
       end
 
       it "should delete a topic", priority: "1", test_id: 150526 do

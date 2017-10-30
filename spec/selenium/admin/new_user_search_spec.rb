@@ -114,9 +114,8 @@ describe "new account user search" do
     click_tab
 
     f('.user_search_bar input[type=search]').send_keys('search')
-    f('.user_search_bar button').click
-    wait_for_ajaximations
 
+    expect(f('.users-list')).not_to contain_jqcss('div[role=row]:nth-child(2)')
     rows = get_rows
     expect(rows.count).to eq 1
     expect(rows.first).to include_text(match_user.name)

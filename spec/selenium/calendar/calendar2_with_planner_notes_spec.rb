@@ -61,5 +61,45 @@ describe "calendar2" do
       expect(note).to include_text('Course To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
+    it "should create a new todo" do
+      title = "new todo title"
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('.fc-week td').click # click the first day of the month
+      f('li[aria-controls="edit_planner_note_form_holder"]').click # the To Do tab
+      replace_content(f('#planner_note_date'), 1.day.from_now.to_date.iso8601)
+      replace_content(f('#planner_note_title'), title)
+      f('button.save_note').click
+      wait_for_ajaximations
+      note = f('a.fc-event')
+      expect(note.attribute('class')).to include("group_user_#{@student1.id}") # the user calendar
+      expect(note).to include_text('Student 1')
+      expect(note).to include_text('To Do:')
+      expect(note).to include_text(title)
+      expect(note).to contain_css('i.icon-note-light')
+    end
+    it "should delete a todo" do
+      @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('a.fc-event').click # click the note
+      wait_for_animations
+      f('.delete_event_link').click # delete button in the popup
+      f('.btn-primary').click       # delete button in the confirmation dialog
+      expect(f('.fc-view-container')).not_to contain_css('a.fc-event')
+    end
+    it "should edit a todo" do
+      @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
+      new_title = "new todo title"
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('a.fc-event').click # click the note
+      f('button.edit_event_link').click # the Edit button
+      replace_content(f('#planner_note_title'), new_title)
+      f('button.save_note').click
+      wait_for_ajaximations
+      note = f('a.fc-event')
+      expect(note).to include_text(new_title)
+    end
   end
 end

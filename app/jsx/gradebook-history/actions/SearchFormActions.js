@@ -83,10 +83,10 @@ const SearchFormActions = {
     };
   },
 
-  getGradeHistory (input) {
+  getGradebookHistory (input) {
     return function (dispatch) {
       dispatch(HistoryActions.fetchHistoryStart());
-      return HistoryApi.getGradeHistory(courseId, input)
+      return HistoryApi.getGradebookHistory(courseId, input)
         .then((response) => {
           dispatch(HistoryActions.fetchHistorySuccess(response.data, response.headers));
         })

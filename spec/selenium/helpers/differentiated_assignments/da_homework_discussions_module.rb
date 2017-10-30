@@ -29,12 +29,22 @@ module DifferentiatedAssignments
           @discussion_for_everyone                  = create_discussion_for(HomeworkAssignee::EVERYONE)
           @discussion_for_section_a                 = create_discussion_for(HomeworkAssignee::Section::SECTION_A)
           @discussion_for_section_b                 = create_discussion_for(HomeworkAssignee::Section::SECTION_B)
-          @discussion_for_sections_a_and_b          = create_discussion_for([ HomeworkAssignee::Section::SECTION_A, HomeworkAssignee::Section::SECTION_B ])
+          @discussion_for_sections_a_and_b          = create_discussion_for([HomeworkAssignee::Section::SECTION_A,
+                                                                             HomeworkAssignee::Section::SECTION_B ])
           @discussion_for_section_c                 = create_discussion_for(HomeworkAssignee::Section::SECTION_C)
           @discussion_for_first_student             = create_discussion_for(HomeworkAssignee::Student::FIRST_STUDENT)
-          @discussion_for_second_and_third_students = create_discussion_for([ HomeworkAssignee::Student::SECOND_STUDENT, HomeworkAssignee::Student::THIRD_STUDENT ])
+          @discussion_for_second_and_third_students = create_discussion_for([HomeworkAssignee::Student::SECOND_STUDENT,
+                                                                             HomeworkAssignee::Student::THIRD_STUDENT ])
           assign_discussion_overrides
           submit_discussions
+        end
+
+        def short_list_initialize
+          @discussion_for_sections_a_and_b          = create_discussion_for([HomeworkAssignee::Section::SECTION_A,
+                                                                             HomeworkAssignee::Section::SECTION_B ])
+          @discussion_for_second_and_third_students = create_discussion_for([HomeworkAssignee::Student::SECOND_STUDENT,
+                                                                             HomeworkAssignee::Student::THIRD_STUDENT ])
+          assign_discussion_overrides(short: true)
         end
 
         def all
@@ -49,14 +59,25 @@ module DifferentiatedAssignments
           ]
         end
 
+        def short_list
+          [
+            self.discussion_for_sections_a_and_b,
+            self.discussion_for_second_and_third_students
+          ]
+        end
+
         private
 
           def create_discussion_for(assignee)
             DifferentiatedAssignments::Discussion.new(assignee)
           end
 
-          def assign_discussion_overrides
-            self.all.each(&:assign_overrides)
+          def assign_discussion_overrides(short=false)
+            if short
+              self.short_list.each(&:assign_overrides)
+            else
+              self.all.each(&:assign_overrides)
+            end
           end
 
           def submit_discussions

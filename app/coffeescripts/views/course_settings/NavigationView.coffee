@@ -16,10 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
+  'i18n!course_navigation'
   'jquery'
   'Backbone'
   'str/htmlEscape'
-], ($, Backbone, htmlEscape) ->
+  'jsx/move_item'
+], (I18n, $, Backbone, htmlEscape, MoveItem) ->
   ###
   xsslint jqueryObject.identifier dragObject current_item
   ###
@@ -36,13 +38,10 @@ define [
       'click .move_nav_item_link'   : 'moveNavLink'
       'click .enable_nav_item_link' : 'enableNavLink'
 
-
     els:
       '#nav_enabled_list' : '$enabled_list'
       '#nav_disabled_list' : '$disabled_list'
-      '#move_nav_item_form': '$move_dialog'
       '.navitem' : '$navitems'
-      '#move_nav_item_name' : '$move_name'
 
     disableNavLink: (e) ->
       $targetItem = $(e.currentTarget).closest('.navitem')
@@ -63,51 +62,25 @@ define [
       $targetItem.find('a.al-trigger').focus()
 
     moveNavLink: (e) ->
-      dialog = @$move_dialog
-      which_list = $(e.currentTarget).closest '.nav_list'
-      which_item = $(e.currentTarget).closest '.navitem'
-      options = []
-      which_list.children('.navitem').each (key, item) ->
-        if $(item).attr('aria-label') is which_item.attr('aria-label')
-          return
-        options.push('<option value="' + htmlEscape($(item).attr('id')) + '">' + htmlEscape($(item).attr('aria-label')) + '</option>')
-      $select = @$move_dialog.children().find('#move_nav_item_select')
-      # Clear the options first
-      $('#move_nav_item_form').attr('aria-hidden', 'false')
-      $select.empty()
-      $select.append($.raw(options.join('')))
-      # Set the name in the dialog
-      @$move_name.text which_item.attr('aria-label')
-      @$move_dialog.data 'current_item', which_item
+      selectedItem = $(e.currentTarget).closest '.navitem'
+      navList = $(e.currentTarget).closest '.nav_list'
+      navOptions = navList.children('.navitem').map (key, item) ->
+        id: item.getAttribute('id')
+        title: item.getAttribute('aria-label')
+      .toArray()
 
+      @moveTrayProps =
+        title: I18n.t('Move Navigation Item')
+        item:
+          id: selectedItem.attr('id')
+          title: selectedItem.attr('aria-label')
+        moveOptions:
+          siblings: navOptions
+        onMoveSuccess: (res) =>
+          MoveItem.reorderElements(res.data, @$enabled_list[0], (id) => '#' + id)
+        focusOnExit: (item) => document.querySelector("##{item.id} a.al-trigger")
 
-      @$move_dialog.dialog(
-        modal: true
-        width: 600
-        height: 300
-        close: ->
-          dialog.dialog('close')
-          which_item.find('a.al-trigger').focus()
-        )
-
-    moveSubmit: (e) ->
-      e.preventDefault()
-      current_item = $('#move_nav_item_form').data 'current_item'
-      before_or_after = $('[name="move_location"]:checked').val();
-      selected_item = $('#' + $('#move_nav_item_select').val());
-      if before_or_after is 'before'
-        selected_item.before current_item
-      if before_or_after is 'after'
-        selected_item.after current_item
-      $('#move_nav_item_form').attr('aria-hidden', 'true')
-      $('#move_nav_item_form').dialog('close')
-      current_item.find('a.al-trigger').focus()
-
-    cancelMove: ->
-      current_item = $('#move_nav_item_form').data 'current_item'
-      $('#move_nav_item_form').attr('aria-hidden', 'true')
-      $('#move_nav_item_form').dialog('close')
-      current_item.find('a.al-trigger').focus()
+      MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
 
     focusKeyboardHelp: (e) ->
       $('.drag_and_drop_warning').removeClass('screenreader-only')
@@ -118,8 +91,6 @@ define [
     afterRender: ->
       @keyCodes = Object.freeze? @keyCodes
       $("li.navitem").on 'keydown', @onKeyDown
-      $('#move_nav_item_cancel_btn').on 'click', @cancelMove
-      @$move_dialog.on 'submit', @moveSubmit
       $('#navigation_tab').on 'blur', @focusKeyboardHelp
       $('.drag_and_drop_warning').on 'blur', @hideKeyboardHelp
 

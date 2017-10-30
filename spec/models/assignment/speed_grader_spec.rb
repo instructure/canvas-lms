@@ -237,6 +237,30 @@ describe Assignment::SpeedGrader do
       end
     end
 
+    it "creates a non-annotatable DocViewer session for Discussion attachments" do
+      course = student_in_course(active_all: true).course
+      assignment = assignment_model(course: course)
+      topic = course.discussion_topics.create!(assignment: assignment)
+      attachment = attachment_model(
+        context: @student,
+        uploaded_data: stub_png_data,
+        filename: "homework.png"
+      )
+      entry = topic.reply_from(user: @student, text: "entry")
+      entry.attachment = attachment
+      entry.save!
+      topic.ensure_submission(@student)
+
+      expect(Canvadocs).to receive(:enabled?).twice.and_return(true)
+      expect(Canvadocs).to receive(:config).and_return({ a: 1 })
+      expect(Canvadoc).to receive(:mime_types).and_return( "image/png")
+
+      json = Assignment::SpeedGrader.new(assignment, @teacher).json
+      sub = json[:submissions].first[:submission_history].first[:submission]
+      canvadoc_url = sub[:versioned_attachments].first.dig(:attachment, :canvadoc_url)
+      expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
+    end
+
     it "includes submission missing status in each submission history version" do
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
       json[:submissions].each do |submission|

@@ -20,7 +20,11 @@ define [
   'Backbone'
   'underscore'
   'jst/conversations/message'
-], (I18n, {View}, _, template) ->
+  'react'
+  'react-dom'
+  'instructure-ui/lib/components/Checkbox'
+  'instructure-ui/lib/components/ScreenReaderContent'
+], (I18n, {View}, _, template, React, ReactDOM, {default: Checkbox}, {default: ScreenReaderContent}) ->
 
   class MessageView extends View
 
@@ -32,6 +36,7 @@ define [
       '.star-btn': '$starBtn'
       '.StarButton-LabelContainer': '$starBtnScreenReaderMessage'
       '.read-state': '$readBtn'
+      '.select-checkbox': '$selectCheckbox'
 
     events:
       'click': 'onSelect'
@@ -41,10 +46,10 @@ define [
       'mousedown': 'onMouseDown'
 
     messages:
-      read:     I18n.t('mark_as_read', 'Mark as read')
-      unread:   I18n.t('mark_as_unread', 'Mark as unread')
-      star:     I18n.t('star_conversation', 'Star conversation')
-      unstar:   I18n.t('unstar_conversation', 'Unstar conversation')
+      read:     I18n.t('Mark as read')
+      unread:   I18n.t('Mark as unread')
+      star:     I18n.t('Star conversation')
+      unstar:   I18n.t('Unstar conversation')
 
     initialize: ->
       super
@@ -53,11 +58,24 @@ define [
     attachModel: ->
       @model.on('change:starred', @setStarBtnChecked)
       @model.on('change:workflow_state', => @$readBtn.toggleClass('read', @model.get('workflow_state') isnt 'unread'))
-      @model.on('change:selected', (m) => @$el.toggleClass('active', m.get('selected')))
+      @model.on('change:selected', @setSelected)
+
+    renderSelectCheckbox: ->
+      subject = @model.get('subject') || I18n.t('No Subject')
+      ReactDOM.render(
+        React.createElement(Checkbox,
+          label: React.createElement(ScreenReaderContent, {}, I18n.t('Select Conversation %{subject}', subject: subject ))
+          checked: !!@model.get('selected')
+          onChange: => @model.set('selected', !@model.get('selected'))
+        ), @$selectCheckbox[0])
+
+    setSelected: (m) =>
+      selected = m.get('selected')
+      @$el.toggleClass('active', selected)
+      @renderSelectCheckbox()
 
     onSelect: (e) ->
-      e.preventDefault()
-      return if e and e.target.className.match(/star|read-state/)
+      return if e and e.target.className.match(/star|read-state/) or @$selectCheckbox[0].contains(e.target)
       if e.shiftKey
         return @model.collection.selectRange(@model)
       modifier = e.metaKey or e.ctrlKey
@@ -113,6 +131,13 @@ define [
         setTimeout ->
           window.getSelection().removeAllRanges() # IE
         , 0
+
+    afterRender: () ->
+      @renderSelectCheckbox()
+
+    remove: () ->
+      ReactDOM.unmountComponentAtNode(@$selectCheckbox[0])
+      View.prototype.remove.apply(this, arguments)
 
     toJSON: ->
       @model.toJSON().conversation

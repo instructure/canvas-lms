@@ -91,8 +91,8 @@ describe "new groups" do
       wait_for_ajaximations
       f('.edit-group-assignment').click
       wait_for_ajaximations
-      click_option('.single-select', "#{@testgroup[1].name}")
-      f('.set-group').click
+      click_option('.move-select .move-select__group select', "#{@testgroup[1].name}")
+      f('.move-select button').click
       wait_for_ajaximations
 
       # Verifies the student count updates
@@ -136,7 +136,7 @@ describe "new groups" do
       wait_for_ajaximations
 
       # Looks for student to have a group leader icon
-      expect(f('.icon-user.group-leader')).to be_displayed
+      expect(f('.group-leader .icon-user')).to be_displayed
       # Verifies group leader silhouette and leader's name appear in the group header
       expect(f('.span3.ellipsis.group-leader')).to be_displayed
       expect(f('.span3.ellipsis.group-leader')).to include_text(@students.first.name)
@@ -203,11 +203,11 @@ describe "new groups" do
       wait_for_ajaximations
       f(".ui-menu-item .edit-group-assignment").click
       wait_for_ajaximations
-      f("option").click
-      f(".set-group").click
+      ff(".move-select .move-select__group option").last.click
+      f(".move-select button").click
       wait_for_ajaximations
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
-      expect(f("#content")).not_to contain_css(".icon-user.group-leader")
+      expect(f("#content")).not_to contain_css(".group-leader .icon-user")
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 1")
     end
 
@@ -243,10 +243,10 @@ describe "new groups" do
       f('.ui-menu-item .edit-group-assignment').click
       wait_for_ajaximations
 
-      f('.single-select option').click
+      ff('.move-select .move-select__group option').last.click
       wait_for_ajaximations
 
-      f('.set-group').click
+      f('.move-select button').click
       wait_for_ajaximations
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).not_to be_displayed
@@ -293,20 +293,20 @@ describe "new groups" do
 
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
 
-      expect(f(".icon-user.group-leader")).to be_displayed
+      expect(f(".group-leader .icon-user")).to be_displayed
 
       f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
 
       f(".ui-menu-item .edit-group-assignment").click
 
-      f(".single-select option").click
+      ff(".move-select .move-select__group option").last.click
 
-      f(".set-group").click
+      f(".move-select button").click
       wait_for_ajaximations
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
 
-      expect(f("#content")).not_to contain_css(".icon-user.group-leader")
+      expect(f("#content")).not_to contain_css(".group-leader .icon-user")
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 1")
     end
 
@@ -323,15 +323,16 @@ describe "new groups" do
 
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
 
-      expect(f(".icon-user.group-leader")).to be_displayed
+      expect(f(".group-leader .icon-user")).to be_displayed
 
       f(".group-user-actions[data-user-id=\"user_#{@students[1].id}\"]").click
 
       f(".ui-menu-item .edit-group-assignment").click
       wait_for_ajaximations
 
-      click_option("#move_from_group_#{@testgroup[0].id}", @testgroup[1].id.to_s, :value)
-      f(".set-group").click
+      click_option(".move-select .move-select__group select", @testgroup[1].id.to_s, :value)
+      wait_for_ajaximations
+      f(".move-select button").click
       wait_for_ajaximations
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
@@ -356,7 +357,7 @@ describe "new groups" do
       wait_for_ajaximations
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).to include_text('Test Student 1')
-      expect(f('.icon-user.group-leader')).to be_displayed
+      expect(f('.group-leader .icon-user')).to be_displayed
 
       f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       f('.ui-menu-item .icon-trash').click
@@ -574,12 +575,12 @@ describe "new groups" do
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
       # click opens the second group, wait for it to complete
-      expect(f('.icon-user.group-leader')).to be_displayed
+      expect(f('.group-leader .icon-user')).to be_displayed
 
       drag_and_drop_element(fj(drag_item1), fj(drop_target1))
       wait_for_ajaximations
 
-      expect(f("#content")).not_to contain_css('.icon-user.group-leader')
+      expect(f("#content")).not_to contain_css('.group-leader .icon-user')
       expect(fj(drop_target1)).to include_text('Test Student 5')
     end
 
@@ -965,8 +966,8 @@ describe "new groups" do
           wait_for_ajaximations
           ff('.edit-group-assignment').last.click
           wait_for_ajaximations
-          click_option('.ui-dialog select:last', "#{@testgroup.first.name}")
-          ff('.set-group').last.click
+          click_option('.move-select .move-select__group select', "#{@testgroup.first.name}")
+          ff('.move-select button').last.click
           wait_for_ajaximations
 
           select_change_groups_option

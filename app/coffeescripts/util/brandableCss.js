@@ -19,8 +19,9 @@ const loadedStylesheets = {}
 
 const brandableCss = {
   getCssVariant () {
-    const contrast = window.ENV.use_high_contrast ? '_high_contrast' : '_normal_contrast'
-    return `new_styles${contrast}`
+    const variant = window.ENV.use_new_typography ? 'new_typography' : 'new_styles'
+    const contrast = window.ENV.use_high_contrast ? 'high_contrast' : 'normal_contrast'
+    return `${variant}_${contrast}`
   },
 
   // combinedChecksum should be like '09f833ef7a'

@@ -175,32 +175,6 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should continue to work with the old import_results format" do
-      @copy_to = course_factory
-      @sub = @template.add_child_course!(@copy_to)
-
-      topic = @copy_from.discussion_topics.create!(:title => "some title")
-
-      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
-      run_job(Delayed::Job.where(:tag => "MasterCourses::MasterMigration#perform_exports").first) # only run the export job right now
-
-      @migration.reload
-      result = @migration.migration_results.first
-      expect(result.state).to eq 'queued'
-
-      import_results = {result.content_migration_id => {
-        :state => 'queued', :import_type => result.import_type.to_sym, :subscription_id => result.child_subscription_id, :skipped => []
-      }}
-      @migration.update_attribute(:import_results, import_results)
-      MasterCourses::MigrationResult.where(:master_migration_id => @migration).delete_all # make sure they're gone
-
-      run_jobs
-
-      expect(@migration.reload).to be_completed
-      expect(@migration.imports_completed_at).to be_present
-      expect(@sub.reload.use_selective_copy?).to be_truthy # should have been marked as up-to-date now
-    end
-
     it "should copy selectively on second time" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
@@ -1030,6 +1004,34 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
       expect(@copy_to.reload.tab_configuration).to eq @copy_from.tab_configuration
+    end
+
+    it "should not break trying to match existing attachments on cloned_item_id" do
+      # this was 'fun' to debug - i'm still not quite sure how it came about
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      att1 = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
+        :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+
+      run_master_migration
+
+      att_to = @copy_to.attachments.where(:migration_id => mig_id(att1)).first
+      expect(att_to.cloned_item_id).to eq att1.reload.cloned_item_id # i still don't know why we set this
+
+      sub.destroy
+
+      @copy_from2 = course_factory
+      @template2 = MasterCourses::MasterTemplate.set_as_master_course(@copy_from2)
+      att2 = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
+        :folder => Folder.unfiled_folder(@copy_from2), :context => @copy_from2, :cloned_item_id => att1.cloned_item_id)
+      sub2 = @template2.add_child_course!(@copy_to)
+
+      MasterCourses::MasterMigration.start_new_migration!(@template2, @admin)
+      run_jobs
+
+      expect(@copy_to.content_migrations.last.migration_issues).to_not be_exists
+      att2_to = @copy_to.attachments.where(:migration_id => @template2.migration_id_for(att2)).first
+      expect(att2_to).to be_present
     end
 
     it "sends notifications", priority: "2", test_id: 3211103 do

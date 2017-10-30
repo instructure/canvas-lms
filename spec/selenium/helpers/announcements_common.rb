@@ -77,7 +77,8 @@ module AnnouncementsCommon
     expect(f('.zip')).to include_text(filename)
   end
 
-  def edit(title, message)
+  def edit_announcement(title, message)
+    wait_for_tiny(f('textarea[name=message]'))
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }

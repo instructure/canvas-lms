@@ -18,6 +18,7 @@
 
 import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
+import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
 import SubmissionTray from 'jsx/gradezilla/default_gradebook/components/SubmissionTray';
 
 QUnit.module('SubmissionTray', function (hooks) {
@@ -48,13 +49,17 @@ QUnit.module('SubmissionTray', function (hooks) {
         missing: '#F99',
         excused: '#E5F3FC'
       },
+      editedCommentId: null,
+      editSubmissionComment () {},
+      gradingDisabled: false,
       locale: 'en',
+      onGradeSubmission () {},
       onRequestClose () {},
       onClose () {},
-      showContentComingSoon: false,
       submissionUpdating: false,
       isOpen: true,
       courseId: '1',
+      currentUserId: '2',
       speedGraderEnabled: true,
       student: {
         id: '27',
@@ -62,18 +67,23 @@ QUnit.module('SubmissionTray', function (hooks) {
         gradesUrl: 'http://gradeUrl/'
       },
       submission: {
-        grade: '100%',
+        assignmentId: '30',
         excused: false,
+        grade: '100%',
+        id: '2501',
         late: false,
         missing: false,
         pointsDeducted: 3,
-        secondsLate: 0,
-        assignmentId: '30'
+        secondsLate: 0
       },
       updateSubmission () {},
+      updateSubmissionComment () {},
       assignment: {
         name: 'Book Report',
-        htmlUrl: 'http://htmlUrl/'
+        gradingType: 'points',
+        htmlUrl: 'http://htmlUrl/',
+        muted: false,
+        published: true
       },
       isFirstAssignment: true,
       isLastAssignment: true,
@@ -83,13 +93,15 @@ QUnit.module('SubmissionTray', function (hooks) {
       isLastStudent: true,
       selectNextStudent () {},
       selectPreviousStudent () {},
-      updateSubmissionComments () {},
       submissionCommentsLoaded: true,
       createSubmissionComment () {},
       deleteSubmissionComment () {},
       processing: false,
       setProcessing () {},
-      submissionComments: []
+      submissionComments: [],
+      isInOtherGradingPeriod: false,
+      isInClosedGradingPeriod: false,
+      isInNoGradingPeriod: false
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
     clock.tick(50); // wait for Tray to transition open
@@ -111,14 +123,68 @@ QUnit.module('SubmissionTray', function (hooks) {
     return document.querySelector('#SubmissionTray__RadioInputGroup');
   }
 
-  test('shows "Content Coming Soon" content if showContentComingSoon is true', function () {
-    const server = sinon.fakeServer.create({ respondImmediately: true });
-    server.respondWith('GET', /^\/images\/.*\.svg$/, [
-      200, { 'Content-Type': 'img/svg+xml' }, '{}'
-    ]);
-    mountComponent({ showContentComingSoon: true });
-    ok(document.querySelector('.ComingSoonContent__Container'));
-    server.restore();
+  QUnit.module('Student Carousel', function () {
+    test('is disabled when the tray is "processing"', function () {
+      mountComponent({ processing: true });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), true);
+    });
+
+    test('is not disabled when the tray is not "processing"', function () {
+      mountComponent({ processing: false });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission comments have not loaded', function () {
+      mountComponent({ submissionCommentsLoaded: false });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission comments have loaded', function () {
+      mountComponent({ submissionCommentsLoaded: true });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission is updating', function () {
+      mountComponent({ submissionUpdating: true });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission is not updating', function () {
+      mountComponent({ submissionUpdating: false });
+      strictEqual(wrapContent().find('Carousel').at(0).prop('disabled'), false);
+    });
+  });
+
+  QUnit.module('Assignment Carousel', function () {
+    test('is disabled when the tray is "processing"', function () {
+      mountComponent({ processing: true });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), true);
+    });
+
+    test('is not disabled when the tray is not "processing"', function () {
+      mountComponent({ processing: false });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission comments have not loaded', function () {
+      mountComponent({ submissionCommentsLoaded: false });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission comments have loaded', function () {
+      mountComponent({ submissionCommentsLoaded: true });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), false);
+    });
+
+    test('is disabled when the submission is updating', function () {
+      mountComponent({ submissionUpdating: true });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), true);
+    });
+
+    test('is not disabled when the submission is not updating', function () {
+      mountComponent({ submissionUpdating: false });
+      strictEqual(wrapContent().find('Carousel').at(1).prop('disabled'), false);
+    });
   });
 
   test('shows SpeedGrader link if enabled', function () {
@@ -134,7 +200,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     notOk(speedGraderLink);
   });
 
-  test('shows avatar if showContentComingSoon is false and avatar is not null', function () {
+  test('shows avatar if avatar is not null', function () {
     const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty';
     const gradesUrl = 'http://gradesUrl/';
     mountComponent({ student: { id: '27', name: 'Bob', avatarUrl, gradesUrl } });
@@ -142,12 +208,53 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(avatarBackground, `url("${avatarUrl}")`);
   });
 
-  test('shows no avatar if showContentComingSoon is false and avatar is null', function () {
+  test('shows no avatar if avatar is null', function () {
     mountComponent({ student: { id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/' } });
     notOk(avatarDiv());
   });
 
-  test('shows name if showContentComingSoon is false', function () {
+  test('shows the state of the submission', function () {
+    mountComponent();
+
+    strictEqual(wrapContent().find('SubmissionStatus').length, 1);
+  });
+
+  test('passes along assignment prop to SubmissionStatus', function () {
+    mountComponent();
+    const submissionStatusProps = wrapContent().find('SubmissionStatus').at(0).props();
+
+    deepEqual(submissionStatusProps.assignment, wrapper.props().assignment);
+  });
+
+  test('passes along submission prop to SubmissionStatus', function () {
+    mountComponent();
+    const submissionStatusProps = wrapContent().find('SubmissionStatus').at(0).props();
+
+    deepEqual(submissionStatusProps.submission, wrapper.props().submission);
+  });
+
+  test('passes along isInOtherGradingPeriod prop to SubmissionStatus', function () {
+    mountComponent();
+    const isInOtherGradingPeriod = wrapContent().find('SubmissionStatus').at(0).prop('isInOtherGradingPeriod');
+
+    deepEqual(isInOtherGradingPeriod, wrapper.prop('isInOtherGradingPeriod'));
+  });
+
+  test('passes along isInClosedGradingPeriod prop to SubmissionStatus', function () {
+    mountComponent();
+    const isInClosedGradingPeriod = wrapContent().find('SubmissionStatus').at(0).prop('isInClosedGradingPeriod');
+
+    deepEqual(isInClosedGradingPeriod, wrapper.prop('isInClosedGradingPeriod'));
+  });
+
+  test('passes along isInNoGradingPeriod prop to SubmissionStatus', function () {
+    mountComponent();
+    const isInNoGradingPeriod = wrapContent().find('SubmissionStatus').at(0).prop('isInNoGradingPeriod');
+
+    deepEqual(isInNoGradingPeriod, wrapper.prop('isInNoGradingPeriod'));
+  });
+
+  test('shows name', function () {
     mountComponent({ student: { id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/' } });
     strictEqual(studentNameDiv().innerHTML, 'Sara');
   });
@@ -165,28 +272,26 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('does not show the late policy grade when zero points have been deducted', function () {
-    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: 0, secondsLate: 0, assignmentId: '30' } });
+    mountComponent({
+      submission: {
+        excused: false, id: '2501', late: true, missing: false, pointsDeducted: 0, secondsLate: 0, assignmentId: '30'
+      }
+    });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
   test('does not show the late policy grade when points deducted is null', function () {
-    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: null, secondsLate: 0, assignmentId: '30' } });
+    mountComponent({
+      submission: {
+        excused: false, id: '2501', late: true, missing: false, pointsDeducted: null, secondsLate: 0, assignmentId: '30'
+      }
+    });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
-  test('shows a radio input group if showContentComingSoon is false', function () {
+  test('shows a radio input group', function () {
     mountComponent();
     ok(radioInputGroupDiv());
-  });
-
-  test('does not show a radio input group if showContentComingSoon is true', function () {
-    const server = sinon.fakeServer.create({ respondImmediately: true });
-    server.respondWith('GET', /^\/images\/.*\.svg$/, [
-      200, { 'Content-Type': 'img/svg+xml' }, '{}'
-    ]);
-    mountComponent({ showContentComingSoon: true });
-    notOk(radioInputGroupDiv());
-    server.restore();
   });
 
   test('shows assignment carousel', function () {
@@ -356,5 +461,83 @@ QUnit.module('SubmissionTray', function (hooks) {
     });
 
     strictEqual(wrapContent().find('#SubmissionTray__Content').find('Container').at(0).prop('padding'), 'small 0 0 0');
+  });
+
+  QUnit.module('Grade Input', function () {
+    test('receives the "assignment" given to the Tray', function () {
+      const assignment = {
+        gradingType: 'points',
+        htmlUrl: 'http://htmlUrl/',
+        muted: false,
+        name: 'Book Report',
+        published: true
+      };
+      mountComponent({ assignment });
+      equal(wrapContent().find('GradeInput').prop('assignment'), assignment);
+    });
+
+    test('is disabled when grading is disabled', function () {
+      mountComponent({ gradingDisabled: true });
+      strictEqual(wrapContent().find('GradeInput').prop('disabled'), true);
+    });
+
+    test('is not disabled when grading is not disabled', function () {
+      mountComponent({ gradingDisabled: false });
+      strictEqual(wrapContent().find('GradeInput').prop('disabled'), false);
+    });
+
+    test('receives the "onGradeSubmission" callback given to the Tray', function () {
+      function onGradeSubmission () {}
+      mountComponent({ onGradeSubmission });
+      equal(wrapContent().find('GradeInput').prop('onSubmissionUpdate'), onGradeSubmission);
+    });
+
+    test('receives the "submission" given to the Tray', function () {
+      const submission = {
+        assignmentId: '2301',
+        enteredGrade: '100%',
+        excused: false,
+        grade: '70%',
+        id: '2501',
+        late: false,
+        missing: false,
+        pointsDeducted: 3,
+        secondsLate: 0
+      };
+      mountComponent({ submission });
+      equal(wrapContent().find('GradeInput').prop('submission'), submission);
+    });
+
+    test('receives the "submissionUpdating" given to the Tray', function () {
+      mountComponent({ submissionUpdating: true });
+      strictEqual(wrapContent().find('GradeInput').prop('submissionUpdating'), true);
+    });
+  });
+
+  test('renders the new comment form if the editedCommentId is null', function () {
+    mountComponent();
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 1);
+  });
+
+  test('does not render the new comment form if the editedCommentId is not null', function () {
+    mountComponent({ editedCommentId: '5' });
+    const form = wrapContent().find(SubmissionCommentCreateForm);
+    strictEqual(form.length, 0);
+  });
+
+  test('cancelCommenting calls editSubmissionComment', function () {
+    const editSubmissionComment = sinon.stub();
+    mountComponent({ editedCommentId: '5', editSubmissionComment });
+    wrapper.instance().cancelCommenting();
+    strictEqual(editSubmissionComment.callCount, 1);
+  });
+
+  test('cancelCommenting sets the edited submission comment id to null', function () {
+    const editSubmissionComment = sinon.stub();
+    mountComponent({ editedCommentId: '5', editSubmissionComment });
+    wrapper.instance().cancelCommenting();
+    const editedCommentId = editSubmissionComment.firstCall.args[0];
+    strictEqual(editedCommentId, null);
   });
 });

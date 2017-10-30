@@ -40,9 +40,9 @@ module UserSearch
       restrict_search = true
     end
     context.shard.activate do
-      base_scope = base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
+      base_scope = base_scope.where(conditions_statement(search_term, context.root_account, {:restrict_search => restrict_search}))
       if options[:role_filter_id] && options[:role_filter_id] != ""
-        base_scope = base_scope.where("#{options[:role_filter_id]} IN 
+        base_scope = base_scope.where("#{options[:role_filter_id]} IN
                             (SELECT role_id FROM #{Enrollment.quoted_table_name}
                             WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
       end
@@ -50,12 +50,12 @@ module UserSearch
     end
   end
 
-  def self.conditions_statement(search_term, options={})
+  def self.conditions_statement(search_term, root_account, options={})
     pattern = like_string_for(search_term)
     conditions = []
 
     if complex_search_enabled? && !options[:restrict_search]
-      conditions << complex_sql << pattern << pattern << pattern << CommunicationChannel::TYPE_EMAIL << pattern
+      conditions << complex_sql << pattern << pattern << root_account << pattern << CommunicationChannel::TYPE_EMAIL << pattern
     else
       conditions << like_condition('users.name') << pattern
     end
@@ -126,7 +126,7 @@ module UserSearch
             end
 
     if options[:role_filter_id] && options[:role_filter_id] != ""
-      users = users.where("#{options[:role_filter_id]} IN 
+      users = users.where("#{options[:role_filter_id]} IN
                             (SELECT role_id FROM #{Enrollment.quoted_table_name}
                               WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
     end
@@ -168,17 +168,22 @@ module UserSearch
 
   def self.complex_sql
     <<-SQL
-      (EXISTS (SELECT 1 FROM #{Pseudonym.quoted_table_name}
-         WHERE (#{like_condition('pseudonyms.sis_user_id')} OR
-             #{like_condition('pseudonyms.unique_id')})
-           AND pseudonyms.user_id = users.id
-           AND pseudonyms.workflow_state='active')
-       OR (#{like_condition('users.name')})
-       OR EXISTS (SELECT 1 FROM #{CommunicationChannel.quoted_table_name}
-         WHERE communication_channels.user_id = users.id
-           AND communication_channels.path_type = ?
-           AND #{like_condition('communication_channels.path')}
-           AND communication_channels.workflow_state in ('active', 'unconfirmed')))
+      users.id IN (
+        SELECT user_id FROM #{Pseudonym.quoted_table_name}
+          WHERE (#{like_condition('pseudonyms.sis_user_id')} OR
+            #{like_condition('pseudonyms.unique_id')})
+            AND pseudonyms.user_id = users.id
+            AND pseudonyms.workflow_state='active'
+            AND pseudonyms.account_id = ?
+        UNION
+        SELECT id FROM #{User.quoted_table_name} WHERE (#{like_condition('users.name')})
+        UNION
+        SELECT user_id FROM #{CommunicationChannel.quoted_table_name}
+          WHERE communication_channels.user_id = users.id
+            AND communication_channels.path_type = ?
+            AND #{like_condition('communication_channels.path')}
+            AND communication_channels.workflow_state in ('active', 'unconfirmed')
+      )
     SQL
   end
 

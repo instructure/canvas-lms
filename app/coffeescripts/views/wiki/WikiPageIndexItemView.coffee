@@ -41,6 +41,7 @@ define [
       'click .edit-menu-item': 'editPage'
       'click .delete-menu-item': 'deletePage'
       'click .use-as-front-page-menu-item': 'useAsFrontPage'
+      'click .unset-as-front-page-menu-item': 'unsetAsFrontPage'
       'click .duplicate-wiki-page': 'duplicateWikiPage'
 
     @optionProperty 'indexView'
@@ -161,6 +162,20 @@ define [
       @model.duplicate(ENV.COURSE_ID, handleResponse)
       return
 
+    unsetAsFrontPage: (ev) ->
+      ev?.preventDefault()
+
+      if (ev?.target)
+        $curCog = $(ev.target).parents('td').children().find('.al-trigger')
+        $allCogs =  $('.collectionViewItems').children().find('.al-trigger')
+        curIndex = $allCogs.index($curCog)
+
+      @model.unsetFrontPage ->
+        # Here's the aforementioned magic and index stuff
+        if (curIndex?)
+          cogs = $('.collectionViewItems').children().find('.al-trigger')
+          $(cogs[curIndex]).focus()
+
     useAsFrontPage: (ev) ->
       ev?.preventDefault()
       return unless @model.get('published')
@@ -168,12 +183,12 @@ define [
       # isn't valid after the re-render occurs... so we use the index and
       # re-collect the cogs afterwards.
       if (ev?.target)
-        $curCog = $(ev.target).parents('td').children().find('.al-trigger')
-        $allCogs =  $('.collectionViewItems').children().find('.al-trigger')
+        $curCog = $(ev.target).parents('td').find('.al-trigger')
+        $allCogs =  $('.collectionViewItems').find('.al-trigger')
         curIndex = $allCogs.index($curCog)
 
       @model.setFrontPage ->
         # Here's the aforementioned magic and index stuff
         if (curIndex?)
-          cogs = $('.collectionViewItems').children().find('.al-trigger')
+          cogs = $('.collectionViewItems').find('.al-trigger')
           $(cogs[curIndex]).focus()

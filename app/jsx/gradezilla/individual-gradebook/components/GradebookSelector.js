@@ -63,7 +63,7 @@ import I18n from 'i18n!gradebook'
       });
     }
 
-    selectGradeHistory () { this.setLocation(`${this.props.courseUrl}/gradebook/history`); }
+    selectGradebookHistory () { this.setLocation(`${this.props.courseUrl}/gradebook/history`); }
 
     selectDefaultGradebook () {
       this.setLocation(`${this.props.courseUrl}/gradebook/change_gradebook_version?version=default`);
@@ -74,7 +74,7 @@ import I18n from 'i18n!gradebook'
         'individual-gradebook': this.selectIndividualGradebook.bind(this),
         'learning-mastery': this.selectLearningMastery.bind(this),
         'default-gradebook': this.selectDefaultGradebook.bind(this),
-        'grade-history': this.selectGradeHistory.bind(this)
+        'gradebook-history': this.selectGradebookHistory.bind(this)
       };
       valueFunctionMap[e.target.value]();
     }
@@ -85,8 +85,8 @@ import I18n from 'i18n!gradebook'
         modifiedVariant = `${modifiedVariant}LearningMastery`;
       }
       const optionsForGradebook = {
-        IndividualGradebook: ['IndividualGradebook', 'LearningMastery', 'DefaultGradebook', 'GradeHistory'],
-        IndividualGradebookLearningMastery: ['LearningMastery', 'IndividualGradebook', 'DefaultGradebook', 'GradeHistory'],
+        IndividualGradebook: ['IndividualGradebook', 'LearningMastery', 'DefaultGradebook', 'GradebookHistory'],
+        IndividualGradebookLearningMastery: ['LearningMastery', 'IndividualGradebook', 'DefaultGradebook', 'GradebookHistory'],
       };
       const options = optionsForGradebook[modifiedVariant];
       return [
@@ -113,9 +113,9 @@ import I18n from 'i18n!gradebook'
       return <option value={key} key={key}>{I18n.t('Gradebook…')}</option>;
     }
 
-    renderGradeHistoryOption () {
-      const key = 'grade-history';
-      return <option value={key} key={key}>{I18n.t('Grade History…')}</option>;
+    renderGradebookHistoryOption () {
+      const key = 'gradebook-history';
+      return <option value={key} key={key}>{I18n.t('Gradebook History…')}</option>;
     }
 
     render () {

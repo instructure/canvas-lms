@@ -20,7 +20,7 @@ import $ from 'jquery'
 
 export function loadMathJax (config_file, cb = null) {
   if (!isMathJaxLoaded()) {
-    $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.1/MathJax.js?config=${config_file}`, cb);
+    $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=${config_file}`, cb);
   }
 }
 

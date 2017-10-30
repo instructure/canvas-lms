@@ -287,6 +287,21 @@ require 'securerandom'
 #           "description": "The course's IANA time zone name.",
 #           "example": "America/Denver",
 #           "type": "string"
+#         },
+#         "blueprint": {
+#           "description": "optional: whether the course is set as a Blueprint Course (blueprint fields require the Blueprint Courses feature)",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "blueprint_restrictions": {
+#           "description": "optional: Set of restrictions applied to all locked course objects",
+#           "example": {"content": true, "points": true, "due_dates": false, "availability_dates": false},
+#           "type": "object"
+#         },
+#         "blueprint_restrictions_by_object_type": {
+#           "description": "optional: Sets of restrictions differentiated by object type applied to locked course objects",
+#           "example": {"assignment": {"content": true, "points": true}, "wiki_page": {"content": true}},
+#           "type": "object"
 #         }
 #       }
 #     }
@@ -1173,8 +1188,7 @@ class CoursesController < ApplicationController
 
       if @context.root_account.feature_enabled?(:master_courses)
         master_template = @context.master_course_templates.for_full_course.first
-        restrictions_by_object_type = master_template&.default_restrictions_by_type || {}
-        cleaned_restrictions = restrictions_by_object_type.map{|k, v| [k.sub(/^.+::/, '').underscore, v] }.to_h
+        restrictions_by_object_type = master_template&.default_restrictions_by_type_for_api || {}
         message =!MasterCourses::MasterTemplate.is_master_course?(@context) && why_cant_i_enable_master_course(@context)
         message ||= ''
         js_env({
@@ -1182,7 +1196,7 @@ class CoursesController < ApplicationController
           DISABLED_BLUEPRINT_MESSAGE: message,
           BLUEPRINT_RESTRICTIONS: master_template&.default_restrictions || { :content => true },
           USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: master_template&.use_default_restrictions_by_type || false,
-          BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: cleaned_restrictions
+          BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: restrictions_by_object_type
         })
       end
 
@@ -2234,7 +2248,7 @@ class CoursesController < ApplicationController
 
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
-      if enrollment_term_id && @course.root_account.grants_right?(@current_user, session, :manage_courses)
+      if enrollment_term_id && @course.account.grants_right?(@current_user, session, :manage_courses)
         enrollment_term = api_find(@course.root_account.enrollment_terms, enrollment_term_id)
         @course.enrollment_term = enrollment_term if enrollment_term && enrollment_term != @course.enrollment_term
       end

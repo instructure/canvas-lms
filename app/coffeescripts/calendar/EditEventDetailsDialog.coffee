@@ -24,10 +24,12 @@ define [
   'compiled/calendar/EditAssignmentDetails'
   'compiled/calendar/EditApptCalendarEventDialog'
   'compiled/calendar/EditAppointmentGroupDetails'
+  'compiled/calendar/EditPlannerNoteDetails'
   'jst/calendar/editEvent'
   'jqueryui/dialog'
   'jqueryui/tabs'
-], ($, I18n, _, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails, EditApptCalendarEventDialog, EditAppointmentGroupDetails, editEventTemplate) ->
+], ($, I18n, _, CommonEvent, EditCalendarEventDetails, EditAssignmentDetails,
+    EditApptCalendarEventDialog, EditAppointmentGroupDetails, EditPlannerNoteDetails, editEventTemplate) ->
 
   dialog = $('<div id="edit_event"><div /></div>').appendTo('body').dialog
     autoOpen: false
@@ -55,19 +57,28 @@ define [
 
       if @event.eventType == 'calendar_event'
         tabs.tabs('select', 0)
+        tabs.tabs('remove', 2)
         tabs.tabs('remove', 1)
-        if @canManageAppointments() then tabs.tabs('remove', 2)
+        if @canManageAppointments() then tabs.tabs('remove', 3)
         @calendarEventForm.activate()
       else if @event.eventType.match(/assignment/)
         tabs.tabs('select', 1)
+        tabs.tabs('remove', 2)
         tabs.tabs('remove', 0)
-        if @canManageAppointments() then tabs.tabs('remove', 2)
+        if @canManageAppointments() then tabs.tabs('remove', 3)
         @assignmentDetailsForm.activate()
       else if @event.eventType.match(/appointment/) && @canManageAppointments()
-        tabs.tabs('select', 2)
+        tabs.tabs('select', 3)
+        tabs.tabs('remove', 2)
         tabs.tabs('remove', 1)
         tabs.tabs('remove', 0)
         @appointmentGroupDetailsForm.activate()
+      else if @event.eventType == 'planner_note'
+        tabs.tabs('select', 2)
+        tabs.tabs('remove', 3)
+        tabs.tabs('remove', 1)
+        tabs.tabs('remove', 0)
+        @plannerNoteDetailsForm.activate()
       else
         # don't even show the assignments tab if the user doesn't have
         # permission to create them
@@ -113,6 +124,11 @@ define [
         if @event.isNewEvent() || @event.eventType.match(/assignment/)
           @assignmentDetailsForm = new EditAssignmentDetails($('#edit_assignment_form_holder'), @event, @contextChange, @closeCB)
           dialog.find("#edit_assignment_form_holder").data('form-widget', @assignmentDetailsForm)
+
+        if @event.isNewEvent() || @event.eventType == 'planner_note'
+          formHolder = dialog.find('#edit_planner_note_form_holder')
+          @plannerNoteDetailsForm = new EditPlannerNoteDetails(formHolder, @event, @contextChange, @closeCB)
+          formHolder.data('form-widget', @plannerNoteDetailsForm)
 
         if @event.isNewEvent() && @canManageAppointments()
           group = {

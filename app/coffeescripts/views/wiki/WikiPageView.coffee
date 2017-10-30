@@ -46,6 +46,7 @@ define [
     events:
       'click .delete_page': 'deleteWikiPage'
       'click .use-as-front-page-menu-item': 'useAsFrontPage'
+      'click .unset-as-front-page-menu-item': 'unsetAsFrontPage'
 
     @optionProperty 'modules_path'
     @optionProperty 'wiki_pages_path'
@@ -132,6 +133,12 @@ define [
         model: @model
         wiki_pages_path: @wiki_pages_path
       deleteDialog.open()
+
+    unsetAsFrontPage: (ev) ->
+      ev?.preventDefault()
+
+      @model.unsetFrontPage ->
+        $('#wiki_page_show .header-bar-right .al-trigger').focus()
 
     useAsFrontPage: (ev) ->
       ev?.preventDefault()

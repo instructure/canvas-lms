@@ -37,6 +37,7 @@ describe "announcements" do
 
     get "/courses/#{@course.id}/announcements"
     expect_new_page_load { f('.btn-primary').click }
+    wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
     replace_content(f('input[name=title]'), topic_title)
     type_in_tiny('textarea[name=message]', 'hi, first announcement')
     f('#require_initial_post').click
@@ -53,6 +54,7 @@ describe "announcements" do
     ff('.discussion_entry').each { |entry| expect(entry).not_to include_text(student_2_entry) }
     f('.discussion-reply-action').click
     wait_for_ajaximations
+    wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
     type_in_tiny('textarea', 'reply')
     submit_form('#discussion_topic .discussion-reply-form')
     wait_for_ajaximations
@@ -143,6 +145,7 @@ describe "announcements" do
 
       f('.discussion-reply-action').click
       wait_for_ajaximations
+      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
       type_in_tiny('textarea', 'stuff and things')
       submit_form('.discussion-reply-form')
       wait_for_ajaximations
@@ -161,6 +164,7 @@ describe "announcements" do
 
       f('.discussion-reply-action').click
       wait_for_ajaximations
+      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
       type_in_tiny('textarea', 'stuff and things')
       submit_form('.discussion-reply-form')
       wait_for_ajaximations

@@ -720,6 +720,48 @@ describe ApplicationController do
         controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
         expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Group)}).to eq [@group]
       end
+
+      it 'must select all cross-shard courses the user belongs to' do
+        user_factory(active_all: true)
+        controller.instance_variable_set(:@context, @user)
+
+        account = Account.create!
+        enrollment1 = course_with_teacher(user: @user, active_all: true, account: account)
+        course1 = enrollment1.course
+
+        enrollment2 = @shard1.activate do
+          account = Account.create!
+          course_with_teacher(user: @user, active_all: true, account: account)
+        end
+        course2 = enrollment2.course
+
+        controller.send(:get_all_pertinent_contexts, cross_shard: true)
+        contexts = controller.instance_variable_get(:@contexts)
+        expect(contexts).to include course1, course2
+      end
+
+      it 'must select only the specified cross-shard courses when only_contexts is included' do
+        user_factory(active_all: true)
+        controller.instance_variable_set(:@context, @user)
+
+        account = Account.create!
+        enrollment1 = course_with_teacher(user: @user, active_all: true, account: account)
+        course1 = enrollment1.course
+
+        enrollment2 = @shard1.activate do
+          account = Account.create!
+          course_with_teacher(user: @user, active_all: true, account: account)
+        end
+        course2 = enrollment2.course
+
+        controller.send(:get_all_pertinent_contexts, {
+          cross_shard: true,
+          only_contexts: "Course_#{course2.id}",
+        })
+        contexts = controller.instance_variable_get(:@contexts)
+        expect(contexts).to_not include course1
+        expect(contexts).to include course2
+      end
     end
   end
 

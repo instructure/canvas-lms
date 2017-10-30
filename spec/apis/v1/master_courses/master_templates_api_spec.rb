@@ -431,31 +431,6 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       ])
     end
 
-    it "works with the old import results format" do
-      import_results = {}
-      @migration.migration_results.each do |r|
-        import_results[r.content_migration_id] = {:skipped => r.skipped_items, :subscription_id => r.child_subscription_id}
-      end
-      @migration.update_attribute(:import_results, import_results)
-      MasterCourses::MigrationResult.where(:master_migration_id => @migration).delete_all # make sure they're gone
-
-      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
-        :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
-        :id => @migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
-      expect(json).to match_array([
-        {"asset_id"=>@page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
-          "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
-        {"asset_id"=>@quiz.id,"asset_type"=>"quiz","asset_name"=>"TestQuiz","change_type"=>"created",
-          "html_url"=>"http://www.example.com/courses/#{@master.id}/quizzes/#{@quiz.id}","locked"=>false,"exceptions"=>[]},
-        {"asset_id"=>@assignment.id,"asset_type"=>"assignment","asset_name"=>"Blah","change_type"=>"deleted",
-          "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/#{@assignment.id}",
-          "locked"=>false,"exceptions"=>[{"course_id"=>@minions.last.id, "conflicting_changes"=>["points"]}]},
-        {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"I Can Rename Files Too",
-          "change_type"=>"updated","html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}",
-          "locked"=>false,"exceptions"=>[{"course_id"=>@minions.first.id, "conflicting_changes"=>["content"]}]}
-      ])
-    end
-
     it "returns change information from the minion side" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
