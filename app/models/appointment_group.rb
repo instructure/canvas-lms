@@ -131,6 +131,17 @@ class AppointmentGroup < ActiveRecord::Base
                                          :sub_context_code => code)
         ]
       else
+        # if new record and we have a course without sections, add all the sections
+        if new_record?
+          @new_contexts.each do |context|
+            context_subs = context.course_sections.map(&:asset_string)
+            # if context has no selected subcontexts, add all subcontexts
+            if (@new_sub_context_codes & context_subs).count == 0
+              @new_sub_context_codes += context_subs
+            end
+          end
+        end
+
         # right now we don't support changing the sub contexts for a context
         # on an appointment group after it has been saved
         disallowed_sub_context_codes = contexts.map(&:course_sections).
