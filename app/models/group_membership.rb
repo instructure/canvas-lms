@@ -46,6 +46,9 @@ class GroupMembership < ActiveRecord::Base
 
   scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
   scope :moderators, -> { where(:moderator => true) }
+  scope :active_for_context_and_users, -> (context, users) {
+    joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: 'available'})
+  }
 
   alias_method :context, :group
 

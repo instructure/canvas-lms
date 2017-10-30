@@ -893,11 +893,15 @@ class CoursesController < ApplicationController
 
       users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
-      user_json_preloads(
-        users,
-        includes.include?('email'),
-        group_memberships: includes.include?('group_ids')
-      )
+
+      # user_json_preloads loads both active/accepted and deleted
+      # group_memberships when passed "group_memberships: true." In a
+      # known case in the wild, each student had thousands of deleted
+      # group memberships. Since we only care about active group
+      # memberships for this course, load the data in a more targeted way.
+      user_json_preloads(users, includes.include?('email'))
+      include_group_ids = includes.delete('group_ids').present?
+
       unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
         users.reject! do |u|
           u.preferences[:fake_student]
@@ -921,9 +925,15 @@ class CoursesController < ApplicationController
 
       render :json => users.map { |u|
         enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
-        user_unconfirmed = enrollments ? enrollments.all?{|e| %w{invited creation_pending rejected}.include?(e.workflow_state)} : !confirmed_user_ids.include?(u.id)
+        user_unconfirmed = if enrollments
+          enrollments.all?{|e| %w{invited creation_pending rejected}.include?(e.workflow_state)}
+        else
+          !confirmed_user_ids.include?(u.id)
+        end
         excludes = user_unconfirmed ? %w{pseudonym personal_info} : []
-        user_json(u, @current_user, session, includes, @context, enrollments, excludes)
+        user_json(u, @current_user, session, includes, @context, enrollments, excludes).tap do |json|
+          json[:group_ids] = active_group_memberships(users)[u.id]&.map(&:group_id) || [] if include_group_ids
+        end
       }
     end
   end
@@ -2927,6 +2937,10 @@ class CoursesController < ApplicationController
   end
 
   private
+
+  def active_group_memberships(users)
+    @active_group_memberships ||= GroupMembership.active_for_context_and_users(@context, users).group_by(&:user_id)
+  end
 
   def effective_due_dates_params
     params.permit(assignment_ids: [])
