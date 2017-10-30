@@ -33,7 +33,7 @@ module RuboCop
           return unless first_arg
           reason = first_arg.children.first
           return if refs_ticket?(reason)
-          add_offense node, :expression, MSG, :warning
+          add_offense node, message: MSG, severity: :warning
         end
 
         def refs_ticket?(reason)

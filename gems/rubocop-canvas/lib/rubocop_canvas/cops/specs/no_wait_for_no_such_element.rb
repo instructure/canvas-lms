@@ -28,7 +28,7 @@ module RuboCop
         def on_send(node)
           _receiver, method_name, *_args = *node
           return unless method_name == METHOD
-          add_offense node, :expression, MSG, :warning
+          add_offense node, message: MSG, severity: :warning
         end
       end
     end

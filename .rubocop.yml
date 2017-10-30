@@ -114,6 +114,10 @@ Style/Dir:
   Enabled: false
 Style/ReturnNil:
   Enabled: false
+Style/StderrPuts:
+  Enabled: false
+Style/DateTime:
+  Enabled: false
 # We may want to enable this when we start working toward Ruby 3
 Style/FrozenStringLiteralComment:
   Enabled: false
@@ -132,6 +136,8 @@ RSpec/RepeatedDescription:
 
 # this isn't good for us because of how we pin dependencies
 Bundler/OrderedGems:
+  Enabled: false
+Gemspec/OrderedDependencies:
   Enabled: false
 
 # Rails style changes

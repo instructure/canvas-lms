@@ -60,7 +60,9 @@ module RuboCop
           full_name = nesting + const_parts
           return if require_dependency_calls.include? full_name.join("::").underscore
 
-          add_offense arg, :expression, error_message(nesting, const_parts), :warning
+          add_offense(arg,
+            message: error_message(nesting, const_parts),
+            severity: :warning)
         end
 
         def error_message(nesting, const_parts)

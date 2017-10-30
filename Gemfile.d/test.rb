@@ -35,7 +35,7 @@ group :test do
   gem 'shoulda-matchers', '3.1.2'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
-    gem 'rubocop', '0.50.0', require: false
+    gem 'rubocop', '0.51.0', require: false
       gem 'rainbow', '2.2.2', require: false
   gem 'rubocop-rspec', '1.15.1', require: false
 
