@@ -50,7 +50,9 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     };
     submissionState = { hideGrade: false };
 
-    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').withArgs(submission).returns(submissionState);
+    const getSubmissionState = gradebook.submissionStateMap.getSubmissionState.bind(gradebook.submissionStateMap);
+    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').callsFake(getSubmissionState);
+    gradebook.submissionStateMap.getSubmissionState.withArgs(submission).returns(submissionState);
   });
 
   hooks.afterEach(function () {
@@ -151,6 +153,16 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
 
   test('renders an empty cell when the student is not initialized', function () {
     student.initialized = false;
+    strictEqual(renderCell().innerHTML, '');
+  });
+
+  test('renders an empty cell when the submission is not defined', function () {
+    submission = undefined;
+    strictEqual(renderCell().innerHTML, '');
+  });
+
+  test('renders an empty cell when the submission state is not defined', function () {
+    gradebook.submissionStateMap.getSubmissionState.withArgs(submission).returns(undefined);
     strictEqual(renderCell().innerHTML, '');
   });
 

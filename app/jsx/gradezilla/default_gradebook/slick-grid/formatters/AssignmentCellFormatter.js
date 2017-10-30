@@ -91,11 +91,15 @@ export default class AssignmentCellFormatter {
   }
 
   render = (row, cell, submission /* value */, _columnDef, student /* dataContext */) => {
-    if (!student.loaded || !student.initialized) {
+    let submissionState;
+    if (submission) {
+      submissionState = this.options.getSubmissionState(submission);
+    }
+
+    if (!student.loaded || !student.initialized || !submissionState) {
       return renderTemplate('');
     }
 
-    const submissionState = this.options.getSubmissionState(submission);
     if (submissionState.hideGrade) {
       return renderTemplate('', { dimmed: true });
     }
