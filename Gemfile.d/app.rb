@@ -83,7 +83,7 @@ gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.8.0'
 gem 'multi_json', '1.12.2'
 gem 'netaddr', '1.5.1', require: false
-gem 'nokogiri', '1.8.0', require: false
+gem 'nokogiri', '1.8.1', require: false
 gem 'oauth', '0.5.3', require: false
 gem 'parallel', '1.12.0', require: false
   gem 'ruby-progressbar', '1.8.1', require: false #used to show progress of S3Uploader
