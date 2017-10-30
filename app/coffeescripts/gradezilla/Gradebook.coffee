@@ -244,7 +244,6 @@ define [
         max: 400
 
     hasSections: $.Deferred()
-    gridReady: $.Deferred()
 
     constructor: (@options) ->
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
@@ -255,6 +254,8 @@ define [
 
       # emitted by GradingPeriodMenuView
       $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
+
+      @gridReady = $.Deferred()
 
       @setInitialState()
       @loadSettings()
@@ -390,6 +391,9 @@ define [
         @setSubmissionsLoaded(true)
         @updateColumnHeaders()
         @renderFilters()
+
+      @gridReady.then () =>
+        @renderViewOptionsMenu()
 
     reloadStudentData: =>
       @setStudentsLoaded(false)
@@ -1283,7 +1287,7 @@ define [
       else
         onSelect = @createTeacherNotes
 
-      disabled: @contentLoadStates.teacherNotesColumnUpdating
+      disabled: @contentLoadStates.teacherNotesColumnUpdating || @gridReady.state() != 'resolved'
       onSelect: onSelect
       selected: showingNotes
 
