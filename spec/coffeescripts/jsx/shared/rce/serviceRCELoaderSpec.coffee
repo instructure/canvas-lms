@@ -153,7 +153,6 @@ define [
       fakeENV.setup()
       ENV.RICH_CONTENT_APP_HOST = 'http://rce.host'
       ENV.RICH_CONTENT_CAN_UPLOAD_FILES = true
-      ENV.RICH_CONTENT_SIDEBAR_SOURCE = 'api'
       ENV.context_asset_string = 'courses_1'
       fixtures.setup()
       @$div = fixtures.create('<div />')
@@ -176,21 +175,6 @@ define [
     equal props.host, 'http://rce.host'
     equal props.contextType, 'courses'
     equal props.contextId, '1'
-
-  test 'passes undefined source for api', ->
-    cb = sinon.spy()
-    RCELoader.loadSidebarOnTarget(@$div, cb)
-    ok @rce.renderSidebarIntoDiv.called
-    props = @rce.renderSidebarIntoDiv.args[0][1]
-    equal typeof props.source, 'undefined'
-
-  test 'passes object source for fake', ->
-    ENV.RICH_CONTENT_SIDEBAR_SOURCE = 'fake'
-    cb = sinon.spy()
-    RCELoader.loadSidebarOnTarget(@$div, cb)
-    ok @rce.renderSidebarIntoDiv.called
-    props = @rce.renderSidebarIntoDiv.args[0][1]
-    equal typeof props.source, 'object'
 
   test 'yields sidebar to callback', ->
     cb = sinon.spy()
