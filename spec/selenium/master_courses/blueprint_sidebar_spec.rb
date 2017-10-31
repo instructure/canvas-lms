@@ -180,6 +180,23 @@ describe "master courses sidebar" do
       expect(f('span[aria-label="Associations"]')).to be_displayed
     end
 
+    it "should open and close Associations modal from course settings page" do
+      # see jira ticket ADMIN-5
+      get "/courses/#{@master.id}/settings"
+      blueprint_open_sidebar_button.click
+      f('button#mcSidebarAsscBtn').click
+      expect(f('span[aria-label="Associations"]')).to be_displayed
+      f('body').find_element(:xpath, '//*[@aria-label="Associations"]//button[contains(., "Close")]').click
+      expect(f('body')).not_to contain_css('[aria-label="Associations"]')
+      # try again from the sections tab, just to be sure
+      f('#sections_tab>a').click
+      expect(f('#tab-sections')).to be_displayed
+      f('button#mcSidebarAsscBtn').click
+      expect(f('span[aria-label="Associations"]')).to be_displayed
+      f('body').find_element(:xpath, '//*[@aria-label="Associations"]//button[contains(., "Close")]').click
+      expect(f('body')).not_to contain_css('[aria-label="Associations"]')
+    end
+
     it "limits notification message to 140 characters", priority: "2", test_id: 3186725 do
       msg = '1234567890123456789012345678901234567890123456789012345678901234567890'
       open_blueprint_sidebar
