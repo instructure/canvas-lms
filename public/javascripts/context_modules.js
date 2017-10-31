@@ -564,7 +564,7 @@ import 'compiled/jquery.rails_flash_notifications'
           $('#context_module_requirement_count_').prop('checked', true).change();
         }
 
-
+        $module.fadeIn(200);
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
         var $toFocus = $('.ig-header-admin .al-trigger', $module);
