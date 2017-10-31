@@ -34,6 +34,7 @@ export function createGradebook (options = {}) {
       { id: '2801', data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]], title: 'Emoji Grades' }
     ],
     locale: 'en',
+    latePolicyStatusDisabled: false,
     new_gradebook_development_enabled: true,
     outcome_gradebook_enabled: false,
     post_grades_ltis: [],

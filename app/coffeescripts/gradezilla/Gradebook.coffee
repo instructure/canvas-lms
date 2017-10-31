@@ -2231,6 +2231,7 @@ define [
         name: htmlDecode(student.name)
         avatarUrl: htmlDecode(student.avatar_url)
         gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
+        isConcluded: student.isConcluded
       submission: ConvertCase.camelize(submission)
       submissionUpdating: @contentLoadStates.submissionUpdating
       updateSubmission: @updateSubmissionAndRenderSubmissionTray

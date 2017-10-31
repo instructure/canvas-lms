@@ -6417,7 +6417,8 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
               html_url: 'http://gradesUrl/'
             }
           }
-        ]
+        ],
+        isConcluded: false
       }
     };
     gradebook.gridSupport = {
@@ -6497,6 +6498,13 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
 
     strictEqual(props.student.name, "J'onn J'onzz");
+  });
+
+  test('student has isConcluded property', function () {
+    gradebook.setSubmissionTrayState(true, '1101', '2301');
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'));
+
+    strictEqual(props.student.isConcluded, false);
   });
 
   test('isInOtherGradingPeriod is true when the SubmissionStateMap returns true', function () {
@@ -6635,7 +6643,8 @@ QUnit.module('Gradebook#renderSubmissionTray', {
               html_url: 'http://gradesUrl/'
             }
           }
-        ]
+        ],
+        isConcluded: false
       }
     };
     this.gradebook.gridSupport = {
@@ -6730,7 +6739,8 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         },
-        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }]
+        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }],
+        isConcluded: false
       },
       1101: {
         id: '1101',
@@ -6738,7 +6748,8 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         },
-        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }]
+        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }],
+        isConcluded: false
       },
       1102: {
         id: '1100',
@@ -6746,7 +6757,8 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         },
-        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }]
+        enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }],
+        isConcluded: false
       }
     };
     sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]));

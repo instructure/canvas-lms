@@ -57,6 +57,7 @@ export default function SubmissionTrayRadioInput (props) {
     <div className={radioInputClasses} style={styles}>
       <RadioInput
         checked={props.checked}
+        disabled={props.disabled}
         name={props.value}
         label={props.text}
         onChange={props.onChange}
@@ -68,6 +69,7 @@ export default function SubmissionTrayRadioInput (props) {
           <span className="NumberInput__Container NumberInput__Container-LeftIndent">
             <NumberInput
               defaultValue={defaultDurationLate(interval, props.submission.secondsLate)}
+              disabled={props.disabled}
               inline
               label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
               locale={props.locale}
@@ -91,6 +93,7 @@ export default function SubmissionTrayRadioInput (props) {
 SubmissionTrayRadioInput.propTypes = {
   checked: bool.isRequired,
   color: string.isRequired,
+  disabled: bool.isRequired,
   latePolicy: shape({
     lateSubmissionInterval: string.isRequired
   }).isRequired,

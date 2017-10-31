@@ -97,9 +97,10 @@ export default class SubmissionTray extends React.Component {
     onRequestClose: func.isRequired,
     student: shape({
       id: string.isRequired,
-      name: string.isRequired,
       avatarUrl: string,
-      gradesUrl: string.isRequired
+      gradesUrl: string.isRequired,
+      isConcluded: bool.isRequired,
+      name: string.isRequired
     }).isRequired,
     submission: shape({
       drop: bool,
@@ -275,10 +276,11 @@ export default class SubmissionTray extends React.Component {
             <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
               <SubmissionStatus
                 assignment={this.props.assignment}
-                submission={this.props.submission}
+                isConcluded={this.props.student.isConcluded}
                 isInOtherGradingPeriod={this.props.isInOtherGradingPeriod}
                 isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
                 isInNoGradingPeriod={this.props.isInNoGradingPeriod}
+                submission={this.props.submission}
               />
 
               <GradeInput
@@ -300,6 +302,7 @@ export default class SubmissionTray extends React.Component {
               <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
                 <SubmissionTrayRadioInputGroup
                   colors={this.props.colors}
+                  disabled={this.props.gradingDisabled}
                   locale={this.props.locale}
                   latePolicy={this.props.latePolicy}
                   submission={this.props.submission}

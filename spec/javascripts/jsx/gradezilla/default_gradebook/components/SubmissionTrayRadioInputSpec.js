@@ -26,6 +26,7 @@ QUnit.module('SubmissionTrayRadioInput', {
     const props = {
       checked: false,
       color: '#FEF7E5',
+      disabled: false,
       latePolicy: { lateSubmissionInterval: 'day' },
       locale: 'en',
       onChange () {},
@@ -76,6 +77,26 @@ test('renders with a NumberInput when value is "late" and checked is true', func
 test('renders without a NumberInput when value is "late" and checked is false', function () {
   this.wrapper = this.mountComponent({ value: 'late' });
   strictEqual(this.numberInput().length, 0);
+});
+
+test('renders with the NumberInput enabled when disabled is false', function () {
+  this.wrapper = this.mountComponent({ value: 'late', checked: true });
+  strictEqual(this.numberInput().props().disabled, false);
+});
+
+test('renders with the NumberInput disabled when disabled is true', function () {
+  this.wrapper = this.mountComponent({ value: 'late', checked: true, disabled: true });
+  strictEqual(this.numberInput().props().disabled, true);
+});
+
+test('renders with the radio option enabled when disabled is false', function () {
+  this.wrapper = this.mountComponent({ disabled: false });
+  strictEqual(this.wrapper.find('RadioInput').props().disabled, false);
+});
+
+test('renders with the radio option disabled when disabled is true', function () {
+  this.wrapper = this.mountComponent({ disabled: true });
+  strictEqual(this.wrapper.find('RadioInput').props().disabled, true);
 });
 
 test('renders with the radio option selected when checked is true', function () {

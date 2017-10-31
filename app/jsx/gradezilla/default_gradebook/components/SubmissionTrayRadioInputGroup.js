@@ -78,6 +78,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
         key={status}
         checked={checkedValue(this.props.submission) === status}
         color={this.props.colors[status]}
+        disabled={this.props.disabled}
         latePolicy={this.props.latePolicy}
         locale={this.props.locale}
         onChange={this.handleRadioInputChanged}
@@ -89,7 +90,12 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
     );
 
     return (
-      <FormFieldGroup description={I18n.t('Status')} layout="stacked" rowSpacing="none">
+      <FormFieldGroup
+        description={I18n.t('Status')}
+        disabled={this.props.disabled}
+        layout="stacked"
+        rowSpacing="none"
+      >
         {radioOptions}
       </FormFieldGroup>
     );
@@ -102,6 +108,7 @@ SubmissionTrayRadioInputGroup.propTypes = {
     missing: string.isRequired,
     excused: string.isRequired
   }).isRequired,
+  disabled: bool.isRequired,
   latePolicy: shape({
     lateSubmissionInterval: string.isRequired
   }).isRequired,

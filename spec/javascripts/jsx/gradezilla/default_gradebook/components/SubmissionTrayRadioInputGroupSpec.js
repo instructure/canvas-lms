@@ -28,6 +28,7 @@ QUnit.module('SubmissionTrayRadioInputGroup', {
         missing: '#F99',
         excused: '#E5F3FC'
       },
+      disabled: false,
       latePolicy: { lateSubmissionInterval: 'day' },
       locale: 'en',
       submission: { excused: false, late: false, missing: false, secondsLate: 0 },
@@ -45,6 +46,28 @@ QUnit.module('SubmissionTrayRadioInputGroup', {
   teardown () {
     this.wrapper.unmount();
   }
+});
+
+test('renders FormFieldGroup enabled if disabled is false', function () {
+  this.wrapper = this.mountComponent({ disabled: false });
+  strictEqual(this.wrapper.find('FormFieldGroup').props().disabled, false);
+});
+
+test('renders FormFieldGroup disabled if disabled is true', function () {
+  this.wrapper = this.mountComponent({ disabled: true });
+  strictEqual(this.wrapper.find('FormFieldGroup').props().disabled, true);
+});
+
+test('renders all SubmissionTrayRadioInputs enabled if disabled is false', function () {
+  this.wrapper = this.mountComponent({ disabled: false });
+  const inputDisabledStatus = this.wrapper.find('SubmissionTrayRadioInput').map((input) => input.props().disabled);
+  deepEqual(inputDisabledStatus, [false, false, false, false]);
+});
+
+test('renders all SubmissionTrayRadioInputs disabled if disabled is false', function () {
+  this.wrapper = this.mountComponent({ disabled: true });
+  const inputDisabledStatus = this.wrapper.find('SubmissionTrayRadioInput').map((input) => input.props().disabled);
+  deepEqual(inputDisabledStatus, [true, true, true, true]);
 });
 
 test('renders with "none" selected if the submission is not late, missing, or excused', function () {
