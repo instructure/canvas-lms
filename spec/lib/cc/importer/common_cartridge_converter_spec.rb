@@ -687,4 +687,11 @@ describe "other cc files" do
       expect(issues.any?{|i| i.include?("This package includes EPub3 file(s)")}).to be_truthy
     end
   end
+
+  describe "cc syllabus intendeduse" do
+    it "should import" do
+      import_cc_file("cc_syllabus.zip")
+      expect(@course.reload.syllabus_body).to include("<p>beep beep</p>")
+    end
+  end
 end

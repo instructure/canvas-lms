@@ -22,10 +22,16 @@ module CC::Importer::Standard
     def create_file_map
       new_assignments = []
       resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
-        if res[:intended_use] == "assignment"
+        if res[:intended_use]
           path = get_full_path(res[:href])
           if path && File.exists?(path) && Attachment.mimetype(path) =~ /html/
-            new_assignments << {:migration_id => res[:migration_id], :description => File.read(path)}
+            case res[:intended_use]
+            when "assignment"
+              new_assignments << {:migration_id => res[:migration_id], :description => File.read(path)}
+            when "syllabus"
+              @course[:course] ||= {}
+              @course[:course][:syllabus_body] = File.read(path)
+            end
           end
         end
 
