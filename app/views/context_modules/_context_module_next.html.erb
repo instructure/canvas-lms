@@ -193,7 +193,10 @@
     </div>
   </div>
 
-  <div class="content" id="context_module_content_<%= context_module && context_module.id %>">
+  <div 
+    class="content" 
+    id="context_module_content_<%= context_module && context_module.id %>"
+    aria-controls="context_module_content_<%= context_module && context_module.id %>" >
     <ul class="ig-list items context_module_items <%= 'manageable' if editable %>">
       <% if context_module && module_data[:items] %>
         <% module_data[:items].each do |item| %>
