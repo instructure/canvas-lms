@@ -17,13 +17,13 @@
 
 define [
   'jquery'
-  'underscore'
   'Backbone'
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
   'compiled/views/groups/manage/GroupCategoryCloneView'
-], ($, _, {View}, template, GroupUsersView, GroupDetailView, GroupCategoryCloneView) ->
+  'compiled/util/groupHasSubmissions'
+], ($, {View}, template, GroupUsersView, GroupDetailView, GroupCategoryCloneView, groupHasSubmissions) ->
 
   class GroupView extends View
 
@@ -76,7 +76,7 @@ define [
       else
         # enable droppable on the child GroupView (view)
         if !@$el.data('droppable')
-          @$el.droppable(_.extend({}, @dropOptions))
+          @$el.droppable(Object.assign({}, @dropOptions))
             .on('drop', @_onDrop)
         @$el.removeClass('slots-full')
 
@@ -105,7 +105,10 @@ define [
       !user.has('group') || (user.get('group').get("id") != @model.get("id"))
 
     eitherGroupHasSubmission: (user) =>
-      (user.has('group') && user.get('group').get("has_submission")) || @model.get('has_submission')
+      (user.has('group') && groupHasSubmissions user.get('group')) || groupHasSubmissions @model
+
+    isUnassignedUserWithSubmission: (user) =>
+      !user.has('group') && user.has('group_submissions') && user.get('group_submissions').length > 0
 
     ##
     # handle drop events on a GroupView
@@ -115,8 +118,10 @@ define [
     #   ui.draggable - the user being dragged
     _onDrop: (e, ui) =>
       user = ui.draggable.data('model')
+      diffGroupsWithSubmission = @groupsAreDifferent(user) && @eitherGroupHasSubmission(user)
+      unassignedWithSubmission = @isUnassignedUserWithSubmission(user) && @model.usersCount() > 0
 
-      if @groupsAreDifferent(user) && @eitherGroupHasSubmission(user)
+      if diffGroupsWithSubmission || unassignedWithSubmission
         @cloneCategoryView = new GroupCategoryCloneView
           model: @model.collection.category,
           openedFromCaution: true

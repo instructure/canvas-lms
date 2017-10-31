@@ -22,7 +22,8 @@ define [
   'compiled/views/groups/manage/GroupCategoryCloneView'
   'jst/groups/manage/randomlyAssignMembers'
   'jst/EmptyDialogFormWrapper'
-], (I18n, _, DialogFormView, GroupCategoryCloneView, template, wrapper) ->
+  'compiled/util/groupHasSubmissions'
+], (I18n, _, DialogFormView, GroupCategoryCloneView, template, wrapper, groupHasSubmissions) ->
 
   class RandomlyAssignMembersView extends DialogFormView
 
@@ -61,7 +62,7 @@ define [
 
       groupHasSubmission = false
       for group in @model.groups().models
-        if group.get('has_submission')
+        if groupHasSubmissions group
           groupHasSubmission = true
           break
       if groupHasSubmission

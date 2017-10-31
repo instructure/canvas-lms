@@ -17,11 +17,10 @@
 
 define [
   'i18n!groups'
-  'underscore'
   'compiled/views/DialogFormView'
   'jst/groups/manage/groupEdit'
   'jst/EmptyDialogFormWrapper'
-], (I18n, _, DialogFormView, template, wrapper) ->
+], (I18n, DialogFormView, template, wrapper) ->
 
   class GroupEditView extends DialogFormView
 
@@ -50,7 +49,7 @@ define [
         window.location.reload()
 
 
-    events: _.extend {},
+    events: Object.assign {},
       DialogFormView::events
       'click .dialog_closer': 'close'
 
@@ -67,7 +66,7 @@ define [
       @render()
 
     toJSON: ->
-      json = _.extend super,
+      json = Object.assign {}, super,
         role: @groupCategory.get('role')
         nameOnly: @options.nameOnly
       json

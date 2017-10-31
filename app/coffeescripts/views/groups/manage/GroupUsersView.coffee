@@ -24,9 +24,10 @@ define [
   'compiled/views/groups/manage/GroupUserView'
   'compiled/views/groups/manage/GroupCategoryCloneView'
   'jst/groups/manage/groupUsers'
+  'compiled/util/groupHasSubmissions'
   'jqueryui/draggable'
   'jqueryui/droppable'
-], (I18n, $, MoveItem, GroupCollection, PaginatedCollectionView, GroupUserView, GroupCategoryCloneView, template) ->
+], (I18n, $, MoveItem, GroupCollection, PaginatedCollectionView, GroupUserView, GroupCategoryCloneView, template, groupHasSubmissions) ->
 
   class GroupUsersView extends PaginatedCollectionView
 
@@ -78,7 +79,7 @@ define [
       $target = $(e.currentTarget)
       user = @collection.getUser($target.data('user-id'))
 
-      if @model.get("has_submission")
+      if groupHasSubmissions @model
         @cloneCategoryView = new GroupCategoryCloneView
           model: @model.collection.category,
           openedFromCaution: true
@@ -133,7 +134,10 @@ define [
           groups: MoveItem.backbone.collectionToGroups(@model.collection, (col) => models: [])
           excludeCurrent: true
         onMoveSuccess: (res) =>
-          if @model.get('has_submission') or @model.collection.get(res.groupId).get('has_submission')
+          groupsHaveSubs = groupHasSubmissions(@model) || groupHasSubmissions(@model.collection.get(res.groupId))
+          userHasSubs = user.get('group_submissions')?.length > 0
+          newGroupNotEmpty = @model.collection.get(res.groupId).usersCount() > 0
+          if groupsHaveSubs || (userHasSubs && newGroupNotEmpty)
             @cloneCategoryView = new GroupCategoryCloneView
               model: user.collection.category
               openedFromCaution: true

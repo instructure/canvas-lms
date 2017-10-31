@@ -304,8 +304,13 @@ module GroupsCommon
     category = @group_category[0]
     assignment = @course.assignments.create({
       :name => "test assignment",
-      :group_category => category})
-    assignment.submit_homework(student)
+      :group_category => category
+    })
+    a = Attachment.create! context: student,
+      filename: "homework.pdf",
+      uploaded_data: StringIO.new("blah blah blah")
+    assignment.submit_homework(student, attachments: [a],
+    submission_type: "online_upload")
   end
 
   def create_group_announcement_manually(title,text)
