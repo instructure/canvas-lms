@@ -51,12 +51,15 @@ define [
     initialize: ->
       super
       @model.fetch().done =>
-        picked_params = _.pick(@model.attributes,
-          'start_at', 'start_time', 'end_time',
+        picked_params = _.pick(Object.assign({}, @model.attributes, deparam()),
+          'start_at', 'start_date', 'start_time', 'end_time',
           'title', 'description', 'location_name', 'location_address',
           'duplicate')
         if picked_params.start_at
           picked_params.start_date = tz.format($.fudgeDateForProfileTimezone(picked_params.start_at), 'date.formats.medium_with_weekday')
+        else
+          picked_params.start_date = tz.format($.fudgeDateForProfileTimezone(picked_params.start_date), 'date.formats.medium_with_weekday')
+
 
         attrs = @model.parse(picked_params)
         # if start and end are at the beginning of a day, assume it is an all day date
