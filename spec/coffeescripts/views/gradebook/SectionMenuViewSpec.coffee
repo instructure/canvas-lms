@@ -41,11 +41,14 @@ define [
     ok @view.$el.find('button').text().match(/Section One/), 'button label includes current section'
 
   test 'it displays given sections', ->
+    clock = sinon.useFakeTimers()
     @view.$el.find('button').click()
+    clock.tick(101)
     html = $('.section-select-menu:visible').html()
     ok html.match(/All Sections/), 'displays default "all sections"'
     ok html.match(/Section One/), 'displays first section'
     ok html.match(/Section Two/), 'displays section section'
+    clock.restore()
 
   test 'it changes sections', ->
     @view.$el.find('button').click()

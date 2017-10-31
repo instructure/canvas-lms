@@ -284,4 +284,3 @@ $.widget( "ui.popup", {
 			.attr( "aria-expanded", "false" );
 	}
 });
-

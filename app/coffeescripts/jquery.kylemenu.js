@@ -166,12 +166,22 @@ export default class KyleMenu {
     const triggerWidth = this.$trigger.outerWidth()
     const triggerOffsetLeft = this.$trigger.offset().left
 
+    // the menu may have flipped above the trigger
+    const mbox = this.$menu[0].getBoundingClientRect()
+    const tbox = this.$trigger[0].getBoundingClientRect()
+    const caratIsBelow = (mbox.top + mbox.height) < tbox.top
+    const caratY = mbox.height - 2
+
     // if it is a mouse event, it will have a 'pageX' otherwise use the middle of the trigger
     const pointToDropDownFrom = event.pageX || triggerOffsetLeft + triggerWidth / 2
     const differenceInOffset = triggerOffsetLeft - this.$menu.offset().left
     const actualOffset = pointToDropDownFrom - this.$trigger.offset().left
     const caratOffset = Math.min(Math.max(6, actualOffset), triggerWidth - 6) + differenceInOffset
-    this.$carat = $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this.$menu)
+    this.$carat = $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset)
+    if (caratIsBelow) {
+      this.$carat.css('top', caratY).css('transform', 'rotateX(180deg)')
+    }
+    this.$carat.prependTo(this.$menu)
   }
 
   static defaults = {
@@ -181,7 +191,7 @@ export default class KyleMenu {
         at: 'center bottom',
         offset: '0 10px',
         within: '#main',
-        collision: 'fit'
+        collision: 'flipfit'
       }
     },
     buttonOpts: {
