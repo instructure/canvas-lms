@@ -24,14 +24,6 @@ import loadEventListeners from 'jsx/shared/rce/loadEventListeners'
 import polyfill from 'jsx/shared/rce/polyfill'
 import splitAssetString from 'compiled/str/splitAssetString'
 
-function getSidebarSource(source_name) {
-  var ret = undefined
-  if (source_name === 'fake') {
-    ret = require("canvas-rce/lib/sidebar/sources/fake")
-  }
-  return ret
-}
-
   const RCELoader = {
     preload() {
       this.loadRCE(function(){})
@@ -50,9 +42,11 @@ function getSidebarSource(source_name) {
     },
 
     loadSidebarOnTarget(target, callback) {
+      if (ENV.RAILS_ENV === "test") {
+        return
+      }
       let context = splitAssetString(ENV.context_asset_string)
       let props = {
-        source: getSidebarSource(ENV.RICH_CONTENT_SIDEBAR_SOURCE),
         jwt: ENV.JWT,
         refreshToken: refreshToken(ENV.JWT),
         host: ENV.RICH_CONTENT_APP_HOST,
