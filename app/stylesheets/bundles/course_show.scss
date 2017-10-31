@@ -58,4 +58,19 @@
   &__message {
     width: 80%;
   }
+
+  &__message-content {
+    table {
+      margin: 8px;
+      border: 1px solid $ic-border-color;
+    }
+
+    tr {
+      height: 32px;
+    }
+
+    td {
+      border: 1px solid $ic-border-color;
+    }
+  }
 }

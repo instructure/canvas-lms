@@ -50,7 +50,7 @@ export default class AnnouncementList extends React.Component {
         <tr key={c.id}>
           <td>
             <ToggleDetails summary={TextHelper.truncateText(c.title, { max: 100 })} className="AnnouncementList__message">
-              <p dangerouslySetInnerHTML={{__html: c.message}}/>
+              <div className="AnnouncementList__message-content" dangerouslySetInnerHTML={{__html: c.message}}/>
               <Link href={c.url}>{I18n.t('View Announcement')}</Link>
             </ToggleDetails>
           </td>
