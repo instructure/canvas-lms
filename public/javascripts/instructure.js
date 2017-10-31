@@ -215,9 +215,6 @@ function handleYoutubeLink () {
     }
 
     ///////////// START layout related stuff
-    // make sure that #main is at least as big as the tallest of #right_side, #content, and #left_side and ALWAYS at least 500px tall
-    $('#main:not(.already_sized)').css({"minHeight" : Math.max($("#left_side").height(), parseInt(($('#main').css('minHeight') || "").replace('px', ''), 10))});
-
     var $menu_items = $(".menu-item"),
         $menu = $("#menu"),
         menuItemHoverTimeoutId;

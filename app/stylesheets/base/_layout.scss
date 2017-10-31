@@ -115,8 +115,8 @@ div.content_notice {
 
 .before_external_content_info_alert,
 .after_external_content_info_alert {
-  margin: 20px 0px 20px 0px;
   &:focus {
+    margin: 20px 0px 20px 0px;
     outline: none;
   }
 }
