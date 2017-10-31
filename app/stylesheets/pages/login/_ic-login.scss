@@ -161,6 +161,13 @@ body.ic-Login-Body { // apply the background to the body element so that you don
     label {
       color: var(--ic-brand-Login-Content-label-text-color);
     }
+
+    input[type="checkbox"] {
+      &:focus {
+        outline: 1px solid var(--ic-brand-Login-Content-password-text-color);
+        outline-offset: 1px;
+      }
+    }
   }
   .ic-Login__actions--right {
     flex: 1;
