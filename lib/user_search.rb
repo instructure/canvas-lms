@@ -172,15 +172,13 @@ module UserSearch
         SELECT user_id FROM #{Pseudonym.quoted_table_name}
           WHERE (#{like_condition('pseudonyms.sis_user_id')} OR
             #{like_condition('pseudonyms.unique_id')})
-            AND pseudonyms.user_id = users.id
             AND pseudonyms.workflow_state='active'
             AND pseudonyms.account_id = ?
         UNION
         SELECT id FROM #{User.quoted_table_name} WHERE (#{like_condition('users.name')})
         UNION
         SELECT user_id FROM #{CommunicationChannel.quoted_table_name}
-          WHERE communication_channels.user_id = users.id
-            AND communication_channels.path_type = ?
+          WHERE communication_channels.path_type = ?
             AND #{like_condition('communication_channels.path')}
             AND communication_channels.workflow_state in ('active', 'unconfirmed')
       )
