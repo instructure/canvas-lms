@@ -239,7 +239,8 @@ class Quizzes::QuizzesController < ApplicationController
         COURSE_ID: @context.id,
         LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
         QUIZ: quiz_json(@quiz,@context,@current_user,session),
-        QUIZZES_URL: course_quizzes_url(@context)
+        QUIZZES_URL: course_quizzes_url(@context),
+        MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
       }
       append_sis_data(hash)
       js_env(hash)
