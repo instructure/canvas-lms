@@ -920,6 +920,10 @@ function beforeLeavingSpeedgrader(e) {
   }
 }
 
+function unexcuseSubmission (grade, submission, assignment) {
+  return grade === "" && submission.excused && assignment.grading_type === "pass_fail";
+}
+
 // Public Variables and Methods
 EG = {
   options: {},
@@ -2498,6 +2502,8 @@ EG = {
 
     if (grade.toUpperCase() === "EX") {
       formData["submission[excuse]"] = true;
+    } else if (unexcuseSubmission(grade, EG.currentStudent.submission, jsonData)) {
+      formData["submission[excuse]"] = false;
     } else if (use_existing_score) {
       // If we're resubmitting a score, pass it as a raw score not grade.
       // This allows percentage grading types to be handled correctly.
