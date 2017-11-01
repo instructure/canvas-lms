@@ -2116,7 +2116,7 @@ class Submission < ActiveRecord::Base
 
   def filter_attributes_for_user(hash, user, session)
     unless user_can_read_grade?(user, session)
-      %w(score published_grade published_score grade).each do |secret_attr|
+      %w(score grade published_score published_grade entered_score entered_grade).each do |secret_attr|
         hash.delete secret_attr
       end
     end
