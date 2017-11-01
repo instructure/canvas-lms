@@ -72,7 +72,7 @@ def test_selective_content(source_course=nil)
   visit_page
 
   # Open selective dialog
-  expect(f('.migrationProgressItem .progressStatus')).to include_text("Waiting for select")
+  expect(f('.migrationProgressItem .progressStatus')).to include_text("Waiting for Selection")
   f('.migrationProgressItem .selectContentBtn').click
   wait_for_ajaximations
 

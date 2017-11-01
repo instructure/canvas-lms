@@ -102,7 +102,7 @@
               <a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a>
             </td>
             <td style="width: 30%;">
-              <%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %> | created <%= datetime_string(enrollment.created_at) %>
+              <%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %> | <%= t('Created %{created_at}', :created_at => datetime_string(enrollment.created_at)) %>
             </td>
             <% if enrollment.is_a?(ObserverEnrollment) %>
               <td style="<%= hidden unless enrollment.associated_user %>" class="associated_user" >
