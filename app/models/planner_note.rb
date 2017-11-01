@@ -21,6 +21,8 @@ class PlannerNote < ActiveRecord::Base
   include Plannable
   belongs_to :user
   belongs_to :course
+  belongs_to :linked_object, polymorphic:
+    [:announcement, :assignment, :discussion_topic, :wiki_page, quiz: 'Quizzes::Quiz']
   validates_presence_of :user_id, :title, :todo_date, :workflow_state
 
   scope :for_user, lambda { |user| where(user: user) }

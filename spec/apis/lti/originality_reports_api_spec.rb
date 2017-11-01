@@ -659,13 +659,6 @@ module Lti
         expect(response.code).to eq '401'
       end
 
-      it "requires the plagiarism feature flag" do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
-
-        post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
-        expect(response).not_to be_success
-      end
-
       it "verifies the specified attachment is in the course" do
         attachment = @attachment.dup
         attachment.context = @course

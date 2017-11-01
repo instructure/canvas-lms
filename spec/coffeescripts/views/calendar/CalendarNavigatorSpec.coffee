@@ -18,7 +18,8 @@
 define [
   'jquery'
   'compiled/views/calendar/CalendarNavigator'
-], ($, CalendarNavigator) ->
+  'helpers/assertions'
+], ($, CalendarNavigator, assertions) ->
 
   QUnit.module 'CalendarNavigator',
     setup: ->
@@ -31,6 +32,10 @@ define [
       $("#ui-datepicker-div").empty()
       $(".ui-dialog").remove()
       $("ul[id^=ui-id-]").remove()
+
+  test 'should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @navigator, done, {'a11yReport': true}
 
   test 'clicking a day in picker navigates to that date', ->
     # instrument the callback

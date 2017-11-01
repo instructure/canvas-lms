@@ -51,18 +51,20 @@ define [
     initialize: ->
       super
       @model.fetch().done =>
-        picked_params = _.pick(deparam(),
-          'start_date', 'start_time', 'end_time',
+        picked_params = _.pick(Object.assign({}, @model.attributes, deparam()),
+          'start_at', 'start_date', 'start_time', 'end_time',
           'title', 'description', 'location_name', 'location_address',
           'duplicate')
-        if picked_params.start_date
+        if picked_params.start_at
+          picked_params.start_date = tz.format($.fudgeDateForProfileTimezone(picked_params.start_at), 'date.formats.medium_with_weekday')
+        else
           picked_params.start_date = tz.format($.fudgeDateForProfileTimezone(picked_params.start_date), 'date.formats.medium_with_weekday')
+
 
         attrs = @model.parse(picked_params)
         # if start and end are at the beginning of a day, assume it is an all day date
         attrs.all_day = !!attrs.start_at?.equals(attrs.end_at) and attrs.start_at.equals(attrs.start_at.clearTime())
         @model.set(attrs)
-
         @render()
 
         # populate inputs with params passed through the url
@@ -89,7 +91,6 @@ define [
 
     render: =>
       super
-
       @$(".date_field").date_field({ datepicker: { dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday')) } })
       @$(".time_field").time_field()
       @$(".date_start_end_row").each (_, row) =>

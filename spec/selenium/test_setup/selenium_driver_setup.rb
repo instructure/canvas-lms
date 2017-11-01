@@ -91,7 +91,7 @@ module SeleniumDriverSetup
       @driver = nil
     end
 
-    def reset_driver_between_specs?
+    def saucelabs_test_run?
       SeleniumDriverSetup::CONFIG[:remote_url].present? &&
         SeleniumDriverSetup::CONFIG[:remote_url].downcase.include?("saucelabs")
     end
@@ -102,6 +102,8 @@ module SeleniumDriverSetup
           Thread.new { start_webserver },
           Thread.new { start_driver }
         ].each(&:join)
+      rescue Selenium::WebDriver::Error::WebDriverError
+        driver.quit if saucelabs_test_run?
       rescue StandardError
         puts "selenium startup failed: #{$ERROR_INFO}"
         puts "exiting :'("
@@ -217,7 +219,7 @@ module SeleniumDriverSetup
     end
 
     def run_headless?
-      ENV.key?("TEST_ENV_NUMBER")
+      ENV.key?("TEST_ENV_NUMBER") && !saucelabs_test_run?
     end
 
     HEADLESS_DEFAULTS = {

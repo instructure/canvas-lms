@@ -23,7 +23,8 @@ define [
   'jst/assignments/EditView'
   'helpers/fakeENV'
   'Backbone'
-], ($, _, Assignment, EditHeaderView, editViewTemplate, fakeENV, Backbone) ->
+  'helpers/assertions'
+], ($, _, Assignment, EditHeaderView, editViewTemplate, fakeENV, Backbone, assertions) ->
 
   defaultAssignmentOpts =
     name: 'Test Assignment'
@@ -51,6 +52,11 @@ define [
     teardown: ->
       fakeENV.teardown()
       $(document).off 'submit'
+
+  test 'should be accessible', (assert) ->
+    view = editHeaderView()
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'renders', ->
     view = editHeaderView()

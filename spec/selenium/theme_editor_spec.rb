@@ -59,6 +59,7 @@ describe 'Theme Editor' do
   end
 
   it 'should close theme editor on cancel and redirect to /accounts/x', priority: "1", test_id: 239981 do
+    skip_if_safari(:alert)
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
@@ -73,6 +74,7 @@ describe 'Theme Editor' do
   end
 
   it 'should close after preview (no changes saved)', priority: "1", test_id: 239984 do
+    skip_if_safari(:alert)
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open

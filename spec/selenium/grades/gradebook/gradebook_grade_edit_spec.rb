@@ -204,6 +204,7 @@ describe "editing grades" do
   end
 
   it "should optionally assign zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
+    skip_if_safari(:alert)
     grade_page.visit_gradebook(@course)
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', '')

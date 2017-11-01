@@ -35,14 +35,18 @@ import axios from 'axios'
       isOpen: false
     }
 
-    handleOkayButtonClick = (e, onSuccessFunc = window.location.reload) => {
+    handleOkayButtonClick = (e, onSuccessFunc) => {
       const API_URL = '/api/v1/users/self/features/flags/new_user_tutorial_on_off';
       axios.put(API_URL, {
         state: 'off'
       }).then(() => {
         // Done this way such that onSuccessFunc (reload) gets the proper thisArg
         // while still allowing us to easily provide a replacement for tests.
-        onSuccessFunc.call(window.location);
+        if (onSuccessFunc) {
+          onSuccessFunc()
+        } else {
+          window.location.reload();
+        }
       });
     }
 

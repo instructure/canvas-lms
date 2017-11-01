@@ -103,6 +103,7 @@ describe 'developer keys' do
   end
 
   it 'should delete without error', priority: "1", test_id: 344079 do
+    skip_if_safari(:alert)
     add_developer_key
     get "/accounts/#{Account.default.id}/developer_keys"
     f("#keys tbody tr.key .edit_link").click

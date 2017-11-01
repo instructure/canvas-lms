@@ -89,7 +89,7 @@ function getSidebarSource(source_name) {
       require.ensure([], (require) => {
         const first = !this.RCE
         this.RCE = require('canvas-rce/lib/async')
-        require('tinymce-a11y-checker')
+        require('./initA11yChecker')
         if (first) {
           this.loadEventListeners()
           this.loadingFlag = false

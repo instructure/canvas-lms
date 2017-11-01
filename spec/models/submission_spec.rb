@@ -1082,6 +1082,32 @@ describe Submission do
     @submission.save!
   end
 
+  it "grade change event author can be set" do
+    submission_spec_model
+    assistant = User.create!
+    @course.enroll_ta(assistant, enrollment_state: "active")
+
+    expect(Auditors::GradeChange).to receive(:record).once do |submission|
+      expect(submission.grader_id).to eq assistant.id
+    end
+
+    @submission.grade_change_event_author_id = assistant.id
+    @submission.score = 5
+    @submission.save!
+  end
+
+  it "uses the existing grader_id as the author if grade_change_event_author_id is not set" do
+    submission_spec_model
+    @assignment.grade_student(@student, grade: 10, grader: @teacher)
+
+    expect(Auditors::GradeChange).to receive(:record).once do |submission|
+      expect(submission.grader_id).to eq @teacher.id
+    end
+
+    @submission.score = 5
+    @submission.save!
+  end
+
   it "should log excused submissions" do
     submission_spec_model
 

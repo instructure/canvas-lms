@@ -59,7 +59,7 @@
     "timezone": "1.0.6",
     "tinycolor2": "1.4.1",
     "tinymce": "4.5.7",
-    "tinymce-a11y-checker": "1.0.3",
+    "tinymce-a11y-checker": "1.0.5",
     "tinymce-light-skin": "1.3.1"
   },
   "devDependencies": {
@@ -157,6 +157,7 @@
     "webpack-stats": "webpack --profile --json",
     "webpack-production": "NODE_ENV=production gulp rev & node --max_old_space_size=4096 $(yarn bin)/webpack --color --config webpack.production.config.js",
     "jspec": "./spec/jspec.sh",
-    "jspec-watch": "./spec/jspec.sh --watch"
+    "jspec-watch": "./spec/jspec.sh --watch",
+    "a11y-report": "./spec/jspec.sh --a11y"
   }
 }

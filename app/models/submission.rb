@@ -269,7 +269,8 @@ class Submission < ActiveRecord::Base
 
   attr_accessor :saved_by,
                 :assignment_changed_not_sub,
-                :grading_error_message
+                :grading_error_message,
+                :grade_change_event_author_id
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -1653,6 +1654,10 @@ class Submission < ActiveRecord::Base
     newly_graded = self.workflow_state_changed? && self.workflow_state == 'graded'
     grade_changed = (self.changed & %w(grade score excused)).present?
     return true unless newly_graded || grade_changed || force_audit
+
+    if grade_change_event_author_id.present?
+      self.grader_id = grade_change_event_author_id
+    end
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 

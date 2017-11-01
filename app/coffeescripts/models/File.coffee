@@ -78,9 +78,16 @@ define [
       FilesystemObject::save.call this, null,
         multipart: true
         success: (data) =>
-          if data.location?
+          if @uploadParams.success_url
+            # s3 upload, need to ping success_url to finalize and get back
+            # attachment information
+            $.ajaxJSON(@uploadParams.success_url, 'GET', {}, onUpload, onError)
+          else if data.location?
+            # inst-fs upload, need to request attachment information from
+            # location
             $.ajaxJSON(data.location, 'GET', {}, onUpload, onError)
           else
+            # local-storage upload, this _is_ the attachment information
             onUpload(data)
         error: onError
 

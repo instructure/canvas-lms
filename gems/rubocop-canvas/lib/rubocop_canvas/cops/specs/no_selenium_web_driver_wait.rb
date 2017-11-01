@@ -38,12 +38,12 @@ module RuboCop
         def_node_matcher :bad_const?, <<-PATTERN
           (const
             (const
-              (const nil #{BAD_CONST_MATCHER}
+              (const ... #{BAD_CONST_MATCHER}
         PATTERN
 
         def on_const(node)
           return unless bad_const?(node)
-          add_offense node, :expression, MSG, :warning
+          add_offense node, message: MSG, severity: :warning
         end
       end
     end

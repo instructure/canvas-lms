@@ -49,7 +49,7 @@ import 'compiled/jquery/fixDialogButtons'
         $(this).attr('id', 'criterion_' + (i + 1));
       });
     },
-    updateAddCriterionLinks($rubric) {
+    updateAddCriterionLinks($rubric, forceFocus = false) {
       if ($rubric.find("#add_criterion_holder").length === 0) { return; }
       $("#add_criterion_container").remove();
       $rubric.find("#add_criterion_holder").append($('<span/>').attr('id', 'add_criterion_container'));
@@ -57,9 +57,13 @@ import 'compiled/jquery/fixDialogButtons'
         <RubricAddCriterionPopover rubric={$rubric} duplicateFunction={rubricEditing.copyCriterion} />,
         document.getElementById("add_criterion_container")
       );
+      if (forceFocus) {
+        $rubric.find("#add_criterion_container .icon-plus").focus()
+      }
     },
     copyCriterion($rubric, criterion_index) {
       const $criterion = rubricEditing.addCriterion($rubric, criterion_index);
+      $criterion.removeClass("new_criterion");
       $criterion.find(".criterion_id").text("blank");
       $criterion.find(".rating_id").text("blank");
       rubricEditing.editCriterion($criterion);
@@ -72,12 +76,13 @@ import 'compiled/jquery/fixDialogButtons'
         $blank = $rubric.find(".criterion.blank:first");
       }
       var $criterion = $blank.clone(true);
+      $criterion.addClass("new_criterion");
       $criterion.removeClass('blank');
       $rubric.find(".summary").before($criterion.show());
+      const forceFocus = $criterion.hasClass("learning_outcome_criterion")
       rubricEditing.updateCriteria($rubric);
-      rubricEditing.updateRubricPoints($rubric);
       rubricEditing.sizeRatings($criterion);
-      rubricEditing.updateAddCriterionLinks($rubric);
+      rubricEditing.updateAddCriterionLinks($rubric, forceFocus);
       return $criterion;
     },
     addNewRatingColumn: function($this) {
@@ -131,10 +136,10 @@ import 'compiled/jquery/fixDialogButtons'
           $criterion;
 
       $rubric.find(".criterion.learning_outcome_" + outcome.id).find(".delete_criterion_link").click();
-      $rubric.find(".add_criterion_link").click();
+      rubricEditing.addCriterion($rubric);
 
       $criterion = $rubric.find('.criterion:not(.blank):last');
-
+      $criterion.removeClass("new_criterion");
       $criterion.toggleClass('ignore_criterion_for_scoring', !outcome.useForScoring);
       $criterion.find('.mastery_points').val(outcome.get('mastery_points'));
       $criterion.addClass('learning_outcome_criterion');
@@ -153,7 +158,8 @@ import 'compiled/jquery/fixDialogButtons'
 
       $criterion.find(".cancel_button").click();
 
-      $criterion.find(".long_description").val(outcome.get('description'));
+      $criterion.find("div.long_description").remove();
+      $criterion.find("textarea.long_description").text(outcome.get('description'));
       $criterion.find(".long_description_holder").toggleClass('empty', !outcome.get('description'));
 
       $criterion.find(".criterion_description_value").text(outcome.get('title'));
@@ -163,6 +169,8 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.find(".edit_criterion_link").remove();
       $criterion.find(".rating .links").remove();
       rubricEditing.updateAddCriterionLinks($rubric);
+      $rubric.find("#add_criterion_container .icon-search").focus();
+      $criterion.find(".long_description_holder").show();
     },
     hideCriterionAdd: function($rubric) {
       $rubric.find('.add_right, .add_left, .add_column').removeClass('add_left add_right add_column');
@@ -262,25 +270,8 @@ import 'compiled/jquery/fixDialogButtons'
     editCriterion: function($criterion) {
       if(!$criterion.parents(".rubric").hasClass('editing')) { return; }
       if($criterion.hasClass('learning_outcome_criterion')) { return; }
-      rubricEditing.hideEditCriterion(true);
-      var $td = $criterion.find(".criterion_description");
-      var height = Math.max(40, $td.find(".description").height());
-      var data = $td.getTemplateData({textValues: ['description']});
-      var $box = $("#edit_criterion");
-      $box.fillFormData(data);
-      $td.find(".container").hide().after($box.show());
-      $box.find(":input:first").focus().select();
-      rubricEditing.sizeRatings($criterion);
+      $criterion.find(".edit_criterion_link").click()
     },
-    hideEditCriterion: function(updateCurrent) {
-      var $form = $("#edit_criterion");
-      if($form.filter(":visible").length > 0 && updateCurrent) { $form.find("form").submit(); }
-      var $criterion = $form.parents(".criterion");
-      $form.appendTo("body").hide();
-      $criterion.find(".criterion_description").find(".container").show();
-      rubricEditing.sizeRatings($criterion);
-    },
-
     originalSizeRatings: function() {
       var $visibleCriteria = $(".rubric:not(.rubric_summary) .criterion:visible");
       if ($visibleCriteria.length) {
@@ -337,7 +328,9 @@ import 'compiled/jquery/fixDialogButtons'
           $criterion.find("span.mastery_points").text(numberHelper.validate(masteryPoints) ? masteryPoints : 0);
         }
         var vals = $criterion.getTemplateData({textValues: ['description', 'display_criterion_points', 'learning_outcome_id', 'mastery_points', 'long_description', 'criterion_id']});
-        vals.long_description = $criterion.find("textarea.long_description").val();
+        if($criterion.hasClass('learning_outcome_criterion')) {
+          vals.long_description = $criterion.find("textarea.long_description").val();
+        }
         vals.mastery_points = $criterion.find("span.mastery_points").text();
         var pre_criterion = "rubric[criteria][" + criterion_idx + "]";
         data[pre_criterion + "[description]"] = vals.description;
@@ -421,7 +414,6 @@ import 'compiled/jquery/fixDialogButtons'
         $rubric = $rubric.next(".editing");
       }
       $rubric.removeClass('editing');
-      $("#edit_criterion").hide().appendTo('body');
       $rubric.find(".edit_rubric").remove();
       if(remove) {
         if($rubric.attr('id') != 'rubric_new') {
@@ -474,6 +466,13 @@ import 'compiled/jquery/fixDialogButtons'
         $criterion.find('.hide_when_learning_outcome').showIf(!criterion.learning_outcome_id);
         $criterion.toggleClass('learning_outcome_criterion', !!criterion.learning_outcome_id);
         $criterion.toggleClass('ignore_criterion_for_scoring', !!criterion.ignore_for_scoring);
+        if (criterion.learning_outcome_id) {
+          $criterion.find(".long_description_holder").show();
+          $criterion.find("div.long_description").remove();
+          if (criterion.long_description) {
+            $criterion.find(".long_description_link").removeClass("hidden");
+          }
+        }
         var count = 0;
         criterion.ratings.forEach(function(rating) {
           count++;
@@ -520,14 +519,24 @@ import 'compiled/jquery/fixDialogButtons'
     rubricEditing.htmlBody = $('html,body');
 
     $("#rubrics")
-    .delegate(".long_description_link", 'click', function(event) {
+    .delegate(".edit_criterion_link, .long_description_link", 'click', function(event) {
       event.preventDefault();
       var editing           = $(this).parents(".rubric").hasClass('editing'),
           $criterion        = $(this).parents(".criterion"),
           isLearningOutcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion"),
+          title             = I18n.t("Edit Criterion"),
           data              = $criterion.getTemplateData({textValues: ['long_description', 'description']});
 
       if(editing && !isLearningOutcome) {
+        // Override the default description if this is a new criterion.
+        if ($criterion.hasClass("new_criterion")) {
+          data.description = ""
+          title = I18n.t("Add Criterion")
+          $rubric_long_description_dialog.find('.save_button').text(I18n.t("Create Criterion"))
+        }
+        else {
+          $rubric_long_description_dialog.find('.save_button').text(I18n.t("Update Criterion"))
+        }
         $rubric_long_description_dialog
           .fillFormData(data).fillTemplateData({data: data})
           .find('.editing').show().end()
@@ -546,19 +555,40 @@ import 'compiled/jquery/fixDialogButtons'
           // to the tests that broke while putting this together).
           data.long_description = htmlEscape(data.long_description).replace(/(\r?\n)/g, '<br>$1');
         }
-
+        title = I18n.t("Criterion Long Description")
         $rubric_long_description_dialog
-          .fillTemplateData({data: data, htmlValues: ['long_description'], avoid: 'textarea'})
+          .fillTemplateData({data: data, htmlValues: ['description', 'long_description'], avoid: 'textarea'})
           .find(".displaying").show().end()
           .find('.editing').hide().end();
       }
 
+      const closeFunction = function() {
+        // If the criterion is still in the new state (user either canceled or closed dialog)
+        // delete the criterion.
+        if ($criterion.hasClass("new_criterion")) {
+          setTimeout(() => {
+            $.screenReaderFlashMessageExclusive(I18n.t("New Criterion Canceled"));
+          }, 100);
+          $criterion.find(".delete_criterion_link").click();
+        }
+      };
+
+      const beforeCloseFunction = function() {
+        if ($criterion.hasClass("new_criterion")) {
+          $criterion.parents('.rubric_container').first().find("#add_criterion_container .icon-plus").focus()
+        } else {
+          $criterion.find('.edit_criterion_link').focus()
+        }
+      };
+
       $rubric_long_description_dialog
         .data('current_criterion', $criterion)
         .dialog({
-          title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
+          title: title,
           width: 416,
-          buttons: []
+          buttons: [],
+          close: closeFunction,
+          beforeClose: beforeCloseFunction
         });
 
       if(editing && !isLearningOutcome) {
@@ -691,11 +721,27 @@ import 'compiled/jquery/fixDialogButtons'
 
     $rubric_long_description_dialog.find(".save_button").click(function() {
       var long_description = $rubric_long_description_dialog.find("textarea.long_description").val(),
+          description      = $rubric_long_description_dialog.find("textarea.description").val(),
           $criterion       = $rubric_long_description_dialog.data('current_criterion');
       if($criterion) {
-        $criterion.fillTemplateData({data: {long_description: long_description}});
+        $criterion.fillTemplateData({data: {long_description: long_description, criterion_description_value: description}});
         $criterion.find("textarea.long_description").val(long_description);
+        $criterion.find("textarea.description").val(description);
         $criterion.find(".long_description_holder").toggleClass('empty', !long_description);
+        let screenreaderMessage = I18n.t("Criterion Updated")
+        if ($criterion.hasClass("new_criterion")) {
+          screenreaderMessage = I18n.t("Criterion Created")
+        }
+        $criterion.removeClass("new_criterion");
+        $criterion.show();
+        const $rubric = $criterion.parents(".rubric")
+        rubricEditing.updateCriteria($rubric);
+        rubricEditing.updateRubricPoints($rubric);
+        rubricEditing.updateAddCriterionLinks($rubric);
+        setTimeout(() => {
+          $.screenReaderFlashMessageExclusive(screenreaderMessage);
+          $criterion.find(".edit_criterion_link").focus();
+        }, 100);
       }
       $rubric_long_description_dialog.dialog('close');
     });
@@ -997,13 +1043,10 @@ import 'compiled/jquery/fixDialogButtons'
 
     $("#rubrics").delegate('.add_criterion_link', 'click', function(event) {
       var $criterion = rubricEditing.addCriterion($(this).parents(".rubric")); //"#default_rubric"));
+      $criterion.hide();
       rubricEditing.editCriterion($criterion);
       return false;
     }).delegate('.criterion_description_value', 'click', function(event) {
-      var $criterion = $(this).parents(".criterion")
-      rubricEditing.editCriterion($criterion);
-      return false;
-    }).delegate('.edit_criterion_link', 'click', function(event) {
       var $criterion = $(this).parents(".criterion")
       rubricEditing.editCriterion($criterion);
       return false;
@@ -1014,22 +1057,26 @@ import 'compiled/jquery/fixDialogButtons'
       // of rows the "blank" template element is, so we have to account for the
       // fact that it could be the previous row
       var $prevCriterion = $criterion.prevAll('.criterion:not(.blank)').first();
-      var $target = $prevCriterion.find('.long_description_link');
+      let $target = $prevCriterion.find('.edit_criterion_link');
       if ($prevCriterion.length == 0) {
         $target = $criterion.parents('.rubric_container').find('.rubric_title input');
       }
-
-      // focusing before the fadeOut so safari
-      // screenreader can handle focus properly
-      $target.focus();
-
-      $criterion.fadeOut(function() {
-        var $rubric = $criterion.parents(".rubric");
+      const $rubric = $criterion.parents(".rubric");
+      if ($criterion.hasClass("new_criterion")) {
         $criterion.remove();
-        rubricEditing.updateCriteria($rubric);
-        rubricEditing.updateRubricPoints($rubric);
-        rubricEditing.updateAddCriterionLinks($rubric);
-      });
+        rubricEditing.updateAddCriterionLinks($rubric, true);
+      } else {
+        // focusing before the fadeOut so safari
+        // screenreader can handle focus properly
+        $target.focus();
+
+        $criterion.fadeOut(function() {
+          $criterion.remove();
+          rubricEditing.updateCriteria($rubric);
+          rubricEditing.updateRubricPoints($rubric);
+          rubricEditing.updateAddCriterionLinks($rubric);
+        });
+      }
       return false;
     }).delegate('.rating_description_value', 'click', function(event) {
       return false;
@@ -1069,23 +1116,6 @@ import 'compiled/jquery/fixDialogButtons'
     }).blur(function(event) {
       rubricEditing.updateCriterionPoints($(this).parents(".criterion"));
     });
-    $("#edit_criterion").delegate(".cancel_button", 'click', function(event) {
-      var $target = $(this).closest('td.criterion_description').find('.edit_criterion_link');
-      rubricEditing.hideEditCriterion();
-      $target.focus();
-    });
-    $("#edit_criterion_form").submit(function(event) {
-      var $target = $(this).closest('td.criterion_description').find('.edit_criterion_link');
-      event.preventDefault();
-      event.stopPropagation();
-      var data = $(this).parents("#edit_criterion").getFormData();
-      data.criterion_description_value = data.description;
-      delete data['description'];
-      $(this).parents(".criterion").fillTemplateData({data: data});
-      rubricEditing.hideEditCriterion();
-      rubricEditing.updateAddCriterionLinks($target.parents(".rubric"));
-      $target.focus();
-    });
     $("#edit_rating").delegate(".cancel_button", 'click', function(event) {
       var $target = $(this).closest('td.rating').find('.edit_rating_link');
     });
@@ -1114,6 +1144,7 @@ import 'compiled/jquery/fixDialogButtons'
     $("#criterion_blank").find(".criterion_points").val("5");
     if($("#default_rubric").find(".criterion").length <= 1) {
       rubricEditing.addCriterion($("#default_rubric"));
+      $("#default_rubric").find(".criterion").removeClass("new_criterion");
     }
     setInterval(rubricEditing.sizeRatings, 10000);
     $.publish('edit_rubric/initted')

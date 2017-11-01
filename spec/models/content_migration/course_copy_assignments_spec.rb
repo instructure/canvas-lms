@@ -186,6 +186,7 @@ describe ContentMigration do
       @assignment.muted = true
       @assignment.omit_from_final_grade = true
       @assignment.only_visible_to_overrides = true
+      @assignment.post_to_sis = true
 
       @assignment.save!
 
@@ -195,7 +196,7 @@ describe ContentMigration do
       attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :muted, :omit_from_final_grade]
+          :position, :peer_review_count, :muted, :omit_from_final_grade, :post_to_sis]
 
       run_course_copy
 

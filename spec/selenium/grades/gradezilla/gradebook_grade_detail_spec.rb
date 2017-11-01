@@ -257,6 +257,7 @@ describe 'Grade Detail Tray:' do
     end
 
     it "delete a comment", test_id: 3339966, priority: '1' do
+      skip_if_safari(:alert)
       Gradezilla::Cells.open_tray(@course.students.first, @a1)
       Gradezilla::GradeDetailTray.delete_comment(comment_1)
 

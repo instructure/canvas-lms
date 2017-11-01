@@ -68,6 +68,10 @@ QUnit.module('StudentCellFormatter', function (hooks) {
     return $fixture;
   }
 
+  function studentGradesLink () {
+    return renderCell().querySelector('.student-grades-link');
+  }
+
   QUnit.module('#render with a placeholder student');
 
   test('renders no content', function () {
@@ -79,29 +83,29 @@ QUnit.module('StudentCellFormatter', function (hooks) {
 
   test('includes a link to the student grades', function () {
     const expectedUrl = 'http://example.com/grades/1101#tab-assignments';
-    equal(renderCell().querySelector('.student-grades-link').href, expectedUrl);
+    equal(studentGradesLink().href, expectedUrl);
   });
 
   test('renders the student name when displaying names as "first, last"', function () {
-    equal(renderCell().querySelector('.student-grades-link').innerHTML, 'Adam Jones');
+    equal(studentGradesLink().innerHTML, 'Adam Jones');
   });
 
   test('does not escape html in the student name when displaying names as "first, last"', function () {
     // student names have already been escaped
     student.name = '&lt;span&gt;Adam Jones&lt;/span&gt;';
-    equal(renderCell().querySelector('.student-grades-link').innerHTML, '&lt;span&gt;Adam Jones&lt;/span&gt;');
+    equal(studentGradesLink().innerHTML, '&lt;span&gt;Adam Jones&lt;/span&gt;');
   });
 
   test('renders the sortable name when displaying names as "last, first"', function () {
     gradebook.setSelectedPrimaryInfo('last_first', true); // skipRedraw
-    equal(renderCell().querySelector('.student-grades-link').innerHTML, 'Jones, Adam');
+    equal(studentGradesLink().innerHTML, 'Jones, Adam');
   });
 
   test('does not escape html in the student name when displaying names as "last, first"', function () {
     // student names have already been escaped
     gradebook.setSelectedPrimaryInfo('last_first', true); // skipRedraw
     student.sortable_name = '&lt;span&gt;Jones, Adam&lt;/span&gt;';
-    equal(renderCell().querySelector('.student-grades-link').innerHTML, '&lt;span&gt;Jones, Adam&lt;/span&gt;');
+    equal(studentGradesLink().innerHTML, '&lt;span&gt;Jones, Adam&lt;/span&gt;');
   });
 
   test('does not render an enrollment status label', function () {
@@ -140,6 +144,18 @@ QUnit.module('StudentCellFormatter', function (hooks) {
   test('does not render secondary info when secondary info is "none"', function () {
     gradebook.setSelectedSecondaryInfo('none', true); // skipRedraw
     strictEqual(renderCell().querySelector('.secondary-info'), null);
+  });
+
+  test('student grades link doubles as a context card trigger', function () {
+    strictEqual(studentGradesLink().classList.contains('student_context_card_trigger'), true);
+  });
+
+  test('student grades link includes the student id as a data attribute', function () {
+    strictEqual(studentGradesLink().getAttribute("data-student_id"), student.id);
+  });
+
+  test('student grades link includes the course id as a data attribute', function () {
+    strictEqual(studentGradesLink().getAttribute("data-course_id"), gradebook.options.context_id);
   });
 
   QUnit.module('#render with an inactive student');

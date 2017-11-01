@@ -21,7 +21,8 @@ define [
   'compiled/views/DiscussionTopic/EntryView'
   'compiled/discussions/Reply'
   'helpers/fakeENV'
-], ($, Entry, EntryView, Reply, fakeENV) ->
+  'helpers/assertions'
+], ($, Entry, EntryView, Reply, fakeENV, assertions) ->
 
   QUnit.module 'EntryView',
     setup: ->
@@ -34,6 +35,16 @@ define [
     teardown: ->
       fakeENV.teardown()
       $('#fixtures').empty()
+
+  test 'it should be accessible', (assert) ->
+    entry = new Entry(id: 1, message: 'hi')
+    $('#fixtures').append($('<div />').attr('id', 'e1'))
+    view = new EntryView
+      model: entry
+      el: '#e1'
+    view.render()
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'renders', ->
     entry = new Entry(id: 1, message: 'hi')

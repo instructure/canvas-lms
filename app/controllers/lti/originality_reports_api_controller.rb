@@ -110,7 +110,7 @@ module Lti
     ].freeze
 
     skip_before_action :load_user
-    before_action :authorized_lti2_tool, :plagiarism_feature_flag_enabled
+    before_action :authorized_lti2_tool
     before_action :attachment_in_context, only: [:create]
     before_action :find_originality_report
     before_action :report_in_context, only: [:show, :update]
@@ -235,10 +235,6 @@ module Lti
 
     def tool_proxy_associated?
       PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)
-    end
-
-    def plagiarism_feature_flag_enabled
-      render_unauthorized_action unless assignment.context.root_account.feature_enabled?(:plagiarism_detection_platform)
     end
 
     def create_attributes

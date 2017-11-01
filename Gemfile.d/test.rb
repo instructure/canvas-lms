@@ -23,19 +23,19 @@ group :test do
   gem 'dotenv', '2.2.1', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
-  gem 'simplecov', '0.15.0', require: false
+  gem 'simplecov', '0.15.1', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'puma', '3.9.1'
+  gem 'puma', '3.10.0'
 
-  gem 'rspec', '3.6.0'
+  gem 'rspec', '3.7.0'
   gem 'rspec_around_all', '0.2.0'
-  gem 'rspec-rails', '3.6.0'
+  gem 'rspec-rails', '3.7.1'
   gem 'rspec-collection_matchers', '1.1.3'
   gem 'shoulda-matchers', '3.1.2'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
-    gem 'rubocop', '0.49.1', require: false
+    gem 'rubocop', '0.51.0', require: false
       gem 'rainbow', '2.2.2', require: false
   gem 'rubocop-rspec', '1.15.1', require: false
 
@@ -50,12 +50,12 @@ group :test do
   gem 'test-queue', github: 'instructure/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false
   gem 'testrailtagging', '0.3.8.3', require: false
 
-  gem 'webmock', '3.0.1', require: false
+  gem 'webmock', '3.1.0', require: false
     gem 'crack', '0.4.3', require: false
   gem 'timecop', '0.9.1'
   gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2', require: false
-  gem 'hashdiff', '0.3.4'
+  gem 'hashdiff', '0.3.7'
   gem 'luminosity_contrast', '0.2.1'
 end

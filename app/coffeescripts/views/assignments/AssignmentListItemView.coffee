@@ -19,9 +19,8 @@ define [
   'i18n!assignments'
   'Backbone'
   'jquery'
-  'underscore'
   'jsx/shared/conditional_release/CyoeHelper'
-  'jsx/move_item_tray/NewMoveDialogView'
+  'jsx/move_item'
   'compiled/models/Assignment'
   'compiled/views/PublishIconView'
   'compiled/views/LockIconView'
@@ -29,7 +28,6 @@ define [
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/SisButtonView'
-  'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentListItem'
   'jst/assignments/_assignmentListItemScore'
@@ -38,7 +36,7 @@ define [
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, Backbone, $, _, CyoeHelper, NewMoveDialogView, Assignment, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+], (I18n, Backbone, $, CyoeHelper, MoveItem, Assignment, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -88,7 +86,7 @@ define [
 
         # re-render for attributes we are showing
         attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules", "published"]
-        observe = _.map(attrs, (attr) -> "change:#{attr}").join(" ")
+        observe = attrs.map((attr) -> "change:#{attr}").join(" ")
         @model.on(observe, @render)
       @model.on 'change:submission', @updateScore
 
@@ -98,7 +96,6 @@ define [
       @sisButtonView = false
       @editAssignmentView = false
       @dateAvailableColumnView = false
-      @moveAssignmentView = false
 
       if @canManage()
         @publishIconView = new PublishIconView({
@@ -115,18 +112,6 @@ define [
         })
         @editAssignmentView = new CreateAssignmentView(model: @model)
 
-        @moveAssignmentView = new NewMoveDialogView
-          model: @model
-          nested: true
-          parentCollection: @model.collection.view?.parentCollection
-          parentTitleLabel: @messages.ag_move_label
-          childKey: 'assignments'
-          closeTarget: @$el.find('a[id*=manage_link]')
-          saveURL: "#{ENV.URLS.assignment_sort_base_url}"
-          onSuccessfulMove: @onMoveSuccess
-          movePanelParent: document.getElementById('not_right_side')
-          modalTitle: I18n.t('Move Assignment')
-
         if @isGraded() && @model.postToSISEnabled() && @model.published()
           @sisButtonView = new SisButtonView
             model: @model
@@ -141,35 +126,25 @@ define [
     #
     # Returns nothing.
     onMove: () =>
-      @moveAssignmentView.renderOpenMoveDialog();
+      @moveTrayProps =
+        title: I18n.t('Move Assignment')
+        item:
+          id: @model.get('id')
+          title: @model.get('name')
+        moveOptions:
+          groupsLabel:  @messages.ag_move_label
+          groups: MoveItem.backbone.collectionToGroups(@model.collection.view?.parentCollection, (col) => col.get('assignments'))
+        onMoveSuccess: (res) =>
+          keys =
+            model: 'assignments'
+            parent: 'assignment_group_id'
+          MoveItem.backbone.reorderAcrossCollections(res.data.order, res.groupId, @model, keys)
+        focusOnExit: =>
+          document.querySelector("#assignment_#{@model.id} a[id*=manage_link]")
+        formatSaveUrl: ({ groupId }) ->
+          "#{ENV.URLS.assignment_sort_base_url}/#{groupId}/reorder"
 
-    onMoveSuccess: (movedItems, groupId) ->
-      # collID must be a string
-      collID = groupId
-      newCollection = @parentCollection?.get(collID).get(@childKey)
-
-      # there is a currentCollection, but it doesn't match the model's collection
-      if newCollection and newCollection != @model.collection
-        #we need to remove the model from the previous collection
-        #and add it to to the new one
-        @model.collection.remove @model
-        newCollection.add @model
-        # also update the relationship to the collection
-        # if we know how
-        if @parentKey
-          @model.set 'assignment_group_id', collID
-      else
-        newCollection = @model.collection
-
-      #update all of the position attributes
-      positions = [1..newCollection.length]
-
-      movedItems.forEach (id, index) ->
-        newCollection.get(id)?.set 'position', positions[index]
-
-      newCollection.sort()
-      # finally, call reset to trigger a re-render
-      newCollection.reset newCollection.models
+      MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
 
     updatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
@@ -194,10 +169,6 @@ define [
       if @editAssignmentView
         @editAssignmentView.hide()
         @editAssignmentView.setTrigger @$editAssignmentButton
-
-      if @moveAssignmentView
-        if @canMove()
-          @moveAssignmentView.setCloseFocus @$moveAssignmentButton
 
       @updateScore() if @canReadGrades()
 
@@ -243,23 +214,23 @@ define [
         data.alignTextClass = 'align-right'
 
       if @model.isQuiz()
-        data.menu_tools = ENV.quiz_menu_tools
-        _.each data.menu_tools, (tool) =>
+        data.menu_tools = ENV.quiz_menu_tools || []
+        data.menu_tools.forEach (tool) =>
           tool.url = tool.base_url + "&quizzes[]=#{@model.get("quiz_id")}"
       else if @model.isDiscussionTopic()
-        data.menu_tools = ENV.discussion_topic_menu_tools
-        _.each data.menu_tools, (tool) =>
+        data.menu_tools = ENV.discussion_topic_menu_tools || []
+        data.menu_tools.forEach (tool) =>
           tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic")?.id}"
       else
-        data.menu_tools = ENV.assignment_menu_tools
-        _.each data.menu_tools, (tool) =>
+        data.menu_tools = ENV.assignment_menu_tools || []
+        data.menu_tools.forEach (tool) =>
           tool.url = tool.base_url + "&assignments[]=#{@model.get("id")}"
 
       if modules = @model.get('modules')
         moduleName = modules[0]
         has_modules = modules.length > 0
         joinedNames = modules.join(",")
-        _.extend data, {
+        Object.assign data, {
           modules: modules
           module_count: modules.length
           module_name: moduleName

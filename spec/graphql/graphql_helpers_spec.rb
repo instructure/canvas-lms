@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GraphQLHelpers do
   context "relay_or_legacy_id_prepare_func" do
-    let :relay_user_id { "VXNlci0xMjM0" }
+    let(:relay_user_id) { "VXNlci0xMjM0" }
 
     it "passes legacy ids straight through" do
       expect(
@@ -48,9 +48,9 @@ describe GraphQLHelpers do
   end
 
   context "relay_or_legacy_ids_prepare_func" do
-    let :user1234 { "VXNlci0xMjM0" }
-    let :user5678 { "VXNlci01Njc4" }
-    let :ctx { nil }
+    let(:user1234) { "VXNlci0xMjM0" }
+    let(:user5678) { "VXNlci01Njc4" }
+    let(:ctx) { nil }
 
     it "works for valid ids" do
       expect(

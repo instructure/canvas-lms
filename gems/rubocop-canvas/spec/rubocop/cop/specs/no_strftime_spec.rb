@@ -19,7 +19,7 @@ describe RuboCop::Cop::Specs::NoStrftime do
   subject(:cop) { described_class.new }
 
   it 'disallows strftime' do
-    inspect_source(cop, %{
+    inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
           next_year = 1.year.from_now.strftime("%Y")

@@ -171,12 +171,16 @@ define [
       })
 
     onPostAvatar: (preflightResponse, postAvatarResponse) =>
-      if postAvatarResponse.location
-        @getCanvasJSON(postAvatarResponse.location).then(@onServiceSuccess)
-      else if preflightResponse.success_url
-        @s3Success(preflightResponse, postAvatarResponse).then(@onServiceSuccess)
+      if preflightResponse.success_url
+        # s3 upload, need to ping success_url to finalize and get back
+        # attachment information
+        @s3Success(preflightResponse, postAvatarResponse).then(@onUploadSuccess)
+      else if postAvatarResponse.location
+        # inst-fs upload, need to request attachment information from location
+        @getCanvasJSON(postAvatarResponse.location).then(@onUploadSuccess)
       else
-        @waitAndSaveUserAvatar(postAvatarResponse.avatar.token, postAvatarResponse.avatar.url)
+        # local-storage upload, this _is_ the attachment information
+        @onUploadSuccess(postAvatarResponse)
 
     getCanvasJSON: (location) =>
       $.getJSON("#{location}?include=avatar")
@@ -189,7 +193,7 @@ define [
         etag:   $s3.find('ETag').text()
       })
 
-    onServiceSuccess: (response) =>
+    onUploadSuccess: (response) =>
       @waitAndSaveUserAvatar(response.avatar.token, response.avatar.url)
 
     # need to wait for the avatar to get processed by background jobs before

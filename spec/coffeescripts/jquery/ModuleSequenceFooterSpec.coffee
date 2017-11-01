@@ -293,7 +293,7 @@ define [
     @server.respond()
     btn = nextButton(this.$testEl)
 
-    ok btn.data('html-tooltip-title').match('Next mastery path is currently processing'), "indicates path is processing"
+    ok btn.data('html-tooltip-title').match('Next mastery path is still processing'), "indicates path is processing"
     ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
 
   test 'properly disables the next button when path locked and modules tab disabled', ->
@@ -337,7 +337,7 @@ define [
     @server.respond()
     btn = nextButton(this.$testEl)
 
-    ok btn.data('html-tooltip-title').match('Next mastery path is currently processing'), "indicates path is processing"
+    ok btn.data('html-tooltip-title').match('Next mastery path is still processing'), "indicates path is processing"
     ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
 
   test 'does not show next button when no next items exist and paths are unlocked', ->

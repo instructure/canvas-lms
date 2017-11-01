@@ -3680,10 +3680,6 @@ glob-stream@^3.1.5:
     through2 "^0.6.1"
     unique-stream "^1.0.0"
 
-glob-to-regexp@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/glob-to-regexp/-/glob-to-regexp-0.3.0.tgz#8c5a1494d2066c570cc3bfe4496175acc4d502ab"
-
 glob-watcher@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/glob-watcher/-/glob-watcher-0.0.6.tgz#b95b4a8df74b39c83298b0c05c978b4d9a3b710b"
@@ -4423,7 +4419,7 @@ install@~0.1.7:
     shortid "^2.2.8"
     svg-to-jsx "^0.0.20"
 
-instructure-ui@3.3.1, instructure-ui@3.x, "instructure-ui@^2.1.0 || 3", "instructure-ui@3.3.1 - 3.4.0":
+instructure-ui@3.3.1, "instructure-ui@3.3.1 - 3.4.0", instructure-ui@3.x, "instructure-ui@^2.1.0 || 3":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-3.3.1.tgz#28351c0e6c5f8499ad51575f3a6ae5676a70dd04"
   dependencies:
@@ -8392,9 +8388,9 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
-tinymce-a11y-checker@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.0.3.tgz#be21e620858776b623ce208e787a882770d9572d"
+tinymce-a11y-checker@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.0.5.tgz#ff75c42e32b41101e28417c1d9b1c7433fba1d63"
   dependencies:
     instructure-icons "4.x"
     instructure-ui "3.x"

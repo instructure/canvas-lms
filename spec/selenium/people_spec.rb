@@ -676,4 +676,19 @@ describe "people" do
       end
     end
   end
+
+  it "should not show unenroll link to admins without permissions" do
+    account_admin_user(:active_all => true)
+    user_session(@admin)
+
+    course_with_student(:active_all => true)
+    get "/users/#{@student.id}"
+
+    expect(f("#courses")).to contain_css(".unenroll_link")
+
+    Account.default.role_overrides.create!(:permission => "manage_students", :enabled => false, :role => admin_role)
+    refresh_page
+
+    expect(f("#courses")).to_not contain_css(".unenroll_link")
+  end
 end

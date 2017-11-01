@@ -539,22 +539,20 @@ TEXT
             <% end %>
           </fieldset>
 
-          <% if @account.feature_enabled?(:plagiarism_detection_platform) || @account.settings[:enable_turnitin] %>
-            <fieldset id="turnitin_settings">
-              <legend><%= t("Similarity Detection Platform") %></legend>
-              <table class="formtable">
-                <tr>
-                  <td><%= f.blabel :turnitin_pledge, en: "Similarity Pledge" %></td>
-                  <td>
-                    <span style="font-size: 0.9em;">
-                      <%= t(:turnitin_pledge_help, "students must check a box acknowledging that they agree with this pledge") %>
-                    </span>
-                    <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
-                  </td>
-                </tr>
-              </table>
-            </fieldset>
-          <% end %>
+          <fieldset id="turnitin_settings">
+            <legend><%= t("Similarity Detection Platform") %></legend>
+            <table class="formtable">
+              <tr>
+                <td><%= f.blabel :turnitin_pledge, en: "Similarity Pledge" %></td>
+                <td>
+                  <span style="font-size: 0.9em;">
+                    <%= t(:turnitin_pledge_help, "students must check a box acknowledging that they agree with this pledge") %>
+                  </span>
+                  <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
+                </td>
+              </tr>
+            </table>
+          </fieldset>
 
           <% if @account.settings[:enable_turnitin] %>
             <fieldset id="turnitin_settings">

@@ -17,8 +17,9 @@
 
 define [
   'jquery'
+  'helpers/assertions'
   'compiled/views/DiscussionTopic/DiscussionTopicToolbarView'
-], ($, DiscussionTopicToolbarView) ->
+], ($, assertions, DiscussionTopicToolbarView) ->
 
   fixture = """
   <div id="discussion-topic-toolbar">
@@ -36,6 +37,10 @@ define [
 
     teardown: ->
       $('#fixtures').empty()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @view, done, {'a11yReport': true}
 
   test 'keyboard shortcut modal info shows when it has focus', ->
     ok @info.css('display') is 'none'

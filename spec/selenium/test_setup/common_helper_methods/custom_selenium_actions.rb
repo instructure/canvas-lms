@@ -29,6 +29,15 @@ module CustomSeleniumActions
     skip("skipping test, fails in Chrome: #{additional_error_text}") if driver.browser == :chrome
   end
 
+  def skip_if_safari(additional_error_text)
+    return unless driver.browser == :safari
+    case additional_error_text
+    when :alert
+      additional_error_text = "SafariDriver doesn't support alerts"
+    end
+    skip("skipping test, fails in Safari: #{additional_error_text}")
+  end
+
   def find_radio_button_by_value(value, scope = nil)
     fj("input[type=radio][value=#{value}]", scope)
   end
@@ -276,7 +285,7 @@ module CustomSeleniumActions
   #
   # 3.) This function will likely have trouble clicking links. Use fln instead.
   def force_click(element_jquery_finder)
-    fj(element_jquery_finder) 
+    fj(element_jquery_finder)
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).click()})
   end
 
@@ -342,7 +351,7 @@ module CustomSeleniumActions
     when :chrome
       driver.execute_script("arguments[0].select()", el)
       keys = [:backspace]
-    when :safari
+    when :safari, :internet_explorer
       el.clear()
       keys = []
     end

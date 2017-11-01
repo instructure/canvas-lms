@@ -24,8 +24,9 @@ define [
   'compiled/views/assignments/AssignmentGroupWeightsView'
   'jquery'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (Backbone, AssignmentGroupCollection, Course, AssignmentGroup, AssignmentSettingsView, AssignmentGroupWeightsView, $, fakeENV) ->
+], (Backbone, AssignmentGroupCollection, Course, AssignmentGroup, AssignmentSettingsView, AssignmentGroupWeightsView, $, fakeENV, assertions) ->
 
   group = (opts = {}) ->
     new AssignmentGroup $.extend({group_weight: 50}, opts)
@@ -48,6 +49,11 @@ define [
   QUnit.module 'AssignmentSettingsView',
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
+
+  test 'should be accessible', (assert) ->
+    view = createView(true)
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'sets the checkbox to the right value on open', ->
     view = createView(weighted: true)

@@ -223,7 +223,7 @@ export default class ModuleSequenceFooter {
       this.next.tooltipText = I18n.t('Choose the next mastery path')
     } else {
       const lockedMessage = I18n.t('Next mastery path is currently locked')
-      const processingMessage = I18n.t('Next mastery path is currently processing')
+      const processingMessage = I18n.t('Next mastery path is still processing, please periodically refresh the page')
       const tooltipText = masteryPath.locked ? lockedMessage : processingMessage
       this.next.modules_tab_disabled = masteryPath.modules_tab_disabled
       this.next.url = masteryPath.modules_url

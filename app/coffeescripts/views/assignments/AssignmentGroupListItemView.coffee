@@ -18,8 +18,7 @@
 define [
   'i18n!assignments'
   'jquery'
-  'underscore'
-  'jsx/move_item_tray/NewMoveDialogView'
+  'jsx/move_item'
   'compiled/class/cache'
   'compiled/util/hasLocalStorage'
   'compiled/views/DraggableCollectionView'
@@ -27,13 +26,12 @@ define [
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
-  'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
 ], (
-  I18n, $, _, NewMoveDialogView, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
-  CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin
+  I18n, $, MoveItem, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
+  CreateGroupView, DeleteGroupView, preventDefault, template, AssignmentKeyBindingsMixin
 ) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
@@ -50,7 +48,7 @@ define [
     @child 'editGroupView', '[data-view=editAssignmentGroup]'
     @child 'deleteGroupView', '[data-view=deleteAssignmentGroup]'
 
-    els: _.extend({}, @::els, {
+    els: Object.assign({}, @::els, {
       '.add_assignment': '$addAssignmentButton'
       '.delete_group': '$deleteGroupButton'
       '.edit_group': '$editGroupButton'
@@ -94,9 +92,6 @@ define [
         @deleteGroupView.hide()
         @deleteGroupView.setTrigger @$deleteGroupButton
 
-      if @moveGroupView
-        @moveGroupView.setCloseFocus @$moveGroupButton
-
       if @model.hasRules()
         @createRulesToolTip()
 
@@ -136,7 +131,6 @@ define [
       @editGroupView = false
       @createAssignmentView = false
       @deleteGroupView = false
-      @moveGroupView = false
 
       if @canManage()
         @editGroupView = new CreateGroupView
@@ -147,24 +141,6 @@ define [
         if @canDelete()
           @deleteGroupView = new DeleteGroupView
             model: @model
-        @moveGroupView = new NewMoveDialogView
-          model: @model
-          nested: false
-          closeTarget: @$el.find('a[id*=manage_link]')
-          saveURL: ENV.URLS.sort_url
-          onSuccessfulMove: @onSuccessfulMove
-          movePanelParent: document.getElementById('not_right_side')
-          modalTitle: I18n.t('Move Assignment Group')
-
-    onSuccessfulMove: (movedItems) =>
-      newCollection = @model.collection
-      #update all of the position attributes
-      positions = [1..newCollection.length]
-      movedItems.forEach (id, index) ->
-        newCollection.get(id)?.set 'position', positions[index]
-      newCollection.sort()
-      # finally, call reset to trigger a re-render
-      newCollection.reset newCollection.models
 
     initCache: ->
       $.extend true, @, Cache
@@ -195,7 +171,7 @@ define [
       showWeight = @course?.get('apply_assignment_group_weights') and data.group_weight?
       canMove = @model.collection.length > 1
 
-      attributes = _.extend(data, {
+      attributes = Object.assign(data, {
         course_home: ENV.COURSE_HOME
         canMove: canMove
         canDelete: @canDelete()
@@ -232,7 +208,7 @@ define [
         }))
 
       if rules.never_drop? and rules.never_drop.length > 0
-        _.each rules.never_drop, (never_drop_assignment_id) =>
+        rules.never_drop.forEach (never_drop_assignment_id) =>
           assign = @model.get('assignments').findWhere(id: never_drop_assignment_id)
 
           # TODO: students won't see never drop rules for unpublished
@@ -334,7 +310,20 @@ define [
       @cache.set(key, expanded)
 
     onMoveGroup: () =>
-      @moveGroupView.renderOpenMoveDialog();
+      @moveTrayProps =
+        title: I18n.t('Move Assignment Group')
+        item:
+          id: @model.get('id')
+          title: @model.get('name')
+        moveOptions:
+          siblings: MoveItem.backbone.collectionToItems(@model.collection)
+        onMoveSuccess: (res) =>
+          MoveItem.backbone.reorderInCollection(res.data.order, @model)
+        focusOnExit: =>
+          document.querySelector("#assignment_group_#{@model.id} a[id*=manage_link]")
+        formatSaveUrl: => ENV.URLS.sort_url
+
+      MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
 
     hasMasterCourseRestrictedAssignments: ->
       @model.get('assignments').any (m) ->

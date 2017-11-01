@@ -21,15 +21,14 @@ define [
   'underscore'
   'Backbone'
   'jsx/shared/conditional_release/CyoeHelper'
-  'jsx/move_item_tray/NewMoveDialogView'
+  'jsx/move_item'
   'jst/DiscussionTopics/discussion'
   'compiled/models/DiscussionTopic'
   'compiled/views/PublishIconView'
   'compiled/views/LockIconView'
   'compiled/views/ToggleableSubscriptionIconView'
   'compiled/views/assignments/DateDueColumnView'
-  'compiled/views/MoveDialogView'
-], (I18n, $, _, {View}, CyoeHelper, NewMoveDialogView, template, DiscussionTopic, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
+], (I18n, $, _, {View}, CyoeHelper, MoveItem, template, DiscussionTopic, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -66,7 +65,6 @@ define [
       '.screenreader-only': '$title'
       '.discussion-row': '$row'
       '.move_item': '$moveItemButton'
-      '.move_panel': '$movePanel'
       '.discussion-actions .al-trigger': '$gearButton'
 
     # Public: Topic is able to be locked/unlocked.
@@ -103,20 +101,23 @@ define [
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       if @model.get('assignment')
         options.dateDueColumnView = new DateDueColumnView(model: @model.get('assignment'))
-      @newModalView = new NewMoveDialogView
-        model: @model
-        nested: false
-        closeTarget: @$el.find('a[id=manage_link]')
-        saveURL: @model.collection.reorderURL()
-        onSuccessfulMove: @onSuccessfulMove
-        movePanelParent: document.getElementById('not_right_side')
-        modalTitle: I18n.t('Move Discussion')
+
+      @moveTrayProps =
+        title: I18n.t('Move Discussion')
+        item:
+          id: @model.get('id')
+          title: @model.get('title')
+        moveOptions:
+          siblings: MoveItem.backbone.collectionToItems(@model.collection)
+        focusOnExit: (item) => document.querySelector(".discussion[data-id=\"#{item.id}\"] .al-trigger")
+        onMoveSuccess: (res) =>
+          MoveItem.backbone.reorderInCollection(res.data.order, @model)
+        formatSaveUrl: => @model.collection.reorderURL()
       super
 
     render: ->
       super
       @$el.attr('data-id', @model.get('id'))
-      @newModalView.setCloseFocus @$gearButton
       this
 
     # Public: Lock or unlock the model and update it on the server.
@@ -149,22 +150,7 @@ define [
     #
     # Returns nothing.
     onMove: () =>
-      @newModalView.renderOpenMoveDialog();
-
-    # Public: Moves the items currently in the list to match backend
-    #
-    # movedItems - List of ID's of correct order
-    #
-    # Returns nothing.
-    onSuccessfulMove: (movedItems) =>
-      newCollection = @model.collection
-      #update all of the position attributes
-      positions = [1..newCollection.length]
-      movedItems.forEach (id, index) ->
-        newCollection.get(id)?.set 'position', positions[index]
-      newCollection.sort()
-      # finally, call reset to trigger a re-render
-      newCollection.reset newCollection.models
+      MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
 
     insertDuplicatedDiscussion: (response) =>
       index = @model.collection.indexOf(@model) + 1

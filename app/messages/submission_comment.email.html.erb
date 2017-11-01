@@ -64,7 +64,7 @@
 <% if asset.media_comment? %>
 <p><%= t "#messages.conversation_message.email.audio_comment", "This message includes media comments. To listen or reply, click the link below:" %></p>
 <% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-<p><%= t :submission_comment_link_message, "You can review the submission details using the link below, or can reply to this comment by responding to this message." %></p>
+<p><%= t :submission_comment_link_message, "You can review the submission details using the link below, or can reply to this comment by responding to this message.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the submission." %></p>
 <% else %>
 <p><%= t "You can review the submission details using the link below." %></p>
 <% end %>

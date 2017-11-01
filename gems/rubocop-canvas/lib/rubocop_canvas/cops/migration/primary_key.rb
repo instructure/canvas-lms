@@ -37,7 +37,7 @@ module RuboCop
           return unless options.hash_type?
 
           if options.children.find { |pair| pair == NO_PK }
-            add_offense(node, :expression, MSG, :warning)
+            add_offense(node, message: MSG, severity: :warning)
           end
         end
       end

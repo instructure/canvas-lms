@@ -181,6 +181,7 @@ module GroupsCommon
   # Used to set group_limit field manually. Assumes you are on Edit Group Set page and self-sign up is checked
   def manually_set_groupset_limit(member_limit = "2")
     replace_content(fj('input[name="group_limit"]:visible'), member_limit)
+    scroll_page_to_bottom
     fj('.btn.btn-primary[type=submit]').click
     wait_for_ajaximations
   end
@@ -207,9 +208,9 @@ module GroupsCommon
   end
 
   def open_clone_group_set_option
-    f('.icon-settings').click
+    move_to_click('.icon-settings')
     wait_for_ajaximations
-    f('.clone-category').click
+    move_to_click('.clone-category')
     wait_for_ajaximations
   end
 
@@ -251,8 +252,8 @@ module GroupsCommon
     wait_for_ajaximations
     ff('.edit-group-assignment')[student].click
     wait_for_ajaximations
-    click_option('.single-select', "#{@testgroup[group_destination].name}")
-    f('.set-group').click
+    click_option('.move-select .move-select__group select', "#{@testgroup[group_destination].name}")
+    f('.move-select button').click
     wait_for_ajaximations
   end
 
@@ -295,7 +296,7 @@ module GroupsCommon
   end
 
   def save_group_set
-    f('#newGroupSubmitButton').click
+    move_to_click('#newGroupSubmitButton')
     wait_for_ajaximations
   end
 

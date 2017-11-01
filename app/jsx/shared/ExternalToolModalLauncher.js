@@ -161,6 +161,7 @@ export default React.createClass({
 
     return (
       <Modal className="ReactModal__Content--canvas"
+        contentLabel={I18n.t('Launch External Tool')}
         overlayClassName="ReactModal__Overlay--canvas"
         style={this.state.modalStyle}
         isOpen={this.props.isOpen}

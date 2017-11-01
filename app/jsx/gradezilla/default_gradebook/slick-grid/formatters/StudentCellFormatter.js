@@ -54,7 +54,12 @@ function render (options) {
 
   return `
     <div class="student-name">
-      <a class="student-grades-link" href="${options.url}">${options.displayName}</a>
+      <a
+        class="student-grades-link student_context_card_trigger"
+        data-student_id="${options.studentId}"
+        data-course_id="${options.courseId}"
+        href="${options.url}"
+      >${options.displayName}</a>
       ${enrollmentStatus}
     </div>
     ${secondaryInfo}
@@ -64,6 +69,7 @@ function render (options) {
 export default class StudentCellFormatter {
   constructor (gradebook) {
     this.options = {
+      courseId: gradebook.options.context_id,
       getSection (sectionId) {
         return gradebook.sections[sectionId];
       },
@@ -88,9 +94,11 @@ export default class StudentCellFormatter {
     const secondaryInfo = this.options.getSelectedSecondaryInfo();
 
     const options = {
+      courseId: this.options.courseId,
       displayName: primaryInfo === 'last_first' ? student.sortable_name : student.name,
       enrollmentLabel: getEnrollmentLabel(student),
       secondaryInfo: getSecondaryDisplayInfo(student, secondaryInfo, this.options),
+      studentId: student.id,
       url: `${student.enrollments[0].grades.html_url}#tab-assignments`
     };
 

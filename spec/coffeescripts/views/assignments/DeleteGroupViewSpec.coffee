@@ -24,9 +24,9 @@ define [
   'compiled/models/Assignment'
   'compiled/views/assignments/DeleteGroupView'
   'jquery'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-  'helpers/fakeENV'
-], (_, Backbone, AssignmentGroupCollection, AssignmentCollection, AssignmentGroup, Assignment, DeleteGroupView, $) ->
+], (_, Backbone, AssignmentGroupCollection, AssignmentCollection, AssignmentGroup, Assignment, DeleteGroupView, $, assertions) ->
 
   group = (assignments=true, id) ->
     new AssignmentGroup
@@ -50,6 +50,11 @@ define [
     teardown: ->
       $("#fixtures").empty()
       $("form.dialogFormView").remove()
+
+  test 'should be accessible', (assert) ->
+    view = createView(false, true)
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'it should delete a group without assignments', ->
     @stub(window, "confirm").returns(true)

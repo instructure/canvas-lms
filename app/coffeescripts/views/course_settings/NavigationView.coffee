@@ -20,8 +20,8 @@ define [
   'jquery'
   'Backbone'
   'str/htmlEscape'
-  'jsx/move_item_tray/NewMoveDialogView'
-], (I18n, $, Backbone, htmlEscape, NewMoveDialogView) ->
+  'jsx/move_item'
+], (I18n, $, Backbone, htmlEscape, MoveItem) ->
   ###
   xsslint jqueryObject.identifier dragObject current_item
   ###
@@ -38,13 +38,10 @@ define [
       'click .move_nav_item_link'   : 'moveNavLink'
       'click .enable_nav_item_link' : 'enableNavLink'
 
-
     els:
       '#nav_enabled_list' : '$enabled_list'
       '#nav_disabled_list' : '$disabled_list'
-      '#move_nav_item_form': '$move_dialog'
       '.navitem' : '$navitems'
-      '#move_nav_item_name' : '$move_name'
 
     disableNavLink: (e) ->
       $targetItem = $(e.currentTarget).closest('.navitem')
@@ -65,69 +62,25 @@ define [
       $targetItem.find('a.al-trigger').focus()
 
     moveNavLink: (e) ->
-      dialog = @$move_dialog
-      which_list = $(e.currentTarget).closest '.nav_list'
-      which_item = $(e.currentTarget).closest '.navitem'
-      navigationSelectOptions = []
-      which_list.children('.navitem').each (key, item) ->
-        if $(item).attr('aria-label') is which_item.attr('aria-label')
-          return
-        navigationSelectOptions.push({ attributes: { id: htmlEscape($(item).attr('id')), name: htmlEscape($(item).attr('aria-label')) } })
-      @$move_dialog.data 'current_item', which_item
+      selectedItem = $(e.currentTarget).closest '.navitem'
+      navList = $(e.currentTarget).closest '.nav_list'
+      navOptions = navList.children('.navitem').map (key, item) ->
+        id: item.getAttribute('id')
+        title: item.getAttribute('aria-label')
+      .toArray()
 
-      currentSelectionModel = {
-        attributes: {
-          id:  htmlEscape(which_item.attr('id')),
-          name: htmlEscape(which_item.attr('aria-label'))
-        },
-        collection: {
-          models: navigationSelectOptions
-        }
-      }
+      @moveTrayProps =
+        title: I18n.t('Move Navigation Item')
+        item:
+          id: selectedItem.attr('id')
+          title: selectedItem.attr('aria-label')
+        moveOptions:
+          siblings: navOptions
+        onMoveSuccess: (res) =>
+          MoveItem.reorderElements(res.data, @$enabled_list[0], (id) => '#' + id)
+        focusOnExit: (item) => document.querySelector("##{item.id} a.al-trigger")
 
-      @newModalView = new NewMoveDialogView
-        model: currentSelectionModel
-        nested: false
-        closeTarget: which_item.find('a.al-trigger')
-        saveURL: ""
-        onSuccessfulMove: @onSuccessfulMove
-        movePanelParent: document.getElementById('not_right_side')
-        modalTitle: I18n.t('Move Navigation Item')
-        navigationList: which_list
-
-      @newModalView.renderOpenMoveDialog();
-
-    onSuccessfulMove: (items, action, relativeID) ->
-      current_item = $('#move_nav_item_form').data 'current_item'
-      before_or_after = action
-      selected_item = $('#' + relativeID);
-      if action is 'before'
-        selected_item.before current_item
-      else if action is 'after'
-        selected_item.after current_item
-      else if action is 'first'
-        selected_item.before current_item
-      else if action is 'last'
-        selected_item.after current_item
-
-    moveSubmit: (e) ->
-      e.preventDefault()
-      current_item = $('#move_nav_item_form').data 'current_item'
-      before_or_after = $('[name="move_location"]:checked').val();
-      selected_item = $('#' + $('#move_nav_item_select').val());
-      if before_or_after is 'before'
-        selected_item.before current_item
-      if before_or_after is 'after'
-        selected_item.after current_item
-      $('#move_nav_item_form').attr('aria-hidden', 'true')
-      $('#move_nav_item_form').dialog('close')
-      current_item.find('a.al-trigger').focus()
-
-    cancelMove: ->
-      current_item = $('#move_nav_item_form').data 'current_item'
-      $('#move_nav_item_form').attr('aria-hidden', 'true')
-      $('#move_nav_item_form').dialog('close')
-      current_item.find('a.al-trigger').focus()
+      MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
 
     focusKeyboardHelp: (e) ->
       $('.drag_and_drop_warning').removeClass('screenreader-only')
@@ -138,8 +91,6 @@ define [
     afterRender: ->
       @keyCodes = Object.freeze? @keyCodes
       $("li.navitem").on 'keydown', @onKeyDown
-      $('#move_nav_item_cancel_btn').on 'click', @cancelMove
-      @$move_dialog.on 'submit', @moveSubmit
       $('#navigation_tab').on 'blur', @focusKeyboardHelp
       $('.drag_and_drop_warning').on 'blur', @hideKeyboardHelp
 

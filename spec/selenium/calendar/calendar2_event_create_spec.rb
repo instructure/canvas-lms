@@ -50,7 +50,7 @@ describe "calendar2" do
         expect(fj('.event-details-content:visible')).to include_text('location title')
       end
 
-      it 'should create an event with location name and address' do
+      it 'should create an event with name and address' do
         get "/calendar2"
         event_title = 'event title'
         location_name = 'my house'
@@ -69,11 +69,9 @@ describe "calendar2" do
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
         # submit_form makes the spec fragile
-        expect_new_page_load { f('#editCalendarEventFull').submit }
-        fj('.fc-event:visible').click
-        event_content = fj('.event-details-content:visible')
-        expect(event_content).to include_text(location_name)
-        expect(event_content).to include_text(location_address)
+        f('#editCalendarEventFull').submit
+        expect(CalendarEvent.last.location_name).to eq location_name
+        expect(CalendarEvent.last.location_address).to eq location_address
       end
 
       it "should go to calendar event modal when a syllabus link is clicked", priority: "1", test_id: 186581 do
@@ -101,7 +99,7 @@ describe "calendar2" do
         expect(event.title).to eq event_name
       end
 
-      it "should create a recurring event", priority: "1", test_id: 223510 do
+      it "should create an event that is recurring", priority: "1", test_id: 223510 do
         Account.default.enable_feature!(:recurring_calendar_events)
         make_full_screen
         get '/calendar2'

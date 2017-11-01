@@ -259,7 +259,7 @@ describe UserContent, type: :request do
           <a href='/courses/#{@course.id}/wiki/test-wiki-page-2?titleize=0'>wiki page</a>
           <a href='/courses/#{@course.id}/pages'>wiki index</a>
           <a href='/courses/#{@course.id}/pages/test-wiki-page'>wiki page</a>
-          <a href='/courses/#{@course.id}/pages/test-wiki-page-2?titleize=0'>wiki page</a>
+          <a href='/courses/#{@course.id}/pages/test-wiki%20page-2?titleize=0'>wiki page</a>
           <a href='/courses/#{@course.id}/discussion_topics'>discussion index</a>
           <a href='/courses/#{@course.id}/discussion_topics/456'>discussion topic</a>
           <a href='/courses/#{@course.id}/files'>files index</a>
@@ -287,7 +287,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page-2",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page",
-          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page-2",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki%20page-2",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
           "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",

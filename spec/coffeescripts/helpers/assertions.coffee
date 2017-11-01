@@ -29,8 +29,13 @@ define ['jquery', 'underscore', 'axe-core'], ($, _, axe) ->
     ok $el.length, "elements found"
     ok $el.hasClass(className), "#{$el} has class #{className} " + message
 
-  isAccessible: ($el, done, options) ->
-    options = options || {}
+  isAccessible: ($el, done, options={}) ->
+    if options.a11yReport
+      if __A11Y_REPORT
+        options.ignores = ':html-has-lang, :document-title, :region, :meta-viewport, :skip-link'
+      else
+        ok(true)
+        return done()
 
     el = $el[0]
 

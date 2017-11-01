@@ -98,7 +98,7 @@ import 'compiled/badge_counts'
           .addClass('external')
           .html('<span>' + $(this).html() + '</span>')
           .attr('target', '_blank')
-          .attr('rel', 'noreferrer')
+          .attr('rel', 'noreferrer noopener')
           .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
           .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
       }).end()
@@ -905,7 +905,7 @@ import 'compiled/badge_counts'
           .children("span.ui-icon-extlink").remove().end()
           .html('<span>' + $(this).html() + '</span>')
           .attr('target', '_blank')
-          .attr('rel', 'noreferrer')
+          .attr('rel', 'noreferrer noopener')
           .append($linkIndicator);
       });
     }, 2000);

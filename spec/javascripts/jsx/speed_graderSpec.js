@@ -554,6 +554,16 @@ test('handleGradeSubmit should submit grade if not using existing score', functi
   SpeedgraderHelpers.determineGradeToSubmit.restore();
 });
 
+test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', function () {
+  this.stub(SpeedgraderHelpers, 'determineGradeToSubmit').returns('');
+  window.jsonData.grading_type = 'pass_fail';
+  SpeedGrader.EG.currentStudent.submission.excused = true;
+  SpeedGrader.EG.handleGradeSubmit(null, false);
+  const formData = $.ajaxJSON.getCall(0).args[2];
+  strictEqual(formData['submission[excuse]'], false);
+  SpeedgraderHelpers.determineGradeToSubmit.restore();
+});
+
 let $div = null;
 QUnit.module('loading a submission Preview', {
   setup() {

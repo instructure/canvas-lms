@@ -30,7 +30,7 @@ module RuboCop
           _receiver, method_name, *args = *node
           return unless SUSPECT_METHOD_NAMES.keys.include?(method_name)
           return if jquery_necessary?(args.to_a.first.children.first)
-          add_offense node, :expression, error_msg(method_name), :warning
+          add_offense node, message: error_msg(method_name), severity: :warning
         end
 
         private

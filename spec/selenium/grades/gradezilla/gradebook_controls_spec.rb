@@ -37,9 +37,9 @@ describe 'Gradebook Controls' do
       expect(f('h1')).to include_text("Gradebook: Individual View")
     end
 
-    it "navigates to Grading History", priority: "2", test_id: 3253265 do
+    it "navigates to Gradebook History", priority: "2", test_id: 3253265 do
       Gradezilla.visit(@course)
-      expect_new_page_load { Gradezilla.gradebook_dropdown_item_click("Grading History") }
+      expect_new_page_load { Gradezilla.gradebook_dropdown_item_click("Gradebook History") }
       expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
     end
 

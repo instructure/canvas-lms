@@ -1072,6 +1072,7 @@ class AssignmentsApiController < ApplicationController
     @assignment = @context.active_assignments.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       @assignment.content_being_saved_by(@current_user)
+      @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
       opts = assignment_json_opts
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)

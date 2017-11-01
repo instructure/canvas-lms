@@ -29,6 +29,7 @@ define [
   'timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
   'compiled/behaviors/tooltip'
 ], (
@@ -44,7 +45,8 @@ define [
   juneau,
   french,
   I18nStubber,
-  fakeENV) ->
+  fakeENV,
+  assertions) ->
 
   fixtures = $('#fixtures')
 
@@ -162,6 +164,11 @@ define [
       fakeENV.teardown()
       tz.restore(@snapshot)
       I18nStubber.popFrame()
+
+  test 'should be accessible', (assert) ->
+    view = createView(@assignment1)
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test "initialize generates a new assignment for creation", ->
     view = createView(@group)

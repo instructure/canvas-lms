@@ -2201,14 +2201,22 @@ test('includes teacherNotes', function () {
   equal(typeof props.selected, 'boolean', 'props include "selected"');
 });
 
-test('disabled defaults to false', function () {
+test('disabled defaults to true', function () {
   const gradebook = createGradebook();
+  const props = gradebook.getTeacherNotesViewOptionsMenuProps();
+  equal(props.disabled, true);
+});
+
+test('disabled is false when the grid is ready', function () {
+  const gradebook = createGradebook();
+  sinon.stub(gradebook.gridReady, 'state').returns('resolved');
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   equal(props.disabled, false);
 });
 
 test('disabled is true if the teacher notes column is updating', function () {
   const gradebook = createGradebook();
+  sinon.stub(gradebook.gridReady, 'state').returns('resolved');
   gradebook.setTeacherNotesColumnUpdating(true);
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   equal(props.disabled, true);
@@ -2216,6 +2224,7 @@ test('disabled is true if the teacher notes column is updating', function () {
 
 test('disabled is false if the teacher notes column is not updating', function () {
   const gradebook = createGradebook();
+  sinon.stub(gradebook.gridReady, 'state').returns('resolved');
   gradebook.setTeacherNotesColumnUpdating(false);
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   equal(props.disabled, false);
