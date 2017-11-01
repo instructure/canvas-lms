@@ -3869,6 +3869,10 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
     this.gradebook.setHeaderComponentRef('student', this.studentColumnHeader);
   });
 
+  hooks.afterEach(function () {
+    this.gradebook.destroy();
+  });
+
   this.triggerEvent = function (eventName, event, location) {
     return this.gradebook.gradebookGrid.gridSupport.events[eventName].trigger(event, location);
   };
@@ -4339,6 +4343,10 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
 
   setup () {
     this.gradebook = this.setupGradebook();
+  },
+
+  teardown () {
+    this.gradebook.destroy();
   }
 });
 
@@ -4412,6 +4420,7 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
   });
 
   hooks.afterEach(function () {
+    this.gradebook.destroy();
     $fixtures.innerHTML = '';
   });
 
@@ -6219,6 +6228,7 @@ QUnit.module('Gradebook#onGridBlur', {
   },
 
   teardown () {
+    this.gradebook.destroy();
     $fixtures.innerHTML = '';
   }
 });

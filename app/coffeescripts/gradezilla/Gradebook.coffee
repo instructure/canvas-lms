@@ -2728,3 +2728,6 @@ define [
           @renderSubmissionTray(student)
           Promise.reject(response)
         )
+
+    destroy: =>
+      $(window).unbind('resize.fillWindowWithMe')

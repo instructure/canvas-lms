@@ -202,6 +202,7 @@ QUnit.module('Gradebook Grid Column Ordering', function (suiteHooks) {
   suiteHooks.afterEach(function () {
     gradebook.gradebookGrid.gridSupport.destroy();
     gradebook.gradebookGrid.grid.destroy();
+    gradebook.destroy();
     DataLoader.loadGradebookData.restore();
     DataLoader.getDataForColumn.restore();
     server.restore();
