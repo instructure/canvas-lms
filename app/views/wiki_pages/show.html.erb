@@ -22,5 +22,7 @@
   css_bundle :wiki_page
 %>
 
-<%= render "shared/mark_as_done" %>
+<% unless @page.locked_for?(@current_user, {check_policies: true, context: @context, deep_check_if_needed: true}) %>
+  <%= render "shared/mark_as_done" %>
+<% end %>
 <div id="wiki_page_show"></div>
