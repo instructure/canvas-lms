@@ -142,6 +142,26 @@ class Rubric < ActiveRecord::Base
 
   def criteria_object
     OpenObject.process(self.data.sort { |a, b|
+      if a[:description] && b[:description]
+        section_a = a[:description][/^([0-9]+)/, 1]
+        subsection_a = a[:description][/^[0-9]+\.([0-9]+)/, 1]
+        section_b = b[:description][/^([0-9]+)/, 1]
+        subsection_b = b[:description][/^[0-9]+\.([0-9]+)/, 1]
+
+        if section_a.nil? || section_b.nil? || subsection_a.nil? || subsection_b.nil?
+          next a[:description] <=> b[:description]
+        end
+
+        section_a = section_a.to_i
+        section_b = section_b.to_i
+        subsection_a = subsection_a.to_i
+        subsection_b = subsection_b.to_i
+
+        answer_a = section_a * 1000 + subsection_a
+        answer_b = section_b * 1000 + subsection_b
+
+        next answer_a <=> answer_b
+      end
       a[:description] <=> b[:description]
     } )
   end
