@@ -209,7 +209,7 @@ END
 New Gradebook enables an early release of new Gradebook enhancements.
 END
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'allowed',
       root_opt_in: true,
       beta: true,
 
