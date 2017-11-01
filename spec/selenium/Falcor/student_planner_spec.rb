@@ -211,9 +211,9 @@ describe "student planner" do
     it "adds a new date with the date picker", priority: "1", test_id: 3263159 do
       # sets up the date to compare against
       current_month = Time.zone.today.month
-      test_month = Date::MONTHNAMES[(current_month + 1) % 12]
+      test_month = Date::MONTHNAMES[(current_month % 12) + 1]
       test_year = Time.zone.today.year
-      if current_month + 1 == 13
+      if current_month == 12
         test_year += 1
       end
 
