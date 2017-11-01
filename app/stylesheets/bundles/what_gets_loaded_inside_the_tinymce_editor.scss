@@ -48,6 +48,12 @@ body, td {
   min-width: 20px;
 }
 
+// ic-reset makes these images have a max-width that causes them to shrink when displayed. This
+// makes it so that they don't do that.
+.mce-item-table td img {
+  max-width: none;
+}
+
 body#tinymce, body#tinyrce{
   height: 100vh;
 }
