@@ -25,8 +25,9 @@ module Importers
     def self.process_migration(data, migration)
       assignments = data['assignments'] ? data['assignments']: []
       to_import = migration.to_import 'assignments'
+      tool_settings = data['tool_settings']
 
-      create_assignments(assignments, migration)
+      create_assignments(assignments, migration, tool_settings)
 
       migration_ids = assignments.map{|m| m['assignment_id'] }.compact
       conn = Assignment.connection
@@ -38,7 +39,7 @@ module Importers
       end
     end
 
-    def self.create_assignments(assignments, migration)
+    def self.create_assignments(assignments, migration, tool_settings = [])
       assignment_records = []
       context = migration.context
 
@@ -46,7 +47,7 @@ module Importers
         assignments.each do |assign|
           if migration.import_object?("assignments", assign['migration_id'])
             begin
-              assignment_records << import_from_migration(assign, context, migration)
+              assignment_records << import_from_migration(assign, context, migration, nil, nil, tool_settings)
             rescue
               migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
             end
@@ -71,7 +72,24 @@ module Importers
       context.touch_admins if context.respond_to?(:touch_admins)
     end
 
-    def self.import_from_migration(hash, context, migration, item=nil, quiz=nil)
+    def self.create_tool_settings(tool_settings, tool_proxy, assignment)
+      return if tool_proxy.blank? || tool_settings.blank?
+      tool_settings.each do |tool_setting_data|
+        ts_vendor_code = tool_setting_data.dig('tool_setting', 'tool_proxy', 'vendor_code')
+        ts_product_code = tool_setting_data.dig('tool_setting', 'tool_proxy', 'product_code')
+        ts_custom = tool_setting_data.dig('tool_setting', 'custom')
+        ts_custom_params = tool_setting_data.dig('tool_setting', 'custom_params')
+        next unless tool_proxy.product_family.vendor_code == ts_vendor_code && tool_proxy.product_family.product_code == ts_product_code
+        tool_proxy.tool_settings.create!(
+          resource_link_id: assignment.lti_context_id,
+          context: assignment.course,
+          custom: ts_custom,
+          custom_parameters: ts_custom_params
+        )
+      end
+    end
+
+    def self.import_from_migration(hash, context, migration, item=nil, quiz=nil, tool_settings=[])
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
@@ -328,12 +346,18 @@ module Importers
           tool_type: 'Lti::MessageHandler'
         )
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-          context: context, vendor_code: vendor_code, product_code: product_code)
+          context: context, vendor_code: vendor_code, product_code: product_code
+        ).preload(:tool_settings)
+
+
         if active_proxies.blank?
           migration.add_warning(I18n.t(
             "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
             vendor_code: vendor_code, product_code: product_code)
           )
+        else
+          item.lti_context_id ||= SecureRandom.uuid
+          create_tool_settings(tool_settings, active_proxies.first, item)
         end
       end
 

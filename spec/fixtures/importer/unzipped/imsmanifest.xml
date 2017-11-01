@@ -43,5 +43,8 @@
     <resource identifier="i964fd8107ac2c2e75e9a142971693976" type="tool_profile">
       <file href="i964fd8107ac2c2e75e9a142971693976.json"/>
     </resource>
+    <resource identifier="i234fd8107ac2c2e75e9a142971693934" type="tool_setting">
+      <file href="i234fd8107ac2c2e75e9a142971693934.json"/>
+    </resource>
   </resources>
 </manifest>

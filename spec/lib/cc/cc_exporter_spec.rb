@@ -466,6 +466,37 @@ describe "Common Cartridge exporting" do
       end
     end
 
+    describe "tool settings" do
+      include_context 'lti2_course_spec_helper'
+
+      before { tool_proxy.update_attributes!(context: @course) }
+
+      it 'should export tool settings that have a tool proxy' do
+        Lti::ToolSetting.create!(
+          tool_proxy: tool_proxy,
+          resource_link_id: SecureRandom.uuid,
+          context: @course
+        )
+        run_export
+
+        resource = @manifest_doc.at_css('resource[type="tool_setting"]')
+        expect(resource).not_to be_nil
+        file_path = resource.at_css('file').attribute('href')
+        expect(@zip_file.find_entry(file_path)).not_to be_nil
+      end
+
+      it 'should not export tool settings that have no tool proxy' do
+        Lti::ToolSetting.create!(
+          resource_link_id: SecureRandom.uuid,
+          context: @course
+        )
+        run_export
+
+        resource = @manifest_doc.at_css('resource[type="tool_setting"]')
+        expect(resource).to be_nil
+      end
+    end
+
     it "should use canvas_export.txt as flag" do
       run_export
 
