@@ -82,9 +82,8 @@
 
 #assignment_show {
   .assignment-title {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    word-wrap: break-word; /* for IE support */
+    overflow-wrap: break-word;
   }
   .title-content {
     flex-grow: 1;
