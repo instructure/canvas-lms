@@ -42,7 +42,7 @@ function getProps (column, gradebook, gridSupport, options) {
     gradeDisplay: {
       currentDisplay: gradebook.options.show_total_grade_as_points ? 'points' : 'percentage',
       disabled: !gradebook.contentLoadStates.submissionsLoaded,
-      hidden: gradebook.weightedGroups(),
+      hidden: gradebook.weightedGrades(),
       onSelect: gradebook.togglePointsOrPercentTotals
     },
 

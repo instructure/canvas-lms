@@ -4906,3 +4906,57 @@ describe Course, "#default_home_page" do
     expect(course.default_view).to eq 'modules'
   end
 end
+
+describe Course, "#show_total_grade_as_points?" do
+  before(:once) do
+    @course = Course.create!
+  end
+
+  it "returns true if the course settings include show_total_grade_as_points: true" do
+    @course.update!(show_total_grade_as_points: true)
+    expect(@course).to be_show_total_grade_as_points
+  end
+
+  it "returns false if the course settings include show_total_grade_as_points: false" do
+    @course.update!(show_total_grade_as_points: false)
+    expect(@course).not_to be_show_total_grade_as_points
+  end
+
+  it "returns false if the course settings do not include show_total_grade_as_points" do
+    expect(@course).not_to be_show_total_grade_as_points
+  end
+
+  context "course settings include show_total_grade_as_points: true" do
+    before(:once) do
+      @course.update!(show_total_grade_as_points: true)
+    end
+
+    it "returns true if assignment groups are not weighted" do
+      @course.group_weighting_scheme = "equal"
+      expect(@course).to be_show_total_grade_as_points
+    end
+
+    it "returns false if assignment groups are weighted" do
+      @course.group_weighting_scheme = "percent"
+      expect(@course).not_to be_show_total_grade_as_points
+    end
+
+    context "assignment groups are not weighted" do
+      before(:once) do
+        @course.update!(group_weighting_scheme: "equal")
+      end
+
+      it "returns true if the associated grading period group is not weighted" do
+        group = @course.account.grading_period_groups.create!
+        group.enrollment_terms << @course.enrollment_term
+        expect(@course).to be_show_total_grade_as_points
+      end
+
+      it "returns false if the associated grading period group is weighted" do
+        group = @course.account.grading_period_groups.create!(weighted: true)
+        group.enrollment_terms << @course.enrollment_term
+        expect(@course).not_to be_show_total_grade_as_points
+      end
+    end
+  end
+end

@@ -578,9 +578,9 @@ define [
 
     renderTotalHeader: () =>
       @totalHeader = new TotalColumnHeaderView
-        showingPoints: @displayPointTotals()
+        showingPoints: @options.show_total_grade_as_points
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
-        weightedGroups: @weightedGroups
+        weightedGrades: @weightedGrades
         totalColumnInFront: @totalColumnInFront
         moveTotalColumn: @moveTotalColumn.bind(this)
       @totalHeader.render()
@@ -759,7 +759,7 @@ define [
       if columnDef.type == 'total_grade'
         templateOpts.warning = @totalGradeWarning
         templateOpts.lastColumn = true
-        templateOpts.showPointsNotPercent = @displayPointTotals()
+        templateOpts.showPointsNotPercent = @options.show_total_grade_as_points
         templateOpts.hideTooltip = @weightedGrades() and not @totalGradeWarning
       GroupTotalCellTemplate templateOpts
 
@@ -1271,17 +1271,14 @@ define [
       @options.group_weighting_scheme == "percent"
 
     weightedGrades: =>
-      @options.group_weighting_scheme == "percent" || @gradingPeriodSet?.weighted || false
-
-    displayPointTotals: =>
-      @options.show_total_grade_as_points and not @weightedGrades()
+      @options.group_weighting_scheme == "percent" || !!@gradingPeriodSet?.weighted
 
     switchTotalDisplay: ({ dontWarnAgain = false } = {}) =>
       if dontWarnAgain
         UserSettings.contextSet('warned_about_totals_display', true)
 
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
-      $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
+      $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @options.show_total_grade_as_points
       @grid.invalidate()
       @totalHeader.switchTotalDisplay(@options.show_total_grade_as_points)
 

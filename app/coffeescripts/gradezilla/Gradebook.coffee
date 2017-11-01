@@ -1393,17 +1393,14 @@ define [
       @options.group_weighting_scheme == "percent"
 
     weightedGrades: =>
-      @options.group_weighting_scheme == "percent" || @gradingPeriodSet?.weighted || false
-
-    displayPointTotals: =>
-      @options.show_total_grade_as_points and not @weightedGrades()
+      @weightedGroups() || !!@gradingPeriodSet?.weighted
 
     switchTotalDisplay: ({ dontWarnAgain = false } = {}) =>
       if dontWarnAgain
         UserSettings.contextSet('warned_about_totals_display', true)
 
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
-      $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
+      $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @options.show_total_grade_as_points
       @gradebookGrid.invalidate()
       @gradebookGrid.gridSupport.columns.updateColumnHeaders(['total_grade'])
 

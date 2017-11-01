@@ -155,7 +155,7 @@ test('flips the show_total_grade_as_points property', function () {
 });
 
 test('updates the total display preferences for the current user', function () {
-  const self = this.setupThis();
+  const self = this.setupThis({ showTotalGradeAsPoints: false });
   this.switchTotalDisplay.call(self, { dontWarnAgain: false });
 
   equal($.ajaxJSON.callCount, 1);

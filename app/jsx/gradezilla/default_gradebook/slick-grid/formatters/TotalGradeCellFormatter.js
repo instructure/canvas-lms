@@ -124,7 +124,7 @@ export default class TotalGradeCellFormatter {
         return gradebook.listMutedAssignments();
       },
       shouldShowPoints () {
-        return gradebook.displayPointTotals();
+        return gradebook.options.show_total_grade_as_points;
       }
     };
   }

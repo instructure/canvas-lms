@@ -34,8 +34,8 @@ shared_examples_for 'a gradebook' do
 
     'grading period weights': {
       'all grading periods': ["55.17%", "55.17%"],
-      'grading period one': ["75%", "75%"],
-      'grading period two': ["46.67%", "46.67%"]
+      'grading period one': ["75%", "75% (15 / 20 points)"],
+      'grading period two': ["46.67%", "46.67% (28 / 60 points)"]
     },
 
     'both grading period and assignment group weights': {
@@ -46,8 +46,8 @@ shared_examples_for 'a gradebook' do
 
     'grading period weights with ungraded assignment': {
       'all grading periods': ["55.17%", "55.17%"],
-      'grading period one': ["75%", "75%"],
-      'grading period two': ["46.67%", "46.67%"]
+      'grading period one': ["75%", "75% (15 / 20 points)"],
+      'grading period two': ["46.67%", "46.67% (28 / 60 points)"]
     },
 
     'assign outside of weighted grading period': {

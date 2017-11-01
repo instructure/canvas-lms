@@ -3072,6 +3072,12 @@ class Course < ActiveRecord::Base
     @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
   end
 
+  def show_total_grade_as_points?
+    !!settings[:show_total_grade_as_points] &&
+      group_weighting_scheme != "percent" &&
+      !relevant_grading_period_group&.weighted?
+  end
+
   private
 
   def effective_due_dates

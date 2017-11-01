@@ -2303,29 +2303,6 @@ test('returns false when group_weighting_scheme is not "percent" and gradingPeri
   equal(this.gradebook.weightedGrades(), false);
 });
 
-QUnit.module('Gradebook#displayPointTotals', {
-  setup () {
-    this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'weightedGrades').returns(false);
-  }
-});
-
-test('returns true when grades are not weighted and show_total_grade_as_points is true', function () {
-  this.gradebook.options.show_total_grade_as_points = true;
-  equal(this.gradebook.displayPointTotals(), true);
-});
-
-test('returns false when grades are weighted', function () {
-  this.gradebook.options.show_total_grade_as_points = true;
-  this.gradebook.weightedGrades.returns(true);
-  equal(this.gradebook.displayPointTotals(), false);
-});
-
-test('returns false when show_total_grade_as_points is false', function () {
-  this.gradebook.options.show_total_grade_as_points = false;
-  equal(this.gradebook.displayPointTotals(), false);
-});
-
 QUnit.module('Gradebook#switchTotalDisplay', {
   setup () {
     this.gradebook = createGradebook({

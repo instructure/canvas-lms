@@ -318,6 +318,20 @@ function calculateSubtotals (byGradingPeriod, calculatedGrades, currentOrFinal) 
   return subtotals
 }
 
+function finalGradePointsPossibleText (groupWeightingScheme, scoreWithPointsPossible) {
+  if (groupWeightingScheme === "percent") {
+    return "";
+  }
+
+  const gradingPeriodId = GradeSummary.getSelectedGradingPeriodId();
+  const gradingPeriodSet = getGradingPeriodSet();
+  if (gradingPeriodId == null && gradingPeriodSet && gradingPeriodSet.weighted) {
+    return "";
+  }
+
+  return scoreWithPointsPossible;
+}
+
 function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme) {
   const showTotalGradeAsPoints = ENV.show_total_grade_as_points
 
@@ -348,7 +362,10 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
   const $finalGradeRow = $('.student_assignment.final_grade')
   $finalGradeRow.find('.grade').text(finalGrade)
   $finalGradeRow.find('.score_teaser').text(teaserText)
-  $finalGradeRow.find('.points_possible').text(scoreAsPoints)
+
+  const pointsPossibleText = finalGradePointsPossibleText(groupWeightingScheme, scoreAsPoints);
+  $finalGradeRow.find('.points_possible').text(pointsPossibleText);
+
   if (groupWeightingScheme === 'percent') {
     $finalGradeRow.find('.score_teaser').hide()
   }
@@ -616,6 +633,7 @@ export default _.extend(GradeSummary, {
   calculateTotals,
   calculateSubtotals,
   calculatePercentGrade,
+  finalGradePointsPossibleText,
   formatPercentGrade,
   updateScoreForAssignment,
   updateStudentGrades

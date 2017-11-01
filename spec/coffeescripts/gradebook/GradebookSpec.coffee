@@ -421,25 +421,6 @@ define [
     self = @setupThis('points', null)
     equal @weightedGrades.call(self), false
 
-  QUnit.module 'Gradebook#displayPointTotals',
-    setupThis:(show_total_grade_as_points, weightedGrades) ->
-      options: { show_total_grade_as_points }
-      weightedGrades: () -> weightedGrades
-    setup: ->
-      @displayPointTotals = Gradebook.prototype.displayPointTotals
-
-  test 'returns true when grades are not weighted and show_total_grade_as_points is true', ->
-    self = @setupThis(true, false)
-    equal @displayPointTotals.call(self), true
-
-  test 'returns false when grades are weighted', ->
-    self = @setupThis(true, true)
-    equal @displayPointTotals.call(self), false
-
-  test 'returns false when show_total_grade_as_points is false', ->
-    self = @setupThis(false, false)
-    equal @displayPointTotals.call(self), false
-
   QUnit.module 'Gradebook#showNotesColumn',
     setup: ->
       @loadNotes = @stub(DataLoader, 'getDataForColumn')
