@@ -116,36 +116,32 @@ describe "people" do
     before (:each) do
       course_with_teacher_logged_in
 
-      #add first student
+      # add first student
       @student_1 = create_user('student@test.com')
 
       enroll_student(@student_1)
 
-      #adding users for tests to work correctly
-
-      #teacher user
+      # adding users for tests to work correctly
       @test_teacher = create_user('teacher@test.com')
-      #student user
       @student_2 = create_user('student2@test.com')
-      #ta user
       @test_ta = create_user('ta@test.com')
-      #observer user
       @test_observer = create_user('observer@test.com')
 
       enroll_ta(@test_ta)
-
-      get "/courses/#{@course.id}/users"
     end
 
     it "should have tabs" do
+      get "/courses/#{@course.id}/users"
       expect(f('.collectionViewItems>li:first-child').text).to match "Everyone"
     end
 
     it "should display a dropdown menu when item cog is clicked" do
+      get "/courses/#{@course.id}/users"
       open_dropdown_menu
     end
 
     it "should display the option to remove a student from a course if manually enrolled" do
+      get "/courses/#{@course.id}/users"
       open_dropdown_menu("tr[id=user_#{@student_1.id}]")
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_1.id}]")).to be true
     end
@@ -182,11 +178,13 @@ describe "people" do
     end
 
     it "should display the option to remove a ta from the course" do
+      get "/courses/#{@course.id}/users"
       open_dropdown_menu("tr[id=user_#{@test_ta.id}]")
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@test_ta.id}]")).to be true
     end
 
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
+      get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       fln("Student Interactions Report").click
       expect(f("h1").text).to eq "Teacher Activity Report for #{@user.name}"
@@ -199,21 +197,22 @@ describe "people" do
     end
 
     it "should focus on the + Group Set button after the tabs" do
+      get "/courses/#{@course.id}/users"
       driver.execute_script("$('.collectionViewItems > li:last a').focus()")
       active = driver.execute_script("return document.activeElement")
       active.send_keys(:tab)
       check_element_has_focus(f('.group-categories-actions .btn-primary'))
     end
 
-    # focus test removed. delegated to inst-ui which now implements the modal
-
     it "should validate the main page" do
+      get "/courses/#{@course.id}/users"
       users = ff('.roster_user_name')
       expect(users[1].text).to match @student_1.name
       expect(users[0].text).to match @teacher.name
     end
 
     it "should navigate to registered services on profile page" do
+      get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       fln('View Registered Services').click
       fln('Link web services to my account').click
@@ -221,10 +220,12 @@ describe "people" do
     end
 
     it "should make a new set of student groups" do
+      get "/courses/#{@course.id}/users"
       create_student_group
     end
 
     it "should test self sign up functionality" do
+      get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       expect_new_page_load { fln('View User Groups').click }
       dialog = open_student_group_dialog
@@ -234,6 +235,7 @@ describe "people" do
     end
 
     it "should test self sign up / group structure functionality" do
+      get "/courses/#{@course.id}/users"
       group_count = "4"
       expect_new_page_load do
         f("#people-options .Button").click
@@ -250,6 +252,7 @@ describe "people" do
     end
 
     it "should test group structure functionality" do
+      get "/courses/#{@course.id}/users"
       enroll_more_students
 
       group_count = "4"
@@ -271,6 +274,7 @@ describe "people" do
     end
 
     it "should edit a student group" do
+      get "/courses/#{@course.id}/users"
       new_group_name = "new group edit name"
       create_student_group
       fj('.group-category-actions:visible a:visible').click
@@ -283,6 +287,7 @@ describe "people" do
     end
 
     it "should delete a student group" do
+      get "/courses/#{@course.id}/users"
       create_student_group
       fj('.group-category-actions:visible a:visible').click
       f('.delete-category').click
@@ -330,6 +335,32 @@ describe "people" do
 
       expect(enrollments[0]).to include_text @students[0].name
       expect(enrollments[1]).to include_text @students[1].name
+    end
+
+    it "allows conclude/restore without profiles enabled" do
+      get "/courses/#{@course.id}/users/#{@student_1.id}"
+      f('.more_user_information_link').click
+      wait_for_animations
+      f('.conclude_enrollment_link').click
+      accept_alert
+      wait_for_ajaximations
+      f('.unconclude_enrollment_link').click
+      wait_for_ajaximations
+      expect(f('.conclude_enrollment_link')).to be_displayed
+    end
+
+    it "allows conclude/restore with profiles enabled" do
+      account = Account.default
+      account.settings[:enable_profiles] = true
+      account.save!
+
+      get "/courses/#{@course.id}/users/#{@student_1.id}"
+      f('.conclude_enrollment_link').click
+      accept_alert
+      wait_for_ajaximations
+      f('.unconclude_enrollment_link').click
+      wait_for_ajaximations
+      expect(f('.conclude_enrollment_link')).to be_displayed
     end
   end
 

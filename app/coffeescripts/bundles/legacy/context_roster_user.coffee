@@ -35,9 +35,9 @@ define [
       event.preventDefault()
       $enrollment = $(this).parents(".enrollment")
       $.ajaxJSON $(this).attr("href"), "POST", {}, (data) ->
-        $enrollment.find(".conclude_enrollment_link_holder").slideDown()
-        $enrollment.find(".unconclude_enrollment_link_holder").slideUp()
-        $enrollment.find(".completed_at_holder").slideUp()
+        $enrollment.find(".conclude_enrollment_link_holder").show()
+        $enrollment.find(".unconclude_enrollment_link_holder").hide()
+        $enrollment.find(".completed_at_holder").hide()
 
 
     $(".conclude_enrollment_link").click (event) ->
@@ -46,9 +46,13 @@ define [
         message: I18n.t("confirm.conclude_student", "Are you sure you want to conclude this student's enrollment?")
         url: $(this).attr("href")
         success: (data) ->
-          $(this).undim()
-          $(this).find(".conclude_enrollment_link_holder").slideUp()
-          $(this).find(".unconclude_enrollment_link_holder").slideDown()
+          comp_at = $.datetimeString(data.enrollment.completed_at)
+          $enrollment = $(this)
+          $enrollment.undim()
+          $enrollment.find(".conclude_enrollment_link_holder").hide()
+          $enrollment.find(".unconclude_enrollment_link_holder").show()
+          $enrollment.find(".completed_at_holder .completed_at").text(comp_at)
+          $enrollment.find(".completed_at_holder").show()
 
     $(".elevate_enrollment_link,.restrict_enrollment_link").click (event) ->
       limit = (if $(this).hasClass("restrict_enrollment_link") then "1" else "0")
