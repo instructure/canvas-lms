@@ -131,7 +131,7 @@ describe "new account course search" do
 
     get "/accounts/#{@account.id}"
 
-    f('.courses-list [role=row] .addUserButton').click
+    fj('.courses-list [role=row] button:has([name="IconPlusLine"])').click
     dialog = fj('.ui-dialog:visible')
     expect(dialog).to be_displayed
     role_options = dialog.find_elements(:css, '#role_id option')
