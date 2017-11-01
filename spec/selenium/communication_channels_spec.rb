@@ -32,6 +32,18 @@ describe "communication channel selenium tests" do
       expect_logout_link_present
     end
 
+    it "should not show a mysterious error" do
+      Setting.set('terms_required', 'false')
+      u1 = user_with_communication_channel(:user_state => 'creation_pending')
+      get "/register/#{u1.communication_channel.confirmation_code}"
+      f('#registration_confirmation_form').submit
+      wait_for_ajaximations
+      error_boxes = ff('.error_box')
+      text = error_boxes.map(&:text).join
+      expect(text).to include("Must be at least 8 characters")
+      expect(text).to_not include("Doesn't match")
+    end
+
     it "should require the terms if configured to do so" do
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
