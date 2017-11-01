@@ -44,3 +44,16 @@ define [
         @url = "/api/v1/group_categories/#{@category.id}/groups?per_page=50"
       else
         @url = super
+
+    fetchAll: ->
+      @fetchAllDriver(success: @fetchNext)
+
+    fetchNext: =>
+      if @canFetch 'next'
+        @fetch(page: 'next', success: @fetchNext)
+      else
+        @trigger('finish')
+
+    fetchAllDriver: (options = {}) ->
+      options.data = Object.assign per_page: 20, include: "can_message", options.data || {}
+      @fetch options
