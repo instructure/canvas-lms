@@ -54,6 +54,10 @@ body, td {
   max-width: none;
 }
 
+.mce-item-table td[data-mce-selected] {
+  background-color: $electric;
+}
+
 body#tinymce, body#tinyrce{
   height: 100vh;
 }
