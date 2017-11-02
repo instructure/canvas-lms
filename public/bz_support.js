@@ -546,3 +546,60 @@ function BZ_LoadMagicFields(field_names, callback) {
   http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   http.send(data);
 }
+
+
+function bzWikiPageContentPreload(wikipage, finalize_page_show) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString("<div class=\"bz-modified\">" + wikipage["body"] + "</div>", "text/html");
+
+    function finalize_page_show_wrapped() {
+        var serializer = new XMLSerializer();
+        wikipage["body"] = serializer.serializeToString(doc);
+
+        finalize_page_show(wikipage);
+    }
+
+    var replacements = doc.querySelectorAll("div[data-replace-with-page]");
+    if(replacements.length) {
+        var pagesToLoad = [];
+        var pagesToLoadHash = {};
+        for(var i = 0; i < replacements.length; i++) {
+            var pn = replacements[i].getAttribute("data-replace-with-page");
+            if(!pagesToLoadHash[pn]) {
+                pagesToLoadHash[pn] = true;
+                pagesToLoad.push(pn);
+            }
+        }
+
+        var http = new XMLHttpRequest();
+        http.onload = function() {
+            // substring is to cut off json p stuff
+            var json = http.responseText.substring(9)
+            var obj = JSON.parse(json);
+
+            for(var i = 0; i < replacements.length; i++) {
+                var pn = replacements[i].getAttribute("data-replace-with-page");
+                if(obj[pn]) {
+                    replacements[i].innerHTML = obj[pn];
+                    replacements[i].setAttribute("data-replaced-with-page", pn);
+                    replacements[i].removeAttribute("data-replace-with-page");
+                }
+            }
+
+            finalize_page_show_wrapped();
+       };
+
+        var data = "";
+        for(var i = 0; i < pagesToLoad.length; i++) {
+           data += "&";
+           data += "names[]=" + encodeURIComponent(pagesToLoad[i]);
+        }
+
+        http.open("GET", "/bz/load_wiki_pages?course_id=" + ENV["COURSE_ID"] + data, true);
+        http.send(data);
+    } else {
+        finalize_page_show_wrapped();
+    }
+
+
+}

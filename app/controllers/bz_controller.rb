@@ -264,6 +264,23 @@ class BzController < ApplicationController
     end
   end
 
+  def load_wiki_pages
+    names = params[:names]
+    course_id = params[:course_id]
+
+    all_pages = Course.find(course_id).wiki_pages.active
+
+    result = {}
+    names.each do |name|
+      page = all_pages.where(:title => name)
+      if page.any?
+        result[name] = page.first.body
+      end
+    end
+
+    render :json => result
+  end
+
   def user_linkedin_url
     result = {}
     result['linkedin_url'] = ''
