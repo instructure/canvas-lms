@@ -142,13 +142,18 @@ module SectionTabHelper
 
     def li_classes
       [ 'section' ].tap do |a|
-        a << 'section-tab-hidden' if @tab.hide?
+        a << 'section-tab-hidden' if @tab.hide? || @tab.unused?
       end
     end
 
     def span_tag
-      if @tab.hide?
-        content_tag(:span, I18n.t('* No content has been added'), {
+      if @tab.hide? || @tab.unused?
+        if @tab.hide?
+          text = I18n.t('* Disabled in Course Settings')
+        else
+          text = I18n.t('* No content has been added')
+        end
+        content_tag(:span, text, {
           id: 'inactive_nav_link',
           class: 'screenreader-only'
         })
