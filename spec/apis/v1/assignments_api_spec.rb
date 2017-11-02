@@ -304,6 +304,18 @@ describe AssignmentsApiController, type: :request do
                              :points_possible => 12,
                               :free_form_criterion_comments => true)
 
+      @rubric.data.push(
+        {
+          id: 'crit3', description: "Criterion With Range",
+          long_description: "Long Criterion With Range",
+          points: 5, criterion_use_range: true, ratings:
+            [{id: 'rat1',
+              description: "Full Marks",
+              long_description: "Student did a great job.",
+              points: 5.0}]
+        }
+      )
+
       @assignment.build_rubric_association(:rubric => @rubric,
                                            :purpose => 'grading',
                                            :use_for_grading => true,
@@ -336,6 +348,17 @@ describe AssignmentsApiController, type: :request do
           'ratings' => [
             {'id' => 'rat1', 'points' => 2, 'description' => 'Pass', 'long_description' => ''},
             {'id' => 'rat2', 'points' => 0, 'description' => 'Fail', 'long_description' => ''},
+          ]
+        },
+        {
+          'id' => 'crit3',
+          'points' => 5,
+          'description' => 'Criterion With Range',
+          'long_description' => 'Long Criterion With Range',
+          'criterion_use_range' => true,
+          'ratings' => [
+            {'id' => 'rat1', 'points' => 5, 'description' => 'Full Marks',
+             'long_description' => 'Student did a great job.'}
           ]
         }
       ]
