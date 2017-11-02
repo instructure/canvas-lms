@@ -21,45 +21,107 @@ define([
   'helpers/fakeENV',
   'compiled/SubmissionDetailsDialog'
 ], ($, fakeENV, SubmissionDetailsDialog) => {
+  let assignment;
+  let student;
+  let options;
 
   QUnit.module('#SubmissionDetailsDialog', {
-
     setup() {
       fakeENV.setup();
       this.clock = sinon.useFakeTimers();
-      this.stub($, 'publish')
+      this.stub($, 'publish');
       ENV.GRADEBOOK_OPTIONS = {
         has_grading_periods: false
       };
-      const assignment = {
+      this.stub($, 'ajaxJSON');
+
+      assignment = {
         id: 1,
         grading_type: 'points',
         points_possible: 10
       };
-      const student = {
+      student = {
         assignment_1: {
           submission_history: []
         }
       };
-      const options = {
-        change_grade_url: ''
-      };
-      this.stub($, 'ajaxJSON');
-      this.submissionsDetailsDialog = new SubmissionDetailsDialog(assignment, student, options);
+      options = { change_grade_url: '' };
     },
 
     teardown() {
       this.clock.restore();
       fakeENV.teardown();
+      $('.use-css-transitions-for-show-hide').remove();
     }
   });
 
   test('flashWarning is called when score is 150% points possible', function() {
+    const submissionsDetailsDialog = new SubmissionDetailsDialog(assignment, student, options);
     const flashWarningStub = this.stub($, 'flashWarning');
-    $('.submission_details_grade_form', this.submissionsDetailsDialog.dialog).trigger('submit');
+    $('.submission_details_grade_form', submissionsDetailsDialog.dialog).trigger('submit');
     const callback = $.ajaxJSON.getCall(1).args[3];
     callback({ score: 15, excused: false });
     this.clock.tick(510);
     ok(flashWarningStub.calledOnce);
+    submissionsDetailsDialog.dialog.dialog('destroy');
+  });
+
+  test("display name by default", function () {
+    const submissionDetailsDialog = new SubmissionDetailsDialog(assignment, student, options);
+    const submissionData = {
+      submission_comments: [{
+        author: {
+          id: "2",
+        },
+        author_id: "2",
+        author_name: "Some Author",
+        comment: "a comment",
+        id: "27"
+      }]
+    };
+    submissionDetailsDialog.update(submissionData);
+
+    strictEqual(document.querySelector('address').innerText.includes('Some Author'), true);
+    submissionDetailsDialog.dialog.dialog('destroy');
+  });
+
+  test("when anonymous hides student's name from address section", function () {
+    options.anonymous = true;
+    const submissionDetailsDialog = new SubmissionDetailsDialog(assignment, student, options);
+    const submissionData = {
+      submission_comments: [{
+        author: {
+          id: "2",
+        },
+        author_id: "2",
+        author_name: "Some Author",
+        comment: "a comment",
+        id: "27"
+      }]
+    };
+    submissionDetailsDialog.update(submissionData);
+
+    strictEqual(document.querySelector('address').innerText.includes('Student'), true);
+    submissionDetailsDialog.dialog.dialog('destroy');
+  });
+
+  test("when anonymous does not hide the user's name", function () {
+    options.anonymous = true;
+    const submissionDetailsDialog = new SubmissionDetailsDialog(assignment, student, options);
+    const submissionData = {
+      submission_comments: [{
+        author: {
+          id: ENV.current_user_id,
+        },
+        author_id: ENV.current_user_id,
+        author_name: "Some Author",
+        comment: "a comment",
+        id: "27"
+      }]
+    };
+    submissionDetailsDialog.update(submissionData);
+
+    strictEqual(document.querySelector('address').innerText.includes('Some Author'), true);
+    submissionDetailsDialog.dialog.dialog('destroy');
   });
 });

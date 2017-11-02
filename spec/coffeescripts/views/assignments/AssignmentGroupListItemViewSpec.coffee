@@ -296,7 +296,7 @@ define [
 
   test "cacheKey builds unique key", ->
     view = createView(@model)
-    deepEqual view.cacheKey(), ["course", 1, "user", 1, "ag", 1, "expanded"]
+    deepEqual view.cacheKey(), ["course", 1, "user", "1", "ag", 1, "expanded"]
 
   test "disallows deleting groups with frozen assignments", ->
     assignments = @model.get('assignments')

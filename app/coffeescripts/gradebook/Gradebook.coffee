@@ -961,7 +961,11 @@ define [
       $(@grid.getActiveCellNode()).removeClass('editable')
       assignment = @assignments[data.assignmentId]
       student = @student(data.userId)
-      opts = @options
+      opts = Object.assign({}, { anonymous: false }, @options)
+
+      if @$grid.find('.grid-canvas').hasClass('hide-students')
+        student.name = I18n.t 'Student'
+        opts.anonymous = true
 
       SubmissionDetailsDialog.open assignment, student, opts
 

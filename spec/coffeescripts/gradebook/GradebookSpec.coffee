@@ -467,7 +467,9 @@ define [
       @assignments = {
         '61890000000013319': { name: 'Assignment #1' }
       }
-      @student = @stub().returns({})
+      @student = @stub().returns({
+        name: 'Some Student'
+      })
       @options = {}
 
       @fixture = document.createElement('div')
@@ -487,6 +489,10 @@ define [
         preventDefault: @stub(),
         currentTarget: @fixture
       }
+      @$grid =
+        find: =>
+          hasClass: =>
+            false
       @grid = {
         getActiveCellNode: @stub().returns(@fixture)
       }
@@ -517,11 +523,25 @@ define [
   test 'when editable, calls SubmissionDetailsDialog', ->
     @cellCommentClickHandler(@event)
 
-    expectedArguments = {
+    expectedArguments =
       0: { name: 'Assignment #1' },
-      1: {},
-      2: {}
-    }
+      1: { name: 'Some Student' },
+      2: { anonymous: false }
+
+    equal SubmissionDetailsDialog.open.callCount, 1
+    deepEqual expectedArguments, @submissionDialogArgs
+
+  test 'when editable, calls SubmissionDetailsDialog', ->
+    @$grid =
+      find: =>
+        hasClass: =>
+          true
+    @cellCommentClickHandler(@event)
+
+    expectedArguments =
+      0: { name: 'Assignment #1' },
+      1: { name: 'Student' },
+      2: { anonymous: true }
 
     equal SubmissionDetailsDialog.open.callCount, 1
     deepEqual expectedArguments, @submissionDialogArgs

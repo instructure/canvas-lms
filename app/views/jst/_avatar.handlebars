@@ -1,18 +1,27 @@
 {{!-- same markup as ApplicationHelper#avatar, essensially --}}
 {{#if this}}
-  {{#ifAny avatar_url avatar_image_url}}
-    {{#if alreadyEscaped}}
-      <a
-        {{#ifAny url html_url}}href="{{{or url html_url}}}"{{/ifAny}}
-        class="avatar"
-        style="background-image: url({{{or avatar_url avatar_image_url}}})">
-        <span class="screenreader-only">{{{or display_name short_name}}}</span></a>
-    {{else}}
-      <a
-        {{#ifAny url html_url}}href="{{or url html_url}}"{{/ifAny}}
-        class="avatar"
-        style="background-image: url({{or avatar_url avatar_image_url}})"
-        ><span class="screenreader-only">{{or display_name short_name}}</span></a>
-    {{/if}}
-  {{/ifAny}}
+  {{#if anonymous}}
+    <a
+      class="avatar"
+      style="background-image: url(/images/messages/avatar-50.png)"
+    >
+      <span class="screenreader-only">{{#t}}Student{{/t}}</span>
+    </a>
+  {{else}}
+    {{#ifAny avatar_url avatar_image_url}}
+      {{#if alreadyEscaped}}
+        <a
+          {{#ifAny url html_url}}href="{{{or url html_url}}}"{{/ifAny}}
+          class="avatar"
+          style="background-image: url({{{or avatar_url avatar_image_url}}})">
+          <span class="screenreader-only">{{{or display_name short_name}}}</span></a>
+      {{else}}
+        <a
+          {{#ifAny url html_url}}href="{{or url html_url}}"{{/ifAny}}
+          class="avatar"
+          style="background-image: url({{or avatar_url avatar_image_url}})"
+          ><span class="screenreader-only">{{or display_name short_name}}</span></a>
+      {{/if}}
+    {{/ifAny}}
+  {{/if}}
 {{/if}}

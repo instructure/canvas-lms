@@ -47,7 +47,11 @@
               {{>avatar author}}
               <div class="middle">
                 <address class="vcard">
-                  <a class="fn url" href="{{url}}">{{author_name}}</a>
+                  {{#if anonymous}}
+                    {{author_name}}
+                  {{else}}
+                    <a class="fn url" href="{{url}}">{{author_name}}</a>
+                  {{/if}}
                 </address>
                 <div>
                   {{newlinesToBreak comment}}
