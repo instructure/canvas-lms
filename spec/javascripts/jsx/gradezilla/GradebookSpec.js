@@ -22,6 +22,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import moxios from 'moxios';
+import qs from 'qs';
 import fakeENV from 'helpers/fakeENV';
 import Gradebook from 'compiled/gradezilla/Gradebook';
 import UserSettings from 'compiled/userSettings';
@@ -1696,8 +1697,235 @@ test('returns the result of compareAssignmentPositions', function () {
   strictEqual(this.comparisonResult, -1);
 });
 
-QUnit.module('Gradebook Column Ordering', () => {
+QUnit.module('Gradebook Column Order', (suiteHooks) => {
   let gradebook;
+
+  function createWithSettings (settings) {
+    gradebook = createGradebook({ gradebook_column_order_settings: settings });
+    gradebook.setContextModules([
+      { id: '2601', name: 'Algebra', position: 1 },
+    ]);
+  }
+
+  suiteHooks.afterEach(() => {
+    gradebook.destroy();
+  });
+
+  QUnit.module('initialization', () => {
+    test('sets column sort direction to "ascending" when the settings are invalid', () => {
+      createWithSettings({
+        direction: 'descending', freezeTotalGrade: 'false', sortType: 'due_date'
+      });
+      equal(gradebook.getColumnOrder().direction, 'descending');
+    });
+
+    test('sets column sort type to "assignment_group" when the settings are invalid', () => {
+      createWithSettings({
+        direction: 'descending', freezeTotalGrade: 'false', sortType: 'due_date'
+      });
+      equal(gradebook.getColumnOrder().sortType, 'due_date');
+    });
+
+    test('freezes the total grade column when the setting is "true"', () => {
+      createWithSettings({
+        direction: 'descending', freezeTotalGrade: 'true', sortType: 'due_date'
+      });
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true);
+    });
+
+    test('does not freeze the total grade column when the setting is "false"', () => {
+      createWithSettings({
+        direction: 'descending', freezeTotalGrade: 'false', sortType: 'due_date'
+      });
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false);
+    });
+
+    test('does not freeze the total grade column when the setting is not set', () => {
+      createWithSettings({
+        direction: 'descending', sortType: 'due_date'
+      });
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false);
+    });
+  });
+
+  QUnit.module('#setColumnOrder', (hooks) => {
+    hooks.beforeEach(() => {
+      createWithSettings({ direction: 'descending', sortType: 'module_position' });
+    });
+
+    test('updates "direction"', () => {
+      gradebook.setColumnOrder({ direction: 'ascending', sortType: 'due_date' });
+      equal(gradebook.getColumnOrder().direction, 'ascending');
+    });
+
+    test('updates "sortType"', () => {
+      gradebook.setColumnOrder({ direction: 'ascending', sortType: 'due_date' });
+      equal(gradebook.getColumnOrder().sortType, 'due_date');
+    });
+
+    test('does not update "direction" when not included', () => {
+      gradebook.setColumnOrder({ direction: undefined, sortType: 'due_date' });
+      equal(gradebook.getColumnOrder().direction, 'descending');
+    });
+
+    test('does not update "sortType" when "direction" is not included', () => {
+      gradebook.setColumnOrder({ direction: undefined, sortType: 'due_date' });
+      equal(gradebook.getColumnOrder().sortType, 'module_position');
+    });
+
+    test('does not update "sortType" when not included', () => {
+      gradebook.setColumnOrder({ direction: 'ascending', sortType: undefined });
+      equal(gradebook.getColumnOrder().sortType, 'module_position');
+    });
+
+    test('does not update "direction" when "sortType" is not included', () => {
+      gradebook.setColumnOrder({ direction: 'ascending', sortType: undefined });
+      equal(gradebook.getColumnOrder().direction, 'descending');
+    });
+
+    test('updates a "sortType" of "custom"', () => {
+      const originalOrder = ['assignment_2301', 'total_grade'];
+      gradebook.setColumnOrder({ customOrder: originalOrder, sortType: 'custom' });
+      equal(gradebook.getColumnOrder().sortType, 'custom');
+    });
+
+    test('updates "customOrder" with a "sortType" of "custom"', () => {
+      const customOrder = ['assignment_2301', 'total_grade'];
+      gradebook.setColumnOrder({ customOrder, sortType: 'custom' });
+      equal(gradebook.getColumnOrder().customOrder, customOrder);
+    });
+
+    test('does not update "sortType" of "custom" when "customOrder" is not included', () => {
+      gradebook.setColumnOrder({ customOrder: undefined, sortType: 'custom' });
+      equal(gradebook.getColumnOrder().sortType, 'module_position');
+    });
+
+    test('does not update "customOrder" when "sortType" is not included', () => {
+      gradebook.setColumnOrder({ customOrder: ['assignment_2301', 'total_grade'], sortType: undefined });
+      strictEqual(typeof gradebook.getColumnOrder().customOrder, 'undefined');
+    });
+
+    test('does not update "customOrder" when "sortType" is not "custom"', () => {
+      const originalOrder = ['assignment_2301', 'total_grade'];
+      gradebook.setColumnOrder({ customOrder: originalOrder, sortType: 'custom' });
+      gradebook.setColumnOrder({ customOrder: ['total_grade', 'assignment_2301'], sortType: 'due_date' });
+      equal(gradebook.getColumnOrder().customOrder, originalOrder);
+    });
+
+    test('updates "freezeTotalGrade"', () => {
+      gradebook.setColumnOrder({ freezeTotalGrade: true });
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true);
+    });
+
+    test('does not update "freezeTotalGrade" when not included', () => {
+      gradebook.setColumnOrder({ freezeTotalGrade: undefined });
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false);
+    });
+  });
+
+  QUnit.module('#getColumnOrder', () => {
+    test('sets column sort direction to "ascending" when the settings are invalid', () => {
+      createWithSettings({ sortType: 'custom' });
+      equal(gradebook.getColumnOrder().direction, 'ascending');
+    });
+
+    test('sets column sort type to "assignment_group" when the settings are invalid', () => {
+      createWithSettings({ sortType: 'custom' });
+      equal(gradebook.getColumnOrder().sortType, 'assignment_group');
+    });
+
+    test('does not freeze the total grade column when the settings are invalid', () => {
+      createWithSettings({ sortType: 'custom' });
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false);
+    });
+
+    test('sets column sort direction to "ascending" when the settings are not defined', () => {
+      createWithSettings(undefined);
+      equal(gradebook.getColumnOrder().direction, 'ascending');
+    });
+
+    test('sets column sort type to "assignment_group" when the settings are not defined', () => {
+      createWithSettings(undefined);
+      equal(gradebook.getColumnOrder().sortType, 'assignment_group');
+    });
+
+    test('does not freeze the total grade column when the settings are not defined', () => {
+      createWithSettings(undefined);
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false);
+    });
+  });
+
+  QUnit.module('#getColumnOrder when sorting by module position', (hooks) => {
+    hooks.beforeEach(() => {
+      createWithSettings({ direction: 'descending', sortType: 'module_position' });
+    });
+
+    test('includes the stored column sort direction', () => {
+      equal(gradebook.getColumnOrder().direction, 'descending');
+    });
+
+    test('includes "module_position" as the stored column sort type', () => {
+      equal(gradebook.getColumnOrder().sortType, 'module_position');
+    });
+
+    test('sets the column direction to "ascending" when the course has no modules', () => {
+      gradebook.setContextModules([]);
+      equal(gradebook.getColumnOrder().direction, 'ascending');
+    });
+
+    test('sets the column sort type to "assignment_group" when the course has no modules', () => {
+      gradebook.setContextModules([]);
+      equal(gradebook.getColumnOrder().sortType, 'assignment_group');
+    });
+  });
+
+  QUnit.module('#saveColumnOrder', (hooks) => {
+    let server;
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      gradebook.setColumnOrder({ sortType: 'name', direction: 'ascending' });
+      server = sinon.fakeServer.create({ respondImmediately: true });
+    });
+
+    hooks.afterEach(() => {
+      server.restore();
+    });
+
+    test('sends a request to the "gradebook custom order settings" url', () => {
+      gradebook.saveColumnOrder();
+      const requests = server.requests.filter(request => (
+        request.url === 'http://example.com/gradebook_column_order_settings_url'
+      ));
+      strictEqual(requests.length, 1);
+    });
+
+    test('sends a POST request', () => {
+      gradebook.saveColumnOrder();
+      const saveRequest = server.requests.find(request => (
+        request.url === 'http://example.com/gradebook_column_order_settings_url'
+      ));
+      equal(saveRequest.method, 'POST');
+    });
+
+    test('includes the column order', () => {
+      gradebook.saveColumnOrder();
+      const saveRequest = server.requests.find(request => (
+        request.url === 'http://example.com/gradebook_column_order_settings_url'
+      ));
+      const requestBody = qs.parse(saveRequest.requestBody);
+      deepEqual(qs.stringify(requestBody.column_order), qs.stringify(gradebook.getColumnOrder()));
+    });
+
+    test('does not send a request when the order setting is invalid', () => {
+      gradebook.gradebookColumnOrderSettings = { sortType: 'custom' };
+      gradebook.saveColumnOrder();
+      const requests = server.requests.filter(request => (
+        request.url === 'http://example.com/gradebook_column_order_settings_url'
+      ));
+      strictEqual(requests.length, 0);
+    });
+  });
 
   QUnit.module('#saveCustomColumnOrder', (hooks) => {
     hooks.beforeEach(() => {
@@ -1716,67 +1944,116 @@ QUnit.module('Gradebook Column Ordering', () => {
       gradebook.gridData.columns.frozen = columns.slice(0, 2).map(column => column.id);
       gradebook.gridData.columns.scrollable = columns.slice(2).map(column => column.id);
 
-      sinon.stub(gradebook, 'setStoredSortOrder');
-    });
-
-    hooks.afterEach(() => {
-      gradebook.destroy();
-    });
-
-    test('stores the order of scrollable columns', () => {
-      gradebook.saveCustomColumnOrder();
-      strictEqual(gradebook.setStoredSortOrder.callCount, 1);
+      gradebook.setColumnOrder({ sortType: 'name', direction: 'ascending' });
+      sinon.stub(gradebook, 'saveColumnOrder');
     });
 
     test('includes the "sortType" when storing the order', () => {
       gradebook.saveCustomColumnOrder();
-      const [sortOrder] = gradebook.setStoredSortOrder.lastCall.args;
-      equal(sortOrder.sortType, 'custom');
+      equal(gradebook.getColumnOrder().sortType, 'custom');
     });
 
     test('includes the column order when storing the order', () => {
       gradebook.saveCustomColumnOrder();
-      const [sortOrder] = gradebook.setStoredSortOrder.lastCall.args;
       const expectedOrder = ['assignment_2301', 'assignment_2302', 'assignment_group_2201', 'total_grade'];
-      deepEqual(sortOrder.customOrder, expectedOrder);
+      deepEqual(gradebook.getColumnOrder().customOrder, expectedOrder);
+    });
+
+    test('saves the column order', () => {
+      gradebook.saveCustomColumnOrder();
+      strictEqual(gradebook.saveColumnOrder.callCount, 1);
+    });
+
+    test('saves the column order after setting the new settings', () => {
+      gradebook.saveColumnOrder.callsFake(() => {
+        equal(gradebook.getColumnOrder().sortType, 'custom');
+      });
+      gradebook.saveCustomColumnOrder();
     });
   });
-});
 
-QUnit.module('Gradebook#getStoredSortOrder', {
-  setup () {
-    this.gradebookColumnOrderSettings = {
-      sortType: 'due_date',
-      direction: 'descending'
-    };
-    this.defaultColumnOrderSettings = {
-      sortType: 'assignment_group',
-      direction: 'ascending'
-    };
-    this.invalidColumnOrderSettings = {
-      sortType: 'custom'
-    };
-
-    this.gradebook = createGradebook({
-      gradebook_column_order_settings: this.gradebookColumnOrderSettings
+  QUnit.module('#freezeTotalGradeColumn', (hooks) => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      gradebook.setColumnOrder({ freezeTotalGrade: false });
+      sinon.stub(gradebook, 'saveColumnOrder');
+      sinon.stub(gradebook, 'updateGrid');
+      sinon.stub(gradebook, 'updateColumnHeaders');
     });
-  }
-});
 
-test('returns the saved column order settings if they are valid', function () {
-  deepEqual(this.gradebook.getStoredSortOrder(), this.gradebookColumnOrderSettings);
-});
+    test('sets the total grade column as frozen', () => {
+      gradebook.freezeTotalGradeColumn();
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true);
+    });
 
-test('returns the default column order settings if the stored settings are invalid', function () {
-  this.gradebook.gradebookColumnOrderSettings = this.invalidColumnOrderSettings;
+    test('saves column order', () => {
+      gradebook.freezeTotalGradeColumn();
+      strictEqual(gradebook.saveColumnOrder.callCount, 1);
+    });
 
-  deepEqual(this.gradebook.getStoredSortOrder(), this.defaultColumnOrderSettings);
-});
+    test('saves column order after setting the total grade column as frozen', () => {
+      gradebook.saveColumnOrder.callsFake(() => {
+        strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true);
+      });
+      gradebook.freezeTotalGradeColumn();
+    });
 
-test('returns the default column order settings if the column order has never been saved', function () {
-  this.gradebook.gradebookColumnOrderSettings = undefined
+    test('updates the grid', () => {
+      gradebook.freezeTotalGradeColumn();
+      strictEqual(gradebook.updateGrid.callCount, 1);
+    });
 
-  deepEqual(this.gradebook.getStoredSortOrder(), this.defaultColumnOrderSettings);
+    test('updates column headers', () => {
+      gradebook.freezeTotalGradeColumn();
+      strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+    });
+  });
+
+  QUnit.module('#moveTotalGradeColumnToEnd', (hooks) => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      gradebook.setColumnOrder({ freezeTotalGrade: true });
+      sinon.stub(gradebook, 'saveColumnOrder');
+      sinon.stub(gradebook, 'saveCustomColumnOrder');
+      sinon.stub(gradebook, 'updateGrid');
+      sinon.stub(gradebook, 'updateColumnHeaders');
+    });
+
+    test('sets the total grade column as not frozen', () => {
+      gradebook.moveTotalGradeColumnToEnd();
+      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false);
+    });
+
+    test('saves column order when not using a custom order', () => {
+      gradebook.moveTotalGradeColumnToEnd();
+      strictEqual(gradebook.saveColumnOrder.callCount, 1);
+      strictEqual(gradebook.saveCustomColumnOrder.callCount, 0);
+    });
+
+    test('saves custom column order when using a custom order', () => {
+      gradebook.setColumnOrder({ customOrder: ['assignment_2301', 'total_grade'], sortType: 'custom' });
+      gradebook.moveTotalGradeColumnToEnd();
+      strictEqual(gradebook.saveColumnOrder.callCount, 0);
+      strictEqual(gradebook.saveCustomColumnOrder.callCount, 1);
+    });
+
+    test('saves column order after setting the total grade column as not frozen', () => {
+      gradebook.saveColumnOrder.callsFake(() => {
+        strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false);
+      });
+      gradebook.moveTotalGradeColumnToEnd();
+    });
+
+    test('updates the grid', () => {
+      gradebook.moveTotalGradeColumnToEnd();
+      strictEqual(gradebook.updateGrid.callCount, 1);
+    });
+
+    test('updates column headers', () => {
+      gradebook.moveTotalGradeColumnToEnd();
+      strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+    });
+  });
 });
 
 QUnit.module('Gradebook#isDefaultSortOrder', {
@@ -1817,20 +2094,20 @@ QUnit.module('Gradebook#isInvalidSort', {
 });
 
 test('returns false if sorting by any valid criterion', function () {
-  this.gradebook.setStoredSortOrder({ sortType: 'name', direction: 'ascending' });
+  this.gradebook.setColumnOrder({ sortType: 'name', direction: 'ascending' });
 
   strictEqual(this.gradebook.isInvalidSort(), false);
 });
 
 test('returns true if sorting by module position but there are no modules in the course any more', function () {
-  this.gradebook.setStoredSortOrder({ sortType: 'module_position', direction: 'ascending' });
+  this.gradebook.setColumnOrder({ sortType: 'module_position', direction: 'ascending' });
   this.gradebook.courseContent.contextModules = [];
 
   strictEqual(this.gradebook.isInvalidSort(), true);
 });
 
 test('returns false if sorting by module position and there are modules in the course', function () {
-  this.gradebook.setStoredSortOrder({ sortType: 'module_position', direction: 'ascending' });
+  this.gradebook.setColumnOrder({ sortType: 'module_position', direction: 'ascending' });
   this.gradebook.courseContent.contextModules = [
     { id: '1', name: 'Module 1', position: 1 }
   ];
@@ -2295,13 +2572,8 @@ test('selected is true if teacher notes are visible', function () {
 
 QUnit.module('Gradebook#getColumnSortSettingsViewOptionsMenuProps', {
   getProps (sortType = 'due_date', direction = 'ascending') {
-    const storedSortOrder = { sortType, direction };
-
-    this.stub(this.gradebook, 'getStoredSortOrder').returns(storedSortOrder);
-    const props = this.gradebook.getColumnSortSettingsViewOptionsMenuProps();
-    this.gradebook.getStoredSortOrder.restore();
-
-    return props;
+    this.gradebook.setColumnOrder({ direction, sortType });
+    return this.gradebook.getColumnSortSettingsViewOptionsMenuProps();
   },
 
   expectedArgs (sortType, direction) {
@@ -4236,46 +4508,6 @@ test('uses Grid Support to update the column headers', function () {
   strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
-QUnit.module('Gradebook#freezeTotalGradeColumn', {
-  setupGradebook () {
-    const gradebook = createGradebook();
-    gradebook.gradebookGrid.grid = {
-      columns: [],
-
-      getColumns () {
-        return this.columns;
-      },
-
-      setColumns (incomingColumns) {
-        this.columns = incomingColumns;
-      },
-
-      setNumberOfColumnsToFreeze () {}
-    };
-
-    this.stub(gradebook.gradebookGrid, 'invalidate');
-    this.stub(gradebook, 'updateColumnHeaders');
-
-    return gradebook;
-  },
-
-  setup () {
-    this.gradebook = this.setupGradebook();
-  }
-});
-
-test('re-renders column headers after reordering is done', function () {
-  this.gradebook.freezeTotalGradeColumn();
-
-  strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('invalidates the grid, forcing a re-render', function () {
-  this.gradebook.freezeTotalGradeColumn();
-
-  strictEqual(this.gradebook.gradebookGrid.invalidate.callCount, 1);
-});
-
 QUnit.module('Gradebook#listRowIndicesForStudentIds');
 
 test('returns a row index for each student id', function () {
@@ -4377,64 +4609,6 @@ test('has no effect when the grid has not been initialized', function () {
   this.gradebook.gradebookGrid.grid = null;
   this.gradebook.invalidateRowsForStudentIds(['1101']);
   ok(true, 'no error was thrown');
-});
-
-QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
-  setupGradebook () {
-    const gradebook = createGradebook();
-    gradebook.gradebookGrid.grid = {
-      columns: [],
-
-      destroy () {},
-
-      getColumns () {
-        return this.columns;
-      },
-
-      setColumns (incomingColumns) {
-        this.columns = incomingColumns;
-      },
-
-      setNumberOfColumnsToFreeze () {}
-    };
-    gradebook.gradebookGrid.gridSupport = {
-      columns: {
-        getColumns () {
-          return {
-            frozen: [],
-            scrollable: []
-          }
-        }
-      },
-
-      destroy () {}
-    };
-
-    this.stub(gradebook.gradebookGrid, 'invalidate');
-    this.stub(gradebook, 'updateColumnHeaders');
-
-    return gradebook;
-  },
-
-  setup () {
-    this.gradebook = this.setupGradebook();
-  },
-
-  teardown () {
-    this.gradebook.destroy();
-  }
-});
-
-test('re-renders column headers after reordering is done', function () {
-  this.gradebook.moveTotalGradeColumnToEnd();
-
-  strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('invalidates the grid, forcing a re-render', function () {
-  this.gradebook.moveTotalGradeColumnToEnd();
-
-  strictEqual(this.gradebook.gradebookGrid.invalidate.callCount, 1);
 });
 
 QUnit.module('Gradebook Rows', function () {

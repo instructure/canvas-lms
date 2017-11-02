@@ -315,7 +315,11 @@ define [
       @initShowUnpublishedAssignments(@options.settings.show_unpublished_assignments)
       @initSubmissionStateMap()
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
-      @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
+      @setColumnOrder(Object.assign(
+        {},
+        @options.gradebook_column_order_settings,
+        freezeTotalGrade: @options.gradebook_column_order_settings?.freezeTotalGrade == 'true'
+      ))
       @teacherNotesNotYetLoaded = !@getTeacherNotesColumn()? || @getTeacherNotesColumn().hidden
 
       @gotSections(@options.sections)
@@ -664,36 +668,55 @@ define [
 
       false
 
-    columnOrderHasNotBeenSaved: =>
-      !@gradebookColumnOrderSettings
-
     isDefaultSortOrder: (sortOrder) =>
       not (['due_date', 'name', 'points', 'module_position', 'custom'].includes(sortOrder))
 
-    getStoredSortOrder: =>
-      if @isInvalidSort() || @columnOrderHasNotBeenSaved()
-        sortType: @defaultSortType
+    setColumnOrder: (order) ->
+      @gradebookColumnOrderSettings ?= {
         direction: 'ascending'
+        freezeTotalGrade: false
+        sortType: @defaultSortType
+      }
+
+      return unless order
+
+      if order.freezeTotalGrade?
+        @gradebookColumnOrderSettings.freezeTotalGrade = order.freezeTotalGrade
+
+      if order.sortType == 'custom' and order.customOrder?
+        @gradebookColumnOrderSettings.sortType = 'custom'
+        @gradebookColumnOrderSettings.customOrder = order.customOrder
+      else if order.sortType? and order.direction?
+        @gradebookColumnOrderSettings.sortType = order.sortType
+        @gradebookColumnOrderSettings.direction = order.direction
+
+    getColumnOrder: =>
+      if @isInvalidSort() || !@gradebookColumnOrderSettings
+        direction: 'ascending'
+        freezeTotalGrade: false
+        sortType: @defaultSortType
       else
         @gradebookColumnOrderSettings
 
-    setStoredSortOrder: (newSortOrder) ->
-      @gradebookColumnOrderSettings = newSortOrder
+    saveColumnOrder: ->
       unless @isInvalidSort()
         url = @options.gradebook_column_order_settings_url
-        $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
+        $.ajaxJSON(url, 'POST', { column_order: @getColumnOrder() })
 
     reorderCustomColumns: (ids) ->
       $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
 
     saveCustomColumnOrder: =>
-      @setStoredSortOrder(
+      @setColumnOrder(
         customOrder: @gridData.columns.scrollable
         sortType: 'custom'
       )
+      @saveColumnOrder()
 
     arrangeColumnsBy: (newSortOrder, isFirstArrangement) =>
-      @setStoredSortOrder(newSortOrder) unless isFirstArrangement
+      unless isFirstArrangement
+        @setColumnOrder(newSortOrder)
+        @saveColumnOrder()
 
       columns = @gridData.columns.scrollable.map((columnId) => @gridData.columns.definitions[columnId])
       columns.sort @makeColumnSortFn(newSortOrder)
@@ -1183,7 +1206,7 @@ define [
       @renderGradebookMenus()
       @renderFilters()
 
-      @arrangeColumnsBy(@getStoredSortOrder(), true)
+      @arrangeColumnsBy(@getColumnOrder(), true)
 
       @renderGradebookSettingsModal()
       @renderSettingsButton()
@@ -1224,7 +1247,7 @@ define [
       selected: showingNotes
 
     getColumnSortSettingsViewOptionsMenuProps: ->
-      storedSortOrder = @getStoredSortOrder()
+      storedSortOrder = @getColumnOrder()
       criterion = if @isDefaultSortOrder(storedSortOrder.sortType)
         'default'
       else
@@ -1406,6 +1429,9 @@ define [
       @userFilter.el.setAttribute('aria-disabled', disabled)
 
     setVisibleGridColumns: ->
+      parentColumnIds = @gridData.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
+      customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))
+
       assignments = @filterAssignments(Object.values(@assignments))
       scrollableColumns = assignments.map (assignment) =>
         @gridData.columns.definitions[@getAssignmentColumnId(assignment.id)]
@@ -1413,13 +1439,13 @@ define [
       unless @hideAggregateColumns()
         for assignmentGroupId of @assignmentGroups
           scrollableColumns.push(@gridData.columns.definitions[@getAssignmentGroupColumnId(assignmentGroupId)])
-        scrollableColumns.push(@gridData.columns.definitions['total_grade'])
+        if @getColumnOrder().freezeTotalGrade
+          parentColumnIds.push('total_grade')
+        else
+          scrollableColumns.push(@gridData.columns.definitions['total_grade'])
 
       if @gradebookColumnOrderSettings?.sortType
-        scrollableColumns.sort @makeColumnSortFn(@getStoredSortOrder())
-
-      parentColumnIds = @gridData.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
-      customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))
+        scrollableColumns.sort @makeColumnSortFn(@getColumnOrder())
 
       @gridData.columns.frozen = [parentColumnIds..., customColumnIds...]
       @gridData.columns.scrollable = scrollableColumns.map((column) -> column.id)
@@ -2041,20 +2067,28 @@ define [
 
     freezeTotalGradeColumn: =>
       @totalColumnPositionChanged = true
+      @gradebookColumnOrderSettings.freezeTotalGrade = true
 
       studentColumnPosition = @gridData.columns.frozen.indexOf('student')
       @gridData.columns.frozen.splice(studentColumnPosition + 1, 0, 'total_grade')
       @gridData.columns.scrollable = @gridData.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
 
+      @saveColumnOrder()
       @updateGrid()
       @updateColumnHeaders()
 
     moveTotalGradeColumnToEnd: =>
       @totalColumnPositionChanged = true
+      @gradebookColumnOrderSettings.freezeTotalGrade = false
 
       @gridData.columns.frozen = @gridData.columns.frozen.filter((columnId) -> columnId != 'total_grade')
       @gridData.columns.scrollable = @gridData.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
       @gridData.columns.scrollable.push('total_grade')
+
+      if @getColumnOrder().sortType == 'custom'
+        @saveCustomColumnOrder()
+      else
+        @saveColumnOrder()
 
       @updateGrid()
       @updateColumnHeaders()
