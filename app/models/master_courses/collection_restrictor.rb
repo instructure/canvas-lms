@@ -48,9 +48,9 @@ module MasterCourses::CollectionRestrictor
     end
   end
 
-  def check_restrictions_on_creation?
+  def check_restrictions?
     if self.is_a?(Quizzes::QuizQuestion)
-      !self.generated?
+      !self.generated? # allow updating through the bank even though it's technically locked... shhh don't tell anybody
     else
       true
     end

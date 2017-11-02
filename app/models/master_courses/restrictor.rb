@@ -65,8 +65,7 @@ module MasterCourses::Restrictor
     end
 
     def check_for_restricted_column_changes
-      return true if @importing_migration || !is_child_content?
-      return true if new_record? && !self.check_restrictions_on_creation? # shouldn't be able to create new collection items if owner is locked
+      return true if @importing_migration || !is_child_content? || !self.check_restrictions?
 
       restrictions = nil
       locked_columns = []
@@ -101,8 +100,8 @@ module MasterCourses::Restrictor
     end
   end
 
-  def check_restrictions_on_creation?
-    false
+  def check_restrictions?
+    !self.new_record?
   end
 
   def mark_downstream_changes(changed_columns=nil)
