@@ -33,6 +33,7 @@ const store = configureStore(initialState)
 
 const props = {
   permissions: ENV.PERMISSIONS,
+  rootAccountId: ENV.ROOT_ACCOUNT_ID.toString(),
   accountId: ENV.ACCOUNT_ID.toString(),
   roles: Array.prototype.slice.call(ENV.COURSE_ROLES),
   addUserUrls: ENV.URLS,

@@ -2318,6 +2318,7 @@ class ApplicationController < ActionController::Base
     add_crumb '', '?' # the text for this will be set by javascript
     js_env({
       ACCOUNT_ID: @account.id,
+      ROOT_ACCOUNT_ID: @account.root_account.id,
       PERMISSIONS: {
         can_read_course_list: can_read_course_list,
         can_read_roster: can_read_roster,

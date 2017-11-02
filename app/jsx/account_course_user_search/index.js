@@ -30,14 +30,16 @@ const stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore]
 export default class AccountCourseUserSearch extends React.Component {
   static propTypes = {
     accountId: string.isRequired,
+    rootAccountId: string.isRequired,
     permissions: shape({
       analytics: bool.isRequired
     }).isRequired
   }
 
   componentWillMount() {
+    const {accountId, rootAccountId} = this.props
     stores.forEach(s => {
-      s.reset({accountId: this.props.accountId})
+      s.reset({accountId, rootAccountId})
     })
   }
 
