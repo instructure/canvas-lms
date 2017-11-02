@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
+import GridHelper from './GridHelper';
 
 function getItemMetadata (data, rowIndex) {
   const classes = [];

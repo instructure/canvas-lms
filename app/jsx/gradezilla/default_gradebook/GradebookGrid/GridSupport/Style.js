@@ -33,8 +33,10 @@ export default class Style {
   }
 
   destroy () {
-    this.$styles.remove();
-    this.$styles = null;
+    if (this.$styles) {
+      this.$styles.remove();
+      this.$styles = null;
+    }
   }
 
   updateClassesForActiveLocation (location) {
@@ -51,7 +53,6 @@ export default class Style {
     const { options } = this.gridSupport;
     this.$styles.innerHTML = `
       .slick-header .slick-header-column.${location.columnId} {
-        background: ${options.activeHeaderBackground};
         border: 1px solid ${options.activeBorderColor};
         padding-left: 0;
       }
@@ -69,7 +70,6 @@ export default class Style {
     const { options } = this.gridSupport;
     this.$styles.innerHTML = `
       .slick-header .slick-header-column.${location.columnId}:not(.primary-column) {
-        background: ${options.activeHeaderBackground};
         border: 1px solid ${options.activeBorderColor};
         padding-left: 0;
       }

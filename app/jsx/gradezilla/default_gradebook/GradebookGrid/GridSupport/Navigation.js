@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
+import GridHelper from './GridHelper';
 
 function isLeftArrow (event) {
   return event.which === 37;
@@ -46,7 +46,7 @@ function skipSlickGridDefaults (event) {
   (event.originalEvent || event).skipSlickGridDefaults = true; // eslint-disable-line no-param-reassign
 }
 
-class Navigation {
+export default class Navigation {
   constructor (grid, gridSupport) {
     this.grid = grid;
     this.gridSupport = gridSupport;
@@ -316,5 +316,3 @@ class Navigation {
     return { region: 'unknown' };
   }
 }
-
-export default Navigation;

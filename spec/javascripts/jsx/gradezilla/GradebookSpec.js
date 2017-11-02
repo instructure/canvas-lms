@@ -399,7 +399,7 @@ test('builds rows when student ids are loaded', function () {
   const gradebook = this.createInitializedGradebook();
   const studentIds = ['1101', '1102', '1103'];
   this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
-  deepEqual(gradebook.rows.map(row => row.id), studentIds);
+  deepEqual(gradebook.gridData.rows.map(row => row.id), studentIds);
 });
 
 test('stores context modules when loaded', function () {
@@ -671,7 +671,7 @@ test('builds rows when student ids are loaded', function () {
   gradebook.reloadStudentData();
   const studentIds = ['1101', '1102', '1103'];
   this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
-  deepEqual(gradebook.rows.map(row => row.id), studentIds);
+  deepEqual(gradebook.gridData.rows.map(row => row.id), studentIds);
 });
 
 test('updates students load state when loaded', function () {
@@ -761,11 +761,8 @@ QUnit.module('Gradebook#gotChunkOfStudents', {
     const placeholderStudent = { id: '1101' };
     this.gradebook = createGradebook();
     this.gradebook.courseContent.students.addUserStudents([placeholderStudent]);
-    this.gradebook.rows.push(placeholderStudent);
-    this.gradebook.grid = {
-      invalidateRow () {},
-      render: this.stub()
-    };
+    this.gradebook.gridData.rows.push(placeholderStudent);
+    this.stub(this.gradebook.gradebookGrid, 'render');
     this.students = [
       {
         id: '1101',
@@ -816,7 +813,7 @@ test('updates attributes of each student', function () {
 
 test('updates the row for each student', function () {
   this.gradebook.gotChunkOfStudents(this.students);
-  strictEqual(this.gradebook.rows[0], this.students[0]);
+  strictEqual(this.gradebook.gridData.rows[0], this.students[0]);
 });
 
 test('builds rows when filtering with search', function () {
@@ -834,7 +831,7 @@ test('does not build rows when not filtering with search', function () {
 
 test('renders the grid when not filtering with search', function () {
   this.gradebook.gotChunkOfStudents(this.students);
-  strictEqual(this.gradebook.grid.render.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.render.callCount, 1);
 });
 
 QUnit.module('Gradebook#calculateStudentGrade', {
@@ -1699,36 +1696,51 @@ test('returns the result of compareAssignmentPositions', function () {
   strictEqual(this.comparisonResult, -1);
 });
 
-QUnit.module('Gradebook#storeCustomColumnOrder');
+QUnit.module('Gradebook Column Ordering', () => {
+  let gradebook;
 
-test('stores the custom column order (ignoring frozen columns)', function () {
-  const columns = [
-    { id: 'student' },
-    { id: 'assignment_232' },
-    { id: 'total_grade' },
-    { id: 'assignment_group_12' }
-  ];
-  const gradeBook = createGradebook();
-  this.stub(gradeBook, 'setStoredSortOrder');
-  gradeBook.grid = {
-    getColumns () {
-      return columns;
-    },
+  QUnit.module('#saveCustomColumnOrder', (hooks) => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      const columns = [
+        { id: 'student' },
+        { id: 'custom_col_2401' },
+        { id: 'assignment_2301' },
+        { id: 'assignment_2302' },
+        { id: 'assignment_group_2201' },
+        { id: 'total_grade' }
+      ];
+      columns.forEach((column) => {
+        gradebook.gridData.columns.definitions[column.id] = column;
+      });
+      gradebook.gridData.columns.frozen = columns.slice(0, 2).map(column => column.id);
+      gradebook.gridData.columns.scrollable = columns.slice(2).map(column => column.id);
 
-    getOptions () {
-      return {
-        numberOfColumnsToFreeze: 1
-      }
-    }
-  };
+      sinon.stub(gradebook, 'setStoredSortOrder');
+    });
 
-  const expectedSortOrder = {
-    sortType: 'custom',
-    customOrder: ['assignment_232', 'total_grade', 'assignment_group_12']
-  };
+    hooks.afterEach(() => {
+      gradebook.destroy();
+    });
 
-  gradeBook.storeCustomColumnOrder();
-  ok(gradeBook.setStoredSortOrder.calledWith(expectedSortOrder));
+    test('stores the order of scrollable columns', () => {
+      gradebook.saveCustomColumnOrder();
+      strictEqual(gradebook.setStoredSortOrder.callCount, 1);
+    });
+
+    test('includes the "sortType" when storing the order', () => {
+      gradebook.saveCustomColumnOrder();
+      const [sortOrder] = gradebook.setStoredSortOrder.lastCall.args;
+      equal(sortOrder.sortType, 'custom');
+    });
+
+    test('includes the column order when storing the order', () => {
+      gradebook.saveCustomColumnOrder();
+      const [sortOrder] = gradebook.setStoredSortOrder.lastCall.args;
+      const expectedOrder = ['assignment_2301', 'assignment_2302', 'assignment_group_2201', 'total_grade'];
+      deepEqual(sortOrder.customOrder, expectedOrder);
+    });
+  });
 });
 
 QUnit.module('Gradebook#getStoredSortOrder', {
@@ -2043,15 +2055,13 @@ QUnit.module('Gradebook#switchTotalDisplay', {
       show_total_grade_as_points: true,
       setting_update_url: 'http://settingUpdateUrl'
     });
-    this.gradebook.grid = {
-      invalidate: this.stub()
-    }
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
     }
 
+    this.stub(this.gradebook.gradebookGrid, 'invalidate');
     // Stub this here so the AJAX calls in Dataloader don't get stubbed too
     this.stub($, 'ajaxJSON');
   },
@@ -2091,17 +2101,17 @@ test('updates the total display preferences for the current user', function () {
 test('invalidates the grid so it re-renders it', function () {
   this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
 
-  equal(this.gradebook.grid.invalidate.callCount, 1);
+  equal(this.gradebook.gradebookGrid.invalidate.callCount, 1);
 });
 
 test('updates the total grade column header', function () {
   this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['total_grade']);
 });
 
@@ -2641,7 +2651,7 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
       { id: '2401', teacher_notes: true, hidden: true, title: 'Notes' },
       { id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes' }
     ];
-    this.gradebook.grid = {
+    this.gradebook.gradebookGrid.grid = {
       getColumns () {
         return [];
       },
@@ -2751,7 +2761,7 @@ QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
       context_id: '1201',
       teacher_notes: { id: '2401', teacher_notes: true, hidden: false }
     });
-    this.gradebook.grid = {
+    this.gradebook.gradebookGrid.grid = {
       getColumns () {
         return [];
       },
@@ -3302,46 +3312,37 @@ test('sets .cssClass using the id of the student', function () {
 QUnit.module('Gradebook#updateStudentRow', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.grid = {
-      invalidateRow: this.stub()
-    };
-    this.gradebook.rows = [{ id: '1101' }, { id: '1102' }, { id: '1103' }];
+    this.gradebook.gridData.rows = [{ id: '1101' }, { id: '1102' }, { id: '1103' }];
+    this.stub(this.gradebook.gradebookGrid, 'invalidateRow');
   }
 });
 
 test('updates the associated row with the given student', function () {
   const student = { id: '1102', name: 'Adam Jones' };
   this.gradebook.updateStudentRow(student);
-  strictEqual(this.gradebook.rows[1], student);
+  strictEqual(this.gradebook.gridData.rows[1], student);
 });
 
 test('invalidates the associated grid row', function () {
   this.gradebook.updateStudentRow({ id: '1102', name: 'Adam Jones' });
-  strictEqual(this.gradebook.grid.invalidateRow.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 1);
 });
 
 test('includes the row index when invalidating the grid row', function () {
   this.gradebook.updateStudentRow({ id: '1102', name: 'Adam Jones' });
-  const [row] = this.gradebook.grid.invalidateRow.lastCall.args;
+  const [row] = this.gradebook.gradebookGrid.invalidateRow.lastCall.args;
   strictEqual(row, 1);
 });
 
 test('does not update rows when the given student is not already included', function () {
   this.gradebook.updateStudentRow({ id: '1104', name: 'Dana Smith' });
-  equal(typeof this.gradebook.rows[-1], 'undefined');
-  deepEqual(this.gradebook.rows.map(row => row.id), ['1101', '1102', '1103']);
+  equal(typeof this.gradebook.gridData.rows[-1], 'undefined');
+  deepEqual(this.gradebook.gridData.rows.map(row => row.id), ['1101', '1102', '1103']);
 });
 
 test('does not invalidate rows when the given student is not already included', function () {
   this.gradebook.updateStudentRow({ id: '1104', name: 'Dana Smith' });
-  strictEqual(this.gradebook.grid.invalidateRow.callCount, 0);
-});
-
-test('does not invalidate rows when the grid is not defined', function () {
-  const invalidateRow = this.gradebook.grid.invalidateRow;
-  this.gradebook.grid = null;
-  this.gradebook.updateStudentRow({ id: '1102', name: 'Adam Jones' });
-  strictEqual(invalidateRow.callCount, 0);
+  strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 0);
 });
 
 QUnit.module('sortByStudentColumn', {
@@ -3351,48 +3352,48 @@ QUnit.module('sortByStudentColumn', {
 });
 
 test('sorts the gradebook rows', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Z' },
     { id: '4', sortable_name: 'A' }
   ];
   this.gradebook.sortByStudentColumn('sortable_name', 'ascending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.id, '4');
   strictEqual(secondRow.id, '3');
 });
 
 test('sorts the gradebook rows descending', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'A' },
     { id: '4', sortable_name: 'Z' }
   ];
   this.gradebook.sortByStudentColumn('sortable_name', 'descending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.id, '4');
   strictEqual(secondRow.id, '3');
 });
 
 test('sort gradebook rows by id when sortable names are the same', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '4', sortable_name: 'Same Name' },
     { id: '3', sortable_name: 'Same Name' }
   ];
   this.gradebook.sortByStudentColumn('sortable_name', 'ascending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.id, '3');
   strictEqual(secondRow.id, '4');
 });
 
 test('descending sort gradebook rows by id sortable names are the same and direction is descending', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Same Name' },
     { id: '4', sortable_name: 'Same Name' }
   ];
   this.gradebook.sortByStudentColumn('someProperty', 'descending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.id, '4');
   strictEqual(secondRow.id, '3');
@@ -3405,72 +3406,72 @@ QUnit.module('sortByCustomColumn', {
 });
 
 test('sorts the gradebook rows', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', custom_col_501: 'Z' },
     { id: '4', custom_col_501: 'A' }
   ];
   this.gradebook.sortByCustomColumn('custom_col_501', 'ascending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.custom_col_501, 'A');
   strictEqual(secondRow.custom_col_501, 'Z');
 });
 
 test('sorts the gradebook rows descending', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '4', custom_col_501: 'A' },
     { id: '3', custom_col_501: 'Z' }
   ];
   this.gradebook.sortByCustomColumn('custom_col_501', 'descending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.custom_col_501, 'Z');
   strictEqual(secondRow.custom_col_501, 'A');
 });
 
 test('sort gradebook rows by sortable_name when setting key is the same', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '4', sortable_name: 'Jones, Adam', custom_col_501: '42' },
     { id: '3', sortable_name: 'Ford, Betty', custom_col_501: '42' }
   ];
   this.gradebook.sortByCustomColumn('custom_col_501', 'ascending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.sortable_name, 'Ford, Betty');
   strictEqual(secondRow.sortable_name, 'Jones, Adam');
 });
 
 test('descending sort gradebook rows by sortable_name when setting key is the same and direction is descending', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Ford, Betty', custom_col_501: '42' },
     { id: '4', sortable_name: 'Jones, Adam', custom_col_501: '42' }
   ];
   this.gradebook.sortByCustomColumn('custom_col_501', 'descending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.sortable_name, 'Jones, Adam');
   strictEqual(secondRow.sortable_name, 'Ford, Betty');
 });
 
 test('sort gradebook rows by id when setting key and sortable name are the same', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '4', sortable_name: 'Same Name', custom_col_501: '42' },
     { id: '3', sortable_name: 'Same Name', custom_col_501: '42' }
   ];
   this.gradebook.sortByCustomColumn('custom_col_501', 'ascending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.id, '3');
   strictEqual(secondRow.id, '4');
 });
 
 test('descending sort gradebook rows by id when when setting key and sortable name are the same and direction is descending', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Same Name', custom_col_501: '42' },
     { id: '4', sortable_name: 'Same Name', custom_col_501: '42' }
   ];
   this.gradebook.sortByCustomColumn('custom_col_501', 'descending');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   strictEqual(firstRow.id, '4');
   strictEqual(secondRow.id, '3');
@@ -3857,8 +3858,8 @@ test('excludes assignments from other assignment groups when filtering by an ass
   deepEqual(_.map(assignments, 'id'), ['2302']);
 });
 
-QUnit.module('Gradebook Grid Events', function (hooks) {
-  hooks.beforeEach(function () {
+QUnit.module('Gradebook Grid Events', function (suiteHooks) {
+  suiteHooks.beforeEach(function () {
     $fixtures.innerHTML = `
       <div id="application">
         <span data-component="GridColor"></span>
@@ -3877,15 +3878,18 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
 
     this.gradebook = createGradebook();
     sinon.stub(this.gradebook, 'setVisibleGridColumns');
-    sinon.stub(this.gradebook, 'getVisibleGradeGridColumns').returns([]);
     sinon.stub(this.gradebook, 'onGridInit');
 
     this.gradebook.createGrid();
     this.gradebook.setHeaderComponentRef('student', this.studentColumnHeader);
   });
 
+  suiteHooks.afterEach(function () {
+    this.gradebook.destroy();
+  });
+
   this.triggerEvent = function (eventName, event, location) {
-    return this.gradebook.gridSupport.events[eventName].trigger(event, location);
+    return this.gradebook.gradebookGrid.gridSupport.events[eventName].trigger(event, location);
   };
 
   QUnit.module('onActiveLocationChanged', {
@@ -3895,7 +3899,7 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
   });
 
   test('sets focus on the student grades link when a "student" body cell becomes active', function () {
-    this.stub(this.gradebook.gridSupport.state, 'getActiveNode')
+    this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
     strictEqual(document.activeElement, this.$studentGradesLink);
@@ -3904,7 +3908,7 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
   test('does nothing when a "student" body cell without a student grades link becomes active', function () {
     const previousActiveElement = document.activeElement;
     $fixtures.querySelector('#example-gradebook-cell').innerHTML = 'Student Name';
-    this.stub(this.gradebook.gridSupport.state, 'getActiveNode')
+    this.stub(this.gradebook.gradebookGrid.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
     this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
     strictEqual(document.activeElement, previousActiveElement);
@@ -4040,6 +4044,62 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
     this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
     strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
   });
+
+  QUnit.module('onColumnsReordered', (hooks) => {
+    let gradebook;
+    let allColumns;
+    let columns;
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+      allColumns = [
+        { id: 'student' },
+        { id: 'custom_col_2401' },
+        { id: 'custom_col_2402' },
+        { id: 'assignment_2301' },
+        { id: 'assignment_2302' },
+        { id: 'assignment_group_2201' },
+        { id: 'assignment_group_2202' },
+        { id: 'total_grade' }
+      ];
+      columns = {
+        frozen: allColumns.slice(0, 3),
+        scrollable: allColumns.slice(3)
+      };
+
+      gradebook.gridData.columns.frozen = columns.frozen.map(column => column.id);
+      gradebook.gridData.columns.scrollable = columns.scrollable.map(column => column.id);
+
+      sinon.stub(gradebook, 'reorderCustomColumns').returns(Promise.resolve());
+      sinon.stub(gradebook, 'renderViewOptionsMenu');
+      sinon.stub(gradebook, 'updateColumnHeaders');
+      sinon.stub(gradebook, 'saveCustomColumnOrder');
+    });
+
+    test('reorders custom columns when frozen columns were reordered', () => {
+      columns.frozen = [allColumns[0], allColumns[2], allColumns[1]];
+      columns.scrollable = allColumns.slice(3, 8);
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.reorderCustomColumns.callCount, 1);
+    });
+
+    test('stores custom column order when scrollable columns were reordered', () => {
+      columns.frozen = allColumns.slice(0, 3);
+      columns.scrollable = [allColumns[7], ...allColumns.slice(3, 7)];
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.saveCustomColumnOrder.callCount, 1);
+    });
+
+    test('re-renders the View options menu', () => {
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.renderViewOptionsMenu.callCount, 1);
+    });
+
+    test('re-renders all column headers', () => {
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+    });
+  });
 });
 
 QUnit.module('Gradebook#onGridKeyDown', {
@@ -4158,12 +4218,12 @@ QUnit.module('Gradebook#updateColumnHeaders', {
       { type: 'total_grade' }
     ];
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
     };
-    this.gradebook.grid = {
+    this.gradebook.gradebookGrid.grid = {
       getColumns () {
         return columns;
       }
@@ -4173,13 +4233,13 @@ QUnit.module('Gradebook#updateColumnHeaders', {
 
 test('uses Grid Support to update the column headers', function () {
   this.gradebook.updateColumnHeaders();
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 QUnit.module('Gradebook#freezeTotalGradeColumn', {
   setupGradebook () {
     const gradebook = createGradebook();
-    gradebook.grid = {
+    gradebook.gradebookGrid.grid = {
       columns: [],
 
       getColumns () {
@@ -4190,11 +4250,10 @@ QUnit.module('Gradebook#freezeTotalGradeColumn', {
         this.columns = incomingColumns;
       },
 
-      setNumberOfColumnsToFreeze () {},
-
-      invalidate: sinon.stub()
+      setNumberOfColumnsToFreeze () {}
     };
 
+    this.stub(gradebook.gradebookGrid, 'invalidate');
     this.stub(gradebook, 'updateColumnHeaders');
 
     return gradebook;
@@ -4214,14 +4273,14 @@ test('re-renders column headers after reordering is done', function () {
 test('invalidates the grid, forcing a re-render', function () {
   this.gradebook.freezeTotalGradeColumn();
 
-  strictEqual(this.gradebook.grid.invalidate.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.invalidate.callCount, 1);
 });
 
 QUnit.module('Gradebook#listRowIndicesForStudentIds');
 
 test('returns a row index for each student id', function () {
   const gradebook = createGradebook();
-  gradebook.rows = [
+  gradebook.gridData.rows = [
     { id: '1101' },
     { id: '1102' },
     { id: '1103' },
@@ -4239,11 +4298,11 @@ QUnit.module('Gradebook#updateRowCellsForStudentIds', {
       { id: 'assignment_group_12', type: 'assignment' }
     ];
     this.gradebook = createGradebook();
-    this.gradebook.rows = [
+    this.gradebook.gridData.rows = [
       { id: '1101' },
       { id: '1102' }
     ];
-    this.gradebook.grid = {
+    this.gradebook.gradebookGrid.grid = {
       updateCell: this.stub(),
       getColumns () { return columns },
     };
@@ -4252,28 +4311,28 @@ QUnit.module('Gradebook#updateRowCellsForStudentIds', {
 
 test('updates cells for each column', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101']);
-  strictEqual(this.gradebook.grid.updateCell.callCount, 4, 'called once per column');
+  strictEqual(this.gradebook.gradebookGrid.grid.updateCell.callCount, 4, 'called once per column');
 });
 
 test('includes the row index of the student when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1102']);
-  const rows = _.map(this.gradebook.grid.updateCell.args, args => args[0]); // get the first arg of each call
+  const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[0]); // get the first arg of each call
   deepEqual(rows, [1, 1, 1, 1], 'each call specified row 1 (student 1102)');
 });
 
 test('includes the index of each column when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101', '1102']);
-  const rows = _.map(this.gradebook.grid.updateCell.args, args => args[1]); // get the first arg of each call
+  const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[1]); // get the first arg of each call
   deepEqual(rows, [0, 1, 2, 3, 0, 1, 2, 3]);
 });
 
 test('updates row cells for each student', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101', '1102']);
-  strictEqual(this.gradebook.grid.updateCell.callCount, 8, 'called once per student, per column');
+  strictEqual(this.gradebook.gradebookGrid.grid.updateCell.callCount, 8, 'called once per student, per column');
 });
 
 test('has no effect when the grid has not been initialized', function () {
-  this.gradebook.grid = null;
+  this.gradebook.gradebookGrid.grid = null;
   this.gradebook.updateRowCellsForStudentIds(['1101']);
   ok(true, 'no error was thrown');
 });
@@ -4281,43 +4340,41 @@ test('has no effect when the grid has not been initialized', function () {
 QUnit.module('Gradebook#invalidateRowsForStudentIds', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.rows = [
+    this.gradebook.gridData.rows = [
       { id: '1101' },
       { id: '1102' }
     ];
-    this.gradebook.grid = {
-      invalidateRow: this.stub(),
-      render: this.stub()
-    };
+    this.stub(this.gradebook.gradebookGrid, 'invalidateRow');
+    this.stub(this.gradebook.gradebookGrid, 'render');
   }
 });
 
 test('invalidates each student row', function () {
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102']);
-  strictEqual(this.gradebook.grid.invalidateRow.callCount, 2, 'called once per student row');
+  strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 2, 'called once per student row');
 });
 
 test('includes the row index of the student when invalidating', function () {
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102']);
-  const rows = _.map(this.gradebook.grid.invalidateRow.args, args => args[0]); // get the first arg of each call
+  const rows = _.map(this.gradebook.gradebookGrid.invalidateRow.args, args => args[0]); // get the first arg of each call
   deepEqual(rows, [0, 1]);
 });
 
 test('re-renders the grid after invalidating', function () {
-  this.gradebook.grid.render.callsFake(() => {
-    strictEqual(this.gradebook.grid.invalidateRow.callCount, 2, 'both rows have already been validated');
+  this.gradebook.gradebookGrid.render.callsFake(() => {
+    strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 2, 'both rows have already been validated');
   });
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102']);
 });
 
 test('does not invalidate rows for students not included', function () {
   this.gradebook.invalidateRowsForStudentIds(['1102']);
-  strictEqual(this.gradebook.grid.invalidateRow.callCount, 1, 'called once');
-  strictEqual(this.gradebook.grid.invalidateRow.lastCall.args[0], 1, 'called for the row (1) of student 1102');
+  strictEqual(this.gradebook.gradebookGrid.invalidateRow.callCount, 1, 'called once');
+  strictEqual(this.gradebook.gradebookGrid.invalidateRow.lastCall.args[0], 1, 'called for the row (1) of student 1102');
 });
 
 test('has no effect when the grid has not been initialized', function () {
-  this.gradebook.grid = null;
+  this.gradebook.gradebookGrid.grid = null;
   this.gradebook.invalidateRowsForStudentIds(['1101']);
   ok(true, 'no error was thrown');
 });
@@ -4325,8 +4382,10 @@ test('has no effect when the grid has not been initialized', function () {
 QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
   setupGradebook () {
     const gradebook = createGradebook();
-    gradebook.grid = {
+    gradebook.gradebookGrid.grid = {
       columns: [],
+
+      destroy () {},
 
       getColumns () {
         return this.columns;
@@ -4336,11 +4395,9 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
         this.columns = incomingColumns;
       },
 
-      setNumberOfColumnsToFreeze () {},
-
-      invalidate: sinon.stub()
+      setNumberOfColumnsToFreeze () {}
     };
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       columns: {
         getColumns () {
           return {
@@ -4348,9 +4405,12 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
             scrollable: []
           }
         }
-      }
+      },
+
+      destroy () {}
     };
 
+    this.stub(gradebook.gradebookGrid, 'invalidate');
     this.stub(gradebook, 'updateColumnHeaders');
 
     return gradebook;
@@ -4358,6 +4418,10 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
 
   setup () {
     this.gradebook = this.setupGradebook();
+  },
+
+  teardown () {
+    this.gradebook.destroy();
   }
 });
 
@@ -4370,7 +4434,19 @@ test('re-renders column headers after reordering is done', function () {
 test('invalidates the grid, forcing a re-render', function () {
   this.gradebook.moveTotalGradeColumnToEnd();
 
-  strictEqual(this.gradebook.grid.invalidate.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.invalidate.callCount, 1);
+});
+
+QUnit.module('Gradebook Rows', function () {
+  QUnit.module('#buildRows', function () {
+    test('invalidates the grid', function () {
+      const gradebook = createGradebook();
+      sinon.spy(gradebook.gradebookGrid, 'invalidate');
+      gradebook.buildRows();
+      strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1);
+      gradebook.destroy();
+    });
+  });
 });
 
 QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
@@ -4431,6 +4507,7 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
   });
 
   hooks.afterEach(function () {
+    this.gradebook.destroy();
     $fixtures.innerHTML = '';
   });
 
@@ -4557,7 +4634,7 @@ test('sorts the grid rows after updating the setting', function () {
 QUnit.module('Gradebook#sortRowsWithFunction', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.rows = [
+    this.gradebook.gridData.rows = [
       { id: '3', sortable_name: 'Z Lastington', someProperty: false },
       { id: '4', sortable_name: 'A Firstington', someProperty: true }
     ];
@@ -4568,12 +4645,12 @@ QUnit.module('Gradebook#sortRowsWithFunction', {
 test('returns two objects in the rows collection', function () {
   this.gradebook.sortRowsWithFunction(this.sortFn);
 
-  equal(this.gradebook.rows.length, 2);
+  equal(this.gradebook.gridData.rows.length, 2);
 });
 
 test('sorts with a passed in function', function () {
   this.gradebook.sortRowsWithFunction(this.sortFn);
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '4', 'when fn is true, order first');
   equal(secondRow.id, '3', 'when fn is false, order second');
@@ -4581,7 +4658,7 @@ test('sorts with a passed in function', function () {
 
 test('sorts by descending when asc is false', function () {
   this.gradebook.sortRowsWithFunction(this.sortFn, { asc: false });
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '3', 'when fn is false, order first');
   equal(secondRow.id, '4', 'when fn is true, order second');
@@ -4589,10 +4666,10 @@ test('sorts by descending when asc is false', function () {
 
 test('relies on localeSort when rows have equal sorting criteria results', function () {
   const value = 0;
-  this.gradebook.rows[0].someProperty = value;
-  this.gradebook.rows[1].someProperty = value;
+  this.gradebook.gridData.rows[0].someProperty = value;
+  this.gradebook.gridData.rows[1].someProperty = value;
   this.gradebook.sortRowsWithFunction(this.sortFn);
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.sortable_name, 'A Firstington', 'A Firstington sorts first');
   equal(secondRow.sortable_name, 'Z Lastington', 'Z Lastington sorts second');
@@ -4600,13 +4677,13 @@ test('relies on localeSort when rows have equal sorting criteria results', funct
 
 test('relies on idSort when rows have equal sorting criteria and the same sortable name', function () {
   const value = 0;
-  this.gradebook.rows[0].someProperty = value;
-  this.gradebook.rows[1].someProperty = value;
+  this.gradebook.gridData.rows[0].someProperty = value;
+  this.gradebook.gridData.rows[1].someProperty = value;
   const name = 'Same Name';
-  this.gradebook.rows[0].sortable_name = name;
-  this.gradebook.rows[1].sortable_name = name;
+  this.gradebook.gridData.rows[0].sortable_name = name;
+  this.gradebook.gridData.rows[1].sortable_name = name;
   this.gradebook.sortRowsWithFunction(this.sortFn);
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '3', 'lower id sorts first');
   equal(secondRow.id, '4', 'higher id sorts second');
@@ -4614,13 +4691,13 @@ test('relies on idSort when rows have equal sorting criteria and the same sortab
 
 test('relies on descending idSort when rows have equal sorting criteria and the same sortable name', function () {
   const value = 0;
-  this.gradebook.rows[0].someProperty = value;
-  this.gradebook.rows[1].someProperty = value;
+  this.gradebook.gridData.rows[0].someProperty = value;
+  this.gradebook.gridData.rows[1].someProperty = value;
   const name = 'Same Name';
-  this.gradebook.rows[0].sortable_name = name;
-  this.gradebook.rows[1].sortable_name = name;
+  this.gradebook.gridData.rows[0].sortable_name = name;
+  this.gradebook.gridData.rows[1].sortable_name = name;
   this.gradebook.sortRowsWithFunction(this.sortFn, { asc: false });
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '4', 'higher id sorts first');
   equal(secondRow.id, '3', 'lower id sorts second');
@@ -4629,7 +4706,7 @@ test('relies on descending idSort when rows have equal sorting criteria and the 
 QUnit.module('Gradebook#missingSort', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.rows = [
+    this.gradebook.gridData.rows = [
       { id: '3', sortable_name: 'Z Lastington', assignment_201: { missing: false }},
       { id: '4', sortable_name: 'A Firstington', assignment_201: { missing: true }}
     ];
@@ -4638,21 +4715,21 @@ QUnit.module('Gradebook#missingSort', {
 
 test('sorts by missing', function () {
   this.gradebook.missingSort('assignment_201');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '4', 'when missing is true, order first');
   equal(secondRow.id, '3', 'when missing is false, order second');
 });
 
 test('relies on localeSort when rows have equal sorting criteria results', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '1', sortable_name: 'Z Last Graded', assignment_201: { missing: false }},
     { id: '3', sortable_name: 'Z Last Missing', assignment_201: { missing: true }},
     { id: '2', sortable_name: 'A First Graded', assignment_201: { missing: false }},
     { id: '4', sortable_name: 'A First Missing', assignment_201: { missing: true }}
   ];
   this.gradebook.missingSort('assignment_201');
-  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.rows;
+  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.sortable_name, 'A First Missing', 'A First Missing sorts first');
   equal(secondRow.sortable_name, 'Z Last Missing', 'Z Last Missing sorts second');
@@ -4661,14 +4738,14 @@ test('relies on localeSort when rows have equal sorting criteria results', funct
 });
 
 test('relies on id sorting when rows have equal sorting criteria results and same sortable name', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '2', sortable_name: 'Student Name', assignment_201: { missing: true }},
     { id: '3', sortable_name: 'Student Name', assignment_201: { missing: true }},
     { id: '4', sortable_name: 'Student Name', assignment_201: { missing: true }},
     { id: '1', sortable_name: 'Student Name', assignment_201: { missing: true }}
   ];
   this.gradebook.missingSort('assignment_201');
-  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.rows;
+  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '1');
   equal(secondRow.id, '2');
@@ -4680,12 +4757,12 @@ test('when no submission is found, it is missing', function () {
   // Since SubmissionStateMap always creates an assignment key even when there
   // is no corresponding submission, the correct way to test this is to have a
   // key for the assignment with a missing criteria key
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Z Lastington', assignment_201: { missing: false }},
     { id: '4', sortable_name: 'A Firstington', assignment_201: {} }
   ];
   this.gradebook.lateSort('assignment_201');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '4', 'missing assignment sorts first');
   equal(secondRow.id, '3', 'graded assignment sorts second');
@@ -4694,7 +4771,7 @@ test('when no submission is found, it is missing', function () {
 QUnit.module('Gradebook#lateSort', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.rows = [
+    this.gradebook.gridData.rows = [
       { id: '3', sortable_name: 'Z Lastington', assignment_201: { late: false }},
       { id: '4', sortable_name: 'A Firstington', assignment_201: { late: true }}
     ];
@@ -4703,21 +4780,21 @@ QUnit.module('Gradebook#lateSort', {
 
 test('sorts by late', function () {
   this.gradebook.lateSort('assignment_201');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '4', 'when late is true, order first');
   equal(secondRow.id, '3', 'when late is false, order second');
 });
 
 test('relies on localeSort when rows have equal sorting criteria results', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '1', sortable_name: 'Z Last Not Late', assignment_201: { late: false }},
     { id: '3', sortable_name: 'Z Last Late', assignment_201: { late: true }},
     { id: '2', sortable_name: 'A First Not Late', assignment_201: { late: false }},
     { id: '4', sortable_name: 'A First Late', assignment_201: { late: true }}
   ];
   this.gradebook.lateSort('assignment_201');
-  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.rows;
+  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.sortable_name, 'A First Late', 'A First Late sorts first');
   equal(secondRow.sortable_name, 'Z Last Late', 'Z Last Late sorts second');
@@ -4726,14 +4803,14 @@ test('relies on localeSort when rows have equal sorting criteria results', funct
 });
 
 test('relies on id sort when rows have equal sorting criteria results and the same sortable name', function () {
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '4', sortable_name: 'Student Name', assignment_201: { late: true }},
     { id: '3', sortable_name: 'Student Name', assignment_201: { late: true }},
     { id: '2', sortable_name: 'Student Name', assignment_201: { late: true }},
     { id: '1', sortable_name: 'Student Name', assignment_201: { late: true }}
   ];
   this.gradebook.lateSort('assignment_201');
-  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.rows;
+  const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '1');
   equal(secondRow.id, '2');
@@ -4745,12 +4822,12 @@ test('when no submission is found, it is not late', function () {
   // Since SubmissionStateMap always creates an assignment key even when there
   // is no corresponding submission, the correct way to test this is to have a
   // key for the assignment with a missing criteria key (e.g. `late`)
-  this.gradebook.rows = [
+  this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Z Lastington', assignment_201: {}},
     { id: '4', sortable_name: 'A Firstington', assignment_201: { late: true }}
   ];
   this.gradebook.lateSort('assignment_201');
-  const [firstRow, secondRow] = this.gradebook.rows;
+  const [firstRow, secondRow] = this.gradebook.gridData.rows;
 
   equal(firstRow.id, '4', 'when late is true, order first');
   equal(secondRow.id, '3', 'when no submission is found, order second');
@@ -4805,7 +4882,7 @@ test('returns array including multiple values when settings are on', function ()
 QUnit.module('Gradebook#toggleEnrollmentFilter', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -4831,12 +4908,12 @@ test('saves settings', function () {
 
 test('updates the student column header', function () {
   this.gradebook.toggleEnrollmentFilter('inactive');
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.toggleEnrollmentFilter('inactive');
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['student']);
 });
 
@@ -4854,10 +4931,10 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
       2301: { id: '2301', grading_type: 'points', name: 'Math Assignment', published: true },
       2302: { id: '2302', grading_type: 'points', name: 'English Assignment', published: false }
     });
-    gradebook.grid = {
+    gradebook.gradebookGrid.grid = {
       invalidate () {}
     };
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders () {}
       }
@@ -4928,8 +5005,8 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
   QUnit.module('#updateEnterGradesAsSetting', function (hooks) {
     hooks.beforeEach(function () {
       sinon.stub(gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
-      sinon.stub(gradebook.grid, 'invalidate');
-      sinon.stub(gradebook.gridSupport.columns, 'updateColumnHeaders');
+      sinon.stub(gradebook.gradebookGrid, 'invalidate');
+      sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders');
     });
 
     hooks.afterEach(function () {
@@ -4955,32 +5032,32 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
 
     test('updates the column header for the related assignment column', function () {
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
-      strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+      strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
     });
 
     test('updates the column header with the assignment column id', function () {
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
-      const [columnIds] = gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+      const [columnIds] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
       deepEqual(columnIds, ['assignment_2301']);
     });
 
     test('updates the column header after settings have been saved', function () {
       gradebook.saveSettings.callsFake((_data, callback) => {
-        strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 0);
+        strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 0);
         callback();
-        strictEqual(gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+        strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
       });
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
     });
 
     test('invalidates the grid', function () {
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
-      strictEqual(gradebook.grid.invalidate.callCount, 1);
+      strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1);
     });
 
     test('invalidates the grid after updating the column header', function () {
-      gradebook.grid.invalidate.callsFake(() => {
-        strictEqual(gradebook.grid.invalidate.callCount, 1);
+      gradebook.gradebookGrid.invalidate.callsFake(() => {
+        strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1);
       });
       gradebook.updateEnterGradesAsSetting('2301', 'percent');
     });
@@ -5286,20 +5363,8 @@ QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks)
 
   hooks.beforeEach(function () {
     gradebook = createGradebook();
-
-    let gridColumns;
-    gradebook.grid = {
-      getColumns () {
-        return gridColumns;
-      },
-
-      setColumns (columns) {
-        gridColumns = columns;
-      }
-    };
-
+    sinon.stub(gradebook.gradebookGrid, 'updateColumns');
     sinon.stub(gradebook, 'setVisibleGridColumns');
-    sinon.stub(gradebook, 'getVisibleGradeGridColumns').returns([{ id: 'student' }, { id: 'total_grade' }]);
     sinon.stub(gradebook, 'updateColumnHeaders');
     sinon.stub(gradebook, 'renderViewOptionsMenu');
   });
@@ -5311,7 +5376,14 @@ QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks)
 
   test('sets the columns on the grid', function () {
     gradebook.updateColumnsAndRenderViewOptionsMenu();
-    deepEqual(gradebook.grid.getColumns().map(column => column.id), ['student', 'total_grade']);
+    strictEqual(gradebook.gradebookGrid.updateColumns.callCount, 1);
+  });
+
+  test('sets the columns after updating the grid', function () {
+    gradebook.gradebookGrid.updateColumns.callsFake(() => {
+      strictEqual(gradebook.setVisibleGridColumns.callCount, 1, 'setVisibleGridColumns was already called');
+    });
+    gradebook.updateColumnsAndRenderViewOptionsMenu();
   });
 
   test('calls updateColumnHeaders', function () {
@@ -5536,7 +5608,7 @@ QUnit.module('Gradebook#arrangeColumnsBy', {
   setup () {
     this.gradebook = createGradebook();
     this.gradebook.makeColumnSortFn = () => () => 1;
-    this.gradebook.grid = {
+    this.gradebook.gradebookGrid.grid = {
       getColumns () { return []; },
       getOptions () {
         return {
@@ -5557,66 +5629,6 @@ test('renders the view options menu', function () {
   this.gradebook.arrangeColumnsBy({ sortBy: 'due_date', direction: 'ascending' }, false);
 
   strictEqual(this.gradebook.renderViewOptionsMenu.callCount, 1);
-});
-
-QUnit.module('Gradebook#onColumnsReordered', function (hooks) {
-  let gradebook;
-  let columns;
-  let numberOfColumnsToFreeze;
-
-  hooks.beforeEach(function () {
-    gradebook = createGradebook();
-    columns = [
-      { id: 'student' },
-      { id: 'custom_col_2401' },
-      { id: 'custom_col_2402' },
-      { id: 'assignment_2301' },
-      { id: 'assignment_2302' },
-      { id: 'assignment_group_2201' },
-      { id: 'assignment_group_2202' },
-      { id: 'total_grade' }
-    ];
-    numberOfColumnsToFreeze = 3;
-    gradebook.grid = {
-      getColumns () {
-        return columns;
-      },
-      getOptions () {
-        return {
-          numberOfColumnsToFreeze
-        }
-      }
-    }
-    gradebook.gradebookGrid.columns.frozen = columns.slice(0, numberOfColumnsToFreeze).map(column => column.id);
-    gradebook.gradebookGrid.columns.scrollable = columns.slice(numberOfColumnsToFreeze).map(column => column.id);
-
-    sinon.stub(gradebook, 'reorderCustomColumns').returns(Promise.resolve());
-    sinon.stub(gradebook, 'renderViewOptionsMenu');
-    sinon.stub(gradebook, 'updateColumnHeaders');
-    sinon.stub(gradebook, 'storeCustomColumnOrder');
-  });
-
-  test('reorders custom columns when frozen columns were reordered', function () {
-    columns = [columns[0], columns[2], columns[1], ...columns.slice(3, 8)];
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.reorderCustomColumns.callCount, 1);
-  });
-
-  test('stores custom column order when scrollable columns were reordered', function () {
-    columns = [...columns.slice(0, 3), columns[7], ...columns.slice(3, 7)];
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.storeCustomColumnOrder.callCount, 1);
-  });
-
-  test('re-renders the View options menu', function () {
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.renderViewOptionsMenu.callCount, 1);
-  });
-
-  test('re-renders all column headers', function () {
-    gradebook.onColumnsReordered();
-    strictEqual(gradebook.updateColumnHeaders.callCount, 1);
-  });
 });
 
 QUnit.module('Gradebook#updateCurrentGradingPeriod', {
@@ -6081,7 +6093,7 @@ test('returns the current_grading_period_id when set and the "filter columns by"
 QUnit.module('Gradebook#setSelectedPrimaryInfo', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -6112,19 +6124,19 @@ test('re-renders the grid unless asked not to do it', function () {
 test('updates the student column header', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false);
 
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false);
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['student']);
 });
 
 QUnit.module('Gradebook#setSelectedSecondaryInfo', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -6155,12 +6167,12 @@ test('re-renders the grid unless asked not to do it', function () {
 test('updates the student column header', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false);
 
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the "student" column id when updating column headers', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false);
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds, ['student']);
 });
 
@@ -6207,7 +6219,7 @@ QUnit.module('Gradebook#onGridBlur', {
     `;
 
     this.gradebook = createGradebook();
-    this.gradebook.rows = [{ id: '1101' }];
+    this.gradebook.gridData.rows = [{ id: '1101' }];
     const students = [{
       enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }],
       id: '1101',
@@ -6233,11 +6245,12 @@ QUnit.module('Gradebook#onGridBlur', {
       }
     });
     this.gradebook.initGrid();
-    this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
-    this.spy(this.gradebook.gridSupport.state, 'blur');
+    this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
+    this.spy(this.gradebook.gradebookGrid.gridSupport.state, 'blur');
   },
 
   teardown () {
+    this.gradebook.destroy();
     $fixtures.innerHTML = '';
   }
 });
@@ -6257,20 +6270,20 @@ test('does not close grid details tray when not open', function () {
 
 test('blurs the grid when clicking off grid cells', function () {
   this.gradebook.onGridBlur({ target: document.body });
-  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 1);
 });
 
 test('does not blur the grid when clicking on the active cell', function () {
-  const $activeNode = this.gradebook.gridSupport.state.getActiveNode();
+  const $activeNode = this.gradebook.gradebookGrid.gridSupport.state.getActiveNode();
   this.gradebook.onGridBlur({ target: $activeNode });
-  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 0);
 });
 
 test('does not blur the grid when clicking on another grid cell', function () {
-  const $activeNode = this.gradebook.gridSupport.state.getActiveNode();
-  this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 1, row: 0 });
+  const $activeNode = this.gradebook.gradebookGrid.gridSupport.state.getActiveNode();
+  this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 1, row: 0 });
   this.gradebook.onGridBlur({ target: $activeNode });
-  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.state.blur.callCount, 0);
 });
 
 QUnit.module('GridColor', {
@@ -6291,7 +6304,6 @@ QUnit.module('GridColor', {
 test('is rendered on init', function () {
   const gradebook = createGradebook();
   const renderGridColorStub = this.stub(gradebook, 'renderGridColor');
-  this.stub(gradebook, 'getVisibleGradeGridColumns').returns([]);
   this.stub(gradebook, 'onGridInit');
   gradebook.initGrid();
   ok(renderGridColorStub.called);
@@ -6339,11 +6351,11 @@ QUnit.module('Gradebook#updateSubmissionsFromExternal', {
       setSubmissionCellState () {},
       getSubmissionState () { return { locked: false } }
     };
-    this.gradebook.grid = {
+    this.gradebook.gradebookGrid.grid = {
       updateCell: this.stub(),
       getColumns () { return columns },
     };
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       columns: {
         updateColumnHeaders: this.stub()
       }
@@ -6379,7 +6391,7 @@ test('updates column headers', function () {
     { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true }
   ];
   this.gradebook.updateSubmissionsFromExternal(submissions);
-  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('includes the column ids for related assignments when updating column headers', function () {
@@ -6389,7 +6401,7 @@ test('includes the column ids for related assignments when updating column heade
     { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
   ];
   this.gradebook.updateSubmissionsFromExternal(submissions);
-  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
   deepEqual(columnIds.sort(), ['assignment_201', 'assignment_202']);
 });
 
@@ -6420,7 +6432,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
         ]
       }
     };
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -6638,7 +6650,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         ]
       }
     };
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -6750,7 +6762,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
       }
     };
     sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]));
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -6776,7 +6788,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('does not show the previous student arrow for the first student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6785,7 +6797,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('shows the next student arrow for the first student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 0 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6794,7 +6806,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('does not show the next student arrow for the last student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6803,7 +6815,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('shows the previous student arrow for the last student', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 2 });
     gradebook.setSubmissionTrayState(true, '1101', '2301');
     gradebook.renderSubmissionTray(gradebook.student('1101'));
     clock.tick(500); // wait for Tray to transition open
@@ -6812,7 +6824,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('clicking the next student arrow calls loadTrayStudent with "next"', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
     sinon.stub(gradebook, 'loadTrayStudent');
     sinon.stub(gradebook, 'getCommentsUpdating').returns(false);
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true);
@@ -6827,7 +6839,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
   });
 
   test('clicking the previous student arrow calls loadTrayStudent with "previous"', function () {
-    gradebook.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
+    gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({ region: 'body', cell: 0, row: 1 });
     sinon.stub(gradebook, 'loadTrayStudent');
     sinon.stub(gradebook, 'getCommentsUpdating').returns(false);
     sinon.stub(gradebook, 'getSubmissionCommentsLoaded').returns(true);
@@ -6869,7 +6881,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
 
   hooks.beforeEach(() => {
     gradebook = createGradebook();
-    gradebook.gridSupport = {
+    gradebook.gradebookGrid.gridSupport = {
       state: {
         getActiveLocation: () => ({ region: 'body', cell: 0, row: 1 }),
         setActiveLocation: sinon.stub()
@@ -6910,7 +6922,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
     gradebook.loadTrayStudent('previous');
 
     const expectation = ['body', { cell: 0, row: 0}];
-    deepEqual(gradebook.gridSupport.state.setActiveLocation.firstCall.args, expectation);
+    deepEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args, expectation);
   });
 
   test('when called with "previous", updates the submission tray state', function () {
@@ -6933,14 +6945,14 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "previous" while on the first row, does not change the highlighted cell', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
     gradebook.loadTrayStudent('previous');
 
-    strictEqual(gradebook.gridSupport.state.setActiveLocation.callCount, 0);
+    strictEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount, 0);
   });
 
   test('when called with "previous" while on the first row, does not update the submission tray state', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
     sinon.stub(gradebook, 'setSubmissionTrayState');
     gradebook.loadTrayStudent('previous');
 
@@ -6948,7 +6960,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "previous" while on the first row, does not update and render the submission tray', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 0 });
     gradebook.loadTrayStudent('previous');
 
     strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0);
@@ -6958,7 +6970,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
     gradebook.loadTrayStudent('next');
 
     const expectation = ['body', { cell: 0, row: 2}];
-    deepEqual(gradebook.gridSupport.state.setActiveLocation.firstCall.args, expectation);
+    deepEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.firstCall.args, expectation);
   });
 
   test('when called with "next", updates the submission tray state', function () {
@@ -6981,14 +6993,14 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "next" while on the last row, does not change the highlighted cell', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
     gradebook.loadTrayStudent('next');
 
-    strictEqual(gradebook.gridSupport.state.setActiveLocation.callCount, 0);
+    strictEqual(gradebook.gradebookGrid.gridSupport.state.setActiveLocation.callCount, 0);
   });
 
   test('when called with "next" while on the last row, does not update the submission tray state', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
     sinon.stub(gradebook, 'setSubmissionTrayState');
     gradebook.loadTrayStudent('next');
 
@@ -6996,7 +7008,7 @@ QUnit.module('Gradebook#loadTrayStudent', function (hooks) {
   });
 
   test('when called with "next" while on the last row, does not update and render the submission tray', function () {
-    sinon.stub(gradebook.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
+    sinon.stub(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation').returns({ region: 'body', cell: 0, row: 2 });
     gradebook.loadTrayStudent('next');
 
     strictEqual(gradebook.updateRowAndRenderSubmissionTray.callCount, 0);
@@ -7035,7 +7047,7 @@ test('renders the submission tray', function () {
 QUnit.module('Gradebook#toggleSubmissionTrayOpen', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {}
@@ -7070,9 +7082,9 @@ QUnit.module('Gradebook#closeSubmissionTray', {
   setup () {
     this.gradebook = createGradebook();
     this.activeStudentId = '1101';
-    this.gradebook.rows = [{ id: this.activeStudentId }];
-    this.gradebook.grid = { getActiveCell () { return { row: 0 } } };
-    this.gradebook.gridSupport = {
+    this.gradebook.gridData.rows = [{ id: this.activeStudentId }];
+    this.gradebook.gradebookGrid.grid = { getActiveCell () { return { row: 0 } } };
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit () {},
         focus () {},
@@ -7101,15 +7113,15 @@ test('calls updateRowAndRenderSubmissionTray with the student id for the active 
 });
 
 test('puts the active grid cell back into "editing" mode', function () {
-  this.stub(this.gradebook.gridSupport.helper, 'beginEdit');
+  this.stub(this.gradebook.gradebookGrid.gridSupport.helper, 'beginEdit');
   this.gradebook.closeSubmissionTray();
-  strictEqual(this.gradebook.gridSupport.helper.beginEdit.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.beginEdit.callCount, 1);
 });
 
 QUnit.module('Gradebook#setSubmissionTrayState', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit: this.stub(),
         focus: this.stub()
@@ -7135,12 +7147,12 @@ test('sets the state of the submission tray', function () {
 
 test('puts cell in view mode when tray is opened', function () {
   this.gradebook.setSubmissionTrayState(true, '1', '2');
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 1);
 });
 
 test('does not put cell in view mode when tray is closed', function () {
   this.gradebook.setSubmissionTrayState(false, '1', '2');
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 0);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 0);
 });
 
 QUnit.module('Gradebook#getSubmissionTrayState', {

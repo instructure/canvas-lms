@@ -28,7 +28,7 @@ QUnit.module('AssignmentRowCellPropFactory#getProps', {
     setFixtureHtml(fixture);
     this.assignment = { id: '2301' };
     this.gradebook = createGradebook({ context_id: '1201' });
-    this.gradebook.gridSupport = {
+    this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit: this.stub(),
         focus: this.stub()
@@ -67,7 +67,7 @@ test('onToggleSubmissionTrayOpen cancels current cell edit', function () {
   const props = this.factory.getProps(this.student);
   this.stub(this.gradebook, 'renderSubmissionTray');
   props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
+  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 1);
 });
 
 test('isSubmissionTrayOpen is true if the tray is open for the cell', function () {

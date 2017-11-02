@@ -58,10 +58,6 @@ $gradebook_cell_padding_top: 8px;
   height: $row-height - 4px;
 }
 
-.slick-row.active .slick-cell.primary-column {
-  background-color: $ic-bg-light-primary;
-}
-
 .container_0,
 .container_1 {
   .slick-header.ui-state-default { // header container with full width of grid
@@ -214,9 +210,6 @@ $gradebook_cell_padding_top: 8px;
 
   &.hovered-column, // an element in the column is being hovered
   &.slick-header-column-active, // the column is being dragged or resized
-  &.ui-state-hover {
-    background-color: $ic-bg-light-primary;
-  }
   .slick-column-name {
     font-weight: bold;
     color: #2f2a34;
@@ -406,10 +399,6 @@ $gradebook_cell_padding_top: 8px;
   padding-top: 5px;
   padding-bottom: 55px;
   margin-bottom: -50px;
-}
-
-.slick-cell.completely-hidden {
-  display: none;
 }
 
 .container_1 .slick-cell:last-child .gradebook-tooltip {
