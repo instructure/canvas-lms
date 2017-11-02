@@ -22,7 +22,6 @@ services:
       - quizzes_tmp:/usr/src/app/client_apps/canvas_quizzes/tmp
       - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
       - styleguide:/usr/src/app/app/views/info
-      - stylesheets:/usr/src/app/app/stylesheets
       - tmp:/usr/src/app/tmp
       - translations:/usr/src/app/public/javascripts/translations
       - yardoc:/usr/src/app/.yardoc
@@ -63,7 +62,6 @@ volumes:
   quizzes_tmp: {}
   selinimum_node_modules: {}
   styleguide: {}
-  stylesheets: {}
   tmp: {}
   translations: {}
   yardoc: {}
