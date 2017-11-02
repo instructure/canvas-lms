@@ -1,19 +1,32 @@
-# See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
-version: '2'
+---
+version: "2"
+networks:
+  default: ~
 services:
-  web: &WEB
-    build:
-      context: .
-    links:
-      - postgres
-      - redis
-
   jobs:
-    <<: *WEB
-    command: bundle exec script/delayed_job run
-
+    build:
+      context: "."
+    command: "bundle exec script/delayed_job run"
+    networks:
+      default:
+        aliases:
+          - jobs
   postgres:
     build: ./docker-compose/postgres
-
+    networks:
+      default:
+        aliases:
+          - postgres
   redis:
-    image: redis:alpine
+    image: "redis:alpine"
+    networks:
+      default:
+        aliases:
+          - redis
+  web:
+    build:
+      context: "."
+    networks:
+      default:
+        aliases:
+          - web
