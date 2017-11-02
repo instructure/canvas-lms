@@ -88,3 +88,13 @@ test('Shows delete overlay if isBeingDeleted is true', () => {
     'shows delete overlay heading'
   )
 })
+
+test('Shows tooltip if there are multiple cards of the same theme', () => {
+  const wrapperWithoutDuplicates = shallow(<ThemeCard {...props} />)
+  notOk(wrapperWithoutDuplicates.find('.Button--icon-active-rev').exists())
+
+  props.showMultipleCurrentThemesMessage = true
+  props.isActiveBrandConfig = true
+  const wrapper = shallow(<ThemeCard {...props} />)
+  ok(wrapper.find('.Button--icon-action-rev[data-tooltip][title]').exists())
+})
