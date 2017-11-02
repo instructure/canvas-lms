@@ -739,4 +739,24 @@ describe Group do
       expect(@group.submissions_folder).to eq f
     end
   end
+
+  describe 'participating_users_in_context' do
+    before :once do
+      context = course_model
+      @group = Group.create(:name => "group1", :context => context)
+      @group.add_user(@user)
+      @user.enrollments.first.deactivate
+    end
+
+    it "filter inactive users if requested" do
+      users = @group.participating_users_in_context
+      expect(users.length).to eq 0
+    end
+
+    it "don't filter inactive users if not requested" do
+      users = @group.participating_users_in_context(include_inactive_users: true)
+      expect(users.length).to eq 1
+      expect(users.first.id).to eq @user.id
+    end
+  end
 end

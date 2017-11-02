@@ -29,6 +29,7 @@ define [
 
     @optionProperty 'category'
     @optionProperty 'loadAll'
+    @optionProperty 'markInactiveStudents'
 
     _defaultUrl: ->
       if @forCourse

@@ -51,7 +51,10 @@ define [
       , 1000
 
     toJSON: ->
-      Object.assign {groupId: @model.get('group')?.id}, this, super
+      result = Object.assign {groupId: @model.get('group')?.id}, this, super
+      result.shouldMarkInactive =
+        @options.markInactiveStudents && @model.attributes.is_inactive
+      result
 
     isLeader: ->
       @model.get('group')?.get?('leader')?.id == @model.get('id')

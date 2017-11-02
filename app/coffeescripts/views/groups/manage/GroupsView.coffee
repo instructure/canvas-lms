@@ -57,9 +57,21 @@ define [
       @detachScroll() if @collection.loadAll
 
     createItemView: (group) ->
-      groupUsersView = new GroupUsersView {model: group, collection: group.users(), itemViewOptions: {canEditGroupAssignment: not group.isLocked()}}
+      groupUsersView = new GroupUsersView {
+        model: group,
+        collection: group.users(),
+        itemViewOptions: {
+          canEditGroupAssignment: not group.isLocked()
+          markInactiveStudents: group.users()?.markInactiveStudents
+        }
+      }
       groupDetailView = new GroupDetailView {model: group, users: group.users()}
-      groupView = new GroupView {model: group, groupUsersView, groupDetailView, addUnassignedMenu: @options.addUnassignedMenu}
+      groupView = new GroupView {
+        model: group,
+        groupUsersView,
+        groupDetailView,
+        addUnassignedMenu: @options.addUnassignedMenu
+      }
       group.itemView = groupView
 
     updateDetails: ->

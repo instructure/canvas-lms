@@ -108,10 +108,10 @@ class Group < ActiveRecord::Base
       participating_users_association
   end
 
-  def participating_users_in_context(user_ids = nil, sort: false)
+  def participating_users_in_context(user_ids = nil, sort: false, include_inactive_users: false)
     users = participating_users(user_ids)
     users = users.order_by_sortable_name if sort
-    return users unless self.context.is_a? Course
+    return users unless !include_inactive_users && (self.context.is_a? Course)
     context.participating_users(users.pluck(:id))
   end
 

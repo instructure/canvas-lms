@@ -37,6 +37,7 @@ define [
       itemViewOptions:
         canAssignToGroup: false
         canEditGroupAssignment: true
+        markInactiveStudents: false
 
     dragOptions:
       appendTo: 'body'
