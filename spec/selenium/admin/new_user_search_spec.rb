@@ -104,19 +104,26 @@ describe "new account user search" do
   end
 
   it "should paginate" do
-    10.times do |x|
-      user_with_pseudonym(:account => @account, :name => "Test User #{x + 1}")
+    ('A'..'Z').each do |letter|
+      user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
     end
 
     get "/accounts/#{@account.id}/users"
 
-    expect(get_rows.count).to eq 10
+    expect(get_rows.count).to eq 15
+    expect(get_rows.first).to include_text("Test User A")
+    expect(f(".users-list")).to_not include_text("Test User O")
+    expect(f("#content")).not_to contain_css('button[title="Previous Page"]')
 
-    f(".load_more").click
+    f('button[title="Next Page"]').click
     wait_for_ajaximations
 
-    expect(get_rows.count).to eq 11
-    expect(f("#content")).not_to contain_css(".load_more")
+    expect(get_rows.count).to eq 12
+    expect(get_rows.first).to include_text("Test User O")
+    expect(get_rows.last).to include_text("Test User Z")
+    expect(f(".users-list")).not_to include_text("Test User A")
+    expect(f("#content")).to contain_css('button[title="Previous Page"]')
+    expect(f("#content")).not_to contain_css('button[title="Next Page"]')
   end
 
   it "should search by name" do

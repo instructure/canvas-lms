@@ -110,16 +110,6 @@ export default {
     }
   },
 
-  getMoreUsers(store = UsersStore) {
-    return (dispatch, getState) => {
-      const searchFilter = getState().userList.searchFilter
-      dispatch(this.loadingUsers())
-      store.loadMore(searchFilter).then((response, _, xhr) => {
-        dispatch(this.addToUsers(response, xhr))
-      })
-    }
-  },
-
   applySearchFilter(minSearchLength, store = UsersStore) {
     return (dispatch, getState) => {
       const searchFilter = getState().userList.searchFilter

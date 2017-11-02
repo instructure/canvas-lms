@@ -17,7 +17,7 @@
  */
 
 import {combineReducers} from 'redux'
-import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import parseLinkHeader from 'parse-link-header'
 import initialState from '../store/initialState'
 
 const emailRegex = /([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/i
@@ -63,17 +63,16 @@ const userListHandlers = {
       users: state.users.concat(mappedEmailUsers)
     }
     if (action.payload.xhr) {
-      newState.next = parseLinkHeader(action.payload.xhr).next
+      newState.links = parseLinkHeader(action.payload.xhr.getResponseHeader('Link'))
     }
     return {...state, ...newState}
   },
   GOT_USERS(state, action) {
-    const {next} = parseLinkHeader(action.payload.xhr)
     return {
       ...state,
       users: action.payload.users,
       isLoading: false,
-      next
+      links: parseLinkHeader(action.payload.xhr.getResponseHeader('Link'))
     }
   },
   GOT_USER_UPDATE(state, action) {

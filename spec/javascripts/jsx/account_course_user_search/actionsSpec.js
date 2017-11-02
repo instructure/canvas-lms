@@ -154,43 +154,6 @@ test('loadingUsers', () => {
   equal(message.type, 'LOADING_USERS', 'it returns the proper type')
 })
 
-asyncTest('getMoreUsers', () => {
-  let count = 2
-  const done = () => {
-    --count || start()
-  }
-
-  const fakeDispatcher = response => {
-    if (count === 2) {
-      equal(response.type, 'LOADING_USERS', 'it returns the proper action type')
-      done()
-    } else {
-      equal(response.type, 'ADD_TO_USERS', 'it returns the proper action type')
-      deepEqual(response.payload.users[0], STUDENTS[0], 'it returns the user in the payload')
-      done()
-    }
-  }
-
-  const fakeGetState = () => ({
-    userList: {
-      searchFilter: 'abc',
-      next: '/api/v1/accounts/1/users?page=2'
-    }
-  })
-
-  const fakeUserStore = {
-    loadMore(filter) {
-      return Promise.resolve([STUDENTS[0]])
-    }
-  }
-
-  const actionThunk = actions.getMoreUsers(fakeUserStore)
-
-  equal(typeof actionThunk, 'function', 'it initally returns a callback function')
-
-  actionThunk(fakeDispatcher, fakeGetState)
-})
-
 asyncTest('applySearchFilter', () => {
   let count = 3
   const done = () => {

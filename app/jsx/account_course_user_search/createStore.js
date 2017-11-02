@@ -18,9 +18,15 @@
 
 import $ from 'jquery'
 import createStore from 'jsx/shared/helpers/createStore'
-import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import parseLinkHeader from 'parse-link-header'
 import _ from 'underscore'
 import 'jquery.ajaxJSON'
+
+const getNextUrl = obj =>
+  obj &&
+  obj.links &&
+  obj.links.next &&
+  obj.links.next.url
 
 /**
  * Build a store that support basic ajax fetching (first, next, all),
@@ -87,11 +93,16 @@ export default function factory(spec) {
     loadMore(params) {
       const key = this.getKey(params)
       this.lastParams = params
-      const state = this.getState()[key] || {}
+      const nextUrl = getNextUrl(this.getStateFor(key))
+      if (!nextUrl) return
 
-      if (!state.next) return
+      return this._load(key, nextUrl, {}, {append: true})
+    },
 
-      return this._load(key, state.next, {}, {append: true})
+    loadPage(page, params) {
+      const key = this.getKey(params)
+      this.lastParams = params
+      return this._load(key, page  )
     },
 
     /**
@@ -111,10 +122,8 @@ export default function factory(spec) {
       if (!promise) return
 
       promise.then(() => {
-        const state = this.getState()[key] || {}
-        if (state.next) {
-          this._loadAll(key, state.next, {}, true)
-        }
+        const nextUrl = getNextUrl(this.getStateFor(key))
+        if (nextUrl) this._loadAll(key, nextUrl, {}, true)
       })
     },
 
@@ -126,8 +135,8 @@ export default function factory(spec) {
         if (options.wrap) data = [data]
         if (options.append) data = (this.getStateFor(key).data || []).concat(data)
 
-        const {next} = parseLinkHeader(xhr)
-        this.mergeState(key, {data, next, loading: false})
+        const links = parseLinkHeader(xhr.getResponseHeader('Link'))
+        this.mergeState(key, {data, links, loading: false})
       }, () => {
         this.mergeState(key, {error: true, loading: false})
       })

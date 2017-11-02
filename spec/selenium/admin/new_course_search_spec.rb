@@ -58,23 +58,25 @@ describe "new account course search" do
     rows = get_rows
     expect(rows.count).to eq 1
     expect(rows.first).to include_text(not_empty_course.name)
-    expect(rows.first).to_not include_text(empty_course.name)
+    expect(rows.first).not_to include_text(empty_course.name)
   end
 
   it "should paginate" do
-    11.times do |x|
-      course_factory(:account => @account, :course_name => "course_factory #{x + 1}")
-    end
-
+    16.times { |i| @account.courses.create!(:name => "course #{i + 1}") }
     get "/accounts/#{@account.id}"
 
-    expect(get_rows.count).to eq 10
+    expect(get_rows.count).to eq 15
+    expect(get_rows.first).to include_text("course 1")
+    expect(f(".courses-list")).not_to include_text("course 16")
+    expect(f("#content")).not_to contain_css('button[title="Previous Page"]')
 
-    f(".load_more").click
+    f('button[title="Next Page"]').click
     wait_for_ajaximations
 
-    expect(get_rows.count).to eq 11
-    expect(f("#content")).not_to contain_css(".load_more")
+    expect(get_rows.count).to eq 1
+    expect(get_rows.first).to include_text("course 16")
+    expect(f("#content")).to contain_css('button[title="Previous Page"]')
+    expect(f("#content")).not_to contain_css('button[title="Next Page"]')
   end
 
   it "should search by term" do

@@ -17,10 +17,9 @@
  */
 
 import React from 'react'
-import {shape, func, arrayOf, string } from 'prop-types'
+import {shape, func, arrayOf, string} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
-import UsersStore from './UsersStore'
 import UsersList from './UsersList'
 import UsersToolbar from './UsersToolbar'
 import SearchMessage from './SearchMessage'
@@ -38,6 +37,7 @@ export default class UsersPane extends React.Component {
     roles: arrayOf(string).isRequired,
     onUpdateQueryParams: func.isRequired,
     queryParams: shape({
+      page: string,
       search_term: string,
       role_filter_id: string
     }).isRequired
@@ -69,10 +69,6 @@ export default class UsersPane extends React.Component {
     this.setState({userList: this.props.store.getState().userList});
   }
 
-  fetchMoreUsers = () => {
-    UsersStore.loadMore(this.state.userList.filters);
-  }
-
   handleApplyingSearchFilter = () => {
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
     this.updateQueryString()
@@ -86,7 +82,7 @@ export default class UsersPane extends React.Component {
   debouncedDispatchApplySearchFilter = _.debounce(this.handleApplyingSearchFilter, 250)
 
   handleUpdateSearchFilter = (searchFilter) => {
-    this.props.store.dispatch(UserActions.updateSearchFilter(searchFilter));
+    this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}));
     this.debouncedDispatchApplySearchFilter();
   }
 
@@ -102,8 +98,9 @@ export default class UsersPane extends React.Component {
     this.props.store.dispatch(UserActions.closeEditUserDialog(user));
   }
 
-  handleGetMoreUsers = () => {
-    this.props.store.dispatch(UserActions.getMoreUsers());
+  handleSetPage = (page) => {
+    this.props.store.dispatch(UserActions.updateSearchFilter({page}))
+    this.handleApplyingSearchFilter()
   }
 
   handleAddNewUser = (attributes) => {
@@ -117,7 +114,7 @@ export default class UsersPane extends React.Component {
   }
 
   render () {
-    const {next, timezones, accountId, users, isLoading, errors, searchFilter} = this.state.userList
+    const {links, timezones, accountId, users, isLoading, errors, searchFilter} = this.state.userList
     return (
       <div>
         {<UsersToolbar
@@ -153,8 +150,8 @@ export default class UsersPane extends React.Component {
           }
 
         <SearchMessage
-          collection={{data: users, loading: isLoading, next}}
-          loadMore={this.handleGetMoreUsers}
+          collection={{data: users, loading: isLoading, links}}
+          setPage={this.handleSetPage}
           noneFoundMessage={I18n.t('No users found')}
         />
       </div>

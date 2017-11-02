@@ -36,7 +36,8 @@ const defaultFilters = {
   with_students: false,
   sort: 'sis_course_id',
   order: 'asc',
-  search_by: 'course'
+  search_by: 'course',
+  page: null
 }
 
 class CoursesPane extends React.Component {
@@ -94,14 +95,17 @@ class CoursesPane extends React.Component {
     CoursesStore.load(this.state.filters)
   }
 
-  fetchMoreCourses = () => {
-    CoursesStore.loadMore(this.state.filters)
+  setPage = (page) => {
+    this.setState({
+      filters: {...this.state.filters, page},
+      previousCourses: CoursesStore.get(this.state.filters)
+    }, this.fetchCourses)
   }
 
   onUpdateFilters = (newFilters) => {
     this.setState({
       errors: {},
-      draftFilters: Object.assign({}, this.state.draftFilters, newFilters)
+      draftFilters: Object.assign({page: null}, this.state.draftFilters, newFilters)
     }, this.debouncedApplyFilters)
   }
 
@@ -116,11 +120,7 @@ class CoursesPane extends React.Component {
 
   onChangeSort = (column) => {
     const {sort, order} = this.state.filters
-    let newOrder = 'asc'
-
-    if (column === sort && order === 'asc') {
-      newOrder = 'desc'
-    }
+    const newOrder = (column === sort && order === 'asc') ? 'desc' : 'asc'
 
     const newFilters = Object.assign({}, this.state.filters, {
       sort: column,
@@ -178,7 +178,7 @@ class CoursesPane extends React.Component {
 
         <SearchMessage
           collection={courses}
-          loadMore={this.fetchMoreCourses}
+          setPage={this.setPage}
           noneFoundMessage={I18n.t('No courses found')}
         />
       </div>

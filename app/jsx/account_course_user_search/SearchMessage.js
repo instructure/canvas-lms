@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import { array, func, string } from 'prop-types'
+import Pagination, {PaginationButton} from 'instructure-ui/lib/components/Pagination'
+import { array, func, string, shape } from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 
-export default function SearchMessage({ collection, loadMore, noneFoundMessage }) {
+export default function SearchMessage({ collection, setPage, noneFoundMessage }) {
   if (!collection || collection.loading) {
     return <div className="text-center pad-box">{I18n.t('Loading...')}</div>
   } else if (collection.error) {
@@ -37,21 +38,54 @@ export default function SearchMessage({ collection, loadMore, noneFoundMessage }
         <div className="alert alert-info">{noneFoundMessage}</div>
       </div>
     )
-  } else if (collection.next) {
+  } else if (collection.links) {
+    let lastKnownPage = collection.links.last
+    let pageCountIsUnknown
+    if (!lastKnownPage) {
+      lastKnownPage = collection.links.next
+      pageCountIsUnknown = true
+    }
     return (
-      <div className="text-center pad-box">
-        <button className="Button--link load_more" onClick={loadMore}>
-          <i className="icon-refresh" /> {I18n.t('Load more...')}
-        </button>
-      </div>
+      <Pagination
+        variant="compact"
+        labelNext={I18n.t('Next Page')}
+        labelPrev={I18n.t('Previous Page')}
+      >
+        {Array.from(Array(Number(lastKnownPage.page))).map((v, i) => {
+          const pageNumber = i + 1
+          return (
+            <PaginationButton
+              key={pageNumber}
+              onClick={() => setPage(pageNumber)}
+              current={pageNumber === Number(collection.links.current.page)}
+            >
+              {I18n.n(pageNumber)}
+            </PaginationButton>
+          )
+        }).concat(pageCountIsUnknown
+          ? <span key="page-count-is-unknown-indicator" aria-hidden>...</span>
+          : []
+        )}
+      </Pagination>
     )
   } else {
     return <noscript />
   }
 }
 
+const linkPropType = shape({
+  url: string.isRequired,
+  page: string.isRequired
+}).isRequired
+
 SearchMessage.propTypes = {
-  collection: array.isRequired,
-  loadMore: func.isRequired,
+  collection: shape({
+    data: array.isRequired,
+    links: shape({
+      current: linkPropType,
+      last: linkPropType
+    })
+  }).isRequired,
+  setPage: func.isRequired,
   noneFoundMessage: string.isRequired
 }
