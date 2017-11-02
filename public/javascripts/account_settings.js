@@ -337,7 +337,7 @@ import './vendor/jquery.scrollTo'
         $('#terms_of_service_modal').show()
         $rce_container.show();
         setTimeout (() => {
-          RichContentEditor.loadNewEditor($textarea, { manageParent: true, defaultContent: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT})
+          RichContentEditor.loadNewEditor($textarea, { manageParent: true, defaultContent: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT || ''})
         }, 1000);
       }
       $( "#account_terms_of_service_terms_type" ).change(function() {
@@ -347,7 +347,7 @@ import './vendor/jquery.scrollTo'
           RichContentEditor.loadNewEditor($textarea, {
             focus: true,
             manageParent: true,
-            defaultContent: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT
+            defaultContent: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT || ''
           });
         } else {
           $rce_container.hide();
