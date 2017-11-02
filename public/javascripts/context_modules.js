@@ -1448,7 +1448,8 @@ import 'compiled/jquery.rails_flash_notifications'
         isNew: true
       };
 
-      initPublishButton($item.find('.publish-icon'), publishData);
+      var view = initPublishButton($item.find('.publish-icon'), publishData);
+      overrideModel(view.model, view);
     }
 
     var initPublishButton = function($el, data) {
