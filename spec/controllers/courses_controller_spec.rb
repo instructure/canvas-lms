@@ -2268,6 +2268,7 @@ describe CoursesController do
       assignment = @course.assignments.create!(:workflow_state => 'published')
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher }
       expect(test_student.submissions.size).not_to be_zero
+      OriginalityReport.create!(attachment: attachment_model, originality_score: '1', submission: test_student.submissions.first)
       delete 'reset_test_student', params: {course_id: @course.id}
       test_student.reload
       expect(test_student.submissions.size).to be_zero
