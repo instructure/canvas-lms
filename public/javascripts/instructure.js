@@ -215,65 +215,6 @@ function handleYoutubeLink () {
     }
 
     ///////////// START layout related stuff
-    var $menu_items = $(".menu-item"),
-        $menu = $("#menu"),
-        menuItemHoverTimeoutId;
-
-    // Makes sure that the courses/groups menu is openable by clicking
-    var $coursesItem = $menu.find('#courses_menu_item .menu-item-title');
-    $coursesItem.click(function (e) {
-      if (e.metaKey || e.ctrlKey) return;
-      e.preventDefault();
-      $coursesItem.focus();
-    })
-
-    function clearMenuHovers(){
-      window.clearTimeout(menuItemHoverTimeoutId);
-      // this is explicitly finding every time in case
-      // someone has added menu items to the list after init
-      $menu.find(".menu-item").removeClass("hover hover-pending");
-    }
-
-    function unhoverMenuItem(){
-      $menu_items.filter(".hover-pending").removeClass('hover-pending');
-      menuItemHoverTimeoutId = window.setTimeout(clearMenuHovers, 400);
-    }
-
-    function hoverMenuItem(event){
-      var hadClass = $menu_items.filter(".hover").length > 0;
-      clearMenuHovers();
-      var $elem = $(this);
-      $elem.addClass('hover-pending');
-      if(hadClass) { $elem.addClass('hover'); }
-      setTimeout(function() {
-        if($elem.hasClass('hover-pending')) {
-          $elem.addClass("hover");
-        }
-      }, 300);
-      $.publish('menu/hovered', $elem);
-    }
-
-    $menu
-      .delegate('.menu-item', 'mouseenter focusin', hoverMenuItem )
-      .delegate('.menu-item', 'mouseleave focusout', unhoverMenuItem );
-
-
-    // this stuff is for the ipad, it needs a little help getting the drop menus to show up
-    $menu_items.live('touchstart', function(){
-      // if we are not in an alredy hovering drop-down, drop it down, otherwise do nothing
-      // (so that if a link is clicked in one of the li's it gets followed).
-      if(!$(this).hasClass('hover')){
-        return hoverMenuItem.call(this, event);
-      }
-    });
-    // If I touch anywhere on the screen besides inside a dropdown, make the dropdowns go away.
-    $(document).bind('touchstart', function(event){
-      if (!$(event.target).closest(".menu-item").length) {
-        unhoverMenuItem();
-      }
-    });
-
-
 
     // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
     var $breadcrumbs = $("#breadcrumbs"),
@@ -408,6 +349,7 @@ function handleYoutubeLink () {
         $dialog.dialog('open');
       });
     });
+
     if ($.filePreviewsEnabled()) {
       $("a.scribd_file_preview_link").live('click', function(event) {
         event.preventDefault();
