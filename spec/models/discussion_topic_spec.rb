@@ -962,6 +962,20 @@ describe DiscussionTopic do
 
       expect(@student.stream_item_instances.count).to eq 1
     end
+
+    it "doesn't send stream items for students that aren't assigned" do
+      @empty_section = @course.course_sections.create!
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build title: @topic.title,
+        submission_types: 'discussion_topic',
+        only_visible_to_overrides: true,
+        title: @topic.title
+      @assignment.assignment_overrides.build set: @empty_section
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+      expect(@student.stream_item_instances.count).to eq 0
+    end
   end
 
   context "posting first to view" do
