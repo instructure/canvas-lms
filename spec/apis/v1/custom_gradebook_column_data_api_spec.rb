@@ -166,6 +166,15 @@ describe CustomGradebookColumnDataApiController, type: :request do
       expect(datum.content).to eq "Example Note"
     end
 
+    it 'works for hidden custom columns' do
+      @col.update!(workflow_state: 'hidden')
+
+      @user = @teacher
+      update(@student1, "Example Note")
+
+      expect(response).to be_success
+    end
+
     it 'works for students with concluded enrollments' do
       student = user_factory(active_all: true)
       @course.default_section.enroll_user(student, 'StudentEnrollment', 'completed')
