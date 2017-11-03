@@ -76,14 +76,14 @@ describe InfoController do
           :is_default => 'true'
         },
         {
-          :available_to => ['user', 'student', 'teacher', 'admin'],
+          :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
           :text => 'Search the Canvas Guides',
           :subtext => 'Find answers to common questions',
           :url => 'http://community.canvaslms.com/community/answers/guides',
           :is_default => 'true'
         },
         {
-          :available_to => ['user', 'student', 'teacher', 'admin'],
+          :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
           :text => 'Report a Problem',
           :subtext => 'If Canvas misbehaves, tell us about it',
           :url => '#create_ticket',
