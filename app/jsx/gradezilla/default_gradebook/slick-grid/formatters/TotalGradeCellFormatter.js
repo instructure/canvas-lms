@@ -96,11 +96,13 @@ function render (options) {
   return `
     <div class="gradebook-cell">
       ${tooltip}
-      <span class="percentage">
-        ${warningIcon}
-        ${grade}
+      <span class="grades">
+        <span class="percentage">
+          ${warningIcon}
+          ${grade}
+        </span>
+        ${letterGrade}
       </span>
-      ${letterGrade}
     </div>
   `;
 }

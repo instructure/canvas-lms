@@ -466,6 +466,37 @@ $gradebook_cell_padding_top: 8px;
 .slick-cell {
   z-index: auto;
 
+  &.custom_column {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.assignment {
+    .gradebook-cell,
+    .Grid__AssignmentRowCell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &.assignment-group-cell {
+    .gradebook-cell .percentage {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+  }
+
+  &.total_grade {
+    .gradebook-cell .grades {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+  }
+
   &.active {
     background-color: inherit;
     z-index: 5;
