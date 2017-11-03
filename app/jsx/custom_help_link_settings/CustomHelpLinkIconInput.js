@@ -19,36 +19,36 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-  const CustomHelpLinkIconInput = React.createClass({
-    propTypes: {
-      value: PropTypes.string.isRequired,
-      children: PropTypes.node.isRequired,
-      label: PropTypes.string.isRequired,
-      defaultChecked: PropTypes.bool
-    },
-    getDefaultProps () {
-      return {
-        checked: false
-      }
-    },
-    render () {
-      const {
-        value,
-        icon,
-        label,
-        defaultChecked,
-        children
-      } = this.props
-      return (
-        <label className="ic-Radio ic-Radio--icon-only" data-icon-value={value}>
-          <input type="radio" value={value} name="account[settings][help_link_icon]" defaultChecked={defaultChecked} />
-          <span className="ic-Label">
-            <span className="screenreader-only">{label}</span>
-            {children}
-          </span>
-        </label>
-      )
-    }
-  });
+export default function CustomHelpLinkIconInput(props) {
+  const {value, label, defaultChecked, children} = props
+  return (
+    <label
+      className="ic-Radio ic-Radio--icon-only"
+      data-icon-value={value}
+      htmlFor={`account_settings_help_link_icon_${value}`}
+    >
+      <input
+        id={`account_settings_help_link_icon_${value}`}
+        type="radio"
+        value={value}
+        name="account[settings][help_link_icon]"
+        defaultChecked={defaultChecked}
+      />
+      <span className="ic-Label">
+        <span className="screenreader-only">{label}</span>
+        {children}
+      </span>
+    </label>
+  )
+}
 
-export default CustomHelpLinkIconInput
+CustomHelpLinkIconInput.propTypes = {
+  value: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  label: PropTypes.string.isRequired,
+  defaultChecked: PropTypes.bool
+}
+
+CustomHelpLinkIconInput.defaultProps = {
+  defaultChecked: false
+}

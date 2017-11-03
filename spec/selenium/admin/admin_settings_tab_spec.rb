@@ -444,7 +444,7 @@ describe "admin settings tab" do
       form = f('#account_settings')
       form.submit
       cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://url.example.com' }
-      expect(cl).to include({"text"=>"text", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin"]})
+      expect(cl).to include({"text"=>"text", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin", "observer", "unenrolled"]})
     end
 
     it "edits a custom link" do
