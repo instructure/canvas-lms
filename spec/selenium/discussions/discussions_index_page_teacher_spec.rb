@@ -248,9 +248,9 @@ describe "discussions" do
             wait_for_ajaximations
             fj('.move_item:visible').click
             wait_for_ajaximations
-            click_option '.move-select .move-select__position select', "Last"
+            click_option '.move-select .move-select__position select', "At the Bottom"
             wait_for_ajaximations
-            fj('.move-select button').click
+            fj('.move-select button[type="submit"]').click
             wait_for_ajaximations
             topics.each(&:reload)
             sleep 1
@@ -275,7 +275,7 @@ describe "discussions" do
           wait_for_ajaximations
           click_option '.move-select .move-select__sibling select', topics[2].title
           wait_for_ajaximations
-          fj('.move-select button').click
+          fj('.move-select button[type="submit"]').click
           wait_for_ajaximations
           topics.each &:reload
           expect(topics.map(&:position)).to eq [2, 1, 3]

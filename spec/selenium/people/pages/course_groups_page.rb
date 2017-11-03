@@ -98,7 +98,7 @@ class CourseGroups
     end
 
     def save_dropdown_selection_button
-      f(".move-select button")
+      f(".move-select button[type='submit']")
     end
 
     def groupset_tabs
@@ -154,4 +154,3 @@ class CourseGroups
     end
   end
 end
-

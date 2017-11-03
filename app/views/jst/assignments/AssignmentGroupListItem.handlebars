@@ -114,10 +114,17 @@
             {{#if canMove}}
             <li>
               <a
+                class="move_contents icon-move-down"
+                aria-label='{{#t}}Move Assignment Contents{{/t}}'
+                data-focus-returns-to="ag_{{id}}_manage_link"
+              >{{#t}}Move Contents…{{/t}}</a>
+            </li>
+            <li>
+              <a
                 class="move_group icon-updown"
                 aria-label='{{#t}}Move Assignment Group{{/t}}'
                 data-focus-returns-to="ag_{{id}}_manage_link"
-              >{{#t}}Move To…{{/t}}</a>
+              >{{#t}}Move Group…{{/t}}</a>
             </li>
             {{/if}}
           </ul>

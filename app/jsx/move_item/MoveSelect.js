@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!move_select'
 import React from 'react'
-import { func } from 'prop-types'
+import { func, arrayOf } from 'prop-types'
 import Select from 'instructure-ui/lib/components/Select'
 import Button from 'instructure-ui/lib/components/Button'
 import Container from 'instructure-ui/lib/components/Container'
@@ -31,15 +31,19 @@ import { positions } from './positions'
 
 export default class MoveSelect extends React.Component {
   static propTypes = {
-    item: itemShape.isRequired,
+    items: arrayOf(itemShape).isRequired,
     moveOptions: moveOptionsType.isRequired,
     onSelect: func.isRequired,
+    onClose: func.isRequired
   }
 
-  state = {
-    selectedGroup: null,
-    selectedPosition: null,
-    selectedSibling: null,
+  constructor(props) {
+    super(props)
+    this.state = {
+      selectedGroup: this.props.moveOptions.groups && this.getFilteredGroups()[0],
+      selectedPosition: positions.first,
+      selectedSibling: 0,
+    }
   }
 
   selectGroup = (e) => {
@@ -51,25 +55,25 @@ export default class MoveSelect extends React.Component {
   }
 
   selectSibling = (e) => {
-    this.setState({ selectedSibling: e.target.value === '' ? null : Number(e.target.value) })
+    this.setState({ selectedSibling: e.target.value === '' ? 0 : Number(e.target.value) })
   }
 
   submitSelection = () => {
-    const { item, moveOptions } = this.props
+    const { items, moveOptions } = this.props
     const { selectedGroup, selectedPosition, selectedSibling } = this.state
-    let order = [item.id]
+    let order = items.map(({ id }) => id)
     if (selectedPosition) {
-      const items = selectedGroup ? selectedGroup.items : moveOptions.siblings
+      const itemsInGroup = selectedGroup ? selectedGroup.items : moveOptions.siblings
       order = selectedPosition.apply({
-        item: item.id,
-        order: items.map(({ id }) => id),
+        items: items.map(({ id }) => id),
+        order: itemsInGroup.map(({ id }) => id),
         relativeTo: selectedSibling,
       })
     }
 
     this.props.onSelect({
       groupId: moveOptions.groups ? selectedGroup.id : null,
-      itemId: item.id,
+      itemIds: items.map(({ id }) => id),
       order,
     })
   }
@@ -78,6 +82,15 @@ export default class MoveSelect extends React.Component {
     const { selectedSibling, selectedPosition } = this.state
     const isAbsolute = selectedPosition && selectedPosition.type === 'absolute'
     return !!selectedPosition && (isAbsolute || selectedSibling !== null)
+  }
+
+  getFilteredGroups() {
+    const { moveOptions, items } = this.props
+    let { groups } = moveOptions
+    if (moveOptions.excludeCurrent && items[0].groupId) {
+      groups = groups.filter(group => group.id !== items[0].groupId)
+    }
+    return groups
   }
 
   isDoneSelecting () {
@@ -93,13 +106,14 @@ export default class MoveSelect extends React.Component {
     }
   }
 
-  renderSelect ({ label, onChange, options, className }) {
+  renderSelect ({ label, onChange, options, className,  selectOneDefault}) {
     return (
       <Container margin="medium 0" display="block" className={className}>
         <Select
           label={<ScreenReaderContent>{label}</ScreenReaderContent>}
-          onChange={onChange}>
-          <option>{I18n.t('Select one')}</option>
+          onChange={onChange}
+          >
+          {selectOneDefault && (<option>{I18n.t('Select one')}</option>)}
           {options}
         </Select>
       </Container>
@@ -109,11 +123,7 @@ export default class MoveSelect extends React.Component {
   renderSelectGroup () {
     const { selectedGroup } = this.state
     const selectPosition = !!(selectedGroup && selectedGroup.items && selectedGroup.items.length)
-    const { moveOptions, item } = this.props
-    let { groups } = moveOptions
-    if (moveOptions.excludeCurrent && item.groupId) {
-      groups = groups.filter(group => group.id !== item.groupId)
-    }
+    const groups = this.getFilteredGroups(this.props)
     return (
       <div>
         {this.renderSelect({
@@ -121,7 +131,8 @@ export default class MoveSelect extends React.Component {
           className: 'move-select__group',
           onChange: this.selectGroup,
           options: groups.map(group =>
-            <option key={group.id} value={group.id}>{group.title}</option>)
+            <option key={group.id} value={group.id}>{group.title}</option>),
+          selectOneDefault: false
         })}
         {selectPosition ? this.renderSelectPosition(selectedGroup.items) : null}
       </div>
@@ -133,12 +144,14 @@ export default class MoveSelect extends React.Component {
     const selectSibling = !!(selectedPosition && selectedPosition.type === 'relative')
     return (
       <div>
+        {this.renderPlaceTitle()}
         {this.renderSelect({
           label: I18n.t('Position Select'),
           className: 'move-select__position',
           onChange: this.selectPosition,
           options: Object.keys(positions).map((pos) =>
-            <option key={pos} value={pos}>{positions[pos].label}</option>)
+            <option key={pos} value={pos}>{positions[pos].label}</option>),
+          selectOneDefault: false
         })}
         {selectSibling ? (
           <div>
@@ -150,28 +163,44 @@ export default class MoveSelect extends React.Component {
   }
 
   renderSelectSibling (items) {
-    const filteredItems = items.filter(item => item.id !== this.props.item.id)
+    const filteredItems = items.filter(item => item.id !== this.props.items[0].id)
     return this.renderSelect({
       label: I18n.t('Item Select'),
       className: 'move-select__sibling',
       onChange: this.selectSibling,
       options: filteredItems.map((item, index) =>
-        <option key={item.id} value={index}>{item.title}</option>)
+        <option key={item.id} value={index}>{item.title}</option>),
+      selectOneDefault: false
     })
+  }
+
+  renderPlaceTitle() {
+    const title = (this.props.moveOptions.groups) ?
+      I18n.t('Place') :
+      I18n.t('Place "%{title}"', { title: this.props.items[0].title })
+    return (
+      <Typography paragraphMargin="medium 0" weight="bold">{title}</Typography>
+    );
   }
 
   render () {
     const { siblings, groups } = this.props.moveOptions
     return (
       <div className="move-select">
-        <Typography paragraphMargin="large 0" weight="bold">{I18n.t('Place "%{title}"', { title: this.props.item.title })}</Typography>
+        {this.props.moveOptions.groupsLabel &&
+          <Typography paragraphMargin="medium 0" weight="bold">{this.props.moveOptions.groupsLabel}</Typography>}
         {groups
           ? this.renderSelectGroup()
           : this.renderSelectPosition(siblings)}
-        {this.isDoneSelecting() && (
-          <Container textAlign="center" display="block">
+        {(
+          <Container textAlign="end" display="block">
             <hr />
-            <Button variant="primary" onClick={this.submitSelection}>{I18n.t('Done')}</Button>
+            <Button onClick={this.props.onClose} margin="0 x-small 0 0">{I18n.t('Cancel')}</Button>
+            <Button
+              disabled={!this.isDoneSelecting()}
+              type="submit" variant="primary"
+              onClick={this.submitSelection}
+              margin="0 x-small 0 0">{I18n.t('Move')}</Button>
           </Container>
         )}
       </div>

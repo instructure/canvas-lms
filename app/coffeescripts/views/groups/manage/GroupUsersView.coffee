@@ -126,10 +126,11 @@ define [
 
       @moveTrayProps =
         title: I18n.t('Move Student')
-        item:
+        items: [
           id: user.get('id')
           title: user.get('name')
           groupId: @model.get('id')
+        ]
         moveOptions:
           groupsLabel: I18n.t('Groups')
           groups: MoveItem.backbone.collectionToGroups(@model.collection, (col) => models: [])

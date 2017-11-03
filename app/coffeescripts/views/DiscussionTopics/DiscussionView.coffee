@@ -104,9 +104,10 @@ define [
 
       @moveTrayProps =
         title: I18n.t('Move Discussion')
-        item:
+        items: [
           id: @model.get('id')
           title: @model.get('title')
+        ]
         moveOptions:
           siblings: MoveItem.backbone.collectionToItems(@model.collection)
         focusOnExit: (item) => document.querySelector(".discussion[data-id=\"#{item.id}\"] .al-trigger")

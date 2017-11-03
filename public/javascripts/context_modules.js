@@ -1238,16 +1238,17 @@ function scrollTo ($thing, time = 500) {
 
       const moveTrayProps = {
         title: I18n.t('Move Module Item'),
-        item: {
+        items: [{
           id:  currentItem.getAttribute('id').substring('context_module_item_'.length),
           title: currentItem.querySelector('.title').textContent.trim(),
-        },
+        }],
         moveOptions: {
           groupsLabel: I18n.t('Modules'),
           groups,
         },
         formatSaveUrl: ({ groupId }) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
-        onMoveSuccess: ({ data, itemId, groupId }) => {
+        onMoveSuccess: ({ data, itemIds, groupId }) => {
+          const itemId = itemIds[0]
           const $container = $(`#context_module_${groupId} .ui-sortable`)
           $container.sortable('disable')
 
@@ -1277,16 +1278,67 @@ function scrollTo ($thing, time = 500) {
 
       const moveTrayProps = {
         title: I18n.t('Move Module'),
-        item: {
+        items: [{
           id:  currentModule.getAttribute('id').substring('context_module_'.length),
           title: currentModule.querySelector('.header > .collapse_module_link > .name').textContent,
-        },
+        }],
         moveOptions: { siblings },
         formatSaveUrl: () => `${ENV.CONTEXT_URL_ROOT}/modules/reorder`,
         onMoveSuccess: res => {
           const container = document.querySelector('#context_modules.ui-sortable')
           MoveItem.reorderElements(res.data.map(item => item.context_module.id), container, (id) => `#context_module_${id}`)
           $(container).sortable('refresh')
+        },
+        focusOnExit: () => currentModule.querySelector('.al-trigger'),
+      }
+
+      MoveItem.renderTray(moveTrayProps, document.getElementById('not_right_side'))
+    })
+
+    $('.move_module_contents_link').on('click keyclick', function (event) {
+      event.preventDefault()
+
+      const currentModule = $(this).parents('.context_module')[0]
+      const modules = document.querySelectorAll('#context_modules .context_module')
+      const groups = Array.prototype.map.call(modules, module => {
+        const id = module.getAttribute('id').substring('context_module_'.length)
+        const title = module.querySelector('.header > .collapse_module_link > .name').textContent
+        const moduleItems = module.querySelectorAll('.context_module_item')
+        const items = Array.prototype.map.call(moduleItems, item => ({
+          id: item.getAttribute('id').substring('context_module_item_'.length),
+          title: item.querySelector('.title').textContent.trim(),
+        }))
+        return { id, title, items }
+      })
+      const moduleItems = currentModule.querySelectorAll('.context_module_item')
+      const items = Array.prototype.map.call(moduleItems, item => ({
+        id: item.getAttribute('id').substring('context_module_item_'.length),
+        title: item.querySelector('.title').textContent.trim(),
+      }))
+      items[0].groupId = currentModule.getAttribute('id').substring('context_module_'.length)
+
+      const moveTrayProps = {
+        title: I18n.t('Move Contents Into'),
+        items,
+        moveOptions: {
+          groupsLabel: I18n.t('Modules'),
+          groups,
+          excludeCurrent: true
+        },
+        formatSaveUrl: ({ groupId }) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
+        onMoveSuccess: ({ data, itemIds, groupId }) => {
+          const $container = $(`#context_module_${groupId} .ui-sortable`)
+          $container.sortable('disable')
+
+          itemIds.forEach((id) => {
+            const item = document.querySelector(`#context_module_item_${id}`)
+            $container[0].appendChild(item)
+          })
+
+          const order = data.context_module.content_tags.map(item => item.content_tag.id)
+          MoveItem.reorderElements(order, $container[0], id => `#context_module_item_${id}`)
+
+          $container.sortable('enable').sortable('refresh')
         },
         focusOnExit: () => currentModule.querySelector('.al-trigger'),
       }

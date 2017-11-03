@@ -253,7 +253,8 @@ module GroupsCommon
     ff('.edit-group-assignment')[student].click
     wait_for_ajaximations
     click_option('.move-select .move-select__group select', "#{@testgroup[group_destination].name}")
-    f('.move-select button').click
+    wait_for_animations
+    f('.move-select button[type="submit"]').click
     wait_for_ajaximations
   end
 

@@ -71,9 +71,10 @@ define [
 
       @moveTrayProps =
         title: I18n.t('Move Navigation Item')
-        item:
+        items: [
           id: selectedItem.attr('id')
           title: selectedItem.attr('aria-label')
+        ]
         moveOptions:
           siblings: navOptions
         onMoveSuccess: (res) =>

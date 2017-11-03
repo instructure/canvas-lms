@@ -19,7 +19,7 @@
 import I18n from 'i18n!move_item_tray'
 import axios from 'axios'
 import React from 'react'
-import { string, func } from 'prop-types'
+import { string, func, arrayOf } from 'prop-types'
 import Tray from 'instructure-ui/lib/components/Tray'
 import Heading from 'instructure-ui/lib/components/Heading'
 import Container from 'instructure-ui/lib/components/Container'
@@ -31,7 +31,7 @@ import MoveSelect from './MoveSelect'
 export default class MoveItemTray extends React.Component {
   static propTypes = {
     title: string,
-    item: itemShape.isRequired,
+    items: arrayOf(itemShape).isRequired,
     moveOptions: moveOptionsType.isRequired,
     focusOnExit: func,
     formatSaveUrl: func,
@@ -42,7 +42,7 @@ export default class MoveItemTray extends React.Component {
   }
 
   static defaultProps = {
-    title: I18n.t('Move Item'),
+    title: I18n.t('Move To'),
     focusOnExit: () => null,
     formatSaveUrl: () => null,
     formatSaveData: (order) => ({ order: order.join(',') }),
@@ -57,20 +57,19 @@ export default class MoveItemTray extends React.Component {
 
   onExited = () => {
     setTimeout(() => {
-      const focusTo = this.props.focusOnExit(this.props.item)
+      const focusTo = this.props.focusOnExit(this.props.items[0])
       if (focusTo) focusTo.focus()
     })
     if (this.props.onExited) this.props.onExited()
   }
 
-  onMoveSelect = ({ order, itemId, groupId }) => {
+  onMoveSelect = ({ order, itemId, groupId, itemIds }) => {
     const saveUrl = this.props.formatSaveUrl({ itemId, groupId })
     const promise = saveUrl
                   ? axios.post(saveUrl, this.props.formatSaveData(order))
                   : Promise.resolve({ data: order })
-
     promise.then(res => {
-      this.props.onMoveSuccess({ data: res.data, groupId, itemId })
+      this.props.onMoveSuccess({ data: res.data, groupId, itemId, itemIds })
       this.close()
     })
     .catch(showFlashError(I18n.t('Move Item Failed')))
@@ -99,9 +98,10 @@ export default class MoveItemTray extends React.Component {
         <Heading margin="small xx-large" level="h4">{this.props.title}</Heading>
         <Container display="block" padding="medium medium large">
           <MoveSelect
-            item={this.props.item}
+            items={this.props.items}
             moveOptions={this.props.moveOptions}
             onSelect={this.onMoveSelect}
+            onClose={this.close}
           />
         </Container>
       </Tray>

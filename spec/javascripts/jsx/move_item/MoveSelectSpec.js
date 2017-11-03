@@ -24,10 +24,10 @@ import { positions } from 'jsx/move_item/positions'
 QUnit.module('MoveItemTray component')
 
 const defaultProps = () => ({
-  item: {
+  items: [{
     id: '10',
     title: 'Foo Bar',
-  },
+  }],
   moveOptions: {
     siblings: [
       { id: '12', title: 'Making Cake'},
@@ -84,7 +84,7 @@ test('isDoneSelecting() is true if props.moveOptions is siblings and hasSelected
   ok(instance.isDoneSelecting())
 })
 
-test('isDoneSelecting() is false if props.moveOptions is siblings and hasSelectedPosition() is false', () => {
+test('isDoneSelecting() is true if props.moveOptions is siblings because of default position', () => {
   const props = defaultProps()
   props.moveOptions = {
     siblings: [
@@ -95,7 +95,7 @@ test('isDoneSelecting() is false if props.moveOptions is siblings and hasSelecte
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
   instance.setState({ selectedPosition: positions.before })
-  notOk(instance.isDoneSelecting())
+  ok(instance.isDoneSelecting())
 })
 
 test('isDoneSelecting() is false if props.moveOptions is groups and selectedGroup is false-y', () => {
@@ -113,7 +113,7 @@ test('isDoneSelecting() is false if props.moveOptions is groups and selectedGrou
   notOk(instance.isDoneSelecting())
 })
 
-test('isDoneSelecting() is false if props.moveOptions is groups and selectedGroup is valid with items but hasSelectedPosition() is false', () => {
+test('isDoneSelecting() is true if props.moveOptions is groups and selectedGroup is valid with items because of default position', () => {
   const props = defaultProps()
   props.moveOptions = {
     groupsLabel: 'groups',
@@ -125,7 +125,7 @@ test('isDoneSelecting() is false if props.moveOptions is groups and selectedGrou
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
   instance.setState({ selectedGroup: props.moveOptions.groups[0], selectedPosition: positions.before })
-  notOk(instance.isDoneSelecting())
+  ok(instance.isDoneSelecting())
 })
 
 test('isDoneSelecting() is true if props.moveOptions is groups and selectedGroup is valid with items but hasSelectedPosition() is true', () => {
@@ -165,7 +165,7 @@ test('submitSelection() calls onSelect with properly ordered items for siblings'
   const instance = tree.instance()
   instance.setState({ selectedPosition: positions.before, selectedSibling: 1 })
   instance.submitSelection()
-  ok(props.onSelect.calledWith({ groupId: null, order: ['12', '10', '30'], itemId: '10' }))
+  ok(props.onSelect.calledWith({ groupId: null, order: ['12', '10', '30'], itemIds: ['10'] }))
 })
 
 test('submitSelection() calls onSelect with properly ordered items for groups', () => {
@@ -182,5 +182,92 @@ test('submitSelection() calls onSelect with properly ordered items for groups', 
   const instance = tree.instance()
   instance.setState({ selectedPosition: positions.before, selectedGroup: props.moveOptions.groups[0], selectedSibling: 1 })
   instance.submitSelection()
-  ok(props.onSelect.calledWith({ groupId: '12', order: ['2', '10', '8'], itemId: '10' }))
+  ok(props.onSelect.calledWith({ groupId: '12', order: ['2', '10', '8'], itemIds: ['10'] }))
+})
+
+test('submitSelection() calls onSelect with properly ordered items for multple items', () => {
+  const props = defaultProps()
+  props.items = [{
+    id: '88',
+    title: 'Bleh Bar',
+    groupId: '12'
+  },{
+    id: '14',
+    title: 'Blerp Bar',
+  },
+  {
+    id: '12',
+    title: 'Blop Bar',
+  }]
+  props.onSelect = sinon.spy()
+  props.moveOptions = {
+    groupsLabel: 'groups',
+    groups: [
+      { id: '12', title: 'Making Cake', items: [{ id: '2', title: 'foo bar' }, { id: '8', title: 'baz foo' }] },
+      { id: '30', title: 'Very Hard Quiz', items: [{ id: '4', title: 'foo baz' }, { id: '6', title: 'bar foo' }] }
+    ]
+  }
+  const tree = enzyme.mount(<MoveSelect {...props} />)
+  const instance = tree.instance()
+  instance.setState({ selectedPosition: positions.before, selectedGroup: props.moveOptions.groups[1], selectedSibling: 1 })
+  instance.submitSelection()
+  ok(props.onSelect.calledWith({ groupId: '30', order: ['4', '88', '14', '12', '6'], itemIds: ['88', '14', '12'] }))
+})
+
+test('submitSelection() calls onSelect with properly ordered items for multple items for an absolute position', () => {
+  const props = defaultProps()
+  props.items = [{
+    id: '88',
+    title: 'Bleh Bar',
+    groupId: '12'
+  },{
+    id: '14',
+    title: 'Blerp Bar',
+  },
+  {
+    id: '12',
+    title: 'Blop Bar',
+  }]
+  props.onSelect = sinon.spy()
+  props.moveOptions = {
+    groupsLabel: 'groups',
+    groups: [
+      { id: '12', title: 'Making Cake', items: [{ id: '2', title: 'foo bar' }, { id: '8', title: 'baz foo' }] },
+      { id: '30', title: 'Very Hard Quiz', items: [{ id: '4', title: 'foo baz' }, { id: '6', title: 'bar foo' }] }
+    ]
+  }
+  const tree = enzyme.mount(<MoveSelect {...props} />)
+  const instance = tree.instance()
+  instance.setState({ selectedPosition: positions.last, selectedGroup: props.moveOptions.groups[1], selectedSibling: 1 })
+  instance.submitSelection()
+  ok(props.onSelect.calledWith({ groupId: '30', order: ['4', '6', '88', '14', '12'], itemIds: ['88', '14', '12'] }))
+})
+
+test('submitSelection() calls onSelect with properly ordered items for a selected group in the first position', () => {
+  const props = defaultProps()
+  props.items = [{
+    id: '88',
+    title: 'Bleh Bar',
+    groupId: '12'
+  },{
+    id: '14',
+    title: 'Blerp Bar',
+  },
+  {
+    id: '12',
+    title: 'Blop Bar',
+  }]
+  props.onSelect = sinon.spy()
+  props.moveOptions = {
+    groupsLabel: 'groups',
+    groups: [
+      { id: '12', title: 'Making Cake', items: [{ id: '2', title: 'foo bar' }, { id: '8', title: 'baz foo' }] },
+      { id: '30', title: 'Very Hard Quiz', items: [{ id: '4', title: 'foo baz' }, { id: '6', title: 'bar foo' }] }
+    ]
+  }
+  const tree = enzyme.mount(<MoveSelect {...props} />)
+  const instance = tree.instance()
+  instance.setState({ selectedPosition: positions.first, selectedGroup: props.moveOptions.groups[0], selectedSibling: 0 })
+  instance.submitSelection()
+  ok(props.onSelect.calledWith({ groupId: '12', order: ['88', '14', '12', '2', '8'], itemIds: ['88', '14', '12'] }))
 })

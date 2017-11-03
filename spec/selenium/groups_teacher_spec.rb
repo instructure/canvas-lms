@@ -32,7 +32,9 @@ describe "new groups" do
       get "/courses/#{@course.id}/groups"
       click_add_group_set
       f('#new_category_name').send_keys("Test Group Set")
+
       save_group_set
+      wait_for_ajaximations
       # Looks in the group tab list for the last item, which should be the group set
       expect(fj('.collectionViewItems[role=tablist]>li:last-child').text).to match "Test Group Set"
     end
@@ -93,7 +95,7 @@ describe "new groups" do
       f('.edit-group-assignment').click
       wait_for_ajaximations
       click_option('.move-select .move-select__group select', "#{@testgroup[1].name}")
-      f('.move-select button').click
+      f('.move-select button[type="submit"]').click
       wait_for_ajaximations
 
       # Verifies the student count updates
@@ -205,7 +207,7 @@ describe "new groups" do
       f(".ui-menu-item .edit-group-assignment").click
       wait_for_ajaximations
       ff(".move-select .move-select__group option").last.click
-      f(".move-select button").click
+      f('.move-select button[type="submit"]').click
       wait_for_ajaximations
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
       expect(f("#content")).not_to contain_css(".group-leader .icon-user")
@@ -247,7 +249,7 @@ describe "new groups" do
       ff('.move-select .move-select__group option').last.click
       wait_for_ajaximations
 
-      f('.move-select button').click
+      f('.move-select button[type="submit"]').click
       wait_for_ajaximations
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).not_to be_displayed
@@ -302,7 +304,7 @@ describe "new groups" do
 
       ff(".move-select .move-select__group option").last.click
 
-      f(".move-select button").click
+      f('.move-select button[type="submit"]').click
       wait_for_ajaximations
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
@@ -333,7 +335,7 @@ describe "new groups" do
 
       click_option(".move-select .move-select__group select", @testgroup[1].id.to_s, :value)
       wait_for_ajaximations
-      f(".move-select button").click
+      f('.move-select button[type="submit"]').click
       wait_for_ajaximations
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
@@ -923,7 +925,7 @@ describe "new groups" do
           ff('.edit-group-assignment').last.click
           wait_for_ajaximations
           click_option('.move-select .move-select__group select', "#{@testgroup.first.name}")
-          ff('.move-select button').last.click
+          ff('.move-select button[type="submit"]').last.click
           wait_for_ajaximations
 
           select_change_groups_option
