@@ -1543,7 +1543,7 @@ da:
   addressbook_microservice_a4940422: "AddressBook microservice"
   addressbook_performance_tap_98ddf67: "AddressBook ydeevne"
   adjust_final_grade_fa45e7e0: "Juster endelig karakter"
-  admin_4d3ba42f: Administrator
+  admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_navigation_menu_77b801a2: Admin-navigationsmenu
   admin_user_name_29dd115a: admin_user_name
@@ -12570,17 +12570,17 @@ da:
   number: 
     currency: 
       format: 
-        delimiter: ","
+        delimiter: "."
         format: "%u%n"
         precision: 2
-        separator: "."
+        separator: ","
         significant: false
         strip_insignificant_zeros: false
         unit: $
     format: 
-      delimiter: ","
+      delimiter: "."
       precision: 3
-      separator: "."
+      separator: ","
       significant: false
       strip_insignificant_zeros: false
     human: 

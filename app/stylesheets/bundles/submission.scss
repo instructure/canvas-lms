@@ -97,7 +97,7 @@
 
 .file-upload-submission-attachment {
   @include fontSize(13px);
-  flex: 0 0 30%;
+  flex: 0 0 auto;
   text-align: right;
   box-sizing: border-box;
   padding-left: $ic-sp;

@@ -243,8 +243,11 @@ module Api::V1::Assignment
         rubric = assignment.rubric
         hash['rubric'] = rubric.data.map do |row|
           row_hash = row.slice(:id, :points, :description, :long_description)
+          row_hash["criterion_use_range"] = row[:criterion_use_range] || false
           row_hash["ratings"] = row[:ratings].map do |c|
-            c.slice(:id, :points, :description)
+            rating_hash = c.slice(:id, :points, :description, :long_description)
+            rating_hash["long_description"] = c[:long_description] || ""
+            rating_hash
           end
           if row[:learning_outcome_id] && outcome = LearningOutcome.where(id: row[:learning_outcome_id]).first
             row_hash["outcome_id"] = outcome.id
