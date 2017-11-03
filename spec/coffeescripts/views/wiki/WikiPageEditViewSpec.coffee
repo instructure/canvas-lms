@@ -200,7 +200,7 @@ define [
       model = @wikiPage
       bodyInput = @bodyInput
       editorBox = bodyInput.editorBox
-      @stub $.fn, 'editorBox', (options) ->
+      @stub($.fn, 'editorBox').callsFake (options) ->
         if options == 'is_dirty'
           return bodyInput.val() != model.get('body')
         else

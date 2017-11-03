@@ -163,7 +163,7 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    @stub quiz, "multipleDueDates", -> false
+    @stub(quiz, "multipleDueDates").returns(false)
     deepEqual quiz.singleSectionDueDate(), dueAt.toISOString()
 
   test "returns due_at when only one date/section are present", ->
@@ -218,6 +218,6 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    @stub quiz, "multipleDueDates", -> false
+    @stub(quiz, "multipleDueDates").returns(false)
     json = quiz.toView()
     equal json.singleSectionDueDate, dueAt.toISOString()

@@ -294,7 +294,7 @@ define [
   test 'properly saves model with a custom url if present', ->
     ENV.MAX_NAME_LENGTH = 256
     @quiz.set('title', 'George St. Geegland')
-    @stub @quiz, 'save', (attributes, options) ->
+    @stub(@quiz, 'save').callsFake (attributes, options) ->
       ok options['url'], '/some_other_url'
     @quiz.set('post_to_sis', false)
     @view = new SisButtonView(model: @quiz)
