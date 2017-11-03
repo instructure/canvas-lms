@@ -666,7 +666,7 @@ define [
       ,{})
 
     submissionsLoaded: (->
-      assignments = @get("assignments")
+      assignments = @get("assignmentsFromGroups")
       assignmentsByID = @groupById assignments
       studentsByID = @groupById @get("students")
       submissions = @get('submissions')
