@@ -26,6 +26,7 @@ import I18n from 'i18n!terms_of_service_modal'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 
 const { bool } = PropTypes
+const termsOfServiceText = I18n.t('Terms of Service')
 
 export default class TermsOfServiceModal extends React.Component {
   static propTypes = {
@@ -59,19 +60,19 @@ export default class TermsOfServiceModal extends React.Component {
     return (
       <span id="terms_of_service_modal">
        <Link ref={(c) => { this.link = c; }} onClick={this.handleLinkClick}>
-         {this.props.preview ? I18n.t('Preview') : I18n.t('Terms Of Service')}
+         {this.props.preview ? I18n.t('Preview') : termsOfServiceText}
        </Link>
        <Modal
          open={this.state.open}
          onDismiss={this.handleCloseModal}
          size="fullscreen"
-         label={I18n.t("Terms Of Service")}
+         label={termsOfServiceText}
          shouldCloseOnOverlayClick
          closeButtonLabel={I18n.t('Close')}
          applicationElement={() => [document.getElementById('main')] }
        >
          <ModalHeader>
-           <Heading>{I18n.t('Terms Of Service')}</Heading>
+           <Heading>{termsOfServiceText}</Heading>
          </ModalHeader>
          <ModalBody>
            <div dangerouslySetInnerHTML={{__html: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT}} />
