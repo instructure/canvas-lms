@@ -180,13 +180,13 @@ function sectionSelectionOptions (courseSections, groupGradingModeEnabled = fals
   let selectedSectionName = I18n.t('All Sections');
   const sectionOptions = [
     {
-      id: 'section_0',
+      id: 'section_all',
       data: {
-        'section-id': 0
+        'section-id': "all"
       },
       name: I18n.t('Show all sections'),
       className: {
-        raw: 'section_0'
+        raw: 'section_all'
       }
     }
   ];
@@ -306,7 +306,7 @@ function mergeStudentsAndSubmission() {
 }
 
 function changeToSection (sectionId) {
-  if (sectionId === '0') {
+  if (sectionId === 'all') {
     // We're removing all filters and resetting to default
     userSettings.contextRemove('grading_show_only_section');
   } else {
@@ -337,7 +337,7 @@ function initDropdown(){
   $selectmenu.appendTo("#combo_box_container", (event) => {
     const newStudentOrSection = $(event.target).val()
 
-    if (newStudentOrSection && newStudentOrSection.match(/^section_\d+$/)) {
+    if (newStudentOrSection && newStudentOrSection.match(/^section_(\d+|all)$/)) {
       const sectionId = newStudentOrSection.replace(/^section_/, '');
       changeToSection(sectionId);
     } else {
