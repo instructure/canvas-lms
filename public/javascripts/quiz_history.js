@@ -184,7 +184,7 @@ import 'compiled/behaviors/quiz_selectmenu'
       var $total = $("#after_fudge_points_total");
       var total = 0;
       $(".display_question .user_points:visible").each(function() {
-        var points = parseFloat($(this).find("input[type=number]").val(), 10) || 0;
+        var points = parseFloat($(this).find("input.question_input").val(), 10) || 0;
         points = Math.round(points * 100.0) / 100.0;
         total = total + points;
       });
