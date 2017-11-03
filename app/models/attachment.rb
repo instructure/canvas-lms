@@ -1064,6 +1064,8 @@ class Attachment < ActiveRecord::Base
       "image/pjpeg" => "image",
       "image/png" => "image",
       "image/gif" => "image",
+      "image/bmp" => "image",
+      "image/vnd.microsoft.icon" => "image",
       "application/x-rar" => "zip",
       "application/x-rar-compressed" => "zip",
       "application/x-zip" => "zip",
