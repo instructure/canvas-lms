@@ -344,7 +344,8 @@ class PlannerOverridesController < ApplicationController
 
   def planner_note_collection
     item_collection('planner_notes',
-                    PlannerNote.active.where(user: @current_user, todo_date: @start_date...@end_date),
+                    PlannerNote.active.where(user: @current_user, todo_date: @start_date...@end_date).
+                      where("course_id IS NULL OR course_id IN (?)", @current_user.course_ids_for_todo_lists(:student, default_opts)),
                     PlannerNote, [:todo_date, :created_at], :id)
   end
 
