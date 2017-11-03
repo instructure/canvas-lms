@@ -17,7 +17,7 @@
  */
 
 import { Editors, Grid } from 'vendor/slickgrid';
-import GridSupport from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support';
+import GridSupport from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport';
 
 function createColumns () {
   return [1, 2, 3, 4].map(id => (
@@ -57,12 +57,12 @@ function createGrid () {
   return new Grid('#example-grid', createRows(), createColumns(), options);
 }
 
-QUnit.module('GridHelper', function (hooks) {
+QUnit.module('GridHelper', (suiteHooks) => {
   let $gridContainer;
   let grid;
   let gridSupport;
 
-  hooks.beforeEach(function () {
+  suiteHooks.beforeEach(() => {
     $gridContainer = document.createElement('div');
     $gridContainer.id = 'example-grid';
     document.body.appendChild($gridContainer);
@@ -71,34 +71,34 @@ QUnit.module('GridHelper', function (hooks) {
     gridSupport.initialize();
   });
 
-  hooks.afterEach(function () {
+  suiteHooks.afterEach(() => {
     gridSupport.destroy();
     grid.destroy();
     $gridContainer.remove();
   });
 
-  QUnit.module('#beginEdit', function (localHooks) {
-    localHooks.beforeEach(function () {
+  QUnit.module('#beginEdit', (hooks) => {
+    hooks.beforeEach(() => {
       gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
       gridSupport.helper.commitCurrentEdit();
     });
 
-    test('edits the active cell', function () {
+    test('edits the active cell', () => {
       gridSupport.helper.beginEdit();
       strictEqual(grid.getEditorLock().isActive(), true);
     });
 
-    test('does not edit the active cell when the grid is not editable', function () {
+    test('does not edit the active cell when the grid is not editable', () => {
       grid.setOptions({ editable: false });
       gridSupport.helper.beginEdit();
       strictEqual(grid.getEditorLock().isActive(), false);
     });
   });
 
-  QUnit.module('#focus');
-
-  test('sets focus on the grid', function () {
-    gridSupport.helper.focus();
-    equal(document.activeElement, gridSupport.helper.getAfterGridNode());
+  QUnit.module('#focus', () => {
+    test('sets focus on the grid', () => {
+      gridSupport.helper.focus();
+      equal(document.activeElement, gridSupport.helper.getAfterGridNode());
+    });
   });
 });

@@ -16,30 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default class SlickGridSpecHelper {
+export default class Columns {
   constructor (gradebookGrid) {
-    this.grid = gradebookGrid.grid;
+    this.gradebookGrid = gradebookGrid;
   }
 
-  listColumns () {
-    return this.grid.getColumns();
-  }
+  initialize () {
+    const { events, grid, gridSupport } = this.gradebookGrid;
 
-  listColumnIds () {
-    return this.grid.getColumns().map(column => column.id);
-  }
-
-  listFrozenColumnIds () {
-    return this.listColumnIds().slice(0, this.grid.getOptions().numberOfColumnsToFreeze);
-  }
-
-  listScrollableColumnIds () {
-    return this.listColumnIds().slice(this.grid.getOptions().numberOfColumnsToFreeze);
-  }
-
-  updateColumnOrder (columnIds) {
-    const columns = this.grid.getColumns();
-    this.grid.setColumns(columnIds.map(id => columns.find(column => column.id === id)));
-    this.grid.onColumnsReordered.notify();
+    grid.onColumnsReordered.subscribe((sourceEvent, _object) => {
+      const event = sourceEvent.originalEvent || sourceEvent;
+      events.onColumnsReordered.trigger(event, gridSupport.columns.getColumns());
+    });
   }
 }

@@ -26,6 +26,7 @@ export function createGradebook (options = {}) {
     context_url: '/courses/1/',
     currentUserId: '1',
     default_grading_standard: [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0.0]],
+    editable: true,
     export_gradebook_csv_url: 'http://example.com/export',
     gradebook_import_url: 'http://example.com/import',
     gradebook_is_editable: true,
