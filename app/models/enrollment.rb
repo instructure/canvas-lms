@@ -1238,7 +1238,10 @@ class Enrollment < ActiveRecord::Base
 
   def self.limit_privileges_to_course_section!(course, user, limit)
     course.shard.activate do
-      Enrollment.where(:course_id => course, :user_id => user).update_all(:limit_privileges_to_course_section => !!limit)
+      Enrollment.where(:course_id => course, :user_id => user).each do |enrollment|
+        enrollment.limit_privileges_to_course_section = !!limit
+        enrollment.save!
+      end
     end
     user.touch
   end
