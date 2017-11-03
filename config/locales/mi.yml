@@ -1547,11 +1547,11 @@ mi:
   addressbook_microservice_a4940422: "AddressBook Ratonga moroiti"
   addressbook_performance_tap_98ddf67: "AddressBook Ngā akoranga tīpako kore"
   adjust_final_grade_fa45e7e0: "Whakarite Kōeke Whakamautunga"
-  admin_4d3ba42f: "Rawa kaiwhakahaere"
+  admin_4d3ba42f: Whakahaere
   admin_csv_f8d1b3eb: "Kaiwhakahaere CSV"
   admin_navigation_menu_77b801a2: "Whakahaere Whakatere Tahua"
   admin_user_name_29dd115a: admin_user_name
-  admins_3e1dce15: kaiwhakahaere
+  admins_3e1dce15: Kaiwhakahaere
   after_4c71e718: "I muri"
   after_cbb5ebae: "I muri..."
   after_date_981cd41b: "I muri %{date}"
