@@ -433,13 +433,16 @@ define [
       return if @startedInitializing
       @startedInitializing = true
 
-      @spinner = new Spinner() unless @spinner
-      $(@spinner.spin().el).css(
-        opacity: 0.5
-        top: '55px'
-        left: '50%'
-      ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
-      $('#gradebook-grid-wrapper').hide()
+      if @gridReady.state() != 'resolved'
+        @spinner = new Spinner() unless @spinner
+        $(@spinner.spin().el).css(
+          opacity: 0.5
+          top: '55px'
+          left: '50%'
+        ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
+        $('#gradebook-grid-wrapper').hide()
+      else
+        $('#gradebook_grid').trigger('resize.fillWindowWithMe')
 
     reloadStudentData: =>
       @setStudentsLoaded(false)
