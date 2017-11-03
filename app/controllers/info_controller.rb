@@ -40,7 +40,10 @@ class InfoController < ApplicationController
 
     links = links.select do |link|
       available_to = link[:available_to] || []
-      available_to.detect { |role| role == 'user' || current_user_roles.include?(role) }
+      available_to.detect do |role|
+        (role == 'user' || current_user_roles.include?(role)) ||
+        (current_user_roles == ['user'] && role == 'unenrolled')
+      end
     end
 
     render :json => links

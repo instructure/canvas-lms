@@ -26,63 +26,60 @@ import IconLifePreserverLine from 'instructure-icons/lib/Line/IconLifePreserverL
 import IconQuestionLine from 'instructure-icons/lib/Line/IconQuestionLine'
 import CustomHelpLinkIconInput from './CustomHelpLinkIconInput'
 
-  const CustomHelpLinkIcons = React.createClass({
-    propTypes: {
-      defaultValue: PropTypes.string
-    },
-    render () {
-      const {
-        defaultValue
-      } = this.props
-      return (
-        <fieldset className="ic-Fieldset ic-Fieldset--radio-checkbox">
-          <legend className="ic-Legend">
-            { I18n.t('Icon') }
-          </legend>
-          <div className="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
-            <CustomHelpLinkIconInput
-              value="help"
-              defaultChecked={defaultValue === 'help'}
-              label={I18n.t('Question mark icon')}
-            >
-              <IconQuestionLine />
-            </CustomHelpLinkIconInput>
+export default function CustomHelpLinkIcons(props) {
+  const {defaultValue} = props
+  return (
+    <fieldset className="ic-Fieldset ic-Fieldset--radio-checkbox">
+      <legend className="ic-Legend">{I18n.t('Icon')}</legend>
+      <div className="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
+        <CustomHelpLinkIconInput
+          value="help"
+          defaultChecked={defaultValue === 'help'}
+          label={I18n.t('Question mark icon')}
+        >
+          <IconQuestionLine />
+        </CustomHelpLinkIconInput>
 
-            <CustomHelpLinkIconInput
-              value="information"
-              defaultChecked={defaultValue === 'information'}
-              label={I18n.t('Information icon')}
-            >
-              <IconInfoLine />
-            </CustomHelpLinkIconInput>
+        <CustomHelpLinkIconInput
+          value="information"
+          defaultChecked={defaultValue === 'information'}
+          label={I18n.t('Information icon')}
+        >
+          <IconInfoLine />
+        </CustomHelpLinkIconInput>
 
-            <CustomHelpLinkIconInput
-              value="folder"
-              defaultChecked={defaultValue === 'folder'}
-              label={I18n.t('Folder icon')}
-            >
-              <IconFolderLine />
-            </CustomHelpLinkIconInput>
+        <CustomHelpLinkIconInput
+          value="folder"
+          defaultChecked={defaultValue === 'folder'}
+          label={I18n.t('Folder icon')}
+        >
+          <IconFolderLine />
+        </CustomHelpLinkIconInput>
 
-            <CustomHelpLinkIconInput
-              value="cog"
-              defaultChecked={defaultValue === 'cog'}
-              label={I18n.t('Cog icon')}
-            >
-              <IconSettingsLine />
-            </CustomHelpLinkIconInput>
+        <CustomHelpLinkIconInput
+          value="cog"
+          defaultChecked={defaultValue === 'cog'}
+          label={I18n.t('Cog icon')}
+        >
+          <IconSettingsLine />
+        </CustomHelpLinkIconInput>
 
-            <CustomHelpLinkIconInput
-              value="lifepreserver"
-              defaultChecked={defaultValue === 'lifepreserver'}
-              label={I18n.t('Life preserver icon')}
-            >
-              <IconLifePreserverLine />
-            </CustomHelpLinkIconInput>
-          </div>
-        </fieldset>
-      )
-    }
-  });
+        <CustomHelpLinkIconInput
+          value="lifepreserver"
+          defaultChecked={defaultValue === 'lifepreserver'}
+          label={I18n.t('Life preserver icon')}
+        >
+          <IconLifePreserverLine />
+        </CustomHelpLinkIconInput>
+      </div>
+    </fieldset>
+  )
+}
 
-export default CustomHelpLinkIcons
+CustomHelpLinkIcons.propTypes = {
+  defaultValue: PropTypes.string
+}
+
+CustomHelpLinkIcons.defaultProps = {
+  defaultValue: ''
+}
