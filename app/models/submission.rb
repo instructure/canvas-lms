@@ -660,7 +660,7 @@ class Submission < ActiveRecord::Base
     if self.grants_right?(user, :view_turnitin_report)
       requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
       report = self.originality_reports.find_by(attachment: requested_attachment)
-      url = report&.report_launch_url
+      url = report&.report_launch_path
     end
     url
   end

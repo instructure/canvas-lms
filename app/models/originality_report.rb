@@ -53,9 +53,9 @@ class OriginalityReport < ActiveRecord::Base
     end
   end
 
-  def report_launch_url
+  def report_launch_path
     if lti_link.present?
-      course_assignment_resource_link_id_url(course_id: assignment.context_id,
+      course_assignment_resource_link_id_path(course_id: assignment.context_id,
                                              assignment_id: assignment.id,
                                              resource_link_id: lti_link.resource_link_id,
                                              host: HostUrl.context_host(assignment.context),
