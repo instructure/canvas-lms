@@ -117,7 +117,10 @@ define [
 
     initCropping: () ->
       if(!@cropper)
-        @cropper = new CropperMaker(@$('.avatar-preview')[0], {imgFile: @file, width: @avatarSize.w, height: @avatarSize.h})
+        @cropper = new CropperMaker(
+          @$('.avatar-preview')[0],
+          {imgFile: @file, onImageLoaded: @options.onImageLoaded, width: @avatarSize.w, height: @avatarSize.h}
+        )
       @cropper.render()
       @trigger('ready')
 

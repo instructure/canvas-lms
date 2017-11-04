@@ -34,6 +34,7 @@ import CanvasCropper from './cropper'
     constructor (root, props) {
       this.root = root;                     // DOM node we render into
       this.imgFile = props.imgFile;
+      this.onImageLoaded = props.onImageLoaded;
       this.width = props.width || 128;
       this.height = props.width || 128;
       this.cropper = null;
@@ -43,7 +44,13 @@ import CanvasCropper from './cropper'
     }
     render () {
       ReactDOM.render(
-        <CanvasCropper ref={(el) => { this.cropper = el }} imgFile={this.imgFile} width={this.width} height={this.height} />,
+        <CanvasCropper
+          height={this.height}
+          imgFile={this.imgFile}
+          onImageLoaded={this.onImageLoaded}
+          ref={(el) => { this.cropper = el }}
+          width={this.width}
+        />,
         this.root
       )
     }
