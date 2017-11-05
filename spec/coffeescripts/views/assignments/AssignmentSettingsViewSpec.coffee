@@ -48,7 +48,9 @@ define [
 
   QUnit.module 'AssignmentSettingsView',
     setup: -> fakeENV.setup()
-    teardown: -> fakeENV.teardown()
+    teardown: ->
+      fakeENV.teardown()
+      $(".ui-dialog").remove()
 
   test 'should be accessible', (assert) ->
     view = createView(true)

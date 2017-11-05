@@ -42,6 +42,7 @@ define ['quiz_rubric', 'jquery'], (QuizRubric, $)->
     teardown: ->
       $("#test-rubrics-wrapper").remove()
       $("#fixtures").html("")
+      $(".ui-dialog").remove()
 
   test 'rubric editing event loads the rubric form', ->
     QuizRubric.createRubricDialog("#", assignmentRubricHtml)

@@ -47,6 +47,7 @@ define [
       $(window).off('beforeunload')
       clickEvent = {}
       fixtures.innerHTML = ""
+      $("#resource_selection_dialog").parent().remove()
 
   test "it creates a confirm alert before closing the modal", ()->
     l = document.getElementById('test-tool')

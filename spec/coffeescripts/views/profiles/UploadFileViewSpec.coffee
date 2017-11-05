@@ -40,6 +40,7 @@ define [
     teardown: ->
       delete @blob
       @view.remove()
+      $(".ui-dialog").remove()
 
   asyncTest 'loads given file', 3, ->
     # initial state

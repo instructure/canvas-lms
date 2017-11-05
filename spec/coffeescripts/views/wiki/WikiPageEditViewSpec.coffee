@@ -35,6 +35,7 @@ define [
       RichContentEditor.initSidebar.restore()
       editorUtils.resetRCE()
       $(window).off('beforeunload')
+      $(".ui-dialog").remove()
 
   test 'init wiki sidebar during render', ->
     wikiPageEditView = new WikiPageEditView
@@ -63,6 +64,7 @@ define [
 
     teardown: ->
       fakeENV.teardown()
+      $(".ui-dialog").remove()
 
   test 'student planner option hidden for insufficient rights', ->
     view = new WikiPageEditView
@@ -120,6 +122,7 @@ define [
 
     teardown: ->
       fakeENV.teardown()
+      $(".ui-dialog").remove()
 
   test 'conditional content option hidden for insufficient rights', ->
     view = new WikiPageEditView
@@ -180,6 +183,7 @@ define [
       fixtures.teardown()
       editorUtils.resetRCE()
       $(window).off('beforeunload')
+      $(".ui-dialog").remove()
 
   setupUnsavedChangesTest = (test, attributes) ->
     setup = ->

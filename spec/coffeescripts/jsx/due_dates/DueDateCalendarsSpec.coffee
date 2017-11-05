@@ -24,9 +24,11 @@ define [
   'jsx/due_dates/DueDateCalendars'
   'helpers/fakeENV'
 ], ($, React, ReactDOM, {Simulate, SimulateNative}, _, DueDateCalendars, fakeENV) ->
+  wrapper = null
 
   QUnit.module 'DueDateCalendars',
     setup: ->
+      wrapper = $('<div>').appendTo('body')[0]
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
       @someDate = new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
@@ -39,11 +41,12 @@ define [
         dateValue: @someDate
 
       DueDateCalendarsElement = React.createElement(DueDateCalendars, props)
-      @dueDateCalendars = ReactDOM.render(DueDateCalendarsElement, $('<div>').appendTo('body')[0])
+      @dueDateCalendars = ReactDOM.render(DueDateCalendarsElement, wrapper)
 
     teardown: ->
       fakeENV.teardown()
       ReactDOM.unmountComponentAtNode(@dueDateCalendars.getDOMNode().parentNode)
+      wrapper.remove()
 
   test 'renders', ->
     ok @dueDateCalendars.isMounted()

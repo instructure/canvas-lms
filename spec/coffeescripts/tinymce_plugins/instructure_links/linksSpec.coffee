@@ -76,6 +76,7 @@ define [
       @fetchClasses = (()-> "classes")
 
     teardown: ->
+      @box.dialog('destroy')
       $("#fixtures").empty()
 
   test "it fires my 'done' callback when form gets submitted", ->

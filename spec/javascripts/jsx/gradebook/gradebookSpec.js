@@ -199,6 +199,7 @@ QUnit.module('Gradebook#togglePointsOrPercentTotals', {
 
   teardown () {
     UserSettings.contextRemove('warned_about_totals_display');
+    $(".ui-dialog").remove();
   }
 });
 

@@ -52,6 +52,7 @@ define([
       this.clock.restore();
       fakeENV.teardown();
       $('.use-css-transitions-for-show-hide').remove();
+      $(".ui-dialog").remove();
     }
   });
 
