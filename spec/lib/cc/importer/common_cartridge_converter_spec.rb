@@ -449,7 +449,7 @@ describe "More Standard Common Cartridge importing" do
     @copy_to.name = "alt name"
     @copy_to.course_code = "alt name"
 
-    @migration = Object.new
+    @migration = ContentMigration.new
     allow(@migration).to receive(:to_import).and_return(nil)
     allow(@migration).to receive(:context).and_return(@copy_to)
     allow(@migration).to receive(:import_object?).and_return(true)

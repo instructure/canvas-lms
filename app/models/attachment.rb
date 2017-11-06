@@ -41,6 +41,7 @@ class Attachment < ActiveRecord::Base
   include MasterCourses::Restrictor
   restrict_columns :content, [:display_name, :uploaded_data]
   restrict_columns :settings, [:folder_id, :locked, :lock_at, :unlock_at, :usage_rights_id]
+  restrict_columns :state, [:locked, :file_state]
 
   attr_accessor :podcast_associated_asset
 
@@ -199,6 +200,7 @@ class Attachment < ActiveRecord::Base
   # note, that the time it takes to send to s3 is the bad guy.
   # It blocks and makes the user wait.
   def run_after_attachment_saved
+    old_workflow_state = self.workflow_state
     if workflow_state == 'unattached' && @after_attachment_saved_workflow_state
       self.workflow_state = @after_attachment_saved_workflow_state
       @after_attachment_saved_workflow_state = nil
@@ -210,7 +212,7 @@ class Attachment < ActiveRecord::Base
     end
 
     # directly update workflow_state so we don't trigger another save cycle
-    if CANVAS_RAILS5_0 ? self.workflow_state_changed? : self.will_save_change_to_workflow_state?
+    if old_workflow_state != self.workflow_state
       self.shard.activate do
         self.class.where(:id => self).update_all(:workflow_state => self.workflow_state)
       end
@@ -270,7 +272,7 @@ class Attachment < ActiveRecord::Base
     dup = existing if existing && options[:overwrite]
 
     excluded_atts = EXCLUDED_COPY_ATTRIBUTES
-    excluded_atts += ["locked", "hidden"] if dup == existing
+    excluded_atts += ["locked", "hidden"] if dup == existing && !options[:migration]&.for_master_course_import?
     dup.assign_attributes(self.attributes.except(*excluded_atts))
 
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers

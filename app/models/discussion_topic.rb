@@ -40,6 +40,7 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
+  restrict_columns :state, [:workflow_state]
   restrict_assignment_columns
 
   attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries

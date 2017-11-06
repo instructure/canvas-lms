@@ -39,6 +39,7 @@ class WikiPage < ActiveRecord::Base
   restrict_columns :content, [:body, :title]
   restrict_columns :settings, [:editing_roles]
   restrict_assignment_columns
+  restrict_columns :state, [:workflow_state]
 
   after_update :post_to_pandapub_when_revised
 

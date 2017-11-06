@@ -51,6 +51,7 @@ class Assignment < ActiveRecord::Base
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
   restrict_assignment_columns
+  restrict_columns :state, [:workflow_state]
 
   has_many :submissions, -> { active.preload(:grading_period) }
   has_many :all_submissions, class_name: 'Submission', dependent: :destroy

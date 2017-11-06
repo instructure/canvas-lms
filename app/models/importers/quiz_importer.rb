@@ -235,11 +235,6 @@ module Importers
         item.assignment ||= context.assignments.temp_record
 
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
-
-        if new_record && !hash[:available] && item.can_unpublish?
-          item.workflow_state = 'unpublished'
-          item.assignment.workflow_state = 'unpublished'
-        end
       elsif !item.assignment && grading = hash[:grading]
         item.quiz_type = 'assignment'
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
@@ -272,6 +267,9 @@ module Importers
         item.generate_quiz_data
         item.workflow_state = 'available'
         item.published_at = Time.now
+      elsif item.can_unpublish? && (new_record || master_migration)
+        item.workflow_state = 'unpublished'
+        item.assignment.workflow_state = 'unpublished' if item.assignment
       end
 
       if hash[:assignment_group_migration_id]

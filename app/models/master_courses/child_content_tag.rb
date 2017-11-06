@@ -27,6 +27,7 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :calendar_event,
                                      :context_external_tool,
                                      :context_module,
+                                     :content_tag,
                                      :discussion_topic,
                                      :learning_outcome,
                                      :rubric,

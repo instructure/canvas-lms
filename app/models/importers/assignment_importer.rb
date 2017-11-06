@@ -84,7 +84,7 @@ module Importers
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
-      if item.new_record? || item.deleted?
+      if item.new_record? || item.deleted? || master_migration
         if item.can_unpublish?
           item.workflow_state = (hash[:workflow_state] || 'published')
         else

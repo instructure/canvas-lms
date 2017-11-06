@@ -408,6 +408,42 @@ describe MasterCourses::MasterMigration do
       expect(page2_to.reload).to be_active # should be restored because it hadn't been deleted manually
     end
 
+    it "doesn't restore deleted associated files unless relocked" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      att1 = Attachment.create!(:filename => 'file1.txt', :uploaded_data => StringIO.new('1'),
+        :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att2 = Attachment.create!(:filename => 'file2.txt', :uploaded_data => StringIO.new('2'),
+        :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+
+      run_master_migration
+
+      att1_to = @copy_to.attachments.where(:migration_id => mig_id(att1)).first
+      att1_to.destroy # "manually" delete it
+      att2_to = @copy_to.attachments.where(:migration_id => mig_id(att2)).first
+
+      Timecop.freeze(3.minutes.from_now) do
+        att1.touch
+        att2.destroy
+      end
+      run_master_migration
+
+      expect(att1_to.reload).to be_deleted # shouldn't have restored it
+      expect(att2_to.reload).to be_deleted # should still sync the original deletion
+
+      Timecop.freeze(5.minutes.from_now) do
+        att1.touch
+        @template.content_tag_for(att1).update_attribute(:restrictions, {:content => true}) # lock it down
+
+        att2.update_attribute(:file_state, "available") # restore the original
+      end
+      run_master_migration
+
+      expect(att1_to.reload).to be_available # should be restored because it's locked now
+      expect(att2_to.reload).to be_available # should be restored because it hadn't been deleted manually
+    end
+
     it "limits the number of items to track" do
       Setting.set('master_courses_history_count', '2')
 
@@ -1127,6 +1163,83 @@ describe MasterCourses::MasterMigration do
       rub_to = @copy_to.rubrics.where(:migration_id => mig_id(rub)).first
       expect(rub_to.data.first["learning_outcome_id"]).to eq lo_to.id
       expect(rub_to.learning_outcome_alignments.first.learning_outcome_id).to eq lo_to.id
+    end
+
+    it "should sync workflow states more betterisher" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      assmt = @copy_from.assignments.create!
+      topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      quiz = @copy_from.quizzes.create!(:workflow_state => 'available')
+      file = @copy_from.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
+      mod = @copy_from.context_modules.create!(:name => "module")
+      tag = mod.add_item(type: 'context_module_sub_header', title: 'header')
+      tag.publish!
+
+      run_master_migration
+
+      copied_assmt = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
+      copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_file = @copy_to.attachments.where(:migration_id => mig_id(file)).first
+      copied_mod = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      copied_tag = @copy_to.context_module_tags.where(:migration_id => mig_id(tag)).first
+      copied_things = [copied_assmt, copied_topic, copied_page, copied_quiz, copied_file, copied_mod, copied_tag]
+
+      copied_things.each do |copied_obj|
+        expect(copied_obj).to be_published
+      end
+
+      # unpublish everything
+      Timecop.freeze(1.minute.from_now) do
+        [assmt, topic, page, quiz, mod, tag].each do |obj|
+          obj.update_attribute(:workflow_state, "unpublished")
+        end
+        file.update_attribute(:locked, true)
+      end
+
+      run_master_migration
+
+      # should be unpublished
+      copied_things.each do |copied_obj|
+        expect(copied_obj.reload).to_not be_published
+      end
+
+      # republish everything
+      Timecop.freeze(2.minutes.from_now) do
+        assmt.update_attribute(:workflow_state, 'published')
+        quiz.update_attribute(:workflow_state, 'available')
+        [topic, page, mod, tag].each do |obj|
+          obj.update_attribute(:workflow_state, "active")
+        end
+        file.update_attribute(:locked, false)
+      end
+
+      run_master_migration
+
+      # should be published
+      copied_things.each do |copied_obj|
+        expect(copied_obj.reload).to be_published
+      end
+
+      # unpublish everything on child side
+      [copied_assmt, copied_topic, copied_page, copied_quiz, copied_mod, copied_tag].each do |obj|
+        obj.update_attribute(:workflow_state, "unpublished")
+      end
+      copied_file.update_attribute(:locked, true)
+      Timecop.freeze(3.minutes.from_now) do
+        [assmt, topic, page, quiz, mod, tag, file].each(&:touch) # retouch
+      end
+
+      run_master_migration
+
+      # should still be unpublished
+      copied_things.each do |copied_obj|
+        expect(copied_obj.reload).to_not be_published
+      end
     end
 
     it "sends notifications", priority: "2", test_id: 3211103 do

@@ -21,6 +21,9 @@ class ContextModule < ActiveRecord::Base
   include SearchTermHelper
   include DuplicatingObjects
 
+  include MasterCourses::Restrictor
+  restrict_columns :state, [:workflow_state]
+
   belongs_to :context, polymorphic: [:course]
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, -> { order('content_tags.position, content_tags.title') }, dependent: :destroy
