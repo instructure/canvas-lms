@@ -37,10 +37,6 @@ test('onUpdateFilters calls debouncedApplyFilters after updating state', () => {
       roles={[{id: '1' }]}
       queryParams={{}}
       onUpdateQueryParams={function(){}}
-      addUserUrls={{
-        USER_LISTS_URL: '/',
-        ENROLL_USERS_URL: '/',
-      }}
     />
   );
   const instance = wrapper.instance();

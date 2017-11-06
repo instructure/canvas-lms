@@ -43,10 +43,6 @@ const defaultFilters = {
 class CoursesPane extends React.Component {
   static propTypes = {
     roles: arrayOf(shape({ id: string.isRequired })).isRequired,
-    addUserUrls: shape({
-      USER_LISTS_URL: string.isRequired,
-      ENROLL_USERS_URL: string.isRequired,
-    }).isRequired,
     queryParams: shape().isRequired,
     onUpdateQueryParams: func.isRequired,
     accountId: string.isRequired
@@ -171,7 +167,6 @@ class CoursesPane extends React.Component {
           accountId={this.props.accountId}
           courses={courses.data}
           roles={this.props.roles}
-          addUserUrls={this.props.addUserUrls}
           sort={filters.sort}
           order={filters.order}
         />

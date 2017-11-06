@@ -22,6 +22,6 @@ import {actionTypes} from '../actions'
 import '../store'
 
 export default handleActions({
-  [actionTypes.ENROLL_USERS_SUCCESS]: (/* state, action */) => true,
+  [actionTypes.ENROLL_USERS_SUCCESS]: (state, action) => action.payload,
   [actionTypes.RESET]: (/* state, action */) => false
 }, false)

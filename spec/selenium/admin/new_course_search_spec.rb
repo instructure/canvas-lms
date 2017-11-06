@@ -133,10 +133,24 @@ describe "new account course search" do
     get "/accounts/#{@account.id}"
 
     fj('.courses-list [role=row] button:has([name="IconPlusLine"])').click
-    dialog = fj('.ui-dialog:visible')
+
+    dialog = fj('#add_people_modal:visible')
     expect(dialog).to be_displayed
-    role_options = dialog.find_elements(:css, '#role_id option')
+    role_options = dialog.find_elements(:css, '#peoplesearch_select_role option')
     expect(role_options.map{|r| r.text}).to match_array(["Student", "Observer", custom_name])
+  end
+
+  it "should load sections in new enrollment dialog" do
+    course = course_factory(:account => @account)
+    get "/accounts/#{@account.id}"
+
+    # doing this after the page loads to ensure that the frontend loads them dynamically
+    # when the "+ users" is clicked and not as part of the page load
+    sections = ('A'..'Z').map { |i| course.course_sections.create!(:name => "Test Section #{i}") }
+
+    fj('.courses-list [role=row] button:has([name="IconPlusLine"])').click # click the "+" to open addPeople
+    section_options = ffj('#add_people_modal:visible #peoplesearch_select_section option')
+    expect(section_options.map(&:text)).to eq(sections.map(&:name))
   end
 
   it "should create a new course from the 'Add a New Course' dialog" do

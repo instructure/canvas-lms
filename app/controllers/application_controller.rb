@@ -2306,17 +2306,14 @@ class ApplicationController < ActionController::Base
         priority_zones: localized_timezones(I18nTimeZone.us_zones),
         timezones: localized_timezones(I18nTimeZone.all)
       },
-      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user),
-      URLS: {
-        USER_LISTS_URL: course_user_lists_url("{{ id }}"),
-        ENROLL_USERS_URL: course_enroll_users_url("{{ id }}", :format => :json)
-      }
+      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user)
     })
     js_bundle :account_course_user_search
-    css_bundle :account_course_user_search
+    css_bundle :account_course_user_search, :addpeople
     @page_title = @account.name
     add_crumb '', '?' # the text for this will be set by javascript
     js_env({
+      ROOT_ACCOUNT_NAME: @domain_root_account.name, # used in AddPeopleApp modal
       ACCOUNT_ID: @account.id,
       ROOT_ACCOUNT_ID: @account.root_account.id,
       PERMISSIONS: {
