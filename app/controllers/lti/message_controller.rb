@@ -24,16 +24,18 @@ module Lti
   class MessageController < ApplicationController
 
     before_action :require_context, :require_user
+    skip_before_action :verify_authenticity_token, only: [:registration]
 
     def registration
       if authorized_action(@context, @current_user, :update)
+        return head :bad_request if tool_consumer_url.blank?
         @lti_launch = Launch.new
-        @lti_launch.resource_url = params[:tool_consumer_url]
+        @lti_launch.resource_url = tool_consumer_url
         message = RegistrationRequestService.create_request(
           @context,
           polymorphic_url([@context, :tool_consumer_profile]),
-          -> { polymorphic_url([@context, :registration_return]) },
-          params[:tool_consumer_url],
+          -> {polymorphic_url([@context, :registration_return])},
+          tool_consumer_url,
           polymorphic_url([:create, @context, :lti_tool_proxy])
         )
 
@@ -45,7 +47,6 @@ module Lti
         @lti_launch.params['ext_api_domain'] = HostUrl.context_host(@context, request.host)
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
-
         render Lti::AppUtil.display_template('borderless')
       end
     end
@@ -96,17 +97,29 @@ module Lti
     def registration_return
       @tool = ToolProxy.where(guid: params[:tool_proxy_guid]).first
       @data = {
-          subject: 'lti.lti2Registration',
-          status: params[:status],
-          app_id: @tool&.id,
-          name: @tool&.name,
-          description: @tool&.description,
-          message: params[:lti_errormsg] || params[:lti_msg]
+        subject: 'lti.lti2Registration',
+        status: params[:status],
+        app_id: @tool&.id,
+        name: @tool&.name,
+        description: @tool&.description,
+        message: params[:lti_errormsg] || params[:lti_msg]
       }
       render layout: false
     end
 
     private
+
+    def tool_consumer_url
+      url = URI(params[:tool_consumer_url])
+      ['http', 'https'].include?(url.scheme) ? url.to_s : ''
+    end
+
+    def generate_resource_link_id(message_handler)
+      message_handler.build_resource_link_id(
+        context: @context,
+        link_fragment: params[:resource_link_fragment]
+      )
+    end
 
     def launch_params(tool_proxy:, message:, private_key:)
       if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == 'lti_jwt_message_security'}
@@ -202,8 +215,8 @@ module Lti
       sequence_asset = tag.try(:content)
       if sequence_asset
         env_hash[:SEQUENCE] = {
-            :ASSET_ID => sequence_asset.id,
-            :COURSE_ID => @context.id,
+          :ASSET_ID => sequence_asset.id,
+          :COURSE_ID => @context.id,
         }
         js_hash = {:LTI => env_hash}
         js_env(js_hash)
@@ -229,9 +242,9 @@ module Lti
 
     def create_variable_expander(opts = {})
       default_opts = {
-          current_user: @current_user,
-          current_pseudonym: @current_pseudonym,
-          assignment: assignment
+        current_user: @current_user,
+        current_pseudonym: @current_pseudonym,
+        assignment: assignment
       }
       VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
     end
@@ -261,9 +274,9 @@ module Lti
         ).first_or_create
 
         {
-            tool_setting_link_id: link.id,
-            tool_setting_binding_id: binding.id,
-            tool_setting_proxy_id: proxy.id
+          tool_setting_link_id: link.id,
+          tool_setting_binding_id: binding.id,
+          tool_setting_proxy_id: proxy.id
         }
       else
         {}
