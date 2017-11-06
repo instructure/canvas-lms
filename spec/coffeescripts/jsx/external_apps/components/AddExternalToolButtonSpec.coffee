@@ -58,17 +58,10 @@ define [
     ok nodes.component.isMounted()
     ok TestUtils.isCompositeComponentWithType(nodes.component, AddExternalToolButton)
 
-  test 'does not include close button in footer if not LTI2 registration', ->
-    addToolButton = renderComponent({'canAddEdit': true})
-    addToolButton.setState({isLti2: false})
-    addToolButton.setState({modalIsOpen: true})
-    ok !document.querySelector('#footer-close-button')
-
   test 'includes close button in footer if LTI2 registration', ->
     addToolButton = renderComponent({'canAddEdit': true})
     addToolButton.setState({isLti2: true})
     addToolButton.setState({modalIsOpen: true})
-    console.log(addToolButton.state)
     ok document.querySelector('#footer-close-button')
 
   test 'bad config url error message', ->
@@ -157,5 +150,32 @@ define [
           "error_report_id":8
         })
         equal addToolButton._errorHandler(xhr), 'We were unable to add the app.'
+
+      test 'renders a tool launch iframe for LTI2', ->
+        addToolButton = renderComponent({'canAddEdit': true})
+        addToolButton.setState({modalIsOpen: true, isLti2: true})
+        ok document.querySelector('#lti2-iframe-container')
+
+      test 'hides the configuration form once registration begins', ->
+        addToolButton = renderComponent({'canAddEdit': true})
+        addToolButton.setState({isLti2: false, modalIsOpen: true})
+        element = document.querySelector('#lti2-iframe-container')
+        style = window.getComputedStyle(element)
+        equal style.getPropertyValue('display'), 'none'
+
+      test 'submits the configuration form to the launch iframe for LTI2', ->
+        addToolButton = renderComponent({'canAddEdit': true})
+        addToolButton.setState({modalIsOpen: true})
+        registrationUrl = 'http://www.instructure.com/register'
+        iframeDouble = { submit: sinon.spy() }
+        launchButton = document.querySelector('#submitExternalAppBtn')
+        closestStub = sinon.stub();
+        closestStub.withArgs('form').returns(iframeDouble)
+        launchButton.closest = closestStub
+        addToolButton.createTool('lti2', {'registrationUrl': registrationUrl}, {'currentTarget': launchButton})
+        ok iframeDouble.submit.called
+
+
+
 
 

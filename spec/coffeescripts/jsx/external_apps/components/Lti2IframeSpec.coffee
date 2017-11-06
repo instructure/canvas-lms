@@ -30,6 +30,7 @@ define [
     React.createElement(Lti2Iframe, {
       registrationUrl: data.registrationUrl
       handleInstall: data.handleInstall
+      reregistration: data.reregistration
     })
 
   renderComponent = (data) ->
@@ -55,4 +56,18 @@ define [
     component = TestUtils.renderIntoDocument(element)
     ok $(component.getDOMNode()).find('#test-child').length == 1
 
+  test 'getLaunchUrl returns the launch url if doing reregistration', ->
+    data =
+      registrationUrl: 'http://example.com'
+      handleInstall: ->
+      reregistration: true
+    component = renderComponent(data)
+    equal component.getLaunchUrl(), 'http://example.com'
 
+  test 'getLaunchUrl returns about:blank if not doing reregistration', ->
+    data =
+      registrationUrl: 'http://example.com'
+      handleInstall: ->
+      reregistration: false
+    component = renderComponent(data)
+    equal component.getLaunchUrl(), 'about:blank'

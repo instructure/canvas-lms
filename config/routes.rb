@@ -309,7 +309,7 @@ CanvasRails::Application.routes.draw do
         action: 'resource', as: :resource_link_id
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message',
         action: 'basic_lti_launch_request', as: :basic_lti_launch_request
-    get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
+    post 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
         as: :tool_proxy_reregistration
     get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
@@ -620,7 +620,7 @@ CanvasRails::Application.routes.draw do
         action: 'resource', as: :resource_link_id
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message',
         action: 'basic_lti_launch_request', as: :basic_lti_launch_request
-    get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
+    post 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
         as: :tool_proxy_reregistration
     get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
