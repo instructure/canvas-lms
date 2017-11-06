@@ -204,26 +204,39 @@ define [
     ok submissionCellResponse.indexOf("icon-check") > -1
 
   QUnit.module "Pass/Fail SubmissionCell",
-    setup: ->
+    getCell: (overrides = {}) ->
       opts =
         item:
-          foo: {}
+          foo: Object.assign({}, overrides.foo)
         column:
           field: 'foo'
           object:
             points_possible: 100
         assignment: {}
         container: $('#fixtures')[0]
+
       @cell = new SubmissionCell.pass_fail opts
-      @cell.$input = $("<button><i></i></button>")
+
     teardown: -> $('#fixtures').empty()
 
+  test "#pass_fail#htmlFromSubmission sets the data value for the button to entered_grade when it is complete", ->
+    @getCell({ foo: { entered_grade: 'complete' }})
+    strictEqual(@cell.$input.data('value'), 'complete')
+
+  test "#pass_fail#htmlFromSubmission sets the data value for the button to entered_grade when it is incomplete", ->
+    @getCell({ foo: { entered_grade: 'incomplete' }})
+    strictEqual(@cell.$input.data('value'), 'incomplete')
+
   test "#pass_fail#transitionValue changes the aria-label to match the currently selected option", ->
-    @cell.transitionValue('fail')
+    @getCell()
+    @cell.$input = $("<button><i></i></button>")
+    @cell.transitionValue('incomplete')
     equal @cell.$input.attr('aria-label'), 'fail'
 
   test "#pass_fail#transitionValue updates the icon class", ->
-    @cell.transitionValue('pass')
+    @getCell()
+    @cell.$input = $("<button><i></i></button>")
+    @cell.transitionValue('complete')
     ok @cell.$input.find('i').hasClass('icon-check')
 
   QUnit.module ".styles"
