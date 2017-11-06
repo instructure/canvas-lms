@@ -58,11 +58,15 @@ import 'jqueryui/sortable'
 import 'compiled/jquery.rails_flash_notifications'
 
   function refreshDuplicateLinkStatus($module) {
-    if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length) {
-      $module.find('.duplicate_module_menu_item').show();
-    } else {
-      $module.find('.duplicate_module_menu_item').hide();
-    }
+    // TODO: activiate the below "if" when we are ready to launch module
+    // duplication
+    $module.find('.duplicate_module_menu_item').hide();
+    // MAKE DEAD SURE THIS LINK DOESN'T SHOW UP UNTIL WE RELEASE MODULE DUPLICATION
+    // if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length) {
+    //   $module.find('.duplicate_module_menu_item').show();
+    // } else {
+    //   $module.find('.duplicate_module_menu_item').hide();
+    // }
   }
   // TODO: AMD don't export global, use as module
   /*global modules*/
