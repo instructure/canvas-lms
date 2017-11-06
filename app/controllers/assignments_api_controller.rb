@@ -784,7 +784,7 @@ class AssignmentsApiController < ApplicationController
   #   The position of this assignment in the group when displaying
   #   assignment lists.
   #
-  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"online_quiz"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
+  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.
@@ -793,7 +793,6 @@ class AssignmentsApiController < ApplicationController
   #     "online_quiz"
   #     "none"
   #     "on_paper"
-  #     "online_quiz"
   #     "discussion_topic"
   #     "external_tool"
   #
@@ -939,7 +938,7 @@ class AssignmentsApiController < ApplicationController
   #   The position of this assignment in the group when displaying
   #   assignment lists.
   #
-  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"online_quiz"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
+  # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.
@@ -948,7 +947,6 @@ class AssignmentsApiController < ApplicationController
   #     "online_quiz"
   #     "none"
   #     "on_paper"
-  #     "online_quiz"
   #     "discussion_topic"
   #     "external_tool"
   #
