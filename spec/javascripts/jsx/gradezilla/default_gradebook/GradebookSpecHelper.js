@@ -40,6 +40,7 @@ export function createGradebook (options = {}) {
     new_gradebook_development_enabled: true,
     outcome_gradebook_enabled: false,
     post_grades_ltis: [],
+    publish_to_sis_enabled: false,
     sections: [],
     settings: {
       show_concluded_enrollments: 'false',

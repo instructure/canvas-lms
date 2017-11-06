@@ -6088,28 +6088,40 @@ test('sets postGradesLtis to conform to ActionMenu.propTypes.postGradesLtis', fu
   ok(console.error.notCalled); // eslint-disable-line no-console
 });
 
-QUnit.module('Gradebook#getActionMenuProps', {
-  teardown () {
-    $fixtures.innerHTML = '';
-  }
-});
+QUnit.module('Gradebook', () => {
+  QUnit.module('#getActionMenuProps', (hooks) => {
+    let options;
 
-test('generates props that conform to ActionMenu.propTypes', function () {
-  $fixtures.innerHTML = '<span data-component="ActionMenu"><button /></span>';
-  const gradebook = createGradebook({
-    context_allows_gradebook_uploads: true,
-    gradebook_import_url: 'http://example.com/import',
-    currentUserId: '123',
-    export_gradebook_csv_url: 'http://example.com/export',
-    post_grades_feature: false,
-    publish_to_sis_enabled: false
+    hooks.beforeEach(() => {
+      $fixtures.innerHTML = '<span data-component="ActionMenu"><button /></span>';
+      options = {
+        context_allows_gradebook_uploads: true,
+        currentUserId: '123',
+        export_gradebook_csv_url: 'http://example.com/export',
+        gradebook_import_url: 'http://example.com/import',
+        post_grades_feature: false,
+        publish_to_sis_enabled: false
+      };
+    });
+
+    hooks.afterEach(() => {
+      $fixtures.innerHTML = '';
+    });
+
+    test('sets publishGradesToSis.isEnabled to true when "publish to SIS" is enabled', () => {
+      options.publish_to_sis_enabled = true;
+      const gradebook = createGradebook(options);
+      const props = gradebook.getActionMenuProps();
+      strictEqual(props.publishGradesToSis.isEnabled, true);
+    });
+
+    test('sets publishGradesToSis.isEnabled to false when "publish to SIS" is not enabled', () => {
+      options.publish_to_sis_enabled = false;
+      const gradebook = createGradebook(options);
+      const props = gradebook.getActionMenuProps();
+      strictEqual(props.publishGradesToSis.isEnabled, false);
+    });
   });
-
-  const props = gradebook.getActionMenuProps();
-
-  this.spy(console, 'error');
-  PropTypes.checkPropTypes(ActionMenu.propTypes, props, 'props', 'ActionMenu')
-  ok(console.error.notCalled); // eslint-disable-line no-console
 });
 
 QUnit.module('Gradebook#getInitialGridDisplaySettings');
