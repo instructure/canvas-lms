@@ -1892,8 +1892,8 @@ class CoursesController < ApplicationController
       enrollment_options[:role] = custom_role if custom_role
 
       list =
-        if params[:user_ids]
-          Array(params[:user_ids])
+        if params[:user_tokens]
+          Array(params[:user_tokens])
         else
           UserList.new(params[:user_list],
                           root_account: @context.root_account,

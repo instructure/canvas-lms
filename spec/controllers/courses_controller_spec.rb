@@ -1339,11 +1339,11 @@ describe CoursesController do
       expect(enrollment.limit_privileges_to_course_section).to eq true
     end
 
-    it "should also accept a list of user ids (instead of ye old UserList)" do
+    it "should also accept a list of user tokens (instead of ye old UserList)" do
       u1 = user_factory
       u2 = user_factory
       user_session(@teacher)
-      post 'enroll_users', params: {:course_id => @course.id, :user_ids => [u1.id, u2.id]}
+      post 'enroll_users', params: {:course_id => @course.id, :user_tokens => [u1.token, u2.token]}
       expect(response).to be_success
       @course.reload
       expect(@course.students).to include(u1)

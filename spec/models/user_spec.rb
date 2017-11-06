@@ -3967,4 +3967,26 @@ describe User do
         expect(user.has_student_enrollment?).to eq false
     end
   end
+
+  describe "from_tokens" do
+    specs_require_sharding
+
+    let(:users) { [User.create!, @shard1.activate { User.create! }] }
+    let(:tokens) { users.map(&:token) }
+
+    it "generates tokens made of id/md5(uuid) pairs" do
+      tokens.each_with_index do |token, i|
+        expect(token).to eq "#{users[i].id}_#{Digest::MD5.hexdigest(users[i].uuid)}"
+      end
+    end
+
+    it "instantiates users by token" do
+      expect(User.from_tokens(tokens)).to match_array(users)
+    end
+
+    it "excludes bad tokens" do
+      broken_tokens = tokens.map { |token| token + 'ff' }
+      expect(User.from_tokens(broken_tokens)).to be_empty
+    end
+  end
 end

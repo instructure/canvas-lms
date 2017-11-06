@@ -3021,4 +3021,22 @@ class User < ActiveRecord::Base
     end
     roles
   end
+
+  # user tokens are returned by UserListV2 and used to bulk-enroll users using information that isn't easy to guess
+  def self.token(id, uuid)
+    "#{id}_#{Digest::MD5.hexdigest(uuid)}"
+  end
+
+  def token
+    User.token(id, uuid)
+  end
+
+  def self.from_tokens(tokens)
+    id_token_map = tokens.each_with_object({}) do |token, map|
+      id, huuid = token.split('_')
+      id = Shard.relative_id_for(id, Shard.current, Shard.current)
+      map[id] = "#{id}_#{huuid}"
+    end
+    User.where(:id => id_token_map.keys).to_a.select { |u| u.token == id_token_map[u.id] }
+  end
 end
