@@ -260,20 +260,14 @@ describe Submission do
         end
 
         it 'changes if an override is removed for the student' do
-          other_student = User.create!
-          @course.enroll_student(other_student, active_all: true)
           @override.assignment_override_students.create!(user: @student)
-          # need two students for this spec. if there's only one student and we remove the
-          # assignment_override_student, the entire assignment_override gets wiped out and
-          # we're testing something completely different.
-          @override.assignment_override_students.create!(user: other_student)
           expect { @override.assignment_override_students.find_by(user_id: @student).destroy }.to change {
             submission.reload.cached_due_date
           }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
         end
 
         it 'changes if the due date for the override is changed' do
-          @override.assignment_override_students.create!(user: @student)
+          @override.assignment_override_students.create!(user: @student, workflow_state: 'active')
           expect { @override.update!(due_at: 14.minutes.ago(@now)) }.to change {
             submission.reload.cached_due_date
           }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
