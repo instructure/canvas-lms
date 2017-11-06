@@ -58,6 +58,11 @@ describe CutyCapt do
       allow(Resolv).to receive(:getaddresses).and_return([ "8.8.8.8", "10.0.1.1" ])
       expect(CutyCapt.verify_url("http://workingexample.com/blah")).to be_falsey
     end
+
+    it "should check that the url resolves to something" do
+      ConfigFile.stub('cutycapt', { :path => 'not used' })
+      expect(CutyCapt.verify_url("http://successfull")).to be_falsey
+    end
   end
 
   context "execution" do
@@ -65,11 +70,9 @@ describe CutyCapt do
       ConfigFile.stub('cutycapt', { :path => '/bin/sleep', :timeout => '1000' })
 
       allow(CutyCapt).to receive(:cuty_arguments).and_return([ "/bin/sleep", "60" ])
-      begin
+      expect {
         Timeout::timeout(10) { CutyCapt.snapshot_url("http://google.com/") }
-      rescue Timeout::Error
-        raise "Cuty did not time out after 2 seconds!"
-      end
+      }.not_to raise_error
     end
   end
 end
