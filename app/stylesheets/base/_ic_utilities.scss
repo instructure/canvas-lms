@@ -52,6 +52,15 @@
   @include clearfix();
 }
 
+// Clickthrough container
+.clickthrough-container {
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
+}
+
 // Accessible yet invisible text
 .hide-text {
   text-indent: -119988px;

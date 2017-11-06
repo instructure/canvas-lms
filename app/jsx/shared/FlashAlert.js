@@ -196,6 +196,7 @@ export function showFlashAlert ({ message, err, type = err ? 'error' : 'info' })
     let alertContainer = document.getElementById(messageHolderId)
     if (!alertContainer) {
       alertContainer = document.createElement('div')
+      alertContainer.classList.add('clickthrough-container')
       alertContainer.id = messageHolderId
       alertContainer.setAttribute('style', 'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;')
       document.body.appendChild(alertContainer)
