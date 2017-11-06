@@ -34,7 +34,8 @@ export default React.createClass({
       required:     PropTypes.bool,
       hintText:     PropTypes.string,
       placeholder:  PropTypes.string,
-      errors:       PropTypes.object
+      errors:       PropTypes.object,
+      name:         PropTypes.string
     },
 
     render() {
@@ -47,7 +48,8 @@ export default React.createClass({
               placeholder={this.props.placeholder || this.props.label}
               required={this.props.required ? "required" : null}
               onChange={this.handleChange}
-              aria-invalid={!!this.getErrorMessage()} />
+              aria-invalid={!!this.getErrorMessage()}
+              name={this.props.name || null}/>
             {this.renderHint()}
           </label>
         </div>

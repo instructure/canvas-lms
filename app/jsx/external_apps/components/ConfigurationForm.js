@@ -33,7 +33,9 @@ export default React.createClass({
       configurationType: PropTypes.string,
       handleSubmit: PropTypes.func.isRequired,
       tool: PropTypes.object.isRequired,
-      showConfigurationSelector: PropTypes.bool
+      showConfigurationSelector: PropTypes.bool,
+      hideComponent: PropTypes.bool,
+      children: PropTypes.node
     },
 
     getDefaultProps : function() {
@@ -134,10 +136,17 @@ export default React.createClass({
         };
         var formData = form.getFormData();
         formData = strip(formData);
-        this.props.handleSubmit(this.state.configurationType, formData);
+        this.props.handleSubmit(this.state.configurationType, formData, e);
       } else {
         $('.ReactModal__Overlay').animate({ scrollTop: 0 }, 'slow');
       }
+    },
+
+    iframeTarget() {
+      if (this.state.configurationType === 'lti2') {
+        return 'lti2_registration_frame';
+      }
+      return null;
     },
 
     form() {
@@ -208,20 +217,27 @@ export default React.createClass({
 
     render() {
       return (
-        <form className="ConfigurationForm" onSubmit={this.handleSubmit}>
-          <div className="ReactModal__Body">
-            {this.configurationTypeSelector()}
-            <div className="formFields">
-              {this.form()}
+        <div style={this.props.hideComponent ? {display: 'none'} : {}}>
+          <form
+            className="ConfigurationForm"
+            onSubmit={this.handleSubmit}
+            target={this.iframeTarget()}
+            method="post"
+            action={ENV.LTI_LAUNCH_URL}>
+            <div className="ReactModal__Body">
+              {this.configurationTypeSelector()}
+              <div className="formFields">
+                {this.form()}
+              </div>
             </div>
-          </div>
-          <div className="ReactModal__Footer">
-            <div className="ReactModal__Footer-Actions">
-              {this.props.children}
-              {this.submitButton()}
+            <div className="ReactModal__Footer">
+              <div className="ReactModal__Footer-Actions">
+                {this.props.children}
+                {this.submitButton()}
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       )
     }
   });
