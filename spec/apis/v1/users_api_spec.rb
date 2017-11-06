@@ -101,6 +101,24 @@ describe Api::V1::User do
         })
     end
 
+    it 'should return SIS login when setting is set' do
+      @user = User.create!(name: 'User')
+      Account.default.settings['return_sis_login_id'] = 'true'
+      Account.default.save!
+      @user.pseudonyms.create!(unique_id: 'xyz', account: Account.default) { |p| p.sis_user_id = 'xyz' }
+      expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
+          'name' => 'User',
+          'sortable_name' => 'User',
+          'sis_import_id' => nil,
+          'id' => @user.id,
+          'short_name' => 'User',
+          'sis_user_id' => 'xyz',
+          'integration_id' => nil,
+          'login_id' => 'xyz',
+          'sis_login_id' => 'xyz'
+        })
+    end
+
     it 'should show SIS data to sub account admins' do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
