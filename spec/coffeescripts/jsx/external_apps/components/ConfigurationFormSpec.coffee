@@ -216,3 +216,39 @@ define [
     formData = handleSubmitSpy.getCall(0).args[1]
     handleSubmitSpy.reset()
     strictEqual formData.registrationUrl, 'https://lti-tool-provider-example..com/register'
+
+  test "'iframeTarget' returns null if configuration type is not lti2", ->
+    data =
+      configurationType: 'manual'
+      handleSubmit: handleSubmit
+      tool: {}
+      showConfigurationSelector: true
+    nodes = getDOMNodes(data)
+    equal nodes.component.iframeTarget(), null
+
+  test "'iframeTarget' returns 'lti2_registration_frame' if configuration type is lti2", ->
+    data =
+      configurationType: 'lti2'
+      handleSubmit: handleSubmit
+      tool: {}
+      showConfigurationSelector: true
+    nodes = getDOMNodes(data)
+    equal nodes.component.iframeTarget(), 'lti2_registration_frame'
+
+  test "sets the target of the form to the iframe for lti2", ->
+    data =
+      configurationType: 'lti2'
+      handleSubmit: handleSubmit
+      tool: {}
+      showConfigurationSelector: true
+    nodes = getDOMNodes(data)
+    equal document.querySelector('form').getAttribute('target'), 'lti2_registration_frame'
+
+  test "sets the form method to post", ->
+    data =
+      configurationType: 'lti2'
+      handleSubmit: handleSubmit
+      tool: {}
+      showConfigurationSelector: true
+    nodes = getDOMNodes(data)
+    equal document.querySelector('form').getAttribute('method'), 'post'
