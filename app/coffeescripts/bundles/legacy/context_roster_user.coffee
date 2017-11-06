@@ -43,7 +43,7 @@ define [
     $(".conclude_enrollment_link").click (event) ->
       event.preventDefault()
       $(this).parents(".enrollment").confirmDelete
-        message: I18n.t("confirm.conclude_student", "Are you sure you want to conclude this student's enrollment?")
+        message: I18n.t("confirm.conclude", "Are you sure you want to conclude this enrollment?")
         url: $(this).attr("href")
         success: (data) ->
           comp_at = $.datetimeString(data.enrollment.completed_at)
