@@ -893,6 +893,7 @@ class CoursesController < ApplicationController
 
       user_ids = params[:user_ids]
       if user_ids.present?
+        user_ids = user_ids.split(",") if user_ids.is_a?(String)
         users = users.where(id: user_ids)
       end
 
