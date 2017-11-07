@@ -155,9 +155,8 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @attachments = @portfolio.attachments.not_deleted.
         where(display_name: zip_filename,
-              workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached']).
-        order(:created_at)
-      @attachment = @attachments.last
+              workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached'])
+      @attachment = @attachments.order(:created_at).last
       @attachments.where.not(id: @attachment).find_each(&:destroy_permanently_plus)
 
       if @attachment && stale_zip_file?
