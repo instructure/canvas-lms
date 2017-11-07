@@ -1454,7 +1454,8 @@ class User < ActiveRecord::Base
     original_shard = Shard.current
     shard.activate do
       course_ids = course_ids_for_todo_lists(participation_type, opts)
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored, :include_locked, :include_concluded, :scope_only, :only_favorites))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored,
+        :include_locked, :include_concluded, :scope_only, :only_favorites, :needing_submitting))
 
       if opts[:scope_only]
         Shard.partition_by_shard(course_ids) do |shard_course_ids|
@@ -1536,7 +1537,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def ungraded_quizzes_needing_submitting(opts={})
+  def ungraded_quizzes(opts={})
     assignments_needing('submitting', :student, 15.minutes, opts.merge(:ungraded_quizzes => true)) do |quiz_scope, options|
       due_after = options[:due_after] || Time.now
       due_before = options[:due_before] || 1.week.from_now
@@ -1547,8 +1548,8 @@ class User < ActiveRecord::Base
       quizzes = quizzes.
                   available.
                   due_between_with_overrides(due_after, due_before).
-                  need_submitting_info(id, options[:limit]).
                   preload(:context)
+      quizzes = quizzes.need_submitting_info(id, options[:limit]) if options[:needing_submitting]
       if options[:scope_only]
         quizzes.for_course(options[:shard_course_ids])
       else

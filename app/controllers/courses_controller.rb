@@ -1055,7 +1055,7 @@ class CoursesController < ApplicationController
         todo_item_json(a, @current_user, session, 'submitting')
       }
       if Array(params[:include]).include? 'ungraded_quizzes'
-        submitting += @current_user.ungraded_quizzes_needing_submitting(:contexts => [@context]).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
+        submitting += @current_user.ungraded_quizzes(:contexts => [@context], :needing_submitting => true).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
         submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
       end
       render :json => (grading + submitting)
