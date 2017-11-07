@@ -273,13 +273,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def record_creation_event
-    Quizzes::QuizSubmissionEvent.new.tap do |event|
-      event.event_type = Quizzes::QuizSubmissionEvent::EVT_SUBMISSION_CREATED
-      event.event_data = {"quiz_version" => self.quiz_version, "quiz_data" => self.quiz_data}
-      event.created_at = Time.zone.now
-      event.quiz_submission = self
-      event.attempt = self.attempt
-    end.save!
+    self.events.create!(
+      event_type: Quizzes::QuizSubmissionEvent::EVT_SUBMISSION_CREATED,
+      event_data: {"quiz_version" => self.quiz_version, "quiz_data" => self.quiz_data},
+      created_at: Time.zone.now,
+      attempt: self.attempt
+    )
   end
 
   def sanitize_params(params)
