@@ -426,7 +426,7 @@ describe AppointmentGroupsController, type: :request do
       expect(json.first['reserved_times']).to include({"id" => event.id, "start_at" => event.start_at.iso8601, "end_at" => event.end_at.iso8601})
     end
   end
-  
+
   types = {
     'users' => proc {
       @ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
@@ -523,6 +523,21 @@ describe AppointmentGroupsController, type: :request do
       @ag2.appointments.last.reserve_for(@student2, @me)
       json = api_call_as_user(@student2, :get, @path, @params)
       expect(json.length).to eq 0
+    end
+
+    it 'doesnt get confused by appointment groups with both past and future' do
+      ag3 = AppointmentGroup.create!(:title => "past and future", :contexts => [@course2],
+        :new_appointments => [
+          [1.month.ago, 1.month.ago + 30.minutes],
+          [1.month.from_now, 1.month.from_now + 30.minutes]
+        ])
+      ag3.publish!
+      @path += "&appointment_group_ids[]=#{ag3.to_param}"
+      @params[:appointment_group_ids].push(ag3.to_param)
+      json = api_call_as_user(@student2, :get, @path, @params)
+      pp json
+      expect(json.length).to eq 1
+      expect(json[0]['id']).to eq ag3.appointments.last.id
     end
   end
 end
