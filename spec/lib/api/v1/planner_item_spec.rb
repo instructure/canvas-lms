@@ -144,13 +144,15 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:excused]).to be true
       end
 
-      it 'should indicate that an assignment is graded' do
+      it 'should indicate that a graded assignment is graded' do
         submission = @assignment.submit_homework(@student, body: "o")
         submission.update(score: 10)
         submission.grade_it!
 
         json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:graded]).to be true
+        # just because it's graded, doesn't mean there's feedback
+        expect(json[:submissions][:has_feedback]).to be false
       end
 
       it 'should indicate that an assignment is late' do
@@ -168,13 +170,25 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:needs_grading]).to be true
       end
 
-      it 'should indicate that an assignment has feedback' do
+      it 'should indicate that a graded assignment with comment has feedback and is graded' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @teacher, comment: "nice work, fam")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:graded]).to be true
+      end
+
+      it 'should indicate that a not-yet-graded assignment has feedback' do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         submission.add_comment(user: @teacher, comment: "nice work, fam")
         submission.grade_it!
 
         json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
         expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:graded]).to be false
       end
     end
   end

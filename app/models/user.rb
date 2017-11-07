@@ -1705,7 +1705,9 @@ class User < ActiveRecord::Base
           late: Set.new(Submission.active.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
           missing: Set.new(Submission.active.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
           needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
-          has_feedback: Set.new(self.recent_feedback(start_at: opts[:due_after]).pluck(:assignment_id)),
+          # distinguishes between assignment being graded and having feedback comments, but cannot discern new feedback and new grades if there is already feedback.
+          # that's OK for now, since the "New" was removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there is _any_ feedback or grade.
+          has_feedback: Set.new((self.recent_feedback(start_at: opts[:due_after]).select { |feedback| feedback[:submission_comments_count].to_i > 0 }).pluck(:assignment_id)),
           new_activity: Set.new(Submission.active.with_assignment.unread_for(self).pluck(:assignment_id))
         }.with_indifferent_access
     end

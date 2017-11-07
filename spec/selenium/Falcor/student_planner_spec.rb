@@ -76,14 +76,14 @@ describe "student planner" do
     end
 
     it "shows new grades tag for assignments that are graded", priority: "1", test_id: 3263152 do
-      @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
+      @assignment.grade_student(@student1, grade: 10, grader: @teacher)
       go_to_list_view
       validate_pill('Graded')
       expect(f('.PlannerApp')).not_to include_text('Feedback') # graded != feedback
     end
 
     it "shows new feedback tag for assignments that has feedback", priority: "1", test_id: 3263154 do
-      @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
+      @assignment.update_submission(@student1, {comment: 'Good', author: @teacher})
       go_to_list_view
       validate_pill('Feedback')
     end

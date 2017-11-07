@@ -2550,6 +2550,7 @@ describe User do
       submission.grade_it!
 
       expect(@student.submission_statuses[:graded]).to match_array([@assignment.id])
+      expect(@student.submission_statuses[:has_feedback]).to match_array([])
     end
 
     it 'should indicate that an assignment is late' do
