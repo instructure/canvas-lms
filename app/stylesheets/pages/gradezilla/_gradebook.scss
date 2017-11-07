@@ -883,6 +883,12 @@ $gradebook_checkbox_size: 16px;
   }
 }
 
+.with-fixed-bottom #SubmissionTray__Content::after {
+  content: ' ';
+  height: 60px; // ref: app/stylesheets/components/_g_instructure.scss
+  display: block;
+}
+
 .SubmissionTray__RadioInput {
   padding: 0.4rem;
   margin-bottom: 0.4rem;
