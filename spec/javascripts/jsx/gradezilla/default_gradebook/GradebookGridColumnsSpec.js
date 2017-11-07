@@ -252,6 +252,16 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
       ];
       deepEqual(reorderEventData.scrollable.map(column => column.id), expectedOrder);
     });
+
+    test('does not trigger the "onColumnsReordered" event when column order did not change', function () {
+      const spy = sinon.spy();
+      gradebook.gradebookGrid.events.onColumnsReordered.subscribe(spy);
+      gridSpecHelper.updateColumnOrder([
+        'student', 'custom_col_2401', 'custom_col_2402', 'assignment_2301', 'assignment_2302',
+        'assignment_group_2201', 'assignment_group_2202', 'total_grade'
+      ]);
+      strictEqual(spy.callCount, 0);
+    });
   });
 
   QUnit.module('when rearranging scrollable columns', function (hooks) {

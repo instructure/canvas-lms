@@ -342,11 +342,15 @@ define [
         @gridData.columns.scrollable = columns.scrollable.map((column) -> column.id)
 
         if !_.isEqual(currentFrozenIds, updatedFrozenIds)
-          customColumnIds = (column.customColumnId for column in columns.frozen when column.type == 'custom_column')
-          @reorderCustomColumns(customColumnIds)
-            .then =>
-              colsById = _(@gradebookContent.customColumns).indexBy (c) -> c.id
-              @gradebookContent.customColumns = _(customColumnIds).map (id) -> colsById[id]
+          currentFrozenColumns = currentFrozenIds.map((columnId) => @gridData.columns.definitions[columnId])
+          currentCustomColumnIds = (column.customColumnId for column in currentFrozenColumns when column.type == 'custom_column')
+          updatedCustomColumnIds = (column.customColumnId for column in columns.frozen when column.type == 'custom_column')
+
+          if !_.isEqual(currentCustomColumnIds, updatedCustomColumnIds)
+            @reorderCustomColumns(updatedCustomColumnIds)
+              .then =>
+                colsById = _(@gradebookContent.customColumns).indexBy (c) -> c.id
+                @gradebookContent.customColumns = _(updatedCustomColumnIds).map (id) -> colsById[id]
         else
           @saveCustomColumnOrder()
 

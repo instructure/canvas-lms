@@ -4303,20 +4303,23 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
     hooks.beforeEach(() => {
       gradebook = createGradebook();
       allColumns = [
-        { id: 'student' },
-        { id: 'custom_col_2401' },
-        { id: 'custom_col_2402' },
-        { id: 'assignment_2301' },
-        { id: 'assignment_2302' },
-        { id: 'assignment_group_2201' },
-        { id: 'assignment_group_2202' },
-        { id: 'total_grade' }
+        { id: 'student', type: 'student' },
+        { id: 'custom_col_2401', type: 'custom_column', customColumnId: '2401' },
+        { id: 'custom_col_2402', type: 'custom_column', customColumnId: '2402' },
+        { id: 'assignment_2301', type: 'assignment' },
+        { id: 'assignment_2302', type: 'assignment' },
+        { id: 'assignment_group_2201', type: 'assignment_group' },
+        { id: 'assignment_group_2202', type: 'assignment_group' },
+        { id: 'total_grade', type: 'total_grade' }
       ];
       columns = {
         frozen: allColumns.slice(0, 3),
         scrollable: allColumns.slice(3)
       };
 
+      gradebook.gridData.columns.definitions = allColumns.reduce((map, column) => (
+        { ...map, [column.id]: column }
+      ), {});
       gradebook.gridData.columns.frozen = columns.frozen.map(column => column.id);
       gradebook.gridData.columns.scrollable = columns.scrollable.map(column => column.id);
 
@@ -4331,6 +4334,13 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
       columns.scrollable = allColumns.slice(3, 8);
       gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
       strictEqual(gradebook.reorderCustomColumns.callCount, 1);
+    });
+
+    test('does not reorder custom columns when custom column order was not affected', () => {
+      columns.frozen = [allColumns[1], allColumns[0], allColumns[2]];
+      columns.scrollable = allColumns.slice(3, 8);
+      gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns);
+      strictEqual(gradebook.reorderCustomColumns.callCount, 0);
     });
 
     test('stores custom column order when scrollable columns were reordered', () => {
