@@ -66,6 +66,7 @@ class Enrollment < ActiveRecord::Base
   after_create :create_linked_enrollments
   after_create :create_enrollment_state
   after_save :copy_scores_from_existing_enrollment, if: :need_to_copy_scores?
+  after_save :restore_submissions_and_scores
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
@@ -1342,6 +1343,50 @@ class Enrollment < ActiveRecord::Base
     student_or_fake_student? && other_enrollment_of_same_type.present?
   end
 
+  def restore_submissions_and_scores
+    return unless being_restored?(to_state: "completed")
+
+    # running in an n_strand to handle situations where a SIS import could
+    # update a ton of enrollments from "deleted" to "completed".
+    send_later_if_production_enqueue_args(
+      :restore_submissions_and_scores_now,
+      {
+        n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
+        max_attempts: 1,
+        priority: Delayed::LOW_PRIORITY
+      }
+    )
+  end
+
+  def restore_submissions_and_scores_now
+    restore_deleted_submissions
+    restore_deleted_scores
+  end
+
+  def restore_deleted_submissions
+    Submission.
+      joins(:assignment).
+      where(user_id: user_id, workflow_state: "deleted", assignments: { context_id: course_id }).
+      merge(Assignment.active).
+      in_batches.
+      update_all("workflow_state = #{DueDateCacher::INFER_SUBMISSION_WORKFLOW_STATE_SQL}")
+  end
+
+  def restore_deleted_scores
+    assignment_groups = course.assignment_groups.active
+    grading_periods = GradingPeriod.for(course)
+
+    Score.
+      where(enrollment_id: id, workflow_state: "deleted").
+      where(course_score: true).or(
+        Score.where(assignment_group: assignment_groups)
+      ).or(
+        Score.where(grading_period: grading_periods)
+      ).
+      in_batches.
+      update_all(workflow_state: "active")
+  end
+
   def student_or_fake_student?
     ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
   end
@@ -1356,7 +1401,7 @@ class Enrollment < ActiveRecord::Base
     ).where.not(id: id, workflow_state: :deleted).first
   end
 
-  def being_restored?
-    workflow_state_changed? && workflow_state_was == 'deleted'
+  def being_restored?(to_state: workflow_state)
+    workflow_state_changed? && workflow_state_was == 'deleted' && workflow_state == to_state
   end
 end

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DueDateCacher do
-  before do
+  before(:once) do
     course_with_student(:active_all => true)
     assignment_model(:course => @course)
   end
