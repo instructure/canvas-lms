@@ -20,6 +20,9 @@ define [
   'compiled/quizzes/log_auditing/constants'
   'jquery'
 ], (Subject, K, $) ->
+  scrollSelector = 'html, body'
+  $scrollContainer = $(scrollSelector)
+
   QUnit.module 'Quizzes::LogAuditing::EventTrackers::QuestionViewed',
     setup: ->
     teardown: ->
@@ -54,9 +57,8 @@ define [
   test 'capturing: it works', ->
     tracker = new Subject(frequency: 0)
     capture = @stub()
-    tracker.install(capture)
+    tracker.install(capture, scrollSelector)
 
-    wh = $(window).height()
     offsetTop = 3500
 
     $fakeQuestion = createQuestion('123')
@@ -65,21 +67,19 @@ define [
       'margin-top': offsetTop
     })
 
-    $(window).scroll()
+    $scrollContainer.scrollTop(10).scroll()
     ok !capture.called,
       'question should not be marked as viewed just yet'
 
-    $(window).scrollTop($(document).height())
-    $(window).scroll()
+    $scrollContainer.scrollTop(offsetTop).scroll()
     ok capture.called,
       'question should now be marked as viewed after scrolling it into viewport'
 
     capture.reset()
 
-    $(window).scrollTop(0).scroll()
+    $scrollContainer.scrollTop(0).scroll()
     ok !capture.called
 
-    $(window).scrollTop($(document).height())
-    $(window).scroll()
+    $scrollContainer.scrollTop(offsetTop).scroll()
     ok !capture.called,
       'should not track the same question more than one time'

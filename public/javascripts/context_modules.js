@@ -53,9 +53,15 @@ import './jquery.keycodes'
 import './jquery.loadingImg'
 import './jquery.templateData' /* fillTemplateData, getTemplateData */
 import './vendor/date' /* Date.parse */
-import './vendor/jquery.scrollTo'
 import 'jqueryui/sortable'
 import 'compiled/jquery.rails_flash_notifications'
+
+function scrollTo ($thing, time = 500) {
+  if (!$thing || $thing.length === 0) return
+  $('html, body').animate({
+    scrollTop: $thing.offset().top,
+  }, time)
+}
 
   function refreshDuplicateLinkStatus($module) {
     // TODO: activiate the below "if" when we are ready to launch module
@@ -1941,9 +1947,6 @@ import 'compiled/jquery.rails_flash_notifications'
       });
     });
 
-    if($(".context_module:first .content:visible").length == 0) {
-      $("html,body").scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"));
-    }
     if($("#context_modules").hasClass('editable')) {
       setTimeout(modules.initModuleManagement, 1000);
       modules.loadMasterCourseData();
@@ -1953,7 +1956,11 @@ import 'compiled/jquery.rails_flash_notifications'
     modules.updateAssignmentData(function() {
       modules.updateProgressions(function() {
         if (window.location.hash && !window.location.hash.startsWith('#!')) {
-          $.scrollTo($(window.location.hash));
+          scrollTo($(window.location.hash))
+        } else {
+          if ($(".context_module:first .content:visible").length == 0) {
+            scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"))
+          }
         }
       });
     });
