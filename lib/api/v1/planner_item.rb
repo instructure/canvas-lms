@@ -35,6 +35,7 @@ module Api::V1::PlannerItem
   }.freeze
 
   def planner_item_json(item, user, session, opts = {})
+    item = item.assignment if item.respond_to?(:assignment) && item.assignment
     context_data(item).merge({
       :plannable_id => item.id,
       :plannable_date => item.planner_date,

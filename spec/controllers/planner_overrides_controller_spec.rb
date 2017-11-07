@@ -507,6 +507,30 @@ describe PlannerOverridesController do
               get :items_index, params: {filter: "new_activity"}
               expect(json_parse(response.body).length).to eq 1
             end
+
+            it "should return graded discussions with unread replies" do
+              @topic.change_read_state('read', @student)
+              assign = assignment_model(course: @course, due_at: Time.zone.now)
+              topic = @course.discussion_topics.create!(course: @course, assignment: assign)
+              topic.change_read_state('read', @student)
+
+              get :items_index, params: {filter: "new_activity"}
+              expect(json_parse(response.body)).to be_empty
+
+              entry = topic.discussion_entries.create!(:message => "Hello!", :user => @student)
+              reply = entry.reply_from(:user => @teacher, :text => "ohai!")
+              topic.reload
+
+              get :items_index, params: {filter: "new_activity"}
+              response_json = json_parse(response.body)
+              expect(response_json.length).to eq 1
+              expect(response_json.first["plannable_id"]).to eq assign.id
+              expect(response_json.first["plannable"]["id"]).to eq topic.id
+
+              reply.change_read_state('read', @student)
+              get :items_index, params: {filter: "new_activity"}
+              expect(json_parse(response.body)).to be_empty
+            end
           end
         end
       end

@@ -80,6 +80,7 @@ module Factories
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
     @topic.save!
+    @assignment.reload
     @topic
   end
 

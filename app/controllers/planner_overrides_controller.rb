@@ -325,7 +325,7 @@ class PlannerOverridesController < ApplicationController
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
                     @current_user.discussion_topics_needing_viewing(scope_only: true, include_ignored: true,
-                      due_before: end_date, due_after: start_date).
+                      due_before: end_date, due_after: start_date, new_activity: true).
                       unread_for(@current_user),
                     DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at], :id)
   end

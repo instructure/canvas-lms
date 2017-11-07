@@ -2342,13 +2342,22 @@ describe User do
         expect(@student.discussion_topics_needing_viewing(opts)).to eq []
       end
 
-      it 'should not show discussions that are graded' do
-        a = @course.assignments.create!(title: "some assignment", points_possible: 5)
+      it 'should not show discussions that are graded unless new_activity is true' do
+        a = @course.assignments.create!(title: "some assignment", points_possible: 5, due_at: 1.day.from_now)
         t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
         t.save
         expect(t.assignment_id).to eql(a.id)
         expect(t.assignment).to eql(a)
         expect(@student.discussion_topics_needing_viewing(opts)).not_to include t
+      end
+
+      it 'should show graded discussion if new activity is true' do
+        a = @course.assignments.create!(title: "some assignment", points_possible: 5, due_at: 1.day.from_now)
+        t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
+        t.save
+        expect(t.assignment_id).to eql(a.id)
+        expect(t.assignment).to eql(a)
+        expect(@student.discussion_topics_needing_viewing(opts.merge({new_activity: true}))).to include t
       end
 
       context "locked discussion topics" do

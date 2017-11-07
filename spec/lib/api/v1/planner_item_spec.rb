@@ -77,6 +77,13 @@ describe Api::V1::PlannerItem do
       expect(annc_hash[:plannable_date]).to eq annc_post_date
     end
 
+    it 'should show the assignment for the plannable_id if one exists' do
+      asg = assignment_model course: @couse, submission_types: 'online_text_entry'
+      dt = @course.discussion_topics.create!(assignment: asg, title: 'Assignment DT')
+      dt_hash = api.planner_item_json(dt, @student, session)
+      expect(dt_hash[:plannable_id]).to eq asg.id
+    end
+
     context 'with an existing planner override' do
       it 'should return the planner visibility state' do
         teacher_hash = api.planner_item_json(@assignment, @teacher, session)
