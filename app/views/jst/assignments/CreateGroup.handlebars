@@ -53,6 +53,7 @@
               class="span1 field"
               name="rules[drop_lowest]"
               value="{{n drop_lowest}}"
+              min="0"
               {{#unless can_change_weighting}}readonly{{/unless}}
             />
           </div>
@@ -68,6 +69,7 @@
               class="span1 field"
               name="rules[drop_highest]"
               value="{{n drop_highest}}"
+              min="0"
               {{#unless can_change_weighting}}readonly{{/unless}}
             />
           </div>
