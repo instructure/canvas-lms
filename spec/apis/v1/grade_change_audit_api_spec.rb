@@ -134,19 +134,29 @@ describe "GradeChangeAudit API", type: :request do
       api_call_as_user(user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
-    def expect_event_for_context(context, event, options={})
+    def events_for_context(context, options={})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .to include([event.id, event.event_type])
+      json['events'].map { |e| [e['id'], e['event_type']] }
+    end
+
+    def expect_event_for_context(context, event, options={})
+      json = fetch_for_context(context, options)
+      events = events_for_context(context, options.merge(json: json))
+      expect(events).to include([event.id, event.event_type])
       json
     end
 
-    def expect_event_for_course_and_contexts(contexts, event, options={})
+    def events_for_course_and_contexts(contexts, options)
       json = options.delete(:json)
       json ||= fetch_for_course_and_other_contexts(contexts, options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-        .to include([event.id, event.event_type])
+      json['events'].map{ |e| [e['id'], e['event_type']] }
+    end
+
+    def expect_event_for_course_and_contexts(contexts, event, options={})
+      json = fetch_for_course_and_other_contexts(contexts, options)
+      events = events_for_course_and_contexts(contexts, options.merge(json: json))
+      expect(events).to include([event.id, event.event_type])
       json
     end
 
@@ -166,7 +176,7 @@ describe "GradeChangeAudit API", type: :request do
       json
     end
 
-    def test_course_and_contexts
+    def test_course_and_contexts(student: @student)
       # course assignment
       contexts = { course: @course, assignment: @assignment }
       yield(contexts)
@@ -174,7 +184,7 @@ describe "GradeChangeAudit API", type: :request do
       contexts[:grader] = @teacher
       yield(contexts)
       # course assignment grader student
-      contexts[:student] = @student
+      contexts[:student] = student
       yield(contexts)
       # course assignment student
       contexts.delete(:grader)
@@ -186,7 +196,7 @@ describe "GradeChangeAudit API", type: :request do
       contexts = { course: @course, grader: @teacher}
       yield(contexts)
       # course grader student
-      contexts[:student] = @student
+      contexts[:student] = student
       yield(contexts)
     end
 
@@ -199,6 +209,58 @@ describe "GradeChangeAudit API", type: :request do
 
         test_course_and_contexts do |contexts|
           expect_event_for_course_and_contexts(contexts, @event)
+        end
+      end
+    end
+
+    context "section visibility" do
+      before do
+        new_section = @course.course_sections.create!
+        @ta = User.create
+        @course.enroll_user(@ta, "TaEnrollment", limit_privileges_to_course_section: true, section: new_section)
+        @student_in_new_section = User.create!
+        @course.enroll_user(@student_in_new_section, "StudentEnrollment", enrollment_state: "active", section: new_section)
+        submission = @assignment.grade_student(@student_in_new_section, grade: 8, grader: @teacher).first
+        @event_visible_to_ta = Auditors::GradeChange.record(submission)
+      end
+
+      context "course" do
+        it "returns grade change events for students within the current user's section visibility" do
+          events = events_for_context(@course, user: @ta)
+          expect(events).to include([@event_visible_to_ta.id, @event_visible_to_ta.event_type])
+        end
+
+        it "returns grade change events for rejected enrollments" do
+          @course.student_enrollments.find_by(user_id: @student_in_new_section).update!(workflow_state: "rejected")
+          events = events_for_context(@course, user: @ta)
+          expect(events).to include([@event_visible_to_ta.id, @event_visible_to_ta.event_type])
+        end
+
+        it "returns grade change events for deleted enrollments" do
+          @course.student_enrollments.find_by(user_id: @student_in_new_section).destroy
+          events = events_for_context(@course, user: @ta)
+          expect(events).to include([@event_visible_to_ta.id, @event_visible_to_ta.event_type])
+        end
+
+        it "does not return grade change events for students outside of the current user's section visibility" do
+          events = events_for_context(@course, user: @ta)
+          expect(events).not_to include([@event.id, @event.event_type])
+        end
+      end
+
+      context "course + other context" do
+        it "returns grade change events for students within the current user's section visibility" do
+          test_course_and_contexts(student: @student_in_new_section) do |contexts|
+            events = events_for_course_and_contexts(contexts, user: @ta)
+            expect(events).to include([@event_visible_to_ta.id, @event_visible_to_ta.event_type])
+          end
+        end
+
+        it "does not return grade change events for students outside of the current user's section visibility" do
+          test_course_and_contexts do |contexts|
+            events = events_for_course_and_contexts(contexts, user: @ta)
+            expect(events).not_to include([@event.id, @event.event_type])
+          end
         end
       end
     end

@@ -3676,6 +3676,18 @@ describe Course, "section_visibility" do
   end
 
   context "full" do
+    it "returns rejected enrollments if passed :priors_and_deleted" do
+      @course.student_enrollments.find_by(user_id: @student1).update!(workflow_state: "rejected")
+      visible_student_ids = @course.students_visible_to(@teacher, include: :priors_and_deleted).pluck(:id)
+      expect(visible_student_ids).to include @student1.id
+    end
+
+    it "returns deleted enrollments if passed :priors_and_deleted" do
+      @course.student_enrollments.find_by(user_id: @student1).destroy
+      visible_student_ids = @course.students_visible_to(@teacher, include: :priors_and_deleted).pluck(:id)
+      expect(visible_student_ids).to include @student1.id
+    end
+
     it "should return students from all sections" do
       expect(@course.students_visible_to(@teacher).sort_by(&:id)).to eql [@student1, @student2]
       expect(@course.students_visible_to(@student1).sort_by(&:id)).to eql [@student1, @student2]
