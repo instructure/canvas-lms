@@ -1113,7 +1113,7 @@ acknowledge that you have read and agreed to the
                   (<%= extra_text %>)
                 <% end %>
                 <% if last_complete.workflow_state == 'complete' %>
-                  <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id), 'aria-label' => t('Download Report'), 'title' => t('Download Report') %>
+                  <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id, download_frd: 1), 'aria-label' => t('Download Report'), 'title' => t('Download Report') %>
                 <% end %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>
