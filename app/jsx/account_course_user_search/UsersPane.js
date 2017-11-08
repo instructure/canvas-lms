@@ -34,7 +34,7 @@ export default class UsersPane extends React.Component {
       dispatch: func.isRequired,
       subscribe: func.isRequired,
     }).isRequired,
-    roles: arrayOf(string).isRequired,
+    roles: UsersToolbar.propTypes.roles,
     onUpdateQueryParams: func.isRequired,
     queryParams: shape({
       page: string,
@@ -120,7 +120,6 @@ export default class UsersPane extends React.Component {
         {<UsersToolbar
           onUpdateFilters={this.handleUpdateSearchFilter}
           onApplyFilters={this.handleApplyingSearchFilter}
-          isLoading={isLoading}
           errors={errors}
           {...searchFilter}
           accountId={accountId.toString()}
