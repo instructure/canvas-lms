@@ -237,6 +237,7 @@ define [
       _.each @views(), (v) => @$el.append v.render().el
       @handleWarning() if @inFindDialog
       @initDroppable() unless @readOnly
+      @startPaginationListener()
       # Make the first <li /> tabbable for accessibility purposes.
       @$('li:first').attr('tabindex', 0)
       @$el.data 'view', this
