@@ -16,44 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/shared/TimeZoneSelect'
-], (React, TestUtils, TimeZoneSelect) => {
+import React from 'react'
+import {shallow} from 'enzyme'
+import TimeZoneSelect from 'jsx/shared/TimeZoneSelect'
 
-  QUnit.module('TimeZoneSelect Component');
+QUnit.module('TimeZoneSelect')
 
-  test('filterTimeZones', () => {
-    const timezones = [{
-      name: 'Central'
-    }, {
-      name: 'Eastern'
-    }, {
-      name: 'Mountain'
-    }, {
-      name: 'Pacific'
-    }];
+test('renders the right zones', () => {
+  const timezones = [
+    {
+      name: 'Central',
+      localized_name: 'Central localized'
+    },
+    {
+      name: 'Eastern',
+      localized_name: 'Eastern localized'
+    },
+    {
+      name: 'Mountain',
+      localized_name: 'Mountain localized'
+    },
+    {
+      name: 'Pacific',
+      localized_name: 'Pacific localized'
+    }
+  ]
+  const priorityZones = [timezones[0]]
 
-    const priorityZones = [{
-      name: 'Mountain'
-    }];
+  const wrapper = shallow(<TimeZoneSelect timezones={timezones} priority_zones={priorityZones} />)
 
-    const component = TestUtils.renderIntoDocument(
-      <TimeZoneSelect timezones={timezones} priority_timezones={priorityZones} />
-    );
+  const prorityOptions = wrapper.find('optgroup[label="Common Timezones"] option')
+  deepEqual(
+    prorityOptions.map(e => ({name: e.prop('value'), localized_name: e.text()})),
+    priorityZones
+  )
 
-    const withoutPriority = component.filterTimeZones(timezones, priorityZones);
-    const expected = [{
-      name: 'Central'
-    }, {
-      name: 'Eastern'
-    }, {
-      name: 'Pacific'
-    }];
-
-    deepEqual(withoutPriority, expected, 'the filter removed zones with priority');
-  });
-
-
-});
+  const allOptions = wrapper.find('optgroup[label="All Timezones"] option')
+  deepEqual(
+    allOptions.map(e => ({name: e.prop('value'), localized_name: e.text()})),
+    timezones
+  )
+})

@@ -75,3 +75,5 @@ function createScreenreaderNodeWithDelay (content) {
 }
 
 $(() => setTimeout(renderServerNotifications, 500))
+
+export default $
