@@ -289,6 +289,7 @@ module Importers
         item.assignment.points_possible = item.points_possible
       end
 
+      item.root_entries(true) if !item.available? && !item.survey? # reload items so we get accurate points
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?
 

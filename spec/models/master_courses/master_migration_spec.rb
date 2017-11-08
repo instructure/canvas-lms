@@ -321,6 +321,35 @@ describe MasterCourses::MasterMigration do
       expect(qq3_to.reload).to_not be_deleted
     end
 
+    it "should sync unpublished quiz points possible" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!(:workflow_state => "unpublished")
+      qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question', 'points_possible' => 1})
+      quiz.root_entries(true)
+      quiz.save!
+
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      expect(quiz_to.points_possible).to eq 1
+      qq_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq)).first
+
+      new_text = "new text"
+      Timecop.freeze(2.minutes.from_now) do
+        qq.update_attribute(:question_data, qq.question_data.merge(:points_possible => 2))
+        quiz.root_entries(true)
+        quiz.save!
+        expect(quiz.points_possible).to eq 2
+      end
+
+      run_master_migration
+
+      expect(qq_to.reload.question_data["points_possible"]).to eq 2
+      expect(quiz_to.reload.points_possible).to eq 2
+    end
+
     it "tracks creations and updates in selective migrations" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
