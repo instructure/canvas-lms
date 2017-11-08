@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {number, string, shape, arrayOf} from 'prop-types'
+import {number, string, shape, arrayOf, bool} from 'prop-types'
 import Button from 'instructure-ui/lib/components/Button'
 import Tooltip from 'instructure-ui/lib/components/Tooltip'
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
@@ -42,6 +42,7 @@ export default class CoursesListRow extends React.Component {
     subaccount_name: string.isRequired,
     term: shape({name: string.isRequired}).isRequired,
     roles: arrayOf(shape({id: string.isRequired})),
+    showSISIds: bool.isRequired
   }
 
   static defaultProps = {
@@ -103,7 +104,7 @@ export default class CoursesListRow extends React.Component {
   }
 
   render() {
-    const {id, name, workflow_state, sis_course_id, total_students, subaccount_name} = this.props
+    const {id, name, workflow_state, sis_course_id, total_students, subaccount_name, showSISIds} = this.props
     const url = `/courses/${id}`
     const isPublished = workflow_state !== 'unpublished'
 
@@ -124,11 +125,13 @@ export default class CoursesListRow extends React.Component {
           </div>
         </div>
 
-        <div className="col-xs-1" role="gridcell">
-          {sis_course_id}
-        </div>
+        {showSISIds &&
+          <div className="col-xs-1" role="gridcell">
+            {sis_course_id}
+          </div>
+        }
 
-        <div className="col-xs-1" role="gridcell">
+        <div className={`col-xs-${showSISIds ? 1 : 2}`} role="gridcell">
           {this.props.term.name}
         </div>
 

@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {shallow, mount} from 'enzyme'
+import {omit} from 'lodash'
 import CoursesList from 'jsx/account_course_user_search/CoursesList'
 import CoursesListRow from 'jsx/account_course_user_search/CoursesListRow'
 
@@ -53,6 +54,7 @@ const coursesProps = {
   courses: [{
     id: '1',
     name: 'A',
+    sis_course_id: 'SIS 1',
     workflow_state: 'alive',
     total_students: 6,
     teachers: [{
@@ -65,6 +67,7 @@ const coursesProps = {
   }, {
     id: '2',
     name: 'Ba',
+    sis_course_id: 'SIS Ba',
     workflow_state: 'alive',
     total_students: 7,
     teachers: [{
@@ -77,6 +80,7 @@ const coursesProps = {
   }, {
     id: '3',
     name: 'Bb',
+    sis_course_id: 'SIS Bb',
     workflow_state: 'alive',
     total_students: 6,
     teachers: [{
@@ -89,6 +93,7 @@ const coursesProps = {
   }, {
     id: '4',
     name: 'C',
+    sis_course_id: 'SIS C',
     workflow_state: 'alive',
     total_students: 6,
     teachers: [{
@@ -101,6 +106,7 @@ const coursesProps = {
   }, {
     id: '5',
     name: 'De',
+    sis_course_id: 'SIS De',
     workflow_state: 'alive',
     total_students: 11,
     teachers: [{
@@ -113,6 +119,7 @@ const coursesProps = {
   }, {
     id: '6',
     name: 'Dz',
+    sis_course_id: 'SIS Dz',
     workflow_state: 'alive',
     total_students: 10,
     teachers: [{
@@ -192,6 +199,20 @@ Object.entries({
     const header = Array.from(wrapper.querySelectorAll('[role=columnheader] button')).find(e => e.textContent.match(label))
     header.click()
   })
+})
+
+test('displays SIS ID column if any course has one', () => {
+  const wrapper = shallow(<CoursesList {...coursesProps} />)
+  ok(wrapper.findWhere(n => n.prop('label') === 'SIS ID').exists())
+})
+
+test(`doesn't display SIS ID column if no course has one`, () => {
+  const propsWithoutSISids = {
+    ...coursesProps,
+    courses: coursesProps.courses.map(c => omit(c, ['sis_course_id']))
+  }
+  const wrapper = shallow(<CoursesList {...propsWithoutSISids} />)
+  notOk(wrapper.findWhere(n => n.prop('label') === 'SIS ID').exists())
 })
 
 test('displays courses in the right order', () => {

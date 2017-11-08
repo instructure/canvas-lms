@@ -23,6 +23,9 @@ import CoursesListRow from './CoursesListRow'
 import CoursesListHeader from './CoursesListHeader'
 
 export default function CoursesList(props) {
+  // if none of the corses have an SIS ID, we don't need to show that column
+  const showSISIds = props.courses && props.courses.some(c => c.sis_course_id)
+
   return (
     <div className="content-box" role="grid">
       <div role="row" className="grid-row border border-b pad-box-mini">
@@ -40,16 +43,18 @@ export default function CoursesList(props) {
             </div>
           </div>
         </div>
-        <div role="columnheader" className="col-xs-1">
-          <CoursesListHeader
-            {...props}
-            id="sis_course_id"
-            label={I18n.t('SIS ID')}
-            tipDesc={I18n.t('Click to sort by SIS ID ascending')}
-            tipAsc={I18n.t('Click to sort by SIS ID descending')}
-          />
-        </div>
-        <div role="columnheader" className="col-xs-1">
+        {showSISIds &&
+          <div role="columnheader" className="col-xs-1">
+            <CoursesListHeader
+              {...props}
+              id="sis_course_id"
+              label={I18n.t('SIS ID')}
+              tipDesc={I18n.t('Click to sort by SIS ID ascending')}
+              tipAsc={I18n.t('Click to sort by SIS ID descending')}
+            />
+          </div>
+        }
+        <div role="columnheader" className={`col-xs-${showSISIds ? 1 : 2}`}>
           <CoursesListHeader
             {...props}
             id="term"
@@ -96,6 +101,7 @@ export default function CoursesList(props) {
             key={course.id}
             courseModel={props.courses}
             roles={props.roles}
+            showSISIds={showSISIds}
             {...course}
           />
         )}
