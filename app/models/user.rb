@@ -177,10 +177,11 @@ class User < ActiveRecord::Base
     next none if name.strip.empty?
     scopes = []
     all.primary_shard.activate do
-      scopes << unscoped.where(wildcard('users.name', name))
-      scopes << unscoped.where(wildcard('users.short_name', name))
-      scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
-      scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
+      base_scope = except(:select, :order, :group, :having)
+      scopes << base_scope.where(wildcard('users.name', name))
+      scopes << base_scope.where(wildcard('users.short_name', name))
+      scopes << base_scope.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
+      scopes << base_scope.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
     end
 
     scopes.map!(&:to_sql)
