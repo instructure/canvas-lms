@@ -87,7 +87,7 @@ class Wiki < ActiveRecord::Base
 
   def unset_front_page!
     if self.context.is_a?(Course) && self.context.default_view == 'wiki'
-      self.context.default_view = 'feed'
+      self.context.default_view = nil
       self.context.save
     end
 

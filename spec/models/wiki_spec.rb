@@ -26,10 +26,12 @@ describe Wiki do
 
   context "unset_front_page!" do
     it "should unset front page" do
+      @course.default_view = "wiki"
       @wiki.unset_front_page!
 
       expect(@wiki.has_front_page?).to eq false
       expect(@wiki.front_page_url).to eq nil
+      expect(@wiki.course.default_view).to eq @wiki.course.default_home_page
     end
   end
 
