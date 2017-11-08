@@ -33,7 +33,7 @@
                    }) do |f| %>
       <%= f.hidden_field :auth_type, value: aac.auth_type, id: nil %>
       <%= f.hidden_field :id, id: nil %>
-        <h3><%= aac.class.display_name %></h3>
+        <h3 tabindex="0"><%= aac.class.display_name %></h3>
         <% if !aac.new_record? %>
           <p><%= mt "You can log in directly with this provider by going to %{url}",
                     url: url_for(presenter.login_url_options(aac)) %></p>
