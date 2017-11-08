@@ -124,10 +124,6 @@ class EditorToggle {
     return this.textAreaContainer.detach()
   }
 
-  renewTextAreaID () {
-    return this.textArea.attr('id', nextID())
-  }
-
   // #
   // Converts the editor to an element
   // @api public
