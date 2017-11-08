@@ -16,9 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
+  'tinymce/tinymce',
   'tinymce_plugins/instructure_external_tools/TinyMCEContentItem',
   './ContentItems.coffee'
-], (TinyMCEContentItem, contentItems)->
+], (tinymce, TinyMCEContentItem, contentItems)->
 
   QUnit.module "TinyMCEContentItem LTI Link",
     setup: ->
@@ -80,7 +81,6 @@ define [
     equal(contentItem.url, "/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti")
     equal(contentItem.codePayload, '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" target="_blank">Arch Linux plain window</a>')
 
-
   QUnit.module "TinyMCEContentItem File Item",
     setup: ->
     teardown: ->
@@ -132,3 +132,51 @@ define [
     equal(contentItem.text, "Arch Linux file item window")
     equal(contentItem.url, "http://lti-tool-provider-example.dev/test_file.txt")
     equal(contentItem.codePayload, '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" target="_blank">Arch Linux file item window</a>')
+
+  test "Preserves formatting if a selection is present", ->
+    originalTinyMCE = window.tinyMCE
+    getContentStub = sinon.stub()
+    getContentStub.returns('<em><strong>formatted selection</strong></em>')
+    tinyMCEDouble = {
+      activeEditor: {
+        selection: {
+          getContent: getContentStub
+        }
+      }
+    }
+    window.tinyMCE = tinyMCEDouble
+    contentItem = TinyMCEContentItem.fromJSON(contentItems.text_window)
+    equal(contentItem.codePayload, '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" target="_blank"><em><strong>formatted selection</strong></em></a>')
+    window.tinyMCE = originalTinyMCE
+
+  test "Uses the content item text if no selection is present", ->
+    originalTinyMCE = window.tinyMCE
+    getContentStub = sinon.stub()
+    getContentStub.returns('')
+    tinyMCEDouble = {
+      activeEditor: {
+        selection: {
+          getContent: getContentStub
+        }
+      }
+    }
+    window.tinyMCE = tinyMCEDouble
+    contentItem = TinyMCEContentItem.fromJSON(contentItems.text_window)
+    equal(contentItem.codePayload, '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" target="_blank">Arch Linux file item window</a>')
+    window.tinyMCE = originalTinyMCE
+
+  test "Uses the content item title if no selection is present", ->
+    originalTinyMCE = window.tinyMCE
+    getContentStub = sinon.stub()
+    getContentStub.returns('')
+    tinyMCEDouble = {
+      activeEditor: {
+        selection: {
+          getContent: getContentStub
+        }
+      }
+    }
+    window.tinyMCE = tinyMCEDouble
+    contentItem = TinyMCEContentItem.fromJSON(contentItems.text_window_no_text)
+    equal(contentItem.codePayload, '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" target="_blank">Its like sexy for your computer</a>')
+    window.tinyMCE = originalTinyMCE

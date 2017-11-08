@@ -273,5 +273,18 @@ define [], ->
       "mediaType": "text/plain",
       "@type": "FileItem",
       "@id": "http://lti-tool-provider-example.dev/test_file.txt"
+    },
+    "text_window_no_text": {
+      "text": "",
+      "title": "Its like sexy for your computer",
+      "url": "http://lti-tool-provider-example.dev/test_file.txt",
+      "placementAdvice": {
+        "displayHeight": 600,
+        "displayWidth": 800,
+        "presentationDocumentTarget": "window"
+      },
+      "mediaType": "text/plain",
+      "@type": "FileItem",
+      "@id": "http://lti-tool-provider-example.dev/test_file.txt"
     }
   }
