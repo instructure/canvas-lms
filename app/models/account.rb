@@ -745,6 +745,25 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def self.multi_account_chain_ids(starting_account_ids)
+    if connection.adapter_name == 'PostgreSQL'
+      original_shard = Shard.current
+      Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
+        ids = Account.connection.select_values(<<-SQL)
+              WITH RECURSIVE t AS (
+                SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(", ")})
+                UNION
+                SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
+              )
+              SELECT id FROM t
+        SQL
+        ids.map{|id| Shard.relative_id_for(id, Shard.current, original_shard)}
+      end
+    else
+      account_chain(starting_account_id).map(&:id)
+    end
+  end
+
   def self.add_site_admin_to_chain!(chain)
     chain << Account.site_admin unless chain.last.site_admin?
     chain
