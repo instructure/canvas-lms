@@ -941,6 +941,8 @@ define [
 
       for submission in submissions
         student = @student(submission.user_id)
+        continue unless student # if the student isn't loaded, we don't need to update it
+
         idToMatch = @getAssignmentColumnId(submission.assignment_id)
         cell = index for column, index in columns when column.id is idToMatch
 

@@ -6597,6 +6597,18 @@ test('updates row cells only once for each student', function () {
   deepEqual(studentIds, ['1101', '1102']);
 });
 
+test('ignores submissions for students not currently loaded', function () {
+  const submissions = [
+    { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true },
+    { assignment_id: '201', user_id: '1103', score: 9, assignment_visible: true },
+    { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
+  ];
+  this.stub(this.gradebook, 'updateRowCellsForStudentIds');
+  this.gradebook.updateSubmissionsFromExternal(submissions);
+  const [studentIds] = this.gradebook.updateRowCellsForStudentIds.lastCall.args;
+  deepEqual(studentIds, ['1101', '1102']);
+});
+
 test('updates column headers', function () {
   const submissions = [
     { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true }
