@@ -2410,6 +2410,13 @@ describe AssignmentsApiController, type: :request do
         expect(@json['grading_type']).to eq @assignment.grading_type
       end
 
+      it "updates the assignments grading_type when type is empty" do
+        @json = api_update_assignment_call(@course, @assignment, {'grading_type': ''})
+        @assignment.reload
+        expect(@assignment.grading_type).to eq 'points'
+        expect(@json['grading_type']).to eq @assignment.grading_type
+      end
+
       it "returns, but does not change, the needs_grading_count" do
         expect(@assignment.needs_grading_count).to eq 0
         expect(@json['needs_grading_count']).to eq 0

@@ -107,6 +107,7 @@ class Assignment < ActiveRecord::Base
     else
       assignment.association(:external_tool_tag).reset
     end
+    assignment.infer_grading_type
     true
   end
 
@@ -316,8 +317,7 @@ class Assignment < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
-  validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES },
-    allow_nil: true, on: :create
+  validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES }
 
   acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5
@@ -353,7 +353,6 @@ class Assignment < ActiveRecord::Base
   end
 
   before_save :ensure_post_to_sis_valid,
-              :infer_grading_type,
               :process_if_quiz,
               :default_values,
               :maintain_group_category_attribute,
@@ -926,6 +925,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def infer_grading_type
+    self.grading_type = nil if self.grading_type.blank?
     self.grading_type = "pass_fail" if self.submission_types == "attendance"
     self.grading_type = "not_graded" if self.submission_types == "wiki_page"
     self.grading_type ||= "points"
