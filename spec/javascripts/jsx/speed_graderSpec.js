@@ -1049,6 +1049,37 @@ test('shows an error when the gateway times out', function () {
   strictEqual($('#speed_grader_timeout_alert').text(), message);
 });
 
+QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
+  let disableWhileLoadingStub;
+
+  hooks.beforeEach(function () {
+    sinon.stub($, 'ajaxJSON');
+    disableWhileLoadingStub = sinon.stub($.fn, 'disableWhileLoading');
+    fakeENV.setup({ RUBRIC_ASSESSMENT: {} });
+
+    const fixtures = `
+      <div id="rubric_holder">
+        <button class="save_rubric_button"></button>
+      </div>
+    `;
+
+    $('#fixtures').html(fixtures);
+  });
+
+  hooks.afterEach(function() {
+    $('#fixtures').empty();
+    fakeENV.teardown();
+    disableWhileLoadingStub.restore();
+    $.ajaxJSON.restore();
+  });
+
+  test('disables the button', function () {
+    SpeedGrader.EG.domReady();
+    $('.save_rubric_button').trigger('click');
+    strictEqual(disableWhileLoadingStub.callCount, 1);
+  });
+});
+
 QUnit.module('SpeedGrader - no gateway timeout', {
   setup () {
     fakeENV.setup();

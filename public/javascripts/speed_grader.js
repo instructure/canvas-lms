@@ -63,6 +63,8 @@ import 'jquery.elastic';
 import 'jquery-getscrollbarwidth';
 import './vendor/jquery.scrollTo';
 import './vendor/ui.selectmenu';
+import './jquery.disableWhileLoading';
+import 'compiled/jquery/fixDialogButtons';
 
 // PRIVATE VARIABLES AND FUNCTIONS
 // all of the $ variables here are to speed up access to dom nodes,
@@ -134,6 +136,7 @@ var $window = $(window),
     $assignment_submission_vericite_report_url = $('#assignment_submission_vericite_report_url'),
     $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url'),
     $rubric_full = $('#rubric_full'),
+    $rubric_holder = $('#rubric_holder'),
     $rubric_full_resizer_handle = $('#rubric_full_resizer_handle'),
     $no_annotation_warning = $('#no_annotation_warning'),
     $comment_submitted = $('#comment_submitted'),
@@ -774,9 +777,9 @@ function initRubricStuff(){
     data['graded_anonymously'] = utils.shouldHideStudentNames();
     var url = $(".update_rubric_assessment_url").attr('href');
     var method = "POST";
-    EG.toggleFullRubric();
-    $(".rubric_summary").loadingImage();
-    $.ajaxJSON(url, method, data, function(response) {
+    EG.toggleFullRubric('close');
+
+    var promise = $.ajaxJSON(url, method, data, function(response) {
       var found = false;
       if(response && response.rubric_association) {
         rubricAssessment.updateRubricAssociation($rubric, response.rubric_association);
@@ -805,11 +808,16 @@ function initRubricStuff(){
         EG.updateSelectMenuStatus(student);
       });
 
-      $(".rubric_summary").loadingImage('remove');
       EG.showGrade();
       EG.showDiscussion();
       EG.showRubric();
       EG.updateStatsInHeader();
+    });
+
+    $rubric_holder.disableWhileLoading(promise, {
+      buttons: {
+        '.save_rubric_button': 'Saving...'
+      }
     });
   });
 }
