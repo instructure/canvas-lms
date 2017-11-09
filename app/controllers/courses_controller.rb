@@ -1062,11 +1062,14 @@ class CoursesController < ApplicationController
     end
   end
 
-  # @API Conclude a course
+  # @API Delete/Conclude a course
   # Delete or conclude an existing course
   #
   # @argument event [Required, String, "delete"|"conclude"]
   #   The action to take on the course.
+  #
+  # @example_response
+  #   { "delete": "true" }
   def destroy
     @context = api_find(Course, params[:id])
     if api_request? && !['delete', 'conclude'].include?(params[:event])
