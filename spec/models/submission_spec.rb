@@ -2852,6 +2852,26 @@ describe Submission do
       sub.attachments.update_all(:context_type => "Submission", :context_id => sub.id)
       expect(sub.reload.versioned_attachments).to be_empty
     end
+
+    it "includes attachments owned by other users in a group for a group submission" do
+      student1, student2 = n_students_in_course(2, { course: @course })
+      assignment = @course.assignments.create!(name: "A1", submission_types: "online_upload")
+
+      group_category = @course.group_categories.create!(name: "Project Groups")
+      group = group_category.groups.create!(name: "A Team", context: @course)
+      group.add_user(student1)
+      group.add_user(student2)
+      assignment.update_attributes(group_category: group_category)
+
+      user_attachment = attachment_model(context: student1)
+      assignment.submit_homework(student1, submission_type: "online_upload", attachments: [user_attachment])
+
+      [student1, student2].each do |student|
+        submission = assignment.submission_for_student(student)
+        submission.versioned_attachments
+        expect(submission.versioned_attachments).to include user_attachment
+      end
+    end
   end
 
   describe "includes_attachment?" do
