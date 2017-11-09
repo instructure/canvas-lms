@@ -1294,6 +1294,7 @@ class Attachment < ActiveRecord::Base
     return true if Purgatory.where(attachment_id: att).active.exists?
     att.send_to_purgatory(deleted_by_user)
     att.destroy_content
+    att.thumbnail&.destroy
     att.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
     CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
     Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all

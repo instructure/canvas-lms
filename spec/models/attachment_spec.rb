@@ -483,6 +483,14 @@ describe Attachment do
       expect(a.content_type).to eq 'unknown/unknown'
     end
 
+    it "should also destroy thumbnails" do
+      a = attachment_model(uploaded_data: stub_png_data, content_type: 'image/png')
+      thumb = a.thumbnail
+      expect(thumb).not_to be_nil
+      expect(thumb).to receive(:destroy).once
+      a.destroy_content_and_replace
+    end
+
     it "should destroy content and record on destroy_permanently_plus" do
       a = attachment_model
       a2 = attachment_model(root_attachment: a)
