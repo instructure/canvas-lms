@@ -49,8 +49,8 @@ class Converter < Canvas::Migration::Migrator
   def export
     unzip_archive
 
-    if Converter.is_qti_2(File.join(@unzipped_file_path, MANIFEST_FILE))
-      @dest_dir_2_1 = @unzipped_file_path
+    if Converter.is_qti_2(@package_root.item_path(MANIFEST_FILE))
+      @dest_dir_2_1 = @package_root.root_path
       @converted = true
     else
       run_qti_converter
@@ -61,7 +61,7 @@ class Converter < Canvas::Migration::Migrator
     @course[:assessment_questions] = convert_questions(:file_path_map => path_map, :flavor => @flavor)
     @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
 
-    original_manifest_path = File.join(@unzipped_file_path, MANIFEST_FILE)
+    original_manifest_path = @package_root.item_path(MANIFEST_FILE)
     if File.exist?(original_manifest_path)
       @manifest = Nokogiri::XML(File.open(original_manifest_path))
       post_process_assessments # bring in canvas metadata if available
@@ -94,7 +94,7 @@ class Converter < Canvas::Migration::Migrator
   def run_qti_converter
     # convert to 2.1
     @dest_dir_2_1 = Dir.mktmpdir(QTI_2_OUTPUT_PATH)
-    command = Qti.get_conversion_command(@dest_dir_2_1, @unzipped_file_path)
+    command = Qti.get_conversion_command(@dest_dir_2_1, @package_root.root_path)
     logger.debug "Running migration command: #{command}"
     python_std_out = `#{command}`
 
@@ -156,7 +156,7 @@ class Converter < Canvas::Migration::Migrator
   end
 
   def apply_respondus_settings
-    settings_path = File.join(@unzipped_file_path, 'settings.xml')
+    settings_path = @package_root.item_path('settings.xml')
     if File.file?(settings_path)
       doc = Nokogiri::XML(File.open(settings_path))
     end

@@ -25,8 +25,8 @@ module CC::Exporter::Epub::Converters
         meta_path = res.at_css('file[href$="assignment_settings.xml"]')
         next unless meta_path
 
-        meta_path = File.join @unzipped_file_path, meta_path['href']
-        html_path = File.join @unzipped_file_path, res.at_css('file[href$="html"]')['href']
+        meta_path = @package_root.item_path meta_path['href']
+        html_path = @package_root.item_path res.at_css('file[href$="html"]')['href']
 
         meta_node = open_file_xml(meta_path)
         html_node = open_file(html_path)

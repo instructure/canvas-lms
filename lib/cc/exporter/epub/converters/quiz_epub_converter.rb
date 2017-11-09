@@ -22,13 +22,13 @@ module CC::Exporter::Epub::Converters
     def convert_quizzes
       quizzes = []
       @manifest.css('resource[type$=assessment]').each do |quiz|
-        xml_path = File.join @unzipped_file_path, quiz.at_css('file[href$="xml"]')['href']
+        xml_path = @package_root.item_path quiz.at_css('file[href$="xml"]')['href']
 
         meta_node = open_file_xml(xml_path)
         ident = get_node_att(meta_node, "assessment", "ident")
 
         quiz_meta_path = "#{ident}/assessment_meta.xml"
-        quiz_meta_link = File.join @unzipped_file_path, quiz_meta_path
+        quiz_meta_link = @package_root.item_path quiz_meta_path
         quiz_meta_data = open_file_xml(quiz_meta_link)
 
         quiz = convert_quiz(quiz_meta_data)

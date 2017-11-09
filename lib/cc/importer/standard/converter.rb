@@ -47,7 +47,7 @@ module CC::Importer::Standard
       @course[:assignments] ||= []
 
       @archive.prepare_cartridge_file(MANIFEST_FILE)
-      @manifest = open_file_xml(File.join(@unzipped_file_path, MANIFEST_FILE))
+      @manifest = open_file_xml(@package_root.item_path(MANIFEST_FILE))
       @manifest.remove_namespaces!
 
       get_all_resources(@manifest)
@@ -96,9 +96,9 @@ module CC::Importer::Standard
         @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
 
       unless mig_id
-        full_path = File.expand_path(File.join(@unzipped_file_path, path))
+        full_path = @package_root.item_path(path)
 
-        if full_path.start_with?(File.expand_path(@unzipped_file_path)) && File.exists?(full_path)
+        if File.exists?(full_path)
           # try to make it work even if the file wasn't technically included in the manifest :/
           mig_id = Digest::MD5.hexdigest(path)
           file = {:path_name => path, :migration_id => mig_id,

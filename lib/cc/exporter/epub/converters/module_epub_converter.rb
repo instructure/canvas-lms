@@ -20,7 +20,7 @@ module CC::Exporter::Epub::Converters
     include CC::Exporter
 
     def settings_doc(html = false)
-      path = File.join(@unzipped_file_path, "course_settings", "module_meta.xml")
+      path = @package_root.item_path("course_settings", "module_meta.xml")
       return nil unless File.exist? path
       if html
         open_file path

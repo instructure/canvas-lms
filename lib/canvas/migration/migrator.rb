@@ -21,7 +21,8 @@ class Migrator
   include MigratorHelper
   SCRAPE_ALL_HASH = { 'course_outline' => true, 'announcements' => true, 'assignments' => true, 'goals' => true, 'rubrics' => true, 'web_links' => true, 'learning_modules' => true, 'calendar_events' => true, 'calendar_start' => nil, 'calendar_end' => nil, 'discussions' => true, 'assessments' => true, 'question_bank' => true, 'all_files' => true, 'groups' => true, 'assignment_groups' => true, 'tasks' => true, 'wikis' => true }
 
-  attr_accessor :course, :unzipped_file_path, :extra_settings, :total_error_count
+  # TODO remove unzipped_file_path once plugins stop using it
+  attr_accessor :course, :unzipped_file_path, :extra_settings, :total_error_count, :package_root
   attr_reader :base_export_dir, :manifest, :import_objects, :settings
 
   def initialize(settings, migration_type)
@@ -35,12 +36,16 @@ class Migrator
 
     if @settings[:unzipped_file_path]
       @unzipped = true
+      # TODO remove unzipped_file_path once plugins stop using it
       @unzipped_file_path = @settings[:unzipped_file_path]
+      @package_root = PackageRoot.new(@unzipped_file_path)
     elsif !@settings[:no_archive_file]
       @archive = @settings[:archive] || Canvas::Migration::Archive.new(@settings)
       @archive_file = @archive.file
+      # TODO remove unzipped_file_path once plugins stop using it
       @unzipped_file_path = @archive.unzipped_file_path
       @archive_file_path = @archive.path
+      @package_root = PackageRoot.new(@unzipped_file_path)
     end
 
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
@@ -69,7 +74,7 @@ class Migrator
   end
 
   def get_full_path(file_name)
-    File.join(@unzipped_file_path, file_name) if file_name
+    @package_root.item_path(file_name) if file_name.present?
   end
 
   def move_archive_to(full_path)
@@ -81,13 +86,13 @@ class Migrator
   end
 
   def package_course_files(base_dir=nil)
-    base_dir ||= @unzipped_file_path
+    package_root = base_dir ? PackageRoot.new(base_dir) : @package_root
     zip_file = File.join(@base_export_dir, MigratorHelper::ALL_FILES_ZIP)
     make_export_dir
 
     Zip::File.open(zip_file, 'w') do |zipfile|
       @course[:file_map].each_value do |val|
-        file_path = File.join(base_dir, val[:real_path] || val[:path_name])
+        file_path = package_root.item_path(val[:real_path] || val[:path_name])
         val.delete :real_path
         if File.exist?(file_path)
           zipfile.add(val[:path_name], file_path)

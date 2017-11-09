@@ -26,7 +26,7 @@ describe CC::Importer::Canvas::ToolProfileConverter do
 
       def initialize(manifest, path)
         @manifest = manifest
-        @unzipped_file_path = path
+        @package_root = PackageRoot.new(path)
       end
     end.new(manifest, path)
   end
