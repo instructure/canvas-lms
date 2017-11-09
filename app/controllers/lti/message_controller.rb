@@ -24,16 +24,18 @@ module Lti
   class MessageController < ApplicationController
 
     before_action :require_context, :require_user
+    skip_before_action :verify_authenticity_token, only: [:registration]
 
     def registration
       if authorized_action(@context, @current_user, :update)
+        return head :bad_request if tool_consumer_url.blank?
         @lti_launch = Launch.new
-        @lti_launch.resource_url = params[:tool_consumer_url]
+        @lti_launch.resource_url = tool_consumer_url
         message = RegistrationRequestService.create_request(
           @context,
           polymorphic_url([@context, :tool_consumer_profile]),
           -> {polymorphic_url([@context, :registration_return])},
-          params[:tool_consumer_url],
+          tool_consumer_url,
           polymorphic_url([:create, @context, :lti_tool_proxy])
         )
 
@@ -45,7 +47,6 @@ module Lti
         @lti_launch.params['ext_api_domain'] = HostUrl.context_host(@context, request.host)
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
-
         render Lti::AppUtil.display_template('borderless')
       end
     end
@@ -107,6 +108,11 @@ module Lti
     end
 
     private
+
+    def tool_consumer_url
+      url = URI(params[:tool_consumer_url])
+      ['http', 'https'].include?(url.scheme) ? url.to_s : ''
+    end
 
     def generate_resource_link_id(message_handler)
       message_handler.build_resource_link_id(

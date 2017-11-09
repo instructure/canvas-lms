@@ -8183,7 +8183,7 @@ en-GB:
       media_comment: "This is a media comment,"
       not_official: "*NOTE*: This is NOT your official score."
       page_title: "Grades for %{student}"
-      print_grades: Bring
+      print_grades: Print
       score_details: "Score Details"
       see_rubric_results: "See rubric results"
       see_rubric_results_screenreader: "See rubric results"
@@ -12502,7 +12502,7 @@ en-GB:
       new_context_group_membership: "New context group membership"
       new_context_group_membership_invitation: "New context group membership invitation"
       new_course: "New course"
-      new_discussion_entry: "New ciscussion entry"
+      new_discussion_entry: "New discussion entry"
       new_discussion_topic: "New discussion topic"
       new_event_created: "New event created"
       new_file_added: "New file added"

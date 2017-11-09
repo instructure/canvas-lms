@@ -239,6 +239,12 @@ describe ContextExternalTool do
       expect(@found_tool).to eql(@tool)
     end
 
+    it "should not match on domain if domain is nil" do
+      @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com/coolness", :consumer_key => '12345', :shared_secret => 'secret')
+      @found_tool = ContextExternalTool.find_external_tool("http://malicious.domain./hahaha", Course.find(@course.id))
+      expect(@found_tool).to be_nil
+    end
+
     it "should match on url or domain for a tool that has both" do
       @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com/coolness", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       expect(ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id))).to eql(@tool)

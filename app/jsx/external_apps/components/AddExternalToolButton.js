@@ -55,7 +55,7 @@ export default React.createClass({
         modalIsOpen: false,
         tool: {},
         isLti2: false,
-        lti2RegistrationUrl: null,
+        lti2RegistrationUrl: 'about:blank',
         configurationType: '',
       }
     },
@@ -122,13 +122,14 @@ export default React.createClass({
       this.setState({ modalIsOpen: false, tool: {}, isLti2: false, lti2RegistrationUrl: null });
     },
 
-    createTool(configurationType, data) {
+    createTool(configurationType, data, e) {
       if (configurationType == 'lti2') {
         this.setState({
           isLti2: true,
           lti2RegistrationUrl: data.registrationUrl,
           tool: {}
         });
+        e.currentTarget.closest('form').submit();
       } else if (!this.throttleCreation) {
           this.setState({'configurationType': configurationType});
           store.save(configurationType, data, this._successHandler.bind(this), this._errorHandler.bind(this));
@@ -139,21 +140,31 @@ export default React.createClass({
     renderForm() {
       if (this.state.isLti2 && this.state.tool.app_id) {
         return <Lti2Permissions ref="lti2Permissions" tool={this.state.tool} handleCancelLti2={this.handleCancelLti2} handleActivateLti2={this.handleActivateLti2} />;
-      } else if (this.state.isLti2) {
-        return (
-          <Lti2Iframe ref="lti2Iframe" handleInstall={this.handleLti2ToolInstalled} registrationUrl={this.state.lti2RegistrationUrl} >
-            <div className="ReactModal__Footer">
-              <div id="footer-close-button" className="ReactModal__Footer-Actions">
-                <button type="button" className="Button" onClick={this.closeModal}>{I18n.t('Close')}</button>
-              </div>
-            </div>
-          </Lti2Iframe>
-        );
       } else {
         return (
-          <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.createTool}>
-            <button type="button" className="Button" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
-          </ConfigurationForm>
+          <div>
+            <ConfigurationForm
+              ref="configurationForm"
+              tool={this.state.tool}
+              configurationType="manual"
+              handleSubmit={this.createTool}
+              hideComponent={this.state.isLti2}
+            >
+              <button type="button" className="Button" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
+            </ConfigurationForm>
+            <Lti2Iframe
+              ref="lti2Iframe"
+              handleInstall={this.handleLti2ToolInstalled}
+              registrationUrl={this.state.lti2RegistrationUrl}
+              hideComponent={!this.state.isLti2}
+            >
+              <div className="ReactModal__Footer">
+                <div id="footer-close-button" className="ReactModal__Footer-Actions">
+                  <button type="button" className="Button" onClick={this.closeModal}>{I18n.t('Close')}</button>
+                </div>
+              </div>
+            </Lti2Iframe>
+          </div>
         );
       }
     },
