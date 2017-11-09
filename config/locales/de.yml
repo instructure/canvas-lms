@@ -195,9 +195,9 @@ de:
       test_ldap_search_label: "Die LDAP-Suche wird getestet ..."
     linkedin_fields: 
       description: |-
-          Sie müssen eine [register an application on LinkedIn](%{linkedin_url}).
-          Sie sollten %{callback_url} als eine OAuth 2.0 autorisierte URL zur Weiterleitung hinzufügen und den Status der Anwendung auf Live setzen
-          Wenn Sie Ihre Anwendung erzeugt haben, notieren Sie sich die Client-ID und Client-Secret, und geben beide hier ein.
+          Sie müssen [eine Anwendung bei LinkedIn registrieren](%{linkedin_url}).
+          Sie müssen %{callback_url} als einen OAuth 2.0-autorisierten URL zur Weiterleitung hinzufügen und den Status der Anwendung auf Live setzen.
+          Wenn Sie Ihre Anwendung erstellt haben, notieren Sie sich die Client-ID und den Client-Code, und geben beide hier ein.
     login_required: "muss angegeben werden"
     no_changing_auth_types: "Der Typ der Autorisierungskonfiguration kann nicht geändert werden. Bitte löschen und neue Konfiguration erstellen."
     password_required: "muss angegeben werden"
@@ -6733,7 +6733,7 @@ de:
   editor_button_6647db9c: Editor-Schaltfläche
   either_the_url_or_domain_should_be_set_c29cf8c1: "Entweder der URL oder die Domäne muss festgelegt werden."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Sie sind entweder ein neuer Benutzer oder die *Nutzungsbedingungen* haben sich geändert, seit Sie ihnen das letzte Mal zugestimmt haben. Bitte stimmen Sie den *Nutzungsbedingungen* und der **Datenschutzrichtlinie** zu, bevor Sie fortfahren."
-  element_option_missing_error_an_element_to_attach__be433478: "Fehler wegen fehlender Option `element`: Beim Festlegen der Ausgabeoption 'true' für BBTreeBrowserView muss ein Element angegeben werden, an das die TreeBrowserView angefügt werden soll."
+  element_option_missing_error_an_element_to_attach__be433478: "Fehler wegen fehlender `element`-Option : Beim Festlegen der Ausgabeoption auf TRUE für BBTreeBrowserView muss ein Element angegeben werden, an das die TreeBrowserView angehängt werden soll."
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: E-Mail
