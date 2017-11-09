@@ -47,11 +47,14 @@ describe MasterCourses::MasterTemplate do
   describe "remove_as_master_course" do
     it "should remove a template from a course" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      other_course = Course.create!
+      sub = template.add_child_course!(other_course)
       expect(template.workflow_state).to eq "active"
       expect(template.active?).to eq true
 
       expect{MasterCourses::MasterTemplate.remove_as_master_course(@course)}.to change{template.reload.workflow_state}.from("active").to("deleted")
       expect(MasterCourses::MasterTemplate.full_template_for(@course)).to be_nil
+      expect(sub.reload).to be_deleted
     end
 
     it "should ignore deleted templates" do

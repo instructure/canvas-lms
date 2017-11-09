@@ -126,7 +126,7 @@ define [
     teardown: ->
       $("#fixtures").empty()
 
-  test "it sets up the placeholder with attributes from the iframe's style property if it exists", ->
+  test "does not replace iframes with placebolders", ->
     $editor = $(new LinkableEditor(rawEditor))
     links.initEditor($editor)
     mockEditor =
@@ -134,5 +134,4 @@ define [
       getBody: ->
         $('#fixtures')[0]
     links.updateLinks(mockEditor)
-    equal($('.iframe_placeholder').height(), 600, 'Height should be correct')
-    equal($('.iframe_placeholder').width(), 800, 'Width should be correct')
+    equal($('.iframe_placeholder').length, 0, 'should not replace iframes with placeholders')

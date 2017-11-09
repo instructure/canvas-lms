@@ -44,7 +44,7 @@ module Lti
         it 'initiates a tool proxy registration request' do
           course_with_teacher_logged_in(:active_all => true)
           course = @course
-          get 'registration', params: {course_id: course.id, tool_consumer_url: 'http://tool.consumer.url'}
+          post 'registration', params: {course_id: course.id, tool_consumer_url: 'http://tool.consumer.url'}
           expect(response).to be_success
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
@@ -66,14 +66,14 @@ module Lti
 
         it "doesn't allow student to register an app" do
           course_with_student_logged_in(active_all: true)
-          get 'registration', params: {course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'}
+          post 'registration', params: {course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'}
           expect(response.code).to eq '401'
         end
 
         it "includes the authorization URL when feature flag enabled" do
           allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
           course_with_teacher_logged_in(active_all: true)
-          get 'registration', params: {course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'}
+          post 'registration', params: {course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'}
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
           expect(launch_params['oauth2_access_token_url']).to(
@@ -81,12 +81,18 @@ module Lti
           )
         end
 
+        it 'only allows http and https protocols in the "tool_consumer_url"' do
+          course_with_student_logged_in(active_all: true)
+          user_session(@teacher)
+          post 'registration', params: {course_id: @course.id, tool_consumer_url: 'javascript://tool.consumer.url'}
+          expect(response).to be_bad_request
+        end
       end
 
       context 'account' do
         it 'initiates a tool proxy registration request' do
           user_session(account_admin_user)
-          get 'registration', params: {account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'}
+          post 'registration', params: {account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'}
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
@@ -101,7 +107,7 @@ module Lti
         end
 
         it "doesn't allow non admin to register an app" do
-          get 'registration', params: {account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'}
+          post 'registration', params: {account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'}
           assert_unauthorized
         end
 

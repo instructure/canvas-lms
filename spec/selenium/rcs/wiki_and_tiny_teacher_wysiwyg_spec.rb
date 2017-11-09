@@ -480,5 +480,21 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       close_visible_dialog
       expect(f('#media_comment_dialog')).not_to be_displayed
     end
+
+    it "should save with an iframe in a list" do
+      text = "<ul><li><iframe src=\"about:blank\"></iframe></li></ul>"
+      wysiwyg_state_setup(text, html: true)
+      f('form.edit-form button.submit').click
+      wait_for_ajax_requests
+      expect(f("#wiki_page_show")).to contain_css('ul iframe')
+    end
+
+    it "should save with an iframe in a table" do
+      text = "<table><tr><td><iframe src=\"about:blank\"></iframe></td></tr></table>"
+      wysiwyg_state_setup(text, html: true)
+      f('form.edit-form button.submit').click
+      wait_for_ajax_requests
+      expect(f("#wiki_page_show")).to contain_css('table iframe')
+    end
   end
 end

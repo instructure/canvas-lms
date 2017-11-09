@@ -16,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 export default {
-    link: PropTypes.shape({
-      text: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-      subtext: PropTypes.string,
-      available_to: PropTypes.array,
-      type: PropTypes.oneOf(['default', 'custom']),
-      id: PropTypes.string,
+  link: PropTypes.shape({
+    text: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    subtext: PropTypes.string,
+    available_to: PropTypes.array,
+    type: PropTypes.oneOf(['default', 'custom']),
+    id: PropTypes.string,
 
-      index: PropTypes.number,
-      state: PropTypes.oneOf(['new', 'active', 'deleted']),
-      action: PropTypes.oneOf(['edit', 'focus']),
-      is_disabled: PropTypes.bool
-    })
-  }
+    index: PropTypes.number,
+    state: PropTypes.oneOf(['new', 'active', 'deleted']),
+    action: PropTypes.oneOf(['edit', 'focus']),
+    is_disabled: PropTypes.bool
+  })
+}

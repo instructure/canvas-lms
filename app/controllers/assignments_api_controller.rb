@@ -91,6 +91,10 @@
 #         "description": {
 #           "example": "Full marks",
 #           "type": "string"
+#         },
+#        "long_description": {
+#           "example": "Student completed the assignment flawlessly.",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -126,6 +130,10 @@
 #         "long_description": {
 #           "example": "Criterion 1 more details",
 #           "type": "string"
+#         },
+#         "criterion_use_range": {
+#           "example": true,
+#           "type": "boolean"
 #         },
 #         "ratings": {
 #           "type": "array",

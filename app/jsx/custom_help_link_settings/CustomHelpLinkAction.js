@@ -17,46 +17,49 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 
-  const CustomHelpLinkAction = React.createClass({
-    propTypes: {
-      link: CustomHelpLinkPropTypes.link.isRequired,
-      label: PropTypes.string.isRequired,
-      iconClass: PropTypes.string.isRequired,
-      onClick: PropTypes.func
-    },
-    handleClick (e) {
-      if (typeof this.props.onClick === 'function') {
-        this.props.onClick(this.props.link)
-      } else {
-        e.preventDefault();
-      }
-    },
-    focus () {
-      const node = ReactDOM.findDOMNode(this);
+export default class CustomHelpLinkAction extends React.Component {
+  static propTypes = {
+    link: CustomHelpLinkPropTypes.link.isRequired,
+    label: PropTypes.string.isRequired,
+    iconClass: PropTypes.string.isRequired,
+    onClick: PropTypes.func
+  }
 
-      if (node && !node.disabled) {
-        node.focus();
-      }
-    },
-    render () {
-      return (
-        <button
-          type="button"
-          className="Button Button--icon-action ic-Sortable-sort-controls__button"
-          onClick={this.handleClick}
-          disabled={this.props.onClick ? null : true}
-        >
-          <span className="screenreader-only">
-            {this.props.label}
-          </span>
-          <i className={this.props.iconClass} aria-hidden="true"></i>
-        </button>
-      )
+  static defaultProps = {
+    onClick: null
+  }
+
+  handleClick = e => {
+    if (typeof this.props.onClick === 'function') {
+      this.props.onClick(this.props.link)
+    } else {
+      e.preventDefault()
     }
-  });
+  }
 
-export default CustomHelpLinkAction
+  focus = () => {
+    if (this.node && !this.node.disabled) {
+      this.node.focus()
+    }
+  }
+
+  render() {
+    return (
+      <button
+        type="button"
+        className="Button Button--icon-action ic-Sortable-sort-controls__button"
+        onClick={this.handleClick}
+        disabled={this.props.onClick ? null : true}
+        ref={c => {
+          this.node = c
+        }}
+      >
+        <span className="screenreader-only">{this.props.label}</span>
+        <i className={this.props.iconClass} aria-hidden="true" />
+      </button>
+    )
+  }
+}

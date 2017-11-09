@@ -304,6 +304,18 @@ describe AssignmentsApiController, type: :request do
                              :points_possible => 12,
                               :free_form_criterion_comments => true)
 
+      @rubric.data.push(
+        {
+          id: 'crit3', description: "Criterion With Range",
+          long_description: "Long Criterion With Range",
+          points: 5, criterion_use_range: true, ratings:
+            [{id: 'rat1',
+              description: "Full Marks",
+              long_description: "Student did a great job.",
+              points: 5.0}]
+        }
+      )
+
       @assignment.build_rubric_association(:rubric => @rubric,
                                            :purpose => 'grading',
                                            :use_for_grading => true,
@@ -321,19 +333,32 @@ describe AssignmentsApiController, type: :request do
           'id' => 'crit1',
           'points' => 10,
           'description' => 'Crit1',
+          'criterion_use_range' => false,
           'ratings' => [
-            {'id' => 'rat1', 'points' => 10, 'description' => 'A'},
-            {'id' => 'rat2', 'points' => 7, 'description' => 'B'},
-            {'id' => 'rat3', 'points' => 0, 'description' => 'F'}
+            {'id' => 'rat1', 'points' => 10, 'description' => 'A', 'long_description' => ''},
+            {'id' => 'rat2', 'points' => 7, 'description' => 'B', 'long_description' => ''},
+            {'id' => 'rat3', 'points' => 0, 'description' => 'F', 'long_description' => ''}
           ]
         },
         {
           'id' => 'crit2',
           'points' => 2,
           'description' => 'Crit2',
+          'criterion_use_range' => false,
           'ratings' => [
-            {'id' => 'rat1', 'points' => 2, 'description' => 'Pass'},
-            {'id' => 'rat2', 'points' => 0, 'description' => 'Fail'},
+            {'id' => 'rat1', 'points' => 2, 'description' => 'Pass', 'long_description' => ''},
+            {'id' => 'rat2', 'points' => 0, 'description' => 'Fail', 'long_description' => ''},
+          ]
+        },
+        {
+          'id' => 'crit3',
+          'points' => 5,
+          'description' => 'Criterion With Range',
+          'long_description' => 'Long Criterion With Range',
+          'criterion_use_range' => true,
+          'ratings' => [
+            {'id' => 'rat1', 'points' => 5, 'description' => 'Full Marks',
+             'long_description' => 'Student did a great job.'}
           ]
         }
       ]
@@ -1357,7 +1382,7 @@ describe AssignmentsApiController, type: :request do
         'submission_type' => 'online',
         'submission_types' => ['online_upload'],
         'report_visibility' => 'after_grading',
-        "vericite_settings" => {  
+        "vericite_settings" => {
           "originality_report_visibility" => "immediately",
           "exclude_quoted" => true,
           "exclude_self_plag" => true,
@@ -1377,7 +1402,7 @@ describe AssignmentsApiController, type: :request do
         'submission_type' => 'online',
         'submission_types' => ['online_upload'],
         'report_visibility' => 'after_grading',
-        "turnitin_settings" => {  
+        "turnitin_settings" => {
           "originality_report_visibility" => "immediately",
           "exclude_quoted" => true,
           "exclude_self_plag" => true,

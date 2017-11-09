@@ -489,8 +489,10 @@ class ContextExternalTool < ActiveRecord::Base
       res.normalize!
       return true if res.to_s == standard_url
     end
-    host = Addressable::URI.parse(url).host rescue nil
-    !!(host && ('.' + host).match(/\.#{domain}\z/))
+    if domain.present?
+      host = Addressable::URI.parse(url).normalize.host rescue nil
+      !!(host && ('.' + host).match(/\.#{domain}\z/))
+    end
   end
 
   def matches_domain?(url)

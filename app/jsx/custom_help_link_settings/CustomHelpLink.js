@@ -17,101 +17,109 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkHiddenInputs from './CustomHelpLinkHiddenInputs'
 import CustomHelpLinkAction from './CustomHelpLinkAction'
 
-  const CustomHelpLink = React.createClass({
-    propTypes: {
-      link: CustomHelpLinkPropTypes.link.isRequired,
-      onMoveUp: PropTypes.func,
-      onMoveDown: PropTypes.func,
-      onEdit: PropTypes.func,
-      onRemove: PropTypes.func
-    },
-    getInitialState () {
-      return {
-        shouldFocus: this.props.shouldFocus
-      };
-    },
-    focus (action) {
-      // screenreaders are the worst
-      // We have to force a focus change and a delay because clicking the "up" or "delete" buttons
-      // just causes React to rearrange the DOM nodes, so the focus doesn't actually change. If the
-      // focus doesn't change, screenreaders don't read the up button or delete button again like we
-      // want them to. If we don't delay, then screenreaders don't notice the focus changed.
-      this.actions['edit'].focus();
-      setTimeout(() => {
-        const ref = this.actions[action];
+export default class CustomHelpLink extends React.Component {
+  static propTypes = {
+    link: CustomHelpLinkPropTypes.link.isRequired,
+    onMoveUp: PropTypes.func,
+    onMoveDown: PropTypes.func,
+    onEdit: PropTypes.func,
+    onRemove: PropTypes.func
+  }
 
-        if (ref && ref.props.onClick) {
-          ref.focus();
-        } else {
-          const focusable = this.focusable();
-          if (focusable) {
-            focusable.focus();
-          }
+  static defaultProps = {
+    onMoveUp: () => {},
+    onMoveDown: () => {},
+    onEdit: () => {},
+    onRemove: () => {}
+  }
+
+  focus = action => {
+    // screenreaders are the worst
+    // We have to force a focus change and a delay because clicking the "up" or "delete" buttons
+    // just causes React to rearrange the DOM nodes, so the focus doesn't actually change. If the
+    // focus doesn't change, screenreaders don't read the up button or delete button again like we
+    // want them to. If we don't delay, then screenreaders don't notice the focus changed.
+    this.actions.edit.focus()
+    setTimeout(() => {
+      const ref = this.actions[action]
+
+      if (ref && ref.props.onClick) {
+        ref.focus()
+      } else {
+        const focusable = this.focusable()
+        if (focusable) {
+          focusable.focus()
         }
-      }, 100);
-    },
-    focusable () {
-      const focusable = this.rootElement.querySelectorAll('button:not([disabled])');
-      return focusable[0];
-    },
-    render () {
-      const {
-        text
-      } = this.props.link;
+      }
+    }, 100)
+  }
 
-      this.actions = {};
+  focusable = () => {
+    const focusable = this.rootElement.querySelectorAll('button:not([disabled])')
+    return focusable[0]
+  }
 
-      return (
-        <li
-          className="ic-Sortable-item"
-          ref={(c) => { this.rootElement = c }}
-        >
-          <div className="ic-Sortable-item__Text">
-            {text}
-          </div>
-          <div className="ic-Sortable-item__Actions">
-            <div className="ic-Sortable-sort-controls">
-              <CustomHelpLinkAction
-                ref={(c) => this.actions['moveUp'] = c}
-                link={this.props.link}
-                label={I18n.t('Move %{text} up', { text })}
-                onClick={this.props.onMoveUp}
-                iconClass="icon-mini-arrow-up"
-              />
-              <CustomHelpLinkAction
-                ref={(c) => this.actions['moveDown'] = c}
-                link={this.props.link}
-                label={I18n.t('Move %{text} down', { text })}
-                onClick={this.props.onMoveDown}
-                iconClass="icon-mini-arrow-down"
-              />
-            </div>
+  render() {
+    const {text} = this.props.link
+
+    this.actions = {}
+
+    return (
+      <li
+        className="ic-Sortable-item"
+        ref={c => {
+          this.rootElement = c
+        }}
+      >
+        <div className="ic-Sortable-item__Text">{text}</div>
+        <div className="ic-Sortable-item__Actions">
+          <div className="ic-Sortable-sort-controls">
             <CustomHelpLinkAction
-              ref={(c) => this.actions['edit'] = c}
+              ref={c => {
+                this.actions.moveUp = c
+              }}
               link={this.props.link}
-              label={I18n.t('Edit %{text}', { text })}
-              onClick={this.props.onEdit}
-              iconClass="icon-edit"
+              label={I18n.t('Move %{text} up', {text})}
+              onClick={this.props.onMoveUp}
+              iconClass="icon-mini-arrow-up"
             />
             <CustomHelpLinkAction
-              ref={(c) => this.actions['remove'] = c}
+              ref={c => {
+                this.actions.moveDown = c
+              }}
               link={this.props.link}
-              label={I18n.t('Remove %{text}', { text })}
-              onClick={this.props.onRemove}
-              iconClass="icon-trash"
+              label={I18n.t('Move %{text} down', {text})}
+              onClick={this.props.onMoveDown}
+              iconClass="icon-mini-arrow-down"
             />
           </div>
-          <CustomHelpLinkHiddenInputs link={this.props.link} />
-        </li>
-      )
-    }
-  });
-
-export default CustomHelpLink
+          <CustomHelpLinkAction
+            ref={c => {
+              this.actions.edit = c
+            }}
+            link={this.props.link}
+            label={I18n.t('Edit %{text}', {text})}
+            onClick={this.props.onEdit}
+            iconClass="icon-edit"
+          />
+          <CustomHelpLinkAction
+            ref={c => {
+              this.actions.remove = c
+            }}
+            link={this.props.link}
+            label={I18n.t('Remove %{text}', {text})}
+            onClick={this.props.onRemove}
+            iconClass="icon-trash"
+          />
+        </div>
+        <CustomHelpLinkHiddenInputs link={this.props.link} />
+      </li>
+    )
+  }
+}
