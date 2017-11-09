@@ -20,6 +20,14 @@ define [
   'compiled/views/tinymce/EquationEditorView'
 ], ($, EquationEditorView) ->
 
+  QUnit.module "EquationEditorView#doubleEncodeEquationForUrl",
+    setup: ->
+    teardown: ->
+
+  test "encodes pound sign using utf-8", ->
+    equation = "£"
+    equal(EquationEditorView.doubleEncodeEquationForUrl(equation), "%25C2%25A3")
+
   QUnit.module "EquationEditorView#getEquationText",
     setup: ->
     teardown: ->
