@@ -95,7 +95,8 @@ import 'compiled/jquery.rails_flash_notifications'
     }
     $.ajax({
       url: url,
-      data: { external_tool: params },
+      contentType: 'application/json',
+      data: JSON.stringify({ external_tool: params }),
       type: method,
       success: success.bind(this),
       error: error.bind(this)
