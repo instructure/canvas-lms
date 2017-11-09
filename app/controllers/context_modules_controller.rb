@@ -530,6 +530,7 @@ class ContextModulesController < ApplicationController
         is_cyoe_able: cyoe_able?(@tag),
         is_duplicate_able: @tag.duplicate_able?,
       )
+      @context.touch
       render json: json
     end
   end
