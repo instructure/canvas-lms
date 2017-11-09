@@ -387,7 +387,7 @@ class GradeCalculator
           WHERE
             enrollment_id IN (#{joined_enrollment_ids}) AND
             assignment_group_id IS NULL AND
-            grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'};
+            #{@grading_period ? "grading_period_id = #{@grading_period.id}" : 'course_score IS TRUE'};
       INSERT INTO #{Score.quoted_table_name}
           (enrollment_id, grading_period_id, #{current_score_column}, #{final_score_column}, course_score, created_at, updated_at)
           SELECT
@@ -415,7 +415,8 @@ class GradeCalculator
           FROM #{Enrollment.quoted_table_name} enrollments
           LEFT OUTER JOIN #{Score.quoted_table_name} scores on
             scores.enrollment_id = enrollments.id AND
-            scores.grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'}
+            scores.assignment_group_id IS NULL AND
+            #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'}
           WHERE
             enrollments.id IN (#{joined_enrollment_ids}) AND
             scores.id IS NULL;
@@ -437,7 +438,7 @@ class GradeCalculator
         WHERE
           scores.enrollment_id IN (#{joined_enrollment_ids}) AND
           scores.assignment_group_id IS NULL AND
-          scores.grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'} AND
+          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'} AND
           metadata.score_id = scores.id;
       INSERT INTO #{ScoreMetadata.quoted_table_name}
         (score_id, calculation_details, created_at, updated_at)
@@ -459,7 +460,7 @@ class GradeCalculator
         WHERE
           scores.enrollment_id IN (#{joined_enrollment_ids}) AND
           scores.assignment_group_id IS NULL AND
-          scores.grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'} AND
+          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'} AND
           metadata.id IS NULL;
     ")
   end

@@ -1107,6 +1107,13 @@ describe GradeCalculator do
         expect(scored_enrollment_ids).to contain_exactly *(@student.enrollments.map(&:id))
       end
 
+      it "creates a course score for the student if one does not exist, but assignment group scores exist" do
+        student_enrollment = @course.student_enrollments.find_by(user_id: @student)
+        student_enrollment.find_score(course_score: true).destroy_permanently!
+        GradeCalculator.new(@student.id, @course).compute_and_save_scores
+        expect(student_enrollment.find_score(course_score: true)).to be_present
+      end
+
       it "updates active score rows for assignment groups if they already exist" do
         orig_score_id = student_scores.first.id
         @assignment1.grade_student(@student, grade: 15, grader: @teacher)
