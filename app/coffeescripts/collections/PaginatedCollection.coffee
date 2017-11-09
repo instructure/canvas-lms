@@ -89,6 +89,19 @@ define [
       dfd.error = dfd.fail
       dfd
 
+    fetchAll: ->
+      @fetchAllDriver(success: @fetchNext)
+
+    fetchNext: =>
+      if @canFetch 'next'
+        @fetch(page: 'next', success: @fetchNext)
+      else
+        @trigger('finish')
+
+    fetchAllDriver: (options = {}) ->
+      options.data = Object.assign per_page: 20, options.data || {}
+      @fetch options
+
     canFetch: (page) ->
       @urls? and @urls[page]?
 

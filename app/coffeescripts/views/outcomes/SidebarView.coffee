@@ -163,13 +163,6 @@ define [
       @selectedDir().makeFocusable()
 
       @goingBack = false
-#      if @selectedModel() instanceof OutcomeGroup
-#        parentDir = @selectedDir().parent
-##        @selectDir @selectedDir(), @selectedDir().parent?.selectedModel
-#      else
-#        i = _.indexOf @directories, @selectedDir()
-#        @selectDir @directories[i - 1]
-#      @goingBack = false
 
     updateSidebarWidth: ->
       sidebarWidth = if @directories.length is 1 then @directoryWidth else (@directoryWidth * 2)

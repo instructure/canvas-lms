@@ -184,7 +184,8 @@ define [
     fetchOutcomes: ->
       @collection = @outcomes
       @bindPaginationEvents()
-      @outcomes.fetch(success: => @loadDfd.resolve(this))
+      @outcomes.fetchAll()
+      @outcomes.on("finish", => @loadDfd.resolve(this))
       @startPaginationListener()
       @showPaginationLoader()
 
