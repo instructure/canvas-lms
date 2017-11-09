@@ -131,12 +131,12 @@ describe ExternalToolsController, type: :request do
             expect(json["errors"]["assignment_id"].first["message"]).to eq 'An assignment id must be provided for assessment LTI launch'
           end
 
-          it 'returns a bad request response if the assignment is not found in the class' do
+          it 'returns a not found response if the assignment is not found in the class' do
             params = {id: tool.id.to_s, launch_type: 'assessment', assignment_id: -1}
             code = get_raw_sessionless_launch_url(@course, 'course', params)
-            expect(code).to eq 400
+            expect(code).to eq 404
             json = JSON.parse(response.body)
-            expect(json["errors"]["assignment_id"].first["message"]).to eq 'The assignment was not found in this course'
+            expect(json['errors'].first['message']).to eq 'The specified resource does not exist.'
           end
 
           it "returns an unauthorized response if the user can't read the assignment" do
@@ -203,7 +203,12 @@ describe ExternalToolsController, type: :request do
           expect(code).to eq 302
         end
 
-
+        it 'redirects if there is no launch url associated with the tool' do
+          no_url_tool = tool.dup
+          no_url_tool.update_attributes!(url: nil)
+          get_raw_sessionless_launch_url(@course, 'course', {id: no_url_tool.id})
+          expect(response).to be_redirect
+        end
       end
     end
 

@@ -1266,7 +1266,6 @@ describe ExternalToolsController do
       tag.save!
 
       get :generate_sessionless_launch, params: {course_id: @course.id, launch_type: 'assessment', assignment_id: @assignment.id}
-
       expect(response).to be_success
 
       json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
