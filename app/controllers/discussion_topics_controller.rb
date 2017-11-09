@@ -672,6 +672,9 @@ class DiscussionTopicsController < ApplicationController
   # @argument delayed_post_at [DateTime]
   #   If a timestamp is given, the topic will not be published until that time.
   #
+  # @argument allow_rating [Boolean]
+  #   Whether or not users can rate entries in this topic.
+  #
   # @argument lock_at [DateTime]
   #   If a timestamp is given, the topic will be scheduled to lock at the
   #   provided timestamp. If the timestamp is in the past, the topic will be
