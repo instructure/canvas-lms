@@ -75,6 +75,22 @@ QUnit.module("SpeedGraderSelectMenu", () => {
         ok(true, 'does not error');
       });
 
+      test('updates status for current student', () => {
+        const student = students[0];
+        student.submission_state = 'graded';
+
+        const status = $('.ui-selectmenu-status');
+
+        let isCurrentStudent = false;
+
+        selectMenu.updateSelectMenuStatus(student, isCurrentStudent, 'Guy B. Studying - graded');
+        strictEqual(status.hasClass("graded"), false);
+
+        isCurrentStudent = true;
+        selectMenu.updateSelectMenuStatus(student, isCurrentStudent, 'Guy B. Studying - graded');
+        strictEqual(status.hasClass("graded"), true);
+      });
+
       test('updates to graded', () => {
         const student = students[0];
         student.submission_state = 'graded';

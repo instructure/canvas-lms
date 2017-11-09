@@ -272,16 +272,22 @@ export default function speedgraderSelectMenu (optionsArray) {
 
     if(className.raw === "graded" || className.raw === "not_gradeable"){
       $queryIcon.text("").append("<i class='icon-check'></i>");
-      $status.addClass("graded");
-      $statusIcon.text("").append("<i class='icon-check'></i>");
+      if (isCurrentStudent) {
+        $status.addClass("graded");
+        $statusIcon.text("").append("<i class='icon-check'></i>");
+      }
     }else if(className.raw === "not_graded"){
       $queryIcon.text("").append("&#9679;");
-      $status.removeClass("graded");
-      $statusIcon.text("").append("&#9679;");
+      if (isCurrentStudent) {
+        $status.removeClass("graded");
+        $statusIcon.text("").append("&#9679;");
+      }
     }else{
       $queryIcon.text("");
-      $status.removeClass("graded");
-      $statusIcon.text("");
+      if (isCurrentStudent) {
+        $status.removeClass("graded");
+        $statusIcon.text("");
+      }
     }
 
     // this is because selectmenu.js uses .data('optionClasses' on the
