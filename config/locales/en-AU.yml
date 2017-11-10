@@ -2866,7 +2866,7 @@ en-AU:
       failed: Failed
       finished: Finished
       importing: "Importing into Canvas"
-      migration_cancelled_on: "Cancelled on %{date}"
+      migration_cancelled_on: "Canceled on %{date}"
       migration_failed_on: "Failed on %{date}"
       migration_finished_on: "Finished on %{date}"
       migration_queueing: "The individual course migrations are being queued to run."
@@ -10226,7 +10226,7 @@ en-AU:
           details: "Appointment Details"
           group: Group
           link_text: "Click here to sign up for a different time slot"
-          message: "%{user} cancelled your time slot for %{appointment_name}."
+          message: "%{user} canceled your time slot for %{appointment_name}."
           no_reason_given: "none given"
           subject: "Your time slot for %{appointment_name} has been cancelled (%{course})"
         instructions: "Sign up for a different time slot at the following link: %{link}"
@@ -10254,9 +10254,9 @@ en-AU:
           dates: Date(s)
           details: "Appointment Details"
           link_text: "View the appointment"
-          message: "All appointments for %{appointment_name} have been cancelled."
+          message: "All appointments for %{appointment_name} have been canceled."
           no_reason_given: "none given"
-          subject: "Appointments for %{appointment_name} have been cancelled (%{course})"
+          subject: "Appointments for %{appointment_name} have been canceled (%{course})"
         labels: 
           cancel_reason: "Reason for canceling"
           course: Course
@@ -17824,7 +17824,7 @@ en-AU:
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "The URL of the page the user was on when they reported the error"
   theme_52404e51: Theme
   theme_editor_b7b00f6b: "Theme Editor"
-  theme_editor_changes_have_been_cancelled_2af5cc5f: "Theme editor changes have been cancelled."
+  theme_editor_changes_have_been_cancelled_2af5cc5f: "Theme editor changes have been canceled."
   theme_name_68f46e09: "Theme Name"
   themes_89bfe9c4: Themes
   there_are_count_associations_906edb03: 
