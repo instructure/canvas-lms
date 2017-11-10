@@ -3176,14 +3176,24 @@ describe Submission do
       @student2 = user_factory
       @course.enroll_student(@student2).accept!
       @assignment = peer_review_assignment
-      @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
-      @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
+      @student1_homework = @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
+      @student2_homework = @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
     end
 
     it "should send a reminder notification" do
       expect_any_instance_of(AssessmentRequest).to receive(:send_reminder!).once
       submission1, submission2 = @assignment.submissions
       submission1.assign_assessor(submission2)
+    end
+
+    it "should not allow read access when assignment peer reviews are off" do
+      @student1_homework.assign_assessor(@student2_homework)
+      expect(@student1_homework.grants_right?(@student2, :read)).to eq true
+      @assignment.peer_reviews = false
+      @assignment.save!
+      @student1_homework.reload
+      AdheresToPolicy::Cache.clear
+      expect(@student1_homework.grants_right?(@student2, :read)).to eq false
     end
   end
 

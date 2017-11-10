@@ -406,6 +406,7 @@ class Submission < ActiveRecord::Base
 
     given do |user|
       self.assignment.published? &&
+        self.assignment.peer_reviews &&
         user &&
         self.assessment_requests.map(&:assessor_id).include?(user.id)
     end
