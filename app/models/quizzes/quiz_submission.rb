@@ -721,7 +721,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       self.without_versioning(&:save)
     end
     self.reload
-    Quizzes::SubmissionGrader.new(self).track_outcomes(version.model.attempt)
     true
   end
 
