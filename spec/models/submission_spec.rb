@@ -3174,7 +3174,8 @@ describe Submission do
     before(:each) do
       student_in_course(active_all: true)
       @student2 = user_factory
-      @course.enroll_student(@student2).accept!
+      @student2_enrollment = @course.enroll_student(@student2)
+      @student2_enrollment.accept!
       @assignment = peer_review_assignment
       @student1_homework = @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
       @student2_homework = @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
@@ -3186,7 +3187,7 @@ describe Submission do
       submission1.assign_assessor(submission2)
     end
 
-    it "should not allow read access when assignment peer reviews are off" do
+    it "should not allow read access when assignment's peer reviews are off" do
       @student1_homework.assign_assessor(@student2_homework)
       expect(@student1_homework.grants_right?(@student2, :read)).to eq true
       @assignment.peer_reviews = false
@@ -3194,6 +3195,12 @@ describe Submission do
       @student1_homework.reload
       AdheresToPolicy::Cache.clear
       expect(@student1_homework.grants_right?(@student2, :read)).to eq false
+    end
+
+    it "should not allow read access when other student's enrollment is not active" do
+      @student2_homework.assign_assessor(@student1_homework)
+      @student2_enrollment.conclude
+      expect(@student2_homework.grants_right?(@student, :read)).to eq false
     end
   end
 
