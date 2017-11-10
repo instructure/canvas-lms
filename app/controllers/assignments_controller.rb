@@ -55,7 +55,7 @@ class AssignmentsController < ApplicationController
       set_tutorial_js_env
       hash = {
         WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
-        POST_TO_SIS_DEFAULT: Assignment.sis_grade_export_enabled?(@context),
+        POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
         SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,

@@ -122,6 +122,24 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
+    it "js_env POST_TO_SIS_DEFAULT is false when sis_default_grade_export is false on the account" do
+      user_session(@teacher)
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: false}
+      a.save!
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(false)
+    end
+
+    it "js_env POST_TO_SIS_DEFAULT is true when sis_default_grade_export is true on the account" do
+      user_session(@teacher)
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(true)
+    end
+
     it "should set QUIZ_LTI_ENABLED in js_env if quizzes 2 is available" do
       user_session @teacher
       @course.context_external_tools.create!(
