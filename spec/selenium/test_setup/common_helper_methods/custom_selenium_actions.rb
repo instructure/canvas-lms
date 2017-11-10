@@ -343,15 +343,10 @@ module CustomSeleniumActions
 
   MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
   def replace_content(el, value, options = {})
-    # We are treating the chrome browser different because currently Selenium cannot send :command key to the chrome.
-    # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
     case driver.browser
-    when :firefox
+    when :firefox, :chrome, :safari
       keys = [[MODIFIER_KEY, "a"], :backspace]
-    when :chrome
-      driver.execute_script("arguments[0].select()", el)
-      keys = [:backspace]
-    when :safari, :internet_explorer
+    when :internet_explorer
       el.clear()
       keys = []
     end
