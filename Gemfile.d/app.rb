@@ -29,7 +29,7 @@ gem 'rails-observers', '0.1.5'
 gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.4'
 
-gem 'encrypted_cookie_store-instructure', '1.2.6', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.7', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.6.1'
