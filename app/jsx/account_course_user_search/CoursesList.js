@@ -84,10 +84,10 @@ export default function CoursesList(props) {
         <div role="columnheader" className="col-xs-2">
           <CoursesListHeader
             {...props}
-            id="enrollments"
-            label={I18n.t('Enrollments')}
-            tipDesc={I18n.t('Click to sort by enrollments ascending')}
-            tipAsc={I18n.t('Click to sort by enrollments descending')}
+            id="total_students"
+            label={I18n.t('Students')}
+            tipDesc={I18n.t('Click to sort by number of students ascending')}
+            tipAsc={I18n.t('Click to sort by number of students descending')}
           />
         </div>
         <div role="columnheader" className="col-xs-1">

@@ -147,7 +147,7 @@ Object.entries({
   term: 'Term',
   teacher: 'Teacher',
   subaccount: 'Sub-Account',
-  enrollments: 'Enrollments'
+  total_students: 'Students'
 }).forEach(([columnID, label]) => {
 
   test(`sorting by ${columnID} asc puts down-arrow on ${label} only`, () => {
@@ -162,9 +162,10 @@ Object.entries({
     equal(icons.length, 1, 'only one down arrow')
     const header = icons[0].parentNode
 
-    const expectedTip = (columnID === 'course_name')
-      ? 'Click to sort by name descending'
-      : `Click to sort by ${label} descending`
+    const expectedTip = {
+      course_name: 'Click to sort by name descending',
+      total_students: 'Click to sort by number of students descending'
+    }[columnID] || `Click to sort by ${label} descending`
 
     ok(header.textContent.match(RegExp(expectedTip, 'i')), 'has right tooltip')
     ok(header.textContent.match(label), `${label} is the one that has the down arrow`)
@@ -181,9 +182,10 @@ Object.entries({
     const icons = wrapper.querySelectorAll('svg[name=IconMiniArrowUpSolid]', 'no columns have a down arrow')
     equal(icons.length, 1, 'only one up arrow')
     const header = icons[0].parentNode
-    const expectedTip = (columnID === 'course_name')
-      ? 'Click to sort by name ascending'
-      : `Click to sort by ${label} ascending`
+    const expectedTip = {
+      course_name: 'Click to sort by name ascending',
+      total_students: 'Click to sort by number of students ascending'
+    }[columnID] || `Click to sort by ${label} ascending`
 
     ok(header.textContent.match(RegExp(expectedTip, 'i')), 'has right tooltip')
     ok(header.textContent.match(label), `${label} is the one that has the up arrow`)
