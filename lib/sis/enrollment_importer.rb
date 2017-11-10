@@ -26,7 +26,7 @@ module SIS
       i = Work.new(@batch, @root_account, @logger, updates_every, messages)
 
       Enrollment.skip_touch_callbacks(:course) do
-        Enrollment.suspend_callbacks(:update_cached_due_dates) do
+        Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
           User.skip_updating_account_associations do
             Enrollment.process_as_sis(@sis_options) do
               yield i

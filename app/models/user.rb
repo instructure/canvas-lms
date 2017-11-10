@@ -872,7 +872,7 @@ class User < ActiveRecord::Base
   # avoid extraneous callbacks when enrolled in multiple sections
   def delete_enrollments(enrollment_scope=self.enrollments)
     courses_to_update = enrollment_scope.active.distinct.pluck(:course_id)
-    Enrollment.suspend_callbacks(:update_cached_due_dates) do
+    Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
       enrollment_scope.each{ |e| e.destroy }
     end
     courses_to_update.each do |course|

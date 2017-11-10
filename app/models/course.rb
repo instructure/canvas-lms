@@ -202,12 +202,12 @@ class Course < ActiveRecord::Base
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
-  after_save :update_cached_due_dates
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
   after_save :touch_students_if_necessary
   after_save :set_self_enrollment_code
+  after_commit :update_cached_due_dates
 
   before_update :handle_syllabus_changes_for_master_migration
 
@@ -1053,7 +1053,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    DueDateCacher.recompute_course(self) if enrollment_term_id_changed?
+    DueDateCacher.recompute_course(self) if previous_changes.key?(:enrollment_term_id)
   end
 
   def update_final_scores_on_weighting_scheme_change
@@ -2838,7 +2838,7 @@ class Course < ActiveRecord::Base
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
     self.default_section unless course_sections.active.any?
-    Enrollment.suspend_callbacks(:update_cached_due_dates) do
+    Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
       self.course_sections.active.each do |section|
         # enroll fake_student will only create the enrollment if it doesn't already exist
         self.enroll_user(fake_student, 'StudentViewEnrollment',
