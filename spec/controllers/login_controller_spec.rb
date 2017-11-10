@@ -141,7 +141,7 @@ describe LoginController do
 
     it "follows SAML logout redirect to IdP" do
       account_with_saml(account: Account.default, saml_log_out_url: 'https://www.google.com/')
-      session[:login_aac] = Account.default.authentication_providers.first
+      session[:login_aac] = Account.default.authentication_providers.first.id
       delete 'destroy'
       expect(response.status).to eq 302
       expect(response.location).to match(%r{^https://www.google.com/\?SAMLRequest=})
