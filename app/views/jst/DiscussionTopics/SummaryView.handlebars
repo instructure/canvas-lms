@@ -12,12 +12,12 @@
     <input class="toggleSelected" type="checkbox" aria-label="{{title}}" {{#if selected}}checked{{/if}} >
   </label>
 {{/if}}
+<div class="image-block-image" aria-hidden="true">
+  {{>avatar author}}
+</div>
 <div class="discussion-column image-block">
   <div class="image-block-content">
     <div>
-      <div class="image-block-image" aria-hidden="true">
-        {{>avatar author}}
-      </div>
       <a href="{{html_url}}" class="discussion-title" >{{title}}</a>
       {{#if author}}
         <a class="discussion-author" href="{{author.html_url}}">{{author.display_name}}</a>

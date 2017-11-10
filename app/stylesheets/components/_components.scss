@@ -103,14 +103,14 @@
   }
 }
 .image-block {
-  display: flex; min-width: 1px;
+  display: flex;
+  min-width: 1px;
 
-  .image-block-image {
-    margin-right: $ic-sp;
-  }
   .image-block-content {
     flex: 1;
     min-width: 1px;
+    padding-left: $ic-sp;
+    box-sizing: border-box;
   }
 }
 
