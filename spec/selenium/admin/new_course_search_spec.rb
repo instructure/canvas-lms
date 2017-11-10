@@ -179,4 +179,12 @@ describe "new account course search" do
     # make sure it shows up on the page
     expect(f('.courses-list')).to include_text('Test Course Name')
   end
+
+  it "should list course name at top of add user modal", priority: "1", test_id: 3391719 do
+    named_course = course_factory(:account => @account, :course_name => "course factory with name")
+
+    get "/accounts/#{@account.id}"
+    fj('.courses-list [role=row] button:has([name="IconPlusLine"])').click # click the "+" to open addPeople
+    expect(f('#add_people_modal h2')).to include_text(named_course.name)
+  end
 end
