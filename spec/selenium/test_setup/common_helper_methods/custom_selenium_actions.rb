@@ -87,6 +87,13 @@ module CustomSeleniumActions
     end
   end
 
+  # short for find with xpath
+  def fxpath(xpath, scope = nil)
+    stale_element_protection do
+      (scope || driver).find_element :xpath, xpath
+    end
+  end
+
   # same as `f`, but returns all matching elements
   #
   # like other selenium methods, this will wait until it finds elements on
@@ -110,6 +117,12 @@ module CustomSeleniumActions
         result.present?
       end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}"
       result
+    end
+  end
+
+  def ffxpath(xpath, scope = nil)
+    reloadable_collection do
+      (scope || driver).find_elements(:xpath, xpath)
     end
   end
 
