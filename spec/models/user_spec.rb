@@ -2122,23 +2122,28 @@ describe User do
 
   describe "submissions_needing_peer_review" do
     before(:each) do
-      course_with_student(:active_all => true)
-      @assessor = @student
+      @reviewer = course_with_student(active_all: true).user
+      @reviewee = course_with_student(course: @course, active_all: true).user
       assignment_model(course: @course, peer_reviews: true)
-      @submission = submission_model(assignment: @assignment)
-      @assessor_submission = submission_model(assignment: @assignment, user: @assessor)
-      @assessment_request = AssessmentRequest.create!(assessor: @assessor, asset: @submission, user: @student, assessor_asset: @assessor_submission)
-      @assessment_request.workflow_state = 'assigned'
-      @assessment_request.save
+
+      @reviewer_submission = submission_model(assignment: @assignment, user: @reviewer)
+      @reviewee_submission = submission_model(assignment: @assignment, user: @reviewee)
+      @assessment_request = @assignment.assign_peer_review(@reviewer, @reviewee)
     end
 
     it "should included assessment requests where the user is the assessor" do
-      expect(@assessor.submissions_needing_peer_review.length).to eq 1
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 1
     end
 
-    it "should note include assessment requests that have been ignored" do
-      Ignore.create!(asset: @assessment_request, user: @assessor, purpose: 'reviewing')
-      expect(@assessor.submissions_needing_peer_review.length).to eq 0
+    it "should not include assessment requests that have been ignored" do
+      Ignore.create!(asset: @assessment_request, user: @reviewer, purpose: 'reviewing')
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 0
+    end
+
+    it "should not include assessment requests the user does not have permission to perform" do
+      @assignment.peer_reviews = false
+      @assignment.save!
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 0
     end
   end
 

@@ -1630,10 +1630,13 @@ class User < ActiveRecord::Base
             shard_course_context_codes = shard_course_ids.map { |course_id| "course_#{course_id}"}
             AssessmentRequest.where(assessor_id: id).incomplete.
               not_ignored_by(self, 'reviewing').
-              for_context_codes(shard_course_context_codes)
+              for_context_codes(shard_course_context_codes).
+              preload({submission: :assignment}) # avoid n+1 query on grants_right? check below
           end
+          # only include assessment requests they have permission to perform
+          result = result.select { |request| request.submission.grants_right?(self, :read) }
           # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit && !opts[:scope_only]
+          result = result[0...limit] if limit
           result
         end
       end
