@@ -355,13 +355,11 @@ class AssignmentOverride < ActiveRecord::Base
 
   def title_from_students(students)
     return t("No Students") if students.blank?
-    t(:student_count,
-      {
-        one: '%{count} student',
-        other: '%{count} students'
-      },
-      count: students.count
-     )
+    self.class.title_from_student_count(students.count)
+  end
+
+  def self.title_from_student_count(student_count)
+    t(:student_count, { one: '%{count} student', other: '%{count} students' }, count: student_count)
   end
 
   def destroy_if_empty_set
