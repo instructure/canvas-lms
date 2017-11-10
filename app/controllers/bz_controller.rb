@@ -733,6 +733,7 @@ class BzController < ApplicationController
                 fetched_li_data = true
                 request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,honors-awards)?format=json", service.token)
                 info = JSON.parse(request.body)
+                info["jobBookmarks"] = "ERROR FETCHING"
                 if info["errorCode"] == 0
                   fetched_li_data = false
                   Rails.logger.error("### Error exporting LinkedIn data (without jobs-bookmarks) for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
