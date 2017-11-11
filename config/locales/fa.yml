@@ -5243,7 +5243,7 @@ fa:
   datepicker: 
     errors: 
       not_a_date: "این یک تاریخ نیست!"
-    first_day_index: "0"
+    first_day_index: "6"
     nextText: بعدی
     prevText: قبلی
   dates: 
