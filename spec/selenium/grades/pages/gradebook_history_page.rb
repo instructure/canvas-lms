@@ -172,11 +172,13 @@ class GradeBookHistory
     end
 
     def start_date_textfield
-      fxpath("//*[contains(text(),'Start Date')]/../../following-sibling::span[1]/span/input")
+      element = grandparent_fxpath(fxpath("//*[contains(text(),'Start Date')]"))
+      find_from_element_fxpath(element, "following-sibling::span[1]/span/input")
     end
 
     def end_date_textfield
-      fxpath("//*[contains(text(),'End Date')]/../../following-sibling::span[1]/span/input")
+      element = grandparent_fxpath(fxpath("//*[contains(text(),'End Date')]"))
+      find_from_element_fxpath(element, "following-sibling::span[1]/span/input")
     end
 
     def error_text_invalid_dates

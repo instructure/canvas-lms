@@ -151,6 +151,38 @@ module CustomSeleniumActions
     end
   end
 
+  def parent_fxpath(element)
+    stale_element_protection do
+      element.find_element(:xpath,"..")
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "Parent node for given element was not found"
+  end
+
+  def parent_fjs(element)
+    stale_element_protection do
+      driver.execute_script("return arguments[0].parentNode;", element)
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "Parent node for given element was not found"
+  end
+
+  def grandparent_fxpath(element)
+    stale_element_protection do
+      element.find_element(:xpath,"../..")
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "Grandparent node for given element was not found, please check if parent nodes are present"
+  end
+
+  def find_from_element_fxpath(element, xpath)
+    stale_element_protection do
+      element.find_element(:xpath, xpath)
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "No element with reference to given element was found. Please recheck the xpath : #{xpath}"
+  end
+
   def is_checked(css_selector)
     !!fj(css_selector)[:checked]
   end
