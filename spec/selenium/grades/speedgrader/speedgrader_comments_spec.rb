@@ -355,6 +355,7 @@ describe "speed grader" do
       end
 
       it 'should increase the number of published comments', test_id: 1407013, priority: "1" do
+        skip_if_safari(:alert)
         publish_links = ff('#comments .comment.draft .comment_flex > button.submit_comment_button').select(&:displayed?)
 
         expect {

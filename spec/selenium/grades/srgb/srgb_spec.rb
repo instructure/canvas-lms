@@ -161,6 +161,7 @@ describe "Screenreader Gradebook" do
   end
 
   it 'sets default grade', priority: '2', test_id: 615689 do
+    skip_if_safari(:alert)
     num_of_students = 2
     simple_setup(num_of_students)
     SRGB.visit(@course.id)

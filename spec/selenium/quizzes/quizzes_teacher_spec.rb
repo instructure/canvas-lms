@@ -250,6 +250,7 @@ describe "quizzes" do
     end
 
     it "should indicate when it was last saved", priority: "1", test_id: 210065 do
+      skip_if_safari(:alert)
       user_session(@student)
       take_quiz do
         indicator = f('#last_saved_indicator')
@@ -266,6 +267,7 @@ describe "quizzes" do
     end
 
     it "should validate numerical input data", priority: "1", test_id: 210066 do
+      skip_if_safari(:alert)
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)

@@ -91,6 +91,7 @@ describe "grading standards" do
   end
 
   it "should allow setting a grading standard for a course", priority: "1", test_id: 217600 do
+    skip_if_safari(:alert)
     course_with_teacher_logged_in
 
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
