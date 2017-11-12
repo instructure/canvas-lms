@@ -140,11 +140,34 @@ class Speedgrader
       fj("#students_selectmenu-button:contains('#{student_name}')")
     end
 
+    def sections_menu_link
+      f("#section-menu-link")
+    end
+
+    def section_with_id(section_id)
+      f("a.section_#{section_id}")
+    end
+
+    def students_select_menu_list
+      ff("#students_selectmenu-menu li")
+    end
+
+    def section_all
+      f("a[data-section-id=\"all\"]")
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
       visibility_check = grade_input
       keep_trying_until { visibility_check.displayed? }
+    end
+
+    def visit_section(section)
+      students_dropdown_button.click
+      hover(sections_menu_link)
+      section.click
+      wait_for_dom_ready
     end
 
     def enter_grade(grade)
