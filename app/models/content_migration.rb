@@ -481,6 +481,8 @@ class ContentMigration < ActiveRecord::Base
     self.workflow_state = :importing
     self.save
 
+    Lti::Asset.opaque_identifier_for(self.context)
+
     all_files_path = nil
     begin
       data = nil
