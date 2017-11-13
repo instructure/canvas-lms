@@ -203,6 +203,7 @@ describe "groups" do
       end
 
       it "should allow discussions to be deleted by their creator", priority: "1", test_id: 329626 do
+        skip_if_safari(:alert)
         DiscussionTopic.create!(context: @testgroup.first, user: @user, title: 'Delete Me', message: 'Discussion text')
         get discussions_page
         expect(ff('.discussion-title-block').size).to eq 1
@@ -283,6 +284,7 @@ describe "groups" do
       end
 
       it "should allow group members to delete a folder", priority: "1", test_id: 273631 do
+        skip_if_safari(:alert)
         get files_page
         add_folder
         delete(0, :cog_icon)
@@ -301,6 +303,7 @@ describe "groups" do
       end
 
       it "should allow a group member to delete a file", priority: "1", test_id: 273630 do
+        skip_if_safari(:alert)
         add_test_files(false)
         get files_page
         delete(0, :cog_icon)

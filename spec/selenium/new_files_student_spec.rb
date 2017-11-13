@@ -71,6 +71,7 @@ describe "better_file_browsing" do
       end
 
       it "should only see Download option on cog icon", priority: "1", test_id: 133105 do
+        skip_if_safari(:alert)
         get "/courses/#{@course.id}/files"
         content = f("#content")
         f('.al-trigger-gray').click

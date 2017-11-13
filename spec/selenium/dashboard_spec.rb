@@ -319,6 +319,7 @@ describe "dashboard" do
     end
 
     it "should end conferences from stream", priority: "1", test_id: 216355 do
+      skip_if_safari(:alert)
       PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
 
       course_with_teacher_logged_in

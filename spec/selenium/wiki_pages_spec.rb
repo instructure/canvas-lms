@@ -431,6 +431,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
+        skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys("derp")
         fln('Home').click
@@ -439,6 +440,7 @@ describe "Wiki Pages" do
       end
 
       it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
+        skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys('derp')
         fln('Home').click
@@ -449,6 +451,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
+        skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         f('.title').clear()
         f('.title').send_keys("derpy-title")

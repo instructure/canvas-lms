@@ -55,6 +55,7 @@ describe "outcomes" do
       end
 
       it "should delete a learning outcome", priority: "1", test_id: 250536 do # no
+        skip_if_safari(:alert)
         should_delete_a_learning_outcome
       end
 

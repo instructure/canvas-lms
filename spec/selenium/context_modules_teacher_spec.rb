@@ -1094,6 +1094,7 @@ describe "context modules" do
     end
 
     it "should delete a module", priority: "1", test_id: 126736 do
+      skip_if_safari(:alert)
       add_module('Delete Module')
       driver.execute_script("$('.context_module').addClass('context_module_hover')")
       f('.ig-header-admin .al-trigger').click

@@ -166,6 +166,7 @@ describe "threaded discussions" do
   end
 
   it "should delete a reply", priority: "1", test_id: 150515 do
+    skip_if_safari(:alert)
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     delete_entry(entry)

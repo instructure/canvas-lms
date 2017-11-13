@@ -63,6 +63,7 @@ describe "account admin outcomes" do
     end
 
     it "should import state standards to course groups and all nested outcomes", priority: "2", test_id: 56584 do
+      skip_if_safari(:alert)
       import_state_standards_to_account(state_outcome)
       el1 = fj(".outcome-level:first .outcome-group .ellipsis")
       el2 = fj(".outcome-level:last .outcome-link .ellipsis")
@@ -71,6 +72,7 @@ describe "account admin outcomes" do
     end
 
     it "should import a state standard into account level", priority: "2", test_id: 56017 do
+      skip_if_safari(:alert)
       outcome = ['NGA Center/CCSSO']
       import_state_standards_to_account(outcome)
       el = fj('.outcome-level:first .outcome-group .ellipsis')
@@ -78,6 +80,7 @@ describe "account admin outcomes" do
     end
 
     it "should import account outcomes into course", priority: "1", test_id: 56585 do
+      skip_if_safari(:alert)
       import_state_standards_to_account(state_outcome)
       outcome = ['Default Account', 'Something else']
       goto_state_outcomes("/courses/#{@course.id}/outcomes")
@@ -86,6 +89,7 @@ describe "account admin outcomes" do
     end
 
     it "should delete state standards outcome groups from course listing", priority: "2", test_id: 250009 do
+      skip_if_safari(:alert)
       import_state_standards_to_account(state_outcome)
       f(".ellipsis[title='Something else']").click
       wait_for_ajaximations

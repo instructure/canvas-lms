@@ -117,6 +117,7 @@ describe "assignment rubrics" do
     end
 
     it "should use an existing rubric to use for grading", priority: "2", test_id: 114344 do
+      skip_if_safari(:alert)
       assignment_with_rubric(10)
       course_rubric = outcome_with_rubric
       course_rubric.associate_with(@course, @course, purpose: 'grading')
@@ -181,6 +182,7 @@ describe "assignment rubrics" do
     end
 
     it "should not adjust points when importing an outcome to an assignment", priority: "1", test_id: 2896223 do
+      skip_if_safari(:alert)
       create_assignment_with_points(2)
 
       outcome_with_rubric

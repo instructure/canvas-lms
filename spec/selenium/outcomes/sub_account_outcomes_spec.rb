@@ -46,6 +46,7 @@ describe "sub account outcomes" do
         end
 
         it "should delete a learning outcome", priority: "2", test_id: 263682 do
+          skip_if_safari(:alert)
           should_delete_a_learning_outcome
         end
 
@@ -72,6 +73,7 @@ describe "sub account outcomes" do
         end
 
         it "should delete an outcome group", priority: "1", test_id: 250523 do
+          skip_if_safari(:alert)
           should_delete_an_outcome_group
         end
       end

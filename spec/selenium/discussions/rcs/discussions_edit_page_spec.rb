@@ -55,6 +55,7 @@ describe "discussions" do
         let(:topic) { assignment_topic }
 
         it "should warn user when leaving page unsaved", priority: "1", test_id: 270919 do
+          skip_if_safari(:alert)
           title = 'new title'
           get url
 

@@ -206,6 +206,7 @@ describe "discussions" do
         end
 
         it "should delete a topic", priority: "1", test_id: 150502 do
+          skip_if_safari(:alert)
           topic
           get url
 
@@ -218,6 +219,7 @@ describe "discussions" do
         end
 
         it "should restore a deleted topic with replies", priority: "2", test_id: 927756 do
+          skip_if_safari(:alert)
           topic.reply_from(user: student, text: 'student reply')
           topic.workflow_state = "deleted"
           topic.save!
