@@ -264,6 +264,23 @@ class BzController < ApplicationController
     end
   end
 
+  def load_wiki_pages
+    names = params[:names]
+    course_id = params[:course_id]
+
+    all_pages = Course.find(course_id).wiki_pages.active
+
+    result = {}
+    names.each do |name|
+      page = all_pages.where(:title => name)
+      if page.any?
+        result[name] = page.first.body
+      end
+    end
+
+    render :json => result
+  end
+
   def user_linkedin_url
     result = {}
     result['linkedin_url'] = ''
@@ -696,21 +713,36 @@ class BzController < ApplicationController
             Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
 
             # See: https://developer.linkedin.com/docs/fields/full-profile
+            fetched_li_data = true
             request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,job-bookmarks,honors-awards)?format=json", service.token)
 
-            # TODO: The 'suggestions' field was causing this error, so we're not fetching it:
+            # NOTE: The 'suggestions' field was causing this error, so we're not fetching it:
             # {"errorCode"=>0, "message"=>"Internal API server error", "requestId"=>"Y4175L15PK", "status"=>500, "timestamp"=>1490298963387}
             # Also, I decided not to fetch picture-urls::(original)
 
             info = JSON.parse(request.body)
 
-            Rails.logger.debug("### info = #{info.inspect}")
-
             if info["errorCode"] == 0
+              fetched_li_data = false
               Rails.logger.error("### Error exporting LinkedIn data for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
               # TODO: if "message"=>"Unable to verify access token" we should unregister the user.  I reproduced this by registering a second
               # account with the same LinkedIn account.  It invalidated the first.
-            else
+
+              if info["message"] == "Internal API server error" # For certain LinkedIn accounts, requesting the job-bookmarks makes it fail. Try again without that.
+                Rails.logger.debug("### Retrying request without job-bookmarks parameter for user = #{u.name} - #{u.email}.")
+                fetched_li_data = true
+                request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,honors-awards)?format=json", service.token)
+                info = JSON.parse(request.body)
+                info["jobBookmarks"] = "ERROR FETCHING"
+                if info["errorCode"] == 0
+                  fetched_li_data = false
+                  Rails.logger.error("### Error exporting LinkedIn data (without jobs-bookmarks) for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
+                end
+              end
+            end
+
+            if fetched_li_data
+              Rails.logger.debug("### info = #{info.inspect}")
               result = LinkedinExport.where(:user_id => u.id)
               linkedin_data = nil
               if result.empty?
