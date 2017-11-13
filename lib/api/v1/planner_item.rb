@@ -45,7 +45,8 @@ module Api::V1::PlannerItem
       if item.is_a?(PlannerNote)
         hash[:plannable_type] = 'planner_note'
         hash[:plannable] = api_json(item, user, session)
-        hash[:html_url] = api_v1_planner_notes_show_path(item)
+        # TODO: We don't currently have an html_url for individual planner items.
+        # hash[:html_url] = ???
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_type] = 'quiz'
