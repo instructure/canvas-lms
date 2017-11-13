@@ -333,6 +333,8 @@ class Account < ActiveRecord::Base
   def require_acceptance_of_terms?(user)
     return false if !terms_required?
     return true if (user.nil? || user.new_record?)
+    soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
+    return false if user.created_at < soc2_start_date
     terms_changed_at = root_account.terms_of_service.terms_of_service_content&.terms_updated_at || settings[:terms_changed_at]
     last_accepted = user.preferences[:accepted_terms]
     return false if last_accepted && (terms_changed_at.nil? || last_accepted > terms_changed_at)
