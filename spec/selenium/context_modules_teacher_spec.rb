@@ -722,22 +722,23 @@ describe "context modules" do
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
-      it "should return focus to the previous module item cog when deleting a module item." do
+      it "should return focus to the previous module item link when deleting a module item." do
         add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
         @tag2 = ContentTag.last
         hover_and_click("#context_module_item_#{@tag2.id} .delete_item_link")
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
         wait_for_ajaximations
-        check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
+        check_element_has_focus(fj("#context_module_item_#{@tag.id} .item_link"))
       end
 
-      it "should return focus to the parent module's cog when deleting the last module item." do
-        hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
+      it "should return focus to the parent module's cog when deleting the first module item." do
+        first_tag = ContentTag.first
+        hover_and_click("#context_module_item_#{first_tag.id} .delete_item_link")
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
         wait_for_ajaximations
-        check_element_has_focus(f("#context_module_#{@tag.context_module_id} .al-trigger"))
+        check_element_has_focus(f("#context_module_#{first_tag.context_module_id} .al-trigger"))
       end
     end
 
@@ -1188,7 +1189,7 @@ describe "context modules" do
 
       title_input = fj('input[name="title"]:visible')
       replace_content(title_input, 'some title')
-
+      scroll_to(f('.add_item_button.ui-button'))
       f('.add_item_button.ui-button').click
 
       expect(f('.errorBox:not(#error_box_template)')).to be_displayed

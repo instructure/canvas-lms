@@ -1195,12 +1195,18 @@ function scrollTo ($thing, time = 500) {
       var $currentModule = $(this).parents('.context_module');
       var curIndex = $allInCurrentModule.index($(this).parents('.context_module_item'));
       var newIndex = curIndex - 1;
-      var $previousCogLink;
-      if (newIndex < 0) {
-        // Focus on the module cog since there are not more module item cogs
-        $previousCogLink = $(this).closest('.editable_context_module').find('button.al-trigger')
+        // Skip over headers, since they are not actionable
+      var $placeToFocus
+      if (newIndex >= 0) {
+        const prevItem = $allInCurrentModule[newIndex]
+        if ($(prevItem).hasClass('context_module_sub_header')) {
+          $placeToFocus = $(prevItem).find('.cog-menu-container .al-trigger')
+        } else {
+          $placeToFocus = $(prevItem).find('.item_link')
+        }
       } else {
-        $previousCogLink = $($allInCurrentModule[newIndex]).find('.cog-menu-container .al-trigger');
+        // Focus on the module cog since there are not more module item cogs
+        $placeToFocus = $(this).closest('.editable_context_module').find('button.al-trigger')
       }
       $(this).parents(".context_module_item").confirmDelete({
         url: $(this).attr('href'),
@@ -1209,7 +1215,7 @@ function scrollTo ($thing, time = 500) {
           $(this).slideUp(function() {
             $(this).remove();
             modules.updateTaggedItems();
-            $previousCogLink.focus();
+            $placeToFocus.focus();
             refreshDuplicateLinkStatus($currentModule);
           });
           $.flashMessage(I18n.t("Module item %{module_item_name} was successfully deleted.", {module_item_name: data.content_tag.title}));
@@ -1436,7 +1442,7 @@ function scrollTo ($thing, time = 500) {
               data: {position: content_tag.position}
             })
           })
-
+          $(`#context_module_item_${data.content_tag.id} .item_link`).focus()
           $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
         })
         .catch(showFlashError('Error duplicating item'))
