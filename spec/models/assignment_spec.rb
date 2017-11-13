@@ -1770,6 +1770,20 @@ describe Assignment do
       }
     end
 
+    it "should re-schedule auto_assign date is pushed out" do
+      @a.peer_reviews = true
+      @a.automatic_peer_reviews = true
+      @a.peer_reviews_due_at = 1.day.from_now
+      @a.save!
+      job = Delayed::Job.where(:tag => "Assignment#do_auto_peer_review").last
+      expect(job.run_at.to_i).to eq @a.peer_reviews_due_at.to_i
+
+      @a.peer_reviews_due_at = 2.days.from_now
+      @a.save!
+      job.reload
+      expect(job.run_at.to_i).to eq @a.peer_reviews_due_at.to_i
+    end
+
     it "should not schedule auto_assign when skip_schedule_peer_reviews is set" do
       @a.peer_reviews = true
       @a.automatic_peer_reviews = true
