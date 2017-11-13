@@ -193,7 +193,7 @@ define [
       @model.collection.models[current_index - 1]
 
     focusOnModel: (discussionTopic) =>
-      $("##{discussionTopic.id}_discussion_content").attr("tabindex",-1).focus()
+      $("##{discussionTopic.id}_discussion_content .discussion-title-link").focus()
 
     # Public: Pin or unpin the model and update it on the server.
     #
