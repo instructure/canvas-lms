@@ -42,13 +42,6 @@ describe "outcomes as a student" do
       expect(f('.outcomes-content .title')).to include_text "outcome 0"
     end
 
-    it "should load all outcomes on initial load" do
-      course_outcome 20
-      get outcome_url
-      expect(f('.outcomes-content .title')).to include_text "outcome 0"
-      expect(ff('.outcome-level li').count).to be 20
-    end
-
     it "should select the first outcome group from the list if there are outcome groups" do
       course_bulk_outcome_groups_course(2, 2)
       get outcome_url
