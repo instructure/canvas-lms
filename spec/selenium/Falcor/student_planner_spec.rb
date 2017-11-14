@@ -78,13 +78,14 @@ describe "student planner" do
     it "shows new grades tag for assignments that are graded", priority: "1", test_id: 3263152 do
       @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
       go_to_list_view
-      validate_pill('New Grades')
+      validate_pill('Graded')
+      expect(f('.PlannerApp')).not_to include_text('Feedback') # graded != feedback
     end
 
     it "shows new feedback tag for assignments that has feedback", priority: "1", test_id: 3263154 do
       @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
       go_to_list_view
-      validate_pill('New Feedback')
+      validate_pill('Feedback')
     end
 
     it "shows missing tag for assignments with missing submissions", priority: "1", test_id: 3263153 do
@@ -124,7 +125,7 @@ describe "student planner" do
     it "shows new replies tag for discussion with new replies", priority: "1", test_id: 3284231 do
       @discussion.reply_from(user: @teacher, text: 'teacher reply')
       go_to_list_view
-      validate_pill('New Replies')
+      validate_pill('Replies')
     end
   end
 
@@ -275,6 +276,9 @@ describe "student planner" do
       expect(todo_item).to include_text("Title Text")
       fj("a:contains('Title Text')", todo_item).click
       fj("button:contains('Delete')").click
+      alert = driver.switch_to.alert
+      expect(alert.text).to eq("Are you sure you want to delete this planner item?")
+      alert.accept()
       refresh_page
 
       expect(fj("h2:contains('No Due Dates Assigned')")).to be_displayed
