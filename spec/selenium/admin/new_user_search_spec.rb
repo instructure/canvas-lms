@@ -87,9 +87,6 @@ describe "new account user search" do
     email = 'someemail@example.com'
     f('input.user_email').send_keys(email)
 
-    input = f('input.user_send_confirmation')
-    move_to_click("label[for=#{input['id']}]")
-
     f('.ReactModalPortal button[type="submit"]').click
     wait_for_ajaximations
 
@@ -101,6 +98,36 @@ describe "new account user search" do
     expect(rows.count).to eq 2 # the first user is the admin
     new_row = rows.detect{|r| r.text.include?(name)}
     expect(new_row).to include_text(email)
+  end
+
+  it "should be able to create users with confirmation disabled", priority: "1", test_id: 3399311 do
+    name = 'Confirmation Disabled'
+    get "/accounts/#{@account.id}/users"
+
+    f('button.add_user').click
+    f('input.user_name').send_keys(name)
+    wait_for_ajaximations
+
+    email = 'someemail@example.com'
+    f('input.user_email').send_keys(email)
+
+    input = f('input.user_send_confirmation')
+    move_to_click("label[for=#{input['id']}]")
+
+    f('.ReactModalPortal button[type="submit"]').click
+    wait_for_ajaximations
+
+    new_pseudonym = Pseudonym.where(:unique_id => email).first
+    expect(new_pseudonym.user.name).to eq name
+  end
+
+  it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
+    page_user = user_with_pseudonym(:account => @account, :name => "User Page")
+    get "/accounts/#{@account.id}/users"
+
+    ff('.userUrl')[1].click
+    wait_for_ajax_requests
+    expect(f("#content h2")).to include_text page_user.name
   end
 
   it "should paginate" do
@@ -140,6 +167,16 @@ describe "new account user search" do
     expect(rows.first).to include_text(match_user.name)
   end
 
+  it "should search but not find bogus user", priority: "1", test_id: 3399649 do
+    bogus = 'jtsdumbthing'
+    get "/accounts/#{@account.id}/users"
+
+    f('.user_search_bar input[type=search]').send_keys(bogus)
+
+    rows = get_rows
+    expect(rows.first).not_to include_text(bogus)
+  end
+
   it "should link to the user avatar page" do
     match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
     user_with_pseudonym(:account => @account, :name => "diffrient user")
@@ -163,4 +200,5 @@ describe "new account user search" do
 
     expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
   end
+
 end
