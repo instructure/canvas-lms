@@ -454,6 +454,25 @@ describe DiscussionTopicsController, type: :request do
         expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
       end
 
+      it "should order topics by title when order_by parameter is specified" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+
+        topics = [@sub, @topic, @topic2, @topic3]
+        topic_reply_date = Time.zone.now - 1.day
+        topics.each do |topic|
+          topic.last_reply_at = topic_reply_date
+          topic.save!
+          topic_reply_date -= 1.day
+        end
+
+        @topic4 = create_topic(@course, :title => "Topic 4", :message => "<p>content here</p>")
+        topics << @topic4
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?order_by=title",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :order_by => 'title'})
+        expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
+      end
+
       it "should only include topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")

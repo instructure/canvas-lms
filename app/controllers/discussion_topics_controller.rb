@@ -253,7 +253,7 @@ class DiscussionTopicsController < ApplicationController
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
   #
-  # @argument order_by [String, "position"|"recent_activity"]
+  # @argument order_by [String, "position"|"recent_activity"|"title"]
   #   Determines the order of the discussion topic list. Defaults to "position".
   #
   # @argument scope [String, "locked"|"unlocked"|"pinned"|"unpinned"]
@@ -301,6 +301,8 @@ class DiscussionTopicsController < ApplicationController
 
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at
+            elsif params[:order_by] == 'title'
+              scope.order(DiscussionTopic.best_unicode_collation_key("discussion_topics.title")).order(:position, :id)
             elsif params[:only_announcements]
               scope.by_posted_at
             else
