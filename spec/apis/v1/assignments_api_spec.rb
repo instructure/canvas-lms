@@ -199,6 +199,59 @@ describe AssignmentsApiController, type: :request do
                           assignment4)
     end
 
+    it "sorts the returned list of assignments by name" do
+      # the API returns the assignments sorted by
+      # [assignment_groups.position, assignments.position]
+      group1 = @course.assignment_groups.create!(:name => 'group1')
+      group1.update_attribute(:position, 10)
+      group2 = @course.assignment_groups.create!(:name => 'group2')
+      group2.update_attribute(:position, 7)
+      group3 = @course.assignment_groups.create!(:name => 'group3')
+      group3.update_attribute(:position, 12)
+      @course.assignments.create!(:title => 'assignment1',
+                                  :assignment_group => group2).
+        update_attribute(:position, 2)
+      @course.assignments.create!(:title => 'assignment2',
+                                  :assignment_group => group2).
+        update_attribute(:position, 1)
+      @course.assignments.create!(:title => 'assignment3',
+                                  :assignment_group => group1).
+        update_attribute(:position, 1)
+      @course.assignments.create!(:title => 'assignment4',
+                                  :assignment_group => group3).
+        update_attribute(:position, 3)
+      @course.assignments.create!(:title => 'assignment5',
+                                  :assignment_group => group1).
+        update_attribute(:position, 2)
+      @course.assignments.create!(:title => 'assignment6',
+                                  :assignment_group => group2).
+        update_attribute(:position, 3)
+      @course.assignments.create!(:title => 'assignment7',
+                                  :assignment_group => group3).
+        update_attribute(:position, 2)
+      @course.assignments.create!(:title => 'assignment8',
+                                  :assignment_group => group3).
+        update_attribute(:position, 1)
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments.json?order_by=name",
+                      {
+                        controller: 'assignments_api',
+                        action: 'index',
+                        format: 'json',
+                        course_id: @course.id.to_s,
+                        order_by: 'name'
+                      })
+      order = json.map { |a| a['name'] }
+      expect(order).to eq %w(assignment1
+                          assignment2
+                          assignment3
+                          assignment4
+                          assignment5
+                          assignment6
+                          assignment7
+                          assignment8)
+    end
+
     it "should search for assignments by title" do
       2.times {|i| @course.assignments.create!(:title => "First_#{i}") }
       ids = @course.assignments.map(&:id)

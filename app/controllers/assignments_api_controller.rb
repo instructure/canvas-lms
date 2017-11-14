@@ -582,6 +582,8 @@ class AssignmentsApiController < ApplicationController
   # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"unsubmitted"|"upcoming"|"future"]
   #   If included, only return certain assignments depending on due date and submission status.
   # @argument assignment_ids[] if set, return only assignments specified
+  # @argument order_by [String, "position"|"name"]
+  #   Determines the order of the assignments. Defaults to "position".
   # @returns [Assignment]
   def index
     error_or_array= get_assignments(@current_user)
@@ -657,6 +659,7 @@ class AssignmentsApiController < ApplicationController
         end
         scope = scope.where(id: params[:assignment_ids])
       end
+      scope = scope.reorder("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id") if params[:order_by] == 'name'
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
 
