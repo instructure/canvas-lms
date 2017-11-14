@@ -183,6 +183,47 @@ describe GradebooksController do
       expect(assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"]).to be_nil
     end
 
+    it "includes assignment sort options in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:assignment_sort_options]).to match_array [["Due Date", "due_at"], ["Title", "title"]]
+    end
+
+    it "includes the current assignment sort order in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      order = assigns[:js_env][:current_assignment_sort_order]
+      expect(order).to eq :due_at
+    end
+
+    it "includes the current grading period id in the ENV" do
+      group = @course.root_account.grading_period_groups.create!
+      period = group.grading_periods.create!(title: "GP", start_date: 3.months.ago, end_date: 3.months.from_now)
+      group.enrollment_terms << @course.enrollment_term
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:current_grading_period_id]).to eq period.id
+    end
+
+    it "includes courses_with_grades, with each course having an id, nickname, and URL" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      courses = assigns[:js_env][:courses_with_grades]
+      expect(courses).to all include("id", "nickname", "url")
+    end
+
+    it "includes the URL to save the assignment order in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env]).to have_key :save_assignment_order_url
+    end
+
+    it "includes the students for the grade summary page in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:students]).to match_array [@student].as_json(include_root: false)
+    end
+
     it "includes muted assignments" do
       user_session(@student)
       assignment = @course.assignments.create!(title: "Example Assignment")

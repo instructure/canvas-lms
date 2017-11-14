@@ -104,6 +104,14 @@ class GradeSummaryPresenter
     end
   end
 
+  def students
+    if multiple_observed_students?
+      linkable_observed_students
+    else
+      Array.wrap(student)
+    end
+  end
+
   def validate_id
     raise ActiveRecord::RecordNotFound if ( !@id_param.is_a?(User) && (@id_param.to_s =~ Api::ID_REGEX).nil? )
     true

@@ -91,6 +91,37 @@ describe GradeSummaryPresenter do
     end
   end
 
+  describe '#students' do
+    before(:once) do
+      @course = Course.create!
+      @student = User.create!
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher, active_all: true)
+      @course.enroll_student(@student, active_all: true)
+    end
+
+    it 'returns all of the observed students, if there are multiple' do
+      student_two = User.create!
+      @observer = User.create!
+      @course.enroll_student(student_two, active_all: true)
+      @course.observer_enrollments.create!(user_id: @observer, associated_user_id: @student)
+      @course.observer_enrollments.create!(user_id: @observer, associated_user_id: student_two)
+
+      presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
+      expect(presenter.students.map(&:id)).to match_array [@student.id, student_two.id]
+    end
+
+    it 'returns an array with a single student if there is only one student' do
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.students.map(&:id)).to match_array [@student.id]
+    end
+
+    it 'returns an empty array if there are no students' do
+      presenter = GradeSummaryPresenter.new(@course, @teacher, nil)
+      expect(presenter.students).to be_empty
+    end
+  end
+
   describe '#assignment_stats' do
     before(:each) do
       teacher_in_course

@@ -90,6 +90,7 @@ describe "gradebook - logged in as a student" do
 
       it 'should only show assignments that belong to the selected grading period', priority: "1", test_id: 2528639 do
         student_grades_page.select_period_by_name(past_period_name)
+        expect_new_page_load { student_grades_page.click_apply_button }
         expect(student_grades_page.assignment_titles).to include(past_assignment_name)
         expect(student_grades_page.assignment_titles).not_to include(current_assignment_name)
       end

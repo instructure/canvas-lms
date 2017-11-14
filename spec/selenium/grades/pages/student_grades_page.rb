@@ -22,7 +22,7 @@ class StudentGradesPage
 
   # Period components
   def period_options_css
-    '.grading_periods_selector > option'
+    '#grading_period_select_menu > option'
   end
 
   # Assignment components
@@ -47,11 +47,15 @@ class StudentGradesPage
   end
 
   def grading_period_dropdown
-    f('.grading_periods_selector')
+    f('#grading_period_select_menu')
   end
 
   def select_period_by_name(name)
     click_option(grading_period_dropdown, name)
+  end
+
+  def click_apply_button
+    f('#apply_select_menus').click
   end
 
   def assignment_titles

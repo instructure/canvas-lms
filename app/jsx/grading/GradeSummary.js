@@ -594,33 +594,8 @@ function setup () {
       GradeSummary.updateStudentGrades()
     }).triggerHandler('change')
 
-    $('#observer_user_url').change(function () {
-      if (location.href !== $(this).val()) {
-        location.href = $(this).val()
-      }
-    })
-
-    $('#assignment_order').change(function () {
-      this.form.submit()
-    })
-
     bindShowAllDetailsButton($ariaAnnouncer)
     StatusPill.renderPills()
-  })
-
-  $(document).on('change', '.grading_periods_selector', function () {
-    const newGP = $(this).val()
-    let matches = location.href.match(/grading_period_id=\d*/)
-    if (matches) {
-      location.href = location.href.replace(matches[0], `grading_period_id=${newGP}`)
-      return
-    }
-    matches = location.href.match(/#tab-assignments/)
-    if (matches) {
-      location.href = `${location.href.replace(matches[0], '')}?grading_period_id=${newGP}${matches[0]}`
-    } else {
-      location.href += `?grading_period_id=${newGP}`
-    }
   })
 }
 
