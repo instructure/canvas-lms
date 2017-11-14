@@ -73,10 +73,14 @@ function install_dependencies {
   [[ ${#packages[@]} -gt 0 ]] || return 0
 
   message "First, we need to install some dependencies."
-  if [[ $OS == 'Darwin' ]] && ! installed brew; then
-    echo 'We need homebrew to install dependencies, please install that first!'
-    echo 'See https://brew.sh/'
-    exit 1
+  if [[ $OS == 'Darwin' ]]; then
+    if ! installed brew; then
+      echo 'We need homebrew to install dependencies, please install that first!'
+      echo 'See https://brew.sh/'
+      exit 1
+    elif ! brew ls --versions dinghy > /dev/null; then
+      brew tap codekitchen/dinghy
+    fi
   elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
     echo 'This script only supports Debian-based Linux (for now - contributions welcome!)'
     exit 1

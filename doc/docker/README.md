@@ -8,7 +8,7 @@ You need Docker. Don't have Docker yet? Go [here](getting_docker.md) for details
 This command should get you going:
 
 ```bash
-./scripts/docker_dev_setup.sh
+./script/docker_dev_setup.sh
 ```
 
 Now you can do `docker-compose up` and you should be good to go. If you're
