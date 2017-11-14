@@ -407,7 +407,7 @@ class BzController < ApplicationController
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
-      data.path = request.referrer[0 .. 220] # trim off unnecessary detail so it fits in db
+      data.path = request.referrer ? request.referrer[0 .. 220] : '' # trim off unnecessary detail so it fits in db
       data.name = params[:name]
       was_new = true
     else

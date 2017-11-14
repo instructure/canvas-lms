@@ -39,7 +39,7 @@
     <input type="hidden" name="rubric_association[association_id]" value="<%= @context.id %>"/>
     <input type="hidden" name="rubric_association[purpose]" value="bookmark"/>
   </div>
-  <span class="current_user_id" style="display: none;"><%= @current_user.id %></span>
+  <span class="current_user_id" style="display: none;"><%= @current_user ? @current_user.id : '' %></span>
   <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_association_url" style="display: none;">&nbsp;</a>
 </div>
 <%= render :partial => "shared/find_outcome" %>
