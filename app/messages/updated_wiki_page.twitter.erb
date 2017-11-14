@@ -1,4 +1,4 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.context, :wiki_page], id: asset.url) %>
 <% end -%>
-<%=  t :tweet, "Canvas Alert - Page Updated: %{title}, %{user}.", :title => asset.title, :user => asset.context.name %>
+<%=  t :tweet, "Courseware Alert - Page Updated: %{title}, %{user}.", :title => asset.title, :user => asset.context.name %>

@@ -7,7 +7,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+  <%= t :subject, "%{user_name}, you just sent a message in Courseware.", :user_name => content(:user_name) %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -26,7 +26,7 @@
 <% if asset.has_media_objects? %>
   <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
 <% else %>
-  <%= t("You can reply to this message in Canvas by replying directly to this email, or by clicking this link: %{link}.", link: content(:link)) %>
+  <%= t("You can reply to this message in Courseware by replying directly to this email, or by clicking this link: %{link}.", link: content(:link)) %>
 <% end %>
 
 <% unless asset.attachments.empty? %>

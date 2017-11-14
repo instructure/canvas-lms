@@ -1,4 +1,4 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end -%>
-<%= t('subject', 'Canvas Alert - Late Group Submission: %{group_name}, %{assignment_name}', :group_name => asset.group.name, :assignment_name => asset.assignment.title) %>
+<%= t('subject', 'Courseware Alert - Late Group Submission: %{group_name}, %{assignment_name}', :group_name => asset.group.name, :assignment_name => asset.assignment.title) %>

@@ -4,6 +4,6 @@
   <%= p.user.registered? ? confirm_change_password_url(p, cc.confirmation_code) : registration_confirmation_url(cc.confirmation_code) %>
 <% end %>
 
-<%= t :body, "You have been registered for a Canvas account at %{account}!  ", :account => p.account.display_name %>
+<%= t :body, "You have been registered for a Courseware account at %{account}!  ", :account => p.account.display_name %>
 
 <%= t('link', 'Visit the following url to access your account %{link}', :link => content(:link)) %>

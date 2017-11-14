@@ -1,4 +1,4 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.collaboration.context, asset.collaboration.becomes(Collaboration)]) %>
 <% end -%>
-<%= t :body, "Canvas Alert - Collaboration Invite: %{document}, %{course_or_group}", :document => asset.collaboration.title, :course_or_group => asset.collaboration.context.name %>
+<%= t :body, "Courseware Alert - Collaboration Invite: %{document}, %{course_or_group}", :document => asset.collaboration.title, :course_or_group => asset.collaboration.context.name %>

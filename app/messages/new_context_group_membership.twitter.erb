@@ -4,8 +4,8 @@
 <%=
     case asset.group.context_type
     when 'Account'
-      t :body_account, "Canvas Alert - New Group: %{group} for the account %{account}", :group => asset.group.name, :account => asset.group.context.name
+      t :body_account, "Courseware Alert - New Group: %{group} for the account %{account}", :group => asset.group.name, :account => asset.group.context.name
     else
-      t :body_course, "Canvas Alert - New Group: %{group} for the course %{course}", :group => asset.group.name, :course => asset.group.context.name
+      t :body_course, "Courseware Alert - New Group: %{group} for the course %{course}", :group => asset.group.name, :course => asset.group.context.name
     end
 %>

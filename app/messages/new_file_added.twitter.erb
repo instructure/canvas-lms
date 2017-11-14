@@ -1,7 +1,7 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.context, :file], id: asset) %>
 <% end -%>
-<%= t('body', 'Canvas Alert - New File: %{title} (%{size}) for %{name}:', 
+<%= t('body', 'Courseware Alert - New File: %{title} (%{size}) for %{name}:',
         :title => asset.title,
         :size => asset.readable_size,
         :name => asset.context.name) %>

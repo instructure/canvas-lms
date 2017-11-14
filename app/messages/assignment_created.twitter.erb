@@ -1,7 +1,7 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.context, asset]) %>
 <% end -%>
-<%= I18n.t("Canvas Alert - Change: %{assignment_name}, %{course_name}", :assignment_name => asset.title, :course_name => asset.context.name) %>
+<%= I18n.t("Courseware Alert - Change: %{assignment_name}, %{course_name}", :assignment_name => asset.title, :course_name => asset.context.name) %>
 
 <%
   multiple_dates_text = I18n.t("due: Multiple Dates")

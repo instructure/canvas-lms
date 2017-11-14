@@ -1,4 +1,4 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user_id) %>
 <% end -%>
-<%= t :tweet, "Canvas Alert - Reminder: assess %{rubric}, %{context}", :rubric => asset.submission.assignment.title, :context => asset.rubric_association.context.name %>
+<%= t :tweet, "Courseware Alert - Reminder: assess %{rubric}, %{context}", :rubric => asset.submission.assignment.title, :context => asset.rubric_association.context.name %>
