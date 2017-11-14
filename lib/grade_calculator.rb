@@ -158,16 +158,23 @@ class GradeCalculator
     @final_updates[user_id] = scores[:final][:grade]
     @current_groups[user_id] = group_sums[:current]
     @final_groups[user_id] = group_sums[:final]
-    @dropped_updates[user_id] = {current: {dropped: scores[:current][:dropped]}, final: {dropped: scores[:final][:dropped]}}
+    @dropped_updates[user_id] = {
+      current: {dropped: scores[:current][:dropped]},
+      final: {dropped: scores[:final][:dropped]}
+    }
   end
 
-  def all_grading_period_scores
-    @all_grading_period_scores ||= Score.where(enrollment_id: enrollments.map(&:id), grading_period: grading_periods_for_course.map(&:id)).group_by(&:enrollment_id)
+  def grading_period_scores(enrollment_id)
+    @grading_period_scores ||= Score.active.where(
+      enrollment: enrollments.map(&:id),
+      grading_period: grading_periods_for_course.map(&:id)
+    ).group_by(&:enrollment_id)
+    @grading_period_scores[enrollment_id] || []
   end
 
   def calculate_total_from_weighted_grading_periods(user_id)
     enrollment = enrollments_by_user[user_id].first
-    grading_period_scores = all_grading_period_scores[enrollment.id]
+    grading_period_scores = grading_period_scores(enrollment.id)
     scores = apply_grading_period_weights_to_scores(grading_period_scores)
     scale_and_round_scores(scores, grading_period_scores)
   end

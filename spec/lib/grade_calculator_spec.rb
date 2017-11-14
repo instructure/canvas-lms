@@ -64,6 +64,22 @@ describe GradeCalculator do
       }.not_to raise_error
     end
 
+    it "weighted grading periods: compute_scores does not raise an error if no grading period score objects exist" do
+      grading_period_set = @course.root_account.grading_period_groups.create!(weighted: true)
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now,
+        weight: 50
+      )
+      Score.where(enrollment: @course.student_enrollments).destroy_all
+
+      grade_calculator = GradeCalculator.new(@user.id, @course.id)
+
+      expect { grade_calculator.compute_scores }.not_to raise_error
+    end
+
     it "can compute scores for users with deleted enrollments when grading periods are used" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term
