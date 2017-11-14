@@ -16,5 +16,5 @@ services:
     ports:
       - 5901:5900
     environment:
-      remote_url: http://selenium-firefox:4444/wd/hub
+      remote_url: http://selenium-chrome:4444/wd/hub
       browser: chrome
