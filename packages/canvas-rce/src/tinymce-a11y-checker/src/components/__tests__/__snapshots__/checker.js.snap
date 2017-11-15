@@ -1,5 +1,346 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`render matches snapshot with errors 1`] = `
+<LiveAnnouncer>
+  <Tray
+    applicationElement={[Function]}
+    border={false}
+    closeButtonLabel="Close Accessibility Checker"
+    closeButtonRef={[Function]}
+    closeButtonVariant="icon"
+    contentRef={[Function]}
+    defaultFocusElement={null}
+    insertAt="bottom"
+    isDismissable={true}
+    label="Accessibility Checker"
+    mountNode={[Function]}
+    onClose={[Function]}
+    onDismiss={[Function]}
+    onEnter={[Function]}
+    onEntered={[Function]}
+    onEntering={[Function]}
+    onExit={[Function]}
+    onExited={[Function]}
+    onExiting={[Function]}
+    onOpen={[Function]}
+    open={true}
+    placement="end"
+    shadow={true}
+    shouldCloseOnDocumentClick={false}
+    shouldContainFocus={true}
+    shouldReturnFocus={true}
+    size="small"
+  >
+    <Container
+      as="div"
+      display={null}
+      padding="medium"
+      style={
+        Object {
+          "width": "20rem",
+        }
+      }
+    >
+      <Heading
+        as="h2"
+        border="none"
+        color="inherit"
+        ellipsis={false}
+        level="h3"
+        margin="medium 0"
+      >
+         Accessibility Checker
+      </Heading>
+      <Container
+        as="div"
+        display={null}
+      >
+        <LiveMessage
+          aria-live="polite"
+          message="
+                  Issue 1/2
+                  Element starting with 
+                  Error Message
+                "
+        />
+        <Container
+          as="div"
+          display={null}
+          margin="large 0 medium 0"
+        >
+          <Grid
+            colSpacing="none"
+            hAlign="space-between"
+            rowSpacing="medium"
+            startAt="small"
+            vAlign="middle"
+            visualDebug={false}
+          >
+            <GridRow>
+              <GridCol
+                textAlign="inherit"
+              >
+                <Typography
+                  as="span"
+                  letterSpacing="normal"
+                  size="medium"
+                  weight="bold"
+                >
+                  Issue 1/2
+                </Typography>
+              </GridCol>
+              <GridCol
+                textAlign="inherit"
+                width="auto"
+              >
+                <Popover
+                  applicationElement={[Function]}
+                  closeButtonLabel="Close"
+                  closeButtonRef={[Function]}
+                  constrain="window"
+                  contentRef={[Function]}
+                  defaultFocusElement={null}
+                  defaultShow={false}
+                  insertAt="bottom"
+                  label={null}
+                  mountNode={null}
+                  offsetX={0}
+                  offsetY={0}
+                  on="click"
+                  onBlur={[Function]}
+                  onClick={[Function]}
+                  onDismiss={[Function]}
+                  onFocus={[Function]}
+                  onMouseOut={[Function]}
+                  onMouseOver={[Function]}
+                  onPositionChanged={[Function]}
+                  onPositioned={[Function]}
+                  onShow={[Function]}
+                  onToggle={[Function]}
+                  placement="bottom center"
+                  positionTarget={null}
+                  shouldCloseOnDocumentClick={true}
+                  shouldCloseOnEscape={true}
+                  shouldContainFocus={true}
+                  shouldRenderOffscreen={false}
+                  shouldReturnFocus={true}
+                  trackPosition={true}
+                  variant="default"
+                  withArrow={true}
+                >
+                  <PopoverTrigger>
+                    <Button
+                      as="button"
+                      buttonRef={[Function]}
+                      fluidWidth={false}
+                      margin="0"
+                      size="medium"
+                      type="button"
+                      variant="icon"
+                    >
+                      <IconQuestionLine
+                        title="Why"
+                      />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <Container
+                      display="block"
+                      padding="medium"
+                      style={
+                        Object {
+                          "width": "16rem",
+                        }
+                      }
+                    >
+                      <Typography
+                        as="span"
+                        letterSpacing="normal"
+                        size="medium"
+                      >
+                        <p>
+                          Why Text 
+                          <Link
+                            as="button"
+                            ellipsis={false}
+                            href="http://some-url"
+                            linkRef={[Function]}
+                            target="_blank"
+                            variant="default"
+                          >
+                            Learn more
+                          </Link>
+                        </p>
+                      </Typography>
+                    </Container>
+                  </PopoverContent>
+                </Popover>
+              </GridCol>
+            </GridRow>
+          </Grid>
+        </Container>
+        <form
+          onSubmit={[Function]}
+        >
+          <Typography
+            as="div"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Error Message
+          </Typography>
+          <Container
+            as="div"
+            display={null}
+            key="select"
+            margin="medium 0 0"
+          >
+            <Select
+              disabled={false}
+              inline={false}
+              label="Select Field"
+              layout="stacked"
+              messages={Array []}
+              name="select"
+              onChange={[Function]}
+              selectRef={[Function]}
+              size="medium"
+              type="text"
+              value="a"
+            >
+              <option
+                key="a"
+                value="a"
+              >
+                A
+              </option>
+              <option
+                key="b"
+                value="b"
+              >
+                B
+              </option>
+            </Select>
+          </Container>
+          <Container
+            as="div"
+            display={null}
+            key="checkbox"
+            margin="medium 0 0"
+          >
+            <Checkbox
+              checked={true}
+              disabled={false}
+              inline={false}
+              label="Select Field"
+              name="checkbox"
+              onChange={[Function]}
+              size="medium"
+              variant="simple"
+            />
+          </Container>
+          <Container
+            as="div"
+            display={null}
+            key="color"
+            margin="medium 0 0"
+          >
+            <ColorField
+              label="Select Field"
+              name="color"
+              onChange={[Function]}
+              value="rgba(40, 100, 200, 0.6)"
+            />
+          </Container>
+          <Container
+            as="div"
+            display={null}
+            key="text"
+            margin="medium 0 0"
+          >
+            <TextInput
+              disabled={true}
+              inline={false}
+              inputRef={[Function]}
+              label="Text Field"
+              layout="stacked"
+              messages={Array []}
+              name="text"
+              onChange={[Function]}
+              size="medium"
+              type="text"
+              value="Text"
+            />
+          </Container>
+        </form>
+        <Container
+          as="div"
+          display={null}
+          margin="medium 0"
+        >
+          <Grid
+            colSpacing="none"
+            hAlign="space-between"
+            rowSpacing="medium"
+            startAt="small"
+            vAlign="middle"
+            visualDebug={false}
+          >
+            <GridRow>
+              <GridCol
+                textAlign="inherit"
+              >
+                <Button
+                  as="button"
+                  buttonRef={[Function]}
+                  fluidWidth={false}
+                  margin="0 small 0 0"
+                  onClick={[Function]}
+                  size="medium"
+                  type="button"
+                  variant="default"
+                >
+                  Prev
+                </Button>
+                <Button
+                  as="button"
+                  buttonRef={[Function]}
+                  fluidWidth={false}
+                  margin="0"
+                  onClick={[Function]}
+                  size="medium"
+                  type="button"
+                  variant="default"
+                >
+                  Next
+                </Button>
+              </GridCol>
+              <GridCol
+                textAlign="inherit"
+                width="auto"
+              >
+                <Button
+                  as="button"
+                  buttonRef={[Function]}
+                  disabled={true}
+                  fluidWidth={false}
+                  margin="0"
+                  size="medium"
+                  type="submit"
+                  variant="primary"
+                >
+                  Apply
+                </Button>
+              </GridCol>
+            </GridRow>
+          </Grid>
+        </Container>
+      </Container>
+    </Container>
+  </Tray>
+</LiveAnnouncer>
+`;
+
 exports[`render matches snapshot without errors 1`] = `
 <LiveAnnouncer>
   <Tray
