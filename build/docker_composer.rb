@@ -111,6 +111,7 @@ class DockerComposer
       docker_compose "build #{services.join(" ")}"
       prepare_volumes
       start_services
+      update_postgis
       db_prepare unless using_snapshot? # already set up, just need to migrate
     end
 
@@ -127,6 +128,15 @@ class DockerComposer
     def prepare_volumes
       docker_compose_up "data_loader"
       wait_for "data_loader"
+    end
+
+    # To prevent errors similar to: OperationalError: could not access file "$libdir/postgis-X.X
+    # These happen when your docker image expects one version of PostGIS but the volume has a different one.  This
+    # should noop if there's no mismatch in the version of PostGIS
+    # https://hub.docker.com/r/mdillon/postgis/
+    def update_postgis
+      puts "Updating PostGIS"
+      docker "exec --user postgres #{ENV["COMPOSE_PROJECT_NAME"]}_postgres_1 update-postgis.sh"
     end
 
     def db_prepare
