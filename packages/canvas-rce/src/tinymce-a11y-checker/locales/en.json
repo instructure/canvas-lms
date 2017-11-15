@@ -2,8 +2,8 @@
   "accessibility_checker_b3af1f6c": {
     "message": "Accessibility Checker"
   },
-  "action_to_take_e18646b2": {
-    "message": "Action to take"
+  "action_to_take_b626a99a": {
+    "message": "Action to take:"
   },
   "add_a_caption_2a915239": {
     "message": "Add a caption"
@@ -17,20 +17,17 @@
   "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
     "message": "Alt attribute text should not contain more than 120 characters."
   },
-  "apply_fix_7b90ba48": {
-    "message": "Apply Fix"
+  "apply_781a2546": {
+    "message": "Apply"
   },
   "change_alt_text_92654906": {
     "message": "Change alt text"
   },
-  "change_heading_tag_to_paragraph_da394dca": {
-    "message": "Change Heading tag to Paragraph"
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Change heading tag to paragraph"
   },
   "change_text_color_1aecb912": {
     "message": "Change text color"
-  },
-  "change_this_heading_tag_to_div_212bed35": {
-    "message": "Change this Heading tag to DIV"
   },
   "check_accessibility_3c78211c": {
     "message": "Check Accessibility"
@@ -44,29 +41,26 @@
   "column_e1ae5c64": {
     "message": "Column"
   },
-  "column_group_ddc70c6c": {
-    "message": "Column Group"
+  "column_group_1c062368": {
+    "message": "Column group"
   },
-  "conform_this_heading_tag_aca0db1a": {
-    "message": "Conform this Heading tag"
-  },
-  "decorative_image_3c28aa7d": {
-    "message": "Decorative Image"
-  },
-  "do_nothing_59cf8de4": {
-    "message": "Do nothing"
+  "decorative_image_fde98579": {
+    "message": "Decorative image"
   },
   "element_starting_with_start_91bf4c3b": {
     "message": "Element starting with { start }"
   },
-  "header_column_f5d836fd": {
-    "message": "Header Column"
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "Fix heading hierarchy"
   },
-  "header_row_and_column_c40dc402": {
-    "message": "Header Row and Column"
+  "header_column_f27433cb": {
+    "message": "Header column"
   },
-  "header_row_cb73f789": {
-    "message": "Header Row"
+  "header_row_and_column_ec5b9ec": {
+    "message": "Header row and column"
+  },
+  "header_row_f33eb169": {
+    "message": "Header row"
   },
   "heading_levels_should_not_be_skipped_3947c0e0": {
     "message": "Heading levels should not be skipped."
@@ -86,14 +80,17 @@
   "images_should_include_an_alt_attribute_describing__b86d6a86": {
     "message": "Images should include an alt attribute describing the image content."
   },
-  "issue_num_of_total_f5856670": {
-    "message": "Issue { num } of { total }"
+  "issue_num_total_f94536cf": {
+    "message": "Issue { num }/{ total }"
   },
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users."
   },
   "learn_more_a79a7918": {
     "message": "Learn more"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "Leave as is"
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Link with text starting with { start }"
@@ -107,8 +104,8 @@
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No accessibility issues were detected."
   },
-  "no_headers_547ae5e3": {
-    "message": "No Headers"
+  "no_headers_9bc7dc7f": {
+    "message": "No headers"
   },
   "none_3b5e34d2": {
     "message": "None"
@@ -119,11 +116,14 @@
   "prev_f82cbc48": {
     "message": "Prev"
   },
+  "remove_heading_style_5fdc8855": {
+    "message": "Remove heading style"
+  },
   "row_fc0944a7": {
     "message": "Row"
   },
-  "row_group_565e7a2c": {
-    "message": "Row Group"
+  "row_group_979f5528": {
+    "message": "Row group"
   },
   "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
     "message": "Screen readers cannot determine what is displayed in an image without alternative text, and filenames are often meaningless strings of numbers and letters that do not describe the context or meaning."
