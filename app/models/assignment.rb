@@ -2028,7 +2028,16 @@ class Assignment < ActiveRecord::Base
       candidate_set -= group_ids
     else
       # don't assign to ourselves
-      candidate_set.delete(current_submission.id) # don't assign to ourselves
+      candidate_set.delete(current_submission.id)
+
+      if self.discussion_topic? && self.discussion_topic.group_category_id
+        # only assign to other members in the group discussion
+        child_topic = self.discussion_topic.child_topic_for(current_submission.user)
+        if child_topic
+          other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
+          candidate_set = candidate_set & peer_review_params[:submissions].select{|s| other_member_ids.include?(s.user_id)}.map(&:id)
+        end
+      end
     end
     candidate_set
   end

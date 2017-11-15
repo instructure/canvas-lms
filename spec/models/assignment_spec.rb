@@ -1877,6 +1877,29 @@ describe Assignment do
       ids = @late_submissions.map{|s| s.user_id}
     end
 
+    it "should not assign out of group for graded group-discussions" do
+      # (as opposed to group assignments)
+      group_discussion_assignment
+
+      users = create_users_in_course(@course, 6.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+      [@group1, @group2].each do |group|
+        users.pop(3).each do |user|
+          group.add_user(user)
+          @topic.child_topic_for(user).reply_from(:user => user, :text => "entry from #{user.name}")
+        end
+      end
+
+      @assignment.reload
+      @assignment.peer_review_count = 2
+      @assignment.save!
+      requests = @assignment.assign_peer_reviews
+      expect(requests.count).to eq 12
+      requests.each do |req|
+        group = @group1.users.include?(req.user) ? @group1 : @group2
+        expect(group.users).to include(req.assessor)
+      end
+    end
+
     context "intra group peer reviews" do
       it "should not assign peer reviews to members of the same group when disabled" do
         @submissions = []
