@@ -253,7 +253,7 @@ class DockerComposer
 end
 
 begin
-  DockerComposer.run
+  DockerComposer.run if __FILE__ == $0
 rescue
   $stderr.puts "ERROR: #{$ERROR_INFO}"
   exit 1

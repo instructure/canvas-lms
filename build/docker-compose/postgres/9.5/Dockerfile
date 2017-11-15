@@ -8,5 +8,6 @@ RUN echo "max_locks_per_transaction = 640" >> /usr/share/postgresql/$PG_MAJOR/po
 
 # needs to be named .sh for it to get run
 COPY /create-dbs.sh /docker-entrypoint-initdb.d/
+COPY /zz-run-update-postgis.sh /docker-entrypoint-initdb.d/
 
 COPY /wait-for-it /
