@@ -47,6 +47,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
 
   belongs_to :context, polymorphic: [:course, :group]
+  belongs_to :assignment
 
   acts_as_url :title, :sync_url => true
 
