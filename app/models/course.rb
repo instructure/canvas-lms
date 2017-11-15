@@ -325,8 +325,15 @@ class Course < ActiveRecord::Base
     end
 
     tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    return tags if user.blank? || user_is_teacher
 
-    tags
+    path_visible_pages = self.wiki_pages.left_outer_joins(assignment: :submissions).
+      except(:preload).
+      where("assignments.id is null or submissions.user_id = ?", user.id).
+      select(:id)
+
+    tags.where("content_tags.content_type <> 'WikiPage' or
+      content_tags.content_id in (?)", path_visible_pages)
   end
 
   def sequential_module_item_ids
