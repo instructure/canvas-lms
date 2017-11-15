@@ -355,6 +355,10 @@ class GroupsController < ApplicationController
           flash[:notice] = t('notices.already_deleted', "That group has been deleted")
           redirect_to named_context_url(@group.context, :context_url)
           return
+        elsif @group.context.concluded? && !@group.context.grants_right?(@current_user, session, :read_roster)
+          flash[:error] = t("Cannot access group in concluded course")
+          redirect_to dashboard_url
+          return
         end
         @current_conferences = @group.web_conferences.active.select{|c| c.active? && c.users.include?(@current_user) } rescue []
         @scheduled_conferences = @context.web_conferences.active.select{|c| c.scheduled? && c.users.include?(@current_user)} rescue []

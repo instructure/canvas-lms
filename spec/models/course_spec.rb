@@ -3701,7 +3701,7 @@ describe Course, "section_visibility" do
       expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
     end
 
-    it "should ignore concluded secitions if option is given" do
+    it "should ignore concluded sections if option is given" do
       @student1 = student_in_section(@other_section, {:active_all => true})
       @student1.enrollments.each(&:conclude)
 
