@@ -62,6 +62,50 @@ describe("check", () => {
     const error = instance.state.errors[0]
     expect(error.rule.test).toHaveBeenCalledWith(error.node, conf)
   })
+
+  test("calls beforeCheck when provided it as a config option", async () => {
+    const testCallback = jest.fn()
+    const beforeCheck = done => {
+      testCallback()
+      done()
+    }
+    const conf = { beforeCheck }
+    instance.setConfig(conf)
+    await promisify(instance.check.bind(instance))()
+    expect(testCallback).toHaveBeenCalled()
+  })
+
+  test("calls afterCheck when provided it as a config option", async () => {
+    const testCallback = jest.fn()
+    const afterCheck = done => {
+      testCallback()
+      done()
+    }
+    const conf = { afterCheck }
+    instance.setConfig(conf)
+    await promisify(instance.check.bind(instance))()
+    expect(testCallback).toHaveBeenCalled()
+  })
+
+  test("calls both beforeCheck and afterCheck when both are provided", async () => {
+    const beforeCallback = jest.fn()
+    const afterCallback = jest.fn()
+
+    const beforeCheck = done => {
+      beforeCallback()
+      done()
+    }
+    const afterCheck = done => {
+      afterCallback()
+      done()
+    }
+
+    const conf = { afterCheck, beforeCheck }
+    instance.setConfig(conf)
+    await promisify(instance.check.bind(instance))()
+    expect(beforeCallback).toHaveBeenCalled()
+    expect(afterCallback).toHaveBeenCalled()
+  })
 })
 
 describe("setErrorIndex", () => {

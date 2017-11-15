@@ -73,7 +73,25 @@ export default class Checker extends React.Component {
         errors: [],
         errorIndex: 0
       },
-      () => this._check(done)
+      () => {
+        if (typeof this.state.config.beforeCheck === "function") {
+          this.state.config.beforeCheck(() => {
+            this._check(() => {
+              if (typeof this.state.config.afterCheck === "function") {
+                this.state.config.afterCheck(done)
+              } else {
+                done()
+              }
+            })
+          })
+        } else if (typeof this.state.config.afterCheck === "function") {
+          this._check(() => {
+            this.state.config.afterCheck(done)
+          })
+        } else {
+          this._check(done)
+        }
+      }
     )
   }
 
