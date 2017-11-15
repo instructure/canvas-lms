@@ -557,7 +557,6 @@ describe "More Standard Common Cartridge importing" do
     XML
 
     doc = Nokogiri::XML(resources)
-    @converter.unzipped_file_path = 'testing/'
     @converter.get_all_resources(doc)
     expect(@converter.resources['a1'][:href]).to eq 'a1/a1.html'
     expect(@converter.resources['w1'][:files].first[:href]).to eq 'w1/w1.html'
