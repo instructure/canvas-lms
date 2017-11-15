@@ -11,8 +11,8 @@
   "add_alt_text_for_the_image_48cd88aa": {
     "message": "Add alt text for the image"
   },
-  "adjacent_links_that_link_to_the_same_place_should__9d603733": {
-    "message": "Adjacent links that link to the same place should be one link"
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "Adjacent links with the same URL should be a single link."
   },
   "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
     "message": "Alt attribute text should not contain more than 120 characters."
@@ -23,8 +23,8 @@
   "change_alt_text_92654906": {
     "message": "Change alt text"
   },
-  "change_heading_tag_to_p_fbe1e167": {
-    "message": "Change Heading tag to P"
+  "change_heading_tag_to_paragraph_da394dca": {
+    "message": "Change Heading tag to Paragraph"
   },
   "change_text_color_1aecb912": {
     "message": "Change text color"
@@ -47,9 +47,6 @@
   "column_group_ddc70c6c": {
     "message": "Column Group"
   },
-  "combine_anchor_tags_814c0413": {
-    "message": "Combine anchor tags"
-  },
   "conform_this_heading_tag_aca0db1a": {
     "message": "Conform this Heading tag"
   },
@@ -71,14 +68,14 @@
   "header_row_cb73f789": {
     "message": "Header Row"
   },
-  "heading_should_have_a_prior_heading_one_size_bigge_33715e32": {
-    "message": "Heading should have a prior heading one size bigger"
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "Heading levels should not be skipped."
   },
   "heading_starting_with_start_42a3e7f9": {
     "message": "Heading starting with { start }"
   },
-  "heading_tags_should_not_be_used_for_paragraphs_f9ba72b1": {
-    "message": "Heading tags should not be used for paragraphs"
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Headings should not contain more than 120 characters."
   },
   "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
     "message": "Image filenames should not be used as the alt attribute describing the image content."
@@ -86,17 +83,23 @@
   "image_with_filename_file_aacd7180": {
     "message": "Image with filename { file }"
   },
-  "images_should_have_an_alt_attribute_describing_its_a86ed190": {
-    "message": "Images should have an alt attribute describing its content."
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Images should include an alt attribute describing the image content."
   },
   "issue_num_of_total_f5856670": {
     "message": "Issue { num } of { total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users."
   },
   "learn_more_a79a7918": {
     "message": "Learn more"
   },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Link with text starting with { start }"
+  },
+  "merge_links_2478df96": {
+    "message": "Merge links"
   },
   "next_40e12421": {
     "message": "Next"
@@ -109,30 +112,6 @@
   },
   "none_3b5e34d2": {
     "message": "None"
-  },
-  "paragraph_about_why_adjacent_same_links_are_not_de_61753b47": {
-    "message": "Paragraph about why adjacent-same links are not desired"
-  },
-  "paragraph_about_why_alt_text_for_images_is_importa_1093bc8d": {
-    "message": "Paragraph about why alt text for images is important."
-  },
-  "paragraph_about_why_color_contrast_is_important_7053f9c9": {
-    "message": "Paragraph about why color contrast is important."
-  },
-  "paragraph_about_why_heading_hierarchy_sequences_ar_4a43044": {
-    "message": "Paragraph about why heading hierarchy sequences are important."
-  },
-  "paragraph_about_why_table_captions_are_important_20607615": {
-    "message": "Paragraph about why table captions are important."
-  },
-  "paragraph_about_why_table_header_scope_is_importan_b6361131": {
-    "message": "Paragraph about why table header scope is important."
-  },
-  "paragraph_about_why_table_headers_are_important_cd99c445": {
-    "message": "Paragraph about why table headers are important."
-  },
-  "paragraph_on_why_headings_tags_should_not_be_used__facd0c3b": {
-    "message": "paragraph on why headings tags should not be used for paragraphs"
   },
   "paragraph_starting_with_start_a59923f8": {
     "message": "Paragraph starting with { start }"
@@ -152,11 +131,29 @@
   "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
     "message": "Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image. Alternative text should be simple and concise."
   },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Screen readers cannot interpret tables without the proper structure. Table headers provide direction and content scope."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Screen readers cannot interpret tables without the proper structure. Table headers provide direction and overview of the content."
+  },
   "set_header_scope_8c548f40": {
     "message": "Set header scope"
   },
   "set_table_header_cfab13a0": {
     "message": "Set table header"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should be concise within the proper structure."
   },
   "table_header_starting_with_start_ffcabba6": {
     "message": "Table header starting with { start }"
@@ -164,20 +161,23 @@
   "table_starting_with_start_e7232848": {
     "message": "Table starting with { start }"
   },
-  "tables_headers_should_have_scope_specified_5bf21f10": {
-    "message": "Tables headers should have scope specified"
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Tables headers should specify scope."
   },
-  "tables_should_have_a_caption_describing_the_conten_bea25b4e": {
-    "message": "Tables should have a caption describing the contents of the table"
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Tables should include a caption describing the contents of the table."
   },
-  "tables_should_have_at_least_one_header_e8aeadd1": {
-    "message": "Tables should have at least one header"
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Tables should include at least one header."
   },
-  "text_18pt_14pt_if_bold_or_larger_should_have_a_min_ccb18c3c": {
-    "message": "Text 18pt (14pt if bold) or larger should have a minimum contrast ratio of 3:1."
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "Text is difficult to read without suffcient contrast between the text and the background, especially for those with low vision."
   },
-  "text_smaller_than_18pt_14pt_if_bold_should_have_a__b08f92f4": {
-    "message": "Text smaller than 18pt (14pt if bold) should have a minimum contrast ratio of 4.5:1."
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "Text larger than 18pt (or bold 14pt) should display a minimum contrast ratio of 3:1."
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "Text smaller than 18pt (or bold 14pt) should display a minimum contrast ratio of 4.5:1."
   },
   "why_523b3d8c": {
     "message": "Why"
