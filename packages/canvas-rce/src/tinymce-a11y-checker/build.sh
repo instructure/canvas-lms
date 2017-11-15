@@ -1,5 +1,5 @@
 #!/bin/bash
-docker build -t tinymce-a11y-checker .
+bash scripts/build-image .
 
 docker run tinymce-a11y-checker npm test
 unit_status=$?
