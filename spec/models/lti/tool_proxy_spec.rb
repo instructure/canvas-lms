@@ -496,6 +496,34 @@ module Lti
       end
     end
 
+    describe "#matches?" do
+      include_context 'lti2_spec_helper'
+
+      let(:fields) do
+        {
+          vendor_code: tool_proxy.product_family.vendor_code,
+          product_code: tool_proxy.product_family.product_code,
+          resource_type_code: resource_handler.resource_type_code
+        }
+      end
+
+      it 'matches' do
+        expect(tool_proxy.matches?(fields)).to eq(true)
+      end
+
+      it 'does not match when vendor code is wrong' do
+        expect(tool_proxy.matches?(fields.merge(vendor_code: ''))).to eq(false)
+      end
+
+      it 'does not match when product_code is wrong' do
+        expect(tool_proxy.matches?(fields.merge(product_code: ''))).to eq(false)
+      end
+
+      it 'does not match when resource_type_code is wrong' do
+        expect(tool_proxy.matches?(fields.merge(resource_type_code: ''))).to eq(false)
+      end
+    end
+
     describe "#find_service" do
       let(:service_one_id) { "http://originality.docker/lti/v2/services#vnd.Canvas.SubmissionEvent" }
       let(:service_one_endpoint) { "http://originality.docker/event/submission" }

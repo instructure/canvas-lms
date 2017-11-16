@@ -144,5 +144,13 @@ module Lti
         s.id.include?(service_id) && s.action.include?(action)
       end
     end
+
+    def matches?(vendor_code:, product_code:, resource_type_code:)
+      return false if vendor_code != product_family.vendor_code
+      return false if product_code != product_family.product_code
+      return false if resources.where(resource_type_code: resource_type_code).empty?
+
+      true
+    end
   end
 end
