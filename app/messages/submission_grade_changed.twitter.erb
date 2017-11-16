@@ -1,7 +1,7 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.assignment.context, asset.assignment, :submission], id: asset.user) %>
 <% end -%>
-<%= t :tweet, "Canvas Alert - Grade Change: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
+<%= t :tweet, "Courseware Alert - Grade Change: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
 
 <% if asset.score -%>
 <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>

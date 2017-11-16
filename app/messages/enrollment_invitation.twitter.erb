@@ -1,4 +1,4 @@
 <% define_content :link do -%>
   <%= course_url(asset.course, invitation: asset.uuid) %>
 <% end -%>
-<%= t "Canvas Alert - Invited: %{course} as %{role_type}", :course => asset.course.name, :role_type => asset.readable_role_name %>
+<%= t "Courseware Alert - Invited: %{course} as %{role_type}", :course => asset.course.name, :role_type => asset.readable_role_name %>

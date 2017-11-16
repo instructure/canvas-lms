@@ -5,10 +5,10 @@
   <%= asset.author_short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
 <% end %>
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %>
+  <%= t :subject, "%{user_name} just sent you a message in Courseware.", :user_name => content(:user_name) %>
 <% end %>
 
-<%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %>
+<%= t :body, "%{user_name} just sent you a message in Courseware:", :user_name => content(:user_name) %>
 
 <%= CanvasTextHelper.truncate_text(asset.conversation.subject.present? ? <<HEREDOC : asset.body, :max_length => 200)
 Subject: #{asset.conversation.subject}
