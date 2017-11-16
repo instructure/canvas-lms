@@ -340,7 +340,7 @@ $(document).ready(function() {
       var channel_id = data.user.communication_channel.id;
       $(".channel.default").removeClass('default').find('a.default_link span.screenreader-only.default_label').remove();
       $(".channel#channel_" + channel_id).addClass('default').find('a.default_link').append( $('<span class="screenreader-only" />').text(I18n.t("This is the default email address")) );
-      $(".default_email.display_data").text(data.user.pseudonym.unique_id);
+      $(".default_email.display_data").text(data.user.communication_channel.path);
     });
   });
   $(".dialog .re_send_confirmation_link").click(function(event) {

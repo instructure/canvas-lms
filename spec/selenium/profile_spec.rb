@@ -138,6 +138,7 @@ describe "profile" do
     end
 
     it "should change default email address" do
+      @user.communication_channel.confirm!
       channel = @user.communication_channels.create!(:path_type => 'email',
                                                      :path => 'walter_white@example.com')
       channel.confirm!
@@ -148,6 +149,7 @@ describe "profile" do
       link.click
       wait_for_ajaximations
       expect(row).to have_class("default")
+      expect(f(".default_email.display_data")).to include_text('walter_white@example.com')
     end
 
     it "should edit full name" do
