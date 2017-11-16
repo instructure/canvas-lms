@@ -87,6 +87,7 @@ define [
   test 'replaceTextArea', ->
     @stub(RichContentEditor, 'destroyRCE')
     @stub($.fn, 'insertBefore')
+    @stub($.fn, 'remove')
     @stub($.fn, 'detach')
 
     textArea = $('<textarea/>')
@@ -100,6 +101,7 @@ define [
 
     ok $.fn.insertBefore.calledOn(et.el), 'inserts el'
     ok $.fn.insertBefore.calledWith(et.textAreaContainer), 'before container'
+    ok $.fn.remove.calledOn(textArea), 'old textarea removed'
     ok RichContentEditor.destroyRCE.calledWith(textArea), 'destroys rce'
     ok $.fn.detach.calledOn(et.textAreaContainer), 'removes container'
 
