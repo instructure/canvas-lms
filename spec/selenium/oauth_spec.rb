@@ -28,6 +28,15 @@ describe "oauth2 flow" do
   end
 
   if Canvas.redis_enabled?
+    def oauth_login_fill_out_form
+      expect(driver.current_url).to match(%r{/login/canvas$})
+      user_element = f('#pseudonym_session_unique_id')
+      user_element.send_keys("nobody@example.com")
+      password_element = f('#pseudonym_session_password')
+      password_element.send_keys("asdfasdf")
+      password_element.submit
+    end
+
     describe "a logged-in user" do
       before do
         course_with_student_logged_in(:active_all => true)
@@ -47,15 +56,6 @@ describe "oauth2 flow" do
     describe "a non-logged-in user" do
       before do
         course_with_student(:active_all => true, :user => user_with_pseudonym)
-      end
-
-      def oauth_login_fill_out_form
-        expect(driver.current_url).to match(%r{/login/canvas$})
-        user_element = f('#pseudonym_session_unique_id')
-        user_element.send_keys("nobody@example.com")
-        password_element = f('#pseudonym_session_password')
-        password_element.send_keys("asdfasdf")
-        password_element.submit
       end
 
       it "should show the confirmation dialog after logging in" do
@@ -98,6 +98,30 @@ describe "oauth2 flow" do
     it "should not show remember authorization checkbox for unscoped requests" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com"
       expect(f("#content")).not_to contain_css('#remember_access')
+    end
+
+    it "should not let developer keys expire if remember me was checked" do
+      expiring_key = DeveloperKey.create!(
+        name: 'IExpire',
+        redirect_uri: 'http://www.example.com',
+        auto_expire_tokens: true
+      )
+      redirect_uri = 'http://www.example.com&scopes=/auth/userinfo'
+      get "/login/oauth2/auth?response_type=code&client_id=#{expiring_key.id}&redirect_uri=#{redirect_uri}"
+      f('#remember_access').click
+      f('input[type=submit]').click
+      f('body') # wait until the redirect page loads
+
+      code = driver.current_url.match(%r{code=([^\?&]+)})[1]
+      integration_test = ActionDispatch::IntegrationTest.new(self)
+      integration_test.post "/login/oauth2/token", params: {
+        grant_type: 'authorization_code',
+        client_id: expiring_key.id,
+        client_secret: expiring_key.api_key,
+        redirect_uri: redirect_uri,
+        code: code,
+      }
+      expect(AccessToken.last.expires_at).to be_nil
     end
   end
 end
