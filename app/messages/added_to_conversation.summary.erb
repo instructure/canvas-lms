@@ -5,7 +5,7 @@
   <%= asset.author_short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
 <% end %>
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name} just added you to a conversation in Canvas.", :user_name => content(:user_name) %>
+  <%= t :subject, "%{user_name} just added you to a conversation in Courseware.", :user_name => content(:user_name) %>
 <% end %>
 
-<%= t :body, "%{user_name} just added you to a conversation in Canvas.", :user_name => content(:user_name) %>
+<%= t :body, "%{user_name} just added you to a conversation in Courseware.", :user_name => content(:user_name) %>

@@ -16,5 +16,5 @@
 <%= before_label :email, "Email" %> <%= asset.user.email %>
 <% if email != login %><%= before_label :username, "Username" %> <%= asset.user.pseudonym.unique_id rescue t(:none, "none") %><% end %>
 
-<%= t :details, "You'll need to register with Canvas before you can participate in the class.  To get started, visit the course page here:" %>
+<%= t :details, "You'll need to register with Courseware before you can participate in the class.  To get started, visit the course page here:" %>
 <%= content :link %>

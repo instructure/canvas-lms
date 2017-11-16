@@ -1,9 +1,9 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end -%>
-<%= t('assignment_change', 'Canvas Alert - Date Change: %{assignment_name}, %{course_name} (%{override})', 
-        :assignment_name => asset.assignment.title, 
-        :course_name => asset.assignment.context.name, 
+<%= t('assignment_change', 'Courseware Alert - Date Change: %{assignment_name}, %{course_name} (%{override})',
+        :assignment_name => asset.assignment.title,
+        :course_name => asset.assignment.context.name,
         :override => asset.title) %>
 
 <% if asset.due_at -%>
@@ -11,4 +11,3 @@
 <% else -%>
   <%= t('no_due_date', 'due: No Due Date') %>
 <% end -%>
-

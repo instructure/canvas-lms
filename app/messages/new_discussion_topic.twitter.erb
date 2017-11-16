@@ -1,4 +1,4 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.context, asset]) %>
 <% end -%>
-<%= t :subject, "Canvas Alert - Topic: %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+<%= t :subject, "Courseware Alert - Topic: %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name %>

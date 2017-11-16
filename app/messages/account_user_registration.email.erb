@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Canvas Account Admin Invitation" %>
+  <%= t :subject, "Courseware Account Admin Invitation" %>
 <% end %>
 
 <%= t("You've been given an account role for the %{account} account at %{website}. Role type: %{role_type}.",
@@ -14,4 +14,4 @@
 <%= t(:email_info, "Email: %{email}", :email => email) %>
 <% if email != login %><%= t(:username_info, "Username: %{username}", :username => login) %><% end %>
 
-<%= t(:url_info, "You'll need to register with Canvas before you can participate as an account admin.  You can finish the registration process here:\n%{url}", :url => content(:link)) %>
+<%= t(:url_info, "You'll need to register with Courseware before you can participate as an account admin.  You can finish the registration process here:\n%{url}", :url => content(:link)) %>
