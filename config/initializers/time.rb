@@ -45,9 +45,16 @@ end
 
 ActiveSupport::TimeZone.include(TimeZoneAsJson)
 
-# Add Paraguay (Asuncion) as a friendly time zone
+# Custom friendly time zones
 ActiveSupport::TimeZone::MAPPING['Asuncion'] = 'America/Asuncion'
 ActiveSupport::TimeZone::MAPPING['Philippines'] = 'Asia/Manila'
+# Additional Brazil zones
+ActiveSupport::TimeZone::MAPPING['Noronha'] = 'America/Noronha'
+ActiveSupport::TimeZone::MAPPING['Fortaleza'] = 'America/Fortaleza'
+ActiveSupport::TimeZone::MAPPING['Manaus'] = 'America/Manaus'
+ActiveSupport::TimeZone::MAPPING['Cuiaba'] = 'America/Cuiaba'
+ActiveSupport::TimeZone::MAPPING['Eirunepe'] = 'America/Eirunepe'
+
 ActiveSupport::TimeZone.instance_variable_set(:@zones, nil)
 ActiveSupport::TimeZone.instance_variable_set(:@zones_map, nil)
 ActiveSupport::TimeZone.instance_variable_set(:@lazy_zones_map, Concurrent::Map.new)
