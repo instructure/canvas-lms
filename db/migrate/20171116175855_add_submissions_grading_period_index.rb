@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddActiveSubmissionsIndex < ActiveRecord::Migration[5.0]
+class AddSubmissionsGradingPeriodIndex < ActiveRecord::Migration[5.0]
   tag :postdeploy
   disable_ddl_transaction!
 
   def change
     add_index :submissions, [:assignment_id, :grading_period_id],
+              where: "workflow_state<>'deleted' AND grading_period_id IS NOT NULL",
               algorithm: :concurrently,
-              name: 'index_active_submissions',
-              where: "workflow_state <> 'deleted'"
+              name: 'index_active_submissions_gp'
   end
 end
