@@ -3,6 +3,7 @@ type Assignment implements Node, Timestamped {
   _id: ID!
   createdAt: Time
   description: String
+  discussion: Discussion
 
   # when this assignment is due
   dueAt: String
@@ -16,6 +17,7 @@ type Assignment implements Node, Timestamped {
 
   # determines the order this assignment is displayed in in its assignment group
   position: Int
+  quiz: Quiz
   updatedAt: Time
 }
 
@@ -218,6 +220,14 @@ enum CourseWorkflowState {
   deleted
 }
 
+type Discussion implements Node, Timestamped {
+  # legacy canvas id
+  _id: ID!
+  createdAt: Time
+  id: ID!
+  updatedAt: Time
+}
+
 type Enrollment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
@@ -366,6 +376,14 @@ type Query {
     # ID of the object.
     id: ID!
   ): Node
+}
+
+type Quiz implements Node, Timestamped {
+  # legacy canvas id
+  _id: ID!
+  createdAt: Time
+  id: ID!
+  updatedAt: Time
 }
 
 type Section implements Node, Timestamped {
