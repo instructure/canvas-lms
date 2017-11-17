@@ -30,6 +30,8 @@ import * as dom from "../utils/dom"
 import rules from "../rules"
 import formatMessage from "format-message"
 
+const noop = () => {}
+
 export default class Checker extends React.Component {
   constructor() {
     super()
@@ -65,7 +67,7 @@ export default class Checker extends React.Component {
     this.setState({ config })
   }
 
-  check(done) {
+  check(done = noop) {
     this.setState(
       {
         open: true,
@@ -75,10 +77,10 @@ export default class Checker extends React.Component {
       },
       () => {
         if (typeof this.state.config.beforeCheck === "function") {
-          this.state.config.beforeCheck(() => {
+          this.state.config.beforeCheck(this.props.editor, () => {
             this._check(() => {
               if (typeof this.state.config.afterCheck === "function") {
-                this.state.config.afterCheck(done)
+                this.state.config.afterCheck(this.props.editor, done)
               } else {
                 done()
               }
@@ -86,7 +88,7 @@ export default class Checker extends React.Component {
           })
         } else if (typeof this.state.config.afterCheck === "function") {
           this._check(() => {
-            this.state.config.afterCheck(done)
+            this.state.config.afterCheck(this.props.editor, done)
           })
         } else {
           this._check(done)

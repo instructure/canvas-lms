@@ -65,7 +65,7 @@ describe("check", () => {
 
   test("calls beforeCheck when provided it as a config option", async () => {
     const testCallback = jest.fn()
-    const beforeCheck = done => {
+    const beforeCheck = (ed, done) => {
       testCallback()
       done()
     }
@@ -77,7 +77,7 @@ describe("check", () => {
 
   test("calls afterCheck when provided it as a config option", async () => {
     const testCallback = jest.fn()
-    const afterCheck = done => {
+    const afterCheck = (ed, done) => {
       testCallback()
       done()
     }
@@ -91,11 +91,11 @@ describe("check", () => {
     const beforeCallback = jest.fn()
     const afterCallback = jest.fn()
 
-    const beforeCheck = done => {
+    const beforeCheck = (ed, done) => {
       beforeCallback()
       done()
     }
-    const afterCheck = done => {
+    const afterCheck = (ed, done) => {
       afterCallback()
       done()
     }
@@ -105,6 +105,30 @@ describe("check", () => {
     await promisify(instance.check.bind(instance))()
     expect(beforeCallback).toHaveBeenCalled()
     expect(afterCallback).toHaveBeenCalled()
+  })
+
+  test("calls beforeCheck and afterCheck providing a done callback and an editor instance", async () => {
+    component = shallow(
+      <Checker getBody={() => node} editor={{ someObject: true }} />
+    )
+    instance = component.instance()
+    const beforeCallback = jest.fn()
+    const afterCallback = jest.fn()
+
+    const beforeCheck = (ed, done) => {
+      expect(ed).toEqual({ someObject: true })
+      beforeCallback()
+      done()
+    }
+    const afterCheck = (ed, done) => {
+      expect(ed).toEqual({ someObject: true })
+      afterCallback()
+      done()
+    }
+
+    const conf = { afterCheck, beforeCheck }
+    instance.setConfig(conf)
+    await promisify(instance.check.bind(instance))()
   })
 })
 
