@@ -12,7 +12,7 @@ tinymce.create("tinymce.plugins.AccessibilityChecker", {
     container.className = "tinymce-a11y-checker-container"
     document.body.appendChild(container)
     instance = ReactDOM.render(
-      <Checker getBody={ed.getBody.bind(ed)} />,
+      <Checker getBody={ed.getBody.bind(ed)} editor={ed} />,
       container
     )
     pendingInstanceCallbacks.forEach(cb => cb(instance))
