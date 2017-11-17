@@ -55,5 +55,22 @@ module Types
         ).count
       end
     end
+
+    connection :submissionsConnection, SubmissionType.connection_type do
+      description "submissions for this assignment"
+      resolve ->(assignment, _, ctx) {
+        current_user = ctx[:current_user]
+        session = ctx[:session]
+        course = assignment.course
+
+        if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+          # a user can see all submissions
+          assignment.submissions.where.not(workflow_state: "unsubmitted")
+        elsif course.grants_right?(current_user, session, :read_grades)
+          # a user can see their own submission
+          assignment.submissions.where(user_id: current_user.id).where.not(workflow_state: "unsubmitted")
+        end
+      }
+    end
   end
 end

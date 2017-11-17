@@ -58,4 +58,14 @@ describe Types::AssignmentType do
     expect(assignment_type._id).to eq assignment.id
     expect(assignment_type.name).to eq assignment_type.name
   end
+
+  it "returns submissions from submission connection (with permissions)" do
+    test_course.enroll_student(test_student, enrollment_state: 'active')
+    submission = assignment.submit_homework(test_student, { :body => "sub1", :submission_type => 'online_text_entry' })
+
+    expect(assignment_type.submissionsConnection(current_user: @teacher).length).to eq 1
+    expect(assignment_type.submissionsConnection(current_user: @teacher)[0].id).to eq submission.id
+
+    expect(assignment_type.submissionsConnection(current_user: @student)).to eq nil
+  end
 end
