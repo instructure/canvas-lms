@@ -2476,7 +2476,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.assignment_ids_with_submissions(assignment_ids)
-    Submission.active.having_submission.where(:assignment_id => assignment_ids).distinct.pluck(:assignment_id)
+    Submission.from(sanitize_sql(["unnest('{?}'::int4[]) as subs (assignment_id)", assignment_ids])).
+      where("EXISTS (?)", Submission.active.having_submission.where("submissions.assignment_id=subs.assignment_id")).
+      distinct.pluck("subs.assignment_id")
   end
 
   # override so validations are called
