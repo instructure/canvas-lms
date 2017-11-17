@@ -147,9 +147,9 @@
     <% end %>
   <% end %>
   <%= render :partial => "shared/rubric_criterion", :object => nil %>
-  <tr class="summary" style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
+  <tr class="summary">
     <td colspan="4">
-      <div style="float: right;" class="total_points_holder">
+      <div style="float: right;" class="total_points_holder" style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
         <span><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
