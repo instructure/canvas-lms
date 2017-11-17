@@ -120,10 +120,17 @@ class ApplicationController < ActionController::Base
         active_brand_config_url('css'),
         view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
       ]
+
+      editor_hc_css = [
+        active_brand_config_url('css', { force_high_contrast: true }),
+        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
+      ]
+
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
         active_brand_config_json_url: active_brand_config_url('json'),
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
+        url_for_high_contrast_tinymce_editor_css: editor_hc_css,
         current_user_id: @current_user.try(:id),
         current_user: Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile) },
         current_user_roles: @current_user.try(:roles, @domain_root_account),

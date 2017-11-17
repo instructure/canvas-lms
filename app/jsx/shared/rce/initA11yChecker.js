@@ -17,10 +17,9 @@
  */
 
 import { getInstance } from 'tinymce-a11y-checker'
+import { beforeCheck, afterCheck } from './a11yCheckerHooks';
 
-// disable contrast checking unless in high contrast mode
-// this is only temporary, until the checker supports forcing high contrast
-// styles durring the check.
-if (ENV.use_high_contrast !== true) {
-  getInstance(c => c.setConfig({ disableContrastCheck: true }))
-}
+getInstance(c => c.setConfig({
+  beforeCheck,
+  afterCheck
+}))
