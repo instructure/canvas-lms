@@ -448,6 +448,16 @@ test('uses submission#entered_grade for other types of assignments', function ()
   ok($grade.calledWith('A'));
 });
 
+test('Does not error out if a user has no submission', function () {
+  this.stub(SpeedGrader.EG, 'updateStatsInHeader');
+
+  SpeedGrader.EG.currentStudent.submission_state = 'unsubmitted';
+  delete SpeedGrader.EG.currentStudent.submission;
+
+  SpeedGrader.EG.showGrade();
+  ok(true);
+});
+
 QUnit.module('SpeedGrader#handleGradeSubmit', {
   setup () {
     fakeENV.setup();

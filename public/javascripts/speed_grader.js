@@ -2553,7 +2553,7 @@ EG = {
   },
 
   showGrade: function() {
-    const submission = EG.currentStudent.submission;
+    const submission = EG.currentStudent.submission || {};
     const grade = EG.getGradeToShow(submission, ENV.grading_role);
 
     if (submission.grading_type === 'pass_fail' || ['complete', 'incomplete', 'pass', 'fail'].indexOf(submission.grade) > -1) {
