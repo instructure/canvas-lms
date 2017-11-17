@@ -33,13 +33,35 @@ module BasicLTI
       end
     end
 
+    class InvalidSourceId < StandardError
+    end
+
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
-        sourcedid = BasicLTI::Sourcedid.load!(sourceid)
-        raise BasicLTI::Errors::InvalidSourceId, 'Tool is invalid' unless tool == sourcedid.tool
-        return sourcedid.course, sourcedid.assignment, sourcedid.user
+        raise InvalidSourceId, 'Invalid sourcedid' if sourceid.blank?
+        md = sourceid.match(SOURCE_ID_REGEX)
+        raise InvalidSourceId, 'Invalid sourcedid' unless md
+        new_encoding = [md[1], md[2], md[3], md[4]].join('-')
+        raise InvalidSourceId, 'Invalid signature' unless Canvas::Security.
+            verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
+
+        raise InvalidSourceId, 'Tool is invalid' unless tool.id == md[1].to_i
+        course = Course.active.where(id: md[2]).first
+        raise InvalidSourceId, 'Course is invalid' unless course
+
+        user = course.student_enrollments.active.where(user_id: md[4]).first.try(:user)
+        raise InvalidSourceId, 'User is no longer in course' unless user
+
+        assignment = course.assignments.active.where(id: md[3]).first
+        raise InvalidSourceId, 'Assignment is invalid' unless assignment
+
+        tag = assignment.external_tool_tag if assignment
+        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.
+            matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
+
+        return course, assignment, user
       end
     end
 
@@ -161,7 +183,7 @@ module BasicLTI
 
         begin
           course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
-        rescue Errors::InvalidSourceId => e
+        rescue InvalidSourceId => e
           self.code_major = 'failure'
           self.description = e.to_s
           self.body = "<#{operation_ref_identifier}Response />"

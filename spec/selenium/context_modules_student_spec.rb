@@ -492,8 +492,6 @@ describe "context modules" do
     end
 
     it "shows Mark as Done button for assignments with external tool submission", priority: "2", test_id: 3340306 do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
       tool = @course.context_external_tools.create!(name: "a",
                                                     url: "example.com",
                                                     consumer_key: '12345',
