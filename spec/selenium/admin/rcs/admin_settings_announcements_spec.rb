@@ -79,7 +79,7 @@ describe "settings tabs" do
       course_with_admin_logged_in
       enable_all_rcs @course.account
       stub_rcs_config
-      driver.manage.window.maximize
+      make_full_screen
     end
 
     it "should add and delete an announcement" do

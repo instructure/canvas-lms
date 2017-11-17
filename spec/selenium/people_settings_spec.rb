@@ -23,7 +23,7 @@ describe "course people" do
   before(:once) do
     # in the people table, the kyle menu can be off the screen
     # and uninteractable if the window is too small
-    driver.manage.window.maximize
+    make_full_screen
   end
 
   before (:each) do
