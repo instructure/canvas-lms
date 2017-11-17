@@ -131,7 +131,12 @@ class SubAccountsController < ApplicationController
         return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: 401
       end
     end
+    if params[:account][:is_root]
+      @sub_account.parent_account_id = nil
+      @sub_account.root_account_id = nil
+    end
     if @sub_account.save
+      @sub_account.account_users << AccountUser.create(:account => @sub_account, :user => @current_user) if params[:account][:is_root]
       render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors
