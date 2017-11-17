@@ -183,6 +183,14 @@ module CustomSeleniumActions
     raise "No element with reference to given element was found. Please recheck the xpath : #{xpath}"
   end
 
+  # This helps us get runtime element values for an attribute
+  # usage example : expect(element_value_for_attr(element, attribute)).to eq('true')
+  def element_value_for_attr(element, attr)
+    element.attribute(attr)
+  rescue Selenium::WebDriver::Error::UnknownError
+    raise "Attribute may not be passed correctly. Please recheck attribute passed, and its format : #{attr}"
+  end
+
   def is_checked(css_selector)
     !!fj(css_selector)[:checked]
   end
