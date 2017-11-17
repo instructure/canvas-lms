@@ -155,7 +155,7 @@ module AssignmentOverrideApplicator
           scope.where(user_id: visible_user_ids)
         end
 
-      scope.pluck(:assignment_override_id, :user_id).each do |ov_id, user_id|
+      scope.distinct.pluck(:assignment_override_id, :user_id).each do |ov_id, user_id|
         override_ids_to_student_ids[ov_id] ||= []
         override_ids_to_student_ids[ov_id] << user_id
       end
