@@ -413,10 +413,11 @@ class SubmissionsApiController < ApplicationController
 
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
-        eager_load(:user => :pseudonyms).
-        where("users.id" => student_ids)
+        preload(:user => :pseudonyms).
+        where(:user_id => student_ids)
+      student_enrollments = Api.paginate(scope, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
 
-      submissions_scope = Submission.active.where(user_id: student_ids, assignment_id: assignments)
+      submissions_scope = Submission.active.where(user_id: student_enrollments.map(&:user_id), assignment_id: assignments)
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
@@ -427,7 +428,7 @@ class SubmissionsApiController < ApplicationController
       seen_users = Set.new
       result = []
       show_sis_info = context.grants_any_right?(@current_user, :read_sis, :manage_sis)
-      scope.each do |enrollment|
+      student_enrollments.each do |enrollment|
         student = enrollment.user
         next if seen_users.include?(student.id)
         seen_users << student.id
