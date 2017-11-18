@@ -28,6 +28,12 @@ module DifferentiatedAssignments
         DifferentiatedAssignments::Homework::Discussions.initialize
         DifferentiatedAssignments::Homework::Quizzes.initialize
       end
+
+      def short_list_initialize
+        DifferentiatedAssignments::Homework::Assignments.short_list_initialize
+        DifferentiatedAssignments::Homework::Discussions.short_list_initialize
+        DifferentiatedAssignments::Homework::Quizzes.short_list_initialize
+      end
     end
   end
 end

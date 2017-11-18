@@ -57,7 +57,7 @@ describe "API Authentication", type: :request do
       before :each do
         # Trust the referer
         allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
-        post '/login', params: {'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test1234'}
+        post '/login/canvas', params: {'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test1234'}
       end
 
        it "should not need developer key when we have an actual application session" do
@@ -142,7 +142,7 @@ describe "API Authentication", type: :request do
           expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
           json = JSON.parse(response.body)
           token = json['access_token']
-          expect(json['user']).to eq({ 'id' => @user.id, 'name' => 'test1@example.com' })
+          expect(json['user']).to eq({ 'id' => @user.id, 'global_id' => @user.global_id.to_s, 'name' => 'test1@example.com' })
           reset!
 
           # try an api call
@@ -170,7 +170,7 @@ describe "API Authentication", type: :request do
 
       it "should not prepend the csrf protection even if the post has a session" do
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
-        post "/login", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
+        post "/login/canvas", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
         code = SecureRandom.hex(64)
         code_data = { 'user' => @user.id, 'client_id' => @client_id }
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
@@ -282,7 +282,7 @@ describe "API Authentication", type: :request do
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
         course_with_teacher(:user => @user)
         allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
-        post "/login", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
+        post "/login/canvas", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
 
         # step 2
         expect(response).to be_redirect
@@ -328,7 +328,7 @@ describe "API Authentication", type: :request do
             follow_redirect!
             expect(response).to be_success
             allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
-            post "/login", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
+            post "/login/canvas", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
 
             # step 3
             expect(response).to be_redirect
@@ -348,7 +348,7 @@ describe "API Authentication", type: :request do
             expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
             json = JSON.parse(response.body)
             @token = json['access_token']
-            expect(json['user']).to eq({ 'id' => @user.id, 'name' => 'test1@example.com' })
+            expect(json['user']).to eq({ 'id' => @user.id, 'global_id' => @user.global_id.to_s, 'name' => 'test1@example.com' })
             reset!
           end
 
@@ -395,7 +395,7 @@ describe "API Authentication", type: :request do
               follow_redirect!
               expect(response).to be_success
               allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
-              post "/login", params: {:pseudonym_session => {:unique_id => 'test1@example.com', :password => 'test1234'}}
+              post "/login/canvas", params: {:pseudonym_session => {:unique_id => 'test1@example.com', :password => 'test1234'}}
 
               expect(response).to be_redirect
               expect(response['Location']).to match(%r{/login/oauth2/confirm$})
@@ -954,7 +954,7 @@ describe "API Authentication", type: :request do
     it "should prepend the CSRF protection for API endpoints, when session auth is used" do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
       allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
-      post "/login", params: {"pseudonym_session[unique_id]" => "test1@example.com",
+      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "test1@example.com",
         "pseudonym_session[password]" => "test1234"}
       assert_response 302
       get "/api/v1/users/self/profile"

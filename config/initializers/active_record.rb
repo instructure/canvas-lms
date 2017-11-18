@@ -1367,3 +1367,20 @@ module DupArraysInMutationTracker
   end
 end
 ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker) unless CANVAS_RAILS5_0
+
+module IgnoreOutOfSequenceMigrationDates
+  def current_migration_number(dirname)
+    migration_lookup_at(dirname).map do |file|
+      digits = File.basename(file).split("_").first
+      next if ActiveRecord::Base.timestamped_migrations && digits.length != 14
+      digits.to_i
+    end.compact.max.to_i
+  end
+end
+# Thor doesn't call `super` in its `inherited` method, so hook in so that we can hook in later :)
+Thor::Group.singleton_class.prepend(Autoextend::ClassMethods)
+Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
+                IgnoreOutOfSequenceMigrationDates,
+                singleton: true,
+                method: :prepend,
+                optional: true)

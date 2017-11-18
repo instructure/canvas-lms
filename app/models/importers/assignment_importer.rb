@@ -275,6 +275,12 @@ module Importers
         end
       end
 
+      if hash["similarity_detection_tool"].present?
+        settings =  item.turnitin_settings
+        settings[:originality_report_visibility] = hash["similarity_detection_tool"]["visibility"]
+        item.turnitin_settings = settings
+      end
+
       migration.add_imported_item(item)
 
       if migration.date_shift_options
@@ -309,6 +315,28 @@ module Importers
           item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
         end
       end
+
+      if hash["similarity_detection_tool"].present?
+        similarity_tool = hash["similarity_detection_tool"]
+        vendor_code = similarity_tool["vendor_code"]
+        product_code = similarity_tool["product_code"]
+        resource_type_code = similarity_tool["resource_type_code"]
+        item.assignment_configuration_tool_lookups.create(
+          tool_vendor_code: vendor_code,
+          tool_product_code: product_code,
+          tool_resource_type_code: resource_type_code,
+          tool_type: 'Lti::MessageHandler'
+        )
+        active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
+          context: context, vendor_code: vendor_code, product_code: product_code)
+        if active_proxies.blank?
+          migration.add_warning(I18n.t(
+            "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
+            vendor_code: vendor_code, product_code: product_code)
+          )
+        end
+      end
+
 
       if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
         if group = context.assignment_group_no_drop_assignments[item.migration_id]

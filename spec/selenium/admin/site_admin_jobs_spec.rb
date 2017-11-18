@@ -162,8 +162,8 @@ describe "site admin jobs ui" do
         f("#un-hold-jobs").click
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
-        expect(f("#jobs-grid .even .r2")).to include_text "0/ 15"
-        expect(f("#jobs-grid .odd .r2")).to include_text "0/ 15"
+        expect(f("#jobs-grid .even .r2")).to include_text "0/ 1"
+        expect(f("#jobs-grid .odd .r2")).to include_text "0/ 1"
         expect(jobs_on_hold.count).to eq 0
       end
 

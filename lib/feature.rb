@@ -209,7 +209,7 @@ END
 New Gradebook enables an early release of new Gradebook enhancements.
 END
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'allowed',
       root_opt_in: true,
       beta: true,
 
@@ -397,6 +397,15 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
+      development: true,
+      root_opt_in: false
+    },
+    'new_typography' =>
+    {
+      display_name: -> { I18n.t('New Typography') },
+      description: -> { I18n.t('This is a feature to allow product design to remove all the various font-size overrides throughout the application.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
       development: true,
       root_opt_in: false
     },

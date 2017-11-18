@@ -171,7 +171,11 @@ module Canvas::Oauth
       end
 
       it 'grabs the user json as well' do
-        expect(json['user']).to eq user.as_json(:only => [:id, :name], :include_root => false)
+        expect(json['user']).to eq({
+          'id' => user.id,
+          'name' => user.name,
+          'global_id' => user.global_id.to_s
+        })
       end
 
       it 'returns the expires_in parameter' do

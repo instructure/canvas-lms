@@ -53,7 +53,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
     @values = [
       [
         '08d87bfc-a679-4f5d-9315-470a5fc7d7d0',
-        Time.new(2016, 10, 18, 23, 24, 38).utc,
+        2.months.ago,
         10000000000018,
         10000000000116,
         10000000000001,
@@ -62,7 +62,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
       ],
       [
         'fc85afda-538e-4fcb-a7fb-45697c551b71',
-        Time.new(2017, 6, 26, 16, 40, 5).utc,
+        1.month.ago,
         10000000000028,
         10000000000144,
         10000000000003,

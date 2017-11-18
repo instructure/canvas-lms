@@ -63,7 +63,7 @@ module Lti
         expect(response.status).to eq 401
       end
 
-      it 'returns global_navigation launches for a student' do
+      it 'returns global_navigation launches for a student using account context' do
         course_with_student(active_all: true, user: user_with_pseudonym, account: account)
 
         tool = new_valid_external_tool(@course.root_account)
@@ -72,8 +72,8 @@ module Lti
         }
         tool.save!
 
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
-          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s},
+        json = api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', :account_id => account.id.to_param, format: 'json'},
           placements: ['global_navigation'])
 
         expect(response.status).to eq 200

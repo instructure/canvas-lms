@@ -708,6 +708,17 @@ describe GradebooksController do
         expect(gradebook_options).not_to have_key :late_policy
       end
 
+      it "includes grading_schemes when New Gradebook is enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options).to have_key :grading_schemes
+      end
+
+      it "does not include grading_schemes when New Gradebook is disabled" do
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options).not_to have_key :grading_schemes
+      end
+
       it 'includes api_max_per_page' do
         Setting.set('api_max_per_page', 50)
         get :show, params: {course_id: @course.id}

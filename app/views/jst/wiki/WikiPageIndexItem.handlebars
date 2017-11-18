@@ -29,11 +29,23 @@
             </a>
           </li>
         {{/unless}}
+        {{#if front_page}}
+          <li>
+            <a href="#" class="unset-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+               title="{{#t}}Remove as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
+                <i class="icon-remove-bookmark" aria-hidden="true">
+                 {{#t}}Remove as Front Page{{/t}}
+                </i>
+            </a>
+          </li>
+        {{/if}}
         {{#unless front_page}}
           <li>
-            <a href="#" class="icon-document use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+            <a href="#" class="use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
                title="{{#t}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
-               {{#t}}Use as Front Page{{/t}}
+                <i class="icon-bookmark" aria-hidden="true">
+                  {{#t}}Use as Front Page{{/t}}
+                </i>
             </a>
           </li>
         {{/unless}}

@@ -969,7 +969,7 @@ change_sis_id.csv
 <td>✓</td>
 <td></td>
 <td>The desired sis_id of the object. This id must be currently unique to the
-object type and the root_account</td>
+object type and the root_account.</td>
 </tr>
 <tr>
 <td>type</td>

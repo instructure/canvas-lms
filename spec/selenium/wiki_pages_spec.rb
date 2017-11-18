@@ -202,7 +202,7 @@ describe "Wiki Pages" do
       check_header_focus('updated_at')
     end
 
-    describe "Add Course Button" do
+    describe "Add Page Button" do
       before :each do
         get "/courses/#{@course.id}/pages"
 
@@ -210,13 +210,15 @@ describe "Wiki Pages" do
         @active_element = driver.execute_script('return document.activeElement')
       end
 
-      it "navigates to the add course view when enter is pressed" do
+      it "navigates to the add page view when enter is pressed" do
+        skip('see CNVS-39931')
         @active_element.send_keys(:enter)
         wait_for_ajaximations
         check_element_has_focus(f('.edit-header #title'))
       end
 
-      it "navigates to the add course view when spacebar is pressed" do
+      it "navigates to the add page view when spacebar is pressed" do
+        skip('see CNVS-39931')
         @active_element.send_keys(:space)
         wait_for_ajaximations
         check_element_has_focus(f('.edit-header #title'))

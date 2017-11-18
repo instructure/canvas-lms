@@ -60,7 +60,12 @@ module DatesOverridable
   end
 
   def has_overrides?
-    assignment_overrides.loaded? ? assignment_overrides.any? : assignment_overrides.exists?
+    if current_version?
+      assignment_overrides.loaded? ? assignment_overrides.any?(&:active?) : assignment_overrides.active.exists?
+    else
+      # the old version's overrides might have be deleted too but it's probably more trouble than it's worth to check here
+      assignment_overrides.loaded? ? assignment_overrides.any? : assignment_overrides.exists?
+    end
   end
 
   def has_active_overrides?

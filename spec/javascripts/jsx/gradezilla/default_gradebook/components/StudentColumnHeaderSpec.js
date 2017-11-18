@@ -39,6 +39,7 @@ function mountAndOpenOptions (props) {
 
 function defaultProps ({ props, sortBySetting } = {}) {
   return {
+    disabled: false,
     onToggleEnrollmentFilter () {},
     selectedEnrollmentFilters: [],
     sectionsEnabled: true,

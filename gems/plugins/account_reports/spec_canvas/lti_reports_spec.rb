@@ -104,13 +104,13 @@ describe 'lti report' do
   end
 
   it 'should not include tools from courses in deleted accounts' do
-    @sub_account2.destroy
+    Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
     parsed = read_report(@type, {order: 4})
     expect(parsed.length).to eq 2
   end
 
   it 'should include tools from deleted courses for include deleted objects' do
-    @sub_account2.destroy
+    Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
     @course.destroy
     parsed = read_report(@type, {params: {"include_deleted" => true}, order: 4})
     expect(parsed.length).to eq 3

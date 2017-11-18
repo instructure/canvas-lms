@@ -199,7 +199,8 @@ module Canvas::LiveEvents
       body: LiveEvents.truncate(submission.body),
       url: submission.url,
       attempt: submission.attempt,
-      lti_assignment_id: submission.assignment.lti_context_id
+      lti_assignment_id: submission.assignment.lti_context_id,
+      group_id: submission.group_id
     }
   end
 

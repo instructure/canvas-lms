@@ -31,11 +31,11 @@ define [
 
     template: template
 
-    els: _.extend {}, # override Filterable's els, since our filter is in another view
+    els: Object.assign {}, # override Filterable's els, since our filter is in another view
       PaginatedCollectionView::els
       '.no-results': '$noResults'
 
-    events: _.extend {},
+    events: Object.assign {},
       PaginatedCollectionView::events
       'scroll': 'closeMenus'
       'dragstart': 'closeMenus'

@@ -86,14 +86,14 @@ describe "security" do
       u.save!
       https!
 
-      post "/login", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
+      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf"}
       assert_response 302
       c = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
       reset!
       https!
-      post "/login", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
+      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf",
         "pseudonym_session[remember_me]" => "1"}
       assert_response 302
@@ -107,7 +107,7 @@ describe "security" do
                               :password => "asdfasdf"
       u.save!
       https!
-      post "/login", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
+      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf"}
       assert_response 302
       c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
@@ -122,7 +122,7 @@ describe "security" do
       :username => "nobody@example.com",
       :password => "asdfasdf"
     u.save!
-    post "/login", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+    post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
       "pseudonym_session[password]" => "asdfasdf",
       "pseudonym_session[remember_me]" => "1" },
       headers: { 'HTTP_ACCEPT' => 'application/json' }
@@ -192,7 +192,7 @@ describe "security" do
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
 
-      post "/login", params: {:pseudonym_session => { :unique_id => @p.unique_id, :password => 'asdfasdf' }}
+      post "/login/canvas", params: {:pseudonym_session => { :unique_id => @p.unique_id, :password => 'asdfasdf' }}
       expect(response).to redirect_to settings_profile_url
       expect(session[:used_remember_me_token]).not_to be_truthy
 
@@ -234,7 +234,7 @@ describe "security" do
     end
 
     it "should generate and return a token when remember_me is checked" do
-      post "/login", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
+      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf",
         "pseudonym_session[remember_me]" => "1"}
       assert_response 302
@@ -252,7 +252,7 @@ describe "security" do
 
     it "should destroy the token both user agent and server side on logout" do
       expect {
-        post "/login", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
+        post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
           "pseudonym_session[password]" => "asdfasdf",
           "pseudonym_session[remember_me]" => "1"}
       }.to change(SessionPersistenceToken, :count).by(1)
@@ -271,11 +271,11 @@ describe "security" do
       s1.https!
       s2 = open_session
       s2.https!
-      s1.post "/login", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
+      s1.post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf",
         "pseudonym_session[remember_me]" => "1"}
       c1 = s1.cookies['pseudonym_credentials']
-      s2.post "/login", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
+      s2.post "/login/canvas", params: {"pseudonym_session[unique_id]" => "nobody@example.com",
         "pseudonym_session[password]" => "asdfasdf",
         "pseudonym_session[remember_me]" => "1"}
       c2 = s2.cookies['pseudonym_credentials']
@@ -341,7 +341,7 @@ describe "security" do
       end
 
       def bad_login(ip)
-        post "/login",
+        post "/login/canvas",
           params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "failboat" },
           headers: { "REMOTE_ADDR" => ip }
         follow_redirect! while response.redirect?
@@ -353,7 +353,7 @@ describe "security" do
         bad_login("5.5.5.5")
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
-        post "/login",
+        post "/login/canvas",
           params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
           headers: { "REMOTE_ADDR" => "5.5.5.5" }
         follow_redirect! while response.redirect?
@@ -368,7 +368,7 @@ describe "security" do
         bad_login("5.5.5.7") # different IP, but too many total failures
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
-        post "/login",
+        post "/login/canvas",
           params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
           headers: { "REMOTE_ADDR" => "5.5.5.7" }
         follow_redirect! while response.redirect?
@@ -382,7 +382,7 @@ describe "security" do
         # schools like to NAT hundreds of people to the same IP, so we don't
         # ever block the IP address as a whole
         user_with_pseudonym(:active_user => true, :username => "second@example.com", :password => "12341234").save!
-        post "/login",
+        post "/login/canvas",
           params: { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
           headers:  { "REMOTE_ADDR" => "5.5.5.5" }
         follow_redirect! while response.redirect?
@@ -401,7 +401,7 @@ describe "security" do
         bad_login("5.5.5.7") # different IP, but too many total failures
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
-        post "/login",
+        post "/login/canvas",
           params: { "pseudonym_session[unique_id]" => "nobody@example.com", "pseudonym_session[password]" => "asdfasdf" },
           headers: { "REMOTE_ADDR" => "5.5.5.5" }
         follow_redirect! while response.redirect?
@@ -562,7 +562,7 @@ describe "security" do
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
 
-      post "/login", params: {:pseudonym_session => { :unique_id => @admin.pseudonyms.first.unique_id, :password => 'password' }}
+      post "/login/canvas", params: {:pseudonym_session => { :unique_id => @admin.pseudonyms.first.unique_id, :password => 'password' }}
       expect(response).to redirect_to user_masquerade_url(@student)
       expect(session[:used_remember_me_token]).not_to be_truthy
 

@@ -235,6 +235,17 @@ QUnit.module('StatusesModal', function (suiteHooks) {
     strictEqual(modalContent.find('StatusColorListItem Popover').at(0).prop('show'), false);
   });
 
+  test('after clicking a color in the color picker, the status modal is not closed', function () {
+    sinon.stub(this.instance, 'close');
+    this.instance.open();
+    clock.tick(50); // wait for Modal to transition open
+    const modalContent = new ReactWrapper(this.wrapper.node.modalContentRef, this.wrapper.node);
+    modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
+    const colorButton = document.querySelector("button[role='radio'][title='steel (#E9EDF5)']");
+    colorButton.click();
+    strictEqual(this.instance.close.callCount, 0);
+  });
+
   test('after clicking cancel in the color picker, the color picker popover is closed', function () {
     const { wrapper, instance } = this;
     instance.open();

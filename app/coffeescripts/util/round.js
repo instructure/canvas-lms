@@ -20,8 +20,8 @@ export default function round (n, digits = 0) {
   if (typeof n !== 'number' && !(n instanceof Number)) {
     n = parseFloat(n)
   }
-  const x = Math.pow(10, digits)
-  return Math.round(n * x) / x
+  const rounded = Math.round(`${n}e${digits}`)
+  return Number(`${rounded}e-${digits}`)
 }
 
 round.DEFAULT = 2

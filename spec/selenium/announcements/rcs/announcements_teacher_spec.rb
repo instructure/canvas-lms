@@ -152,7 +152,7 @@ describe "announcements" do
         get url
 
         expect_new_page_load { f('.btn-primary').click }
-        edit(@topic_title, 'new topic')
+        edit_announcement(@topic_title, 'new topic')
       end
 
       it "should add an attachment to a new topic", priority: "1", test_id: 150529 do
@@ -197,7 +197,7 @@ describe "announcements" do
         get url + "#{topic.id}"
         expect_new_page_load { f(".edit-btn").click }
 
-        edit(edit_name, 'edit message')
+        edit_announcement(edit_name, 'edit message')
       end
 
       it "should delete a topic", priority: "1", test_id: 150526 do # no

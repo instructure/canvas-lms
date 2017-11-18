@@ -1516,6 +1516,11 @@ describe Account do
         expect(account_model.terms_required?).to eq true
       end
 
+      it "returns false by default for new accounts" do
+        TermsOfService.skip_automatic_terms_creation = false
+        expect(account_model.terms_required?).to eq false
+      end
+
       it "returns false if Setting is false" do
         Setting.set(:terms_required, "false")
         expect(account_model.terms_required?).to eq false

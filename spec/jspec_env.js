@@ -4,6 +4,7 @@ const path = require('path')
 const config = {
   __SPEC_FILE: null,
   __SPEC_DIR: null,
+  __A11Y_REPORT: null
 }
 
 const printErr = (...args) => {
@@ -29,6 +30,10 @@ if (process.env.JSPEC_WD && process.env.JSPEC_PATH) {
     printErr('Error reading spec path:', e.code, specPath)
     process.exit(1)
   }
+}
+
+if (process.env.A11Y_REPORT) {
+  config.__A11Y_REPORT = 1
 }
 
 // JSON.stringify config values since webpack plugin does a hard search-replace

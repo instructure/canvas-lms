@@ -19,17 +19,21 @@
 import I18n from 'i18n!gradebook'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import round from 'compiled/util/round'
+import { scoreToGrade } from 'jsx/gradebook/GradingSchemeHelper';
 
 const POINTS = 'points';
 const PERCENT = 'percent';
-const COMPLETION = 'completion';
+const PASS_FAIL = 'pass_fail';
 
-function isCompletion (grade, gradeType) {
+const PASS_GRADES = ['complete', 'pass'];
+const FAIL_GRADES = ['incomplete', 'fail'];
+
+function isPassFail (grade, gradeType) {
   if (gradeType) {
-    return gradeType === COMPLETION;
+    return gradeType === PASS_FAIL;
   }
 
-  return grade === 'complete' || grade === 'incomplete';
+  return PASS_GRADES.includes(grade) || FAIL_GRADES.includes(grade);
 }
 
 function isPercent (grade, gradeType) {
@@ -40,8 +44,22 @@ function isPercent (grade, gradeType) {
   return /%/g.test(grade);
 }
 
+function isExcused (grade) {
+  return grade === 'EX';
+}
+
+function normalizeCompleteIncompleteGrade (grade) {
+  if (PASS_GRADES.includes(grade)) {
+    return 'complete';
+  }
+  if (FAIL_GRADES.includes(grade)) {
+    return 'incomplete';
+  }
+  return null;
+}
+
 function shouldFormatGradingType (gradingType) {
-  return gradingType === POINTS || gradingType === PERCENT || gradingType === COMPLETION;
+  return gradingType === POINTS || gradingType === PERCENT || gradingType === PASS_FAIL;
 }
 
 function shouldFormatGrade (grade, gradingType) {
@@ -49,7 +67,41 @@ function shouldFormatGrade (grade, gradingType) {
     return shouldFormatGradingType(gradingType);
   }
 
-  return typeof grade === 'number' || isCompletion(grade);
+  return typeof grade === 'number' || isPassFail(grade);
+}
+
+function excused () {
+  return I18n.t('Excused');
+}
+
+function formatPointsGrade (score) {
+  return I18n.n(score, { precision: 2, strip_insignificant_zeros: true });
+}
+
+function formatPercentageGrade (score, options) {
+  const percent = options.pointsPossible ? score / options.pointsPossible * 100 : score;
+  return I18n.n(round(percent, 2), { percentage: true, precision: 2, strip_insignificant_zeros: true });
+}
+
+function formatGradingSchemeGrade (score, grade, options) {
+  if (options.pointsPossible) {
+    const percent = score / options.pointsPossible * 100;
+    return scoreToGrade(percent, options.gradingScheme);
+  } else if (grade != null) {
+    return grade;
+  } else {
+    return scoreToGrade(score, options.gradingScheme);
+  }
+}
+
+function formatCompleteIncompleteGrade (score, grade, options) {
+  let passed = false;
+  if (options.pointsPossible) {
+    passed = score > 0;
+  } else {
+    passed = PASS_GRADES.includes(grade);
+  }
+  return passed ? I18n.t('Complete') : I18n.t('Incomplete');
 }
 
 const GradeFormatHelper = {
@@ -62,7 +114,7 @@ const GradeFormatHelper = {
    * @param {object} options - An optional hash of arguments. The following optional arguments are supported:
    *  gradingType {string} - If present will be used to determine whether or not to
    *    format given grade. A value of 'points' or 'percent' will result in the grade
-   *    being formatted. A value of 'completion' will result in internationalization.
+   *    being formatted. A value of 'pass_fail' will result in internationalization.
    *    Any other value will result in the grade not being formatted.
    *  precision {number} - If present grade will be rounded to given precision. Default is two decimals.
    *  defaultValue - If present will be the return value when the grade is undefined, null, or empty string.
@@ -77,10 +129,15 @@ const GradeFormatHelper = {
       return ('defaultValue' in options) ? options.defaultValue : grade;
     }
 
-    const parsedGrade = GradeFormatHelper.parseGrade(grade, options);
+    if (isExcused(grade)) {
+      return excused();
+    }
+
+    let parsedGrade = GradeFormatHelper.parseGrade(grade, options);
 
     if (shouldFormatGrade(parsedGrade, options.gradingType)) {
-      if (isCompletion(parsedGrade, options.gradingType)) {
+      if (isPassFail(parsedGrade, options.gradingType)) {
+        parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade);
         formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete');
       } else {
         const roundedGrade = round(parsedGrade, options.precision || 2);
@@ -131,6 +188,34 @@ const GradeFormatHelper = {
     }
 
     return parsedGrade;
+  },
+
+  excused,
+  isExcused,
+
+  formatSubmissionGrade (submission, options = { version: 'final' }) {
+    if (submission.excused) {
+      return excused();
+    }
+
+    const score = options.version === 'entered' ? submission.enteredScore : submission.score;
+    const grade = options.version === 'entered' ? submission.enteredGrade : submission.grade;
+
+    if (score == null) {
+      return options.formatType === 'passFail' ? I18n.t('ungraded') : '–';
+    }
+
+    switch (options.formatType) {
+      case 'percent':
+        return formatPercentageGrade(score, options);
+      case 'gradingScheme':
+        return formatGradingSchemeGrade(score, grade, options);
+      case 'passFail':
+        return formatCompleteIncompleteGrade(score, grade, options);
+      default:
+        return formatPointsGrade(score);
+    }
+
   }
 };
 

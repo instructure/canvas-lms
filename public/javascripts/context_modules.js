@@ -21,6 +21,7 @@ import ModuleFile from 'compiled/models/ModuleFile'
 import PublishCloud from 'jsx/shared/PublishCloud'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import * as MoveItem from 'jsx/move_item'
 import PublishableModuleItem from 'compiled/models/PublishableModuleItem'
 import PublishIconView from 'compiled/views/PublishIconView'
 import LockIconView from 'compiled/views/LockIconView'
@@ -39,6 +40,8 @@ import PublishButtonView from 'compiled/views/PublishButtonView'
 import htmlEscape from './str/htmlEscape'
 import setupContentIds from 'jsx/modules/utils/setupContentIds'
 import get from 'lodash/get'
+import axios from 'axios'
+import { showFlashError } from 'jsx/shared/FlashAlert'
 import './jquery.ajaxJSON'
 import './jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */
 import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
@@ -90,11 +93,11 @@ import 'compiled/jquery.rails_flash_notifications'
       },
 
       updateModulePositions: function() {
-        var ids = []
+        const ids = []
         $("#context_modules .context_module").each(function() {
           ids.push($(this).attr('id').substring('context_module_'.length));
-        });
-        var url = $(".reorder_modules_url").attr('href');
+        })
+        const url = `${ENV.CONTEXT_URL_ROOT}/modules/reorder`
         $("#context_modules").loadingImage();
         $.ajaxJSON(url, 'POST', {order: ids.join(",")}, function(data) {
           $("#context_modules").loadingImage('remove');
@@ -108,9 +111,10 @@ import 'compiled/jquery.rails_flash_notifications'
       },
 
       updateModuleItemPositions: function(event, ui) {
-        var $module = ui.item.parents(".context_module");
-        var url = $module.find(".reorder_items_url").attr('href');
-        var items = [];
+        const $module = ui.item.parents('.context_module')
+        const moduleId = $module.attr('id').substring('context_module_'.length)
+        const url = `${ENV.CONTEXT_URL_ROOT}/modules/${moduleId}/reorder`
+        const items = []
         $module.find(".context_module_items .context_module_item").each(function() {
           items.push($(this).getTemplateData({textValues: ['id']}).id);
         });
@@ -260,125 +264,6 @@ import 'compiled/jquery.rails_flash_notifications'
           $this.attr('title', content_tag.title);
         });
       },
-
-      showMoveModuleItem: function ($item, returnFocusTo) {
-        var $currentModule = $item.closest(".context_module");
-        var $form = $('#move_module_item_form');
-        $form.data('current_module', $currentModule);
-        $form.data('current_item', $item);
-
-        // Set the name of the item being moved.
-        $('#move_module_item_name').text($item.children().find('span.title').text());
-
-        // Get all the modules
-        var moduleSelectOptions = [];
-        $("#context_modules .context_module").each(function() {
-          var id = $(this).attr('id').substring('context_module_'.length);
-          var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
-          moduleSelectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
-        });
-        $('#move_module_item_module_select').empty();
-        $('#move_module_item_module_select').append($.raw(moduleSelectOptions.join('')));
-
-        // Trigger the change to make sure the list is initally populated.
-        $('#move_module_item_module_select').trigger('change');
-
-        // Make sure these fields are shown because they may be hidden from a previous use of the modal.
-        $('#move_module_item_form .move-module-before-after-container').show();
-        $('#move_module_item_select').show();
-
-        $form.dialog({
-          autoOpen: false,
-          modal: true,
-          width: 600,
-          height: 400,
-          close: function () {
-            modules.hideMoveModule(true);
-            returnFocusTo.focus()
-          }
-        }).dialog('open');
-      },
-      showMoveModule: function ($module, returnFocusTo) {
-        var $form = $('#move_context_module_form');
-        $form.data('current_module', $module);
-        // Set the module name
-        $('#move_module_name').text($module.children('.header').children('.collapse_module_link').children('.name').text());
-
-        // Get current module ordering
-        var selectOptions = [];
-
-        $("#context_modules .context_module").each(function() {
-          if ($module.attr('id') === $(this).attr('id')) {
-            return;
-          }
-          var id = $(this).attr('id').substring('context_module_'.length);
-          var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
-          selectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
-        });
-
-        var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
-        $('#move_context_module_select').empty();
-        $('#move_context_module_select').append($.raw(selectOptions.join('')));
-        //$form.fillFormData(data, {object_name: 'context_module'});
-        $form.dialog({
-          autoOpen: false,
-          modal: true,
-          width: 600,
-          height: 300,
-          close: function () {
-            modules.hideMoveModule(true);
-            returnFocusTo.focus();
-          }
-        }).dialog('open');
-        $module.removeClass('dont_remove');
-        // $form.find('.ui-dialog-titlebar-close').focus();
-
-      },
-      hideMoveModuleItem: function (remove) {
-        $('#move_module_item_form:visible').dialog('close');
-      },
-      hideMoveModule: function (remove) {
-        $('#move_context_module_form:visible').dialog('close');
-      },
-      submitMoveModuleItem: function () {
-        var beforeOrAfterVal = $('[name="item_move_location"]:checked').val();
-        var $currentItem = $('#move_module_item_form').data('current_item');
-        var relativeToId = $('#move_module_item_select').val();
-        var selectedModuleId = $('#move_module_item_module_select').val();
-
-
-        if (beforeOrAfterVal === 'before') {
-          $('#context_module_item_' + relativeToId).before($currentItem);
-        }
-        if (beforeOrAfterVal === 'after') {
-          $('#context_module_item_' + relativeToId).after($currentItem);
-        }
-        if ($('#move_module_item_select').children().length === 0) {
-          // In this case, we are moving it into a currently empty module.
-          $('#context_module_content_' + selectedModuleId + ' .context_module_items').append($currentItem);
-        }
-
-        modules.hideMoveModuleItem();
-        modules.updateModuleItemPositions(null, {item: $currentItem});
-
-
-      },
-      submitMoveModule: function () {
-        var beforeOrAfterVal = $('[name="move_location"]:checked').val();
-        var $currentModule = $('#move_context_module_form').data('current_module');
-        var relativeToId = $('#move_context_module_select').val();
-
-        if (beforeOrAfterVal === 'before') {
-          $('#context_module_' + relativeToId).before($currentModule);
-        }
-        if (beforeOrAfterVal === 'after') {
-          $('#context_module_' + relativeToId).after($currentModule);
-        }
-        modules.hideMoveModule();
-        modules.updateModulePositions();
-
-      },
-
       editModule: function($module) {
         var $form = $("#add_context_module_form");
         $form.data('current_module', $module);
@@ -504,6 +389,9 @@ import 'compiled/jquery.rails_flash_notifications'
         }
         $item.addClass(data.type + '_' + data.id);
         $item.addClass(data.type);
+        if (data.is_duplicate_able) {
+          $item.addClass('dupeable')
+        }
         $item.attr('aria-label', data.title);
         $item.find('.title').attr('title', data.title);
         $item.fillTemplateData({
@@ -980,7 +868,6 @@ import 'compiled/jquery.rails_flash_notifications'
           }
           fixLink('span.collapse_module_link', 'href');
           fixLink('span.expand_module_link', 'href');
-          fixLink('.reorder_items_url', 'href');
           fixLink('.add_module_item_link', 'rel');
           fixLink('.add_module_item_link', 'rel');
           var publishData = {
@@ -1135,7 +1022,6 @@ import 'compiled/jquery.rails_flash_notifications'
       })
     });
 
-
     $(".delete_module_link").live('click', function(event) {
       event.preventDefault();
       $(this).parents(".context_module").confirmDelete({
@@ -1247,6 +1133,7 @@ import 'compiled/jquery.rails_flash_notifications'
         $(this).formErrors(data);
       }
     });
+
     $(".delete_item_link").live('click', function(event) {
       event.preventDefault();
       var $currentCogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
@@ -1278,60 +1165,79 @@ import 'compiled/jquery.rails_flash_notifications'
       });
     });
 
-    $('#move_module_item_module_select').on('change', function (event) {
-      // Remove all existing items
-      $('#move_module_item_select').empty();
-      var moduleId = $(event.currentTarget.selectedOptions).val();
-      // Get the current item id, so it can be skipped when adding options.
-      var selectedItemId = $(this).parents('#move_module_item_form').data('current_item').attr('id');
-      // Get all the items for the selected module.
-      var selectItemOptions = [];
-      $('#context_module_' + moduleId).children().find('.context_module_item').each(function (index, item) {
-        if ($(item).attr('id') === selectedItemId) {
-          return;
-        }
-        var id = $(item).attr('id').substring('context_module_item_'.length);
-        var name = $(item).children().find('span.title').text();
-        selectItemOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
-      });
-      $('#move_module_item_select').append($.raw(selectItemOptions.join('')));
-
-      // The case where the module has no items.
-      if ($('#move_module_item_select').children().length === 0) {
-        $('#move_module_item_form .move-module-before-after-container').hide();
-        $('#move_module_item_select').hide();
-      }
-    });
-
     $('.move_module_item_link').on('click keyclick', function (event) {
-      event.preventDefault();
-      var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
-      modules.showMoveModuleItem($(this).parents(".context_module_item"), $cogLink);
-    });
+      event.preventDefault()
 
-    $('#move_module_item_form').on('submit', function (event) {
-      event.preventDefault();
-      modules.submitMoveModuleItem();
+      const currentItem = $(this).parents('.context_module_item')[0]
+      const modules = document.querySelectorAll('#context_modules .context_module')
+      const groups = Array.prototype.map.call(modules, module => {
+        const id = module.getAttribute('id').substring('context_module_'.length)
+        const title = module.querySelector('.header > .collapse_module_link > .name').textContent
+        const moduleItems = module.querySelectorAll('.context_module_item')
+        const items = Array.prototype.map.call(moduleItems, item => ({
+          id: item.getAttribute('id').substring('context_module_item_'.length),
+          title: item.querySelector('.title').textContent.trim(),
+        }))
+        return { id, title, items }
+      })
+
+      const moveTrayProps = {
+        title: I18n.t('Move Module Item'),
+        item: {
+          id:  currentItem.getAttribute('id').substring('context_module_item_'.length),
+          title: currentItem.querySelector('.title').textContent.trim(),
+        },
+        moveOptions: {
+          groupsLabel: I18n.t('Modules'),
+          groups,
+        },
+        formatSaveUrl: ({ groupId }) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
+        onMoveSuccess: ({ data, itemId, groupId }) => {
+          const $container = $(`#context_module_${groupId} .ui-sortable`)
+          $container.sortable('disable')
+
+          const item = document.querySelector(`#context_module_item_${itemId}`)
+          $container[0].appendChild(item)
+
+          const order = data.context_module.content_tags.map(item => item.content_tag.id)
+          MoveItem.reorderElements(order, $container[0], id => `#context_module_item_${id}`)
+          $container.sortable('enable').sortable('refresh')
+        },
+        focusOnExit: () => currentItem.querySelector('.al-trigger'),
+      }
+
+      MoveItem.renderTray(moveTrayProps, document.getElementById('not_right_side'))
     })
 
     $('.move_module_link').on('click keyclick', function (event) {
-      event.preventDefault();
-      var $cogLink = $(this).closest('.ig-header-admin').children('.al-trigger');
-      modules.showMoveModule($(this).parents('.context_module'), $cogLink);
-    });
+      event.preventDefault()
 
-    $('#move_context_module_form').on('submit', function (event) {
-      event.preventDefault();
-      modules.submitMoveModule();
-    });
+      const currentModule = $(this).parents('.context_module')[0]
+      const modules = document.querySelectorAll('#context_modules .context_module')
+      const siblings = Array.prototype.map.call(modules, module => {
+        const id = module.getAttribute('id').substring('context_module_'.length)
+        const title = module.querySelector('.header > .collapse_module_link > .name').textContent
+        return { id, title }
+      })
 
-    $('#move_module_cancel_btn').on('click keyclick', function (event) {
-      modules.hideMoveModule();
-    });
+      const moveTrayProps = {
+        title: I18n.t('Move Module'),
+        item: {
+          id:  currentModule.getAttribute('id').substring('context_module_'.length),
+          title: currentModule.querySelector('.header > .collapse_module_link > .name').textContent,
+        },
+        moveOptions: { siblings },
+        formatSaveUrl: () => `${ENV.CONTEXT_URL_ROOT}/modules/reorder`,
+        onMoveSuccess: res => {
+          const container = document.querySelector('#context_modules.ui-sortable')
+          MoveItem.reorderElements(res.data.map(item => item.context_module.id), container, (id) => `#context_module_${id}`)
+          $(container).sortable('refresh')
+        },
+        focusOnExit: () => currentModule.querySelector('.al-trigger'),
+      }
 
-    $('#move_module_item_cancel_btn').on('click keyclick', function (event) {
-      modules.hideMoveModuleItem();
-    });
+      MoveItem.renderTray(moveTrayProps, document.getElementById('not_right_side'))
+    })
 
     $('.drag_and_drop_warning').on('focus', function (event) {
       $(event.currentTarget).removeClass('screenreader-only');
@@ -1400,7 +1306,35 @@ import 'compiled/jquery.rails_flash_notifications'
         };
         INST.selectContentDialog(options);
       }
-    });
+    })
+
+    $('.duplicate_item_link').on('click', function(event) {
+      event.preventDefault()
+
+      const $module = $(this).closest('.context_module')
+      const url = $(this).attr('href')
+
+      axios.post(url)
+        .then(({ data }) => {
+          const $item = modules.addItemToModule($module, data.content_tag)
+          initNewItemPublishButton($item, data.content_tag)
+          modules.updateAssignmentData()
+
+          $item.find('.lock-icon').data({moduleType: data.content_tag.type, contentId: data.content_tag.id})
+          modules.loadMasterCourseData(data.content_tag.id)
+
+          $module.find('.context_module_items.ui-sortable').sortable('disable')
+          data.new_positions.forEach(({ content_tag }) => {
+            $module.find(`#context_module_item_${content_tag.id}`).fillTemplateData({
+              data: {position: content_tag.position}
+            })
+          })
+
+          $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
+        })
+        .catch(showFlashError('Error duplicating item'))
+    })
+
     $("#add_module_prerequisite_dialog .cancel_button").click(function() {
       $("#add_module_prerequisite_dialog").dialog('close');
     });

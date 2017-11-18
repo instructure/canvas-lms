@@ -91,6 +91,10 @@
     width: 99.9%;
     height: 100%;
     page-break-inside: avoid;
+
+    .find_outcome_link {
+      margin-left: 10px;
+    }
   }
   thead th {
     background-color: $ic-color-medium-light;
@@ -364,4 +368,7 @@
 }
 .rating_form_label {
   font-size: 1rem;
+}
+.popover_menu_width {
+  max-width: 15em;
 }

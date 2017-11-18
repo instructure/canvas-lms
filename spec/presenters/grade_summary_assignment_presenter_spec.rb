@@ -44,13 +44,25 @@ describe GradeSummaryAssignmentPresenter do
   }
 
   describe '#is_plagiarism_attachment?' do
-    it 'returns true if the attachment has an OriginalityReport' do
+    it 'returns true if the submission has an OriginalityReport' do
       OriginalityReport.create(originality_score: 0.8,
                                attachment: @attachment,
                                submission: @submission,
                                workflow_state: 'pending')
 
       expect(presenter.is_plagiarism_attachment?(@attachment)).to be_truthy
+    end
+
+    it 'returns when submission was automatically created by group assignment submission' do
+      submission_two = @submission.dup
+      submission_two.update_attributes!(user: User.create!(name: 'second student'))
+      AttachmentAssociation.create!(context: @submission, attachment_id: @attachment)
+      AttachmentAssociation.create!(context: submission_two, attachment_id: @attachment)
+      OriginalityReport.create(originality_score: 0.8,
+                               attachment: @attachment,
+                               submission: @submission,
+                               workflow_state: 'pending')
+      expect(presenter.is_plagiarism_attachment?(submission_two.attachments.first)).to be_truthy
     end
   end
 

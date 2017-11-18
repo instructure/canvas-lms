@@ -33,6 +33,7 @@ define [
   'compiled/views/InputFilterView'
   'i18nObj'
   'i18n!gradezilla'
+  'jsx/shared/helpers/numberHelper'
   'compiled/gradezilla/GradebookTranslations'
   'jsx/gradebook/CourseGradeCalculator'
   'jsx/gradebook/EffectiveDueDates'
@@ -79,6 +80,7 @@ define [
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
   'jsx/gradezilla/shared/helpers/TextMeasure'
+  'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/grading/LatePolicyApplicator'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
@@ -98,7 +100,7 @@ define [
   'compiled/jquery/fixDialogButtons'
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, axios, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
-  GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
+  GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, numberHelper, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
@@ -107,7 +109,7 @@ define [
   GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, LatePolicyApplicator, { default: Button },
+  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, OutlierScoreHelper, LatePolicyApplicator, { default: Button },
   { default: IconSettingsSolid }, FlashAlert) ->
 
   isAdmin = =>
@@ -191,6 +193,7 @@ define [
         comments: []
         commentsLoaded: false
         commentsUpdating: false
+        editedCommentId: null
     }
 
   ## Gradebook Application State
@@ -205,8 +208,17 @@ define [
     }
 
   getInitialCourseContent = (options) ->
+    defaultGradingScheme = null
+    if options.default_grading_standard
+      defaultGradingScheme = {
+        title: I18n.t('Default Grading Scheme')
+        data: options.default_grading_standard
+      }
+
     {
       contextModules: []
+      defaultGradingScheme
+      gradingSchemes: options.grading_schemes.map(ConvertCase.camelize)
       gradingPeriodAssignments: {}
       assignmentStudentVisibility: {}
       latePolicy: ConvertCase.camelize(options.late_policy) if options.late_policy
@@ -1333,7 +1345,7 @@ define [
         gradebookIsEditable: @options.gradebook_is_editable
         contextAllowsGradebookUploads: @options.context_allows_gradebook_uploads
         gradebookImportUrl: @options.gradebook_import_url
-        currentUserId: ENV.current_user_id
+        currentUserId: @options.currentUserId
         gradebookExportUrl: @options.export_gradebook_csv_url
         postGradesLtis: @postGradesLtis
         postGradesFeature:
@@ -1732,9 +1744,14 @@ define [
 
     # The target cell will enter editing mode
     onBeforeEditCell: (event, obj) =>
-      { row, cell } = obj
-      $cell = @grid.getCellNode(row, cell)
-      return false if $($cell).hasClass("cannot_edit") || $($cell).find(".gradebook-cell").hasClass("cannot_edit")
+      return true if obj.column.type != 'assignment'
+      return false unless student = @student(obj.item.id)
+      return false if student.isConcluded
+      submissionState = @submissionStateMap.getSubmissionState({
+        user_id: obj.item.id,
+        assignment_id: obj.column.assignmentId
+      })
+      not submissionState?.locked
 
     # The current cell editor has been changed and is valid
     onCellChange: (event, obj) =>
@@ -2155,9 +2172,9 @@ define [
       @setSubmissionTrayState(true, studentId, assignment.assignmentId)
       @updateRowAndRenderSubmissionTray(studentId)
 
-    renderSubmissionTray: (student) =>
-      mountPoint = document.getElementById('StudentTray__Container')
-      { open, studentId, assignmentId, comments } = @getSubmissionTrayState()
+    getSubmissionTrayProps: (student) =>
+      { open, studentId, assignmentId, comments, editedCommentId } = @getSubmissionTrayState()
+      student ||= @student(studentId)
       # get the student's submission, or use a fake submission object in case the
       # submission has not yet loaded
       fakeSubmission = { assignment_id: assignmentId, late: false, missing: false, excused: false, seconds_late: 0 }
@@ -2178,45 +2195,57 @@ define [
       isFirstStudent = activeLocation.row == 0
       isLastStudent = activeLocation.row == (@listRows().length - 1)
 
-      props =
-        assignment: ConvertCase.camelize(assignment)
-        colors: @getGridColors()
-        courseId: @options.context_id
-        isFirstAssignment: isFirstAssignment
-        isLastAssignment: isLastAssignment
-        isFirstStudent: isFirstStudent
-        isLastStudent: isLastStudent
-        isOpen: open
-        key: "grade_details_tray"
-        latePolicy: @courseContent.latePolicy
-        locale: @options.locale
-        onClose: => @gridSupport.helper.focus()
-        onRequestClose: @closeSubmissionTray
-        selectNextAssignment: => @loadTrayAssignment('next')
-        selectPreviousAssignment: => @loadTrayAssignment('previous')
-        selectNextStudent: => @loadTrayStudent('next')
-        selectPreviousStudent: => @loadTrayStudent('previous')
-        showContentComingSoon: !@options.new_gradebook_development_enabled
-        speedGraderEnabled: @options.speed_grader_enabled
-        student:
-          id: student.id
-          name: htmlDecode(student.name)
-          avatarUrl: htmlDecode(student.avatar_url)
-          gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
-        submission: ConvertCase.camelize(submission)
-        submissionUpdating: @contentLoadStates.submissionUpdating
-        updateSubmission: @updateSubmissionAndRenderSubmissionTray
-        processing: @getCommentsUpdating()
-        setProcessing: @setCommentsUpdating
-        updateSubmissionComments: @updateSubmissionComments
-        createSubmissionComment: @createSubmissionComment
-        deleteSubmissionComment: @deleteSubmissionComment
-        submissionComments: @getSubmissionComments()
-        submissionCommentsLoaded: @getSubmissionCommentsLoaded()
+      submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
 
+      assignment: ConvertCase.camelize(assignment)
+      colors: @getGridColors()
+      comments: comments
+      courseId: @options.context_id
+      currentUserId: @options.currentUserId
+      gradingDisabled: !!submissionState?.locked || student.isConcluded
+      isFirstAssignment: isFirstAssignment
+      isInOtherGradingPeriod: !!submissionState?.inOtherGradingPeriod
+      isInClosedGradingPeriod: !!submissionState?.inClosedGradingPeriod
+      isInNoGradingPeriod: !!submissionState?.inNoGradingPeriod
+      isLastAssignment: isLastAssignment
+      isFirstStudent: isFirstStudent
+      isLastStudent: isLastStudent
+      isOpen: open
+      key: "grade_details_tray"
+      latePolicy: @courseContent.latePolicy
+      locale: @options.locale
+      onClose: => @gridSupport.helper.focus()
+      onGradeSubmission: @gradeSubmission
+      onRequestClose: @closeSubmissionTray
+      selectNextAssignment: => @loadTrayAssignment('next')
+      selectPreviousAssignment: => @loadTrayAssignment('previous')
+      selectNextStudent: => @loadTrayStudent('next')
+      selectPreviousStudent: => @loadTrayStudent('previous')
+      speedGraderEnabled: @options.speed_grader_enabled
+      student:
+        id: student.id
+        name: htmlDecode(student.name)
+        avatarUrl: htmlDecode(student.avatar_url)
+        gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
+      submission: ConvertCase.camelize(submission)
+      submissionUpdating: @contentLoadStates.submissionUpdating
+      updateSubmission: @updateSubmissionAndRenderSubmissionTray
+      processing: @getCommentsUpdating()
+      setProcessing: @setCommentsUpdating
+      createSubmissionComment: @apiCreateSubmissionComment
+      updateSubmissionComment: @apiUpdateSubmissionComment
+      deleteSubmissionComment: @apiDeleteSubmissionComment
+      editSubmissionComment: @editSubmissionComment
+      submissionComments: @getSubmissionComments()
+      submissionCommentsLoaded: @getSubmissionCommentsLoaded()
+      editedCommentId: editedCommentId
+
+    renderSubmissionTray: (student) =>
+      { open, studentId, assignmentId } = @getSubmissionTrayState()
+      mountPoint = document.getElementById('StudentTray__Container')
+      props = @getSubmissionTrayProps(student)
       @loadSubmissionComments(assignmentId, studentId) if !@getSubmissionCommentsLoaded() and open
-
-      renderComponent(SubmissionTray, mountPoint, Object.assign(props, { comments: comments }))
+      renderComponent(SubmissionTray, mountPoint, props)
 
     loadSubmissionComments: (assignmentId, studentId) =>
       SubmissionCommentApi.getSubmissionComments(@options.context_id, assignmentId, studentId)
@@ -2266,15 +2295,15 @@ define [
 
     updateSubmissionComments: (comments) =>
       @setSubmissionComments(comments)
+      @setEditedCommentId(null)
       @setCommentsUpdating(false)
-      { studentId } = @getSubmissionTrayState()
-      @renderSubmissionTray(@student(studentId))
+      @renderSubmissionTray()
 
     unloadSubmissionComments: =>
       @setSubmissionComments([])
       @setSubmissionCommentsLoaded(false)
 
-    createSubmissionComment: (comment) =>
+    apiCreateSubmissionComment: (comment) =>
       { assignmentId, studentId } = @getSubmissionTrayState()
       SubmissionCommentApi.createSubmissionComment(@options.context_id, assignmentId, studentId, comment)
         .then(@updateSubmissionComments)
@@ -2282,18 +2311,39 @@ define [
         .catch(=> @setCommentsUpdating(false))
         .catch(FlashAlert.showFlashError I18n.t 'There was a problem posting the comment')
 
-    deleteSubmissionComment: (commentId) =>
+    apiUpdateSubmissionComment: (updatedComment, commentId) =>
+      SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
+        .then((response) =>
+          { id, comment, editedAt } = response.data
+          comments = @getSubmissionComments().map((submissionComment) =>
+            if submissionComment.id == id
+              Object.assign({}, submissionComment, { comment, editedAt })
+            else
+              submissionComment
+          )
+          @updateSubmissionComments(comments)
+          FlashAlert.showFlashSuccess(I18n.t('Successfully updated the comment'))()
+        ).catch(FlashAlert.showFlashError(I18n.t('There was a problem updating the comment')))
+
+    apiDeleteSubmissionComment: (commentId) =>
       SubmissionCommentApi.deleteSubmissionComment(commentId)
-        .then(=> @removeSubmissionComment commentId)
+        .then(@removeSubmissionComment commentId)
         .then(FlashAlert.showFlashSuccess I18n.t 'Successfully deleted the comment')
         .catch(FlashAlert.showFlashError I18n.t 'There was a problem deleting the comment')
 
-    getSubmissionComments: () =>
+    editSubmissionComment: (commentId) =>
+      @setEditedCommentId(commentId)
+      @renderSubmissionTray()
+
+    setEditedCommentId: (id) =>
+      @gridDisplaySettings.submissionTray.editedCommentId = id
+
+    getSubmissionComments: =>
       @gridDisplaySettings.submissionTray.comments
 
     removeSubmissionComment: (commentId) =>
       comments = _.reject(@getSubmissionComments(), (c) => c.id == commentId)
-      @updateSubmissionComments(comments, { deserialize: false })
+      @updateSubmissionComments(comments)
 
     setSubmissionCommentsLoaded: (loaded) =>
       @gridDisplaySettings.submissionTray.commentsLoaded = loaded
@@ -2486,7 +2536,20 @@ define [
       @setEnterGradesAsSetting(assignmentId, value)
       @saveSettings({}, =>
         @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
+        @grid.invalidate()
       )
+
+    ## Course Settings Access Methods
+
+    getDefaultGradingScheme: ->
+      @courseContent.defaultGradingScheme
+
+    getGradingScheme: (gradingSchemeId) ->
+      @courseContent.gradingSchemes.find((scheme) => scheme.id == gradingSchemeId)
+
+    getAssignmentGradingScheme: (assignmentId) ->
+      assignment = @getAssignment(assignmentId)
+      @getGradingScheme(assignment.grading_standard_id) || @getDefaultGradingScheme()
 
     ## Gradebook Content Access Methods
 
@@ -2661,6 +2724,18 @@ define [
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
 
+    gradeSubmission: (submission) =>
+      if submission.excused
+        submissionData = { excuse: true }
+      else
+        submissionData = { posted_grade: GradeFormatHelper.delocalizeGrade(submission.enteredGrade) }
+      @updateSubmissionAndRenderSubmissionTray(submissionData)
+        .then((response) =>
+          assignment = @getAssignment(submission.assignmentId)
+          outlierScoreHelper = new OutlierScoreHelper(response.data.score, assignment.points_possible)
+          $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
+        )
+
     updateSubmissionAndRenderSubmissionTray: (data) =>
       { studentId, assignmentId } = @getSubmissionTrayState()
       student = @student(studentId)
@@ -2671,8 +2746,10 @@ define [
           @setSubmissionUpdating(false)
           @updateSubmissionsFromExternal(response.data.all_submissions)
           @renderSubmissionTray(student)
-        ).catch(=>
+          response
+        ).catch((response) =>
           @setSubmissionUpdating(false)
           $.flashError I18n.t('There was a problem updating the submission.')
           @renderSubmissionTray(student)
+          Promise.reject(response)
         )

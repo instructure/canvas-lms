@@ -182,7 +182,7 @@ module CanvasCassandra
     end
 
     def tables
-      if @db.connection.describe_version >= '20.1.0'
+      if @db.connection.describe_version >= '20.1.0' && @db.execute("SELECT cql_version FROM system.local").first['cql_version'] >= '3.4.4'
         @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row|
           row['table_name']
         end

@@ -106,6 +106,20 @@ describe AccountNotification do
       expect(unenrolled_notifications).not_to include(sub_account_announcement)
     end
 
+    it "should find announcements from parent accounts to sub-accounts where user is enrolled" do
+      params = {
+        subject: 'sub account notification',
+        account: @sub_account,
+        role_ids: [Role.get_built_in_role("StudentEnrollment").id]
+      }
+      sub_account_announcement = sub_account_notification(params)
+
+      sub_sub_account = @sub_account.sub_accounts.create!
+      course_with_student(account: sub_sub_account, active_all: true)
+      students_notifications = AccountNotification.for_user_and_account(@student, Account.default)
+      expect(students_notifications).to include(sub_account_announcement)
+    end
+
     it "should find announcements where user is an account admin" do
       params = {
         subject: 'sub account notification',

@@ -143,6 +143,7 @@ class StatusesModal extends React.Component {
         onDismiss={close}
         onExited={onClose}
         contentRef={bindContentRef}
+        shouldCloseOnOverlayClick={false}
       >
         <ModalHeader>
           <Heading level="h3">{I18n.t('Statuses')}</Heading>

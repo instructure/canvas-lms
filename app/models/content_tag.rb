@@ -161,6 +161,10 @@ class ContentTag < ActiveRecord::Base
     return content && !content.assignment_id.nil?
   end
 
+  def duplicate_able?
+    ['assignment', 'discussion_topic', 'wiki_page'].include? self.content_type_class
+  end
+
   def content_type_class
     if self.content_type == 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'

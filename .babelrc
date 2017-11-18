@@ -1,10 +1,33 @@
 {
-  "presets": ["es2015", "react", "stage-1"],
-  "plugins": ["add-module-exports"],
+  "presets": [
+    [
+      "env",
+      {
+        "targets": [
+          "last 2 chrome versions",
+          "last 2 firefox versions",
+          "last 2 edge versions",
+          "last 2 ios versions",
+          "last 2 opera versions",
+          "last 2 safari versions",
+          "last 2 ChromeAndroid versions",
+          "ie >= 11"
+        ]
+      }
+    ],
+    "react",
+    "stage-1"
+  ],
+  "plugins": [
+    "add-module-exports",
+    ["transform-runtime", {
+      "polyfill": false
+    }]
+  ],
   "env": {
     "production": {
       "plugins": [
-        "transform-react-remove-prop-types",
+        "transform-react-remove-prop-types"
       ]
     }
   }

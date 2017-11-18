@@ -160,11 +160,11 @@ describe "Accounts API", type: :request do
       a1 = root.sub_accounts.create! :name => "Account 1"
       a2 = root.sub_accounts.create! :name => "Account 2"
       a1.sub_accounts.create! :name => "Account 1.1"
-      a1_2 = a1.sub_accounts.create! :name => "Account 1.2"
+      @a1_2 = a1.sub_accounts.create! :name => "Account 1.2"
       a1.sub_accounts.create! :name => "Account 1.2.1"
-      3.times.each { |i|
+      3.times.each do |i|
         a2.sub_accounts.create! :name => "Account 2.#{i+1}"
-      }
+      end
     end
 
     it "should return child accounts" do
@@ -196,6 +196,16 @@ describe "Accounts API", type: :request do
       expect(sub.default_group_storage_quota_mb).to eq 147
     end
 
+    it 'should destroy a sub_account' do
+      json = api_call(:delete,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts/#{@a1_2.id}",
+                      {controller: 'sub_accounts', action: 'destroy',
+                       account_id: @a1.to_param, format: 'json', id: @a1_2.to_param})
+      expect(json['id']).to eq @a1_2.id
+      expect(json['workflow_state']).to eq 'deleted'
+      expect(@a1_2.reload.workflow_state).to eq 'deleted'
+    end
+
     describe "recursive" do
 
       it "returns sub accounts recursively" do
@@ -213,7 +223,7 @@ describe "Accounts API", type: :request do
         @a1.sub_accounts.create!(:name => "Deleted Account").destroy
         parent_account = @a1.sub_accounts.create!(:name => "Deleted Parent Account")
         parent_account.sub_accounts.create!(:name => "Child Account")
-        parent_account.destroy
+        Account.where(id: parent_account).update_all(workflow_state: 'deleted')
 
         json = api_call(:get,
                         "/api/v1/accounts/#{@a1.id}/sub_accounts?recursive=1",

@@ -18,7 +18,7 @@
 
 import axios from 'axios';
 
-function getGradeHistory (courseId, input) {
+function getGradebookHistory (courseId, input) {
   let url = `/api/v1/audit/grade_change/courses/${courseId}`;
   url += input.assignment ? `/assignments/${input.assignment}` : '';
   url += input.grader ? `/graders/${input.grader}` : '';
@@ -40,6 +40,6 @@ function getNextPage (url) {
 }
 
 export default {
-  getGradeHistory,
+  getGradebookHistory,
   getNextPage
 };

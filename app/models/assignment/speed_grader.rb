@@ -209,6 +209,9 @@ class Assignment
             version.as_json(only: submission_fields,
                             methods: %i[versioned_attachments late missing external_tool_url]).tap do |version_json|
               version_json['submission']['has_originality_report'] = version.versioned_originality_reports.present?
+              if version_json['submission'][:submission_type] == 'discussion_topic'
+                url_opts[:enable_annotations] = false
+              end
               if version_json['submission'] && version_json['submission']['versioned_attachments']
                 version_json['submission']['versioned_attachments'].map! do |a|
                   if @grading_role == :moderator

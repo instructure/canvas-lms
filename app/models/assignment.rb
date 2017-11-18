@@ -37,9 +37,7 @@ class Assignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
 
-  POINTED_GRADING_TYPES = %w(percent letter_grade gpa_scale points).freeze
-  NON_POINTED_GRADING_TYPES = %w(pass_fail not_graded).freeze
-  ALLOWED_GRADING_TYPES = (POINTED_GRADING_TYPES + NON_POINTED_GRADING_TYPES).freeze
+  ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
 
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze

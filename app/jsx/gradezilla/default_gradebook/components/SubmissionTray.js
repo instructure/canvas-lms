@@ -29,11 +29,12 @@ import Tray from 'instructure-ui/lib/components/Tray';
 import Typography from 'instructure-ui/lib/components/Typography';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
 import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
-import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
+import GradeInput from 'jsx/gradezilla/default_gradebook/components/GradeInput';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
 import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem';
-import SubmissionCommentForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentForm';
+import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
+import SubmissionStatus from 'jsx/gradezilla/default_gradebook/components/SubmissionStatus';
 import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 
 function renderAvatar (name, avatarUrl) {
@@ -55,15 +56,6 @@ function renderSpeedGraderLink (speedGraderUrl) {
   );
 }
 
-function renderComingSoon (speedGraderEnabled, speedGraderUrl) {
-  return (
-    <div>
-      { speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
-      <ComingSoonContent />
-    </div>
-  );
-}
-
 function renderTraySubHeading (headingText) {
   return (
     <Heading level="h4" as="h2" margin="auto auto small">
@@ -74,223 +66,257 @@ function renderTraySubHeading (headingText) {
   );
 }
 
-function renderSubmissionCommentList (args) {
-  return args.submissionComments.map(comment =>
-    <SubmissionCommentListItem
-      author={comment.author}
-      authorUrl={comment.authorUrl}
-      authorAvatarUrl={comment.authorAvatarUrl}
-      comment={comment.comment}
-      createdAt={comment.createdAt}
-      id={comment.id}
-      key={comment.id}
-      last={args.submissionComments[args.submissionComments.length - 1].id === comment.id}
-      deleteSubmissionComment={args.deleteSubmissionComment}
-    />
-  );
-}
+export default class SubmissionTray extends React.Component {
+  static defaultProps = {
+    contentRef: undefined,
+    gradingDisabled: false,
+    latePolicy: { lateSubmissionInterval: 'day' },
+    submission: { drop: false }
+  };
 
-function renderSubmissionComments (args) {
-  const {
-    submissionComments,
-    submissionCommentsLoaded,
-    deleteSubmissionComment,
-    createSubmissionComment,
-    updateSubmissionComments,
-    processing,
-    setProcessing
-  } = args;
+  static propTypes = {
+    assignment: shape({
+      name: string.isRequired,
+      htmlUrl: string.isRequired,
+      muted: bool.isRequired,
+      published: bool.isRequired
+    }).isRequired,
+    contentRef: func,
+    currentUserId: string.isRequired,
+    editedCommentId: string,
+    editSubmissionComment: func.isRequired,
+    gradingDisabled: bool,
+    isOpen: bool.isRequired,
+    colors: shape({
+      late: string.isRequired,
+      missing: string.isRequired,
+      excused: string.isRequired
+    }).isRequired,
+    onClose: func.isRequired,
+    onGradeSubmission: func.isRequired,
+    onRequestClose: func.isRequired,
+    student: shape({
+      id: string.isRequired,
+      name: string.isRequired,
+      avatarUrl: string,
+      gradesUrl: string.isRequired
+    }).isRequired,
+    submission: shape({
+      drop: bool,
+      excused: bool.isRequired,
+      grade: string,
+      late: bool.isRequired,
+      missing: bool.isRequired,
+      pointsDeducted: number,
+      secondsLate: number.isRequired,
+      assignmentId: string.isRequired
+    }),
+    isFirstAssignment: bool.isRequired,
+    isLastAssignment: bool.isRequired,
+    selectNextAssignment: func.isRequired,
+    selectPreviousAssignment: func.isRequired,
+    isFirstStudent: bool.isRequired,
+    isLastStudent: bool.isRequired,
+    selectNextStudent: func.isRequired,
+    selectPreviousStudent: func.isRequired,
+    courseId: string.isRequired,
+    speedGraderEnabled: bool.isRequired,
+    submissionUpdating: bool.isRequired,
+    updateSubmission: func.isRequired,
+    updateSubmissionComment: func.isRequired,
+    locale: string.isRequired,
+    latePolicy: shape({
+      lateSubmissionInterval: string
+    }).isRequired,
+    submissionComments: arrayOf(shape(CommentPropTypes).isRequired).isRequired,
+    submissionCommentsLoaded: bool.isRequired,
+    createSubmissionComment: func.isRequired,
+    deleteSubmissionComment: func.isRequired,
+    processing: bool.isRequired,
+    setProcessing: func.isRequired,
+    isInOtherGradingPeriod: bool.isRequired,
+    isInClosedGradingPeriod: bool.isRequired,
+    isInNoGradingPeriod: bool.isRequired
+  };
 
-  if(submissionCommentsLoaded) {
+  cancelCommenting = () => {
+    this.props.editSubmissionComment(null);
+  };
+
+  renderSubmissionCommentList () {
+    return this.props.submissionComments.map(comment => (
+      <SubmissionCommentListItem
+        author={comment.author}
+        cancelCommenting={this.cancelCommenting}
+        currentUserIsAuthor={this.props.currentUserId === comment.authorId}
+        authorUrl={comment.authorUrl}
+        authorAvatarUrl={comment.authorAvatarUrl}
+        comment={comment.comment}
+        createdAt={comment.createdAt}
+        editedAt={comment.editedAt}
+        editing={!!this.props.editedCommentId && this.props.editedCommentId === comment.id}
+        id={comment.id}
+        key={comment.id}
+        last={this.props.submissionComments[this.props.submissionComments.length - 1].id === comment.id}
+        deleteSubmissionComment={this.props.deleteSubmissionComment}
+        editSubmissionComment={this.props.editSubmissionComment}
+        updateSubmissionComment={this.props.updateSubmissionComment}
+        processing={this.props.processing}
+        setProcessing={this.props.setProcessing}
+      />
+    ));
+  }
+
+  renderSubmissionComments () {
+    if (this.props.submissionCommentsLoaded) {
+      return (
+        <div>
+          {renderTraySubHeading('Comments')}
+
+          {this.renderSubmissionCommentList()}
+
+          {
+            !this.props.editedCommentId &&
+              <SubmissionCommentCreateForm
+                cancelCommenting={this.cancelCommenting}
+                createSubmissionComment={this.props.createSubmissionComment}
+                processing={this.props.processing}
+                setProcessing={this.props.setProcessing}
+              />
+          }
+        </div>
+      );
+    }
+
     return (
-      <div>
-        {renderTraySubHeading('Comments')}
-
-        {renderSubmissionCommentList({ submissionComments, submissionCommentsLoaded, deleteSubmissionComment })}
-
-        <SubmissionCommentForm
-          createSubmissionComment={createSubmissionComment}
-          updateSubmissionComments={updateSubmissionComments}
-          processing={processing}
-          setProcessing={setProcessing}
-        />
+      <div style={{ textAlign: 'center' }}>
+        <Spinner title={I18n.t('Loading comments')} size="large" />
       </div>
     );
   }
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <Spinner title={I18n.t('Loading comments')} size="large" />
-    </div>
-  );
-}
 
-export default function SubmissionTray (props) {
-  const { name, avatarUrl } = props.student;
+  render () {
+    const { name, avatarUrl } = this.props.student;
+    const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`;
+    const studentParam = `#%7B%22student_id%22%3A${this.props.student.id}%7D`;
+    const speedGraderUrl = `/courses/${this.props.courseId}/gradebook/speed_grader?${assignmentParam}${studentParam}`;
+    const submissionCommentsProps = {
+      submissionComments: this.props.submissionComments,
+      submissionCommentsLoaded: this.props.submissionCommentsLoaded,
+      deleteSubmissionComment: this.props.deleteSubmissionComment,
+      createSubmissionComment: this.props.createSubmissionComment,
+      processing: this.props.processing,
+      setProcessing: this.props.setProcessing,
+    };
+    const trayIsBusy = this.props.processing || this.props.submissionUpdating || !this.props.submissionCommentsLoaded;
 
-  const assignmentParam = `assignment_id=${props.submission.assignmentId}`;
-  const studentParam = `#%7B%22student_id%22%3A${props.student.id}%7D`;
-  const speedGraderUrl = `/courses/${props.courseId}/gradebook/speed_grader?${assignmentParam}${studentParam}`;
+    let carouselContainerStyleOverride = '0 0 0 0';
 
-  const submissionCommentsProps = {
-    submissionComments: props.submissionComments,
-    submissionCommentsLoaded: props.submissionCommentsLoaded,
-    deleteSubmissionComment: props.deleteSubmissionComment,
-    createSubmissionComment: props.createSubmissionComment,
-    updateSubmissionComments: props.updateSubmissionComments,
-    processing: props.processing,
-    setProcessing: props.setProcessing
-  };
-  let carouselContainerStyleOverride = '0 0 0 0';
+    if (!avatarUrl) {
+      // When we don't have an avatar, let's ensure there's enough space between the tray close button and the student
+      // carousel's previous student arrow
+      carouselContainerStyleOverride = 'small 0 0 0';
+    }
 
-  if (!avatarUrl) {
-    // When we don't have an avatar, let's ensure there's enough space between the tray close button and the student
-    // carousel's previous student arrow
-    carouselContainerStyleOverride = 'small 0 0 0';
-  }
+    return (
+      <Tray
+        contentRef={this.props.contentRef}
+        label={I18n.t('Submission tray')}
+        closeButtonLabel={I18n.t('Close submission tray')}
+        applicationElement={() => document.getElementById('application')}
+        open={this.props.isOpen}
+        shouldContainFocus
+        placement="end"
+        onDismiss={this.props.onRequestClose}
+        onClose={this.props.onClose}
+      >
+        <div className="SubmissionTray__Container">
+          <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
+            <Container as="div" padding={carouselContainerStyleOverride}>
+              {avatarUrl && renderAvatar(name, avatarUrl)}
 
-  return (
-    <Tray
-      contentRef={props.contentRef}
-      label={I18n.t('Submission tray')}
-      closeButtonLabel={I18n.t('Close submission tray')}
-      applicationElement={() => document.getElementById('application')}
-      open={props.isOpen}
-      shouldContainFocus
-      placement="end"
-      onDismiss={props.onRequestClose}
-      onClose={props.onClose}
-    >
-      <div className="SubmissionTray__Container">
-        { props.showContentComingSoon ?
-            renderComingSoon(props.speedGraderEnabled, speedGraderUrl) :
-            <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
-              <Container as="div" padding={carouselContainerStyleOverride}>
-                {avatarUrl && renderAvatar(name, avatarUrl)}
+              <Carousel
+                id="student-carousel"
+                disabled={trayIsBusy}
+                displayLeftArrow={!this.props.isFirstStudent}
+                displayRightArrow={!this.props.isLastStudent}
+                leftArrowDescription={I18n.t('Previous student')}
+                onLeftArrowClick={this.props.selectPreviousStudent}
+                onRightArrowClick={this.props.selectNextStudent}
+                rightArrowDescription={I18n.t('Next student')}
+              >
+                <Link href={this.props.student.gradesUrl}>
+                  {name}
+                </Link>
+              </Carousel>
 
-                <Carousel
-                  id="student-carousel"
-                  disabled={props.processing || !props.submissionCommentsLoaded}
-                  displayLeftArrow={!props.isFirstStudent}
-                  displayRightArrow={!props.isLastStudent}
-                  leftArrowDescription={I18n.t('Previous student')}
-                  onLeftArrowClick={props.selectPreviousStudent}
-                  onRightArrowClick={props.selectNextStudent}
-                  rightArrowDescription={I18n.t('Next student')}
-                >
-                  <Link href={props.student.gradesUrl}>
-                    {name}
-                  </Link>
-                </Carousel>
+              <Container as="div" margin="small 0" className="hr" />
 
-                <Container as="div" margin="small 0" className="hr" />
+              <Carousel
+                id="assignment-carousel"
+                disabled={trayIsBusy}
+                displayLeftArrow={!this.props.isFirstAssignment}
+                displayRightArrow={!this.props.isLastAssignment}
+                leftArrowDescription={I18n.t('Previous assignment')}
+                onLeftArrowClick={this.props.selectPreviousAssignment}
+                onRightArrowClick={this.props.selectNextAssignment}
+                rightArrowDescription={I18n.t('Next assignment')}
+              >
+                <Link href={this.props.assignment.htmlUrl}>
+                  {this.props.assignment.name}
+                </Link>
+              </Carousel>
 
-                <Carousel
-                  id="assignment-carousel"
-                  disabled={props.processing || !props.submissionCommentsLoaded}
-                  displayLeftArrow={!props.isFirstAssignment}
-                  displayRightArrow={!props.isLastAssignment}
-                  leftArrowDescription={I18n.t('Previous assignment')}
-                  onLeftArrowClick={props.selectPreviousAssignment}
-                  onRightArrowClick={props.selectNextAssignment}
-                  rightArrowDescription={I18n.t('Next assignment')}
-                >
-                  <Link href={props.assignment.htmlUrl}>
-                    {props.assignment.name}
-                  </Link>
-                </Carousel>
+              { this.props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
 
-                { props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
+              <Container as="div" margin="small 0" className="hr" />
+            </Container>
 
-                <Container as="div" margin="small 0" className="hr" />
-              </Container>
+            <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+              <SubmissionStatus
+                assignment={this.props.assignment}
+                submission={this.props.submission}
+                isInOtherGradingPeriod={this.props.isInOtherGradingPeriod}
+                isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
+                isInNoGradingPeriod={this.props.isInNoGradingPeriod}
+              />
 
-              <Container as="div" style={{ overflowY: 'auto', flex: '1 1 auto' }}>
-                {!!props.submission.pointsDeducted &&
-                  <div>
-                    <LatePolicyGrade submission={props.submission} />
+              <GradeInput
+                assignment={this.props.assignment}
+                disabled={this.props.gradingDisabled}
+                onSubmissionUpdate={this.props.onGradeSubmission}
+                submission={this.props.submission}
+                submissionUpdating={this.props.submissionUpdating}
+              />
 
-                    <Container as="div" margin="small 0" className="hr" />
-                  </div>
-                }
-
-                <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
-                  <SubmissionTrayRadioInputGroup
-                    colors={props.colors}
-                    locale={props.locale}
-                    latePolicy={props.latePolicy}
-                    submission={props.submission}
-                    submissionUpdating={props.submissionUpdating}
-                    updateSubmission={props.updateSubmission}
-                  />
+              {!!this.props.submission.pointsDeducted &&
+                <Container as="div" margin="small 0 0 0">
+                  <LatePolicyGrade submission={this.props.submission} />
                 </Container>
+              }
 
-                <div id="SubmissionTray__Comments">
-                  {renderSubmissionComments(submissionCommentsProps)}
-                </div>
+              <Container as="div" margin="small 0" className="hr" />
+
+              <Container as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
+                <SubmissionTrayRadioInputGroup
+                  colors={this.props.colors}
+                  locale={this.props.locale}
+                  latePolicy={this.props.latePolicy}
+                  submission={this.props.submission}
+                  submissionUpdating={this.props.submissionUpdating}
+                  updateSubmission={this.props.updateSubmission}
+                />
               </Container>
-            </div>
-        }
-      </div>
-    </Tray>
-  );
+
+              <Container as="div" margin="small 0" className="hr" />
+
+              <Container as="div" id="SubmissionTray__Comments" padding="xx-small">
+                {this.renderSubmissionComments(submissionCommentsProps)}
+              </Container>
+            </Container>
+          </div>
+        </div>
+      </Tray>
+    );
+  }
 }
-
-SubmissionTray.defaultProps = {
-  contentRef: undefined,
-  latePolicy: { lateSubmissionInterval: 'day' }
-};
-
-SubmissionTray.propTypes = {
-  assignment: shape({
-    name: string.isRequired,
-    htmlUrl: string.isRequired
-  }).isRequired,
-  contentRef: func,
-  isOpen: bool.isRequired,
-  colors: shape({
-    late: string.isRequired,
-    missing: string.isRequired,
-    excused: string.isRequired
-  }).isRequired,
-  onClose: func.isRequired,
-  onRequestClose: func.isRequired,
-  showContentComingSoon: bool.isRequired,
-  student: shape({
-    id: string.isRequired,
-    name: string.isRequired,
-    avatarUrl: string,
-    gradesUrl: string.isRequired
-  }).isRequired,
-  submission: shape({
-    excused: bool.isRequired,
-    grade: string,
-    late: bool.isRequired,
-    missing: bool.isRequired,
-    pointsDeducted: number,
-    secondsLate: number.isRequired,
-    assignmentId: string.isRequired
-  }),
-  isFirstAssignment: bool.isRequired,
-  isLastAssignment: bool.isRequired,
-  selectNextAssignment: func.isRequired,
-  selectPreviousAssignment: func.isRequired,
-  isFirstStudent: bool.isRequired,
-  isLastStudent: bool.isRequired,
-  selectNextStudent: func.isRequired,
-  selectPreviousStudent: func.isRequired,
-  courseId: string.isRequired,
-  speedGraderEnabled: bool.isRequired,
-  submissionUpdating: bool.isRequired,
-  updateSubmission: func.isRequired,
-  locale: string.isRequired,
-  latePolicy: shape({
-    lateSubmissionInterval: string
-  }).isRequired,
-  submissionComments: arrayOf(shape(CommentPropTypes).isRequired).isRequired,
-  submissionCommentsLoaded: bool.isRequired,
-  createSubmissionComment: func.isRequired,
-  deleteSubmissionComment: func.isRequired,
-  updateSubmissionComments: func.isRequired,
-  processing: bool.isRequired,
-  setProcessing: func.isRequired
-};

@@ -367,50 +367,89 @@ describe Canvas::LiveEvents do
     end
   end
 
-  describe ".submission_created" do
-    it "should include the user_id and assignment_id" do
+  context 'submissions' do
+    let(:submission) do
       course_with_student_submissions
-      submission = @course.assignments.first.submissions.first
-
-      expect_event('submission_created',
-        hash_including(
-          user_id: @student.global_id.to_s,
-          lti_user_id: @student.lti_context_id,
-          assignment_id: submission.global_assignment_id.to_s,
-          lti_assignment_id: submission.assignment.lti_context_id.to_s
-        ))
-      Canvas::LiveEvents.submission_created(submission)
+      @course.assignments.first.submissions.first
     end
-  end
 
-  describe ".submission_updated" do
-    it "should include the user_id and assignment_id" do
-      course_with_student_submissions
-      submission = @course.assignments.first.submissions.first
-
-      expect_event('submission_updated',
-        hash_including(
-          user_id: @student.global_id.to_s,
-          lti_user_id: @student.lti_context_id,
-          assignment_id: submission.global_assignment_id.to_s,
-          lti_assignment_id: submission.assignment.lti_context_id.to_s
-        ))
-      Canvas::LiveEvents.submission_updated(submission)
+    let(:group) do
+      Group.create!(
+        name: 'test group',
+        workflow_state: 'available',
+        context: submission.assignment.course
+      )
     end
-  end
 
-  describe '.plagiarism_resubmit' do
-    it "should include the user_id and assignment_id" do
-      course_with_student_submissions
-      submission = @course.assignments.first.submissions.first
-      expect_event('plagiarism_resubmit',
-        hash_including(
-          user_id: @student.global_id.to_s,
-          lti_user_id: @student.lti_context_id,
-          assignment_id: submission.global_assignment_id.to_s,
-          lti_assignment_id: submission.assignment.lti_context_id.to_s
-        ))
-      Canvas::LiveEvents.plagiarism_resubmit(submission)
+    before { submission }
+
+    describe ".submission_created" do
+      it "should include the user_id and assignment_id" do
+        expect_event('submission_created',
+          hash_including(
+            user_id: @student.global_id.to_s,
+            lti_user_id: @student.lti_context_id,
+            assignment_id: submission.global_assignment_id.to_s,
+            lti_assignment_id: submission.assignment.lti_context_id.to_s
+          ))
+        Canvas::LiveEvents.submission_created(submission)
+      end
+
+      it 'should include the group_id if assignment is a group assignment' do
+        submission.update_attributes(group: group)
+
+        expect_event('submission_created',
+          hash_including(
+            group_id: group.id.to_s
+          ))
+        Canvas::LiveEvents.submission_created(submission)
+      end
+    end
+
+    describe ".submission_updated" do
+      it "should include the user_id and assignment_id" do
+        expect_event('submission_updated',
+          hash_including(
+            user_id: @student.global_id.to_s,
+            lti_user_id: @student.lti_context_id,
+            assignment_id: submission.global_assignment_id.to_s,
+            lti_assignment_id: submission.assignment.lti_context_id.to_s
+          ))
+        Canvas::LiveEvents.submission_updated(submission)
+      end
+
+      it 'should include the group_id if assignment is a group assignment' do
+        submission.update_attributes(group: group)
+
+        expect_event('submission_updated',
+          hash_including(
+            group_id: group.id.to_s
+          ))
+        Canvas::LiveEvents.submission_updated(submission)
+      end
+    end
+
+    describe '.plagiarism_resubmit' do
+      it "should include the user_id and assignment_id" do
+        expect_event('plagiarism_resubmit',
+          hash_including(
+            user_id: @student.global_id.to_s,
+            lti_user_id: @student.lti_context_id,
+            assignment_id: submission.global_assignment_id.to_s,
+            lti_assignment_id: submission.assignment.lti_context_id.to_s
+          ))
+        Canvas::LiveEvents.plagiarism_resubmit(submission)
+      end
+
+      it 'should include the group_id if assignment is a group assignment' do
+        submission.update_attributes(group: group)
+
+        expect_event('plagiarism_resubmit',
+          hash_including(
+            group_id: group.id.to_s
+          ))
+        Canvas::LiveEvents.plagiarism_resubmit(submission)
+      end
     end
   end
 

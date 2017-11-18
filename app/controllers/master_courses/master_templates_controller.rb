@@ -625,9 +625,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   end
 
   def get_exceptions_by_subscription(subscriptions)
-    results = @mm.import_results.present? ?
-      @mm.import_results.values.index_by{|h| h[:subscription_id]} :
-      Hash[@mm.migration_results.where(:child_subscription_id => subscriptions).where.not(:results => nil).pluck(:child_subscription_id, :results)]
+    results = Hash[@mm.migration_results.where(:child_subscription_id => subscriptions).where.not(:results => nil).pluck(:child_subscription_id, :results)]
 
     exceptions = {}
     subscriptions.each do |sub|

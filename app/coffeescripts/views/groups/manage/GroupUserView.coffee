@@ -17,10 +17,9 @@
 
 define [
   'i18n!groups'
-  'underscore'
   'Backbone'
   'jst/groups/manage/groupUser'
-], (I18n, _, {View}, template) ->
+], (I18n, {View}, template) ->
 
   class GroupUserView extends View
 
@@ -52,7 +51,7 @@ define [
       , 1000
 
     toJSON: ->
-      _.extend {groupId: @model.get('group')?.id}, this, super
+      Object.assign {groupId: @model.get('group')?.id}, this, super
 
     isLeader: ->
       @model.get('group')?.get?('leader')?.id == @model.get('id')

@@ -24,6 +24,13 @@ module Lti
       include Lti::ApiServiceHelper
       include Lti::Ims::AccessTokenHelper
 
+      rescue_from ActiveRecord::RecordNotFound do
+        render json: {
+          :status => I18n.t('lib.auth.api.not_found_status', 'not_found'),
+          :errors => [{:message => I18n.t('lib.auth.api.not_found_message', "not_found")}]
+        }, status: :not_found
+      end
+
       TOOL_SETTINGS_SERVICE = 'ToolProxySettings'.freeze
       TOOL_PROXY_BINDING_SERVICE = 'ToolProxyBindingSettings'.freeze
       LTI_LINK_SETTINGS = 'LtiLinkSettings'.freeze
@@ -63,13 +70,13 @@ module Lti
 
       def show
         render_bad_request and return unless valid_show_request?
-        render json: tool_setting_json(@tool_setting, params[:bubble]), content_type: @content_type
+        render json: tool_setting_json(tool_setting, params[:bubble]), content_type: @content_type
       end
 
       def update
         json = JSON.parse(request.body.read)
         render_bad_request and return unless valid_update_request?(json)
-        @tool_setting.update_attribute(:custom, custom_settings(tool_setting_type(@tool_setting), json))
+        tool_setting.update_attribute(:custom, custom_settings(tool_setting_type(tool_setting), json))
         head :ok
       end
 
@@ -147,7 +154,6 @@ module Lti
         if oauth2_request?
           begin
             validate_access_token!
-            @tool_proxy = tool_proxy
           rescue Lti::Oauth2::InvalidTokenError
             render_unauthorized and return
           end
@@ -156,7 +162,26 @@ module Lti
         else
           render_unauthorized and return
         end
-        @tool_setting = @tool_proxy.tool_settings.find(params[:tool_setting_id]) if @tool_proxy
+      end
+
+      def tool_setting
+        @_tool_setting ||= begin
+          tool_setting_id = params[:tool_setting_id]
+          ts = if tool_setting_id.present?
+                 tool_proxy.tool_settings.find(tool_setting_id)
+               else
+                 tool_proxy_guid = params[:tool_proxy_guid]
+                 context = params[:context_id].present? ? get_context && @context : nil
+                 resource_link_id = params[:resource_link_id]
+                 render_unauthorized and return unless tool_proxy_guid == tool_proxy.guid
+                 tool_proxy.tool_settings.find_by(
+                   context: context,
+                   resource_link_id: resource_link_id
+                 )
+               end
+          raise ActiveRecord::RecordNotFound if ts.blank?
+          ts
+        end
       end
 
       def valid_show_request?
@@ -179,7 +204,7 @@ module Lti
       def render_bad_request
         render :json => {
                              :status => I18n.t('lib.auth.api.bad_request_status', 'bad_request'),
-                             :errors => [{:message => I18n.t('lib.auth.api.bad_request_messagee', "bad_request")}]
+                             :errors => [{:message => I18n.t('lib.auth.api.bad_request_message', "bad_request")}]
                            },
                :status => :bad_request
       end

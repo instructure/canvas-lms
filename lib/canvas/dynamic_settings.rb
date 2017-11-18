@@ -112,9 +112,8 @@ module Canvas
         @kv_client
       end
 
-      def reset_cache!(hard: false)
+      def reset_cache!
         Canvas::DynamicSettings::Cache.reset!
-        @strategic_reserve = {} if hard
       end
     end
   end

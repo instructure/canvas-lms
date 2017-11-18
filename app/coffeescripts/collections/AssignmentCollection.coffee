@@ -25,19 +25,3 @@ define [
     model: Assignment
 
     comparator: 'position'
-
-    # Inserts the model in at the position specified in the model.  Anything
-    # that has a position equal to or greater than to the newModel's position
-    # will have its position incremented, to maintain order and uniqueness of
-    # position.  IF position is not set, inserts at the beginning (assumes
-    # positons are 1-indexed)
-    insertModel: (newModel) =>
-      newPos = newModel.get('position') || 1
-      @models.forEach((oldModel) =>
-        oldPos = oldModel.get('position')
-        # If an entry somehow doesn't have a position, just don't move it.
-        # This assumes positions are always at least 1.
-        if oldPos && oldPos >= newPos
-          oldModel.set('position', oldPos + 1)
-      )
-      @add(newModel)

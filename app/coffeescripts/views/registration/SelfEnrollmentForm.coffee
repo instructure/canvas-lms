@@ -53,7 +53,7 @@ define [
 
       @$el.attr 'action', switch @action
         when 'create' then '/users'
-        when 'log_in' then '/login'
+        when 'log_in' then '/login/canvas'
         when 'enroll' then @enrollUrl
 
     success: (data) =>

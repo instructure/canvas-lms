@@ -124,6 +124,22 @@ class Speedgrader
       f("#final-grade").text
     end
 
+    def view_rubric_button
+      fj("button:contains('View Rubric')")
+    end
+
+    def rubric_grade_input(criteria_id)
+      f("#criterion_#{criteria_id} input.criterion_points")
+    end
+
+    def save_rubric_button
+      f("button.save_rubric_button")
+    end
+
+    def student_grading_status_icon(student_name)
+      fj("#students_selectmenu-button:contains('#{student_name}')")
+    end
+
     # action
     def visit(course_id, assignment_id)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
@@ -183,6 +199,10 @@ class Speedgrader
 
     def submit_settings_form
       fj('.ui-dialog-buttonset .ui-button:visible:last').click
+    end
+
+    def grade_rubric_criteria(criteria_id, grade)
+      rubric_grade_input(criteria_id).send_keys(grade)
     end
   end
 end

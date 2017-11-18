@@ -261,7 +261,7 @@ define [
     # @config {String} url
     #
     # (POST) Endpoint for creating and destroying sessions (login).
-    url: "/login?nonldap=true"
+    url: "/login/canvas"
 
     # @config {Function} template
     #

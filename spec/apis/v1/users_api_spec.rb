@@ -648,6 +648,7 @@ describe "Users API", type: :request do
 
       context 'using force_validations param' do
         it "validates with force_validations set to true" do
+          @site_admin.account.create_terms_of_service!(terms_type: "default", passive: false)
           raw_api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
             { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
             {
@@ -882,6 +883,7 @@ describe "Users API", type: :request do
 
       it "should require acceptance of the terms" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        @admin.account.create_terms_of_service!(terms_type: "default", passive: false)
         @admin.account.save!
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -997,6 +999,7 @@ describe "Users API", type: :request do
       end
 
       it "should require acceptance of the terms" do
+        @admin.account.create_terms_of_service!(terms_type: "default", passive: false)
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                      { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },

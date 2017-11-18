@@ -148,7 +148,7 @@ shared_examples 'pages_page' do |context|
     f('.btn-primary').click
     wait_for_ajaximations
     expect(f("#pages_accordion")).to be_displayed
-    fj(".ui-accordion-header a:contains('Wiki Pages')").click
+    fj(".ui-accordion-header a:contains('Pages')").click
     expect(fln("#{group_page.title}")).to be_displayed
     expect(f("#content")).not_to contain_link("#{course_page.title}")
   end

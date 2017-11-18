@@ -28,6 +28,10 @@ module PlannerPageObject
     driver.find_element(:xpath, "//span[text()[contains(.,'List View')]]").click
   end
 
+  def select_dashboard_view
+    driver.find_element(:xpath, "//span[text()[contains(.,'Card View')]]").click
+  end
+
   def navigate_to_course_object(object)
     expect_new_page_load do
       fln(object.title.to_s).click
@@ -55,15 +59,17 @@ module PlannerPageObject
   end
 
   def go_to_dashcard_view
-    fj("button:contains('Go to Dashboard Card View')").click
+    click_dashboard_settings
+    select_dashboard_view
+    wait_for_dashboard_load
   end
 
   def expand_completed_item
-    f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Show 1 completed item')]]").click
+    f('.PlannerApp').find_element(:xpath, "//*[text()[contains(.,'Show 1 completed item')]]").click
   end
 
   def validate_pill(pill_type)
-    expect(f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'#{pill_type}')]]")).to be_displayed
+    expect(f('.PlannerApp').find_element(:xpath, "//*[text()[contains(.,'#{pill_type}')]]")).to be_displayed
   end
 
   def go_to_list_view
@@ -96,6 +102,12 @@ module PlannerPageObject
     todo_modal_button
   end
 
+  def wait_for_dashboard_load
+    wait_for_dom_ready
+    wait_for_ajaximations
+    f('.ic-dashboard-app')
+  end
+
   def todo_save_button
     fj("button:contains('Save')")
   end
@@ -104,8 +116,12 @@ module PlannerPageObject
     f('textarea')
   end
 
-  def todo_sidebar_modal
-    f("div[aria-label = 'Add To Do']")
+  def todo_sidebar_modal(title = nil)
+    if title
+      f("[aria-label = 'Edit #{title}']")
+    else
+      f("[aria-label = 'Add To Do']")
+    end
   end
 
   def wait_for_spinner

@@ -22,5 +22,8 @@ class PlannerNote < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
   validates_presence_of :user_id, :title, :todo_date, :workflow_state
+
+  scope :for_user, lambda { |user| where(user: user) }
+  scope :for_course, lambda { |course| where(course: course) }
 end
 

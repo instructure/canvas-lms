@@ -20,7 +20,8 @@ class MessageDispatcher < Delayed::PerformableMethod
 
   def self.dispatch(message)
     Delayed::Job.enqueue(self.new(message, :deliver),
-                         :run_at => message.dispatch_at)
+                         run_at: message.dispatch_at,
+                         max_attempts: 15)
   end
 
   def self.batch_dispatch(messages)
@@ -31,10 +32,9 @@ class MessageDispatcher < Delayed::PerformableMethod
       return
     end
 
-    dispatch_at = messages.first.dispatch_at
-
     Delayed::Job.enqueue(self.new(self, :deliver_batch, [messages]),
-                         :run_at => messages.first.dispatch_at)
+                         run_at: messages.first.dispatch_at,
+                         max_attempts: 15)
   end
 
   # Called by delayed_job when a job fails to reschedule it.

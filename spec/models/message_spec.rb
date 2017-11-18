@@ -67,7 +67,7 @@ describe Message do
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body.scan(/<html>/).length).to eq 1
-      expect(msg.html_body.index('<html>')).to eq 0
+      expect(msg.html_body.index('<!DOCTYPE')).to eq 0
     end
 
     it "should not html escape the subject" do

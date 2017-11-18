@@ -29,7 +29,7 @@ class Gradezilla
     # Gradebook Menu
     GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'.freeze
     INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'.freeze
-    GRADE_HISTORY_ITEM_SELECTOR = 'grade-history'.freeze
+    GRADE_HISTORY_ITEM_SELECTOR = 'gradebook-history'.freeze
     LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'.freeze
 
     # Action Menu
@@ -126,10 +126,6 @@ class Gradezilla
       fj(GRADEBOOK_MENU_SELECTOR + ':visible')
     end
 
-    def grading_period_menu_item(grading_period_name)
-      fj("option:contains(\"#{grading_period_name}\")")
-    end
-
     def grade_input(cell)
       f(".grade", cell)
     end
@@ -162,8 +158,8 @@ class Gradezilla
       ff('.gradebook-cell .icon-warning')
     end
 
-    def grade_history
-      f('[data-menu-item-id="grade-history"]')
+    def gradebook_history
+      f('[data-menu-item-id="gradebook-history"]')
     end
 
     def gradebook_menu_element
@@ -299,9 +295,8 @@ class Gradezilla
     end
 
     def select_grading_period(grading_period_name)
-      grading_period_dropdown.click
-      grading_period_menu_item(grading_period_name).click
-      wait_for_animations
+      click_option(grading_period_dropdown_selector, grading_period_name, :text)
+      wait_for_ajaximations
     end
 
     def show_notes
@@ -459,8 +454,8 @@ class Gradezilla
       ".slick-header-column[title=\"#{title}\"]"
     end
 
-    def grading_period_dropdown
-      f('#grading-periods-filter-container select')
+    def grading_period_dropdown_selector
+      '#grading-periods-filter-container select'
     end
 
     def section_dropdown

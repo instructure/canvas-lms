@@ -29,6 +29,7 @@ define [
   'compiled/collections/AssignmentGroupCollection'
   'compiled/views/assignments/GroupCategorySelector'
   'helpers/fakeENV'
+  'helpers/assertions'
   'jsx/shared/rce/RichContentEditor'
   'helpers/jquery.simulate'
 ], (
@@ -45,6 +46,7 @@ define [
   AssignmentGroupCollection,
   GroupCategorySelector,
   fakeENV,
+  assertions,
   RichContentEditor) ->
 
   editView = (opts = {}, discussOpts = {}) ->
@@ -91,6 +93,10 @@ define [
       fakeENV.teardown()
     editView: ->
       editView.apply(this, arguments)
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @editView(), done, {'a11yReport': true}
 
   test 'renders', ->
     view = @editView()

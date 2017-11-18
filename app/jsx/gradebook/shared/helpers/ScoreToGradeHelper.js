@@ -42,7 +42,7 @@ export default {
       }
       case 'pass_fail': {
         const grade = score ? 'complete' : 'incomplete';
-        return GradeFormatHelper.formatGrade(grade, { gradingType: 'completion' });
+        return GradeFormatHelper.formatGrade(grade, { gradingType });
       }
       case 'letter_grade': {
         if (!gradingScheme || !assignment.points_possible) {

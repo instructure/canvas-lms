@@ -67,7 +67,10 @@ module QuizzesCommon
     set_question_comment(".question_incorrect_comment", "You know what they say - study long study wrong.")
     set_question_comment(".question_neutral_comment", "Pass or fail you are a winner!")
 
-    submit_form(question)
+    button_locator = "//button[contains(.,'Update Question') and not(contains(.,'Create'))]"
+    update_question_button=driver.find_element(:xpath,button_locator)
+    scroll_to(update_question_button)
+    update_question_button.click
     wait_for_ajaximations
   end
 

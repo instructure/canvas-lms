@@ -67,12 +67,27 @@
 
 class PlannerNotesController < ApplicationController
   include Api::V1::PlannerNote
+  include PlannerHelper
 
   before_action :require_user
 
   # @API List planner notes
   #
   # Retrieve the paginated list of planner notes
+  #
+  # @argument start_date [Date]
+  #   Only return notes with todo dates since the start_date (inclusive).
+  #   No default. The value should be formatted as: yyyy-mm-dd.
+  # @argument end_date [Date]
+  #   Only return notes with todo dates before the end_date (inclusive).
+  #   No default. The value should be formatted as: yyyy-mm-dd.
+  #   If end_date and start_date are both specified and equivalent,
+  #   then only notes with todo dates on that day are returned.
+  # @argument context_codes[] [String]
+  #   List of context codes of courses/users whose notes you want to see.
+  #   If not specified, defaults to all contexts that the user belongs to.
+  #   The format of this field is the context type, followed by an
+  #   underscore, followed by the context id. For example: course_42, user_37
   #
   # @example_response
   #   [
@@ -102,6 +117,32 @@ class PlannerNotesController < ApplicationController
   # @returns [PlannerNote]
   def index
     notes = PlannerNote.where(user: @current_user).active
+
+    # Format & filter our notes by context code if passed
+    if (context_codes = params.delete(:context_codes))
+      # Append to our notes scope to include the context codes for courses
+      course_ids = context_codes.select{ |c| /course_\d+/.match? c }.map{ |c| c.split("_").last }
+      notes = notes.for_course(course_ids) if course_ids.present?
+
+      # Append to our notes scope to include the context codes for users that the requesting
+      # user has permission to access
+      user_ids = context_codes.select { |c|
+        c.start_with?("user_") && Context.find_by_asset_string(c).grants_right?(@current_user, session, :read)
+      }.map{ |c| c.split("_").last }
+      notes = notes.or(PlannerNote.for_user(user_ids)) if user_ids.present?
+    end
+
+    # Grab our start_ and end_dates for filtering
+    start_date = formatted_planner_date('start_date', params.delete(:start_date))
+    end_date   = formatted_planner_date('end_date', params.delete(:end_date), end_of_day: true)
+
+    # Make sure that the dates passed in were correctly formatted
+    ensure_valid_planner_params or return
+
+    # Add the date filtering to our existing scope
+    notes = notes.where("todo_date >= :start_date", start_date: start_date) if start_date
+    notes = notes.where("todo_date <= :end_date", end_date: end_date) if end_date
+
     render :json => planner_notes_json(notes, @current_user, session)
   end
 
@@ -172,6 +213,10 @@ class PlannerNotesController < ApplicationController
   end
 
   private
+
+  def planner_note_params
+    params.permit(:start_date, :end_date, :context_codes)
+  end
 
   def require_user
     render_unauthorized_action if !@current_user || !@domain_root_account.feature_enabled?(:student_planner)

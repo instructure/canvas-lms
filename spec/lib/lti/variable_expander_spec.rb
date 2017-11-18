@@ -63,6 +63,7 @@ module Lti
       allow(m).to receive(:named_context_url).and_return('url')
       allow(m).to receive(:active_brand_config_json_url).and_return('http://example.com/brand_config.json')
       allow(m).to receive(:active_brand_config_js_url).and_return('http://example.com/brand_config.js')
+      allow(m).to receive(:active_brand_config).and_return(double(to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'))
       allow(m).to receive(:polymorphic_url).and_return('url')
       view_context_mock = double('view_context')
       allow(view_context_mock).to receive(:stylesheet_path)
@@ -78,7 +79,20 @@ module Lti
                                 submission: submission,
                                 link_id: resource_link_id)
     end
-    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, originality_report: originality_report) }
+    let(:editor_contents) { '<p>This is the contents of the editor</p>' }
+    let(:editor_selection) { 'is the contents' }
+    let(:variable_expander) do
+      VariableExpander.new(
+        root_account,
+        account,
+        controller,
+        current_user: user,
+        tool: tool,
+        originality_report: originality_report,
+        editor_contents: editor_contents,
+        editor_selection: editor_selection
+      )
+    end
 
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
@@ -334,6 +348,18 @@ module Lti
         expect(exp_hash[:test]).to eq lti_assignment_id
       end
 
+      it 'has substitution for com.instructure.Editor.contents' do
+        exp_hash = {test: '$com.instructure.Editor.contents'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq editor_contents
+      end
+
+      it 'has substitution for com.instructure.Editor.selection' do
+        exp_hash = {test: '$com.instructure.Editor.selection'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq editor_selection
+      end
+
       it 'has a substitution for Context.title' do
         exp_hash = {test: '$Context.title'}
         variable_expander.expand_variables!(exp_hash)
@@ -415,6 +441,20 @@ module Lti
         exp_hash = {test: '$com.instructure.brandConfigJSON.url'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq '$com.instructure.brandConfigJSON.url'
+      end
+
+      it 'has substitution for $com.instructure.brandConfigJSON' do
+        exp_hash = {test: '$com.instructure.brandConfigJSON'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '{"ic-brand-primary-darkened-5":"#0087D7"}'
+      end
+
+      it 'does not expand $com.instructure.brandConfigJSON when the controller is unset' do
+        variable_expander.instance_variable_set(:@controller, nil)
+        variable_expander.instance_variable_set(:@request, nil)
+        exp_hash = {test: '$com.instructure.brandConfigJSON'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '$com.instructure.brandConfigJSON'
       end
 
       it 'has substitution for $com.instructure.brandConfigJS.url' do

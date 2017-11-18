@@ -11,6 +11,9 @@ export JSPEC_WD=$(pwd)
 if [ "$1" == "--watch" ]; then
   export JSPEC_PATH=$2
   yarn run test-watch --silent || true
+elif [ "$1" == "--a11y" ]; then
+  export JSPEC_PATH=$2
+  A11Y_REPORT=1 yarn run test-watch --silent || true
 else
   export JSPEC_PATH=$1
   yarn run test || true

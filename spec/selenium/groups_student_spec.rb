@@ -171,7 +171,7 @@ describe "student groups" do
         expect(f('.unassigned-students')).to include_text("#{@students[0].name}")
         # Fourth student should remain group leader
         expect(fj(".group[data-id=\"#{@testgroup[0].id}\"] ." \
-      "group-user:contains(\"#{@students[3].name}\") .group-leader")).to be_displayed
+      ".group-leader:contains(\"#{@students[3].name}\")")).to be_displayed
       end
     end
 

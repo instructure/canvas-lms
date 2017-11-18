@@ -181,14 +181,14 @@ describe ContentMigration do
         expect(@copy_to.wiki.has_no_front_page).to eq true
       end
 
-      it "should set default view to feed if wiki front page is missing" do
+      it "should set default view to modules if wiki front page is missing" do
         @copy_from.default_view = 'wiki'
         @copy_from.save!
         @copy_from.wiki.set_front_page_url!('haha not here')
 
         run_course_copy
 
-        expect(@copy_to.default_view).to eq 'feed'
+        expect(@copy_to.default_view).to eq 'modules'
         expect(@copy_to.wiki.has_front_page?).to eq false
       end
     end

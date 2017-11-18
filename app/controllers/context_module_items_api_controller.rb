@@ -723,6 +723,51 @@ class ContextModuleItemsApiController < ApplicationController
     end
   end
 
+  # @API Duplicate module item
+  #
+  # Makes a copy of an assignment, discussion or wiki page module item, within the same module.
+  # It also creates a duplicate copy of the assignment, discussion, or wiki page.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/items/<item_id>/duplicate \
+  #       -X POST \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  include ContextModulesHelper
+  def duplicate
+    original_tag = @context.context_module_tags.not_deleted.find(params[:id])
+    if authorized_action(original_tag.context_module, @current_user, :update)
+      if original_tag.duplicate_able?
+        new_content = original_tag.content.duplicate
+        new_content.save!
+        new_tag = original_tag.context_module.add_item({
+          type: original_tag.content_type,
+          indent: original_tag.indent,
+          id: new_content.id,
+        })
+
+        new_tag.insert_at(original_tag.position + 1)
+
+        json = new_tag.as_json
+        json['new_positions'] = new_tag.context_module.content_tags.select(:id, :position)
+        json['content_tag'].merge!(
+          publishable: module_item_publishable?(new_tag),
+          published: new_tag.published?,
+          publishable_id: module_item_publishable_id(new_tag),
+          unpublishable: module_item_unpublishable?(new_tag),
+          graded: new_tag.graded?,
+          content_details: content_details(new_tag, @current_user),
+          assignment_id: new_tag.assignment.try(:id),
+          is_duplicate_able: new_tag.duplicate_able?,
+        )
+        render json: json
+      else
+        render :status => 400, :json => { :message => t("Item cannot be duplicated") }
+      end
+    end
+  end
+
   def disable_escape_html_entities
     ActiveSupport.escape_html_entities_in_json = false
   end

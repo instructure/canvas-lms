@@ -25,7 +25,7 @@ class SubmissionCommentsController < ApplicationController
       submission_comment.reload unless submission_comment.update(submission_comment_params)
 
       respond_to do |format|
-        format.json { render json: submission_comment }
+        format.json { render json: submission_comment.as_json }
       end
     end
   end
@@ -43,6 +43,6 @@ class SubmissionCommentsController < ApplicationController
   private
 
   def submission_comment_params
-    params.require(:submission_comment).permit(:draft)
+    params.require(:submission_comment).permit(:draft, :comment)
   end
 end

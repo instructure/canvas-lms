@@ -137,6 +137,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should put images into the right editor" do
+      skip('fragile, see CNVS-39901')
       @course_root = Folder.root_folders(@course).first
       @course_attachment = @course_root.attachments.create!(:context => @course, :uploaded_data => jpeg_data_frd, :filename => 'course.jpg', :display_name => 'course.jpg')
       @course_attachment2 = @course_root.attachments.create!(:context => @course, :uploaded_data => jpeg_data_frd, :filename => 'course2.jpg', :display_name => 'course2.jpg')

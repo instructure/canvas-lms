@@ -26,6 +26,7 @@ class ExternalToolsController < ApplicationController
   before_action :require_access_to_context, except: [:index, :sessionless_launch]
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
+  skip_before_action :verify_authenticity_token, only: :resource_selection
   include Api::V1::ExternalTools
 
   REDIS_PREFIX = 'external_tool:sessionless_launch:'
@@ -665,7 +666,14 @@ class ExternalToolsController < ApplicationController
     }
 
     collaboration = opts[:content_item_id].present? ? ExternalToolCollaboration.find(opts[:content_item_id]) : nil
-    base_expander = variable_expander(tool: tool, collaboration: collaboration)
+
+    base_expander = variable_expander(
+      tool: tool,
+      collaboration: collaboration,
+      editor_contents: params[:editor_contents],
+      editor_selection: params[:selection]
+    )
+
     expander = Lti::PrivacyLevelExpander.new(placement, base_expander)
 
     selection_request.generate_lti_launch(

@@ -124,5 +124,30 @@ export default {
       editor.on('click', function(e){
         target.dropdownList('hide');
       });
+    },
+
+    contentItemDialogOpen: (button, ed, contextAssetString, $contentItemRequestForm) => {
+      let url = $.replaceTags($("#context_external_tool_resource_selection_url").attr('href'), 'id', button.id);
+      let asset = ''
+      const selection = ed.selection.getContent() || "";
+      const contents = ed.getContent() || "";
+
+      if (url === null || typeof url === 'undefined') {
+        // if we don't have a url on the page, build one using the current context.
+        // url should look like: /courses/2/external_tools/15/resoruce_selection?editor=1
+        asset = contextAssetString.split('_');
+        url = `/${asset[0]}s/${asset[1]}/external_tools/${button.id}/resource_selection`;
+      }
+
+      $contentItemRequestForm.attr('action', url);
+      $contentItemRequestForm.find('#editor_contents_input').val(contents);
+      $contentItemRequestForm.find('#selection_input').val(selection);
+      $contentItemRequestForm.submit();
+    },
+
+    contentItemDialogClose: (contentItemDialog, externalToolsPlugin) => {
+      $(window).off('beforeunload', externalToolsPlugin.beforeUnloadHandler);
+      $(window).unbind("externalContentReady");
+      contentItemDialog.dialog('destroy').remove()
     }
   };

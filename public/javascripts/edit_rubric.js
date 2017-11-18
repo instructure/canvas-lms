@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import RubricAddCriterionPopover from 'jsx/rubrics/RubricAddCriterionPopover'
 import I18n from 'i18n!edit_rubric'
 import changePointsPossibleToMatchRubricDialog from 'jst/changePointsPossibleToMatchRubricDialog'
 import $ from 'jquery'
@@ -46,14 +49,35 @@ import 'compiled/jquery/fixDialogButtons'
         $(this).attr('id', 'criterion_' + (i + 1));
       });
     },
-    addCriterion: function($rubric) {
-      var $blank = $rubric.find(".criterion.blank:first");
+    updateAddCriterionLinks($rubric) {
+      if ($rubric.find("#add_criterion_holder").length === 0) { return; }
+      $("#add_criterion_container").remove();
+      $rubric.find("#add_criterion_holder").append($('<span/>').attr('id', 'add_criterion_container'));
+      ReactDOM.render(
+        <RubricAddCriterionPopover rubric={$rubric} duplicateFunction={rubricEditing.copyCriterion} />,
+        document.getElementById("add_criterion_container")
+      );
+    },
+    copyCriterion($rubric, criterion_index) {
+      const $criterion = rubricEditing.addCriterion($rubric, criterion_index);
+      $criterion.find(".criterion_id").text("blank");
+      $criterion.find(".rating_id").text("blank");
+      rubricEditing.editCriterion($criterion);
+    },
+    addCriterion($rubric, criterion_index) {
+      let $blank;
+      if (typeof criterion_index !== "undefined") {
+        $blank = $rubric.find(`.criterion:not(.blank):eq(${criterion_index})`)
+      } else {
+        $blank = $rubric.find(".criterion.blank:first");
+      }
       var $criterion = $blank.clone(true);
       $criterion.removeClass('blank');
       $rubric.find(".summary").before($criterion.show());
       rubricEditing.updateCriteria($rubric);
       rubricEditing.updateRubricPoints($rubric);
       rubricEditing.sizeRatings($criterion);
+      rubricEditing.updateAddCriterionLinks($rubric);
       return $criterion;
     },
     addNewRatingColumn: function($this) {
@@ -138,6 +162,7 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.find(".mastery_points").text(outcome.get('mastery_points'));
       $criterion.find(".edit_criterion_link").remove();
       $criterion.find(".rating .links").remove();
+      rubricEditing.updateAddCriterionLinks($rubric);
     },
     hideCriterionAdd: function($rubric) {
       $rubric.find('.add_right, .add_left, .add_column').removeClass('add_left add_right add_column');
@@ -363,7 +388,7 @@ import 'compiled/jquery/fixDialogButtons'
     },
     editRubric: function($original_rubric, url) {
       var $rubric, data, $tr, $form;
-
+      $("#add_criterion_container").remove();
       rubricEditing.isEditing = true;
 
       $rubric = $original_rubric.clone(true).addClass('editing');
@@ -385,6 +410,7 @@ import 'compiled/jquery/fixDialogButtons'
       $form.find(".save_button").text($rubric.attr('id') == 'rubric_new' ? createText : updateText);
       $form.attr('method', 'PUT').attr('action', url);
       rubricEditing.sizeRatings();
+      rubricEditing.updateAddCriterionLinks($rubric);
 
       return $rubric;
     },
@@ -745,6 +771,7 @@ import 'compiled/jquery/fixDialogButtons'
       var $rubric = rubricEditing.addRubric();
       $("#rubrics").append($rubric.show());
       $(".add_rubric_link").hide();
+      rubricEditing.updateAddCriterionLinks($rubric);
       var $target = $rubric.find('.find_rubric_link:visible:first');
       if ($target.length > 0) {
         $target.focus();
@@ -1001,6 +1028,7 @@ import 'compiled/jquery/fixDialogButtons'
         $criterion.remove();
         rubricEditing.updateCriteria($rubric);
         rubricEditing.updateRubricPoints($rubric);
+        rubricEditing.updateAddCriterionLinks($rubric);
       });
       return false;
     }).delegate('.rating_description_value', 'click', function(event) {
@@ -1055,6 +1083,7 @@ import 'compiled/jquery/fixDialogButtons'
       delete data['description'];
       $(this).parents(".criterion").fillTemplateData({data: data});
       rubricEditing.hideEditCriterion();
+      rubricEditing.updateAddCriterionLinks($target.parents(".rubric"));
       $target.focus();
     });
     $("#edit_rating").delegate(".cancel_button", 'click', function(event) {

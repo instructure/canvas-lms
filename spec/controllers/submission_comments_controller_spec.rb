@@ -49,8 +49,41 @@ describe SubmissionCommentsController do
       user_session(@the_teacher)
     end
 
-    it 'allows updating the status field' do
-      expect { patch 'update', params: @test_params }.to change { SubmissionComment.draft.count }.by(-1)
+    it "allows updating the comment" do
+      updated_comment = "an updated comment!"
+      patch(
+        :update,
+        params: @test_params.merge(submission_comment: { comment: updated_comment })
+      )
+      comment = JSON.parse(response.body).dig("submission_comment", "comment")
+      expect(comment).to eq updated_comment
+    end
+
+    it "sets the edited_at if the comment is updated" do
+      updated_comment = "an updated comment!"
+      patch(
+        :update,
+        params: @test_params.merge(submission_comment: { comment: updated_comment })
+      )
+      edited_at = JSON.parse(response.body).dig("submission_comment", "edited_at")
+      expect(edited_at).to be_present
+    end
+
+    it "returns strings for numeric values when passed the json+canvas-string-ids header" do
+      request.headers["HTTP_ACCEPT"] = "application/json+canvas-string-ids"
+      patch :update, params: @test_params
+      id = JSON.parse(response.body).dig("submission_comment", "id")
+      expect(id).to be_a String
+    end
+
+    it "does not set the edited_at if the comment is not updated" do
+      patch :update, params: @test_params
+      edited_at = JSON.parse(response.body).dig("submission_comment", "edited_at")
+      expect(edited_at).to be_nil
+    end
+
+    it "allows updating the status field" do
+      expect { patch "update", params: @test_params }.to change { SubmissionComment.draft.count }.by(-1)
     end
   end
 end

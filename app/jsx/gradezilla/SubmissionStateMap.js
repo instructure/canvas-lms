@@ -32,19 +32,37 @@ function visibleToStudent (assignment, student) {
   return _.contains(assignment.assignment_visibility, student.id);
 }
 
+function gradingPeriodInfoForCell (assignment, student, selectedGradingPeriodID) {
+  const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID);
+  const { gradingPeriodID, inClosedGradingPeriod } = submissionGradingPeriodInformation(assignment, student);
+  const inNoGradingPeriod = !gradingPeriodID;
+  const inOtherGradingPeriod = !!gradingPeriodID && specificPeriodSelected &&
+    selectedGradingPeriodID !== gradingPeriodID;
+
+  return {
+    inNoGradingPeriod,
+    inOtherGradingPeriod,
+    inClosedGradingPeriod
+  };
+}
+
 function cellMappingsForMultipleGradingPeriods (assignment, student, selectedGradingPeriodID, isAdmin) {
   const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID);
   const { gradingPeriodID, inClosedGradingPeriod } = submissionGradingPeriodInformation(assignment, student);
+  const gradingPeriodInfo = gradingPeriodInfoForCell(assignment, student, selectedGradingPeriodID);
+  let cellMapping;
 
   if (specificPeriodSelected && !gradingPeriodID) {
-    return { locked: true, hideGrade: true };
+    cellMapping = { locked: true, hideGrade: true };
   } else if (specificPeriodSelected && selectedGradingPeriodID !== gradingPeriodID) {
-    return { locked: true, hideGrade: true };
+    cellMapping = { locked: true, hideGrade: true };
   } else if (!isAdmin && inClosedGradingPeriod) {
-    return { locked: true, hideGrade: false };
+    cellMapping = { locked: true, hideGrade: false };
   } else {
-    return { locked: false, hideGrade: false };
+    cellMapping = { locked: false, hideGrade: false };
   }
+
+  return { ...cellMapping, ...gradingPeriodInfo };
 }
 
 

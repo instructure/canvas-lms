@@ -296,6 +296,7 @@ CanvasRails::Application.routes.draw do
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do
       get :resource_selection
+      post :resource_selection
       get :homework_submission
       get :finished
       collection do
@@ -1309,6 +1310,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :sub_accounts) do
       post 'accounts/:account_id/sub_accounts', action: :create
+      delete 'accounts/:account_id/sub_accounts/:id', action: :destroy
     end
 
     scope(controller: :role_overrides) do
@@ -1574,6 +1576,7 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/modules/:module_id/items/:id", action: :destroy
       post "courses/:course_id/modules/:module_id/items/:id/mark_read", action: :mark_item_read
       post "courses/:course_id/modules/:module_id/items/:id/select_mastery_path", action: :select_mastery_path
+      post "courses/:course_id/modules/items/:id/duplicate", action: :duplicate, as: :course_context_module_item_duplicate
     end
 
     scope(controller: 'quizzes/quiz_assignment_overrides') do
@@ -2050,10 +2053,16 @@ CanvasRails::Application.routes.draw do
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :create,
            as: "create_#{context}_lti_tool_proxy"
       get "#{prefix}/jwt_token", controller: 'external_tools', action: :jwt_token
+      get "tool_proxy/:tool_proxy_guid/#{prefix}/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: "show_#{context}_tool_setting"
+      get "tool_proxy/:tool_proxy_guid/#{prefix}/resource_link_id/:resource_link_id/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: "show_#{context}_resource_link_id_tool_setting"
+      put "tool_proxy/:tool_proxy_guid/#{prefix}/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: "update_#{context}_tool_setting"
+      put "tool_proxy/:tool_proxy_guid/#{prefix}/resource_link_id/:resource_link_id/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: "update_#{context}_update_resource_link_id_tool_setting"
     end
     #Tool Setting Services
-    get "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :show, as: 'show_lti_tool_settings'
-    put "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :update, as: 'update_lti_tool_settings'
+    get "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :show, as: :show_lti_tool_settings
+    get "tool_proxy/:tool_proxy_guid/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: :show_tool_proxy_lti_tool_settings
+    put "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :update, as: :update_lti_tool_settings
+    put "tool_proxy/:tool_proxy_guid/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: :update_tool_proxy_lti_tool_settings
 
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"

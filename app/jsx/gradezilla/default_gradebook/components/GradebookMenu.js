@@ -36,8 +36,8 @@ import I18n from 'i18n!gradebook'
     };
 
     static menuItemsForGradebook = {
-      DefaultGradebook: ['LearningMastery', 'IndividualGradebook', 'Separator', 'GradeHistory'],
-      DefaultGradebookLearningMastery: ['DefaultGradebook', 'IndividualGradebook', 'Separator', 'GradeHistory'],
+      DefaultGradebook: ['LearningMastery', 'IndividualGradebook', 'Separator', 'GradebookHistory'],
+      DefaultGradebookLearningMastery: ['DefaultGradebook', 'IndividualGradebook', 'Separator', 'GradebookHistory'],
     };
 
     constructor (props) {
@@ -45,7 +45,7 @@ import I18n from 'i18n!gradebook'
 
       this.handleDefaultGradebookSelect = this.handleDefaultGradebookSelect.bind(this);
       this.handleIndividualGradebookSelect = this.handleIndividualGradebookSelect.bind(this);
-      this.handleGradeHistorySelect = this.handleGradeHistorySelect.bind(this);
+      this.handleGradebookHistorySelect = this.handleGradebookHistorySelect.bind(this);
       this.handleLearningMasterySelect = this.handleLearningMasterySelect.bind(this);
     }
 
@@ -65,7 +65,7 @@ import I18n from 'i18n!gradebook'
       this.setLocation(`${this.props.courseUrl}/gradebook/change_gradebook_version?version=individual`);
     }
 
-    handleGradeHistorySelect () {
+    handleGradebookHistorySelect () {
       this.setLocation(`${this.props.courseUrl}/gradebook/history`);
     }
 
@@ -91,12 +91,12 @@ import I18n from 'i18n!gradebook'
       );
     }
 
-    renderGradeHistoryMenuItem () {
-      const key = 'grade-history';
+    renderGradebookHistoryMenuItem () {
+      const key = 'gradebook-history';
       return (
-        <MenuItem onSelect={this.handleGradeHistorySelect} key={key}>
+        <MenuItem onSelect={this.handleGradebookHistorySelect} key={key}>
           <span data-menu-item-id={key}>
-            {I18n.t('Grade History…')}
+            {I18n.t('Gradebook History…')}
           </span>
         </MenuItem>
       );

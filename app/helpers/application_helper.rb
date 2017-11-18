@@ -245,8 +245,9 @@ module ApplicationHelper
   end
 
   def css_variant
+    variant = use_new_typography? ? 'new_typography' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast?
-    'new_styles' + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
   end
 
   def css_url_for(bundle_name, plugin=false)
@@ -823,12 +824,10 @@ module ApplicationHelper
   def agree_to_terms
     # may be overridden by a plugin
     @agree_to_terms ||
-    t("I agree to the *terms of use* and **privacy policy**.",
+    t("I agree to the *terms of use*.",
       wrapper: {
-        '*' => link_to('\1', terms_of_use_url, target: '_blank'),
-        '**' => link_to('\1', privacy_policy_url, target: '_blank')
-      }
-    )
+        '*' => link_to('\1', "#", class: 'terms_of_service_link'),
+      })
   end
 
   def dashboard_url(opts={})

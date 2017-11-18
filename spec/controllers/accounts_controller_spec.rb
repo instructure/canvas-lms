@@ -427,6 +427,18 @@ describe AccountsController do
       expect(@account.admins_can_view_notifications?).to be_truthy
     end
 
+    it 'does not allow anyone to set unexpected settings' do
+      user_factory
+      user_session(@user)
+      @account = Account.create!
+      Account.site_admin.account_users.create!(user: @user)
+      post 'update', params: {:id => @account.id, :account => {:settings => {
+        :product_name => 'blah'
+      }}}
+      @account.reload
+      expect(@account.settings[:product_name]).to be_nil
+    end
+
     it "doesn't break I18n by setting the help_link_name unnecessarily" do
       account_with_admin_logged_in
 
@@ -628,6 +640,27 @@ describe AccountsController do
           :turnitin_host => 'blah'
         }}
         expect(response).not_to be_success
+      end
+    end
+
+    context "terms of service settings" do
+      before(:once) {account_with_admin}
+      before(:each) {user_session(@admin)}
+
+      it "should be able to set and update a custom terms of service" do
+        post 'update', params: {:id => @account.id, :account => {
+          :terms_of_service => {:terms_type => "custom", :content => "stuff"}
+        }}
+        tos = @account.reload.terms_of_service
+        expect(tos.terms_type).to eq 'custom'
+        expect(tos.terms_of_service_content.content).to eq "stuff"
+      end
+
+      it "should be able to configure the 'passive' setting" do
+        post 'update', params: {:id => @account.id, :account => {:terms_of_service => {:passive => "0"}}}
+        expect(@account.reload.terms_of_service.passive).to eq false
+        post 'update', params: {:id => @account.id, :account => {:terms_of_service => {:passive => "1"}}}
+        expect(@account.reload.terms_of_service.passive).to eq true
       end
     end
   end

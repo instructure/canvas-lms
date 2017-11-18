@@ -25,7 +25,7 @@ Delayed::Backend::Base.class_eval do
   end
 end
 
-Delayed::Settings.max_attempts              = 15
+Delayed::Settings.max_attempts              = 1
 Delayed::Settings.queue                     = "canvas_queue"
 Delayed::Settings.sleep_delay               = ->{ Setting.get('delayed_jobs_sleep_delay', '2.0').to_f }
 Delayed::Settings.sleep_delay_stagger       = ->{ Setting.get('delayed_jobs_sleep_delay_stagger', '2.0').to_f }

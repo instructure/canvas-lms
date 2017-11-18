@@ -45,6 +45,7 @@ class AccountNotification < ActiveRecord::Base
       sub_account_ids += user.account_users.active.shard(user).
         joins(:account).where(accounts: {workflow_state: 'active'}).
         distinct.pluck(:account_id).uniq
+      sub_account_ids = Account.multi_account_chain_ids(sub_account_ids) # get all parent sub-accounts too
       current = self.for_account(account, sub_account_ids)
     end
 

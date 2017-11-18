@@ -110,7 +110,6 @@ Object.entries({
       const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
       const header = icons.first().parents('Tooltip')
-      if (expectedArrow == 'Down') debugger
       ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
       ok(header.contains(label), `${label} is the one that has the ${expectedArrow} arrow`)
     })

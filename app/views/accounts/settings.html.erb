@@ -298,6 +298,25 @@ TEXT
 
         <%= render partial: 'additional_settings', locals: { f: f } %>
 
+        <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
+          <% TermsOfService.ensure_terms_for_account(@account) %>
+          <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @account.terms_of_service_content&.content) %>
+          <% js_bundle :terms_of_service_modal%>
+          <fieldset>
+            <legend><%= t("Terms of Service") %></legend>
+            <%= f.fields_for :terms_of_service do |tos| %>
+              <%= tos.label :terms_type, t("License Type") %>
+              <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options, @account.terms_of_service.terms_type) %>
+              <br>
+              <%= tos.check_box :passive, :checked => @account.terms_of_service.passive %>
+              <%= tos.label :passive, t("Allow passive acceptance of Terms of Service")%>
+            <% end %>
+          </fieldset>
+          <div id="custom_tos_rce_container" style="<%= hidden %>">
+            <textarea name="account[terms_of_service][content]"></textarea>
+          </div>
+          <div id="terms_of_service_preview_link"></div>
+        <% end %>
         <% if !@account.site_admin? &&
                @account.root_account? &&
                @account.feature_enabled?(:google_docs_domain_restriction) &&

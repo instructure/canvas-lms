@@ -143,7 +143,7 @@ define [
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade && opts.submission.workflow_state != 'pending_review'
       innerContents = null if opts.submission.workflow_state == 'pending_review' && !isNaN(innerContents)
-      innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '-'
+      innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '–'
 
       if turnitin = extractDataTurnitin(opts.submission)
         styles.push('turnitin')
@@ -263,7 +263,7 @@ define [
 
     checkboxButtonTemplate = (iconClass) ->
       if _.isEmpty(iconClass)
-        '-'
+        '–'
       else
         """
         <i class="#{htmlEscape iconClass}" role="presentation"></i>

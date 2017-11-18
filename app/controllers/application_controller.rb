@@ -131,6 +131,7 @@ class ApplicationController < ActionController::Base
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         k12: k12?,
+        use_new_typography: use_new_typography?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -236,6 +237,11 @@ class ApplicationController < ActionController::Base
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
   helper_method :k12?
+
+  def use_new_typography?
+    @domain_root_account && @domain_root_account.feature_enabled?(:new_typography)
+  end
+  helper_method :use_new_typography?
 
   def grading_periods?
     !!@context.try(:grading_periods?)
@@ -740,7 +746,11 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      enrollment_scope = Enrollment.for_user(@context).current.active_by_date
+      enrollment_scope = Enrollment
+        .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+        .for_user(@context)
+        .current
+        .active_by_date
       include_groups = !!opts[:include_groups]
       group_ids = nil
 
@@ -751,15 +761,21 @@ class ApplicationController < ActionController::Base
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
         unless course_ids.empty?
-          courses = Course.where(:id => course_ids).where(:id => enrollment_scope.select(:course_id)).to_a
+          courses = Course
+            .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+            .joins(enrollments: :enrollment_state)
+            .merge(enrollment_scope)
+            .where(id: course_ids)
         end
         if include_groups
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-          include_groups = false if group_ids.empty?
+          include_groups = !group_ids.empty?
         end
       else
-        courses = Course.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
-          where(:id => enrollment_scope.select(:course_id)).to_a
+        courses = Course
+          .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+          .joins(enrollments: :enrollment_state)
+          .merge(enrollment_scope)
       end
 
       groups = []
@@ -1219,6 +1235,8 @@ class ApplicationController < ActionController::Base
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)
+    raise if Rails.env.development? && ENV['BETTER_ERRORS_DISABLE'] != 'true'
+
     ActiveSupport::Deprecation.silence do
       message = "\n#{exception.class} (#{exception.message}):\n"
       message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)

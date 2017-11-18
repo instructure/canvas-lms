@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import PropTypes from 'prop-types'
+import { shape } from 'prop-types'
 import Modal from 'react-modal'
 
 const modalOverrides = {
@@ -42,7 +42,7 @@ export default React.createClass({
   displayName: 'ConfigureExternalToolButton',
 
   propTypes: {
-    tool: PropTypes.shape.isRequired
+    tool: shape({}).isRequired
   },
 
   getInitialState () {

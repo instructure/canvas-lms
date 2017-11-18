@@ -136,7 +136,7 @@ class CoursesList extends React.Component {
               tipAsc: I18n.t('Click to sort by sub-account descending')
             })}
           </div>
-          <div role="columnheader" className="col-xs-1">
+          <div role="columnheader" className="col-xs-2">
             {this.renderHeader({
               id: 'enrollments',
               label: I18n.t('Enrollments'),
@@ -144,7 +144,7 @@ class CoursesList extends React.Component {
               tipAsc: I18n.t('Click to sort by enrollments descending')
             })}
           </div>
-          <div role="columnheader" className="col-xs-2">
+          <div role="columnheader" className="col-xs-1">
             <span className="screenreader-only">{I18n.t('Course option links')}</span>
           </div>
         </div>
