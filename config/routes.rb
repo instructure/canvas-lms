@@ -687,6 +687,8 @@ CanvasRails::Application.routes.draw do
 
   get 'login/canvas' => 'login/canvas#new', as: :canvas_login
   post 'login/canvas' => 'login/canvas#create'
+  # deprecated alias
+  post 'login' => 'login/canvas#create'
 
   get 'login/ldap' => 'login/ldap#new'
   post 'login/ldap' => 'login/ldap#create'
