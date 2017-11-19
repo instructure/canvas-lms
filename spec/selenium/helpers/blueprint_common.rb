@@ -149,6 +149,7 @@ module BlueprintCourseCommon
           keep_trying = true
         end
       end
+      wait_for_ajaximations
     end
 
     # reutrn the <tboey> holding the list of avaiable courses
