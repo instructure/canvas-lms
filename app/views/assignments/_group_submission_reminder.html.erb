@@ -16,6 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% js_bundle :group_submission_reminder %>
+
 <% if @assignment.has_group_category? && !@assignment.grade_group_students_individually %>
-  <div style="padding:1em;" class="ui-state-highlight"><%= image_tag "warning.png", :alt => '' %> <%= t 'warnings.group_submission', "Keep in mind, this submission will count for everyone in your %{group_type} group.", :group_type => @assignment.group_category.name %></div>
+  <div
+    class="group_submission_alert"
+    data-group-type="<%= @assignment.group_category.name %>"
+  ></div>
 <% end %>
