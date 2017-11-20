@@ -166,8 +166,10 @@ module Importers
       # there might not be an import id if it's just a text-only type...
       item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first if hash[:id]
       item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      if item && !allow_update
-        if item.deleted?
+      item ||= context.quizzes.temp_record
+      item.mark_as_importing!(migration)
+      if item
+        if !allow_update && item.deleted?
           item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
           item.saved_by = :migration
           item.quiz_groups.destroy_all
@@ -175,8 +177,6 @@ module Importers
           item.save
         end
       end
-      item ||= context.quizzes.temp_record
-      item.mark_as_importing!(migration)
       new_record = item.new_record? || item.deleted?
 
       hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)

@@ -381,31 +381,100 @@ describe MasterCourses::MasterMigration do
 
       page1 = @copy_from.wiki_pages.create!(:title => "whee")
       page2 = @copy_from.wiki_pages.create!(:title => "whoo")
+      quiz = @copy_from.quizzes.create!(:title => 'what')
       run_master_migration
 
       page1_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page1)).first
       page1_to.destroy # "manually" delete it
       page2_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page2)).first
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      quiz_to.destroy
 
       Timecop.freeze(3.minutes.from_now) do
         page1.update_attribute(:title, 'new title eh')
         page2.destroy
+        quiz.update_attribute(:title, 'new title wat')
       end
       run_master_migration
 
       expect(page1_to.reload).to be_deleted # shouldn't have restored it
       expect(page2_to.reload).to be_deleted # should still sync the original deletion
+      expect(quiz_to.reload).to be_deleted # shouldn't have restored it neither
 
       Timecop.freeze(5.minutes.from_now) do
         page1.update_attribute(:title, 'another new title srsly')
         @template.content_tag_for(page1).update_attribute(:restrictions, {:content => true}) # lock it down
-
         page2.update_attribute(:workflow_state, "active") # restore the original
+        quiz.update_attribute(:title, 'another new title frd pdq')
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true}) # lock it down
       end
       run_master_migration
 
       expect(page1_to.reload).to be_active # should be restored because it's locked now
       expect(page2_to.reload).to be_active # should be restored because it hadn't been deleted manually
+      expect(quiz_to.reload).not_to be_deleted # should be restored because it's locked now
+    end
+
+    it "doesn't undelete modules that were deleted downstream" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      mod = @copy_from.context_modules.create! :name => 'teh'
+      run_master_migration
+
+      mod_to = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      mod_to.destroy
+
+      Timecop.freeze(3.minutes.from_now) do
+        mod.touch
+      end
+      run_master_migration
+
+      expect(mod_to.reload).to be_deleted
+    end
+
+    describe "outcomes and groups" do
+      before :once do
+        @copy_to = course_factory
+        @template.add_child_course!(@copy_to)
+
+        root = @copy_from.root_outcome_group
+        @og = @copy_from.learning_outcome_groups.create!({:title => 'outcome group'})
+        root.adopt_outcome_group(@og)
+        @outcome = @copy_from.created_learning_outcomes.create!({:title => 'new outcome'})
+        @og.add_outcome(@outcome)
+        run_master_migration
+
+        @outcome_to = @copy_to.learning_outcomes.where(:migration_id => mig_id(@outcome)).first
+        @og_to = @copy_to.learning_outcome_groups.where(:migration_id => mig_id(@og)).first
+      end
+
+      it "doesn't undelete learning outcomes and outcome groups that were deleted downstream" do
+        @outcome_to.destroy
+        @og_to.destroy
+
+        Timecop.freeze(3.minutes.from_now) do
+          @og.touch
+          @outcome.touch
+        end
+        run_master_migration
+
+        expect(@outcome_to.reload).to be_deleted
+        expect(@og_to.reload).to be_deleted
+      end
+
+      it "doesn't resurrect links to deleted outcomes" do
+        @outcome_to.destroy
+
+        Timecop.freeze(3.minutes.from_now) do
+          @og.touch
+          @outcome.touch
+        end
+        run_master_migration
+
+        expect(@outcome_to.reload).to be_deleted
+        expect(@og_to.child_outcome_links.not_deleted.where(content_type: 'LearningOutcome', content_id: @outcome_to)).not_to be_any
+      end
     end
 
     it "doesn't restore deleted associated files unless relocked" do

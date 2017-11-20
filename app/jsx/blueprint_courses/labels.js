@@ -29,6 +29,7 @@ const itemTypeLabels = {
   assessment_question_bank: I18n.t('Question Bank'),
   calendar_event: I18n.t('Event'),
   learning_outcome: I18n.t('Outcome'),
+  learning_outcome_group: I18n.t('Outcome Group'),
   rubric: I18n.t('Rubric'),
   context_external_tool: I18n.t('External Tool')
 }

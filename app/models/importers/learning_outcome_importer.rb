@@ -82,6 +82,7 @@ module Importers
             where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
           item ||= context.created_learning_outcomes.temp_record
           item.context = context
+          item.mark_as_importing!(migration)
         end
         item.migration_id = hash[:migration_id]
         item.vendor_guid = hash[:vendor_guid]
@@ -112,6 +113,10 @@ module Importers
       else
         item = outcome
       end
+
+      # don't add a deleted outcome to an outcome group, or align it with an assignment
+      # (blueprint migration will not undelete outcomes deleted downstream)
+      return item if item.deleted?
 
       log = hash[:learning_outcome_group] || context.root_outcome_group
       log.add_outcome(item)

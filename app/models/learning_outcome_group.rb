@@ -19,6 +19,9 @@
 class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
   include OutcomeAttributes
+  include MasterCourses::Restrictor
+  restrict_columns :state, [:workflow_state]
+
   belongs_to :learning_outcome_group
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"
   has_many :child_outcome_links, -> { where(tag_type: 'learning_outcome_association', content_type: 'LearningOutcome') }, class_name: 'ContentTag', as: :associated_asset
