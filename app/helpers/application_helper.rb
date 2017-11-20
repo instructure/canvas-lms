@@ -53,7 +53,8 @@ module ApplicationHelper
             final_position += 1
           end
 
-          return data.value.to_s == final_position.to_s ? 'completed' : "started"
+          #  give it some wiggle room with >= instead of == for edits where we remove something
+          return data.value.to_s >= final_position.to_s ? 'completed' : "started"
         end
       end
     end
@@ -914,7 +915,7 @@ module ApplicationHelper
     # this list of course IDs are our 2015, 2016, and Spring 2017 ones.  New UI was rolled out Fall 2017
     # I don't mind hardcoding since we will always use the new
     # style going forward, and thus this list will never change.
-    if @context && [25, 26, 28, 10, 11, 16, 17, 19, 23, 24, 21, 22, 7].include?(@context.id)
+    if @context && [25, 26, 28, 31, 32, 33, 10, 11, 16, 17, 19, 23, 24, 21, 22, 7, 35, 36, 37].include?(@context.id)
       orig.sub("bz_custom.css", "bz_oldui.css")
     else
       orig.sub("bz_custom.css", "bz_newui.css")
