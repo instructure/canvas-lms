@@ -26,8 +26,7 @@ body {
   background: $ic-color-light;
   font-weight: 300;
 
-  &:not(.is-inside-submission-frame),
-  &:not(.embedded) {
+  &:not(.is-inside-submission-frame):not(.embedded) {
     min-width: 768px;
   }
 
@@ -116,8 +115,8 @@ div.content_notice {
 
 .before_external_content_info_alert,
 .after_external_content_info_alert {
-  margin: 20px 0px 20px 0px;
   &:focus {
+    margin: 20px 0px 20px 0px;
     outline: none;
   }
 }

@@ -206,7 +206,9 @@ class SplitUsers
     end
 
     def transfer_enrollment_data(source_user, target_user, courses)
-      Shard.partition_by_shard(courses) do |shard_course|
+      # use a partition proc so that we only run on the actual course shard, not all
+      # shards associated with the course
+      Shard.partition_by_shard(courses, ->(course) { course.shard }) do |shard_course|
         source_user_id = source_user.id
         target_user_id = target_user.id
         ENROLLMENT_DATA_UPDATES.each do |update|

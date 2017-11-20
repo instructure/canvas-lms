@@ -61,28 +61,6 @@ $fire:                      #FC5E13; // orange
 //====================================
 // Default Functional Swatches
 //====================================
-
-// this just needs to be defined outside of this @if $use_high_contrast {...} block
-// so its scope is global and not just inside that @if, so other sheets can use it.
-$ic-brand-primary-high-contrast: null;
-$variables-have-been-defined: false !default;
-@if $use_high_contrast {
-  $ic-brand-primary-high-contrast: #0770A3;
-  $ic-link-color-high-contrast: #0073A7;
-  @if not $variables-have-been-defined { // makes sure this is only output once
-    $variables-have-been-defined: true;
-    :root {
-      --ic-brand-primary: $ic-brand-primary-high-contrast;
-      --ic-brand-primary-darkened-5: darken($ic-brand-primary-high-contrast, 5);
-      --ic-brand-primary-darkened-10: darken($ic-brand-primary-high-contrast, 10);
-      --ic-brand-primary-lightened-15: lighten($ic-brand-primary-high-contrast, 15);
-      --ic-link-color: $ic-link-color-high-contrast;
-      --ic-link-color-darkened-10: darken($ic-link-color-high-contrast, 10);
-      --ic-link-color-lightened-10: darken($ic-link-color-high-contrast, 10);
-    }
-  }
-}
-
 $ic-color-success:          $shamrock;
 $ic-color-action:           $barney;
 $ic-color-danger:           $crimson;
@@ -119,7 +97,7 @@ $ic-bg-light-neutral-text:  #394B58;
 $ic-bg-light-primary:       #E5F2F8;
 @if $use_high_contrast { $ic-bg-light-primary: #E6F1F7;}
 $ic-bg-light-primary-text:  #0078BD;
-@if $use_high_contrast { $ic-bg-light-primary-text: $ic-brand-primary-high-contrast; }
+@if $use_high_contrast { $ic-bg-light-primary-text: #0770A3; }
 $ic-bg-light-success:       #E8F6E9;
 @if $use_high_contrast { $ic-bg-light-success: #E8F2E9; }
 $ic-bg-light-success-text:  #008A13;

@@ -113,7 +113,7 @@ describe 'new ui' do
     end
 
     it 'should not override high contrast theme', priority: "2", test_id: 244898 do
-      BrandableCSS.save_default_css! # make sure variable css file is up to date
+      BrandableCSS.save_default!('css') # make sure variable css file is up to date
       get '/profile/settings'
       f('.ic-Super-toggle__switch').click
       wait_for_ajaximations

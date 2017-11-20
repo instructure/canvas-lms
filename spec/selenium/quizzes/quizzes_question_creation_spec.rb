@@ -63,6 +63,21 @@ describe 'quizzes question creation' do
       expect(question_data[:neutral_comments_html]).to eq '<p>Pass or fail you are a winner!</p>'
     end
 
+    it 'does not open two text editors when you edit a multiple choice answer twice' do
+      question = fj(".question_form:visible")
+      click_option('.question_form:visible .question_type', 'Multiple Choice')
+      answers = question.find_elements(:css, ".form_answers > .answer")
+      first_answer = answers[0]
+      hover(first_answer)
+      # Open the HTML editor, click Done, then open it again.
+      first_answer.find_element(:css, '.edit_html').click
+      first_answer.find_element(:css, '.edit_html_done').click
+      first_answer.find_element(:css, '.edit_html').click
+      # There should only be one text editor showing.
+      text_area = first_answer.find_elements(:css, 'textarea')
+      expect(text_area.length).to eq(1)
+    end
+
     # True/False Question
     it 'creates a true false question', priority: "1", test_id: 140628 do
       quiz = @last_quiz

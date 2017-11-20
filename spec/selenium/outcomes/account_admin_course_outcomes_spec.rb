@@ -58,6 +58,7 @@ describe "account admin outcomes" do
       end
 
       it "should delete a learning outcome", priority: "1", test_id: 250232 do
+        skip_if_safari(:alert)
         should_delete_a_learning_outcome
       end
 
@@ -85,6 +86,7 @@ describe "account admin outcomes" do
       end
 
       it "should delete an outcome group", priority: "2", test_id: 250238 do
+        skip_if_safari(:alert)
         should_delete_an_outcome_group
       end
     end
@@ -99,6 +101,7 @@ describe "account admin outcomes" do
       end
 
       it "should expand/collapse outcome groups", priority: "2", test_id: 114338 do
+        skip_if_safari(:alert)
         import_state_standart_into_account
 
         back_button = f(".go_back")

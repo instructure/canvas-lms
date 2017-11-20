@@ -468,6 +468,35 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       expect(scroll_location).not_to be 0
     end
 
+    it "should not load mathjax if no mathml" do
+      text = '<p>o mathml here</p>'
+      wysiwyg_state_setup(text, html: true)
+      f('button.submit').click
+      wait_for_ajaximations
+      mathjax_defined = driver.execute_script('return (window.MathJax !== undefined)')
+      expect(mathjax_defined).to eq false
+    end
+
+    it "should load mathjax if mathml" do
+      text = '<p><math> <mi>&pi;</mi> <mo>⁢</mo> <msup> <mi>r</mi> <mn>2</mn> </msup> </math></p>'
+      wysiwyg_state_setup(text, html: true)
+      f('button.submit').click
+      wait_for_ajaximations
+      mathjax_defined = driver.execute_script('return (window.MathJax !== undefined)')
+      expect(mathjax_defined).to eq true
+    end
+
+    it "should not load mathjax if displaying an equation editor image and mathml" do
+      text = '<p><math> <mi>&pi;</mi> <mo>⁢</mo> <msup> <mi>r</mi> <mn>2</mn> </msup> </math></p>'
+      mathmanImg = '<p><img class="equation_image" title="\infty" src="/equation_images/%255Cinfty" alt="LaTeX: \infty" data-equation-content="\infty" /></p>'
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      add_html_to_tiny(text+mathmanImg)
+      f('button.btn-primary').click
+      wait_for_ajaximations
+      mathjax_defined = driver.execute_script('return (window.MathJax !== undefined)')
+      expect(mathjax_defined).to be false
+    end
+
     it "should display record video dialog" do
       stub_kaltura
 

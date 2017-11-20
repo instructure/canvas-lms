@@ -190,6 +190,7 @@ class PageViewsController < ApplicationController
       date_options[:newest] = end_time
       url_options[:end_time] = params[:end_time]
     end
+    date_options[:viewer] = @current_user
     page_views = @user.page_views(date_options)
     url = api_v1_user_page_views_url(url_options)
 
@@ -201,7 +202,7 @@ class PageViewsController < ApplicationController
       format.csv do
         cancel_cache_buster
 
-        csv = PageView::CsvReport.new(@user).generate
+        csv = PageView::CsvReport.new(@user, @current_user).generate
 
         options = {
           type: 'text/csv',

@@ -21,7 +21,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!file_not_found'
-import preventDefault from 'compiled/fn/preventDefault'
 
   const LABEL_TEXT = I18n.t('Please let them know which page you were viewing and the link you clicked on.');
 
@@ -33,7 +32,8 @@ import preventDefault from 'compiled/fn/preventDefault'
       };
     }
 
-    submitMessage () {
+    submitMessage = (e) => {
+      e.preventDefault();
       const conversationData = {
         subject: I18n.t('Broken file link found in your course'),
         recipients: this.props.contextCode + '_teachers',
@@ -57,8 +57,8 @@ import preventDefault from 'compiled/fn/preventDefault'
             <form
               style={{marginBottom: 0}}
               ref='form'
-              onSubmit={preventDefault(this.submitMessage)}
-            />
+              onSubmit={this.submitMessage}
+            >
               <div className='form-group pad-box'>
                 <label htmlFor='fnfMessage' className='screenreader-only'>
                   {LABEL_TEXT}
@@ -73,6 +73,7 @@ import preventDefault from 'compiled/fn/preventDefault'
               <div className='form-actions' style={{marginBottom: 0}}>
                 <button type='submit' className='btn btn-primary'>{I18n.t('Send')}</button>
               </div>
+            </form>
           </div>
         );
       } else {

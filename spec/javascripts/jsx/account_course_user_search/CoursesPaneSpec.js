@@ -35,10 +35,8 @@ test('onUpdateFilters calls debouncedApplyFilters after updating state', () => {
     <CoursesPane
       accountId="1"
       roles={[{id: '1' }]}
-      addUserUrls={{
-        USER_LISTS_URL: '/',
-        ENROLL_USERS_URL: '/',
-      }}
+      queryParams={{}}
+      onUpdateQueryParams={function(){}}
     />
   );
   const instance = wrapper.instance();

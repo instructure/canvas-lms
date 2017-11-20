@@ -52,10 +52,9 @@
   li {
     a {
       @include fontSize($ic-font-size--xsmall);
-      padding-top: $ic-sp * 0.75;
-      padding-bottom: $ic-sp * 0.75;
+      padding-top: $ic-sp;
+      padding-bottom: $ic-sp;
       display: flex;
-      border-bottom: 1px solid #d6d6d6;
 
       @if $use_high_contrast {
         text-decoration: underline;

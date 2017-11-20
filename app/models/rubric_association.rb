@@ -307,6 +307,8 @@ class RubricAssociation < ActiveRecord::Base
       if assessments_unique_per_asset?(params[:assessment_type])
         # Unless it's for grading, in which case assessments are unique per artifact (the assessor can change, depending on if the teacher/TA updates it)
         assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessment_type: params[:assessment_type]).first
+        # Update the assessor in case it did change
+        assessment&.assessor = opts[:assessor]
       else
         # Assessments are unique per artifact/assessor/assessment_type.
         assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessor_id: opts[:assessor], assessment_type: params[:assessment_type]).first

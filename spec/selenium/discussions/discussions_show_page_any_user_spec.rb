@@ -343,6 +343,7 @@ describe "discussions" do
         end
 
         it "should delete a side comment", priority: "1", test_id: 345490 do
+          skip_if_safari(:alert)
           entry = topic.discussion_entries.create!(:user => somebody, :message => "new side comment from somebody", :parent_entry => entry)
           get url
           delete_entry(entry)

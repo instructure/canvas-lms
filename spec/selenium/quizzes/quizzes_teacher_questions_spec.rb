@@ -96,7 +96,8 @@ describe "quizzes questions" do
     end
 
     it "should not show Missing Word option in question types dropdown", priority: "1", test_id: 209948 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
 
       expect(ff("#question_form_template option.missing_word").length).to eq 1
 

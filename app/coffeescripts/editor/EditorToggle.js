@@ -119,13 +119,12 @@ class EditorToggle {
   replaceTextArea () {
     this.el.insertBefore(this.textAreaContainer)
     RichContentEditor.destroyRCE(this.textArea)
+    if (this.textArea) {
+      this.textArea.remove()
+    }
     this.textArea = this.createTextArea()
     this.textAreaContainer.append(this.textArea)
     return this.textAreaContainer.detach()
-  }
-
-  renewTextAreaID () {
-    return this.textArea.attr('id', nextID())
   }
 
   // #

@@ -195,43 +195,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  def course_user_search
-    return unless authorized_action(@account, @current_user, :read)
-    can_read_course_list = !@account.site_admin? && @account.grants_right?(@current_user, session, :read_course_list)
-    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
-    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
-
-    unless can_read_course_list || can_read_roster
-      return render_unauthorized_action
-    end
-
-    @permissions = {
-      theme_editor: can_manage_account && @account.branding_allowed?,
-      can_read_course_list: can_read_course_list,
-      can_read_roster: can_read_roster,
-      can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
-      can_create_users: @account.root_account? && @account.grants_right?(@current_user, session, :manage_user_logins),
-      analytics: @account.service_enabled?(:analytics),
-      can_masquerade: @account.grants_right?(@current_user, session, :become_user),
-      can_message_users: @account.grants_right?(@current_user, session, :send_messages),
-      can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins)
-    }
-
-    js_env({
-      TIMEZONES: {
-        priority_zones: localized_timezones(I18nTimeZone.us_zones),
-        timezones: localized_timezones(I18nTimeZone.all)
-      },
-      BASE_PATH: request.env['PATH_INFO'].sub(/\/search.*/, '') + '/search',
-      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user),
-      URLS: {
-        USER_LISTS_URL: course_user_lists_url("{{ id }}"),
-        ENROLL_USERS_URL: course_enroll_users_url("{{ id }}", :format => :json)
-      }
-    })
-    render template: "accounts/course_user_search"
-  end
-
   # @API Get the sub-accounts of an account
   #
   # List accounts that are sub-accounts of the given account.
@@ -329,7 +292,7 @@ class AccountsController < ApplicationController
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
-  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"subaccount"|"enrollments"]
+  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"subaccount"|"total_students"]
   #   The column to sort results by.
   #
   # @argument order [String, "asc"|"desc"]
@@ -366,14 +329,8 @@ class AccountsController < ApplicationController
                 AND #{Enrollment.quoted_table_name}.type = 'TeacherEnrollment'
                 AND #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
                 ORDER BY #{sortable_name_col} LIMIT 1)"
-            elsif params[:sort] == 'enrollments'
-              "(SELECT DISTINCT COUNT(DISTINCT #{Enrollment.quoted_table_name}.user_id)
-                AS count_user_id FROM #{Enrollment.quoted_table_name}
-                WHERE #{Enrollment.quoted_table_name}.type = 'StudentEnrollment'
-                AND (#{Enrollment.quoted_table_name}.workflow_state
-                NOT IN ('rejected', 'completed', 'deleted', 'inactive'))
-                AND #{Enrollment.quoted_table_name}.course_id
-                = #{Course.quoted_table_name}.id)"
+            elsif params[:sort] == 'total_students'
+              "student_count"
             elsif params[:sort] == 'subaccount'
               "(SELECT #{name_col} FROM #{Account.quoted_table_name}
                 WHERE #{Account.quoted_table_name}.id
@@ -467,18 +424,23 @@ class AccountsController < ApplicationController
     # sections, needs_grading_count, and total_score not valid as enrollments are needed
     includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
 
+    includes << "total_students" if params[:sort] == "total_students"
+    if includes.include?("total_students")
+      @courses = @courses.select("*, (
+        SELECT COUNT(*) from #{Enrollment.quoted_table_name}
+        WHERE
+          #{Enrollment.quoted_table_name}.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND
+          #{Enrollment.quoted_table_name}.type IN ('StudentEnrollment') AND
+          #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
+      ) AS student_count")
+    end
+
     page_opts = {}
     page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account])
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
-
-    if includes.include?("total_students")
-      student_counts = StudentEnrollment.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
-        where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
-      @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
-    end
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end
@@ -1062,7 +1024,7 @@ class AccountsController < ApplicationController
       end
     end
 
-    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).admin.where.not(:enrollments => {:workflow_state => %w{rejected deleted}})
+    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => {:workflow_state => %w{rejected deleted}})
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
     courses_to_teachers = teachers.inject({}) do |result, teacher|
       result[teacher.course_id] ||= []
@@ -1168,16 +1130,6 @@ class AccountsController < ApplicationController
   def rich_content_service_config
     rce_js_env(:basic)
   end
-
-  def localized_timezones(timezones)
-    timezones.map do |timezone|
-      {
-        name: timezone.name,
-        localized_name: timezone.to_s
-      }
-    end
-  end
-  private :localized_timezones
 
   private
 

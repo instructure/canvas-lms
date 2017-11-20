@@ -30,7 +30,7 @@
       if(form !== null){
         form.style.display = "";
         setTimeout(function(){
-          $(form).find(":text:first").focus();
+          $(form).find(":focusable:first").focus();
           form.scrollIntoView();
         }, 100);
       }

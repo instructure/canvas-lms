@@ -19,7 +19,7 @@ describe RuboCop::Cop::Migration::SendLater do
   subject(:cop) { described_class.new }
 
   it 'catches other forms of send_later' do
-    inspect_source(cop, %{
+    inspect_source(%{
       class TestMigration < ActiveRecord::Migration
 
         def up
@@ -33,7 +33,7 @@ describe RuboCop::Cop::Migration::SendLater do
   end
 
   it 'disallows send_later in predeploys' do
-    inspect_source(cop, %{
+    inspect_source(%{
       class TestMigration < ActiveRecord::Migration
         tag :predeploy
 

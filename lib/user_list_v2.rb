@@ -99,13 +99,13 @@ class UserListV2
 
   def add_rows(rows, original_shard)
     rows.uniq!{|r| r[1]} # unique on user_id
-    rows.each do |address, user_id, account_id, user_name, account_name|
+    rows.each do |address, user_id, user_uuid, account_id, user_name, account_name|
       if Shard.current != original_shard
         user_id = Shard.relative_id_for(user_id, Shard.current, original_shard)
         account_id = Shard.relative_id_for(account_id, Shard.current, original_shard)
       end
-      @all_results << {:address => address, :user_id => user_id, :user_name => user_name,
-        :account_id => account_id, :account_name => account_name}
+      @all_results << {:address => address, :user_id => user_id, :user_token => User.token(user_id, user_uuid),
+                       :user_name => user_name, :account_id => account_id, :account_name => account_name}
     end
   end
 
@@ -172,7 +172,7 @@ class UserListV2
     search_for_results(restricted_shards) do |account_ids|
       Pseudonym.active.where(:account_id => account_ids).
         where("LOWER(unique_id) IN (?)", unique_ids).joins(:user, :account).
-        pluck(:unique_id, :user_id, :account_id, 'users.name', 'accounts.name')
+        pluck(:unique_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
     end
     @lowercase = true
   end
@@ -187,9 +187,9 @@ class UserListV2
     ids = @addresses.map{|a| a[:address]}
     search_for_results(restricted_shards) do |account_ids|
       rows = Pseudonym.active.where(:account_id => account_ids, :sis_user_id => ids).joins(:user, :account).
-        pluck(:sis_user_id, :user_id, :account_id, 'users.name', 'accounts.name')
+        pluck(:sis_user_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
       rows += Pseudonym.active.where(:account_id => account_ids, :integration_id => ids).joins(:user, :account).
-        pluck(:integration_id, :user_id, :account_id, 'users.name', 'accounts.name')
+        pluck(:integration_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
       rows
     end
   end
@@ -239,7 +239,7 @@ class UserListV2
         path = cc.path
         # replace the actual path with the original address for SMS
         path = sms_path_header_map[path.split("@").first] if cc.path_type == 'sms'
-        [path, cc.user_id, p.account_id, cc.user.name, p.account.name]
+        [path, cc.user_id, cc.user.uuid, p.account_id, cc.user.name, p.account.name]
       end.compact
     end
     @lowercase = true

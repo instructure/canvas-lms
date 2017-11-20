@@ -18,8 +18,22 @@
 
 class AddNotNullConstraintToScoresCourseScore < ActiveRecord::Migration[5.0]
   tag :postdeploy
+  disable_ddl_transaction!
 
-  def change
-    change_column_null :scores, :course_score, false
+  def up
+    self.connection.execute(<<SQL)
+      ALTER TABLE #{Score.quoted_table_name}
+       ADD CONSTRAINT course_score_not_null CHECK (course_score IS NOT NULL) NOT VALID;
+SQL
+
+    self.connection.execute(<<SQL)
+      ALTER TABLE #{Score.quoted_table_name} VALIDATE CONSTRAINT course_score_not_null;
+SQL
+  end
+
+  def down
+    self.connection.execute(<<SQL)
+      ALTER TABLE #{Score.quoted_table_name} DROP CONSTRAINT course_score_not_null;
+SQL
   end
 end

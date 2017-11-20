@@ -17,47 +17,48 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import { debounce } from 'underscore'
+import {shape, arrayOf, string, func} from 'prop-types'
+import {debounce} from 'underscore'
 import I18n from 'i18n!account_course_user_search'
 import CoursesStore from './CoursesStore'
 import TermsStore from './TermsStore'
 import AccountsTreeStore from './AccountsTreeStore'
 import CoursesList from './CoursesList'
 import CoursesToolbar from './CoursesToolbar'
-import renderSearchMessage from './renderSearchMessage'
+import SearchMessage from './SearchMessage'
 
 const MIN_SEARCH_LENGTH = 3
 const stores = [CoursesStore, TermsStore, AccountsTreeStore]
-const { shape, arrayOf, string } = PropTypes
+
+const defaultFilters = {
+  enrollment_term_id: '',
+  search_term: '',
+  with_students: false,
+  sort: 'sis_course_id',
+  order: 'asc',
+  search_by: 'course',
+  page: null
+}
 
 class CoursesPane extends React.Component {
   static propTypes = {
     roles: arrayOf(shape({ id: string.isRequired })).isRequired,
-    addUserUrls: shape({
-      USER_LISTS_URL: string.isRequired,
-      ENROLL_USERS_URL: string.isRequired,
-    }).isRequired,
-    accountId: string.isRequired,
+    queryParams: shape().isRequired,
+    onUpdateQueryParams: func.isRequired,
+    accountId: string.isRequired
   }
 
   constructor () {
     super()
 
-    const filters = {
-      enrollment_term_id: '',
-      search_term: '',
-      with_students: false,
-      sort: 'sis_course_id',
-      order: 'asc',
-      search_by: 'course',
-    }
-
     this.state = {
-      filters,
-      draftFilters: filters,
+      filters: defaultFilters,
+      draftFilters: defaultFilters,
       errors: {},
-      previousCourses: {data: []},
+      previousCourses: {
+        data: [],
+        loading: true
+      }
     }
 
     // Doing this here because the class property version didn't work :(
@@ -66,6 +67,8 @@ class CoursesPane extends React.Component {
 
   componentWillMount () {
     stores.forEach(s => s.addChangeListener(this.refresh))
+    const filters = Object.assign({}, defaultFilters, this.props.queryParams)
+    this.setState({filters, draftFilters: filters})
   }
 
   componentDidMount () {
@@ -78,18 +81,27 @@ class CoursesPane extends React.Component {
     stores.forEach(s => s.removeChangeListener(this.refresh))
   }
 
+  componentWillReceiveProps(nextProps) {
+    const filters = Object.assign({}, defaultFilters, nextProps.queryParams)
+    this.setState({filters, draftFilters: filters})
+  }
+
   fetchCourses = () => {
+    this.updateQueryString()
     CoursesStore.load(this.state.filters)
   }
 
-  fetchMoreCourses = () => {
-    CoursesStore.loadMore(this.state.filters)
+  setPage = (page) => {
+    this.setState({
+      filters: {...this.state.filters, page},
+      previousCourses: CoursesStore.get(this.state.filters)
+    }, this.fetchCourses)
   }
 
   onUpdateFilters = (newFilters) => {
     this.setState({
       errors: {},
-      draftFilters: Object.assign({}, this.state.draftFilters, newFilters)
+      draftFilters: Object.assign({page: null}, this.state.draftFilters, newFilters)
     }, this.debouncedApplyFilters)
   }
 
@@ -104,11 +116,7 @@ class CoursesPane extends React.Component {
 
   onChangeSort = (column) => {
     const {sort, order} = this.state.filters
-    let newOrder = 'asc'
-
-    if (column === sort && order === 'asc') {
-      newOrder = 'desc'
-    }
+    const newOrder = (column === sort && order === 'asc') ? 'desc' : 'asc'
 
     const newFilters = Object.assign({}, this.state.filters, {
       sort: column,
@@ -119,6 +127,17 @@ class CoursesPane extends React.Component {
 
   refresh = () => {
     this.forceUpdate()
+  }
+
+  updateQueryString = () => {
+    const differences = Object.keys(this.state.filters).reduce((memo, key) => {
+      const value = this.state.filters[key]
+      if (value !== defaultFilters[key]) {
+        return {...memo, [key]: value}
+      }
+      return memo
+    }, {})
+    this.props.onUpdateQueryParams(differences)
   }
 
   render () {
@@ -139,8 +158,8 @@ class CoursesPane extends React.Component {
           terms={terms && terms.data}
           accounts={accounts}
           isLoading={isLoading}
-          {...draftFilters}
           errors={errors}
+          draftFilters={draftFilters}
         />
 
         <CoursesList
@@ -148,12 +167,15 @@ class CoursesPane extends React.Component {
           accountId={this.props.accountId}
           courses={courses.data}
           roles={this.props.roles}
-          addUserUrls={this.props.addUserUrls}
           sort={filters.sort}
           order={filters.order}
         />
 
-        {renderSearchMessage(courses, this.fetchMoreCourses, I18n.t('No courses found'))}
+        <SearchMessage
+          collection={courses}
+          setPage={this.setPage}
+          noneFoundMessage={I18n.t('No courses found')}
+        />
       </div>
     )
   }

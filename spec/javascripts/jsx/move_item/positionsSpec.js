@@ -16,43 +16,67 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { positions, removeFromOrder } from 'jsx/move_item/positions'
+import { positions, removeAllFromOrder } from 'jsx/move_item/positions'
 
 QUnit.module('MoveItem positions')
 
-test('removeFromOrder removes item if it is in order', () => {
+test('removeAllFromOrder removes item if it is in order', () => {
   const order = ['a', 'b', 'c', 'd']
-  const item = 'a'
+  const items = ['a']
   const expected = ['b', 'c', 'd']
-  deepEqual(removeFromOrder(order, item), expected)
+  deepEqual(removeAllFromOrder(order, items), expected)
 })
 
-test('removeFromOrder does not change the order if item is not found', () => {
+test('removeAllFromOrder does not change the order if item is not found', () => {
   const order = ['a', 'b', 'c', 'd']
-  const item = 'z'
-  deepEqual(removeFromOrder(order, item), order)
+  const items = ['z']
+  deepEqual(removeAllFromOrder(order, items), order)
 })
 
 test('first places item first in order', () => {
   const order = ['a', 'b', 'c']
-  const item = 'z'
-  deepEqual(positions.first.apply({ order, item }), ['z', 'a', 'b', 'c'])
+  const items = ['z']
+  deepEqual(positions.first.apply({ order, items }), ['z', 'a', 'b', 'c'])
 })
 
 test('last places item last in order', () => {
   const order = ['a', 'b', 'c']
-  const item = 'z'
-  deepEqual(positions.last.apply({ order, item }), ['a', 'b', 'c', 'z'])
+  const items = ['z']
+  deepEqual(positions.last.apply({ order, items }), ['a', 'b', 'c', 'z'])
 })
 
 test('before places item correctly in order', () => {
   const order = ['a', 'b', 'c']
-  const item = 'z'
-  deepEqual(positions.before.apply({ order, item, relativeTo: 1 }), ['a', 'z', 'b', 'c'])
+  const items = ['z']
+  deepEqual(positions.before.apply({ order, items, relativeTo: 1 }), ['a', 'z', 'b', 'c'])
 })
 
 test('after places item correctly in order', () => {
   const order = ['a', 'b', 'c']
-  const item = 'z'
-  deepEqual(positions.after.apply({ order, item, relativeTo: 1 }), ['a', 'b', 'z', 'c'])
+  const items = ['z']
+  deepEqual(positions.after.apply({ order, items, relativeTo: 1 }), ['a', 'b', 'z', 'c'])
+})
+
+test('first places many items first in order', () => {
+  const order = ['a', 'b', 'c']
+  const items = ['z', 'q', 'h']
+  deepEqual(positions.first.apply({ order, items }), ['z', 'q', 'h', 'a', 'b', 'c'])
+})
+
+test('last places many items last in order', () => {
+  const order = ['a', 'b', 'c']
+  const items = ['z', 'q', 'h']
+  deepEqual(positions.last.apply({ order, items }), ['a', 'b', 'c', 'z', 'q', 'h'])
+})
+
+test('before places many items correctly in order', () => {
+  const order = ['a', 'b', 'c']
+  const items = ['z', 'q', 'h']
+  deepEqual(positions.before.apply({ order, items, relativeTo: 1 }), ['a', 'z', 'q', 'h', 'b', 'c'])
+})
+
+test('after places many items correctly in order', () => {
+  const order = ['a', 'b', 'c']
+  const items = ['z', 'q', 'h']
+  deepEqual(positions.after.apply({ order, items, relativeTo: 1 }), ['a', 'b', 'z', 'q', 'h', 'c'])
 })

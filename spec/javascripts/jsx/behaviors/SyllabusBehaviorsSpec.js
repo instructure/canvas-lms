@@ -41,6 +41,7 @@ QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {
     }
     editorUtils.resetRCE()
     fixtures.teardown()
+    $(".ui-dialog").remove()
   }
 });
 

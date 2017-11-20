@@ -77,7 +77,8 @@ describe "quizzes" do
     end
 
     it "should create a new question group", priority: "1", test_id: 210060 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
 
       click_questions_tab
       f('.add_question_group_link').click
@@ -91,7 +92,8 @@ describe "quizzes" do
     it "should update a question group", priority: "1", test_id: 210061
 
     it "should not let you exceed the question limit", priority: "2", test_id: 210062 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
 
       click_questions_tab
       f('.add_question_group_link').click
@@ -124,7 +126,8 @@ describe "quizzes" do
 
     describe "insufficient count warnings" do
       it "should show a warning for groups picking too many questions", priority: "2", test_id: 539340 do
-        get "/courses/#{@course.id}/quizzes/new"
+        get "/courses/#{@course.id}/quizzes"
+        click_new_quiz_button
         click_questions_tab
         f('.add_question_group_link').click
         submit_form('.quiz_group_form')
@@ -163,7 +166,8 @@ describe "quizzes" do
         bank = @course.assessment_question_banks.create!
         assessment_question_model(bank: bank)
 
-        get "/courses/#{@course.id}/quizzes/new"
+        get "/courses/#{@course.id}/quizzes"
+        click_new_quiz_button
         click_questions_tab
         f('.add_question_group_link').click
 
@@ -246,6 +250,7 @@ describe "quizzes" do
     end
 
     it "should indicate when it was last saved", priority: "1", test_id: 210065 do
+      skip_if_safari(:alert)
       user_session(@student)
       take_quiz do
         indicator = f('#last_saved_indicator')
@@ -262,6 +267,7 @@ describe "quizzes" do
     end
 
     it "should validate numerical input data", priority: "1", test_id: 210066 do
+      skip_if_safari(:alert)
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)

@@ -89,12 +89,12 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 
 @keyframes al-slide-down {
   from {
-    transform: translate3d(-1px,-25%,0);
+    transform: rotateX(-90deg);
     opacity: 0.2;
   }
 
   to {
-    transform: translate3d(-1px,0,0);
+    transform: rotateX(0);
     opacity: 1;
   }
 }
@@ -132,6 +132,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
     animation-name: al-slide-down;
     animation-fill-mode: forwards;
     animation-timing-function: cubic-bezier(0,1,0.5,1);
+    transform-origin: top
   }
 
   .ui-menu-item {

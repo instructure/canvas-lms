@@ -65,8 +65,7 @@ module MasterCourses::Restrictor
     end
 
     def check_for_restricted_column_changes
-      return true if @importing_migration || !is_child_content?
-      return true if new_record? && !self.check_restrictions_on_creation? # shouldn't be able to create new collection items if owner is locked
+      return true if @importing_migration || !is_child_content? || !self.check_restrictions?
 
       restrictions = nil
       locked_columns = []
@@ -101,15 +100,19 @@ module MasterCourses::Restrictor
     end
   end
 
-  def check_restrictions_on_creation?
-    false
+  def check_restrictions?
+    !self.new_record?
   end
 
   def mark_downstream_changes(changed_columns=nil)
     return if @importing_migration || @skip_downstream_changes || !is_child_content? # don't mark changes on import
 
     changed_columns ||= self.changes.keys & self.class.base_class.restricted_column_settings.values.flatten
-    changed_columns << "manually_deleted" if self.changes["workflow_state"]&.last == "deleted"
+    state_column = self.is_a?(Attachment) ? "file_state" : "workflow_state"
+    if self.changes[state_column]&.last == "deleted"
+      changed_columns.delete(state_column)
+      changed_columns << "manually_deleted"
+    end
     if changed_columns.any?
       if self.is_a?(Assignment) && submittable = self.submittable_object
         tag_content = submittable # mark on the owner's tag
@@ -159,12 +162,13 @@ module MasterCourses::Restrictor
       end
     end
 
-    if self.changes["workflow_state"]&.first == "deleted" && child_tag.downstream_changes.include?("manually_deleted")
+    state_column = self.is_a?(Attachment) ? "file_state" : "workflow_state"
+    if self.changes[state_column]&.first == "deleted" && child_tag.downstream_changes.include?("manually_deleted")
       if self.editing_restricted?(:any)
         child_tag.downstream_changes.delete("manually_deleted")
         child_tag.save!
       else
-        columns_to_restore << "workflow_state" # don't restore if we manually deleted it
+        columns_to_restore << state_column # don't restore if we manually deleted it
       end
     end
 

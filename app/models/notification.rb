@@ -489,7 +489,7 @@ EOS
       mt(:all_submissions_description,  <<-EOS)
 *Instructor and Admin only:*
 
-Assignment submission/resubmission
+Assignment (except quizzes) submission/resubmission
 EOS
     when 'Submission Comment'
       t(:submission_comment_description, "Assignment submission comment")

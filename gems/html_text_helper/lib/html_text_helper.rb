@@ -164,13 +164,31 @@ module HtmlTextHelper
   # html - The original HTML string to format.
   # options - Formatting options.
   #   - base_url: The protocol and domain to prepend to relative links (e.g. "https://instructure.com").
-  #
+  #   - elements: elements (in addition to those allowed by BASIC) to be permitted
+  #   - attributes: a { element: attributes } hash of which attributes should be
+  #                 allowed for which elements.  This is in addition to whatever BASIC
+  #                 permits.
   # Returns an HTML string.
   def html_to_simple_html(html, options = {})
     return '' if html.blank?
     base_url = options.fetch(:base_url, '')
-    output = Sanitize.clean(html, Sanitize::Config::BASIC)
-
+    config = Sanitize::Config::BASIC
+    if options[:tags] || options[:attributes]
+      elements = config[:elements] + (options[:tags] || [])
+      final_attributes = {}
+      # Make sure if the basic config allows attriutes for a given element, and
+      # we pass in other attributes for that same element, that we permit both.
+      elements_with_attributes =
+        (config[:attributes]&.keys || []) | (options[:attributes]&.keys || [])
+      elements_with_attributes.each do |element|
+        basic_attributes = config[:attributes][element] || []
+        given_attributes = options[:attributes][element] || []
+        final_attributes[element] = basic_attributes | given_attributes
+      end
+      output = Sanitize.clean(html, :elements => elements, :attributes => final_attributes)
+    else
+      output = Sanitize.clean(html, config)
+    end
     append_base_url(output, base_url).html_safe
   end
 

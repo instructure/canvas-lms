@@ -19,6 +19,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CourseSection, "moving to new course" do
+  it "generates placeholder submissions for the students being cross-listed" do
+    account = Account.create!
+    course = account.courses.create!
+    section = course.course_sections.create!
+    student = User.create!
+    course.enroll_student(student, enrollment_state: "active", section: section)
+    new_course = account.courses.create!
+    assignment = new_course.assignments.create!
+
+    expect { section.move_to_course(new_course) }.to change {
+      assignment.submissions.where(user_id: student).count
+    }.from(0).to(1)
+  end
 
   it "should transfer enrollments to the new root account" do
     account1 = Account.create!(:name => "1")

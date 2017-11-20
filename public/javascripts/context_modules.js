@@ -53,10 +53,27 @@ import './jquery.keycodes'
 import './jquery.loadingImg'
 import './jquery.templateData' /* fillTemplateData, getTemplateData */
 import './vendor/date' /* Date.parse */
-import './vendor/jquery.scrollTo'
 import 'jqueryui/sortable'
 import 'compiled/jquery.rails_flash_notifications'
 
+function scrollTo ($thing, time = 500) {
+  if (!$thing || $thing.length === 0) return
+  $('html, body').animate({
+    scrollTop: $thing.offset().top,
+  }, time)
+}
+
+  function refreshDuplicateLinkStatus($module) {
+    // TODO: activiate the below "if" when we are ready to launch module
+    // duplication
+    $module.find('.duplicate_module_menu_item').hide();
+    // MAKE DEAD SURE THIS LINK DOESN'T SHOW UP UNTIL WE RELEASE MODULE DUPLICATION
+    // if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length) {
+    //   $module.find('.duplicate_module_menu_item').show();
+    // } else {
+    //   $module.find('.duplicate_module_menu_item').hide();
+    // }
+  }
   // TODO: AMD don't export global, use as module
   /*global modules*/
   window.modules = (function() {
@@ -135,6 +152,9 @@ import 'compiled/jquery.rails_flash_notifications'
             $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
           })
         );
+        $('.context_module').each(function() {
+          refreshDuplicateLinkStatus($(this));
+        });
       },
 
       updateProgressions: function(callback) {
@@ -424,6 +444,7 @@ import 'compiled/jquery.rails_flash_notifications'
             $before.before($item.show());
           }
         }
+        refreshDuplicateLinkStatus($module);
         return $item;
       },
 
@@ -1022,6 +1043,38 @@ import 'compiled/jquery.rails_flash_notifications'
       })
     });
 
+    $(".duplicate_module_link").live('click', function(event) {
+      event.preventDefault();
+      const duplicateRequestUrl = $(this).attr('href');
+      const duplicatedModuleElement = $(this).parents(".context_module");
+      const duplicatedModuleElementId = duplicatedModuleElement[0].id;
+
+      const renderDuplicatedModule = function(response) {
+        response.data.ENV_UPDATE.forEach((newAttachmentItem) => {
+          ENV.MODULE_FILE_DETAILS[newAttachmentItem.id] = newAttachmentItem
+        });
+        const contextModule = response.data.context_module;
+        const newModuleId = response.data.context_module.id;
+        var context_response = response;
+        axios.get(location.href).then((response) => {
+          const $newContent = $(response.data);
+          const $newModule = $newContent.find("#context_module_" + newModuleId);
+          $newModule.insertAfter(duplicatedModuleElement);
+          modules.updateAssignmentData();
+          // Without these two 'die' commands, the event handler happens twice after
+          // initModuleManagement is called.
+          $('.delete_module_link').die();
+          $('.duplicate_module_link').die();
+          $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', toggleModuleCollapse);
+          modules.initModuleManagement();
+        }).catch(showFlashError(I18n.t('Error rendering duplicated module')));
+      }
+
+      axios.post(duplicateRequestUrl, {})
+        .then(renderDuplicatedModule)
+        .catch(showFlashError(I18n.t('Error duplicating module')));
+    });
+
     $(".delete_module_link").live('click', function(event) {
       event.preventDefault();
       $(this).parents(".context_module").confirmDelete({
@@ -1139,14 +1192,21 @@ import 'compiled/jquery.rails_flash_notifications'
       var $currentCogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
       // Get the previous cog item to focus after delete
       var $allInCurrentModule = $(this).parents('.context_module_items').children()
+      var $currentModule = $(this).parents('.context_module');
       var curIndex = $allInCurrentModule.index($(this).parents('.context_module_item'));
       var newIndex = curIndex - 1;
-      var $previousCogLink;
-      if (newIndex < 0) {
-        // Focus on the module cog since there are not more module item cogs
-        $previousCogLink = $(this).closest('.editable_context_module').find('button.al-trigger')
+        // Skip over headers, since they are not actionable
+      var $placeToFocus
+      if (newIndex >= 0) {
+        const prevItem = $allInCurrentModule[newIndex]
+        if ($(prevItem).hasClass('context_module_sub_header')) {
+          $placeToFocus = $(prevItem).find('.cog-menu-container .al-trigger')
+        } else {
+          $placeToFocus = $(prevItem).find('.item_link')
+        }
       } else {
-        $previousCogLink = $($allInCurrentModule[newIndex]).find('.cog-menu-container .al-trigger');
+        // Focus on the module cog since there are not more module item cogs
+        $placeToFocus = $(this).closest('.editable_context_module').find('button.al-trigger')
       }
       $(this).parents(".context_module_item").confirmDelete({
         url: $(this).attr('href'),
@@ -1155,7 +1215,8 @@ import 'compiled/jquery.rails_flash_notifications'
           $(this).slideUp(function() {
             $(this).remove();
             modules.updateTaggedItems();
-            $previousCogLink.focus();
+            $placeToFocus.focus();
+            refreshDuplicateLinkStatus($currentModule);
           });
           $.flashMessage(I18n.t("Module item %{module_item_name} was successfully deleted.", {module_item_name: data.content_tag.title}));
         },
@@ -1183,16 +1244,17 @@ import 'compiled/jquery.rails_flash_notifications'
 
       const moveTrayProps = {
         title: I18n.t('Move Module Item'),
-        item: {
+        items: [{
           id:  currentItem.getAttribute('id').substring('context_module_item_'.length),
           title: currentItem.querySelector('.title').textContent.trim(),
-        },
+        }],
         moveOptions: {
           groupsLabel: I18n.t('Modules'),
           groups,
         },
         formatSaveUrl: ({ groupId }) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
-        onMoveSuccess: ({ data, itemId, groupId }) => {
+        onMoveSuccess: ({ data, itemIds, groupId }) => {
+          const itemId = itemIds[0]
           const $container = $(`#context_module_${groupId} .ui-sortable`)
           $container.sortable('disable')
 
@@ -1222,16 +1284,67 @@ import 'compiled/jquery.rails_flash_notifications'
 
       const moveTrayProps = {
         title: I18n.t('Move Module'),
-        item: {
+        items: [{
           id:  currentModule.getAttribute('id').substring('context_module_'.length),
           title: currentModule.querySelector('.header > .collapse_module_link > .name').textContent,
-        },
+        }],
         moveOptions: { siblings },
         formatSaveUrl: () => `${ENV.CONTEXT_URL_ROOT}/modules/reorder`,
         onMoveSuccess: res => {
           const container = document.querySelector('#context_modules.ui-sortable')
           MoveItem.reorderElements(res.data.map(item => item.context_module.id), container, (id) => `#context_module_${id}`)
           $(container).sortable('refresh')
+        },
+        focusOnExit: () => currentModule.querySelector('.al-trigger'),
+      }
+
+      MoveItem.renderTray(moveTrayProps, document.getElementById('not_right_side'))
+    })
+
+    $('.move_module_contents_link').on('click keyclick', function (event) {
+      event.preventDefault()
+
+      const currentModule = $(this).parents('.context_module')[0]
+      const modules = document.querySelectorAll('#context_modules .context_module')
+      const groups = Array.prototype.map.call(modules, module => {
+        const id = module.getAttribute('id').substring('context_module_'.length)
+        const title = module.querySelector('.header > .collapse_module_link > .name').textContent
+        const moduleItems = module.querySelectorAll('.context_module_item')
+        const items = Array.prototype.map.call(moduleItems, item => ({
+          id: item.getAttribute('id').substring('context_module_item_'.length),
+          title: item.querySelector('.title').textContent.trim(),
+        }))
+        return { id, title, items }
+      })
+      const moduleItems = currentModule.querySelectorAll('.context_module_item')
+      const items = Array.prototype.map.call(moduleItems, item => ({
+        id: item.getAttribute('id').substring('context_module_item_'.length),
+        title: item.querySelector('.title').textContent.trim(),
+      }))
+      items[0].groupId = currentModule.getAttribute('id').substring('context_module_'.length)
+
+      const moveTrayProps = {
+        title: I18n.t('Move Contents Into'),
+        items,
+        moveOptions: {
+          groupsLabel: I18n.t('Modules'),
+          groups,
+          excludeCurrent: true
+        },
+        formatSaveUrl: ({ groupId }) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
+        onMoveSuccess: ({ data, itemIds, groupId }) => {
+          const $container = $(`#context_module_${groupId} .ui-sortable`)
+          $container.sortable('disable')
+
+          itemIds.forEach((id) => {
+            const item = document.querySelector(`#context_module_item_${id}`)
+            $container[0].appendChild(item)
+          })
+
+          const order = data.context_module.content_tags.map(item => item.content_tag.id)
+          MoveItem.reorderElements(order, $container[0], id => `#context_module_item_${id}`)
+
+          $container.sortable('enable').sortable('refresh')
         },
         focusOnExit: () => currentModule.querySelector('.al-trigger'),
       }
@@ -1329,7 +1442,7 @@ import 'compiled/jquery.rails_flash_notifications'
               data: {position: content_tag.position}
             })
           })
-
+          $(`#context_module_item_${data.content_tag.id} .item_link`).focus()
           $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
         })
         .catch(showFlashError('Error duplicating item'))
@@ -1448,12 +1561,12 @@ import 'compiled/jquery.rails_flash_notifications'
         isNew: true
       };
 
-      initPublishButton($item.find('.publish-icon'), publishData);
+      var view = initPublishButton($item.find('.publish-icon'), publishData);
+      overrideModel(view.model, view);
     }
 
     var initPublishButton = function($el, data) {
       data = data || $el.data();
-
       if(data.moduleType == 'attachment'){
         // Module isNew if it was created with an ajax request vs being loaded when the page loads
         var moduleItem = {};
@@ -1649,7 +1762,95 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   }
 
+  var toggleModuleCollapse = function(event, goSlow) {
+    event.preventDefault();
+    var expandCallback = null;
+    if(goSlow && $.isFunction(goSlow)) {
+      expandCallback = goSlow;
+      goSlow = null;
+    }
+    var collapse = $(this).hasClass('collapse_module_link') ? '1' : '0';
+    var $module = $(this).parents(".context_module");
+    var reload_entries = $module.find(".content .context_module_items").children().length === 0;
+    var toggle = function(show) {
+      var callback = function() {
+        $module.find(".collapse_module_link").css('display', $module.find(".content:visible").length > 0 ? 'inline-block' : 'none');
+        $module.find(".expand_module_link").css('display', $module.find(".content:visible").length === 0 ? 'inline-block' : 'none');
+        if($module.find(".content:visible").length > 0) {
+          $module.find(".footer .manage_module").css('display', '');
+          $module.toggleClass('collapsed_module', false);
+          // Makes sure the resulting item has focus.
+          $module.find(".collapse_module_link").focus();
+          $.screenReaderFlashMessage(I18n.t('Expanded'));
+
+        } else {
+          $module.find(".footer .manage_module").css('display', ''); //'none');
+          $module.toggleClass('collapsed_module', true);
+          // Makes sure the resulting item has focus.
+          $module.find(".expand_module_link").focus();
+          $.screenReaderFlashMessage(I18n.t('Collapsed'));
+        }
+        if(expandCallback && $.isFunction(expandCallback)) {
+          expandCallback();
+        }
+      };
+      if(show) {
+        $module.find(".content").show();
+        callback();
+      } else {
+        $module.find(".content").slideToggle(callback);
+      }
+
+    }
+    if(reload_entries || goSlow) {
+      $module.loadingImage();
+    }
+    var url = $(this).attr('href');
+    if(goSlow) {
+      url = $module.find(".edit_module_link").attr('href');
+    }
+    $.ajaxJSON(url, (goSlow ? 'GET' : 'POST'), {collapse: collapse}, function(data) {
+      if(goSlow) {
+        $module.loadingImage('remove');
+        var items = data;
+        var next = function() {
+          var item = items.shift();
+          if(item) {
+            modules.addItemToModule($module, item.content_tag);
+            next();
+          } else {
+            $module.find(".context_module_items.ui-sortable").sortable('refresh');
+            toggle(true);
+            modules.updateProgressionState($module);
+            $("#context_modules").triggerHandler('slow_load');
+          }
+        };
+        next();
+      } else {
+        if(reload_entries) {
+          $module.loadingImage('remove');
+          for(var idx in data) {
+            modules.addItemToModule($module, data[idx].content_tag);
+          }
+          $module.find(".context_module_items.ui-sortable").sortable('refresh');
+          toggle();
+          modules.updateProgressionState($module);
+        }
+      }
+    }, function(data) {
+      $module.loadingImage('remove');
+    });
+    if(collapse == '1' || !reload_entries) {
+      toggle();
+    }
+  }
+
+  // THAT IS THE END
+
   $(document).ready(function() {
+   $('.context_module').each(function() {
+     refreshDuplicateLinkStatus($(this));
+   });
    if (ENV.IS_STUDENT) {
       $('.context_module').addClass('student-view');
       $('.context_module_item .ig-row').addClass('student-view');
@@ -1804,9 +2005,6 @@ import 'compiled/jquery.rails_flash_notifications'
       });
     });
 
-    if($(".context_module:first .content:visible").length == 0) {
-      $("html,body").scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"));
-    }
     if($("#context_modules").hasClass('editable')) {
       setTimeout(modules.initModuleManagement, 1000);
       modules.loadMasterCourseData();
@@ -1816,94 +2014,16 @@ import 'compiled/jquery.rails_flash_notifications'
     modules.updateAssignmentData(function() {
       modules.updateProgressions(function() {
         if (window.location.hash && !window.location.hash.startsWith('#!')) {
-          $.scrollTo($(window.location.hash));
+          scrollTo($(window.location.hash))
+        } else {
+          if ($(".context_module:first .content:visible").length == 0) {
+            scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"))
+          }
         }
       });
     });
 
-    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
-      event.preventDefault();
-      var expandCallback = null;
-      if(goSlow && $.isFunction(goSlow)) {
-        expandCallback = goSlow;
-        goSlow = null;
-      }
-      var collapse = $(this).hasClass('collapse_module_link') ? '1' : '0';
-      var $module = $(this).parents(".context_module");
-      var reload_entries = $module.find(".content .context_module_items").children().length === 0;
-      var toggle = function(show) {
-        var callback = function() {
-          $module.find(".collapse_module_link").css('display', $module.find(".content:visible").length > 0 ? 'inline-block' : 'none');
-          $module.find(".expand_module_link").css('display', $module.find(".content:visible").length === 0 ? 'inline-block' : 'none');
-          if($module.find(".content:visible").length > 0) {
-            $module.find(".footer .manage_module").css('display', '');
-            $module.toggleClass('collapsed_module', false);
-            // Makes sure the resulting item has focus.
-            $module.find(".collapse_module_link").focus();
-            $.screenReaderFlashMessage(I18n.t('Expanded'));
-
-          } else {
-            $module.find(".footer .manage_module").css('display', ''); //'none');
-            $module.toggleClass('collapsed_module', true);
-            // Makes sure the resulting item has focus.
-            $module.find(".expand_module_link").focus();
-            $.screenReaderFlashMessage(I18n.t('Collapsed'));
-          }
-          if(expandCallback && $.isFunction(expandCallback)) {
-            expandCallback();
-          }
-        };
-        if(show) {
-          $module.find(".content").show();
-          callback();
-        } else {
-          $module.find(".content").slideToggle(callback);
-        }
-
-      }
-      if(reload_entries || goSlow) {
-        $module.loadingImage();
-      }
-      var url = $(this).attr('href');
-      if(goSlow) {
-        url = $module.find(".edit_module_link").attr('href');
-      }
-      $.ajaxJSON(url, (goSlow ? 'GET' : 'POST'), {collapse: collapse}, function(data) {
-        if(goSlow) {
-          $module.loadingImage('remove');
-          var items = data;
-          var next = function() {
-            var item = items.shift();
-            if(item) {
-              modules.addItemToModule($module, item.content_tag);
-              next();
-            } else {
-              $module.find(".context_module_items.ui-sortable").sortable('refresh');
-              toggle(true);
-              modules.updateProgressionState($module);
-              $("#context_modules").triggerHandler('slow_load');
-            }
-          };
-          next();
-        } else {
-          if(reload_entries) {
-            $module.loadingImage('remove');
-            for(var idx in data) {
-              modules.addItemToModule($module, data[idx].content_tag);
-            }
-            $module.find(".context_module_items.ui-sortable").sortable('refresh');
-            toggle();
-            modules.updateProgressionState($module);
-          }
-        }
-      }, function(data) {
-        $module.loadingImage('remove');
-      });
-      if(collapse == '1' || !reload_entries) {
-        toggle();
-      }
-
-    });
+    $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', toggleModuleCollapse);
     $(document).fragmentChange(function(event, hash) {
       if (hash == '#student_progressions') {
         $(".module_progressions_link").trigger('click');

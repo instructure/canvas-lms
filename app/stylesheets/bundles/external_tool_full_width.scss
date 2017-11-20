@@ -31,3 +31,7 @@ body.ic-full-screen-lti-tool .tool_content_wrapper {
 #footer {
   display: none;
 }
+
+iframe#tool_content {
+  margin-bottom: -10px;
+}

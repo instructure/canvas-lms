@@ -296,7 +296,7 @@ define [
 
   test "cacheKey builds unique key", ->
     view = createView(@model)
-    deepEqual view.cacheKey(), ["course", 1, "user", 1, "ag", 1, "expanded"]
+    deepEqual view.cacheKey(), ["course", 1, "user", "1", "ag", 1, "expanded"]
 
   test "disallows deleting groups with frozen assignments", ->
     assignments = @model.get('assignments')
@@ -356,14 +356,14 @@ define [
       fakeENV.teardown()
 
   test 'provides a view to delete a group when canDelete is true', ->
-    @stub @model, 'canDelete', -> true
+    @stub(@model, 'canDelete').returns(true)
     @model.set('any_assignment_in_closed_grading_period', true)
     view = createView(@model, userIsAdmin: true)
     ok view.deleteGroupView
     notOk view.$("#assignment_group_#{@model.id} a.delete_group.disabled").length
 
   test 'provides a view to delete a group when canDelete is false', ->
-    @stub @model, 'canDelete', -> false
+    @stub(@model, 'canDelete').returns(false)
     @model.set('any_assignment_in_closed_grading_period', true)
     view = createView(@model, userIsAdmin: true)
     ok view.deleteGroupView

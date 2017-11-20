@@ -22,7 +22,7 @@ module CC::Importer::Canvas
     
     def convert_quizzes
       assessments = []
-      qti_folder = File.join(@unzipped_file_path, ASSESSMENT_NON_CC_FOLDER)
+      qti_folder = @package_root.item_path(ASSESSMENT_NON_CC_FOLDER)
 
       return unless File.exist?(qti_folder) && File.directory?(qti_folder)
 

@@ -93,6 +93,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     :ip_filter, :require_lockdown_browser, :require_lockdown_browser_for_results
   ]
   restrict_assignment_columns
+  restrict_columns :state, [:workflow_state]
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
@@ -402,6 +403,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         id: [@old_assignment_id, self.last_assignment_id].compact,
         submission_types: 'online_quiz'
       ).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
+      self.course.recompute_student_scores
       send_later_if_production_enqueue_args(:destroy_related_submissions, priority: Delayed::HIGH_PRIORITY)
       ::ContentTag.delete_for(::Assignment.find(@old_assignment_id)) if @old_assignment_id
       ::ContentTag.delete_for(::Assignment.find(self.last_assignment_id)) if self.last_assignment_id

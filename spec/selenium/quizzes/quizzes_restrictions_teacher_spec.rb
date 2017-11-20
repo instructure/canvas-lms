@@ -39,19 +39,22 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should have a checkbox on the quiz creation page', priority: "1", test_id: 474273 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       expect('#enable_quiz_access_code').to be
     end
 
     it 'should show a password field when checking the checkbox', priority: "1", test_id: 474274 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       expect(f('#quiz_access_code')).to have_attribute('tabindex', '-1')
       f('#enable_quiz_access_code').click
       expect(f('#quiz_access_code')).to have_attribute('tabindex', '0')
     end
 
     it 'should not allow a blank restrict access code password', priority: "1", test_id: 474275 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_access_code').click
       wait_for_ajaximations
 
@@ -62,7 +65,8 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should accept a valid password when creating a quiz', priority: "1", test_id: 474276 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_access_code').click
       wait_for_ajaximations
       f('#quiz_access_code').send_keys('guybrush')
@@ -89,19 +93,22 @@ describe 'quiz restrictions as a teacher' do
 
   context 'filter ip addresses' do
     it 'should have a checkbox on the quiz creation page', priority: "1", test_id: 474278 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       expect('#enable_quiz_ip_filter').to be
     end
 
     it 'should show a password field when checking the checkbox', priority: "1", test_id: 474279 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       expect(f('#quiz_ip_filter')).to have_attribute('tabindex', '-1')
       f('#enable_quiz_ip_filter').click
       expect(f('#quiz_ip_filter')).to have_attribute('tabindex', '0')
     end
 
     it 'should not allow a blank ip address', priority: "1", test_id: 474280 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
 
@@ -112,7 +119,8 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should accept a valid ipv4 address when creating a quiz', priority: "1", test_id: 474281 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
       f('#quiz_ip_filter').send_keys('7.7.7.7')
@@ -125,7 +133,8 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should accept a valid ipv4 address with subnet mask when creating a quiz', priority: "1", test_id: 474282 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
       f('#quiz_ip_filter').send_keys('7.7.7.7/255.255.255.0')
@@ -138,7 +147,8 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should accept a valid ipv6 address when creating a quiz', priority: "1", test_id: 474283 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
       f('#quiz_ip_filter').send_keys('2001:0db8:85a3:0000:0000:8a2e:0370:7334')
@@ -151,7 +161,8 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should not accept an invalid ip address when creating a quiz', priority: "1", test_id: 474284 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
       f('#quiz_ip_filter').send_keys('7')
@@ -162,7 +173,8 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should have a working link to help with ip address filtering', priority: "1", test_id: 474285 do
-      get "/courses/#{@course.id}/quizzes/new"
+      get "/courses/#{@course.id}/quizzes"
+      click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
 

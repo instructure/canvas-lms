@@ -253,13 +253,19 @@ define [
   class SubmissionCell.pass_fail extends SubmissionCell
 
     states = ['pass', 'fail', '']
+    STATE_MAPPING =
+      pass: 'pass'
+      complete: 'pass'
+      fail: 'fail'
+      incomplete: 'fail'
+
     classFromSubmission = (submission) ->
       if submission.excused
         # this can never occur, since excused submissions have no grade
         # and ungraded submissions do not use htmlFromSubmission
         "EX"
       else
-        { pass: 'pass', complete: 'pass', fail: 'fail', incomplete: 'fail' }[submission.rawGrade] || ''
+        STATE_MAPPING[submission.rawGrade] || ''
 
     checkboxButtonTemplate = (iconClass) ->
       if _.isEmpty(iconClass)
@@ -280,7 +286,7 @@ define [
         ''
       SubmissionCell::cellWrapper("""
         <button
-          data-value="#{htmlEscape cssClass}"
+          data-value="#{htmlEscape(options.submission.entered_grade || '')}"
           class="Button Button--icon-action gradebook-checkbox gradebook-checkbox-#{htmlEscape cssClass} #{htmlEscape(editable)}"
           type="button"
           aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape(passFailMessage(cssClass))}</span>#{checkboxButtonTemplate(iconClass)}</button>
@@ -302,12 +308,12 @@ define [
         .bind('click', (event) =>
           event.preventDefault()
           currentValue = @$input.data('value')
-          if currentValue is 'pass'
-            newValue = 'fail'
-          else if currentValue is 'fail'
+          if currentValue is 'complete'
+            newValue = 'incomplete'
+          else if currentValue is 'incomplete'
             newValue = ''
           else
-            newValue = 'pass'
+            newValue = 'complete'
           @transitionValue(newValue)
         ).focus()
 
@@ -318,7 +324,7 @@ define [
       @$input
         .removeClass('gradebook-checkbox-pass gradebook-checkbox-fail')
         .addClass('gradebook-checkbox-' + classFromSubmission(rawGrade: newValue))
-        .attr('aria-label', passFailMessage(newValue))
+        .attr('aria-label', passFailMessage(STATE_MAPPING[newValue]))
         .data('value', newValue)
       @$input.find('i')
         .removeClass()

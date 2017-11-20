@@ -1165,10 +1165,22 @@ describe User do
       expect(@user.avatar_image_url).to be_nil
     end
 
-    it "should allow external url's to be assigned" do
+    it "should not allow external url's to be assigned" do
       @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq 'http://www.example.com/image.jpg'
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should allow external url's that match avatar_external_url_patterns to be assigned" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.instructure.com/image.jpg' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should allow gravatar url's to be assigned" do
+      @user.avatar_image = { 'type' => 'gravatar', 'url' => 'http://www.gravatar.com/image.jpg' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq 'http://www.gravatar.com/image.jpg'
     end
 
     it "should return a useful avatar_fallback_url" do
@@ -2047,7 +2059,7 @@ describe User do
     end
   end
 
-  describe "ungraded_quizzes_needing_submitting" do
+  describe "ungraded_quizzes" do
     before(:once) do
       course_with_student :active_all => true
       @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.from_now)
@@ -2055,46 +2067,47 @@ describe User do
     end
 
     it "includes ungraded quizzes" do
-      expect(@student.ungraded_quizzes_needing_submitting).to include @quiz
+      expect(@student.ungraded_quizzes(:needing_submitting => true)).to include @quiz
     end
 
     it "excludes graded quizzes" do
       other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "assignment", :due_at => 1.day.from_now)
       other_quiz.publish!
-      expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
+      expect(@student.ungraded_quizzes(:needing_submitting => true)).not_to include other_quiz
     end
 
     it "excludes unpublished quizzes" do
       other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.from_now)
-      expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
+      expect(@student.ungraded_quizzes(:needing_submitting => true)).not_to include other_quiz
     end
 
     it "excludes locked quizzes" do
       @quiz.unlock_at = 1.day.from_now
       @quiz.save!
-      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+      expect(@student.ungraded_quizzes(:needing_submitting => true)).not_to include @quiz
     end
 
     it "includes locked quizzes if requested" do
       @quiz.unlock_at = 1.day.from_now
       @quiz.save!
-      expect(@student.ungraded_quizzes_needing_submitting(include_locked: true)).to include @quiz
+      expect(@student.ungraded_quizzes(include_locked: true, needing_submitting: true)).to include @quiz
     end
 
     it "filters by due date" do
-      expect(@student.ungraded_quizzes_needing_submitting(:due_after => 2.days.from_now)).not_to include @quiz
+      expect(@student.ungraded_quizzes(:due_after => 2.days.from_now, :needing_submitting => true)).not_to include @quiz
     end
 
-    it "excludes submitted quizzes" do
+    it "excludes submitted quizzes unless requested" do
       qs = @quiz.quiz_submissions.build :user => @student
       qs.workflow_state = 'complete'
       qs.save!
-      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+      expect(@student.ungraded_quizzes(:needing_submitting => true)).not_to include @quiz
+      expect(@student.ungraded_quizzes(:needing_submitting => false)).to include @quiz
     end
 
     it "filters by enrollment state" do
       @student.enrollments.where(course: @course).first.complete!
-      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+      expect(@student.ungraded_quizzes(:needing_submitting => true)).not_to include @quiz
     end
 
     context "sharding" do
@@ -2102,7 +2115,7 @@ describe User do
       it "includes quizzes from other shards" do
         other_user = @shard1.activate { user_factory }
         student_in_course :course => @course, :user => other_user, :active_all => true
-        expect(other_user.ungraded_quizzes_needing_submitting).to include @quiz
+        expect(other_user.ungraded_quizzes(:needing_submitting => true)).to include @quiz
       end
     end
   end
@@ -3964,6 +3977,28 @@ describe User do
     it "returns false when user is designer" do
         course_with_designer(:user => user)
         expect(user.has_student_enrollment?).to eq false
+    end
+  end
+
+  describe "from_tokens" do
+    specs_require_sharding
+
+    let(:users) { [User.create!, @shard1.activate { User.create! }] }
+    let(:tokens) { users.map(&:token) }
+
+    it "generates tokens made of id/md5(uuid) pairs" do
+      tokens.each_with_index do |token, i|
+        expect(token).to eq "#{users[i].id}_#{Digest::MD5.hexdigest(users[i].uuid)}"
+      end
+    end
+
+    it "instantiates users by token" do
+      expect(User.from_tokens(tokens)).to match_array(users)
+    end
+
+    it "excludes bad tokens" do
+      broken_tokens = tokens.map { |token| token + 'ff' }
+      expect(User.from_tokens(broken_tokens)).to be_empty
     end
   end
 end

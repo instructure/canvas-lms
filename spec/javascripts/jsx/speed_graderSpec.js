@@ -554,6 +554,16 @@ test('handleGradeSubmit should submit grade if not using existing score', functi
   SpeedgraderHelpers.determineGradeToSubmit.restore();
 });
 
+test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', function () {
+  this.stub(SpeedgraderHelpers, 'determineGradeToSubmit').returns('');
+  window.jsonData.grading_type = 'pass_fail';
+  SpeedGrader.EG.currentStudent.submission.excused = true;
+  SpeedGrader.EG.handleGradeSubmit(null, false);
+  const formData = $.ajaxJSON.getCall(0).args[2];
+  strictEqual(formData['submission[excuse]'], false);
+  SpeedgraderHelpers.determineGradeToSubmit.restore();
+});
+
 let $div = null;
 QUnit.module('loading a submission Preview', {
   setup() {
@@ -1039,6 +1049,37 @@ test('shows an error when the gateway times out', function () {
   strictEqual($('#speed_grader_timeout_alert').text(), message);
 });
 
+QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
+  let disableWhileLoadingStub;
+
+  hooks.beforeEach(function () {
+    sinon.stub($, 'ajaxJSON');
+    disableWhileLoadingStub = sinon.stub($.fn, 'disableWhileLoading');
+    fakeENV.setup({ RUBRIC_ASSESSMENT: {} });
+
+    const fixtures = `
+      <div id="rubric_holder">
+        <button class="save_rubric_button"></button>
+      </div>
+    `;
+
+    $('#fixtures').html(fixtures);
+  });
+
+  hooks.afterEach(function() {
+    $('#fixtures').empty();
+    fakeENV.teardown();
+    disableWhileLoadingStub.restore();
+    $.ajaxJSON.restore();
+  });
+
+  test('disables the button', function () {
+    SpeedGrader.EG.domReady();
+    $('.save_rubric_button').trigger('click');
+    strictEqual(disableWhileLoadingStub.callCount, 1);
+  });
+});
+
 QUnit.module('SpeedGrader - no gateway timeout', {
   setup () {
     fakeENV.setup();
@@ -1062,140 +1103,4 @@ test('does not show an error when the gateway times out', function () {
   ENV.assignment_title = 'Assignment Title';
   SpeedGrader.setup();
   strictEqual($('#speed_grader_timeout_alert').text(), '');
-});
-
-QUnit.module('SpeedGrader#updateSelectMenuStatus', {
-  setup () {
-    fakeENV.setup();
-    this.originalWindowJSONData = window.jsonData;
-    window.jsonData = {};
-
-    window.jsonData.studentsWithSubmissions = [
-      {
-        index: 0,
-        id: 4,
-        name: 'Guy B. Studying',
-        submission_state: 'not_graded',
-        submission: {
-          score: null,
-          grade: null
-        }
-      },
-      {
-        index: 1,
-        id: 12,
-        name: 'Sil E. Bus',
-        submission_state: 'graded',
-        submission: {
-          score: 7,
-          grade: 70
-        }
-      }
-    ];
-
-    const menuHtml = `<div id="combo_box_container"></div>`;
-    $('#fixtures').html(menuHtml);
-
-    const optionsArray = window.jsonData.studentsWithSubmissions.map((s, _) => {
-      const className = SpeedgraderHelpers.classNameBasedOnStudent(s);
-      return { id: s.id, name: s.name, className };
-    });
-
-    this.selectmenu = new SpeedgraderSelectMenu(optionsArray);
-    this.selectmenu.appendTo("#combo_box_container", function () {});
-  },
-
-  teardown () {
-    $('#fixtures').empty();
-    window.jsonData = this.originalWindowJSONData;
-    fakeENV.teardown();
-  }
-});
-
-test('ignores null students', function () {
-  SpeedGrader.EG.updateSelectMenuStatus(null, this.selectmenu);
-  ok(true, 'does not error');
-});
-
-test('updates to graded', function () {
-  const student = window.jsonData.studentsWithSubmissions[0];
-  student.submission_state = 'graded';
-  SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
-
-  const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon i.icon-check').length, 1);
-  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
-
-  const option = $(this.selectmenu.option_tag_array[0]);
-  strictEqual(option.hasClass("not_graded"), false);
-  equal(option.text(), "Guy B. Studying - graded");
-  strictEqual(option.hasClass("graded"), true);
-});
-
-test('updates to not_graded', function () {
-  const student = window.jsonData.studentsWithSubmissions[1];
-  student.submission_state = 'not_graded';
-  SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
-
-  const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(1)').children();
-  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")').length, 1);
-  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Sil E. Bus")').length, 1)
-
-  const option = $(this.selectmenu.option_tag_array[1]);
-  strictEqual(option.hasClass("graded"), false);
-  equal(option.text(), "Sil E. Bus - not graded");
-  strictEqual(option.hasClass("not_graded"), true);
-});
-
-// We really never go to not_submitted, but a background update
-// *could* potentially do this, so we should handle it.
-test('updates to not_submitted', function () {
-  const student = window.jsonData.studentsWithSubmissions[0];
-  student.submission_state = 'not_submitted';
-  SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
-
-  const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon').length, 1);
-  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
-
-  const option = $(this.selectmenu.option_tag_array[0]);
-  strictEqual(option.hasClass("graded"), false);
-  equal(option.text(), "Guy B. Studying - not submitted");
-  strictEqual(option.hasClass("not_submitted"), true);
-});
-
-// We really never go to resubmitted, but a backgroud update *could*
-// potentially do this, so we should handle it.
-test('updates to resubmitted', function () {
-  const student = window.jsonData.studentsWithSubmissions[1];
-  student.submission_state = 'resubmitted';
-  student.submission.submitted_at = '2017-07-10T17:00:00Z';
-  SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
-
-  const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")').length, 1);
-  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
-
-  const option = $(this.selectmenu.option_tag_array[1]);
-  strictEqual(option.hasClass("not_graded"), false);
-  equal(option.text(), "Sil E. Bus - graded, then resubmitted (Jul 10 at 5pm)");
-  strictEqual(option.hasClass("resubmitted"), true);
-});
-
-// We really never go to not_gradable, but a backgroud update *could*
-// potentially do this, so we should handle it.
-test('updates to not_gradable', function () {
-  const student = window.jsonData.studentsWithSubmissions[0];
-  student.submission_state = 'not_gradeable';
-  student.submission.submitted_at = '2017-07-10T17:00:00Z';
-  SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
-
-  const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon > i.icon-check').length, 1);
-  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
-
-  const option = $(this.selectmenu.option_tag_array[1]);
-  strictEqual(option.hasClass("not_graded"), false);
-  equal(option.text().trim(), "Sil E. Bus - graded");
-  strictEqual(option.hasClass("graded"), true);
 });

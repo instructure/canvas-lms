@@ -312,6 +312,34 @@ describe Assignment do
     end
   end
 
+  describe '#tool_settings_tool_name' do
+    let(:assignment) { Assignment.create!(name: 'assignment with tool settings', context: course) }
+
+    before do
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
+    end
+
+    it 'returns the name of the tool proxy' do
+      expected_name = 'test name'
+      message_handler.tool_proxy.update_attributes!(name: expected_name)
+      setup_assignment_with_homework
+      course.assignments << @assignment
+      @assignment.tool_settings_tool = message_handler
+      @assignment.save!
+      expect(@assignment.tool_settings_tool_name).to eq expected_name
+    end
+
+    it 'returns the name of the context external tool' do
+      expected_name = 'test name'
+      setup_assignment_with_homework
+      tool = @course.context_external_tools.create!(name: expected_name, url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tool = tool
+      @assignment.save
+      expect(@assignment.tool_settings_tool_name).to eq(expected_name)
+    end
+  end
+
   describe '#tool_settings_tool=' do
     let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
     let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
@@ -1407,6 +1435,13 @@ describe Assignment do
         points_possible: 10
     end
 
+    it "sets the 'eula_agreement_timestamp'" do
+      setup_assignment_without_submission
+      timestamp = Time.now.to_i.to_s
+      @a.submit_homework(@user, {eula_agreement_timestamp: timestamp})
+      expect(@a.submissions.first.turnitin_data[:eula_agreement_timestamp]).to eq timestamp
+    end
+
     it "creates a new version for each submission" do
       setup_assignment_without_submission
       @a.submit_homework(@user)
@@ -1763,6 +1798,20 @@ describe Assignment do
       }
     end
 
+    it "should re-schedule auto_assign date is pushed out" do
+      @a.peer_reviews = true
+      @a.automatic_peer_reviews = true
+      @a.peer_reviews_due_at = 1.day.from_now
+      @a.save!
+      job = Delayed::Job.where(:tag => "Assignment#do_auto_peer_review").last
+      expect(job.run_at.to_i).to eq @a.peer_reviews_due_at.to_i
+
+      @a.peer_reviews_due_at = 2.days.from_now
+      @a.save!
+      job.reload
+      expect(job.run_at.to_i).to eq @a.peer_reviews_due_at.to_i
+    end
+
     it "should not schedule auto_assign when skip_schedule_peer_reviews is set" do
       @a.peer_reviews = true
       @a.automatic_peer_reviews = true
@@ -1854,6 +1903,29 @@ describe Assignment do
       res = @a.assign_peer_reviews
       expect(res.length).to be >= 6
       ids = @late_submissions.map{|s| s.user_id}
+    end
+
+    it "should not assign out of group for graded group-discussions" do
+      # (as opposed to group assignments)
+      group_discussion_assignment
+
+      users = create_users_in_course(@course, 6.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+      [@group1, @group2].each do |group|
+        users.pop(3).each do |user|
+          group.add_user(user)
+          @topic.child_topic_for(user).reply_from(:user => user, :text => "entry from #{user.name}")
+        end
+      end
+
+      @assignment.reload
+      @assignment.peer_review_count = 2
+      @assignment.save!
+      requests = @assignment.assign_peer_reviews
+      expect(requests.count).to eq 12
+      requests.each do |req|
+        group = @group1.users.include?(req.user) ? @group1 : @group2
+        expect(group.users).to include(req.assessor)
+      end
     end
 
     context "intra group peer reviews" do
@@ -3707,6 +3779,32 @@ describe Assignment do
   end
 
   describe "update_student_submissions" do
+    context "grade change events" do
+      before(:once) do
+        @assignment = @course.assignments.create!
+        @assignment.grade_student(@student, grade: 5, grader: @teacher)
+        @assistant = User.create!
+        @course.enroll_ta(@assistant, enrollment_state: "active")
+      end
+
+      it "triggers a grade change event with the grader_id as the updating_user" do
+        @assignment.updating_user = @assistant
+
+        expect(Auditors::GradeChange).to receive(:record).once do |submission|
+          expect(submission.grader_id).to eq @assistant.id
+        end
+        @assignment.update_student_submissions
+      end
+
+      it "triggers a grade change event using the grader_id on the submission if no updating_user is present" do
+        expect(Auditors::GradeChange).to receive(:record).once do |submission|
+          expect(submission.grader_id).to eq @teacher.id
+        end
+
+        @assignment.update_student_submissions
+      end
+    end
+
     context "pass/fail assignments" do
       before :once do
         @student1, @student2 = create_users_in_course(@course, 2, return_type: :record)
@@ -3770,7 +3868,6 @@ describe Assignment do
         submission.reload
         expect(submission.score).to eql(0.0)
       end
-
     end
   end
 

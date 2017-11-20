@@ -51,8 +51,14 @@ QUnit.module('FlashAlert', function (hooks) {
   test('has no effect when the container element has been removed', function () {
     callShowFlashAlert();
     destroyContainer();
-    clock.tick(10510);
+    clock.tick(11000);
     ok('no error was thrown');
+  });
+
+  test('applies the "clickthrough-container" class to the container element', function () {
+    callShowFlashAlert();
+    ok(document.getElementById('flashalert_message_holder').classList.contains('clickthrough-container'));
+    clock.tick(11000);
   });
 
   QUnit.module('.showFlashError');
@@ -62,6 +68,7 @@ QUnit.module('FlashAlert', function (hooks) {
     clock.tick(600);
     const expectedText = 'An error occurred making a network request';
     ok(document.querySelector('#flashalert_message_holder').innerText.includes(expectedText));
+    clock.tick(500); // tick to close the alert with timeout
   });
 
   QUnit.module('.showFlashSuccess');
@@ -71,11 +78,13 @@ QUnit.module('FlashAlert', function (hooks) {
     showFlashSuccess(expectedText)();
     clock.tick(600);
     ok(document.querySelector('#flashalert_message_holder').innerText.includes(expectedText));
+    clock.tick(500); // tick to close the alert with timeout
   });
 
   test('renders an alert without "Details"', function () {
     showFlashSuccess('yay!')({ body: 'a body' });
     clock.tick(600);
     strictEqual(document.querySelector('#flashalert_message_holder').innerText.includes('Details'), false);
+    clock.tick(500); // tick to close the alert with timeout
   });
 });

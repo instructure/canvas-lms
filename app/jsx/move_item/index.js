@@ -36,8 +36,8 @@ export function renderTray (props, rootContainer = document.body) {
 }
 
 export const backbone = {
-  collectionToItems (collection) {
-    return collection.models.map(item => ({
+  collectionToItems (collection, getItems = (col) => col.models) {
+    return getItems(collection).map(item => ({
       id: item.attributes.id,
       title: item.attributes.name || item.attributes.title,
     }))
@@ -69,6 +69,27 @@ export const backbone = {
     if (newColl && newColl !== model.collection) {
       model.collection.remove(model)
       newColl.add(model)
+
+      if (keys.parent) {
+        model.set(keys.parent, collId)
+      }
+    } else {
+      newColl = model.collection
+    }
+
+    this.reorderInCollection(order, model, newColl)
+  },
+
+  reorderAllItemsIntoNewCollection (order, collId, model, keys) {
+    let newColl = model.collection.get(collId).get(keys.model)
+    // if item moved across collections
+    if (newColl && newColl !== model.collection) {
+      const allAssignments = model.get(keys.model).models.slice()
+
+      allAssignments.forEach((asg) => {
+        model.get(keys.model).remove(asg)
+        newColl.add(asg)
+      })
 
       if (keys.parent) {
         model.set(keys.parent, collId)

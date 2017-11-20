@@ -3,14 +3,17 @@ ar:
     ar: العربية
   bigeasy_locale: ar_SA
   moment_locale: ar-sa
+  dow_offset: 6
 da:
   locales:
     da: Dansk
   bigeasy_locale: da_DK
+  dow_offset: 1
 de:
   locales:
     de: Deutsch
   bigeasy_locale: de_DE
+  dow_offset: 1
 en:
   locales:
     en: English (US)
@@ -18,25 +21,30 @@ en:
 en-AU:
   locales:
     en-AU: English (Australia)
+  dow_offset: 1
 en-CA:
   locales:
     en-CA: English (Canada)
-en-GB:
+  en-GB:
   locales:
     en-GB: English (United Kingdom)
+  dow_offset: 1
 es:
   locales:
     es: Español
   bigeasy_locale: es_ES
+  dow_offset: 1
 fa:
   locales:
     fa: فارسی
   bigeasy_locale: fa_IR
   crowdsourced: true
+  dow_offset: 6
 fr:
   locales:
     fr: Français
   bigeasy_locale: fr_FR
+  dow_offset: 1
 fr-CA:
   locales:
     fr-CA: Français (Canada)
@@ -60,10 +68,12 @@ hy:
   fullcalendar_locale: en
   moment_locale: hy-am
   crowdsourced: true
+  dow_offset: 1
 is:
   locales:
     is: Íslenska
   bigeasy_locale: is_IS
+  dow_offset: 1
 ja:
   locales:
     ja: 日本語
@@ -84,24 +94,29 @@ nl:
     nl: Nederlands
   bigeasy_locale: nl_NL
   crowdsourced: false
+  dow_offset: 1
 nb:
   locales:
     nb: Norsk (Bokmål)
   bigeasy_locale: nb_NO
+  dow_offset: 1
 nn:
   locales:
     nn: Norsk (Nynorsk)
   bigeasy_locale: nn_NO
   fullcalendar_locale: nb
   crowdsourced: true
+  dow_offset: 1
 pl:
   locales:
     pl: Polski
   bigeasy_locale: pl_PL
+  dow_offset: 1
 pt:
   locales:
     pt: Português
   bigeasy_locale: pt_PT
+  dow_offset: 1
 pt-BR:
   locales:
     pt-BR: Português do Brasil
@@ -109,24 +124,29 @@ ru:
   locales:
     ru: pу́сский
   bigeasy_locale: ru_RU
+  dow_offset: 1
 sv:
   locales:
     sv: Svenska
   bigeasy_locale: sv_SE
+  dow_offset: 1
 tr:
   locales:
     tr: Türkçe
   bigeasy_locale: tr_TR
   crowdsourced: true
+  dow_offset: 1
 zh-Hans:
   locales:
     zh-Hans: 简体中文
   bigeasy_locale: zh_CN
   fullcalendar_locale: zh-cn
   moment_locale: zh-cn
+  dow_offset: 1
 zh-Hant:
   locales:
     zh-Hant: 繁體中文
   bigeasy_locale: zh_HK
   fullcalendar_locale: zh-cn
   moment_locale: zh-tw
+  dow_offset: 1

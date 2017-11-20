@@ -18,10 +18,11 @@
 
 define([
   'jquery',
+  'compiled/shared/CurveGradesDialog',
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager',
   'i18n!gradebook',
   'compiled/jquery.rails_flash_notifications'
-], ($, { createCurveGradesAction }, I18n) => {
+], ($, CurveGradesDialog, { createCurveGradesAction }, I18n) => {
   QUnit.module('CurveGradesDialogManager.createCurveGradesAction.isDisabled', {
     props ({points_possible, grading_type, submissionsLoaded}) {
       return [
@@ -68,7 +69,7 @@ define([
   QUnit.module('CurveGradesDialogManager.createCurveGradesAction.onSelect', {
     setup () {
       this.flashErrorSpy = this.spy($, 'flashError');
-      this.dialogSpy = this.spy($.fn, 'dialog');
+      this.stub(CurveGradesDialog.prototype, 'show');
     },
     onSelect ({ isAdmin = false, inClosedGradingPeriod = false } = {}) {
       createCurveGradesAction({ inClosedGradingPeriod }, [], isAdmin, 'http://contextUrl/', true).onSelect()
@@ -98,7 +99,7 @@ define([
   test('does not call curve grades dialog if is not admin and in a closed grading period', function () {
     const props = this.props({ isAdmin: false, inClosedGradingPeriod: true });
     createCurveGradesAction(...props).onSelect();
-    ok(this.dialogSpy.notCalled);
+    strictEqual(CurveGradesDialog.prototype.show.callCount, 0);
   });
 
   test('does not call flashError if is admin and in a closed grading period', function () {
@@ -110,8 +111,7 @@ define([
   test('calls curve grades dialog if is admin and in a closed grading period', function () {
     const props = this.props({ isAdmin: true, inClosedGradingPeriod: true });
     createCurveGradesAction(...props).onSelect();
-    // called twice due to $.fn.fixDialogButtons
-    ok(this.dialogSpy.calledTwice);
+    strictEqual(CurveGradesDialog.prototype.show.callCount, 1);
   });
 
   test('does not call flashError if is not admin and not in a closed grading period', function () {
@@ -123,8 +123,7 @@ define([
   test('calls curve grades dialog if is not admin and not in a closed grading period', function () {
     const props = this.props({ isAdmin: false, inClosedGradingPeriod: false });
     createCurveGradesAction(...props).onSelect();
-    // called twice due to $.fn.fixDialogButtons
-    ok(this.dialogSpy.calledTwice);
+    strictEqual(CurveGradesDialog.prototype.show.callCount, 1);
   });
 
   test('does not call flashError if is admin and not in a closed grading period', function () {
@@ -136,7 +135,6 @@ define([
   test('calls curve grades dialog if is admin and not in a closed grading period', function () {
     const props = this.props({ isAdmin: true, inClosedGradingPeriod: false });
     createCurveGradesAction(...props).onSelect();
-    // called twice due to $.fn.fixDialogButtons
-    ok(this.dialogSpy.calledTwice);
+    strictEqual(CurveGradesDialog.prototype.show.callCount, 1);
   });
 });

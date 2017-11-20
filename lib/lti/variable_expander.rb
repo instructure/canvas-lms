@@ -374,7 +374,7 @@ module Lti
     #   http://example.url/path.json
     #   ```
     register_expansion 'com.instructure.brandConfigJSON.url', [],
-                       -> { @controller.active_brand_config_json_url },
+                       -> { @controller.active_brand_config_url('json') },
                        CONTROLLER_GUARD
 
     # returns the brand config JSON itself for the launching context.
@@ -395,7 +395,7 @@ module Lti
     #   http://example.url/path.js
     #   ```
     register_expansion 'com.instructure.brandConfigJS.url', [],
-                       -> { @controller.active_brand_config_js_url },
+                       -> { @controller.active_brand_config_url('js') },
                        CONTROLLER_GUARD
 
     # returns the URL for the common css file.

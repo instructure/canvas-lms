@@ -32,7 +32,7 @@ module RuboCop
           first_arg = args.to_a.first
           return unless first_arg
           return unless BAD_ARG == first_arg.children.first
-          add_offense node, :expression, MSG, :warning
+          add_offense node, message: MSG, severity: :warning
         end
       end
     end

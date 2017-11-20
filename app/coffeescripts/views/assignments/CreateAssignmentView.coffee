@@ -90,9 +90,16 @@ define [
       _.each data, (value, key) ->
         if _.contains(valid, key)
           dataParams[key] = value
-      url = if @assignmentGroup then @newAssignmentUrl() else @model.htmlEditUrl()
 
-      @redirectTo("#{url}?#{$.param(dataParams)}")
+      if dataParams.submission_types == 'online_quiz'
+        button = @$('.more_options')
+        button.prop('disabled', true)
+        $.post(@newQuizUrl(), dataParams)
+          .done((response) => @redirectTo(response.url))
+          .always(-> button.prop('disabled', false))
+      else
+        url = if @assignmentGroup then @newAssignmentUrl() else @model.htmlEditUrl()
+        @redirectTo("#{url}?#{$.param(dataParams)}")
 
     redirectTo: (url) ->
       window.location.href = url
@@ -146,6 +153,9 @@ define [
 
     newAssignmentUrl: ->
       ENV.URLS.new_assignment_url
+
+    newQuizUrl: ->
+      ENV.URLS.new_quiz_url
 
     validateBeforeSave: (data, errors) ->
       errors = @_validateTitle data, errors

@@ -249,7 +249,8 @@ class SubmissionsController < ApplicationController
 
     submission_params = params[:submission].permit(
       :body, :url, :submission_type, :comment, :group_comment,
-      :media_comment_type, :media_comment_id, :attachment_ids => []
+      :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
+      :attachment_ids => []
     )
     submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
 

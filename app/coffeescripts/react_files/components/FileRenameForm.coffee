@@ -51,6 +51,7 @@ define [
       @props.onNameConflictResolved({
         file: @state.fileOptions.file
         dup: 'overwrite'
+        name: @state.fileOptions.name
         expandZip: @state.fileOptions.expandZip
       })
 

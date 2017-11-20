@@ -49,6 +49,7 @@ describe "collaborations" do
       end
 
       it 'start collaboration with people', priority: "1", test_id: 162362 do
+        skip_if_safari(:alert)
         select_collaborators_and_look_for_start(type)
       end
     end

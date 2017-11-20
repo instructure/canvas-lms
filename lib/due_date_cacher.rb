@@ -16,6 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class DueDateCacher
+  INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT
+    CASE
+    WHEN grade IS NOT NULL OR excused IS TRUE THEN
+      'graded'
+    WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN
+      'pending_review'
+    WHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN
+      'submitted'
+    ELSE
+      'unsubmitted'
+    END
+  SQL_FRAGMENT
+
   def self.recompute(assignment)
     return unless assignment.active?
     recompute_course(assignment.context, [assignment.id],
@@ -86,16 +99,7 @@ class DueDateCacher
               grading_period_id = vals.grading_period_id::integer,
               workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
                 -- infer actual workflow state
-                CASE
-                WHEN grade IS NOT NULL OR excused THEN
-                  'graded'
-                WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN
-                  'pending_review'
-                WHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN
-                  'submitted'
-                ELSE
-                  'unsubmitted'
-                END
+                #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
               ))
             FROM (
               VALUES

@@ -20,7 +20,7 @@ describe RuboCop::Cop::Specs::DeterministicDescribedClasses do
 
   shared_examples "relative describe constants" do
     before do
-      inspect_source(cop, source)
+      inspect_source(source)
     end
 
     let(:preamble) { "" }
@@ -97,7 +97,7 @@ describe RuboCop::Cop::Specs::DeterministicDescribedClasses do
 
   context "at the top level" do
     it 'allows describe constants' do
-      inspect_source(cop, %{
+      inspect_source(%{
         describe Foo
       })
       expect(cop.offenses.size).to eq(0)
@@ -105,7 +105,7 @@ describe RuboCop::Cop::Specs::DeterministicDescribedClasses do
   end
 
   it "allows describe strings inside a module" do
-    inspect_source(cop, %{
+    inspect_source(%{
       module Foo
         describe "bar"
       end
@@ -114,7 +114,7 @@ describe RuboCop::Cop::Specs::DeterministicDescribedClasses do
   end
 
   it "allows top-level describe constants inside a module" do
-    inspect_source(cop, %{
+    inspect_source(%{
       module Foo
         describe ::Bar
       end

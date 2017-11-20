@@ -20,7 +20,7 @@ describe RuboCop::Cop::Specs::ScopeIncludes do
 
   context "within describe" do
     it 'allows includes' do
-      inspect_source(cop, %{
+      inspect_source(%{
         describe JumpStick do
           include Foo
         end
@@ -31,7 +31,7 @@ describe RuboCop::Cop::Specs::ScopeIncludes do
 
   context "within module" do
     it 'allows includes' do
-      inspect_source(cop, %{
+      inspect_source(%{
         module JumpStick
           include Foo
         end
@@ -41,7 +41,7 @@ describe RuboCop::Cop::Specs::ScopeIncludes do
   end
 
   it "disallows defs on Object" do
-    inspect_source(cop, %{
+    inspect_source(%{
       include Foo
     })
     expect(cop.offenses.size).to eq(1)

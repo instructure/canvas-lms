@@ -22,6 +22,9 @@ define [
 
   class GroupCategoryCollection extends PaginatedCollection
     model: GroupCategory
+
+    @optionProperty 'markInactiveStudents'
+
     comparator: (category) ->
       prefix = if category.get('role') is 'uncategorized'
         '2_'

@@ -261,6 +261,7 @@ shared_examples 'conferences_page' do |context|
   end
 
   it "should allow group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323557, teacher: 323558) do
+    skip_if_safari(:alert)
     skip_if_chrome('delete_conference method is fragile')
     WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
     get conferences_page
@@ -270,6 +271,7 @@ shared_examples 'conferences_page' do |context|
   end
 
   it "should allow group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323559, teacher: 323560) do
+    skip_if_safari(:alert)
     skip_if_chrome('delete_conference method is fragile')
     cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
     conclude_conference(cc)

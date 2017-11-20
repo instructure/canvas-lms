@@ -43,6 +43,7 @@ define [
     teardown: ->
       $("#fixtures").html("")
       RceCommandShim.send.restore()
+      $(".ui-dialog").remove()
 
   test "it uses RceCommandShim to call insert_code", ->
     view = new InsertUpdateImageView(fakeEditor, "<div></div>")

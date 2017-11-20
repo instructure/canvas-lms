@@ -461,3 +461,5 @@ import 'jqueryui/widget'
     });
     return $picker;
   };
+
+export default $

@@ -16,26 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {pickBy as omitFalsyValues} from 'lodash'
 import createStore from './createStore'
 
-  const UsersStore = createStore({
-    getUrl () {
-      return `/api/v1/accounts/${this.context.accountId}/users`;
-    },
+const USERS_TO_FETCH_PER_PAGE = 15
+const defaultParms = {
+  include: ['last_login', 'avatar_url', 'email', 'time_zone'],
+  per_page: USERS_TO_FETCH_PER_PAGE
+}
 
-    normalizeParams (params) {
-      let payload = {}
-      if (params.search_term) {
-        payload.search_term = params.search_term
-      } else {
-        payload = Object.assign({}, params)
-      }
-      if (params.sort) payload.sort = params.sort
-      if (params.order) payload.order = params.order
-      if (params.role_filter_id) payload.role_filter_id = params.role_filter_id
-      payload.include = ['last_login', 'avatar_url', 'email', 'time_zone']
-      return payload
-    }
-  })
+export default createStore({
+  getUrl() {
+    return `/api/v1/accounts/${this.context.accountId}/users`
+  },
 
-export default UsersStore
+  normalizeParams: params => omitFalsyValues({...defaultParms, ...params})
+})

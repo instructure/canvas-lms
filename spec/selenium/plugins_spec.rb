@@ -56,7 +56,7 @@ describe "plugins ui" do
     expect(is_checked('#plugin_setting_disabled')).to be_falsey
   end
 
-  it "should not overwrite settings that are not shown", priority: "1", test_id: 268055 do
+  it "should not overwrite settings that are not shown" do
     get '/plugins/etherpad'
 
     multiple_accounts_select

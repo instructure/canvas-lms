@@ -638,21 +638,9 @@ module ApplicationHelper
     end
   end
 
-  def active_brand_config_json_url(opts={})
-    path = active_brand_config(opts).try(:public_json_path)
-    path ||= BrandableCSS.public_default_json_path
-    "#{Canvas::Cdn.config.host}/#{path}"
-  end
-
-  def active_brand_config_js_url(opts={})
-    path = active_brand_config(opts).try(:public_js_path)
-    path ||= BrandableCSS.public_default_js_path
-    "#{Canvas::Cdn.config.host}/#{path}"
-  end
-
-  def active_brand_config_css_url(opts={})
-    path = active_brand_config(opts).try(:public_css_path)
-    path ||= BrandableCSS.public_default_css_path
+  def active_brand_config_url(type, opts={})
+    path = active_brand_config(opts).try("public_#{type}_path")
+    path ||= BrandableCSS.public_default_path(type, @current_user&.prefers_high_contrast?)
     "#{Canvas::Cdn.config.host}/#{path}"
   end
 

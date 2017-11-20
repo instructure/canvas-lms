@@ -27,7 +27,8 @@ define [
   'compiled/views/assignments/ToggleShowByView'
   'jquery'
   'helpers/fakeENV'
-], (_, Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $, fakeENV) ->
+  'helpers/assertions'
+], (_, Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $, fakeENV, assertions) ->
 
 
   COURSE_SUBMISSIONS_URL = "/courses/1/submissions"
@@ -85,6 +86,11 @@ define [
       @server.restore()
       $(".ui-dialog").remove()
       $("ul[id^=ui-id-]").remove()
+
+  test 'should be accessible', (assert) ->
+    view = createView(true)
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'should sort assignments into groups correctly', ->
 

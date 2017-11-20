@@ -483,6 +483,14 @@ describe Attachment do
       expect(a.content_type).to eq 'unknown/unknown'
     end
 
+    it "should also destroy thumbnails" do
+      a = attachment_model(uploaded_data: stub_png_data, content_type: 'image/png')
+      thumb = a.thumbnail
+      expect(thumb).not_to be_nil
+      expect(thumb).to receive(:destroy).once
+      a.destroy_content_and_replace
+    end
+
     it "should destroy content and record on destroy_permanently_plus" do
       a = attachment_model
       a2 = attachment_model(root_attachment: a)
@@ -1018,7 +1026,7 @@ describe Attachment do
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       allow(attachment).to receive(:authenticated_url) # allow other calls due to, e.g., save
-      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 86400.seconds))
+      expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 3600.seconds))
       attachment.download_url
       expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 2.days))
       attachment.download_url(2.days)
@@ -1106,6 +1114,20 @@ describe Attachment do
       expect(@attachment.read_attribute(:namespace)).to be_nil
       expect(@attachment.namespace).to be_nil
       expect(@attachment.read_attribute(:namespace)).to be_nil
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "returns the account_id relative to the current shard" do
+        birth_account = Shard.default.activate { Account.first }
+        Attachment.domain_namespace = birth_account.file_namespace
+
+        @shard1.activate {
+          a = Attachment.new
+          expect(a.root_account_id).to eq birth_account.global_id
+        }
+      end
     end
   end
 

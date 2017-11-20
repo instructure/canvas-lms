@@ -92,4 +92,13 @@ describe Types::CourseType do
       ]
     end
   end
+
+  describe "AssignmentGroupConnection" do
+    it "returns groups" do
+      c = Course.find(course.id)
+      c.assignment_groups.create!(name: 'a group')
+      expect(c.assignment_groups.size).to be 1
+      expect(course_type.assignmentGroupsConnection.length).to be 1
+    end
+  end
 end

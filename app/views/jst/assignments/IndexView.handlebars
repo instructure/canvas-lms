@@ -38,7 +38,7 @@
   </div>
 
   <div class="header-bar-right">
-    {{#if ENV.PERMISSIONS.manage_course}}
+    {{#if ENV.PERMISSIONS.manage_assignments}}
       {{#if ENV.QUIZ_LTI_ENABLED}}
         <span class="new_quiz_lti_wrapper">
           <a
@@ -77,7 +77,7 @@
 
 <div data-view="assignmentGroups" class="item-group-container" id="ag-list"></div>
 
-{{#if ENV.PERMISSIONS.manage_course}}
+{{#if ENV.PERMISSIONS.manage_assignments}}
   <form data-view="createGroup" class="form-dialog"></form>
   <form data-view="assignmentSettings" class="form-dialog"></form>
   <form data-view="assignmentSyncSettings" class="form-dialog"></form>

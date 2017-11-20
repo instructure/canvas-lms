@@ -17,6 +17,8 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lti2_spec_helper')
 
 describe AssignmentsController do
   before :once do
@@ -118,6 +120,24 @@ describe AssignmentsController do
       allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
+    end
+
+    it "js_env POST_TO_SIS_DEFAULT is false when sis_default_grade_export is false on the account" do
+      user_session(@teacher)
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: false}
+      a.save!
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(false)
+    end
+
+    it "js_env POST_TO_SIS_DEFAULT is true when sis_default_grade_export is true on the account" do
+      user_session(@teacher)
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(true)
     end
 
     it "should set QUIZ_LTI_ENABLED in js_env if quizzes 2 is available" do
@@ -691,46 +711,26 @@ describe AssignmentsController do
       end
     end
 
-    it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
-      user_session(@teacher)
-      account = @course.account
-      product_family = Lti::ProductFamily.create(
-        vendor_code: '123',
-        product_code: 'abc',
-        vendor_name: 'acme',
-        root_account: account
-      )
+    context 'plagiarism detection platform' do
+      include_context 'lti2_spec_helper'
 
-      tool_proxy = Lti:: ToolProxy.create(
-        shared_secret: 'shared_secret',
-        guid: 'guid',
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        context: @course,
-        workflow_state: 'active',
-        raw_data: 'some raw data'
-      )
+      it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
+        user_session(@teacher)
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
+        allow(Lti::ToolProxy).to receive(:find_active_proxies_for_context).with(@course) { Lti::ToolProxy.where(id: tool_proxy.id) }
+        tool_proxy.resources << resource_handler
+        tool_proxy.update_attributes!(context: @course)
 
-      resource_handler = Lti::ResourceHandler.create(
-        resource_type_code: 'code',
-        name: 'resource name',
-        tool_proxy: tool_proxy
-      )
+        AssignmentConfigurationToolLookup.create!(
+          assignment: @assignment,
+          tool: message_handler,
+          tool_type: 'Lti::MessageHandler',
+          tool_id: message_handler.id
+        )
 
-      message_handler = Lti::MessageHandler.create(
-        message_type: 'basic-lti-launch-request',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler
-      )
-
-      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
-      Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
-      @assignment.tool_settings_tool = message_handler
-      @assignment.save!
-
-      get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
-      expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq message_handler.id
+        get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
+        expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq message_handler.id
+      end
     end
 
     context "redirects" do

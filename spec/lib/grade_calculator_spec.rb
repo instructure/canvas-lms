@@ -64,6 +64,22 @@ describe GradeCalculator do
       }.not_to raise_error
     end
 
+    it "weighted grading periods: compute_scores does not raise an error if no grading period score objects exist" do
+      grading_period_set = @course.root_account.grading_period_groups.create!(weighted: true)
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now,
+        weight: 50
+      )
+      Score.where(enrollment: @course.student_enrollments).destroy_all
+
+      grade_calculator = GradeCalculator.new(@user.id, @course.id)
+
+      expect { grade_calculator.compute_scores }.not_to raise_error
+    end
+
     it "can compute scores for users with deleted enrollments when grading periods are used" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term
@@ -785,10 +801,21 @@ describe GradeCalculator do
       expect(overall_course_score.current_score).to eq(97.3)
     end
 
+    it 'updates the overall course score metadata' do
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      expect(overall_course_score.score_metadata.calculation_details).to eq({'current' => {'dropped' => []}, 'final' => {'dropped' => []}})
+    end
+
     it 'updates all grading period scores' do
       GradeCalculator.new(@student.id, @course).compute_and_save_scores
       expect(scores[@first_period.id].current_score).to eq(99.6)
       expect(scores[@second_period.id].current_score).to eq(95.0)
+    end
+
+    it 'updates all grading period score metadata' do
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      expect(scores[@first_period.id].score_metadata.calculation_details).to eq({'current' => {'dropped' => []}, 'final' => {'dropped' => []}})
+      expect(scores[@second_period.id].score_metadata.calculation_details).to eq({'current' => {'dropped' => []}, 'final' => {'dropped' => []}})
     end
 
     it 'does not update grading period scores if update_all_grading_period_scores is false' do
@@ -1096,6 +1123,13 @@ describe GradeCalculator do
         expect(scored_enrollment_ids).to contain_exactly *(@student.enrollments.map(&:id))
       end
 
+      it "creates a course score for the student if one does not exist, but assignment group scores exist" do
+        student_enrollment = @course.student_enrollments.find_by(user_id: @student)
+        student_enrollment.find_score(course_score: true).destroy_permanently!
+        GradeCalculator.new(@student.id, @course).compute_and_save_scores
+        expect(student_enrollment.find_score(course_score: true)).to be_present
+      end
+
       it "updates active score rows for assignment groups if they already exist" do
         orig_score_id = student_scores.first.id
         @assignment1.grade_student(@student, grade: 15, grader: @teacher)
@@ -1142,7 +1176,7 @@ describe GradeCalculator do
     a.grade_student @student, grade: 25, grader: @teacher
     calc = GradeCalculator.new([@student.id], @course)
     grade_info = calc.compute_scores.first[:current]
-    expect(grade_info).to eq({:grade => 50, :total => 25, :possible => 50})
+    expect(grade_info).to eq({grade: 50, total: 25, possible: 50, dropped: []})
   end
 
   # We should keep this in sync with GradeCalculatorSpec.coffee
@@ -1379,6 +1413,10 @@ describe GradeCalculator do
         GradeCalculator.new([user.id], course.id).compute_scores.first[:final]
       end
 
+      def find_submission(assignment)
+        assignment.submissions.where(user_id: @user.id).first.id
+      end
+
       context "DA" do
         before do
           set_up_course_for_differentiated_assignments
@@ -1396,12 +1434,14 @@ describe GradeCalculator do
           # 5 + 15 + 10 - 5
           expect(final_grade_info(@user, @course)[:total]).to eq 25
           expect(final_grade_info(@user, @course)[:possible]).to eq 40
+          expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_lowest)]
         end
         it "should drop the highest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_highest:1') # rubocop:disable Rails/SkipsModelValidations
           # 5 + 15 + 10 - 15
           expect(final_grade_info(@user, @course)[:total]).to eq 15
           expect(final_grade_info(@user, @course)[:possible]).to eq 40
+          expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_highest)]
         end
         it "should not count an invisible assignment with never drop on" do
           # rubocop:disable Rails/SkipsModelValidations
@@ -1410,12 +1450,50 @@ describe GradeCalculator do
           # 5 + 15 + 10 - 10
           expect(final_grade_info(@user, @course)[:total]).to eq 20
           expect(final_grade_info(@user, @course)[:possible]).to eq 40
+          expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_middle)]
         end
-        it("saves scores for all assignment group and enrollment combinations") do
+        it "saves scores for all assignment group and enrollment combinations" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           user_ids = @course.enrollments.map(&:user_id).uniq
           group_ids = @assignments.map(&:assignment_group_id).uniq
           GradeCalculator.new(user_ids, @course.id).compute_and_save_scores
-          expect(Score.where(assignment_group_id: group_ids).count).to be @course.enrollments.count * group_ids.length
+          expect(Score.where(assignment_group_id: group_ids).count).to eq @course.enrollments.count * group_ids.length
+          expect(ScoreMetadata.where(score_id: Score.where(assignment_group_id: group_ids)).count).to eq 2
+        end
+        it "saves dropped submission to group score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(assignment_group: @group)
+          expect(score.score_metadata.calculation_details).to eq ({
+            'current' => {'dropped' => [find_submission(@overridden_middle)]},
+            'final' => {'dropped' => [find_submission(@overridden_middle)]}
+          })
+        end
+        it "saves dropped submissions to course score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(course_score: true)
+          expect(score.score_metadata.calculation_details).to eq ({
+            'current' => {'dropped' => [find_submission(@overridden_middle)]},
+            'final' => {'dropped' => [find_submission(@overridden_middle)]}
+          })
+        end
+        it "updates existing course score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(course_score: true)
+          metadata = score.score_metadata
+
+          @group.update_attribute(:rules, 'drop_highest:1')
+          expect { GradeCalculator.new(@user.id, @course.id).compute_and_save_scores }.not_to change{ScoreMetadata.count}
+          metadata.reload
+          expect(metadata.calculation_details).to eq ({
+            'current' => {'dropped' => [find_submission(@overridden_highest)]},
+            'final' => {'dropped' => [find_submission(@overridden_highest)]}
+          })
         end
       end
     end

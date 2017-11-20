@@ -24,6 +24,7 @@ module CC
     include LearningOutcomes
     include Rubrics
     include Events
+    include WebResources
 
     def add_canvas_non_cc_data
       migration_id = create_key(@course)
@@ -43,8 +44,10 @@ module CC
       resources << run_and_set_progress(:files_meta_path, nil, I18n.t('course_exports.errors.file_meta', "Failed to export file meta data"))
       resources << run_and_set_progress(:create_events, 25, I18n.t('course_exports.errors.events', "Failed to export calendar events"))
 
-      File.write(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), '') # just in case an error happens later
-      resources << File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MEDIA_TRACKS)
+      if export_media_objects?
+        File.write(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), '') # just in case an error happens later
+        resources << File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MEDIA_TRACKS)
+      end
 
       # Create the syllabus resource
       if @course.syllabus_body && (export_symbol?(:syllabus_body) || export_symbol?(:all_syllabus_body))
@@ -117,6 +120,7 @@ JOKE
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::COURSE_SETTINGS)
         document = Builder::XmlMarkup.new(:target=>course_file, :indent=>2)
       end
+
       document.instruct!
       document.course("identifier" => migration_id,
                       "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -156,7 +160,7 @@ JOKE
         end
 
         @course.disable_setting_defaults do # so that we don't copy defaulted settings
-          atts.each do |att|
+          atts.uniq.each do |att|
             c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ''
           end
         end

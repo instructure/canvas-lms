@@ -172,15 +172,17 @@ class GradeBookHistory
     end
 
     def start_date_textfield
-      driver.find_element(:xpath,"//*[contains(text(),'Start Date')]/../../following-sibling::span[1]/span/input")
+      element = grandparent_fxpath(fxpath("//*[contains(text(),'Start Date')]"))
+      find_from_element_fxpath(element, "following-sibling::span[1]/span/input")
     end
 
     def end_date_textfield
-      driver.find_element(:xpath,"//*[contains(text(),'End Date')]/../../following-sibling::span[1]/span/input")
+      element = grandparent_fxpath(fxpath("//*[contains(text(),'End Date')]"))
+      find_from_element_fxpath(element, "following-sibling::span[1]/span/input")
     end
 
     def error_text_invalid_dates
-      driver.find_element(:xpath,"(//span[contains(text(), 'date must be before')])[2]")
+      fxpath("(//span[contains(text(), 'date must be before')])[2]")
     end
 
     def filter_button
@@ -188,31 +190,31 @@ class GradeBookHistory
     end
 
     def filter_button_for_aria
-       driver.find_element(:xpath,"//button[@type='submit']")
+      fxpath("//button[@type='submit']")
     end
 
     def results_table
-      driver.find_element(:xpath, "//table")
+      fxpath("//table")
     end
 
     def results_table_rows
-      driver.find_elements(:xpath, "//table/tbody/tr")
+      ffxpath("//table/tbody/tr")
     end
 
     def results_table_current_col(index)
-      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[8]")
+      fxpath("//table/tbody/tr[#{index}]/td[8]")
     end
 
     def results_table_assignment_col(index)
-      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[5]")
+      fxpath("//table/tbody/tr[#{index}]/td[5]")
     end
 
     def results_table_grader_col(index)
-      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[4]")
+      fxpath("//table/tbody/tr[#{index}]/td[4]")
     end
 
     def results_table_student_col(index)
-      driver.find_element(:xpath,"//table/tbody/tr[#{index}]/td[3]")
+      fxpath("//table/tbody/tr[#{index}]/td[3]")
     end
   end
 end

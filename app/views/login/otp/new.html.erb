@@ -50,7 +50,7 @@ profile page and print out a set of back-up codes, in case your normal multi-fac
       %></p>
       <div class="content-box">
         <div class="grid-row">
-          <div class="col-xs-12 col-md-8">
+          <div class="col-xs-8">
             <% ccs = @current_user.communication_channels.sms.unretired.map { |cc| [ cc.path, cc.id ] } %>
             <% unless ccs.empty? %>
               <% ccs << [ "<< #{t('select.new_number', "a new phone")} >>", '{{id}}' ] %>
@@ -76,7 +76,7 @@ profile page and print out a set of back-up codes, in case your normal multi-fac
               </div>
             <% end %>
           </div>
-          <div class="col-xs-12 col-md-4">
+          <div class="col-xs-4">
             <% provisioning_uri = ROTP::TOTP.new(session[:pending_otp_secret_key]).provisioning_uri("Canvas") %>
             <% qr_code = Barby::QrCode.new(provisioning_uri) %>
             <div class="otp-qr-code">

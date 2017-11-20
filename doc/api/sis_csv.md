@@ -339,6 +339,13 @@ from a group import.</td>
 <td></td>
 <td>active, deleted</td>
 </tr>
+<tr>
+<td>integration_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>Sets the integration_id of the account</td>
+</tr>
 </table>
 
 Any account that will have child accounts must be listed in the csv before any child account
@@ -385,6 +392,13 @@ interface, this is called the SIS ID.</td>
 <td>✓</td>
 <td></td>
 <td>active, deleted</td>
+</tr>
+<tr>
+<td>integration_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>Sets the integration_id of the term</td>
 </tr>
 <tr>
 <td>start_date</td>
@@ -470,6 +484,13 @@ specified the default term for the account will be used</td>
 <td>✓</td>
 <td>✓</td>
 <td>active, deleted, completed</td>
+</tr>
+<tr>
+<td>integration_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>Sets the integration_id of the course</td>
 </tr>
 <tr>
 <td>start_date</td>
@@ -560,6 +581,13 @@ interface, this is called the SIS ID.</td>
 <td>active, deleted</td>
 </tr>
 <tr>
+<td>integration_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>Sets the integration_id of the section</td>
+</tr>
+<tr>
 <td>start_date</td>
 <td>date</td>
 <td></td>
@@ -614,9 +642,18 @@ enrollments.csv
 <tr>
 <td>user_id</td>
 <td>text</td>
-<td>✓</td>
+<td>✓&#42;</td>
 <td></td>
-<td>The User identifier from users.csv</td>
+<td>The User identifier from users.csv, required to identify user.
+ If the user_integration_id is present, this field will be ignored.</td>
+</tr>
+<tr>
+<td>user_integration_id</td>
+<td>text</td>
+<td>✓&#42;</td>
+<td></td>
+<td>The integration_id of the user from users.csv required to identify user if
+ the user_id is not present.</td>
 </tr>
 <tr>
 <td>role</td>
@@ -667,7 +704,8 @@ Ignored for any role other than observer</td>
 </tr>
 </table>
 
-&#42; course_id or section_id is required, and role or role_id is required.
+&#42; course_id or section_id is required, role or role_id is required, and
+ user_id or user_integration_id is required.
 
 When an enrollment is in a 'completed' state the student is limited to read-only access to the
 course.
@@ -969,14 +1007,14 @@ change_sis_id.csv
 <td>✓</td>
 <td></td>
 <td>The desired sis_id of the object. This id must be currently unique to the
-object type and the root_account</td>
+object type and the root_account.</td>
 </tr>
 <tr>
 <td>type</td>
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>account, term, course, section, group, user</td>
+<td>account, term, course, section, group, user, user_integration_id</td>
 </tr>
 </table>
 

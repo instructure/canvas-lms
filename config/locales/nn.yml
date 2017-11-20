@@ -5400,7 +5400,7 @@ nn:
   datepicker: 
     errors: 
       not_a_date: "Det er ikkje ein dato."
-    first_day_index: "0"
+    first_day_index: "1"
     nextText: Neste
     prevText: Førre
   dates: 

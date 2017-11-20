@@ -14,18 +14,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
+  add_crumb t('titles.sub_accounts', "Sub-Accounts")
+  @active_tab = "sub_accounts"
+  content_for :page_title, t('titles.sub_accounts', 'Sub-Accounts')
+  css_bundle :sub_accounts
+  js_bundle :sub_accounts 
 %>
-
-<% add_crumb t('titles.sub_accounts', "Sub-Accounts") %>
-<% @active_tab = "sub_accounts" %>
-<% content_for :page_title do %><%= t('titles.sub_accounts', 'Sub-Accounts') %><% end %>
-
-<% content_for :right_side do %>
-  <%= render :partial => 'shared/accounts_right_side_shared' %>
-<% end %>
-
-<% css_bundle :sub_accounts %>
-<% js_bundle :sub_accounts %>
 
 <h1 class="screenreader-only"><%= t :page_header_title, 'Sub Accounts' %></h1>
 <div id="sub_account_urls">

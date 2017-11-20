@@ -132,6 +132,55 @@ define [
 
     store._generateParams = _generateParams
 
+  test 'save stringifys JSON payload', ->
+    _generateParams = store._generateParams
+    ajax = $.ajax
+    ajaxSpy = sinon.spy()
+    store._generateParams = ->
+      return {
+        foo: 'bar'
+        url: null
+      }
+    data = { some: 'data' }
+    success = (data, statusText, xhr)->
+      equal statusText, 'success'
+      equal data.status, 'ok'
+    error = ->
+      ok false, 'Unable to save app'
+    $.ajax = ajaxSpy
+    @server.respondWith "POST", /\/external_tools/, [200, { "Content-Type": "application/json" }, '{ "status": "ok" }' ]
+    store.save('manual', data, success.bind(this), error.bind(this))
+    @server.respond()
+
+    equal (typeof ajaxSpy.lastCall.args[0].data), 'string'
+
+    store._generateParams = _generateParams
+    $.ajax = ajax
+
+  test 'save sets the content type to application/json', ->
+    _generateParams = store._generateParams
+    ajax = $.ajax
+    ajaxSpy = sinon.spy()
+    store._generateParams = ->
+      return {
+        foo: 'bar'
+        url: null
+      }
+    data = { some: 'data' }
+    success = (data, statusText, xhr)->
+      equal statusText, 'success'
+      equal data.status, 'ok'
+    error = ->
+      ok false, 'Unable to save app'
+    $.ajax = ajaxSpy
+    @server.respondWith "POST", /\/external_tools/, [200, { "Content-Type": "application/json" }, '{ "status": "ok" }' ]
+    store.save('manual', data, success.bind(this), error.bind(this))
+    @server.respond()
+    equal ajaxSpy.lastCall.args[0].contentType, 'application/json'
+
+    store._generateParams = _generateParams
+    $.ajax = ajax
+
   test '_generateParams manual', ->
     data =
       name: 'My App'

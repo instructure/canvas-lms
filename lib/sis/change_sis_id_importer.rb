@@ -28,6 +28,7 @@ module SIS
       if @batch
         types = {
           'user' => {scope: @root_account.pseudonyms},
+          'user_integration_id' => {scope: @root_account.pseudonyms},
           'course' => {scope: @root_account.all_courses},
           'section' => {scope: @root_account.course_sections},
           'term' => {scope: @root_account.enrollment_terms},
@@ -68,13 +69,16 @@ module SIS
 
         raise ImportError, "No type given for change_sis_id" if type.blank?
         raise ImportError, "No old_id given for change_sis_id" if old_id.blank?
-        raise ImportError, "No new_id given for change_sis_id" if new_id.blank?
+        unless type == 'user_integration_id'
+          raise ImportError, "No new_id given for change_sis_id" if new_id.blank?
+        end
 
         type = type.downcase.strip
         things_to_update_batch_ids[type] ||= Set.new
 
         types = {
           'user' => {scope: @root_account.pseudonyms, column: :sis_user_id},
+          'user_integration_id' => {scope: @root_account.pseudonyms, column: :integration_id},
           'course' => {scope: @root_account.all_courses},
           'section' => {scope: @root_account.course_sections},
           'term' => {scope: @root_account.enrollment_terms},
@@ -85,7 +89,7 @@ module SIS
         details = types[type]
         raise ImportError, "Invalid type '#{type}' for change_sis_id" unless details
         column = details[:column] || :sis_source_id
-        check_new = details[:scope].where(column => new_id).exists?
+        check_new = details[:scope].where(column => new_id).exists? if new_id.present?
         raise ImportError, "A new_id, '#{new_id}', referenced an existing #{type} and the #{type} with #{column} '#{old_id}' was not updated" if check_new
         old_pseudo = details[:scope].where(column => old_id).take
         raise ImportError, "An old_id, '#{old_id}', referenced a non-existent #{type} and was not changed to '#{new_id}'" unless old_pseudo

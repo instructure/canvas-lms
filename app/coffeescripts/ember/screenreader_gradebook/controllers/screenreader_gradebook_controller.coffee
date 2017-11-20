@@ -582,10 +582,6 @@ define [
             order: customColumns.mapBy('id')
         )
 
-    displayPointTotals: (->
-      @get('showTotalAsPoints') and not @get('gradesAreWeighted')
-    ).property('gradesAreWeighted', 'showTotalAsPoints')
-
     groupsAreWeighted: (->
       @get("weightingScheme") == "percent"
     ).property("weightingScheme")
@@ -594,17 +590,21 @@ define [
       !!@getGradingPeriodSet()?.weighted
 
     gradesAreWeighted: (->
-      @get('groupsAreWeighted') or !!@getGradingPeriodSet()?.weighted
+      @get('groupsAreWeighted') or @periodsAreWeighted()
     ).property('weightingScheme')
 
+    hidePointsPossibleForFinalGrade: (->
+      !!(@get('groupsAreWeighted') or @subtotalByGradingPeriod())
+    ).property("weightingScheme", "selectedGradingPeriod")
+
     updateShowTotalAs: (->
-      @set "showTotalAsPoints", @get("displayPointTotals")
+      @set "showTotalAsPoints", @get("showTotalAsPoints")
       ajax.request(
         dataType: "json"
         type: "PUT"
         url: ENV.GRADEBOOK_OPTIONS.setting_update_url
         data:
-          show_total_grade_as_points: @get("displayPointTotals"))
+          show_total_grade_as_points: @get("showTotalAsPoints"))
     ).observes('showTotalAsPoints', 'gradesAreWeighted')
 
     studentColumnData: {}
@@ -666,7 +666,7 @@ define [
       ,{})
 
     submissionsLoaded: (->
-      assignments = @get("assignments")
+      assignments = @get("assignmentsFromGroups")
       assignmentsByID = @groupById assignments
       studentsByID = @groupById @get("students")
       submissions = @get('submissions')

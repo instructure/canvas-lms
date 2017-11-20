@@ -67,6 +67,7 @@ describe 'editing a quiz' do
       end
 
       it 'deletes the quiz', priority: "1", test_id: 351921 do
+        skip_if_safari(:alert)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         delete_quiz
       end
@@ -119,6 +120,7 @@ describe 'editing a quiz' do
       end
 
       it 'deletes the quiz', priority: "1", test_id: 351922 do
+        skip_if_safari(:alert)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         delete_quiz
       end
@@ -170,6 +172,7 @@ describe 'editing a quiz' do
       end
 
       it 'deletes the quiz', priority: "1", test_id: 210073 do
+        skip_if_safari(:alert)
         delete_quiz
       end
     end

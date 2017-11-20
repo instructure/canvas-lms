@@ -34,6 +34,21 @@ describe "reply attachment" do
     expect(f('.discussion-title').text).to eq @topic_title
   end
 
+  it "should allow reply after cancel" do
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    f('.discussion-reply-box').click
+    wait_for_ajaximations
+    f('.cancel_button').click
+    f('.discussion-reply-box').click
+    wait_for_ajaximations
+    begin
+      tinymce = f('.mce-tinymce')
+      expect(tinymce.enabled?).to eq true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      expect("tinymce not loaded").to eq "loaded"
+    end
+  end
+
   it "should reply to the discussion with attachment" do
     file_attachment = "graded.png"
     entry_text = 'new entry'

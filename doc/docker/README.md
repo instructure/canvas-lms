@@ -5,16 +5,14 @@ You need Docker. Don't have Docker yet? Go [here](getting_docker.md) for details
 
 ## Development
 
-These commands should get you going
+This command should get you going:
 
 ```bash
-cp docker-compose/config/* config/
-docker-compose run --rm web bash -c "bundle install"
-docker-compose run --rm web bash -c "bundle exec rake db:create db:initial_setup"
+./script/docker_dev_setup.sh
 ```
 
 Now you can do `docker-compose up` and you should be good to go. If you're
-using Dinghy or Dory. You should be able to access Canvas by going to: [http://web.canvaslms.docker/](http://web.canvaslms.docker/)
+using Dinghy or Dory. You should be able to access Canvas by going to: [http://canvas.docker/](http://canvas.docker/)
 
 On Linux you may want to run this to avoid a few permissions issues:
 

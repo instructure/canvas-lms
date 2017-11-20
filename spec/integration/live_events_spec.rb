@@ -96,4 +96,12 @@ describe LiveEvents do
       end
     end
   end
+
+  context 'Enrollments' do
+    it "should trigger a live event on limit_privileges_to_course_section!" do
+      course_with_student
+      expect(Canvas::LiveEvents).to receive(:enrollment_updated).once
+      Enrollment.limit_privileges_to_course_section!(@course, @user, true)
+    end
+  end
 end

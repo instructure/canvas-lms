@@ -23,6 +23,8 @@ define([
   'jsx/shared/ExternalToolModalLauncher',
   'jsx/shared/modal',
 ], (React, TestUtils, $, ExternalToolModalLauncher, Modal) => {
+  const defaultWidth = 700;
+  const defaultHeight = 700;
   QUnit.module('ExternalToolModalLauncher');
 
   function generateProps (overrides = {}) {
@@ -42,6 +44,39 @@ define([
     const modalCount = TestUtils.scryRenderedComponentsWithType(component, Modal).length;
 
     equal(modalCount, 1);
+  });
+
+  test('getDimensions returns the modalStyle', () => {
+    const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps()} />);
+
+    deepEqual(component.getDimensions().modalStyle, {width: defaultWidth});
+  });
+
+  test('getDimensions returns the modalBodyStyle', () => {
+    const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps()} />);
+
+    deepEqual(
+      component.getDimensions().modalBodyStyle,
+      {width: defaultWidth, height: defaultHeight, padding: 0, display: 'flex', flexDirection: 'column'});
+  });
+
+  test('getDimensions returns the modalLaunchStyle', () => {
+    const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps()} />);
+
+    deepEqual(component.getDimensions().modalLaunchStyle, {width: defaultWidth, height: defaultHeight, border: 'none'});
+  });
+
+  test('getDimensions returns the modalLaunchStyle with custom height & width', () => {
+    const height = 111;
+    const width = 222;
+
+    const overrides = {
+      tool: { placements: { course_assignments_menu: { launch_width: width, launch_height: height } } },
+      isOpen: true }
+
+    const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps(overrides)} />);
+
+    deepEqual(component.getDimensions().modalLaunchStyle, {width: width, height: height, border: 'none'});
   });
 
   test('invokes onRequestClose prop when window receives externalContentReady event', () => {

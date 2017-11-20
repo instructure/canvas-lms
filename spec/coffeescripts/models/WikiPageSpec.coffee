@@ -96,7 +96,7 @@ define [
 
   test 'publish convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    @stub wikiPage, 'save', (attributes, options) ->
+    @stub(wikiPage, 'save').callsFake (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.published, true, 'published provided correctly'
@@ -104,7 +104,7 @@ define [
 
   test 'unpublish convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    @stub wikiPage, 'save', (attributes, options) ->
+    @stub(wikiPage, 'save').callsFake (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.published, false, 'published provided correctly'
@@ -112,7 +112,7 @@ define [
 
   test 'setFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    @stub wikiPage, 'save', (attributes, options) ->
+    @stub(wikiPage, 'save').callsFake (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, true, 'front_page provided correctly'
@@ -120,7 +120,7 @@ define [
 
   test 'unsetFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    @stub wikiPage, 'save', (attributes, options) ->
+    @stub(wikiPage, 'save').callsFake (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, false, 'front_page provided correctly'

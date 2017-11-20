@@ -23,9 +23,8 @@ module RuboCop
           _receiver, method_name, *_args = *node
           if method_name.to_s == 'eager_load'
             add_offense(node,
-              :expression,
-              "eager_load in a data fixup causes errors",
-              :error)
+              message: "eager_load in a data fixup causes errors",
+              severity: :error)
           end
         end
       end

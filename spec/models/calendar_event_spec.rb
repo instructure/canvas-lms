@@ -184,6 +184,11 @@ describe CalendarEvent do
         expect(res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
       end
 
+      it 'should not fail with no date for all_day event' do
+        res = calendar_event_model(all_day: true).to_ics
+        expect(res).not_to be_nil
+      end
+
       it "should return string dates for all_day events" do
         calendar_event_model(:start_at => "Sep 3 2008 12:00am")
         expect(@event.all_day).to eql(true)

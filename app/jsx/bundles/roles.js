@@ -97,7 +97,9 @@ $(document).on('click', (event) => {
   }
   return true
 })
-
+$(document).on('focus', 'label', (e) => {
+  return false
+})
 $(document).on('click', '.btn.dropdown-toggle', function (event) {
   event.preventDefault()
   const previousState = $(this).parent().hasClass('open')
@@ -105,9 +107,9 @@ $(document).on('click', '.btn.dropdown-toggle', function (event) {
 
   if (previousState === false && !$(this).attr('disabled')) {
     $(this).parent().addClass('open')
-    $(this).siblings('.dropdown-menu').find('input:checked').first().focus()
+    const inputFocus = $(this).siblings('.dropdown-menu').find('input:checked').attr('id')
+    $(`[for=${inputFocus}]`).focus()
   }
-
   $(document).on('keyup', (event) => {
     if (event.keyCode === 27) {
       $('.btn-group').removeClass('open')

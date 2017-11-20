@@ -1210,9 +1210,9 @@ describe "Default Account Reports" do
       before(:once) do
         create_an_account
         create_some_users_with_pseudonyms
-        @uo1 = @user2.user_observees.create_or_restore(user_id: @user1)
-        uo2 = @user4.user_observees.create_or_restore(user_id: @user3)
-        @user7.user_observees.create_or_restore(user_id: @user6)
+        @uo1 = UserObserver.create_or_restore(observee: @user1, observer: @user2)
+        uo2 = UserObserver.create_or_restore(observee: @user3, observer: @user4)
+        UserObserver.create_or_restore(observee: @user6, observer: @user7)
         UserObserver.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis.id)
       end
 

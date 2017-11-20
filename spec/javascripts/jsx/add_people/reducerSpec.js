@@ -462,7 +462,7 @@ define([
     deepEqual(newState.apiState, {pendingCount: 0, error: undefined}, 'api is no longer in-flight');
     deepEqual(newState.userValidationResult, runningState.userValidationResult, 'userValidationResult');
     deepEqual(newState.usersToBeEnrolled, [], 'usersToBeEnrolled is emptied');
-    equal(newState.usersEnrolled, true, 'usersEnrolled');
+    equal(Boolean(newState.usersEnrolled), true, 'usersEnrolled');
   });
   test('ENROLL_USERS_ERROR', () => {
     const state = _.cloneDeep(INITIAL_STATE);

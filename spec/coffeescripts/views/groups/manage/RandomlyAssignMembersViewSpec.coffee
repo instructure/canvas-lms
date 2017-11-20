@@ -179,7 +179,7 @@ define [
       queueResponse("GET", "/api/v1/group_categories/20/groups?per_page=50", groupsResponse)
       queueResponse(
         "GET",
-        "/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true",
+        "/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true&include[]=group_submissions",
         unassignedUsersResponse
       )
 
@@ -259,7 +259,7 @@ define [
 
     queueResponse(
       "GET",
-      "/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true",
+      "/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true&include[]=group_submissions",
       []
     )
     server.respond()

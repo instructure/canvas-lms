@@ -87,6 +87,13 @@ module CustomSeleniumActions
     end
   end
 
+  # short for find with xpath
+  def fxpath(xpath, scope = nil)
+    stale_element_protection do
+      (scope || driver).find_element :xpath, xpath
+    end
+  end
+
   # same as `f`, but returns all matching elements
   #
   # like other selenium methods, this will wait until it finds elements on
@@ -113,6 +120,12 @@ module CustomSeleniumActions
     end
   end
 
+  def ffxpath(xpath, scope = nil)
+    reloadable_collection do
+      (scope || driver).find_elements(:xpath, xpath)
+    end
+  end
+
   def find_with_jquery(selector, scope = nil)
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1]))[0];", selector, scope)
   end
@@ -136,6 +149,46 @@ module CustomSeleniumActions
     ensure
       driver.switch_to.window saved_window_handle
     end
+  end
+
+  def parent_fxpath(element)
+    stale_element_protection do
+      element.find_element(:xpath,"..")
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "Parent node for given element was not found"
+  end
+
+  def parent_fjs(element)
+    stale_element_protection do
+      driver.execute_script("return arguments[0].parentNode;", element)
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "Parent node for given element was not found"
+  end
+
+  def grandparent_fxpath(element)
+    stale_element_protection do
+      element.find_element(:xpath,"../..")
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "Grandparent node for given element was not found, please check if parent nodes are present"
+  end
+
+  def find_from_element_fxpath(element, xpath)
+    stale_element_protection do
+      element.find_element(:xpath, xpath)
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "No element with reference to given element was found. Please recheck the xpath : #{xpath}"
+  end
+
+  # This helps us get runtime element values for an attribute
+  # usage example : expect(element_value_for_attr(element, attribute)).to eq('true')
+  def element_value_for_attr(element, attr)
+    element.attribute(attr)
+  rescue Selenium::WebDriver::Error::UnknownError
+    raise "Attribute may not be passed correctly. Please recheck attribute passed, and its format : #{attr}"
   end
 
   def is_checked(css_selector)
@@ -285,7 +338,7 @@ module CustomSeleniumActions
   #
   # 3.) This function will likely have trouble clicking links. Use fln instead.
   def force_click(element_jquery_finder)
-    fj(element_jquery_finder) 
+    fj(element_jquery_finder)
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).click()})
   end
 
@@ -343,17 +396,15 @@ module CustomSeleniumActions
 
   MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
   def replace_content(el, value, options = {})
-    # We are treating the chrome browser different because currently Selenium cannot send :command key to the chrome.
+    # We don't use selenium el.clear because it doesn't work with textboxes that have a pattern attribute.
+    # We are treating the chrome browser different because Selenium cannot send :command key to chrome on Mac.
     # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
     case driver.browser
-    when :firefox
+    when :firefox, :safari, :internet_explorer
       keys = [[MODIFIER_KEY, "a"], :backspace]
     when :chrome
       driver.execute_script("arguments[0].select()", el)
       keys = [:backspace]
-    when :safari
-      el.clear()
-      keys = []
     end
     keys << value
     keys << :tab if options[:tab_out]
@@ -483,7 +534,9 @@ module CustomSeleniumActions
   end
 
   def dismiss_flash_messages_if_present
-    find_all_with_jquery(flash_message_selector).each(&:click)
+    unless (find_all_with_jquery(flash_message_selector).length) > 0
+      find_all_with_jquery(flash_message_selector).each(&:click)
+    end
   end
 
   def scroll_into_view(selector)

@@ -40,7 +40,7 @@ class GradebookExporter
     student_enrollments = student_enrollments.uniq(&:user_id)
 
     # grading_period_id == 0 means no grading period selected
-    unless @options[:grading_period_id].try(:to_i) == 0
+    unless @options[:grading_period_id].to_i == 0
       grading_period = GradingPeriod.for(@course).find_by(id: @options[:grading_period_id])
     end
 

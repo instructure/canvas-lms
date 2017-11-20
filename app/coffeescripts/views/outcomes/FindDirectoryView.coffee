@@ -58,6 +58,9 @@ define [
 
       @outcomes = new OutcomeCollection # empty - not needed
       @groups = new OutcomeGroupCollection _.compact([account, state, core, course])
+      # for PaginatedView
+      # @collection starts as @groups but can later change to @outcomes
+      @collection = @groups
 
       dfds = for g in _.compact([state, core])
         g.on 'change', @revertTitle

@@ -29,10 +29,10 @@ define (require) ->
       frequency: 2500
     }
 
-    install: (deliver) ->
+    install: (deliver, scrollContainer = window) ->
       viewed = []
 
-      @bind window, 'scroll', =>
+      @bind scrollContainer, 'scroll', =>
         newlyViewed = @identifyVisibleQuestions().filter (questionId) ->
           viewed.indexOf(questionId) == -1
 

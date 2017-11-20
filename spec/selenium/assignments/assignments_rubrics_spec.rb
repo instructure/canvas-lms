@@ -68,14 +68,14 @@ describe "assignment rubrics" do
        f('.add_rubric_link').click
        f('#add_criterion_container a:nth-of-type(1)').click
        f('#add_criterion_button').click
-       set_value(f('.criterion_description input[name = "description"]'), 'criterion 1')
-       f(' .ok_button').click
+       set_value(f('#edit_criterion_form .description'), 'criterion 1')
+       f('.ui-dialog-buttonset .save_button').click
        wait_for_ajaximations
        f('#criterion_2 .add_rating_link_after').click
 
        expect(f('#flash_screenreader_holder')).to have_attribute("textContent", "New Rating Created")
        set_value(f('.rating_description'), 'rating 1')
-       f('.ui-dialog-buttonset .save_button').click
+       fj('.ui-dialog-buttonset:visible .save_button').click
        wait_for_ajaximations
        submit_form('#edit_rubric_form')
        wait_for_ajaximations
@@ -117,6 +117,7 @@ describe "assignment rubrics" do
     end
 
     it "should use an existing rubric to use for grading", priority: "2", test_id: 114344 do
+      skip_if_safari(:alert)
       assignment_with_rubric(10)
       course_rubric = outcome_with_rubric
       course_rubric.associate_with(@course, @course, purpose: 'grading')
@@ -181,6 +182,7 @@ describe "assignment rubrics" do
     end
 
     it "should not adjust points when importing an outcome to an assignment", priority: "1", test_id: 2896223 do
+      skip_if_safari(:alert)
       create_assignment_with_points(2)
 
       outcome_with_rubric
@@ -275,19 +277,15 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f("#rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
-      expect(f("#rubric_long_description_dialog div.displaying .long_description").
-          text).to eq "<b>This text should not be bold</b>"
-      close_visible_dialog
+      expect(f("#rubric_#{@rubric.id} .long_description").text).
+        to eq "<b>This text should not be bold</b>"
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f(".toggle_full_rubric").click
       wait_for_ajaximations
-      f('#criterion_1 .long_description_link').click
-      expect(f('#rubric_long_description_dialog')).to be_displayed
-      expect(f("#rubric_long_description_dialog div.displaying .long_description")).
-          to include_text "<b>This text should not be bold</b>"
+      expect(f('#criterion_1 .long_description')).
+        to include_text "<b>This text should not be bold</b>"
     end
 
     it "should follow learning outcome ignore_for_scoring", priority: "2", test_id: 220328 do
@@ -394,6 +392,25 @@ describe "assignment rubrics" do
       wait_for_ajaximations
 
       expect(fj('.criterion:visible .rating_long_description')).to include_text "long description"
+    end
+
+    it "deletes new criterion when user cancels creation", priority: "1", test_id: 220342 do
+      assignment_with_editable_rubric(10, 'Assignment Rubric')
+
+      get "/courses/#{@assignment.course.id}/assignments/#{@assignment.id}"
+
+      f('.rubric_title .icon-edit').click
+      wait_for_ajaximations
+
+      expect(ffj(".criterion:visible").count).to eq 1
+      f('#add_criterion_container a:nth-of-type(1)').click
+      f('#add_criterion_button').click
+      wait_for_ajaximations
+
+      f('.ui-dialog-buttonset .cancel_button').click
+      wait_for_ajaximations
+
+      expect(ffj(".criterion:visible").count).to eq 1
     end
 
     context "ranged ratings" do
@@ -542,7 +559,7 @@ describe "assignment rubrics" do
         f('#add_criterion_container a:nth-of-type(1)').click
         f('#criterion_duplicate_menu ul li:nth-of-type(2)').click
         wait_for_ajaximations
-        f(' .ok_button').click
+        f('.ui-dialog-buttonset .save_button').click
 
         wait_for_ajaximations
 
@@ -616,8 +633,9 @@ describe "assignment rubrics" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f(".criterion_description .long_description_link").click
-      expect(f("#content")).not_to contain_jqcss('.ui-dialog .save_button:visible')
+      expect(f("#content")).to contain_css(".criterion_description .long_description")
+      expect(f("#content")).not_to contain_jqcss(".criterion_description .long_description_link:visible")
+      expect(f("#content")).not_to contain_jqcss(".criterion_description .edit_criterion_link:visible")
     end
   end
 

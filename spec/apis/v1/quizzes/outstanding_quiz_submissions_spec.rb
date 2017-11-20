@@ -38,10 +38,9 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
     before :once do
       course_factory
-      @user = student_in_course.user
+      @student = student_in_course.user
       @quiz = @course.quizzes.create!(:title => "Outstanding")
-      @quiz.save
-      @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, false)
+      @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student, false)
       @submission.submission_data = {}
       @submission.end_at = 20.minutes.ago
       @submission.save!
@@ -58,8 +57,13 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
       end
 
       it 'returns all outstanding QS' do
-        json = api_index({})
+        json = api_index
         expect(json["quiz_submissions"].first["id"]).to eq @submission.id
+      end
+
+      it 'also returns user info' do
+        json = api_index
+        expect(json["users"].first["id"]).to eq @student.id
       end
     end
   end

@@ -43,18 +43,21 @@ describe 'Web conferences' do
 
   context 'when creating a conference' do
     it 'invites a subset of users', priority: "1", test_id: 273639 do
+      skip_if_safari(:alert)
       conference_title = 'Private Conference by Invitation Only'
       create_conference(title: conference_title, invite_all_users: false)
       verify_conference_list_includes(conference_title)
     end
 
     it 'invites all the course users', priority: "1", test_id: 273640 do
+      skip_if_safari(:alert)
       conference_title = 'Course Conference'
       create_conference(title: conference_title, invite_all_users: true)
       verify_conference_list_includes(conference_title)
     end
 
     it 'includes observers in manual invite', priority: "1", test_id: 3255709 do
+      skip_if_safari(:alert)
       course_with_observer(name: 'Observer Kim', course: @course, active_all: true)
       get conferences_index_page
       new_conference_button.click
@@ -100,6 +103,7 @@ describe 'Web conferences' do
 
   context 'when no conferences exist' do
     it 'should display initial elements of the conference page', priority: "1", test_id: 118488 do
+      skip_if_safari(:alert)
       expect(new_conference_button).to be
 
       headers = ff('.element_toggler')
@@ -111,12 +115,14 @@ describe 'Web conferences' do
     end
 
     it 'should create a web conference', priority: "1", test_id: 118489 do
+      skip_if_safari(:alert)
       conference_title = 'A New Web Conference'
       create_conference(title: conference_title, invite_all_users: true)
       verify_conference_list_includes(conference_title)
     end
 
     it 'should cancel creating a web conference', priority: "2", test_id: 581092 do
+      skip_if_safari(:alert)
       create_conference(cancel: true)
       expect(f('#add_conference_form')).not_to be_displayed
       verify_conference_list_is_empty

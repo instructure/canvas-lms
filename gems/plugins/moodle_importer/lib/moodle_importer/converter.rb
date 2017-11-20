@@ -23,7 +23,7 @@ module Moodle
 
     def export(to_export = Canvas::Migration::Migrator::SCRAPE_ALL_HASH)
       unzip_archive
-      migrator = Moodle2CC::Migrator.new @unzipped_file_path, Dir.mktmpdir, 'format' => 'canvas', 'logger' => self
+      migrator = Moodle2CC::Migrator.new @package_root.root_path, Dir.mktmpdir, 'format' => 'canvas', 'logger' => self
       migrator.migrate
 
       if migrator.last_error

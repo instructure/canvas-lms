@@ -54,6 +54,7 @@ shared_examples_for "settings basic tests" do |account_type|
     end
 
     it "should delete an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249781, root_account: 251031) do
+      skip_if_safari(:alert)
       admin_id = add_account_admin
       scroll_page_to_top # to get the flash alert out of the way
       f("#enrollment_#{admin_id} .remove_account_user_link").click

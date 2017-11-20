@@ -688,13 +688,13 @@ if (typeof Slick === "undefined") {
     function getHeaderRowColumn(columnId) {
       var idx = getColumnIndex(columnId);
       // FreezeColumn - Combine frozen and nonFrozen side header row objects
-      var $headerRowObject;
+      var $headersObject;
       if (!options.numberOfColumnsToFreeze) {
-        $headerRowObject = $headerRow_1;
+        $headersObject = $headers_1;
       } else { // Combine frozen and nonFrozen
-        $headerRowObject = $($.merge( $.merge([], $headerRow_0), $headerRow_1));
+        $headersObject = $($.merge( $.merge([], $headers_0), $headers_1));
       }
-      var $header = $headerRowObject.children().eq(idx);
+      var $header = $headersObject.children().eq(idx);
       return $header && $header[0];
     }
 

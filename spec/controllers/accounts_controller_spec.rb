@@ -981,60 +981,43 @@ describe AccountsController do
       end
     end
 
-    it "should be able to sort courses by enrollments ascending" do
-      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+    describe "sorting by total_students" do
+      before do
+        course_with_teacher(account: @account, course_name: "Course with lots of TAs but no students", active_all: true)
+        create_users_in_course(@course, 3, enrollment_type: "TaEnrollment")
+        3.times.to_a.shuffle.each do |i|
+          course_with_teacher(account: @account, course_name: "Course with #{i} students", active_all: true)
+          create_users_in_course(@course, i)
+        end
+      end
 
-      user = @c3.shard.activate {user_factory()}
-      enrollment = @c3.enroll_user(user, 'StudentEnrollment')
-      user.save!
-      enrollment.course = @c3
-      enrollment.workflow_state = 'active'
-      enrollment.save!
-      @c3.reload
+      it "should be able to sort courses by total_students ascending" do
+        admin_logged_in(@account)
+        get 'courses_api', params: {account_id: @account.id, sort: "total_students"}
+        expect(response).to be_success
+        expect(json_parse(response.body)).to match([
+          {"name" => "Course with 0 students", "total_students" => 0},
+          {"name" => "Course with lots of TAs but no students", "total_students" => 0},
+          {"name" => "bar", "total_students" => 0},
+          {"name" => "foo", "total_students" => 0},
+          {"name" => "Course with 1 students", "total_students" => 1},
+          {"name" => "Course with 2 students", "total_students" => 2}
+        ].map{ |attrs| a_hash_including(attrs) })
+      end
 
-      user2 = @c3.shard.activate {user_factory()}
-      enrollment2 = @c3.enroll_user(user2, 'StudentEnrollment')
-      user2.save!
-      enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
-      enrollment2.save!
-      @c3.reload
-
-      @c4 = course_with_student(course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
-
-      admin_logged_in(@account)
-      get 'courses_api', params: {account_id: @account.id, sort: "enrollments", order: "asc"}
-
-      expect(response).to be_success
-      expect(response.body).to match(/\"name\":\"foo\".+\"name\":\"bar\".+\"name\":\"xylophone\".+\"name\":\"apple\"/)
-    end
-
-    it "should be able to sort courses by enrollments descending" do
-      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
-
-      user = @c3.shard.activate {user_factory()}
-      enrollment = @c3.enroll_user(user, 'StudentEnrollment')
-      user.save!
-      enrollment.course = @c3
-      enrollment.workflow_state = 'active'
-      enrollment.save!
-      @c3.reload
-
-      user2 = @c3.shard.activate {user_factory()}
-      enrollment2 = @c3.enroll_user(user2, 'StudentEnrollment')
-      user2.save!
-      enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
-      enrollment2.save!
-      @c3.reload
-
-      @c4 = course_with_student(course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
-
-      admin_logged_in(@account)
-      get 'courses_api', params: {account_id: @account.id, sort: "enrollments", order: "desc"}
-
-      expect(response).to be_success
-      expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"xylophone\".+\"name\":\"bar\".+\"name\":\"foo\"/)
+      it "should be able to sort courses by total_students descending" do
+        admin_logged_in(@account)
+        get 'courses_api', params: {account_id: @account.id, sort: "total_students", order: "desc"}
+        expect(response).to be_success
+        expect(json_parse(response.body)).to match([
+          {"name" => "Course with 2 students", "total_students" => 2},
+          {"name" => "Course with 1 students", "total_students" => 1},
+          {"name" => "Course with 0 students", "total_students" => 0},
+          {"name" => "Course with lots of TAs but no students", "total_students" => 0},
+          {"name" => "bar", "total_students" => 0},
+          {"name" => "foo", "total_students" => 0}
+        ].map{ |attrs| a_hash_including(attrs) })
+      end
     end
 
     it "should be able to search by teacher" do

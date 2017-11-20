@@ -19,9 +19,10 @@ define [
   'Backbone'
   'jquery'
   'compiled/views/accounts/admin_tools/AdminToolsView'
-], (Backbone, $, AdminToolsView) -> 
+  'helpers/assertions'
+], (Backbone, $, AdminToolsView, assertions) ->
   QUnit.module 'AdminToolsViewSpec',
-    setup: -> 
+    setup: ->
       @admin_tools_view = new AdminToolsView
         restoreContentPaneView: new Backbone.View
         messageContentPaneView: new Backbone.View
@@ -31,8 +32,12 @@ define [
 
       $('#fixtures').append @admin_tools_view.render().el
 
-    teardown: -> 
+    teardown: ->
       @admin_tools_view.remove()
 
-  test "creates a new jquery tabs", -> 
+  test 'should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @admin_tools_view, done, {'a11yReport': true}
+
+  test "creates a new jquery tabs", ->
     ok @admin_tools_view.$adminToolsTabs.data('tabs'), "There should be 2 tabs initialized"

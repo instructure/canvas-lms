@@ -167,7 +167,7 @@ QUnit.module('Gradebook Grid Column Ordering', function (suiteHooks) {
     gradebook = createGradebook(options);
     gradebook.initialize();
     addGridData();
-    gridSpecHelper = new SlickGridSpecHelper(gradebook.grid);
+    gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid);
   }
 
   suiteHooks.beforeEach(function () {
@@ -200,8 +200,7 @@ QUnit.module('Gradebook Grid Column Ordering', function (suiteHooks) {
   });
 
   suiteHooks.afterEach(function () {
-    gradebook.gridSupport.destroy();
-    gradebook.grid.destroy();
+    gradebook.destroy();
     DataLoader.loadGradebookData.restore();
     DataLoader.getDataForColumn.restore();
     server.restore();

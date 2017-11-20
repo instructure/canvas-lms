@@ -50,6 +50,7 @@ describe "account admin outcomes" do
       end
 
       it "should delete a learning outcome", priority: "1", test_id: 250232 do # no
+        skip_if_safari(:alert)
         should_delete_a_learning_outcome
       end
 
@@ -77,6 +78,7 @@ describe "account admin outcomes" do
       end
 
       it "should delete an outcome group", priority: "2", test_id: 250238 do # no
+        skip_if_safari(:alert)
         should_delete_an_outcome_group
       end
     end

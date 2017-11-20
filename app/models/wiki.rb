@@ -87,7 +87,7 @@ class Wiki < ActiveRecord::Base
 
   def unset_front_page!
     if self.context.is_a?(Course) && self.context.default_view == 'wiki'
-      self.context.default_view = 'feed'
+      self.context.default_view = nil
       self.context.save
     end
 
@@ -172,6 +172,10 @@ class Wiki < ActiveRecord::Base
   end
 
   def find_page(param)
+    # to allow linking to a WikiPage by id (to avoid needing to hit the database to pull its url)
+    if (match = param.match(/\Apage_id:(\d+)\z/))
+      return self.wiki_pages.where(id: match[1].to_i).first
+    end
     self.wiki_pages.not_deleted.where(url: param.to_s).first ||
       self.wiki_pages.not_deleted.where(url: param.to_url).first ||
       self.wiki_pages.not_deleted.where(id: param.to_i).first

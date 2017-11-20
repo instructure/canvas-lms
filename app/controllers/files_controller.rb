@@ -580,6 +580,7 @@ class FilesController < ApplicationController
       # if the file doesn't exist, don't leak its existence (and the context's name) to an unauthenticated user
       # (note that it is possible to have access to the file without :read on the context, e.g. with submissions)
       return unless authorized_action(@context, @current_user, :read)
+      @include_js_env = true
       return render 'shared/errors/file_not_found',
         status: :bad_request,
         formats: [:html]

@@ -307,6 +307,11 @@ module QuizzesCommon
     /(?:#{label}\s*){2}/
   end
 
+  def click_new_quiz_button
+    f('.new-quiz-link').click
+    wait_for_new_page_load
+  end
+
   def click_new_question_button
     find_accessible_link('New Question').click
   end

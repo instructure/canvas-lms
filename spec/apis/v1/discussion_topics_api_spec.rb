@@ -51,6 +51,60 @@ describe Api::V1::DiscussionTopics do
     @topic = @course.discussion_topics.create
   end
 
+  describe 'include root data if requested' do
+    before :once do
+      @delayed_post_time = 1.day.from_now
+      @lock_at_time = 2.days.from_now
+      @group_topic = group_discussion_topic_model(:delayed_post_at => @delayed_post_time, :lock_at => @lock_at_time)
+    end
+
+    it 'get root topic data' do
+      root_topics = @test_api.get_root_topic_data(@group_topic.child_topics, [:delayed_post_at, :lock_at])
+      expect(root_topics.length).to eq 1
+      # Key by the root, not the child topic
+      expect(root_topics[@group_topic.child_topics.first.id]).to eq nil
+      root_topic = root_topics[@group_topic.id]
+      expect(root_topic).not_to eq nil
+      expect(root_topic[:id]).to eq @group_topic.id
+      expect(root_topic[:delayed_post_at]).to eq @delayed_post_time
+      expect(root_topic[:lock_at]).to eq @lock_at_time
+    end
+
+    it 'include if requested and not prefetched' do
+      root_topic_fields = [:delayed_post_at]
+      json = @test_api.discussion_topic_api_json(
+        @group_topic.child_topics.first, @course, @user,{},
+        { :root_topic_fields => root_topic_fields }, nil
+      )
+      expect(json[:delayed_post_at]).to eq @delayed_post_time
+      expect(json[:lock_at]).to be nil  # We didn't ask for it, so don't fill it
+      expect(json[:id]).to eq @group_topic.child_topics.first.id
+    end
+
+    it 'include if requested and prefetched' do
+      root_topic_fields = [:delayed_post_at]
+      root_topics = @test_api.get_root_topic_data(@group_topic.child_topics, root_topic_fields)
+      json = @test_api.discussion_topic_api_json(
+        @group_topic.child_topics.first, @course, @user,{},
+        { :root_topic_fields => root_topic_fields }, root_topics
+      )
+      expect(json[:delayed_post_at]).to eq @delayed_post_time
+      expect(json[:lock_at]).to be nil  # We didn't ask for it, so don't fill it
+      expect(json[:id]).to eq @group_topic.child_topics.first.id
+    end
+
+    it 'dont include if not requested' do
+      root_topic_fields = []
+      json = @test_api.discussion_topic_api_json(
+        @group_topic.child_topics.first, @course, @user,{},
+        { :root_topic_fields => root_topic_fields }
+      )
+      expect(json[:delayed_post_at]).to be nil
+      expect(json[:lock_at]).to be nil  # We didn't ask for it, so don't fill it
+      expect(json[:id]).to eq @group_topic.child_topics.first.id
+    end
+  end
+
   it 'should render a podcast_url using the discussion topic\'s context if there is no @context_enrollment/@context' do
     @topic.update_attribute :podcast_enabled, true
     data = nil
@@ -400,6 +454,25 @@ describe DiscussionTopicsController, type: :request do
         expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
       end
 
+      it "should order topics by title when order_by parameter is specified" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+        @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
+
+        topics = [@sub, @topic, @topic2, @topic3]
+        topic_reply_date = Time.zone.now - 1.day
+        topics.each do |topic|
+          topic.last_reply_at = topic_reply_date
+          topic.save!
+          topic_reply_date -= 1.day
+        end
+
+        @topic4 = create_topic(@course, :title => "Topic 4", :message => "<p>content here</p>")
+        topics << @topic4
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?order_by=title",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :order_by => 'title'})
+        expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
+      end
+
       it "should only include topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
@@ -659,6 +732,24 @@ describe DiscussionTopicsController, type: :request do
         gtopic.reload
         expect(gtopic.allow_rating).to be_truthy
         expect(gtopic.require_initial_post).to_not be_truthy
+      end
+
+      it "should not allow updating certain attributes for group sub-discussions" do
+        # but should allow them to pin/unpin them
+        group_category = @course.group_categories.create(:name => 'watup')
+        group = group_category.groups.create!(:name => "group1", :context => @course)
+        rtopic = @course.discussion_topics.create!(:group_category => group_category)
+        gtopic = rtopic.child_topics.first
+
+        api_call(:put, "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :group_id => group.to_param, :topic_id => gtopic.to_param},
+          {:message => 'new message'}, {}, {:expected_status => 401})
+
+        api_call(:put, "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          {:controller => "discussion_topics", :action => "update", :format => "json", :group_id => group.to_param, :topic_id => gtopic.to_param},
+          {:pinned => '1'}, {}, {:expected_status => 200})
+
+        expect(gtopic.reload.pinned).to be_truthy
       end
 
       context "publishing" do

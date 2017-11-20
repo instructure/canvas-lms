@@ -38,4 +38,6 @@ new IndexView({
   atom_feed_url: ENV.atom_feed_url
 })
 
-collection.fetch()
+collection.fetch({fetchOptions: {
+  per_page: 20
+}})

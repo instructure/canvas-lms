@@ -170,7 +170,7 @@ class GradeChangeAuditApiController < AuditorApiController
     return render_unauthorized_action unless course_authorized?(course)
 
     events = Auditors::GradeChange.for_course(course, query_options)
-    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, course]))
+    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, course]), course: course)
   end
 
   # @API Query by student.
@@ -253,7 +253,7 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
-    render_events(events, send(url_method, args))
+    render_events(events, send(url_method, args), course: course)
   end
 
   private
@@ -266,7 +266,7 @@ class GradeChangeAuditApiController < AuditorApiController
     course.grants_right?(@current_user, session, :manage_grades)
   end
 
-  def render_events(events, route)
+  def render_events(events, route, course: nil)
     events = Api.paginate(events, self, route)
 
     if params.fetch(:include, []).include?("current_grade")
@@ -274,7 +274,18 @@ class GradeChangeAuditApiController < AuditorApiController
       events.each { |event| event.grade_current = current_grade_for_event(event, grades) }
     end
 
+    if course.present?
+      events = events_visible_to_current_user(course, events)
+    end
+
     render :json => grade_change_events_compound_json(events, @current_user, session)
+  end
+
+  def events_visible_to_current_user(course, events)
+    visible_student_ids =
+      course.students_visible_to(@current_user, include: :priors_and_deleted).index_by(&:global_id)
+
+    events.select { |event| visible_student_ids[event.student_id] }
   end
 
   def current_grade_for_event(event, grades)

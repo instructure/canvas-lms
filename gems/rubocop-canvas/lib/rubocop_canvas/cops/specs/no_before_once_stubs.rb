@@ -52,7 +52,7 @@ module RuboCop
               child.to_a[2].is_a?(::RuboCop::AST::Node) &&
               child.to_a[2].children[0] == BLOCK_ARG
           end
-          add_offense node, :expression, MSG, :warning
+          add_offense node, message: MSG, severity: :warning
         end
       end
     end

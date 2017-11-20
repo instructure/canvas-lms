@@ -390,6 +390,11 @@ class UsersController < ApplicationController
   # @returns [User]
   def index
     get_context
+    if !api_request? && @context.feature_enabled?(:course_user_search)
+      @account ||= @context
+      return course_user_search
+    end
+
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account
       @query = (params[:user] && params[:user][:name]) || params[:term]
@@ -491,7 +496,7 @@ class UsersController < ApplicationController
           end
         }
       }
-      render :html => '<div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
+      render :html => '<div id="application"></div><div id="act_as_modal"></div>'.html_safe, :layout => 'layouts/bare'
     end
   end
 
@@ -842,7 +847,7 @@ class UsersController < ApplicationController
       todo_item_json(a, @current_user, session, 'submitting')
     }
     if Array(params[:include]).include? 'ungraded_quizzes'
-      submitting += @current_user.ungraded_quizzes_needing_submitting.map { |q| todo_item_json(q, @current_user, session, 'submitting') }
+      submitting += @current_user.ungraded_quizzes(:needing_submitting => true).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
       submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] || CanvasSort::Last }
     end
     render :json => (grading + submitting)
@@ -1736,7 +1741,7 @@ class UsersController < ApplicationController
             :url => av_json['url'] }
         end
       elsif url = avatar.try(:[], :url)
-        user_params[:avatar_image] = { :type => 'external', :url => url }
+        user_params[:avatar_image] = { :url => url }
       end
     end
 
@@ -2125,15 +2130,15 @@ class UsersController < ApplicationController
       # check just in case
       existing_rows = Pseudonym.active.where(:account_id => @context.root_account).joins(:user => :communication_channels).joins(:account).
         where("communication_channels.workflow_state<>'retired' AND path_type='email' AND LOWER(path) = ?", email.downcase).
-        pluck('communication_channels.path', :user_id, :account_id, 'users.name', 'accounts.name')
+        pluck('communication_channels.path', :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
 
       if existing_rows.any?
-        existing_users = existing_rows.map do |address, user_id, account_id, user_name, account_name|
-         {:address => address, :user_id => user_id, :user_name => user_name, :account_id => account_id, :account_name => account_name}
+        existing_users = existing_rows.map do |address, user_id, user_uuid, account_id, user_name, account_name|
+         {:address => address, :user_id => user_id, :user_token => User.token(user_id, user_uuid), :user_name => user_name, :account_id => account_id, :account_name => account_name}
         end
         errored_users << user_hash.merge(:errors => [{:message => "Matching user(s) already exist"}], :existing_users => existing_users)
       elsif user.save
-        invited_users << user_hash.merge(:id => user.id)
+        invited_users << user_hash.merge(:id => user.id, :user_token => user.token)
       else
         errored_users << user_hash.merge(user.errors.as_json)
       end
@@ -2471,7 +2476,7 @@ class UsersController < ApplicationController
       end
       @user.save!
       if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        @user.user_observees << @user.user_observees.create_or_restore(user_id: @observee)
+        UserObserver.create_or_restore(observee: @observee, observer: @user)
       end
 
       if notify_policy.is_self_registration?

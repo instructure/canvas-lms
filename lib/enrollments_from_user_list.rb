@@ -36,7 +36,7 @@ class EnrollmentsFromUserList
   end
 
   def process(list)
-    raise ArgumentError, "Must provide a UserList or Array (of user ids)" unless list.is_a?(UserList) || list.is_a?(Array)
+    raise ArgumentError, "Must provide a UserList or Array (of user tokens)" unless list.is_a?(UserList) || list.is_a?(Array)
     @enrollments = []
     @user_ids_to_touch = []
 
@@ -46,7 +46,7 @@ class EnrollmentsFromUserList
         list.users
       else
         # list of user ids
-        User.where(:id => list).to_a
+        User.from_tokens(list)
       end
     users.each_slice(Setting.get('enrollments_from_user_list_batch_size', 50).to_i) do |users|
       @course.transaction do

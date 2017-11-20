@@ -124,7 +124,7 @@ end
 describe "terms of use SOC2 compliance test" do
   include_context "in-process server selenium tests"
 
-  it "should prevent a user from accessing canvas if they are newly registered/imported after the SOC2 start date and have not yet accepted the terms", priority: "1", test_id: 268935 do
+  it "should prevent a user from accessing canvas if they are newly registered/imported after the SOC2 start date and have not yet accepted the terms" do
 
     # Create a user after SOC2 implemented
     after_soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime + 10.days
@@ -150,6 +150,26 @@ describe "terms of use SOC2 compliance test" do
       submit_form form
     }
 
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
+  end
+
+  it "should grandfather in previously registered users without prompting them to reaccept the terms", priority: "1", test_id: 268936 do
+
+    # Create a user before SOC2 implemented
+    before_soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime - 10.days
+
+    Timecop.freeze(before_soc2_start_date) do
+      user_with_pseudonym
+      @user.register!
+    end
+
+    login
+
+    # terms page shouldn't be visible
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
+
+    # view a different page, verify terms page isn't displayed
+    get "/profile/settings"
     expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 end

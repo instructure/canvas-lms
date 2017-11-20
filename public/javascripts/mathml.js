@@ -18,8 +18,17 @@
 
 import $ from 'jquery'
 
+// configure MathJax to use 'color' extension fo LaTeX coding
+const localConfig = {
+  TeX: {
+    extensions: ["color.js"]
+  }
+};
+
 export function loadMathJax (config_file, cb = null) {
-  if (!isMathJaxLoaded()) {
+  if (!isMathJaxLoaded() && shouldLoadMathJax()) {
+    // signal local config to mathjax as it loads
+    window.MathJax = localConfig;
     $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=${config_file}`, cb);
   }
 }
@@ -30,6 +39,10 @@ export function isMathMLOnPage () {
 
 export function isMathJaxLoaded () {
   return !(typeof MathJax === 'undefined')
+}
+
+export function shouldLoadMathJax() {
+  return ($(document.documentElement).find("img.equation_image").length <= 0)
 }
 
 /*

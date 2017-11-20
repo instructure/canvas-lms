@@ -142,7 +142,7 @@ describe "announcements" do
     it "allows rating when enabled", priority: "1", test_id: 603587 do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: true)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
-
+      make_full_screen
       f('.discussion-reply-action').click
       wait_for_ajaximations
       wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
@@ -151,7 +151,7 @@ describe "announcements" do
       wait_for_ajaximations
 
       expect(f('.discussion-rate-action')).to be_displayed
-
+      scroll_to(f('.discussion-rate-action'))
       f('.discussion-rate-action').click
       wait_for_ajaximations
 

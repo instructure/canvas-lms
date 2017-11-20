@@ -55,7 +55,7 @@
   </p>
 <% end %>
 <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-  <p><%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %></p>
+  <p><%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion." %></p>
 <% else %>
     <p><%= t "Join the conversation using the link below." %></p>
 <% end %>

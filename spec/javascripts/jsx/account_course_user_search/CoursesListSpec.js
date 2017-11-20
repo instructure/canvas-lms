@@ -17,7 +17,9 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import ReactDOM from 'react-dom'
+import {shallow, mount} from 'enzyme'
+import {omit} from 'lodash'
 import CoursesList from 'jsx/account_course_user_search/CoursesList'
 import CoursesListRow from 'jsx/account_course_user_search/CoursesListRow'
 
@@ -37,10 +39,6 @@ const props = {
       name: "Testing Term"
     }
   }],
-  addUserUrls: {
-    USER_LISTS_URL: 'http://courses/{{id}}/users',
-    ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
-  },
   roles: [{
     id: '1',
     course_id: '1',
@@ -50,23 +48,13 @@ const props = {
   }]
 }
 
-test('renders with the proper urls and roles', () => {
-  const wrapper = shallow(<CoursesList {...props} />)
-
-  const renderedList = wrapper.find(CoursesListRow)
-  const renderedUrls = renderedList.props().urls;
-  deepEqual(renderedUrls, {
-    USER_LISTS_URL: 'http://courses/123/users',
-    ENROLL_USERS_URL: 'http://courses/123/users/enroll'
-  }, 'it passed url props in and they were replaced properly');
-});
-
 QUnit.module('Account Course User Search CoursesList Sorting');
 
 const coursesProps = {
   courses: [{
     id: '1',
     name: 'A',
+    sis_course_id: 'SIS 1',
     workflow_state: 'alive',
     total_students: 6,
     teachers: [{
@@ -79,6 +67,7 @@ const coursesProps = {
   }, {
     id: '2',
     name: 'Ba',
+    sis_course_id: 'SIS Ba',
     workflow_state: 'alive',
     total_students: 7,
     teachers: [{
@@ -91,6 +80,7 @@ const coursesProps = {
   }, {
     id: '3',
     name: 'Bb',
+    sis_course_id: 'SIS Bb',
     workflow_state: 'alive',
     total_students: 6,
     teachers: [{
@@ -103,6 +93,7 @@ const coursesProps = {
   }, {
     id: '4',
     name: 'C',
+    sis_course_id: 'SIS C',
     workflow_state: 'alive',
     total_students: 6,
     teachers: [{
@@ -115,6 +106,7 @@ const coursesProps = {
   }, {
     id: '5',
     name: 'De',
+    sis_course_id: 'SIS De',
     workflow_state: 'alive',
     total_students: 11,
     teachers: [{
@@ -127,6 +119,7 @@ const coursesProps = {
   }, {
     id: '6',
     name: 'Dz',
+    sis_course_id: 'SIS Dz',
     workflow_state: 'alive',
     total_students: 10,
     teachers: [{
@@ -137,10 +130,6 @@ const coursesProps = {
       name: "Dz Term"
     }
   }],
-  addUserUrls: {
-    USER_LISTS_URL: 'http://courses/{{id}}/users',
-    ENROLL_USERS_URL: 'http://courses/{{id}}/users/enroll'
-  },
   roles: [{
     id: '1',
     course_id: '1',
@@ -158,56 +147,74 @@ Object.entries({
   term: 'Term',
   teacher: 'Teacher',
   subaccount: 'Sub-Account',
-  enrollments: 'Enrollments'
+  total_students: 'Students'
 }).forEach(([columnID, label]) => {
 
   test(`sorting by ${columnID} asc puts down-arrow on ${label} only`, () => {
-    const wrapper = shallow(<CoursesList {...{
+    const wrapper = mount(<CoursesList {...{
       ...coursesProps,
       sort: columnID,
       order: 'asc'
-    }} />)
-    equal(wrapper.find('IconMiniArrowUpSolid').length, 0, 'no columns have an up arrow')
-    const icons = wrapper.find('IconMiniArrowDownSolid')
+    }} />).getDOMNode()
+
+    equal(wrapper.querySelectorAll('svg[name="IconMiniArrowUpSolid"]').length, 0, 'no columns have an up arrow')
+    const icons = wrapper.querySelectorAll('svg[name=IconMiniArrowDownSolid]')
     equal(icons.length, 1, 'only one down arrow')
-    const header = icons.first().parents('Tooltip')
-    let expectedTip = `Click to sort by ${label} descending`
-    if (columnID === 'course_name') {
-      expectedTip = 'Click to sort by name descending'
-    }
-    ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
-    ok(header.contains(label), `${label} is the one that has the down arrow`)
+    const header = icons[0].parentNode
+
+    const expectedTip = {
+      course_name: 'Click to sort by name descending',
+      total_students: 'Click to sort by number of students descending'
+    }[columnID] || `Click to sort by ${label} descending`
+
+    ok(header.textContent.match(RegExp(expectedTip, 'i')), 'has right tooltip')
+    ok(header.textContent.match(label), `${label} is the one that has the down arrow`)
   })
 
   test(`sorting by ${columnID} desc puts up-arrow on ${label} only`, () => {
-    const wrapper = shallow(<CoursesList {...{
+    const wrapper = mount(<CoursesList {...{
       ...coursesProps,
       sort: columnID,
       order: 'desc'
-    }} />)
-    equal(wrapper.find('IconMiniArrowDownSolid').length, 0)
-    const icons = wrapper.find('IconMiniArrowUpSolid', 'no columns have a down arrow')
+    }} />).getDOMNode()
+
+    equal(wrapper.querySelectorAll('svg[name=IconMiniArrowDownSolid]').length, 0)
+    const icons = wrapper.querySelectorAll('svg[name=IconMiniArrowUpSolid]', 'no columns have a down arrow')
     equal(icons.length, 1, 'only one up arrow')
-    const header = icons.first().parents('Tooltip')
-    let expectedTip = `Click to sort by ${label} ascending`
-    if (columnID === 'course_name') {
-      expectedTip = 'Click to sort by name ascending'
-    }
-    ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
-    ok(header.contains(label), `${label} is the one that has the up arrow`)
+    const header = icons[0].parentNode
+    const expectedTip = {
+      course_name: 'Click to sort by name ascending',
+      total_students: 'Click to sort by number of students ascending'
+    }[columnID] || `Click to sort by ${label} ascending`
+
+    ok(header.textContent.match(RegExp(expectedTip, 'i')), 'has right tooltip')
+    ok(header.textContent.match(label), `${label} is the one that has the up arrow`)
   })
 
   test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, function() {
-    const sortSpy = this.spy()
-    const wrapper = shallow(<CoursesList {...{
+    const wrapper = document.getElementById('fixtures')
+    ReactDOM.render(<CoursesList {...{
       ...coursesProps,
-      onChangeSort: sortSpy
-    }} />)
-    const header = wrapper.findWhere(n => n.text() === label).first().parents('Tooltip')
-    header.simulate('click')
-    ok(sortSpy.calledOnce)
-    ok(sortSpy.calledWith(columnID))
+      onChangeSort: this.mock().once().withArgs(columnID)
+    }} />, wrapper)
+
+    const header = Array.from(wrapper.querySelectorAll('[role=columnheader] button')).find(e => e.textContent.match(label))
+    header.click()
   })
+})
+
+test('displays SIS ID column if any course has one', () => {
+  const wrapper = shallow(<CoursesList {...coursesProps} />)
+  ok(wrapper.findWhere(n => n.prop('label') === 'SIS ID').exists())
+})
+
+test(`doesn't display SIS ID column if no course has one`, () => {
+  const propsWithoutSISids = {
+    ...coursesProps,
+    courses: coursesProps.courses.map(c => omit(c, ['sis_course_id']))
+  }
+  const wrapper = shallow(<CoursesList {...propsWithoutSISids} />)
+  notOk(wrapper.findWhere(n => n.prop('label') === 'SIS ID').exists())
 })
 
 test('displays courses in the right order', () => {

@@ -121,6 +121,14 @@ export default class SubmissionDetailsDialog {
       })
     })
 
+    if (this.options.anonymous) {
+      this.submission.submission_comments.forEach((comment) => {
+        if(comment.author.id !== ENV.current_user_id) {
+          comment.anonymous = comment.author.anonymous = true;
+          comment.author_name = I18n.t('Student');
+        }
+      });
+    }
 
     if (this.submission.excused) {
       this.submission.grade = 'EX'
@@ -133,6 +141,6 @@ export default class SubmissionDetailsDialog {
   }
 
   static open (assignment, student, options) {
-    return new SubmissionDetailsDialog(assignment, student, options, ENV).open()
+    return new SubmissionDetailsDialog(assignment, student, options).open()
   }
 }

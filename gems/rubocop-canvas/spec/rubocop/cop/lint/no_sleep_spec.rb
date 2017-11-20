@@ -24,7 +24,7 @@ describe RuboCop::Cop::Lint::NoSleep do
     end
 
     it 'disallows sleep' do
-      inspect_source(cop, %{
+      inspect_source(%{
         class KnightsController < ApplicationController
           def find_sword
             sleep 999
@@ -43,7 +43,7 @@ describe RuboCop::Cop::Lint::NoSleep do
     end
 
     it 'disallows sleep' do
-      inspect_source(cop, %{
+      inspect_source(%{
         describe "Alerts" do
           it "should validate the form" do
             sleep 2
@@ -62,7 +62,7 @@ describe RuboCop::Cop::Lint::NoSleep do
     end
 
     it 'disallows sleep' do
-      inspect_source(cop, %{
+      inspect_source(%{
         class BookmarkService < UserService
           def find_bookmarks(query)
             sleep Time.now - last_get

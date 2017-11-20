@@ -187,6 +187,7 @@ describe "discussions" do
       end
 
       it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223507 do
+        skip_if_safari(:alert)
         # given
         get url
         expect(f("#content")).not_to contain_css('#disussion_attachment_uploaded_data')
@@ -202,6 +203,7 @@ describe "discussions" do
         let(:url) { "/groups/#{group.id}/discussion_topics/new" }
 
         it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223508 do
+          skip_if_safari(:alert)
           # given
           get url
           expect(f("#content")).not_to contain_css('label[for=discussion_attachment_uploaded_data]')

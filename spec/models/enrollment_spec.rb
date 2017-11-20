@@ -37,7 +37,7 @@ describe Enrollment do
     expect(@enrollment.state).to eql(:active)
     @enrollment.reject
     expect(@enrollment.state).to eql(:rejected)
-    Score.where(enrollment_id: @enrollment).delete_all
+    Score.where(enrollment_id: @enrollment).each(&:destroy_permanently!)
     @enrollment.destroy_permanently!
     enrollment_model
     @enrollment.complete
@@ -2328,31 +2328,40 @@ describe Enrollment do
   describe '#can_be_deleted_by' do
 
     describe 'on a student enrollment' do
-      let(:enrollment) { StudentEnrollment.new }
+      let(:course) { Course.new(id: 99) }
+      let(:enrollment) { StudentEnrollment.new(course_id: course.id) }
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
       it 'is true for a user who has been granted :manage_students' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is false for a user without :manage_students' do
-        context = double(:grants_right? => false)
+        context = course
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
       it 'is false for someone with :manage_admin_users but without :manage_students' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
+      it 'is false for someone with :manage_admin_users in other context' do
+        context = CourseSection.new(id: 10)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
+        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+      end
+
       it 'is false if a user is trying to remove their own enrollment' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         allow(context).to receive_messages(:account => context)
@@ -2362,26 +2371,27 @@ describe Enrollment do
     end
 
     describe 'on an observer enrollment' do
-      let(:enrollment) { ObserverEnrollment.new }
+      let(:course) { Course.new(id: 99) }
+      let(:enrollment) { ObserverEnrollment.new(course_id: course.id) }
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
       it 'is true with :manage_students' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is true with :manage_admin_users' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is false otherwise' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
@@ -2589,5 +2599,144 @@ describe Enrollment do
     enrolls = Enrollment.where(:id => [restricted_enroll, future_enroll, active_enroll]).
       joins(:enrollment_state).order(Enrollment.state_by_date_rank_sql).to_a
     expect(enrolls).to eq [active_enroll, future_enroll, restricted_enroll]
+  end
+
+  describe "restoring completed enrollments" do
+    before(:once) do
+      @student = @user
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher, enrollment_state: :active)
+      @enrollment = @course.enroll_student(@student, enrollment_state: :active)
+      @assignment = @course.assignments.create!(submission_types: ["online_text_entry"], points_possible: 10)
+    end
+
+    it "restores deleted submissions for assignments that are still active" do
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        Submission.active.where(assignment_id: @assignment, user_id: @student.id).count
+      }.from(0).to(1)
+    end
+
+    it "does not restore deleted submissions for assignments that are deleted" do
+      @enrollment.destroy
+      @assignment.destroy
+
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+        Submission.active.where(assignment_id: @assignment, user_id: @student.id).count
+      })
+    end
+
+    it "infers the appropriate workflow state for unsubmitted submissions when restoring them" do
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        @assignment.all_submissions.find_by(user_id: @enrollment.user_id).workflow_state
+      }.from("deleted").to("unsubmitted")
+    end
+
+    it "infers the appropriate workflow state for submitted, not-yet-graded submissions when restoring them" do
+      @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "a submission!")
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        @assignment.all_submissions.find_by(user_id: @enrollment.user_id).workflow_state
+      }.from("deleted").to("submitted")
+    end
+
+    it "infers the appropriate workflow state for graded submissions when restoring them" do
+      @assignment.grade_student(@user, grade: 8, grader: @teacher)
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        @assignment.all_submissions.find_by(user_id: @enrollment.user_id).workflow_state
+      }.from("deleted").to("graded")
+    end
+
+    it "infers the appropriate workflow state for excused submissions when restoring them" do
+      @assignment.grade_student(@user, excused: true, grader: @teacher)
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        @assignment.all_submissions.find_by(user_id: @enrollment.user_id).workflow_state
+      }.from("deleted").to("graded")
+    end
+
+    it "infers the appropriate workflow state for pending review submissions when restoring them" do
+      quiz_with_graded_submission(
+        [{question_data: {name: 'Q1', points_possible: 1, 'question_type' => 'essay_question'}}],
+        user: @student,
+        course: @course
+      )
+      submission = @quiz.assignment.all_submissions.find_by(user_id: @enrollment.user_id)
+      submission.update!(score: nil)
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        submission.reload.workflow_state
+      }.from("deleted").to("pending_review")
+    end
+
+    it "restores deleted course scores" do
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        @enrollment.scores.where(course_score: true).count
+      }.from(0).to(1)
+    end
+
+    it "restores scores for assignment groups that are still active" do
+      @enrollment.destroy
+      assignment_group = @course.assignment_groups.active.first
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        @enrollment.scores.where(assignment_group_id: assignment_group).count
+      }.from(0).to(1)
+    end
+
+    it "does not restore scores for assignment groups that are deleted" do
+      @enrollment.destroy
+      assignment_group = @course.assignment_groups.active.first
+      assignment_group.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+        @enrollment.scores.where(assignment_group_id: assignment_group).count
+      })
+    end
+
+    it "restores scores for grading periods that are still active" do
+      grading_period_group = @course.root_account.grading_period_groups.create!
+      grading_period_group.enrollment_terms << @course.enrollment_term
+      grading_period = grading_period_group.grading_periods.create!(
+        title: "Grading Period",
+        start_date: 2.months.ago,
+        end_date: 1.month.ago
+      )
+      @enrollment.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.to change {
+        @enrollment.scores.where(grading_period_id: grading_period).count
+      }.from(0).to(1)
+    end
+
+    it "does not restore scores for grading periods that are deleted" do
+      grading_period_group = @course.root_account.grading_period_groups.create!
+      grading_period_group.enrollment_terms << @course.enrollment_term
+      grading_period = grading_period_group.grading_periods.create!(
+        title: "Grading Period",
+        start_date: 2.months.ago,
+        end_date: 1.month.ago
+      )
+      @enrollment.destroy
+      grading_period.destroy
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+        @enrollment.scores.where(grading_period_id: grading_period).count
+      })
+    end
+
+    it "does not restore scores for grading periods that are not associated with the course" do
+      grading_period_group = @course.root_account.grading_period_groups.create!
+      grading_period_group.enrollment_terms << @course.enrollment_term
+      grading_period = grading_period_group.grading_periods.create!(
+        title: "Grading Period",
+        start_date: 2.months.ago,
+        end_date: 1.month.ago
+      )
+      @enrollment.destroy
+      @course.enrollment_term.update!(grading_period_group_id: nil)
+      expect { @enrollment.update!(workflow_state: :completed) }.not_to(change {
+        @enrollment.scores.where(grading_period_id: grading_period).count
+      })
+    end
   end
 end

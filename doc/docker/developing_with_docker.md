@@ -6,12 +6,20 @@ way to get started developing Canvas.
 **Note for previous docker for canvas development users**
 If you have a `docker-compose.override.yml`, you'll need to update it to version 2 or delete it.
 
+## Automated setup script
+
+The easiest way to get a working development environment is to run:
+
+```
+./script/docker_dev_setup.sh
+```
+
+This will guide you through the process of installing docker, dinghy/dory,
+building the docker images, and setting up Canvas.
+
+If you would rather do things manually, read on!
+
 ## Recommendations
-
-If using dinghy (macOS) or [dory](https://github.com/FreedomBen/dory) (Linux || Mac), you can use the
-auto-generated host names.
-
-- web.canvaslms.docker
 
 By default `docker-compose` will look at 2 files
 - docker-compose.yml

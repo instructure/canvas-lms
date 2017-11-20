@@ -212,7 +212,7 @@ describe "dashboard" do
       expect(messages[1].text).to eq a2.message
     end
 
-    it "should interpolate the user's domain in global notifications", priority: "1", test_id: 215583 do
+    it "should interpolate the user's domain in global notifications" do
       announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}",
                                                            :subject => 'test',
                                                            :start_at => Date.today,
@@ -222,7 +222,7 @@ describe "dashboard" do
       expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
     end
 
-    it "should interpolate the user's id in global notifications", priority: "1", test_id: 215584 do
+    it "should interpolate the user's id in global notifications" do
       announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}",
                                                            :subject => 'test',
                                                            :start_at => Date.today,
@@ -319,6 +319,7 @@ describe "dashboard" do
     end
 
     it "should end conferences from stream", priority: "1", test_id: 216355 do
+      skip_if_safari(:alert)
       PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
 
       course_with_teacher_logged_in

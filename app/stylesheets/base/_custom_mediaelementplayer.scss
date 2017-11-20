@@ -18,11 +18,6 @@
 
 // customizations to vendored mediaelementplayer css
 
-/* make subtitle text bigger when it's in fullscreen */
-.mejs-container-fullscreen .mejs-captions-layer {
-  @include fontSize($ic-font-size--xlarge);
-}
-
 /* good menu widths */
 .mejs-controls .mejs-sourcechooser-button .mejs-sourcechooser-selector {
   width: 160px;

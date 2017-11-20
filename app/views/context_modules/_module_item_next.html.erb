@@ -103,7 +103,7 @@
           <% else %>
             <a
               title="<%= module_item && module_item.title %>"
-              class="ig-title title"
+              class="ig-title title item_link"
               href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>"
               <% if item_data[:mastery_paths] && item_data[:mastery_paths][:locked] %>
               aria-describedby="module-item-locked-<%= module_item && module_item.id %>"

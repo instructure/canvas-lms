@@ -20,7 +20,7 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
 
   context "before(:all)" do
     it "allows all kinds of stubs" do
-      inspect_source(cop, %{
+      inspect_source(%{
         before(:all) do
           stub_file_data
           stub_kaltura
@@ -35,7 +35,7 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
 
   context "before(:each)" do
     it "allows all kinds of stubs" do
-      inspect_source(cop, %{
+      inspect_source(%{
         before(:each) do
           stub_file_data
           stub_kaltura
@@ -50,7 +50,7 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
 
   context "before(:once)" do
     it "disallows all kinds of stubs" do
-      inspect_source(cop, %{
+      inspect_source(%{
         before(:once) do
           stub_file_data
           stub_kaltura

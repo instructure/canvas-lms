@@ -19,7 +19,7 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
   subject(:cop) { described_class.new }
 
   it 'disallows skipping without referencing a ticket' do
-    inspect_source(cop, %{
+    inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
           skip("fragile")
@@ -33,7 +33,7 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
   end
 
   it 'allows skipping if referencing a ticket' do
-    inspect_source(cop, %{
+    inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
           skip("CNVS-1234")

@@ -351,14 +351,27 @@ module Lti
           cm.source_course = @c2
           cm.save!
         end
+
+        @c3 = Course.create!
+        @c3.root_account = root_account
+        @c3.account = account
+        @c3.lti_context_id = 'def'
+        @c3.save!
+
+        @c1.content_migrations.create!.tap do |cm|
+          cm.context = course
+          cm.workflow_state = 'imported'
+          cm.source_course = @c3
+          cm.save!
+        end
       end
 
       it "should return previous canvas course ids" do
-        expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(',')
+        expect(subject.previous_course_ids).to eq [@c1.id, @c2.id, @c3.id].sort.join(',')
       end
 
       it "should return previous lti context_ids" do
-        expect(subject.previous_lti_context_ids).to eq 'abc'
+        expect(subject.previous_lti_context_ids).to eq 'abc,def'
       end
     end
 

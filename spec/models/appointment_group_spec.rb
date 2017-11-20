@@ -41,14 +41,36 @@ describe AppointmentGroup do
       )).not_to be_valid
     end
 
+    it "should include all section if only course is specified" do
+      course1 = course_factory
+      course2 = course_factory
+
+      c1section1 = course1.default_section
+      c1section2 = course1.course_sections.create!
+
+      c2section1 = course2.default_section
+      course2.course_sections.create! # create second section
+
+      group = AppointmentGroup.new(
+        :title => "test",
+        :contexts => [course1, course2],
+        :sub_context_codes => [c2section1.asset_string]
+      )
+
+      expect(group).to be_valid
+      selected = [c1section1.asset_string, c1section2.asset_string, c2section1.asset_string].sort()
+      expect(group.sub_context_codes.sort()).to eql selected
+    end
+
     it "should ignore invalid sub context types" do
+      invalid_context = Account.create.asset_string
       group = AppointmentGroup.new(
         :title => "test",
         :contexts => [@course],
-        :sub_context_codes => [Account.create.asset_string]
+        :sub_context_codes => [invalid_context]
       )
       expect(group).to be_valid
-      expect(group.sub_context_codes).to be_empty
+      expect(group.sub_context_codes.include?(invalid_context)).to be_falsey
     end
   end
 

@@ -18,14 +18,15 @@
 require_relative '../common'
 require_relative '../helpers/assignments_common'
 
-describe "assignment group that can't manage a course" do
+describe "assignment group that can't manage assignments" do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 
   it "does not display the manage cog menu" do
     @domain_root_account = Account.default
     course_factory
-    account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+    account_admin_user_with_role_changes(:role_changes => {:manage_course => true,
+                                                           :manage_assignments => false})
     user_session(@user)
     @course.require_assignment_group
     @assignment_group = @course.assignment_groups.first
@@ -54,7 +55,7 @@ describe "assignment groups" do
     @course.assignments.create(name: "test", assignment_group: @assignment_group)
   end
 
-  it "should create a new assignment group", priority: "1", test_id: 120673  do
+  it "should create a new assignment group", priority: "1", test_id: 120673 do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
@@ -84,7 +85,7 @@ describe "assignment groups" do
     expect(get_value("#assignment_group_id")).to eq ag.id.to_s
   end
 
-  #Per selenium guidelines, we should not test buttons navigating to a page
+  # Per selenium guidelines, we should not test buttons navigating to a page
   # We could test that the page loads with the correct info from the params elsewhere
   it "should remember entered settings when 'more options' is pressed", priority: "2", test_id: 209999 do
     ag2 = @course.assignment_groups.create!(name: "blah")
@@ -109,32 +110,32 @@ describe "assignment groups" do
     4.times do
       @course.assignments.create(title: 'other assignment', assignment_group: assignment_group)
     end
-    assignment = @course.assignments.create(title: 'assignment with rubric', assignment_group:  assignment_group)
+    assignment = @course.assignments.create(title: 'assignment with rubric', assignment_group: assignment_group)
 
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
-    #edit group grading rules
+    # edit group grading rules
     f("#ag_#{assignment_group.id}_manage_link").click
     fj(".edit_group:visible:first").click
-    #change the name
+    # change the name
     f("#ag_#{assignment_group.id}_name").clear
     f("#ag_#{assignment_group.id}_name").send_keys('name change')
-    #set number of lowest scores to drop
+    # set number of lowest scores to drop
     f("#ag_#{assignment_group.id}_drop_lowest").clear
     f("#ag_#{assignment_group.id}_drop_lowest").send_keys('1')
-    #set number of highest scores to drop
+    # set number of highest scores to drop
     f("#ag_#{assignment_group.id}_drop_highest").clear
     f("#ag_#{assignment_group.id}_drop_highest").send_keys('2')
-    #set assignment to never drop
+    # set assignment to never drop
     fj('.add_never_drop:visible').click
     expect(f('.never_drop_rule select')).to be
     click_option('.never_drop_rule select', assignment.title)
-    #save it
+    # save it
     fj('.create_group:visible').click
     wait_for_ajaximations
     assignment_group.reload
-    #verify grading rules
+    # verify grading rules
     expect(assignment_group.name).to match 'name change'
     expect(assignment_group.rules_hash["drop_lowest"]).to eq 1
     expect(assignment_group.rules_hash["drop_highest"]).to eq 2
@@ -149,10 +150,10 @@ describe "assignment groups" do
 
     f("#ag_#{ag1.id}_manage_link").click
     fj(".edit_group:visible:first").click
-    #wanted to change number but can only use clear because of the auto insert of 0 after clearing
+    # wanted to change number but can only use clear because of the auto insert of 0 after clearing
     # the input
     fj('input[name="group_weight"]:visible').send_keys('50')
-    #need to wait for the total to update
+    # need to wait for the total to update
     fj('.create_group:visible').click
 
     expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text('50% of Total')
@@ -174,7 +175,7 @@ describe "assignment groups" do
     expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text('10.11% of Total')
   end
 
-  #This feels like it would be better suited here than in QUnit
+  # This feels like it would be better suited here than in QUnit
   it "should not remove new assignments when editing a group", priority: "1", test_id: 210000 do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
@@ -200,7 +201,7 @@ describe "assignment groups" do
     expect(fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text).to match "Disappear"
   end
 
-  #Because of the way this feature was made, i recommend we keep this one
+  # Because of the way this feature was made, i recommend we keep this one
   it "should move assignments to another assignment group", priority: "2", test_id: 210001 do
     before_count = @assignment_group.assignments.count
     @ag2 = @course.assignment_groups.create!(name: "2nd Group")
@@ -219,7 +220,7 @@ describe "assignment groups" do
     wait_for_ajaximations
 
     # two id selectors to make sure it moved
-    expect(fj("#assignment_group_#{@assignment_group.id} #assignment_#{@assignment.id}")).to_not be_nil
+    expect(fj("#assignment_group_#{@assignment_group.id} #assignment_#{@assignment.id}")).not_to be_nil
 
     @assignment.reload
     expect(@assignment.assignment_group).to eq @assignment_group
@@ -237,7 +238,7 @@ describe "assignment groups" do
     drag_with_js("#assignment_group_#{ags[1].id} .sortable-handle", 0, 100)
     wait_for_ajaximations
 
-    ags.each {|ag| ag.reload}
+    ags.each(&:reload)
     expect(ags.collect(&:position)).to eq [1,3,2,4,5]
   end
 
@@ -271,7 +272,7 @@ describe "assignment groups" do
       expect(a.points_possible).to eq 13
 
       # Checks Assignments Index page UI for correct values.
-      expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match "#{assignment_name}"
+      expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match assignment_name.to_s
       expect(ff("#assignment_group_#{ag.id} .assignment-date-due").last.text).to match current_time
       expect(f("#assignment_#{a.id} .non-screenreader").text).to match "#{assignment_points} pts"
 
@@ -280,9 +281,9 @@ describe "assignment groups" do
       wait_for_ajaximations
 
       # Checks Assignment Show page for correct values.
-      expect(f(".title").text).to match "#{assignment_name}"
-      expect(f(".points_possible").text).to match "#{assignment_points}"
-      expect(f(".assignment_dates").text).to match "#{current_time}"
+      expect(f(".title").text).to match assignment_name.to_s
+      expect(f(".points_possible").text).to match assignment_points.to_s
+      expect(f(".assignment_dates").text).to match current_time.to_s
     end
   end
 

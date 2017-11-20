@@ -40,7 +40,6 @@
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
       <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.rubric_association %>"><%= t 'links.assign_rubric', "Assign Rubric" %></a>
     </div>
-    <%= render :partial => "shared/rubric_forms" %>
   <% end %>
   <a href="#" class="btn add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png", :alt => '' %> <%= t 'links.add_rubric', "Add Rubric" %></a>
 </div>

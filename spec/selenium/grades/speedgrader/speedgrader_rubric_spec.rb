@@ -42,6 +42,7 @@ describe "speed grader - rubrics" do
     scroll_into_view('.toggle_full_rubric')
     f('.toggle_full_rubric').click
     expect(f('#rubric_full')).to be_displayed
+    scroll_into_view('.hide_rubric_link')
     f('#rubric_holder .hide_rubric_link').click
     wait_for_ajaximations
     expect(f('#rubric_full')).not_to be_displayed

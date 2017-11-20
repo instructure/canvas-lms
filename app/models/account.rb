@@ -333,6 +333,8 @@ class Account < ActiveRecord::Base
   def require_acceptance_of_terms?(user)
     return false if !terms_required?
     return true if (user.nil? || user.new_record?)
+    soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
+    return false if user.created_at < soc2_start_date
     terms_changed_at = root_account.terms_of_service.terms_of_service_content&.terms_updated_at || settings[:terms_changed_at]
     last_accepted = user.preferences[:accepted_terms]
     return false if last_accepted && (terms_changed_at.nil? || last_accepted > terms_changed_at)
@@ -739,6 +741,25 @@ class Account < ActiveRecord::Base
           id_chain.concat(ids.map(&:to_i))
         end
         id_chain
+      end
+    else
+      account_chain(starting_account_id).map(&:id)
+    end
+  end
+
+  def self.multi_account_chain_ids(starting_account_ids)
+    if connection.adapter_name == 'PostgreSQL'
+      original_shard = Shard.current
+      Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
+        ids = Account.connection.select_values(<<-SQL)
+              WITH RECURSIVE t AS (
+                SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(", ")})
+                UNION
+                SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
+              )
+              SELECT id FROM t
+        SQL
+        ids.map{|id| Shard.relative_id_for(id, Shard.current, original_shard)}
       end
     else
       account_chain(starting_account_id).map(&:id)
@@ -1308,12 +1329,8 @@ class Account < ActiveRecord::Base
   end
 
   def closest_turnitin_pledge
-    if self.turnitin_pledge && !self.turnitin_pledge.empty?
-      self.turnitin_pledge
-    else
-      res = self.parent_account.try(:closest_turnitin_pledge)
-      res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
-    end
+    account_with_pledge = account_chain.find { |a| a.turnitin_pledge.present? }
+    account_with_pledge&.turnitin_pledge || t('This assignment submission is my own, original work')
   end
 
   def closest_turnitin_comments
@@ -1377,13 +1394,7 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, :manage_account_settings)
     if root_account.site_admin?
       tabs = []
-      if user && self.grants_right?(user, :read_roster)
-        if feature_enabled?(:course_user_search)
-          tabs << { :id => TAB_SEARCH, :label => t("Courses & People"), :css_class => 'search', :href => :account_course_user_search_path }
-        else
-          tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path }
-        end
-      end
+      tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
@@ -1391,12 +1402,8 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if root_account? && self.grants_right?(user, :view_jobs)
     else
       tabs = []
-      if feature_enabled?(:course_user_search)
-        tabs << { :id => TAB_SEARCH, :label => t("Courses & People"), :css_class => 'search', :href => :account_path } if user && (grants_right?(user, :read_course_list) || grants_right?(user, :read_roster))
-      else
-        tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
-        tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
-      end
+      tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
+      tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, :view_statistics)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       if user && self.grants_right?(user, :manage_outcomes)

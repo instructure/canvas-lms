@@ -66,7 +66,7 @@ let createGroupView = false
 let showByView = false
 const indexEl = window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
 
-if (ENV.PERMISSIONS.manage_course) {
+if (ENV.PERMISSIONS.manage_assignments) {
   assignmentSettingsView = new AssignmentSettingsView({
     model: course,
     assignmentGroups,

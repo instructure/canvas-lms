@@ -64,7 +64,8 @@ QUnit.module('SubmissionTray', function (hooks) {
       student: {
         id: '27',
         name: 'Jane Doe',
-        gradesUrl: 'http://gradeUrl/'
+        gradesUrl: 'http://gradeUrl/',
+        isConcluded: false
       },
       submission: {
         assignmentId: '30',
@@ -203,13 +204,13 @@ QUnit.module('SubmissionTray', function (hooks) {
   test('shows avatar if avatar is not null', function () {
     const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty';
     const gradesUrl = 'http://gradesUrl/';
-    mountComponent({ student: { id: '27', name: 'Bob', avatarUrl, gradesUrl } });
+    mountComponent({ student: { id: '27', name: 'Bob', avatarUrl, gradesUrl, isConcluded: false } });
     const avatarBackground = avatarDiv().firstChild.style.getPropertyValue('background-image');
     strictEqual(avatarBackground, `url("${avatarUrl}")`);
   });
 
   test('shows no avatar if avatar is null', function () {
-    mountComponent({ student: { id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/' } });
+    mountComponent({ student: { id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/', isConcluded: false } });
     notOk(avatarDiv());
   });
 
@@ -255,7 +256,7 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('shows name', function () {
-    mountComponent({ student: { id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/' } });
+    mountComponent({ student: { id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/', isConcluded: false } });
     strictEqual(studentNameDiv().innerHTML, 'Sara');
   });
 
@@ -292,6 +293,16 @@ QUnit.module('SubmissionTray', function (hooks) {
   test('shows a radio input group', function () {
     mountComponent();
     ok(radioInputGroupDiv());
+  });
+
+  test('enables the late policy radio input group when gradingDisabled is false', function () {
+    mountComponent({ gradingDisabled: false });
+    strictEqual(wrapContent().find('SubmissionTrayRadioInputGroup').props().disabled, false);
+  });
+
+  test('disables the late policy radio input group when gradingDisabled is true', function () {
+    mountComponent({ gradingDisabled: true });
+    strictEqual(wrapContent().find('SubmissionTrayRadioInputGroup').props().disabled, true);
   });
 
   test('shows assignment carousel', function () {
@@ -435,7 +446,8 @@ QUnit.module('SubmissionTray', function (hooks) {
       id: '27',
       name: 'Jane Doe',
       gradesUrl: 'http://gradeUrl/',
-      avatarUrl: 'http://avatarUrl/'
+      avatarUrl: 'http://avatarUrl/',
+      isConcluded: false
     };
 
     mountComponent({
@@ -452,6 +464,7 @@ QUnit.module('SubmissionTray', function (hooks) {
       id: '27',
       name: 'Jane Doe',
       gradesUrl: 'http://gradeUrl/',
+      isConcluded: false
     };
 
     mountComponent({

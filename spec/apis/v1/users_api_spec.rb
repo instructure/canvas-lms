@@ -1196,8 +1196,8 @@ describe "Users API", type: :request do
         expect(user.avatar_state).to eql :locked
       end
 
-      it "should allow the user's avatar to be set to an external url" do
-        url_to_set = 'http://www.instructure.example.com/image.jpg'
+      it "should not allow the user's avatar to be set to an external url" do
+        url_to_set = 'https://www.instructure.example.com/image.jpg'
         json = api_call(:put, @path, @path_options, {
           :user => {
             :avatar => {
@@ -1206,8 +1206,8 @@ describe "Users API", type: :request do
           }
         })
         user = User.find(json['id'])
-        expect(user.avatar_image_source).to eql 'external'
-        expect(user.avatar_image_url).to eql url_to_set
+        expect(user.avatar_image_source).to eql 'no_pic'
+        expect(user.avatar_image_url).to eql nil
       end
 
       it "should be able to update a name without changing sortable name if sent together" do

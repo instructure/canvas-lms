@@ -30,7 +30,11 @@ class SectionTabPresenter
   end
 
   def hide?
-    tab.hidden || tab.hidden_unused
+    tab.hidden
+  end
+
+  def unused?
+    tab.hidden_unused
   end
 
   def target?
@@ -46,6 +50,6 @@ class SectionTabPresenter
   end
 
   def to_h
-    { css_class: tab.css_class, icon: tab.icon, hidden: hide?, path: path, label: tab.label }
+    { css_class: tab.css_class, icon: tab.icon, hidden: hide? || unused?, path: path, label: tab.label }
   end
 end

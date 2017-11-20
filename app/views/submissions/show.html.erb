@@ -65,7 +65,7 @@
             <td class="bold">
               <% if can_do(@assignment, @current_user, :grade) %>
                 <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
-              <% elsif @submission.user_can_read_grade?(@current_user, session) %>
+              <% else %>
                 <span class="entered_grade">
                   <% if @submission.excused? %>
                     <%= t "Excused" %>
@@ -73,9 +73,9 @@
                     <%= i18n_grade(round_if_whole @submission.entered_grade) %>
                   <% end %>
                 </span>
-                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible %>
-                  <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
-                <% end %>
+              <% end %>
+              <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible %>
+                <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
               <% end %>
             </td>
           </tr>

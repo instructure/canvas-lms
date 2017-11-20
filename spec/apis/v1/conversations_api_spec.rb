@@ -482,6 +482,20 @@ describe ConversationsController, type: :request do
     end
 
     context "create" do
+
+      it "should render error if no body is provided" do
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @me)
+        @bob = student_in_course(:name => "bob")
+
+        @message = conversation(@me, :sender => @bob).messages.first
+
+        api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
+          { :controller => 'conversations', :action => 'add_message',
+           :id => @conversation.conversation_id.to_s, :format => 'json' })
+
+        assert_status(400)
+      end
+
       it "should create a private conversation" do
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },

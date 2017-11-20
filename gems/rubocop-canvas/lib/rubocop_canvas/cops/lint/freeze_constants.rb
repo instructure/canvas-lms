@@ -59,8 +59,9 @@ module RuboCop
         end
 
         def mark_offense!(node)
-          add_offense(node, :expression, "data structure constants"\
-                                            " should be frozen", :warning)
+          add_offense(node,
+            message: "data structure constants should be frozen",
+            severity: :warning)
         end
 
       end

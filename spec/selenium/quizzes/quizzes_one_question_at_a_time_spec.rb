@@ -60,6 +60,7 @@ describe 'taking a quiz one question at a time' do
       end
 
       it 'warns upon submitting unanswered questions', priority: "1", test_id: 209371 do
+        skip_if_safari(:alert)
         submit_unfinished_quiz('You have 2 unanswered questions')
       end
     end
@@ -83,6 +84,7 @@ describe 'taking a quiz one question at a time' do
       end
 
       it 'prevents cheating', priority: "1", test_id: 209365 do
+        skip_if_safari(:alert)
         accept_cant_go_back_warning
 
         click_next_button_and_accept_warning
@@ -92,12 +94,14 @@ describe 'taking a quiz one question at a time' do
       end
 
       it 'warns upon submitting a quiz when not on the last question', priority: "1", test_id: 209366 do
+        skip_if_safari(:alert)
         accept_cant_go_back_warning
         answer_the_question_correctly
         submit_unfinished_quiz('There is still 1 question you haven\'t seen')
       end
 
       it 'warns upon moving on without answering a question', priority: "1", test_id: 209367 do
+        skip_if_safari(:alert)
         accept_cant_go_back_warning
         click_next_button_and_accept_warning
       end

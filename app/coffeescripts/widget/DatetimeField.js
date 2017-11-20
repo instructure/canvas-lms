@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {debounce} from 'underscore'
 import tz from 'timezone'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
+import moment from 'moment'
 import 'jquery.instructure_date_and_time'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -78,7 +79,8 @@ export default class DatetimeField {
       const datepickerOptions = $.extend({}, this.datepickerDefaults(), {
         timePicker: this.allowTime,
         beforeShow: () => this.$field.trigger('detachTooltip'),
-        onClose: () => this.$field.trigger('reattachTooltip')
+        onClose: () => this.$field.trigger('reattachTooltip'),
+        firstDay: moment.localeData(ENV.LOCALE).firstDayOfWeek(),
       }, options.datepicker)
       this.$field.datepicker(datepickerOptions)
 

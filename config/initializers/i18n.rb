@@ -241,6 +241,10 @@ I18n.send(:extend, Module.new {
   def moment_locale
     backend.send(:lookup, locale.to_s, "moment_locale") || locale.to_s.downcase
   end
+
+  def dow_offset
+    backend.send(:lookup, locale.to_s, "dow_offset") || 0
+  end
 })
 
 # see also corresponding extractor logic in

@@ -225,6 +225,13 @@
                 <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
               </div>
             </div>
+            <% if @assignment.assignment_configuration_tool_lookup_ids.present? %>
+              <div id='plagiarism_platform_info_container'>
+                <a href="#" id="plagiarism_resubmit_button" class="btn btn-small" title="<%= I18n.t('Resubmit to the associated tool for plagiarism analysis.') %>">
+                  <%= I18n.t("Resubmit to %{tool_name}", tool_name: @assignment.tool_settings_tool_name ) %>
+                </a>
+              </div>
+            <% end %>
             <div class="turnitin_info_container"></div>
           </div>
         </div>

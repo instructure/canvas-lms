@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper.rb'
 describe PageView do
   before do
     # sets both @user and @course (@user is a teacher in @course)
-    course_model
+    course_model(account: Account.default.manually_created_courses_account)
     @page_view = PageView.new { |p| p.assign_attributes({ :created_at => Time.now, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }) }
   end
 
@@ -138,6 +138,29 @@ describe PageView do
     it "should ignore an invalid page" do
       @page_view.save!
       expect(@user.page_views.paginate(:per_page => 2, :page => '3')).to eq [@page_view]
+    end
+
+    context "filtering" do
+      it "restricts results to accounts that the viewer can see" do
+        @page_view.save!
+        user = @user
+        viewer1 = User.create!
+        viewer2 = account_admin_user
+        viewer3 = account_admin_user(account: @course.account)
+        expect(@course.account).not_to eq Account.default
+
+        other_root = Account.create!
+        user.pseudonyms.create!(account: other_root, unique_id: 'bob')
+        expect(user.associated_accounts).to be_include(other_root)
+        viewer4 = account_admin_user(account: other_root)
+        expect(user.grants_right?(viewer4, :view_statistics)).to eq true
+
+        expect(user.page_views(viewer: viewer1).paginate(per_page: 2)).to eq []
+        expect(user.page_views(viewer: viewer2).paginate(per_page: 2)).to eq [@page_view]
+        expect(user.page_views(viewer: viewer3).paginate(per_page: 2)).to eq [@page_view]
+        expect(user.page_views(viewer: viewer4).paginate(per_page: 2)).to eq []
+      end
+
     end
 
     describe "db migrator" do

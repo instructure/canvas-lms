@@ -478,13 +478,11 @@ describe SectionsController, type: :request do
                  { :course_section => { :name => 'New Name' } }, {}, :expected_status => 404)
       end
 
-      it "should ignore the sis id parameter" do
-        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
-          { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :sis_section_id => 'NEWSIS' }})
-        expect(json['id']).to eq @section.id
-        @section.reload
-        expect(@section.name).to eq 'New Name'
-        expect(@section.sis_source_id).to eq 'SISsy'
+      it 'should return unauthorized when changing sis attributes' do
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param),
+                        {course_section: {name: 'New Name', sis_section_id: 'NEWSIS'}}, {}, expected_status: 401)
+        expect(json['message']).to eq 'You must have manage_sis permission to update sis attributes'
+        expect(@section.reload.sis_source_id).to eq 'SISsy'
       end
     end
 
@@ -502,6 +500,27 @@ describe SectionsController, type: :request do
     context "as admin" do
       before do
         site_admin_user
+      end
+
+      it 'should set integration_id' do
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param),
+                        {course_section: {name: 'New Name', sis_section_id: 'NEWSIS', integration_id: 'int_id1'}})
+        expect(json['id']).to eq @section.id
+        @section.reload
+        expect(@section.name).to eq 'New Name'
+        expect(@section.integration_id).to eq 'int_id1'
+        expect(@section.sis_source_id).to eq 'NEWSIS'
+      end
+
+      it 'should not change sis attributes when not passed' do
+        CourseSection.where(id: @section).update_all(integration_id: 'int_id_OG')
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param),
+                        {course_section: {name: 'New Name', integration_id: 'int1'}})
+        expect(json['id']).to eq @section.id
+        @section.reload
+        expect(@section.name).to eq 'New Name'
+        expect(@section.integration_id).to eq 'int1'
+        expect(@section.sis_source_id).to eq 'SISsy'
       end
 
       it "should set the sis id" do

@@ -61,11 +61,20 @@ describe SectionTabPresenter do
   describe '#hide?' do
     it 'should return true if tab has element hidden or hidden_unused' do
       expect(SectionTabPresenter.new(tab.merge(hidden: true), course).hide?).to be_truthy
-      expect(SectionTabPresenter.new(tab.merge(hidden_unused: true), course).hide?).to be_truthy
     end
 
     it 'should return false if tab does not have element hidden or hidden_unused' do
       expect(presenter.hide?).to be_falsey
+    end
+  end
+
+  describe '#unused?' do
+    it 'should return true if tab has element hidden or hidden_unused' do
+      expect(SectionTabPresenter.new(tab.merge(hidden_unused: true), course).unused?).to be_truthy
+    end
+
+    it 'should return false if tab does not have element hidden or hidden_unused' do
+      expect(presenter.unused?).to be_falsey
     end
   end
 

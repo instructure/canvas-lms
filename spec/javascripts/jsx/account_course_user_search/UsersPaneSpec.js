@@ -48,6 +48,8 @@ test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) =>
     <UsersPane
       store={fakeStore}
       roles={['a']}
+      queryParams={{}}
+      onUpdateQueryParams={function(){}}
     />
   );
 

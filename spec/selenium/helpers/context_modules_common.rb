@@ -104,6 +104,7 @@ module ContextModulesCommon
     wait_for_ajaximations
     select_module_item('#add_module_item_select', module_name)
     select_module_item(item_select_selector + ' .module_item_select', item_name)
+    scroll_to(fj('.add_item_button.ui-button'))
     fj('.add_item_button.ui-button').click
     wait_for_ajaximations
     tag = ContentTag.last
@@ -159,7 +160,7 @@ module ContextModulesCommon
     replace_content(url_input, url_text)
 
     replace_content(title_input, page_name_text)
-
+    scroll_to(fj('.add_item_button.ui-button'))
     fj('.add_item_button.ui-button').click
     wait_for_ajaximations
     tag = ContentTag.last

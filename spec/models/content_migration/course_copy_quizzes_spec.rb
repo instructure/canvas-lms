@@ -537,6 +537,26 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(qq_to.question_data[:answers][0][:html]).to match_ignoring_whitespace(%{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">})
     end
 
+    it "should correctly copy quiz question mathml equation image references" do
+      qtext = <<-HTML.strip
+        equation: <p>
+          <img class="equation_image" title="\\sum" src="/equation_images/%255Csum"
+            alt="LaTeX: \\sum" data-equation-content="\\sum" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
+              &lt;mo&gt;&amp;#x2211;&lt;!-- &sum; --&gt;&lt;/mo&gt;&lt;/math&gt;" />
+        </p>
+      HTML
+      data = {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => qtext}
+
+      q1 = @copy_from.quizzes.create!(:title => 'quiz1')
+      qq = q1.quiz_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      q_to = @copy_to.quizzes.where(:migration_id => mig_id(q1)).first
+      qq_to = q_to.active_quiz_questions.first
+      expect(qq_to.question_data[:question_text]).to match_ignoring_whitespace(qq.question_data[:question_text])
+    end
+
     it "should copy all html fields in assessment questions" do
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = {:correct_comments_html => "<strong>correct</strong>",

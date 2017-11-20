@@ -146,6 +146,43 @@ define([
     )
   })
 
+  test('showsTooltipOnCopiedThemes',  function () {
+    const twoSameConfigs = JSON.parse(JSON.stringify(props))
+    twoSameConfigs.sharedBrandConfigs.push({
+      account_id: 123,
+      name: 'Account-shared Theme Copy',
+      id: 124,
+      brand_config: {
+        md5: '00112233445566778899aabbccddeeff',
+      }
+    })
+    const twoDifferentConfigs = JSON.parse(JSON.stringify(props))
+    twoDifferentConfigs.sharedBrandConfigs.push({
+      account_id: 123,
+      name: 'Some Other Theme',
+      id: 125,
+      brand_config: {
+        md5: 'someotherhashstring'
+      }
+    })
+    const oneConfigCollection = new CollectionView(props)
+    const twoSameConfigsCollection = new CollectionView(twoSameConfigs)
+    const twoDifferentConfigsCollection = new CollectionView(twoDifferentConfigs)
+
+    ok(
+      twoSameConfigsCollection.multipleThemesReflectActiveOne(),
+      'true if multiple configs have the same hash value'
+    )
+    notOk(
+      oneConfigCollection.multipleThemesReflectActiveOne(),
+      'false if there is only one config'
+    )
+    notOk(
+      twoDifferentConfigsCollection.multipleThemesReflectActiveOne(),
+      'false when there are two configs with different hash values'
+    )
+  })
+
   test('isDeletable', function () {
     const c = new CollectionView(props)
     const config = props.sharedBrandConfigs[0]

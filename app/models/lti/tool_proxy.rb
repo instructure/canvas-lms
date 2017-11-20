@@ -66,6 +66,13 @@ module Lti
       ToolProxy.joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id").where('bindings.enabled = true')
     end
 
+    def self.capability_enabled_in_context?(context, capability)
+      tool_proxies = ToolProxy.find_active_proxies_for_context(context)
+      return true if tool_proxies.map(&:enabled_capabilities).flatten.include? capability
+      capabilities = MessageHandler.where(tool_proxy_id: tool_proxies.map(&:id)).pluck(:capabilities).flatten
+      capabilities.include? capability
+    end
+
     def reregistration_message_handler
       return @reregistration_message_handler if @reregistration_message_handler
       if default_resource_handler
@@ -130,6 +137,12 @@ module Lti
         tool_vendor_code: product_family.vendor_code,
         tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
       ).preload(:assignment).map(&:assignment)
+    end
+
+    def find_service(service_id, action)
+      ims_tool_proxy.tool_profile&.service_offered&.find do |s|
+        s.id.include?(service_id) && s.action.include?(action)
+      end
     end
   end
 end

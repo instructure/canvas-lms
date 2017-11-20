@@ -63,6 +63,8 @@ import 'jquery.elastic';
 import 'jquery-getscrollbarwidth';
 import './vendor/jquery.scrollTo';
 import './vendor/ui.selectmenu';
+import './jquery.disableWhileLoading';
+import 'compiled/jquery/fixDialogButtons';
 
 // PRIVATE VARIABLES AND FUNCTIONS
 // all of the $ variables here are to speed up access to dom nodes,
@@ -134,6 +136,7 @@ var $window = $(window),
     $assignment_submission_vericite_report_url = $('#assignment_submission_vericite_report_url'),
     $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url'),
     $rubric_full = $('#rubric_full'),
+    $rubric_holder = $('#rubric_holder'),
     $rubric_full_resizer_handle = $('#rubric_full_resizer_handle'),
     $no_annotation_warning = $('#no_annotation_warning'),
     $comment_submitted = $('#comment_submitted'),
@@ -180,13 +183,13 @@ function sectionSelectionOptions (courseSections, groupGradingModeEnabled = fals
   let selectedSectionName = I18n.t('All Sections');
   const sectionOptions = [
     {
-      id: 'section_0',
+      id: 'section_all',
       data: {
-        'section-id': 0
+        'section-id': "all"
       },
       name: I18n.t('Show all sections'),
       className: {
-        raw: 'section_0'
+        raw: 'section_all'
       }
     }
   ];
@@ -306,7 +309,7 @@ function mergeStudentsAndSubmission() {
 }
 
 function changeToSection (sectionId) {
-  if (sectionId === '0') {
+  if (sectionId === 'all') {
     // We're removing all filters and resetting to default
     userSettings.contextRemove('grading_show_only_section');
   } else {
@@ -337,7 +340,7 @@ function initDropdown(){
   $selectmenu.appendTo("#combo_box_container", (event) => {
     const newStudentOrSection = $(event.target).val()
 
-    if (newStudentOrSection && newStudentOrSection.match(/^section_\d+$/)) {
+    if (newStudentOrSection && newStudentOrSection.match(/^section_(\d+|all)$/)) {
       const sectionId = newStudentOrSection.replace(/^section_/, '');
       changeToSection(sectionId);
     } else {
@@ -346,8 +349,8 @@ function initDropdown(){
   });
 
   if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
-    var $selectmenu_list = $selectmenu.jquerySelectMenu().data('selectmenu').list,
-    $menu = $("#section-menu");
+    const $selectmenu_list = $selectmenu.data('selectmenu').list;
+    const $menu = $("#section-menu");
 
 
     $menu.find('ul').append($.raw($.map(jsonData.context.active_course_sections, function(section, i){
@@ -378,7 +381,7 @@ function initDropdown(){
         .addClass('selected');
     }
 
-    $selectmenu.jquerySelectMenu().selectmenu( 'option', 'open', function(){
+    $selectmenu.selectmenu( 'option', 'open', function(){
       $selectmenu_list.find('li:first').css('margin-top', $selectmenu_list.find('li').height() + 'px');
       $menu.show().css({
         'left'   : $selectmenu_list.css('left'),
@@ -774,9 +777,9 @@ function initRubricStuff(){
     data['graded_anonymously'] = utils.shouldHideStudentNames();
     var url = $(".update_rubric_assessment_url").attr('href');
     var method = "POST";
-    EG.toggleFullRubric();
-    $(".rubric_summary").loadingImage();
-    $.ajaxJSON(url, method, data, function(response) {
+    EG.toggleFullRubric('close');
+
+    var promise = $.ajaxJSON(url, method, data, function(response) {
       var found = false;
       if(response && response.rubric_association) {
         rubricAssessment.updateRubricAssociation($rubric, response.rubric_association);
@@ -800,16 +803,21 @@ function initRubricStuff(){
       $.each(response.related_group_submissions_and_assessments, function(i,submissionAndAssessment){
         //setOrUpdateSubmission returns the student. so we can set student.rubric_assesments
         // submissionAndAssessment comes back with :include_root => true, so we have to get rid of the root
-        var student = EG.setOrUpdateSubmission(response.artifact);
+        const student = EG.setOrUpdateSubmission(response.artifact);
         student.rubric_assessments = $.map(submissionAndAssessment.rubric_assessments, function(ra){return ra.rubric_assessment;});
         EG.updateSelectMenuStatus(student);
       });
 
-      $(".rubric_summary").loadingImage('remove');
       EG.showGrade();
       EG.showDiscussion();
       EG.showRubric();
       EG.updateStatsInHeader();
+    });
+
+    $rubric_holder.disableWhileLoading(promise, {
+      buttons: {
+        '.save_rubric_button': 'Saving...'
+      }
     });
   });
 }
@@ -918,6 +926,10 @@ function beforeLeavingSpeedgrader(e) {
     e.returnValue = I18n.t("If you would like to keep your unsubmitted comments, please save them before navigating away from this page.");
     return e.returnValue;
   }
+}
+
+function unexcuseSubmission (grade, submission, assignment) {
+  return grade === "" && submission.excused && assignment.grading_type === "pass_fail";
 }
 
 // Public Variables and Methods
@@ -1168,10 +1180,10 @@ EG = {
     var student = jsonData.studentMap[student_id];
 
     if (student) {
-      $selectmenu.jquerySelectMenu().selectmenu("value", student.id);
+      $selectmenu.selectmenu("value", student.id);
       // manually tell $selectmenu to fire the change event
       if (!this.currentStudent || (this.currentStudent.id != student.id)) {
-        $selectmenu.jquerySelectMenu().change();
+        $selectmenu.change();
       }
       if (student.avatar_path && !hideStudentNames) {
         // If there's any kind of delay in loading the user's avatar, it's
@@ -1197,7 +1209,7 @@ EG = {
       EG.addSubmissionComment(true);
     }
 
-    var id = $selectmenu.jquerySelectMenu().val();
+    const id = $selectmenu.val();
     // This call on the or side of the street is probably
     // non-performant at scale (4000 students) if we just want the
     // first value
@@ -1513,6 +1525,7 @@ EG = {
 
   populateTurnitin: function(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent) {
     var $turnitinSimilarityScore = null;
+    const showLegacyResubmit = isMostRecent && !submission.has_plagiarism_tool;
 
     // build up new values based on this asset
     if (turnitinAsset.status == 'scored' || (turnitinAsset.status == null && turnitinAsset.similarity_score != null)) {
@@ -1549,21 +1562,13 @@ EG = {
       var $turnitinInfo = $(turnitinInfoTemplate({
         assetString: assetString,
         message: (turnitinAsset.status == 'error' ? (turnitinAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
-        showResubmit: isMostRecent
+        showResubmit: showLegacyResubmit
       }));
       $turnitinInfoContainer.append($turnitinInfo);
 
-      if (isMostRecent) {
-        var resubmitUrl = $.replaceTags($assignment_submission_resubmit_to_turnitin_url.attr('href'), { user_id: submission.user_id });
-        $turnitinInfo.find('.turnitin_resubmit_button').click(function(event) {
-          event.preventDefault();
-          $(this).attr('disabled', true)
-            .text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
-
-          $.ajaxJSON(resubmitUrl, "POST", {}, function() {
-            window.location.reload();
-          });
-        });
+      if (showLegacyResubmit) {
+        var resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission)
+        $('.turnitin_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl) });
       }
     }
   },
@@ -1653,6 +1658,14 @@ EG = {
 
     var turnitinEnabled = submission.turnitin_data && (typeof submission.turnitin_data.provider === 'undefined');
     var vericiteEnabled = submission.turnitin_data && submission.turnitin_data.provider === 'vericite';
+
+    if (submission.has_originality_score) {
+      $('#plagiarism_platform_info_container').hide();
+    } else {
+      var resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission)
+      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl) })
+    }
+
     if(vericiteEnabled){
       var $vericiteScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
       $vericiteInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
@@ -2498,6 +2511,8 @@ EG = {
 
     if (grade.toUpperCase() === "EX") {
       formData["submission[excuse]"] = true;
+    } else if (unexcuseSubmission(grade, EG.currentStudent.submission, jsonData)) {
+      formData["submission[excuse]"] = false;
     } else if (use_existing_score) {
       // If we're resubmitting a score, pass it as a raw score not grade.
       // This allows percentage grading types to be handled correctly.
@@ -2572,51 +2587,10 @@ EG = {
     EG.updateStatsInHeader();
   },
 
-  updateSelectMenuStatus: function (student, selectmenu = $selectmenu) {
+  updateSelectMenuStatus: function(student) {
     if (!student) return;
-    let $query = selectmenu.jquerySelectMenu().data('selectmenu').list.find(`li:eq(${student.index})`);
-    const className = SpeedgraderHelpers.classNameBasedOnStudent(student);
-    const submissionStates = 'not_graded not_submitted graded resubmitted';
-
-    if (student == EG.currentStudent) {
-      $query = $query.add(selectmenu.jquerySelectMenu().data('selectmenu').newelement);
-    }
-    $query
-      .removeClass(submissionStates)
-      .addClass(className.raw);
-
-    const $status = $('.ui-selectmenu-status');
-    const $statusIcon = $status.find('.speedgrader-selectmenu-icon');
-    const $queryIcon = $query.find('.speedgrader-selectmenu-icon');
-
-    const studentInfo = EG.getStudentNameAndGrade(student);
-    const option = $(selectmenu.option_tag_array[student.index]);
-    option.text(studentInfo).removeClass(submissionStates).addClass(className.raw);
-
-    if(className.raw == "graded" || className.raw == "not_gradeable"){
-      $queryIcon.text("").append("<i class='icon-check'></i>");
-      $status.addClass("graded");
-      $statusIcon.text("").append("<i class='icon-check'></i>");
-    }else if(className.raw == "not_graded"){
-      $queryIcon.text("").append("&#9679;");
-      $status.removeClass("graded");
-      $statusIcon.text("").append("&#9679;");
-    }else{
-      $queryIcon.text("");
-      $status.removeClass("graded");
-      $statusIcon.text("");
-    }
-
-    // this is because selectmenu.js uses .data('optionClasses' on the
-    // li to keep track of what class to put on the selected option (
-    // aka: $selectmenu.data('selectmenu').newelement ) when this li
-    // is selected.  so even though we set the class of the li and the
-    // $selectmenu.data('selectmenu').newelement when it is graded, we
-    // need to also set the data() so that if you skip back to this
-    // student it doesnt show the old checkbox status.
-    $.each(submissionStates.split(' '), function(){
-      $query.data('optionClasses', $query.data('optionClasses').replace(this, ''));
-    });
+    const isCurrentStudent = student === EG.currentStudent;
+    $selectmenu.updateSelectMenuStatus(student, isCurrentStudent, EG.getStudentNameAndGrade(student));
   },
 
   isGradingTypePercent: function () {

@@ -24,7 +24,7 @@ import Navigation from 'jsx/navigation_header/Navigation'
 
 // #
 // Handle user toggling of nav width
-let navCollapsed = window.ENV.SETTINGS.collapse_global_nav
+let navCollapsed = window.ENV.SETTINGS && window.ENV.SETTINGS.collapse_global_nav
 
 $('body').on('click', '#primaryNavToggle', function () {
   let primaryNavToggleText

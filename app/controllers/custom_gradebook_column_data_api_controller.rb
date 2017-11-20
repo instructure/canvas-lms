@@ -78,7 +78,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
     user = allowed_users.where(:id => params[:user_id]).first
     raise ActiveRecord::RecordNotFound unless user
 
-    column = @context.custom_gradebook_columns.active.find(params[:id])
+    column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     datum = column.custom_gradebook_column_data.find_or_initialize_by(user_id: user.id)
     if authorized_action? datum, @current_user, :update
       CustomGradebookColumnDatum.unique_constraint_retry do |retry_count|

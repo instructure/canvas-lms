@@ -306,7 +306,7 @@ class PlannerOverridesController < ApplicationController
     # moderation = @current_user.assignments_needing_moderation(default_opts)
     submitting = @current_user.assignments_needing_submitting(default_opts).
       preload(:quiz, :discussion_topic)
-    ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts)
+    ungraded_quiz = @current_user.ungraded_quizzes(default_opts)
     submitted = @current_user.submitted_assignments(default_opts).preload(:quiz, :discussion_topic)
     scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
               submitting: submitting}
@@ -344,7 +344,8 @@ class PlannerOverridesController < ApplicationController
 
   def planner_note_collection
     item_collection('planner_notes',
-                    PlannerNote.active.where(user: @current_user, todo_date: @start_date...@end_date),
+                    PlannerNote.active.where(user: @current_user, todo_date: @start_date...@end_date).
+                      where("course_id IS NULL OR course_id IN (?)", @current_user.course_ids_for_todo_lists(:student, default_opts)),
                     PlannerNote, [:todo_date, :created_at], :id)
   end
 

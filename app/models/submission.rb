@@ -269,7 +269,8 @@ class Submission < ActiveRecord::Base
 
   attr_accessor :saved_by,
                 :assignment_changed_not_sub,
-                :grading_error_message
+                :grading_error_message,
+                :grade_change_event_author_id
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -659,7 +660,7 @@ class Submission < ActiveRecord::Base
     if self.grants_right?(user, :view_turnitin_report)
       requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
       report = self.originality_reports.find_by(attachment: requested_attachment)
-      url = report&.report_launch_url
+      url = report&.report_launch_path
     end
     url
   end
@@ -1459,11 +1460,12 @@ class Submission < ActiveRecord::Base
   end
 
   def versioned_attachments=(attachments)
-    @versioned_attachments = Array(attachments).compact.select { |a|
+    @versioned_attachments = Array(attachments).compact.select do |a|
       (a.context_type == 'User' && a.context_id == user_id) ||
       (a.context_type == 'Group' && a.context_id == group_id) ||
-      (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?)
-    }
+      (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
+      attachment_fake_belongs_to_group(a)
+    end
   end
 
   # This helper method is used by the bulk_load_versioned_* methods
@@ -1653,6 +1655,10 @@ class Submission < ActiveRecord::Base
     newly_graded = self.workflow_state_changed? && self.workflow_state == 'graded'
     grade_changed = (self.changed & %w(grade score excused)).present?
     return true unless newly_graded || grade_changed || force_audit
+
+    if grade_change_event_author_id.present?
+      self.grader_id = grade_change_event_author_id
+    end
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
@@ -2111,7 +2117,7 @@ class Submission < ActiveRecord::Base
 
   def filter_attributes_for_user(hash, user, session)
     unless user_can_read_grade?(user, session)
-      %w(score published_grade published_score grade).each do |secret_attr|
+      %w(score grade published_score published_grade entered_score entered_grade).each do |secret_attr|
         hash.delete secret_attr
       end
     end

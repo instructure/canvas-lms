@@ -31,12 +31,12 @@ describe TermsOfService do
       expect(@terms_of_service.workflow_state).to eq 'deleted'
     end
 
-    it "returns 'active' for Terms Of Service Content even if its terms has been deleted" do
+    it "returns 'active' for Terms of Service Content even if its terms has been deleted" do
       expect(@terms_of_service_content.workflow_state).to eq 'active'
     end
   end
 
-  it "creates a Terms Of Service defaulting passive to true" do
+  it "creates a Terms of Service defaulting passive to true" do
     ac2 = account_model
     tos = TermsOfService.create!(terms_type: "default",
                                                terms_of_service_content: @terms_of_service_content,

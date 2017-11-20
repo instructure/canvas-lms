@@ -24,10 +24,10 @@
 
  const defaultProps = () => ({
    title: 'Move Item',
-   item: {
+   items: [{
      id: '10',
      title: 'Foo Bar',
-   },
+   }],
    moveOptions: {
      siblings: [
        { id: '12', title: 'Making Cake'},
@@ -85,9 +85,9 @@ test('onMoveSelect calls onMoveSuccess with move data', (assert) => {
   props.onMoveSuccess = sinon.spy()
   const tree = enzyme.mount(<MoveItemTray {...props} />)
   const instance = tree.instance()
-  instance.onMoveSelect({ order: ['1', '2', '3'], groupId: '5', itemId: '2' })
+  instance.onMoveSelect({ order: ['1', '2', '3'], groupId: '5', itemIds: ['2'] })
   setTimeout(() => {
-    ok(props.onMoveSuccess.calledWith, { data: ['1', '2', '3'], groupId: '5', itemId: '2' })
+    ok(props.onMoveSuccess.calledWith, { data: ['1', '2', '3'], groupId: '5', itemIda: ['2'] })
     done()
   })
 })

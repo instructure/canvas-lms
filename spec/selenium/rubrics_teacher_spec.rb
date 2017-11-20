@@ -110,9 +110,13 @@ describe "course rubrics" do
       expect(f('tr.learning_outcome_criterion .criterion_description .description').text).to eq @outcome.title
       expect(ff('tr.learning_outcome_criterion td.rating .description').map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| round_if_whole(c[:points]).to_s }
+      # important to check this both before and after submit, thanks to the super janky
+      # way edit_rubric.js and the .erb template work
+      expect(f('tr.learning_outcome_criterion .outcome_sr_content')).to have_attribute('aria-hidden', 'false')
       submit_form('#edit_rubric_form')
       wait_for_ajaximations
       rubric = Rubric.order(:id).last
+      expect(f('tr.learning_outcome_criterion .outcome_sr_content')).to have_attribute('aria-hidden', 'false')
       expect(rubric.data.first[:ratings].map { |r| r[:description] }).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       expect(rubric.data.first[:ratings].map { |r| r[:points] }).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
     end
@@ -143,6 +147,7 @@ describe "course rubrics" do
       f('.add_rubric_link').click
       expect(fj('.rubric_grading:hidden')).not_to be_nil
     end
+
   end
 
   it "should display free-form comments to the student" do

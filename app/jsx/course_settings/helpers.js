@@ -30,14 +30,6 @@
       }
     },
 
-    createFormData (uploadParams) {
-      const formData = new FormData();
-      Object.keys(uploadParams).forEach((key) => {
-        formData.append(key, uploadParams[key]);
-      });
-      return formData;
-    },
-
     extractInfoFromEvent (event) {
       let file = '';
       let type = '';

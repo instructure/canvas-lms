@@ -27,7 +27,7 @@ const karmaConfig = {
   // - Firefox
   // - Opera (has to be installed with `npm install karma-opera-launcher`)
   // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
-  // - PhantomJS
+  // - PhantomJS (has to be installed with `npm install karma-phantomjs-launcher`))
   // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
   browsers: ['Chrome'],
 

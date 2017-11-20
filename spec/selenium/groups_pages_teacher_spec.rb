@@ -72,6 +72,7 @@ describe "groups" do
       end
 
       it "should allow teachers to delete their own group announcements", priority: "1", test_id: 326522 do
+        skip_if_safari(:alert)
         @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @teacher)
 
         get announcements_page
@@ -81,6 +82,7 @@ describe "groups" do
       end
 
       it "should allow teachers to delete group member announcements", priority: "1", test_id: 326523 do
+        skip_if_safari(:alert)
         @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @students.first)
 
         get announcements_page
@@ -151,6 +153,7 @@ describe "groups" do
       end
 
       it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627 do
+        skip_if_safari(:alert)
         DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                 title: 'Group Discussion', message: 'Group')
         get discussions_page
@@ -204,6 +207,7 @@ describe "groups" do
       end
 
       it "should allow teacher to delete a folder", priority: "2", test_id: 304184 do
+        skip_if_safari(:alert)
         get files_page
         add_folder
         delete(0, :toolbar_menu)
@@ -211,6 +215,7 @@ describe "groups" do
       end
 
       it "should allow a teacher to delete a file", priority: "2", test_id: 304183 do
+        skip_if_safari(:alert)
         add_test_files
         get files_page
         delete(0, :toolbar_menu)

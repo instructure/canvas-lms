@@ -129,8 +129,18 @@ import './jquery.instructure_date_and_time'
       } else {
         return "not_submitted";
       }
-    }
+    },
+    plagiarismResubmitHandler: (event, resubmitUrl) => {
+      event.preventDefault();
+      $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
 
+      $.ajaxJSON(resubmitUrl, "POST", {}, () => {
+        window.location.reload();
+      });
+    },
+    plagiarismResubmitUrl: (submission) => {
+      return $.replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), { user_id: submission.user_id });
+    }
   }
 
 export default speedgraderHelpers;

@@ -219,6 +219,7 @@ describe "conversations new" do
     end
 
     it "should show a flash message when deleting a message via Trash Button", priority: "1", test_id: 201492 do
+      skip_if_safari(:alert)
       conversations
 
       click_message(0)
@@ -229,6 +230,7 @@ describe "conversations new" do
     end
 
     it "should show a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
+      skip_if_safari(:alert)
       conversations
 
       click_message(0)
@@ -240,6 +242,7 @@ describe "conversations new" do
     end
 
     it "should archive a message via the admin archive button", priority: "1", test_id: 201494 do
+      skip_if_safari(:alert)
       conversations
 
       click_message(0)
@@ -251,6 +254,7 @@ describe "conversations new" do
     end
 
     it "should archive a message via the cog dropdown", priority: "1", test_id: 201495 do
+      skip_if_safari(:alert)
       conversations
 
       click_message(0)
@@ -291,6 +295,7 @@ describe "conversations new" do
       end
 
       it "should unarchive a message via the admin unarchive button", priority: "1", test_id: 201496 do
+        skip_if_safari(:alert)
         click_archive_button
         # Unarchiving messages requires jobs to run to complete
         run_progress_job
@@ -299,6 +304,7 @@ describe "conversations new" do
       end
 
       it "should unarchive a message via the cog dropdown", priority: "1", test_id: 201497 do
+        skip_if_safari(:alert)
         # Clicks the title-level more options gear menu
         click_more_options(convo:true)
         click_archive_menu_item
@@ -392,6 +398,7 @@ describe "conversations new" do
     end
 
     it "should hide the spinner after deleting the last conversation", priority: "1", test_id: 207164 do
+      skip_if_safari(:alert)
       conversations
       select_view('archived')
       expect(conversation_elements.size).to eq 1

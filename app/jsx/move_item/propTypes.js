@@ -37,6 +37,6 @@ export const moveOptionsType = oneOfType([
   shape({
     groupsLabel: string.isRequired,
     groups: arrayOf(groupShape).isRequired,
-    excludeCurrent: bool,
+    excludeCurrent: bool
   }),
 ])
