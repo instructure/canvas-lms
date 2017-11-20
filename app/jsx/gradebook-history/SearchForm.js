@@ -58,8 +58,8 @@ class SearchFormComponent extends Component {
       assignment: '',
       grader: '',
       student: '',
-      from: '',
-      to: ''
+      from: { value: '', conversionFailed: false },
+      to: { value: '', conversionFailed: false }
     },
     messages: {
       assignments: I18n.t('Type a few letters to start searching'),
@@ -117,22 +117,22 @@ class SearchFormComponent extends Component {
     }
   }
 
-  setSelectedFrom = (_, from) => {
+  setSelectedFrom = (_, from, _rawValue, rawConversionFailed) => {
     const startOfFrom = from ? moment(from).startOf('day').format() : '';
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        from: startOfFrom
+        from: { value: startOfFrom, conversionFailed: rawConversionFailed }
       }
     }));
   }
 
-  setSelectedTo = (_, to) => {
+  setSelectedTo = (_, to, _rawValue, rawConversionFailed) => {
     const endOfTo = to ? moment(to).endOf('day').format() : '';
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        to: endOfTo
+        to: { value: endOfTo, conversionFailed: rawConversionFailed }
       }
     }));
   }
@@ -168,11 +168,13 @@ class SearchFormComponent extends Component {
   }
 
   hasToBeforeFrom () {
-    return moment(this.state.selected.from).diff(moment(this.state.selected.to), 'seconds') >= 0;
+    return moment(this.state.selected.from.value).diff(moment(this.state.selected.to.value), 'seconds') >= 0;
   }
 
   hasDateInputErrors () {
-    return this.dateInputErrors().length > 0;
+    return this.dateInputErrors().length > 0 ||
+      this.state.selected.from.conversionFailed ||
+      this.state.selected.to.conversionFailed;
   }
 
   dateInputErrors = () => {
