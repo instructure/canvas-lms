@@ -466,7 +466,7 @@ a better user experience to provide both.)</td>
 <td>account_id</td>
 <td>text</td>
 <td></td>
-<td></td>
+<td>✓</td>
 <td>The account identifier from accounts.csv, if none is specified the course will be attached to
 the root account</td>
 </tr>
