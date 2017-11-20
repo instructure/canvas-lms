@@ -392,6 +392,11 @@ describe "LTI integration tests" do
   end
 
   context "outcome launch" do
+    before do
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+    end
+
     def tool_setup(for_student=true)
       if for_student
         course_with_student(:active_all => true)
@@ -409,11 +414,12 @@ describe "LTI integration tests" do
     end
 
     it "should include assignment outcome service params for student" do
-      allow(Canvas::Security).to receive(:hmac_sha1).and_return('some_sha')
-      hash = tool_setup
+      allow(Canvas::Security).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
+      allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
 
-      payload = [@tool.id, @course.id, @assignment.id, @user.id].join('-')
-      expect(hash['lis_result_sourcedid']).to eq "#{payload}-some_sha"
+      hash = tool_setup
+      expect(hash['lis_result_sourcedid']).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
       expect(hash['lis_outcome_service_url']).to eq "/my/test/url"
       expect(hash['ext_ims_lis_basic_outcome_url']).to eq "/my/other/test/url"
       expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'

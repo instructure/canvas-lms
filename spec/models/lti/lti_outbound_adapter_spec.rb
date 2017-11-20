@@ -238,6 +238,8 @@ describe Lti::LtiOutboundAdapter do
 
     before(:each) do
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
     end
 
     it "includes the 'ext_lti_assignment_id' parameter" do
@@ -252,20 +254,6 @@ describe Lti::LtiOutboundAdapter do
       adapter.prepare_tool_launch(return_url, variable_expander)
 
       expect(tool_launch).to receive(:for_assignment!).with(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-
-      adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-    end
-
-    it "generates the correct source_id for the assignment" do
-      generated_sha = 'generated_sha'
-      allow(Canvas::Security).to receive(:hmac_sha1).and_return(generated_sha)
-      source_id = "tool_id-course_id-assignment_id-#{user.id}-#{generated_sha}"
-      allow(tool_launch).to receive(:for_assignment!)
-      assignment_creator = double
-      allow(assignment_creator).to receive(:convert).and_return(tool_launch)
-      adapter.prepare_tool_launch(return_url, variable_expander)
-
-      expect(Lti::LtiAssignmentCreator).to receive(:new).with(assignment, source_id).and_return(assignment_creator)
 
       adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
     end
@@ -313,6 +301,64 @@ describe Lti::LtiOutboundAdapter do
     it "returns the LtiOutbound::LTIConsumerInstance if none defined" do
       Lti::LtiOutboundAdapter.consumer_instance_class = nil
       expect(Lti::LtiOutboundAdapter.consumer_instance_class).to eq LtiOutbound::LTIConsumerInstance
+    end
+  end
+
+  describe '#encode_source_id' do
+    let(:user) do
+      student_in_course
+      @student
+    end
+    let(:assignment) { assignment_model(course: @course) }
+    let(:course) { assignment.course }
+    let(:tool) { external_tool_model(context: course) }
+    let(:adapter) { Lti::LtiOutboundAdapter.new(tool, user, course) }
+    let(:enrollment) { StudentEnrollment.create!(user: user, course: course, workflow_state: 'active') }
+
+    before do
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      assignment.update_attributes!(
+        external_tool_tag: ContentTag.create!(
+          context: assignment,
+          content: tool,
+          title: 'test',
+          url: tool.url
+        )
+      )
+    end
+
+    it 'builds the expected encrypted JWT with the correct course data' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
+      sourced_id = adapter.encode_source_id(assignment)
+      parsed_sourced_id = BasicLTI::Sourcedid.load! sourced_id
+      expect(parsed_sourced_id.course).to eq course
+    end
+
+    it 'builds the expected encrypted JWT with the correct assignment data' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
+      sourced_id = adapter.encode_source_id(assignment)
+      parsed_sourced_id = BasicLTI::Sourcedid.load! sourced_id
+      expect(parsed_sourced_id.assignment).to eq assignment
+    end
+
+    it 'builds the expected encrypted JWT with the correct user data' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
+      sourced_id = adapter.encode_source_id(assignment)
+      parsed_sourced_id = BasicLTI::Sourcedid.load! sourced_id
+      expect(parsed_sourced_id.user).to eq user
+    end
+
+    it 'uses the new sourcedids if the "encrypted_sourcedids" FF is enabled' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
+      sourced_id = adapter.encode_source_id(assignment)
+      expect(sourced_id).not_to match(BasicLTI::Sourcedid::SOURCE_ID_REGEX)
+    end
+
+    it 'uses legacy sourcedids if the "encrypted_sourcedids" FF is disabled' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(false)
+      sourced_id = adapter.encode_source_id(assignment)
+      expect(sourced_id).to match(BasicLTI::Sourcedid::SOURCE_ID_REGEX)
     end
   end
 end

@@ -18,6 +18,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
+  before do
+    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+    allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+  end
+
   let(:lti_student) { user_model }
   let(:lti_course) { course_with_student({user: lti_student}).course }
   let(:tool) do

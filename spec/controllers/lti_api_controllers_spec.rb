@@ -32,6 +32,11 @@ describe LtiApiController, type: :request do
     tag.save!
   end
 
+  before do
+    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+    allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+  end
+
   def check_error_response(message, check_generated_sig=true)
     expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
 
@@ -266,8 +271,6 @@ XML
     desc = xml.at_css('imsx_description').content.match(/(?<description>.+)\n\[EID_(?<error_report>[^\]]+)\]/)
     expect(desc[:description]).to eq error_message if error_message
     expect(desc[:error_report]).to_not be_empty
-
-
   end
 
   def check_success
