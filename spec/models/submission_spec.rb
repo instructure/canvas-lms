@@ -3744,6 +3744,16 @@ describe Submission do
       @assignment.grade_student(@student, excused: true, grader: @teacher)
       expect(Submission.needs_grading.count).to eq(0)
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "serializes relative to current scope's shard" do
+        @shard1.activate do
+          expect(Submission.shard(Shard.default).needs_grading.count).to eq(1)
+        end
+      end
+    end
   end
 
   describe "#needs_grading?" do

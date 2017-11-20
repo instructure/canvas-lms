@@ -252,16 +252,16 @@ class Submission < ActiveRecord::Base
   end
 
   scope :needs_grading, -> {
-    s_name = quoted_table_name
-    e_name = Enrollment.quoted_table_name
-    joins("INNER JOIN #{e_name} ON #{s_name}.user_id=#{e_name}.user_id")
-    .where(needs_grading_conditions)
-    .where(Enrollment.active_student_conditions)
-    .distinct
+    all.primary_shard.activate do
+      joins("INNER JOIN #{Enrollment.quoted_table_name} ON submissions.user_id=enrollments.user_id")
+      .where(needs_grading_conditions)
+      .where(Enrollment.active_student_conditions)
+      .distinct
+    end
   }
 
   scope :needs_grading_count, -> {
-    select("COUNT(#{quoted_table_name}.id)")
+    select("COUNT(submissions.id)")
     .needs_grading
   }
 
