@@ -138,6 +138,7 @@ module Canvas::ICU
   end
 
   def self.locale_for_collation
+    I18n.set_locale_with_localizer
     collator.rules.empty? ? 'root' : I18n.locale
   end
 
