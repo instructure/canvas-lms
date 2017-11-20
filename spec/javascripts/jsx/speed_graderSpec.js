@@ -17,14 +17,14 @@
  */
 
 import $ from 'jquery';
-import SpeedGrader from 'speed_grader';
-import SpeedgraderHelpers from 'speed_grader_helpers';
-import SpeedgraderSelectMenu from 'speed_grader_select_menu';
+import natcompare from 'compiled/util/natcompare';
 import fakeENV from 'helpers/fakeENV';
-import userSettings from 'compiled/userSettings';
+import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import MGP from 'jsx/speed_grader/gradingPeriod';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
-import natcompare from 'compiled/util/natcompare';
+import SpeedGrader from 'speed_grader';
+import SpeedgraderHelpers from 'speed_grader_helpers';
+import userSettings from 'compiled/userSettings';
 import 'jquery.ajaxJSON';
 
 QUnit.module('SpeedGrader#showDiscussion', {
@@ -1113,4 +1113,52 @@ test('does not show an error when the gateway times out', function () {
   ENV.assignment_title = 'Assignment Title';
   SpeedGrader.setup();
   strictEqual($('#speed_grader_timeout_alert').text(), '');
+});
+
+QUnit.module('SpeedGrader#refreshFullRubric', function(hooks) {
+  let speedGraderCurrentStudent;
+  let jsonData;
+  const rubricHTML = `
+    <select id="rubric_assessments_select">
+      <option value="3">an assessor</option>
+    </select>
+    <div id="rubric_full"><span>foo</span></div>
+  `;
+
+  hooks.beforeEach(function () {
+    $('#fixtures').html(rubricHTML);
+    fakeENV.setup({ RUBRIC_ASSESSMENT: {} });
+    ({jsonData} = window);
+    speedGraderCurrentStudent = SpeedGrader.EG.currentStudent;
+    window.jsonData = { rubric_association: {} };
+    SpeedGrader.EG.currentStudent = {
+      rubric_assessments: [{ id: '3', assessor_id: '5', data: [{ points: 2, criterion_id: '9'}] }]
+    }
+    const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get');
+    getFromCache.withArgs('#rubric_full').returns($('#rubric_full'));
+    getFromCache.withArgs('#rubric_assessments_select').returns($('#rubric_assessments_select'));
+    sinon.stub(window.rubricAssessment, 'populateRubric');
+  });
+
+  hooks.afterEach(function() {
+    window.rubricAssessment.populateRubric.restore();
+    JQuerySelectorCache.prototype.get.restore();
+    SpeedGrader.EG.currentStudent = speedGraderCurrentStudent;
+    window.jsonData = jsonData;
+    fakeENV.teardown();
+    $('#fixtures').empty();
+  });
+
+  test('populates the rubric without data if the user is not the selected assessor', function () {
+    SpeedGrader.EG.refreshFullRubric();
+    const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1];
+    propEqual(data, []);
+  });
+
+  test('populates the rubric with data if the user is the selected assessor', function () {
+    fakeENV.setup({ current_user_id: '5' });
+    SpeedGrader.EG.refreshFullRubric();
+    const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1];
+    propEqual(data, [{ points: 2, criterion_id: '9' }]);
+  });
 });
