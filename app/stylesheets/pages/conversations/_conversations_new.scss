@@ -260,7 +260,7 @@
     }
 
     &.active, &:hover {
-      .star-btn, .read-state {
+      .star-btn {
         transform: translateX(0);
       }
     }
@@ -331,16 +331,16 @@
     margin: 3px;
     height: 16px;
     width: 16px;
-    box-shadow: 0 0 0 1px #A5AFB5;
-    transform: translateX(-50px);
+    background: var(--ic-brand-primary);
+    box-shadow: none;
 
     &:focus {
       outline: none;
     }
 
     &.read {
-      background: var(--ic-brand-primary);
-      box-shadow: none;
+      box-shadow: 0 0 0 1px #A5AFB5;
+      background: none;
     }
   }
 
