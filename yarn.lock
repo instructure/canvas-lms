@@ -4769,7 +4769,7 @@ jquery.elastic@^1.0.0:
   dependencies:
     jquery ">=1.5"
 
-jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS":
+jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d":
   version "1.7.2"
   resolved "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d"
 
