@@ -43,7 +43,8 @@
 #         },
 #         "answers": {
 #           "description": "The possible answers for this question when those possible answers are necessary.  The presence of this parameter is dependent on permissions.",
-#           "type": "array"
+#           "type": "array",
+#           "items": {"type": "string"}
 #         }
 #       }
 #     }

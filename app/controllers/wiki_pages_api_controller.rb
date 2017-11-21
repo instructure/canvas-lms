@@ -168,7 +168,7 @@ class WikiPagesApiController < ApplicationController
   #     curl -X DELETE -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages/14/duplicate
   #
-  # @returns the page that was created
+  # @returns Page
   def duplicate
     return unless authorized_action(@page, @current_user, :create)
     if @page.deleted?
