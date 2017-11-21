@@ -156,5 +156,8 @@
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y"
+  },
+  "resolutions": {
+    "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d"
   }
 }
