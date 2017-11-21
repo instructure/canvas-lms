@@ -21,10 +21,8 @@ class CalendarsController < ApplicationController
 
   def show2
     get_context
-    get_all_pertinent_contexts(include_groups: true, favorites_first: true, cross_shard: true)
-    @manage_contexts = @contexts.select { |c|
-      c.grants_right?(@current_user, session, :manage_calendar)
-    }.map(&:asset_string)
+    get_all_pertinent_contexts(include_groups: true, favorites_first: true)
+    @manage_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :manage_calendar) }.map(&:asset_string)
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
     if params[:include_contexts]
       @selected_contexts = params[:include_contexts].split(",")
