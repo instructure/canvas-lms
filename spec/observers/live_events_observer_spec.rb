@@ -19,6 +19,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe LiveEventsObserver do
+  describe "general" do
+    it "doesn't post events for no change" do
+      user_model(name: "Joey Joe Joe")
+
+      @user.name = "Joey Joe Joe"
+      expect(Canvas::LiveEvents).to receive(:user_updated).never
+      @user.save!
+    end
+    it "does post event for actual change" do
+      user_model(name: "Joey Joe Joe")
+
+      @user.name = "Joey Joe Joe Jr. Shabadu"
+      expect(Canvas::LiveEvents).to receive(:user_updated).once
+      @user.save!
+    end
+  end
   describe "syllabus" do
     it "doesn't post for no changes" do
       course_model
@@ -147,9 +163,9 @@ describe LiveEventsObserver do
       course = course_model
       student = course.enroll_student(user_model).user
       group = course.groups.create!(name: "Group 1")
-      membership = group.add_user(student, 'invited')
+      membership = group.add_user(student)
       expect(Canvas::LiveEvents).to receive(:group_membership_updated).once
-      membership.accept
+      membership.moderator = true
       membership.save
     end
   end
@@ -177,7 +193,8 @@ describe LiveEventsObserver do
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:submission_updated).once
       s = submission_model
-      s.touch
+      s.excused = true
+      s.save!
     end
   end
 
