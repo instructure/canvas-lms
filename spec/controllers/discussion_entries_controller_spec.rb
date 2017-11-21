@@ -30,7 +30,7 @@ describe DiscussionEntriesController do
     @topic.update_attribute(:podcast_enabled, true)
     @mo1 = @course.media_objects.build(:media_id => 'asdf', :title => 'asdf')
     @mo1.data = {:extensions => {:mp4 => {
-      :size => 100, 
+      :size => 100,
       :extension => 'mp4'
     }}}
     @mo1.save!
@@ -49,7 +49,7 @@ describe DiscussionEntriesController do
       get 'show', params: {:course_id => @course.id, :id => @entry.id}
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       user_session(@student)
       get 'show', params: {:course_id => @course.id, :id => @entry.id}, :format => :json
@@ -58,13 +58,13 @@ describe DiscussionEntriesController do
       expect(assigns[:entry]).to eql(@entry)
     end
   end
-  
+
   describe "POST 'create'" do
     it "should require authorization" do
       post 'create', params: {:course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}}
       assert_unauthorized
     end
-    
+
     it "should create a message" do
       user_session(@student)
       post 'create', params: {:course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}}
@@ -73,7 +73,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].message).to eql("yo")
       expect(response).to be_redirect
     end
-    
+
     it "should attach a file if authorized" do
       user_session(@teacher)
       post 'create', params: {:course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}, :attachment => {:uploaded_data => default_uploaded_data}}
@@ -83,7 +83,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].attachment).not_to be_nil
       expect(response).to be_redirect
     end
-    
+
     it "should NOT attach a file if not authorized" do
       user_session(@student)
       post 'create', params: {:course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}, :attachment => {:uploaded_data => default_uploaded_data}}
@@ -109,13 +109,13 @@ describe DiscussionEntriesController do
       expect(@student.submissions.not_placeholder.first.submission_type).to eq 'discussion_topic'
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       put 'update', params: {:course_id => @course.id, :id => @entry.id, :discussion_entry => {}}
       assert_unauthorized
     end
-    
+
     it "should update the entry" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}}
@@ -123,7 +123,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry]).to eql(@entry)
       expect(assigns[:entry].message).to eql("ahem")
     end
-    
+
     it "should attach a new file to the entry" do
       user_session(@teacher)
       put 'update', params: {:course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}, :attachment => {:uploaded_data => default_uploaded_data}}
@@ -132,7 +132,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].message).to eql("ahem")
       expect(assigns[:entry].attachment).not_to be_nil
     end
-    
+
     it "should replace the file on the entry" do
       user_session(@teacher)
       @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
@@ -145,7 +145,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].attachment).not_to be_nil
       expect(assigns[:entry].attachment).not_to eql(@a)
     end
-    
+
     it "should remove the file from the entry" do
       user_session(@teacher)
       @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
@@ -157,7 +157,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].message).to eql("ahem")
       expect(assigns[:entry].attachment).to be_nil
     end
-    
+
     it "should not replace the file to the entry if not authorized" do
       user_session(@student)
       put 'update', params: {:course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}, :attachment => {:uploaded_data => default_uploaded_data}}
@@ -166,7 +166,7 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].message).to eql("ahem")
       expect(assigns[:entry].attachment).to be_nil
     end
-    
+
     it "should set the editor_id to whoever edited to entry" do
       user_session(@teacher)
       @entry = @topic.discussion_entries.build(:message => "test")
@@ -180,13 +180,13 @@ describe DiscussionEntriesController do
       expect(assigns[:entry].user).to eql(@student)
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       delete 'destroy', params: {:course_id => @course.id, :id => @entry.id}
       assert_unauthorized
     end
-    
+
     it "should delete the entry" do
       user_session(@teacher)
       delete 'destroy', params: {:course_id => @course.id, :id => @entry.id}
@@ -200,7 +200,7 @@ describe DiscussionEntriesController do
       expect(@topic.discussion_entries.active).to be_empty
     end
   end
-  
+
   describe "GET 'public_feed.rss'" do
     before :once do
       @entry.destroy
@@ -210,12 +210,12 @@ describe DiscussionEntriesController do
       get 'public_feed', params: {:discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code + "x"}, :format => 'rss'
       expect(assigns[:problem]).to eql("The verification code does not match any currently enrolled user.")
     end
-    
+
     it "should require the podcast to be enabled" do
       get 'public_feed', params: {:discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code}, :format => 'rss'
       expect(assigns[:problem]).to eql("Podcasts have not been enabled for this topic.")
     end
-    
+
     it "should return a valid RSS feed" do
       @topic.update_attribute(:podcast_enabled, true)
       get 'public_feed', params: {:discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code}, :format => 'rss'
@@ -274,7 +274,7 @@ describe DiscussionEntriesController do
       expect(assigns[:discussion_entries]).not_to be_empty
       expect(assigns[:discussion_entries][0]).to eql(@entry)
     end
-    
+
     it "should not include student entries if locked" do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
@@ -290,7 +290,7 @@ describe DiscussionEntriesController do
       expect(rss.items.length).to eql(0)
       expect(assigns[:discussion_entries]).to be_empty
     end
-    
+
     it "should not include student entries if initial post is required but missing" do
       topic_with_media_reply
       @user = user_model
