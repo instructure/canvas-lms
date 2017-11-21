@@ -284,6 +284,23 @@ describe "student planner" do
       expect(fj("h2:contains('No Due Dates Assigned')")).to be_displayed
     end
 
+    it "allows editing the date of a to-do item", priority: "1", test_id: 3402913 do
+      @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Student to do")
+      go_to_list_view
+      fln(@student_to_do.title).click
+      modal = todo_sidebar_modal(@student_to_do.title)
+      element = ff('input', modal)[1]
+      element.click
+      date = format_date_for_view(Time.zone.now, :long).split(" ")
+      day = date[0] + ' 15, ' + date[2]
+      fj("button:contains('15')").click
+      todo_save_button.click
+      expect(f('body')).to contain_jqcss("h2:contains(#{day})")
+      @student_to_do.reload
+      expect(format_date_for_view(@student_to_do.todo_date, :long)).
+        to eq(day)
+    end
+
     it "has courses in the course combo box", priority: "1", test_id: 3263160 do
       go_to_list_view
       todo_modal_button.click
