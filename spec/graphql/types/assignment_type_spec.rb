@@ -68,4 +68,8 @@ describe Types::AssignmentType do
 
     expect(assignment_type.submissionsConnection(current_user: @student)).to eq nil
   end
+
+  it "can access it's parent course" do
+    expect(assignment_type.course).to eq test_course
+  end
 end

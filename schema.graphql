@@ -1,6 +1,7 @@
 type Assignment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
+  course: Course
   createdAt: Time
   description: String
   discussion: Discussion

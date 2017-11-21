@@ -56,6 +56,14 @@ module Types
       end
     end
 
+    field :course, Types::CourseType, resolve: -> (assignment, _, _) {
+      # course is polymorphicly associated with assignment through :context
+      # it could also be queried by assignment.assignment_group.course
+      Loaders::AssociationLoader.for(Assignment, :context)
+        .load(assignment)
+        .then { assignment.context }
+    }
+
     connection :submissionsConnection, SubmissionType.connection_type do
       description "submissions for this assignment"
       resolve ->(assignment, _, ctx) {
