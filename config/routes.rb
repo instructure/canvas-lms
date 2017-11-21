@@ -17,6 +17,7 @@ CanvasRails::Application.routes.draw do
 
   get 'bz/retained_data_stats' => 'bz#retained_data_stats'
   get 'bz/retained_data_export' => 'bz#retained_data_export'
+  get 'bz/magic_field_dump' => 'bz#magic_field_dump'
 
   get 'bz/user_linkedin_url' => 'bz#user_linkedin_url'
 
