@@ -201,4 +201,8 @@ YAML
     hash = {:blah => "<<"}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
+
+  it "dumps and loads singletons" do
+    expect(YAML.load(YAML.dump(Mime::NullType.instance))).to eq Mime::NullType.instance
+  end
 end
