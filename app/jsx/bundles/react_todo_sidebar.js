@@ -22,7 +22,7 @@ import { Provider } from 'react-redux';
 import ToDoSidebar from 'jsx/dashboard/ToDoSidebar';
 import configureStore from 'jsx/dashboard/ToDoSidebar/store';
 
-const store = configureStore({}, window.ENV.DEBUG_PLANNER);
+const store = configureStore({});
 
 /**
 * This handles rendering this properly.  Because the sidebar itself is loaded
