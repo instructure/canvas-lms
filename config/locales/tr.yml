@@ -1507,6 +1507,7 @@ tr:
   add_new_term_d2217c0d: "Yeni Dönem Ekle"
   add_people_7ee4b2ec: "Katılımcı Ekle"
   add_quiz_ip_filter_c7b37dc5: "Kısa Sınav IP Filtresi Ekle"
+  add_rating_89d7fbde: "Puanlama Ekle"
   add_recipient_ff135ed7: "Alıcı Ekle"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Bu portfolyoya bölüm ekleyin, silin veya yeniden ayarlayın"
   add_review_2fb1590c: "Değerlendirme Ekle"
@@ -1524,7 +1525,9 @@ tr:
   add_users_to_name_b8109bbb: "%{name}'a Kullanıcıları Ekle"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Aşağıdakilerin her biri için Zendesk yapılandırılmanızın isteğe bağlı alan ID'sini ekleyin (ID'si olamayan alanların logları tutulmayacak):"
+  additional_outcomes_options_6df428f1: "Ek öğrenme çıktısı seçenekleri"
   admin_4d3ba42f: Yönetici
+  admin_csv_f8d1b3eb: "Yönetici CSV"
   admin_navigation_menu_77b801a2: "Yönetici Gezinme Menüsü"
   admin_user_name_29dd115a: admin_user_name
   admins_3e1dce15: Yöneticiler
@@ -1638,6 +1641,7 @@ tr:
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Akademik Karşılaştırma'yı kullanmak için API anahtarı gerekiyor"
   an_assignment_name_dc624e70: "Bir Ödev Adı"
   an_error_occured_please_try_again_e59b65b: "Hata oluştu. Lütfen tekrar deneyin."
+  an_error_occured_while_deleting_the_grading_period_c8343484: "Notlandırma peryodunu silerken bir hata oluştu"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Bir hata oluştu*, lütfen cevabınızı daha sonra tekrar gönderin"
   an_error_occurred_please_try_again_later_84223241: "Hata oluştu. Lütfen daha sonra tekrar deneyin."
   an_error_occurred_publishing_grades_cfdf7631: "Notlar yayınlanırken hata oluştu."
@@ -1647,6 +1651,15 @@ tr:
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "İndirmeye hazırlanırken bir hata oluştu, lütfen tekrar deneyin."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "%{filename} dosyası için kullanıcı haklarını ayarlarken bir hata oluştu"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Turnitin ile iletişim kurulurken hata oluştu."
+  an_error_occurred_while_migrating_405ac0b5: "Aktarım sırasında bir hata oluştu."
+  an_error_occurred_while_starting_migration_8e6015e2: "Aktarımı başlatırken bir hata oluştu."
+  an_error_occurred_while_updating_late_policies_a95b707f: "Geç teslim ilkelerini güncellerken bir hata oluştu"
+  an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Randevu grubunu silerken bir hata oluştu"
+  an_error_ocurred_while_loading_sync_history_ad9dc6df: "Eşzamanlama geçmişini yüklerken bir hata oluştu"
+  an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "Eşzamanlanmamış değişiklikleri yüklerken bir hata oluştu"
+  an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Randevu grubunu kaydederken bir hata oluştu"
+  an_export_is_already_in_progress_54270f01: "Bir dışa aktarım işlemi zaten devam ediyor."
+  an_internal_error_occurred_83b8a685: "Dahili bir hata oluştu"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" adına bir öğe zaten bu konumda mevcut. Var olan dosyayı değiştirmek ister misiniz?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Bilinmeyen sunucu hatası oluştu. Lütfen tekrar deneyin."
   an_update_is_available_for_toolname_bba3fa2: "%{toolName} aracı için güncelleme mevcut"
@@ -1673,6 +1686,7 @@ tr:
   analytics_c94ba601: Analitikler
   analytics_course_code_student_name_d63bab4c: "Analitikler: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "ve %{count} fazlası... "
+  and_more_1c35b232: "ve daha fazlası..."
   ange_name: "Açı Dönüştürücü"
   angel: 
     file_copy_fail: "\"%{base_path}\" klasörüne kopyalanamadı"
@@ -1732,8 +1746,10 @@ tr:
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "İsimsiz notlandırma, SpeedGrader™ da öğrencilerin isimlerini gizler"
   anonymous_user: "İsimsiz Kullanıcı"
   anonymous_user_d984b9ce: "İsimsiz Kullanıcı"
+  anonymously_graded_59149570: "İsimsiz notlandırıldı"
   another_assignment_name_369f8481: "Bir Başka Ödev Adı"
   another_configuration_is_currently_selected_select_95b394e: "Şu anda başka bir yapılandırma seçili. Bu yapılandırmayı seçerseniz diğerinin seçimi kaldırılır."
+  answer_answerid_97fc4afc: "Cevap %{answerId}"
   answer_correct_answer_c2c4a20c: "%{answer}, (Doğru cevap)"
   answer_description_6b353cfd: "Cevap Açıklaması"
   answer_distribution_2a956e3f: "Cevap Dağılımı"
@@ -1745,6 +1761,8 @@ tr:
   answers_which_scored_in_the_middle_46_46466ffd: "%46'lık orta alanda notlandırılmış cevaplar"
   answers_which_scored_in_the_top_27_a605232d: "En süt %27'de notlandırılmış cevaplar"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Son teşebbüsünüzden sonra cevaplar gösterilecektir"
+  any_sub_account_ec7069f2: "Herhangi bir Alt Hesap"
+  any_term_d49af19f: "Herhangi bir Dönem"
   api_url_3ee7cb0a: "API URL"
   app_b157c2b3: Uygulama
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Bir dersin veya Hesabın ayarlar sayfasındaki \"Uygulamalar\" sekmesinde Uygulama Merkezi görülecektir. Aşağıdaki URL geçerli bir Uygulama Merkezine yönlenmelidir (örneğin %{url} -- sondaki kesme işaretini yazmayın"
@@ -1796,9 +1814,11 @@ tr:
     wiki_front_page_default_content_group: "Grubun yeni wiki sayfasına hoş geldiniz!"
   application_id_2aa1640f: "Uygulama ID"
   application_secret_e6803c7e: "Uygulama Gizli Anahtarı"
+  applied_cc7be774: Uygulandı
   apply_781a2546: Uygula
   apply_theme_7af08387: "Temayı uygula"
   applying_new_styles_to_subaccounts_e8aeeef2: "Yeni stiller alt hesaplara uygulanıyor"
+  applying_please_be_patient_f7b5f244: "Uygulanıyor, lütfen sabırlı olun"
   appointment_group: 
     errors: 
       invalid_end_at: "Randevu bitiş saati, başlangıç ​​saatinden önce"
@@ -1809,6 +1829,8 @@ tr:
       invalid_course_section: "Geçersiz ders bölümü"
       invalid_group_category: "Geçersiz grup kategorisi"
       missing_group_category: "Grup randevularının bir grup kategorisi olmalıdır"
+  appointments_dcb41d23: Randevular
+  approved_c3b285d4: Onaylandı
   approximate_value_with_precision_precision_6b7cc6ef: "%{precision} hassasiyetli %{approximate_value}"
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Uygulamalar Canvas'a yeni özellikler eklemenin kolay yoludur. Tek bir derse ya da bir hesaba bağlı tüm derslere eklenebilirler. Ayarları yapıldıktan sonra ders modüllerinde bunlara bağlantı verebilir ve değerlendirme araçları için ödevler oluşturabilirsiniz."
   appt_calendar_event_dialog: 
@@ -1818,6 +1840,10 @@ tr:
   archive_3f794d7e: Arşiv
   archive_selected_d64506ca: "Arşiv Seçildi"
   are_you_sure_26795d3c: "Emin misiniz?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: "Bu mesajlaşmanın kopyasının arşivlenmesini istediğinize emin misiniz?"
+    other: "Mesajlaşmalarınızın kopyalarının arşivlenmesini istediğinize emin misiniz?"
+  are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "İptal etmek istediğinize emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "%{name} ile olan randevunuzu iptal etmek istediğinizden emin misiniz?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Final puanını kopyalamak istediğinize emin misiniz? Var olan puanın üzerine yazılacak."
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Bu kullanıcıyı etkisiz kılmak istediğinize emin misiniz? Bu kullanıcılar etkisiz durumdayken derse katılamayacaklar."
@@ -1825,18 +1851,27 @@ tr:
     one: "%{name} öğesini silmek istediğinizden emin misiniz?"
     other: "%{count} öğeyi silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Bu duyuru silmek istediğinizden emin misiniz?"
+  are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Bu ödevi silmek isteğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Bu yorumu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Bu olayı silmek istediğinize emin misiniz?"
+  are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Bu notlandırma peryod setini silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Bu notlandırma şemasını silmek istediğinize emin misiniz?"
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: "Bu mesajlaşmanın sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
+    other: "Bu mesajlaşmaların sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Bu olay için rezervasyonunuzu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Bunu yapmak istediğinize emin misiniz? Bu işlem geri alınamaz ve not defterinde var olan notların üzerine yazılır."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı kaldırmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Bu kullanıcıyı silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Bu profil resmini rapor etmek istediğnize emin misiniz?"
+  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Bu notları öğrenci bilgi sistemiyle yeniden eşzamanlamak istediğinize emin misiniz?"
+  are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Bu yorumu göndermek istediğinize emin misiniz?"
+  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Bu notları öğrenci bilgi sistemiyle eşzamanlamak istediğinize emin misiniz? Tüm notlarınız son hali verilmişse bunu yapmalısınız."
   argentina_54_375d6af4: "Arjantin (+54)"
   arrange_by_34a545de: "Göre düzenle"
+  arrange_by_a121617c: "Göre düzenle"
   arrange_columns_by_assignment_group_33acdf03: "Sütunları Ödev Grubuna göre düzenle"
   arrange_columns_by_assignment_group_59bbddd0: "Sütunları ödev grubuna göre düzenle"
   arrange_columns_by_due_date_888f2551: "Sütunları Son Teslim Tarihine göre Düzenle"
@@ -1934,8 +1969,12 @@ tr:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Kilitli ödevleri olan grubu silemezsiniz."
+  assignment_groups_bc9cc3c9: "Ödev Grupları"
+  assignment_groups_weight_2f1a5a7c: "Ödev Grup Ağırlığı"
+  assignment_id_b040cee0: "Ödev Id"
   assignment_menu_91fe3716: "Ödev Menüsü"
   assignment_muted_4cb590a4: "Ödev bekletiliyor"
+  assignment_muted_8d74bfa0: "Ödev Bekletiliyor"
   assignment_muter: 
     mute_assignment: "Ödevi Beklet"
     muting_assignment: "Ödev beklemeye alınıyor..."
@@ -1943,17 +1982,21 @@ tr:
     unmute_button: "Ödevi Beklemeden Çıkar"
     unmute_dialog: "Bu ödev şu anda bekletiliyor. Öğrenciler notlarını ve geribildirimleri göremezler. Şimdi açmak ister misiniz?"
     unmuting_assignment: "Ödev beklemeden çıkarılıyor..."
+  assignment_name_a_z_aeefaa36: "Ödev Adı - A-Z"
   assignment_name_b2d87383: "Ödev Adı"
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, bitiş tarihi artık"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{course_name} (%{override}), %{assignment_name} bitişi"
   assignment_name_grade_history_b506426c: "%{assignment_name} not geçmişi"
+  assignment_name_z_a_34f92f4b: "Ödev Adı - Z-A"
   assignment_options_1e5b7074: "Ödev Seçenekleri"
   assignment_override: 
     student_count: 
       one: "%{count} öğrenci"
       other: "%{count} öğrenci"
   assignment_selection_6bff05c4: "Ödev Seçimi"
+  assignment_title_82b4422e: "Ödev Başlığı:"
   assignment_was_deleted_8320d26d: "Ödev silindi"
+  assignment_weights_d4bcf9ab: "Ödev Ağırlıkları"
   assignments: 
     assignment_count: 
       one: "1 Ödev"
@@ -2101,6 +2144,8 @@ tr:
         remove_these_dates: "Bu Tarihlerde Sil"
     edit: 
       edit_assignment: "Ödevi Düzenle"
+      links: 
+        add_rubric: "Değerlendirme Listesi"
     edit_header_view: 
       buttons: 
         not_published: Yayınlanmadı
@@ -14627,7 +14672,7 @@ tr:
           other: "Unutmayın ki %{count} öğrenci bu değerlendirme listesi kullanılarak değerlendirildi. Bunu değiştirirseniz bu değerlendirme etkilenir."
         rubric_in_use2: "Bu değerlendirme listesi ile öğrencileri zaten değerlendirdiniz. Büyük değişiklikler onların değerlendirme sonuçlarını etkileyecektir."
       out_of: "*%{total} üzerinden* %{points} puan"
-      rubric: Tubrik
+      rubric: "Değerlendirme Listesi"
       rubric_title: Başlık
       title: "Başlık:"
       titles: 
