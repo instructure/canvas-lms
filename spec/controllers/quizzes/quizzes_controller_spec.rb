@@ -1061,6 +1061,41 @@ describe Quizzes::QuizzesController do
 
       expect(response).to be_success
     end
+
+    context "with non-utf8 submission data" do
+      render_views
+
+      before do
+        course_quiz(true)
+
+        @question = @quiz.quiz_questions.create!(question_data: {
+          'question_text' => '<p>[color]是我最喜欢的颜色</p>',
+          'question_type' => 'fill_in_multiple_blanks_question',
+          'answers' => [{
+            'id' => rand(1..999).to_s,
+            'text' => '红色',
+            'blank_id' => 'color'
+          }]
+        })
+        @quiz.generate_quiz_data
+        @quiz.save!
+      end
+
+      it "should render without error" do
+        quiz_submission = @quiz.generate_submission(@student)
+        quiz_submission.mark_completed
+        quiz_submission.submission_data = [{
+          correct: false,
+          question_id: @question.id,
+          answer_for_color: "\b红色" # the \b causes psych to store this as a binary string
+        }]
+        quiz_submission.save!
+
+        user_session(@teacher)
+        get 'history', params: { course_id: @course.id, quiz_id: @quiz.id, quiz_submission_id: quiz_submission.id }
+        expect(response).to have_http_status(:success)
+      end
+    end
   end
 
   describe "POST 'create'" do
