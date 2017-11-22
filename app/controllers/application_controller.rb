@@ -287,11 +287,10 @@ class ApplicationController < ActionController::Base
 
     return unless is_master || is_child
 
-    js_bundle :blueprint_courses
+    js_bundle(is_master ? :blueprint_course_master : :blueprint_course_child)
     css_bundle :blueprint_courses
 
     master_course = is_master ? @context : MasterCourses::MasterTemplate.master_course_for_child_course(@context)
-    js_env :DEBUG_BLUEPRINT_COURSES => Rails.env.development? || Rails.env.test?
     bc_data = {
       isMasterCourse: is_master,
       isChildCourse: is_child,

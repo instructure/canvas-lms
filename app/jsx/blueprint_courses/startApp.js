@@ -18,16 +18,12 @@
 
 const data = ENV.BLUEPRINT_COURSES_DATA
 
-require.ensure([], (require) => {
-  const App = data.isMasterCourse
-    ? require('../blueprint_courses/apps/BlueprintCourse')
-    : require('../blueprint_courses/apps/ChildCourse')
-
+export default function startApp(App) {
   const wrapper = document.getElementById('wrapper')
   const root = document.createElement('div')
   root.className = 'blueprint__root'
   wrapper.appendChild(root)
 
-  const app = new App(root, data, ENV.DEBUG_BLUEPRINT_COURSES)
+  const app = new App(root, data)
   app.start()
-})
+}
