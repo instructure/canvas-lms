@@ -214,6 +214,16 @@ class GradeSummaryPresenter
     Rails.cache.delete(cache_key(context, 'assignment_stats'))
   end
 
+  # This requires that the array passed in must be sorted.
+  # Adapted from https://stackoverflow.com/a/11785414
+  def percentile(values, count, percentile)
+    return nil if count < 2
+    k = (percentile*(count - 1)+1).floor - 1
+    f = (percentile*(count - 1)+1).modulo(1)
+
+    values[k] + (f * (values[k+1] - values[k]))
+  end
+
   def assignment_stats
     # performance note: There is an overlap between
     # Submission.not_placeholder and the submission where clause.
@@ -223,16 +233,36 @@ class GradeSummaryPresenter
     # require score then add a filter when the DA feature is on
     @stats ||= begin
       Rails.cache.fetch(GradeSummaryPresenter.cache_key(@context, 'assignment_stats')) do
-        @context.assignments.active.except(:order).
+        ret = @context.assignments.active.except(:order).
           joins(:submissions).
           joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
           merge(Enrollment.of_student_type.active_or_pending).
           merge(Submission.not_placeholder).
           where(enrollments: {course_id: @context}).
           where("submissions.excused IS NOT TRUE").
-          group("assignments.id").
-          select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").
-          index_by(&:id)
+          where("submissions.score IS NOT NULL").
+          order("score").
+          select("assignments.id as id, submissions.score as score").
+          group_by(&:id)
+
+        ret.map do |k,assignment| 
+          scores = assignment.map do |submission|
+            submission.score
+          end
+          Rails.logger.warn(scores)
+
+          count = scores.length
+
+          [k, OpenStruct.new({
+            'max' => scores[-1],
+            'min' => scores[0],
+            'avg' => scores.sum / count,
+            'count' => count,
+            'median' => percentile(scores, count, 0.5),
+            'lower_q' => percentile(scores, count, 0.25),
+            'upper_q' => percentile(scores, count, 0.75)
+          })]
+        end.to_h
       end
     end
   end

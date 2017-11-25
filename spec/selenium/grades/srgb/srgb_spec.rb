@@ -305,6 +305,9 @@ describe "Screenreader Gradebook" do
     data = [
       'Average Score: 10',
       'High Score: 15',
+      'Upper Quartile: 7.5',
+      'Median Score: 10',
+      'Lower Quartile: 12.5', 
       'Low Score: 5',
       'Total Graded Submissions: 2 submissions'
     ]
