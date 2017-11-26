@@ -773,6 +773,7 @@ module Api::V1::Assignment
       assignment.validate_overrides_for_sis(prepared_batch)
       assignment.save_without_broadcasting!
       perform_batch_update_assignment_overrides(assignment, prepared_batch)
+      assignment.update_activity_stream_items
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
