@@ -80,6 +80,10 @@ define [
         tabs.tabs('remove', 0)
         @plannerNoteDetailsForm.activate()
       else
+        #don't show To Do tab if the planner isn't enabled
+        if !ENV.STUDENT_PLANNER_ENABLED
+          tabs.tabs('remove', 2)
+
         # don't even show the assignments tab if the user doesn't have
         # permission to create them
         can_create_assignments = _.any(@event.allPossibleContexts, (c) -> c.can_create_assignments)

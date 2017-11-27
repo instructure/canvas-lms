@@ -101,5 +101,19 @@ describe "calendar2" do
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
     end
+
+    context "with student planner disabled" do
+      before :each do
+        Account.default.disable_feature!(:student_planner)
+      end
+
+      it "should not show todo tab" do
+        get '/calendar2'
+        wait_for_ajax_requests
+        f('.fc-week td').click # click the first day of the month
+        expect(f('#edit_event_tabs')).to be_displayed
+        expect(f('#edit_event_tabs')).not_to contain_css('[aria-controls="edit_planner_note_form_holder"]')
+      end
+    end
   end
 end
