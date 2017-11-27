@@ -886,6 +886,21 @@ class UsersController < ApplicationController
     render :json => todos
   end
 
+  def todo_item_count
+    return render_unauthorized_action unless @current_user
+    limit = ToDoListPresenter::ASSIGNMENT_LIMIT
+    grading = @current_user.assignments_needing_grading(limit: limit).map { |a| todo_item_json(a, @current_user, session, 'grading') }
+    submitting = @current_user.assignments_needing_submitting(include_ungraded: true, limit: limit).map do |a|
+      todo_item_json(a, @current_user, session, 'submitting')
+    end
+    if Array(params[:include]).include? 'ungraded_quizzes'
+      submitting += @current_user.ungraded_quizzes(:needing_submitting => true, limit: limit).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
+      submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] || CanvasSort::Last }
+    end
+    count = grading.inject(0) {|sum, asg| sum += asg['needs_grading_count'] || 0}
+    render json: {needs_grading_count: count, assignments_needing_submitting: submitting.count}
+  end
+
   include Api::V1::Assignment
   include Api::V1::CalendarEvent
 

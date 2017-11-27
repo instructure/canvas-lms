@@ -319,4 +319,20 @@ describe UsersController, type: :request do
       expect(response_ids - @student_assignment_ids).to be_empty
     end
   end
+
+  describe "todo_item_count" do
+
+    it "should check for auth" do
+      get("/api/v1/users/self/todo_item_count")
+      assert_status(401)
+    end
+
+    it "returns the correct count" do
+      10.times { another_submission }
+      json = api_call(:get, "/api/v1/users/self/todo_item_count",
+                :controller => "users", :action => "todo_item_count", :format => "json")
+      expect(json['needs_grading_count']).to eq 11
+      expect(json['assignments_needing_submitting']).to eq 1
+    end
+  end
 end

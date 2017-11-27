@@ -1235,6 +1235,7 @@ CanvasRails::Application.routes.draw do
       delete "users/:user_id/followers/self", action: :unfollow
 
       get 'users/self/todo', action: :todo_items, as: 'user_todo_list_items'
+      get 'users/self/todo_item_count', action: :todo_item_count
       get 'users/self/upcoming_events', action: :upcoming_events
       get 'users/:user_id/missing_submissions', action: :missing_submissions, as: 'user_missing_submissions'
 
