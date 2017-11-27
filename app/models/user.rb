@@ -2900,7 +2900,7 @@ class User < ActiveRecord::Base
   end
 
   def all_paginatable_accounts
-    ShardedBookmarkedCollection.build(Account::Bookmarker, self.adminable_accounts_scope)
+    ShardedBookmarkedCollection.build(Account::Bookmarker, self.adminable_accounts_scope.order(:name, :id))
   end
 
   def all_pseudonyms_loaded?

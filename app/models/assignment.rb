@@ -2217,8 +2217,6 @@ class Assignment < ActiveRecord::Base
       :now => Time.zone.now)
   }
 
-  scope :order_by_base_due_at, -> { order("assignments.due_at") }
-
   scope :unpublished, -> { where(:workflow_state => 'unpublished') }
   scope :published, -> { where(:workflow_state => 'published') }
   scope :api_id, lambda { |api_id|

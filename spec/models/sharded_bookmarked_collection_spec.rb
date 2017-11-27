@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe ShardedBookmarkedCollection do
   before(:each) do
@@ -25,13 +25,28 @@ describe ShardedBookmarkedCollection do
     @user.account_users.create! account: Account.create! { |a| a.workflow_state = 'deleted' }
   end
 
-  context "without sharding" do
+  it "returns a paginatable collection" do
+    collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts_scope) do |scope|
+      scope.active
+    end
+    expect(collection.paginate(per_page: 10).size).to equal 1
+    # only one sub-scope, so pass-through
+    expect(collection).to be_is_a ActiveRecord::Relation
+  end
+
+  context "sharding" do
+    specs_require_sharding
 
     it "returns a paginatable collection" do
+      @shard1.activate do
+        a = Account.create!
+        a.account_users.create!(user: @user)
+      end
       collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts_scope) do |scope|
         scope.active
       end
-      expect(collection.paginate(per_page: 10).size).to equal 1
+      expect(collection.paginate(per_page: 10).size).to equal 2
+      # only one sub-scope, so pass-through
       expect(collection).to be_is_a BookmarkedCollection::MergeProxy
     end
   end
