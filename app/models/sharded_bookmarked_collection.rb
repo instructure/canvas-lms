@@ -43,11 +43,19 @@ module ShardedBookmarkedCollection
     # flatten our list of pairs
     collections = []
     # get the per-shard relations
+    last_relation = nil
     relation.activate do |sharded_relation|
       sharded_relation = yield sharded_relation if block_given?
+      # if they returned nil, there was nothing pertinent on this shard anyway, so completely skip it
+      next if sharded_relation.nil?
+      last_relation = sharded_relation
       collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, sharded_relation)]
       nil
     end
+    # optimization if there ended up being none
+    return relation.none if collections.empty?
+    # optimization if there only ended up being one
+    return last_relation if collections.size == 1
     BookmarkedCollection.merge(*collections)
   end
 end
