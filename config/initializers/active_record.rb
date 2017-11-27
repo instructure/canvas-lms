@@ -394,14 +394,15 @@ class ActiveRecord::Base
       # If that extension isn't around, casting to a bytea sucks for international characters,
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
-      unless instance_variable_defined?(:@collkey)
-        @collkey = connection.extension_installed?(:pg_collkey)
+      unless @collkey&.key?(Shard.current.database_server.id)
+        @collkey ||= {}
+        @collkey[Shard.current.database_server.id] = connection.extension_installed?(:pg_collkey)
       end
-      if @collkey
+      if (schema = @collkey[Shard.current.database_server.id])
         # The collation level of 3 is the default, but is explicitly specified here and means that
         # case, accents and base characters are all taken into account when creating a collation key
         # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
-        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
+        "#{schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
       else
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
