@@ -194,9 +194,13 @@ class ApplicationController < ActionController::Base
   helper_method :rce_js_env
 
   def conditional_release_js_env(assignment = nil, includes: [])
-    return unless ConditionalRelease::Service.enabled_in_context?(@context)
+    currentContext = @context
+    if currentContext.is_a?(Group)
+      currentContext = @context.context
+    end
+    return unless ConditionalRelease::Service.enabled_in_context?(currentContext)
     cr_env = ConditionalRelease::Service.env_for(
-      @context,
+      currentContext,
       @current_user,
       session: session,
       assignment: assignment,
