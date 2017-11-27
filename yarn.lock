@@ -4514,9 +4514,9 @@ install@~0.1.7:
     shortid "^2.2.8"
     svg-to-jsx "^0.0.20"
 
-instructure-ui@3.3.1, "instructure-ui@3.3.1 - 3.4.0", instructure-ui@3.x, "instructure-ui@^2.1.0 || 3":
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-3.3.1.tgz#28351c0e6c5f8499ad51575f3a6ae5676a70dd04"
+"instructure-ui@3.3.1 - 3.4.0", instructure-ui@3.3.4, instructure-ui@3.x, "instructure-ui@^2.1.0 || 3":
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-3.3.4.tgz#6a5640f60d5cd5c0c4462c021350407a8975f556"
   dependencies:
     bowser "^1.7.0"
     classnames "^2.2.5"

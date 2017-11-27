@@ -60,7 +60,8 @@ describe "Blueprint association settings" do
     it "courses show in the 'To be Added' area", priority: "2", test_id: 3077486 do
       open_associations
       open_courses_list
-      f('.bca-table__course-row').find_element(xpath: 'td/label').click
+      row = f('.bca-table__course-row')
+      row.find_element(xpath: 'td//label').click
       expect(fj("span:contains('To be Added')")).to be
       element = f('.bca-associations-table')
       element = element.find_element(css: "form[data-course-id=\"#{@minion3.id}\"]")
