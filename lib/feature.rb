@@ -418,10 +418,10 @@ END
       development: true,
       root_opt_in: false
     },
-    'new_typography' =>
+    'responsive_layout' =>
     {
-      display_name: -> { I18n.t('New Typography') },
-      description: -> { I18n.t('This is a feature to allow product design to remove all the various font-size overrides throughout the application.') },
+      display_name: -> { I18n.t('Responsive Layout') },
+      description: -> { I18n.t('This is a feature to allow the development of a responsive layout ') },
       applies_to: 'RootAccount',
       state: 'hidden',
       development: true,

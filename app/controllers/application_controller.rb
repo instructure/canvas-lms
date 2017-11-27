@@ -32,6 +32,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  layout :application_layout
+
   attr_accessor :active_tab
   attr_reader :context
 
@@ -138,7 +140,7 @@ class ApplicationController < ActionController::Base
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         k12: k12?,
-        use_new_typography: use_new_typography?,
+        use_responsive_layout: use_responsive_layout?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -245,10 +247,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :k12?
 
-  def use_new_typography?
-    @domain_root_account && @domain_root_account.feature_enabled?(:new_typography)
+  def use_responsive_layout?
+    @domain_root_account&.feature_enabled?(:responsive_layout)
   end
-  helper_method :use_new_typography?
+  helper_method :use_responsive_layout?
+
+  def application_layout
+    use_responsive_layout? ? "ic_layout" : "application"
+  end
+  private :application_layout
 
   def grading_periods?
     !!@context.try(:grading_periods?)
@@ -2337,5 +2344,4 @@ class ApplicationController < ActionController::Base
     })
     render html: '', layout: true
   end
-
 end
