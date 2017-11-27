@@ -170,7 +170,7 @@ module Api::V1::CalendarEvent
       hash['assignment'] = assignment_json(assignment, user, session, override_dates: false, submission: options[:submission])
       hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
     end
-    hash['context_code'] = assignment.context_code
+    hash['context_code'] = Context.context_code_for(assignment)
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
     if assignment.applied_overrides.present?
