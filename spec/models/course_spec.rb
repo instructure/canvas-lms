@@ -1818,7 +1818,7 @@ describe Course, "gradebook_to_csv_in_background" do
 
       @shard1.activate do
         expect {
-          Attachment.find(@attachment_id).download_url
+          Attachment.find(@attachment_id).public_download_url
         }.not_to raise_error
       end
     end
@@ -4889,7 +4889,7 @@ describe Course, "#image" do
   it "returns the download_url for a course file if image_id is set" do
     @course.image_id = @attachment.id
     @course.save!
-    expect(@course.image).to eq @attachment.download_url
+    expect(@course.image).to eq @attachment.public_download_url
   end
 
   it "returns nil if image_id and image_url are not set" do

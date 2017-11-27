@@ -27,7 +27,7 @@ class Canvadoc < ActiveRecord::Base
   def upload(opts = {})
     return if document_id.present?
 
-    url = attachment.authenticated_url(expires_in: 7.days)
+    url = attachment.public_url(expires_in: 7.days)
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
 

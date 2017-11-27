@@ -779,6 +779,37 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def authenticated_url_for_user(user, **options)
+    authenticated_url(options.merge(user: user))
+  end
+
+  def download_url_for_user(user, ttl = url_ttl)
+    authenticated_url_for_user(user, expires_in: ttl, download: true)
+  end
+
+  def inline_url_for_user(user, ttl = url_ttl)
+    authenticated_url_for_user(user, expires_in: ttl, download: false)
+  end
+
+  def public_url(**options)
+    authenticated_url_for_user(nil, options)
+  end
+
+  def public_inline_url(ttl = url_ttl)
+    inline_url_for_user(nil, ttl)
+  end
+
+  def public_download_url(ttl = url_ttl)
+    download_url_for_user(nil, ttl)
+  end
+
+  def url_ttl
+    settings = root_account_id && Account.find_cached(root_account_id)&.settings
+    setting = settings && settings[:s3_url_ttl_seconds]
+    setting ||= Setting.get('attachment_url_ttl', 1.hour.to_s)
+    setting.to_i.seconds
+  end
+
   def stored_locally?
     # if the file exists in inst-fs, it won't be in local storage even if
     # that's what Canvas otherwise thinks it's configured for
@@ -965,19 +996,6 @@ class Attachment < ActiveRecord::Base
     h = ActionView::Base.new
     h.extend ActionView::Helpers::NumberHelper
     h.number_to_human_size(self.size) rescue "size unknown"
-  end
-
-  def download_url(ttl = url_ttl)
-    authenticated_url(expires_in: ttl, download: true)
-  end
-
-  def inline_url(ttl = url_ttl)
-    authenticated_url(expires_in: ttl, download: false)
-  end
-
-  def url_ttl
-    default = Setting.get('attachment_url_ttl', 1.hour.to_s).to_i.seconds
-    (root_account_id && Account.find_cached(root_account_id)&.settings[:s3_url_ttl_seconds]&.to_i&.seconds) || default
   end
 
   def disposition_filename

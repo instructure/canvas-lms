@@ -601,7 +601,7 @@ describe FilesController do
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'text/html')
         @file.update_attribute(:size, 1024 * 1024)
-        allow_any_instantiation_of(@file).to receive(:inline_url).and_return("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:inline_url_for_user).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -611,7 +611,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'image/jpeg')
-        allow_any_instantiation_of(@file).to receive(:inline_url).and_return("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:inline_url_for_user).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -621,7 +621,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         # it's a .doc file
-        allow_any_instantiation_of(@file).to receive(:download_url).and_return("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:download_url_for_user).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -1254,7 +1254,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_url(secure: false) })
+        expect(data).to eq({ "public_url" => @attachment.public_url(secure: false) })
       end
     end
 
@@ -1272,7 +1272,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_url(secure: false) })
+        expect(data).to eq({ "public_url" => @attachment.public_url(secure: false) })
       end
 
       it "should verify that the requested file belongs to the submission" do
@@ -1288,7 +1288,7 @@ describe FilesController do
         get "public_url", params: {:id => old_file.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => old_file.authenticated_url(secure: false) })
+        expect(data).to eq({ "public_url" => old_file.public_url(secure: false) })
       end
     end
   end

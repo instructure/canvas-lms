@@ -105,7 +105,7 @@ describe ContentExport do
     it "composes the payload with qti details" do
       Account.default.enable_feature!(:quizzes2_exporter)
       @ce.export_without_send_later
-      expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.download_url)
+      expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
     end
 
     it "completes with export_type of 'quizzes2'" do

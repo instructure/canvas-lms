@@ -213,7 +213,7 @@ class ContentExport < ActiveRecord::Base
           export_type: QUIZZES2
         )
         self.settings[:quizzes2][:qti_export] = {}
-        self.settings[:quizzes2][:qti_export][:url] = self.attachment.download_url
+        self.settings[:quizzes2][:qti_export][:url] = self.attachment.public_download_url
         self.progress = 100
         mark_exported
       end

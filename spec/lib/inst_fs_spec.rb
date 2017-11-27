@@ -70,6 +70,21 @@ describe InstFS do
         }).to raise_error(Canvas::Security::TokenExpired)
       end
     end
+
+    it "includes global user_id claim in the token if user provided" do
+      user = user_model
+      url = InstFS.authenticated_url(@attachment, user: user)
+      token = url.split(/token=/).last
+      claims = Canvas::Security.decode_jwt(token, [ @secret ])
+      expect(claims[:user_id]).to eql(user.global_id.to_s)
+    end
+
+    it "includes omits user_id claim in the token if no user provided" do
+      url = InstFS.authenticated_url(@attachment)
+      token = url.split(/token=/).last
+      claims = Canvas::Security.decode_jwt(token, [ @secret ])
+      expect(claims[:user_id]).to be_nil
+    end
   end
 
   context "authenticated_thumbnail_url" do

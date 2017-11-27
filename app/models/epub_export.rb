@@ -72,7 +72,9 @@ class EpubExport < ActiveRecord::Base
     create_job_progress(completion: 0, tag: self.class.to_s.underscore)
   end
 
-  delegate :download_url, to: :attachment, allow_nil: true
+  delegate :public_download_url, to: :attachment, allow_nil: true
+  delegate :download_url_for_user, to: :attachment, allow_nil: true
+  delegate :downloadable?, to: :attachment, allow_nil: true
   delegate :completion, :running?, to: :job_progress, allow_nil: true
 
   scope :running, -> { where(workflow_state: ['created', 'exporting', 'exported', 'generating']) }

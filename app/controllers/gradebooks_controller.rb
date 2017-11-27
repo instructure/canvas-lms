@@ -303,6 +303,7 @@ class GradebooksController < ApplicationController
                    Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
                  end
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+    last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     {
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
@@ -380,8 +381,8 @@ class GradebooksController < ApplicationController
         ),
         export_gradebook_csv_url: course_gradebook_csv_url,
         gradebook_csv_progress: @last_exported_gradebook_csv.try(:progress),
-        attachment_url: @last_exported_gradebook_csv.try(:attachment).try(:download_url),
-        attachment: @last_exported_gradebook_csv.try(:attachment),
+        attachment_url: last_exported_attachment && last_exported_attachment.download_url_for_user(@current_user),
+        attachment: last_exported_attachment,
         sis_app_url: Setting.get('sis_app_url', nil),
         sis_app_token: Setting.get('sis_app_token', nil),
         list_students_by_sortable_name_enabled: @context.list_students_by_sortable_name?,

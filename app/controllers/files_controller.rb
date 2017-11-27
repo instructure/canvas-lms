@@ -398,7 +398,7 @@ class FilesController < ApplicationController
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
     if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-      render :json  => { :public_url => @attachment.authenticated_url(:secure => request.ssl?) }
+      render :json  => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
   end
 
@@ -537,11 +537,11 @@ class FilesController < ApplicationController
           # some form.
           if @current_user &&
              (attachment.canvadocable? ||
-              (service_enabled?(:google_docs_previews) && attachment.authenticated_url))
+              GoogleDocsPreview.previewable?(@domain_root_account, attachment))
             attachment.context_module_action(@current_user, :read)
           end
-          if url = service_enabled?(:google_docs_previews) && attachment.authenticated_url
-            json[:attachment][:authenticated_url] = url
+          if GoogleDocsPreview.previewable?(@domain_root_account, attachment)
+            json[:attachment][:public_url] = GoogleDocsPreview.url_for(attachment)
           end
 
           json_include = if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)

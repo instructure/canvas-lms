@@ -105,7 +105,7 @@ module InstFS
       expires_in = options[:expires_in] || expires_in
       Canvas::Security.create_jwt({
         iat: Time.now.utc.to_i,
-        user_id: attachment.global_user_id.to_s,
+        user_id: options[:user]&.global_id&.to_s,
         resource: attachment.instfs_uuid
       }, expires_in.from_now, self.jwt_secret)
     end
