@@ -186,11 +186,7 @@ class GradeBookHistory
     end
 
     def filter_button
-      f("button[type='submit']")
-    end
-
-    def filter_button_for_aria
-      fxpath("//button[@type='submit']")
+      find_button('Filter')
     end
 
     def results_table

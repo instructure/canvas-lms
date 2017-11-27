@@ -47,7 +47,7 @@ describe "Gradebook History Page" do
       GradeBookHistory.enter_start_date('bad date')
       GradeBookHistory.enter_end_date('invalid date')
       GradeBookHistory.enter_end_date(:tab)
-      filter_button_updated=GradeBookHistory.filter_button_for_aria
+      filter_button_updated=GradeBookHistory.filter_button
       expect(element_value_for_attr(filter_button_updated,'aria-disabled')).to eq('true')
     end
   end

@@ -196,6 +196,12 @@ module CustomSeleniumActions
     raise "Attribute may not be passed correctly. Please recheck attribute passed, and its format : #{attr}"
   end
 
+  # find button with fj, and the text it contains
+  # usage example: find_button ("Save")
+  def find_button(label = "", scope = nil)
+    fj("button:contains('#{label}')", scope)
+  end
+
   def is_checked(css_selector)
     !!fj(css_selector)[:checked]
   end
