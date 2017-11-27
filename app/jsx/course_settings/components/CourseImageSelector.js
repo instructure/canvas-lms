@@ -101,7 +101,7 @@ import Spinner from 'instructure-ui/lib/components/Spinner'
                      ref="changeImage"
                      role="menuitem"
                   >
-                    {I18n.t('Change image')}
+                    {I18n.t('Choose image')}
                   </a>
                 </li>
                 <li role="presentation">

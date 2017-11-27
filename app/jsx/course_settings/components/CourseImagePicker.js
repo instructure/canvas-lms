@@ -17,13 +17,34 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!course_images'
 import _ from 'underscore'
+import Spinner from 'instructure-ui/lib/components/Spinner'
+import Grid, {GridCol, GridRow} from 'instructure-ui/lib/components/Grid'
+import Button from 'instructure-ui/lib/components/Button'
+import Heading from 'instructure-ui/lib/components/Heading'
+import IconXLine from 'instructure-icons/lib/Line/IconXLine'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
-import Spinner from 'instructure-ui/lib/components/Spinner'
 
   class CourseImagePicker extends React.Component {
+
+    static propTypes = {
+      courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      handleClose: PropTypes.func,
+      handleFileUpload: PropTypes.func,
+      handleFlickrUrlUpload: PropTypes.func,
+      uploadingImage: PropTypes.bool
+    }
+
+    static defaultProps = {
+      handleClose: () => {},
+      handleFileUpload: () => {},
+      handleFlickrUrlUpload: () => {},
+      uploadingImage: false
+    }
+
     constructor (props) {
       super(props);
 
@@ -90,20 +111,28 @@ import Spinner from 'instructure-ui/lib/components/Spinner'
             :
             null
           }
-          <div className="ic-Action-header CourseImagePicker__Header">
-            <h3 className="ic-Action-header__Heading">{I18n.t('Change Image')}</h3>
-            <div className="ic-Action-header__Secondary">
-              <button
-                className="CourseImagePicker__CloseBtn"
-                onClick={this.props.handleClose}
-                type="button"
-              >
-                <i className="icon-x" />
-                <span className="screenreader-only">
-                  {I18n.t('Close')}
-                </span>
-              </button>
-            </div>
+          <div className="CourseImagePicker__Header">
+            <Grid
+              vAlign="middle"
+              colSpacing="none">
+              <GridRow>
+                <GridCol>
+                  <Heading>{I18n.t('Choose Image')}</Heading>
+                </GridCol>
+                <GridCol width="auto">
+                  <Button
+                    variant="icon"
+                    title="Cancel"
+                    onClick={this.props.handleClose}
+                  >
+                    <span className="screenreader-only">
+                      {I18n.t('Close')}
+                    </span>
+                    <IconXLine />
+                  </Button>
+                </GridCol>
+              </GridRow>
+            </Grid>
           </div>
           <div className="CourseImagePicker__Content">
             <UploadArea
