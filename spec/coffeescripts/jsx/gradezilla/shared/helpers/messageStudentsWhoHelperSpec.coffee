@@ -20,19 +20,64 @@ define [
   'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper'
 ], (_, MessageStudentsWhoHelper) ->
 
-  QUnit.module "messageStudentsWhoHelper#options",
-    setup: ->
+  QUnit.module "messageStudentsWhoHelper#options", (hooks) ->
+    hooks.beforeEach ->
       @assignment = { id: '1', name: 'Shootbags'}
 
-  test "Includes the 'Haven't been graded' option if there are submissions", ->
-    @stub(MessageStudentsWhoHelper, 'hasSubmission').returns(true)
-    options = MessageStudentsWhoHelper.options(@assignment)
-    deepEqual options[1].text, "Haven't been graded"
+    test "Includes the 'Haven't been graded' option if there are submissions", ->
+      sinon.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(true)
+      options = MessageStudentsWhoHelper.options(@assignment)
+      deepEqual options[1].text, "Haven't been graded"
+      MessageStudentsWhoHelper.hasSubmission.restore()
 
-  test "Does not include the 'Haven't been graded' option if there are no submissions", ->
-    @stub(MessageStudentsWhoHelper, 'hasSubmission').returns(false)
-    options = MessageStudentsWhoHelper.options(@assignment)
-    deepEqual options[1].text, "Scored less than"
+    test "Does not include the 'Haven't been graded' option if there are no submissions", ->
+      sinon.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(false)
+      options = MessageStudentsWhoHelper.options(@assignment)
+      deepEqual options[1].text, "Scored less than"
+      MessageStudentsWhoHelper.hasSubmission.restore()
+
+    QUnit.module "'Haven't Submitted Yet' criteria function", (hooks) ->
+      hooks.beforeEach ->
+        assignment = { id: '1', name: 'Homework', submissionTypes: ['online_text_entry'] }
+        options = MessageStudentsWhoHelper.options(assignment)
+        option = options.find((option) => option.text == "Haven't submitted yet")
+        @hasNotSubmitted = option.criteriaFn
+
+      test "returns true if the submission has not been submitted", ->
+        submission = { excused: false, latePolicyStatus: null, submittedAt: null }
+        strictEqual(@hasNotSubmitted(submission), true)
+
+      test "returns true if the submission has not been submitted (with snake-cased key)", ->
+        submission = { excused: false, latePolicyStatus: null, submitted_at: null }
+        strictEqual(@hasNotSubmitted(submission), true)
+
+      test "returns false if the submission has been submitted", ->
+        submission = { excused: false, latePolicyStatus: null, submittedAt: new Date() }
+        strictEqual(@hasNotSubmitted(submission), false)
+
+      test "returns false if the submission has been submitted (with snake-cased key)", ->
+        submission = { excused: false, latePolicyStatus: null, submitted_at: new Date() }
+        strictEqual(@hasNotSubmitted(submission), false)
+
+      test "returns true if the submission status has been set to 'Missing'", ->
+        submission = { excused: false, latePolicyStatus: 'missing', submittedAt: null }
+        strictEqual(@hasNotSubmitted(submission), true)
+
+      test "returns false if the submission status has been set to anything other than 'Missing'", ->
+        submission = { excused: false, latePolicyStatus: 'late', submittedAt: null }
+        strictEqual(@hasNotSubmitted(submission), false)
+
+      test "returns true if the submission status has been set to 'Missing' and the student has submitted", ->
+        submission = { excused: false, latePolicyStatus: 'missing', submittedAt: new Date() }
+        strictEqual(@hasNotSubmitted(submission), true)
+
+      test "returns false if the submission is excused", ->
+        submission = { excused: true, latePolicyStatus: null, submittedAt: null }
+        strictEqual(@hasNotSubmitted(submission), false)
+
+      test "returns false if the submission is excused and the student has not submitted", ->
+        submission = { excused: true, latePolicyStatus: null, submittedAt: null }
+        strictEqual(@hasNotSubmitted(submission), false)
 
   QUnit.module "messageStudentsWhoHelper#hasSubmission"
 
@@ -181,22 +226,3 @@ define [
       "students", "context_code", "callback", "subjectCallback"]
 
     deepEqual settingsKeys, expectedKeys
-
-  QUnit.module 'messageStudentsWhoHelper#options'
-
-  test "returns a `Haven't submitted yet option` with a criteriaFn that checks submission date", ->
-    assignment = { id: '1', name: 'Shootbags', submission_types: 'arbitrary' }
-    studentWithSubmission = { submitted_at: new Date() }
-    studentWithoutSubmission = {}
-    options = MessageStudentsWhoHelper.options(assignment)
-
-    notOk(options[0].criteriaFn(studentWithSubmission))
-    ok(options[0].criteriaFn(studentWithoutSubmission))
-
-  test "returns a `Haven't submitted yet option` with a criteriaFn that checks submission date and submittedAt is camelCase", ->
-    assignment = { id: '1', name: 'Shootbags', submission_types: 'arbitrary' }
-    studentWithSubmission = { submittedAt: new Date() }
-    options = MessageStudentsWhoHelper.options(assignment)
-
-    notOk(options[0].criteriaFn(studentWithSubmission))
-

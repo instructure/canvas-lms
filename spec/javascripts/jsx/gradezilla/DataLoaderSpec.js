@@ -326,6 +326,22 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     });
   });
 
+  test('includes "late_policy_status" when requesting submissions', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      const submissionsRequest = XHRS.find(xhr => xhr.url.match('/submissions'));
+      const params = qs.parse(submissionsRequest.url.split('?')[1]);
+      ok(params.response_fields.includes('late_policy_status'));
+      resolve();
+    });
+  });
+
   test('resolves gotSubmissions when all pages of submissions have loaded', function (assert) {
     respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
     respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
