@@ -249,6 +249,7 @@
     .message-middle-column {
       flex-grow: 1;
       padding: 0 10px;
+      max-width: calc(100% - 70px); // 70px comes from the padding of the parent + the width of the siblings
     }
 
     .message-right-column {
