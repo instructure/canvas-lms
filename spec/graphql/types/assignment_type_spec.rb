@@ -73,4 +73,8 @@ describe Types::AssignmentType do
   it "can access it's parent course" do
     expect(assignment_type.course).to eq test_course
   end
+
+  it "has an assignmentGroup" do
+    expect(assignment_type.assignmentGroup).to eq assignment.assignment_group
+  end
 end

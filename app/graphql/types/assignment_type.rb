@@ -24,6 +24,12 @@ module Types
 
     field :state, !AssignmentState, property: :workflow_state
 
+    field :assignmentGroup, AssignmentGroupType, resolve: ->(assignment, _, _) {
+      Loaders::AssociationLoader.for(Assignment, :assignment_group)
+        .load(assignment)
+        .then { assignment.assignment_group }
+    }
+
     field :quiz, Types::QuizType, resolve: -> (assignment, _, _) {
       Loaders::AssociationLoader.for(Assignment, :quiz)
         .load(assignment)
