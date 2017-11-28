@@ -718,9 +718,6 @@ class DiscussionTopicsController < ApplicationController
   #   If present, the topic will become a group discussion assigned
   #   to the group.
   #
-  # @argument allow_rating [Boolean]
-  #   If true, users will be allowed to rate entries.
-  #
   # @argument only_graders_can_rate [Boolean]
   #   If true, only graders will be allowed to rate entries.
   #
