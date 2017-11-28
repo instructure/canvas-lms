@@ -92,7 +92,7 @@ describe "speed grader submissions" do
       wait_for_ajax_requests
 
       #add comment
-      f('#add_a_comment > textarea').send_keys('grader comment')
+      f('#add_a_comment textarea').send_keys('grader comment')
       submit_form('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
     end

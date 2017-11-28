@@ -1068,8 +1068,11 @@ QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
     fakeENV.setup({ RUBRIC_ASSESSMENT: {} });
 
     const fixtures = `
-      <div id="rubric_holder">
-        <button class="save_rubric_button"></button>
+      <div>
+        <div id="rubric_holder">
+          <button class="save_rubric_button"></button>
+        </div>
+        <div id="speedgrader_comment_textarea_mount_point"></div>
       </div>
     `;
 

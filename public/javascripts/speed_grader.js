@@ -20,6 +20,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Alert from 'instructure-ui/lib/components/Alert';
+import TextArea from 'instructure-ui/lib/components/TextArea';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import MGP from 'jsx/speed_grader/gradingPeriod';
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper';
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading';
@@ -60,7 +62,6 @@ import './jquery.templateData';
 import './media_comments';
 import 'compiled/jquery/mediaCommentThumbnail';
 import 'compiled/jquery.rails_flash_notifications';
-import 'jquery.elastic';
 import 'jquery-getscrollbarwidth';
 import './vendor/jquery.scrollTo';
 import './vendor/ui.selectmenu';
@@ -68,6 +69,7 @@ import './jquery.disableWhileLoading';
 import 'compiled/jquery/fixDialogButtons';
 
 const selectors = new JQuerySelectorCache();
+const SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speedgrader_comment_textarea_mount_point';
 // PRIVATE VARIABLES AND FUNCTIONS
 // all of the $ variables here are to speed up access to dom nodes,
 // so that the jquery selector does not have to be run every time.
@@ -101,7 +103,7 @@ var $window = $(window),
     $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach(),
     $add_a_comment = $('#add_a_comment'),
     $add_a_comment_submit_button = $add_a_comment.find('button:submit'),
-    $add_a_comment_textarea = $add_a_comment.find('textarea'),
+    $add_a_comment_textarea = null,
     $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach(),
     fileIndex = 1,
     $add_attachment = $('#add_attachment'),
@@ -559,9 +561,36 @@ header = {
   }
 };
 
+function unmountCommentTextArea () {
+  const node = document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT);
+  ReactDOM.unmountComponentAtNode(node);
+}
+
+function renderCommentTextArea () {
+  // unmounting is a temporary workaround for INSTUI-870 to allow
+  // for textarea minheight to be reset
+  unmountCommentTextArea();
+  function textareaRef (textarea) {
+    $add_a_comment_textarea = $(textarea);
+  }
+
+  const textAreaProps = {
+    autoGrow: true,
+    id: 'speedgrader_comment_textarea',
+    label: React.createElement(ScreenReaderContent, null, I18n.t('Add a Comment')),
+    placeholder: I18n.t('Add a Comment'),
+    resize: 'vertical',
+    textareaRef
+  };
+
+  ReactDOM.render(
+    React.createElement(TextArea, textAreaProps),
+    document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT)
+  );
+}
+
 function initCommentBox(){
-  //initialize the auto height resizing on the textarea
-  $('#add_a_comment textarea').elastic();
+  renderCommentTextArea();
 
   $(".media_comment_link").click(function(event) {
     event.preventDefault();
@@ -1057,7 +1086,6 @@ EG = {
     EG.initComments();
     header.init();
     initKeyCodes();
-
 
     $('.dismiss_alert').click(function(e){
       e.preventDefault();
@@ -2382,12 +2410,7 @@ EG = {
     }
 
     EG.showDiscussion();
-    $add_a_comment_textarea.val("");
-    // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
-    // type it the textarea after you do that.  but I put it in a setTimeout it works.  so this is a hack for webkit,
-    // but it still works in all other browsers.
-    setTimeout(function(){ $add_a_comment_textarea.trigger('keyup'); }, 0);
-
+    renderCommentTextArea();
     $add_a_comment.find(":input").prop("disabled", false);
     if (jsonData.GROUP_GRADING_MODE) {
       disableGroupCommentCheckbox();
