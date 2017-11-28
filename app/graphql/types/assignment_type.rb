@@ -22,6 +22,8 @@ module Types
       "when this assignment is due",
       property: :due_at
 
+    field :state, !AssignmentState, property: :workflow_state
+
     field :quiz, Types::QuizType, resolve: -> (assignment, _, _) {
       Loaders::AssociationLoader.for(Assignment, :quiz)
         .load(assignment)
@@ -80,5 +82,13 @@ module Types
         end
       }
     end
+  end
+
+  AssignmentState = GraphQL::EnumType.define do
+    name "AssignmentState"
+    description "States that an Assignment can be in"
+    value "unpublished"
+    value "published"
+    value "deleted"
   end
 end

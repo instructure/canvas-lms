@@ -57,6 +57,7 @@ describe Types::AssignmentType do
   it "has the same data" do
     expect(assignment_type._id).to eq assignment.id
     expect(assignment_type.name).to eq assignment_type.name
+    expect(assignment_type.state).to eq assignment.workflow_state
   end
 
   it "returns submissions from submission connection (with permissions)" do

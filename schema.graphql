@@ -19,6 +19,7 @@ type Assignment implements Node, Timestamped {
   # determines the order this assignment is displayed in in its assignment group
   position: Int
   quiz: Quiz
+  state: AssignmentState!
 
   # submissions for this assignment
   submissionsConnection(
@@ -117,6 +118,13 @@ enum AssignmentGroupState {
 input AssignmentInput {
   courseId: ID!
   name: String!
+}
+
+# States that an Assignment can be in
+enum AssignmentState {
+  deleted
+  published
+  unpublished
 }
 
 type Course implements Node, Timestamped {
