@@ -24,15 +24,26 @@ describe GradeSummaryPresenter do
       let(:course) { Course.create! }
       let(:presenter) { GradeSummaryPresenter.new(course, @user, nil) }
       let(:assignment) { assignment_model(:course => course) }
+      let(:enrollment) { course.enroll_student(@user, enrollment_state: 'active') }
 
-      before do
+      before :each do
         user_factory
-        enrollment = StudentEnrollment.create!(:course => course, :user => @user)
-        enrollment.update_attribute(:workflow_state, 'active')
-        course.update_attribute(:workflow_state, 'available')
+        enrollment
+        course.offer
       end
 
       it 'includes courses where the user is enrolled' do
+        expect(presenter.courses_with_grades).to include(course)
+      end
+
+      it "includes concluded courses" do
+        course.soft_conclude!
+        course.save
+        expect(presenter.courses_with_grades).to include(course)
+      end
+
+      it "includes courses for concluded enrollments" do
+        enrollment.conclude
         expect(presenter.courses_with_grades).to include(course)
       end
     end

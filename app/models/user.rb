@@ -1976,14 +1976,32 @@ class User < ActiveRecord::Base
     end
   end
 
+  def participating_student_current_and_concluded_course_ids
+    @participating_student_current_and_concluded_course_ids ||=
+      participating_course_ids('student_current_and_concluded') do |enrollments|
+        enrollments.current_and_concluded.not_inactive_by_date_ignoring_access
+      end
+  end
+
   def participating_student_course_ids
-    @participating_student_course_ids ||= self.shard.activate do
-      Rails.cache.fetch([self, 'participating_student_course_ids', ApplicationController.region].cache_key) do
-        self.enrollments.shard(in_region_associated_shards).where(:type => %w{StudentEnrollment StudentViewEnrollment}).
-          current.active_by_date.distinct.pluck(:course_id)
+    @participating_student_course_ids ||=
+      participating_course_ids('student') do |enrollments|
+        enrollments.current.active_by_date
+      end
+  end
+
+  def participating_course_ids(cache_qualifier)
+    self.shard.activate do
+      cache_path = [self, "participating_#{cache_qualifier}_course_ids", ApplicationController.region]
+      Rails.cache.fetch(cache_path.cache_key) do
+        enrollments = yield self.enrollments.
+          shard(in_region_associated_shards).
+          where(type: %w{StudentEnrollment StudentViewEnrollment})
+        enrollments.distinct.pluck(:course_id)
       end
     end
   end
+  private :participating_course_ids
 
   def participating_instructor_course_ids
     @participating_instructor_course_ids ||= self.shard.activate do
