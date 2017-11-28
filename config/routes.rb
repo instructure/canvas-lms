@@ -295,8 +295,7 @@ CanvasRails::Application.routes.draw do
 
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do
-      get :resource_selection
-      post :resource_selection
+      match :resource_selection, via: [:get, :post]
       get :homework_submission
       get :finished
       collection do
@@ -536,7 +535,7 @@ CanvasRails::Application.routes.draw do
 
     resources :external_tools do
       get :finished
-      get :resource_selection
+      match :resource_selection, via: [:get, :post]
       collection do
         get :retrieve
       end
@@ -610,7 +609,7 @@ CanvasRails::Application.routes.draw do
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do
       get :finished
-      get :resource_selection
+      match :resource_selection, via: [:get, :post]
       collection do
         get :retrieve
       end

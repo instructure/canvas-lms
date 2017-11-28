@@ -997,8 +997,8 @@ class SubmissionsApiController < ApplicationController
   def submission_summary
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      student_scope = @context.students_visible_to(@current_user)
-        .where("enrollments.type<>'StudentViewEnrollment'").distinct
+      student_scope = @context.students_visible_to(@current_user).
+        where("enrollments.type<>'StudentViewEnrollment'").distinct
       student_scope = @assignment.students_with_visibility(student_scope)
       student_ids = student_scope.pluck(:id)
 

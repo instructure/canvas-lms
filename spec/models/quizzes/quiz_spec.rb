@@ -429,6 +429,15 @@ describe Quizzes::Quiz do
     expect(q.assignment_id).to eql(nil)
   end
 
+  it "recomputes course scores when the quiz becomes ungraded" do
+    q = @course.quizzes.build(title: "Example Quiz", points_possible: 10, quiz_type: "assignment")
+    q.workflow_state = "available"
+    q.save
+    expect(@course).to receive(:recompute_student_scores)
+    q.quiz_type = "practice_quiz"
+    q.save
+  end
+
   it "should not create an assignment for ungraded quizzes" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "survey", :assignment_group_id => g.id)

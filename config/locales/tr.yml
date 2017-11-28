@@ -711,6 +711,12 @@ tr:
     default_account_quotas_not_updated: "Varsayılan hesap kotaları güncellenmedi"
     default_account_quotas_updated: "Varsayılan hesap kotaları güncellendi"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Etkinlik Tarihi:"
       dcr2: 
         parameters: 
           custom_reports: 
@@ -735,6 +741,29 @@ tr:
             start: 
               parameters: 
                 header: "Başlangıç:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Bitiş:"
+            start: 
+              parameters: 
+                header: "Başlangıç:"
+      submissions_detail: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Bitiş:"
+            start: 
+              parameters: 
+                header: "Başlangıç:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "Ders ÖBS Verisi(leri) (Virgülle ayrılmış liste):"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
