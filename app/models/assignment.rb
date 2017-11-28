@@ -2551,7 +2551,9 @@ class Assignment < ActiveRecord::Base
   def run_if_overrides_changed!(student_ids=nil)
     relocked_modules = []
     self.relock_modules!(relocked_modules, student_ids)
-    each_submission_type { |submission| submission.relock_modules!(relocked_modules, student_ids) if submission }
+    each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids)}
+
+    DueDateCacher.recompute(self)
 
     if only_visible_to_overrides?
       Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."

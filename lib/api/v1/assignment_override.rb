@@ -301,6 +301,7 @@ module Api::V1::AssignmentOverride
         override.changed_student_ids.merge(defunct_student_ids)
         override.assignment_override_students.
           where(:user_id => defunct_student_ids.to_a).
+          in_batches.
           delete_all
       end
     end
