@@ -2171,27 +2171,28 @@ class Course < ActiveRecord::Base
   ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}
   def section_visibilities_for(user, opts={})
     RequestCache.cache('section_visibilities_for', user, self, opts) do
-      Rails.cache.fetch(['section_visibilities_for', user, self, opts].cache_key) do
-        workflow_not = opts[:excluded_workflows] || 'deleted'
+      shard.activate do
+        Rails.cache.fetch(['section_visibilities_for', user, self, opts].cache_key) do
+          workflow_not = opts[:excluded_workflows] || 'deleted'
 
-        enrollment_rows = all_enrollments
-          .where(user: user)
-          .where.not(workflow_state: workflow_not)
-          .pluck(
-            :course_section_id,
-            :limit_privileges_to_course_section,
-            :type,
-            :associated_user_id
-          )
+          enrollment_rows = all_enrollments.
+            where(user: user).
+            where.not(workflow_state: workflow_not).
+            pluck(
+              :course_section_id,
+              :limit_privileges_to_course_section,
+              :type,
+              :associated_user_id)
 
-        enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
-          {
-            :course_section_id => section_id,
-            :limit_privileges_to_course_section => limit_privileges,
-            :type => type,
-            :associated_user_id => associated_user_id,
-            :admin => ADMIN_TYPES.include?(type)
-          }
+          enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
+            {
+              :course_section_id => section_id,
+              :limit_privileges_to_course_section => limit_privileges,
+              :type => type,
+              :associated_user_id => associated_user_id,
+              :admin => ADMIN_TYPES.include?(type)
+            }
+          end
         end
       end
     end
@@ -2421,62 +2422,62 @@ class Course < ActiveRecord::Base
       :css_class => 'grades',
       :href => :course_grades_path,
     }, {
-        :id => TAB_PEOPLE,
-        :label => t('#tabs.people', "People"),
-        :css_class => 'people',
-        :href => :course_users_path
-      }, {
-        :id => TAB_PAGES,
-        :label => t('#tabs.pages', "Pages"),
-        :css_class => 'pages',
-        :href => :course_wiki_path
-      }, {
-        :id => TAB_FILES,
-        :label => t('#tabs.files', "Files"),
-        :css_class => 'files',
-        :href => :course_files_path,
-        :icon => 'icon-folder'
-      }, {
-        :id => TAB_SYLLABUS,
-        :label => t('#tabs.syllabus', "Syllabus"),
-        :css_class => 'syllabus',
-        :href => :syllabus_course_assignments_path
-      }, {
-        :id => TAB_OUTCOMES,
-        :label => t('#tabs.outcomes', "Outcomes"),
-        :css_class => 'outcomes',
-        :href => :course_outcomes_path
-      }, {
-        :id => TAB_QUIZZES,
-        :label => t('#tabs.quizzes', "Quizzes"),
-        :css_class => 'quizzes',
-        :href => :course_quizzes_path
-      }, {
-        :id => TAB_MODULES,
-        :label => t('#tabs.modules', "Modules"),
-        :css_class => 'modules',
-        :href => :course_context_modules_path
-      }, {
-        :id => TAB_CONFERENCES,
-        :label => t('#tabs.conferences', "Conferences"),
-        :css_class => 'conferences',
-        :href => :course_conferences_path
-      }, {
-        :id => TAB_COLLABORATIONS,
-        :label => t('#tabs.collaborations', "Collaborations"),
-        :css_class => 'collaborations',
-        :href => :course_collaborations_path
-      }, {
-        :id => TAB_COLLABORATIONS_NEW,
-        :label => t('#tabs.collaborations', "Collaborations"),
-        :css_class => 'collaborations',
-        :href => :course_lti_collaborations_path
-      }, {
-        :id => TAB_SETTINGS,
-        :label => t('#tabs.settings', "Settings"),
-        :css_class => 'settings',
-        :href => :course_settings_path,
-      }]
+      :id => TAB_PEOPLE,
+      :label => t('#tabs.people', "People"),
+      :css_class => 'people',
+      :href => :course_users_path
+    }, {
+      :id => TAB_PAGES,
+      :label => t('#tabs.pages', "Pages"),
+      :css_class => 'pages',
+      :href => :course_wiki_path
+    }, {
+      :id => TAB_FILES,
+      :label => t('#tabs.files', "Files"),
+      :css_class => 'files',
+      :href => :course_files_path,
+      :icon => 'icon-folder'
+    }, {
+      :id => TAB_SYLLABUS,
+      :label => t('#tabs.syllabus', "Syllabus"),
+      :css_class => 'syllabus',
+      :href => :syllabus_course_assignments_path
+    }, {
+      :id => TAB_OUTCOMES,
+      :label => t('#tabs.outcomes', "Outcomes"),
+      :css_class => 'outcomes',
+      :href => :course_outcomes_path
+    }, {
+      :id => TAB_QUIZZES,
+      :label => t('#tabs.quizzes', "Quizzes"),
+      :css_class => 'quizzes',
+      :href => :course_quizzes_path
+    }, {
+      :id => TAB_MODULES,
+      :label => t('#tabs.modules', "Modules"),
+      :css_class => 'modules',
+      :href => :course_context_modules_path
+    }, {
+      :id => TAB_CONFERENCES,
+      :label => t('#tabs.conferences', "Conferences"),
+      :css_class => 'conferences',
+      :href => :course_conferences_path
+    }, {
+      :id => TAB_COLLABORATIONS,
+      :label => t('#tabs.collaborations', "Collaborations"),
+      :css_class => 'collaborations',
+      :href => :course_collaborations_path
+    }, {
+      :id => TAB_COLLABORATIONS_NEW,
+      :label => t('#tabs.collaborations', "Collaborations"),
+      :css_class => 'collaborations',
+      :href => :course_lti_collaborations_path
+    }, {
+      :id => TAB_SETTINGS,
+      :label => t('#tabs.settings', "Settings"),
+      :css_class => 'settings',
+      :href => :course_settings_path,
+    }]
   end
 
   def tab_hidden?(id)
