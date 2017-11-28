@@ -177,7 +177,7 @@ module SIS
               user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
               @messages << I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
             end
-            pseudo.integration_id = user_row.integration_id if user_row.integration_id
+            pseudo.integration_id = user_row.integration_id if user_row.integration_id.present?
             pseudo.account = @root_account
             pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
             if pseudo.new_record? && status_is_active
