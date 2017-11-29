@@ -281,6 +281,11 @@ $subtleBorderColor: #e5e5e5;
       input {
         box-sizing: border-box;
         height: auto;
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 1px var(--ic-link-color);
+        }
       }
       input[type="text"] {
         margin: 0;
