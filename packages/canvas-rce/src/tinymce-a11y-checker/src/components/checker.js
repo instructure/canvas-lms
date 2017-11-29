@@ -394,34 +394,34 @@ export default class Checker extends React.Component {
                       {this.renderField(f)}
                     </Container>
                   ))}
+                  <Container as="div" margin="medium 0">
+                    <Grid
+                      vAlign="middle"
+                      hAlign="space-between"
+                      colSpacing="none"
+                    >
+                      <GridRow>
+                        <GridCol>
+                          <Button onClick={this.prevError} margin="0 small 0 0">
+                            {formatMessage("Prev")}
+                          </Button>
+                          <Button onClick={this.nextError}>
+                            {formatMessage("Next")}
+                          </Button>
+                        </GridCol>
+                        <GridCol width="auto">
+                          <Button
+                            type="submit"
+                            variant="primary"
+                            disabled={!this.state.formStateValid}
+                          >
+                            {formatMessage("Apply")}
+                          </Button>
+                        </GridCol>
+                      </GridRow>
+                    </Grid>
+                  </Container>
                 </form>
-                <Container as="div" margin="medium 0">
-                  <Grid
-                    vAlign="middle"
-                    hAlign="space-between"
-                    colSpacing="none"
-                  >
-                    <GridRow>
-                      <GridCol>
-                        <Button onClick={this.prevError} margin="0 small 0 0">
-                          {formatMessage("Prev")}
-                        </Button>
-                        <Button onClick={this.nextError}>
-                          {formatMessage("Next")}
-                        </Button>
-                      </GridCol>
-                      <GridCol width="auto">
-                        <Button
-                          type="submit"
-                          variant="primary"
-                          disabled={!this.state.formStateValid}
-                        >
-                          {formatMessage("Apply")}
-                        </Button>
-                      </GridCol>
-                    </GridRow>
-                  </Grid>
-                </Container>
               </Container>
             )}
             {this.state.errors.length === 0 &&
