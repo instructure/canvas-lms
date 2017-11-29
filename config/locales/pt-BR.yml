@@ -6598,7 +6598,7 @@ pt-BR:
   due_at_5d7d2fa: "Para Ser Entregue Às"
   due_at_5e18eeac: "Prazo de Entrega Vai Até:"
   due_at_time_fa41cf6c: "Vencimento: %{time}"
-  due_by_c263dc10: "vencido em"
+  due_by_c263dc10: "vencimento:"
   due_date_5d0a953c: "Prazo de Entrega:"
   due_date_6a281fe3: "Vencimento: %{date}"
   due_date_822625d8: "Prazo de entrega"
