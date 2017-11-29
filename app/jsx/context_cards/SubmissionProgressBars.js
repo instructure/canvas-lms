@@ -99,7 +99,7 @@ import Link from 'instructure-ui/lib/components/Link'
     }
 
     render () {
-      const {submissions} = this.props
+      const submissions = this.props.submissions.filter(s => s.grade != null);
       if (submissions.length > 0) {
         return (
           <section

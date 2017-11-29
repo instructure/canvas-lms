@@ -21,8 +21,9 @@ define([
   'react-dom',
   'react-addons-test-utils',
   'jsx/context_cards/SubmissionProgressBars',
-  'instructure-ui/lib/components/Progress'
-], (React, ReactDOM, TestUtils, SubmissionProgressBars, { default: InstUIProgress }) => {
+  'instructure-ui/lib/components/Progress',
+  'enzyme'
+], (React, ReactDOM, TestUtils, SubmissionProgressBars, { default: InstUIProgress }, { shallow }) => {
 
   const user = { _id: 1 };
 
@@ -265,6 +266,28 @@ define([
         )
         const instUIProgressBars = TestUtils.scryRenderedComponentsWithType(subject, InstUIProgress)
         equal(instUIProgressBars.length, submissions.length)
+      })
+
+      test('ignores submissions with null grades', () => {
+        const submissions = [
+          {
+            id: '1',
+            score: 5,
+            grade: '5',
+            assignment: {html_url: 'asdf', points_possible: 1},
+            user: {short_name: 'bob', _id: '1'}
+          },
+          {
+            id: '2',
+            score: null,
+            grade: null,
+            assignment: {html_url: 'asdf', points_possible: 1},
+            user: {short_name: 'bob', _id: '1'}
+          }
+        ]
+
+        const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
+        equal(tray.find('Progress').length, 1)
       })
     })
   })
