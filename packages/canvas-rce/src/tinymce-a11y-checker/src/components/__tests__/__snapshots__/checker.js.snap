@@ -272,69 +272,69 @@ exports[`render matches snapshot with errors 1`] = `
               value="Text"
             />
           </Container>
-        </form>
-        <Container
-          as="div"
-          display={null}
-          margin="medium 0"
-        >
-          <Grid
-            colSpacing="none"
-            hAlign="space-between"
-            rowSpacing="medium"
-            startAt="small"
-            vAlign="middle"
-            visualDebug={false}
+          <Container
+            as="div"
+            display={null}
+            margin="medium 0"
           >
-            <GridRow>
-              <GridCol
-                textAlign="inherit"
-              >
-                <Button
-                  as="button"
-                  buttonRef={[Function]}
-                  fluidWidth={false}
-                  margin="0 small 0 0"
-                  onClick={[Function]}
-                  size="medium"
-                  type="button"
-                  variant="default"
+            <Grid
+              colSpacing="none"
+              hAlign="space-between"
+              rowSpacing="medium"
+              startAt="small"
+              vAlign="middle"
+              visualDebug={false}
+            >
+              <GridRow>
+                <GridCol
+                  textAlign="inherit"
                 >
-                  Prev
-                </Button>
-                <Button
-                  as="button"
-                  buttonRef={[Function]}
-                  fluidWidth={false}
-                  margin="0"
-                  onClick={[Function]}
-                  size="medium"
-                  type="button"
-                  variant="default"
+                  <Button
+                    as="button"
+                    buttonRef={[Function]}
+                    fluidWidth={false}
+                    margin="0 small 0 0"
+                    onClick={[Function]}
+                    size="medium"
+                    type="button"
+                    variant="default"
+                  >
+                    Prev
+                  </Button>
+                  <Button
+                    as="button"
+                    buttonRef={[Function]}
+                    fluidWidth={false}
+                    margin="0"
+                    onClick={[Function]}
+                    size="medium"
+                    type="button"
+                    variant="default"
+                  >
+                    Next
+                  </Button>
+                </GridCol>
+                <GridCol
+                  textAlign="inherit"
+                  width="auto"
                 >
-                  Next
-                </Button>
-              </GridCol>
-              <GridCol
-                textAlign="inherit"
-                width="auto"
-              >
-                <Button
-                  as="button"
-                  buttonRef={[Function]}
-                  disabled={true}
-                  fluidWidth={false}
-                  margin="0"
-                  size="medium"
-                  type="submit"
-                  variant="primary"
-                >
-                  Apply
-                </Button>
-              </GridCol>
-            </GridRow>
-          </Grid>
-        </Container>
+                  <Button
+                    as="button"
+                    buttonRef={[Function]}
+                    disabled={true}
+                    fluidWidth={false}
+                    margin="0"
+                    size="medium"
+                    type="submit"
+                    variant="primary"
+                  >
+                    Apply
+                  </Button>
+                </GridCol>
+              </GridRow>
+            </Grid>
+          </Container>
+        </form>
       </Container>
     </Container>
   </Tray>
