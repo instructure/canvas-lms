@@ -54,7 +54,14 @@ namespace :canvas do
     generate_tasks = []
     generate_tasks << 'i18n:generate_js' if build_webpack
     build_tasks = []
-    build_tasks << 'js:webpack' if build_webpack
+    if build_webpack
+      # build dev bundles even in prod mode so you can debug with ?optimized_js=0 query string 
+      # (except for on jenkins where we set JS_BUILD_NO_UGLIFY anyway so there's no need for an unminified fallback)
+      build_prod = ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
+      dont_need_dev_fallback = build_prod && ENV['JS_BUILD_NO_UGLIFY']
+      build_tasks << 'js:webpack_development' unless dont_need_dev_fallback
+      build_tasks << 'js:webpack_production' if build_prod
+    end
 
     msg = "run " + (generate_tasks + build_tasks).join(", ")
     tasks[msg] = -> {
