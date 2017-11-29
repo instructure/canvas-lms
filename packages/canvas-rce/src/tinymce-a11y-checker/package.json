@@ -1,6 +1,6 @@
 {
   "name": "tinymce-a11y-checker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An accessibility checker plugin for TinyMCE.",
   "main": "lib/en/plugin.js",
   "module": "lib/en/modules/plugin.js",
@@ -14,12 +14,7 @@
     "build": "scripts/build",
     "prepublish": "npm test && npm run build"
   },
-  "keywords": [
-    "tinymce",
-    "accessibility",
-    "plugin",
-    "a11y"
-  ],
+  "keywords": ["tinymce", "accessibility", "plugin", "a11y"],
   "author": "Brent Burgoyne",
   "license": "MIT",
   "devDependencies": {
@@ -55,11 +50,7 @@
     "wcag-element-contrast": "^1.0.1"
   },
   "jest": {
-    "setupFiles": [
-      "./jest-setup.js"
-    ],
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/enzyme-to-json/serializer"
-    ]
+    "setupFiles": ["./jest-setup.js"],
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"]
   }
 }
