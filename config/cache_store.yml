@@ -6,5 +6,3 @@ test:
 development:
   cache_store: redis_store
   force_sharding: true
-
-  

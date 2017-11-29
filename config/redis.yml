@@ -5,7 +5,7 @@
 # # then in cache_store.yml specify cache_store: redis_store without any servers
 # # listed, which will tell Canvas to use this same server list.
 #
-default:
+development:
    servers:
 #   # list of redis servers to use in the ring
 #   - redis://redis01

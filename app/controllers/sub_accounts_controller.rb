@@ -136,8 +136,6 @@ class SubAccountsController < ApplicationController
     end
     if @sub_account.save
       if params[:account][:is_root]
-        # @sub_account.parent_account_id = nil
-        # @sub_account.root_account_id = nil
         @sub_account.account_users << AccountUser.create(:account => @sub_account, :user => @current_user)
         @sub_account.save
       end

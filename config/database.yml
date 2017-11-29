@@ -39,4 +39,3 @@ sisyphus:
   pool: <%= ENV["DB_POOL"] || 5 %>
   use_qualified_names: true
   schema_search_path: "sisyphus"
-  
