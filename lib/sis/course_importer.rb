@@ -89,7 +89,10 @@ module SIS
         account = nil
         account = @root_account.all_accounts.where(sis_source_id: account_id).take if account_id.present?
         account ||= @root_account.all_accounts.where(sis_source_id: fallback_account_id).take if fallback_account_id.present?
-        course.account = account if account
+        course_account_stuck = course.stuck_sis_fields.include?(:account_id)
+        unless course_account_stuck
+          course.account = account if account
+        end
         course.account ||= @root_account
 
         update_account_associations = course.account_id_changed? || course.root_account_id_changed?
@@ -173,7 +176,7 @@ module SIS
         if course.changed?
           course.templated_courses.each do |templated_course|
             templated_course.root_account = @root_account
-            templated_course.account = course.account
+            templated_course.account = course.account if !templated_course.stuck_sis_fields.include?(:account_id) && !course_account_stuck
             templated_course.name = course.name if !templated_course.stuck_sis_fields.include?(:name) && !course_name_stuck
             templated_course.course_code = course.course_code if !templated_course.stuck_sis_fields.include?(:course_code) && !course_course_code_stuck
             templated_course.enrollment_term = course.enrollment_term if !templated_course.stuck_sis_fields.include?(:enrollment_term_id) && !course_enrollment_term_id_stuck
