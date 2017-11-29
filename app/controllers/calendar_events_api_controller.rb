@@ -271,6 +271,7 @@ class CalendarEventsApiController < ApplicationController
   before_action :require_user_or_observer, :only => [:user_index]
   before_action :require_authorization, :only => %w(index user_index)
 
+  RECURRING_EVENT_LIMIT = 200
   # @API List calendar events
   #
   # Retrieve the paginated list of calendar events or assignments for the current user
@@ -414,7 +415,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
   # @argument calendar_event[duplicate][count] [Number]
-  #   Number of times to copy/duplicate the event.
+  #   Number of times to copy/duplicate the event.  Count cannot exceed 200.
   # @argument calendar_event[duplicate][interval] [Number]
   #   Defaults to 1 if duplicate `count` is set.  The interval between the duplicated events.
   # @argument calendar_event[duplicate][frequency] [String, "daily"|"weekly"|"monthly"]
@@ -447,17 +448,17 @@ class CalendarEventsApiController < ApplicationController
       events = []
       dup_options = get_duplicate_params(params[:calendar_event])
       title = dup_options[:title]
-
       if dup_options[:count] > 0
         events += create_event_and_duplicates(dup_options)
       else
         events = [@event]
       end
 
-      if dup_options[:count] > 100
+      if dup_options[:count] > RECURRING_EVENT_LIMIT
         return render :json => {
-                        message: t("only a maximum of 100 events can be created")
-                      }, :status => :bad_request
+          message: t("only a maximum of %{limit} events can be created",
+            limit: RECURRING_EVENT_LIMIT)
+          }, :status => :bad_request
       end
 
       CalendarEvent.transaction do
