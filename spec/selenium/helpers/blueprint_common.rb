@@ -143,13 +143,13 @@ module BlueprintCourseCommon
         try += 1
         begin
           f('.bca-course-details__wrapper button').click
+          wait_for_ajaximations
           f('.bca-table__course-row')
           keep_trying = false
         rescue
           keep_trying = true
         end
       end
-      wait_for_ajaximations
     end
 
     # reutrn the <tboey> holding the list of avaiable courses
