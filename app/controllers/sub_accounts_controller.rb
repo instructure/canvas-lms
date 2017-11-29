@@ -120,7 +120,6 @@ class SubAccountsController < ApplicationController
     end
     @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
-
     @sub_account = @parent_account.sub_accounts.build(account_params)
     @sub_account.root_account = @context.root_account
     if params[:account][:sis_account_id]
@@ -136,7 +135,12 @@ class SubAccountsController < ApplicationController
       @sub_account.root_account_id = nil
     end
     if @sub_account.save
-      @sub_account.account_users << AccountUser.create(:account => @sub_account, :user => @current_user) if params[:account][:is_root]
+      if params[:account][:is_root]
+        # @sub_account.parent_account_id = nil
+        # @sub_account.root_account_id = nil
+        @sub_account.account_users << AccountUser.create(:account => @sub_account, :user => @current_user)
+        @sub_account.save
+      end
       render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors

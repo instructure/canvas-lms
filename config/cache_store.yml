@@ -1,6 +1,10 @@
 production:
   cache_store: redis_store
+  force_sharding: true
 test:
   cache_store: redis_store
 development:
   cache_store: redis_store
+  force_sharding: true
+
+  

@@ -1568,8 +1568,9 @@ class Account < ActiveRecord::Base
   private :manually_created_courses_account_from_settings
 
   def trusted_account_ids
-    return [] if !root_account? || self == Account.site_admin
-    [ Account.site_admin.id ]
+    # return [] if !root_account? || self == Account.site_admin
+    # [ Account.site_admin.id ]
+     Account.root_accounts.pluck(:id)
   end
 
   def trust_exists?

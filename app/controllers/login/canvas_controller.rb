@@ -63,7 +63,6 @@ class Login::CanvasController < ApplicationController
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session].permit(:unique_id, :password, :remember_me).to_h)
     @pseudonym_session.remote_ip = request.remote_ip
     found = @pseudonym_session.save
-
     # look for LDAP pseudonyms where we get the unique_id back from LDAP, or if we're doing JIT provisioning
     if !found && !@pseudonym_session.attempted_record
       found = @domain_root_account.authentication_providers.active.where(auth_type: 'ldap').any? do |aac|
