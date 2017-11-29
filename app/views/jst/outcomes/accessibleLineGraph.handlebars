@@ -10,7 +10,7 @@
   </tr>
   {{#each data}}
     <tr>
-      <td scope="row">{{ tTimeToString (fudge date) "medium" }}</td>
+      <td scope="row">{{ tDateToString date "medium" }}</td>
       <td>{{nf y format="outcomeScore"}}</td>
     </tr>
   {{/each}}

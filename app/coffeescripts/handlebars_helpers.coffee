@@ -161,12 +161,16 @@ define [
     # convert a date to a string, using the given i18n format in the date.formats namespace
     tDateToString : (date = '', i18n_format) ->
       return '' unless date
-      I18n.l "date.formats.#{i18n_format}", date
+      date = tz.parse(date) unless _.isDate date
+      fudged = $.fudgeDateForProfileTimezone(tz.parse(date))
+      I18n.l "date.formats.#{i18n_format}", fudged
 
     # convert a date to a time string, using the given i18n format in the time.formats namespace
     tTimeToString : (date = '', i18n_format) ->
       return '' unless date
-      I18n.l "time.formats.#{i18n_format}", date
+      date = tz.parse(date) unless _.isDate date
+      fudged = $.fudgeDateForProfileTimezone(tz.parse(date))
+      I18n.l "time.formats.#{i18n_format}", fudged
 
     tTimeHours : (date = '') ->
       if date.getMinutes() == 0 and date.getSeconds() == 0
