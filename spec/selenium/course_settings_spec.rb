@@ -144,6 +144,17 @@ describe "course settings" do
 
   describe "course items" do
 
+    def admin_cog(id)
+      f(id).find_element(:css, '.admin-links').displayed?
+      rescue Selenium::WebDriver::Error::NoSuchElementError
+        false
+    end
+
+    it 'should not show cog menu for disabling or moving on home nav item' do
+      get "/courses/#{@course.id}/settings#tab-navigation"
+      expect(admin_cog('#nav_edit_tab_id_0')).to be_falsey
+    end
+
     it "should change course details" do
       course_name = 'new course name'
       course_code = 'new course-101'

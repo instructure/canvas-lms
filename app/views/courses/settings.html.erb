@@ -606,26 +606,27 @@
               id="nav_edit_tab_id_<%= tab[:id] %>"
           >
             <%= tab[:label] %>
-            <div class="admin-links">
-              <a class="al-trigger al-trigger-gray" role="button" href="#">
-                <i class="icon-more" aria-hidden="true"></i>
-                <span class="screenreader-only">
-                  <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
-                </span>
-              </a>
-
-              <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
-                <li role="presentation">
-                  <a href="#" class="icon-x disable_nav_item_link" id="disable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Disable this item"><%= t("Disable") %></a>
-                </li>
-                <li role="presentation">
-                  <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
-                </li>
-              </ul>
-            </div>
-            <span class="disabled_message"><%= tab[:disabled_message] %></span>
+            <% if tab[:id] != Course::TAB_HOME %>
+              <div class="admin-links">
+                <a class="al-trigger al-trigger-gray" role="button" href="#">
+                  <i class="icon-settings"></i>
+                  <i class="icon-mini-arrow-down"></i>
+                  <span class="screenreader-only">
+                    <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
+                  </span>
+                </a>
+                <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                  <li role="presentation">
+                    <a href="#" class="icon-x disable_nav_item_link" id="disable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Disable this item"><%= t("Disable") %></a>
+                  </li>
+                  <li role="presentation">
+                    <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
+                  </li>
+                </ul>
+              </div>
+              <span class="disabled_message"><%= tab[:disabled_message] %></span>
+            <% end %>
           </li>
-
         <% end %>
       </ul>
 
