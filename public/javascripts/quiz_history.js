@@ -408,7 +408,7 @@ import 'compiled/behaviors/quiz_selectmenu'
       gradingForm.setInitialSnapshot(data);
     }
 
-    $(".question_holder .user_points input[type=number],.question_holder .question_neutral_comment .question_comment_text textarea").change(function() {
+    $(".question_holder .user_points .question_input,.question_holder .question_neutral_comment .question_comment_text textarea").change(function() {
       var $question = $(this).parents(".display_question");
       var questionId = $question.attr('id');
       gradingForm.updateSnapshotFor($question);
