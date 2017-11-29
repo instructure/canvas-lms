@@ -1057,6 +1057,7 @@ it:
       tab_quotas: Quote
       tab_reports: Report
       tab_settings: Impostazioni
+      transifex_message: "Partecipa alla [Canvas Translation Community](%{transifex_url})"
       turnitin_comments_help: "questi commenti verrano mostrati agli studenti durante l'invio di un compito Turnitin"
       turnitin_pledge_help: "gli studenti devono selezionare una casella confermando di accettare questo impegno"
       turnitin_settings_title: "Impostazioni Turnitin"
@@ -1150,6 +1151,9 @@ it:
         other: "%{count} batch in attesa di elaborazione."
       pending_batches_title: "Batch in sospeso"
       process_data_button: "Elabora dati"
+      select_file_instructions: |-
+          Seleziona il file zip che desideri importare.
+          Per una descrizione su come creare questi file zip, [consulta questa documentazione](%{url}).
       sis_import_crumb: "Importazione SIS"
       started_at_message: "Avviata: %{started_at}"
       title: "Importazione SIS"
@@ -1162,6 +1166,7 @@ it:
     statistics: 
       concluded_at: "concluso %{at}"
       created_at: "creato %{at}"
+      created_at_by: "creato %{at} da [%{teacher}](%{url})"
       download_csv_link: "Scarica CSV"
       file_storage_header: "Spazio di archiviazione file"
       general_numbers_title: "Numeri generali"
@@ -1681,6 +1686,8 @@ it:
     notices: 
       first_teacher: "Questo corso è ora rivendicato e sei stato registrato come suo primo insegnante."
       first_teacher_with_email: "Questo corso è ora rivendicato e sei stato registrato come suo primo insegnante. Dovresti ricevere un'email a breve per completare il processo di registrazione."
+      need_to_accept_enrollment: "Devi [accettare l'invito di iscrizione](%{url}) prima di poter partecipare completamento a questo corso."
+      need_to_accept_future_enrollment: "Devi [accettare l'invito di iscrizione](%{url}) prima di poter partecipare completamento a questo corso, che comincerà il %{date}."
       page_disabled: "La pagina è stata disattivata"
       page_disabled_for_account: "La pagina è stata disattivata per questo account"
       page_disabled_for_course: "La pagina è stata disattivata per questo corso"
@@ -2154,6 +2161,10 @@ it:
       peer_reviews_header: "Revisioni paritarie"
       reviews_per_user: "Revisioni per utente"
     points_possible_number: "I punti possibili devono essere un numero"
+    redirect_page: 
+      redirect_message: |-
+          Questa consegna era un URL. Ti stiamo reindirizzando al link URL.
+          [Fai clic qui per accedere alla consegna](%{url})
     remove_never_drop_rule: "Rimuovi regola Non rimuovere"
     remove_unsaved_never_drop_rule: "Rimuovi regola Non rimuovere non salvata"
     rules_text: 
@@ -3230,6 +3241,10 @@ it:
         update: "Aggiorna collaborazione"
       collaboration_name: "%{course_or_group_name} Collaborazione"
       descriptions: 
+        etherpad: |-
+            EtherPad è un progetto open source che consente di configurare rapidamente i documenti condivisi.  È così veloce di consentirti di visualizzare ciò che gli altri scrivono durante la digitazione. D'altra parte, gli "EtherPad" non sono protetti da password, quindi chiunque abbia un link può modificarli. EtherPad è più adatto di Documenti Google se desideri supportare l'anonimato e/o consentire alle persone senza account Google di partecipare.
+            
+            **Avviso**: assicurati di acquisire familiarità con le [norme di eliminazione di EtherPad](%{etherpad_deletion_policy_url}) per assicurare che il tuo lavoro venga preservato.
         google_docs: |-
             Documenti Google è una risorsa fantastica per collaborare a un progetto di gruppo.  È un editor di testi come Microsoft Word, ma consente a più persone di collaborare simultaneamente allo stesso file, senza dover inserire indirizzi email.
             
@@ -3245,6 +3260,23 @@ it:
     google_drive: 
       file_not_found: "File di collaborazione non trovato"
     index: 
+      description_rs: |-
+          Strumenti web online gratuiti come [Documenti Google](%{google_url}) sono una risorsa eccellente che consente agli studenti di lavorare su elaborati o progetti di gruppo, creare note condivise e così via.
+          L'insegnante *o* gli studenti possono configurare le collaborazioni di gruppo.
+      description_student: |-
+          **Cosa si intende per collaborazioni?**  Si tratta di strumenti basati sul Web per
+          lavorare insieme su un documento condiviso.  Puoi utilizzare risorse come
+          [Documenti Google](%{google_url})
+          per lavorare in modo collaborativo su attività come elaborati di gruppo o creazione di note.  Questa pagina è
+          un modo semplice per tenere traccia delle collaborazioni e per configurarle
+          senza dover inserire alcun indirizzo email.
+      description_teacher: |-
+          **Cosa si intende per collaborazioni?**  Si tratta di strumenti basati sul Web con cui molto probabilmente
+          i tuoi studenti hanno già familiarità.  Gli studenti possono utilizzare risorse come
+          [Documenti Google](%{google_url})
+          per lavorare in modo collaborativo su attività come elaborati di gruppo o creazione di note.  Questa pagina offre loro
+          (e a te ) un modo semplice per tenere traccia delle collaborazioni e per configurarle
+          senza dover inserire alcun indirizzo email.
       how_to_start_a_new_collaboration: "Per scoprire di più su un particolare tipo di collaborazione, fai clic su \"Avvia una nuova collaborazione\", quindi scegli il tipo desiderato nell'elenco a discesa."
       links: 
         new: "Avvia una nuova collaborazione"
@@ -4803,6 +4835,7 @@ it:
         edit_navigation: "Modifica esplorazione corso"
       tooltips: 
         cannot_unpublish_course: "Non puoi annullare la pubblicazione di questo corso se ci sono consegne degli studenti valutate"
+      transifex_message: "Partecipa alla [Canvas Translation Community](%{transifex_url})"
       turnitin: "questi commenti verrano mostrati agli studenti durante l'invio di un compito Turnitin"
       view_grading_scheme: "visualizza schema di valutazione"
       wiki_editing_roles_change_existing: "Cambia pagine attualmente modificabili da \"%{current_setting}\" in \"%{new_setting}\"."
@@ -5942,6 +5975,7 @@ it:
   either_the_url_or_domain_should_be_set_c29cf8c1: "Devi impostare l'URL o il dominio."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Sei un nuovo utente o i *Termini di utilizzo* sono cambiati dall'ultima volta in cui li hai accettati. Accetta i *Termini di utilizzo* e le **norme sulla privacy** prima di continuare."
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Sei un nuovo utente o i *Termini di utilizzo* sono cambiati dall'ultima volta in cui li hai accettati. Accetta i *Termini di utilizzo* prima di continuare."
+  element_option_missing_error_an_element_to_attach__be433478: "Errore opzione `elemento` mancante: Un elemento a cui allegare la TreeBrowserView deve essere specificato al momento dell'impostazione dell'opzione di rendering su 'vero' per BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: Email
@@ -6530,6 +6564,7 @@ it:
         folder_locked: "La cartella \"%{folder},\" che include questo file, è stata bloccata."
     no_preview: 
       file_previews: 
+        download_file: "Scarica *nome file*"
         no_preview_available: "Nessuna anteprima disponibile per questo file."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "I file verranno inclusi in tutte le pagine nell'applicazione desktop Canvas."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "I file verranno inclusi quando il contenuto dell'utente viene visualizzato nelle app iOS o Android per Canvas e nelle app di terze parti basate sulla nostra API."
@@ -8177,6 +8212,13 @@ it:
           send: Invia
           verify: Verifica
         details: 
+          mfa_enrollment: |-
+              L'autenticazione a più fattori aumenta la sicurezza in quanto chiede agli utenti di provare il possesso di un oggetto fisico,
+              oltre a richiedere la conoscenza della password, prima di eseguire l'accesso a Canvas. Questo può essere un dispositivo in grado di generare
+              codici di verifica o un telefono che può ricevere messaggi di testo. Puoi configurare l'app Google Authenticator per [iPhone](%{iphone_url}) o
+              [Android](%{android_url}) attraverso la scansione del codice QR riportato di seguito. Puoi configurare altri token inserendo la
+              chiave segreta **%{secret_key}**. Una volta configurata l'autenticazione a più fattori, ti consigliamo di accedere alla tua
+              pagina del profilo e stampare un set di codici di backup nel caso in cui il normale dispositivo a più fattori non sia disponibile.
           mfa_required: "Devi impostare l'autenticazione a più fattori."
           otp_on_device: "Inserisci il codice di verifica mostrato sul tuo token."
           otp_sent_to_phone: "Un codice di verifica è stato inviato al tuo telefono. Inseriscilo qui."
@@ -11043,6 +11085,7 @@ it:
       description: "BigBlueButton Supporto conferenza web"
       name: BigBlueButton
     big_blue_button_settings: 
+      description: "Devi accedere a una istanza [BigBlueButton](%{url})."
       domain_description: "**nome host** o **indirizzo ip** della tua installazione BigBlueButton (es. bigbluebutton.mycompany.com)"
       labels: 
         domain: Dominio
@@ -11123,6 +11166,10 @@ it:
     facebook: 
       description: "Accesso a Facebook"
     facebook_settings: 
+      description: |-
+          Devi creare una [nuova app su Facebook](%{facebook_url}) e abilitare l'accesso client OAuth
+          nelle Impostazioni avanzate.  Devi configurare %{callback_url} come URI di reindirizzamento OAuth valido.
+          Dopo aver salvato l'app, annota l'ID e il segreto dell'app e inseriscili qui.
       labels: 
         app_id: "ID app"
         app_secret: "Segreto app"
@@ -11134,6 +11181,9 @@ it:
         client_secret: "Segreto client"
         domain: Dominio
     google_docs_settings: 
+      description: |-
+          Devi [registrare il tuo dominio con Google](%{google_url}).
+          Annota i valori "Chiave consumer OAuth" e "Segreto consumer OAuth".
       labels: 
         api_key: "Chiave consumer OAuth"
         secret_key: "Segreto consumer OAuth"
@@ -11204,6 +11254,18 @@ it:
     kaltura_settings: 
       account_settings: "Puoi trovare questi valori nella Console di gestione Kaltura in \"Impostazioni -> Impostazioni integrazione\""
       cache_explanation: "Vuoto indica memorizzazione illimitata nella cache, 0 indica nessuna memorizzazione nella cache."
+      description: |-
+          Devi disporre di un account in [Kaltura.com](%{kaltura_url})
+          o un'istanza in self-hosting di Kaltura.
+          
+          **Nota:** una volta configurato Kaltura in Canvas,
+          devi accedere alla Console di gestione Kaltura e in "Impostazioni ->
+          Impostazioni integrazione" abilitare le notifiche server con un
+          URL di notifica di:
+          
+          %{notification_url}
+          
+          Seleziona quindi le caselle "Aggiungi voce" ed "Elimina voce" nella colonna "Inviato dal server".
       headers: 
         account_settings: "Impostazioni account"
         canvas_settings: "Impostazioni Canvas"
@@ -11269,6 +11331,10 @@ it:
     microsoft: 
       description: "Accesso Microsoft"
     microsoft_settings: 
+      description: |-
+          Devi registrare una [nuova app con Microsoft](%{ms_app_url}).
+          Devi configurare %{callback_url} come URI di reindirizzamento.
+          Dopo aver salvato l'app, annota l'ID e il segreto dell'applicazione e inseriscili qui.
       labels: 
         application_id: "ID applicazione"
         application_secret: "Segreto applicazione"
@@ -11561,6 +11627,11 @@ it:
           **Copia questo token ora**. Una volta lasciata questa pagina non sarai più in grado di
           recuperare il tuo token completo. Dovrai rigenerarlo per ottenere un nuovo
           valore.
+      generate_access_token_description: |-
+          I token di accesso consentono alle applicazioni di terze parti di accedere alle risorse
+          Canvas a tuo nome. Questi token vengono generalmente creati in modo automatico per
+          le applicazioni, se necessario, ma se [stai sviluppando un progetto nuovo o
+          limitato](%{documentation_url}) puoi generare i token da qui.
       google_drive_description: "Dopo averci autorizzati a visualizzare il tuo Google Drive, potrai inviare i tuoi compiti direttamente da Google Drive nonché creare documenti e condividerli con i membri della tua classe."
       headers: 
         application_abbrev: App
@@ -12842,6 +12913,8 @@ it:
       take_quiz_in_popup: 
         headers: 
           loading_in_lockdown: "Caricamento quiz nel browser Respondus LockDown"
+        links: 
+          return_to_quiz_page: "[Fai clic qui](%{url}) per tornare alla pagina dei quiz."
       take_quiz_right_side: 
         labels: 
           attempt_due: "Tentativo scaduto"
@@ -13779,7 +13852,7 @@ it:
     recaptcha_settings: 
       instructions: |-
           Per poter utilizzare il plug-in ReCAPTCHA, devi
-          [registrarti per un account su ReCAPTCHA] (%{url}). Assicurati di impostare il tuo
+          [registrarti per un account su ReCAPTCHA]((%{url})). Assicurati di impostare il tuo
           dominio correttamente per gestire il dominio del tuo sito.  Dopo che hai impostato un
           account, inserisci le tue chiavi pubbliche e private di seguito.
           
@@ -13855,6 +13928,7 @@ it:
       buttons: 
         accept: Accetta
         decline: Rifiuta
+      invitation_text: "Sei stato invitato a partecipare a [%{course}](%{link_to_course}) come %{enrollment_type_with_indefinite_article}"
     error_form: 
       message_failed: "Impossibile inviare il report.  Riprova."
       message_sent: "Grazie per il tuo aiuto.  Ci attiveremo immediatamente per trovare una soluzione."
@@ -16446,10 +16520,18 @@ it:
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Ti è stato inviato un promemoria per valutare %{rubric}, %{context}."
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Sarai reindirizzato a una pagina di accesso in cui dovrai accedere con le credenziali dell'elemento secondario."
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Sarai reindirizzato al registro dei voti durante il caricamento del tuo file. Se hai un file CSV di grandi dimensioni, l'aggiornamento delle tue modifiche potrebbe richiedere alcuni minuti. Per evitare di sovrascrivere i dati, conferma che il caricamento è stato completato e che il registro dei voti è corretto prima di apportare modifiche aggiuntive."
+  you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
+      Devi creare una [nuova app su Facebook](%{facebook_url}) e abilitare l'accesso client OAuth
+      nelle Impostazioni avanzate.  Devi configurare %{callback_url} come URI di reindirizzamento OAuth valido.
+      Dopo aver salvato l'app, annota l'ID e il segreto dell'app e inseriscili qui.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Devi creare un'applicazione web nella [Google Developer Console](%{google_url}).
       Devi aggiungere %{callback_url} come URI di reindirizzamento.
       Dopo aver creato la tua app, annota l'ID client e il segreto client, quindi inseriscili qui.
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      Devi registrare una [nuova app con Microsoft](%{ms_app_url}).
+      Devi configurare %{callback_url} come URI di reindirizzamento.
+      Dopo aver salvato l'app, annota l'ID e il segreto dell'applicazione e inseriscili qui.
   you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
       Devi [registrare un'applicazione su Clever](%{clever_url}).
       Devi configurare %{callback_url} come URL di reindirizzamento.
