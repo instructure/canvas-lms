@@ -10,7 +10,7 @@ development:
   prepared_statements: false
   pool: <%= ENV["DB_POOL"] || 5 %>
   use_qualified_names: true
-  schema_search_path: "sisyphus,public"
+  schema_search_path: "courseware,public"
   
 production:
   adapter: postgresql
@@ -24,7 +24,7 @@ production:
   prepared_statements: false
   pool: <%= ENV["DB_POOL"] || 5 %>
   use_qualified_names: true
-  schema_search_path: "sisyphus,public"
+  schema_search_path: "courseware,public"
   
 sisyphus:
   adapter: postgresql
@@ -38,4 +38,4 @@ sisyphus:
   prepared_statements: false
   pool: <%= ENV["DB_POOL"] || 5 %>
   use_qualified_names: true
-  schema_search_path: "sisyphus,public"
+  schema_search_path: "courseware,public"
