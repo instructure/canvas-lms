@@ -122,8 +122,9 @@ class SubAccountsController < ApplicationController
     @sub_account = @parent_account.sub_accounts.build(account_params)
     @sub_account.root_account = @context.root_account
     #Only users in the root_account of the default shard (StrongMind master account) can create Tenants
-    if (!@current_user.account.id == 1 || !@current_user.shard.default?) && @current_user.roles(Account.first).include? "admin"
+    if (!@current_user.account.id == 1 || !@current_user.shard.default?) && @current_user.roles(Account.first).include?("admin")
       return render json: { message: I18n.t("user not authorized to manage create tenant. #{@current_user}") }, status: 401
+    end
     if params[:account][:sis_account_id]
       can_manage_sis = @account.grants_right?(@current_user, :manage_sis)
       if can_manage_sis
