@@ -76,20 +76,45 @@ describe Types::CourseType do
       ).to eq [@student2a1_submission]
     end
 
-    it "takes sorting criteria" do
-      expect(
-        course_type.submissionsConnection(
-          current_user: @teacher,
-          args: {
-            studentIds: [@student1.id.to_s, @student2.id.to_s],
-            orderBy: [{field: "graded_at", direction: "desc"}],
-          }
-        )
-      ).to eq [
-        @student1a2_submission,
-        @student2a1_submission,
-        @student1a1_submission,
-      ]
+    context "sorting criteria" do
+      it "takes sorting criteria" do
+        expect(
+          course_type.submissionsConnection(
+            current_user: @teacher,
+            args: {
+              studentIds: [@student1.id.to_s, @student2.id.to_s],
+              orderBy: [{field: "graded_at", direction: "desc"}],
+            }
+          )
+        ).to eq [
+          @student1a2_submission,
+          @student2a1_submission,
+          @student1a1_submission,
+        ]
+      end
+
+      it "sorts null last" do
+        @student2a1_submission.update_attribute :graded_at, nil
+
+        # the code that turns enums->values runs at the schema- (not type-)
+        # level doing it by hand here
+        direction = Types::SubmissionOrderInputType.arguments["direction"].
+          type.values["descending"].value
+
+        expect(
+          course_type.submissionsConnection(
+            current_user: @teacher,
+            args: {
+              studentIds: [@student1.id.to_s, @student2.id.to_s],
+              orderBy: [{field: "graded_at", direction: direction}],
+            }
+          )
+        ).to eq [
+          @student1a2_submission,
+          @student1a1_submission,
+          @student2a1_submission,
+        ]
+      end
     end
   end
 

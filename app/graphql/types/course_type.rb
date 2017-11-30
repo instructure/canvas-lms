@@ -77,7 +77,7 @@ module Types
         ).where.not(workflow_state: "unsubmitted")
 
         (args[:orderBy] || []).each { |order|
-          submissions = submissions.order(order[:field] => order[:direction])
+          submissions = submissions.order("#{order[:field]} #{order[:direction]}")
         }
 
         submissions
@@ -105,7 +105,7 @@ module Types
     argument :direction, GraphQL::EnumType.define {
       name "OrderDirection"
       value "ascending", value: "ASC"
-      value "descending", value: "DESC"
+      value "descending", value: "DESC NULLS LAST"
     }
   end
 
