@@ -480,6 +480,15 @@ returns the current course's term start date.
 ```
 YYY-MM-DD HH:MM:SS -0700
 ```
+## Canvas.term.name
+returns the current course's term name.
+
+**Availability**: **  
+**Launch Parameter**: *canvas_term_name*  
+
+```
+W1 2017
+```
 ## CourseSection.sourcedId
 returns the current course sis source id
 to return the section source id use Canvas.course.sectionIds.

@@ -74,6 +74,7 @@ module Lti
     let(:valid_enabled_caps){ %w(ToolConsumerInstance.guid Membership.role CourseSection.sourcedId) }
     let(:supported_capabilities){
       %w(ToolConsumerInstance.guid
+         Canvas.term.name
          CourseSection.sourcedId
          Membership.role
          Person.email.primary

@@ -753,6 +753,27 @@ module Lti
           expect(exp_hash[:test]).to eq '2015-05-21 17:01:36'
         end
 
+        it 'has a functioning guard for $Canvas.term.name when term.name is not set' do
+          term = course.enrollment_term
+          exp_hash = {test: '$Canvas.term.name'}
+          variable_expander.expand_variables!(exp_hash)
+
+          unless term && term.name
+            expect(exp_hash[:test]).to eq '$Canvas.term.name'
+          end
+        end
+
+        it 'has substitution for $Canvas.term.name when term.name is set' do
+          course.enrollment_term ||= EnrollmentTerm.new
+          term = course.enrollment_term
+
+          term.name = 'W1 2017'
+          term.save
+          exp_hash = {test: '$Canvas.term.name'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'W1 2017'
+        end
+
         it 'has substitution for $Canvas.externalTool.url' do
           course.save!
           tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
