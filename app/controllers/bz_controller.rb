@@ -372,6 +372,36 @@ class BzController < ApplicationController
     end
   end
 
+  def magic_field_dump
+    access_token = AccessToken.authenticate(params[:access_token])
+    if access_token.nil?
+      render :json => "Access denied"
+      return
+    end
+
+    requesting_user = access_token.user
+    # we should prolly allow designer accounts to access too, but
+    # for now i just want to use the admin access token for myself
+    if requesting_user.id != 1
+      render :json => "Not admin"
+      return
+    end
+
+    result = RetainedData.where("updated_at > to_timestamp(?)", params[:since])
+    data = []
+    result.all.each do |res|
+      obj = {}
+      obj["created_at"] = res.created_at
+      obj["updated_at"] = res.updated_at
+      obj["name"] = res.name
+      obj["value"] = res.value
+      obj["path"] = res.path
+      obj["user_id"] = res.user_id
+      data << obj
+    end
+    render :json => data
+  end
+
   def user_retained_data
     Rails.logger.debug("### user_retained_data - all params = #{params.inspect}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
