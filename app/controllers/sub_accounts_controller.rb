@@ -121,6 +121,8 @@ class SubAccountsController < ApplicationController
     @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
     @sub_account = @parent_account.sub_accounts.build(account_params)
+    return render_json_unauthorized unless @current_user.account_users.exists?(:account_id => 1, :role_id => 1)
+    
     @sub_account.root_account = @context.root_account
     if params[:account][:sis_account_id]
       can_manage_sis = @account.grants_right?(@current_user, :manage_sis)
