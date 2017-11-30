@@ -143,6 +143,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(DelayedMessageScrubber, :scrub)
   end
 
+  Delayed::Periodic.cron 'ConversationBatchScrubber.scrub_all', '0 2 * * *' do
+    with_each_shard_by_database(ConversationBatchScrubber, :scrub)
+  end
+
   Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
     DatabaseServer.send_in_each_region(
       BounceNotificationProcessor,
