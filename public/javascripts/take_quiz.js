@@ -406,20 +406,15 @@ import 'compiled/behaviors/quiz_selectmenu'
 
         data.leaving = !!quizSubmission.clearAccessCode;
 
-        if(navigator.sendBeacon){
-          var blob = new Blob([JSON.stringify(data)], {type : 'application/json; charset=utf-8'});
-          navigator.sendBeacon(url, blob);
-        }
-        else {
-            $.flashMessage(I18n.t('Saving...'));
-            $.ajax({
-              url: url,
-              data: data,
-              type: 'POST',
-              dataType: 'json',
-              async: false
-            });
-        }
+        $.flashMessage(I18n.t('Saving...'));
+        $.ajax({
+          url,
+          data,
+          type: 'POST',
+          dataType: 'json',
+          async: false
+        });
+
         // since this is sync, a callback never fires to reset this
         quizSubmission.currentlyBackingUp = false;
       },
