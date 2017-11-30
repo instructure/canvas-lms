@@ -88,12 +88,15 @@ describe "student planner" do
       validate_pill('Feedback')
     end
 
-    it "shows missing tag for assignments with missing submissions", priority: "1", test_id: 3263153 do
-      skip('WIP: scrolling fails intermittently')
+    it "shows missing tag for an assignment with missing submissions", priority: "1", test_id: 3263153 do
       @assignment.due_at = Time.zone.now - 2.days
       @assignment.save!
       go_to_list_view
-      scroll_to(f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Unnamed Course Assignment')]]"))
+      force_click("button:contains('Load prior')")
+      planner = f('.PlannerApp')
+      expect(planner).to be_displayed
+      assn_element = fxpath("//span[text()[contains(.,'Unnamed Course Assignment')]]", planner)
+      expect(assn_element).to be_displayed
       validate_pill('Missing')
     end
 
@@ -371,7 +374,7 @@ describe "student planner" do
       quiz.generate_quiz_data
       quiz.due_at = Time.zone.now + 2.days
       quiz.save!
-      Array.new(12){|n|n}.each do |i|
+      Array.new(12){|n| n}.each do |i|
         @course.wiki_pages.create!(title: "Page#{i}", todo_date: Time.zone.now + (i-4).days)
         @course.assignments.create!(name: "assignment#{i}",
                                               due_at: Time.zone.now.advance(days:(i-4)))
@@ -381,22 +384,22 @@ describe "student planner" do
       end
     end
 
-    it "loads more items at the bottom of the page", priority: "1", test_id: 3263149 do
-      skip('functionality has changed need to rework ADMIN-276')
+    it "loads future items at the bottom of the page", priority: "1", test_id: 3263149 do
       go_to_list_view
-      current_last_item = items_displayed.last
       current_items = items_displayed.count
-      scroll_to(current_last_item)
+      driver.execute_script("window.scrollTo(0,  document.documentElement.scrollHeight);")
       wait_for_spinner
       expect(items_displayed.count).to be > current_items
     end
   end
 
-  it "completes and collapses item", priority: "1", test_id: 3263155 do
+  it "completes and collapses an item", priority: "1", test_id: 3263155 do
+    skip("often times out in jenkins. Ticket ADMIN-618 exists to fix this.")
     @course.assignments.create!(name: 'assignment 1',
                                 due_at: Time.zone.now + 2.days)
     go_to_list_view
-    force_click('input[id*=Checkbox]')
+    f('label[for*=Checkbox]').click
+    wait_for_ajaximations # wait for the resulting api call to complete
     refresh_page
     wait_for_planner_load
     expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')

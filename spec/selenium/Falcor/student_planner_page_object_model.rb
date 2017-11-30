@@ -73,13 +73,14 @@ module PlannerPageObject
   end
 
   def go_to_list_view
+    @student1.preferences[:dashboard_view] = "planner"
+    @student1.save!
     get '/'
-    click_dashboard_settings
-    select_list_view
     wait_for_planner_load
   end
 
-  def validate_link_to_url(object, url_type) # should pass the type of object as a string
+  # should pass the type of object as a string
+  def validate_link_to_url(object, url_type)
     navigate_to_course_object(object)
     validate_url(url_type, object)
   end
