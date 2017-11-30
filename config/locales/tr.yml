@@ -5646,10 +5646,10 @@ tr:
       - Ekim
       - Kasım
       - Aralık
-  date_created_87e265bc: "Tarih Oluşturuldu"
+  date_created_87e265bc: "Oluşturulma Tarihi"
   date_ee500367: Tarih
   date_error_7b38f8ff: "Tarih Hatası"
-  date_modified_e1c8ac8f: "Tarih Değiştirildi"
+  date_modified_e1c8ac8f: "Değiştirilme Tarihi"
   date_of_most_recent_bounce_b23d0119: "En yakın sıçrama tarihi"
   datepicker: 
     errors: 
@@ -13754,7 +13754,7 @@ tr:
     confirm_delete_with_contents: 
       one: "%{name}'i silmek istediğinize emin misiniz? Bu, boş değil bu yüzden içindeki herşey silinecek."
       other: "%{count} öğeyi ve içindekileri silmek istediğinize emin misiniz?"
-    created_at: "Tarih Oluşturuldu"
+    created_at: "Oluşturulma Tarihi"
     created_at_short: Oluşturuldu
     delete: Sil
     download: İndir
@@ -13774,7 +13774,7 @@ tr:
     folder_browsing_tree: "Dizin Görüntüleme Ağacı"
     folder_name: "Dizin İsmi"
     loading_more_results: "Daha fazla sonuç yükleniyor..."
-    modified_by: "Tarafından Değiştirildi"
+    modified_by: Değiştiren
     move: Taşı
     move_question: 
       one: "%{item}'i nereye taşımak istersiniz?"
@@ -13790,11 +13790,11 @@ tr:
     search_for_files: "Dosyaları ara"
     search_results_for: "\"%{search_term}\" için arama sonuçları"
     select_all: "Tümünü Seç"
-    size: Büyüklük
+    size: Boyut
     sorted_ascending: "Artan Sırala"
     sorted_desending: "Azalan Sırala"
     this_folder_is_empty: "Bu klasör boş"
-    updated_at: "Tarih Değiştirildi"
+    updated_at: "Değiştirilme Tarihi"
     updated_at_short: Değiştirildi
     view: Göster
   recaptcha_not_configured_3a6ef9ee: "Recaptcha yapılandırılmadı"
@@ -15186,7 +15186,7 @@ tr:
     users: 
       user_search_label: "Kullanıcı Arama"
       users_matching_label: "Eşleşen Kullanıcılar"
-  size_b30e1077: Büyüklük
+  size_b30e1077: Boyut
   skip_to_content_22ad1d00: "İçeriğe Atla"
   skipping_unknown_file_type_cd1086ee: "Bilinmeyen dosya türü atlanıyor"
   skype_18850ba7: Skype
