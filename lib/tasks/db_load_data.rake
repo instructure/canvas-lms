@@ -233,7 +233,7 @@ namespace :db do
     puts "\nInitial data loaded"
 
   end # Task: load_initial_data
-
+    
   desc "Useful initial setup task"
   task :initial_setup => [:generate_security_key] do
     Rake::Task['db:migrate:predeploy'].invoke
