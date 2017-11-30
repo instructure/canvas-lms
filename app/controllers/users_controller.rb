@@ -2469,7 +2469,7 @@ class UsersController < ApplicationController
         @pseudonym.send(:skip_session_maintenance=, true)
       end
       @user.save!
-      @user.account.account_users << AccountUser.create(:account => @user.account, :user => @user, :role => Role.find_by_base_role_type(params[:role]) || nil )
+      @user.account.account_users << AccountUser.create(:account => @user.account, :user => @user, :role => Role.find_by_base_role_type(params[:role]) || Role.find_by_base_role_type("StudentEnrollment") )
       if @observee && !@user.user_observees.where(user_id: @observee).exists?
         @user.user_observees << @user.user_observees.create_or_restore(user_id: @observee)
       end
