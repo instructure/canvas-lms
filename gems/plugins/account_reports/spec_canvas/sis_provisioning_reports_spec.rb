@@ -98,20 +98,24 @@ describe "Default Account Reports" do
   def create_some_group_categories()
     create_some_courses
     @group_category1 = GroupCategory.create(
-      :name => 'Test Group Category'
+      name: 'Test Group Category',
+      account: @account,
     )
     @group_category2 = GroupCategory.create(
-      :name => 'Test Group Category2'
+      name: 'Test Group Category2',
+      account: @account,
     )
     @group_category1.save!
     @group_category2.auto_leader = 'first'
     @group_category2.group_limit = 2
     @group_category2.save!
     @group_category3 = GroupCategory.create(
-      :name => 'Test Group Category Deleted'
+      name: 'Test Group Category Deleted',
+      course: @course,
     )
     @group_category4 = GroupCategory.create(
-      :name => 'Test Group Category Course'
+      name: 'Test Group Category Course',
+      course: @course,
     )
     @account.group_categories << @group_category1
     @account.group_categories << @group_category2

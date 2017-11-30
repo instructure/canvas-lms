@@ -34,10 +34,11 @@ describe AppointmentGroup do
     end
 
     it "should ensure the group category matches the course" do
+      other_course = Course.create!(name: 'Other')
       expect(AppointmentGroup.new(
         :title => "test",
         :contexts => [@course],
-        :sub_context_codes => [GroupCategory.create(name: "foo").asset_string]
+        :sub_context_codes => [GroupCategory.create(name: "foo", course: other_course).asset_string]
       )).not_to be_valid
     end
 
