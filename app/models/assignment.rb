@@ -88,11 +88,14 @@ class Assignment < ActiveRecord::Base
       if self.rubric != master.rubric
         self.rubric_association.destroy if self.rubric_association
         if master.rubric_association
-          rubric_association_clone_of_master = master.rubric_association.clone
-          rubric_association_clone_of_master.context_id = self.context_id
-          rubric_association_clone_of_master.context_code = self.context_code
-          self.rubric_association = rubric_association_clone_of_master
-          self.rubric_association.save
+          if self.id # Can't run on before create b/c there is no id for this assignment yet to associate with the rubric
+            rubric_association_clone_of_master = master.rubric_association.clone
+            rubric_association_clone_of_master.context_id = self.context_id
+            rubric_association_clone_of_master.context_code = self.context_code
+            rubric_association_clone_of_master.association_id = self.id
+            self.rubric_association = rubric_association_clone_of_master
+            self.rubric_association.save
+          end
         end
       end
     end
