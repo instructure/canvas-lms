@@ -116,7 +116,8 @@ module Importers
       item.save_without_broadcasting!
 
       rubric = nil
-      rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
+      rubric = Rubric.where(context_id: 1, context_type: "Course", id: hash[:rubric_id]).first if item.clone_of_id
+      rubric ||= context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
       rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
       if rubric
         assoc = rubric.associate_with(item, context, :purpose => 'grading')
