@@ -656,6 +656,15 @@ class CoursesController < ApplicationController
   #
   # @argument enroll_me [Boolean]
   #   Set to true to enroll the current user as the teacher.
+   #
+  # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
+  #   The type of page that users will see when they first visit the course
+  #   * 'feed' Recent Activity Dashboard
+  #   * 'wiki' Wiki Front Page
+  #   * 'modules' Course Modules/Sections Page
+  #   * 'assignments' Course Assignments List
+  #   * 'syllabus' Course Syllabus Page
+  #   other types may be added in the future
   #
   # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
@@ -2153,6 +2162,15 @@ class CoursesController < ApplicationController
   #   * 'undelete' attempts to recover a course that has been deleted. (Recovery is not guaranteed; please conclude
   #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
   #     will be unpublished. Deleted enrollments will not be recovered.
+  #
+  # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
+  #   The type of page that users will see when they first visit the course
+  #   * 'feed' Recent Activity Dashboard
+  #   * 'wiki' Wiki Front Page
+  #   * 'modules' Course Modules/Sections Page
+  #   * 'assignments' Course Assignments List
+  #   * 'syllabus' Course Syllabus Page
+  #   other types may be added in the future
   #
   # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
