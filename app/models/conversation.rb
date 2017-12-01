@@ -120,6 +120,10 @@ class Conversation < ActiveRecord::Base
     Setting.get("max_group_conversation_size", 100).to_i
   end
 
+  def can_add_participants?(users)
+    (users.map(&:id) + conversation_participants.pluck(:user_id)).uniq.count <= self.class.max_group_conversation_size
+  end
+
   def add_participants(current_user, users, options={})
     message = nil
     self.shard.activate do
