@@ -33,20 +33,29 @@ module ShardedBookmarkedCollection
   #     scope.active
   #   end
   #
-  def self.build(bookmarker, association)
-    # not the result of association.with_each_shard because we don't want it to
+  def self.build(bookmarker, relation)
+    # automatically make associations multi-shard, since that's definitely what you want if you're
+    # using this
+    if (owner = (relation.respond_to?(:proxy_association) && relation.proxy_association&.owner))
+      relation = relation.shard(owner)
+    end
+    # not the result of relation.activate because we don't want it to
     # flatten our list of pairs
     collections = []
-    association = association.scope unless association.is_a?(ActiveRecord::Relation)
-    if association.is_a?(ActiveRecord::Relation) && association.shard_category != :explicit &&
-        owner = (association.respond_to?(:proxy_association) && association.proxy_association.try(:owner))
-      association = association.shard(owner)
-    end
-    association.activate do |sharded_association|
-      sharded_association = yield sharded_association if block_given?
-      collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, sharded_association)]
+    # get the per-shard relations
+    last_relation = nil
+    relation.activate do |sharded_relation|
+      sharded_relation = yield sharded_relation if block_given?
+      # if they returned nil, there was nothing pertinent on this shard anyway, so completely skip it
+      next if sharded_relation.nil?
+      last_relation = sharded_relation
+      collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, sharded_relation)]
       nil
     end
+    # optimization if there ended up being none
+    return relation.none if collections.empty?
+    # optimization if there only ended up being one
+    return last_relation if collections.size == 1
     BookmarkedCollection.merge(*collections)
   end
 end

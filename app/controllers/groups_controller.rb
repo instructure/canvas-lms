@@ -219,7 +219,7 @@ class GroupsController < ApplicationController
       end
 
       format.json do
-        @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope) do |scope|
+        @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope.order(:name, :id)) do |scope|
           scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
           scope.preload(:group_category, :context)
         end
