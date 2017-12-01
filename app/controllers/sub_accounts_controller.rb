@@ -119,10 +119,12 @@ class SubAccountsController < ApplicationController
       parent_id = params[:account_id]
     end
     @parent_account = subaccount_or_self(parent_id)
-    return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
-
     @sub_account = @parent_account.sub_accounts.build(account_params)
     @sub_account.root_account = @context.root_account
+    #Only users in the root_account of the default shard (StrongMind master account) can create Tenants
+    if (!@current_user.account.id == 1 || !@current_user.shard.default?) && @current_user.roles(Account.first).include?("admin")
+      return render json: { message: I18n.t("user not authorized to manage create tenant. #{@current_user}") }, status: 401
+    end
     if params[:account][:sis_account_id]
       can_manage_sis = @account.grants_right?(@current_user, :manage_sis)
       if can_manage_sis
@@ -131,7 +133,15 @@ class SubAccountsController < ApplicationController
         return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: 401
       end
     end
+    if params[:account][:is_root]
+      @sub_account.parent_account_id = nil
+      @sub_account.root_account_id = nil
+    end
     if @sub_account.save
+      if params[:account][:is_root]
+        @sub_account.account_users << AccountUser.create(:account => @sub_account, :user => @current_user)
+        @sub_account.save
+      end
       render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors

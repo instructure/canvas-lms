@@ -19,3 +19,7 @@ production:
 default:
   workers:
   - queue: canvas_queue
+    workers: 2
+    max_priority: 10
+  - queue: canvas_queue
+    workers: 4
