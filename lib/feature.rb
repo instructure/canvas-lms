@@ -108,6 +108,14 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
+    'section_specific_announcements' =>
+    {
+      display_name: -> { I18n.t('Section Specific Announcements') },
+      description: -> { I18n.t('Allows creating announcements for a specific section') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
+    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
