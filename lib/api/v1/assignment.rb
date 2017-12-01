@@ -818,7 +818,8 @@ module Api::V1::Assignment
   def plagiarism_capable?(assignment_params)
     assignment_params['submission_type'] == 'online' &&
       assignment_params['submission_types'].present? &&
-      assignment_params['submission_types'].include?('online_upload')
+      (assignment_params['submission_types'].include?('online_upload') ||
+      assignment_params['submission_types'].include?('online_text_entry'))
   end
 
   def submissions_download_url(context, assignment)
