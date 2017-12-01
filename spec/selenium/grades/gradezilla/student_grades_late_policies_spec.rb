@@ -37,11 +37,8 @@ describe 'Late Policy statuses:' do
     end
 
     before(:each) do
-      ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     context 'with new gradebook disabled' do
       before(:once) do

@@ -715,14 +715,12 @@ class GradebooksController < ApplicationController
   private
 
   def new_gradebook_env
-    graded_late_or_missing_submissions_exist =
-      new_gradebook_development_enabled? &&
-      (@context.submissions.graded.late.exists? || @context.submissions.graded.missing.exists?)
+    graded_late_submissions_exist = @context.submissions.graded.late.exists?
 
     {
       GRADEBOOK_OPTIONS: {
         colors: gradebook_settings.fetch(:colors, {}),
-        graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
+        graded_late_submissions_exist: graded_late_submissions_exist,
         grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
         gradezilla: true,
         new_gradebook_development_enabled: new_gradebook_development_enabled?,

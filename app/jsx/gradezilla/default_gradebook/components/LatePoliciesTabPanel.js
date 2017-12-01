@@ -19,7 +19,6 @@
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
 import Alert from 'instructure-ui/lib/components/Alert';
-import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import Container from 'instructure-ui/lib/components/Container';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import NumberInput from 'instructure-ui/lib/components/NumberInput';
@@ -109,7 +108,6 @@ class LatePoliciesTabPanel extends React.Component {
     }).isRequired,
     changeLatePolicy: func.isRequired,
     locale: string.isRequired,
-    showContentComingSoon: bool.isRequired,
     showAlert: bool.isRequired
   };
 
@@ -205,14 +203,6 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   render () {
-    if (this.props.showContentComingSoon) {
-      return (
-        <div id="LatePoliciesTabPanel__Container-noContent">
-          <ComingSoonContent />
-        </div>
-      );
-    }
-
     if (!this.props.latePolicy.data) {
       return (
         <div id="LatePoliciesTabPanel__Container-noContent">
@@ -225,17 +215,6 @@ class LatePoliciesTabPanel extends React.Component {
     const numberInputWidth = "5.5rem";
     return (
       <div id="LatePoliciesTabPanel__Container">
-        {this.state.showAlert &&
-          <Alert
-            variant="warning"
-            closeButtonLabel={I18n.t('Close')}
-            onDismiss={this.closeAlert}
-            margin="small"
-          >
-            {I18n.t('Changing your policy now will affect previously graded submissions.')}
-          </Alert>
-        }
-
         <Container as="div" margin="small">
           <Checkbox
             label={I18n.t('Automatically apply grade for missing submissions')}
@@ -285,6 +264,17 @@ class LatePoliciesTabPanel extends React.Component {
         </FormFieldGroup>
 
         <PresentationContent><hr /></PresentationContent>
+
+        {this.state.showAlert &&
+          <Alert
+            variant="warning"
+            closeButtonLabel={I18n.t('Close')}
+            onDismiss={this.closeAlert}
+            margin="small"
+          >
+            {I18n.t('Changing the late policy will affect previously graded submissions.')}
+          </Alert>
+        }
 
         <Container as="div" margin="small">
           <Checkbox

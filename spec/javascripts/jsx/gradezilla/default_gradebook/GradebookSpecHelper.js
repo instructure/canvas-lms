@@ -31,7 +31,7 @@ export function createGradebook (options = {}) {
     gradebook_column_order_settings_url: 'http://example.com/gradebook_column_order_settings_url',
     gradebook_import_url: 'http://example.com/import',
     gradebook_is_editable: true,
-    graded_late_or_missing_submissions_exist: false,
+    graded_late_submissions_exist: false,
     grading_schemes: [
       { id: '2801', data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]], title: 'Emoji Grades' }
     ],
