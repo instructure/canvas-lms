@@ -158,7 +158,7 @@ describe "assignment rubrics" do
       full_rubric_button = f('.toggle_full_rubric')
       expect(full_rubric_button).to be_displayed
       full_rubric_button.click
-      fj('#rubric_holder .criterion:visible .rating').click
+      set_value(fj('#rubric_holder .criterion:visible .criterion_points'), '2.5')
       f('#rubric_holder .save_rubric_button').click
 
       expect(f('#rubric_summary_container .rubric_total')).to include_text '2.5'

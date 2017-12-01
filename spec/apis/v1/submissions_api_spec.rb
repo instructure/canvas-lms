@@ -1262,7 +1262,7 @@ describe 'Submissions API', type: :request do
         "score"=>9.0,
         "entered_score"=>9.0,
         "rubric_assessment"=>
-         {"crit2"=>{"comments"=>"Hmm", "points"=>2},
+         {"crit2"=>{"comments"=>"Hmm", "points"=>2.0},
           "crit1"=>{"comments"=>nil, "points"=>7.0}},
         "workflow_state"=>"graded",
         "late"=>false,

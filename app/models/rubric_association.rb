@@ -265,7 +265,7 @@ class RubricAssociation < ActiveRecord::Base
       if data
         replace_ratings = true
         has_score = (data[:points]).present?
-        rating[:points] = [criterion.points, data[:points].to_f].min if has_score
+        rating[:points] = data[:points].to_f if has_score
         rating[:criterion_id] = criterion.id
         rating[:learning_outcome_id] = criterion.learning_outcome_id
         if criterion.ignore_for_scoring
