@@ -2331,25 +2331,20 @@ class ApplicationController < ActionController::Base
       return render_unauthorized_action
     end
 
-    def localized_timezones(zones)
-      zones.map { |tz| {name: tz.name, localized_name: tz.to_s} }
-    end
-
     js_env({
-      TIMEZONES: {
-        priority_zones: localized_timezones(I18nTimeZone.us_zones),
-        timezones: localized_timezones(I18nTimeZone.all)
-      },
       COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user)
     })
     js_bundle :account_course_user_search
-    css_bundle :account_course_user_search, :addpeople
+    css_bundle :addpeople
     @page_title = @account.name
     add_crumb '', '?' # the text for this will be set by javascript
     js_env({
-      ROOT_ACCOUNT_NAME: @domain_root_account.name, # used in AddPeopleApp modal
+      ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
       ACCOUNT_ID: @account.id,
       ROOT_ACCOUNT_ID: @account.root_account.id,
+      customized_login_handle_name: @account.root_account.customized_login_handle_name,
+      delegated_authentication: @account.root_account.delegated_authentication?,
+      SHOW_SIS_ID_IN_NEW_USER_FORM: @account.root_account.allow_sis_import && @account.root_account.grants_right?(@current_user, session, :manage_sis),
       PERMISSIONS: {
         can_read_course_list: can_read_course_list,
         can_read_roster: can_read_roster,

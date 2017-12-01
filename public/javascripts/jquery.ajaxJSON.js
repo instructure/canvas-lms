@@ -141,3 +141,5 @@ $.fn.defaultAjaxError = function(func) {
   }
   this.ajaxError($.fn.defaultAjaxError.func)
 }
+
+export default $.ajaxJSON

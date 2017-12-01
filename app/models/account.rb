@@ -948,14 +948,16 @@ class Account < ActiveRecord::Base
     self.login_handle_name.present?
   end
 
-  def login_handle_name_with_inference
+  def customized_login_handle_name
     if login_handle_name_is_customized?
       self.login_handle_name
     elsif self.delegated_authentication?
       AccountAuthorizationConfig.default_delegated_login_handle_name
-    else
-      AccountAuthorizationConfig.default_login_handle_name
     end
+  end
+
+  def login_handle_name_with_inference
+    customized_login_handle_name || AccountAuthorizationConfig.default_login_handle_name
   end
 
   def self_and_all_sub_accounts

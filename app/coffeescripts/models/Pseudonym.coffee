@@ -22,7 +22,7 @@ define [
 
   class Pseudonym extends Backbone.Model
 
-    errorMap: (policy) ->
+    errorMap: (policy={}) ->
       unique_id:
         too_short:    I18n.t("errors.required", "Required")
         too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 100})

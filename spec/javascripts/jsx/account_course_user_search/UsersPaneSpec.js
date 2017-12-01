@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import UsersPane from 'jsx/account_course_user_search/UsersPane';
+import UsersPane from 'jsx/account_course_user_search/components/UsersPane';
 import UserActions from 'jsx/account_course_user_search/actions/UserActions';
 
 QUnit.module('Account Course User Search UsersPane View');
@@ -35,7 +35,6 @@ test('handleUpdateSearchFilter dispatches applySearchFilter action', (assert) =>
           errors: {search_term: ''},
           next: undefined,
           searchFilter: {search_term: ''},
-          timezones: {},
           permissions: {},
           accountId: 1
         },

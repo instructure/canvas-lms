@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {shallow} from 'enzyme'
-import UsersListRow from 'jsx/account_course_user_search/UsersListRow'
+import UsersListRow from 'jsx/account_course_user_search/components/UsersListRow'
 
 QUnit.module('Account Course User Search UsersListRow View')
 
@@ -36,29 +36,18 @@ const defaultProps = () => ({
     can_masquerade: true,
     can_message_users: true,
     can_edit_users: true
-  },
-  timezones: {
-    timezones: [{name: '123123123', localized_name: '123123123 localized'}],
-    priority_zones: [{name: 'alsdkfjasldkfjs', localized_name: 'alsk localized'}]
   }
 })
 
 test('renders an avatar when needed', () => {
   const wrapper = shallow(<UsersListRow {...defaultProps()} />)
-  ok(
-    wrapper.find('.ic-avatar').exists(),
-    'avatar is rendered when supplied given user.avatar_url prop'
-  )
-
-  const propsWithNoAvatar = defaultProps()
-  propsWithNoAvatar.user.avatar_url = null
-  const wrapperWithNoAvatar = shallow(<UsersListRow {...propsWithNoAvatar} />)
-  notOk(wrapperWithNoAvatar.find('.ic-avatar').exists(), 'the avatar is not rendered')
+  equal(wrapper.find('UserLink').prop('avatar_url'), defaultProps().user.avatar_url)
 })
 
 test('renders all actions when all permissions are present', () => {
   const wrapper = shallow(<UsersListRow {...defaultProps()} />)
-  equal(wrapper.find('.courses-user-list-actions Button').length, 3)
+
+  equal(wrapper.find('td Tooltip Button').length, 3)
 })
 
 test('renders no actions if no permissions are present', () => {
@@ -71,5 +60,5 @@ test('renders no actions if no permissions are present', () => {
     }
   }
   const wrapper = shallow(<UsersListRow {...propsWithNoPermissions} />)
-  equal(wrapper.find('.courses-user-list-actions Button').length, 0)
+  equal(wrapper.find('td Tooltip Button').length, 0)
 })
