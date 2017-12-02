@@ -70,9 +70,9 @@ describe SIS::CSV::ChangeSisIdImporter do
     )
     expect(importer.errors).to eq []
     warnings = importer.warnings.map(&:last)
-    expect(warnings).to eq ["An old_id, 'invalid', referenced a non-existent term and was not changed to 'valid'",
-                            "No old_id given for change_sis_id",
-                            "No new_id given for change_sis_id",
+    expect(warnings).to eq ["An old_id, 'invalid', referenced a non-existent term and was not changed.",
+                            "No old_id or old_integration_id given for change_sis_id",
+                            "No new_id or new_integration_id given for change_sis_id",
                             "No type given for change_sis_id",
                             "A new_id, 'c001', referenced an existing course and the course with sis_source_id 'c002' was not updated",
                             "Invalid type 'invalid' for change_sis_id"]
@@ -84,8 +84,8 @@ describe SIS::CSV::ChangeSisIdImporter do
     p1.integration_id = 'int1'
     p1.save!
     process_csv_data_cleanly(
-      'old_id,new_id,type',
-      'int1,,user_integration_id'
+      'old_integration_id,new_integration_id,type',
+      'int1,<delete>,user'
     )
     expect(p1.reload.integration_id).to be_nil
   end
