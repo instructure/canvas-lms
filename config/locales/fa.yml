@@ -17157,6 +17157,8 @@ fa:
       
       اگر ارائه دهنده می تواند نشانی های اینترنتی معتبر فراخوانی یا هدایت مجدد را ارائه دهد، از %{callback_url} استفاده کنید.
   to_do_1d554f36: "برای انجام"
+  to_do_5526f10a: "برای انجام:"
+  to_do_items_loading_d1cdfcd5: "در حال بارگزاری موارد برای انجام"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "برای پیوند دادن بییننده درس *%{name}* به یک دانشجو، نام دانشجو را در قسمت زیر تایپ کنید تا آنها را بیابید و سپس روی بهنگام سازی کلیک کنید."
   to_minscore_43e5452e: "به %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "برای پیش نمایش علامت تجاری ویرایشگر زمینه، باید *واسط کاربر دارای تضاد زیاد را غیر فعال کنید*."
@@ -17181,6 +17183,7 @@ fa:
     incomplete: ناقص
     vdd: 
       more_message: "و %{count} دیگر..."
+  top_66e0adb6: بالا
   top_box_background_6db383e9: "پس زمینه کادر بالایی"
   top_box_border_94cee4a7: "مرز کادر بالایی"
   total_71a4807: کل
@@ -17207,32 +17210,47 @@ fa:
       score: "نمره شباهت Turnitin - به گزارش مفصل مراجعه کنید"
   turnitin_info: 
     buttons: 
-      resubmit_to_turnitin: "ارسال دوباره به turnitin "
+      resubmit_to_turnitin: "ارسال دوباره"
   turnitin_settings: 
     originality_report_never: هرگز
     originality_report_visible_after_due_date: "بعد از تاریخ مهلت"
     originality_report_visible_after_grading: "بعد از اینکه تکلیف نمره گذاری شد"
     originality_report_visible_immediately: بلافاصله
   twitter_fcef6b54: توییتر
+  type_a_few_letters_to_start_searching_3334657b: "تعداد اندکی از حروف را برای شروع جستجو وارد نمایید"
   type_c8106334: نوع
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' یک نوع معتبر تصویر نیست (jpg، png یا gif را امتحان کنید)"
+  type_of_change_1cb24a0e: "نوع تغییر"
+  type_of_item_8a37f69d: "نوع مورد"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "اوه نه! با توسعه دهنده مهربان کاتالوگ خود تماس بگیرید. پیام خطا: %{message}"
   unable_to_accept_update_fd53a7e2: "قادر به قبول بهنگام سازی نیست"
+  unable_to_curve_grades_because_this_assignment_is__17f78c27: "نمی توان نمرات را روی منحنی برد زیرا این تکلیف حداقل برای یک دانشجو در دوره زمانی پایان یافته نمره دهی ارسال شده است"
   unable_to_dismiss_update_df1e32eb: "قادر به رد بهنگام سازی نیست"
   unable_to_find_clever_district_district_id_61deb1cb: "قادر به یافتن Clever District %{district_id} نیست"
   unable_to_remove_app_4293cb53: "قادر به حذف برنامه نیست"
+  unable_to_set_default_grade_because_this_assignmen_d19842a9: "نمی توان نمره پیش فرض را برای این تکلیف قرار داد زیرا حداقل برای یک دانشجو در دوره نمره دهی پایان یافته ارسال شده"
   unarchive_selected_e0c4bd3d: "لغو بایگانی انتخاب شده"
   unauthorized: "غیر مجاز"
   unauthorized_message: "امضای JWT معتبر نیست"
   unauthorized_to_delete_this_file_a1271224: "مجاز به حذف این فایل نیستید"
+  unavailable_46d2c344: "غیرقابل دسترس"
+  unbookmark_bank_70569249: "نشانه گذاری نشده %{bank}"
   unbookmark_this_question_bank_d87d1a07: "لغو نشانه گذاری این مخزن پرسش"
   unchanged_aca18e02: "[تغییر نیافته]"
   undated_15c2e5fe: "بهنگام سازی شد"
   undated_items_toggle_list_visibility_6219e641: "قابلیت مشاهده فهرست تغییر موردهای بدون تاریخ "
   undelivered_message_459916a9: "پیام منتقل نشده"
+  underline_all_links_description: |-
+      پیوندهایی که زیرشان خط کشیده شده نمایانگر ابرپیوندها در منوی هدایت، داشبورد، و منوهای کناری نظیر
+      *متن خط کشی شده* هستند. این گزینه قابل بکارگیری روی پیوندهای محتوای تولید شده توسط کاربر در
+      ویراستار غنی مختوا، که همیشه پیوندها را برای همه کاربران خط کشی می کند، نیست.
+  underline_links_e7cf9b4f: "پیوندهای خط دار"
   undo_a7be8fef: لغو
+  unenrolled_bc89d5e3: "ثبت نام نشده"
   unenrolled_users_e7632d24: "کاربران ثبت نام نشده"
+  ungraded_147a0dce: "نمره دهی نشده"
   ungraded_answers_31ef2df7: "پاسخ های نمره گذاری نشده"
+  ungraded_ed0c6f98: "نمره دهی نشده"
   ungraded_submissions_44efb0ec: "موردهای ارسالی نمره گذاری نشده"
   ungraded_survey_ad7de790: "نظرسنجی نمره گذاری نشده"
   united_arab_emirates_971_649b3750: "امارات متحده عربی (+971)"
@@ -17248,6 +17266,8 @@ fa:
   unknown_content_type_ae6d08e8: "نوع محتوای ناشناس"
   unknown_question_bank: "مخزن پرسش نامعلوم"
   unknown_quiz: "آزمون نامعلوم"
+  unknown_status_status_35331e1d: "وضعیت ناشناخته، %{status}"
+  unknown_status_status_message_3a4ed4d5: "وضعیت ناشناخته، %{status} : %{message}"
   unknown_user_url_82196ba7: "نشانی اینترنتی کاربر ناشناس"
   unlock_at_bb930b34: "قفل گشایی در"
   unlock_at_time_a0bbfb9: "قفل گشایی در %{time}"
@@ -17256,14 +17276,23 @@ fa:
   unlock_date_cannot_be_before_course_start_9c7b8524: "تاریخ قفل گشایی نمی تواند قبل از شروع درس باشد"
   unlock_date_cannot_be_before_section_start_793ddc66: "تاریخ قفل گشایی نمی تواند قبل از شروع بخش باشد"
   unlock_date_cannot_be_before_term_start_d3c01813: "تاریخ قفل گشایی نمی تواند قبل از شروع نیمسال باشد"
+  unlock_f6196bf5: "قفل باز"
   unlock_module_on_date_17144fbd: "قفل گشایی ماژول در تاریخ"
+  unlocked_beee43de: "قفل نشده"
+  unlocked_click_to_lock_53262ce7: "قفل نشده. برای قفل کلیک کنید."
+  unlocking_a6b5c02d: "درحال باز شدن قفل..."
+  unmatched_login_list_283ca77: "فهرست ورود نامنطبق"
   unmute_assignment_29a49038: "فعال کردن تکلیف"
   unnamed_account_id_e688ad87: "حساب بدون نام (%{id})"
+  unpin_a318452a: بازکردن
+  unposted_8d9932ec: "پست نشده"
   unprocessable_entity: "موجودیت غیر قابل پردازش"
   unprocessable_entity_message: "شناسه جلسه تأیید شده معتبر نیست"
   unpublish_9f2d730b: "لغو انتشار"
   unpublished_8b6107d6: "منتشر نشده"
+  unpublished_assignments_9cdbcc87: "تکلیف های منتشر نشده"
   unpublished_click_to_modify_60f9051: "منتشر نشده است - برای تغییر دادن کلیک کنید."
+  unpublished_click_to_publish_6a6d12e1: "منتشر نشده. برای انتشار کلیک کنید."
   unpublished_click_to_publish_c073631a: "منتشر نشده است. برای انتشار کلیک کنید."
   unpublished_click_to_publish_item_name_614c4952: "منتشر نشده است. برای انتشار %{item_name}، کلیک کنید."
   unpublished_click_to_publish_module_name_89f8601c: "منتشر نشده است. برای انتشار  %{module_name}، کلیک کنید."
