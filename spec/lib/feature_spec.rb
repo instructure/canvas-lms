@@ -232,21 +232,97 @@ end
 describe "new_gradebook" do
   let(:ngb_trans_proc) { Feature.definitions["new_gradebook"].custom_transition_proc }
   let(:root_account) { account_model }
-  let(:trans_empty) { { "on" => {}, "allowed" => {}, "off" => {} } }
-  let(:locked) { { "locked" => true } }
+  let(:transitions) { { "on" => {}, "allowed" => {}, "off" => {} } }
+  let(:course) { course_factory(account: root_account, active_all: true) }
+  let(:teacher) { teacher_in_course(course: course).user }
+  let(:ta) { ta_in_course(course: course).user }
+  let(:admin) { account_admin_user(account: root_account) }
 
-  it "only allows admins to enable the new gradebook" do
-    test_course = course_factory(account: root_account, active_all: true)
-    teacher = teacher_in_course(course: test_course)
-    transitions = trans_empty
-    ngb_trans_proc.call(teacher, test_course, nil, transitions)
-    expect(transitions).to include({ "on" => locked, "off" => locked })
+  LOCKED = { "locked" => true }.freeze
+  UNLOCKED = { "locked" => false }.freeze
+
+  it "allows admins to enable the new gradebook" do
+    ngb_trans_proc.call(admin, course, nil, transitions)
+    expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+  end
+
+  it "allows teachers to enable the new gradebook" do
+    ngb_trans_proc.call(teacher, course, nil, transitions)
+    expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+  end
+
+  it "doesn't allow tas to enable the new gradebook" do
+    ngb_trans_proc.call(ta, course, nil, transitions)
+    expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
   end
 
   it "does not allow enabling new gradebook on an entire account" do
-    admin = user_factory(account: root_account)
-    transitions = trans_empty
     ngb_trans_proc.call(admin, root_account, nil, transitions)
-    expect(transitions).to include({ "on" => locked })
+    expect(transitions).to include({ "on" => LOCKED })
+  end
+
+  context "backwards compatibility" do
+    let(:student) { student_in_course(course: course).user }
+    let!(:assignment) { course.assignments.create!(title: 'assignment', points_possible: 10) }
+    let(:submission) { assignment.submissions.find_by(user: student) }
+
+    it "blocks disabling new gradebook on a course if there are any submissions with a late_policy_status of none" do
+      submission.late_policy_status = 'none'
+      submission.save!
+
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+    end
+
+    it "blocks disabling new gradebook on a course if there are any submissions with a late_policy_status of missing" do
+      submission.late_policy_status = 'missing'
+      submission.save!
+
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+    end
+
+    it "blocks disabling new gradebook on a course if there are any submissions with a late_policy_status of late" do
+      submission.late_policy_status = 'late'
+      submission.save!
+
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+    end
+
+    it "allows disabling new gradebook on a course if there are no submissions with a late_policy_status" do
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+    end
+
+    it "blocks disabling new gradebook on a course if a late policy is configured" do
+      course.late_policy = LatePolicy.new(late_submission_deduction_enabled: true)
+
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+    end
+
+    it "blocks disabling new gradebook on a course if a missing policy is configured" do
+      course.late_policy = LatePolicy.new(missing_submission_deduction_enabled: true)
+
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+    end
+
+    it "blocks disabling new gradebook on a course if both a late and missing policy is configured" do
+      course.late_policy =
+        LatePolicy.new(late_submission_deduction_enabled: true, missing_submission_deduction_enabled: true)
+
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
+    end
+
+    it "allows disabling new gradebook on a course if both policies are disabled" do
+      course.late_policy =
+        LatePolicy.new(late_submission_deduction_enabled: false, missing_submission_deduction_enabled: false)
+
+      ngb_trans_proc.call(admin, course, nil, transitions)
+      expect(transitions).to include({ "on" => UNLOCKED, "off" => UNLOCKED })
+    end
   end
 end

@@ -3090,6 +3090,22 @@ class Course < ActiveRecord::Base
       !relevant_grading_period_group&.weighted?
   end
 
+  # This method will be around while we still have two
+  # gradebooks. This method should be used in situations where we want
+  # to identify the user can't move backwards, such as feature flags
+  def gradebook_backwards_incompatible_features_enabled?
+    # The old gradebook can't deal with late policies at all
+    return true if late_policy&.missing_submission_deduction_enabled? || late_policy&.late_submission_deduction_enabled?
+
+    # If you've used the grade tray status changes at all, you can't
+    # go back. Even if set to none, it'll break "Message Students
+    # Who..." for unsubmitted.
+    expire_time = Setting.get('late_policy_tainted_submissions', 1.hour).to_i
+    Rails.cache.fetch(['late_policy_tainted_submissions', self].cache_key, expires_in: expire_time) do
+      submissions.except(:order).where(late_policy_status: ['missing', 'late', 'none']).exists?
+    end
+  end
+
   private
 
   def effective_due_dates

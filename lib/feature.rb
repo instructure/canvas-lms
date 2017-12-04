@@ -223,9 +223,14 @@ END
 
       custom_transition_proc: ->(user, context, _from_state, transitions) do
         if context.is_a?(Course)
-          user_may_change_flag = context.account.grants_right?(user, :manage_account_settings)
-          transitions['on']['locked'] = !user_may_change_flag if transitions&.dig('on')
-          transitions['off']['locked'] = !user_may_change_flag if transitions&.dig('off')
+          if !context.grants_right?(user, :change_course_state)
+            transitions['on']['locked'] = true if transitions&.dig('on')
+            transitions['off']['locked'] = true if transitions&.dig('off')
+          else
+            should_lock = context.gradebook_backwards_incompatible_features_enabled?
+            transitions['on']['locked'] = should_lock if transitions&.dig('on')
+            transitions['off']['locked'] = should_lock if transitions&.dig('off')
+          end
         elsif context.is_a?(Account)
           transitions['on']['locked'] = true if transitions&.dig('on')
         end

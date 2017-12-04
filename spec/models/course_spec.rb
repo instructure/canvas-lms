@@ -4996,4 +4996,69 @@ describe Course, "#show_total_grade_as_points?" do
       end
     end
   end
+
+  describe Course, "#gradebook_backwards_incompatible_features_enabled?" do
+    let(:course) { Course.create! }
+
+    it "returns true if a late policy is enabled" do
+      course.late_policy = LatePolicy.new(late_submission_deduction_enabled: true)
+
+      expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
+    end
+
+    it "returns true if a missing policy is enabled" do
+      course.late_policy = LatePolicy.new(missing_submission_deduction_enabled: true)
+
+      expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
+    end
+
+    it "returns true if both a late and missing policy are enabled" do
+      course.late_policy =
+        LatePolicy.new(late_submission_deduction_enabled: true, missing_submission_deduction_enabled: true)
+
+      expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
+    end
+
+    it "returns false if there are no policies" do
+      expect(course.gradebook_backwards_incompatible_features_enabled?).to be false
+    end
+
+    it "returns false if both policies are disabled" do
+      course.late_policy =
+        LatePolicy.new(late_submission_deduction_enabled: false, missing_submission_deduction_enabled: false)
+
+      expect(course.gradebook_backwards_incompatible_features_enabled?).to be false
+    end
+
+    context "With submissions" do
+      let(:student) { student_in_course(course: course).user }
+      let!(:assignment) { course.assignments.create!(title: 'assignment', points_possible: 10) }
+      let(:submission) { assignment.submissions.find_by(user: student) }
+
+      it "returns true if they are any submissions with a late_policy_status of none" do
+        submission.late_policy_status = 'none'
+        submission.save!
+
+        expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
+      end
+
+      it "returns true if they are any submissions with a late_policy_status of missing" do
+        submission.late_policy_status = 'missing'
+        submission.save!
+
+        expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
+      end
+
+      it "returns true if they are any submissions with a late_policy_status of late" do
+        submission.late_policy_status = 'late'
+        submission.save!
+
+        expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
+      end
+
+      it "returns false if there are no policies and no submissions with late_policy_status" do
+        expect(course.gradebook_backwards_incompatible_features_enabled?).to be false
+      end
+    end
+  end
 end
