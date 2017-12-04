@@ -20,7 +20,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import AssignmentRowCell from '../../../../gradezilla/default_gradebook/components/AssignmentRowCell';
 
-class AssignmentCellEditor {
+/*
+ * This editor is intended to be responsible for interfacing with SlickGrid and
+ * hooking into any relevant lifecycle events. All other business concerns for
+ * Assignment Cell behavior should be located within the AssignmentRowCell
+ * component.
+ */
+export default class AssignmentCellEditor {
   constructor (options) {
     this.options = options;
     this.container = options.container;
@@ -30,11 +36,12 @@ class AssignmentCellEditor {
   }
 
   renderComponent () {
-    const bindComponent = (ref) => { this.component = ref };
     const props = {
-      ...this.options.column.propFactory.getProps(this.options.item),
-      ref: bindComponent,
-      editorOptions: this.options
+      ...this.options.column.propFactory.getProps(this.options),
+      editorOptions: this.options,
+      ref: ref => {
+        this.component = ref
+      }
     };
 
     const element = React.createElement(AssignmentRowCell, props, null);
@@ -47,36 +54,73 @@ class AssignmentCellEditor {
     }
   }
 
+  /*
+   * SlickGrid Editor Interface Method (required)
+   *
+   * `destroy` is called on the editor when the cell is exiting edit mode.
+   * Within this method:
+   *   • Bound events for the editor should be unbound.
+   *   • DOM elements for the editor should be removed.
+   *   • Transient data created for editing should be destroyed.
+   */
   destroy () {
     this.component = null;
     this.options.column.getGridSupport().events.onKeyDown.unsubscribe(this.handleKeyDown);
     ReactDOM.unmountComponentAtNode(this.container);
   }
 
+  /*
+   * SlickGrid Editor Interface Method (required)
+   *
+   * This is called when validation has failed. Focus will be forcibly reset to
+   * the editor.
+   */
   focus () {
     this.component.focus();
   }
 
+  /*
+   * SlickGrid Editor Interface Method (required)
+   */
   isValueChanged () {
     return this.component.isValueChanged();
   }
 
+  /*
+   * SlickGrid Editor Interface Method (required)
+   */
   serializeValue () {
     return this.component.serializeValue();
   }
 
-  loadValue (item) {
-    this.component.loadValue(item);
+  /*
+   * SlickGrid Editor Interface Method (required)
+   *
+   * @param {object} item – The data object for the row.
+   */
+  loadValue(/* item */) {
+    this.component.loadValue();
     this.renderComponent();
   }
 
-  applyValue (item, state) {
-    this.component.applyValue(item, state);
+  /*
+   * SlickGrid Editor Interface Method (required)
+   *
+   * @param {object} item – The data object for the row.
+   * @param {object|string|number|undefined|null} state – The serialized editor value.
+   *
+   * When the current edit is being committed, `applyValue` will be called to
+   * handle the edited value. This is typically when the value is saved.
+   */
+  applyValue(item, state) {
+    this.component.gradeSubmission(item, state)
   }
 
-  validate () {
-    return this.component.validate();
+  /*
+   * SlickGrid Editor Interface Method (required)
+   */
+  validate() {
+    // SlickGrid validation is not to be used.
+    return {msg: null, valid: true}
   }
 }
-
-export default AssignmentCellEditor;

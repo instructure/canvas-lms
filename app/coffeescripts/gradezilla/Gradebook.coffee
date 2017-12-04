@@ -198,7 +198,6 @@ define [
       studentsLoaded: false
       submissionsLoaded: false
       teacherNotesColumnUpdating: false
-      submissionUpdating: false
     }
 
   getInitialCourseContent = (options) ->
@@ -221,6 +220,11 @@ define [
   getInitialGradebookContent = (options) ->
     {
       customColumns: if options.teacher_notes then [options.teacher_notes] else []
+    }
+
+  getInitialActionStates = () ->
+    {
+      submissionsUpdating: []
     }
 
   class Gradebook
@@ -279,6 +283,8 @@ define [
       @gradebookContent = getInitialGradebookContent(@options)
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
+      @actionStates = getInitialActionStates()
+
       @headerComponentRefs = {}
       @filteredContentInfo =
         invalidAssignmentGroups: []
@@ -1491,7 +1497,7 @@ define [
         field: fieldName
         object: assignment
         getGridSupport: => @gradebookGrid.gridSupport
-        propFactory: new AssignmentRowCellPropFactory(assignment, @)
+        propFactory: new AssignmentRowCellPropFactory(@)
         minWidth: columnWidths.assignment.min
         maxWidth: columnWidths.assignment.max
         width: assignmentWidth
@@ -2150,7 +2156,7 @@ define [
         gradesUrl: "#{student.enrollments[0].grades.html_url}#tab-assignments"
         isConcluded: student.isConcluded
       submission: ConvertCase.camelize(submission)
-      submissionUpdating: @contentLoadStates.submissionUpdating
+      submissionUpdating: @submissionIsUpdating({ assignmentId, userId: studentId })
       updateSubmission: @updateSubmissionAndRenderSubmissionTray
       processing: @getCommentsUpdating()
       setProcessing: @setCommentsUpdating
@@ -2303,8 +2309,23 @@ define [
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
 
-    setSubmissionUpdating: (loaded) =>
-      @contentLoadStates.submissionUpdating = loaded
+    setSubmissionUpdating: (submission, updating) =>
+      if updating
+        @actionStates.submissionsUpdating.push(submission)
+      else
+        @actionStates.submissionsUpdating = _.reject(@actionStates.submissionsUpdating, (sub) ->
+          sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
+        )
+
+    submissionIsUpdating: (submission) ->
+      @actionStates.submissionsUpdating.some((sub) ->
+        sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
+      )
+
+    getUpdatingSubmission: (submission) ->
+      @actionStates.submissionsUpdating.find((sub) ->
+        sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
+      ) or null
 
     setTeacherNotesColumnUpdating: (updating) =>
       @contentLoadStates.teacherNotesColumnUpdating = updating
@@ -2648,16 +2669,49 @@ define [
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
 
+    apiUpdateSubmission: (submission, updatingSubmission) =>
+      { userId, assignmentId } = submission
+      student = @student(userId)
+      @setSubmissionUpdating(updatingSubmission, true)
+      @renderSubmissionTray(student) if @getSubmissionTrayState().open
+      GradebookApi.updateSubmission(@options.context_id, assignmentId, userId, submission)
+        .then((response) =>
+          @setSubmissionUpdating(updatingSubmission, false)
+          @updateSubmissionsFromExternal(response.data.all_submissions)
+          @renderSubmissionTray(student) if @getSubmissionTrayState().open
+          response
+        ).catch((response) =>
+          @setSubmissionUpdating(updatingSubmission, false)
+          @updateRowCellsForStudentIds([userId])
+          $.flashError I18n.t('There was a problem updating the submission.')
+          @renderSubmissionTray(student) if @getSubmissionTrayState().open
+          Promise.reject(response)
+        )
+
     gradeSubmission: (submission, gradingData) =>
+      submissionData =
+        assignmentId: submission.assignmentId
+        userId: submission.userId
+
       if gradingData.excused
-        submissionData = { excuse: true }
+        submissionData.excuse = true
       else if gradingData.enteredAs == null
-        submissionData = { posted_grade: '' }
+        submissionData.posted_grade = ''
       else if ['passFail', 'gradingScheme'].includes(gradingData.enteredAs)
-        submissionData = { posted_grade: gradingData.grade }
+        submissionData.posted_grade = gradingData.grade
       else
-        submissionData = { posted_grade: gradingData.score }
-      @updateSubmissionAndRenderSubmissionTray(submissionData)
+        submissionData.posted_grade = gradingData.score
+
+      updatingSubmission =
+        assignmentId: submission.assignmentId
+        enteredGrade: gradingData.grade
+        enteredScore: gradingData.score
+        excused: gradingData.excused
+        grade: gradingData.grade
+        score: gradingData.score
+        userId: submission.userId
+
+      @apiUpdateSubmission(submissionData, updatingSubmission)
         .then((response) =>
           assignment = @getAssignment(submission.assignmentId)
           outlierScoreHelper = new OutlierScoreHelper(response.data.score, assignment.points_possible)
@@ -2666,21 +2720,14 @@ define [
 
     updateSubmissionAndRenderSubmissionTray: (data) =>
       { studentId, assignmentId } = @getSubmissionTrayState()
-      student = @student(studentId)
-      @setSubmissionUpdating(true)
-      @renderSubmissionTray(student)
-      GradebookApi.updateSubmission(@options.context_id, assignmentId, studentId, data)
-        .then((response) =>
-          @setSubmissionUpdating(false)
-          @updateSubmissionsFromExternal(response.data.all_submissions)
-          @renderSubmissionTray(student)
-          response
-        ).catch((response) =>
-          @setSubmissionUpdating(false)
-          $.flashError I18n.t('There was a problem updating the submission.')
-          @renderSubmissionTray(student)
-          Promise.reject(response)
-        )
+      submissionData = Object.assign({
+        assignmentId: assignmentId
+        userId: studentId
+      }, data)
+
+      updatingSubmission = ConvertCase.camelize(@getSubmission(studentId, assignmentId))
+
+      @apiUpdateSubmission(submissionData, updatingSubmission)
 
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')

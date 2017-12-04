@@ -96,10 +96,10 @@ describe "Gradezilla" do
     end
 
     it "allows editing grades", priority: "1", test_id: 210026 do
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1')
+      cell = Gradezilla::Cells.grading_cell(@student_1, @first_assignment)
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
-      expect(ff('.grade', cell)).not_to be_blank
+      expect(Gradezilla::Cells.grading_cell_input(@student_1, @first_assignment)).not_to be_blank
     end
   end
 
@@ -329,12 +329,11 @@ describe "Gradezilla" do
 
       Gradezilla.visit(test_course)
       # in order to get into edit mode with an icon in the way, a total of 3 clicks are needed
-      f('#gradebook_grid .icon-not-graded').click
-      double_click('.online_quiz')
+      grading_cell = Gradezilla::Cells.grading_cell(student, essay_quiz.assignment)
+      grading_cell.click
 
-      replace_value('#gradebook_grid input.grade', '10')
-      f('#gradebook_grid input.grade').send_keys(:enter)
-      expect(f('#gradebook_grid')).not_to contain_css('.icon-not-graded')
+      Gradezilla::Cells.edit_grade(student, essay_quiz.assignment, 10)
+      expect(grading_cell).not_to contain_css('.icon-not-graded')
     end
   end
 end

@@ -35,6 +35,10 @@ class Gradezilla
         f(grading_cell_selector(student, assignment))
       end
 
+      def grading_cell_input(student, assignment)
+        f("#{grading_cell_selector(student, assignment)} input[type='text']")
+      end
+
       def get_grade(student, assignment)
         grading_cell(student, assignment).text
       end
@@ -49,11 +53,10 @@ class Gradezilla
         cell_selector = grading_cell_selector(student, assignment)
         f(cell_selector).click
 
-        grade_input = f("#{cell_selector} .grade")
+        grade_input = grading_cell_input(student, assignment)
         set_value(grade_input, grade)
 
         grade_input.send_keys(:return)
-        wait_for_ajax_requests
       end
 
       def send_keyboard_shortcut(student, assignment, key)

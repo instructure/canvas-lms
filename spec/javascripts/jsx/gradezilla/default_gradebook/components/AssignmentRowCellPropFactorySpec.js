@@ -16,74 +16,192 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createGradebook, setFixtureHtml } from '../../../gradezilla/default_gradebook/GradebookSpecHelper';
-import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory';
+import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
+import {createGradebook} from '../../../gradezilla/default_gradebook/GradebookSpecHelper'
 
-let fixture;
+QUnit.module('AssignmentRowCellPropFactory', () => {
+  let gradebook
 
-QUnit.module('AssignmentRowCellPropFactory#getProps', {
-  setup () {
-    fixture = document.createElement('div');
-    document.body.appendChild(fixture);
-    setFixtureHtml(fixture);
-    this.assignment = { id: '2301' };
-    this.gradebook = createGradebook({ context_id: '1201' });
-    this.gradebook.gradebookGrid.gridSupport = {
-      helper: {
-        commitCurrentEdit: this.stub(),
-        focus: this.stub()
+  QUnit.module('#getProps()', hooks => {
+    let editorOptions
+
+    function getProps() {
+      const factory = new AssignmentRowCellPropFactory(gradebook)
+      return factory.getProps(editorOptions)
+    }
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook({context_id: '1201'})
+      gradebook.gradebookGrid.gridSupport = {
+        helper: {
+          commitCurrentEdit() {},
+          focus() {}
+        }
       }
-    };
-    this.factory = new AssignmentRowCellPropFactory(this.assignment, this.gradebook);
-    this.student = { id: '1101', isConcluded: false };
-  },
 
-  teardown () {
-    fixture.remove();
-  }
-});
+      gradebook.students['1101'] = {id: '1101'}
+      gradebook.setAssignments({
+        2301: {grading_type: 'points', id: '2301', points_possible: 10}
+      })
+      gradebook.updateSubmission({
+        assignment_id: '2301',
+        entered_grade: '7.8',
+        entered_score: 7.8,
+        excused: false,
+        id: '2501',
+        user_id: '1101'
+      })
 
-test('returns an object with AssignmentRowCell props', function () {
-  const props = this.factory.getProps(this.student);
-  equal(typeof props.isSubmissionTrayOpen, 'boolean', 'includes isSubmissionTrayOpen');
-  equal(typeof props.onToggleSubmissionTrayOpen, 'function', 'includes onToggleSubmissionTrayOpen');
-});
+      editorOptions = {
+        column: {
+          assignmentId: '2301'
+        },
+        item: {id: '1101', isConcluded: false}
+      }
 
-test('onToggleSubmissionTrayOpen triggers a render of the submission tray', function () {
-  const props = this.factory.getProps(this.student);
-  this.stub(this.gradebook, 'renderSubmissionTray');
-  props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
-  strictEqual(this.gradebook.renderSubmissionTray.callCount, 1)
-});
+      sinon.stub(gradebook, 'updateRowAndRenderSubmissionTray') // no rendering needed for these tests
+    })
 
-test('onToggleSubmissionTrayOpen sets the tray state', function () {
-  const props = this.factory.getProps(this.student);
-  this.stub(this.gradebook, 'renderSubmissionTray');
-  props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
-  strictEqual(this.gradebook.getSubmissionTrayState().open, true);
-});
+    hooks.afterEach(() => {
+      gradebook.destroy()
+    })
 
-test('onToggleSubmissionTrayOpen cancels current cell edit', function () {
-  const props = this.factory.getProps(this.student);
-  this.stub(this.gradebook, 'renderSubmissionTray');
-  props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
-  strictEqual(this.gradebook.gradebookGrid.gridSupport.helper.commitCurrentEdit.callCount, 1);
-});
+    test('.assignment.id is the id on the assignment', () => {
+      equal(getProps().assignment.id, '2301')
+    })
 
-test('isSubmissionTrayOpen is true if the tray is open for the cell', function () {
-  this.gradebook.setSubmissionTrayState(true, this.student.id, this.assignment.id);
-  const { isSubmissionTrayOpen } = this.factory.getProps(this.student);
-  strictEqual(isSubmissionTrayOpen, true);
-});
+    test('.assignment.pointsPossible is the points possible on the assignment', () => {
+      strictEqual(getProps().assignment.pointsPossible, 10)
+    })
 
-test('isSubmissionTrayOpen is false if the tray is closed for the cell', function () {
-  this.gradebook.setSubmissionTrayState(false, this.student.id, this.assignment.id);
-  const { isSubmissionTrayOpen } = this.factory.getProps(this.student);
-  strictEqual(isSubmissionTrayOpen, false);
-});
+    test('.enterGradesAs is the "enter grades as" setting for the assignment', () => {
+      gradebook.setEnterGradesAsSetting('2301', 'percent')
+      equal(getProps().enterGradesAs, 'percent')
+    })
 
-test('isSubmissionTrayOpen is false if the tray is open for another cell', function () {
-  this.gradebook.setSubmissionTrayState(true, this.student.id, '2302');
-  const { isSubmissionTrayOpen } = this.factory.getProps(this.student);
-  strictEqual(isSubmissionTrayOpen, false);
-});
+    test('.gradingScheme is the grading scheme for the assignment', () => {
+      const gradingScheme = {
+        id: '2801',
+        data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]],
+        title: 'Emoji Grades'
+      }
+      gradebook.getAssignment('2301').grading_standard_id = '2801'
+      gradebook.courseContent.gradingSchemes = [gradingScheme]
+      deepEqual(getProps().gradingScheme, gradingScheme.data)
+    })
+
+    test('.isSubmissionTrayOpen is true when the tray is open for the current student and assignment', () => {
+      gradebook.setSubmissionTrayState(true, '1101', '2301')
+      strictEqual(getProps().isSubmissionTrayOpen, true)
+    })
+
+    test('.isSubmissionTrayOpen is false when the tray is closed', () => {
+      gradebook.setSubmissionTrayState(false, '1101', '2301')
+      strictEqual(getProps().isSubmissionTrayOpen, false)
+    })
+
+    test('.isSubmissionTrayOpen is true when the tray is open for a different student', () => {
+      gradebook.setSubmissionTrayState(true, '1102', '2301')
+      strictEqual(getProps().isSubmissionTrayOpen, false)
+    })
+
+    test('.isSubmissionTrayOpen is true when the tray is open for a different assignment', () => {
+      gradebook.setSubmissionTrayState(true, '1101', '2302')
+      strictEqual(getProps().isSubmissionTrayOpen, false)
+    })
+
+    test('.onGradeSubmission is the .gradeSubmission Gradebook method', () => {
+      strictEqual(getProps().onGradeSubmission, gradebook.gradeSubmission)
+    })
+
+    test('.onToggleSubmissionTrayOpen toggles the tray', () => {
+      getProps().onToggleSubmissionTrayOpen()
+      strictEqual(gradebook.getSubmissionTrayState().open, true)
+    })
+
+    test('.onToggleSubmissionTrayOpen toggles the tray using .toggleSubmissionTrayOpen', () => {
+      sinon.stub(gradebook, 'toggleSubmissionTrayOpen')
+      getProps().onToggleSubmissionTrayOpen()
+      strictEqual(gradebook.toggleSubmissionTrayOpen.callCount, 1)
+    })
+
+    test('.onToggleSubmissionTrayOpen toggles the tray for the current student', () => {
+      getProps().onToggleSubmissionTrayOpen()
+      strictEqual(gradebook.getSubmissionTrayState().studentId, '1101')
+    })
+
+    test('.onToggleSubmissionTrayOpen toggles the tray for the current assignment', () => {
+      getProps().onToggleSubmissionTrayOpen()
+      strictEqual(gradebook.getSubmissionTrayState().assignmentId, '2301')
+    })
+
+    test('.submission.assignmentId is the assignment id', () => {
+      strictEqual(getProps().submission.assignmentId, '2301')
+    })
+
+    test('.submission.enteredGrade is the entered grade on the submission', () => {
+      strictEqual(getProps().submission.enteredGrade, '7.8')
+    })
+
+    test('.submission.enteredScore is the entered score on the submission', () => {
+      strictEqual(getProps().submission.enteredScore, 7.8)
+    })
+
+    test('.submission.excused is true when the submission is excused', () => {
+      gradebook.getSubmission('1101', '2301').excused = true
+      strictEqual(getProps().submission.excused, true)
+    })
+
+    test('.submission.excused is false when the value is undefined on the submission', () => {
+      gradebook.getSubmission('1101', '2301').excused = undefined
+      strictEqual(getProps().submission.excused, false)
+    })
+
+    QUnit.module('when the submission is updating', contextHooks => {
+      let submission
+
+      contextHooks.beforeEach(() => {
+        submission = {
+          assignmentId: '2301',
+          enteredGrade: 'B',
+          enteredScore: 8.9,
+          excused: false,
+          userId: '1101'
+        }
+      })
+
+      test('.submission.enteredGrade is the entered grade on the submission', () => {
+        gradebook.setSubmissionUpdating(submission, true)
+        strictEqual(getProps().submission.enteredGrade, 'B')
+      })
+
+      test('.submission.enteredScore is the entered score on the submission', () => {
+        gradebook.setSubmissionUpdating(submission, true)
+        strictEqual(getProps().submission.enteredScore, 8.9)
+      })
+
+      test('.submission.excused is true when the submission is excused', () => {
+        gradebook.setSubmissionUpdating({...submission, excused: true}, true)
+        strictEqual(getProps().submission.excused, true)
+      })
+    })
+
+    test('.submission.id is the submission id', () => {
+      strictEqual(getProps().submission.id, '2501')
+    })
+
+    test('.submission.userId is the student id', () => {
+      strictEqual(getProps().submission.userId, '1101')
+    })
+
+    test('.submissionIsUpdating is true when the submission is updating', () => {
+      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, true)
+      strictEqual(getProps().submissionIsUpdating, true)
+    })
+
+    test('.submissionIsUpdating is false when the submission is not updating', () => {
+      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, false)
+      strictEqual(getProps().submissionIsUpdating, false)
+    })
+  })
+})

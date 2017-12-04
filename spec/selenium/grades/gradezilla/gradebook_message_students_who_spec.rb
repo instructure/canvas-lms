@@ -17,6 +17,7 @@
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/groups_common'
+require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/gradezilla_page'
 
 describe "Gradezilla - message students who" do
@@ -97,6 +98,7 @@ describe "Gradezilla - message students who" do
     Gradezilla.visit(@course)
     # set grade for first student, 3rd assignment
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3', 0)
+    expect { Gradezilla::Cells.get_grade(@student_1, @third_assignment) }.to become '0'
 
     Gradezilla.click_assignment_header_menu(@third_assignment.id)
     Gradezilla.click_assignment_header_menu_element("message students")

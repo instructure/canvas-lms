@@ -38,6 +38,8 @@ a#accessibility_warning {
 
 $row-height: 35px;
 $cell_height: 33px;
+$cell-icon-height: 33px;
+$cell-icon-width: 32px;
 $header-height: 38px;
 $header-content-height: $header-height - 2px; // subtract border
 
@@ -596,26 +598,102 @@ $gradebook_checkbox_size: 16px;
 }
 
 .Grid__AssignmentRowCell {
+  align-items: center;
   display: flex;
   flex-direction: row;
   height: $cell_height;
-  line-height: $cell_height;
+  justify-content: space-between;
+}
+
+.Grid__AssignmentRowCell__OriginalityScore {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  height: $cell-icon-height;
+  justify-content: center;
+  width: $cell-icon-width;
+}
+
+.Grid__AssignmentRowCell__Error {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  height: $cell-icon-height;
+  justify-content: center;
+  width: $cell-icon-width;
+}
+
+.Grid__AssignmentRowCell__StartContainer,
+.Grid__AssignmentRowCell__EndContainer {
+  display: flex;
+  flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 1;
+  white-space: nowrap;
+}
+
+.Grid__AssignmentRowCell__StartContainer {
+  min-width: $cell-icon-width * 2;
+}
+
+.Grid__AssignmentRowCell__EndContainer {
+  justify-content: flex-end;
 }
 
 .Grid__AssignmentRowCell__Notifications {
-  flex-grow: 0;
-  flex-shrink: 0;
-  width: $cell_height;
+  flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 1;
 }
 
 .Grid__AssignmentRowCell__Content {
+  flex-basis: auto;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.Grid__AssignmentRowCell__GradingSchemeInput {
+  // wide enough to fit "Excused" and the autocomplete arrow
+  width: 78px + $cell-icon-width;
+}
+
+.Grid__AssignmentRowCell__PassFailInput {
+  width: 78px; // wide enough to fit "Excused"
+}
+
+.Grid__AssignmentRowCell {
+  // This nesting is required to ensure higher specificity than InstUI styles
+  .Grid__AssignmentRowCell__PercentInput,
+  .Grid__AssignmentRowCell__PointsInput {
+    label input[type="text"] {
+      text-align: center;
+    }
+
+    width: 78px; // wide enough to fit "Excused"
+  }
+}
+
+.Grid__AssignmentRowCell__EndText {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-basis: 0;
   flex-grow: 1;
+  flex-shrink: 0;
+  min-width: $cell-icon-width;
+  overflow: hidden;
+  padding-left: 2px;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .Grid__AssignmentRowCell__Options {
-  flex-grow: 0;
-  flex-shrink: 0;
-  width: $cell_height;
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  height: $cell-icon-height;
+  justify-content: center;
+  width: $cell-icon-width;
 }
 
 .slick-cell.active {

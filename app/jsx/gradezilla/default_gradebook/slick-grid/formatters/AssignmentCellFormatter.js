@@ -95,6 +95,9 @@ export default class AssignmentCellFormatter {
       },
       getSubmissionState (submission) {
         return gradebook.submissionStateMap.getSubmissionState(submission);
+      },
+      getUpdatingSubmission(submission) {
+        return gradebook.getUpdatingSubmission(submission)
       }
     };
   }
@@ -132,8 +135,6 @@ export default class AssignmentCellFormatter {
 
     const submissionData = {
       dropped: submission.drop,
-      enteredGrade: submission.entered_grade,
-      enteredScore: submission.entered_score,
       excused: submission.excused,
       grade: submission.grade,
       late: submission.late,
@@ -141,6 +142,16 @@ export default class AssignmentCellFormatter {
       resubmitted: submission.grade_matches_current_submission === false,
       score: submission.score
     };
+
+    const updatingSubmission = this.options.getUpdatingSubmission({
+      assignmentId: assignment.id,
+      userId: student.id
+    })
+    if (updatingSubmission) {
+      submissionData.excused = updatingSubmission.excused
+      submissionData.grade = updatingSubmission.enteredGrade
+      submissionData.score = updatingSubmission.enteredScore
+    }
 
     const options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),

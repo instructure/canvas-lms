@@ -47,7 +47,7 @@ function normalizeSubmissionGrade (props) {
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
 }
 
-function gradeHasChanged (props, state) {
+function hasGradeChanged (props, state) {
   const normalizedEnteredGrade = normalizeSubmissionGrade(props);
   return (normalizedEnteredGrade !== state.grade) && (props.submission.enteredGrade !== state.grade)
 }
@@ -159,7 +159,7 @@ export default class GradeInput extends React.Component {
       formattedGrade: GradeFormatHelper.isExcused(enteredGrade) ? GradeFormatHelper.excused() : enteredGrade,
       grade: this.state.grade.trim()
     }, () => {
-      if (gradeHasChanged(this.props, this.state)) {
+      if (hasGradeChanged(this.props, this.state)) {
         this.handleGradeChange();
       }
     });

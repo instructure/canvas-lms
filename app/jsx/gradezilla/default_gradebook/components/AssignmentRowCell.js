@@ -16,24 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { bool, func, shape, string } from 'prop-types';
-import Button from '@instructure/ui-core/lib/components/Button';
+import React, {Component} from 'react'
+import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
+import Text from '@instructure/ui-core/lib/components/Text'
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine';
 import I18n from 'i18n!gradebook';
+import CellButton from '../GradebookGrid/editors/AssignmentCellEditor/CellButton'
+import GradeInput from '../GradebookGrid/editors/AssignmentCellEditor/GradeInput'
 
-function renderSubmissionCell (options) {
-  const assignment = options.column.object;
-  if (assignment.grading_type === 'points' && assignment.points_possible != null) {
-    return new SubmissionCell.out_of(options); // eslint-disable-line new-cap
-  }
-  return new (SubmissionCell[assignment.grading_type] || SubmissionCell)(options);
-}
-
-class AssignmentRowCell extends React.Component {
+export default class AssignmentRowCell extends Component {
   static propTypes = {
-    isSubmissionTrayOpen: bool.isRequired,
+    assignment: shape({
+      id: string.isRequired,
+      pointsPossible: number
+    }).isRequired,
     editorOptions: shape({
       column: shape({
         assignmentId: string.isRequired
@@ -41,47 +38,86 @@ class AssignmentRowCell extends React.Component {
       grid: shape({}).isRequired,
       item: shape({
         id: string.isRequired
-      }).isRequired,
+      }).isRequired
     }).isRequired,
-    onToggleSubmissionTrayOpen: func.isRequired
+    enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
+    gradingScheme: instanceOf(Array).isRequired,
+    onGradeSubmission: func.isRequired,
+    onToggleSubmissionTrayOpen: func.isRequired,
+    submission: shape({
+      assignmentId: string.isRequired,
+      enteredGrade: string,
+      enteredScore: number,
+      excused: bool.isRequired,
+      id: string,
+      userId: string.isRequired
+    }).isRequired,
+    submissionIsUpdating: bool.isRequired
   };
 
   constructor (props) {
     super(props);
 
-    this.bindContainerRef = (ref) => { this.container = ref };
-    this.bindToggleTrayButtonRef = (ref) => { this.trayButton = ref };
+    this.bindContainerRef = ref => {
+      this.contentContainer = ref
+    }
+    this.bindGradeInput = ref => {
+      this.gradeInput = ref
+    }
+    this.bindToggleTrayButtonRef = ref => {
+      this.trayButton = ref
+    }
+
+    this.gradeSubmission = this.gradeSubmission.bind(this)
   }
 
   componentDidMount () {
-    this.submissionCell = renderSubmissionCell({ ...this.props.editorOptions, container: this.container });
+    if (this.props.enterGradesAs === 'passFail') {
+      // eslint-disable-next-line new-cap
+      this.submissionCell = new SubmissionCell.pass_fail({
+        ...this.props.editorOptions,
+        container: this.contentContainer
+      })
+    } else if (!this.props.submissionIsUpdating && this.trayButton !== document.activeElement) {
+      this.gradeInput.focus()
+    }
   }
 
-  componentDidUpdate (prevProps) {
-    if (prevProps.isSubmissionTrayOpen && !this.props.isSubmissionTrayOpen) {
-      this.focusToggleTrayButton();
+  componentDidUpdate(prevProps) {
+    const submissionFinishedUpdating =
+      prevProps.submissionIsUpdating && !this.props.submissionIsUpdating
+
+    if (
+      this.props.enterGradesAs !== 'passFail' &&
+      submissionFinishedUpdating &&
+      this.trayButton !== document.activeElement
+    ) {
+      this.gradeInput.focus()
     }
   }
 
   componentWillUnmount () {
-    this.submissionCell.destroy();
+    if (this.submissionCell) {
+      this.submissionCell.destroy()
+    }
   }
 
   handleKeyDown = (event) => {
-    const submissionCellHasFocus = this.container.contains(document.activeElement);
-    const popoverTriggerHasFocus = this.trayButton.focused;
+    const inputHasFocus = this.contentContainer.contains(document.activeElement)
+    const trayButtonHasFocus = this.trayButton === document.activeElement
 
     if (event.which === 9) { // Tab
-      if (!event.shiftKey && submissionCellHasFocus) {
+      if (!event.shiftKey && inputHasFocus) {
         // browser will set focus on the tray button
         return false; // prevent Grid behavior
-      } else if (event.shiftKey && popoverTriggerHasFocus) {
+      } else if (event.shiftKey && trayButtonHasFocus) {
         // browser will set focus on the submission cell
         return false; // prevent Grid behavior
       }
     }
 
-    if (event.which === 13 && popoverTriggerHasFocus) { // Enter
+    // Enter
+    if (event.which === 13 && trayButtonHasFocus) {
       // browser will activate the tray button
       return false; // prevent Grid behavior
     }
@@ -94,56 +130,82 @@ class AssignmentRowCell extends React.Component {
     this.props.onToggleSubmissionTrayOpen(options.item.id, options.column.assignmentId);
   }
 
-  applyValue (item, state) {
-    this.submissionCell.applyValue(item, state);
+  focus() {
+    if (this.submissionCell) {
+      this.submissionCell.focus()
+    } else {
+      this.gradeInput.focus()
+    }
   }
 
-  focus () {
-    this.submissionCell.focus();
-  }
-
-  focusToggleTrayButton = () => {
-    if (this.trayButton) {
-      this.trayButton.focus();
+  gradeSubmission(item, state) {
+    if (this.props.enterGradesAs === 'passFail') {
+      this.submissionCell.applyValue(item, state)
+    } else {
+      this.props.onGradeSubmission(this.props.submission, this.gradeInput.gradingData)
     }
   }
 
   isValueChanged () {
-    return this.submissionCell.isValueChanged();
+    if (this.props.enterGradesAs === 'passFail') {
+      return this.submissionCell.isValueChanged()
+    }
+    return this.gradeInput.hasGradeChanged()
   }
 
-  loadValue (item) {
-    this.submissionCell.loadValue(item);
+  loadValue() {
+    if (this.submissionCell) {
+      this.submissionCell.loadValue()
+    }
   }
 
-  serializeValue () {
-    return this.submissionCell.serializeValue();
-  }
-
-  validate () {
-    return this.submissionCell.validate();
+  serializeValue() {
+    return this.submissionCell ? this.submissionCell.serializeValue() : null
   }
 
   render () {
+    let pointsPossible = null
+    if (this.props.enterGradesAs === 'points' && this.props.assignment.pointsPossible) {
+      pointsPossible = `/${I18n.n(this.props.assignment.pointsPossible)}`
+    }
+
+    const showEndText =
+      this.props.enterGradesAs === 'percent' || this.props.enterGradesAs === 'points'
+
     return (
       <div className="Grid__AssignmentRowCell">
-        <div className="Grid__AssignmentRowCell__Notifications" />
+        <div className="Grid__AssignmentRowCell__StartContainer" />
 
-        <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef} />
+        <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef}>
+          {this.props.enterGradesAs !== 'passFail' && (
+            <GradeInput
+              assignment={this.props.assignment}
+              enterGradesAs={this.props.enterGradesAs}
+              disabled={this.props.submissionIsUpdating}
+              gradingScheme={this.props.gradingScheme}
+              ref={this.bindGradeInput}
+              submission={this.props.submission}
+            />
+          )}
+        </div>
 
-        <div className="Grid__AssignmentRowCell__Options">
-          <Button
-            ref={this.bindToggleTrayButtonRef}
-            onClick={this.handleToggleTrayButtonClick}
-            size="small"
-            variant="icon"
-          >
-            <IconExpandLeftLine title={I18n.t('Open submission tray')} />
-          </Button>
+        <div className="Grid__AssignmentRowCell__EndContainer">
+          {showEndText && (
+            <span className="Grid__AssignmentRowCell__EndText">
+              {pointsPossible && <Text size="small">{pointsPossible}</Text>}
+            </span>
+          )}
+
+          <div className="Grid__AssignmentRowCell__Options">
+            <CellButton
+              buttonRef={this.bindToggleTrayButtonRef}
+              onClick={this.handleToggleTrayButtonClick}
+            >
+              <IconExpandLeftLine title={I18n.t('Open submission tray')} />
+            </CellButton>
+          </div>
         </div>
       </div>
     );
   }
 }
-
-export default AssignmentRowCell;
