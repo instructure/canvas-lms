@@ -215,6 +215,7 @@ import 'compiled/jquery.rails_flash_notifications'
     params['privacy_level'] = 'anonymous';
     params['consumer_key'] = 'N/A';
     params['shared_secret'] = 'N/A';
+    params['verify_uniqueness'] = data.verifyUniqueness
     if (data.consumerKey && data.consumerKey.length > 0) {
       params['consumer_key'] = data.consumerKey;
     }

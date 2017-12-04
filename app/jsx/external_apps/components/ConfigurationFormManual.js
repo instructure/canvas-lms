@@ -83,14 +83,15 @@ export default React.createClass({
 
     getFormData() {
       return {
-        name         : this.refs.name.state.value,
-        consumerKey  : this.refs.consumerKey.state.value,
-        sharedSecret : this.refs.sharedSecret.state.value,
-        url          : this.refs.url.state.value,
-        domain       : this.refs.domain.state.value,
-        privacyLevel : this.refs.privacyLevel.state.value,
-        customFields : this.refs.customFields.state.value,
-        description  : this.refs.description.state.value
+        name:             this.refs.name.state.value,
+        consumerKey:      this.refs.consumerKey.state.value,
+        sharedSecret:     this.refs.sharedSecret.state.value,
+        url:              this.refs.url.state.value,
+        domain:           this.refs.domain.state.value,
+        privacyLevel:     this.refs.privacyLevel.state.value,
+        customFields:     this.refs.customFields.state.value,
+        description:      this.refs.description.state.value,
+        verifyUniqueness: 'true'
       };
     },
 

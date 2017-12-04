@@ -261,7 +261,6 @@ class ContextExternalTool < ActiveRecord::Base
 
     @config_errors = []
     error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'
-
     converter = CC::Importer::BLTIConverter.new
     tool_hash = if config_type == 'by_url'
                   uri = Addressable::URI.parse(config_url)
@@ -504,6 +503,15 @@ class ContextExternalTool < ActiveRecord::Base
       Addressable::URI.parse(standard_url).host == host
     else
       false
+    end
+  end
+
+  def duplicated_in_context?
+    self.class.all_tools_for(context).where.not(id: id).any? do |other_tool|
+      settings_equal = other_tool.settings == settings
+      launch_urls_equal = other_tool.url == url && settings.values.all?(&:blank?)
+
+      other_tool.settings.values.any?(&:present?) ? settings_equal : launch_urls_equal
     end
   end
 

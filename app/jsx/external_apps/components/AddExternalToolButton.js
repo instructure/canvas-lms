@@ -21,10 +21,11 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import Modal from 'react-modal'
 import ExternalTool from 'compiled/models/ExternalTool'
-import store from '../../external_apps/lib/ExternalAppsStore'
-import ConfigurationForm from '../../external_apps/components/ConfigurationForm'
-import Lti2Iframe from '../../external_apps/components/Lti2Iframe'
-import Lti2Permissions from '../../external_apps/components/Lti2Permissions'
+import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
+import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
+import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
+import DuplicateConfirmationForm from 'jsx/external_apps/components/DuplicateConfirmationForm'
 import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {
@@ -57,6 +58,9 @@ export default React.createClass({
         isLti2: false,
         lti2RegistrationUrl: 'about:blank',
         configurationType: '',
+        duplicateTool: false,
+        attemptedToolSaveData: {},
+        attemptedToolConfigurationType: ''
       }
     },
 
@@ -71,7 +75,13 @@ export default React.createClass({
     },
 
     closeModal() {
-      this.setState({ modalIsOpen: false, tool: {} });
+      this.setState({
+        modalIsOpen: false,
+        tool: {},
+        duplicateTool: false,
+        attemptedToolSaveData: {},
+        attemptedToolConfigurationType: ''
+      });
     },
 
     handleLti2ToolInstalled(toolData) {
@@ -86,7 +96,15 @@ export default React.createClass({
 
     _successHandler() {
       this.throttleCreation = false;
-      this.setState({ modalIsOpen: false, tool: {}, isLti2: false, lti2RegistrationUrl: null }, function() {
+      this.setState({
+        modalIsOpen: false,
+        tool: {},
+        isLti2: false,
+        lti2RegistrationUrl: null,
+        duplicateTool: false,
+        attemptedToolSaveData: {},
+        attemptedToolConfigurationType: ''
+      }, function() {
         $.flashMessage(I18n.t('The app was added'));
         store.fetch({ force: true });
       });
@@ -95,6 +113,12 @@ export default React.createClass({
     _errorHandler(xhr) {
       const errors = JSON.parse(xhr.responseText).errors;
       let errorMessage = I18n.t('We were unable to add the app.');
+
+      if (errors.tool_currently_installed) {
+        this.setState({ duplicateTool: true })
+        this.throttleCreation = false;
+        return
+      }
 
       if (this.state.configurationType !== 'manual') {
         const errorName = `config_${this.state.configurationType}`;
@@ -131,14 +155,27 @@ export default React.createClass({
         });
         e.currentTarget.closest('form').submit();
       } else if (!this.throttleCreation) {
-          this.setState({'configurationType': configurationType});
+          this.setState({
+            'configurationType': configurationType,
+            'attemptedToolSaveData': data,
+            'attemptedToolConfigurationType': configurationType
+          });
           store.save(configurationType, data, this._successHandler.bind(this), this._errorHandler.bind(this));
           this.throttleCreation = true;
       }
     },
 
     renderForm() {
-      if (this.state.isLti2 && this.state.tool.app_id) {
+      if (this.state.duplicateTool) {
+        return <DuplicateConfirmationForm
+                onCancel={this.closeModal}
+                toolData={this.state.attemptedToolSaveData}
+                configurationType={this.state.attemptedToolConfigurationType}
+                onSuccess={this._successHandler.bind(this)}
+                onError={this._errorHandler.bind(this)}
+                store={store}
+               />
+      } else if (this.state.isLti2 && this.state.tool.app_id) {
         return <Lti2Permissions ref="lti2Permissions" tool={this.state.tool} handleCancelLti2={this.handleCancelLti2} handleActivateLti2={this.handleActivateLti2} />;
       } else {
         return (

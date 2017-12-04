@@ -862,6 +862,107 @@ describe ExternalToolsController do
   end
 
   describe "POST 'create'" do
+
+    context 'tool duplication' do
+      let(:launch_url) { 'https://www.tool.com/launch' }
+      let(:consumer_key) { 'key' }
+      let(:shared_secret) { 'seekret' }
+      let(:xml) do
+        <<-XML
+          <?xml version="1.0" encoding="UTF-8"?>
+          <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+            <blti:title>Example Tool Provider</blti:title>
+            <blti:description>This is a Sample Tool Provider.</blti:description>
+            <blti:launch_url>https://www.tool.com/launch</blti:launch_url>
+            <blti:extensions platform="canvas.instructure.com">
+            </blti:extensions>
+          </cartridge_basiclti_link>
+        XML
+      end
+      let(:xml_response) { OpenStruct.new({body: xml}) }
+
+      shared_examples_for 'detects duplication in context' do
+        let(:params) { raise "Override in specs" }
+
+        before do
+          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(xml_response)
+          ContextExternalTool.create!(
+            context: @course,
+            name: 'first tool',
+            url: launch_url,
+            consumer_key: consumer_key,
+            shared_secret: shared_secret,
+          )
+        end
+
+        it 'responds with bad request if tool is a duplicate and "verify_uniqueness" is true' do
+          user_session(@teacher)
+          post 'create', params: params, format: 'json'
+          expect(response).to be_bad_request
+        end
+
+        it 'gives error message in response if duplicate tool and "verify_uniqueness" is true' do
+          user_session(@teacher)
+          post 'create', params: params, format: 'json'
+          error_message = JSON.parse(response.body).dig('errors', 'tool_currently_installed').first['message']
+          expect(error_message).to eq 'The tool is already installed in this context.'
+        end
+      end
+
+      context 'create manually' do
+        it_behaves_like 'detects duplication in context' do
+          let(:params) do
+            {
+              course_id: @course.id,
+              external_tool: {
+                name: 'tool name',
+                url: launch_url,
+                consumer_key: consumer_key,
+                shared_secret: shared_secret,
+                verify_uniqueness: 'true'
+              }
+            }
+          end
+        end
+      end
+
+      context 'create via XML' do
+        it_behaves_like 'detects duplication in context' do
+          let(:params) do
+            {
+              course_id: @course.id,
+              external_tool: {
+                name: 'tool name',
+                consumer_key: consumer_key,
+                shared_secret: shared_secret,
+                verify_uniqueness: 'true',
+                config_type: 'by_xml',
+                config_xml: xml
+              }
+            }
+          end
+        end
+      end
+
+      context 'create via URL' do
+        it_behaves_like 'detects duplication in context' do
+          let(:params) do
+            {
+              course_id: @course.id,
+              external_tool: {
+                name: 'tool name',
+                consumer_key: consumer_key,
+                shared_secret: shared_secret,
+                verify_uniqueness: 'true',
+                config_type: 'by_url',
+                config_url: 'http://config.example.com'
+              }
+            }
+          end
+        end
+      end
+    end
+
     it "should require authentication" do
       post 'create', params: {:course_id => @course.id}, :format => "json"
       assert_status(401)

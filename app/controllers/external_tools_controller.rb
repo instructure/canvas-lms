@@ -822,7 +822,8 @@ class ExternalToolsController < ApplicationController
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
       end
       set_tool_attributes(@tool, external_tool_params)
-      if @tool.save
+      check_for_duplication(@tool)
+      if @tool.errors.blank? && @tool.save
         invalidate_nav_tabs_cache(@tool)
         if api_request?
           render :json => external_tool_json(@tool, @context, @current_user, session)
@@ -831,6 +832,7 @@ class ExternalToolsController < ApplicationController
         end
       else
         render :json => @tool.errors, :status => :bad_request
+        @tool.destroy if @tool.persisted?
       end
     end
   end
@@ -956,6 +958,12 @@ class ExternalToolsController < ApplicationController
   end
 
   private
+
+  def check_for_duplication(tool)
+    if tool.duplicated_in_context? && params.dig(:external_tool, :verify_uniqueness).present?
+      tool.errors.add(:tool_currently_installed, 'The tool is already installed in this context.')
+    end
+  end
 
   def generate_module_item_sessionless_launch
     module_item_id = params[:module_item_id]

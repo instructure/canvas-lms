@@ -64,10 +64,11 @@ export default React.createClass({
 
     getFormData() {
       return {
-        name         : this.refs.name.state.value,
-        consumerKey  : this.refs.consumerKey.state.value,
-        sharedSecret : this.refs.sharedSecret.state.value,
-        configUrl    : this.refs.configUrl.state.value
+        name:             this.refs.name.state.value,
+        consumerKey:      this.refs.consumerKey.state.value,
+        sharedSecret:     this.refs.sharedSecret.state.value,
+        configUrl:        this.refs.configUrl.state.value,
+        verifyUniqueness: 'true'
       };
     },
 
