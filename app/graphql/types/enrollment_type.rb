@@ -35,8 +35,10 @@ module Types
 
       resolve ->(enrollment, args, ctx) {
         grades_resolver = ->(grading_period_id) do
-          grading_period_id = grading_period_id.to_i if grading_period_id
-          grades = enrollment.find_score(grading_period_id: grading_period_id)
+          grades = grading_period_id ?
+            enrollment.find_score(grading_period_id: grading_period_id.to_i) :
+            enrollment.find_score(course_score: true)
+
           grades && grades.grants_right?(ctx[:current_user], :read) ?
             grades :
             nil
