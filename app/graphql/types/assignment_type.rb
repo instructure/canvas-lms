@@ -72,6 +72,11 @@ module Types
         .then { assignment.context }
     }
 
+    field :onlyVisibleToOverrides, types.Boolean,
+      "specifies that this assignment is only assigned to students for whom an
+       `AssignmentOverride` applies.",
+      property: :only_visible_to_overrides
+
     connection :submissionsConnection, SubmissionType.connection_type do
       description "submissions for this assignment"
       resolve ->(assignment, _, ctx) {
