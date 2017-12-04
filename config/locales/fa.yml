@@ -1483,6 +1483,7 @@ fa:
   add_new_set_of_due_dates_e8e240f: "افزودن مجموعه جدید تاریخ های مهلت"
   add_new_term_d2217c0d: "افزودن نیمسال جدید"
   add_people_7ee4b2ec: "افزودن افراد"
+  add_people_to_coursename_5ea234e1: "افزودن افراد به %{courseName}"
   add_quiz_ip_filter_c7b37dc5: "افزودن فیلتر آی پی آزمون"
   add_rating_89d7fbde: "افزودن رتبه بندی"
   add_recipient_ff135ed7: "افزودن گیرنده"
@@ -1601,6 +1602,7 @@ fa:
   all_students_have_taken_the_survey_494f9f42: "همه دانشجویان نظرسنجی را انجام داده اند"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "همه موردهای ارسالی باید یک نمره انتخاب شده داشته باشند."
   all_terms_cd27b0fb: "همه نیمسال‌ها"
+  all_timezones_5e8afa7b: "همه منطقه های زمانی"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "همه وزن‌ها باید بزرگتر یا مساوی صفر باشد."
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "به یک ناظر اجازه داده شود چند نمره مستقل برای موردهای ارسالی را بازبینی کند"
   allow_bulk_grade_export_to_sis_e11a6e66: "اجازه دادن به صدور نمره گروهی به سامانه اطلاعات دانشجو"
@@ -1620,6 +1622,7 @@ fa:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "اجازه دادن به ارسال اطلاعیه ها از طریق صف ارسال"
   allowed_attempts_4e229caa: "تلاش های مجاز"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "به اساتید امکان داده شود داده های نمره را برای صدور گروهی به یکپارچه‌سازی‌های سامانه اطلاعات دانشجو، علامت‌گذاری کنند."
+  allows_the_duplicating_of_modules_in_canvas_2e15b444: "امکان تکرار ماژول ها در کانواس"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "امکان زمان بندی رویدادهای تکرار شونده تقویم را فراهم می کند"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "برای کاربران دارای شماره تلفن بین المللی امکان دریافت پیام های متنی از کانواس را فراهم می کند."
   always_3a59e701: همیشه
@@ -17301,6 +17304,9 @@ fa:
   unpublished_dfd8801: "منتشر نشده"
   unread_e9c1b19c: "خوانده نشده"
   unregister_service_985238e9: "لغو ثبت سرویس"
+  unreserved_e86b7425: "رزرو نشده"
+  unselected_all_courses_99a9d35c: "انتخاب نکردن تمام درس ها"
+  unselected_course_course_89995a83: "درس انتخاب نشده ‍%{course}"
   unstarted_932f2990: "شروع نشده"
   unsupported_package: "بسته محتوای پشتیبانی نشده"
   until_4a1f8cda: تا
