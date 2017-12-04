@@ -18,7 +18,7 @@
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
-    "d3": "3.4.1",
+    "d3": "3.5.17",
     "fullcalendar": "https://github.com/ryankshaw/fullcalendar.git#aa686b36d10cee1e1e3ec7c7784145e46667d47d",
     "graphiql": "^0.11.2",
     "graphql": "^0.10.0",
