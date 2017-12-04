@@ -31,20 +31,20 @@ import 'compiled/jquery.rails_flash_notifications'
 
   var PREDEFINED_COLORS = [
     {hexcode: '#EF4437', name: I18n.t('Red')},
-    {hexcode: '#E71F63', name: I18n.t('Pink')},
-    {hexcode: '#8F3E97', name: I18n.t('Purple')},
-    {hexcode: '#65499D', name: I18n.t('Deep Purple')},
+    {hexcode: '#FF8199', name: I18n.t('Pink')},
+    {hexcode: '#AA0082', name: I18n.t('Purple')},
+    {hexcode: '#C864C8', name: I18n.t('Lavender')},
     {hexcode: '#4554A4', name: I18n.t('Indigo')},
-    {hexcode: '#2083C5', name: I18n.t('Blue')},
-    {hexcode: '#35A4DC', name: I18n.t('Light Blue')},
+    {hexcode: '#000054', name: I18n.t('Blue')},
+    {hexcode: '#0078FF', name: I18n.t('Light Blue')},
     {hexcode: '#09BCD3', name: I18n.t('Cyan')},
-    {hexcode: '#009688', name: I18n.t('Teal')},
-    {hexcode: '#43A047', name: I18n.t('Green')},
-    {hexcode: '#8BC34A', name: I18n.t('Light Green')},
-    {hexcode: '#FDC010', name: I18n.t('Yellow')},
-    {hexcode: '#F8971C', name: I18n.t('Orange')},
-    {hexcode: '#F0592B', name: I18n.t('Deep Orange')},
-    {hexcode: '#F06291', name: I18n.t('Light Pink')}
+    {hexcode: '#7AE1AA', name: I18n.t('Teal')},
+    {hexcode: '#AAD75F', name: I18n.t('Green')},
+    {hexcode: '#00DCB4', name: I18n.t('Aqua')},
+    {hexcode: '#FAC800', name: I18n.t('Yellow')},
+    {hexcode: '#FC9147', name: I18n.t('Orange')},
+    {hexcode: '#EEDC00', name: I18n.t('Lemon')},
+    {hexcode: '#50D2FF', name: I18n.t('Arctic')}
   ];
 
   function shouldApplySwatchBorderColor (color) {
