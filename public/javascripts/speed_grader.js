@@ -857,30 +857,26 @@ function initRubricStuff(){
   });
 }
 
-function initKeyCodes(){
-  $window.keycodes({keyCodes: "j k p n c r g", ignore: 'input, textarea, embed, object'}, function(event) {
+function initKeyCodes () {
+  const keycodeOptions = {
+    keyCodes: 'j k p n c r g',
+    ignore: 'input, textarea, embed, object'
+  };
+  $window.keycodes(keycodeOptions, (event) => {
     event.preventDefault();
     event.stopPropagation();
+    const { keyString } = event;
 
-    //Prev()
-    if(event.keyString == "k" || event.keyString == "p") {
-      EG.prev();
-    }
-    //next()
-    else if(event.keyString == "j" || event.keyString == "n") {
-      EG.next();
-    }
-    //comment
-    else if(event.keyString == "f" || event.keyString == "c") {
-      $add_a_comment_textarea.focus();
-    }
-    // focus on grade
-    else if(event.keyString == "g") {
-      $grade.focus();
-    }
-    // focus on rubric
-    else if(event.keyString == "r") {
-      EG.toggleFullRubric();
+    if (keyString === "k" || keyString === "p") {
+      EG.prev(); // goto Previous Student
+    } else if(keyString === "j" || keyString === "n") {
+      EG.next(); // goto Next Student
+    } else if(keyString === "c") {
+      $add_a_comment_textarea.focus(); // add comment
+    } else if(keyString === "g") {
+      $grade.focus(); // focus on grade
+    } else if(keyString === "r") {
+      EG.toggleFullRubric(); // focus rubric
     }
   });
 }
