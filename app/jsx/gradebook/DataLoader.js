@@ -62,9 +62,7 @@ function getGradingPeriodAssignments (courseId) {
     while (pendingStudentsForSubmissions.length) {
       const studentIds = pendingStudentsForSubmissions.splice(0, submissionChunkSize);
       submissionChunkCount++;
-      $.ajaxJSON(submissionURL, "GET",
-                 {student_ids: studentIds, ...submissionParams},
-                 gotSubmissionsChunk);
+      cheaterDepaginate(submissionURL, { student_ids: studentIds, ...submissionParams }).then(gotSubmissionsChunk);
     }
   };
 

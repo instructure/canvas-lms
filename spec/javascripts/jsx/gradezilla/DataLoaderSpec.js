@@ -266,8 +266,8 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
     respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
     respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
-    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, SUBMISSIONS_CHUNK_1);
-    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, SUBMISSIONS_CHUNK_2);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, { Link: '' }, SUBMISSIONS_CHUNK_1);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, { Link: '' }, SUBMISSIONS_CHUNK_2);
 
     const dataLoader = callLoadGradebookData();
     const resolve = assert.async();
@@ -346,8 +346,8 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
     respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
     respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
-    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, SUBMISSIONS_CHUNK_1);
-    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, SUBMISSIONS_CHUNK_2);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, { Link: '' }, SUBMISSIONS_CHUNK_1);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, { Link: '' }, SUBMISSIONS_CHUNK_2);
 
     const dataLoader = callLoadGradebookData();
     const resolve = assert.async();
@@ -362,8 +362,8 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
     respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
     respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
-    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, SUBMISSIONS_CHUNK_1);
-    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, SUBMISSIONS_CHUNK_2);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, { Link: '' }, SUBMISSIONS_CHUNK_1);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, { Link: '' }, SUBMISSIONS_CHUNK_2);
 
     const pages = [];
     function saveSubmissions (submissions) {
@@ -377,6 +377,28 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
       strictEqual(pages.length, 2, 'two pages of submissions were returned');
       deepEqual(pages[0], SUBMISSIONS_CHUNK_1);
       deepEqual(pages[1], SUBMISSIONS_CHUNK_2);
+      resolve();
+    });
+  });
+
+  QUnit.only('requests submissions with pagination', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS }, 200, {}, STUDENTS_PAGE_1.concat(STUDENTS_PAGE_2));
+    const responseHeaders = { Link: '</submissions&page=2>; rel="last"' };
+    respondWith('/submissions', { student_ids: STUDENT_IDS }, 200, responseHeaders, SUBMISSIONS_CHUNK_1);
+    respondWith('/submissions', { page: '2', student_ids: STUDENT_IDS }, 200, { Link: '' }, SUBMISSIONS_CHUNK_2);
+
+    const pages = [];
+    function saveSubmissions (submissions) {
+      pages.push(submissions);
+    }
+
+    const dataLoader = callLoadGradebookData({ perPage: 50, submissionsChunkCb: saveSubmissions, submissionsChunkSize: 50 });
+    const resolve = assert.async();
+
+    dataLoader.gotSubmissions.then(() => {
+      const submissionsRequests = XHRS.filter(xhr => xhr.url.match('/submissions'));
+      strictEqual(submissionsRequests.length, 2, 'two requests for submissions were made');
       resolve();
     });
   });

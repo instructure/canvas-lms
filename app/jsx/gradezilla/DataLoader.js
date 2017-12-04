@@ -75,12 +75,7 @@ function getPendingSubmissions () {
   while (pendingStudentsForSubmissions.length) {
     const studentIds = pendingStudentsForSubmissions.splice(0, submissionChunkSize);
     submissionChunkCount++;
-    $.ajaxJSON(
-      submissionURL,
-      'GET',
-      { student_ids: studentIds, ...submissionsParams },
-      gotSubmissionsChunk
-    );
+    cheaterDepaginate(submissionURL, { student_ids: studentIds, ...submissionsParams }).then(gotSubmissionsChunk);
   }
 }
 
