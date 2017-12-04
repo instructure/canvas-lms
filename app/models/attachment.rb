@@ -1387,6 +1387,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def copy_attachment_content(destination)
+    # parent is broken; if child is probably broken too, make sure it gets marked as broken
+    if file_state == 'broken' && destination.md5.nil?
+      Attachment.where(id: destination).update_all(file_state: 'broken')
+      return
+    end
+
     destination.write_attribute(:filename, filename) if filename
     if Attachment.s3_storage?
       if filename && s3object.exists? && !destination.s3object.exists?
