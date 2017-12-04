@@ -984,6 +984,8 @@ CanvasRails::Application.routes.draw do
 
       post 'courses/:course_id/enrollments', action: :create
       post 'sections/:section_id/enrollments', action: :create
+      post 'courses/:course_id/enrollments/:id/accept', action: :accept
+      post 'courses/:course_id/enrollments/:id/reject', action: :reject
 
       put 'courses/:course_id/enrollments/:id/reactivate', :action => :reactivate, :as => 'reactivate_enrollment'
 
