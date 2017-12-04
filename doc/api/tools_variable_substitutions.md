@@ -553,6 +553,15 @@ Returns the full name of the launching user.
 ```
 John Doe
 ```
+## Person.name.display
+Returns the display name of the launching user.
+
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *person_name_display*  
+
+```
+John Doe
+```
 ## Person.name.family
 Returns the last name of the launching user.
 

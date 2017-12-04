@@ -81,6 +81,7 @@ module Lti
          Person.name.given
          Person.name.family
          Person.name.full
+         Person.name.display
          Person.sourcedId
          User.id
          User.image

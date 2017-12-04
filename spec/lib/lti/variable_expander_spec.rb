@@ -174,6 +174,7 @@ module Lti
            Person.name.given
            Person.name.family
            Person.name.full
+           Person.name.display
            Person.sourcedId
            User.id
            User.image
@@ -266,6 +267,11 @@ module Lti
         it 'includes Person.name.full when in enabled capability' do
           expanded = variable_expander.enabled_capability_params(enabled_capability)
           expect(expanded.keys).to include 'lis_person_name_full'
+        end
+
+        it 'includes Person.name.display when in enabled capability' do
+          expanded = variable_expander.enabled_capability_params(enabled_capability)
+          expect(expanded.keys).to include 'person_name_display'
         end
       end
     end
@@ -964,6 +970,14 @@ module Lti
           exp_hash = {test: '$Person.name.full'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'Uncle Jake'
+        end
+
+        it 'has substitution for $Person.name.display' do
+          user.name = 'Uncle Jake'
+          user.short_name = 'Unc J'
+          exp_hash = {test: '$Person.name.display'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Unc J'
         end
 
         it 'has substitution for $Person.name.family' do

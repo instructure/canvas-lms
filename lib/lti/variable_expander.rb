@@ -597,6 +597,17 @@ module Lti
                        USER_GUARD,
                        default_name: 'lis_person_name_full'
 
+    # Returns the display name of the launching user.
+    # @launch_parameter lis_person_name_full
+    # @example
+    #   ```
+    #   John Doe
+    #   ```
+    register_expansion 'Person.name.display', [],
+                       -> { @current_user.short_name },
+                       USER_GUARD,
+                       default_name: 'person_name_display'
+
     # Returns the last name of the launching user.
     # @launch_parameter lis_person_name_family
     # @example
