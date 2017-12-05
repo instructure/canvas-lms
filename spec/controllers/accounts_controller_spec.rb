@@ -228,6 +228,18 @@ describe AccountsController do
         get 'show', params: {:id => @account1.id }, :format => 'html'
         expect(assigns[:associated_courses_count]).to eq 1
       end
+
+      it "if crosslisted a section to another account, do show other if that param is not set" do
+        account_with_admin_logged_in(account: @account2)
+        get 'show', params: {:id => @account2.id, :include_crosslisted_courses => true}, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 2
+      end
+
+      it "if crosslisted a section to this account, do *not* show other account's course even if param is not set" do
+        account_with_admin_logged_in(account: @account1)
+        get 'show', params: {:id => @account1.id, :include_crosslisted_courses => true}, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
     end
 
     # Check that both published and un-published courses have the correct count
