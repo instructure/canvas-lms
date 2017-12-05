@@ -253,7 +253,7 @@ export default class ThemeEditor extends React.Component {
       })
   }
 
-  filterAndSetActive = (progresses) => {
+  filterAndSetActive = progresses => {
     this.setState({activeSubAccountProgresses: progresses.filter(notComplete)})
   }
 
@@ -265,8 +265,7 @@ export default class ThemeEditor extends React.Component {
     this.setState({showSubAccountProgress: false})
   }
 
-  renderTabInputs = () => {
-    return this.props.allowGlobalIncludes
+  renderTabInputs = () => this.props.allowGlobalIncludes
       ? TABS.map(tab => (
           <input
             type="radio"
@@ -279,10 +278,8 @@ export default class ThemeEditor extends React.Component {
           />
         ))
       : null
-  }
 
-  renderTabLabels = () => {
-    return this.props.allowGlobalIncludes
+  renderTabLabels = () => this.props.allowGlobalIncludes
       ? TABS.map(tab => (
           <label
             htmlFor={tab.id}
@@ -294,6 +291,56 @@ export default class ThemeEditor extends React.Component {
           </label>
         ))
       : null
+
+  renderHeader(tooltipForWhyApplyIsDisabled) {
+    return (
+      <header
+        className={`Theme__header ${!this.props.hasUnsavedChanges &&
+          'Theme__header--is-active-theme'}`}
+      >
+        <div className="Theme__header-layout">
+          <div className="Theme__header-primary">
+            {/* HIDE THIS BUTTON IF THEME IS ACTIVE THEME */}
+            {/* IF CHANGES ARE MADE, THIS BUTTON IS DISABLED UNTIL THEY ARE SAVED */}
+            {this.props.hasUnsavedChanges ? (
+              <span data-tooltip="right" title={tooltipForWhyApplyIsDisabled}>
+                <button
+                  type="button"
+                  className="Button Button--success"
+                  disabled={!!tooltipForWhyApplyIsDisabled}
+                  onClick={this.handleApplyClicked}
+                >
+                  {I18n.t('Apply theme')}
+                </button>
+              </span>
+            ) : null}
+
+            <h2 className="Theme__header-theme-name">
+              {this.props.hasUnsavedChanges || this.somethingHasChanged() ? null : (
+                <i className="icon-check" />
+              )}
+              &nbsp;&nbsp;
+              {this.state.sharedBrandConfigBeingEdited
+                ? this.state.sharedBrandConfigBeingEdited.name
+                : null}
+            </h2>
+          </div>
+          <div className="Theme__header-secondary">
+            <SaveThemeButton
+              userNeedsToPreviewFirst={this.somethingHasChanged()}
+              sharedBrandConfigBeingEdited={this.state.sharedBrandConfigBeingEdited}
+              accountID={this.props.accountID}
+              brandConfigMd5={this.props.brandConfig.md5}
+              onSave={this.updateSharedBrandConfigBeingEdited}
+            />
+            &nbsp;
+            <button type="button" className="Button" onClick={this.handleCancelClicked}>
+              {I18n.t('Exit')}
+            </button>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   render() {
@@ -310,6 +357,7 @@ export default class ThemeEditor extends React.Component {
 
     return (
       <div id="main" className="ic-Layout-columns">
+        <h1 className="screenreader-only">{I18n.t('Theme Editor')}</h1>
         {this.props.useHighContrast && (
           <div role="alert" className="ic-flash-static ic-flash-error">
             <h4 className="ic-flash__headline">
@@ -342,54 +390,6 @@ export default class ThemeEditor extends React.Component {
         >
           <input name="utf8" type="hidden" value="✓" />
           <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
-
-          <header
-            className={`Theme__header ${!this.props.hasUnsavedChanges &&
-              'Theme__header--is-active-theme'}`}
-          >
-            <h1 className="screenreader-only">{I18n.t('Theme Editor')}</h1>
-            <div className="Theme__header-layout">
-              <div className="Theme__header-primary">
-                {/* HIDE THIS BUTTON IF THEME IS ACTIVE THEME */}
-                {/* IF CHANGES ARE MADE, THIS BUTTON IS DISABLED UNTIL THEY ARE SAVED */}
-                {this.props.hasUnsavedChanges ? (
-                  <span data-tooltip="right" title={tooltipForWhyApplyIsDisabled}>
-                    <button
-                      type="button"
-                      className="Button Button--success"
-                      disabled={!!tooltipForWhyApplyIsDisabled}
-                      onClick={this.handleApplyClicked}
-                    >
-                      {I18n.t('Apply theme')}
-                    </button>
-                  </span>
-                ) : null}
-
-                <h2 className="Theme__header-theme-name">
-                  {this.props.hasUnsavedChanges || this.somethingHasChanged() ? null : (
-                    <i className="icon-check" />
-                  )}
-                  &nbsp;&nbsp;
-                  {this.state.sharedBrandConfigBeingEdited
-                    ? this.state.sharedBrandConfigBeingEdited.name
-                    : null}
-                </h2>
-              </div>
-              <div className="Theme__header-secondary">
-                <SaveThemeButton
-                  userNeedsToPreviewFirst={this.somethingHasChanged()}
-                  sharedBrandConfigBeingEdited={this.state.sharedBrandConfigBeingEdited}
-                  accountID={this.props.accountID}
-                  brandConfigMd5={this.props.brandConfig.md5}
-                  onSave={this.updateSharedBrandConfigBeingEdited}
-                />
-                &nbsp;
-                <button type="button" className="Button" onClick={this.handleCancelClicked}>
-                  {I18n.t('Exit')}
-                </button>
-              </div>
-            </div>
-          </header>
 
           <div
             className={`Theme__layout ${!this.props.hasUnsavedChanges &&
@@ -524,6 +524,7 @@ export default class ThemeEditor extends React.Component {
                 needs to be last element in <form>. see:
                 https://blog.yorkxin.org/posts/2014/02/06/ajax-with-formdata-is-broken-on-ie10-ie11/ */}
           <input type="hidden" name="_workaround_for_IE_10_and_11_formdata_bug" />
+          {this.renderHeader(tooltipForWhyApplyIsDisabled)}
         </form>
 
         <ThemeEditorModal
