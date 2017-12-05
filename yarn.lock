@@ -670,10 +670,6 @@ babel-helper-explode-class@^6.24.1:
     babel-traverse "^6.24.1"
     babel-types "^6.24.1"
 
-babel-helper-flip-expressions@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/babel-helper-flip-expressions/-/babel-helper-flip-expressions-0.2.0.tgz#160d2090a3d9f9c64a750905321a0bc218f884ec"
-
 babel-helper-function-name@^6.24.1:
   version "6.24.1"
   resolved "https://registry.yarnpkg.com/babel-helper-function-name/-/babel-helper-function-name-6.24.1.tgz#d3475b8c03ed98242a25b48351ab18399d3580a9"
@@ -799,12 +795,6 @@ babel-plugin-jscript@^1.0.4:
 babel-plugin-member-expression-literals@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-member-expression-literals/-/babel-plugin-member-expression-literals-1.0.1.tgz#cc5edb0faa8dc927170e74d6d1c02440021624d3"
-
-babel-plugin-minify-guarded-expressions@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-minify-guarded-expressions/-/babel-plugin-minify-guarded-expressions-0.2.0.tgz#8a8c950040fce3e258a12e6eb21eab94ad7235ab"
-  dependencies:
-    babel-helper-flip-expressions "^0.2.0"
 
 babel-plugin-property-literals@^1.0.1:
   version "1.0.1"
@@ -1726,12 +1716,11 @@ canvas-planner@1.0.12:
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
-canvas-rce@2.5.6:
-  version "2.5.6"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.5.6.tgz#fbf3d060e51f5b47b222ba50464a8a2b8c8aaff8"
+canvas-rce@2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.6.2.tgz#393efe1dbfa4cd4b9791a9c64240ca037a5bfd49"
   dependencies:
     aphrodite "^1.1.0"
-    babel-plugin-minify-guarded-expressions "^0.2.0"
     bloody-offset "0.0.0"
     escape-html "1.0.3"
     format-message "^5.1.0"

@@ -11,7 +11,7 @@
     "backbone": "1.1.1",
     "brandable_css": "0.1.0",
     "canvas-planner": "1.0.12",
-    "canvas-rce": "2.5.6",
+    "canvas-rce": "2.6.2",
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
