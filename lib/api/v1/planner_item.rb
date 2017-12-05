@@ -113,7 +113,7 @@ module Api::V1::PlannerItem
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
-      return true if topic && topic.unread_count(user) > 0
+      return true if topic && (topic.unread?(user) || topic.unread_count(user) > 0)
     end
     false
   end

@@ -38,7 +38,7 @@ describe Api::V1::PlannerItem do
     @course.root_account.enable_feature!(:student_planner)
 
     teacher_in_course active_all: true
-    student_in_course active_all: true
+    student_in_course course: @course, active_all: true
     for_course = { course: @course }
 
     assignment_quiz [], for_course
@@ -194,7 +194,12 @@ describe Api::V1::PlannerItem do
   end
 
   describe '#new_activity' do
+    before :once do
+      discussion_topic_model
+    end
+
     it 'should return true for assignments with new grades' do
+      group_discussion_assignment
       graded_submission(@quiz, @student)
       graded_submission_model(assignment: @assignment, user: @student).update_attributes(score: 5)
       graded_submission_model(assignment: @topic.assignment, user: @student).update_attributes(score: 5)
@@ -213,22 +218,36 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
     end
 
+    it 'should return true for unread discussions' do
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
+    end
+
+    it 'should return false for a read discussion' do
+      @topic.change_read_state('read', @student)
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be false
+    end
+
+    it 'should return false for discussions with replies that has been marked read' do
+      @topic.reply_from(user: @teacher, text: 'reply')
+      @topic.change_all_read_state('read', @student)
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be false
+    end
+
     it 'should return true for discussions with new replies' do
-      student_in_course active_all: true
       @group_category = nil
-      announcement_model(context: @course).reply_from(user: @teacher, text: 'reply')
-      group_discussion_assignment.reply_from(user: @teacher, text: 'reply')
+      announcement_model(context: @course)
+      @a.change_read_state('read', @student)
+      @topic.change_read_state('read', @student)
+      @a.reply_from(user: @teacher, text: 'reply')
+      @topic.reply_from(user: @teacher, text: 'reply')
       expect(api.planner_item_json(@a, @student, session)[:new_activity]).to be true
       expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
     end
 
     it 'should return false for items without new activity' do
       student_in_course active_all: true
-      announcement_model(context: @course)
       expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be false
       expect(api.planner_item_json(@assignment, @student, session)[:new_activity]).to be false
-      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be false
-      expect(api.planner_item_json(@a, @student, session)[:new_activity]).to be false
     end
 
     it 'should return false for items that cannot have new activity' do
