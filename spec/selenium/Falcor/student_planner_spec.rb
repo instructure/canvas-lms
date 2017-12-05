@@ -285,6 +285,7 @@ describe "student planner" do
     end
 
     it "allows editing the date of a to-do item", priority: "1", test_id: 3402913 do
+      skip('fragile')
       @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Student to do")
       go_to_list_view
       fln(@student_to_do.title).click
