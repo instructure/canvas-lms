@@ -913,6 +913,35 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.reload.is_public).to be_truthy
     end
 
+    it "should copy front wiki pages" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      @page = @copy_from.wiki_pages.create!(:title => "first page")
+      @page.set_as_front_page!
+      @copy_from.update_attribute(:default_view, 'wiki')
+
+      run_master_migration(:copy_settings => true)
+
+      expect(@copy_to.reload.default_view).to eq 'wiki'
+      @page_copy = @copy_to.wiki_pages.where(:migration_id => mig_id(@page)).first
+      expect(@copy_to.wiki.front_page).to eq @page_copy
+
+      Timecop.freeze(1.minute.from_now) do
+        @page2 = @copy_from.wiki_pages.create!(:title => "second page")
+        @page2.set_as_front_page!
+      end
+
+      run_master_migration
+
+      expect(@copy_to.wiki.reload.front_page).to eq @page_copy # don't change yet
+
+      run_master_migration(:copy_settings => true)
+
+      @page2_copy = @copy_to.wiki_pages.where(:migration_id => mig_id(@page2)).first
+      expect(@copy_to.wiki.reload.front_page).to eq @page2_copy # now should change
+    end
+
     it "shouldn't overwrite syllabus body if already present or changed" do
       @copy_to1 = course_factory
       @template.add_child_course!(@copy_to1)
