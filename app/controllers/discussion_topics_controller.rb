@@ -476,6 +476,9 @@ class DiscussionTopicsController < ApplicationController
         js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
       end
 
+      js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
+        feature_enabled?(:section_specific_announcements)
+
       js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
       js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)

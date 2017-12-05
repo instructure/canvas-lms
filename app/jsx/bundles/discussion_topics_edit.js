@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import $ from 'jquery'
 import DiscussionTopic from 'compiled/models/DiscussionTopic'
 import Announcement from 'compiled/models/Announcement'
@@ -26,6 +25,9 @@ import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupColle
 import SectionCollection from 'compiled/collections/SectionCollection'
 import splitAssetString from 'compiled/str/splitAssetString'
 import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import SectionsAutocomplete from 'jsx/shared/SectionsAutocomplete'
 import 'grading_standards'
 
 const lockManager = new LockManager()
@@ -63,10 +65,14 @@ if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMI
   agc.contextAssetString = ENV.context_asset_string;
   view.assignmentGroupCollection = agc;
 }
-
 $(() => {
   view.render().$el.appendTo('#content')
-  $('#discussion-title').focus()
+  document.querySelector('#discussion-title').focus()
+  const container = document.querySelector('#sections_autocomplete_root')
+  const sectionSpecificAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement  && ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
+  if (container && sectionSpecificAnnouncement) {
+    ReactDOM.render(<SectionsAutocomplete sections={ENV.SECTION_LIST}/>, container)
+  }
 })
 
 export default view
