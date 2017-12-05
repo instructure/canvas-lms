@@ -841,15 +841,49 @@ class UsersController < ApplicationController
   def todo_items
     return render_unauthorized_action unless @current_user
 
-    grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, @current_user, session, 'grading') }
-    submitting = @current_user.assignments_needing_submitting(include_ungraded: true, limit: ToDoListPresenter::ASSIGNMENT_LIMIT).map { |a|
-      todo_item_json(a, @current_user, session, 'submitting')
-    }
-    if Array(params[:include]).include? 'ungraded_quizzes'
-      submitting += @current_user.ungraded_quizzes(:needing_submitting => true).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
-      submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] || CanvasSort::Last }
+    bookmark = BookmarkedCollection::SimpleBookmarker.new(Assignment, :due_at, :id)
+
+    grading_scope = @current_user.assignments_needing_grading(scope_only: true).
+      reorder(:due_at, :id)
+    submitting_scope = @current_user.assignments_needing_submitting(
+        include_ungraded: true,
+        limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
+        scope_only: true ).
+      where('assignments.due_at > ?', Time.zone.now).
+      reorder(:due_at, :id)
+
+    grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
+    grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
+      todo_item_json(a, @current_user, session, 'grading')
     end
-    render :json => (grading + submitting)
+    submitting_collection = BookmarkedCollection.wrap(bookmark, submitting_scope)
+    submitting_collection = BookmarkedCollection.transform(submitting_collection) do |a|
+      todo_item_json(a, @current_user, session, 'submitting')
+    end
+    collections = [
+      ['grading', grading_collection],
+      ['submitting', submitting_collection]
+    ]
+
+    if Array(params[:include]).include? 'ungraded_quizzes'
+      quizzes_bookmark = BookmarkedCollection::SimpleBookmarker.new(Quizzes::Quiz, :due_at, :id)
+      quizzes_scope = @current_user.ungraded_quizzes(
+          :needing_submitting => true,
+          :scope_only => true).
+        where('quizzes.due_at >= ?', Time.zone.now).
+        reorder(:due_at, :id)
+      quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
+      quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
+        todo_item_json(a, @current_user, session, 'submitting')
+      end
+
+      collections << ['quizzes', quizzes_collection]
+    end
+
+    paginated_collection = BookmarkedCollection.merge(*collections)
+    todos = Api.paginate(paginated_collection, self, api_v1_user_todo_list_items_url)
+
+    render :json => todos
   end
 
   include Api::V1::Assignment

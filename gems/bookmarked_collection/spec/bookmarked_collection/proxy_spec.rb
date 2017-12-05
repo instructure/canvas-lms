@@ -103,5 +103,33 @@ describe BookmarkedCollection::Proxy do
         expect(pager.next_bookmark).to be_nil
       end
     end
+
+    context 'transforming' do
+      before do
+        bookmarker = BookmarkedCollection::SimpleBookmarker.new(@scope.klass, :id)
+        @proxy = BookmarkedCollection.wrap(bookmarker, @scope)
+        @proxy = BookmarkedCollection.transform(@proxy) { |_| 'transformed' }
+      end
+
+      it "transforms the items" do
+        pager = @proxy.paginate(per_page: 3)
+        expect(pager).to eql(3.times.map { |_| 'transformed' })
+        expect(pager.next_bookmark).to be_nil
+      end
+
+      it "paginates properly" do
+        pager = @proxy.paginate(per_page: 1)
+        expect(pager).to eql(['transformed'])
+        expect(pager.next_bookmark).not_to be_nil
+
+        pager = @proxy.paginate(per_page: 1, page: pager.bookmark_to_page(pager.next_bookmark))
+        expect(pager).to eql(['transformed'])
+        expect(pager.next_bookmark).not_to be_nil
+
+        pager = @proxy.paginate(per_page: 1, page: pager.bookmark_to_page(pager.next_bookmark))
+        expect(pager).to eql(['transformed'])
+        expect(pager.next_bookmark).to be_nil
+      end
+    end
   end
 end

@@ -248,4 +248,75 @@ describe UsersController, type: :request do
     expect(response).to be_success
   end
 
+  context 'pagination' do
+    before :each do
+      @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+      @teacher_course = @course
+      @student_course = course_factory(active_all: true)
+      @student_course.enroll_student(@user).accept!
+      # an assignment i need to submit (needs_submitting)
+      @student_assignment_ids = []
+      10.times do
+        a = Assignment.create!(:context => @student_course,
+                               :due_at => 6.days.from_now,
+                               :title => 'required work',
+                               :submission_types => 'online_text_entry',
+                               :points_possible => 10)
+        @student_assignment_ids << a.id
+      end
+
+      # an assignment i created, and a student who submits the assignment (needs_grading)
+      @me = @user
+      @student = user_factory(active_all: true)
+      @user = @me
+      @teacher_course.enroll_student(@student).accept!
+      @teacher_assignment_ids = []
+      10.times do
+        a = Assignment.create!(:context => @teacher_course,
+                               :due_at => 1.day.from_now,
+                               :title => 'text',
+                               :submission_types => 'online_text_entry',
+                               :points_possible => 15)
+        a.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'done')
+        @teacher_assignment_ids << a.id
+      end
+    end
+
+    it "paginates (users controller)" do
+      response_ids = []
+      json = api_call(:get, "/api/v1/users/self/todo",
+                      :controller => "users", :action => "todo_items",
+                      :format => "json", :per_page => 10)
+      json.each { |todo| response_ids << todo['assignment']['id'] }
+
+      json_next = follow_pagination_link('next', {
+        controller: 'users',
+        action: 'todo_items',
+        format: 'json',
+        per_page: 10
+      })
+      json_next.each { |todo| response_ids << todo['assignment']['id'] }
+
+      expect(response_ids - @teacher_assignment_ids - @student_assignment_ids).to be_empty
+    end
+
+    it "paginated (courses controller)" do
+      response_ids = []
+      json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
+                      :controller => "courses", :action => "todo_items",
+                      :format => "json", :per_page => 5,
+                      :course_id => @student_course.to_param)
+      json.each { |todo| response_ids << todo['assignment']['id'] }
+      json_next = follow_pagination_link('next', {
+        controller: 'courses',
+        action: 'todo_items',
+        format: 'json',
+        per_page: 5,
+        :course_id => @student_course.to_param
+      })
+      json_next.each { |todo| response_ids << todo['assignment']['id'] }
+
+      expect(response_ids - @student_assignment_ids).to be_empty
+    end
+  end
 end
