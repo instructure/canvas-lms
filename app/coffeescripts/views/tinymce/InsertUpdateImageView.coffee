@@ -40,6 +40,7 @@ define [
       'change [name="image[src]"]' : 'onImageUrlChange'
       'tabsshow .imageSourceTabs': 'onTabsshow'
       'dblclick .flickrImageResult, .treeFile' : 'onFileLinkDblclick'
+      'change [name="image[data-decorative]"]': 'onDecorativeChange'
 
     dialogOptions:
       width: 625
@@ -64,6 +65,7 @@ define [
           alt: @$selectedNode.attr('alt')
           width: @$selectedNode.width()
           height: @$selectedNode.height()
+          'data-decorative': @$selectedNode.attr('data-decorative')
 
     afterRender: ->
       @$('.imageSourceTabs').tabs()
@@ -113,7 +115,13 @@ define [
         newAttributes = _.defaults attributes,
           width: img.width
           height: img.height
-        @$("[name='image[#{key}]']").val(value) for key, value of newAttributes
+        for key, value of newAttributes
+          if (@$("[name='image[#{key}]']")).attr('type') == 'checkbox'
+            @$("[name='image[#{key}]']").attr('checked', !!value)
+          else
+            @$("[name='image[#{key}]']").val(value)
+        if newAttributes['data-decorative']
+          @$("[name='image[alt]']").attr('disabled', true)
         isValidImage = newAttributes.width && newAttributes.height
         @setAspectRatio()
         dfd.resolve newAttributes
@@ -133,6 +141,9 @@ define [
       for key in ['src',  'alt']
         val = @$("[name='image[#{key}]']").val()
         res[key] = val if val
+      if @$("[name='image[data-decorative]']").is(':checked')
+        res['alt'] = ''
+        res['data-decorative'] = true
       res
 
     onFileLinkClick: (event) ->
@@ -154,6 +165,12 @@ define [
       @flickr_link = null
       @setSelectedImage src: $(event.currentTarget).val()
 
+    onDecorativeChange: (event) ->
+      if @$("[name='image[data-decorative]']").is(':checked')
+        @$("[name='image[alt]']").attr('disabled', true)
+      else
+        @$("[name='image[alt]']").removeAttr('disabled')
+
     close: ->
       super
       @restoreCaret()
@@ -170,6 +187,9 @@ define [
     update: =>
       @restoreCaret()
       if @$selectedNode.is('img')
+        # Kill the alt/decorative props (but they get added back if needed)
+        @$selectedNode.removeAttr('alt')
+        @$selectedNode.removeAttr('data-decorative')
         @$selectedNode.attr(@getAttributes())
       else
         RceCommandShim.send(@$editor, 'insert_code', @generateImageHtml())

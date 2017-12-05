@@ -65,6 +65,37 @@ define [
     equal(img.attr('src'), "testsrc")
     equal(img.attr('alt'), "testalt")
 
+  test "it updates decorative attributes for existing images", ->
+    view = new InsertUpdateImageView(fakeEditor, "<img>")
+    img = view.$selectedNode
+    view.$editor = '$fakeEditor'
+    view.$("[name='image[data-decorative]']").attr('checked', true)
+    view.update()
+    equal(img.attr('data-decorative'), 'true', 'data-decorative attribute is present')
+    equal(img.attr('alt'), '', 'decorative image has empty alt text')
+
+  test "it removes decorative attributes for exiting images", ->
+    view = new InsertUpdateImageView(fakeEditor, "<img>")
+    img = view.$selectedNode
+    img.attr('data-decorative', 'true')
+    img.attr('alt', 'some random alt text')
+    view.$editor = '$fakeEditor'
+    view.$("[name='image[data-decorative]']").attr('checked', false)
+    view.update()
+    ok(!img.attr('data-decorative'), 'data-decorative attribute is not present')
+    ok(!img.attr('alt'), 'alt attribute is not present')
+
+  test "it disables alt text entry when decorative is checked and renables if unchecked", ->
+    view = new InsertUpdateImageView(fakeEditor, "<img>")
+    img = view.$selectedNode
+    view.$editor = '$fakeEditor'
+    view.$("[name='image[data-decorative]']").attr('checked', true)
+    view.$("[name='image[data-decorative]']").trigger('change')
+    ok(view.$("[name='image[alt]']").is(':disabled'))
+    view.$("[name='image[data-decorative]']").removeAttr('checked')
+    view.$("[name='image[data-decorative]']").trigger('change')
+    ok(!view.$("[name='image[alt]']").is(':disabled'))
+
   test "it restores caret on update", ->
     view = new InsertUpdateImageView(fakeEditor, "<div></div>")
     view.$editor = '$fakeEditor'

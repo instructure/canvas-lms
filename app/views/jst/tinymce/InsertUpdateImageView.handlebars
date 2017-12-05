@@ -39,6 +39,17 @@
       </div>
     </div>
     <div class="control-group">
+      <label class="control-label" for="decorative_image">{{#t}}Decorative Image{{/t}}</label>
+      <div class="controls">
+        <input
+          type="checkbox"
+          id="decorative_image"
+          name="image[data-decorative]"
+        />
+        <span><p class="help-block" id="decorative_image_description">{{#t}}Indicates the image is for decorative purposes only and should not be read by screenreaders{{/t}}</p></span>
+      </div>
+    </div>
+    <div class="control-group">
       <label class="control-label" for="dimensions_controls">{{#t "dimensions"}}Dimensions{{/t}}</label>
       <div class="controls" id="dimensions_controls" aria-describedby="aspect_ratio_note">
         <input class="span1"
