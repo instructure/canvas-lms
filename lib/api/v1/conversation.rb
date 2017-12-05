@@ -87,15 +87,20 @@ module Api::V1::Conversation
     address_book.preload_users(users)
   end
 
+  def should_include_participant_avatars?(user_count)
+    user_count <= Setting.get('max_conversation_participant_count_for_avatars', '100').to_i
+  end
+
   def conversation_recipients_json(recipients, current_user, session)
     ActiveRecord::Associations::Preloader.new.preload(recipients.select{|r| r.is_a?(User)},
       {:pseudonym => :account}) # for avatar_url
 
     preload_common_contexts(current_user, recipients)
+    include_avatars = should_include_participant_avatars?(recipients.count)
     recipients.map do |recipient|
       if recipient.is_a?(User)
         conversation_user_json(recipient, current_user, session,
-          :include_participant_avatars => true,
+          :include_participant_avatars => include_avatars,
           :include_participant_contexts => true)
       else
         # contexts are already json
@@ -109,6 +114,8 @@ module Api::V1::Conversation
       :include_participant_avatars => true,
       :include_participant_contexts => true
     }.merge(options)
+    options[:include_participant_avatars] = false unless should_include_participant_avatars?(users.count)
+
     if options[:include_participant_avatars]
       ActiveRecord::Associations::Preloader.new.preload(users, {:pseudonym => :account}) # for avatar_url
     end

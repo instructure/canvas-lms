@@ -126,6 +126,21 @@ describe ConversationsController, type: :request do
       end
     end
 
+    it "should ignore include[]=participant_avatars if you're going to break everything" do
+      conversation(@bob, :workflow_state => 'read')
+
+      Setting.set('max_conversation_participant_count_for_avatars', '1')
+
+      json = api_call(:get, "/api/v1/conversations.json",
+        { :controller => 'conversations', :action => 'index',
+          :format => 'json', :include => ["participant_avatars"] })
+      json.each do |conversation|
+        conversation["participants"].each do |user|
+          expect(user).to_not have_key "avatar_url"
+        end
+      end
+    end
+
     it "should stringify audience ids if requested" do
       @c1 = conversation(@bob, :workflow_state => 'read')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
