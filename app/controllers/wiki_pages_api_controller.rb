@@ -263,11 +263,14 @@ class WikiPagesApiController < ApplicationController
           'wiki_pages.created_at'
         when 'updated_at'
           'wiki_pages.updated_at'
-        else
-          'wiki_pages.id'
       end
-      order_clause += ' DESC' if params[:order] == 'desc'
-      scope = scope.order(order_clause)
+      if order_clause
+        order_clause += ' DESC' if params[:order] == 'desc'
+        scope = scope.order(WikiPage.send(:sanitize_sql, order_clause))
+      end
+      id_clause = "wiki_pages.id"
+      id_clause += ' DESC' if params[:order] == 'desc'
+      scope = scope.order(id_clause)
 
       wiki_pages = Api.paginate(scope, self, pages_route)
 
