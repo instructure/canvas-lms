@@ -349,6 +349,14 @@ END
       beta: true,
       root_opt_in: true
     },
+    'membership_service_for_lti_tools' =>
+    {
+      display_name: -> { I18n.t('Membership Service Configuration') },
+      description: -> { I18n.t('If enabled, OAuth 1.0a signing may be used by LTI tools to access the Membership Service API') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true
+    },
     'new_sis_integrations' =>
     {
       display_name: -> { I18n.t('Enable new SIS integration settings') },

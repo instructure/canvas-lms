@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,9 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-addons-test-utils'
-import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
-
-QUnit.module('External Apps Manual Configuration Form');
+import ConfigurationFormUrl from 'jsx/external_apps/components/ConfigurationFormUrl'
 
 const fakeStore = {
   findAppByShortName () {
@@ -32,35 +30,20 @@ const fakeStore = {
 };
 
 const component = TestUtils.renderIntoDocument (
-  <ConfigurationFormManual
-    domain=''
-    description=''
-    shortName="someApp"
-    store={fakeStore}
+  <ConfigurationFormUrl
+    name='Test tool'
+    consumerKey='key'
+    sharedSecret='secret'
+    configUrl='http://example.com'
     allowMembershipServiceAccess={true}
     membershipServiceFeatureFlagEnabled={true}
   />
 );
 
-test('domain field should not be null', () => {
-
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
-
-  equal(app.props.domain, '');
-});
-
-test('description field should not be null', () => {
-
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
-
-  equal(app.props.description, '');
-});
-
-QUnit.module('ConfigurationFormManual#getFormData()');
+QUnit.module('ConfigurationFormUrl#getFormData()');
 
 test('returns expected output with membership service feature flag enabled', () => {
-
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormUrl);
   app.refs.allow_membership_service_access.setState({value: true})
   equal(app.getFormData().allow_membership_service_access, true);
 });

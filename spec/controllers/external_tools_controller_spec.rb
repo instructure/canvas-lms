@@ -1325,6 +1325,27 @@ describe ExternalToolsController do
       expect(json['tool_configuration']).to be_truthy
       expect(json['tool_configuration']['prefer_sis_email']).to eq 'true'
     end
+
+    it 'updates allow_membership_service_access if the feature flag is set' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
+      @tool = new_valid_tool(@course)
+      user_session(@teacher)
+
+      put :update, params: {course_id: @course.id, external_tool_id: @tool.id, external_tool: { allow_membership_service_access: true}}, format: 'json'
+
+      expect(response).to be_success
+      expect(@tool.reload.allow_membership_service_access).to eq true
+    end
+
+    it 'does not update allow_membership_service_access if the feature flag is not set' do
+      @tool = new_valid_tool(@course)
+      user_session(@teacher)
+
+      put :update, params: {course_id: @course.id, external_tool_id: @tool.id, external_tool: { allow_membership_service_access: true}}, format: 'json'
+
+      expect(response).to be_success
+      expect(@tool.reload.allow_membership_service_access).to be_falsey
+    end
   end
 
   describe "'GET 'generate_sessionless_launch'" do

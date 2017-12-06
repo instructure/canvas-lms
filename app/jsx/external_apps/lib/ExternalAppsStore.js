@@ -225,16 +225,16 @@ import 'compiled/jquery.rails_flash_notifications'
     switch(configurationType) {
       case 'manual':
         // Convert custom fields into kv pair
-          if (data.customFields === '' || typeof data.customFields === 'undefined') {
-            params['custom_fields_string'] = '';
-          } else {
-            var pairs = (data.customFields || '').split('\n');
-            params.custom_fields = {}
-            _.forEach(pairs, function(pair) {
-              var vals = pair.trim().split(/=(.+)?/);
-              params.custom_fields[vals[0]] = vals[1];
-            });
-          }
+        if (data.customFields === '' || typeof data.customFields === 'undefined') {
+          params['custom_fields_string'] = '';
+        } else {
+          var pairs = (data.customFields || '').split('\n');
+          params.custom_fields = {}
+          _.forEach(pairs, function(pair) {
+            var vals = pair.trim().split(/=(.+)?/);
+            params.custom_fields[vals[0]] = vals[1];
+          });
+        }
 
         params['domain'] = data.domain;
         params['privacy_level'] = data.privacyLevel;
@@ -250,6 +250,11 @@ import 'compiled/jquery.rails_flash_notifications'
         params['config_xml'] = data.xml;
         break;
     }
+
+    if (data.allow_membership_service_access != null) {
+      params['allow_membership_service_access'] = data.allow_membership_service_access;
+    }
+
     return params;
   };
 

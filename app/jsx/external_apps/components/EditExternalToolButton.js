@@ -136,7 +136,14 @@ export default React.createClass({
     form() {
       if (this.state.tool.app_type === 'ContextExternalTool') {
         return (
-          <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.saveChanges} showConfigurationSelector={false}>
+          <ConfigurationForm
+            ref="configurationForm"
+            tool={this.state.tool}
+            configurationType="manual"
+            handleSubmit={this.saveChanges}
+            showConfigurationSelector={false}
+            membershipServiceFeatureFlagEnabled={window.ENV.MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED}
+          >
             <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
           </ConfigurationForm>
         );

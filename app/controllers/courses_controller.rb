@@ -1217,6 +1217,7 @@ class CoursesController < ApplicationController
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
+        MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)

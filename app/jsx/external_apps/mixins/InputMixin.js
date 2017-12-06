@@ -32,6 +32,10 @@ export default {
       this.setState({ value: e.target.value });
     },
 
+    handleCheckChange(e) {
+      this.setState({ value: !!e.target.checked })
+    },
+
     renderHint() {
       var hintText = this.props.hintText;
       if (!!this.getErrorMessage()) {

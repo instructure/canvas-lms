@@ -186,6 +186,7 @@ export default React.createClass({
               configurationType="manual"
               handleSubmit={this.createTool}
               hideComponent={this.state.isLti2}
+              membershipServiceFeatureFlagEnabled={window.ENV.MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED}
             >
               <button type="button" className="Button" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
             </ConfigurationForm>
