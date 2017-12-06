@@ -72,3 +72,8 @@ test("describes other elements", () => {
   elem.textContent = "This is the text of an element."
   expect(fn(elem)).toBe("Element starting with This is the text…")
 })
+
+test("returns null when there isn't a valid element", () => {
+  const elem = undefined
+  expect(fn(elem)).toBe(null)
+})
