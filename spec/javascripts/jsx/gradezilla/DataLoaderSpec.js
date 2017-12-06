@@ -381,7 +381,7 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     });
   });
 
-  QUnit.only('requests submissions with pagination', function (assert) {
+  test('requests submissions with pagination', function (assert) {
     respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
     respondWith('/students', { user_ids: STUDENT_IDS }, 200, {}, STUDENTS_PAGE_1.concat(STUDENTS_PAGE_2));
     const responseHeaders = { Link: '</submissions&page=2>; rel="last"' };
