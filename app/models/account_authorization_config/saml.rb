@@ -230,12 +230,15 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
     encryption = app_config[:encryption]
 
-    if encryption.is_a?(Hash) &&
-      (cert_path = resolve_saml_key_path(encryption[:certificate]))
+    if encryption.is_a?(Hash)
+      Array.wrap(encryption[:certificate]).each do |path|
+        cert_path = resolve_saml_key_path(path)
+        next unless cert_path
 
-      cert = File.read(cert_path)
-      sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::ENCRYPTION, [SAML2::Key::EncryptionMethod.new])
-      sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::SIGNING)
+        cert = File.read(cert_path)
+        sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::ENCRYPTION, [SAML2::Key::EncryptionMethod.new])
+        sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::SIGNING)
+      end
     end
 
     entity.roles << sp
@@ -313,7 +316,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
     encryption = app_config[:encryption]
     if encryption.is_a?(Hash)
-      settings.xmlsec_certificate = resolve_saml_key_path(encryption[:certificate])
+      settings.xmlsec_certificate = resolve_saml_key_path(Array.wrap(encryption[:certificate]).first)
       settings.xmlsec_privatekey = resolve_saml_key_path(encryption[:private_key])
 
       settings.xmlsec_additional_privatekeys = Array(encryption[:additional_private_keys]).map { |apk| resolve_saml_key_path(apk) }.compact
