@@ -4,6 +4,10 @@ import * as strings from "./strings"
 const WORD_COUNT = 4
 
 export default function describe(elem) {
+  if (!elem || !elem.tagName) {
+    return null
+  }
+
   switch (elem.tagName) {
     case "IMG":
       return formatMessage("Image with filename {file}", {
