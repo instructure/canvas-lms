@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { arrayOf, bool, func, number, shape, string } from 'prop-types';
+import { arrayOf, bool, func, number, oneOf, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
 import Avatar from '@instructure/ui-core/lib/components/Avatar';
 import Button from '@instructure/ui-core/lib/components/Button';
@@ -85,6 +85,8 @@ export default class SubmissionTray extends React.Component {
     currentUserId: string.isRequired,
     editedCommentId: string,
     editSubmissionComment: func.isRequired,
+    enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
+    gradingScheme: arrayOf(Array).isRequired,
     gradingDisabled: bool,
     isOpen: bool.isRequired,
     colors: shape({
@@ -286,6 +288,8 @@ export default class SubmissionTray extends React.Component {
               <GradeInput
                 assignment={this.props.assignment}
                 disabled={this.props.gradingDisabled}
+                enterGradesAs={this.props.enterGradesAs}
+                gradingScheme={this.props.gradingScheme}
                 onSubmissionUpdate={this.props.onGradeSubmission}
                 submission={this.props.submission}
                 submissionUpdating={this.props.submissionUpdating}
@@ -293,7 +297,12 @@ export default class SubmissionTray extends React.Component {
 
               {!!this.props.submission.pointsDeducted &&
                 <Container as="div" margin="small 0 0 0">
-                  <LatePolicyGrade submission={this.props.submission} />
+                  <LatePolicyGrade
+                    assignment={this.props.assignment}
+                    enterGradesAs={this.props.enterGradesAs}
+                    gradingScheme={this.props.gradingScheme}
+                    submission={this.props.submission}
+                  />
                 </Container>
               }
 

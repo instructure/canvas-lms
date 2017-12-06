@@ -2136,7 +2136,9 @@ define [
       comments: comments
       courseId: @options.context_id
       currentUserId: @options.currentUserId
+      enterGradesAs: @getEnterGradesAsSetting(assignmentId)
       gradingDisabled: !!submissionState?.locked || student.isConcluded
+      gradingScheme: @getAssignmentGradingScheme(assignmentId).data
       isFirstAssignment: isFirstAssignment
       isInOtherGradingPeriod: !!submissionState?.inOtherGradingPeriod
       isInClosedGradingPeriod: !!submissionState?.inClosedGradingPeriod

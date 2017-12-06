@@ -20,6 +20,8 @@ import React from 'react';
 import { mount } from 'enzyme';
 import GradeInput from 'jsx/gradezilla/default_gradebook/components/GradeInput';
 
+/* eslint qunit/no-identical-names: 0 */
+
 QUnit.module('GradeInput', (suiteHooks) => {
   let $container;
   let assignment;
@@ -30,18 +32,18 @@ QUnit.module('GradeInput', (suiteHooks) => {
   suiteHooks.beforeEach(() => {
     assignment = {
       gradingType: 'points',
-      pointsPossible: 10
     };
     submission = {
       excused: false,
-      enteredGrade: '7.8',
       id: '2501'
     };
+    const gradingScheme = [['A', 0.90], ['B+', 0.85], ['B', 0.80], ['B-', 0.75]];
     props = {
       assignment,
       disabled: false,
       onSubmissionUpdate () {},
-      submission
+      submission,
+      gradingScheme
     };
 
     $container = document.createElement('div');
@@ -57,43 +59,87 @@ QUnit.module('GradeInput', (suiteHooks) => {
     wrapper = mount(<GradeInput {...props} />, { attachTo: $container });
   }
 
-  QUnit.module('with a "points" assignment', () => {
+  QUnit.module('with a "points" assignment', (hooks) => {
+    hooks.beforeEach(() => {
+      props.assignment.pointsPossible = 10;
+      props.submission.enteredScore = 7.8;
+      props.submission.enteredGrade = '7.8';
+      props.enterGradesAs = 'points';
+    });
+
     test('renders a text input', () => {
       mountComponent();
       const input = wrapper.find('input[type="text"]');
       strictEqual(input.length, 1);
     });
 
-    test('displays a label of "Grade out of <points possible>"', () => {
-      mountComponent();
-      equal(wrapper.find('label').text(), 'Grade out of 10');
+    QUnit.module('when enterGradesAs is points', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'points';
+      });
+
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 10');
+      });
+
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '7.8');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '7.816';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '7.82');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '8.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '8');
+      });
     });
 
-    test('sets the entered grade of the submission as the input value', () => {
-      mountComponent();
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '7.8');
-    });
+    QUnit.module('when enterGradesAs is percent', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'percent';
+      });
 
-    test('rounds the entered grade to two decimal places', () => {
-      submission.enteredGrade = '7.816';
-      mountComponent();
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '7.82');
-    });
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 100%');
+      });
 
-    test('strips insignificant zeros', () => {
-      submission.enteredGrade = '8.00';
-      mountComponent();
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '8');
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78%');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '7.8916';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78.92%');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '8.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '80%');
+      });
     });
 
     test('is blank when the submission is not graded', () => {
-      submission.enteredGrade = null;
+      submission.enteredScore = null;
       mountComponent();
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '');
+      strictEqual(input.prop('value'), '–');
     });
 
     test('displays "Excused" as the input value when the submission is excused', () => {
@@ -190,7 +236,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
 
     test('updates the input value when the submission is replaced', () => {
       mountComponent();
-      const nextSubmission = { excused: false, enteredGrade: '8.9', id: '2502' };
+      const nextSubmission = { excused: false, enteredScore: '8.9', enteredGrade: '8.9', id: '2502' };
       wrapper.setProps({ submission: nextSubmission, submissionUpdating: true });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), '8.9');
@@ -199,16 +245,16 @@ QUnit.module('GradeInput', (suiteHooks) => {
     test('updates the input value when the submission has updated', () => {
       props.submissionUpdating = true;
       mountComponent();
-      const updatedSubmission = { ...submission, enteredGrade: '8.9' };
+      const updatedSubmission = { ...submission, enteredScore: '8.9', enteredGrade: '8.9' };
       wrapper.setProps({ submission: updatedSubmission, submissionUpdating: false });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), '8.9');
     });
 
-    test('rounds the entered grade of the updated submission to two decimal places', () => {
+    test('rounds the formatted entered score of the updated submission to two decimal places', () => {
       props.submissionUpdating = true;
       mountComponent();
-      wrapper.setProps({ submission: { ...submission, enteredGrade: '7.816' }, submissionUpdating: false });
+      wrapper.setProps({ submission: { ...submission, enteredScore: '7.816', enteredGrade: '7.816' }, submissionUpdating: false });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), '7.82');
     });
@@ -216,7 +262,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
     test('strips insignificant zeros on the updated grade', () => {
       props.submissionUpdating = true;
       mountComponent();
-      wrapper.setProps({ submission: { ...submission, enteredGrade: '8.00' }, submissionUpdating: false });
+      wrapper.setProps({ submission: { ...submission, enteredScore: '8.00', enteredGrade: '8.00' }, submissionUpdating: false });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), '8');
     });
@@ -236,7 +282,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
       mountComponent();
       wrapper.find('input').simulate('change', { target: { value: '8.9' } });
       const onSubmissionUpdate = sinon.spy();
-      const updatedSubmission = { ...submission, enteredGrade: '8.9' };
+      const updatedSubmission = { ...submission, enteredScore: '8.9', enteredGrade: '8.9' };
       wrapper.setProps({ onSubmissionUpdate, submission: updatedSubmission, submissionUpdating: false });
       wrapper.find('input').simulate('blur');
       strictEqual(onSubmissionUpdate.callCount, 0);
@@ -250,7 +296,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
       ok(true, 'missing onSubmissionUpdate prop is ignored');
     });
 
-    test('does not update the input when props update without changing the entered grade on the submission', () => {
+    test('does not update the input when props update without changing the entered score on the submission', () => {
       mountComponent();
       wrapper.find('input').simulate('change', { target: { value: '8.9' } });
       wrapper.setProps({ submission: { ...submission } });
@@ -261,8 +307,10 @@ QUnit.module('GradeInput', (suiteHooks) => {
 
   QUnit.module('with a "percent" assignment', (hooks) => {
     hooks.beforeEach(() => {
-      assignment.gradingType = 'percent';
-      submission.enteredGrade = '78%';
+      props.assignment.pointsPossible = 100;
+      props.submission.enteredScore = 78;
+      props.submission.enteredGrade = '78%';
+      props.enterGradesAs = 'percent';
     });
 
     test('renders a text input', () => {
@@ -276,24 +324,66 @@ QUnit.module('GradeInput', (suiteHooks) => {
       equal(wrapper.find('label').text(), 'Grade out of 100%');
     });
 
-    test('sets the entered grade of the submission as the input value', () => {
-      mountComponent();
-      const input = wrapper.find('input');
-      equal(input.prop('value'), '78%');
+    QUnit.module('when enterGradesAs is percent', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'percent';
+      });
+
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 100%');
+      });
+
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78%');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '78.206';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78.21%');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '80.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '80%');
+      });
     });
 
-    test('rounds the entered grade to two decimal places', () => {
-      submission.enteredGrade = '78.916%';
-      mountComponent();
-      const input = wrapper.find('input');
-      equal(input.prop('value'), '78.92%');
-    });
+    QUnit.module('when enterGradesAs is points', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'points';
+      });
 
-    test('strips insignificant zeros', () => {
-      submission.enteredGrade = '78.00%';
-      mountComponent();
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '78%');
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 100');
+      });
+
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '78.916';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78.92');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '80.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '80');
+      });
     });
 
     test('is blank when the submission is not graded', () => {
@@ -389,16 +479,16 @@ QUnit.module('GradeInput', (suiteHooks) => {
     test('updates the input value when the submission has updated', () => {
       props.submissionUpdating = true;
       mountComponent();
-      const updatedSubmission = { ...submission, enteredGrade: '89%' };
+      const updatedSubmission = { ...submission, enteredScore: '89', enteredGrade: '89%' };
       wrapper.setProps({ submission: updatedSubmission, submissionUpdating: false });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), '89%');
     });
 
-    test('rounds the entered grade of the updated submission to two decimal places', () => {
+    test('rounds the formatted entered score of the updated submission to two decimal places', () => {
       props.submissionUpdating = true;
       mountComponent();
-      wrapper.setProps({ submission: { ...submission, enteredGrade: '78.916%' }, submissionUpdating: false });
+      wrapper.setProps({ submission: { ...submission, enteredScore: '78.916', enteredGrade: '78.916%' }, submissionUpdating: false });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), '78.92%');
     });
@@ -406,7 +496,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
     test('strips insignificant zeros on the updated grade', () => {
       props.submissionUpdating = true;
       mountComponent();
-      wrapper.setProps({ submission: { ...submission, enteredGrade: '89.00%' }, submissionUpdating: false });
+      wrapper.setProps({ submission: { ...submission, enteredScore: '89.00', enteredGrade: '89.00%' }, submissionUpdating: false });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), '89%');
     });
@@ -426,7 +516,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
       mountComponent();
       wrapper.find('input').simulate('change', { target: { value: '89%' } });
       const onSubmissionUpdate = sinon.spy();
-      const updatedSubmission = { ...submission, enteredGrade: '89%' };
+      const updatedSubmission = { ...submission, enteredScore: '89', enteredGrade: '89%' };
       wrapper.setProps({ onSubmissionUpdate, submission: updatedSubmission, submissionUpdating: false });
       wrapper.find('input').simulate('blur');
       strictEqual(onSubmissionUpdate.callCount, 0);
@@ -440,7 +530,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
       ok(true, 'missing onSubmissionUpdate prop is ignored');
     });
 
-    test('does not update the input when props update without changing the entered grade on the submission', () => {
+    test('does not update the input when props update without changing the entered score on the submission', () => {
       mountComponent();
       wrapper.find('input').simulate('change', { target: { value: '89%' } });
       wrapper.setProps({ submission: { ...submission } });
@@ -451,8 +541,11 @@ QUnit.module('GradeInput', (suiteHooks) => {
 
   QUnit.module('with a "letter grade" assignment', (hooks) => {
     hooks.beforeEach(() => {
-      assignment.gradingType = 'letter_grade';
-      submission.enteredGrade = 'B';
+      props.assignment.pointsPossible = 100;
+      props.assignment.gradingType = 'letter_grade';
+      props.enterGradesAs = 'gradingScheme'
+      props.submission.enteredScore = 78;
+      props.submission.enteredGrade = 'B';
     });
 
     test('renders a text input', () => {
@@ -461,15 +554,83 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.length, 1);
     });
 
-    test('displays a label of "Letter Grade"', () => {
-      mountComponent();
-      equal(wrapper.find('label').text(), 'Letter Grade');
+    QUnit.module('when enterGradesAs is gradingScheme', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'gradingScheme';
+      });
+
+      test('displays a label of "Letter Grade"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Letter Grade');
+      });
+
+      test('sets as the input value the grade corresponding to the entered score', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        equal(input.prop('value'), 'B-');
+      });
     });
 
-    test('sets the entered grade of the submission as the input value', () => {
-      mountComponent();
-      const input = wrapper.find('input');
-      equal(input.prop('value'), 'B');
+    QUnit.module('when enterGradesAs is points', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'points';
+      });
+
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 100');
+      });
+
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '78.916';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78.92');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '80.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '80');
+      });
+    });
+
+    QUnit.module('when enterGradesAs is percent', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'percent';
+      });
+
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 100%');
+      });
+
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78%');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '78.916';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78.92%');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '80.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '80%');
+      });
     });
 
     test('is blank when the submission is not graded', () => {
@@ -556,16 +717,16 @@ QUnit.module('GradeInput', (suiteHooks) => {
 
     test('does not update the input value when the submission begins updating', () => {
       mountComponent();
-      const updatedSubmission = { ...submission, enteredGrade: 'A' };
+      const updatedSubmission = { ...submission, enteredScore: 100, enteredGrade: 'A' };
       wrapper.setProps({ submission: updatedSubmission, submissionUpdating: true });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), 'B');
+      strictEqual(input.prop('value'), 'B-');
     });
 
     test('updates the input value when the submission has updated', () => {
       props.submissionUpdating = true;
       mountComponent();
-      const updatedSubmission = { ...submission, enteredGrade: 'A' };
+      const updatedSubmission = { ...submission, enteredScore: 100, enteredGrade: 'A' };
       wrapper.setProps({ submission: updatedSubmission, submissionUpdating: false });
       const input = wrapper.find('input');
       strictEqual(input.prop('value'), 'A');
@@ -600,7 +761,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
       ok(true, 'missing onSubmissionUpdate prop is ignored');
     });
 
-    test('does not update the input when props update without changing the entered grade on the submission', () => {
+    test('does not update the input when props update without changing the entered score on the submission', () => {
       mountComponent();
       wrapper.find('input').simulate('change', { target: { value: 'A' } });
       wrapper.setProps({ submission: { ...submission } });
@@ -611,8 +772,11 @@ QUnit.module('GradeInput', (suiteHooks) => {
 
   QUnit.module('with a "GPA scale" assignment', (hooks) => {
     hooks.beforeEach(() => {
-      assignment.gradingType = 'gpa_scale';
-      submission.enteredGrade = '3.7';
+      props.assignment.pointsPossible = 100;
+      props.assignment.gradingType = 'gpa_scale';
+      props.enterGradesAs = 'gradingScheme'
+      props.submission.enteredScore = 78;
+      props.submission.enteredGrade = 'B';
     });
 
     test('renders a text input', () => {
@@ -621,29 +785,83 @@ QUnit.module('GradeInput', (suiteHooks) => {
       strictEqual(input.length, 1);
     });
 
-    test('displays a label of "Grade Point Average"', () => {
-      mountComponent();
-      equal(wrapper.find('label').text(), 'Grade Point Average');
+    QUnit.module('when enterGradesAs is gradingScheme', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'gradingScheme';
+      });
+
+      test('displays a label of "Letter Grade"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Letter Grade');
+      });
+
+      test('sets as the input value the grade corresponding to the entered score', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        equal(input.prop('value'), 'B-');
+      });
     });
 
-    test('sets the entered grade of the submission as the input value', () => {
-      mountComponent();
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3.7');
+    QUnit.module('when enterGradesAs is points', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'points';
+      });
+
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 100');
+      });
+
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '78.916';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78.92');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '80.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '80');
+      });
     });
 
-    test('rounds the entered grade to two decimal places', () => {
-      submission.enteredGrade = '3.716';
-      mountComponent();
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3.72');
-    });
+    QUnit.module('when enterGradesAs is percent', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.enterGradesAs = 'percent';
+      });
 
-    test('strips insignificant zeros', () => {
-      submission.enteredGrade = '3.00';
-      mountComponent();
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3');
+      test('displays a label of "Grade out of <points possible>"', () => {
+        mountComponent();
+        equal(wrapper.find('label').text(), 'Grade out of 100%');
+      });
+
+      test('sets the formatted entered score of the submission as the input value', () => {
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78%');
+      });
+
+      test('rounds the formatted entered score to two decimal places', () => {
+        submission.enteredScore = '78.916';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '78.92%');
+      });
+
+      test('strips insignificant zeros', () => {
+        submission.enteredScore = '80.00';
+        mountComponent();
+        const input = wrapper.find('input');
+        strictEqual(input.prop('value'), '80%');
+      });
     });
 
     test('is blank when the submission is not graded', () => {
@@ -690,7 +908,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
     test('calls the onSubmissionUpdate prop when the value has changed and the input loses focus', () => {
       props.onSubmissionUpdate = sinon.spy();
       mountComponent();
-      wrapper.find('input').simulate('change', { target: { value: '3.8' } });
+      wrapper.find('input').simulate('change', { target: { value: 'A' } });
       wrapper.find('input').simulate('blur');
       strictEqual(props.onSubmissionUpdate.callCount, 1);
     });
@@ -698,24 +916,24 @@ QUnit.module('GradeInput', (suiteHooks) => {
     test('calls the onSubmissionUpdate prop with the updated submission', () => {
       props.onSubmissionUpdate = sinon.spy();
       mountComponent();
-      wrapper.find('input').simulate('change', { target: { value: '3.8' } });
+      wrapper.find('input').simulate('change', { target: { value: 'A' } });
       wrapper.find('input').simulate('blur');
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args;
-      strictEqual(updatedSubmission.enteredGrade, '3.8');
+      strictEqual(updatedSubmission.enteredGrade, 'A');
     });
 
     test('does not call the onSubmissionUpdate prop when the value has changed and input maintains focus', () => {
       props.onSubmissionUpdate = sinon.spy();
       mountComponent();
-      wrapper.find('input').simulate('change', { target: { value: '3.8' } });
+      wrapper.find('input').simulate('change', { target: { value: 'A' } });
       strictEqual(props.onSubmissionUpdate.callCount, 0);
     });
 
     test('does not call the onSubmissionUpdate prop when the value has not changed from initial value', () => {
       props.onSubmissionUpdate = sinon.spy();
       mountComponent();
-      wrapper.find('input').simulate('change', { target: { value: '3.8' } });
-      wrapper.find('input').simulate('change', { target: { value: '3.7' } });
+      wrapper.find('input').simulate('change', { target: { value: 'A' } });
+      wrapper.find('input').simulate('change', { target: { value: 'B' } });
       wrapper.find('input').simulate('blur');
       strictEqual(props.onSubmissionUpdate.callCount, 0);
     });
@@ -730,35 +948,19 @@ QUnit.module('GradeInput', (suiteHooks) => {
 
     test('does not update the input value when the submission begins updating', () => {
       mountComponent();
-      const updatedSubmission = { ...submission, enteredGrade: '3.8' };
+      const updatedSubmission = { ...submission, enteredScore: 100, enteredGrade: 'A' };
       wrapper.setProps({ submission: updatedSubmission, submissionUpdating: true });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3.7');
+      strictEqual(input.prop('value'), 'B-');
     });
 
     test('updates the input value when the submission has updated', () => {
       props.submissionUpdating = true;
       mountComponent();
-      const updatedSubmission = { ...submission, enteredGrade: '3.8' };
+      const updatedSubmission = { ...submission, enteredScore: 100, enteredGrade: 'A' };
       wrapper.setProps({ submission: updatedSubmission, submissionUpdating: false });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3.8');
-    });
-
-    test('rounds the entered grade of the updated submission to two decimal places', () => {
-      props.submissionUpdating = true;
-      mountComponent();
-      wrapper.setProps({ submission: { ...submission, enteredGrade: '3.816' }, submissionUpdating: false });
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3.82');
-    });
-
-    test('strips insignificant zeros on the updated grade', () => {
-      props.submissionUpdating = true;
-      mountComponent();
-      wrapper.setProps({ submission: { ...submission, enteredGrade: '3.00' }, submissionUpdating: false });
-      const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3');
+      strictEqual(input.prop('value'), 'A');
     });
 
     test('is blank when the updated submission is not graded', () => {
@@ -774,9 +976,9 @@ QUnit.module('GradeInput', (suiteHooks) => {
       // its value was already updated after a successful change
       props.submissionUpdating = true;
       mountComponent();
-      wrapper.find('input').simulate('change', { target: { value: '3.8' } });
+      wrapper.find('input').simulate('change', { target: { value: 'A' } });
       const onSubmissionUpdate = sinon.spy();
-      const updatedSubmission = { ...submission, enteredGrade: '3.8' };
+      const updatedSubmission = { ...submission, enteredScore: 100, enteredGrade: 'A' };
       wrapper.setProps({ onSubmissionUpdate, submission: updatedSubmission, submissionUpdating: false });
       wrapper.find('input').simulate('blur');
       strictEqual(onSubmissionUpdate.callCount, 0);
@@ -785,24 +987,27 @@ QUnit.module('GradeInput', (suiteHooks) => {
     test('ignores onSubmissionUpdate when not defined', () => {
       delete props.onSubmissionUpdate;
       mountComponent();
-      wrapper.find('input').simulate('change', { target: { value: '3.8' } });
+      wrapper.find('input').simulate('change', { target: { value: 'A' } });
       wrapper.find('input').simulate('blur');
       ok(true, 'missing onSubmissionUpdate prop is ignored');
     });
 
-    test('does not update the input when props update without changing the entered grade on the submission', () => {
+    test('does not update the input when props update without changing the entered score on the submission', () => {
       mountComponent();
-      wrapper.find('input').simulate('change', { target: { value: '3.8' } });
+      wrapper.find('input').simulate('change', { target: { value: 'A' } });
       wrapper.setProps({ submission: { ...submission } });
       const input = wrapper.find('input');
-      strictEqual(input.prop('value'), '3.8');
+      strictEqual(input.prop('value'), 'A');
     });
   });
 
   QUnit.module('with a "pass/fail" assignment', (hooks) => {
     hooks.beforeEach(() => {
-      assignment.gradingType = 'pass_fail';
-      submission.enteredGrade = 'incomplete';
+      props.assignment.pointsPossible = 100;
+      props.submission.enteredScore = 0;
+      props.assignment.gradingType = 'pass_fail';
+      props.submission.enteredGrade = 'incomplete';
+      props.enterGradesAs = 'passFail';
     });
 
     test('renders a select input', () => {
@@ -852,6 +1057,7 @@ QUnit.module('GradeInput', (suiteHooks) => {
     });
 
     test('sets the select value to "Complete" when the submission is complete', () => {
+      submission.enteredScore = 100;
       submission.enteredGrade = 'complete';
       mountComponent();
       const input = wrapper.find('select');

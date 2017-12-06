@@ -17,8 +17,8 @@
  */
 
 import I18n from 'i18n!gradebook'
-import numberHelper from '../../../shared/helpers/numberHelper'
 import round from 'compiled/util/round'
+import numberHelper from '../../../shared/helpers/numberHelper'
 import { scoreToGrade } from '../../../gradebook/GradingSchemeHelper';
 
 const POINTS = 'points';

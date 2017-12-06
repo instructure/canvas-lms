@@ -17,21 +17,20 @@
  */
 
 import React from 'react';
-import { number, shape, string } from 'prop-types';
+import { arrayOf, number, oneOf, shape, string } from 'prop-types';
 import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 
 export default function LatePolicyGrade (props) {
-  const { grade } = props.submission;
   const pointsDeducted = I18n.n(-props.submission.pointsDeducted);
-  let finalGrade;
-
-  if (isNaN(grade)) {
-    finalGrade = GradeFormatHelper.formatGrade(props.submission.grade);
-  } else {
-    finalGrade = GradeFormatHelper.formatGrade(props.submission.grade, { precision: 2 });
-  }
+  const formatOptions = {
+    formatType: props.enterGradesAs,
+    pointsPossible: props.assignment.pointsPossible,
+    gradingScheme: props.gradingScheme,
+    version: 'final'
+  };
+  const finalGrade = GradeFormatHelper.formatSubmissionGrade(props.submission, formatOptions);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -64,8 +63,14 @@ export default function LatePolicyGrade (props) {
 }
 
 LatePolicyGrade.propTypes = {
+  assignment: shape({
+    pointsPossible: number
+  }).isRequired,
+  enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
+  gradingScheme: arrayOf(Array).isRequired,
   submission: shape({
     grade: string,
+    score: number,
     pointsDeducted: number
   }).isRequired
 };
