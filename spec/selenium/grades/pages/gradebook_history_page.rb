@@ -190,7 +190,7 @@ class GradeBookHistory
     end
 
     def results_table
-      fxpath("//table")
+      find_table('Grade Changes')
     end
 
     def results_table_rows

@@ -202,6 +202,12 @@ module CustomSeleniumActions
     fj("button:contains('#{label}')", scope)
   end
 
+  # find table with fj, and the caption it contains
+  # usage example: find_table ("Grade Changes")
+  def find_table(caption = "", scope = nil)
+    fj("table:contains('#{caption}')", scope)
+  end
+
   def is_checked(css_selector)
     !!fj(css_selector)[:checked]
   end
