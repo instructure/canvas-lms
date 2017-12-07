@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -68,7 +66,10 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
   has_many :discussion_entry_participants, :through => :discussion_entries
-
+  has_many :discussion_topic_section_visibilities, -> {
+    where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
+  }, inverse_of: :discussion_topic, dependent: :destroy
+  has_many :course_sections, :through => :discussion_topic_section_visibilities
   belongs_to :user
 
   validates_presence_of :context_id, :context_type
@@ -76,6 +77,9 @@ class DiscussionTopic < ActiveRecord::Base
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validate :validate_draft_state_change, :if => :workflow_state_changed?
+  validate :section_specific_topics_must_have_sections
+  validate :only_announcements_can_be_section_specific
+  validate :feature_must_be_enabled_for_section_specific
 
   sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
@@ -93,6 +97,32 @@ class DiscussionTopic < ActiveRecord::Base
   after_update :clear_streams_if_not_published
   after_create :create_participant
   after_create :create_materialized_view
+
+  def section_specific_topics_must_have_sections
+    if self.is_section_specific && !self.discussion_topic_section_visibilities.any?(&:active?)
+      self.errors.add(:is_section_specific, t("Section specific topics must have sections"))
+    else
+      true
+    end
+  end
+
+  def only_announcements_can_be_section_specific
+    if self.is_section_specific && !self.is_announcement
+      self.errors.add(:is_section_specific, t("Only announcements can be section-specific"))
+    else
+      true
+    end
+  end
+
+  def feature_must_be_enabled_for_section_specific
+    return true unless self.is_section_specific
+    # We don't allow group discussions to be section-specific, so it's ok to require
+    # that context be a course here.
+    feature_enabled = (self.context.is_a? Course) &&
+      self.context.root_account&.feature_enabled?(:section_specific_announcements)
+    return true if feature_enabled
+    self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
+  end
 
   def threaded=(v)
     self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
@@ -849,6 +879,7 @@ class DiscussionTopic < ActiveRecord::Base
     ContentTag.delete_for(self)
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
+    self.discussion_topic_section_visibilities&.update_all(:workflow_state => "deleted")
     self.save
 
     if self.for_assignment? && self.root_topic_id.blank?

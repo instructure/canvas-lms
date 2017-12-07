@@ -369,6 +369,46 @@ describe CourseSection, "moving to new course" do
       @enrollment.reload
       expect(@enrollment.workflow_state).to eq("deleted")
     end
+
+    it "doesn't associate with deleted discussion topics" do
+      course = course_factory({ :course_name => "Course 1", :active_all => true })
+      section = course.course_sections.create!
+      course.save!
+      course.root_account.enable_feature!(:section_specific_announcements)
+      announcement1 = Announcement.create!(
+        :title => "some topic",
+        :message => "I announce that i am lying",
+        :user => @teacher,
+        :context => course,
+        :workflow_state => "published",
+      )
+      announcement1.is_section_specific = true
+      announcement2 = Announcement.create!(
+        :title => "some topic 2",
+        :message => "I announce that i am lying again",
+        :user => @teacher,
+        :context => course,
+        :workflow_state => "published",
+      )
+      announcement2.is_section_specific = true
+      announcement1.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => announcement1,
+          :course_section => section
+        )
+      announcement2.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => announcement2,
+          :course_section => section
+        )
+      announcement1.save!
+      announcement2.save!
+      expect(section.discussion_topics.length).to eq 2
+      announcement2.destroy
+      section.reload
+      expect(section.discussion_topics.length).to eq 1
+      expect(section.discussion_topics.first.id).to eq announcement1.id
+    end
   end
 
   describe 'deletable?' do

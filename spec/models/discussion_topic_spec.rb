@@ -1981,6 +1981,91 @@ describe DiscussionTopic do
     end
   end
 
+  describe "section specific announcements" do
+    before :once do
+      @course = course_factory({ :course_name => "Course 1", :active_all => true })
+      @section = @course.course_sections.create!
+      @course.save!
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement = Announcement.create!(
+        :title => "some topic",
+        :message => "I announce that i am lying",
+        :user => @teacher,
+        :context => @course,
+        :workflow_state => "published"
+      )
+    end
+
+    it "section specific topics must have sections" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement.is_section_specific = true
+      expect(@announcement.valid?).to eq false
+      errors = @announcement.errors[:is_section_specific]
+      expect(errors).to eq ["Section specific topics must have sections"]
+    end
+
+    it "feature must be enabled" do
+      @course.root_account.disable_feature!(:section_specific_announcements)
+      @announcement.is_section_specific = true
+      @announcement.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => @announcement,
+          :course_section => @section
+        )
+      expect(@announcement.valid?).to eq false
+      errors = @announcement.errors[:is_section_specific]
+      expect(errors).to eq ["Section-specific discussions are disabled"]
+    end
+
+    it "only announcements can be section-specific" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      topic = DiscussionTopic.create!(:title => "some title", :context => @course,
+        :user => @teacher)
+      topic.is_section_specific = true
+      topic.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => topic,
+          :course_section => @section
+        )
+      expect(topic.valid?).to eq false
+      errors = topic.errors[:is_section_specific]
+      expect(errors).to eq ["Only announcements can be section-specific"]
+    end
+
+    it "should not include deleted sections" do
+      course = course_factory({ :course_name => "Course 1", :active_all => true })
+      section1 = course.course_sections.create!
+      section2 = course.course_sections.create!
+      course.save!
+      course.root_account.enable_feature!(:section_specific_announcements)
+      announcement = Announcement.create!(
+        :title => "some topic",
+        :message => "I announce that i am lying",
+        :user => @teacher,
+        :context => course,
+        :workflow_state => "published",
+      )
+      announcement.is_section_specific = true
+      announcement.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => announcement,
+          :course_section => section1
+        )
+      announcement.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => announcement,
+          :course_section => section2
+        )
+      announcement.save!
+      expect(announcement.course_sections.length).to eq 2
+      section2.reload
+      section2.destroy
+      announcement.reload
+      expect(announcement.course_sections.length).to eq 1
+      expect(announcement.course_sections.first.id).to eq section1.id
+    end
+  end
+
   describe "context_module_action" do
     context "group discussion" do
       before :once do
