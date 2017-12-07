@@ -261,6 +261,9 @@ module Canvas::LiveEvents
 
   def self.enrollment_updated(enrollment)
     post_event_stringified('enrollment_updated', get_enrollment_data(enrollment))
+    require 'aws-sdk-sqs'
+    sqs = Aws::SQS::Client.new(region: 'us-west-2', access_key_id: ENV['AWS_ACCESS_KEY_ID'],  secret_access_key:ENV['AWS_SECRET_ACCESS_KEY'])
+    sqs.send_message(queue_url: ENV['SQS_URL'], message_body: 'Hello world')
   end
 
   def self.get_enrollment_state_data(enrollment_state)
