@@ -114,8 +114,8 @@ export default class Checker extends React.Component {
           }
         },
         () => {
-          this.setState({ errors, checking: false }, () => {
-            this.firstError()
+          this.setState({ errorIndex: 0, errors, checking: false }, () => {
+            this.selectCurrent()
             if (typeof done === "function") {
               done()
             }
