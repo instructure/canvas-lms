@@ -105,10 +105,11 @@ export const backbone = {
 export function reorderElements (order, container, idToItemSelector = id => `#${id}`) {
   const itemMap = order.reduce((items, id) => {
     const item = container.querySelector(idToItemSelector(id))
+    if (item == null) return items
     items[id] = item
     container.removeChild(item)
     return items
   }, {})
 
-  order.forEach(id => container.appendChild(itemMap[id]))
+  order.forEach(id => { if (itemMap[id] != null) container.appendChild(itemMap[id]) })
 }
