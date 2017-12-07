@@ -3052,6 +3052,10 @@ eslint-plugin-promise@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-3.6.0.tgz#54b7658c8f454813dc2a870aff8152ec4969ba75"
 
+eslint-plugin-qunit@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-qunit/-/eslint-plugin-qunit-3.2.0.tgz#711b05091637ae8c9f826ffca333a5a00e354a97"
+
 eslint-plugin-react@^7.5.1:
   version "7.5.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.5.1.tgz#52e56e8d80c810de158859ef07b880d2f56ee30b"

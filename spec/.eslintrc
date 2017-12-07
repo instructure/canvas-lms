@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "plugin:qunit/recommended",
+    "plugin:qunit/two"
+  ],
+  "plugins": [
+    "qunit"
+  ],
+  "rules": {
+    "qunit/no-global-assertions": "off",
+    "qunit/no-global-module-test": "off",
+    "qunit/require-expect": "off",
+    "qunit/no-assert-logical-expression": "error",
+    "qunit/no-commented-tests": "error",
+    "qunit/no-compare-relation-boolean": "error"
+  }
+}
+
