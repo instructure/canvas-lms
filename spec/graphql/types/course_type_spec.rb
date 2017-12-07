@@ -93,6 +93,36 @@ describe Types::CourseType do
     end
   end
 
+  describe "usersConnection" do
+    before(:once) do
+      @student1 = @student
+      @student2 = student_in_course(active_all: true).user
+    end
+
+    it "returns all visible users" do
+      expect(
+        course_type.usersConnection(current_user: @teacher)
+      ).to eq [@teacher, @student1, @student2]
+    end
+
+    it "returns only the specified users" do
+      expect(
+        course_type.usersConnection(
+          current_user: @teacher,
+          args: {userIds: @student1}
+        )
+      ).to eq [@student1]
+    end
+
+    it "doesn't return users that aren't visible to you" do
+      other_teacher = teacher_in_course(active_all: true,
+                                        course: Course.create!).user
+      expect(
+        course_type.usersConnection(current_user: other_teacher)
+      ).to be_nil
+    end
+  end
+
   describe "AssignmentGroupConnection" do
     it "returns groups" do
       c = Course.find(course.id)

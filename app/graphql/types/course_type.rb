@@ -33,10 +33,18 @@ module Types
 
     connection :usersConnection do
       type UserType.connection_type
-      resolve ->(course, _, ctx) {
+
+      argument :userIds, types[!types.ID],
+        "only include users with the given ids",
+        prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
+
+      resolve ->(course, args, ctx) {
         if course.grants_any_right?(ctx[:current_user], ctx[:session],
             :read_roster, :view_all_grades, :manage_grades)
-          UserSearch.scope_for(course, ctx[:current_user], {})
+          scope = UserSearch.scope_for(course, ctx[:current_user], {})
+          scope = scope.where(users: {id: args[:userIds]}) if args[:userIds].present?
+
+          scope
         else
           nil
         end
