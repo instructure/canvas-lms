@@ -985,6 +985,24 @@ describe ConversationsController, type: :request do
         expect(json[0]["message"]).to eql "restricted by role"
       end
 
+      it "requires send_messages_all to send to all students" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, "course_#{@course.id}_students"], :body => "test", :subject => "hey ho" },
+                headers={},
+                {expected_status: 400})
+        expect(json[0]["attribute"]).to eql "recipients"
+        expect(json[0]["message"]).to eql "restricted by role"
+      end
+
+      it "does not require send_messages_all to send to all teachers" do
+        api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, "course_#{@course.id}_teachers"], :body => "test", :subject => "halp" },
+                headers={},
+                {expected_status: 201})
+      end
+
       it "should send bulk group messages" do
         json = api_call(:post, "/api/v1/conversations",
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
