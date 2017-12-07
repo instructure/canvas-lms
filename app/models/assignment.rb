@@ -492,7 +492,7 @@ class Assignment < ActiveRecord::Base
 
     if grading_period_was
       # recalculate just the old grading period's score
-      context.recompute_student_scores(grading_period_id: grading_period_was, update_course_score: false)
+      context.recompute_student_scores(grading_period_id: grading_period_was.id, update_course_score: false)
     end
 
     unless needs_to_recompute_grade? || needs_to_update_submissions?
@@ -501,8 +501,8 @@ class Assignment < ActiveRecord::Base
       # grading period is nil, make sure we pass true for `update_course_score`
       # so we can use a singleton job.)
       context.recompute_student_scores(
-        grading_period_id: grading_period,
-        update_course_score: !grading_period || grading_period.grading_period_group&.weighted?
+        grading_period_id: grading_period&.id,
+        update_course_score: grading_period.blank? || grading_period.grading_period_group&.weighted?
       )
     end
     true

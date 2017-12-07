@@ -1073,6 +1073,11 @@ class Course < ActiveRecord::Base
     if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
       # if we have all default args, let's queue this job in a singleton to avoid duplicates
       inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
+    elsif student_ids.blank? && grading_period_id.present?
+      # A migration that changes a lot of due dates in a grading period
+      # situation can kick off a job storm and redo work. Let's avoid
+      # that by putting it into a singleton.
+      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
     end
 
     send_later_if_production_enqueue_args(

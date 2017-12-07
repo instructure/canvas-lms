@@ -104,7 +104,7 @@ class AssignmentOverride < ActiveRecord::Base
 
     if grading_period_was
       # recalculate just the old grading period's score
-      course.recompute_student_scores(students, grading_period_id: grading_period_was, update_course_score: false)
+      course.recompute_student_scores(students, grading_period_id: grading_period_was.id, update_course_score: false)
     end
     # recalculate the new grading period's score. If the grading period group is
     # weighted, then we need to recalculate the overall course score too. (If
@@ -112,8 +112,8 @@ class AssignmentOverride < ActiveRecord::Base
     # so we can use a singleton job.)
     course.recompute_student_scores(
       students,
-      grading_period_id: grading_period,
-      update_course_score: !grading_period || grading_period.grading_period_group&.weighted?
+      grading_period_id: grading_period&.id,
+      update_course_score: grading_period.blank? || grading_period.grading_period_group&.weighted?
     )
     true
   end
