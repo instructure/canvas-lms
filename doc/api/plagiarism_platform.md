@@ -36,7 +36,6 @@ Canvas will include a restricted set of services/capabilities in the TCP if the 
 Canvas requires that the TP use the following restricted capabilities/services:
 * `vnd.Canvas.OriginalityReport` service
 * `vnd.Canvas.submission` service
-* `vnd.Canvas.submission.history` service
 * `Canvas.placements.similarityDetection` capability
 
 To retrieve a TCP with these restricted services/capabilities first retrieve a JWT access token as described in <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0. These tokens are associated with a single developer key which, in turn, are associated with a single custom TCP. Include this token in the authorization header of the request to retrieve the TCP:
@@ -219,19 +218,113 @@ A JSON body example is shown below.
     "lti_assignment_id": "5afe0638-5467-4a6b-b245-c4b2e646c547"
   },
   "subscription": {
-    "id": "ce95af25-a1c9-456a-a4b4-bae1233be2d8"
+    "id": "ce95af25-a1c9-456a-a4b4-bae1233be2d8",
+    "owner_id": "ltiToolProxy:e43eed0a-e7e5-48d6-a578-378c575a3ac3"
   }
 }
 ```
 ### 3. Originality Reports
-Once the TP has been notified of a new submission (see section 2.2), it may access the submission through the Canvas LTI Submissions API for processing (this service is defined in the tool consumer profile). The payload from this request will contain URLs for retrieving the submission’s attachment.
+Once the TP has been notified of a new submission (see section 2.2), it may access the submission through the <a href="plagiarism_detection_submissions.html">Canvas LTI Submissions API</a> for processing. The payload from this request will contain URLs for retrieving the submission’s attachment.
 
 After processing the submission, an Originality Report may be created for the submission.
 
+For more details on creating originality reports see the <a href="originality_reports.html"> Canvas Originality Report API documentation</a>.
+
 Using the Originality Report and Submissions APIs requires a JWT access token be sent in the authorization header. For more information on using JWT tokens in Canvas see <a href="jwt_access_tokens.html">JWT access tokens</a>.
 
-### 4. Optional Features
+### 4. Other Features
 The following are optional features the tool provider may wish to implement.
+
+#### Course Copy
+The plagiarism platform automatically handles most of the work required for course copy to work with TPs. When a Course that contains assignments associated with a plagiarism detection TP is copied in Canvas the following occurs:
+* The copies of assignments in the new course are automatically associated with the correct tool.
+* A webhook subscription is automatically created on behalf of the tool for the newly copied assignments.
+* Tool Settings associated with the course are copied to the new course (See _Using the LTI Tool Settings Service_ below).
+
+These two actions will only occur if the same TP has been installed in the context the course is being copied to.
+
+Once the course copy has occurred TPs should be aware that they will begin receiving `submission_created` webhooks for assignments for which they have never had an LTI launch occur. This is because it is unlikely that an instructor will edit each assignment in the new course, which is what would allow the `Canvas.placements.similarityDetection` placement LTI launch to occur. To access information about assignments that a TP has never received an LTI launch for use the <a href="plagiarism_detection_platform_assignments.html">Assignment LTI API</a>.
+
+TPs often have a configuration that is set on a per-assignment basis via their UI by the instructor creating the assignment and stored by the TP. There are two ways of handeling these TP configurations during a course copy: using reasonable defaults or using the LTI Tool Settings Service.
+
+##### Option 1: Using Defaults
+When receiving a `submission_created` webhook for an assignment that has never had an associated LTI launch, TP configuration items have not been set by the instructor. In these cases, TPs should use good defaults for any custom configuration they typically offer to instructors when configuring assignments. TPs may even wish to provide a resource handler that uses the `Canvas.placements.accountNavigation` placement in order to provide Canvas administrators the ability to set account-level default configurations.
+
+##### Option 2: Using the LTI Tool Settings Service
+The LTI Tool Settings service may be used as a key/value store associated with a particular LTI launch. This means that a TP may store their custom per-assignment configuration in a Tool Setting associated with the Canvas assignment. When a course is copied all Tool Settings will be copied to the new course and be associated with the proper assignments in the new context. The following describes how to create a Tool Setting associated with an assignment and leverage it for course copy:
+
+1. Use `LtiLink.custom.url` variable expansion
+2. Store assignment-level custom configuration in Tool Settings
+3. When receiving a `submission_created` webhook for an unknown assignment, use the LTI assignment API to fetch assignment data
+4. When receiving a `submission_created` webhook for an unknown assignment, use the `lti_assignment_id` and the Tool Setting Service to retrieve TP assignment-level configuration
+
+
+##### 1. Using `LtiLink.custom.url`
+The `LtiLink.custom.url` variable expansion should be used in the same message handler that handles `Canvas.placements.similarityDetection` launches:
+```json
+...
+"message":[
+    {
+       "message_type":"basic-lti-launch-request",
+       "path":"/messages/assignment-configuration",
+       "enabled_capability": ["Canvas.placements.similarityDetection"],
+       "parameter": [
+          {
+            "name": "tool_setting_endpoint",
+            "variable": "LtiLink.custom.url"
+          }
+       ]
+    }
+]
+...
+```
+
+Canvas will then create a Tool Setting for the TP associated with the assignment when the `Canvas.placements.similarityDetection` launch occurs for the first time. This Tool Setting can be used to store TP specific assignment-level configuration that will be copied to the new context during a course copy.
+
+##### 2. Store assignment-level custom configuration in Tool Settings
+```
+PUT
+/api/lti/tool_proxy/<tool proxy guid>/courses/24/resource_link_id/<lti assignment id>/tool_setting
+```
+
+Example Request:
+```
+curl -X PUT \
+  http://canvas.docker/api/lti/tool_proxy/0ce4dbf1-b8c5-407d-85ac-618d7615a5a5/courses/24/resource_link_id/b2d9b916-5128-42ad-ad17-b54091a52be2/tool_setting \
+  -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDYW52YXMiLCJzdWIiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUiLCJleHAiOjE1MTI3NTYwOTMsImF1ZCI6WyJjYW52YXMuZG9ja2VyIiwiY2FudmFzLmRvY2tlciJdLCJpYXQiOjE1MTI3NTI0OTMsIm5iZiI6MTUxMjc1MjQ2MywianRpIjoiZTY3MmM5OGItYmM4NS00NjliLWE5YjYtNjEyMDE2MWFhZjk0Iiwic2hhcmRfaWQiOjEsInJlZ19rZXkiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUifQ.InMhzWYLhcAWRJHJsy9pRojEcQ5KRUtRGp50mQmFrnA' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+```
+When using the update endpoint the request body should contain JSON defining the key/value pairs the TP wishes Canvas to store in the Tool Setting. Canvas will *replace* the contents of the Tool Setting with whatever keys/values are sent in the request:
+```json
+{"tp_custom_setting": "some value"}
+```
+This endpoint is defined in the tool consumer profile.
+
+##### 3. use the LTI assignment API to fetch assignment data
+When a `submission_created` webhook is received for an assignment the TP has not seen before, it means that the submission is for an assignment that was copied from an assignment the TP _was_ configured on within another course. The TP should still process the submission. To fetch assignment information for a submission that has not been seen before, use the <a href="plagiarism_detection_platform_assignments.html">Canvas LTI Assignments API</a>
+
+##### 4. use the `lti_assignment_id` and the Tool Setting Service to retrieve TP assignment-level configuration
+If the TP has been leveraging Tool Settings in Canvas to store TP specific assignment-level configurations, those Tool Settings will be copied to the new assignment as well. To access the Tool Setting note the `lti_assignment_id` in the `submission_created` webhook. The Tool Setting that should be requested will have a `resource_link_id` that matches this value:
+```
+GET
+/api/lti/tool_proxy/<tool proxy guid>/courses/24/resource_link_id/<lti assignment id>/tool_setting
+
+```
+Example Request:
+```
+curl -X GET \
+  http://canvas.docker/api/lti/tool_proxy/0ce4dbf1-b8c5-407d-85ac-618d7615a5a5/courses/24/resource_link_id/b2d9b916-5128-42ad-ad17-b54091a52be2/tool_setting \
+  -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDYW52YXMiLCJzdWIiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUiLCJleHAiOjE1MTI3NTYwOTMsImF1ZCI6WyJjYW52YXMuZG9ja2VyIiwiY2FudmFzLmRvY2tlciJdLCJpYXQiOjE1MTI3NTI0OTMsIm5iZiI6MTUxMjc1MjQ2MywianRpIjoiZTY3MmM5OGItYmM4NS00NjliLWE5YjYtNjEyMDE2MWFhZjk0Iiwic2hhcmRfaWQiOjEsInJlZ19rZXkiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUifQ.InMhzWYLhcAWRJHJsy9pRojEcQ5KRUtRGp50mQmFrnA' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/x-www-form-urlencoded'
+```
+
+Response:
+```
+{"tp_custom_setting": "some value"}
+```
+
 
 #### End-User License Agreement Verification
 ##### Description

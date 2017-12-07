@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# @API Originality Reports
-# @internal
-#
-# LTI API for Submissions
+module Lti
+# @API Plagiarism Detection Submissions
+# **LTI API for Plagiarism Detection Submissions (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
 #
 # @model Submission
 #     {
@@ -86,12 +85,12 @@
 #           }
 #         },
 #         "attachments": {
-#           "description": "Files that are attached to the submission"
+#           "description": "Files that are attached to the submission",
 #           "type": "File"
 #         }
 #       }
 #     }
-
+#
 # @model File
 #     {
 #       "id": "File",
@@ -127,7 +126,6 @@
 #         }
 #       }
 #     }
-module Lti
   class SubmissionsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
     include Api::V1::Submission
