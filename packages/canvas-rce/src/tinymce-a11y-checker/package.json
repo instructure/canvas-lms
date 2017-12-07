@@ -7,6 +7,8 @@
   "scripts": {
     "test": "jest src",
     "test-watch": "jest --watch src",
+    "cypress:open": "cypress open",
+    "cypress:run": "node cypress/run.js",
     "dev": "webpack-dev-server --open",
     "extract": "format-message extract \"src/**/*.js\" > locales/en.json",
     "fmt": "prettier --no-semi --write \"src/**/*.js\"",
@@ -14,12 +16,7 @@
     "build": "scripts/build",
     "prepublish": "npm test && npm run build"
   },
-  "keywords": [
-    "tinymce",
-    "accessibility",
-    "plugin",
-    "a11y"
-  ],
+  "keywords": ["tinymce", "accessibility", "plugin", "a11y"],
   "author": "Brent Burgoyne",
   "license": "MIT",
   "devDependencies": {
@@ -30,6 +27,7 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-polyfill": "^6.23.0",
     "canvas-rce": "^2.5.4",
+    "cypress": "^1.1.4",
     "enzyme": "^3.0.0",
     "enzyme-adapter-react-15": "^1.0.0",
     "enzyme-to-json": "^3.0.1",
@@ -55,11 +53,7 @@
     "wcag-element-contrast": "^1.0.1"
   },
   "jest": {
-    "setupFiles": [
-      "./jest-setup.js"
-    ],
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/enzyme-to-json/serializer"
-    ]
+    "setupFiles": ["./jest-setup.js"],
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"]
   }
 }
