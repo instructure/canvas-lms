@@ -167,6 +167,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce.save!
     ce.master_migration = self # don't need to reload
     ce.export_course(export_opts)
+    if type == :selective && ce.referenced_files.present?
+      ce.settings[:referenced_file_migration_ids] = ce.referenced_files.values
+      ce.save!
+    end
     detect_updated_attachments(type) if ce.exported_for_course_copy? && is_primary
     ce
   end
