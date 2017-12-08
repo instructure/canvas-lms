@@ -1,0 +1,185 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "Verificador de acessibilidade:"
+  },
+  "action_to_take_b626a99a": {
+    "message": "Ação a tomar:"
+  },
+  "add_a_caption_2a915239": {
+    "message": "Adicionar legendas"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Adicionar texto alternativo para a imagem"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "Links adjacentes com a mesma URL devem ser um único link."
+  },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "Texto do atributo alternativo não deve ter mais de 120 caracteres."
+  },
+  "apply_781a2546": {
+    "message": "Aplicar"
+  },
+  "change_alt_text_92654906": {
+    "message": "Alterar texto alternativo"
+  },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Alterar tag do título para parágrafo"
+  },
+  "change_text_color_1aecb912": {
+    "message": "Alterar cor do texto"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "Verificar acessibilidade"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Verificando problemas de acessibilidade"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Fechar Verificador de acessibilidade"
+  },
+  "column_e1ae5c64": {
+    "message": "Coluna"
+  },
+  "column_group_1c062368": {
+    "message": "Grupo de colunas"
+  },
+  "decorative_image_fde98579": {
+    "message": "Imagem decorativa"
+  },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "Elemento começando com { start }"
+  },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "Corrigir hierarquia de títulos"
+  },
+  "header_column_f27433cb": {
+    "message": "Coluna do cabeçalho"
+  },
+  "header_row_and_column_ec5b9ec": {
+    "message": "Linha e coluna do cabeçalho"
+  },
+  "header_row_f33eb169": {
+    "message": "Linha do cabeçalho"
+  },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "Níveis de títulos não devem ser pulados."
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "Título começando com { start }"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Títulos não devem ter mais de 120 caracteres."
+  },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "Nomes de arquivos da imagem não devem ser usados como atributo alternativo descrevendo o conteúdo da imagem."
+  },
+  "image_with_filename_file_aacd7180": {
+    "message": "Imagem com nome de arquivo { file }"
+  },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Imagens devem incluir um atributo alternativo descrevendo o conteúdo da imagem."
+  },
+  "issue_num_total_f94536cf": {
+    "message": "Problema { num }/{ total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Teclados navegam para links usando a tecla Tab. Dois links adjacentes que direcionam para o mesmo destino podem ser confusos para usuários de teclado."
+  },
+  "learn_more_a79a7918": {
+    "message": "Aprender mais"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "Deixar como está"
+  },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "Link com texto começando com { start }"
+  },
+  "merge_links_2478df96": {
+    "message": "Mesclar links"
+  },
+  "next_40e12421": {
+    "message": "Próximo"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "Sem problemas de acessibilidades detectados."
+  },
+  "no_headers_9bc7dc7f": {
+    "message": "Sem cabeçalhos"
+  },
+  "none_3b5e34d2": {
+    "message": "Nenhum"
+  },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "Parágrafo começando com { start }"
+  },
+  "prev_f82cbc48": {
+    "message": "Ant"
+  },
+  "remove_heading_style_5fdc8855": {
+    "message": "Remover estilo do título"
+  },
+  "row_fc0944a7": {
+    "message": "Linha"
+  },
+  "row_group_979f5528": {
+    "message": "Grupo de linhas"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "Leitores de tela não podem determinar o que é exibido em uma imagem sem texto alternativo, e nomes de arquivos geralmente são strings sem significados de números e letras que não descrevem o contexto ou significado."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "Leitores de tela não podem determinar o que é exibido em uma imagem sem texto alternativo, que descreve o conteúdo e significado da imagem. Texto alternativo deve ser simples e conciso."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Leitores de tela não podem determinar o que é exibido em uma imagem sem texto alternativo, que descreve o conteúdo e significado da imagem."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Leitores de tela não podem interpretar tabelas sem a estrutura adequada. Cabeçalhos de tabelas fornecem direção e âmbito do conteúdo."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Leitores de tela não podem interpretar tabelas sem a estrutura adequada. Legendas de tabelas descrevem o contexto e entendimento geral da tabela."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Leitores de tela não podem interpretar tabelas sem a estrutura adequada. Cabeçalhos de tabelas fornecem direção e visão geral do conteúdo."
+  },
+  "set_header_scope_8c548f40": {
+    "message": "Definir âmbito do cabeçalho"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "Definir cabeçalho da tabela"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Deficientes visuais navegam rapidamente nas páginas web, buscando títulos grandes ou negritos. Usuários de leitores de tela dependem dos cabeçalhos para entendimento contextual. Os cabeçalhos devem usar a estrutura adequada."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Deficientes visuais navegam rapidamente nas páginas web, buscando títulos grandes ou negritos. Usuários de leitores de tela dependem dos cabeçalhos para entendimento contextual. Os cabeçalhos devem ser concisos dentro da estrutura adequada."
+  },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "Cabeçalho de tabela começando com { start }"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "Tabela começando com { start }"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Cabeçalhos de tabela devem especificar o âmbito."
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Tabelas devem incluir uma legenda descrevendo o conteúdo da tabela."
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Tabelas devem incluir pelo menos um cabeçalho."
+  },
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "Texto é difícil de ler sem contraste suficiente entre o texto e o plano de fundo, especialmente para aqueles com pouca visão."
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "Texto maior do que 18pt (ou negrito 14pt) deve exibir uma razão mínima de contraste de 3:1."
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "Texto menor do que 18pt (ou negrito 14pt) deve exibir uma razão mínima de contraste de 4.5:1."
+  },
+  "why_523b3d8c": {
+    "message": "Por que"
+  }
+}

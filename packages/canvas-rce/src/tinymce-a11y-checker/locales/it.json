@@ -1,0 +1,185 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "Verifica accessibilità"
+  },
+  "action_to_take_b626a99a": {
+    "message": "Azione da intraprendere:"
+  },
+  "add_a_caption_2a915239": {
+    "message": "Aggiungi una didascalia"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Aggiungi testo alternativo per l''immagine"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "I link adiacenti con lo stesso URL devono essere un singolo link."
+  },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "Il testo alternativo degli attributi non deve contenere più di 120 caratteri."
+  },
+  "apply_781a2546": {
+    "message": "Applica"
+  },
+  "change_alt_text_92654906": {
+    "message": "Cambia testo alternativo"
+  },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Cambia tag di intestazione in paragrafo"
+  },
+  "change_text_color_1aecb912": {
+    "message": "Cambia colore del testo"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "Verifica l''accessibilità"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Verifica i problemi di accessibilità"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Chiudi verifica accessibilità"
+  },
+  "column_e1ae5c64": {
+    "message": "Colonna"
+  },
+  "column_group_1c062368": {
+    "message": "Gruppo di colonne"
+  },
+  "decorative_image_fde98579": {
+    "message": "Immagine decorativa"
+  },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "Elemento che inizia con { start }"
+  },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "Correggi gerarchia intestazioni"
+  },
+  "header_column_f27433cb": {
+    "message": "Colonna intestazione"
+  },
+  "header_row_and_column_ec5b9ec": {
+    "message": "Riga e colonna di intestazione"
+  },
+  "header_row_f33eb169": {
+    "message": "Riga di intestazione"
+  },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "I livelli di intestazione non devono essere ignorati."
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "Intestazione che inizia con { start }"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Le intestazioni non devono contenere più di 120 caratteri."
+  },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "I nomi dei file immagine non devono essere utilizzati come attributo alternativo che descrive il contenuto dell''immagine."
+  },
+  "image_with_filename_file_aacd7180": {
+    "message": "Immagine con nome file { file }"
+  },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Le immagini devono includere un attributo alternativo che descrive il contenuto dell''immagine."
+  },
+  "issue_num_total_f94536cf": {
+    "message": "Problema { num }/{ total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Le tastiere indirizzano ai link utilizzando il tasto TAB. Due link adiacenti che indirizzando alla stessa destinazione possono confondere gli utenti della tastiera."
+  },
+  "learn_more_a79a7918": {
+    "message": "Scopri di più"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "Lascia così"
+  },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "Link al testo che inizia con { start }"
+  },
+  "merge_links_2478df96": {
+    "message": "Unisci link"
+  },
+  "next_40e12421": {
+    "message": "Successivo"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "Nessun problema di accessibilità rilevato."
+  },
+  "no_headers_9bc7dc7f": {
+    "message": "Nessuna intestazione"
+  },
+  "none_3b5e34d2": {
+    "message": "Nessuno"
+  },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "Paragrafo che inizia con { start }"
+  },
+  "prev_f82cbc48": {
+    "message": "Precedente"
+  },
+  "remove_heading_style_5fdc8855": {
+    "message": "Rimuovi stile intestazione"
+  },
+  "row_fc0944a7": {
+    "message": "Riga"
+  },
+  "row_group_979f5528": {
+    "message": "Gruppo di righe"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "Gli screen reader non possono determinare cosa viene visualizzato in un''immagine senza testo alternativo e i nomi file sono spesso stringhe di numeri e lettere senza senso che non descrivono il contesto o il significato."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "Gli screen reader non possono determinare cosa viene visualizzato in un''immagine senza testo alternativo, che descrive il contenuto e il significato dell''immagine. Il testo alternativo deve essere semplice e conciso."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Gli screen reader non possono determinare cosa viene visualizzato in un''immagine senza testo alternativo, che descrive il contenuto e il significato dell''immagine."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Gli screen reader non possono interpretare le tabelle senza la struttura corretta. Le intestazioni della tabella fornisco indicazioni e ambito del contenuto."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Gli screen reader non possono interpretare le tabelle senza la struttura corretta. Le didascalie della tabella descrivono il contesto e le informazioni generali della tabella."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Gli screen reader non possono interpretare le tabelle senza la struttura corretta. Le intestazioni della tabella forniscono indicazioni e panoramica del contenuto."
+  },
+  "set_header_scope_8c548f40": {
+    "message": "Imposta ambito di intestazione"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "Imposta intestazione tabella"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Gli utenti senza problemi di vista esplorano le pagine web velocemente, cercando intestazioni in grassetto o di grandi dimensioni. Gli utenti di screen reader si affidano alle intestazioni per la comprensione contestuale. Le intestazioni devono utilizzare la struttura appropriata."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Gli utenti senza problemi di vista esplorano le pagine web velocemente, cercando intestazioni in grassetto o di grandi dimensioni. Gli utenti di screen reader si affidano alle intestazioni per la comprensione contestuale. Le intestazioni devono essere concise nella struttura appropriata."
+  },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "Intestazione tabella che inizia con { start }"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "Tabella che inizia con { start }"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Le intestazioni delle tabelle devono specificare l''ambito."
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Le tabelle devono includere una didascalia che descrive i contenuti della tabella."
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Le tabelle devono includere almeno un''intestazione."
+  },
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "Il testo è difficile da leggere senza un sufficiente contrasto tra il testo e lo sfondo, soprattutto per gli utenti ipovedenti."
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "Il testo con dimensioni maggiori di 18 pt (o in grassetto 14 pt) deve visualizzare un rapporto di contrasto minimo pari a 3:1."
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "Il testo con dimensioni minori di 18 pt (o in grassetto 14 pt) deve visualizzare un rapporto di contrasto minimo pari a 4,5:1."
+  },
+  "why_523b3d8c": {
+    "message": "Perché"
+  }
+}

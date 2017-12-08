@@ -1,0 +1,185 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "辅助功能检查器"
+  },
+  "action_to_take_b626a99a": {
+    "message": "要执行的操作："
+  },
+  "add_a_caption_2a915239": {
+    "message": "添加说明"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "为图像添加替换文本"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "具有相同 URL 的相邻链接应该为一个单链接。"
+  },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "替换属性文本不得超过 120 个字符。"
+  },
+  "apply_781a2546": {
+    "message": "申请"
+  },
+  "change_alt_text_92654906": {
+    "message": "更改替换文本"
+  },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "更改段落的标题标签"
+  },
+  "change_text_color_1aecb912": {
+    "message": "更改文本颜色"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "检查辅助功能"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "正在检查辅助功能问题"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "关闭辅助功能检查器"
+  },
+  "column_e1ae5c64": {
+    "message": "列"
+  },
+  "column_group_1c062368": {
+    "message": "列组"
+  },
+  "decorative_image_fde98579": {
+    "message": "装饰图片"
+  },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "以{ start }开始的元素"
+  },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "固定标题层次结构"
+  },
+  "header_column_f27433cb": {
+    "message": "标题列"
+  },
+  "header_row_and_column_ec5b9ec": {
+    "message": "标题行和列"
+  },
+  "header_row_f33eb169": {
+    "message": "标题行"
+  },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "不得跳过标题级别。"
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "以{ start }开始的标题"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "标题不得超过 120 个字符。"
+  },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "不得使用图像文件名作为描述图像内容的替换属性。"
+  },
+  "image_with_filename_file_aacd7180": {
+    "message": "文件名为{ file }的图像"
+  },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "图像应包括一个描述图像内容的替换属性。"
+  },
+  "issue_num_total_f94536cf": {
+    "message": "问题{ num }/{ total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "键盘使用 Tab 键导航至链接。转至相同目的地的两个相邻链接可以对键盘用户造成混淆。"
+  },
+  "learn_more_a79a7918": {
+    "message": "了解更多"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "保持原状"
+  },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "具有以{ start }开始的文本的链接"
+  },
+  "merge_links_2478df96": {
+    "message": "合并链接"
+  },
+  "next_40e12421": {
+    "message": "下一步"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "没有发现辅助功能问题。"
+  },
+  "no_headers_9bc7dc7f": {
+    "message": "无标题"
+  },
+  "none_3b5e34d2": {
+    "message": "无"
+  },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "以{ start }开始的段落"
+  },
+  "prev_f82cbc48": {
+    "message": "上一个"
+  },
+  "remove_heading_style_5fdc8855": {
+    "message": "删除标题样式"
+  },
+  "row_fc0944a7": {
+    "message": "行"
+  },
+  "row_group_979f5528": {
+    "message": "行组"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "如果没有替换文本，且文件名通常是不描述上下文或意义的无意义的数字和字母字符串，则屏幕读取器无法确定图像显示的内容。"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "如果没有描述图像内容和意义的替换文本，则屏幕读取器无法确定图像显示的内容。替换文本应简单明了。"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "如果没有描述图像内容和意义的替换文本，则屏幕读取器无法确定图像显示的内容。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "屏幕读取器无法解读不具有正确结构的表格。表格标题提供说明和内容范围。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "屏幕读取器无法解读不具有正确结构的表格。表格说明描述表格的上下文和对表格的一般理解。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "屏幕读取器无法解读不具有正确结构的表格。表格标题提供说明和内容概述。"
+  },
+  "set_header_scope_8c548f40": {
+    "message": "设置标题范围"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "设置表格标题"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "视力好的用户快速浏览网页，查找大号字体或粗体标题。屏幕读取器用户依赖于标题了解上下文。标题应使用正确的结构。"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "视力好的用户快速浏览网页，查找大号字体或粗体标题。屏幕读取器用户依赖于标题了解上下文。标题应在正确的结构内保持简洁。"
+  },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "以{ start }开始的表格标题"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "以{ start }开始的表格"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "表格标题应确定范围。"
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "表格应包括描述表格内容的说明。"
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "表格应包括至少一个标题。"
+  },
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "如果文字与背景之间的对比不充分，则文字读起来困难，尤其是对视力低的人而言。"
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "文字大于 18 磅（或粗体 14 磅）时显示的对比度应至少为 3:1。"
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "文字小于 18 磅（或粗体 14 磅）时显示的对比度应至少为 4.5:1。"
+  },
+  "why_523b3d8c": {
+    "message": "原因"
+  }
+}

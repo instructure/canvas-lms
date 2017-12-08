@@ -1,0 +1,185 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "Zugangskontrolle"
+  },
+  "action_to_take_b626a99a": {
+    "message": "Auszuführende Tätigkeiten:"
+  },
+  "add_a_caption_2a915239": {
+    "message": "Eine Beschriftung hinzufügen"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Alternativen Text für das Bild hinzufügen"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "Nebenstehende Links mit dem gleichen URL sollten ein einziger Link sein."
+  },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "Der alternative Text sollte nicht länger als 120 Zeichen sein."
+  },
+  "apply_781a2546": {
+    "message": "Anwenden"
+  },
+  "change_alt_text_92654906": {
+    "message": "Alt. Text ändern"
+  },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Überschrifts-Tag zu Absatz ändern"
+  },
+  "change_text_color_1aecb912": {
+    "message": "Textfarbe ändern"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "Zugänglichkeit prüfen"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Zugangsprobleme werden überprüft"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Zugangsprüfung schließen"
+  },
+  "column_e1ae5c64": {
+    "message": "Spalte"
+  },
+  "column_group_1c062368": {
+    "message": "Spaltengruppe"
+  },
+  "decorative_image_fde98579": {
+    "message": "Dekoratives Bild"
+  },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "Element beginnt mit { start }"
+  },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "Feste Überschriftshierarchie"
+  },
+  "header_column_f27433cb": {
+    "message": "Überschrift Spalte"
+  },
+  "header_row_and_column_ec5b9ec": {
+    "message": "Überschrift Zeile und Spalte"
+  },
+  "header_row_f33eb169": {
+    "message": "Überschrift Zeile"
+  },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "Die Überschriftsebene darf nicht übersprungen werden."
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "Überschrift beginnt mit { start }"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Überschriften dürfen nicht länger als 120 Zeichen sein."
+  },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "Bilddateinamen dürfen für das Alt-Attribut zur Beschreibung des Bildinhalts nicht verwendet werden."
+  },
+  "image_with_filename_file_aacd7180": {
+    "message": "Bild mit dem Dateinamen { file }"
+  },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Bilder müssen ein Alt-Attribut zur Beschreibung des Bildinhalts haben."
+  },
+  "issue_num_total_f94536cf": {
+    "message": "Fehler { num }/{ total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Tastaturnavigation zu Links mithilfe der Tabulatortaste. Zwei benachbarte Links, die direkt zum gleichen Ziel führen, können für den Tastaturbenutzer verwirrend sein."
+  },
+  "learn_more_a79a7918": {
+    "message": "Mehr erfahren"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "Lassen, wie es ist"
+  },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "Link mit Text, beginnend mit { start }"
+  },
+  "merge_links_2478df96": {
+    "message": "Links zusammenführen"
+  },
+  "next_40e12421": {
+    "message": "Weiter"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "Es wurden keine Zugangsprobleme festgestellt."
+  },
+  "no_headers_9bc7dc7f": {
+    "message": "Keine Header"
+  },
+  "none_3b5e34d2": {
+    "message": "Keine"
+  },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "Absatz, beginnend mit { start }"
+  },
+  "prev_f82cbc48": {
+    "message": "Vorher"
+  },
+  "remove_heading_style_5fdc8855": {
+    "message": "Überschriftsstil entfernen"
+  },
+  "row_fc0944a7": {
+    "message": "Zeile"
+  },
+  "row_group_979f5528": {
+    "message": "Zeilengruppe"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "Ohne alternativen Text kann ein Bildschirmbetrachter nicht bestimmen, was auf einem Bild gezeigt wird, zumal die Dateinamen oft sinnlose Zeichenfolgen aus Zahlen und Buchstaben sind, die weder den Kontext noch die Bedeutung erläutern."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "Ohne alternativen Text, der den Kontext und die Bedeutung erläutert, kann ein Bildschirmbetrachter nicht bestimmen, was auf einem Bild gezeigt wird. Alternativer Text sollte einfach und präzise sein."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Ohne alternativen Text, der den Kontext und die Bedeutung erläutert, kann ein Bildschirmbetrachter nicht bestimmen, was auf einem Bild gezeigt wird."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Bildschirmbetrachter können Tabellen ohne die entsprechende Struktur nicht interpretieren. Tabellenüberschriften liefern die Richtung und den Anwendungsbereich des Inhalts."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Bildschirmbetrachter können Tabellen ohne die entsprechende Struktur nicht interpretieren. Tabellenbeschriftungen beschreiben den Kontext und die allgemeine Bedeutung der Tabelle."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Bildschirmbetrachter können Tabellen ohne die entsprechende Struktur nicht interpretieren. Tabellenüberschriften weisen die Richtung und geben eine Übersicht über den Inhalt."
+  },
+  "set_header_scope_8c548f40": {
+    "message": "Den Anwendungsbereich der Überschrift festlegen"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "Tabellenüberschrift festlegen"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Sehende Benutzer durchsuchen Webseiten schnell nach groß- oder fettgedruckten Überschriften. Benutzer von Bildschirmbetrachtern sind für ein kontextbezogenes Verständnis auf Überschriften angewiesen. Überschriften sollten die entsprechende Struktur verwenden."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Sehende Benutzer durchsuchen Webseiten schnell nach groß- oder fettgedruckten Überschriften. Benutzer von Bildschirmbetrachtern sind für ein kontextbezogenes Verständnis auf Überschriften angewiesen. Überschriften sollten die entsprechende Struktur knapp wiedergeben."
+  },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "Tabellenüberschriften, beginnend mit { start }"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "Tabelle, beginnend mit { start }"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Tabellenüberschriften sollten den Geltungsbereich angeben."
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Tabellen sollten über eine Bildunterschrift verfügen, die den Inhalt der Tabelle beschreibt."
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Tabellen sollten mindestens eine Überschrift haben."
+  },
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "Text ist, insbesondere für Menschen mit Sehschwäche, schwer zu lesen, wenn der Kontrast zwischen Text und Hintergrund nicht ausreicht."
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "Text, der größer als 18 Punkte ist (bei Fettdruck 14 Punkte), sollte einen Mindestkontrastverhältnis von 3:1 haben."
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "Text, der kleiner als 18 Punkte ist (bei Fettdruck 14 Punkte), sollte einen Mindestkontrastverhältnis von 4,5:1 haben."
+  },
+  "why_523b3d8c": {
+    "message": "Warum?"
+  }
+}
