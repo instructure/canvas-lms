@@ -503,6 +503,7 @@ describe ContentMigration do
       att3 = Attachment.create!(:filename => 'testing.jpg', :display_name => "testing.jpg", :uploaded_data => StringIO.new('test this'), :folder => root, :context => @copy_from)
       att4 = Attachment.create!(:filename => 'sub_test.jpg', :display_name => "sub_test.jpg", :uploaded_data => StringIO.new('sub_folder'), :folder => folder, :context => @copy_from)
       qtext = <<-HTML.strip
+sad file ref: <img src="%s">
 File ref:<img src="/courses/%s/files/%s/download">
 different file ref: <img src="/courses/%s/%s">
 subfolder file ref: <img src="/courses/%s/%s">
@@ -515,7 +516,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
                     :question_name => "test fun",
                     :name => "test fun",
                     :points_possible => 10,
-                    :question_text => qtext % [@copy_from.id, att.id, @copy_from.id, "file_contents/course%20files/test.jpg", @copy_from.id, "file_contents/course%20files/folder%201/sub_test.jpg"],
+                    :question_text => qtext % ["/files/#{att.id}", @copy_from.id, att.id, @copy_from.id, "file_contents/course%20files/test.jpg", @copy_from.id, "file_contents/course%20files/folder%201/sub_test.jpg"],
                     :answers =>
                             [{:migration_id => "QUE_1016_A1", :html => %{File ref:<img src="/courses/#{@copy_from.id}/files/#{att3.id}/download">}, :comments_html =>'<i>comment</i>', :text => "", :weight => 100, :id => 8080},
                              {:migration_id => "QUE_1017_A2", :html => "<strong>html answer 2</strong>", :comments_html =>'<i>comment</i>', :text => "", :weight => 0, :id => 2279}]}.with_indifferent_access
@@ -533,7 +534,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       q_to = @copy_to.quizzes.first
       qq_to = q_to.active_quiz_questions.first
-      expect(qq_to.question_data[:question_text]).to match_ignoring_whitespace(qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"])
+      expect(qq_to.question_data[:question_text]).to match_ignoring_whitespace(qtext % ["/courses/#{@copy_to.id}/files/#{att_2.id}/preview", @copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"])
       expect(qq_to.question_data[:answers][0][:html]).to match_ignoring_whitespace(%{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">})
     end
 
