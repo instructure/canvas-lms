@@ -116,21 +116,15 @@ define [
         $.flashError I18n.t 'flash.error', "An error occurred. Please refresh the page and try again."
 
       # create new link
-      outcome.setUrlTo 'delete'
-      unlinkUrl = outcome.url
+      oldGroup = outcome.outcomeGroup
       outcome.outcomeGroup = newGroup
       outcome.setUrlTo 'add'
-      $.ajaxJSON(outcome.url, 'POST', outcome_id: outcome.get 'id')
+      $.ajaxJSON(outcome.url, 'POST', {outcome_id: outcome.get('id'), move_from: oldGroup.id})
         .done( (modelData) ->
           # reset urls etc.
           outcome.set outcome.parse(modelData)
-          # new link created, now remove old link
-          $.ajaxJSON(unlinkUrl, 'DELETE')
-            .done( ->
-              # old link removed
-              $.flashMessage I18n.t 'flash.updateSuccess', 'Update successful'
-              disablingDfd.resolve())
-            .fail onFail)
+          $.flashMessage I18n.t 'flash.updateSuccess', 'Update successful'
+          disablingDfd.resolve())
         .fail onFail
 
       disablingDfd

@@ -391,6 +391,7 @@ describe "Outcome Groups API", type: :request do
                      :action => 'show',
                      :id => group.id.to_s,
                      :format => 'json')
+        assert_status(200)
       end
 
       it "should 404 for non-global groups" do
@@ -1062,6 +1063,47 @@ describe "Outcome Groups API", type: :request do
                      :format => 'json')
         expect(@group.child_outcome_links.reload.size).to eq 1
         expect(@group.child_outcome_links.first.content).to eq @outcome
+      end
+
+      context 'moving outcome link to another group' do
+        def sub_group_with_outcome
+          expect(@group.child_outcome_links).to be_empty
+          sub_group = @account.learning_outcome_groups.create!(title: 'some lonely sub group')
+          sub_group.add_outcome(@outcome)
+          expect(sub_group.child_outcome_links.reload.size).to eq 1
+          expect(sub_group.child_outcome_links.first.content).to eq @outcome
+          sub_group
+        end
+
+        it "should re-use an old link if move_from is included" do
+          sub_group = sub_group_with_outcome
+          api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
+                       controller: 'outcome_groups_api',
+                       action: 'link',
+                       account_id: @account.id.to_s,
+                       id: @group.id.to_s,
+                       outcome_id: @outcome.id.to_s,
+                       move_from: sub_group.id.to_s,
+                       format: 'json')
+          expect(@group.child_outcome_links.reload.size).to eq 1
+          expect(@group.child_outcome_links.first.content).to eq @outcome
+          expect(sub_group.child_outcome_links.reload).to be_empty
+        end
+
+        it "should not re-use an old link if move_from is omitted" do
+          sub_group = sub_group_with_outcome
+          api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
+                       controller: 'outcome_groups_api',
+                       action: 'link',
+                       account_id: @account.id.to_s,
+                       id: @group.id.to_s,
+                       outcome_id: @outcome.id.to_s,
+                       format: 'json')
+          expect(@group.child_outcome_links.reload.size).to eq 1
+          expect(@group.child_outcome_links.first.content).to eq @outcome
+          expect(sub_group.child_outcome_links.reload.size).to eq 1
+          expect(sub_group.child_outcome_links.first.content).to eq @outcome
+        end
       end
 
       it "should return json of the new link" do
