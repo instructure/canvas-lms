@@ -62,8 +62,9 @@ export class ToDoSidebar extends Component {
 
   renderShowMoreTodos (items) {
     if (items.length > 5 && !this.state.showTodos) {
+      const number = items.length - 5
       return (
-        <ButtonLink onClick={this.showMoreTodos}>{`${(items.length) - 5} ${I18n.t('More')}...`}</ButtonLink>
+        <ButtonLink onClick={this.showMoreTodos}>{I18n.t("%{number} More...", {number})}</ButtonLink>
       );
     }
   }
