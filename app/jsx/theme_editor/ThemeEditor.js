@@ -265,7 +265,8 @@ export default class ThemeEditor extends React.Component {
     this.setState({showSubAccountProgress: false})
   }
 
-  renderTabInputs = () => this.props.allowGlobalIncludes
+  renderTabInputs = () =>
+    this.props.allowGlobalIncludes
       ? TABS.map(tab => (
           <input
             type="radio"
@@ -279,7 +280,8 @@ export default class ThemeEditor extends React.Component {
         ))
       : null
 
-  renderTabLabels = () => this.props.allowGlobalIncludes
+  renderTabLabels = () =>
+    this.props.allowGlobalIncludes
       ? TABS.map(tab => (
           <label
             htmlFor={tab.id}
@@ -517,6 +519,8 @@ export default class ThemeEditor extends React.Component {
                 ref="previewIframe"
                 src={`/accounts/${this.props.accountID}/theme-preview/?editing_brand_config=1`}
                 title={I18n.t('Preview')}
+                aria-hidden={this.somethingHasChanged()}
+                tabIndex={this.somethingHasChanged() ? '-1' : '0'}
               />
             </div>
           </div>
