@@ -50,6 +50,13 @@ define [
     outcome = new Outcome({mastery_points: 3})
     equal outcome.status(), 'undefined'
 
+  test "#scaledScore should fall back to mastery score if points possible is zero", ->
+    outcome = new Outcome({percent: 0.70, score: 0, mastery_points: 3, points_possible: 0, question_bank_result: true})
+    equal outcome.roundedScore(), '2.1'
+
+  test "#scaledScore should fall back to mastery score if points possible is less than zero", ->
+    outcome = new Outcome({percent: 0.70, score: 0, mastery_points: 3, points_possible: -1, question_bank_result: true})
+    equal outcome.roundedScore(), '2.1'
 
   test "#percentProgress should be zero if score isn't defined", ->
     outcome = new Outcome({points_possible: 3})

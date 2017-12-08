@@ -42,11 +42,24 @@ class LearningOutcomeResult < ActiveRecord::Base
   def calculate_percent!
     scale_data = scale_params
     if needs_scale?(scale_data) && self.score && self.possible
-      self.percent = (calculate_by_scale(scale_data)).round(4)
+      self.percent = calculate_by_scale(scale_data).round(4)
     elsif self.score && self.possible
-      self.percent = self.score.to_f / self.possible.to_f
+      self.percent = percentage
     end
     self.percent = nil if self.percent && !self.percent.to_f.finite?
+  end
+
+  def percentage
+    if self.possible.to_f > 0
+      self.score.to_f / self.possible.to_f
+    elsif parent_has_mastery?
+      # the parent should always have a mastery score, if it doesn't
+      # it means something is broken with the outcome and it will need to
+      # be corrected. If percent is nil on an Outcome Result associated with
+      # a Quiz, it will cause a 500 error on the learning mastery gradebook in
+      # the get_aggregates method in RollupScoreAggregatorHelper
+      self.score.to_f / parent_outcome.mastery_points.to_f
+    end
   end
 
   def assignment
@@ -146,6 +159,14 @@ class LearningOutcomeResult < ActiveRecord::Base
     end
   end
 
+  def parent_has_mastery?
+    parent_outcome&.mastery_points.to_f > 0
+  end
+
+  def parent_outcome
+    self.learning_outcome
+  end
+
   def needs_scale?(scale_data)
     scale_data && scale_data[:scale_percent] != 1.0
   end
@@ -153,8 +174,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   def precise_mastery_percent
     # the outcome's mastery percent is rounded to 2 places. This is normally OK
     # but for scaling it's too imprecise and can lead to inaccurate calculations
-    parent_outcome = self.learning_outcome
-    return unless parent_outcome.try(:mastery_points) && parent_outcome.points_possible > 0
+    return unless parent_has_mastery? && parent_outcome.points_possible > 0
     parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
   end
 end

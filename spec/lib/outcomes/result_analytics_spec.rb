@@ -257,6 +257,15 @@ describe Outcomes::ResultAnalytics do
       expect(aggregate_result.size).to eq 2
       expect(aggregate_result.scores.map(&:score)).to eq [2.41, 3.5]
     end
+
+    it 'falls back to using mastery score if points possible is 0 or nil' do
+      fake_context = MockUser.new(42, 'fake')
+      o = MockOutcome[81, 'latest', nil, {mastery_points: 3.0, points_possible: 0.0}]
+      q_results = create_quiz_outcome_results(o, "name, o",
+        {score: 10.0, percent: 0.7, possible: 1.0, association_id: 1})
+      aggregate_result = ra.aggregate_outcome_results_rollup([q_results].flatten, fake_context)
+      expect(aggregate_result.scores.map(&:score)).to eq [2.1]
+    end
   end
 
   describe "handling quiz outcome results objects" do
