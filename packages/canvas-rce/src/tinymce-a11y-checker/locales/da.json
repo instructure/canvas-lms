@@ -1,0 +1,185 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "Tilgægelighedskontrol"
+  },
+  "action_to_take_b626a99a": {
+    "message": "Handling, der skal tages:"
+  },
+  "add_a_caption_2a915239": {
+    "message": "Tilføj billedtekst"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Tilføj alternativ tekst til billedet"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "Tilstødende links med samme URL skal være et enkelt link."
+  },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "Alternativ attributtekst må ikke indeholde mere end 120 tegn."
+  },
+  "apply_781a2546": {
+    "message": "Tildel"
+  },
+  "change_alt_text_92654906": {
+    "message": "Skift alternativ tekst"
+  },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Skift overskrift-tag til afsnit"
+  },
+  "change_text_color_1aecb912": {
+    "message": "Skift tekstfarve"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "Kontroller tilgængelighed"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Kontrollerer tilgængelighedsproblemer"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Luk tilgægelighedskontrol"
+  },
+  "column_e1ae5c64": {
+    "message": "Kolonne"
+  },
+  "column_group_1c062368": {
+    "message": "Kolonnegruppe"
+  },
+  "decorative_image_fde98579": {
+    "message": "Dekorativt billede"
+  },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "Element begynder med { start }"
+  },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "Ret overskriftshierarki"
+  },
+  "header_column_f27433cb": {
+    "message": "Overskriftskolonne"
+  },
+  "header_row_and_column_ec5b9ec": {
+    "message": "Overskriftsrække- og kolonne"
+  },
+  "header_row_f33eb169": {
+    "message": "Overskriftsrække"
+  },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "Overskriftsniveauer bør ikke springes over."
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "Overskrift, der starter med { start }"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Overskrifter må ikke indeholde mere end 120 tegn."
+  },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "Billedfilnavne bør ikke bruges som den alternative attribut, der beskriver billedindholdet."
+  },
+  "image_with_filename_file_aacd7180": {
+    "message": "Billede med filnavn { file }"
+  },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Billeder skal indeholde en alternativ attribut, der beskriver billedindholdet."
+  },
+  "issue_num_total_f94536cf": {
+    "message": "Udstedelse { num }/{ total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Tastaturer navigerer til links ved hjælp af Tab-tasten. To tilstødende links, der fører til samme destination, kan være forvirrende for tastaturbrugere."
+  },
+  "learn_more_a79a7918": {
+    "message": "Lær mere"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "Lad det være, som det er"
+  },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "Link med tekst, der begynder med { start }"
+  },
+  "merge_links_2478df96": {
+    "message": "Sammenlæg links"
+  },
+  "next_40e12421": {
+    "message": "Næste"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "Der blev ikke fundet nogen tilgængelighedsproblemer."
+  },
+  "no_headers_9bc7dc7f": {
+    "message": "Ingen overskrifter"
+  },
+  "none_3b5e34d2": {
+    "message": "Ingen"
+  },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "Paragraf begynder med { start }"
+  },
+  "prev_f82cbc48": {
+    "message": "Forrige"
+  },
+  "remove_heading_style_5fdc8855": {
+    "message": "Fjern overskriftsstil"
+  },
+  "row_fc0944a7": {
+    "message": "Række"
+  },
+  "row_group_979f5528": {
+    "message": "Rækkegruppe"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "Skærmlæsere kan ikke bestemme, hvad der vises i et billede uden alternativ tekst, og filnavne er ofte en meningsløs række tal og bogstaver, der ikke beskriver konteksten eller betydningen."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "Skærmlæsere kan ikke bestemme, hvad der vises i et billede uden alternativ tekst, der beskriver billedets indhold og betydning. Alternativ tekst skal være enkel og kortfattet."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Skærmlæsere kan ikke bestemme, hvad der vises i et billede uden alternativ tekst, der beskriver billedets indhold og betydning."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Skærmlæsere kan ikke fortolke tabeller uden den rette struktur. Tabeloverskrifter giver en ide om indholdet og dets omfang."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Skærmlæsere kan ikke fortolke tabeller uden den rette struktur. Tabelbetegnelser beskriver tabellens kontekst og generelle indhold."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Skærmlæsere kan ikke fortolke tabeller uden den rette struktur. Tabeloverskrifter giver en ide om indholdet og en oversigt over det."
+  },
+  "set_header_scope_8c548f40": {
+    "message": "Indstil overskriftens omfang"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "Indstil tabellens overskrift"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Brugere, der er i stand til at se, gennemser websider hurtigt og leder efter store overskrifter. Skærmlæsere er afhængige af overskrifter for kontekstuel forståelse. Overskrifter bør anvende den rigtige struktur."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Brugere, der er i stand til at se, gennemser websider hurtigt og leder efter store overskrifter. Skærmlæsere er afhængige af overskrifter for kontekstuel forståelse. Overskrifter bør være kortfattede inden for den rigtige struktur."
+  },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "Tabeloverskrift, der starter med { start }"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "Tabel, der starter med { start }"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Tabeloverskrifter skal angive omfang."
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Tabeller skal indeholde en billedtekst, der beskriver tabellens indhold."
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Tabeller skal indeholde mindst et overskrift."
+  },
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "Tekst er vanskelig at læse uden tilstrækkelig kontrast mellem tekst og baggrund, især for personer med dårligt syn."
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "Tekst større end 18pt (eller fed 14pt) skal have et kontrastforhold på mindst 3:1."
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "Tekst mindre end 18pt (eller fed 14pt) skal have et kontrastforhold på mindst 4,5:1."
+  },
+  "why_523b3d8c": {
+    "message": "Hvorfor"
+  }
+}

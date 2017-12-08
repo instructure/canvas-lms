@@ -1,0 +1,185 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "可訪問性檢查器"
+  },
+  "action_to_take_b626a99a": {
+    "message": "執行的動作："
+  },
+  "add_a_caption_2a915239": {
+    "message": "添加字幕"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "為圖像添加替代文字"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "URL 相同的相鄰連結應為單一連結。"
+  },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "替代屬性文字不應包含多於 120 個字元。"
+  },
+  "apply_781a2546": {
+    "message": "應用"
+  },
+  "change_alt_text_92654906": {
+    "message": "變更替代文字"
+  },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "變更標題標籤為段落"
+  },
+  "change_text_color_1aecb912": {
+    "message": "變更文字顏色"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "檢查可訪問性"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "檢查可訪問性問題"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "關閉可訪問性檢查器"
+  },
+  "column_e1ae5c64": {
+    "message": "欄"
+  },
+  "column_group_1c062368": {
+    "message": "欄組"
+  },
+  "decorative_image_fde98579": {
+    "message": "裝飾圖像"
+  },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "以 { start } 開始的元素"
+  },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "固定標題階層"
+  },
+  "header_column_f27433cb": {
+    "message": "標題欄"
+  },
+  "header_row_and_column_ec5b9ec": {
+    "message": "標題行與欄"
+  },
+  "header_row_f33eb169": {
+    "message": "標題行"
+  },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "不應跳過標題層。"
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "以 { start } 開始的標題"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "標題不應包含多於 120 個字元。"
+  },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "圖像檔案名稱不應用作說明圖像內容的替代屬性。"
+  },
+  "image_with_filename_file_aacd7180": {
+    "message": "檔案名稱為 { file } 的圖像"
+  },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "圖像應包括說明圖像內容的替代屬性。"
+  },
+  "issue_num_total_f94536cf": {
+    "message": "問題 { num }/{ total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "使用 Tab 鍵以鍵盤導航至連結。目的地相同的兩個相連連結可能對鍵盤使用者造成混亂。"
+  },
+  "learn_more_a79a7918": {
+    "message": "學習更多"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "不需變更"
+  },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "文字以 { start } 開始的連結"
+  },
+  "merge_links_2478df96": {
+    "message": "合併連結"
+  },
+  "next_40e12421": {
+    "message": "下一個"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "並無偵察任何可訪問性問題"
+  },
+  "no_headers_9bc7dc7f": {
+    "message": "無標題"
+  },
+  "none_3b5e34d2": {
+    "message": "無"
+  },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "以 { start } 開始的段落"
+  },
+  "prev_f82cbc48": {
+    "message": "預覽"
+  },
+  "remove_heading_style_5fdc8855": {
+    "message": "移除標題樣式"
+  },
+  "row_fc0944a7": {
+    "message": "行"
+  },
+  "row_group_979f5528": {
+    "message": "行組"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "沒有替代文字，屏幕閱讀器不能判斷圖像所顯示的是什麼，而檔案名稱一般都是無意義的數字與字母串，並不能說明內容或意義。"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "沒有說明圖像內容與意義的替代文字，屏幕閱讀器不能判斷圖像所顯示的是什麼。替代文字應為精簡。"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "沒有說明圖像內容與意義的替代文字，屏幕閱讀器不能判斷圖像所顯示的是什麼。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "沒有適當的結構，屏幕閱讀器不能解讀表格。表格標題能提供方向與內容範圍。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "沒有適當的結構，屏幕閱讀器不能解讀表格。表格字幕說明表格的內容與一般理解。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "沒有適當的結構，屏幕閱讀器不能解讀表格。表格標題能提供方向與內容概要。"
+  },
+  "set_header_scope_8c548f40": {
+    "message": "設定標題範圍"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "設定表格標題"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "有視力的使用者能迅速瀏覽網頁，尋找大型或粗體標題。屏幕閱讀器使用者依靠標題理解內容背景。標題應使用適當的結構。"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "有視力的使用者能迅速瀏覽網頁，尋找大型或粗體標題。屏幕閱讀器使用者依靠標題理解內容背景。標題應使用適當的結構，並保持精簡。"
+  },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "以 { start } 開始的表格標題"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "以 { start } 開始的表格"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "表格標題應指定範圍。"
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "表格應包括字幕說明表格內容。"
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "表格應包括最少一個標題。"
+  },
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "文字與背景之間對比不足，難以閱讀文字，對於視力較差的人尤其如是。"
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "大小為 18pt（或粗體 14pt）以上的文字的色彩比最少應達到 3:1。"
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "大小為 18pt（或粗體 14pt）以下的文字的色彩比最少應達到 4.5:1。"
+  },
+  "why_523b3d8c": {
+    "message": "為什麼"
+  }
+}

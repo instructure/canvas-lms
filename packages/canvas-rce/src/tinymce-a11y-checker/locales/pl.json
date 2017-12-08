@@ -1,0 +1,185 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "Kontrola dostępności"
+  },
+  "action_to_take_b626a99a": {
+    "message": "Wymagane działanie:"
+  },
+  "add_a_caption_2a915239": {
+    "message": "Dodaj napis"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Dodaj alternatywny tekst dla obrazka"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "Sąsiadujące łącza o tym samym adresie URL powinny stanowić pojedyncze łącze."
+  },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "Alternatywny tekst nie może zawierać więcej niż 120 znaków."
+  },
+  "apply_781a2546": {
+    "message": "Zastosuj"
+  },
+  "change_alt_text_92654906": {
+    "message": "Zmień alternatywny tekst"
+  },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Zmień tag nagłówka na akapit"
+  },
+  "change_text_color_1aecb912": {
+    "message": "Zmień kolor tekstu"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "Sprawdź dostępność"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Sprawdź problemy z dostępnością"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Zamknij kontrolę dostępności"
+  },
+  "column_e1ae5c64": {
+    "message": "Kolumna"
+  },
+  "column_group_1c062368": {
+    "message": "Grupa kolumn"
+  },
+  "decorative_image_fde98579": {
+    "message": "Obraz dekoracyjny"
+  },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "Element rozpoczynający się od { start }"
+  },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "Przypnij hierarchię nagłówków"
+  },
+  "header_column_f27433cb": {
+    "message": "Kolumna nagłówka"
+  },
+  "header_row_and_column_ec5b9ec": {
+    "message": "Wiersz i kolumna nagłówka"
+  },
+  "header_row_f33eb169": {
+    "message": "Wiersz nagłówka"
+  },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "Poziomów nagłówka nie można pomijać."
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "Nagłówek rozpoczynający się od { start }"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Nagłówki nie powinny zawierać więcej niż 120 znaków."
+  },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "Nazw plików obrazu nie można używać jako alternatywnego atrybutu opisującego zawartość obrazu."
+  },
+  "image_with_filename_file_aacd7180": {
+    "message": "Plik obrazu z nazwą { file }"
+  },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Obrazy powinny obejmować alternatywny atrybut opisujący zawartość obrazu."
+  },
+  "issue_num_total_f94536cf": {
+    "message": "Problem { num }/{ total }"
+  },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Klawiatury pozwalają przejść do łączy za pomocą klawisza Tab. Dwa sąsiednie łącza prowadzącego do tej samej lokalizacji mogą wprowadzać użytkowników klawiatury w błąd."
+  },
+  "learn_more_a79a7918": {
+    "message": "Dowiedz się więcej"
+  },
+  "leave_as_is_4facfe55": {
+    "message": "Pozostaw jako"
+  },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "Powiąż z tekstem, który się zaczyna od słów { start }"
+  },
+  "merge_links_2478df96": {
+    "message": "Scal łącza"
+  },
+  "next_40e12421": {
+    "message": "Następny"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "Nie wykryto problemów z dostępnością."
+  },
+  "no_headers_9bc7dc7f": {
+    "message": "Brak nagłówków"
+  },
+  "none_3b5e34d2": {
+    "message": "Brak"
+  },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "Akapit rozpoczynający się od { start }"
+  },
+  "prev_f82cbc48": {
+    "message": "Poprz"
+  },
+  "remove_heading_style_5fdc8855": {
+    "message": "Usuń styl nagłówka"
+  },
+  "row_fc0944a7": {
+    "message": "Wiersz"
+  },
+  "row_group_979f5528": {
+    "message": "Grupa wierszy"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "Czytniki ekranu nie mogą określić, co jest wyświetlone na obrazie bez alternatywnego tekstu, a nazwy plików są często pozbawionymi znaczenia ciągami cyfr i liter, które nie opisują kontekstu."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "Czytniki ekranu nie mogą określić, co jest wyświetlone na obrazie bez alternatywnego tekstu, który opisywałby zawartość i znaczenie obrazu. Tekst alternatywny powinien być prosty i zwięzły."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Czytniki ekranu nie mogą określić, co jest wyświetlone na obrazie bez alternatywnego tekstu, który opisywałby zawartość i znaczenie obrazu."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Czytniki ekranu nie mogą interpretować tabel bez odpowiedniej struktury. Nagłówki tabel zapewniają wskazówki i wskazują na zakres zawartości."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Czytniki ekranu nie mogą interpretować tabel bez odpowiedniej struktury. Napisy w tabelach opisują kontekst i ogólne przesłanie tabeli."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Czytniki ekranu nie mogą interpretować tabel bez odpowiedniej struktury. Nagłówki tabeli zapewniają wskazówki i streszczenie zawartości."
+  },
+  "set_header_scope_8c548f40": {
+    "message": "Ustaw zakres nagłówka"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "Ustaw nagłówek tabeli"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Użytkownicy z dobrym wzrokiem szybciej przeglądają strony internetowe, odszukując duże lub zapisane pogrubioną czcionką nagłówki. Użytkownicy czytników ekranu polegają na nagłówkach dla zrozumienia kontekstu. Nagłówki muszą wykorzystywać odpowiednią strukturę."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Użytkownicy z dobrym wzrokiem szybciej przeglądają strony internetowe, odszukując duże lub zapisane pogrubioną czcionką nagłówki. Użytkownicy czytników ekranu polegają na nagłówkach dla zrozumienia kontekstu. Nagłówki w prawidłowej strukturze muszą być zwięzłe."
+  },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "Nagłówek tabeli rozpoczynający się od { start }"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "Tabela rozpoczynająca się od { start }"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Nagłówki tabeli powinny określać zakres."
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Tabele powinny obejmować opis zawartości tabeli."
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Tabele powinny zawierać co najmniej jeden nagłówek."
+  },
+  "text_is_difficult_to_read_without_suffcient_contra_27b82183": {
+    "message": "Tekst jest trudny do czytania bez wystarczającego kontrastu między tekstem i tłem, szczególnie w przypadku osób ze słabym wzrokiem."
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "Tekst o czcionce powyżej 18 pt (lub pogrubionej 14 pt) powinien korzystać ze współczynnika kontrastu co najmniej 3:1."
+  },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "Tekst o czcionce poniżej 18 pt (lub pogrubionej 14 pt) powinien korzystać ze współczynnika kontrastu co najmniej 4,5:1."
+  },
+  "why_523b3d8c": {
+    "message": "Dlaczego"
+  }
+}
