@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import sinon from 'sinon'
-import { render, shallow } from 'enzyme'
+import { render, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 import { merge } from 'lodash'
 import OutcomesImporter, { showOutcomesImporterIfInProgress } from '../OutcomesImporter'
 

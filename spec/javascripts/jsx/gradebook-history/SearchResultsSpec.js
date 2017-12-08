@@ -95,12 +95,7 @@ test('Table has column headers in correct order', function () {
     'Current'
   ];
   const wrapper = mount(<SearchResultsComponent {...defaultProps()} />);
-  const headerNodes = wrapper.find('thead').find('tr').find('th').nodes;
-  const headers = [];
-
-  for (let i = 0; i < headerNodes.length; i += 1) {
-    headers.push(headerNodes[i].innerText);
-  }
+  const headers = wrapper.find('thead').find('tr').find('th').map(n => n.text());
 
   deepEqual(headers, expectedHeaders);
   wrapper.unmount();

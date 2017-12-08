@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { mount } from 'enzyme'
 import ConfigureExternalToolButton from  'jsx/external_apps/components/ConfigureExternalToolButton'
 
@@ -117,5 +116,5 @@ test('sets the iframe allowances', () => {
   wrapper.instance().openModal(event)
   wrapper.instance().handleAlertFocus({ target: { className: "before" } })
   equal(wrapper.state().beforeExternalContentAlertClass, '')
-  ok(wrapper.node.iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+  ok(wrapper.instance().iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
 })

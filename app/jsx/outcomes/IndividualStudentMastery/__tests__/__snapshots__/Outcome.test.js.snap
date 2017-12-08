@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly expanded 1`] = `
-"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
+"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
   <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
     <ListItem>
       <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />
@@ -11,7 +11,7 @@ exports[`renders correctly expanded 1`] = `
 `;
 
 exports[`renders correctly expanded with no results 1`] = `
-"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
+"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
   <View as=\\"div\\" padding=\\"small\\" display=\\"auto\\">
     <Text as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
       No alignments are available for this outcome.
@@ -21,7 +21,7 @@ exports[`renders correctly expanded with no results 1`] = `
 `;
 
 exports[`renders the Outcome component 1`] = `
-"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={false} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function]} iconExpanded={[Function]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function]}>
+"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={false} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
   <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
     <ListItem>
       <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />

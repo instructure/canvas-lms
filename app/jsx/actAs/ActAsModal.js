@@ -67,7 +67,7 @@ export default class ActAsModal extends React.Component {
   }
 
   componentDidMount() {
-    this.closeButton.focus();
+    if (this.closeButton) this.closeButton.focus()
   }
 
   handleModalRequestClose = () => {

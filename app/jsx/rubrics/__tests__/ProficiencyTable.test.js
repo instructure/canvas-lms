@@ -19,7 +19,7 @@ import _ from 'lodash'
 import $ from 'jquery'
 import React from 'react'
 import axios from 'axios'
-import { mount, shallow } from 'enzyme'
+import { mount, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = (props = {}) => (

@@ -93,7 +93,7 @@ test('handleFocusLoss focuses the next item', () => {
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
   const instance = tree.instance()
 
-  const check = tree.find('.bca-table__course-row input[type="checkbox"]').get(0)
+  const check = tree.find('.bca-table__course-row input[type="checkbox"]').at(0).instance()
   check.focus = sinon.spy()
 
   instance.handleFocusLoss(0)
@@ -105,7 +105,7 @@ test('handleFocusLoss focuses the previous item if called on the last item', () 
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
   const instance = tree.instance()
 
-  const check = tree.find('.bca-table__course-row input[type="checkbox"]').get(1)
+  const check = tree.find('.bca-table__course-row input[type="checkbox"]').at(1).instance()
   check.focus = sinon.spy()
 
   instance.handleFocusLoss(2)
@@ -118,7 +118,7 @@ test('handleFocusLoss focuses on select all if no items left', () => {
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
   const instance = tree.instance()
 
-  const check = tree.find('.bca-table__select-all input[type="checkbox"]').get(0)
+  const check = tree.find('.bca-table__select-all input[type="checkbox"]').at(0).instance()
   check.focus = sinon.spy()
 
   instance.handleFocusLoss(1)

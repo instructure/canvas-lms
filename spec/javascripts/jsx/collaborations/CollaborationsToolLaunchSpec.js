@@ -95,5 +95,5 @@ test("sets the iframe allowances", () => {
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
-  ok(wrapper.find('.tool_launch').node.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+  ok(wrapper.find('.tool_launch').instance().getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
 })

@@ -300,7 +300,7 @@ QUnit.module('StudentContextTray/Progress', (hooks) => {
       ]
 
       const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      ok(tray.find("Tooltip").node.props.href.match(/submissions\/99/));
+      ok(tray.find("Tooltip").getElement().props.href.match(/submissions\/99/));
     })
   })
 })

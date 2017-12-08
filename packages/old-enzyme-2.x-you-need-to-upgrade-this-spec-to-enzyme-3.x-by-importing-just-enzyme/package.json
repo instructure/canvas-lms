@@ -1,0 +1,8 @@
+{
+  "name": "old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme",
+  "main": "index.js",
+  "version": "2.0.0",
+  "dependencies": {
+    "enzyme": "^2"
+  }
+}

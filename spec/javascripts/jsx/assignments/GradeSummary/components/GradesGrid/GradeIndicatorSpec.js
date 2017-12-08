@@ -88,6 +88,6 @@ QUnit.module('GradeSummary GradeIndicator', suiteHooks => {
     mountComponent()
     wrapper.setProps({gradeInfo: {...props.gradeInfo, selected: true}})
     const text = wrapper.children().map(child => child.text())
-    deepEqual(text, ['10', 'Selected Grade'])
+    deepEqual(text, ['10Selected Grade'])
   })
 })

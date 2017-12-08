@@ -3,7 +3,7 @@
 exports[`renders the AlignmentResult component 1`] = `
 "<Flex padding=\\"small\\" direction=\\"column\\" alignItems=\\"stretch\\" as=\\"span\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
   <FlexItem as=\\"span\\" grow={false} shrink={false}>
-    <Link href=\\"http://foo\\" variant=\\"default\\" as=\\"button\\" linkRef={[Function]} ellipsis={false} iconPlacement=\\"start\\">
+    <Link href=\\"http://foo\\" variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
       <Flex alignItems=\\"center\\" as=\\"span\\" direction=\\"row\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
         <FlexItem as=\\"span\\" grow={false} shrink={false}>
           <Text size=\\"medium\\" as=\\"span\\" letterSpacing=\\"normal\\">
@@ -28,7 +28,7 @@ exports[`renders the AlignmentResult component 1`] = `
   <FlexItem borderWidth=\\"small\\" as=\\"span\\" grow={false} shrink={false}>
     <div className=\\"react-rubric\\">
       <div className=\\"ratings\\">
-        <Ratings tiers={{...}} points={1} hidePoints={false} useRange={false} customRatings={[undefined]} defaultMasteryThreshold={3} pointsPossible={5} assessing={false} isSummary={false} footer={{...}} onPointChange={[Function]} />
+        <Ratings tiers={{...}} points={1} hidePoints={false} useRange={false} customRatings={[undefined]} defaultMasteryThreshold={3} pointsPossible={5} assessing={false} isSummary={false} footer={{...}} onPointChange={[Function: onPointChange]} />
       </div>
     </div>
   </FlexItem>

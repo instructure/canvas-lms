@@ -50,11 +50,11 @@ function numberInput () {
 }
 
 function numberInputDescription () {
-  return numberInputContainer().find('span.NumberInput__Container.NumberInput__Container-LeftIndent').node.textContent
+  return numberInputContainer().find('span.NumberInput__Container.NumberInput__Container-LeftIndent').instance().textContent
 }
 
 function numberInputLabel () {
-  return numberInputContainer().find('label').node.textContent
+  return numberInputContainer().find('label').instance().textContent
 }
 
 function radioInput () {
@@ -76,18 +76,18 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
 
   test('renders a radio option with a name of "SubmissionTrayRadioInput"', function () {
     wrapper = mountComponent()
-    strictEqual(radioInput().node.name, 'SubmissionTrayRadioInput')
+    strictEqual(radioInput().instance().name, 'SubmissionTrayRadioInput')
   })
 
   test('renders with a background color specified by the "color" prop', function () {
     wrapper = mountComponent({ color: 'green' })
-    const { style } = radioInputContainer().node
+    const { style } = radioInputContainer().instance()
     strictEqual(style.getPropertyValue('background-color'), 'green')
   })
 
   test('renders with a "transparent" background color if a color is not specified', function () {
     wrapper = mountComponent({ color: undefined })
-    const { style } = radioInputContainer().node
+    const { style } = radioInputContainer().instance()
     strictEqual(style.getPropertyValue('background-color'), 'transparent')
   })
 
@@ -103,12 +103,12 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
 
   test('renders with the radio option selected when checked is true', function () {
     wrapper = mountComponent({ checked: true })
-    strictEqual(radioInput().node.checked, true)
+    strictEqual(radioInput().instance().checked, true)
   })
 
   test('renders with the radio option deselected when checked is false', function () {
     wrapper = mountComponent()
-    strictEqual(radioInput().node.checked, false)
+    strictEqual(radioInput().instance().checked, false)
   })
 
   test('calls onChange when the radio option is selected', function () {

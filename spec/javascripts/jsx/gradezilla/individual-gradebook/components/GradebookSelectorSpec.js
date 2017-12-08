@@ -20,7 +20,7 @@ define([
   'react',
   'prop-types',
   'react-dom',
-  'enzyme',
+  'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme',
   'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
 ], (React, PropTypes, ReactDOM, { mount }, GradebookSelector) => {
   QUnit.module('GradebookSelector', {

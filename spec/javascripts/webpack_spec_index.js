@@ -15,10 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import Enzyme from 'enzyme'
+import Adapter from 'enzyme-adapter-react-14'
 import { canvas } from '@instructure/ui-themes/lib'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
+
+Enzyme.configure({ adapter: new Adapter() })
 
 if (process.env.SENTRY_DSN) {
   // This should allow us to capture more errors rather than just

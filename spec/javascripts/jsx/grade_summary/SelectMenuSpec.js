@@ -32,11 +32,11 @@ QUnit.module('SelectMenu', function (hooks) {
   }
 
   function selectMenuOptions () {
-    return selectMenu().node.options;
+    return selectMenu().instance().options;
   }
 
   function selectedOption () {
-    return selectMenuOptions()[selectMenu().node.selectedIndex];
+    return selectMenuOptions()[selectMenu().instance().selectedIndex];
   }
 
   hooks.beforeEach(function () {
@@ -106,7 +106,7 @@ QUnit.module('SelectMenu', function (hooks) {
   test('is disabled if passed disabled: true', function () {
     props.disabled = true;
     wrapper = mountComponent();
-    strictEqual(selectMenu().node.getAttribute('aria-disabled'), 'true');
+    strictEqual(selectMenu().instance().getAttribute('aria-disabled'), 'true');
   });
 
   test('calls onChange when the menu is changed', function () {
