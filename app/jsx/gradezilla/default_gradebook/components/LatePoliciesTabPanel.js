@@ -121,6 +121,19 @@ class LatePoliciesTabPanel extends React.Component {
     this.latePolicyMessages = messages.bind(this, ['lateSubmissionDeduction', 'lateSubmissionMinimumPercent'])
   }
 
+  componentDidUpdate(_prevProps, prevState) {
+    if (!prevState.showAlert || this.state.showAlert) {
+      return;
+    }
+
+    const inputEnabled = this.getLatePolicyAttribute('missingSubmissionDeductionEnabled');
+    if (inputEnabled) {
+      this.missingSubmissionDeductionInput.focus();
+    } else {
+      this.missingSubmissionCheckbox.focus();
+    }
+  }
+
   getLatePolicyAttribute = (key) => {
     const { changes, data } = this.props.latePolicy;
     if (key in changes) {
@@ -197,9 +210,7 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   closeAlert = () => {
-    this.setState({ showAlert: false }, () => {
-      this.missingSubmissionCheckbox.focus();
-    })
+    this.setState({ showAlert: false });
   }
 
   render () {
