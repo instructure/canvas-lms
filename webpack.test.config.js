@@ -13,7 +13,9 @@ testWebpackConfig.plugins.push(new webpack.DefinePlugin(jspecEnv))
 Object.assign(testWebpackConfig.externals || (testWebpackConfig.externals = {}), {
   'react-dom/server': 'window',
   'react/lib/ReactContext': 'true',
-  'react/lib/ExecutionEnvironment': 'true'
+  'react/lib/ExecutionEnvironment': 'true',
+  'react-dom/test-utils': 'somethingThatDoesntActuallyExist',
+  'react-test-renderer/shallow': 'somethingThatDoesntActuallyExist'
 })
 
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')

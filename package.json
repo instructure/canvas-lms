@@ -80,7 +80,7 @@
     "core-js-builder": "^2.5.0",
     "css-loader": "^0.28.4",
     "ember-template-compiler": "^1.8.0",
-    "enzyme": "2.7.1",
+    "enzyme": "^2.9.1",
     "eslint": "^4.11.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.3.0",
