@@ -65,6 +65,7 @@ define([
   })
 
   test('mocks editPage axios to appointmentGroups', (assert) => {
+    assert.expect(1)
     const done = assert.async()
     moxios.stubRequest(/appointment_groups/, {
       status: 200,
@@ -78,6 +79,7 @@ define([
   })
 
   test('mocks editPage axios to calendarEvents', (assert) => {
+    assert.expect(1)
     const done = assert.async()
     moxios.stubRequest(/calendar_events/, {
       status: 200,
