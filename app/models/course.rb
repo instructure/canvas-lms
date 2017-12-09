@@ -332,9 +332,8 @@ class Course < ActiveRecord::Base
       where("assignments.id is null or submissions.user_id = ?", user.id).
       select(:id)
 
-    tags = tags.where.not(content_type: 'WikiPage')
-    tags = tags.union(ContentTag.where(content_type: 'WikiPage', content_id: path_visible_pages))
-    tags
+    tags.where("content_tags.content_type <> 'WikiPage' or
+      content_tags.content_id in (?)", path_visible_pages)
   end
 
   def sequential_module_item_ids
