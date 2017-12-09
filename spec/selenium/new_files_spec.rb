@@ -46,6 +46,7 @@ describe "better_file_browsing" do
       end
 
       it "should delete file", priority: "1", test_id: 133128 do
+        skip_if_safari(:alert)
         delete(0, :cog_icon)
         expect(f("body")).not_to contain_css('.ef-item-row')
       end
@@ -76,6 +77,7 @@ describe "better_file_browsing" do
 
     context "from toolbar menu" do
       it "should delete file from toolbar", priority: "1", test_id: 133105 do
+        skip_if_safari(:alert)
         get "/courses/#{@course.id}/files"
         delete(0, :toolbar_menu)
         expect(f("body")).not_to contain_css('.ef-item-row')

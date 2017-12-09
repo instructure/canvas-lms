@@ -21,6 +21,9 @@ module Api::V1::EnrollmentTerm
   def enrollment_term_json(enrollment_term, user, session, enrollments=[], includes=[])
     api_json(enrollment_term, user, session, :only => %w(id name start_at end_at workflow_state grading_period_group_id created_at)).tap do |hash|
       hash['sis_term_id'] = enrollment_term.sis_source_id if enrollment_term.root_account.grants_any_right?(user, :read_sis, :manage_sis)
+      if enrollment_term.root_account.grants_right?(user, :manage_sis)
+        hash['sis_import_id'] = enrollment_term.sis_batch_id
+      end
       hash['start_at'], hash['end_at'] = enrollment_term.overridden_term_dates(enrollments) if enrollments.present?
       hash['overrides'] = date_overrides_json(enrollment_term) if includes.include?('overrides')
     end

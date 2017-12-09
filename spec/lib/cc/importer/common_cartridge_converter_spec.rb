@@ -449,7 +449,7 @@ describe "More Standard Common Cartridge importing" do
     @copy_to.name = "alt name"
     @copy_to.course_code = "alt name"
 
-    @migration = Object.new
+    @migration = ContentMigration.new
     allow(@migration).to receive(:to_import).and_return(nil)
     allow(@migration).to receive(:context).and_return(@copy_to)
     allow(@migration).to receive(:import_object?).and_return(true)
@@ -557,7 +557,6 @@ describe "More Standard Common Cartridge importing" do
     XML
 
     doc = Nokogiri::XML(resources)
-    @converter.unzipped_file_path = 'testing/'
     @converter.get_all_resources(doc)
     expect(@converter.resources['a1'][:href]).to eq 'a1/a1.html'
     expect(@converter.resources['w1'][:files].first[:href]).to eq 'w1/w1.html'
@@ -685,6 +684,13 @@ describe "other cc files" do
       expect(issues.any?{|i| i.include?("This package includes APIP file(s)")}).to be_truthy
       expect(issues.any?{|i| i.include?("This package includes IWB file(s)")}).to be_truthy
       expect(issues.any?{|i| i.include?("This package includes EPub3 file(s)")}).to be_truthy
+    end
+  end
+
+  describe "cc syllabus intendeduse" do
+    it "should import" do
+      import_cc_file("cc_syllabus.zip")
+      expect(@course.reload.syllabus_body).to include("<p>beep beep</p>")
     end
   end
 end

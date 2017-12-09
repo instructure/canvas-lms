@@ -23,6 +23,7 @@ class Score < ActiveRecord::Base
   belongs_to :grading_period, optional: true
   belongs_to :assignment_group, optional: true
   has_one :course, through: :enrollment
+  has_one :score_metadata, dependent: :destroy
 
   validates :enrollment, presence: true
   validates :current_score, :unposted_current_score, :final_score, :unposted_final_score, numericality: true, allow_nil: true

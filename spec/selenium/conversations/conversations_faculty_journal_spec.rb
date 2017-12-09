@@ -72,6 +72,7 @@ describe "conversations new" do
     end
 
     it "should allow an admin to delete a Journal message", priority: "1", test_id: 75703 do
+      skip_if_safari(:alert)
       user_session(@teacher)
       conversations
       compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true

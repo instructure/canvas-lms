@@ -87,7 +87,7 @@ describe MasterCourses::Restrictor do
     end
 
     it "should return true if fully/individually locked" do
-      @tag.update_attribute(:restrictions, {:content => true, :settings => true, :points => true, :availability_dates => true, :due_dates => true})
+      @tag.update_attribute(:restrictions, {:content => true, :settings => true, :points => true, :availability_dates => true, :due_dates => true, :state => true})
       expect(@page_copy.editing_restricted?(:content)).to be_truthy
       expect(@page_copy.editing_restricted?(:settings)).to be_truthy
       expect(@page_copy.editing_restricted?(:points)).to be_truthy

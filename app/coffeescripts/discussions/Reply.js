@@ -97,17 +97,33 @@ class Reply {
     return this.trigger('edit', this)
   }
 
+  createTextArea(id) {
+    return (
+      $('<textarea/>')
+        .addClass('reply-textarea')
+        .attr('id', id)
+        .attr('aria-hidden', 'true')
+    )
+  }
+
+  replaceTextArea(textAreaId) {
+    RichContentEditor.destroyRCE(this.textArea)
+    this.textArea = this.createTextArea(textAreaId)
+    this.textArea.val(this.content)
+    $(`#tinymce-parent-of-${textAreaId}`).replaceWith(this.textArea)
+  }
+
   // #
   // Hides the TinyMCE editor
   //
   // @api public
   hide () {
+    const textAreaId = this.textArea.attr('id')
     this.content = RichContentEditor.callOnRCE(this.textArea, 'get_code')
-    RichContentEditor.destroyRCE(this.textArea)
     this.form.removeClass('replying')
     this.discussionEntry.removeClass('replying')
-    this.textArea.val(this.content)
     this.editing = false
+    this.replaceTextArea(textAreaId)
     this.trigger('hide', this)
     return this.discussionEntry.find('.discussion-reply-action').focus()
   }

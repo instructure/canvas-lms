@@ -125,6 +125,7 @@ define([
     const messageModal = document.querySelector('#message_participants_form')
 
     ok(messageModal)
+    $(".ui-dialog").remove()
   })
 
 

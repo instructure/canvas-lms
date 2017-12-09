@@ -726,6 +726,45 @@ describe GradebooksController do
         expect(api_max_per_page).to eq(50)
       end
 
+      context "publish_to_sis_enabled" do
+        before(:once) do
+          @course.sis_source_id = 'xyz'
+          @course.save
+        end
+
+        it "is true when the user is able to sync grades to the course SIS" do
+          expect_any_instantiation_of(@course).to receive(:allows_grade_publishing_by).with(@teacher).and_return(true)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:publish_to_sis_enabled]).to be true
+        end
+
+        it "is false when the user is not allowed to publish grades" do
+          expect_any_instantiation_of(@course).to receive(:allows_grade_publishing_by).with(@teacher).and_return(false)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:publish_to_sis_enabled]).to be false
+        end
+
+        it "is false when the user is not allowed to manage grades" do
+          allow_any_instantiation_of(@course).to receive(:allows_grade_publishing_by).with(@teacher).and_return(true)
+          @course.root_account.role_overrides.create!(
+            permission: :manage_grades,
+            role: Role.find_by(name: 'TeacherEnrollment'),
+            enabled: false
+          )
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:publish_to_sis_enabled]).to be false
+        end
+
+
+        it "is false when the course is not using a SIS" do
+          allow_any_instantiation_of(@course).to receive(:allows_grade_publishing_by).with(@teacher).and_return(true)
+          @course.sis_source_id = nil
+          @course.save
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:publish_to_sis_enabled]).to be false
+        end
+      end
+
       it "includes sis_section_id on the sections even if the teacher doesn't have 'Read SIS Data' permissions" do
         @course.root_account.role_overrides.create!(permission: :read_sis, enabled: false, role: teacher_role)
         get :show, params: { course_id: @course.id }

@@ -162,7 +162,7 @@ define [
       selection: { getContent: () => 'itor conte' }
     }
     form = $('#external_tool_button_form')
-    @stub(form, 'submit', () => ({status: 200, data: {}}))
+    @stub(form, 'submit').returns({status: 200, data: {}})
     ExternalToolsHelper.contentItemDialogOpen(button, ed, 'course_1', form)
     equal($('#editor_contents_input').val(), ed.getContent())
 
@@ -175,6 +175,6 @@ define [
       selection: { getContent: () => 'itor conte' }
     }
     form = $('#external_tool_button_form')
-    @stub(form, 'submit', () => ({status: 200, data: {}}))
+    @stub(form, 'submit',).returns({status: 200, data: {}})
     ExternalToolsHelper.contentItemDialogOpen(button, ed, 'course_1', form)
     equal($('#selection_input').val(), ed.selection.getContent())

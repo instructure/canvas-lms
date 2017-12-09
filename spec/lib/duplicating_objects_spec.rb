@@ -34,30 +34,35 @@ describe DuplicatingObjects do
       end
 
       def get_potentially_conflicting_titles(_title_base)
-        [ 'Foo', 'Foo Copy', 'Foo Copy 1', 'Foo Copy 2', 'Foo Copy 5' ].to_set
+        [ 'Foo', 'assignment Copy', 'Foo Copy', 'Foo Copy 1', 'Foo Copy 2', 'Foo Copy 5' ].to_set
       end
 
       attr_accessor :title
     end
 
+    it 'copy treated as "Copy" but case is respected' do
+      entity = MockEntity.new('assignment copy')
+      expect(get_copy_title(entity, 'Copy', entity.title)).to eq('assignment copy 2')
+    end
+
     it 'no conflicts' do
       entity = MockEntity.new('Bar')
-      expect(get_copy_title(entity, 'Copy')).to eq 'Bar Copy'
+      expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Bar Copy'
     end
 
     it 'conflict not ending in suffix' do
       entity = MockEntity.new('Foo')
-      expect(get_copy_title(entity, 'Copy')).to eq 'Foo Copy 3'
+      expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Foo Copy 3'
     end
 
     it 'conflict ending in suffix' do
       entity = MockEntity.new('Foo Copy 1')
-      expect(get_copy_title(entity, 'Copy')).to eq 'Foo Copy 3'
+      expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Foo Copy 3'
     end
 
     it 'increments from given number' do
       entity = MockEntity.new('Foo Copy 5')
-      expect(get_copy_title(entity, 'Copy')).to eq 'Foo Copy 6'
+      expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Foo Copy 6'
     end
   end
 end

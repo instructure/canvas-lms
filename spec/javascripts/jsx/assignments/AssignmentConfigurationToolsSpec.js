@@ -100,7 +100,7 @@ define([
           }
         }
       ]
-      this.stub($, 'ajax', () => ({status: 200, data: toolDefinitions}));
+      this.stub($, 'ajax').returns({status: 200, data: toolDefinitions});
     }
   });
 

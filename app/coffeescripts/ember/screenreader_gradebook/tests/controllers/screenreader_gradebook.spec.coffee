@@ -120,20 +120,6 @@ define [
     @srgb.set('hideStudentNames', false)
     equal @srgb.get('displayName'), 'name'
 
-  test 'displayPointTotals is false when grades are weighted even if showTotalAsPoints is true', ->
-    Ember.run =>
-      @srgb.set('showTotalAsPoints', true)
-      @srgb.set('gradesAreWeighted', true)
-      equal @srgb.get('displayPointTotals'), false
-
-  test 'displayPointTotals is toggled by showTotalAsPoints when grades are unweighted', ->
-    Ember.run =>
-      @srgb.set('gradesAreWeighted', false)
-      @srgb.set('showTotalAsPoints', true)
-      equal @srgb.get('displayPointTotals'), true
-      @srgb.set('showTotalAsPoints', false)
-      equal @srgb.get('displayPointTotals'), false
-
   test 'updateSubmission attaches the submission to the student', ->
     student = clone fixtures.students[0].user
     submission = clone fixtures.submissions[student.id].submissions[0]
@@ -318,6 +304,28 @@ define [
     Ember.run =>
       @srgb.set('groupsAreWeighted', false)
       equal @srgb.get('gradesAreWeighted'), false
+
+  QUnit.module 'screenreader_gradebook_controller#hidePointsPossibleForFinalGrade',
+    setup: ->
+      setup.call this
+    teardown: ->
+      teardown.call this
+
+  test 'is true when groupsAreWeighted is true', ->
+    Ember.run =>
+      @srgb.set('groupsAreWeighted', true)
+      equal @srgb.get('hidePointsPossibleForFinalGrade'), true
+
+  test 'is true when subtotalByGradingPeriod is true', ->
+    @stub(@srgb, 'subtotalByGradingPeriod').returns(true)
+    Ember.run =>
+      equal @srgb.get('hidePointsPossibleForFinalGrade'), true
+
+  test 'is false when groupsAreWeighted is false and subtotalByGradingPeriod is false', ->
+    @stub(@srgb, 'subtotalByGradingPeriod').returns(false)
+    Ember.run =>
+      @srgb.set('groupsAreWeighted', false)
+      equal @srgb.get('hidePointsPossibleForFinalGrade'), false
 
   QUnit.module '#getGradingPeriodSet',
     setup: ->

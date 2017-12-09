@@ -37,6 +37,7 @@ module.exports = {
     "no-continue": [0],
     "no-else-return": [0],
     "no-plusplus": [0],
+    "no-return-assign": ['error', 'except-parens'],
     "no-underscore-dangle": [0],
     "no-unused-vars": [2, { "argsIgnorePattern": "^_"}],
     "object-curly-spacing": [0],

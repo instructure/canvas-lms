@@ -190,6 +190,13 @@ describe AccessToken do
     it "should not match if token has less scopes then requested" do
       expect(token.scoped_to?(['user_profile'])).to eq false
     end
+
+    it "doesn't expire /auth/userinfo scope, even for auto expiring developer key" do
+      dk = DeveloperKey.create!
+      expect(dk.auto_expire_tokens).to eq true
+      token = AccessToken.create!(developer_key: dk, scopes: ['/auth/userinfo'])
+      expect(token.expires_at).to eq nil
+    end
   end
 
   describe "account scoped access" do

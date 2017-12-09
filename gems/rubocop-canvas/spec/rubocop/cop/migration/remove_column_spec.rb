@@ -20,7 +20,7 @@ describe RuboCop::Cop::Migration::RemoveColumn do
 
   context 'predeploy' do
     it 'disallows remove_column in `up`' do
-      inspect_source(cop, %{
+      inspect_source(%{
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 
@@ -35,7 +35,7 @@ describe RuboCop::Cop::Migration::RemoveColumn do
     end
 
     it 'disallows remove_column in `self.up`' do
-      inspect_source(cop, %{
+      inspect_source(%{
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 
@@ -50,7 +50,7 @@ describe RuboCop::Cop::Migration::RemoveColumn do
     end
 
     it 'allows remove_column in `down`' do
-      inspect_source(cop, %{
+      inspect_source(%{
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 

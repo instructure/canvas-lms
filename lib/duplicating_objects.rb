@@ -18,7 +18,7 @@
 
 module DuplicatingObjects
   # Lowercases title and replaces spaces with hyphens (to allow to check for
-  # matching titles that differ only in case or space/hyphens
+  # matching titles that differ only in case or space/hyphens)
   def normalize_title(title)
     title.gsub(/ /, '-').downcase
   end
@@ -27,7 +27,7 @@ module DuplicatingObjects
   # should provide a function "get_potentially_conflicting_titles" that
   # returns a set of titles that might conflict with the entity's title.
   #
-  # If entity.title ends in "#{copy_suffix} #" (or without the number),
+  # If the given title ends in "#{copy_suffix} #" (or without the number),
   # tries incrementing from # (or 2 if no number is given) until one is
   # found that isn't in the set returned by entity.get_potentially_conflicting_titles
   #
@@ -36,16 +36,16 @@ module DuplicatingObjects
   #
   # For the purposes of matching, conflicts are case-insensitive and also
   # treats hyphens and spaces as the same thing.
-  def get_copy_title(entity, copy_suffix)
-    title = entity.title
-    is_multiple_copy = !(normalize_title(title)=~
+  def get_copy_title(entity, copy_suffix, entity_title)
+    is_multiple_copy = !(normalize_title(entity_title)=~
       /#{Regexp.quote(copy_suffix.downcase)}-[0-9]*$/).nil?
-    if title.end_with?(copy_suffix) || is_multiple_copy
-      potential_title = title
-      possible_num_to_try = normalize_title(title).scan(/\d+$/).first
+    normalized_suffix = normalize_title(copy_suffix)
+    if normalize_title(entity_title).end_with?(normalized_suffix) || is_multiple_copy
+      potential_title = entity_title
+      possible_num_to_try = normalize_title(entity_title).scan(/\d+$/).first
       num_to_try = possible_num_to_try ? possible_num_to_try.to_i + 1 : 2
     else
-      potential_title = "#{title} #{copy_suffix}"
+      potential_title = "#{entity_title} #{copy_suffix}"
       num_to_try = 2
     end
     title_base = !is_multiple_copy ? potential_title + " " : potential_title.gsub(/\d+$/, '')

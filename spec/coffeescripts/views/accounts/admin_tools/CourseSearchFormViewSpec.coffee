@@ -20,7 +20,8 @@ define [
   'compiled/models/CourseRestore'
   'compiled/views/accounts/admin_tools/CourseSearchFormView'
   'jquery'
-], (Backbone, CourseRestore, CourseSearchFormView, $) ->
+  'helpers/assertions'
+], (Backbone, CourseRestore, CourseSearchFormView, $, assertions) ->
   QUnit.module 'CourseSearchFormView',
     setup: ->
       @course_id = 42
@@ -32,6 +33,9 @@ define [
     teardown: ->
       @courseSearchFormView.remove()
 
+  test 'should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @courseSearchFormView, done, {'a11yReport': true}
 
   test "#search, when form is submited, search is called", ->
     @mock(@courseRestore).expects("search").once().

@@ -34,6 +34,7 @@ QUnit.module('PostGradesFrameDialog screenreader only content', {
 
   teardown () {
     dialog.close()
+    dialog.$dialog.remove()
     fakeENV.teardown()
   }
 })

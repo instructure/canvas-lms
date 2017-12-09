@@ -27,12 +27,14 @@ module Api::V1::Group
   }
 
   API_GROUP_MEMBERSHIP_JSON_OPTS = {
-    :only => %w(id group_id user_id workflow_state moderator)
-  }
+    :only => %w(id group_id user_id workflow_state moderator).freeze
+  }.freeze
 
-  API_PERMISSIONS_TO_INCLUDE = [:create_discussion_topic, :join, :create_announcement] # permission keys need to be symbols
+  # permission keys need to be symbols
+  API_PERMISSIONS_TO_INCLUDE = [:create_discussion_topic, :join, :create_announcement].freeze
 
   def group_json(group, user, session, options = {})
+    options.reverse_merge!(include_inactive_users: false)
     includes = options[:include] || []
     permissions_to_include = API_PERMISSIONS_TO_INCLUDE if includes.include?('permissions')
 
@@ -46,10 +48,21 @@ module Api::V1::Group
 
     if includes.include?('users')
       users = group.grants_right?(@current_user, :read_as_admin) ?
-        group.users.order_by_sortable_name.distinct : group.participating_users_in_context(sort: true).distinct
+        group.users.order_by_sortable_name.distinct :
+        group.participating_users_in_context(sort: true, include_inactive_users: options[:include_inactive_users]).distinct
+      active_user_ids = nil
+      if options[:include_inactive_users]
+        active_user_ids = group.participating_users_in_context.pluck('id').to_set
+      end
 
       # TODO: this should be switched to user_display_json
-      hash['users'] = users.map{ |u| user_json(u, user, session) }
+      hash['users'] = users.map { |u|
+        json = user_json(u, user, session)
+        if options[:include_inactive_users] && active_user_ids
+          json['active'] = active_user_ids.include?(u.id)
+        end
+        json
+      }
     end
     if includes.include?('group_category')
       hash['group_category'] = group.group_category && group_category_json(group.group_category, user, session)

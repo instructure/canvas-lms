@@ -276,7 +276,7 @@ class EnrollmentsApiController < ApplicationController
   # and a student or in multiple course sections), each enrollment will be
   # listed separately.
   #
-  # note: Currently, only an admin user can return other users' enrollments. A
+  # note: Currently, only a root level admin user can return other users' enrollments. A
   # user can, however, return his/her own enrollments.
   #
   # @argument type[] [String]

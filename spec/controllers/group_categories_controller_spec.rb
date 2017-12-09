@@ -224,4 +224,39 @@ describe GroupCategoriesController do
     end
   end
 
+  describe "GET users" do
+    before :each do
+      @category = @course.group_categories.create(:name => "Study Groups")
+      group = @course.groups.create(:name => "some group", :group_category => @category)
+      group.add_user(@student)
+
+      assignment = @course.assignments.create({
+        :name => "test assignment",
+        :group_category => @category
+      })
+      file = Attachment.create! context: @student, filename: "homework.pdf", uploaded_data: StringIO.new("blah blah blah")
+      @sub = assignment.submit_homework(@student, attachments: [file], submission_type: "online_upload")
+    end
+
+    it "should include group submissions if param is present" do
+      user_session(@teacher)
+      get 'users', params: {:course_id => @course.id, :group_category_id => @category.id, include: ['group_submissions']}
+      json = JSON.parse(response.body[9,response.body.length])
+
+      expect(response).to be_success
+      expect(json.count).to be_equal 1
+      expect(json[0]["group_submissions"][0]).to be_equal @sub.id
+    end
+
+    it "should not include group submissions if param is absent" do
+      user_session(@teacher)
+      get 'users', params: {:course_id => @course.id, :group_category_id => @category.id}
+      json = JSON.parse(response.body[9,response.body.length])
+
+      expect(response).to be_success
+      expect(json.count).to be_equal 1
+      expect(json[0]["group_submissions"]).to be_equal nil
+    end
+  end
+
 end

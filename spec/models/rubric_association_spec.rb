@@ -198,4 +198,47 @@ describe RubricAssociation do
       @rubric.update_with_association(@user, rubric_params, @course, rubric_association_params)
     end
   end
+
+  describe "#assess" do
+    let(:course) { Course.create! }
+    let!(:first_teacher) { course_with_teacher(course: course, active_all: true).user }
+    let!(:second_teacher) { course_with_teacher(course: course, active_all: true).user }
+    let(:student) { student_in_course(course: course, active_all: true).user }
+    let(:assignment) { course.assignments.create!(submission_types: 'online_text_entry') }
+    let(:rubric) do
+      course.rubrics.create! do |r|
+        r.title = "rubric"
+        r.user = first_teacher
+        r.data = [{
+                    id: "stuff",
+                    description: "stuff",
+                    long_description: "",
+                    points: 1.0,
+                    ratings: [
+                      { description: "Full Marks", points: 1.0, id: "blank" },
+                      { description: "No Marks", points: 0.0, id: "blank_2" }
+                    ]
+                  }]
+      end
+    end
+    let!(:rubric_association) do
+      params = rubric_association_params_for_assignment(assignment)
+      RubricAssociation.generate(first_teacher, rubric, course, params)
+    end
+    let(:submission) { assignment.submit_homework(student) }
+    let(:assessment_params) { { assessment_type: 'grading', criterion_stuff: { points: 1 } } }
+
+    it "updates the assessor/grader if the second assessor is different than the first" do
+      rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+                                assessment: assessment_params)
+
+      assessment_params[:criterion_stuff][:points] = 0
+      assessment = rubric_association.assess(user: student, assessor: second_teacher, artifact: submission,
+                                             assessment: assessment_params)
+      submission.reload
+
+      expect(assessment.assessor).to eq(second_teacher)
+      expect(submission.grader).to eq(second_teacher)
+    end
+  end
 end

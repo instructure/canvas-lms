@@ -76,7 +76,9 @@ class Course < ActiveRecord::Base
   has_many :gradable_student_enrollments, -> { where(enrollments: { workflow_state: ['active', 'inactive'], type: ['StudentEnrollment', 'StudentViewEnrollment'] }).preload(:user) }, class_name: 'Enrollment'
   has_many :gradable_students, through: :gradable_student_enrollments, source: :user
   has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
+  has_many :all_student_enrollments_including_deleted, -> { where("enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_students, :through => :all_student_enrollments, :source => :user
+  has_many :all_students_including_deleted, :through => :all_student_enrollments_including_deleted, source: :user
   has_many :all_accepted_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_accepted_students, :through => :all_accepted_student_enrollments, :source => :user
   has_many :all_real_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type<>'StudentViewEnrollment'").preload(:user) }, class_name: 'Enrollment'
@@ -223,7 +225,9 @@ class Course < ActiveRecord::Base
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
   include StickySisFields
-  are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id, :workflow_state
+  are_sis_sticky :name, :course_code, :start_at, :conclude_at,
+                 :restrict_enrollments_to_course_dates, :enrollment_term_id,
+                 :workflow_state, :account_id
 
   include FeatureFlags
 
@@ -321,8 +325,15 @@ class Course < ActiveRecord::Base
     end
 
     tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    return tags if user.blank? || user_is_teacher
 
-    tags
+    path_visible_pages = self.wiki_pages.left_outer_joins(assignment: :submissions).
+      except(:preload).
+      where("assignments.id is null or submissions.user_id = ?", user.id).
+      select(:id)
+
+    tags.where("content_tags.content_type <> 'WikiPage' or
+      content_tags.content_id in (?)", path_visible_pages)
   end
 
   def sequential_module_item_ids
@@ -2206,7 +2217,9 @@ class Course < ActiveRecord::Base
   def students_visible_to(user, include: nil)
     include = Array(include)
 
-    if include.include?(:priors)
+    if include.include?(:priors_and_deleted)
+      scope = self.all_students_including_deleted
+    elsif include.include?(:priors)
       scope = self.all_students
     elsif include.include?(:inactive) || include.include?(:completed)
       scope = self.all_accepted_students
@@ -3069,6 +3082,12 @@ class Course < ActiveRecord::Base
   def find_or_create_progressions_for_user(user)
     @progressions ||= {}
     @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
+  end
+
+  def show_total_grade_as_points?
+    !!settings[:show_total_grade_as_points] &&
+      group_weighting_scheme != "percent" &&
+      !relevant_grading_period_group&.weighted?
   end
 
   private

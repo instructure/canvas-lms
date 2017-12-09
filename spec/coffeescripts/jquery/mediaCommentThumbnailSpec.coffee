@@ -27,8 +27,7 @@ define [
       # flop out the _.defer function to just call directly down to the passed
       # function reference. this helps the tests run in a synchronous order
       # internally so asserts can work like we expect.
-      @stub _, 'defer', (func, args...) ->
-        func(args...)
+      @stub(_, 'defer').callsFake((func, args...) -> func(args...))
       @$fixtures = $('#fixtures')
 
     teardown: ->

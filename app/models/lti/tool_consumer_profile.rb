@@ -75,7 +75,8 @@ module Lti
       *Lti::OriginalityReportsApiController::SERVICE_DEFINITIONS,
       *Lti::SubscriptionsApiController::SERVICE_DEFINITIONS,
       *Lti::SubmissionsApiController::SERVICE_DEFINITIONS,
-      *Lti::UsersApiController::SERVICE_DEFINITIONS
+      *Lti::UsersApiController::SERVICE_DEFINITIONS,
+      *Lti::AssignmentsApiController::SERVICE_DEFINITIONS
     ].freeze
 
     class << self

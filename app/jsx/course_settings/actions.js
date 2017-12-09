@@ -20,6 +20,7 @@ import axios from 'axios'
 import $ from 'jquery'
 import I18n from 'i18n!actions'
 import Helpers from './helpers'
+import rawUploadFile from 'jsx/shared/upload_file'
 import 'compiled/jquery.rails_flash_notifications'
 
   const Actions = {
@@ -178,6 +179,7 @@ import 'compiled/jquery.rails_flash_notifications'
         if (Helpers.isValidImageType(type)) {
           dispatch(this.uploadingImage());
 
+          const url = `/api/v1/courses/${courseId}/files`;
           const data = {
             name: file.name,
             size: file.size,
@@ -185,37 +187,12 @@ import 'compiled/jquery.rails_flash_notifications'
             type,
             no_redirect: true
           };
-          ajaxLib.post(`/api/v1/courses/${courseId}/files`, data)
-                 .then((response) => {
-                    const formData = Helpers.createFormData(response.data.upload_params);
-                    const successUrl = response.data.upload_params.success_url
-                    const config = { responseType: (successUrl ? 'xml' : 'json') }
-                    formData.append('file', file);
-                    ajaxLib.post(response.data.upload_url, formData, config)
-                           .then((response) => {
-                             if (successUrl) {
-                               // s3 upload, need to ping success_url to
-                               // finalize and get back attachment information
-                               return ajaxLib.get(successUrl)
-                             } else if (response.status === 201) {
-                               // inst-fs upload, need to request attachment
-                               // information from location
-                               return ajaxLib.get(response.data.location)
-                             } else {
-                               // local-storage upload, this _is_ the attachment information
-                               return response
-                             }
-                           })
-                           .then((successResp) => {
-                             dispatch(this.prepareSetImage(successResp.data.url, successResp.data.id, courseId, ajaxLib));
-                           })
-                           .catch((response) => {
-                              dispatch(this.errorUploadingImage());
-                           });
-                  })
-                 .catch((response) => {
-                    dispatch(this.errorUploadingImage());
-                 });
+          rawUploadFile(url, data, file, ajaxLib)
+            .then((successResp) => {
+              dispatch(this.prepareSetImage(successResp.data.url, successResp.data.id, courseId, ajaxLib));
+            }).catch((_response) => {
+              dispatch(this.errorUploadingImage());
+            });
         } else {
           dispatch(this.rejectedUpload(type));
           $.flashWarning(I18n.t("'%{type}' is not a valid image type (try jpg, png, or gif)", {type}));

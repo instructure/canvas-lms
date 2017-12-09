@@ -13,7 +13,7 @@
 <% if asset.media_comment? %>
   <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
 <% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-  <%= t("You can reply to this comment by responding to this message, or review the submission details using this link: %{link}.", link: content(:link)) %>
+  <%= t("You can reply to this comment by responding to this message, or review the submission details using this link: %{link}.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the submission", link: content(:link)) %>
 <% else %>
   <%= t("You can review the submission details using this link: %{link}.", link: content(:link)) %>
 <% end %>

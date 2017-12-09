@@ -35,19 +35,36 @@ module Api::V1::DiscussionTopics
   # Public: DiscussionTopic methods to serialize.
   ALLOWED_TOPIC_METHODS = [:user_name, :discussion_subentry_count].freeze
 
+  # For the given discussion topics, get the root topics for these topics,
+  # only grabbing the given fields.  Returns a hash keyed by the id of the
+  # root topic.
+  #
+  # The ids of the root topics are always included.
+  def get_root_topic_data(topics, fields)
+    root_topic_ids = topics.pluck(:root_topic_id).reject(&:blank?).uniq
+    return {} unless root_topic_ids && root_topic_ids.length > 0
+    fields_with_id = fields.unshift(:id)
+    root_topics_array = DiscussionTopic.select(fields_with_id).find(root_topic_ids)
+    root_topics_array.map { |root_topic| [root_topic.id, root_topic] }.to_h
+  end
+
   # Public: Serialize an array of DiscussionTopic objects for returning as JSON.
   #
   # topics - An array of DiscussionTopic objects.
   # context - The current context.
   # user - The current user.
   # session - The current session.
-  #
-  # Returns an array of hashes.
+  # opts - see discussion_topic_api_json in this file for what the options are
+  # Returns an array of hashes
   def discussion_topics_api_json(topics, context, user, session, opts={})
     DiscussionTopic.preload_can_unpublish(context, topics)
+    root_topics = {}
+    if opts[:root_topic_fields]&.length
+      root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
+    end
     topics.inject([]) do |result, topic|
       if topic.visible_for?(user)
-        result << discussion_topic_api_json(topic, context, user, session, opts)
+        result << discussion_topic_api_json(topic, context, user, session, opts, root_topics)
       end
 
       result
@@ -60,14 +77,22 @@ module Api::V1::DiscussionTopics
   # context - The current context.
   # user - The requesting user.
   # session - The current session.
-  # include_assignment - Optionally include the topic's assignment, if any (default: true).
-  #
+  # opts - Supported options are:
+  #   include_assignment: Optionally include the topic's assignment, if any (default: true).
+  #   include_all_dates: include all dates associated with the discussion topic (default: false)
+  #   override_dates: if the topic is graded, use the overridden dates for the given user (default: true)
+  #   root_topic_fields: fields to fill in from root topic (if any) if not already present.
+  # root_topics- if you alraedy have the root topics to get the root_topic_data from, pass
+  #   them in.  Useful if this is to be called repeatedly and you don't want to make a
+  #   db call each time.
   # Returns a hash.
-  def discussion_topic_api_json(topic, context, user, session, opts = {})
+  def discussion_topic_api_json(topic, context, user, session, opts = {}, root_topics = nil)
     opts.reverse_merge!(
       include_assignment: true,
       include_all_dates: false,
-      override_dates: true
+      override_dates: true,
+      include_root_topic_data: false,
+      root_topic_fields: []
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
@@ -91,6 +116,15 @@ module Api::V1::DiscussionTopics
       json[:todo_date] = topic.todo_date
     end
 
+    if opts[:root_topic_fields] && opts[:root_topic_fields].length > 0
+      # If this is called from discussion_topics_api_json then we already
+      # have the topics, so don't get them again.
+      root_topics ||= get_root_topic_data([topic], opts[:root_topic_fields])
+      opts[:root_topic_fields].each do |field_name|
+        # Only overwrite fields that are not present already.
+        json[field_name] ||= root_topics[topic.root_topic_id][field_name] if root_topics[topic.root_topic_id]
+      end
+    end
     json
   end
 

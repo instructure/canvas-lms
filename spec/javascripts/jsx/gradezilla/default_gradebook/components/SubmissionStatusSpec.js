@@ -30,16 +30,17 @@ QUnit.module('SubmissionStatus - Pills', function (hooks) {
         muted: false,
         published: true
       },
+      isConcluded: false,
+      isInOtherGradingPeriod: false,
+      isInClosedGradingPeriod: false,
+      isInNoGradingPeriod: false,
       submission: {
         excused: false,
         late: false,
         missing: false,
         secondsLate: 0,
         assignmentId: '1'
-      },
-      isInOtherGradingPeriod: false,
-      isInClosedGradingPeriod: false,
-      isInNoGradingPeriod: false
+      }
     };
   });
 
@@ -126,16 +127,17 @@ QUnit.module('SubmissionStatus - Grading Period Warnings', function (hooks) {
         muted: false,
         published: true
       },
+      isConcluded: false,
+      isInOtherGradingPeriod: false,
+      isInClosedGradingPeriod: false,
+      isInNoGradingPeriod: false,
       submission: {
         excused: false,
         late: false,
         missing: false,
         secondsLate: 0,
         assignmentId: '1'
-      },
-      isInOtherGradingPeriod: false,
-      isInClosedGradingPeriod: false,
-      isInNoGradingPeriod: false
+      }
     };
   });
 
@@ -196,6 +198,57 @@ QUnit.module('SubmissionStatus - Grading Period Warnings', function (hooks) {
     props.isInOtherGradingPeriod = false;
     wrapper = mountComponent();
     const message = 'This submission is in another grading period.';
+    const messageIcon = wrapper.find('IconWarningLine').nodes.filter(node => node.props.title === message);
+
+    strictEqual(messageIcon.length, 0);
+  });
+});
+
+QUnit.module('SubmissionStatus - Concluded Enrollment Warning', function (hooks) {
+  let props;
+  let wrapper;
+
+  hooks.beforeEach(() => {
+    props = {
+      assignment: {
+        muted: false,
+        published: true
+      },
+      isConcluded: false,
+      isInOtherGradingPeriod: false,
+      isInClosedGradingPeriod: false,
+      isInNoGradingPeriod: false,
+      submission: {
+        excused: false,
+        late: false,
+        missing: false,
+        secondsLate: 0,
+        assignmentId: '1'
+      }
+    };
+  });
+
+  hooks.afterEach(() => {
+    wrapper.unmount();
+  });
+
+  function mountComponent() {
+    return mount(<SubmissionStatus {...props} />);
+  }
+
+  test('when isConcluded is true, warns about enrollment being concluded', function () {
+    props.isConcluded = true;
+    wrapper = mountComponent();
+    const message = "This student's enrollment has been concluded.";
+    const messageIcon = wrapper.find('IconWarningLine').nodes.filter(node => node.props.title === message);
+
+    strictEqual(messageIcon.length, 1);
+  });
+
+  test('when isConcluded is false, does not warn about enrollment being concluded', function () {
+    props.isConcluded = false;
+    wrapper = mountComponent();
+    const message = "This student's enrollment has been concluded.";
     const messageIcon = wrapper.find('IconWarningLine').nodes.filter(node => node.props.title === message);
 
     strictEqual(messageIcon.length, 0);

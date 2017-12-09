@@ -48,6 +48,7 @@ define [
       @loadedAll = false
       exclusionFlag = "fetching#{capitalize options.page}Page"
       @[exclusionFlag] = true
+
       if options.page?
         options.url = @urls[options.page] if @urls?[options.page]
         options.remove = false unless options.remove?
@@ -56,6 +57,10 @@ define [
       else
         # we want the first fetch to reset (since a lot of existing code wants a reset event)
         options.reset = true unless options.reset?
+
+      if options.fetchOptions?
+        options.data = options.fetchOptions
+
       @trigger 'beforeFetch', this, options
       @trigger "beforeFetch:#{options.page}", this, options if options.page?
 

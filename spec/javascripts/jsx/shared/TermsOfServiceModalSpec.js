@@ -42,7 +42,7 @@ test('renders correct link when preview is provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = "Hello World"
   const wrapper = mount(<TermsOfServiceModal/>)
   const renderedLink = wrapper.find(Link)
-  equal(renderedLink.text(), 'Terms Of Service')
+  equal(renderedLink.text(), 'Terms of Service')
 });
 
 

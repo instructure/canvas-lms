@@ -158,6 +158,30 @@ describe Wiki do
     end
   end
 
+  context "find_page" do
+    before :once do
+      @page1 = @course.wiki_pages.create!(title: 'Some Page')
+      @pageN = @course.wiki_pages.create!(title: @page1.id.to_s)
+    end
+
+    it "finds page by URL" do
+      expect(@wiki.find_page('some-page')).to eq @page1
+    end
+
+    it "finds page by title" do
+      expect(@wiki.find_page('Some Page')).to eq @page1
+    end
+
+    it "falls back to ID if url/title don't match" do
+      expect(@wiki.find_page(@page1.id.to_s)).to eq @pageN
+      expect(@wiki.find_page(@pageN.id.to_s)).to eq @pageN
+    end
+
+    it "finds page by ID specifically with page_id:N" do
+      expect(@wiki.find_page("page_id:#{@page1.id}")).to eq @page1
+    end
+  end
+
   context "sharding" do
     specs_require_sharding
 

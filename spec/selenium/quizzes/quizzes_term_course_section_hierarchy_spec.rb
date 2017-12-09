@@ -142,6 +142,7 @@ describe "quizzes section hierarchy" do
       end
 
       it "should allow student in section to take quiz", priority: "1", test_id: 323321 do
+        skip_if_safari(:alert)
         user_session(@student)
         verify_quiz_accessible
       end
@@ -158,6 +159,7 @@ describe "quizzes section hierarchy" do
       end
 
       it "should allow student to take quiz", priority: "1", test_id: 323326 do
+        skip_if_safari(:alert)
         user_session(@student)
         verify_quiz_accessible
       end

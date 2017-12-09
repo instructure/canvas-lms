@@ -27,6 +27,7 @@ define [
     teardown: ->
       @server.restore()
       @avatarDialogView = null
+      $(".ui-dialog").remove()
 
   test 'calls flashError with base error message when errors are present', ->
     errorMessage = "User storage quota exceeded"
@@ -41,6 +42,7 @@ define [
       @avatarDialogView = new AvatarDialogView()
     teardown: ->
       @avatarDialogView = null
+      $(".ui-dialog").remove()
 
   test 'calls flashError with base error message when errors are present', ->
     errorMessage = "User storage quota exceeded"

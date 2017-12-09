@@ -25,9 +25,10 @@ describe Submission do
     course_with_teacher(active_all: true)
     course_with_student(active_all: true, course: @course)
     @context = @course
-    @assignment = @context.assignments.new(:title => "some assignment")
-    @assignment.workflow_state = "published"
-    @assignment.save
+    @assignment = @context.assignments.create!(
+      title: 'some assignment',
+      workflow_state: 'published'
+    )
     @valid_attributes = {
       assignment: @assignment,
       user: @user,
@@ -1079,6 +1080,32 @@ describe Submission do
     @submission.save!
 
     @submission.grader_id = @user.id
+    @submission.save!
+  end
+
+  it "grade change event author can be set" do
+    submission_spec_model
+    assistant = User.create!
+    @course.enroll_ta(assistant, enrollment_state: "active")
+
+    expect(Auditors::GradeChange).to receive(:record).once do |submission|
+      expect(submission.grader_id).to eq assistant.id
+    end
+
+    @submission.grade_change_event_author_id = assistant.id
+    @submission.score = 5
+    @submission.save!
+  end
+
+  it "uses the existing grader_id as the author if grade_change_event_author_id is not set" do
+    submission_spec_model
+    @assignment.grade_student(@student, grade: 10, grader: @teacher)
+
+    expect(Auditors::GradeChange).to receive(:record).once do |submission|
+      expect(submission.grader_id).to eq @teacher.id
+    end
+
+    @submission.score = 5
     @submission.save!
   end
 
@@ -2825,6 +2852,26 @@ describe Submission do
       sub.attachments.update_all(:context_type => "Submission", :context_id => sub.id)
       expect(sub.reload.versioned_attachments).to be_empty
     end
+
+    it "includes attachments owned by other users in a group for a group submission" do
+      student1, student2 = n_students_in_course(2, { course: @course })
+      assignment = @course.assignments.create!(name: "A1", submission_types: "online_upload")
+
+      group_category = @course.group_categories.create!(name: "Project Groups")
+      group = group_category.groups.create!(name: "A Team", context: @course)
+      group.add_user(student1)
+      group.add_user(student2)
+      assignment.update_attributes(group_category: group_category)
+
+      user_attachment = attachment_model(context: student1)
+      assignment.submit_homework(student1, submission_type: "online_upload", attachments: [user_attachment])
+
+      [student1, student2].each do |student|
+        submission = assignment.submission_for_student(student)
+        submission.versioned_attachments
+        expect(submission.versioned_attachments).to include user_attachment
+      end
+    end
   end
 
   describe "includes_attachment?" do
@@ -4177,6 +4224,54 @@ describe Submission do
 
     it 'excludes homeworks that have been manually marked as late' do
       expect(@not_late_submission_ids).not_to include(@timely_hw_marked_late.id)
+    end
+  end
+
+  describe '#filter_attributes_for_user' do
+    let(:user) { instance_double('User', id: 1) }
+    let(:session) { {} }
+    let(:submission) { @assignment.submissions.build(user_id: 2) }
+
+    context 'assignment is muted' do
+      before do
+        @assignment.update!(muted: true)
+      end
+
+      it 'filters score' do
+        expect(submission.assignment).to receive(:user_can_read_grades?).and_return(false)
+        hash = { 'score' => 10 }
+        expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('score')
+      end
+
+      it 'filters grade' do
+        expect(submission.assignment).to receive(:user_can_read_grades?).and_return(false)
+        hash = { 'grade' => 10 }
+        expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('grade')
+      end
+
+      it 'filters published_score' do
+        expect(submission.assignment).to receive(:user_can_read_grades?).and_return(false)
+        hash = { 'published_score' => 10 }
+        expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('published_score')
+      end
+
+      it 'filters published_grade' do
+        expect(submission.assignment).to receive(:user_can_read_grades?).and_return(false)
+        hash = { 'published_grade' => 10 }
+        expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('published_grade')
+      end
+
+      it 'filters entered_score' do
+        expect(submission.assignment).to receive(:user_can_read_grades?).and_return(false)
+        hash = { 'entered_score' => 10 }
+        expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('entered_score')
+      end
+
+      it 'filters entered_grade' do
+        expect(submission.assignment).to receive(:user_can_read_grades?).and_return(false)
+        hash = { 'entered_grade' => 10 }
+        expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('entered_grade')
+      end
     end
   end
 

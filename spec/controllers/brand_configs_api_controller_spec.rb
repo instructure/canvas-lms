@@ -22,7 +22,7 @@ describe BrandConfigsApiController do
 
     it "should redirect to the default when nothing is set" do
       get :show
-      expect(response).to redirect_to("#{Canvas::Cdn.config.host}/#{BrandableCSS.public_default_json_path}")
+      expect(response).to redirect_to("#{Canvas::Cdn.config.host}/#{BrandableCSS.public_default_path('json')}")
     end
 
     it "should redirect to the one for @domain_root_account's brand config if set" do

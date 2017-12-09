@@ -128,9 +128,10 @@ define [
     onMove: () =>
       @moveTrayProps =
         title: I18n.t('Move Assignment')
-        item:
+        items: [
           id: @model.get('id')
           title: @model.get('name')
+        ]
         moveOptions:
           groupsLabel:  @messages.ag_move_label
           groups: MoveItem.backbone.collectionToGroups(@model.collection.view?.parentCollection, (col) => col.get('assignments'))

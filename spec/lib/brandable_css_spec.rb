@@ -68,8 +68,8 @@ describe BrandableCSS do
 
   describe "all_brand_variable_values_as_js" do
     it "eports the default js to the right global variable" do
-      expected_js = "CANVAS_ACTIVE_BRAND_VARIABLES = #{BrandableCSS.default_json};"
-      expect(BrandableCSS.default_js).to eq expected_js
+      expected_js = "CANVAS_ACTIVE_BRAND_VARIABLES = #{BrandableCSS.default('json')};"
+      expect(BrandableCSS.default('js')).to eq expected_js
     end
   end
 
@@ -78,107 +78,56 @@ describe BrandableCSS do
       expected_css = ":root {
         #{BrandableCSS.all_brand_variable_values(nil, true).map{ |k, v| "--#{k}: #{v};"}.join("\n")}
       }"
-      expect(BrandableCSS.default_css).to eq expected_css
+      expect(BrandableCSS.default('css')).to eq expected_css
     end
   end
 
   describe "default_json" do
     it "includes default variables not found in brand config" do
-      brand_variables = JSON.parse(BrandableCSS.default_json)
+      brand_variables = JSON.parse(BrandableCSS.default('json'))
       expect(brand_variables["ic-link-color"]).to eq '#008EE2'
     end
+
+    it "it has high contrast overrides for link and brand-primary" do
+      brand_variables = JSON.parse(BrandableCSS.default('json', !!:high_contrast))
+      expect(brand_variables["ic-brand-primary"]).to eq "#0770A3"
+      expect(brand_variables["ic-link-color"]).to eq "#0073A7"
+    end
+
   end
 
-  describe "save_default_json!" do
-    it "writes the default json representation to the default json file" do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_json_file).and_return(file)
-      BrandableCSS.save_default_json!
-      expect(file.string).to eq BrandableCSS.default_json
-    end
+  [true, false].each do |high_contrast|
+    ['js', 'json', 'css'].each do |type|
+      describe "save_default!(#{type})" do
+        it "writes the default json representation to the default json file" do
+          allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
+          file = StringIO.new
+          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
+          BrandableCSS.save_default!(type, high_contrast)
+          expect(file.string).to eq BrandableCSS.default(type, high_contrast)
+        end
 
-    it 'uploads json file to s3 if cdn is enabled' do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+        it 'uploads json file to s3 if cdn is enabled' do
+          allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
 
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_json_file).and_return(file)
-      allow(File).to receive(:delete)
-      expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_json_path)
-      BrandableCSS.save_default_json!
-    end
+          file = StringIO.new
+          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
+          allow(File).to receive(:delete)
+          expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_path(type, high_contrast))
+          BrandableCSS.save_default!(type, high_contrast)
+        end
 
-    it 'deletes the local json file if cdn is enabled' do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_json_file).and_return(file)
-      expect(File).to receive(:delete).with(BrandableCSS.default_brand_json_file)
-      expect(BrandableCSS.s3_uploader).to receive(:upload_file)
-      BrandableCSS.save_default_json!
-    end
-  end
-
-  describe "save_default_js!" do
-    it "writes the default javascript representation to the default js file" do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_js_file).and_return(file)
-      BrandableCSS.save_default_js!
-      expect(file.string).to eq BrandableCSS.default_js
-    end
-
-    it 'uploads javascript file to s3 if cdn is enabled' do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
-
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_js_file).and_return(file)
-      allow(File).to receive(:delete)
-      expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_js_path)
-      BrandableCSS.save_default_js!
-    end
-
-    it 'deletes the local javascript file if cdn is enabled' do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_js_file).and_return(file)
-      expect(File).to receive(:delete).with(BrandableCSS.default_brand_js_file)
-      expect(BrandableCSS.s3_uploader).to receive(:upload_file)
-      BrandableCSS.save_default_js!
-    end
-  end
-
-  describe "save_default_css!" do
-    it "writes the default css variables to the default css file" do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
-      BrandableCSS.save_default_css!
-      expect(file.string).to eq BrandableCSS.default_css
-    end
-
-    it 'uploads css file to s3 if cdn is enabled' do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
-
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
-      allow(File).to receive(:delete)
-      expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_css_path)
-      BrandableCSS.save_default_css!
-    end
-
-    it 'deletes the local css file if cdn is enabled' do
-      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
-      file = StringIO.new
-      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
-      expect(File).to receive(:delete).with(BrandableCSS.default_brand_css_file)
-      expect(BrandableCSS.s3_uploader).to receive(:upload_file)
-      BrandableCSS.save_default_css!
+        it 'deletes the local json file if cdn is enabled' do
+          allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+          file = StringIO.new
+          allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
+          expect(File).to receive(:delete).with(BrandableCSS.default_brand_file(type, high_contrast))
+          expect(BrandableCSS.s3_uploader).to receive(:upload_file)
+          BrandableCSS.save_default!(type, high_contrast)
+        end
+      end
     end
   end
 end

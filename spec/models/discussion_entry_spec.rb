@@ -585,4 +585,25 @@ describe DiscussionEntry do
       expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
   end
+
+  context 'stream items' do
+    before(:once) do
+      course_with_student active_all: true
+      @empty_section = @course.course_sections.create!
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build title: @topic.title,
+        submission_types: 'discussion_topic',
+        only_visible_to_overrides: true,
+        title: @topic.title
+      @assignment.assignment_overrides.build set: @empty_section
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+    end
+
+    it "doesn't make stream items for students that aren't assigned" do
+      entry = @topic.reply_from(user: @teacher, text: "...")
+      expect(@student.stream_item_instances).to be_empty
+    end
+  end
 end

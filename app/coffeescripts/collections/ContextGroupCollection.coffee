@@ -17,11 +17,12 @@
 #
 
 define [
+  'jquery',
   'compiled/collections/PaginatedCollection'
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
   'compiled/util/natcompare'
-], (PaginatedCollection, GroupUserCollection, Group, natcompare) ->
+], ($, PaginatedCollection, GroupUserCollection, Group, natcompare) ->
 
   class ContextGroupCollection extends PaginatedCollection
     model: Group
@@ -32,4 +33,9 @@ define [
     @optionProperty 'course_id'
 
     url: ->
-      "/api/v1/courses/#{@options.course_id}/groups?include[]=users&include[]=group_category&include[]=permissions"
+      url_base = "/api/v1/courses/#{@options.course_id}/groups?"
+      params = {
+        include: ['users', 'group_category', 'permissions']
+        include_inactive_users: 'true'
+      }
+      url_base + $.param(params)

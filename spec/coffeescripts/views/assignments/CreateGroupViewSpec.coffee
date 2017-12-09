@@ -25,8 +25,9 @@ define [
   'compiled/views/assignments/CreateGroupView'
   'jquery'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (_, Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, Course, CreateGroupView, $, fakeENV) ->
+], (_, Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, Course, CreateGroupView, $, fakeENV, assertions) ->
 
   group = (opts = {}) ->
     new AssignmentGroup $.extend({
@@ -54,6 +55,11 @@ define [
     teardown: ->
       fakeENV.teardown()
       $("form[id^=ui-id-]").remove()
+
+  test 'should be accessible', (assert) ->
+    view = createView()
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'hides drop options for no assignments', ->
     view = createView()

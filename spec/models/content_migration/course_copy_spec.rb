@@ -434,6 +434,9 @@ describe ContentMigration do
       @copy_from.allow_student_discussion_editing = false
       @copy_from.restrict_student_future_view = true
       @copy_from.restrict_student_past_view = true
+      @copy_from.show_total_grade_as_points = true
+      @copy_from.organize_epub_by_content_type = true
+      @copy_from.enable_offline_web_export = true
       @copy_from.save!
 
       run_course_copy
@@ -453,7 +456,7 @@ describe ContentMigration do
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
       atts.each do |att|
-        expect(@copy_to.send(att)).to eq @copy_from.send(att)
+        expect(@copy_to.send(att)).to eq(@copy_from.send(att)), "@copy_to.#{att}: expected #{@copy_from.send(att)}, got #{@copy_to.send(att)}"
       end
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
     end

@@ -29,7 +29,7 @@ module CC::Importer::Canvas
         res.css('file').select{|f| f['href'].to_s.end_with?(ASSESSMENT_META)}.each do |file|
           meta_path = file['href']
           if quiz = quiz_map[meta_path]
-            doc = open_file_xml(File.join(@unzipped_file_path, meta_path))
+            doc = open_file_xml(@package_root.item_path(meta_path))
             get_quiz_meta(doc, quiz)
           end
         end

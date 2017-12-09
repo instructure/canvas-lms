@@ -17,7 +17,7 @@
 <%= asset.comment %>
 
 <% if asset.media_comment? %>
-  <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
+  <%= t("This message includes media comments. To listen or reply, click this link: %{link}.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the submission.", link: content(:link)) %>
 <% else %>
   <%= t("You can review the submission details by clicking this link: %{link}.", link: content(:link)) %>
 <% end %>

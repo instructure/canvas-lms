@@ -235,7 +235,7 @@
 <% end %>
 
 <% if !@locked && can_do(@assignment, @current_user, :submit) %>
-  <%= render :partial => "submit_assignment" %>
+  <%= render :partial => "submit_assignment", locals: { eula_url: eula_url }%>
 <% end %>
 
 <%= render partial: "shared/rubrics_component" %>

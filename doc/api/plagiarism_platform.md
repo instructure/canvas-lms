@@ -13,6 +13,9 @@ Once registered, tools will be provided with an LTI tool placement in the Canvas
 #### Section 3 - Originality Reports
 The webhook sent to the TP contains the data needed for the tool to retrieve the submission from Canvas. The TP can then process the submission, determine its "originality score", and create an Originality Report. This data is then sent back to Canvas and associated with the submission via the Canvas Originality Report API.
 
+#### Section 4 - Other Features
+Descriptions of optional features tool providers may use.
+
 For additional help please see the following reference tools:
 * [Plagiarism Detection Reference Tool](https://github.com/instructure/lti_originality_report_example)
 * [LTI 2.1 Reference Tool](https://github.com/instructure/lti2_reference_tool_provider)
@@ -226,3 +229,64 @@ Once the TP has been notified of a new submission (see section 2.2), it may acce
 After processing the submission, an Originality Report may be created for the submission.
 
 Using the Originality Report and Submissions APIs requires a JWT access token be sent in the authorization header. For more information on using JWT tokens in Canvas see <a href="jwt_access_tokens.html">JWT access tokens</a>.
+
+### 4. Optional Features
+The following are optional features the tool provider may wish to implement.
+
+#### End-User License Agreement Verification
+##### Description
+This feature provides a mechanism for a tool provider to specify a link to a EULA or terms of service they wish to show to students submitting homework.
+
+This feature also guarantees that the user has agreed to the EULA/terms of service before they submit homework. The timestamp of when the user agreed is also provided to the tool provider during the normal submission/attachment retrieval flow.
+
+##### Implementation
+To implement this feature a tool provider must add the `vnd.Canvas.Eula` service to the `service_offered` array of their tool proxy:
+```json
+{
+  …
+  "service_offered": [
+    …
+    {
+      // Must end in "#vnd.Canvas.Eula"
+      "@id": "my.tool.com/service#vnd.Canvas.Eula",
+      "endpoint": "http://my.tool.com/eula", // URL of EULA for Canvas to link to
+      "@type": "RestService",
+      "format": ["application/json"],
+      "action": ["GET"]
+    },
+    …
+  ],
+  …
+}
+```
+
+As shown in the example above the value of `endpoint` should be a fully qualified URL pointing to the tool provider’s terms of service or EULA. The value of the `@id` must end in `#vnd.Canvas.Eula`. The `action` array must contain `GET`.
+
+Once the tool is registered in Canvas and associated with an assignment, students will be presented with a link to the tool’s EULA that they must agree to before Canvas will allow a homework submission:
+
+<img style="width:35vw;" src="./images/eula.png" alt="Submission details" />
+
+When the tool provider retrieves the assignment details from Canvas the body of the response payload will contain a property named `eula_agreement_timestamp` which contains the timestamp indicating when the user clicked the checkbox:
+```json
+{
+   "id":215,
+   "submitted_at":"2017-10-17T14:28:09Z",
+   "assignment_id":216,
+   "user_id":"86157096483e6b3a50bfedc6bac902c0b20a824f",
+   "submission_type":"online_upload",
+   "workflow_state":"submitted",
+   "attempt":1,
+   "eula_agreement_timestamp":"1508250487578",
+   "attachments":[
+      {
+         "id":230,
+         "size":14942,
+         "filename":"1508250488_822__Test_Student_Submission.doc",
+         "display_name":"Test_Student_Submission.doc",
+         "created_at":"2017-10-17T14:28:08Z",
+         "updated_at":"2017-10-17T14:28:08Z",
+         "url":"http://canvas.docker/api/lti/assignments/10000000000216/submissions/10000000000215/attachment/10000000000230"
+      }
+   ]
+}
+```

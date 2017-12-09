@@ -141,11 +141,11 @@ describe "gradebook" do
     expect(f('.gradebook_dropdown')).to be_displayed
   end
 
-  it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
+  it "View Gradebook History menu item redirects to grading history page", priority: "2", test_id: 164218 do
     @gradebook_page.visit_gradebook(@course)
 
     f('#gradebook_settings').click
-    fj('.ui-menu-item a:contains("View Grading History")').click
+    fj('.ui-menu-item a:contains("View Gradebook History")').click
     expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
   end
 

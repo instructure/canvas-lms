@@ -39,6 +39,7 @@ class WikiPage < ActiveRecord::Base
   restrict_columns :content, [:body, :title]
   restrict_columns :settings, [:editing_roles]
   restrict_assignment_columns
+  restrict_columns :state, [:workflow_state]
 
   after_update :post_to_pandapub_when_revised
 
@@ -46,6 +47,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
 
   belongs_to :context, polymorphic: [:course, :group]
+  belongs_to :assignment
 
   acts_as_url :title, :sync_url => true
 
@@ -424,7 +426,8 @@ class WikiPage < ActiveRecord::Base
     }
     opts_with_default = default_opts.merge(opts)
     result = WikiPage.new({
-      :title => opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy")),
+      :title =>
+        opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title),
       :wiki_id => self.wiki_id,
       :context_id => self.context_id,
       :context_type => self.context_type,

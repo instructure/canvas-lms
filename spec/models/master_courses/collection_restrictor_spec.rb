@@ -64,12 +64,14 @@ describe MasterCourses::CollectionRestrictor do
       expect(new_aq.errors[:base].first.to_s).to include("locked by Master Course")
     end
 
-    it "should allow quiz questions to be generated" do
+    it "should allow quiz questions to be generated and updated" do
       original_quiz = @copy_from.quizzes.create!
       quiz_tag = @template.create_content_tag_for!(original_quiz, :restrictions => {:content => true})
 
       quiz_copy = @copy_to.quizzes.create!(:migration_id => quiz_tag.migration_id)
-      quiz_copy.quiz_questions.create!(:question_data => {'some data' => '1'}, :workflow_state => "generated")
+      qq = quiz_copy.quiz_questions.create!(:question_data => {'some data' => '1'}, :workflow_state => "generated")
+
+      qq.update_attribute(:question_data, {'some other data' => '1'})
     end
   end
 

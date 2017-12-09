@@ -72,6 +72,28 @@ describe SubmissionsController do
       expect(assigns[:submission][:submission_type]).to eql("online_upload")
     end
 
+    it "accepts 'eula_agreement_timestamp' params and persists it in the 'turnitin_data'" do
+      course_with_student_logged_in(:active_all => true)
+      timestamp = Time.now.to_i
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+      a1 = attachment_model(:context => @user)
+      post 'create',
+        params: {
+          :course_id => @course.id,
+          :assignment_id => @assignment.id,
+          :submission => {
+            :submission_type => "online_upload",
+            :attachment_ids => a1.id,
+            :eula_agreement_timestamp => timestamp
+          },
+          :attachments => {
+            "0" => { :uploaded_data => "" },
+            "-1" => { :uploaded_data => "" }
+          }
+        }
+      expect(assigns[:submission].turnitin_data[:eula_agreement_timestamp]).to eq timestamp.to_s
+    end
+
     it "should copy attachments to the submissions folder if that feature is enabled" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")

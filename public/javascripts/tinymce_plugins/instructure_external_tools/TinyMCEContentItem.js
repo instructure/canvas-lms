@@ -45,6 +45,14 @@ import $ from 'jquery'
     exportPropsToSelf.call(this, properties);
   }
 
+  function linkText (tinyMCEContentItem) {
+    const editorSelection = window.tinyMCE && window.tinyMCE.activeEditor.selection;
+    const selectedText = editorSelection && editorSelection.getContent();
+    return selectedText ||
+           (tinyMCEContentItem.text && tinyMCEContentItem.text.trim()) ||
+           (tinyMCEContentItem.title && tinyMCEContentItem.title.trim());
+  }
+
   ContentItem.fromJSON = function (obj) {
     return new ContentItem(obj)
   };
@@ -81,9 +89,6 @@ import $ from 'jquery'
     },
 
     link: function (tinyMCEContentItem) {
-      var editorSelection = window.tinyMCE && window.tinyMCE.activeEditor && window.tinyMCE.activeEditor.contentDocument.getSelection();
-      var selectedText = editorSelection && editorSelection.anchorNode && editorSelection.anchorNode.data;
-
       var $linkContainer = $("<div/>"),
         $link = $("<a/>", {
           href: tinyMCEContentItem.url,
@@ -103,18 +108,16 @@ import $ from 'jquery'
           width: tinyMCEContentItem.thumbnail.width || 48,
           alt: tinyMCEContentItem.text
         }))
+      } else if (window.tinyMCE.activeEditor.selection.getContent()) {
+          $link[0].innerHTML = linkText(tinyMCEContentItem);
       } else {
-        let linkText = selectedText;
-        if (!linkText || linkText.trim().length === 0) {
-          linkText = tinyMCEContentItem.text;
-        }
-        $link.text(linkText);
+        // don't inject tool provided content into the page HTML
+        $link.text(linkText(tinyMCEContentItem));
       }
 
       return $linkContainer.html();
     }
   };
-
 
   function TinyMCEContentItem(contentItem) {
     this.contentItem = contentItem;

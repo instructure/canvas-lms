@@ -112,7 +112,7 @@ describe "Wiki Pages" do
       @course.wiki_pages.create!(title: 'Garfield and Odie Food Preparation',
         body: '<a href="http://example.com/poc/" target="_blank" id="click_here_now">click_here</a>')
       get "/courses/#{@course.id}/pages/garfield-and-odie-food-preparation"
-      expect(f('#click_here_now').attribute("rel")).to eq "noreferrer"
+      expect(f('#click_here_now').attribute("rel")).to eq "noreferrer noopener"
     end
 
     it "does not mark valid links as invalid", priority: "2", test_id: 927788 do
@@ -431,6 +431,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
+        skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys("derp")
         fln('Home').click
@@ -439,6 +440,7 @@ describe "Wiki Pages" do
       end
 
       it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
+        skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys('derp')
         fln('Home').click
@@ -449,6 +451,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
+        skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         f('.title').clear()
         f('.title').send_keys("derpy-title")

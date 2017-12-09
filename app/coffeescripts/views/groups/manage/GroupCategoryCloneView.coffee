@@ -16,12 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'underscore'
   'i18n!groups'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/groups/manage/groupCategoryClone'
-], (_, I18n, DialogFormView, wrapperTemplate, template) ->
+], (I18n, DialogFormView, wrapperTemplate, template) ->
 
   class GroupCategoryCloneView extends DialogFormView
 
@@ -33,10 +32,10 @@ define [
 
     defaults:
       width: 520
-      height: 400
+      height: 450
       title: I18n.t("Clone Group Set")
 
-    events: _.extend {},
+    events: Object.assign {},
       DialogFormView::events
       'click .dialog_closer': 'close'
       'click .clone-options-toggle': 'toggleCloneOptions'

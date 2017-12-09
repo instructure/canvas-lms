@@ -34,6 +34,8 @@ define [
       @_users = new GroupUserCollection initialUsers,
         group: this
         category: @collection?.category
+        markInactiveStudents: @collection?.options?.markInactiveStudents
+
       @_users.on 'fetched:last', => @set('members_count', @_users.length)
       @users = -> @_users
       @_users

@@ -29,6 +29,7 @@ define [
   'timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
   'compiled/behaviors/tooltip'
 ], (
@@ -44,7 +45,8 @@ define [
   juneau,
   french,
   I18nStubber,
-  fakeENV) ->
+  fakeENV,
+  assertions) ->
 
   fixtures = $('#fixtures')
 
@@ -163,6 +165,11 @@ define [
       tz.restore(@snapshot)
       I18nStubber.popFrame()
 
+  test 'should be accessible', (assert) ->
+    view = createView(@assignment1)
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
+
   test "initialize generates a new assignment for creation", ->
     view = createView(@group)
     equal view.model.get("assignment_group_id"), @group.get("id")
@@ -229,6 +236,22 @@ define [
     view.moreOptions()
 
     ok view.redirectTo.called
+
+  test "moreOptions creates a quiz if submission_types is online_quiz", ->
+    newQuizUrl = 'http://example.com/course/1/quizzes/new'
+    formData = { submission_types: 'online_quiz' }
+    @stub(CreateAssignmentView.prototype, "getFormData").returns(formData)
+    @stub(CreateAssignmentView.prototype, "newQuizUrl").returns(newQuizUrl)
+    @stub(CreateAssignmentView.prototype, "redirectTo")
+
+    quizEditUrl = 'http://example.com/course/1/quizzes/42/edit'
+    @stub($, "post").returns($.Deferred().resolve({ url: quizEditUrl }))
+
+    view = createView(@assignment1)
+    view.moreOptions()
+
+    ok $.post.calledWith(newQuizUrl, formData)
+    ok view.redirectTo.calledWith(quizEditUrl)
 
   test "generateNewAssignment builds new assignment model", ->
     view = createView(@group)

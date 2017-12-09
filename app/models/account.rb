@@ -1329,12 +1329,8 @@ class Account < ActiveRecord::Base
   end
 
   def closest_turnitin_pledge
-    if self.turnitin_pledge && !self.turnitin_pledge.empty?
-      self.turnitin_pledge
-    else
-      res = self.parent_account.try(:closest_turnitin_pledge)
-      res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
-    end
+    account_with_pledge = account_chain.find { |a| a.turnitin_pledge.present? }
+    account_with_pledge&.turnitin_pledge || t('This assignment submission is my own, original work')
   end
 
   def closest_turnitin_comments
@@ -1398,13 +1394,7 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, :manage_account_settings)
     if root_account.site_admin?
       tabs = []
-      if user && self.grants_right?(user, :read_roster)
-        if feature_enabled?(:course_user_search)
-          tabs << { :id => TAB_SEARCH, :label => t("Courses & People"), :css_class => 'search', :href => :account_course_user_search_path }
-        else
-          tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path }
-        end
-      end
+      tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
@@ -1412,12 +1402,8 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if root_account? && self.grants_right?(user, :view_jobs)
     else
       tabs = []
-      if feature_enabled?(:course_user_search)
-        tabs << { :id => TAB_SEARCH, :label => t("Courses & People"), :css_class => 'search', :href => :account_path } if user && (grants_right?(user, :read_course_list) || grants_right?(user, :read_roster))
-      else
-        tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
-        tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
-      end
+      tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
+      tabs << { :id => TAB_USERS, :label => t("People"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, :view_statistics)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       if user && self.grants_right?(user, :manage_outcomes)

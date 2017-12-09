@@ -64,18 +64,4 @@ TEXT
                {},
                class: 'ic-Input', id: "requested_authn_context_#{presenter.id_suffix(aac)}") %>
 </div>
-<% if @account.self_registration? %>
-    <div id="parent_reg_selected" data-parent-reg-selected="<%= presenter.parent_reg_selected %>"></div>
-    <div class="ic-Form-control">
-      <%= f.label :parent_registration, "Parent Registration", class: 'ic-Label', for: "parent_registration_#{presenter.id_suffix(aac)}" %>
-      <%= f.check_box :parent_registration, class: "parent_reg_warning", id: "parent_registration_#{presenter.id_suffix(aac)}" %>
-      <span class="SAML_parent_default" ><%= t "Use this configuration for parent/observer registration" %></span>
-      <div class="parent_form_message">
-        <div class="parent_form_message_layout">
-          <i class="parent_icon_warning"></i>
-          <span class="parent_warning_message"></span>
-        </div>
-      </div>
-    </div>
-<% end %>
 <%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

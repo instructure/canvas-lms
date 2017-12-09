@@ -17,30 +17,24 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import I18n from 'i18n!account_course_user_search'
+import {string} from 'prop-types'
 
-  var UserLink = React.createClass({
-    propTypes: {
-      id: PropTypes.string.isRequired,
-      display_name: PropTypes.string.isRequired,
-      avatar_image_url: PropTypes.string
-    },
+export default function UserLink ({ id, display_name, avatar_image_url }) {
+  const url = `/users/${id}`
+  return (
+    <div className="ellipsis">
+      {!!avatar_image_url &&
+        <span className="ic-avatar UserLink__Avatar">
+          <img src={avatar_image_url}  alt='' />
+        </span>
+      }
+      <a href={url} className="user_link">{display_name}</a>
+    </div>
+  )
+}
 
-    render() {
-      var { id, display_name, avatar_image_url } = this.props;
-      var url = `/users/${id}`;
-      return (
-        <div className="ellipsis">
-          {!!avatar_image_url &&
-            <span className="ic-avatar UserLink__Avatar">
-              <img src={avatar_image_url}  alt={`User avatar for ${display_name}`} />
-            </span>
-          }
-          <a href={url} className="user_link">{display_name}</a>
-        </div>
-      );
-    }
-  });
-
-export default UserLink
+UserLink.propTypes = {
+  id: string.isRequired,
+  display_name: string.isRequired,
+  avatar_image_url: string
+}

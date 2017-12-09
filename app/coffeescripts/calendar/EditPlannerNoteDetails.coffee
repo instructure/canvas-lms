@@ -67,11 +67,18 @@ define [
       @model = @event
 
     submitNote: (e) =>
+      data = @getFormData()
       if @event.isNewEvent()
-        data = @getFormData()
         data.contextInfo = @event.contextInfo
         data.context_code = @event.contextInfo.asset_string
         @model = commonEventFactory(data, @event.possibleContexts())
+      else if @event.can_change_context && data.context_code != @event.object.context_code
+        # need to update @event so it is cached in the right calendar (aka context_code)
+        @event.old_context_code = @event.object.context_code
+        @event.removeClass "group_#{@event.old_context_code}"
+        @event.object.context_code = data.context_code
+        @event.contextInfo = @contextInfoForCode(data.context_code)
+
       @submit(e)
 
     contextInfoForCode: (code) ->
@@ -135,6 +142,7 @@ define [
         'details': data.details
         'id': @event.object.id
         'type': 'planner_note'
+        'context_code': data.context_code
       }
       if data.context_code.match(/^course_/)
         # is in a course's calendar

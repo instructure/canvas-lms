@@ -28,8 +28,8 @@ module Canvas::Security
   def self.encryption_key
     @encryption_key ||= begin
       res = config && config['encryption_key']
-      abort('encryption key required, see security.yml.example') unless res
-      abort('encryption key is too short, see security.yml.example') unless res.to_s.length >= 20
+      raise('encryption key required, see config/security.yml') unless res
+      raise('encryption key is too short, see config/security.yml') unless res.to_s.length >= 20
       res.to_s
     end
   end
@@ -39,7 +39,11 @@ module Canvas::Security
   end
 
   def self.config
-    @config ||= YAML.safe_load(ERB.new(File.read(Rails.root + 'config/security.yml')).result)[Rails.env]
+    @config ||= begin
+      path = Rails.root + 'config/security.yml'
+      raise('config/security.yml missing, see security.yml.example') unless File.exist?(path)
+      YAML.safe_load(ERB.new(File.read(path)).result)[Rails.env]
+    end
   end
 
   def self.encrypt_password(secret, key)

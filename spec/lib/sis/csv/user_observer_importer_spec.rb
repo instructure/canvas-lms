@@ -55,7 +55,7 @@ describe SIS::CSV::UserObserverImporter do
     before_count = UserObserver.active.count
     process_csv_data_cleanly(
       "observer_id,student_id,status",
-      "U001,U002,active"
+      "U001,U002,ACTIVE"
     )
     expect(UserObserver.active.count).to eq before_count + 1
 

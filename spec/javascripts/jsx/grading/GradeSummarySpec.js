@@ -1075,4 +1075,59 @@ define([
     deepEqual(_.map(ENV.submissions, 'assignment_id'), ['201', '203', '205']);
     deepEqual(_.map(ENV.submissions, 'score'), [10, 15, 30]);
   });
+
+  QUnit.module('GradeSummary.finalGradePointsPossibleText', {
+    setup () {
+      fakeENV.setup();
+    },
+
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('returns an empty string if assignment groups are weighted', function () {
+    const text = GradeSummary.finalGradePointsPossibleText('percent', '50.00 / 100.00');
+    strictEqual(text, '');
+  });
+
+  test('returns the score with points possible if assignment groups are not weighted', function () {
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
+    strictEqual(text, '50.00 / 100.00');
+  });
+
+  test('returns an empty string if grading periods are weighted and "All Grading Periods" is selected', function () {
+    sinon.stub(GradeSummary, 'getSelectedGradingPeriodId').returns(null);
+    ENV.grading_period_set = {
+      id: '1501',
+      grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
+      weighted: true
+    };
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
+    strictEqual(text, '');
+    GradeSummary.getSelectedGradingPeriodId.restore();
+  });
+
+  test('returns the score with points possible if grading periods are weighted and a period is selected', function () {
+    sinon.stub(GradeSummary, 'getSelectedGradingPeriodId').returns('701');
+    ENV.grading_period_set = {
+      id: '1501',
+      grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
+      weighted: true
+    };
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
+    strictEqual(text, '50.00 / 100.00');
+    GradeSummary.getSelectedGradingPeriodId.restore();
+  });
+
+  test('returns the score with points possible if grading periods are not weighted', function () {
+    ENV.grading_period_set = {
+      id: '1501',
+      grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
+      weighted: false
+    };
+
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
+    strictEqual(text, '50.00 / 100.00');
+  });
 });

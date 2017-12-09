@@ -31,7 +31,7 @@
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= yield :auto_discovery %>
-  <%= stylesheet_link_tag(active_brand_config_css_url, media: "all") %>
+  <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
   <%= yield :head %>
   <%=
     # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign
@@ -86,6 +86,6 @@
     }
     document.addEventListener('click', _earlyClick)
   </script>
-  <%= javascript_include_tag(active_brand_config_js_url, defer: true) %>
+  <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
   <%= include_head_js %>
 </head>

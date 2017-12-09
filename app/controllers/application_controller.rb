@@ -113,16 +113,16 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {})
-    return {} unless request.format.html?
+    return {} unless request.format.html? || @include_js_env
     # set some defaults
     unless @js_env
       editor_css = [
-        active_brand_config_css_url,
+        active_brand_config_url('css'),
         view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
       ]
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
-        active_brand_config_json_url: active_brand_config_json_url,
+        active_brand_config_json_url: active_brand_config_url('json'),
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
         current_user: Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile) },
@@ -473,6 +473,7 @@ class ApplicationController < ActionController::Base
     if !files_domain? && Setting.get('block_html_frames', 'true') == 'true' && !@embeddable
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
+    headers['Strict-Transport-Security'] = 'max-age=31536000' if request.ssl?
     RequestContextGenerator.store_request_meta(request, @context)
     true
   end
@@ -1850,7 +1851,7 @@ class ApplicationController < ActionController::Base
   end
 
   def in_app?
-    @pseudonym_session
+    !!(@current_user ? @pseudonym_session : session[:session_id])
   end
 
   def json_as_text?
@@ -2154,6 +2155,7 @@ class ApplicationController < ActionController::Base
     js_env({
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
+        :new_quiz_url => context_url(@context, :context_quizzes_new_url),
         :course_url => api_v1_course_url(@context),
         :sort_url => reorder_course_assignment_groups_url(@context),
         :assignment_sort_base_url => course_assignment_groups_url(@context),
@@ -2279,4 +2281,55 @@ class ApplicationController < ActionController::Base
   def teardown_live_events_context
     LiveEvents.clear_context!
   end
+
+  # TODO: this belongs in AccountsController but while :course_user_search is still behind a feature flag we
+  # have to let UsersController::index own the /accounts/x/users route so it responds as it used to if the
+  # feature isn't enabled but `return course_user_search` if the feature is enabled. you can't `return` an
+  # action from another controller but you can from a controller you inherit from. Hence why this can be
+  # here in ApplicationController but not AccountsController for now. Once we remove the feature flag,
+  # we should move this back to AccountsController and just change conf/routes.rb to let
+  # AccountsController::users own /accounts/x/users instead UsersController::index
+  def course_user_search
+    return unless authorized_action(@account, @current_user, :read)
+    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
+    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
+    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
+
+    unless can_read_course_list || can_read_roster
+      return render_unauthorized_action
+    end
+
+    def localized_timezones(zones)
+      zones.map { |tz| {name: tz.name, localized_name: tz.to_s} }
+    end
+
+    js_env({
+      TIMEZONES: {
+        priority_zones: localized_timezones(I18nTimeZone.us_zones),
+        timezones: localized_timezones(I18nTimeZone.all)
+      },
+      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user)
+    })
+    js_bundle :account_course_user_search
+    css_bundle :account_course_user_search, :addpeople
+    @page_title = @account.name
+    add_crumb '', '?' # the text for this will be set by javascript
+    js_env({
+      ROOT_ACCOUNT_NAME: @domain_root_account.name, # used in AddPeopleApp modal
+      ACCOUNT_ID: @account.id,
+      ROOT_ACCOUNT_ID: @account.root_account.id,
+      PERMISSIONS: {
+        can_read_course_list: can_read_course_list,
+        can_read_roster: can_read_roster,
+        can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+        can_create_users: @account.root_account? && @account.grants_right?(@current_user, session, :manage_user_logins),
+        analytics: @account.service_enabled?(:analytics),
+        can_masquerade: @account.grants_right?(@current_user, session, :become_user),
+        can_message_users: @account.grants_right?(@current_user, session, :send_messages),
+        can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins)
+      }
+    })
+    render html: '', layout: true
+  end
+
 end

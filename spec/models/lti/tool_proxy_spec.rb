@@ -350,6 +350,33 @@ module Lti
       end
     end
 
+    describe "capability_enabled_in_context?" do
+      include_context 'lti2_spec_helper'
+
+      let(:placement) { ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
+
+      it 'returns true when tool proxy root contains the enabled capability' do
+        message_handler.update_attributes!(capabilities: [])
+        tool_proxy.raw_data['enabled_capability'] = [placement]
+        tool_proxy.save!
+        expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
+      end
+
+      it 'returns true when the message handler contains the enabled capability' do
+        tool_proxy.raw_data['enabled_capability'] = []
+        tool_proxy.save!
+        message_handler.update_attributes!(capabilities: [placement])
+        expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
+      end
+
+      it 'returns false when the placement is not in the root or message handlers' do
+        message_handler.update_attributes!(capabilities: [])
+        tool_proxy.raw_data['enabled_capability'] = []
+        tool_proxy.save!
+        expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey
+      end
+    end
+
     describe "#matching_tool_profile?" do
       include_context 'lti2_spec_helper'
 
@@ -466,6 +493,73 @@ module Lti
             }
           ]
         })).to eq(false)
+      end
+    end
+
+    describe "#matches?" do
+      include_context 'lti2_spec_helper'
+
+      let(:fields) do
+        {
+          vendor_code: tool_proxy.product_family.vendor_code,
+          product_code: tool_proxy.product_family.product_code,
+          resource_type_code: resource_handler.resource_type_code
+        }
+      end
+
+      it 'matches' do
+        expect(tool_proxy.matches?(fields)).to eq(true)
+      end
+
+      it 'does not match when vendor code is wrong' do
+        expect(tool_proxy.matches?(fields.merge(vendor_code: ''))).to eq(false)
+      end
+
+      it 'does not match when product_code is wrong' do
+        expect(tool_proxy.matches?(fields.merge(product_code: ''))).to eq(false)
+      end
+
+      it 'does not match when resource_type_code is wrong' do
+        expect(tool_proxy.matches?(fields.merge(resource_type_code: ''))).to eq(false)
+      end
+    end
+
+    describe "#find_service" do
+      let(:service_one_id) { "http://originality.docker/lti/v2/services#vnd.Canvas.SubmissionEvent" }
+      let(:service_one_endpoint) { "http://originality.docker/event/submission" }
+      let(:service_two_id) { "http://originality.docker/lti/v2/services#vnd.Canvas.Eula" }
+      let(:service_two_endpoint) { "http://originality.docker/eula" }
+      let(:tool_proxy) do
+        create_tool_proxy(raw_data: {
+          'tool_profile' => {
+            'service_offered' => [
+              {
+                "endpoint" => service_one_endpoint,
+                "action" => ["POST", "GET"],
+                "@id" => service_one_id,
+                "@type" => "RestService"
+              },
+              {
+                "endpoint" => service_two_endpoint,
+                "action" => ["GET"],
+                "@id" => service_two_id,
+                "@type" => "RestService"
+              }
+            ]
+          }
+        })
+      end
+
+      it 'returns the service for the specified id/action pair' do
+        expect(tool_proxy.find_service(service_one_id, 'POST').endpoint).to eq service_one_endpoint
+      end
+
+      it 'considers all actions of potential services' do
+        expect(tool_proxy.find_service(service_one_id, 'GET').endpoint).to eq service_one_endpoint
+      end
+
+      it 'does not return a service if no matching action is found' do
+        expect(tool_proxy.find_service(service_one_id, 'PUT')).to be_nil
       end
     end
 

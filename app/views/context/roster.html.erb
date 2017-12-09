@@ -23,7 +23,7 @@
   translated_title = @context.is_a?(Course) ? t('Course Roster') : t('Group Roster')
   content_for :page_title, join_title(translated_title, @context.name)
 
-  css_bundle :roster
+  css_bundle :roster, :addpeople
 
   is_teacher = can_do(@context, @current_user, :manage_students)
 %>

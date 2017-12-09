@@ -25,6 +25,9 @@
           {{#t "submission_types.external_tool"}}External Tool{{/t}}
         </option>
       </select>
+      {{#if submissionTypesFrozen }}
+        <input type="hidden" name="submission_type" value="{{submissionType}}" />
+      {{/if}}
 
       {{!-- Online submission types --}}
       <div id="assignment_online_submission_types"
@@ -184,6 +187,9 @@
               <button class="Button" id="assignment_external_tool_tag_attributes_url_find" type="button">
                 {{#t}}Find{{/t}}
               </button>
+              {{#if submissionTypesFrozen }}
+                <input type="hidden" name="external_tool_tag_attributes[url]" value="{{externalToolUrl}}" />
+              {{/if}}
             </div>
           </div>
           <input id="assignment_external_tool_tag_attributes_content_type"

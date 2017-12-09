@@ -41,6 +41,8 @@ define [
     }
   ]
 
+  dialog = null
+
   QUnit.module 'MessageFormDialog',
     setup: ->
       @server = sinon.fakeServer.create()
@@ -52,11 +54,13 @@ define [
           CAN_MESSAGE_ACCOUNT_CONTEXT: false
 
     teardown: ->
+      # $(".ui-dialog").remove()
       fakeENV.teardown()
-
       util.useNormalDebounce()
       @clock.restore()
       @server.restore()
+      dialog.recipientView.remove()
+      dialog.remove()
 
   test 'recipient ids are not parsed as numbers', ->
     dialog = new MessageFormDialog

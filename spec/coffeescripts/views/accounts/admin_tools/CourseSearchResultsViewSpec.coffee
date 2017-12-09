@@ -20,7 +20,8 @@ define [
   'Backbone'
   'compiled/views/accounts/admin_tools/CourseSearchResultsView'
   'compiled/models/CourseRestore'
-], ($, Backbone, CourseSearchResultsView, CourseRestore) ->
+  'helpers/assertions'
+], ($, Backbone, CourseSearchResultsView, CourseRestore, assertions) ->
   errorMessageJSON =
     status: "not_found"
     message: "There was no foo bar in the baz"
@@ -46,6 +47,10 @@ define [
       $('#fixtures').append @courseSearchResultsView.render().el
     teardown: ->
       $('#fixtures').empty()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @courseSearchResultsView, done, {'a11yReport': true}
 
   test "restored is set to false when initialized", ->
     ok !@courseRestore.get('restored')

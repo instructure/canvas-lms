@@ -73,7 +73,7 @@ define [
     # Public: Topic is able to be pinned/unpinned.
     @optionProperty 'pinnable'
 
-    @child 'publishIcon', '[data-view=publishIcon]' if ENV.permissions.publish
+    @child 'publishIcon', '[data-view=publishIcon]' if ENV.permissions?.publish
 
     @child 'lockIconView', '[data-view=lock-icon]'
 
@@ -104,9 +104,10 @@ define [
 
       @moveTrayProps =
         title: I18n.t('Move Discussion')
-        item:
+        items: [
           id: @model.get('id')
           title: @model.get('title')
+        ]
         moveOptions:
           siblings: MoveItem.backbone.collectionToItems(@model.collection)
         focusOnExit: (item) => document.querySelector(".discussion[data-id=\"#{item.id}\"] .al-trigger")
@@ -192,7 +193,7 @@ define [
       @model.collection.models[current_index - 1]
 
     focusOnModel: (discussionTopic) =>
-      $("##{discussionTopic.id}_discussion_content").attr("tabindex",-1).focus()
+      $("##{discussionTopic.id}_discussion_content .discussion-title-link").focus()
 
     # Public: Pin or unpin the model and update it on the server.
     #
@@ -230,7 +231,7 @@ define [
       if @model.get('locked') and !_.intersection(ENV.current_user_roles, ['teacher', 'ta', 'admin']).length
         base.permissions.delete = false
 
-      if base.last_reply_at
+      if base.last_reply_at and base.discussion_subentry_count > 0
         base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
       base.ENV = ENV
       base.discussion_topic_menu_tools = ENV.discussion_topic_menu_tools

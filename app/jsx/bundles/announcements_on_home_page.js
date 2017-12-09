@@ -27,7 +27,7 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
   const container = document.querySelector('#announcements_on_home_page')
   ReactDOM.render(<Spinner title={I18n.t('Loading Announcements')} size="small" />, container)
 
-  const url = `/api/v1/announcements?context_codes[]=course_${ENV.ANNOUNCEMENT_COURSE_ID}&per_page=${ENV.ANNOUNCEMENT_LIMIT || 3}&page=1&start_date=1900-01-01&end_date=${new Date().toISOString()}&active_only=true&text_only=true`
+  const url = '/api/v1/announcements'
 
   const presentAnnouncement = a => ({
     id: a.id,
@@ -37,7 +37,16 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
     url: a.url
   })
 
-  axios.get(url).then(response =>
+  const params = {
+    'context_codes[]': `course_${ENV.ANNOUNCEMENT_COURSE_ID}`,
+    per_page: (ENV.ANNOUNCEMENT_LIMIT || 3),
+    page: '1',
+    start_date: '1900-01-01',
+    end_date: new Date().toISOString(),
+    active_only: true
+  }
+
+  axios.get(url, { params }).then(response =>
     ReactDOM.render(<AnnouncementList announcements={response.data.map(presentAnnouncement)} />, container)
   )
 }

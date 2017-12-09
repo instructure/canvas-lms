@@ -241,6 +241,10 @@ class CourseSection < ActiveRecord::Base
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
       old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?
     end
+
+    # generate submissions in the new course for the students being cross-listed
+    DueDateCacher.recompute_course(course)
+
     if opts.include?(:run_jobs_immediately)
       course.recompute_student_scores_without_send_later(user_ids)
     else

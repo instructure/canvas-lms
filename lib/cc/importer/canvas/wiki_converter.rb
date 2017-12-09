@@ -22,7 +22,7 @@ module CC::Importer::Canvas
     def convert_wikis
       wikis = []
 
-      wiki_dir = File.join(@unzipped_file_path, WIKI_FOLDER)
+      wiki_dir = @package_root.item_path(WIKI_FOLDER)
       Dir["#{wiki_dir}/**/**"].each do |path|
         next if File.directory?(path)
         doc = open_file(path)

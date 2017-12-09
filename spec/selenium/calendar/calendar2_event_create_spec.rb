@@ -50,7 +50,7 @@ describe "calendar2" do
         expect(fj('.event-details-content:visible')).to include_text('location title')
       end
 
-      it 'should create an event with location name and address' do
+      it 'should create an event with name and address' do
         get "/calendar2"
         event_title = 'event title'
         location_name = 'my house'
@@ -69,11 +69,9 @@ describe "calendar2" do
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
         # submit_form makes the spec fragile
-        expect_new_page_load { f('#editCalendarEventFull').submit }
-        fj('.fc-event:visible').click
-        event_content = fj('.event-details-content:visible')
-        expect(event_content).to include_text(location_name)
-        expect(event_content).to include_text(location_address)
+        f('#editCalendarEventFull').submit
+        expect(CalendarEvent.last.location_name).to eq location_name
+        expect(CalendarEvent.last.location_address).to eq location_address
       end
 
       it "should go to calendar event modal when a syllabus link is clicked", priority: "1", test_id: 186581 do
@@ -101,7 +99,7 @@ describe "calendar2" do
         expect(event.title).to eq event_name
       end
 
-      it "should create a recurring event", priority: "1", test_id: 223510 do
+      it "should create an event that is recurring", priority: "1", test_id: 223510 do
         Account.default.enable_feature!(:recurring_calendar_events)
         make_full_screen
         get '/calendar2'
@@ -117,6 +115,7 @@ describe "calendar2" do
         replace_content(f("input[type=text][name= 'end_time']"), "6:00pm")
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
+        wait_for_tiny(f(".mce-edit-area"))
         expect(f('.title')).to have_value "Test Event"
         move_to_click('#duplicate_event')
         replace_content(f("input[type=number][name='duplicate_count']"), 2)
@@ -183,6 +182,7 @@ describe "calendar2" do
 
         get "/courses/#{@course.id}/calendar_events/new"
         wait_for_ajaximations
+        wait_for_tiny(f(".mce-edit-area"))
         f('#use_section_dates').click
 
         num_rows = ff(".show_if_using_sections .row_header").length
@@ -242,6 +242,48 @@ describe "calendar2" do
         expect(event_content.find_element(:css, '.event-details-timestring').text).
           to eq format_date_for_view(Time.zone.now, :short)
         expect(event_content).to contain_link('Course 1')
+      end
+    end
+
+    context "edit to-do event" do
+      before :once do
+        @to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "A new to do")
+      end
+
+      it "respects the calendars checkboxes" do
+        get "/calendar2"
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
+
+        # turn it off
+        f("span.group_user_#{@student1.id}").click
+        expect(f('.fc-view-container')).not_to contain_css('.fc-content .fc-title')
+        # turn it back on
+        f("span.group_user_#{@student1.id}").click
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
+
+
+        # click to edit
+        f(".fc-event-container a.group_user_#{@student1.id}").click
+        # detial popup is displayed
+        expect(f('.event-details .event-details-header h3')).to include_text(@to_do.title)
+        # click edit button
+        f("button.event_button.edit_event_link").click
+        expect(f('#planner_note_context')).to be_displayed
+        # change the calendar
+        select_list = f('#planner_note_context')
+        options=select_list.find_elements(:tag_name => "option")
+        options[1].click
+        # save
+        scroll_into_view('#edit_planner_note_form_holder button[type="submit"]')
+        f('#edit_planner_note_form_holder button[type="submit"]').click
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
+
+        # turn it off
+        f("span.group_course_#{@course.id}").click
+        expect(f('.fc-view-container')).not_to contain_css('.fc-content .fc-title')
+        # turn it back on
+        f("span.group_course_#{@course.id}").click
+        expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
       end
     end
   end

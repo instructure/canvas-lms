@@ -53,6 +53,7 @@ export default class SubmissionStatus extends React.Component {
       muted: bool.isRequired,
       published: bool.isRequired
     }).isRequired,
+    isConcluded: bool.isRequired,
     isInClosedGradingPeriod: bool.isRequired,
     isInNoGradingPeriod: bool.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
@@ -98,6 +99,16 @@ export default class SubmissionStatus extends React.Component {
     const statusNotificationContainerStyle = {
       display: 'flex'
     };
+
+    if (this.props.isConcluded) {
+      const concludedEnrollmentStatusMessage = I18n.t("This student's enrollment has been concluded.")
+
+      statusNotificationComponents.push(
+        <div key="concluded-enrollment-status" style={statusNotificationContainerStyle}>
+          {renderWarning(concludedEnrollmentStatusMessage)}
+        </div>
+      );
+    }
 
     const gradingPeriodStatusMessage = this.gradingPeriodStatusMessage();
     if (gradingPeriodStatusMessage) {

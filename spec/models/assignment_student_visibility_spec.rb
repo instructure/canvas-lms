@@ -299,7 +299,7 @@ describe "differentiated_assignments" do
 
           it "should not keep the assignment visible even if there is a grade" do
             @assignment.grade_student(@user, grade: 10, grader: @teacher)
-            Score.where(enrollment_id: @user.enrollments).delete_all
+            Score.where(enrollment_id: @user.enrollments).each(&:destroy_permanently!)
             @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_does_not_see_assignment
@@ -307,7 +307,7 @@ describe "differentiated_assignments" do
 
           it "should not keep the assignment visible if there is no grade" do
             @assignment.grade_student(@user, grade: nil, grader: @teacher)
-            Score.where(enrollment_id: @user.enrollments).delete_all
+            Score.where(enrollment_id: @user.enrollments).each(&:destroy_permanently!)
             @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_does_not_see_assignment
@@ -315,7 +315,7 @@ describe "differentiated_assignments" do
 
           it "should not keep the assignment visible even if the grade is zero" do
             @assignment.grade_student(@user, grade: 0, grader: @teacher)
-            Score.where(enrollment_id: @user.enrollments).delete_all
+            Score.where(enrollment_id: @user.enrollments).each(&:destroy_permanently!)
             @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_does_not_see_assignment

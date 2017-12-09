@@ -46,3 +46,7 @@ table.details {
     text-align: left;
   }
 }
+
+tr.enrollment td, tr#priveleges td {
+  vertical-align: top;
+}

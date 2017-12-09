@@ -38,7 +38,7 @@ module CC::Importer::Canvas
     end
 
     def convert_file_metadata(file_map)
-      path = File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, FILES_META)
+      path = @package_root.item_path(COURSE_SETTINGS_DIR, FILES_META)
       return unless File.exist? path
       doc = open_file_xml path
 

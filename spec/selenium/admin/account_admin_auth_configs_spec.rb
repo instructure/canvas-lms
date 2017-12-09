@@ -96,6 +96,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "1", test_id: 250264 do
+        skip_if_safari(:alert)
         add_ldap_config
         f("#delete-aac-#{ldap_aac.active.last.id}").click
         accept_alert
@@ -112,6 +113,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of multiple configs', priority: "2", test_id: 250265 do
+        skip_if_safari(:alert)
         add_ldap_config(1)
         add_ldap_config(2)
         keep_trying_until { expect(ldap_aac.active.count).to eq 2 }
@@ -168,6 +170,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "1", test_id: 250268 do
+        skip_if_safari(:alert)
         add_saml_config
         expect { saml_aac.active.count }.to become 1
         f("#delete-aac-#{saml_aac.active.last.id}").click
@@ -365,6 +368,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "1", test_id: 250274 do
+        skip_if_safari(:alert)
         add_cas_config
         f("#delete-aac-#{cas_aac.active.last.id}").click
         accept_alert
@@ -401,6 +405,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250277 do
+        skip_if_safari(:alert)
         add_facebook_config
         f("#delete-aac-#{facebook_aac.active.last.id}").click
         accept_alert
@@ -441,6 +446,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250280 do
+        skip_if_safari(:alert)
         add_github_config
         f("#delete-aac-#{github_aac.active.last.id}").click
         accept_alert
@@ -478,6 +484,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250283 do
+        skip_if_safari(:alert)
         add_google_config
         f("#delete-aac-#{google_aac.active.last.id}").click
         accept_alert
@@ -515,6 +522,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250286 do
+        skip_if_safari(:alert)
         add_linkedin_config
         f("#delete-aac-#{linkedin_aac.active.last.id}").click
         accept_alert
@@ -561,6 +569,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250289 do
+        skip_if_safari(:alert)
         add_openid_connect_config
         f("#delete-aac-#{openid_aac.active.last.id}").click
         accept_alert
@@ -598,6 +607,7 @@ describe 'account authentication' do
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250292 do
+        skip_if_safari(:alert)
         add_twitter_config
         f("#delete-aac-#{twitter_aac.active.last.id}").click
         accept_alert

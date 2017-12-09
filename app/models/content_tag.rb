@@ -26,6 +26,10 @@ class ContentTag < ActiveRecord::Base
 
   include Workflow
   include SearchTermHelper
+
+  include MasterCourses::Restrictor
+  restrict_columns :state, [:workflow_state]
+
   belongs_to :content, polymorphic: [], exhaustive: false
   validates_inclusion_of :content_type, :allow_nil => true, :in => CONTENT_TYPES
   belongs_to :context, polymorphic:

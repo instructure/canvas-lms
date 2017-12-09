@@ -22,6 +22,7 @@ describe "Gradebook History Page" do
   include_context "in-process server selenium tests"
   include GradebookSetup
   include CustomScreenActions
+  include CustomSeleniumActions
 
   before(:once) do
     # create course with teacher
@@ -47,8 +48,7 @@ describe "Gradebook History Page" do
       GradeBookHistory.enter_end_date('invalid date')
       GradeBookHistory.enter_end_date(:tab)
       filter_button_updated=GradeBookHistory.filter_button_for_aria
-      aria_disabled_attribute_value = filter_button_updated.attribute('aria-disabled')
-      expect(aria_disabled_attribute_value).to eq('true')
-     end
+      expect(element_value_for_attr(filter_button_updated,'aria-disabled')).to eq('true')
+    end
   end
 end

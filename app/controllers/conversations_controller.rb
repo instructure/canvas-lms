@@ -910,7 +910,7 @@ class ConversationsController < ApplicationController
         return render :json => [], :status => :accepted
       end
     else
-      render :json => {}, :status => :bad_reqquest
+      render :json => {}, :status => :bad_request
     end
   end
 

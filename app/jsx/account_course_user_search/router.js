@@ -17,27 +17,26 @@
  */
 
 import page from 'page'
+import {parse} from 'qs'
 import TabActions from './actions/TabActions'
 
+export default {
+  start(store) {
+    const tabList = store.getState().tabList
 
-  const router = {
-    start: (store) => {
-      const tabList = store.getState().tabList;
+    page.base(tabList.basePath)
 
-      page.base(tabList.basePath);
+    tabList.tabs.forEach((tab, i) => {
+      page(tab.path, context => {
+        store.dispatch(
+          TabActions.selectTab({
+            selected: i,
+            queryParams: parse(context.querystring)
+          })
+        )
+      })
+    })
 
-      tabList.tabs.forEach((tab, i) => {
-        page(tab.path, (ctx) => {
-          store.dispatch(TabActions.selectTab( i ));
-        });
-      });
-
-      if (tabList.tabs.length)
-        page('/', tabList.tabs[0].path);
-
-      page.start();
-    }
-  };
-
-
-export default router
+    page.start()
+  }
+}

@@ -140,6 +140,7 @@ class GroupsController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Group
   include Api::V1::GroupCategory
+  include Context
 
   SETTABLE_GROUP_ATTRIBUTES = %w(
     name description join_level is_public group_category avatar_attachment
@@ -313,9 +314,12 @@ class GroupsController < ApplicationController
         if value_to_boolean(params[:only_own_groups])
           all_groups = all_groups.merge(@current_user.current_groups)
         end
-
         @paginated_groups = Api.paginate(all_groups, self, path)
-        render :json => @paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
+        render :json => @paginated_groups.map { |g|
+          include_inactive_users = value_to_boolean(params[:include_inactive_users])
+          group_json(g, @current_user, session, :include => Array(params[:include]),
+                     :include_inactive_users => include_inactive_users)
+        }
       end
     end
   end
@@ -691,8 +695,33 @@ class GroupsController < ApplicationController
       users = UserSearch.scope_for(@context, @current_user)
     end
 
+    includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
-    render :json => users_json(users, @current_user, session, Array(params[:include]), @context, nil, Array(params[:exclude]))
+    json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
+
+    if includes.include? 'group_submissions'
+      assignments = @context.group_category.assignments.active
+      submissions = Submission.active.where(assignment_id: assignments, workflow_state: 'submitted').select(:id, :user_id)
+      submissions_by_user = submissions.each_with_object({}) do |sub, obj|
+        obj[sub.user_id] = (obj[sub.user_id] || []).push(sub.id)
+      end
+
+      json_users.each do |user|
+        user[:group_submissions] = submissions_by_user[user[:id]]
+      end
+    end
+
+    if (includes.include? 'active_status') && (@context.context.is_a? Course)
+      user_ids = users.pluck('id')
+      enrollments = Enrollment.where(user_id: user_ids, course_id: @context.context_id)
+
+      inactive_students = enrollments.select(&:inactive?).pluck('user_id').to_set
+      json_users.each do |user|
+        user[:is_inactive] = inactive_students.include?(user[:id])
+      end
+    end
+
+    render :json => json_users
   end
 
   def public_feed

@@ -17,18 +17,10 @@
  */
 
 
-  function permissionFilter(items, perms) {
-    return items.filter(item => {
-      let keep = true;
-
-      if (item.permissions && item.permissions.length) {
-        keep = item.permissions.reduce((prevPerm, curPerm) => {
-          return prevPerm && perms[curPerm];
-        }, keep);
-      }
-
-      return keep;
-    });
-  };
-
-export default permissionFilter
+/**
+ * filters `items` to just the ones who don't require any unavailable permissions.
+ */
+export default (items, availablePermissions) => {
+  const permissionIsAvailable = p => availablePermissions[p]
+  return items.filter(item => (item.permissions || []).every(permissionIsAvailable))
+}

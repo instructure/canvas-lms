@@ -149,9 +149,9 @@ describe CoursesHelper do
     end
 
     it "should not raise an error when passing a numeric type but grading_type is not 'points'" do
-      submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded')
-      submission.create_assignment(:points_possible => 5)
-      expect(readable_grade(submission)).to eq '1.33333333'
+      submission = Submission.new(grade: 1.33333333, workflow_state: 'graded')
+      submission.create_assignment(points_possible: 5, grading_type: 'percent')
+      expect(readable_grade(submission)).to eq '1.33333%'
     end
   end
 

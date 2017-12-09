@@ -291,6 +291,15 @@ describe SIS::CSV::UserImporter do
     expect(user2.pseudonym.integration_id).to be_nil
   end
 
+  it "should recognize a blank integration_id and still work" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status,ssha_password,integration_id",
+      "user_2,user2,User,Dos,user@example.com,active,#{gen_ssha_password("password")},\"\""
+    )
+    user2 = Pseudonym.by_unique_id('user2').first.user
+    expect(user2.pseudonym.integration_id).to be_nil
+  end
+
   it "should not set integration_id to nil when it is not passed" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status,integration_id",

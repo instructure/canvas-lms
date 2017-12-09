@@ -1496,6 +1496,7 @@ describe UsersController do
       new_user1 = User.where(:name => 'example1@example.com').first
       new_user2 = User.where(:name => 'Hurp Durp').first
       expect(json['invited_users'].map{|u| u['id']}).to match_array([new_user1.id, new_user2.id])
+      expect(json['invited_users'].map{|u| u['user_token']}).to match_array([new_user1.token, new_user2.token])
     end
 
     it 'checks for pre-existing users' do
@@ -1513,6 +1514,7 @@ describe UsersController do
       expect(json['invited_users']).to be_empty
       expect(json['errored_users'].count).to eq 1
       expect(json['errored_users'].first['existing_users'].first['user_id']).to eq existing_user.id
+      expect(json['errored_users'].first['existing_users'].first['user_token']).to eq existing_user.token
     end
   end
 

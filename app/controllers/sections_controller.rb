@@ -118,7 +118,7 @@ class SectionsController < ApplicationController
       unless params[:all].present?
         sections = Api.paginate(sections, self, api_v1_course_sections_url)
       end
-      
+
       render :json => sections_json(sections, @current_user, session, includes)
     end
   end
@@ -243,7 +243,10 @@ class SectionsController < ApplicationController
   #   The name of the section
   #
   # @argument course_section[sis_section_id] [String]
-  #   The sis ID of the section
+  #   The sis ID of the section. Must have manage_sis permission to set.
+  #
+  # @argument course_section[integration_id] [String]
+  #   The integration_id of the section. Must have manage_sis permission to set.
   #
   # @argument course_section[start_at] [DateTime]
   #   Section start date in ISO8601 format, e.g. 2011-01-01T01:00Z
@@ -259,15 +262,17 @@ class SectionsController < ApplicationController
     params[:course_section] ||= {}
     if authorized_action(@section, @current_user, :update)
       params[:course_section][:sis_source_id] = params[:course_section].delete(:sis_section_id) if api_request?
-      if sis_id = params[:course_section].delete(:sis_source_id)
-        if sis_id != @section.sis_source_id && @section.root_account.grants_right?(@current_user, session, :manage_sis)
-          if sis_id == ''
-            @section.sis_source_id = nil
-          else
-            @section.sis_source_id = sis_id
-          end
+      sis_id = params[:course_section].delete(:sis_source_id)
+      integration_id = params[:course_section].delete(:integration_id)
+      if sis_id || integration_id
+        if @section.root_account.grants_right?(@current_user, :manage_sis)
+          @section.sis_source_id = (sis_id == '') ?  nil : sis_id if sis_id
+          @section.integration_id = (integration_id == '') ?  nil : integration_id if integration_id
+        else
+          return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized if api_request?
         end
       end
+
       respond_to do |format|
         if @section.update_attributes(course_section_params)
           @context.touch

@@ -477,7 +477,7 @@ class Gradezilla
         menu_item(INDIVIDUAL_VIEW_ITEM_SELECTOR).click
       elsif menu_item_name == "Learning Mastery"
         menu_item(LEARING_MASTERY_ITEM_SELECTOR).click
-      elsif menu_item_name == "Grading History"
+      elsif menu_item_name == "Gradebook History"
         menu_item(GRADE_HISTORY_ITEM_SELECTOR).click
       end
     end

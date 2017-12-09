@@ -48,6 +48,7 @@ describe 'quizzes stats' do
 
     context 'teacher preview' do
       it 'should not show a quiz stats button if there was a teacher preview', priority: "2", test_id: 140645 do
+        skip_if_safari(:alert)
         quiz_with_new_questions(!:goto_edit)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 

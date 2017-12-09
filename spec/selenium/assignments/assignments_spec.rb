@@ -602,6 +602,7 @@ describe "assignments" do
     # This should be part of a spec that follows a critical path through
     #  the draft state index page, but does not need to be a lone wolf
     it "should delete assignments", priority: "1", test_id: 647609 do
+      skip_if_safari(:alert)
       ag = @course.assignment_groups.first
       as = @course.assignments.create({:assignment_group => ag})
 

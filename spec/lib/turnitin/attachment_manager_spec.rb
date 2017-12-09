@@ -43,6 +43,24 @@ module Turnitin
 
     end
 
+    describe 'invalid response' do
+      let(:response_mock) do
+        r_mock = double('response')
+        allow(r_mock).to receive(:headers).
+          and_return({
+                       'content-disposition' => nil,
+                       'content-type' => 'plain/text'
+                     })
+        allow(r_mock).to receive(:body).and_return('abcdef')
+        r_mock
+      end
+
+      it 'does not crash when there is no content-disposition' do
+        subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
+        expect(lti_assignment.attachments.first.display_name).to eq 'default_filename.txt'
+      end
+    end
+
     describe '.update_attachment' do
       let(:submission) do
         sub = lti_assignment.submit_homework(

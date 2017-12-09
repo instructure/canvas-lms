@@ -60,7 +60,7 @@ module Canvas::Migration
         zip_file.read(nest_entry_if_needed(entry))
       else
         unzip_archive
-        path = File.join(self.unzipped_file_path, entry)
+        path = package_root.item_path(entry)
         File.exist?(path) && File.read(path)
       end
     end
@@ -72,7 +72,7 @@ module Canvas::Migration
         # if it's not an actual zip file
         # just extract the package (or try to) and look for the file
         unzip_archive
-        File.exist?(File.join(self.unzipped_file_path, entry))
+        File.exist?(package_root.item_path(entry))
       end
     end
 
@@ -109,6 +109,10 @@ module Canvas::Migration
       @unzipped_file_path
     end
 
+    def package_root
+      @package_root ||= PackageRoot.new(self.unzipped_file_path)
+    end
+
     def get_converter
       Canvas::Migration::PackageIdentifier.new(self).get_converter
     end
@@ -140,7 +144,7 @@ module Canvas::Migration
     # it into the directory with the given file name
     def prepare_cartridge_file(file_name='imsmanifest.xml')
       if self.path.ends_with?('xml')
-        FileUtils::cp(self.path, File.join(self.unzipped_file_path, file_name))
+        FileUtils::cp(self.path, package_root.item_path(file_name))
       else
         unzip_archive
       end

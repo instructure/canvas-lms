@@ -358,10 +358,12 @@ class CommunicationChannelsController < ApplicationController
           valid = @pseudonym.valid?
           valid = @user.valid? && valid # don't want to short-circuit, since we are interested in the errors
           unless valid
+            ps_errors = @pseudonym.errors.as_json[:errors]
+            ps_errors.delete(:password_confirmation) unless params[:pseudonym][:password_confirmation]
             return render :json => {
                             :errors => {
                               :user => @user.errors.as_json[:errors],
-                              :pseudonym => @pseudonym.errors.as_json[:errors]
+                              :pseudonym => ps_errors
                             }
                           }, :status => :bad_request
           end

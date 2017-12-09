@@ -55,7 +55,7 @@ class AssignmentsController < ApplicationController
       set_tutorial_js_env
       hash = {
         WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
-        POST_TO_SIS_DEFAULT: Assignment.sis_grade_export_enabled?(@context),
+        POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
         SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
@@ -164,7 +164,14 @@ class AssignmentsController < ApplicationController
       @similarity_pledge = pledge_text
 
       respond_to do |format|
-        format.html { render }
+        format.html do
+          render locals: {
+            eula_url: @assignment.tool_settings_tool
+                      &.try(:tool_proxy)
+                      &.find_service(Assignment::Lti::EULA_SERVICE, 'GET')
+                      &.endpoint
+          }
+        end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end
@@ -398,9 +405,7 @@ class AssignmentsController < ApplicationController
     @assignment.workflow_state = 'unpublished'
     add_crumb t "Create new"
 
-    if params[:submission_types] == 'online_quiz'
-      redirect_to new_course_quiz_url(@context, index_edit_params)
-    elsif params[:submission_types] == 'discussion_topic'
+    if params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
     elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == 'wiki_page'
       redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
@@ -453,7 +458,6 @@ class AssignmentsController < ApplicationController
       end
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
-
       hash = {
         ASSIGNMENT_GROUPS: json_for_assignment_groups,
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
@@ -466,7 +470,10 @@ class AssignmentsController < ApplicationController
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
         HAS_GRADING_PERIODS: @context.grading_periods?,
-        PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
+        PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
+          @assignment.course,
+          Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2
+        ),
         POST_TO_SIS: post_to_sis,
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         SECTION_LIST: @context.course_sections.active.map do |section|

@@ -22,6 +22,18 @@ module Types
       "when this assignment is due",
       property: :due_at
 
+    field :quiz, Types::QuizType, resolve: -> (assignment, _, _) {
+      Loaders::AssociationLoader.for(Assignment, :quiz)
+        .load(assignment)
+        .then { assignment.quiz }
+    }
+
+    field :discussion, Types::DiscussionType, resolve: -> (assignment, _, _) {
+      Loaders::AssociationLoader.for(Assignment, :discussion_topic)
+        .load(assignment)
+        .then { assignment.discussion_topic }
+    }
+
     field :htmlUrl, UrlType, resolve: ->(assignment, _, ctx) {
       Rails.application.routes.url_helpers.course_assignment_url(
         course_id: assignment.context_id,

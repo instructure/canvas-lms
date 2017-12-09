@@ -198,6 +198,18 @@ module Context
     nil
   end
 
+  def self.asset_name(asset)
+    if asset.respond_to?(:display_name)
+      asset.display_name
+    elsif asset.respond_to?(:title)
+      asset.title
+     elsif asset.respond_to?(:short_description)
+      asset.short_description
+    else
+      asset.name
+    end
+  end
+
   def self.get_account(context)
     case context
     when Account

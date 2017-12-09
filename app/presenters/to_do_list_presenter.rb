@@ -55,7 +55,7 @@ class ToDoListPresenter
   end
 
   def ungraded_quizzes_needing_submitting
-    @user.ungraded_quizzes_needing_submitting(contexts: @contexts, limit: ASSIGNMENT_LIMIT).map do |quiz|
+    @user.ungraded_quizzes(contexts: @contexts, limit: ASSIGNMENT_LIMIT, :needing_submitting => true).map do |quiz|
       AssignmentPresenter.new(@view, quiz, @user, :submitting)
     end
   end

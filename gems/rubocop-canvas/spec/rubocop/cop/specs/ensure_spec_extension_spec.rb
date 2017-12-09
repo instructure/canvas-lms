@@ -25,7 +25,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
 
     context "top level context" do
       it 'does not warn for *_spec.rb extension' do
-        inspect_source(cop, %{
+        inspect_source(%{
           context AccountAuthorizationConfig::BlueDragoon do
             describe '#fire' do
               it 'rains fire' do
@@ -40,7 +40,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
 
     context "top level describe" do
       it 'does not warn for *_spec.rb extension' do
-        inspect_source(cop, %{
+        inspect_source(%{
           describe AccountAuthorizationConfig::GreenDragoon do
             describe '#green' do
               it 'smells bad' do
@@ -61,7 +61,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
 
     context "top level context" do
       it 'warns for *_spec.rb extension' do
-        inspect_source(cop, %{
+        inspect_source(%{
           context AccountAuthorizationConfig::BlueDragoon do
             describe '#fire' do
               it 'rains fire' do
@@ -78,7 +78,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
 
     context "top level describe" do
       it 'warns for *_spec.rb extension' do
-        inspect_source(cop, %{
+        inspect_source(%{
           describe AccountAuthorizationConfig::GreenDragoon do
             describe '#green' do
               it 'smells bad' do

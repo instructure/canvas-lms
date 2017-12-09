@@ -23,13 +23,13 @@ class AssessmentTestConverter
   include HtmlHelper
   DEFAULT_POINTS_POSSIBLE = 1
 
-  attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :quiz
+  attr_reader :package_root, :identifier, :href, :interaction_type, :title, :quiz
 
   def initialize(manifest_node, base_dir, opts={})
     @log = Canvas::Migration::logger
     @manifest_node = manifest_node
-    @base_dir = base_dir
-    @href = File.join(@base_dir, @manifest_node['href'])
+    @package_root = PackageRoot.new(base_dir)
+    @href = @package_root.item_path(@manifest_node['href'])
     @converted_questions = opts[:converted_questions]
     @opts = opts
 

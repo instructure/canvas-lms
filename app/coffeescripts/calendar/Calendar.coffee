@@ -542,6 +542,7 @@ define [
         # need to update the appointmentGroupEventStatus to make sure it
         # correctly displays the new status in the calendar.
         parentEvent.appointmentGroupEventStatus = parentEvent.calculateAppointmentGroupEventStatus()
+        @dataSource.removeCachedReservation(event.calendarEvent)
 
         @refetchEvents()
 

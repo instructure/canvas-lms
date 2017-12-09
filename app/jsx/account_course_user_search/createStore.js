@@ -18,171 +18,165 @@
 
 import $ from 'jquery'
 import createStore from 'jsx/shared/helpers/createStore'
-import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import parseLinkHeader from 'parse-link-header'
 import _ from 'underscore'
 import 'jquery.ajaxJSON'
 
-  /**
-   * Build a store that support basic ajax fetching (first, next, all),
-   * and caches the results by params.
-   *
-   * You only need to implement getUrl, and can optionally implement
-   * normalizeParams and jsonKey
-   */
-  var factory = function(spec) {
-    return _.extend(createStore(), {
-      /**
-       * Get a blank state in the store; useful when mounting the top-
-       * level component that uses the store
-       *
-       * @param {any} context
-       *        User-defined data you can use later on in normalizeParams
-       *        and getUrl; will be available as `this.context`
-       */
-      reset(context) {
-        this.clearState();
-        this.context = context;
-      },
+const getNextUrl = obj =>
+  obj &&
+  obj.links &&
+  obj.links.next &&
+  obj.links.next.url
 
-      getKey(params) {
-        return JSON.stringify(params || {});
-      },
+/**
+ * Build a store that support basic ajax fetching (first, next, all),
+ * and caches the results by params.
+ *
+ * You only need to implement getUrl, and can optionally implement
+ * normalizeParams and jsonKey
+ */
+export default function factory(spec) {
+  return _.extend(createStore(), {
+    /**
+     * Get a blank state in the store; useful when mounting the top-
+     * level component that uses the store
+     *
+     * @param {any} context
+     *        User-defined data you can use later on in normalizeParams
+     *        and getUrl; will be available as `this.context`
+     */
+    reset(context) {
+      this.clearState()
+      this.context = context
+    },
 
-      normalizeParams(params) {
-        return params;
-      },
+    getKey: params => JSON.stringify(params || {}),
+    normalizeParams: params => params,
 
-      getUrl() {
-        throw "not implemented"
-      },
+    getUrl() {
+      throw new Error('not implemented')
+    },
 
-      /**
-       * If the API response is an object instead of an array, use this
-       * to specify the key containing the actual array of results
-       */
-      jsonKey: null,
+    /**
+     * If the API response is an object instead of an array, use this
+     * to specify the key containing the actual array of results
+     */
+    jsonKey: null,
 
-      /**
-       * Load the first page of data for the given params
-       */
-      load(params) {
-        var key = this.getKey(params);
-        this.lastParams = params;
-        var params = this.normalizeParams(params);
-        var url = this.getUrl();
-        var state = this.getState()[key] || {};
+    /**
+     * Load the first page of data for the given params
+     */
+    load(params) {
+      const key = this.getKey(params)
+      this.lastParams = params
+      const normalizedParams = this.normalizeParams(params)
+      const url = this.getUrl()
 
-        return this._load(key, url, params);
-      },
+      return this._load(key, url, normalizedParams)
+    },
 
-      /**
-       * Create a record; since we're lazy, just blow away all the store
-       * data, but reload the last thing we fetched
-       */
-      create(params) {
-        var url = this.getUrl();
-        return $.ajaxJSON(url, "POST", this.normalizeParams(params)).then(() => {
-          this.clearState();
-          if (this.lastParams)
-            this.load(this.lastParams);
-        });
-      },
+    /**
+     * Create a record; since we're lazy, just blow away all the store
+     * data, but reload the last thing we fetched
+     */
+    create(params) {
+      const url = this.getUrl()
+      return $.ajaxJSON(url, 'POST', this.normalizeParams(params)).then(() => {
+        this.clearState()
+        if (this.lastParams) this.load(this.lastParams)
+      })
+    },
 
-      /**
-       * Load the next page of data for the given params
-       */
-      loadMore(params) {
-        var key = this.getKey(params);
-        this.lastParams = params;
-        var state = this.getState()[key] || {};
+    /**
+     * Load the next page of data for the given params
+     */
+    loadMore(params) {
+      const key = this.getKey(params)
+      this.lastParams = params
+      const nextUrl = getNextUrl(this.getStateFor(key))
+      if (!nextUrl) return
 
-        if (!state.next) return;
+      return this._load(key, nextUrl, {}, {append: true})
+    },
 
-        return this._load(key, state.next, {}, {append: true});
-      },
+    loadPage(page, params) {
+      const key = this.getKey(params)
+      this.lastParams = params
+      return this._load(key, page  )
+    },
 
-      /**
-       * Load data from the endpoint, following `next` links until
-       * everything has been fetched. Don't be dumb and call this
-       * on users or something :P
-       */
-      loadAll(params, append) {
-        var key = this.getKey(params);
-        var params = this.normalizeParams(params);
-        this.lastParams = params;
-        var url = this.getUrl();
-        this._loadAll(key, url, params, append);
-      },
+    /**
+     * Load data from the endpoint, following `next` links until
+     * everything has been fetched. Don't be dumb and call this
+     * on users or something :P
+     */
+    loadAll(params, append) {
+      const key = this.getKey(params)
+      const normalizedParams = this.lastParams = this.normalizeParams(params)
+      const url = this.getUrl()
+      this._loadAll(key, url, normalizedParams, append)
+    },
 
-      _loadAll(key, url, params, append) {
-        var promise = this._load(key, url, params, {append});
-        if (!promise) return;
+    _loadAll(key, url, params, append) {
+      const promise = this._load(key, url, params, {append})
+      if (!promise) return
 
-        promise.then(() => {
-          var state = this.getState()[key] || {};
-          if (state.next) {
-            this._loadAll(key, state.next, {}, true);
-          }
-        });
-      },
+      promise.then(() => {
+        const nextUrl = getNextUrl(this.getStateFor(key))
+        if (nextUrl) this._loadAll(key, nextUrl, {}, true)
+      })
+    },
 
-      _load(key, url, params, options) {
-        options = options || {};
-        this.mergeState(key, {loading: true});
+    _load(key, url, params, options={}) {
+      this.mergeState(key, {loading: true})
 
-        return $.ajaxJSON(url, "GET", params).then((data, _, xhr) => {
-          if (this.jsonKey) {
-            data = data[this.jsonKey];
-          }
-          if (options.wrap) {
-            data = [data];
-          }
-          if (options.append) {
-            data = (this.getStateFor(key).data || []).concat(data);
-          }
+      return $.ajaxJSON(url, 'GET', params).then((data, _textStatus, xhr) => {
+        if (this.jsonKey) data = data[this.jsonKey]
+        if (options.wrap) data = [data]
+        if (options.append) data = (this.getStateFor(key).data || []).concat(data)
 
-          var { next } = parseLinkHeader(xhr);
-          this.mergeState(key, { data, next, loading: false });
-        }, (xhr) => {
-          this.mergeState(key, { error: true, loading: false });
-        });
-      },
+        const links = parseLinkHeader(xhr.getResponseHeader('Link'))
+        this.mergeState(key, {data, links, loading: false})
+      }, () => {
+        this.mergeState(key, {error: true, loading: false})
+      })
+    },
 
-      getStateFor(key) {
-        return this.getState()[key] || {};
-      },
+    getStateFor(key) {
+      return this.getState()[key] || {}
+    },
 
-      mergeState(key, newState) {
-        var state = this.getState()[key] || {};
-        var overallState = {};
-        overallState[key] = _.extend({}, state, newState);
-        this.setState(overallState);
-      },
+    mergeState(key, newState) {
+      this.setState({
+        [key]: {
+          ...this.getStateFor(key),
+          ...newState
+        }
+      })
+    },
 
-      /**
-       * Return whatever results we have for the given params, as well as
-       * useful meta data.
-       *
-       * @return {Object}   obj
-       *
-       * @return {Object[]} obj.data
-       *         The actual data
-       *
-       * @return {Boolean}  obj.error
-       *         Indication of whether there was an error
-       *
-       * @return {Boolean}  obj.loading
-       *         Whether or not we are currently fetching data
-       *
-       * @return {String}   obj.next
-       *         A URL where we can retrieve the next page of data (if
-       *         there is more)
-       */
-      get(params) {
-        var key = this.getKey(params);
-        return this.getState()[key];
-      }
-    }, spec);
-  }
-
-export default factory
+    /**
+     * Return whatever results we have for the given params, as well as
+     * useful meta data.
+     *
+     * @return {Object}   obj
+     *
+     * @return {Object[]} obj.data
+     *         The actual data
+     *
+     * @return {Boolean}  obj.error
+     *         Indication of whether there was an error
+     *
+     * @return {Boolean}  obj.loading
+     *         Whether or not we are currently fetching data
+     *
+     * @return {String}   obj.next
+     *         A URL where we can retrieve the next page of data (if
+     *         there is more)
+     */
+    get(params) {
+      const key = this.getKey(params)
+      return this.getStateFor(key)
+    }
+  }, spec)
+}

@@ -124,6 +124,31 @@ describe GroupsController do
       expect(assigns[:paginated_groups][7].name).to eql("4.5")
       expect(assigns[:paginated_groups][8].name).to eql("44")
     end
+
+    it "don't filter out inactive students if json and param set" do
+      course_with_teacher(:active_all => true)
+      students = create_users_in_course(@course, 2, return_type: :record)
+      student1, student2 = students
+      category1 = @course.group_categories.create(:name => "category 1")
+      g = @course.groups.create(:name => "some group", :group_category => category1)
+      g.add_user(student1)
+      g.add_user(student2)
+      student2.enrollments.first.deactivate
+      user_session(student1)
+      get 'index', params: {:course_id => @course.id, :include => 'users',
+        :include_inactive_users => true}, format: :json
+      response_body = response.body.sub('while(1);', '')
+      parsed_json = JSON.parse response_body
+      expect(parsed_json.length).to eq 1
+      users_json = parsed_json.first["users"]
+      expect(users_json).not_to be_nil
+      expect(users_json.length).to eq 2
+      ids_json = users_json.map { |u| u["id"] }.to_set
+      expect(ids_json).to eq [student1.id, student2.id].to_set
+      names_json = users_json.map { |u| u["name"] }.to_set
+      expect(names_json).to eq [student1.name, student2.name].to_set
+      expect(response).to be_success
+    end
   end
 
   describe "GET index" do
@@ -667,6 +692,72 @@ describe GroupsController do
       @group.reload
       expect(@group.has_member?(@user)).to be_falsey
       expect(@group.group_memberships.where(:workflow_state => "invited").count).to eq 1
+    end
+  end
+
+  describe "GET users" do
+    before :each do
+      category = @course.group_categories.create(:name => "Study Groups")
+      @group = @course.groups.create(:name => "some group", :group_category => category)
+      @group.add_user(@student)
+
+      assignment = @course.assignments.create({
+        :name => "test assignment",
+        :group_category => category
+      })
+      file = Attachment.create! context: @student, filename: "homework.pdf", uploaded_data: StringIO.new("blah blah blah")
+      @sub = assignment.submit_homework(@student, attachments: [file], submission_type: "online_upload")
+      @json_prefix = 'while(1);'
+    end
+
+    it "should include group submissions if param is present" do
+      user_session(@teacher)
+      get 'users', params: {:group_id => @group.id, include: ['group_submissions']}
+      json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+
+      expect(response).to be_success
+      expect(json.count).to be_equal 1
+      expect(json[0]["group_submissions"][0]).to be_equal @sub.id
+    end
+
+    it "should not include group submissions if param is absent" do
+      user_session(@teacher)
+      get 'users', params: {:group_id => @group.id}
+      json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+
+      expect(response).to be_success
+      expect(json.count).to be_equal 1
+      expect(json[0]["group_submissions"]).to be_equal nil
+    end
+
+    describe "inactive students" do
+      before :once do
+        course_with_teacher(:active_all => true)
+        students = create_users_in_course(@course, 2, return_type: :record)
+        student1, student2 = students
+        category1 = @course.group_categories.create(:name => "category 1")
+        @group = @course.groups.create(:name => "some group", :group_category => category1)
+        @group.add_user(student1)
+        @group.add_user(student2)
+        student2.enrollments.first.deactivate
+      end
+
+      it "include active status if requested" do
+        user_session(@teacher)
+        get 'users', params: { :group_id => @group.id, include: ['active_status'] }
+        json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+        expect(json.length).to eq 2
+        expect(json.first['is_inactive']).to be_falsey
+        expect(json.second['is_inactive']).to be_truthy
+      end
+
+      it "don't include active status if not requested" do
+        user_session(@teacher)
+        get 'users', params: { :group_id => @group.id }
+        json = JSON.parse(response.body[@json_prefix.length, response.body.length])
+        expect(json.first['is_inactive']).to be_nil
+        expect(json.second['is_inactive']).to be_nil
+      end
     end
   end
 end

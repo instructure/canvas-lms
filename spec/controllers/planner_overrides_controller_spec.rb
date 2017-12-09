@@ -121,10 +121,12 @@ describe PlannerOverridesController do
 
             @c1 = course_with_student(:active_all => true, :user => @u).course
             @a1 = course_assignment
+            @pn1 = planner_note_model(:todo_date => 1.day.from_now, :course => @c1)
 
             @e2 = course_with_student(:active_all => true, :user => @u)
             @c2 = @e2.course
             @a2 = course_assignment
+            @pn2 = planner_note_model(:todo_date => 1.day.from_now, :course => @c2)
             @e2.conclude
           end
 
@@ -135,13 +137,21 @@ describe PlannerOverridesController do
           it "should not include objects from concluded courses by default" do
             get :items_index
             response_json = json_parse(response.body)
-            expect(response_json.map { |i| i["plannable"]["id"] }).not_to be_include(@a2.id)
+            items = response_json.map { |i|  [i["plannable_type"], i["plannable"]["id"]] }
+            expect(items).to include ['assignment', @a1.id]
+            expect(items).to include ['planner_note', @pn1.id]
+            expect(items).to_not include ['assignment', @a2.id]
+            expect(items).to_not include ['planner_note', @pn2.id]
           end
 
           it "should include objects from concluded courses if specified" do
             get :items_index, params: {include: %w{concluded}}
             response_json = json_parse(response.body)
-            expect(response_json.map { |i| i["plannable"]["id"] }).to be_include(@a2.id)
+            items = response_json.map { |i|  [i["plannable_type"], i["plannable"]["id"]] }
+            expect(items).to include ['assignment', @a1.id]
+            expect(items).to include ['planner_note', @pn1.id]
+            expect(items).to include ['assignment', @a2.id]
+            expect(items).to include ['planner_note', @pn2.id]
           end
         end
 

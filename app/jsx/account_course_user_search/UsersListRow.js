@@ -17,131 +17,102 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import {string, func, shape, bool} from 'prop-types'
+import Button from 'instructure-ui/lib/components/Button'
+import Tooltip from 'instructure-ui/lib/components/Tooltip'
+import IconMasqueradeLine from 'instructure-icons/lib/Line/IconMasqueradeLine'
+import IconMessageLine from 'instructure-icons/lib/Line/IconMessageLine'
+import IconEditLine from 'instructure-icons/lib/Line/IconEditLine'
 import I18n from 'i18n!account_course_user_search'
-import $ from 'jquery'
+import {datetimeString} from 'jquery.instructure_date_and_time'
 import EditUserDetailsDialog from 'jsx/shared/EditUserDetailsDialog'
-import 'jquery.instructure_date_and_time'
 
-const { object, string, func, shape, bool } = PropTypes
-
-  export default class UsersListRow extends React.Component {
-    static propTypes = {
-      accountId: string,
-      timezones: object.isRequired,
-      user: shape({
-        id: string.isRequired,
-        name: string.isRequired,
-        avatar_url: string,
-      }).isRequired,
-      handlers: shape({
-        handleOpenEditUserDialog: func,
-        handleSubmitEditUserForm: func,
-        handleCloseEditUserDialog: func
-      }).isRequired,
-      permissions: shape({
-        can_masquerade: bool,
-        can_message_users: bool,
-        can_edit_users: bool
-      }).isRequired
-    }
-
-    renderLinks () {
-      const links = [];
-      const { id, name } = this.props.user;
-      const { handleOpenEditUserDialog } = this.props.handlers;
-      if (this.props.permissions.can_masquerade) {
-        links.push(
-          <a
-            className="Button Button--icon-action user_actions_js_test"
-            key="masqueradeLink"
-            href={`/users/${id}/masquerade`}
-          >
-            <span className="screenreader-only">{I18n.t('Act as %{name}', {name})}</span>
-            <i className="icon-masquerade" aria-hidden="true"></i>
-          </a>
-        );
-      }
-
-      if (this.props.permissions.can_message_users) {
-        links.push(
-          <a
-            className="Button Button--icon-action user_actions_js_test"
-            key="messageUserLink"
-            href={`/conversations?user_name=${name}&user_id=${id}`}
-          >
-            <span className="screenreader-only">{I18n.t("Send message to %{name}", {name})}</span>
-            <i className="icon-message" aria-hidden="true"></i>
-          </a>
-        );
-      }
-
-      if (this.props.permissions.can_edit_users) {
-        links.push(
-          <button
-            className="Button Button--icon-action user_actions_js_test"
-            key="canEditUserLink"
-            onClick={handleOpenEditUserDialog.bind(null, this.props.user)}
-            type="button"
-          >
-            <span className="screenreader-only">{I18n.t("Edit %{name}", {name})}</span>
-            <i className="icon-edit" aria-hidden="true"></i>
-          </button>
-        );
-      }
-
-      return (
-        <div className="courses-user-list-actions">
-          {links}
-        </div>
-      );
-    }
-
-    render () {
-      const { id, name, sis_user_id, email, avatar_url, last_login, editUserDialogOpen } = this.props.user;
-      const { handleSubmitEditUserForm, handleCloseEditUserDialog } = this.props.handlers;
-      const url = `/accounts/${this.props.accountId}/users/${id}`;
-
-      return (
-        <div role='row' className="grid-row middle-xs pad-box-mini border border-b">
-          <div className="col-xs-3" role="gridcell">
-            <div className="grid-row middle-xs">
-              <span className="userAvatar">
-                <span className="userUrl">
-                  {!!avatar_url &&
-                    <span className="ic-avatar UserListRow__Avatar">
-                      <img src={avatar_url} alt={`User avatar for ${name}`} />
-                    </span>
-                  }
-                  <a href={url}>{name}</a>
+export default function UsersListRow({accountId, user, permissions, handlers, timezones}) {
+  return (
+    <div role="row" className="grid-row middle-xs pad-box-mini border border-b">
+      <div className="col-xs-3" role="gridcell">
+        <div className="grid-row middle-xs">
+          <span className="userAvatar">
+            <a className="userUrl" href={`/accounts/${accountId}/users/${user.id}`}>
+              {user.avatar_url && (
+                <span className="ic-avatar UserListRow__Avatar">
+                  <img src={user.avatar_url} alt={`User avatar for ${user.name}`} />
                 </span>
-              </span>
-            </div>
-          </div>
-          <div className="col-xs-3" role='gridcell'>
-            {email}
-          </div>
-
-          <div className="col-xs-1" role='gridcell'>
-            {sis_user_id}
-          </div>
-
-          <div className="col-xs-2" role='gridcell'>
-            {$.datetimeString(last_login)}
-          </div>
-
-          <div className="col-xs-2" role='gridcell'>
-            {this.renderLinks()}
-            <EditUserDetailsDialog
-              submitEditUserForm={handleSubmitEditUserForm}
-              user={this.props.user}
-              timezones={this.props.timezones}
-              isOpen={editUserDialogOpen}
-              contentLabel={I18n.t('Edit User')}
-              onRequestClose={handleCloseEditUserDialog.bind(null, this.props.user)}
-            />
-          </div>
+              )}
+              {user.name}
+            </a>
+          </span>
         </div>
-      );
-    }
-  }
+      </div>
+      <div className="col-xs-3" role="gridcell">
+        {user.email}
+      </div>
+
+      <div className="col-xs-1" role="gridcell">
+        {user.sis_user_id}
+      </div>
+
+      <div className="col-xs-2" role="gridcell">
+        {datetimeString(user.last_login)}
+      </div>
+
+      <div className="col-xs-2" role="gridcell">
+        <div className="courses-user-list-actions">
+          {permissions.can_masquerade && (
+            <Tooltip tip={I18n.t('Act as %{name}', {name: user.name})}>
+              <Button variant="icon" size="small" href={`/users/${user.id}/masquerade`}>
+                <IconMasqueradeLine />
+              </Button>
+            </Tooltip>
+          )}
+          {permissions.can_message_users && (
+            <Tooltip tip={I18n.t('Send message to %{name}', {name: user.name})}>
+              <Button
+                variant="icon"
+                size="small"
+                href={`/conversations?user_name=${user.name}&user_id=${user.id}`}
+              >
+                <IconMessageLine />
+              </Button>
+            </Tooltip>
+          )}
+          {permissions.can_edit_users && (
+            <Tooltip tip={I18n.t('Edit %{name}', {name: user.name})}>
+              <Button
+                variant="icon"
+                size="small"
+                onClick={() => handlers.handleOpenEditUserDialog(user)}
+              >
+                <IconEditLine />
+                <EditUserDetailsDialog
+                  submitEditUserForm={handlers.handleSubmitEditUserForm}
+                  user={user}
+                  timezones={timezones}
+                  isOpen={user.editUserDialogOpen}
+                  contentLabel={I18n.t('Edit User')}
+                  onRequestClose={() => handlers.handleCloseEditUserDialog(user)}
+                />
+              </Button>
+            </Tooltip>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+UsersListRow.propTypes = {
+  accountId: string.isRequired,
+  timezones: EditUserDetailsDialog.propTypes.timezones,
+  user: EditUserDetailsDialog.propTypes.user,
+  handlers: shape({
+    handleOpenEditUserDialog: func.isRequired,
+    handleSubmitEditUserForm: func.isRequired,
+    handleCloseEditUserDialog: func.isRequired
+  }).isRequired,
+  permissions: shape({
+    can_masquerade: bool,
+    can_message_users: bool,
+    can_edit_users: bool
+  }).isRequired
+}

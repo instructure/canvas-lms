@@ -60,6 +60,7 @@ define [
       'keyclick .element_toggler': 'toggleArrowWithKeyboard'
       'click .tooltip_link': preventDefault ->
       'keydown .assignment_group': 'handleKeys'
+      'click .move_contents':  'onMoveContents'
       'click .move_group':  'onMoveGroup'
 
     messages:
@@ -311,10 +312,11 @@ define [
 
     onMoveGroup: () =>
       @moveTrayProps =
-        title: I18n.t('Move Assignment Group')
-        item:
+        title: I18n.t('Move Group')
+        items: [
           id: @model.get('id')
           title: @model.get('name')
+        ]
         moveOptions:
           siblings: MoveItem.backbone.collectionToItems(@model.collection)
         onMoveSuccess: (res) =>
@@ -322,6 +324,28 @@ define [
         focusOnExit: =>
           document.querySelector("#assignment_group_#{@model.id} a[id*=manage_link]")
         formatSaveUrl: => ENV.URLS.sort_url
+
+      MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
+
+    onMoveContents: () =>
+      groupItems = MoveItem.backbone.collectionToItems(@model, (col) => col.get('assignments'))
+      groupItems[0].groupId = @model.get('id')
+      @moveTrayProps =
+        title: I18n.t('Move Contents Into')
+        items: groupItems
+        moveOptions:
+          groupsLabel: I18n.t('Assignment Group')
+          groups: MoveItem.backbone.collectionToGroups(@model.collection, (col) => col.get('assignments'))
+          excludeCurrent: true
+        onMoveSuccess: (res) =>
+          keys =
+            model: 'assignments'
+            parent: 'assignment_group_id'
+          MoveItem.backbone.reorderAllItemsIntoNewCollection(res.data.order, res.groupId, @model, keys)
+        focusOnExit: =>
+          document.querySelector("#assignment_group_#{@model.id} a[id*=manage_link]")
+        formatSaveUrl: ({ groupId }) ->
+          "#{ENV.URLS.assignment_sort_base_url}/#{groupId}/reorder"
 
       MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
 

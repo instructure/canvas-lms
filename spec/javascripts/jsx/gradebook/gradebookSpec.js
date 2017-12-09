@@ -22,6 +22,10 @@ import fakeENV from 'helpers/fakeENV';
 import UserSettings from 'compiled/userSettings';
 import $ from 'jquery';
 
+function createGradebook (opts = {}) {
+  return new Gradebook({ settings: {}, sections: {}, ...opts });
+}
+
 QUnit.module('addRow', {
   setup () {
     fakeENV.setup({
@@ -155,7 +159,7 @@ test('flips the show_total_grade_as_points property', function () {
 });
 
 test('updates the total display preferences for the current user', function () {
-  const self = this.setupThis();
+  const self = this.setupThis({ showTotalGradeAsPoints: false });
   this.switchTotalDisplay.call(self, { dontWarnAgain: false });
 
   equal($.ajaxJSON.callCount, 1);
@@ -199,6 +203,7 @@ QUnit.module('Gradebook#togglePointsOrPercentTotals', {
 
   teardown () {
     UserSettings.contextRemove('warned_about_totals_display');
+    $(".ui-dialog").remove();
   }
 });
 
@@ -231,4 +236,55 @@ test('when user is not ignoring warnings, the dialog has a save property which i
   equal(dialog.options.save, self.switchTotalDisplay);
 
   dialog.cancel();
+});
+
+QUnit.module('Gradebook', (_suiteHooks) => {
+  let gradebook;
+
+  QUnit.module('#updateSubmissionsFromExternal', (hooks) => {
+    const columns = [
+      { id: 'student', type: 'student' },
+      { id: 'assignment_232', type: 'assignment' },
+      { id: 'total_grade', type: 'total_grade' },
+      { id: 'assignment_group_12', type: 'assignment' }
+    ];
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook();
+
+      gradebook.students = {
+        1101: { id: '1101', row: '1', assignment_201: {}, assignment_202: {} },
+        1102: { id: '1102', row: '2', assignment_201: {} }
+      };
+      gradebook.assignments = []
+      gradebook.submissionStateMap = {
+        setSubmissionCellState () {},
+        getSubmissionState () { return { locked: false } }
+      };
+
+      sinon.stub(gradebook, 'updateAssignmentVisibilities');
+      sinon.stub(gradebook, 'updateSubmission');
+      sinon.stub(gradebook, 'calculateStudentGrade');
+      sinon.stub(gradebook, 'updateRowTotals');
+
+      gradebook.grid = {
+        getActiveCell () {},
+        getColumns () { return columns },
+        updateCell: sinon.stub(),
+        getActiveCellNode: sinon.stub(),
+      };
+    });
+
+    test('ignores submissions for students not currently loaded', () => {
+      const submissions = [
+        { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true },
+        { assignment_id: '201', user_id: '1103', score: 9, assignment_visible: true },
+        { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
+      ];
+      gradebook.updateSubmissionsFromExternal(submissions);
+
+      const rowsUpdated = gradebook.updateRowTotals.getCalls().map((stubCall) => stubCall.args[0]);
+      deepEqual(rowsUpdated, ['1', '2']);
+    });
+  });
 });

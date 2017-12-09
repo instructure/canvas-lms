@@ -1759,7 +1759,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "does not return the submissons if the student is not in the overriden section and has a submission with no grade" do
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: nil, grader: @teacher)
@@ -1770,7 +1770,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "returns the submissons if the student is not in the overriden section but has a graded submission" do
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: 5, grader: @teacher)
@@ -1798,7 +1798,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "does not return the submissons if the observed student is not in the overriden section and has a submission with no grade" do
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: nil, grader: @teacher)
@@ -1809,7 +1809,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "returns the submissons if the observed student is not in the overriden section but has a graded submission" do
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: 5, grader: @teacher)
@@ -1832,7 +1832,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "does not return the submisson if the student is not in the overriden section" do
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
 
@@ -1857,7 +1857,7 @@ describe 'Submissions API', type: :request do
       @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
       create_section_override_for_assignment(@assignment, course_section: @section1)
       submit_homework(@assignment, @student)
-      Score.where(enrollment_id: @student.enrollments).delete_all
+      Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
       @student.enrollments.each(&:destroy_permanently!)
       student_in_section(@section2, user: @student)
 

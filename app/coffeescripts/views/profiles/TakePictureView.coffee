@@ -61,7 +61,8 @@ define [
 
     displayMedia: (@stream) =>
       @$video.removeClass('pending')
-      @$video.attr('src', window.URL.createObjectURL(@stream))
+      try @$video.get(0).srcObject = @stream
+      catch err then @$video.attr('src', window.URL.createObjectURL(@stream))
       @$video.on('onloadedmetadata loadedmetadata', _.once(@onMediaMetadata).bind(this))
 
     onMediaMetadata: (e) ->

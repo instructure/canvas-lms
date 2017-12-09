@@ -156,6 +156,28 @@ describe DiscussionTopicsController do
       expect(assigns["topics"]).to include(@topic)
     end
 
+    it "non-graded group discussions include root data if json request" do
+      delayed_post_time = 1.day.from_now
+      lock_at_time = 2.days.from_now
+      user_session(@teacher)
+      group_topic = group_discussion_topic_model(
+        :context => @course, :delayed_post_at => delayed_post_time, :lock_at => lock_at_time
+      )
+      group_topic.save!
+      group_id = group_topic.child_topics.first.group.id
+      get 'index', params: { group_id: group_id }, :format => :json
+      expect(response).to be_success
+      response_body = response.body
+      # Remove the prepending while loop so the parser doesn't choke
+      response_body.sub!('while(1);', '')
+      parsed_json = JSON.parse response_body
+      expect(parsed_json.length).to eq 1
+      parsed_topic = parsed_json.first
+      # barf
+      expect(parsed_topic["delayed_post_at"].to_json).to eq delayed_post_time.to_json
+      expect(parsed_topic["lock_at"].to_json).to eq lock_at_time.to_json
+    end
+
     it "does not filter module locked discussion by default" do
       course_topic(user: @teacher)
       @locked_topic = @topic

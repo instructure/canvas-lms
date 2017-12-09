@@ -61,16 +61,29 @@ describe "assignments" do
     end
   end
 
-  it "shouldn't kersplode on the index with a certain set of limited permissions" do
-    @student = user_with_pseudonym(:active_user => true)
-    course_with_student(:active_all => true, :user => @student)
-    assignment_model(:course => @course, :submission_types => 'online_upload', :title => 'Assignment 1')
+  context "with limited permissions" do
+    before :once do
+      @student = user_with_pseudonym(:active_user => true)
+      course_with_student(:active_all => true, :user => @student)
+      assignment_model(:course => @course, :submission_types => 'online_upload', :title => 'Assignment 1')
+    end
 
-    account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
-    user_session(@user)
+    it "shouldn't kersplode on the index without the `manage_courses` permission" do
+      account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+      user_session(@user)
 
-    get "/courses/#{@course.id}/assignments"
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
+    end
 
-    expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
+    it "shouldn't kersplode on the index without the `manage_assignments` permission" do
+      account_admin_user_with_role_changes(:role_changes => {:manage_assignments => false})
+      user_session(@user)
+
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
+    end
   end
 end

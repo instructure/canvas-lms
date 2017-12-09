@@ -471,6 +471,24 @@ describe "context modules" do
         prog = mod.evaluate_for(@user)
         expect(prog).to be_completed
       end
+
+      it "should doesn't show the mark done button on locked pages" do
+        mod = create_context_module('Mark Done Module')
+        assmt = @course.assignments.create!(:title => "assmt")
+        page = @course.wiki_pages.create!(:title => "page", :body => 'hi')
+
+        tag1 = mod.add_item({:id => assmt.id, :type => 'assignment'})
+        tag2 = mod.add_item({:id => page.id, :type => 'wiki_page'})
+
+        mod.completion_requirements = {tag1.id => {:type => 'must_mark_done'}, tag2.id => {:type => 'must_mark_done'}}
+        mod.require_sequential_progress = true
+        mod.save!
+
+        get "/courses/#{@course.id}/pages/#{page.url}"
+        content = f("#content")
+        expect(content).to contain_css(".lock_explanation")
+        expect(content).to_not contain_css('#mark-as-done-checkbox')
+      end
     end
 
     it "shows Mark as Done button for assignments with external tool submission", priority: "2", test_id: 3340306 do

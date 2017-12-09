@@ -1,0 +1,42 @@
+// these are the styles for the  Add people dialog
+.addpeople {
+  .addpeople__peoplesearch {
+    fieldset {
+      margin-top:1.5em;
+    }
+    fieldset.peoplesearch__selections {
+      margin-right: auto;
+      margin-left: auto;
+      margin-top: .5rem;
+      text-align: center;
+      &>div {
+        display: flex;
+        justify-content: center;
+      }
+      .peoplesearch__selection {
+        text-align: left;
+        margin: 0 1em;
+        flex: 0 0 auto;
+        width: 30%;
+      }
+    }
+    .peoplesearch__instructions {
+      margin: 1.5em 0;
+      text-align: center;
+      .usericon {
+        margin: 0 auto;
+        font-size: 48px;
+        line-height: 50px;
+      }
+    }
+  }
+  .namelist {
+    margin: 1.5em 0;
+  }
+  .peoplevalidationissues__missing tr td:first-child {
+    width: 30px;
+  }
+  &:focus {
+    outline: none;
+  }
+}

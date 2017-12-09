@@ -32,6 +32,7 @@ define([
       fakeENV.setup({conference_type_details: [{settings: [this.datepickerSetting]}]})
     },
     teardown () {
+      this.view.$el.remove();
       fakeENV.teardown();
       tz.restore(this.snapshot);
     }

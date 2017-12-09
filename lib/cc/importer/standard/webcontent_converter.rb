@@ -22,10 +22,16 @@ module CC::Importer::Standard
     def create_file_map
       new_assignments = []
       resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
-        if res[:intended_use] == "assignment"
+        if res[:intended_use]
           path = get_full_path(res[:href])
           if path && File.exists?(path) && Attachment.mimetype(path) =~ /html/
-            new_assignments << {:migration_id => res[:migration_id], :description => File.read(path)}
+            case res[:intended_use]
+            when "assignment"
+              new_assignments << {:migration_id => res[:migration_id], :description => File.read(path)}
+            when "syllabus"
+              @course[:course] ||= {}
+              @course[:course][:syllabus_body] = File.read(path)
+            end
           end
         end
 
@@ -75,11 +81,11 @@ module CC::Importer::Standard
         file_map.each_value do |val|
           next if zipfile.entries.include?(val[:path_name])
 
-          file_path = File.join(@unzipped_file_path, val[:path_name])
+          file_path = @package_root.item_path(val[:path_name])
           if File.exist?(file_path)
             zipfile.add(val[:path_name], file_path) if !File.directory?(file_path)
           else
-            web_file_path = File.join(@unzipped_file_path, WEB_RESOURCES_FOLDER, val[:path_name])
+            web_file_path = @package_root.item_path(WEB_RESOURCES_FOLDER, val[:path_name])
             if File.exist?(web_file_path)
               zipfile.add(val[:path_name], web_file_path) if !File.directory?(web_file_path)
             else

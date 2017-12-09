@@ -591,7 +591,7 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    @stub assignment, "multipleDueDates", -> false
+    @stub(assignment, "multipleDueDates").returns(false)
     equal assignment.singleSectionDueDate(), dueAt.toISOString()
 
   test "returns due_at when only one date/section are present", ->
@@ -761,7 +761,7 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    @stub assignment, "multipleDueDates", -> false
+    @stub(assignment, "multipleDueDates").returns(false)
     json = assignment.toView()
     equal json.singleSectionDueDate, dueAt.toISOString()
 
@@ -815,7 +815,7 @@ define [
 
   test "returns false if record uses quizzes 2", ->
     assignment = new Assignment name: 'foo', frozen_attributes: []
-    @stub assignment, "isQuizLTIAssignment", -> true
+    @stub(assignment, "isQuizLTIAssignment").returns(true)
     equal assignment.canFreeze(), false
 
   QUnit.module "Assignment#submissionTypesFrozen"

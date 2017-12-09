@@ -16,125 +16,124 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers } from 'redux'
-import _ from 'underscore'
-import UserActions from '../actions/UserActions'
-import parseLinkHeader from 'compiled/fn/parseLinkHeader'
-import initialState from 'jsx/account_course_user_search/store/initialState'
+import {combineReducers} from 'redux'
+import parseLinkHeader from 'parse-link-header'
+import initialState from '../store/initialState'
 
-  /**
+const emailRegex = /([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/i
+
+/**
    * Handles setting the editUserDialogOpen state
    * state - the redux state
    * action - the redux action
    * visibility - boolean that editUserDialogOpen should be set to.
    */
-  function setEditUserDialogOpenState (state, action, visibility) {
-    const userObject = _.find(state.users, (user) => {
-      return user.id === action.payload.id;
-    });
-
-    const userIndex = state.users.indexOf(userObject);
-    if (userIndex > -1) {
-      state.users[userIndex].editUserDialogOpen = visibility;
-    }
-    return state;
+function setEditUserDialogOpenState(state, action, visibility) {
+  return {
+    ...state,
+    users: state.users.map(user => {
+      if (user.id === action.payload.id) {
+        return {...user, editUserDialogOpen: visibility}
+      }
+      return user
+    })
   }
+}
 
-  const userListHandlers = {
-    ADD_ERROR: (state, action) => {
-      const errors = _.extend({}, state.errors);
-      state.errors = _.extend(errors, action.error);
-      return state;
-    },
-    ADD_TO_USERS: (state, action) => {
-      if (action.payload.xhr) {
-        const {next} = parseLinkHeader(action.payload.xhr);
-        state.next = next;
+const userListHandlers = {
+  ADD_ERROR(state, action) {
+    return {
+      ...state,
+      errors: {
+        ...state.errors,
+        ...action.error
       }
-
-      const mappedEmailUsers = action.payload.users.map((user) => {
-        if (user.email) {
-          return user;
-        } else {
-          if (user.login_id && user.login_id.match(/([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/i)) {
-            user.email = user.login_id;
-          }
-          return user;
-        }
-      });
-      state.users = state.users.concat(mappedEmailUsers);
-      state.isLoading = false;
-      return state;
-    },
-    GOT_USERS: (state, action) => {
-      const { next } = parseLinkHeader(action.payload.xhr);
-      state.users = action.payload.users;
-      state.isLoading = false;
-      state.next = next;
-      return state;
-    },
-    GOT_USER_UPDATE: (state, action) => {
-      const userObject = _.find(state.users, (user) => {
-        return user.id === action.payload.id;
-      });
-
-      const userIndex = state.users.indexOf(userObject);
-      if (userIndex > -1) {
-        state.users[userIndex] = action.payload;
+    }
+  },
+  ADD_TO_USERS: (state, action) => {
+    const mappedEmailUsers = action.payload.users.map(user => {
+      if (!user.email && emailRegex.test(user.login_id)) {
+        return {...user, email: user.login_id}
       }
-      return state;
-    },
-    OPEN_EDIT_USER_DIALOG: (state, action) => {
-      return setEditUserDialogOpenState(state, action, true);
-    },
-    CLOSE_EDIT_USER_DIALOG: (state, action) => {
-      return setEditUserDialogOpenState(state, action, false);
-    },
-    UPDATE_SEARCH_FILTER: (state, action) => {
-      state.searchFilter = _.extend({}, state.searchFilter, action.payload);
-      state.errors = {
+      return user
+    })
+
+    const newState = {
+      isLoading: false,
+      users: state.users.concat(mappedEmailUsers)
+    }
+    if (action.payload.xhr) {
+      newState.links = parseLinkHeader(action.payload.xhr.getResponseHeader('Link'))
+    }
+    return {...state, ...newState}
+  },
+  GOT_USERS(state, action) {
+    return {
+      ...state,
+      users: action.payload.users,
+      isLoading: false,
+      links: parseLinkHeader(action.payload.xhr.getResponseHeader('Link'))
+    }
+  },
+  GOT_USER_UPDATE(state, action) {
+    return {
+      ...state,
+      users: state.users.map(user => (user.id === action.payload.id ? action.payload : user))
+    }
+  },
+  OPEN_EDIT_USER_DIALOG(state, action) {
+    return setEditUserDialogOpenState(state, action, true)
+  },
+  CLOSE_EDIT_USER_DIALOG(state, action) {
+    return setEditUserDialogOpenState(state, action, false)
+  },
+  UPDATE_SEARCH_FILTER(state, action) {
+    return {
+      ...state,
+      errors: {
         search_term: ''
-      };
-      return state;
-    },
-    SEARCH_TERM_TOO_SHORT: (state, action) => {
-      state.errors.search_term = action.errors.termTooShort;
-      return state;
-    },
-    LOADING_USERS: (state, action) => {
-      state.isLoading = true;
-      return state;
+      },
+      searchFilter: {
+        ...state.searchFilter,
+        ...action.payload
+      }
     }
-
-  };
-
-  const userList = (state = initialState, action) => {
-    if (userListHandlers[action.type]) {
-      const newState = _.extend({}, state);
-      return userListHandlers[action.type](newState, action);
-    } else {
-      return state;
+  },
+  SEARCH_TERM_TOO_SHORT(state, action) {
+    return {
+      ...state,
+      errors: {
+        ...state.errors,
+        search_term: action.errors.termTooShort
+      }
     }
-  };
-
-  const tabListHandlers = {
-    SELECT_TAB: (state, action) => {
-      state.selected = action.payload.tabIndex;
-      return state;
+  },
+  LOADING_USERS(state, _action) {
+    return {
+      ...state,
+      isLoading: true
     }
-  };
+  }
+}
 
-  const tabList = (state = initialState, action) => {
-    if (tabListHandlers[action.type]) {
-      const newState = _.extend({}, state);
-      return tabListHandlers[action.type](newState, action);
-    } else {
-      return state;
+const tabListHandlers = {
+  SELECT_TAB(state, action) {
+    const {selected, queryParams} = action.payload
+    return {
+      ...state,
+      selected,
+      queryParams
     }
-  };
+  }
+}
 
+const makeReducer = handlerList => (state = initialState, action) => {
+  const handler = handlerList[action.type]
+  if (handler) return handler({...state}, action)
+  return state
+}
 
 export default combineReducers({
-    userList,
-    tabList
-  });
+  userList: makeReducer(userListHandlers),
+  tabList: makeReducer(tabListHandlers)
+})

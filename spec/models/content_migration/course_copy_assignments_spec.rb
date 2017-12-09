@@ -186,6 +186,7 @@ describe ContentMigration do
       @assignment.muted = true
       @assignment.omit_from_final_grade = true
       @assignment.only_visible_to_overrides = true
+      @assignment.post_to_sis = true
 
       @assignment.save!
 
@@ -195,7 +196,7 @@ describe ContentMigration do
       attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :muted, :omit_from_final_grade]
+          :position, :peer_review_count, :muted, :omit_from_final_grade, :post_to_sis]
 
       run_course_copy
 
@@ -598,6 +599,66 @@ describe ContentMigration do
         expect(to_override.due_at).to eq due_at
         expect(to_override.due_at_overridden).to eq true
         expect(to_override.unlock_at_overridden).to eq false
+      end
+    end
+
+    context 'external tools' do
+      include_context 'lti2_spec_helper'
+
+      let(:assignment) { @copy_from.assignments.create!(name: 'test assignment') }
+      let(:resource_link_id) { SecureRandom.uuid }
+      let(:custom_data) { {'setting_one' => 'value one'} }
+      let(:custom_parameters) { {'param_one' => 'param value one'} }
+      let(:tool_settings) do
+        Lti::ToolSetting.create!(
+          tool_proxy: tool_proxy,
+          resource_link_id: resource_link_id,
+          context: assignment.course,
+          custom: custom_data,
+          custom_parameters: custom_parameters
+        )
+      end
+
+      before do
+        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+        allow(Lti::ToolProxy).to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) do
+          Lti::ToolProxy.where(id: tool_proxy.id)
+        end
+        product_family.update_attributes!(
+          product_code: 'product_code',
+          vendor_code: 'vendor_code'
+        )
+        tool_proxy.update_attributes!(
+          resources: [resource_handler],
+          context: @copy_to
+        )
+        tool_settings
+        AssignmentConfigurationToolLookup.create!(
+          assignment: assignment,
+          tool_id: message_handler.id,
+          tool_type: 'Lti::MessageHandler',
+          tool_product_code: product_family.product_code,
+          tool_vendor_code: product_family.vendor_code
+        )
+      end
+
+      it 'creates tool settings for associated plagiarism tools' do
+        expect{run_course_copy}.to change{Lti::ToolSetting.count}.from(1).to(2)
+      end
+
+      it 'sets the context of the tool setting to the new course' do
+        run_course_copy
+        expect(Lti::ToolSetting.last.context).to eq @copy_to
+      end
+
+      it 'sets the custom field of the new tool setting' do
+        run_course_copy
+        expect(Lti::ToolSetting.last.custom).to eq custom_data
+      end
+
+      it 'sets the custom parameters of the new tool setting' do
+        run_course_copy
+        expect(Lti::ToolSetting.last.custom_parameters).to eq custom_parameters
       end
     end
   end

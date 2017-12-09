@@ -50,7 +50,7 @@ define [
     setup: ->
       @$testEl = $('<div>')
       $('#fixtures').append @$testEl
-      @stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', -> {done: ->}
+      @stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').returns({done: ->})
 
     teardown: ->
       @$testEl.remove()
@@ -72,7 +72,7 @@ define [
 
   test 'accepts animation option', ->
     $.fn.moduleSequenceFooter.MSFClass.prototype.fetch.restore()
-    @stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', ->
+    @stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').callsFake ->
       this.success
         items: [
           prev: null

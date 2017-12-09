@@ -19,7 +19,8 @@ define [
   'compiled/views/assignments/SpeedgraderLinkView'
   'compiled/models/Assignment'
   'jquery'
-], (SpeedgraderLinkView, Assignment, $) ->
+  'helpers/assertions'
+], (SpeedgraderLinkView, Assignment, $, assertions) ->
 
   QUnit.module "SpeedgraderLinkView",
     setup: ->
@@ -35,6 +36,10 @@ define [
     teardown: ->
       @view.remove()
       $('#fixtures').empty()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @view, done, {'a11yReport': true}
 
   test "#toggleSpeedgraderLink toggles visibility of speedgrader link on change", ->
     @model.set 'published', true

@@ -611,7 +611,7 @@ class CalendarEvent < ActiveRecord::Base
         event.end.icalendar_tzid = 'UTC'
       end
 
-      if @event.all_day
+      if @event.all_day && @event.all_day_date
         event.start = Date.new(@event.all_day_date.year, @event.all_day_date.month, @event.all_day_date.day)
         event.start.ical_params = {"VALUE"=>["DATE"]}
         event.end = event.start

@@ -934,6 +934,7 @@ describe Course do
     end
 
     it "should preserve sticky fields" do
+      sub = @course.root_account.sub_accounts.create
       @course.sis_source_id = 'sis_id'
       @course.course_code = "cid"
       @course.save!
@@ -943,20 +944,21 @@ describe Course do
       profile = @course.profile
       profile.description = "description"
       profile.save!
+      @course.account = sub
       @course.save!
-      expect(@course.stuck_sis_fields).to eq [:name].to_set
+      expect(@course.stuck_sis_fields).to eq [:name, :account_id].to_set
 
       @course.reload
 
       @new_course = @course.reset_content
 
       @course.reload
-      expect(@course.stuck_sis_fields).to eq [:workflow_state, :name].to_set
+      expect(@course.stuck_sis_fields).to eq [:workflow_state, :name, :account_id].to_set
       expect(@course.sis_source_id).to be_nil
 
       @new_course.reload
       expect(@new_course.sis_source_id).to eq 'sis_id'
-      expect(@new_course.stuck_sis_fields).to eq [:name].to_set
+      expect(@new_course.stuck_sis_fields).to eq [:name, :account_id].to_set
 
       expect(@course.uuid).not_to eq @new_course.uuid
       expect(@course.replacement_course_id).to eq @new_course.id
@@ -1794,6 +1796,31 @@ describe Course, "gradebook_to_csv" do
 
       expect(rows[4][4]).to eq "N/A"
       expect(rows[4][5]).to eq "N/A"
+    end
+  end
+end
+
+describe Course, "gradebook_to_csv_in_background" do
+  context "sharding" do
+    specs_require_sharding
+
+    it "works for cross-shard users for courses on birth shard" do
+      s3_storage!
+
+      @shard1.activate do
+        @shard1_user = user_factory(active_all: true)
+      end
+
+      Shard.default.activate do
+        student_in_course(active_all: true)
+        @attachment_id = @course.gradebook_to_csv_in_background("asdf", @shard1_user)[:attachment_id]
+      end
+
+      @shard1.activate do
+        expect {
+          Attachment.find(@attachment_id).download_url
+        }.not_to raise_error
+      end
     end
   end
 end
@@ -3649,6 +3676,18 @@ describe Course, "section_visibility" do
   end
 
   context "full" do
+    it "returns rejected enrollments if passed :priors_and_deleted" do
+      @course.student_enrollments.find_by(user_id: @student1).update!(workflow_state: "rejected")
+      visible_student_ids = @course.students_visible_to(@teacher, include: :priors_and_deleted).pluck(:id)
+      expect(visible_student_ids).to include @student1.id
+    end
+
+    it "returns deleted enrollments if passed :priors_and_deleted" do
+      @course.student_enrollments.find_by(user_id: @student1).destroy
+      visible_student_ids = @course.students_visible_to(@teacher, include: :priors_and_deleted).pluck(:id)
+      expect(visible_student_ids).to include @student1.id
+    end
+
     it "should return students from all sections" do
       expect(@course.students_visible_to(@teacher).sort_by(&:id)).to eql [@student1, @student2]
       expect(@course.students_visible_to(@student1).sort_by(&:id)).to eql [@student1, @student2]
@@ -4902,5 +4941,59 @@ describe Course, "#default_home_page" do
 
   it "is set assigned to 'default_view' on creation'" do
     expect(course.default_view).to eq 'modules'
+  end
+end
+
+describe Course, "#show_total_grade_as_points?" do
+  before(:once) do
+    @course = Course.create!
+  end
+
+  it "returns true if the course settings include show_total_grade_as_points: true" do
+    @course.update!(show_total_grade_as_points: true)
+    expect(@course).to be_show_total_grade_as_points
+  end
+
+  it "returns false if the course settings include show_total_grade_as_points: false" do
+    @course.update!(show_total_grade_as_points: false)
+    expect(@course).not_to be_show_total_grade_as_points
+  end
+
+  it "returns false if the course settings do not include show_total_grade_as_points" do
+    expect(@course).not_to be_show_total_grade_as_points
+  end
+
+  context "course settings include show_total_grade_as_points: true" do
+    before(:once) do
+      @course.update!(show_total_grade_as_points: true)
+    end
+
+    it "returns true if assignment groups are not weighted" do
+      @course.group_weighting_scheme = "equal"
+      expect(@course).to be_show_total_grade_as_points
+    end
+
+    it "returns false if assignment groups are weighted" do
+      @course.group_weighting_scheme = "percent"
+      expect(@course).not_to be_show_total_grade_as_points
+    end
+
+    context "assignment groups are not weighted" do
+      before(:once) do
+        @course.update!(group_weighting_scheme: "equal")
+      end
+
+      it "returns true if the associated grading period group is not weighted" do
+        group = @course.account.grading_period_groups.create!
+        group.enrollment_terms << @course.enrollment_term
+        expect(@course).to be_show_total_grade_as_points
+      end
+
+      it "returns false if the associated grading period group is weighted" do
+        group = @course.account.grading_period_groups.create!(weighted: true)
+        group.enrollment_terms << @course.enrollment_term
+        expect(@course).not_to be_show_total_grade_as_points
+      end
+    end
   end
 end

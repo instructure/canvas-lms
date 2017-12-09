@@ -35,6 +35,15 @@ describe TermsApiController, type: :request do
       json['enrollment_terms']
     end
 
+    it "should show sis_batch_id" do
+      @term2.destroy
+      sis_batch = @term1.root_account.sis_batches.create
+      @term1.sis_batch_id = sis_batch.id
+      @term1.save!
+      json = get_terms
+      expect(json.first['sis_import_id']). to eq sis_batch.id
+    end
+
     describe "filtering by state" do
       before :once do
         @term2.destroy

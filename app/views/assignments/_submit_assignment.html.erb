@@ -65,6 +65,7 @@
     <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_upload" %>
     <%= hidden_field :submission, :attachment_ids, :value => "", :id => "submission_attachment_ids" %>
+    <%= hidden_field :submission, :eula_agreement_timestamp, :id => "eula_agreement_timestamp" %>
     <table class="formtable" style="width: 100%;">
       <tr>
         <td colspan="2">
@@ -122,7 +123,12 @@
           <td colspan="2">
             <label class='checkbox'>
               <input type="checkbox" class='turnitin_pledge' name="turnitin_pledge" value="1"/>
-              <%= @similarity_pledge %>
+              <% if eula_url.present? %>
+                <%= t "I agree to the tool's" %>
+                <%= raw("<a href='#{eula_url}'>#{t 'End-User License Agreement.'}</a>") %>
+              <% else %>
+                <%= @similarity_pledge %>
+              <% end %>
             </label>
           </td>
         </tr>

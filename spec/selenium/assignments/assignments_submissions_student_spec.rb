@@ -92,6 +92,7 @@ describe "submissions" do
     end
 
     it "should not allow blank media submission", priority: "1", test_id: 237021 do
+      skip_if_safari(:alert)
       stub_kaltura
       #pending("failing because it is dependant on an external kaltura system")
 
@@ -123,6 +124,7 @@ describe "submissions" do
     end
 
     it "should not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
+      skip_if_safari(:alert)
       @assignment.submission_types = 'online_upload'
       @assignment.save!
 
@@ -246,6 +248,7 @@ describe "submissions" do
     end
 
     it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
+      skip_if_safari(:alert)
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -378,6 +381,7 @@ describe "submissions" do
       end
 
       it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
+        skip_if_safari(:alert)
         FILENAME = "hello-world.sh"
         FIXTURE_FN = "files/#{FILENAME}"
 

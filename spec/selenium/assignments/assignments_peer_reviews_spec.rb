@@ -23,6 +23,7 @@ describe "assignments" do
   context "peer reviews" do
 
     it "allows deleting a peer review", priority: "2", test_id: 216382 do
+      skip_if_safari(:alert)
       course_with_teacher_logged_in
       @student1 = student_in_course.user
       @student2 = student_in_course.user

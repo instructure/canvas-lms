@@ -294,3 +294,63 @@ define [
     @student.submission.excused = true
     result = SpeedgraderHelpers.submissionState(@student, @grading_role)
     equal(result, 'graded')
+
+  test "returns the proper submission url", ->
+    $('#fixtures').append('<a id="assignment_submission_resubmit_to_turnitin_url" href="http://www.resubmit.com"></a>')
+    submission = { user_id: 1 }
+    result = SpeedgraderHelpers.plagiarismResubmitUrl(submission)
+    equal(result, 'http://www.resubmit.com')
+
+  test "prevents the button's default action", ->
+    $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
+    ajaxStub = sinon.stub()
+    ajaxStub.returns({status: 200, data: {}})
+    previousAjaxJson = $.ajaxJSON
+    $.ajaxJSON = ajaxStub;
+    event = { 
+      preventDefault: sinon.spy(),
+      target: document.getElementById('resubmit-button')
+    }
+    SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
+    ok event.preventDefault.called
+    $.ajaxJSON = previousAjaxJson
+  
+  test "changes the button's text to 'Resubmitting...'", ->
+    $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
+    ajaxStub = sinon.stub()
+    ajaxStub.returns({status: 200, data: {}})
+    previousAjaxJson = $.ajaxJSON
+    $.ajaxJSON = ajaxStub;
+    event = { 
+      preventDefault: sinon.spy(),
+      target: $('#resubmit-button')
+    }
+    SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
+    equal $('#resubmit-button').text(), 'Resubmitting...'
+    $.ajaxJSON = previousAjaxJson
+
+  test "disables the button", ->
+    $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
+    ajaxStub = sinon.stub();
+    ajaxStub.returns({status: 200, data: {}})
+    previousAjaxJson = $.ajaxJSON
+    $.ajaxJSON = ajaxStub;
+    event = { 
+      preventDefault: sinon.spy(),
+      target: $('#resubmit-button')
+    }
+    SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
+    equal $('#resubmit-button').attr('disabled'), 'disabled'
+    $.ajaxJSON = previousAjaxJson
+
+  test "Posts to the resubmit URL", ->
+    $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
+    previousAjaxJson = $.ajaxJSON
+    $.ajaxJSON = sinon.spy()
+    event = { 
+      preventDefault: sinon.spy(),
+      target: document.getElementById('resubmit-button')
+    }
+    SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
+    ok $.ajaxJSON.called
+    $.ajaxJSON = previousAjaxJson

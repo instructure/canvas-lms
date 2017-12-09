@@ -35,15 +35,13 @@ $highlight-blue: #00b5fe;
 }
 
 .collaboration {
-  background: url(/images/google_docs.png) no-repeat;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+  border: 1px solid $ic-border-color;
+  border-radius: $ic-border-radius;
   margin: 0 0 10px 0;
-  padding: 10px 10px 10px 60px;
+  padding: 10px;
 
   &.etherpad {
-    background: url(/images/ether_pad.png) no-repeat 5px 20px;
-    padding: 10px 10px 10px 85px;
+    padding: 10px;
   }
 
   .collaboration-header {
@@ -53,7 +51,7 @@ $highlight-blue: #00b5fe;
       font-size: 1.2em;
       line-height: inherit;
       margin: 0;
-      border-bottom: 1px solid #cccccc;
+      border-bottom: 1px solid $ic-border-color;
     }
 
     .links {

@@ -52,15 +52,7 @@ module Api::V1::MasterCourses
       polymorphic_url([asset.context, asset])
     end
 
-    asset_name = if asset.respond_to?(:display_name)
-      asset.display_name
-    elsif asset.respond_to?(:title)
-      asset.title
-     elsif asset.respond_to?(:short_description)
-       asset.short_description
-    else
-      asset.name
-    end
+    asset_name = Context.asset_name(asset)
 
     json = {
       asset_id: asset.id,

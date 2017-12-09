@@ -95,7 +95,8 @@ define [
       id = item.children(":first").attr('data-id')
       item.find("#assignment_group_#{id}_assignments").slideUp(100)
       ui.item.css("height", "auto")
-      arrow = item.find('i').first()
+      $toggler = item.find('.element_toggler').first()
+      arrow = $toggler.find('i').first()
       arrow.removeClass('icon-mini-arrow-down').addClass('icon-mini-arrow-right')
 
     expand: (e, ui) =>
@@ -113,5 +114,5 @@ define [
       ag = @collection.findWhere id: id
       if ag && ag.groupView.shouldBeExpanded()
         item.find("#assignment_group_#{id}_assignments").slideDown(100)
-        arrow = item.find('i').first()
+        arrow = $toggler.find('i').first()
         arrow.addClass('icon-mini-arrow-down').removeClass('icon-mini-arrow-right')

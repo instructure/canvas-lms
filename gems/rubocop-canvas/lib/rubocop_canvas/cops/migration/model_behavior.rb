@@ -145,7 +145,7 @@ module RuboCop
           else
             message = "If possible, avoid auto-loaded classes/modules in a migration; define any behavior you need here. If you really can't though, add it to the whitelist."
           end
-          add_offense node, :expression, message, :convention
+          add_offense node, message: message, severity: :convention
         end
 
         def model?(const_name)

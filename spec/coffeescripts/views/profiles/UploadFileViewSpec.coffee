@@ -22,7 +22,9 @@ define [
 
   QUnit.module 'UploadFileView',
     setup: ->
-      @view  = new UploadFileView(avatarSize: { h: 128, w: 128 })
+      @resolveImageLoaded = null
+      @imageLoaded = new Promise((resolve) => @resolveImageLoaded = resolve)
+      @view  = new UploadFileView(avatarSize: { h: 128, w: 128 }, onImageLoaded: @resolveImageLoaded)
       @view.$el.appendTo('#fixtures')
       @file  = (->
         dfd    = $.Deferred()
@@ -40,12 +42,14 @@ define [
     teardown: ->
       delete @blob
       @view.remove()
+      $(".ui-dialog").remove()
 
   asyncTest 'loads given file', 3, ->
     # initial state
     ok @view.$el.find('.avatar-preview').length == 0, 'picker begins without preview image'
 
-    $.when(@file).pipe(@view.loadPreview).done(=>
+    $.when(@file).pipe(@view.loadPreview)
+    @imageLoaded.then(=>
       # loaded state
       $preview  = @view.$('.avatar-preview')
       $fullsize = @view.$('img.Cropper-image')
@@ -57,7 +61,8 @@ define [
     )
 
   asyncTest 'getImage returns cropped image object', 1, ->
-    $.when(@file).pipe(@view.loadPreview).done(=>
+    $.when(@file).pipe(@view.loadPreview)
+    @imageLoaded.then(=>
       @view.getImage().then((image) ->
         ok image instanceof Blob, 'image object is a blob'
         start()

@@ -139,10 +139,10 @@ class LearningOutcomeResult < ActiveRecord::Base
   def scale_params
     parent_mastery = precise_mastery_percent
     alignment_mastery = self.alignment.mastery_score
-    if parent_mastery && alignment_mastery
+    return unless parent_mastery && alignment_mastery
+    if parent_mastery > 0 && alignment_mastery > 0
       { scale_percent: parent_mastery / alignment_mastery,
-        alignment_mastery: alignment_mastery
-      }
+        alignment_mastery: alignment_mastery }
     end
   end
 
@@ -154,7 +154,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     # the outcome's mastery percent is rounded to 2 places. This is normally OK
     # but for scaling it's too imprecise and can lead to inaccurate calculations
     parent_outcome = self.learning_outcome
-    return unless parent_outcome.try(:mastery_points)
+    return unless parent_outcome.try(:mastery_points) && parent_outcome.points_possible > 0
     parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
   end
 end

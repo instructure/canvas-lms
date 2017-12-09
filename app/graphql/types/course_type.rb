@@ -14,6 +14,8 @@ module Types
     field :state, !CourseWorkflowState,
       property: :workflow_state
 
+    connection :assignmentGroupsConnection, AssignmentGroupType.connection_type, property: :assignment_groups
+
     connection :assignmentsConnection do
       type AssignmentType.connection_type
       resolve -> (course, _, ctx) {

@@ -84,7 +84,9 @@ module Importers
       end
       hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
       state = hash[:workflow_state]
-      if state || !hide_from_students.nil?
+      if state && migration.for_master_course_import?
+        item.workflow_state = state
+      elsif state || !hide_from_students.nil?
         if state == 'active' && !item.unpublished? && Canvas::Plugin.value_to_boolean(hide_from_students) == false
           item.workflow_state = 'active'
         else

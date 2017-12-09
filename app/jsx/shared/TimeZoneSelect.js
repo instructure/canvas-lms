@@ -17,49 +17,34 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import _ from 'underscore'
+import {arrayOf, shape, string} from 'prop-types'
 import I18n from 'i18n!edit_timezone'
 
-  const { array } = PropTypes;
+export default function TimeZoneSelect({timezones, priority_zones}) {
+  return (
+    <select>
+      {[
+        {label: I18n.t('Common Timezones'), timezones: priority_zones},
+        {label: I18n.t('All Timezones'), timezones}
+      ].map(({label, timezones}) => (
+        <optgroup key={label} label={label}>
+          {timezones.map(zone => (
+            <option key={zone.name} value={zone.name}>
+              {zone.localized_name}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
+  )
+}
 
-  class TimeZoneSelect extends React.Component {
+const timezoneShape = shape({
+  name: string.isRequired,
+  localized_name: string.isRequired
+}).isRequired
 
-    containsZone (timezones, zone) {
-      return (_.find(timezones, (z) => {return z.name === zone.name}));
-    }
-
-    filterTimeZones (timezones, priority_timezones) {
-      return timezones.filter((zone) => {
-        return !this.containsZone(priority_timezones, zone);
-      });
-    }
-
-    renderOptions (timezones) {
-      return timezones.map((zone) => {
-        return <option key={zone.name} value={zone.name}>{zone.localized_name}</option>
-      });
-    }
-
-    render () {
-      const timeZonesWithoutPriorities = this.filterTimeZones(this.props.timezones, this.props.priority_timezones);
-
-      return (
-        <select {...this.props}>
-          <optgroup label={I18n.t('Common Timezones')}>
-            {this.renderOptions(this.props.priority_timezones)}
-          </optgroup>
-          <optgroup label={I18n.t('Other Timezones')}>
-            {this.renderOptions(timeZonesWithoutPriorities)}
-          </optgroup>
-        </select>
-      );
-    }
-  }
-
-  TimeZoneSelect.propTypes = {
-    timezones: array.isRequired,
-    priority_timezones: array.isRequired
-  };
-
-export default TimeZoneSelect
+TimeZoneSelect.propTypes = {
+  timezones: arrayOf(timezoneShape).isRequired,
+  priority_zones: arrayOf(timezoneShape).isRequired
+}

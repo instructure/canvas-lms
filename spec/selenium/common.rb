@@ -189,7 +189,7 @@ shared_context "in-process server selenium tests" do
       SeleniumDriverSetup.disallow_requests!
     end
 
-    if SeleniumDriverSetup.reset_driver_between_specs?
+    if SeleniumDriverSetup.saucelabs_test_run?
       driver.quit
       SeleniumDriverSetup.reset!
     end

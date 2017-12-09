@@ -540,6 +540,7 @@ class AppointmentGroupsController < ApplicationController
     # since the UI only cares about the date to jump to, it might not make a difference in many cases
     events = ag_scope.preload(:appointments => :child_events).to_a.map do |ag|
       ag.appointments.detect do |appointment|
+        appointment.start_at > Time.zone.now &&
         appointment.child_events_for(@current_user).empty? &&
           (appointment.participants_per_appointment.nil? ||
            appointment.child_events.count < appointment.participants_per_appointment)

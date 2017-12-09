@@ -42,7 +42,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
     },
 
     loadSidebarOnTarget(target, callback) {
-      if (ENV.RAILS_ENV === "test") {
+      if (ENV.RICH_CONTENT_SKIP_SIDEBAR) {
         return
       }
       let context = splitAssetString(ENV.context_asset_string)

@@ -35,11 +35,11 @@ module RuboCop
           return unless method_name == METHOD
 
           if named_as_controller?
-            add_offense node, :expression, CONTROLLER_MSG, :error
+            add_offense node, message: CONTROLLER_MSG, severity: :error
           elsif named_as_spec?
-            add_offense node, :expression, SPEC_MSG, :warning
+            add_offense node, message: SPEC_MSG, severity: :warning
           else
-            add_offense node, :expression, OTHER_MSG, :warning
+            add_offense node, message: OTHER_MSG, severity: :warning
           end
         end
       end

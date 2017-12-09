@@ -45,6 +45,7 @@ define [
       @_groups = new GroupCollection models,
         category: this
         loadAll: true
+        markInactiveStudents: @collection?.options?.markInactiveStudents
       if @get('groups_count') is 0 or models?.length
         @_groups.loadedAll = true
       else

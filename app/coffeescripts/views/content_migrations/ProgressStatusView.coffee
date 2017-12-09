@@ -18,7 +18,8 @@
 define [
   'Backbone'
   'jst/content_migrations/ProgressStatus'
-], (Backbone, template) -> 
+  'i18n!content_migrations'
+], (Backbone, template, I18n) ->
   class ProgressingStatusView extends Backbone.View
     template: template
     initialize: ->
@@ -33,7 +34,7 @@ define [
       else
         super
 
-    toJSON: -> 
+    toJSON: ->
       json = super
       json.statusLabel = @statusLabel()
       json.status = @status(humanize: true)
@@ -42,7 +43,7 @@ define [
     # a map of which bootstrap label to display for
     # a given workflow state. Defaults to nothing
     # workflow_state: 'label-class'
-    # ie:  
+    # ie:
     #   'success: 'label-success'
 
     statusLabelClassMap:
@@ -51,7 +52,7 @@ define [
       failed: 'label-important'
       running: 'label-info'
 
-    # Status label css class is determined depending on the status a current item is in. 
+    # Status label css class is determined depending on the status a current item is in.
     # Status labels are mapped to the statusLabel hash. This string should be a css class.
     #
     # @returns statusLabel (type: string)
@@ -73,25 +74,33 @@ define [
       else
         return @status()
 
-    # Status of the current migration or migration progress. Checks the migration 
-    # first. If the migration is completed or failed we don't need to check 
+    # Status of the current migration or migration progress. Checks the migration
+    # first. If the migration is completed or failed we don't need to check
     # the status of the actual migration progress model since it most likely
-    # wasn't pulled anyway and doesn't have a workflow_state that makes sense. 
-    # Only if the migration's workflow state isn't failed or completed do we 
+    # wasn't pulled anyway and doesn't have a workflow_state that makes sense.
+    # Only if the migration's workflow state isn't failed or completed do we
     # use the migration progress models workflow state.
     #
-    # Options can be 
+    # Options can be
     #   humanize: true (returns the status humanized)
     #
-    #   ie: 
+    #   ie:
     #     workflow_state = 'waiting_for_select'
     #     @status(humanize: true) # => "Waiting for select"
     #
     # @expects options (type: object)
     # @returns status (type: string)
     # @api private
-    
-    status: (options={})-> 
+
+    statusLabelMap:
+      queued: -> I18n.t("Queued")
+      running: -> I18n.t("Running")
+      completed: -> I18n.t("Completed")
+      failed: -> I18n.t("Failed")
+      waiting_for_select: -> I18n.t("Waiting for Selection")
+      pre_processing: -> I18n.t("Pre-processing")
+
+    status: (options={})->
       humanize = options.humanize
       migrationState = @model.get('workflow_state')
       progressState = @progress.get('workflow_state')
@@ -99,7 +108,11 @@ define [
       status = if migrationState != "running" then migrationState else progressState || "queued"
 
       if humanize
-        status = status.charAt(0).toUpperCase() + status.substring(1).toLowerCase()
-        status = status.replace(/_/g, " ")
+        translation = @statusLabelMap[status]
+        if translation
+          status = translation()
+        else # just in case i missed one
+          status = status.charAt(0).toUpperCase() + status.substring(1).toLowerCase()
+          status = status.replace(/_/g, " ")
 
       status

@@ -140,6 +140,13 @@ module Lti
           submission.global_id.to_s
         )
       end
+
+      it 'includes the eula agreement timestamp if present' do
+        submission.turnitin_data[:eula_agreement_timestamp] = Time.now.to_i
+        submission.save!
+        get endpoint, headers: request_headers
+        expect(JSON.parse(response.body)['eula_agreement_timestamp']).to eq submission.turnitin_data[:eula_agreement_timestamp]
+      end
     end
 
     describe "#history" do

@@ -122,7 +122,7 @@ define [
     if type == 'planner_note'
       # planner_notes can only be created by the user for herself,
       # so she can always edit them
-      obj.can_change_context = true
+      obj.can_change_context = true # TODO: will change to false when note is linked to an asset
       obj.can_edit = true
       obj.can_delete = true
 

@@ -29,17 +29,6 @@ define([
     ok(!Helpers.isValidImageType('image/tiff'), 'denies tiff');
   });
 
-  test('createFormData', () => {
-    const params = {
-      paramOne: 'valueOne',
-      paramTwo: 'valueTwo'
-    };
-
-    const formData = Helpers.createFormData(params);
-
-    ok(formData instanceof FormData, 'created a FormData object');
-  });
-
   test('extractInfoFromEvent', () => {
     const changeEvent = {
       type: 'change',

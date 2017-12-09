@@ -36,7 +36,7 @@ module RuboCop
           super
           _receiver, method_name, *_args = *node
           if remove_column_in_predeploy?(method_name)
-            add_offense(node, :expression, MSG, :warning)
+            add_offense(node, message: MSG, severity: :warning)
           end
         end
 

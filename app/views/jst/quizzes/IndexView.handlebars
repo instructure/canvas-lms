@@ -6,12 +6,15 @@
   </div>
 
   {{#ifAny permissions.create permissions.manage}}
-  <div class="header-bar-right form-inline">
-    <a href="{{urls.new_quiz_url}}" class="btn btn-primary new-quiz-link icon-plus" role="button"
-       title='{{#t "title_add_quiz"}}Add Quiz{{/t}}'
-       aria-label='{{#t "title_add_quiz"}}Add Quiz{{/t}}'>
-      {{#t "add_quiz"}}Quiz{{/t}}
-    </a>
+  <div class="header-bar-right">
+    <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
+      <input type="hidden" name="authenticity_token" />
+      <button class="btn btn-primary new-quiz-link"
+         title='{{#t "title_add_quiz"}}Add Quiz{{/t}}'
+         aria-label='{{#t "title_add_quiz"}}Add Quiz{{/t}}'>
+        <i class="icon-plus" />&nbsp;{{#t "add_quiz"}}Quiz{{/t}}
+      </button>
+    </form>
 
     <div class="inline-block">
       <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">

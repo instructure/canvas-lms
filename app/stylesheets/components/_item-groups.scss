@@ -270,6 +270,8 @@
 }
 
 .ig-info {
+  word-wrap: break-word; /* for IE support */
+  overflow-wrap: break-word;
   flex: 1;
   min-width: 1px; // firefox flex breaks the parent container
   margin: 0 $ic-sp;
@@ -366,7 +368,6 @@
 }
 
 .ig-title {
-  display: inline-block;
   box-sizing: border-box;
   font-weight: bold;
   padding-right: $ic-sp;

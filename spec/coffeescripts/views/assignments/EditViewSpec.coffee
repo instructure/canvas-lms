@@ -30,6 +30,7 @@ define [
   'compiled/views/assignments/PeerReviewsSelector'
   'helpers/fakeENV'
   'compiled/userSettings'
+  'helpers/assertions'
   'helpers/jquery.simulate'
 ], (
   $,
@@ -45,7 +46,8 @@ define [
   GroupCategorySelector,
   PeerReviewsSelector,
   fakeENV,
-  userSettings) ->
+  userSettings,
+  assertions) ->
 
   s_params = 'some super secure params'
 
@@ -111,6 +113,11 @@ define [
 
     editView: ->
       editView.apply(this, arguments)
+
+  test 'should be accessible', (assert) ->
+    view = @editView()
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'renders', ->
     view = @editView()

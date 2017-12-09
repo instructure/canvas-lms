@@ -185,11 +185,13 @@ module Api
       end
 
       describe '#set_sis_course_id' do
-        let(:sis_course) { double(:grants_any_right? => @has_right, :sis_source_id => @sis_id ) }
+        let(:sis_course) { double(grants_any_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account: root_account) }
+        let(:root_account) { double(grants_right?: @has_right ) }
         let(:hash) { Hash.new }
 
         before do
           @sis_id = 1357
+          @batch = 991357
           @has_right = false
         end
 
@@ -204,6 +206,7 @@ module Api
           describe 'with a nil sis_id' do
             before do
               @sis_id = nil
+              @batch = nil
               course_json.set_sis_course_id( hash, sis_course, user )
             end
 
@@ -212,7 +215,7 @@ module Api
             end
 
             it 'does not get cleared out before translation to json' do
-              expect(course_json.clear_unneeded_fields( hash )).to eq({ 'sis_course_id' => nil })
+              expect(course_json.clear_unneeded_fields( hash )).to eq({ 'sis_course_id' => nil, 'sis_import_id' => nil})
             end
           end
         end

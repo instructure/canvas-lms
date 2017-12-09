@@ -96,11 +96,13 @@ function render (options) {
   return `
     <div class="gradebook-cell">
       ${tooltip}
-      <span class="percentage">
-        ${warningIcon}
-        ${grade}
+      <span class="grades">
+        <span class="percentage">
+          ${warningIcon}
+          ${grade}
+        </span>
+        ${letterGrade}
       </span>
-      ${letterGrade}
     </div>
   `;
 }
@@ -122,7 +124,7 @@ export default class TotalGradeCellFormatter {
         return gradebook.listMutedAssignments();
       },
       shouldShowPoints () {
-        return gradebook.displayPointTotals();
+        return gradebook.options.show_total_grade_as_points;
       }
     };
   }

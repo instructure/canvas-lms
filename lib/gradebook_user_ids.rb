@@ -53,10 +53,11 @@ class GradebookUserIds
 
   def sort_by_assignment_grade(assignment_id)
     students.
-      left_joins(:submissions).
-      where(submissions: { assignment_id: [nil, assignment_id] }).
+      joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id=users.id AND
+             submissions.workflow_state<>'deleted' AND submissions.assignment_id=#{assignment_id}").
       order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
       order("#{Submission.table_name}.score #{sort_direction} NULLS LAST").
+      order("#{Submission.table_name}.id IS NULL").
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).
       uniq

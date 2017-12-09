@@ -63,6 +63,7 @@ describe "student groups" do
       end
 
       it "teacher can delete a student group", priority: "1", test_id: 182060 do
+        skip_if_safari(:alert)
         expect(f(".group-name")).to include_text(group_name.to_s)
         delete_group
         expect(f("#content")).not_to contain_css(".group-name")

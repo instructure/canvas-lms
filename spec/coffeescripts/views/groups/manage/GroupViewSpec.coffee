@@ -83,7 +83,7 @@ define [
       'Content-Type': 'application/json'
       JSON.stringify {}
     ]
-    @stub window, 'confirm', -> true
+    @stub(window, 'confirm').returns(true)
 
     # when
     view.$('.delete-group').click()

@@ -50,9 +50,8 @@ namespace :js do
   desc "Ensure up-to-date node environment"
   task :yarn_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
-    output = `yarn install --frozen-lockfile`
+    system "yarn install --frozen-lockfile"
     unless $?.success?
-      puts output
       raise 'error running yarn install'
     end
   end

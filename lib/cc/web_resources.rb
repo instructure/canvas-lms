@@ -192,10 +192,13 @@ module CC
       tracks_file.close
     end
 
+    def export_media_objects?
+      CanvasKaltura::ClientV3.config && !for_course_copy
+    end
+
     MAX_MEDIA_OBJECT_SIZE = 4.gigabytes
     def add_media_objects(html_content_exporter)
-      return if for_course_copy
-      return unless CanvasKaltura::ClientV3.config
+      return unless export_media_objects?
 
       # check to make sure we don't export more than 4 gigabytes of media objects
       total_size = 0

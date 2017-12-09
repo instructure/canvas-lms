@@ -179,7 +179,7 @@ describe OriginalityReport do
     end
   end
 
-  describe '#report_launch_url' do
+  describe '#report_launch_path' do
     include_context 'lti2_spec_helper'
     let(:lti_link) do
       Lti::Link.new(resource_link_id: SecureRandom.uuid,
@@ -192,16 +192,16 @@ describe OriginalityReport do
 
     it 'creates an LTI launch URL if a lti_link is present' do
       report.update_attributes(lti_link: lti_link)
-      expected_url = "http://localhost/courses/"\
+      expected_url = "/courses/"\
                      "#{submission.assignment.course.id}/assignments/"\
                      "#{submission.assignment.id}/lti/resource/#{lti_link.resource_link_id}?display=borderless"
-      expect(report.report_launch_url).to eq expected_url
+      expect(report.report_launch_path).to eq expected_url
     end
 
     it 'uses the originality_report_url when the link id is present' do
       non_lti_url = 'http://www.test.com/report'
       report.update_attributes(originality_report_url: non_lti_url)
-      expect(report.report_launch_url).to eq non_lti_url
+      expect(report.report_launch_path).to eq non_lti_url
     end
   end
 

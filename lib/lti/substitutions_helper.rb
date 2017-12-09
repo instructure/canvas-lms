@@ -190,10 +190,18 @@ module Lti
 
     def previous_course_ids_and_context_ids
       return [] unless @context.is_a?(Course)
-      @previous_ids ||= Course.where(
-        "EXISTS (?)", ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id")
+
+      # now find all parents for locked folders
+      Course.where(
+        "EXISTS (?)", ContentMigration.where(workflow_state: :imported).where("context_id = ? OR context_id IN (
+            WITH RECURSIVE t AS (
+              SELECT context_id, source_course_id FROM #{ContentMigration.quoted_table_name} WHERE context_id = ?
+              UNION
+              SELECT content_migrations.context_id, content_migrations.source_course_id FROM #{ContentMigration.quoted_table_name} INNER JOIN t ON content_migrations.context_id=t.source_course_id
+            )
+            SELECT DISTINCT context_id FROM t
+          )", @context.id, @context.id).where("content_migrations.source_course_id = courses.id")
       ).select("id, lti_context_id")
     end
-
   end
 end

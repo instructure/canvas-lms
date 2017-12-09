@@ -17,8 +17,12 @@
  */
 
 export default class SlickGridSpecHelper {
-  constructor (grid) {
-    this.grid = grid;
+  constructor (gradebookGrid) {
+    this.grid = gradebookGrid.grid;
+  }
+
+  getColumn (id) {
+    return this.grid.getColumns().find(column => column.id === id);
   }
 
   listColumns () {
@@ -41,5 +45,9 @@ export default class SlickGridSpecHelper {
     const columns = this.grid.getColumns();
     this.grid.setColumns(columnIds.map(id => columns.find(column => column.id === id)));
     this.grid.onColumnsReordered.notify();
+  }
+
+  getColumnHeaderNode (columnId) {
+    return this.grid.getHeaderRowColumn(columnId);
   }
 }

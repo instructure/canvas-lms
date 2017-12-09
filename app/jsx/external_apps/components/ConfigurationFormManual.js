@@ -137,7 +137,7 @@ export default React.createClass({
           <TextInput
             ref="url"
             id="url"
-            defaultValue={this.props.url}
+            defaultValue={this.props.url ? this.props.url : ''}
             label={I18n.t('Launch URL')}
             required={true}
             errors={this.state.errors} />

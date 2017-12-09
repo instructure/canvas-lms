@@ -20,7 +20,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
 
   context "within class" do
     it 'allows defs' do
-      inspect_source(cop, %{
+      inspect_source(%{
         class CombatArmband
           def laserbeams
             "PEWPEWPEPWEPWPEW"
@@ -33,7 +33,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
 
   context "within context" do
     it 'allows defs' do
-      inspect_source(cop, %{
+      inspect_source(%{
         context "Jumpity JumpStick" do
           def jump_and_jab
             puts "heeeeeya!"
@@ -46,7 +46,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
 
   context "within describe" do
     it 'allows defs' do
-      inspect_source(cop, %{
+      inspect_source(%{
         describe JumpStick do
           def zappy_zap
             puts "yarrwafeiowhf"
@@ -59,7 +59,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
 
   context "within module" do
     it 'allows defs' do
-      inspect_source(cop, %{
+      inspect_source(%{
         module JumpStick
           def jumpy
             puts "vroom"
@@ -73,7 +73,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
 
   context "within shared_context" do
     it 'allows defs' do
-      inspect_source(cop, %{
+      inspect_source(%{
         shared_context "in-process server selenium tests" do
           def bat_poo
             "splat!"
@@ -86,7 +86,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
 
   context "within shared_examples" do
     it 'allows defs' do
-      inspect_source(cop, %{
+      inspect_source(%{
         shared_examples '[:correct]' do
           def pirates
             "attaaaaaaaack!"
@@ -98,7 +98,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
   end
 
   it "disallows defs on Object" do
-    inspect_source(cop, %{
+    inspect_source(%{
       def crow_tornado_so_op
         puts "yoo"
       end

@@ -119,7 +119,7 @@ import './jquery.loadingImg'
           if ($.isFunction(opts.ready))
             opts.ready();
         });
-      } else if (!INST.disableGooglePreviews && (!opts.mimeType || $.isPreviewable(opts.mimeType, 'google')) && opts.attachment_id || opts.public_url){
+      } else if (!INST.disableGooglePreviews && (!opts.mimetype || $.isPreviewable(opts.mimetype, 'google')) && opts.attachment_id || opts.public_url){
         // else if it's something google docs preview can handle and we can get a public url to this document.
         var loadGooglePreview = function () {
           // this handles both ssl and plain http.

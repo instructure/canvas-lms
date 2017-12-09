@@ -107,7 +107,7 @@ define [
     originalOpen = window.open
 
     # needed for proper cleanup of windows
-    openStub = @stub window, "open", ->
+    openStub = @stub(window, "open").callsFake ->
       latestWindow = originalOpen.apply(this, arguments)
 
     server = sinon.fakeServer.create()

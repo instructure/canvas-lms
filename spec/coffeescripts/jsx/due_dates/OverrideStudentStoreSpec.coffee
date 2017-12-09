@@ -56,9 +56,9 @@ define [
         }
       ]
       # by id
-      @server.respondWith "GET", "/api/v1/courses/1/users?user_ids%5B%5D=2&user_ids%5B%5D=5&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
+      @server.respondWith "GET", "/api/v1/courses/1/users?user_ids=2%2C5&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       # by id paginated
-      @server.respondWith "GET", "/api/v1/courses/1/users?user_ids%5B%5D=2&user_ids%5B%5D=5&user_ids%5B%5D=7&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json", "Link":'<http://page2>; rel="next"'}, JSON.stringify(@response)]
+      @server.respondWith "GET", "/api/v1/courses/1/users?user_ids=2%2C5%2C7&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids", [200, {"Content-Type":"application/json", "Link":'<http://page2>; rel="next"'}, JSON.stringify(@response)]
       @server.respondWith "GET", "http://page2", [200, {"Content-Type":"application/json"}, JSON.stringify(@response2)]
       # by name
       @server.respondWith "GET", "/api/v1/courses/1/search_users", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]

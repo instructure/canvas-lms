@@ -109,6 +109,8 @@ describe Moodle::Converter do
 
       expect(@course.context_modules.count).to eq 8
       expect(@course.context_module_tags.where(:content_type => "Assignment", :title => "Assignment Name")).to be_exists
+      expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "My First Book")).to be_exists
+      expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "Chapter 1")).to be_exists
       expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "My Sample Page")).to be_exists
       expect(@course.context_module_tags.where(:content_type => "ContextModuleSubHeader", :title => "This is some label text")).to be_exists
       expect(@course.context_module_tags.where(:content_type => "DiscussionTopic", :title => "Hidden Forum")).to be_exists

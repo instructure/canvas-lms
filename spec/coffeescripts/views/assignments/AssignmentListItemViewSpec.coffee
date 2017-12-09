@@ -27,8 +27,9 @@ define [
   'helpers/I18nStubber'
   'helpers/fakeENV'
   'jsx/shared/conditional_release/CyoeHelper'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (Backbone, Assignment, Submission, AssignmentListItemView, $, tz, juneau, french, I18nStubber, fakeENV, CyoeHelper) ->
+], (Backbone, Assignment, Submission, AssignmentListItemView, $, tz, juneau, french, I18nStubber, fakeENV, CyoeHelper, assertions) ->
   screenreaderText = null
   nonScreenreaderText = null
 
@@ -174,6 +175,11 @@ define [
       genTeardown.call @
       tz.restore(@snapshot)
       I18nStubber.popFrame()
+
+  test 'should be accessible', (assert) ->
+    view = createView(@model, canManage: true)
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test "initializes child views if can manage", ->
     view = createView(@model, canManage: true)

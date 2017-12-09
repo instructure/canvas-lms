@@ -97,6 +97,11 @@ require 'securerandom'
 #           "description": "the integration identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
 #         },
+#         "sis_import_id": {
+#           "description": "the unique identifier for the SIS import. This field is only included if the user has permission to manage SIS information.",
+#           "example": 34,
+#           "type": "integer"
+#         },
 #         "name": {
 #           "description": "the full name of the course",
 #           "example": "InstructureCon 2012",
@@ -888,6 +893,7 @@ class CoursesController < ApplicationController
 
       user_ids = params[:user_ids]
       if user_ids.present?
+        user_ids = user_ids.split(",") if user_ids.is_a?(String)
         users = users.where(id: user_ids)
       end
 
@@ -1050,18 +1056,21 @@ class CoursesController < ApplicationController
         todo_item_json(a, @current_user, session, 'submitting')
       }
       if Array(params[:include]).include? 'ungraded_quizzes'
-        submitting += @current_user.ungraded_quizzes_needing_submitting(:contexts => [@context]).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
+        submitting += @current_user.ungraded_quizzes(:contexts => [@context], :needing_submitting => true).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
         submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
       end
       render :json => (grading + submitting)
     end
   end
 
-  # @API Conclude a course
+  # @API Delete/Conclude a course
   # Delete or conclude an existing course
   #
   # @argument event [Required, String, "delete"|"conclude"]
   #   The action to take on the course.
+  #
+  # @example_response
+  #   { "delete": "true" }
   def destroy
     @context = api_find(Course, params[:id])
     if api_request? && !['delete', 'conclude'].include?(params[:event])
@@ -1887,8 +1896,8 @@ class CoursesController < ApplicationController
       enrollment_options[:role] = custom_role if custom_role
 
       list =
-        if params[:user_ids]
-          Array(params[:user_ids])
+        if params[:user_tokens]
+          Array(params[:user_tokens])
         else
           UserList.new(params[:user_list],
                           root_account: @context.root_account,
@@ -2658,6 +2667,7 @@ class CoursesController < ApplicationController
       pg_scope = ModeratedGrading::ProvisionalGrade.where(:submission_id => @fake_student.all_submissions)
       SubmissionComment.where(:provisional_grade_id => pg_scope).delete_all
       pg_scope.delete_all
+      OriginalityReport.where(:submission_id => @fake_student.all_submissions).delete_all
       @fake_student.all_submissions.destroy_all
       @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all

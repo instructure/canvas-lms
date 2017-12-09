@@ -22,7 +22,7 @@
           role="button"
           class="Button"
           aria-describedby="msf{{instanceNumber}}-next-desc"
-          aria-disabled={{next.modules_tab_disabled}}
+          {{#if next.modules_tab_disabled}} aria-disabled="true" {{/if}}
           {{ disabledIf next.modules_tab_disabled }}
         >
           {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>

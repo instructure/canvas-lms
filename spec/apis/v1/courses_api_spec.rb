@@ -566,6 +566,7 @@ describe CoursesController, type: :request do
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
+          'sis_import_id' => nil,
           'workflow_state' => 'available',
           'default_view' => 'modules',
           'storage_quota_mb' => @account.default_storage_quota_mb
@@ -618,6 +619,7 @@ describe CoursesController, type: :request do
             'apply_assignment_group_weights'       => true,
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
+            'sis_import_id'                        => nil,
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
             'time_zone'                            => 'America/Chicago'
           }

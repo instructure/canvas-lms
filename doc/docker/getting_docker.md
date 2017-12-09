@@ -1,5 +1,16 @@
 # Getting Docker Setup
 
+**Note:** this works through the details of how to set docker up manually. If
+you just want to set up a Canvas development environment with a minimum of
+effort, run:
+
+```
+./scripts/docker_dev_setup.sh
+```
+
+The script will guide you through the process of installing docker and setting
+up Canvas.
+
 Docker has lots of info getting up and running [here](https://www.docker.com/products/docker). The info below should still get you going though.
 
 ## Dinghy on macOS

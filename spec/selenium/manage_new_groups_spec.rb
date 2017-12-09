@@ -173,7 +173,6 @@ describe "manage groups" do
       expect(fj(".group-summary:visible:first").text).to eq "1 student"
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
 
-
       # Move the user from one group into the other
       fj(".groups .group .group-user .group-user-actions").click
       wait_for_ajaximations
@@ -181,7 +180,7 @@ describe "manage groups" do
       wait_for_ajaximations
       ff(".move-select .move-select__group option").last.click
       wait_for_ajaximations
-      fj(".move-select button").click
+      fj(".move-select button[type='submit']").click
       wait_for_ajaximations
       expect(fj(".group-summary:visible:first").text).to eq "0 students"
       expect(fj(".group-summary:visible:last").text).to eq "1 student"
@@ -193,7 +192,7 @@ describe "manage groups" do
       wait_for_ajaximations
       ff(".move-select .move-select__group option").last.click
       wait_for_ajaximations
-      fj('.move-select button').click
+      fj('.move-select button[type="submit"]').click
       wait_for_ajaximations
       expect(fj(".group-summary:visible:first").text).to eq "1 student"
       expect(fj(".group-summary:visible:last").text).to eq "0 students"

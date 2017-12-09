@@ -23,6 +23,7 @@ module CC::Importer::Canvas
     include AssignmentConverter
     include TopicConverter
     include ToolProfileConverter
+    include ToolSettingsConverter
     include WebcontentConverter
     include QuizConverter
     include MediaTrackConverter
@@ -44,7 +45,7 @@ module CC::Importer::Canvas
       unzip_archive
       set_progress(5)
 
-      @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
+      @manifest = open_file(@package_root.item_path(MANIFEST_FILE))
       get_all_resources(@manifest)
 
       convert_all_course_settings
@@ -61,6 +62,8 @@ module CC::Importer::Canvas
       set_progress(50)
       @course[:tool_profiles] = convert_tool_profiles
       set_progress(52)
+      @course[:tool_settings] = convert_tool_settings
+      set_progress(56)
       @course[:file_map] = create_file_map
       set_progress(60)
       @course[:all_files_zip] = package_course_files
@@ -83,7 +86,7 @@ module CC::Importer::Canvas
     end
 
     def read_external_content
-      folder = File.join(@unzipped_file_path, EXTERNAL_CONTENT_FOLDER)
+      folder = @package_root.item_path(EXTERNAL_CONTENT_FOLDER)
       return unless File.directory?(folder)
 
       external_content = {}

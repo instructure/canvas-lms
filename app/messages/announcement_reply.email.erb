@@ -11,7 +11,7 @@
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
 <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-  <%= t("Comment by replying to this message, or join the conversation using this link: %{link}.", link: content(:link)) %>
+  <%= t("Comment by replying to this message, or join the conversation using this link: %{link}.When allowed, if you need to include an attachment, please log in to Canvas and reply to the announcement.", link: content(:link)) %>
 <% else %>
   <%= t("Join the conversation using this link: %{link}.", link: content(:link)) %>
 <% end %>

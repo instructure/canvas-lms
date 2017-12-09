@@ -298,15 +298,27 @@ class PageView < ActiveRecord::Base
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user, options={})
+    viewer = options.delete(:viewer)
+    viewer = nil if viewer == user
+    viewer = nil if viewer && Account.site_admin.grants_any_right?(viewer, :view_statistics, :manage_students)
     user.shard.activate do
       if PageView.pv4?
-        pv4_client.for_user(user.global_id, **options)
+        result = pv4_client.for_user(user.global_id, **options)
+        result = AccountFilter.filter(result, viewer) if viewer
+        result
       elsif PageView.cassandra?
-        PageView::EventStream.for_user(user, options)
+        result = PageView::EventStream.for_user(user, options)
+        result = AccountFilter.filter(result, viewer) if viewer
+        result
       else
         scope = self.where(:user_id => user).order('created_at desc')
         scope = scope.where("created_at >= ?", options[:oldest]) if options[:oldest]
         scope = scope.where("created_at <= ?", options[:newest]) if options[:newest]
+        if viewer
+          accounts = user.associated_accounts.shard(user).select { |a| a.grants_any_right?(viewer, :view_statistics, :manage_students) }
+          accounts << nil
+          scope = scope.where(account_id: accounts)
+        end
         scope
       end
     end

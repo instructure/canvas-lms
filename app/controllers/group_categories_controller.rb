@@ -335,7 +335,7 @@ class GroupCategoriesController < ApplicationController
     search_params = params.slice(:search_term)
     search_params[:enrollment_type] = "student" if @context.is_a? Course
 
-    @group_category ||= @context.group_categories.where(id: params[:category_id]).first
+    @group_category ||= @context.group_categories.where(id: params[:group_category_id]).first
     exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active.pluck(:id) : []
     search_params[:exclude_groups] = exclude_groups
 
@@ -345,8 +345,23 @@ class GroupCategoriesController < ApplicationController
       users = UserSearch.scope_for(@context, @current_user, search_params)
     end
 
+    includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
-    render :json => users_json(users, @current_user, session, Array(params[:include]), @context, nil, Array(params[:exclude]))
+    json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
+
+    if includes.include? 'group_submissions'
+      assignments = @group_category.assignments.active
+      submissions = Submission.active.where(assignment_id: assignments, workflow_state: 'submitted').select(:id, :user_id)
+      submissions_by_user = submissions.each_with_object({}) do |sub, obj|
+        obj[sub.user_id] = (obj[sub.user_id] || []).push(sub.id)
+      end
+
+      json_users.each do |user|
+        user[:group_submissions] = submissions_by_user[user[:id]]
+      end
+    end
+
+    render :json => json_users
   end
 
   # @API Assign unassigned members

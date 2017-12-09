@@ -76,10 +76,7 @@ module Lti
 
     def submission_event_service
       @_submission_event_service ||= begin
-        tp = IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
-        tp.tool_profile&.service_offered&.find do |s|
-          s.id.include?(SUBMISSION_EVENT_ID) && s.action.include?("POST")
-        end
+        tool_proxy.find_service(SUBMISSION_EVENT_ID, 'POST')
       end
     end
 

@@ -129,7 +129,7 @@ import {parseNameList, findEmailInEntry} from './helpers'
     dispatch(actions.enrollUsersStart());
     const state = getState();
     const courseId = state.courseParams.courseId;
-    const users = state.usersToBeEnrolled.map(u => u.user_id);
+    const user_tokens = state.usersToBeEnrolled.map(u => u.user_token);
     const role = state.inputParams.role
           || (state.courseParams.roles && state.courseParams.roles.length && state.courseParams.roles[0].id)
           || '';
@@ -137,7 +137,7 @@ import {parseNameList, findEmailInEntry} from './helpers'
           || (state.courseParams.sections && state.courseParams.sections.length && state.courseParams.sections[0].id)
           || '';
     const limitPrivilege = state.inputParams.limitPrivilege || false;
-    api.enrollUsers({ courseId, users, role, section, limitPrivilege })
+    api.enrollUsers({ courseId, user_tokens, role, section, limitPrivilege })
       .then(res => dispatch(actions.enrollUsersSuccess(res.data)))
       .catch(err => dispatch(actions.enrollUsersError(err)));
   };

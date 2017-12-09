@@ -142,4 +142,3 @@ define [
       json.groupsAreSearchable = ENV.IS_LARGE_ROSTER and
                                  not json.randomlyAssignStudentsInProgress
       json
-

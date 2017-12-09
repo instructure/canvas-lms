@@ -115,8 +115,9 @@ module Importers
       item.migration_id = hash[:migration_id]
       migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
+      item.mark_as_importing!(migration)
       if hash[:workflow_state] == 'unpublished'
-        item.workflow_state = 'unpublished' if item.new_record? || item.deleted? # otherwise leave it alone
+        item.workflow_state = 'unpublished' if item.new_record? || item.deleted? || migration.for_master_course_import? # otherwise leave it alone
       else
         item.workflow_state = 'active'
       end
@@ -321,10 +322,11 @@ module Importers
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
         item.position = (context_module.item_migration_position ||= context_module.content_tags.not_deleted.map(&:position).compact.max || 0)
+        item.mark_as_importing!(migration)
         if hash[:workflow_state]
           if item.sync_workflow_state_to_asset?
             item.workflow_state = item.asset_workflow_state if item.deleted? && hash[:workflow_state] != 'deleted'
-          elsif !['active', 'published'].include?(item.workflow_state)
+          elsif !['active', 'published'].include?(item.workflow_state) || migration.for_master_course_import?
             item.workflow_state = hash[:workflow_state]
           end
         end

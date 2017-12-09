@@ -354,10 +354,7 @@ class CalendarEventsApiController < ApplicationController
       # preload data used by assignment_json
       ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
       Shard.partition_by_shard(events) do |shard_events|
-        having_submission = Submission.active.having_submission.
-            where(assignment_id: shard_events).
-            distinct.
-            pluck(:assignment_id).to_set
+        having_submission = Assignment.assignment_ids_with_submissions(shard_events.map(&:id))
         shard_events.each do |event|
           event.has_submitted_submissions = having_submission.include?(event.id)
         end

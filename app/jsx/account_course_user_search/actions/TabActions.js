@@ -16,17 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!user_actions'
-
-  const TabActions = {
-    selectTab(tabIndex) {
-      return {
-        type: 'SELECT_TAB',
-        payload: {
-          tabIndex: tabIndex
-        }
-      };
+export default {
+  selectTab({selected, queryParams}) {
+    return {
+      type: 'SELECT_TAB',
+      payload: {
+        selected,
+        queryParams
+      }
     }
-  };
-
-export default TabActions
+  }
+}

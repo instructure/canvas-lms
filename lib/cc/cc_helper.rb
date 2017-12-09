@@ -22,7 +22,7 @@ module CC
 module CCHelper
 
   CANVAS_NAMESPACE = 'http://canvas.instructure.com/xsd/cccv1p0'
-  XSD_URI = 'http://canvas.instructure.com/xsd/cccv1p0.xsd'
+  XSD_URI = 'https://canvas.instructure.com/xsd/cccv1p0.xsd'
 
   # IMS formats/types
   IMS_DATE = "%Y-%m-%d"

@@ -165,8 +165,8 @@ class AssignmentGroupsController < ApplicationController
 
       return render_unauthorized_action unless can_reorder_assignments?(assignments, @group)
 
-      assignments.update_all(assignment_group_id: @group.id)
-      @context.active_quizzes.where(assignment_id: order).update_all(assignment_group_id: @group.id)
+      assignments.update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
+      @context.active_quizzes.where(assignment_id: order).update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
       groups = AssignmentGroup.where(id: group_ids)
       groups.touch_all

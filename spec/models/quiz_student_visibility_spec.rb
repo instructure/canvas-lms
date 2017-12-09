@@ -189,7 +189,7 @@ describe "differentiated_assignments" do
         end
         it "should not keep the quiz visible even if there is a grade" do
           @quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @student})
           ensure_user_does_not_see_quiz
@@ -199,7 +199,7 @@ describe "differentiated_assignments" do
           @quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
           @quiz.assignment.submissions.last.update_attribute("score", nil)
           @quiz.assignment.submissions.last.update_attribute("grade", 10)
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @student})
           ensure_user_does_not_see_quiz
@@ -207,7 +207,7 @@ describe "differentiated_assignments" do
 
         it "should not keep the quiz visible even if the grade is zero" do
           @quiz.assignment.grade_student(@student, grade: 0, grader: @teacher)
-          Score.where(enrollment_id: @student.enrollments).delete_all
+          Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @student})
           ensure_user_does_not_see_quiz
@@ -227,7 +227,7 @@ describe "differentiated_assignments" do
         it "should update when enrollments change" do
           ensure_user_sees_quiz
           enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
-          Score.where(enrollment_id: enrollments).delete_all
+          Score.where(enrollment_id: enrollments).each(&:destroy_permanently!)
           enrollments.each(&:destroy_permanently!)
           ensure_user_does_not_see_quiz
         end

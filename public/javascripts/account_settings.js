@@ -352,7 +352,6 @@ import './vendor/jquery.scrollTo'
         } else {
           $rce_container.hide();
           $('#terms_of_service_modal').hide()
-          RichContentEditor.destroyRCE($textarea);
         }
       });
     }

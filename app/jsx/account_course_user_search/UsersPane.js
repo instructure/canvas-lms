@@ -17,25 +17,30 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import {shape, func, arrayOf, string} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
-import UsersStore from './UsersStore'
 import UsersList from './UsersList'
 import UsersToolbar from './UsersToolbar'
-import renderSearchMessage from './renderSearchMessage'
+import SearchMessage from './SearchMessage'
 import UserActions from './actions/UserActions'
 
 const MIN_SEARCH_LENGTH = 3;
 
-class UsersPane extends React.Component {
+export default class UsersPane extends React.Component {
   static propTypes = {
-    store: PropTypes.shape({
-      getState: PropTypes.func.isRequired,
-      dispatch: PropTypes.func.isRequired,
-      subscribe: PropTypes.func.isRequired,
+    store: shape({
+      getState: func.isRequired,
+      dispatch: func.isRequired,
+      subscribe: func.isRequired,
     }).isRequired,
-    roles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    roles: UsersToolbar.propTypes.roles,
+    onUpdateQueryParams: func.isRequired,
+    queryParams: shape({
+      page: string,
+      search_term: string,
+      role_filter_id: string
+    }).isRequired
   };
 
   constructor (props) {
@@ -48,7 +53,12 @@ class UsersPane extends React.Component {
 
   componentDidMount = () => {
     this.unsubscribe = this.props.store.subscribe(this.handleStateChange);
-    this.props.store.dispatch(UserActions.apiGetUsers());
+
+    // make page reflect what the querystring params asked for
+    const {search_term, role_filter_id} = {...UsersToolbar.defaultProps, ...this.props.queryParams}
+    this.props.store.dispatch(UserActions.updateSearchFilter({search_term, role_filter_id}))
+
+    this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
   }
 
   componentWillUnmount = () => {
@@ -59,20 +69,20 @@ class UsersPane extends React.Component {
     this.setState({userList: this.props.store.getState().userList});
   }
 
-  fetchMoreUsers = () => {
-    UsersStore.loadMore(this.state.userList.filters);
-  }
-
   handleApplyingSearchFilter = () => {
-    this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH));
+    this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
+    this.updateQueryString()
   }
 
-  debouncedDispatchApplySearchFilter = _.debounce(() => {
-    this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH));
-  }, 250);
+  updateQueryString = () => {
+    const searchFilter = this.props.store.getState().userList.searchFilter
+    this.props.onUpdateQueryParams(searchFilter)
+  }
+
+  debouncedDispatchApplySearchFilter = _.debounce(this.handleApplyingSearchFilter, 250)
 
   handleUpdateSearchFilter = (searchFilter) => {
-    this.props.store.dispatch(UserActions.updateSearchFilter(searchFilter));
+    this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}));
     this.debouncedDispatchApplySearchFilter();
   }
 
@@ -88,8 +98,9 @@ class UsersPane extends React.Component {
     this.props.store.dispatch(UserActions.closeEditUserDialog(user));
   }
 
-  handleGetMoreUsers = () => {
-    this.props.store.dispatch(UserActions.getMoreUsers());
+  handleSetPage = (page) => {
+    this.props.store.dispatch(UserActions.updateSearchFilter({page}))
+    this.handleApplyingSearchFilter()
   }
 
   handleAddNewUser = (attributes) => {
@@ -97,20 +108,18 @@ class UsersPane extends React.Component {
   }
 
   handleAddNewUserFormErrors = (errors) => {
-    for (const key in errors) {
-      this.props.store.dispatch(UserActions.addError({[key]: errors[key]}));
-    }
+    Object.keys(errors).forEach(key => {
+      this.props.store.dispatch(UserActions.addError({[key]: errors[key]}))
+    })
   }
 
   render () {
-    const {next, timezones, accountId, users, isLoading, errors, searchFilter} = this.state.userList;
-    const collection = {data: users, loading: isLoading, next};
+    const {links, timezones, accountId, users, isLoading, errors, searchFilter} = this.state.userList
     return (
       <div>
         {<UsersToolbar
           onUpdateFilters={this.handleUpdateSearchFilter}
           onApplyFilters={this.handleApplyingSearchFilter}
-          isLoading={isLoading}
           errors={errors}
           {...searchFilter}
           accountId={accountId.toString()}
@@ -139,10 +148,12 @@ class UsersPane extends React.Component {
         />
           }
 
-        {renderSearchMessage(collection, this.handleGetMoreUsers, I18n.t('No users found'))}
+        <SearchMessage
+          collection={{data: users, loading: isLoading, links}}
+          setPage={this.handleSetPage}
+          noneFoundMessage={I18n.t('No users found')}
+        />
       </div>
-    );
+    )
   }
 }
-
-export default UsersPane

@@ -79,6 +79,7 @@ describe "quiz taking" do
   end
 
   it "should show a prompt when attempting to submit with unanswered questions", priority: "1", test_id: 140608 do
+    skip_if_safari(:alert)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     # answer just one question

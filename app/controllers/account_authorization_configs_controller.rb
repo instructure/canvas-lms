@@ -566,7 +566,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The attribute to use to look up the user's login in Canvas. Either
   #   'user_id' (the default), or 'screen_name'
   #
-  # - parent_registration [Optional]
+  # - parent_registration [Optional] - DEPRECATED 2017-11-03
   #
   #   Accepts a boolean value, true designates the authentication service
   #   for use on parent registrations.  Only one service can be selected

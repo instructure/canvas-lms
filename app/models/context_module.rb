@@ -19,6 +19,10 @@
 class ContextModule < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
+  include DuplicatingObjects
+
+  include MasterCourses::Restrictor
+  restrict_columns :state, [:workflow_state]
 
   belongs_to :context, polymorphic: [:course]
   has_many :context_module_progressions, :dependent => :destroy
@@ -155,6 +159,81 @@ class ContextModule < ActiveRecord::Base
     self.position
   end
 
+  def get_potentially_conflicting_titles(title_base)
+    ContextModule.not_deleted.where(context_id: self.context_id)
+      .starting_with_name(title_base).pluck("name").to_set
+  end
+
+  def duplicate_base_model(copy_title)
+    ContextModule.new({
+      :context_id => self.context_id,
+      :context_type => self.context_type,
+      :name => copy_title,
+      :position => ContextModule.not_deleted.where(context_id: self.context_id).maximum(:position) + 1,
+      :prerequisites => self.prerequisites,
+      :completion_requirements => self.completion_requirements,
+      :workflow_state => 'unpublished',
+      :unlock_at => self.unlock_at,
+      :require_sequential_progress => self.require_sequential_progress,
+      :completion_events => self.completion_events,
+      :requirement_count => self.requirement_count
+    })
+  end
+
+  def can_be_duplicated?
+    self.content_tags.none? do |content_tag|
+      !content_tag.deleted? && content_tag.content_type_class == 'quiz'
+    end
+  end
+
+  # This is intended for duplicating a content tag when we are duplicating a module
+  # Not intended for duplicating a content tag to keep in the original module
+  def duplicate_content_tag_base_model(original_content_tag)
+    ContentTag.new(
+      :content_id => original_content_tag.content_id,
+      :content_type => original_content_tag.content_type,
+      :context_id => original_content_tag.context_id,
+      :context_type => original_content_tag.context_type,
+      :title => original_content_tag.title,
+      :tag_type => original_content_tag.tag_type,
+      :position => original_content_tag.position,
+      :indent => original_content_tag.indent,
+      :learning_outcome_id => original_content_tag.learning_outcome_id,
+      :context_code => original_content_tag.context_code,
+      :mastery_score => original_content_tag.mastery_score,
+      :workflow_state => 'unpublished'
+    )
+  end
+  private :duplicate_content_tag_base_model
+
+  # Intended for taking a content_tag in this module and duplicating it
+  # into a new module.  Not intended for duplicating a content tag to be
+  # kept in the same module.
+  def duplicate_content_tag(original_content_tag)
+    new_tag = duplicate_content_tag_base_model(original_content_tag)
+    if original_content_tag.content&.respond_to?(:duplicate)
+      new_tag.content = original_content_tag.content.duplicate
+      # If we have multiple assignments (e.g.) make sure they each get unused titles.
+      # A title isn't marked used if the assignment hasn't been saved yet.
+      new_tag.content.save!
+      new_tag.title = nil
+    end
+    new_tag
+  end
+  private :duplicate_content_tag
+
+  def duplicate
+    copy_title = get_copy_title(self, t("Copy"), self.name)
+    new_module = duplicate_base_model(copy_title)
+    living_tags = self.content_tags.select do |content_tag|
+      !content_tag.deleted?
+    end
+    new_module.content_tags = living_tags.map do |content_tag|
+      duplicate_content_tag(content_tag)
+    end
+    new_module
+  end
+
   def validate_prerequisites
     positions = ContextModule.module_positions(self.context)
     @already_confirmed_valid_requirements = false
@@ -207,7 +286,9 @@ class ContextModule < ActiveRecord::Base
   scope :active, -> { where(:workflow_state => 'active') }
   scope :unpublished, -> { where(:workflow_state => 'unpublished') }
   scope :not_deleted, -> { where("context_modules.workflow_state<>'deleted'") }
-
+  scope :starting_with_name, lambda { |name|
+    where('name ILIKE ?', "#{name}%")
+  }
   alias_method :published?, :active?
 
   def publish_items!

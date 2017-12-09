@@ -61,5 +61,5 @@ define [
     toJSON: ->
       json =
         showingPoints: @options.showingPoints
-        weightedGroups: @options.weightedGroups
+        weightedGrades: @options.weightedGrades
         totalColumnInFront: @options.totalColumnInFront

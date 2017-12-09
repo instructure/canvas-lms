@@ -41,7 +41,7 @@ module RuboCop
           return unless method_name == :include
           return if whitelisted_ancestor?(node)
 
-          add_offense node, :expression, MSG, :error
+          add_offense node, message: MSG, severity: :error
         end
 
         private

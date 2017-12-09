@@ -36,13 +36,14 @@ define [
     initialize: (options) ->
       ret = super options
       @fetchOptions = options.fetchOptions
-      @startPaginationListener()
       @bindPaginationEvents()
+      @paginationStopped = false
       ret
 
     render: ->
       ret = super
       @showPaginationLoader() if @collection.fetchingNextPage
+      @startPaginationListener()
       ret
 
     showPaginationLoader: ->
@@ -64,11 +65,15 @@ define [
       containerScrollHeight - $container.scrollTop() - $container.height()
 
     startPaginationListener: ->
-      $(@paginationScrollContainer).on "scroll.pagination#{@cid}, resize.pagination#{@cid}", $.proxy @fetchNextPageIfNeeded, this
+      return if @paginationStopped
+      fn = $.proxy @fetchNextPageIfNeeded, this
+      $(@paginationScrollContainer).on "scroll.pagination:#{@cid}", fn
+      $(@paginationScrollContainer).on "resize.pagination:#{@cid}", fn
       @fetchNextPageIfNeeded()
 
     stopPaginationListener: ->
-      $(@paginationScrollContainer).off ".pagination#{@cid}"
+      @paginationStopped = true
+      $(@paginationScrollContainer).off ".pagination:#{@cid}"
 
     fetchNextPageIfNeeded: ->
       # let the call stack play out before checking the scroll position.

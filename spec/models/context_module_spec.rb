@@ -56,10 +56,75 @@ describe ContextModule do
     end
   end
 
+  describe "can_be_duplicated?" do
+    it "forbid quiz" do
+      course_module
+      quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+      quiz.save!
+      @module.add_item({:id => quiz.id, :type => 'quiz'})
+      assignment = @course.assignments.create!(:title => "some assignment")
+      @module.add_item({ id: assignment.id, :type => 'assignment' })
+      expect(@module.can_be_duplicated?).to be_falsey
+    end
+
+    it "forbid quiz even if added as assignment" do
+      course_module
+      quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+      quiz.save!
+      assignment = Assignment.find(quiz.assignment_id)
+      @module.add_item({:id => assignment.id, :type => 'assignment'})
+      expect(@module.can_be_duplicated?).to be_falsey
+    end
+
+    it "*deleted* quiz tags are ok" do
+      course_module
+      quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+      quiz.save!
+      assignment = Assignment.find(quiz.assignment_id)
+      @module.add_item({:id => assignment.id, :type => 'assignment'})
+      @module.content_tags[0].workflow_state = 'deleted'
+      expect(@module.can_be_duplicated?).to be_truthy
+    end
+
+    it "ok if no quiz" do
+      course_module
+      assignment = @course.assignments.create!(:title => "some assignment")
+      @module.add_item({ id: assignment.id, :type => 'assignment' })
+      expect(@module.can_be_duplicated?).to be_truthy
+    end
+  end
+
+  it "duplicate" do
+    course_module # name is "some module"
+    assignment1 = @course.assignments.create!(:title => "assignment")
+    assignment2 = @course.assignments.create!(:title => "assignment copy")
+    @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
+    @module.add_item({:id => assignment1.id, :type => 'assignment'})
+    quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+    quiz.save!
+    # It is permitted to duplicate a module with a deleted quiz tag, but the deleted
+    # item should not be duplicated.
+    @module.add_item({:id => quiz.id, :type => 'quiz'})
+    @module.content_tags[2].workflow_state = 'deleted'
+    @module.add_item({:id => assignment2.id, :type => 'assignment'})
+
+    @module.workflow_state = 'published'
+    @module.save!
+    new_module = @module.duplicate
+    expect(new_module.name).to eq "some module Copy"
+    expect(new_module.content_tags.length).to eq 3
+    # Stuff with actual content should get unique names, but not stuff like headers.
+    expect(new_module.content_tags[0].title).to eq('unpublished header')
+    expect(new_module.content_tags[1].content.title).to eq('assignment Copy 2')
+    # Respect original choice of "copy" if the thing I copied already made a decision.
+    expect(new_module.content_tags[2].content.title).to eq('assignment copy 3')
+    expect(new_module.workflow_state).to eq('unpublished')
+  end
+
   describe "available_for?" do
     it "should return true by default" do
       course_module
-      expect(@module.available_for?(nil)).to eql(true)
+      expect(@module.available_for?(nil)).to be(true)
     end
 
     it "returns true by default when require_sequential_progress is true and there are no requirements" do

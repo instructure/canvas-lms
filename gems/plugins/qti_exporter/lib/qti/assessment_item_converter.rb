@@ -28,7 +28,7 @@ class AssessmentItemConverter
   DEFAULT_POINTS_POSSIBLE = 1
   UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence']
 
-  attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :question
+  attr_reader :package_root, :identifier, :href, :interaction_type, :title, :question
 
   def initialize(opts)
     @log = Canvas::Migration::logger
@@ -44,9 +44,9 @@ class AssessmentItemConverter
     end
 
     if @manifest_node
-      @base_dir = opts[:base_dir]
+      @package_root = PackageRoot.new(opts[:base_dir])
       @identifier = @manifest_node['identifier']
-      @href = File.join(@base_dir, @manifest_node['href'])
+      @href = @package_root.item_path(@manifest_node['href'])
       if title = @manifest_node.at_css('title langstring') || title = @manifest_node.at_css('xmlns|title xmlns|langstring', 'xmlns' => Qti::Converter::IMS_MD)
         @title = title.text
       end

@@ -40,7 +40,7 @@ gulp.task('rev', () => {
   const timezonesStream = gulp
     .src(timezoneFileGlobs, {base: './node_modules'})
     .pipe(gulpTimezonePlugin())
-  
+
   const customTimezoneStream = gulp
     .src('./public/javascripts/custom_timezone_locales/*.js')
     .pipe(rename(path => path.dirname = '/timezone'))
@@ -67,8 +67,11 @@ gulp.task('rev', () => {
         follow: true // follow symlinks, so it picks up on images inside plugins and stuff
       }),
       gulp.src([
-        // this is used by the include_account_js call in mobile_auth.html.erb to make sure '$' is there for accounts' custom js files
+        // on the mobile login screen, we don't load any of our webpack js bundles. but if they
+        // have a custom js file, we do load a raw copy of jquery for their custom js to use.
+        // See `include_account_js` in mobile_auth.html.erb
         'node_modules/jquery/jquery.js',
+
         'node_modules/tinymce/skins/lightgray/**/*',
       ], {
         base: '.'

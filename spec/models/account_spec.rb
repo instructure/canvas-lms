@@ -439,6 +439,11 @@ describe Account do
       expect(root_account.closest_turnitin_pledge).not_to be_empty
       expect(sub_account.closest_turnitin_pledge).not_to be_empty
     end
+
+    it 'uses the default message if pledge is nil or empty' do
+      account = Account.create!(turnitin_pledge: '')
+      expect(account.closest_turnitin_pledge).to eq 'This assignment submission is my own, original work'
+    end
   end
 
   it "should make a default enrollment term if necessary" do

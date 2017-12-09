@@ -466,6 +466,17 @@ describe GradebookUserIds do
               [@student2.id, @student1.id, @student3.id, @student4.id, @fake_student.id]
             )
           end
+
+          it "returns all students even if only a subset is assigned" do
+            assignment = @course.assignments.create!(points_possible: 10, only_visible_to_overrides: true)
+            create_adhoc_override_for_assignment(assignment, [@student1, @student3], due_at: nil)
+            @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] =
+              "assignment_#{assignment.id}"
+
+            expect(gradebook_user_ids.user_ids).to eq(
+              [@student1.id, @student3.id, @student4.id, @student2.id, @fake_student.id]
+            )
+          end
         end
 
         context 'when pg_collkey is not installed' do

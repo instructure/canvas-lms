@@ -35,13 +35,11 @@ class QuestionBankPage {
   constructor () {
     this.onAddOutcome = this.onAddOutcome.bind(this)
     this.rootOutcomeGroup = new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP)
-    this.cacheElements()
     this.attachEvents()
   }
 
-  cacheElements () {
-    this.$els.addOutcome = $('.add_outcome_link')
-    return this.$els.dialog = new FindDialog({
+  createDialog () {
+    this.$els.dialog = new FindDialog({
       title: this.translations.findOutcome,
       selectedGroup: this.rootOutcomeGroup,
       setQuizMastery: true,
@@ -49,16 +47,19 @@ class QuestionBankPage {
       disableGroupImport: true,
       rootOutcomeGroup: this.rootOutcomeGroup
     })
+    this.$els.dialog.on('import', this.onOutcomeImport)
   }
 
   attachEvents () {
-    this.$els.addOutcome.on('click', this.onAddOutcome)
-    return this.$els.dialog.on('import', this.onOutcomeImport)
+    $('.add_outcome_link').on('click', this.onAddOutcome)
   }
 
   onAddOutcome (e) {
     e.preventDefault()
-    return this.$els.dialog.show()
+    if (!this.$els.dialog) {
+      this.createDialog()
+    }
+    this.$els.dialog.show()
   }
 
   onOutcomeImport (outcome) {
@@ -69,9 +70,9 @@ class QuestionBankPage {
       if (id !== outcome.get('id')) { return [id, percent] } return null
     })
     alignments.push([outcome.get('id'), mastery])
-    return updateAlignments(alignments)
+    updateAlignments(alignments)
   }
-  }
+}
 QuestionBankPage.initClass()
 
 

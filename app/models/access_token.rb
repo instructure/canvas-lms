@@ -130,7 +130,13 @@ class AccessToken < ActiveRecord::Base
     if overwrite || !self.crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
-      if slaved_developer_key != DeveloperKey.default && !self.expires_at_changed? && slaved_developer_key.try(:auto_expire_tokens)
+      # all reasons to _not_ expire the token
+      if slaved_developer_key == DeveloperKey.default ||
+        expires_at_changed? ||
+        !slaved_developer_key&.auto_expire_tokens ||
+        scopes == ['/auth/userinfo']
+        # do nothing
+      else
         self.expires_at = DateTime.now.utc + 1.hour
       end
     end

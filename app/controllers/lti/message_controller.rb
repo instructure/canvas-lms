@@ -40,9 +40,7 @@ module Lti
         )
 
         @lti_launch.params = message.post_params
-        if @context.root_account.feature_enabled?(:lti_2_auth_url_registration)
-          @lti_launch.params['oauth2_access_token_url'] = polymorphic_url([@context, :lti_oauth2_authorize])
-        end
+        @lti_launch.params['oauth2_access_token_url'] = polymorphic_url([@context, :lti_oauth2_authorize])
         @lti_launch.params['ext_tool_consumer_instance_guid'] = @context.root_account.lti_guid
         @lti_launch.params['ext_api_domain'] = HostUrl.context_host(@context, request.host)
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')

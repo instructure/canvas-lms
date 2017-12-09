@@ -88,14 +88,14 @@ export default {
   },
 
   // @param courseId: the course id
-  // @param users: array of user ids
+  // @param user_tokens: array of user tokens returned by user_lists(v2) / invite_users
   // @param role: role id of users being enrolled in
   // @param section: section id the users are being enrolled in
   // @returns [{enrollment: {user_id amongst other properties}, ...}]
   //
-  enrollUsers ({ courseId, users, role, section, limitPrivilege }) {
+  enrollUsers ({ courseId, user_tokens, role, section, limitPrivilege }) {
     return axios.post(`/courses/${courseId}/enroll_users`, {
-      user_ids: users,
+      user_tokens,
       role_id: role,
       course_section_id: section,
       limit_privileges_to_course_section: limitPrivilege

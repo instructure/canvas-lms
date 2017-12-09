@@ -24,11 +24,11 @@ module CC::Exporter::Epub::Converters
       announcements = []
 
       @manifest.css('resource[type=imsdt_xmlv1p1]').each do |res|
-        cc_path = File.join @unzipped_file_path, res.at_css('file')['href']
+        cc_path = @package_root.item_path res.at_css('file')['href']
 
         canvas_id = get_node_att(res, 'dependency', 'identifierref')
         if canvas_id && (meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]}))
-          canvas_path = File.join @unzipped_file_path, meta_res.at_css('file')['href']
+          canvas_path = @package_root.item_path meta_res.at_css('file')['href']
           meta_node = open_file_xml(canvas_path)
         else
           meta_node = nil

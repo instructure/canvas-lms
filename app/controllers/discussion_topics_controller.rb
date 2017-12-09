@@ -253,7 +253,7 @@ class DiscussionTopicsController < ApplicationController
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
   #
-  # @argument order_by [String, "position"|"recent_activity"]
+  # @argument order_by [String, "position"|"recent_activity"|"title"]
   #   Determines the order of the discussion topic list. Defaults to "position".
   #
   # @argument scope [String, "locked"|"unlocked"|"pinned"|"unpinned"]
@@ -279,7 +279,6 @@ class DiscussionTopicsController < ApplicationController
   # @returns [DiscussionTopic]
   def index
     include_params = Array(params[:include])
-
     if params[:only_announcements]
       return unless authorized_action(@context.announcements.temp_record, @current_user, :read)
     else
@@ -302,6 +301,8 @@ class DiscussionTopicsController < ApplicationController
 
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at
+            elsif params[:order_by] == 'title'
+              scope.order(DiscussionTopic.best_unicode_collation_key("discussion_topics.title")).order(:position, :id)
             elsif params[:only_announcements]
               scope.by_posted_at
             else
@@ -380,14 +381,14 @@ class DiscussionTopicsController < ApplicationController
         if @context.grants_right?(@current_user, session, :moderate_forum)
           mc_status = setup_master_course_restrictions(@topics, @context)
         end
-
+        root_topic_fields = [:delayed_post_at, :lock_at]
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
           user_can_moderate: user_can_moderate,
           plain_messages: value_to_boolean(params[:plain_messages]),
           exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
           include_all_dates: include_params.include?('all_dates'),
-          master_course_status: mc_status
-        )
+          master_course_status: mc_status,
+          root_topic_fields: root_topic_fields)
       end
     end
   end
@@ -672,6 +673,9 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument delayed_post_at [DateTime]
   #   If a timestamp is given, the topic will not be published until that time.
+  #
+  # @argument allow_rating [Boolean]
+  #   Whether or not users can rate entries in this topic.
   #
   # @argument lock_at [DateTime]
   #   If a timestamp is given, the topic will be scheduled to lock at the

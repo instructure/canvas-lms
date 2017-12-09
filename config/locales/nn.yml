@@ -143,7 +143,7 @@ nn:
     account_required: "må vere LDAP-godkjend"
     index: 
       delete_auth_confirmation: "Er du sikker? Brukarar kan ikkje logge på dersom denne blir fjerna."
-      delete_auth_link: "Fjern all godkjenning"
+      delete_auth_link: "Fjern autentisering"
       ip_address_list_description: "Dersom du brukar ei godkjenningsteneste som krev at Canvas-tenarane må kontakte tenarane dine direkte, som LDAP, må du kontrollere at tenarane godtek tilkoplingar frå desse IP-adressene:"
       no_auth_type_description: "Kontoen integrerer ikkje med ein identitetsleverandør akkurat no."
       page_title: Godkjenningsinnstillingar
