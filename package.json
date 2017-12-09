@@ -30,6 +30,7 @@
     "jquery-ui-touch-punch": "^0.2.3",
     "jquery.cookie": "^1.4.1",
     "jquery.elastic": "^1.0.0",
+    "location-origin": "^1.1.4",
     "lodash": "^4.16.4",
     "md5": "^2.2.1",
     "moment": "~2.10.6",

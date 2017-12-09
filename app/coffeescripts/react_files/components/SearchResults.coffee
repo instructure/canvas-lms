@@ -23,7 +23,7 @@ define [
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-  '../utils/locationOrigin'
+  'location-origin'
 ], (_, I18n, React, FilesCollection, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
 
   SearchResults =
