@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 
 const VALID_SCOPES = ["row", "col", "rowgroup", "colgroup"]
 

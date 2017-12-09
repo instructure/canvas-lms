@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 import * as strings from "./strings"
 
 const WORD_COUNT = 4

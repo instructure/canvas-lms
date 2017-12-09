@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 
 const MAX_ALT_LENGTH = 120
 

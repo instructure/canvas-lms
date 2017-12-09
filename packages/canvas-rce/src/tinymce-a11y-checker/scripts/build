@@ -5,6 +5,8 @@
 set -e
 rm -rf lib
 
+node scripts/build-translations.js --empty
+
 CPUS=$(node --eval "console.log(Math.max(1, require('os').cpus().length))")
 echo "building pretranslated output in lib/translated $CPUS at a time ..."
 
@@ -17,3 +19,8 @@ ls locales/*.json | \
   xargs basename -s .json | \
   xargs -t -n 1 -P $CPUS -I % env \
     NODE_ENV=transpile BUILD_LOCALE=% $(npm bin)/babel --out-dir lib/% --ignore __*/* --quiet src
+
+node scripts/build-translations.js
+
+$(npm bin)/babel --out-dir lib/modules --ignore __*/* --quiet src
+NODE_ENV=transpile $(npm bin)/babel --out-dir lib/ --ignore __*/* --quiet src

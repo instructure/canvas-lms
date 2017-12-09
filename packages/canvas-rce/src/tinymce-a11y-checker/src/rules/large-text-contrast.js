@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 import contrast from "wcag-element-contrast"
 import smallTextContrast from "./small-text-contrast"
 

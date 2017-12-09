@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 import { changeTag } from "../utils/dom"
 
 const _forEach = Array.prototype.forEach

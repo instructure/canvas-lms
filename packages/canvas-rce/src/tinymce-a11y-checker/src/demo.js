@@ -1,10 +1,12 @@
 import { renderIntoDiv } from "canvas-rce"
 import canvasTheme from "instructure-ui/lib/themes/canvas"
 
-import { getInstance } from "./plugin"
+import { getInstance, setLocale } from "./plugin"
 import "tinymce/plugins/image"
 
 getInstance(instance => instance.setConfig({ disableContrastCheck: false }))
+const lang = (/lang=([^&]+)/.exec(window.location.search) || {})[1]
+setLocale(lang || "en")
 
 canvasTheme.use()
 
