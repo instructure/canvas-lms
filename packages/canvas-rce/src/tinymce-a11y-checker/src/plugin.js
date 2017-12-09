@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import Checker from "./components/checker"
-import formatMessage from "format-message"
+import formatMessage from "./format-message"
 
 let instance
 const pendingInstanceCallbacks = []
@@ -45,4 +45,10 @@ export function getInstance(cb) {
     return cb(instance)
   }
   pendingInstanceCallbacks.push(cb)
+}
+
+export function setLocale(locale) {
+  const options = formatMessage.setup()
+  options.locale = locale
+  formatMessage.setup(options)
 }

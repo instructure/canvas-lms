@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 import { changeTag } from "../utils/dom"
 
 const MAX_HEADING_LENGTH = 125

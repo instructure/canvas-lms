@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 
 const shouldMergeAnchors = (elem1, elem2) => {
   if (!elem1 || !elem2 || elem1.tagName !== "A" || elem2.tagName !== "A") {

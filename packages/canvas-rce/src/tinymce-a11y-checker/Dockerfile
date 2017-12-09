@@ -15,6 +15,9 @@ ARG NPM_PRIVATE_EMAIL
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
+USER root
+RUN chown -R docker:docker /usr/src/app
+USER docker
 
 RUN npm install \
     && npm-private install @inst/sync-format-message-translations; exit 0

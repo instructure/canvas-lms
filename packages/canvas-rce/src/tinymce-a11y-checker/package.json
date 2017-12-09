@@ -2,7 +2,7 @@
   "name": "tinymce-a11y-checker",
   "version": "1.1.3",
   "description": "An accessibility checker plugin for TinyMCE.",
-  "main": "lib/en/plugin.js",
+  "main": "lib/plugin.js",
   "module": "lib/en/modules/plugin.js",
   "scripts": {
     "test": "jest src",
@@ -14,7 +14,7 @@
     "fmt": "prettier --no-semi --write \"src/**/*.js\"",
     "fmt-check": "prettier --no-semi -l \"src/**/*.js\"",
     "build": "scripts/build",
-    "prepublish": "npm test && npm run build"
+    "prepublish": "npm run build"
   },
   "keywords": ["tinymce", "accessibility", "plugin", "a11y"],
   "author": "Brent Burgoyne",
@@ -31,7 +31,6 @@
     "enzyme": "^3.0.0",
     "enzyme-adapter-react-15": "^1.0.0",
     "enzyme-to-json": "^3.0.1",
-    "format-message": "^5.2.0",
     "format-message-cli": "^5.2.0",
     "jest": "^21.2.1",
     "prettier": "^1.7.3",
@@ -44,6 +43,8 @@
     "webpack-dev-server": "^2.6.1"
   },
   "dependencies": {
+    "format-message": "^5.2.0",
+    "format-message-generate-id": "^5.2.1",
     "instructure-icons": "4.x",
     "instructure-ui": "3.x",
     "react": "^0.14.8 || ^15.0.0",

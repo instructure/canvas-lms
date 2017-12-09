@@ -1,4 +1,4 @@
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 import { prepend } from "../utils/dom"
 
 export default {

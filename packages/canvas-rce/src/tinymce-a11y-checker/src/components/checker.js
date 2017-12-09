@@ -28,7 +28,7 @@ import PlaceholderSVG from "./placeholder-svg"
 import describe from "../utils/describe"
 import * as dom from "../utils/dom"
 import rules from "../rules"
-import formatMessage from "format-message"
+import formatMessage from "../format-message"
 
 const noop = () => {}
 
