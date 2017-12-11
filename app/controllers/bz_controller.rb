@@ -202,7 +202,6 @@ class BzController < ApplicationController
       format.csv { render text: csv }
     end
   end
->>>>>>> d481deab9fbfcce34da18610fbad2592bc30213e
 
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
   # Canvas prefers the file upload. It won't even submit the magic field info if the user
