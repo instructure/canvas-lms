@@ -327,18 +327,6 @@ class Course < ActiveRecord::Base
     end
 
     tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
-    return tags if user.blank? || user_is_teacher
-
-    if ConditionalRelease::Service.enabled_in_context?(self)
-      path_visible_pages = self.wiki_pages.active.left_outer_joins(assignment: :submissions).
-        except(:preload).
-        where("assignments.id is null or submissions.user_id = ?", user.id).
-        select(:id)
-
-      tags = tags.where.not(content_type: 'WikiPage')
-      tags = tags.union(ContentTag.where(content_type: 'WikiPage', content_id: path_visible_pages))
-    end
-
     tags
   end
 
