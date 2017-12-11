@@ -47,6 +47,12 @@ test('remove the all sections option when individual one is added', () => {
   deepEqual(wrapper.instance().state.selectedSectionsValue, ["3"])
 })
 
+test('removing all sections shows an error message', () => {
+  const wrapper = shallow(<SectionsAutocomplete {...defaultProps()}/>)
+  wrapper.instance().onAutocompleteChange(null, [])
+  deepEqual(wrapper.instance().state.messages, [{ text: 'A section is required', type: 'error' }])
+})
+
 test('remove the all sections except the all option when all section is added', () => {
   const wrapper = shallow(<SectionsAutocomplete {...defaultProps()}/>)
   wrapper.instance().onAutocompleteChange(null, [{id: "3", value: "other thing"}])

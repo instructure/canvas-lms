@@ -665,6 +665,19 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env]).to have_key(:active_grading_periods)
     end
 
+    it "js_env SELECTED_SECTION_LIST is set correctly for section specific announcements" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = course.course_sections.create!(name: "Section 1")
+      section2 = course.course_sections.create!(name: "Section 2")
+      course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
+      ann.save!
+      get :edit, params: {course_id: @course.id, id: ann.id}
+      expect(assigns[:js_env]["SELECTED_SECTION_LIST"]).to eq([{:id=>section1.id, :name=>section1.name}])
+    end
+
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
@@ -911,6 +924,21 @@ describe DiscussionTopicsController do
       accessed_asset = assigns[:accessed_asset]
       expect(accessed_asset[:category]).to eq 'topics'
       expect(accessed_asset[:level]).to eq 'participate'
+    end
+
+    it 'creates an announcement with sections' do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      post 'create',
+        params: topic_params(@course, {is_announcement: true, specific_sections: [section1.id]}),
+        :format => :json
+      expect(response).to have_http_status :success
+      expect(DiscussionTopic.last.course_sections.first).to eq section1
+      expect(DiscussionTopicSectionVisibility.count).to eq 1
     end
 
     it 'registers a page view' do

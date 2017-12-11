@@ -454,7 +454,7 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
-      sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
+      sections = @context.respond_to?(:course_sections) ? @context.course_sections.active.to_a : []
 
       js_hash = {
         CONTEXT_ACTION_SOURCE: :discussion_topic,
@@ -476,6 +476,16 @@ class DiscussionTopicsController < ApplicationController
         js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
       end
 
+      if @context.account.feature_enabled?(:section_specific_announcements) &&
+          @topic.is_section_specific
+        selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
+        js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
+          {
+            id: section.id,
+            name: section.name
+          }
+        end
+      end
       js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
         feature_enabled?(:section_specific_announcements)
 
@@ -485,7 +495,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context)
 
       if @context.is_a?(Course)
-        js_hash['SECTION_LIST'] = sections.map { |section|
+        js_hash['SECTION_LIST'] = sections.map do |section|
           {
             id: section.id,
             name: section.name,
@@ -493,7 +503,7 @@ class DiscussionTopicsController < ApplicationController
             end_at: section.end_at,
             override_course_and_term_dates: section.restrict_enrollments_to_section_dates
           }
-        }
+        end
         js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
       end
       js_hash[:CANCEL_TO] = cancel_redirect_url
@@ -937,22 +947,46 @@ class DiscussionTopicsController < ApplicationController
                                           allow_rating only_graders_can_rate sort_by_rating).freeze
 
 
+  def set_sections
+    return unless params[:specific_sections]
+    @topic.is_section_specific = true
+    @topic.course_sections = CourseSection.find(params[:specific_sections].split(","))
+  end
+
   def process_discussion_topic(is_new = false)
     @errors = {}
-    model_type = value_to_boolean(params[:is_announcement]) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
+    model_type = if value_to_boolean(params[:is_announcement]) &&
+        @context.announcements.temp_record.grants_right?(@current_user, session, :create)
+                    :announcements
+                 else
+                    :discussion_topics
+                 end
     if is_new
       @topic = @context.send(model_type).build
       prior_version = @topic.dup
+      set_sections if model_type == :announcements &&
+        @context.account.feature_enabled?(:section_specific_announcements) &&
+        params[:specific_sections] != "all"
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
       prior_version = DiscussionTopic.find(@topic.id)
+      if model_type == :announcements &&
+              @context.account.feature_enabled?(:section_specific_announcements) &&
+              @topic.is_section_specific &&
+              params[:specific_sections] == "all"
+        @topic.is_section_specific = false
+      elsif model_type == :announcements &&
+              @context.account.feature_enabled?(:section_specific_announcements)
+        set_sections
+      end
     end
 
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
     only_pinning = discussion_topic_hash.except(*%w{pinned}).blank?
 
-    topic_to_check = only_pinning && @topic.root_topic ? @topic.root_topic : @topic # allow pinning/unpinning if a subtopic and we can update the root
+    # allow pinning/unpinning if a subtopic and we can update the root
+    topic_to_check = only_pinning && @topic.root_topic ? @topic.root_topic : @topic
     return unless authorized_action(topic_to_check, @current_user, (is_new ? :create : :update))
 
     process_podcast_parameters(discussion_topic_hash)

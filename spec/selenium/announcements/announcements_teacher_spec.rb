@@ -17,6 +17,7 @@
 
 require_relative '../common'
 require_relative '../helpers/announcements_common'
+require_relative './announcement_new_edit_page'
 
 describe "announcements" do
   include_context "in-process server selenium tests"
@@ -30,6 +31,30 @@ describe "announcements" do
 
     before :each do
       user_session(@teacher)
+    end
+
+    it "should allow saving of section announcement" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @course.course_sections.create!(name: "Section 1")
+      @course.course_sections.create!(name: "Section 2")
+      AnnouncementNewEdit.visit(@course)
+      AnnouncementNewEdit.select_a_section("Section")
+      AnnouncementNewEdit.add_message("Announcement Body")
+      AnnouncementNewEdit.add_title("Announcement Title")
+      expect_new_page_load {AnnouncementNewEdit.submit_announcement_form}
+      expect(driver.current_url).to include(AnnouncementNewEdit.
+                                            individual_announcement_url(Announcement.last))
+    end
+
+    it "should not allow empty sections" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @course.course_sections.create!(name: "Section 1")
+      @course.course_sections.create!(name: "Section 2")
+      AnnouncementNewEdit.visit(@course)
+      AnnouncementNewEdit.select_a_section("")
+      AnnouncementNewEdit.add_message("Announcement Body")
+      AnnouncementNewEdit.add_title("Announcement Title")
+      expect(AnnouncementNewEdit.section_error).to include("A section is required")
     end
 
     describe "shared bulk topics specs" do

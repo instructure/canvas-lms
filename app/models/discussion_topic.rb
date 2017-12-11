@@ -69,7 +69,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :discussion_topic_section_visibilities, -> {
     where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
   }, inverse_of: :discussion_topic, dependent: :destroy
-  has_many :course_sections, :through => :discussion_topic_section_visibilities
+  has_many :course_sections, :through => :discussion_topic_section_visibilities, :dependent => :destroy
   belongs_to :user
 
   validates_presence_of :context_id, :context_type

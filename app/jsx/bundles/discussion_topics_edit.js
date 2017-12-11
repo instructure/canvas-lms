@@ -69,9 +69,14 @@ $(() => {
   view.render().$el.appendTo('#content')
   document.querySelector('#discussion-title').focus()
   const container = document.querySelector('#sections_autocomplete_root')
-  const sectionSpecificAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement  && ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
+  const sectionSpecificAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
+                                        && ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
   if (container && sectionSpecificAnnouncement) {
-    ReactDOM.render(<SectionsAutocomplete sections={ENV.SECTION_LIST}/>, container)
+    ReactDOM.render(
+      <SectionsAutocomplete
+        selectedSections={ENV.SELECTED_SECTION_LIST}
+        sections={ENV.SECTION_LIST}/>
+      , container)
   }
 })
 

@@ -39,16 +39,22 @@ export default class SectionsAutocomplete extends React.Component {
 
   state = {
     sections: this.props.sections.concat([ALL_MY_SECTIONS_OBJ]),
-    selectedSectionsValue: extractIds(this.props.selectedSections)
+    selectedSectionsValue: extractIds(this.props.selectedSections),
+    messages: []
   }
 
   onAutocompleteChange = (_, value) => {
-    if (this.state.selectedSectionsValue.includes(ALL_MY_SECTIONS_OBJ.id)) {
-      this.setState({selectedSectionsValue: extractIds(value.filter((section) => section.id !== ALL_MY_SECTIONS_OBJ.id))})
+    if(!value.length) {
+      this.setState({selectedSectionsValue: [], messages: [{ text: I18n.t('A section is required'), type: 'error' }]})
+    } else if (this.state.selectedSectionsValue.includes(ALL_MY_SECTIONS_OBJ.id)) {
+      this.setState({
+        selectedSectionsValue: extractIds(value.filter((section) => section.id !== ALL_MY_SECTIONS_OBJ.id)),
+        messages: []
+      })
     } else if (extractIds(value).includes(ALL_MY_SECTIONS_OBJ.id)) {
-      this.setState({selectedSectionsValue: [ALL_MY_SECTIONS_OBJ.id]})
+      this.setState({selectedSectionsValue: [ALL_MY_SECTIONS_OBJ.id], messages: []})
     } else {
-      this.setState({selectedSectionsValue: extractIds(value)})
+      this.setState({selectedSectionsValue: extractIds(value), messages: []})
     }
   }
 
@@ -65,6 +71,7 @@ export default class SectionsAutocomplete extends React.Component {
         <Autocomplete
           label={I18n.t('Post to')}
           selectedOption={this.state.selectedSectionsValue}
+          messages={this.state.messages}
           multiple
           onChange={this.onAutocompleteChange}
           formatSelectedOption={(tag) => (
