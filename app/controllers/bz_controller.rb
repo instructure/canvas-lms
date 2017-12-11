@@ -9,7 +9,8 @@ require 'csv'
 
 class BzController < ApplicationController
 
-  before_filter :require_user
+  # magic field dump uses an access token instead
+  before_filter :require_user, :except => [:magic_field_dump]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
 
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
