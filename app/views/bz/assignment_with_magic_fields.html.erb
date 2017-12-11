@@ -1,5 +1,7 @@
 <% if @permission == false %>
   You do not have permission to view this page.
 <% else %>
-  <%= @assignment_html.html_safe %>
+  <div class="user_content">
+    <%= @assignment_html.html_safe %>
+  </div>
 <% end %>

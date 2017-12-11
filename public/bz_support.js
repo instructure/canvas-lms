@@ -20,16 +20,35 @@
     4. bz_custom.js runs
     5. bottom scripts in view html run, which can also call thi
 */
+
+var onMagicFieldsLoaded = [];
+var magicFieldsLoaded = false;
+
+function addOnMagicFieldsLoaded(func) {
+  if(magicFieldsLoaded) {
+    console.log("running magic field thing now");
+    func();
+  } else {
+    console.log("queuing magic field thing");
+    onMagicFieldsLoaded.push(func);
+  }
+}
+
 function bzRetainedInfoSetup() {
-  function bzChangeRetainedItem(ta, value) {
-    if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
-      ta.checked = (value == "yes") ? true : false;
-    else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "radio")
-      ta.checked = (value == ta.value) ? true : false;
-    else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
-      ta.value = value;
-    else
-      ta.textContent = value;
+  function bzChangeRetainedItem(element, value) {
+    if(element.tagName == "INPUT" && element.getAttribute("type") == "checkbox"){
+      element.checked = (value == "yes") ? true : false;
+    } else if(element.tagName == "INPUT" && element.getAttribute("type") == "radio"){
+      element.checked = (value == element.value) ? true : false;
+    } else if(element.tagName == "INPUT" && element.getAttribute("type") == "button"){
+      if (value == "clicked"){
+       element.className += " bz-was-clicked";
+      }
+    } else if(element.tagName == "INPUT" || element.tagName == "TEXTAREA"){
+      element.value = value;
+    } else {
+      element.textContent = value;
+    }
   }
 
   if(window.ENV && ENV.current_user) {
@@ -41,62 +60,96 @@ function bzRetainedInfoSetup() {
     }
   }
 
-  var textareas = document.querySelectorAll("[data-bz-retained]");
-  for(var i = 0; i < textareas.length; i++) {
-    (function(ta) {
-      var name = ta.getAttribute("data-bz-retained");
+  var pendingMagicFieldLoads = 0;
+  var pendingMagicFieldLoadEvent = false;
+  function triggerMagicFieldsLoaded() {
+    pendingMagicFieldLoadEvent = false;
+    magicFieldsLoaded = true;
+    console.log("running on magic fields loaded");
+    for(var i = 0; i < onMagicFieldsLoaded.length; i++)
+      onMagicFieldsLoaded[i]();
+  }
 
-      if(ta.className.indexOf("bz-retained-field-setup") != -1)
+  var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
+  var names = [];
+  var magicElements = [];
+  for(var i = 0; i < magicElementsDOM.length; i++) {
+    (function(el) {
+      var name = el.getAttribute("data-bz-retained");
+
+      if(el.className.indexOf("bz-retained-field-setup") != -1)
         return; // already set up, no need to redo
 
-      if(ta.tagName == "IMG") {
+      if(el.tagName == "IMG") {
         // this is a hack so the editor will not allow text inside:
         // the field pretends to be an image in that context. But, when
         // it is time to display it, we want to switch back to being an
         // ordinary span.
         var span = document.createElement("span");
-        span.className = ta.className;
-        span.setAttribute("data-bz-retained", ta.getAttribute("data-bz-retained"));
-        ta.parentNode.replaceChild(span, ta);
-        ta = span;
+        span.className = el.className;
+        span.setAttribute("data-bz-retained", el.getAttribute("data-bz-retained"));
+        el.parentNode.replaceChild(span, el);
+        el = span;
       }
 
       var save = function() {
-        var http = new XMLHttpRequest();
-        http.open("POST", "/bz/user_retained_data", true);
-        var value = ta.value;
-        if(ta.getAttribute("type") == "radio")
-          if(!ta.checked)
+        var value = el.value;
+        if(el.getAttribute("type") == "radio"){
+          if(!el.checked)
             return; // we only want to actually save the one that is checked
-        if(ta.getAttribute("type") == "checkbox")
-          value = ta.checked ? "yes" : "";
-        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
-        if (ta.classList.contains("bz-optional-magic-field"))
-          data += "&optional=true";
-        http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        http.send(data);
+        } else if(el.getAttribute("type") == "checkbox"){
+          value = el.checked ? "yes" : "";
+        } else if(el.getAttribute("type") == "button"){
+          value = "clicked";
+          el.className += " bz-was-clicked";
+        }
+        var optional = false;
+        if (el.classList.contains("bz-optional-magic-field"))
+          optional = true;
+
+        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"));
 
         // we also need to update other views on the same page
-        var textareas = document.querySelectorAll("[data-bz-retained]");
-        for(var idx = 0; idx < textareas.length; idx++) {
-            var item = textareas[idx];
-            if(item == ta)
+        var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
+        for(var idx = 0; idx < magicElementsDOM.length; idx++) {
+            var item = magicElementsDOM[idx];
+            if(item == el)
               continue;
             if(item.getAttribute("data-bz-retained") == name)
               bzChangeRetainedItem(item, value);
         }
       };
 
-      ta.className += " bz-retained-field-setup";
-      ta.addEventListener("change", save);
+      el.className += " bz-retained-field-setup";
+      if (el.getAttribute("type") == "button")
+        el.addEventListener("click", save);
+      else
+        el.addEventListener("change", save);
 
-      var http = new XMLHttpRequest();
-      // cut off json p stuff
-      http.onload = function() { bzChangeRetainedItem(ta, http.responseText.substring(9)); };
-      http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
-      http.send();
-    })(textareas[i]);
+      pendingMagicFieldLoads += 1;
+      names.push(name);
+      magicElements.push(el);
+    })(magicElementsDOM[i]);
   }
+
+  BZ_LoadMagicFields(names, function(obj) {
+    for(var i = 0; i < names.length; i++) {
+      var name = names[i];
+      var el = magicElements[i];
+
+      var value = obj[name];
+
+      bzChangeRetainedItem(el, value);
+      pendingMagicFieldLoads -= 1;
+      if(pendingMagicFieldLoads == 0 && !pendingMagicFieldLoadEvent) {
+        pendingMagicFieldLoadEvent = true;
+        window.requestAnimationFrame(triggerMagicFieldsLoaded);
+        console.log("THE MAGIC HAPPENS");
+      }
+    }
+  });
+  // old one, w don't need all that info though so cutting it off while batching to optimize network use
+  // http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(el.value) + "&type=" + el.getAttribute("type"), true);
 }
 
 if(window != window.top) {
@@ -414,3 +467,139 @@ function BZ_GoToMasterPage(master_page_id) {
     req.send('');
 }
 
+var BZ_MagicFieldSaveTimeouts = {};
+
+function BZ_SaveMagicField(field_name, field_value, optional, type) {
+  if(optional == null)
+    optional = true; // the default is to skip grading; assume api updates are optional fields
+  if(type == null)
+    type = "api";
+
+  // if there's an existing retry, cancel it so it doesn't
+  // race condition overwrite a subsequent write; we only
+  // want to retry the most recent content
+  if(BZ_MagicFieldSaveTimeouts[field_name])
+    clearTimeout(BZ_MagicFieldSaveTimeouts[field_name]);
+
+  var http = new XMLHttpRequest();
+  http.open("POST", "/bz/user_retained_data", true);
+  var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + type;
+  if (optional)
+    data += "&optional=true";
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.onreadystatechange = function() {
+    if(http.readyState == 4) {
+      if(http.status != 200) {
+        if(http.status == 0) {
+          // network error
+          var offlineWarning = document.getElementById("bz-offline-warning");
+          if(offlineWarning)
+            offlineWarning.style.display = "";
+          // automatically retry in a little while
+          var timeout = setTimeout(function() {
+            BZ_MagicFieldSaveTimeouts[field_name] = null;
+            BZ_SaveMagicField(field_name, field_value, optional, type);
+          }, 5000);
+          BZ_MagicFieldSaveTimeouts[field_name] = timeout;
+        } else {
+          // returned error from Canvas...
+          // should be a code error on our side
+          // so just gonna log
+          console.log("Magic error: " + http.status + " " + field_name + "=" + field_value);
+        }
+      } else {
+        // success, we can hide the warning again if it is showing
+        var offlineWarning = document.getElementById("bz-offline-warning");
+        if(offlineWarning)
+          offlineWarning.style.display = "none";
+      }
+    }
+  };
+  http.send(data);
+}
+
+// field_names is an array!
+// callback is a function(obj) { } the properties on obj are name and value
+// so like BZ_LoadMagicFields(["foo", "bar"], function(obj) { obj["foo"] == "value_of_foo"; obj["bar"] = "value_of_var"; });
+function BZ_LoadMagicFields(field_names, callback) {
+
+  var http = new XMLHttpRequest();
+  http.onload = function() {
+    // substring is to cut off json p stuff if we go back to GET, unneeded with POST though
+    var json = http.responseText; //.substring(9)
+    var obj = JSON.parse(json);
+
+    callback(obj);
+  };
+
+  var data = "";
+  for(var i = 0; i < field_names.length; i++) {
+    if(data.length)
+      data += "&";
+    data += "names[]=" + encodeURIComponent(field_names[i]);
+  }
+
+  // I would LIKE to use get on this, but since the name list can be arbitrarily long
+  // and I don't want to risk hitting a browser/server limit of url length, I am going to
+  // POST just in case
+  http.open("POST", "/bz/user_retained_data_batch", true);
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.send(data);
+}
+
+
+function bzWikiPageContentPreload(wikipage, finalize_page_show) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString("<div class=\"bz-modified\">" + wikipage["body"] + "</div>", "text/html");
+
+    function finalize_page_show_wrapped() {
+        var serializer = new XMLSerializer();
+        wikipage["body"] = serializer.serializeToString(doc);
+
+        finalize_page_show(wikipage);
+    }
+
+    var replacements = doc.querySelectorAll("div[data-replace-with-page]");
+    if(replacements.length) {
+        var pagesToLoad = [];
+        var pagesToLoadHash = {};
+        for(var i = 0; i < replacements.length; i++) {
+            var pn = replacements[i].getAttribute("data-replace-with-page");
+            if(!pagesToLoadHash[pn]) {
+                pagesToLoadHash[pn] = true;
+                pagesToLoad.push(pn);
+            }
+        }
+
+        var http = new XMLHttpRequest();
+        http.onload = function() {
+            // substring is to cut off json p stuff
+            var json = http.responseText.substring(9)
+            var obj = JSON.parse(json);
+
+            for(var i = 0; i < replacements.length; i++) {
+                var pn = replacements[i].getAttribute("data-replace-with-page");
+                if(obj[pn]) {
+                    replacements[i].innerHTML = obj[pn];
+                    replacements[i].setAttribute("data-replaced-with-page", pn);
+                    replacements[i].removeAttribute("data-replace-with-page");
+                }
+            }
+
+            finalize_page_show_wrapped();
+       };
+
+        var data = "";
+        for(var i = 0; i < pagesToLoad.length; i++) {
+           data += "&";
+           data += "names[]=" + encodeURIComponent(pagesToLoad[i]);
+        }
+
+        http.open("GET", "/bz/load_wiki_pages?course_id=" + ENV["COURSE_ID"] + data, true);
+        http.send(data);
+    } else {
+        finalize_page_show_wrapped();
+    }
+
+
+}

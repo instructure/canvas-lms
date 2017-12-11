@@ -29,7 +29,11 @@ module Importers
         rubric = context.available_rubric(hash[:external_identifier]) unless migration.cross_institution?
 
         if !rubric
-          migration.add_warning(t(:no_context_found, %{The external Rubric couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
+          rubric = Rubric.where(context_id: 1, context_type: context.class.to_s, id: hash[:external_identifier]).first
+          is_content_library_rubric = !rubric.nil?
+          if !rubric
+            migration.add_warning(t(:no_context_found, %{The external Rubric couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
+          end
         end
       end
 
@@ -71,7 +75,7 @@ module Importers
           association.bookmarked = true
           association.save!
         end
-      else
+     elsif !is_content_library_rubric # The content library rubrics are associated when the assignment is created 
         item.associate_with(context, context)
       end
 

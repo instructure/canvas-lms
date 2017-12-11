@@ -15,6 +15,10 @@
     </li>
   <% end %>
 
+  <% if @can_grade %>
+    <li><a class="icon-speed-grader" href="/bz/grades_download.csv?assignment_id=<%=@assignment.id%>">Download Grades</a></li>
+  <% end %>
+
   <% if @current_student_submissions.present? %>
     <% if @assignment.submission_types && @assignment.submission_types.match(/(online_upload|online_text_entry|online_url)/)%>
       <div>

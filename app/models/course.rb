@@ -34,6 +34,7 @@ class Course < ActiveRecord::Base
   attr_accessible :name,
                   :intro_text,
                   :intro_title,
+                  :gradebook_text,
                   :section,
                   :account,
                   :group_weighting_scheme,

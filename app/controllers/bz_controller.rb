@@ -11,7 +11,198 @@ class BzController < ApplicationController
 
   # magic field dump uses an access token instead
   before_filter :require_user, :except => [:magic_field_dump]
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
+
+
+  def get_assignment_info(assignment_id)
+    assignment = Assignment.find(assignment_id)
+    sg = Assignment::SpeedGrader.new(
+      assignment,
+      @current_user,
+      avatars: false,
+      grading_role: :grader
+    ).json
+
+    rubric = assignment.rubric
+
+    criteria = []
+    if rubric
+      rubric.data.each do |criterion|
+        obj = {}
+        obj["description"] = criterion["description"]
+        obj["criterion_id"] = criterion["id"]
+        if criterion["description"]
+          obj["section"] = criterion["description"][/^([0-9]+)/, 1]
+          obj["subsection"] = criterion["description"][/^[0-9]+\.([0-9]+)/, 1]
+        else
+          obj["section"] = 0
+          obj["subsection"] = 0
+        end
+        obj["points_available"] = criterion["points"]
+        criteria << obj
+      end
+    end
+
+    criteria = criteria.sort_by { |h| [h["section"], h["subsection"]] }
+
+    sections = []
+    criteria.each do |c|
+      if sections.length == 0 || sections[-1] != c["section"]
+        sections << c["section"]
+      end
+    end
+
+    sections_points_available = []
+    criteria.each do |c|
+      sections_points_available[c["section"].to_i] = 0.0 if sections_points_available[c["section"].to_i].nil?
+      sections_points_available[c["section"].to_i] += c["points_available"].to_f
+    end
+
+    assignment_info = {}
+    assignment_info[:sg] = sg
+    assignment_info[:assignment] = assignment
+    assignment_info[:rubric] = rubric
+    assignment_info[:criteria] = criteria
+    assignment_info[:sections] = sections
+    assignment_info[:sections_points_available] = sections_points_available
+
+    assignment_info
+  end
+
+  def grades_download
+    assignments_info = []
+
+    students = []
+
+    if params[:assignment_id]
+      assignments_info << get_assignment_info(params[:assignment_id])
+      students = Course.find(Assignment.find(params[:assignment_id]).context_id).students.active
+    elsif params[:course_id]
+      Course.find(params[:course_id]).assignments.active.each do |a|
+        assignments_info << get_assignment_info(a.id)
+      end
+      students = Course.find(params[:course_id]).students.active
+    end
+
+
+    csv = CSV.generate do |csv|
+      # header
+      row = []
+      row << "Student ID"
+      row << "Student Name"
+      row << "Student Email"
+
+      assignments_info.each do |assignment_info|
+        assignment = assignment_info[:assignment]
+        criteria = assignment_info[:criteria]
+        sections = assignment_info[:sections]
+
+        row << "Total Score -- #{assignment.name}"
+
+        sections.each do |section|
+          row << "Category #{section} Average -- #{assignment.name}"
+        end
+
+        criteria.each do |criterion|
+          row << "#{criterion["description"]} -- #{assignment.name}"
+        end
+      end
+
+      csv << row
+
+
+      # data
+      students_done = {}
+      students.each do |student_obj|
+        next if students_done[student_obj.id]
+        students_done[student_obj.id] = true
+
+        row = []
+        # name
+        row << student_obj.id
+        row << student_obj.name
+        row << student_obj.email
+
+        assignments_info.each do |assignment_info|
+          sg = assignment_info[:sg]
+          assignment = assignment_info[:assignment]
+          rubric = assignment_info[:rubric]
+          criteria = assignment_info[:criteria]
+          sections = assignment_info[:sections]
+          sections_points_available = assignment_info[:sections_points_available]
+
+
+          student = nil
+
+          sg["context"]["students"].each do |student_sg|
+            if student_sg["id"].to_i == student_obj.id.to_i
+              student = student_sg
+              break
+            end
+          end
+          if student.nil?
+            student = {}
+            student["name"] = student_obj.name
+            student["rubric_assessments"] = []
+          end
+
+          latest_assessment = student["rubric_assessments"].last
+
+          # total score
+          if latest_assessment
+            row << "#{(latest_assessment["score"].to_f * 100 / assignment.points_possible.to_f).round(2)}%"
+          else
+            row << "0"
+          end
+
+          # section averages...
+
+          section_scores = []
+
+          criteria.each do |criterion|
+            points = 0.0
+            if latest_assessment
+              latest_assessment["data"].each do |datum|
+                points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
+              end
+            end
+            if section_scores[criterion["section"].to_i].nil?
+              section_scores[criterion["section"].to_i] = 0.0
+            end
+            section_scores[criterion["section"].to_i] += points # zero-based array of one-based sections
+          end
+
+
+          sections.each do |idx|
+            ss = section_scores[idx.to_i]
+            if sections_points_available[idx.to_i].nil?
+              row << ss
+            else
+              row << "#{(ss * 100 / sections_points_available[idx.to_i]).round(2)}%"
+            end
+          end
+
+          # individual breakdown...
+
+          criteria.each do |criterion|
+            points = 0.0
+            if latest_assessment
+              latest_assessment["data"].each do |datum|
+                points = datum["points"].to_f if datum["criterion_id"] == criterion["criterion_id"]
+              end
+            end
+            row << points
+          end
+        end
+        csv << row
+      end
+    end
+
+    respond_to do |format|
+      format.csv { render text: csv }
+    end
+  end
+>>>>>>> d481deab9fbfcce34da18610fbad2592bc30213e
 
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
   # Canvas prefers the file upload. It won't even submit the magic field info if the user
@@ -73,6 +264,23 @@ class BzController < ApplicationController
     else
       @permission = false
     end
+  end
+
+  def load_wiki_pages
+    names = params[:names]
+    course_id = params[:course_id]
+
+    all_pages = Course.find(course_id).wiki_pages.active
+
+    result = {}
+    names.each do |name|
+      page = all_pages.where(:title => name)
+      if page.any?
+        result[name] = page.first.body
+      end
+    end
+
+    render :json => result
   end
 
   def user_linkedin_url
@@ -197,16 +405,30 @@ class BzController < ApplicationController
   end
 
   def user_retained_data
+    Rails.logger.debug("### user_retained_data - all params = #{params.inspect}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = ''
-    unless result.empty?
+    if !result.empty?
       data = result.first.value
     end
     render :json => data
   end
 
+  def user_retained_data_batch
+    data = {}
+    if params[:names]
+      params[:names].each do |name|
+        next if data[name]
+        result = RetainedData.where(:user_id => @current_user.id, :name => name)
+        data[name] = result.empty? ? '' : result.first.value
+      end
+    end
+    render :json => data
+  end
+
+
   def set_user_retained_data
-    Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect}")
+    Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect} for user = #{@current_user.name}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
     was_new = false
@@ -217,7 +439,7 @@ class BzController < ApplicationController
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
-      data.path = request.referrer
+      data.path = request.referrer ? request.referrer[0 .. 220] : '' # trim off unnecessary detail so it fits in db
       data.name = params[:name]
       was_new = true
     else
@@ -233,10 +455,33 @@ class BzController < ApplicationController
     if was_new && !was_optional && field_type != 'checkbox' # Checkboxes are optional by nature
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
       module_item_id = request.referrer[/module_item_id=(\d+)/, 1]
+      if module_item_id.nil?
+        # They may have accessed the page from a direct link which didn't provide the module_item_id parameter,
+        # so look it up.
+        name = request.referrer[/\/courses\/\d+\/pages\/([a-zA-Z0-9_\-]{2,})/, 1]
+        Rails.logger.debug("### set_user_retained_data - parsed the WikiPage name = #{name}")
+        pages = WikiPage.where(:url => name)
+        Rails.logger.debug("### set_user_retained_data - found WikiPages = #{pages.inspect}")
+        tag = nil
+        pages.each do |page| # Don't know which WikiPage is from this course, need to lookup the ContentTag for each to find the association
+          tag = ContentTag.where(:content_id => page.id, :context_id => course_id, :context_type => 'Course', :content_type => 'WikiPage').first
+          if !tag.nil?
+            module_item_id = tag.id
+            Rails.logger.debug("### set_user_retained_data - found ContentTag for this course_id = #{course_id}, tag = #{tag.inspect} and set the module_item_id = #{module_item_id} for the page #{request.referrer}")
+            break
+          end
+        end
+      end
       Rails.logger.debug("### set_user_retained_data - course_id = #{course_id}, module_item_id = #{module_item_id}")
-      if course_id && module_item_id
-
+      course = nil
+      is_student = false
+      if course_id
         course = Course.find(course_id)
+        is_student = course.student_enrollments.active.where(:user_id => @current_user.id).any?
+      end
+      if is_student && module_item_id
+        # assuming course is set from above
+
         tag = ContentTag.find(module_item_id)
         context_module = tag.context_module
 
@@ -249,7 +494,7 @@ class BzController < ApplicationController
         # However, given that we can just round up the points at the end of the semester and most the
         # steps will be fractional points, and most the content will be written ahead of time, this
         # shouldn't be a real problem.
-        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.week) do
+        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.day) do
           count = 0
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
@@ -303,19 +548,20 @@ class BzController < ApplicationController
 
           submission = participation_assignment.find_or_create_submission(@current_user)
 
-          # actually a race condition but we should be ok since users will only really
-          # be editing one field at a time anyway and I don't think the Canvas models
-          # have a way to do this with a proper atomic update or a lock.
-          existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
-          new_grade = existing_grade + step 
-          if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
-            Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
-            new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
-                                                                      # to account for floating point inaccuracies.
+          submission.with_lock do
+            existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
+            new_grade = existing_grade + step 
+            if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
+              Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
+              new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
+                                                                        # to account for floating point inaccuracies.
+            end
+            Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
+            participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
           end
-          Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
-          participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
         end
+      elsif is_student
+        Rails.logger.error("### set_user_retained_data - missing either course_id = #{course_id} or module_item_id = #{module_item_id}. Can't update the Course Participation grade without that! user = #{@current_user.inspect}")
       end
     end
 
@@ -382,6 +628,11 @@ class BzController < ApplicationController
       RetainedData.where(:user_id => u.id).each do |rd|
         next if params[:type] == 'magic' && rd.name.starts_with?('instant-survey-')
         next if params[:type] == 'survey' && !rd.name.starts_with?('instant-survey-')
+
+        # only keep generic or fields set specifically on this course...
+        # the problem is if the same user is in two courses with the content bank,
+        # it will only export the most recent ones set.
+        next if !rd.path.blank? && rd.path.match("courses/#{course.id}").nil?
 
         item[rd.name] = rd.value
         all_fields[rd.name] = rd.name
@@ -494,21 +745,36 @@ class BzController < ApplicationController
             Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
 
             # See: https://developer.linkedin.com/docs/fields/full-profile
+            fetched_li_data = true
             request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,job-bookmarks,honors-awards)?format=json", service.token)
 
-            # TODO: The 'suggestions' field was causing this error, so we're not fetching it:
+            # NOTE: The 'suggestions' field was causing this error, so we're not fetching it:
             # {"errorCode"=>0, "message"=>"Internal API server error", "requestId"=>"Y4175L15PK", "status"=>500, "timestamp"=>1490298963387}
             # Also, I decided not to fetch picture-urls::(original)
 
             info = JSON.parse(request.body)
 
-            Rails.logger.debug("### info = #{info.inspect}")
-
             if info["errorCode"] == 0
+              fetched_li_data = false
               Rails.logger.error("### Error exporting LinkedIn data for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
               # TODO: if "message"=>"Unable to verify access token" we should unregister the user.  I reproduced this by registering a second
               # account with the same LinkedIn account.  It invalidated the first.
-            else
+
+              if info["message"] == "Internal API server error" # For certain LinkedIn accounts, requesting the job-bookmarks makes it fail. Try again without that.
+                Rails.logger.debug("### Retrying request without job-bookmarks parameter for user = #{u.name} - #{u.email}.")
+                fetched_li_data = true
+                request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,honors-awards)?format=json", service.token)
+                info = JSON.parse(request.body)
+                info["jobBookmarks"] = "ERROR FETCHING"
+                if info["errorCode"] == 0
+                  fetched_li_data = false
+                  Rails.logger.error("### Error exporting LinkedIn data (without jobs-bookmarks) for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
+                end
+              end
+            end
+
+            if fetched_li_data
+              Rails.logger.debug("### info = #{info.inspect}")
               result = LinkedinExport.where(:user_id => u.id)
               linkedin_data = nil
               if result.empty?
@@ -871,6 +1137,7 @@ class BzController < ApplicationController
     raise "Unauthorized" if !authorized_action(@course, @current_user, :update)
 
     @course.intro_title = params[:course_intro_title]
+    @course.gradebook_text = params[:course_gradebook_text]
     @course.intro_text = params[:course_intro_text]
     @course.save
 

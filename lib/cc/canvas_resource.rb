@@ -125,6 +125,7 @@ JOKE
       ) do |c|
         c.title @course.name
         c.intro_title @course.intro_title
+        c.gradebook_text @course.gradebook_text
         c.intro_text @course.intro_text
         c.course_code @course.course_code
         c.start_at ims_datetime(@course.start_at) if @course.start_at
