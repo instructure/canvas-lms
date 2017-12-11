@@ -98,8 +98,10 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_participant
   after_create :create_materialized_view
 
+  # TODO: Consider merging the following two validations into one to save a
+  # db query
   def section_specific_topics_must_have_sections
-    if self.is_section_specific && !self.discussion_topic_section_visibilities.any?(&:active?)
+    if self.is_section_specific && self.discussion_topic_section_visibilities.none?(&:active?)
       self.errors.add(:is_section_specific, t("Section specific topics must have sections"))
     else
       true
@@ -606,6 +608,41 @@ class DiscussionTopic < ActiveRecord::Base
           AND discussion_topics.context_id IN (?))
           OR (discussion_topics.context_type = 'Group'
           AND discussion_topics.context_id IN (?))", course_ids, group_ids)
+  end
+
+
+  class QueryError < StandardError
+    attr_accessor :status_code
+
+    def initialize(message = nil, status_code = nil)
+      super(message)
+      self.status_code = status_code
+    end
+  end
+
+  # Retrieves all the *course* (as oppposed to group) discussion topics that apply
+  # to the given sections.  Group topics will not be returned.  TODO: figure out
+  # a good way to deal with group topics here.
+  #
+  # Takes in an array of section objects, and it is required that they all belong
+  # to the same course.  At least one section must be provided.
+  scope :in_sections, -> (course_sections) do
+    course_ids = course_sections.pluck(:course_id).uniq
+    if course_ids.length != 1
+      raise QueryError.new(
+        I18n.t("Searching for announcements in sections must span exactly one course")
+      )
+    end
+    course_id = course_ids.first
+    joins("LEFT OUTER JOIN #{DiscussionTopicSectionVisibility.quoted_table_name}
+           AS discussion_section_visibilities ON discussion_topics.is_section_specific = true AND
+           discussion_section_visibilities.discussion_topic_id = discussion_topics.id").
+      where("discussion_topics.context_type = 'Course' AND
+             discussion_topics.context_id = :course_id", {:course_id => course_id }).
+      where("discussion_section_visibilities.id IS null OR
+             (discussion_section_visibilities.workflow_state = 'active' AND
+              discussion_section_visibilities.course_section_id IN (:course_sections))",
+            { :course_sections => course_sections.pluck(:id) }).distinct
   end
 
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }

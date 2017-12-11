@@ -16,8 +16,7 @@
 #
 
 class DiscussionTopicSectionVisibility < ActiveRecord::Base
-  include Workflow
-
+  include Canvas::SoftDeletable
   belongs_to :course_section
   belongs_to :discussion_topic
 
@@ -27,6 +26,8 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
 
   validate :discussion_topic_is_section_specific
   validate :course_and_topic_share_context
+
+  validates_uniqueness_of :course_section_id, scope: :discussion_topic_id, conditions: -> { where(:workflow_state => 'active') }
 
   workflow do
     state :active

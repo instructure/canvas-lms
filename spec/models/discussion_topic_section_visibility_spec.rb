@@ -55,7 +55,7 @@ describe DiscussionTopicSectionVisibility do
     expect(errors).to eq ["Cannot add section to a non-section-specific discussion"]
   end
 
-  it 'forbid sections with wrong context do' do
+  it 'forbid sections with wrong context' do
     @course1.root_account.enable_feature!(:section_specific_announcements)
     @announcement.is_section_specific = true
     @announcement.discussion_topic_section_visibilities <<
@@ -68,7 +68,7 @@ describe DiscussionTopicSectionVisibility do
     expect(errors).to eq ["Section does not belong to course for this discussion topic"]
   end
 
-  it 'valid entry do' do
+  it 'valid entry' do
     @course1.root_account.enable_feature!(:section_specific_announcements)
     @announcement.is_section_specific = true
     @announcement.discussion_topic_section_visibilities <<
@@ -79,5 +79,61 @@ describe DiscussionTopicSectionVisibility do
     expect(@announcement.valid?).to eq true
     expect(@announcement.discussion_topic_section_visibilities.length).to eq 1
     expect(@announcement.discussion_topic_section_visibilities.first.valid?).to eq true
+  end
+
+  def add_section_to_announcement(announcement, section)
+    announcement.discussion_topic_section_visibilities <<
+      DiscussionTopicSectionVisibility.new(
+        :discussion_topic => announcement,
+        :course_section => section
+      )
+  end
+
+  def basic_announcement_model(course)
+    announcement = Announcement.create!(
+      :title => "some topic",
+      :message => "I announce that i am lying",
+      :user => @teacher,
+      :context => course,
+      :workflow_state => "published",
+    )
+    announcement
+  end
+
+  it 'duplicates' do
+    course3 = course_factory({ :course_name => "Course 3" })
+    section3a = course3.course_sections.create!
+    section3b = course3.course_sections.create!
+    announcement1 = basic_announcement_model(course3)
+    announcement1.is_section_specific = true
+    add_section_to_announcement(announcement1, section3a)
+    announcement1.save!
+    announcement2 = basic_announcement_model(course3)
+    announcement2.is_section_specific = true
+    # Two *different* announcements can have the same section.
+    add_section_to_announcement(announcement2, section3a)
+    announcement2.save!
+    expect(announcement2.discussion_topic_section_visibilities.first.valid?).to eq true
+    bad_duplicate_visibility = DiscussionTopicSectionVisibility.new(
+      :discussion_topic => announcement1,
+      :course_section => section3a
+    )
+    expect(bad_duplicate_visibility.valid?).to eq false
+    section3b_visibility = DiscussionTopicSectionVisibility.new(
+      :discussion_topic => announcement1,
+      :course_section => section3b
+    )
+    expect(section3b_visibility.valid?).to eq true
+    section3b_visibility.save! # Should success because it's a different section
+    # We needed to save the second section first because section specific topics
+    # actually have to have sections
+    DiscussionTopicSectionVisibility.where(:discussion_topic => announcement1,
+      :course_section => section3a).first.destroy!
+    # Now that we deleted the first section 3a visibility, we can add another one
+    reborn_section3a_visibility = DiscussionTopicSectionVisibility.new(
+      :discussion_topic => announcement1,
+      :course_section => section3a
+    )
+    expect(reborn_section3a_visibility.valid?).to eq true
   end
 end
