@@ -227,10 +227,11 @@ import 'compiled/jquery.rails_flash_notifications'
           if (data.customFields === '' || typeof data.customFields === 'undefined') {
             params['custom_fields_string'] = '';
           } else {
-              var pairs = (data.customFields || '').split('\n');
+            var pairs = (data.customFields || '').split('\n');
+            params.custom_fields = {}
             _.forEach(pairs, function(pair) {
               var vals = pair.trim().split(/=(.+)?/);
-              params['custom_fields[' + vals[0] + ']'] = vals[1];
+              params.custom_fields[vals[0]] = vals[1];
             });
           }
 

@@ -3174,16 +3174,33 @@ describe Submission do
     before(:each) do
       student_in_course(active_all: true)
       @student2 = user_factory
-      @course.enroll_student(@student2).accept!
+      @student2_enrollment = @course.enroll_student(@student2)
+      @student2_enrollment.accept!
       @assignment = peer_review_assignment
-      @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
-      @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
+      @student1_homework = @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
+      @student2_homework = @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
     end
 
     it "should send a reminder notification" do
       expect_any_instance_of(AssessmentRequest).to receive(:send_reminder!).once
       submission1, submission2 = @assignment.submissions
       submission1.assign_assessor(submission2)
+    end
+
+    it "should not allow read access when assignment's peer reviews are off" do
+      @student1_homework.assign_assessor(@student2_homework)
+      expect(@student1_homework.grants_right?(@student2, :read)).to eq true
+      @assignment.peer_reviews = false
+      @assignment.save!
+      @student1_homework.reload
+      AdheresToPolicy::Cache.clear
+      expect(@student1_homework.grants_right?(@student2, :read)).to eq false
+    end
+
+    it "should not allow read access when other student's enrollment is not active" do
+      @student2_homework.assign_assessor(@student1_homework)
+      @student2_enrollment.conclude
+      expect(@student2_homework.grants_right?(@student, :read)).to eq false
     end
   end
 
@@ -3790,6 +3807,16 @@ describe Submission do
     it "does not include excused submissions" do
       @assignment.grade_student(@student, excused: true, grader: @teacher)
       expect(Submission.needs_grading.count).to eq(0)
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "serializes relative to current scope's shard" do
+        @shard1.activate do
+          expect(Submission.shard(Shard.default).needs_grading.count).to eq(1)
+        end
+      end
     end
   end
 

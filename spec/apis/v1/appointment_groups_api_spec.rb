@@ -498,14 +498,23 @@ describe AppointmentGroupsController, type: :request do
 
   describe "next_appointment" do
     before :once do
-      @ag1 = AppointmentGroup.create!(:title => "past", :contexts => [@course2], :new_appointments =>
-                                       [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+      @ag1 = AppointmentGroup.create!(
+        :title => "past",
+        :contexts => [@course2],
+        :new_appointments => [[1.year.ago, 1.year.ago + 1.hour]]
+      )
       @ag1.publish!
-      @ag2 = AppointmentGroup.create!(:title => "future1", :contexts => [@course2],
-                                      :participants_per_appointment => 1, :max_appointments_per_participant => 1,
-                                      :new_appointments =>
-                                       [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
-                                        ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      one_year_from_now = 1.year.from_now
+      @ag2 = AppointmentGroup.create!(
+        :title => "future1",
+        :contexts => [@course2],
+        :participants_per_appointment => 1,
+        :max_appointments_per_participant => 1,
+        :new_appointments => [
+          [one_year_from_now, one_year_from_now + 1.hour],
+          [one_year_from_now + 1.hour, one_year_from_now + 2.hours]
+        ]
+      )
       @ag2.publish!
       @ag2.appointments.first.reserve_for(@student1, @me)
       @path = "/api/v1/appointment_groups/next_appointment?appointment_group_ids[]=#{@ag1.to_param}&appointment_group_ids[]=#{@ag2.to_param}"
@@ -535,7 +544,6 @@ describe AppointmentGroupsController, type: :request do
       @path += "&appointment_group_ids[]=#{ag3.to_param}"
       @params[:appointment_group_ids].push(ag3.to_param)
       json = api_call_as_user(@student2, :get, @path, @params)
-      pp json
       expect(json.length).to eq 1
       expect(json[0]['id']).to eq ag3.appointments.last.id
     end

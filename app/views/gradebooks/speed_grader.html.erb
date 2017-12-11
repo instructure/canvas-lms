@@ -320,8 +320,7 @@
 
           <% unless @context.completed? || @context_enrollment.try(:completed?) %>
             <form id="add_a_comment">
-              <label for="speedgrader_comment_textarea" class="screenreader-only"><%= t('labels.add_comment', "Add a Comment") %></label>
-              <textarea id="speedgrader_comment_textarea" class="ic-Input" placeholder="<%= t("Add a Comment") %>"></textarea>
+              <div id="speedgrader_comment_textarea_mount_point"></div>
               <div id="media_media_recording" style="display: none;">
                 <div class="media_recording"></div>
               </div>

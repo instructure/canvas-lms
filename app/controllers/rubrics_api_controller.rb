@@ -69,7 +69,7 @@
 #         "assessments": {
 #           "description": "If an assessment type is included in the 'include' parameter, includes an array of rubric assessment objects for a given rubric, based on the assessment type requested. If the user does not request an assessment type this key will be absent.",
 #           "type": "array",
-#           "$ref": "RubricAssessment"
+#           "items": { "$ref": "RubricAssessment" }
 #         }
 #       }
 #     }
@@ -124,11 +124,13 @@
 #         },
 #         "data": {
 #           "description": "(Optional) If 'full' is included in the 'style' parameter, returned assessments will have their full details contained in their data hash. If the user does not request a style, this key will be absent.",
-#           "type": "array"
+#           "type": "array",
+#           "items": { "type": "object" }
 #         },
 #         "comments": {
 #           "description": "(Optional) If 'comments_only' is included in the 'style' parameter, returned assessments will include only the comments portion of their data hash. If the user does not request a style, this key will be absent.",
-#           "type": "array"
+#           "type": "array",
+#           "items": { "type": "string" }
 #         }
 #       }
 #     }

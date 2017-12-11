@@ -35,12 +35,9 @@ describe 'Late Policies:' do
 
   context "grade detail tray other" do
     before(:each) do
-      ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
       GradezillaIndividualViewPage.visit(@course.id)
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it 'missing submission has missing pill' do
       GradezillaIndividualViewPage.select_assignment(@a2)

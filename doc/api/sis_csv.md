@@ -466,7 +466,7 @@ a better user experience to provide both.)</td>
 <td>account_id</td>
 <td>text</td>
 <td></td>
-<td></td>
+<td>✓</td>
 <td>The account identifier from accounts.csv, if none is specified the course will be attached to
 the root account</td>
 </tr>
@@ -997,17 +997,33 @@ change_sis_id.csv
 <tr>
 <td>old_id</td>
 <td>text</td>
-<td>✓</td>
+<td>✓&#42;</td>
 <td></td>
 <td>The current sis_id of the object that should be changed.</td>
 </tr>
 <tr>
 <td>new_id</td>
 <td>text</td>
-<td>✓</td>
+<td>✓&#42;</td>
 <td></td>
 <td>The desired sis_id of the object. This id must be currently unique to the
 object type and the root_account.</td>
+</tr>
+<tr>
+<td>old_integration_id</td>
+<td>text</td>
+<td>✓&#42;</td>
+<td></td>
+<td>The current integration_id of the object that should be changed.</td>
+</tr>
+<tr>
+<td>new_integration_id</td>
+<td>text</td>
+<td>✓&#42;</td>
+<td></td>
+<td>The desired integration_id of the object. This id must be currently unique
+to the object type and the root_account. Can pass "&lt;delete>" to
+remove the integration_id from the object.</td>
 </tr>
 <tr>
 <td>type</td>
@@ -1018,14 +1034,20 @@ object type and the root_account.</td>
 </tr>
 </table>
 
+&#42; old_id or old_integration_id is required, new_id or new_integration_id is
+required.
+
 change_sis_id.csv is optional. The goal of change_sis_id.csv is to provide a
-way to change sis_ids of existing objects. If included in a zip file this file
-will process first. All other files should include the new ids.
+way to change sis_ids or integration_ids of existing objects. If included in a
+zip file this file will process first. All other files should include the new
+ids.
 
 Sample:
 
-<pre>old_id,new_id,type
+<pre>old_id,new_id,old_integration_id,new_integration_id,type
 u001,u001a,user
 couse1,old_course1,course
 term1,fall17,term
+u001,,,<delete>,user
+,,integration01,int01,section
 </pre>

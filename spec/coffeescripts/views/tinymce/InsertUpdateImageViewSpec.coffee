@@ -51,6 +51,20 @@ define [
     view.update()
     ok RceCommandShim.send.calledWith('$fakeEditor', 'insert_code', view.generateImageHtml())
 
+  test "it updates attributes of existing image if selected node is img", ->
+    view = new InsertUpdateImageView(fakeEditor, "<img>")
+    img = view.$selectedNode
+    view.$editor = '$fakeEditor'
+    view.$("[name='image[width]']").val("400")
+    view.$("[name='image[height]']").val("300")
+    view.$("[name='image[src]']").val("testsrc")
+    view.$("[name='image[alt]']").val("testalt")
+    view.update()
+    equal(img.attr('width'), "400")
+    equal(img.attr('height'), "300")
+    equal(img.attr('src'), "testsrc")
+    equal(img.attr('alt'), "testalt")
+
   test "it restores caret on update", ->
     view = new InsertUpdateImageView(fakeEditor, "<div></div>")
     view.$editor = '$fakeEditor'

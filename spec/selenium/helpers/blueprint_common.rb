@@ -143,6 +143,7 @@ module BlueprintCourseCommon
         try += 1
         begin
           f('.bca-course-details__wrapper button').click
+          wait_for_ajaximations
           f('.bca-table__course-row')
           keep_trying = false
         rescue

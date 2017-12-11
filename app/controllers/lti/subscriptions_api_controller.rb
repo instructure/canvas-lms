@@ -89,8 +89,6 @@ module Lti
     #
     # @argument subscription[TransportType] [Required, String]
     #   Must be either 'sqs' or 'https'.
-    #
-    # @returns Webhook Subscription
     def create
       subscription_helper = SubscriptionsValidator.new(params.require(:subscription).to_unsafe_h, tool_proxy)
       subscription_helper.validate_subscription_request!

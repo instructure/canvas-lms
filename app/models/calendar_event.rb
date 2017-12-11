@@ -47,13 +47,10 @@ class CalendarEvent < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :user, :group, :appointment_group, :course_section],
              polymorphic_prefix: true
-  has_many :calendar_event_contexts
-
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   has_many :child_event_participants, :through => :child_events, :source => :user
-
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -123,8 +120,6 @@ class CalendarEvent < ActiveRecord::Base
     effective_context_code && ActiveRecord::Base.find_by_asset_string(effective_context_code) || context
   end
 
-  scope :order_by_start_at, -> { order(:start_at) }
-
   scope :active, -> { where("calendar_events.workflow_state<>'deleted'") }
   scope :are_locked, -> { where(:workflow_state => 'locked') }
   scope :are_unlocked, -> { where("calendar_events.workflow_state NOT IN ('deleted', 'locked')") }
@@ -141,35 +136,32 @@ class CalendarEvent < ActiveRecord::Base
     codes = args.shift
     section_codes = args.shift || user.section_context_codes(codes)
     effectively_courses_codes = [user.asset_string] + section_codes
+    # the all_codes check is redundant, but makes the query more efficient
+    all_codes = codes | effectively_courses_codes
     group_codes = codes.grep(/\Aappointment_group_\d+\z/)
     codes -= group_codes
 
-    supplied_contexts = Context.find_all_by_context_codes(codes)
-    group_contexts = Context.find_all_by_context_codes(group_codes)
-    effectively_course_contexts = Context.find_all_by_context_codes(effectively_courses_codes)
+    codes_conditions = codes.map { |code|
+      wildcard(quoted_table_name + '.effective_context_code', code, :delimiter => ',')
+    }.join(" OR ")
+    codes_conditions = self.connection.quote(false) if codes_conditions.blank?
 
-    # I'm so sorry
-    calendar_event_contexts_join = <<-SQL
-    LEFT JOIN #{CalendarEventContext.quoted_table_name} ON
-    #{CalendarEventContext.quoted_table_name}."calendar_event_id" = #{self.quoted_table_name}."id"
-    AND #{CalendarEventContext.quoted_table_name}."workflow_state" <> 'deleted'
+    where(<<-SQL, all_codes, codes, group_codes, effectively_courses_codes)
+      calendar_events.context_code IN (?)
+      AND (
+        ( -- explicit contexts (e.g. course_123)
+          calendar_events.context_code IN (?)
+          AND calendar_events.effective_context_code IS NULL
+        )
+        OR ( -- appointments (manageable or reservable)
+          calendar_events.context_code IN (?)
+        )
+        OR ( -- own appointment_participants, or section events in the course
+          calendar_events.context_code IN (?)
+          AND (#{codes_conditions})
+        )
+      )
     SQL
-    where({
-      id: CalendarEvent
-        .select(:id)
-        .joins(calendar_event_contexts_join)
-        .where(context: supplied_contexts, effective_context_code: nil)
-        .having(%{COUNT(#{CalendarEventContext.quoted_table_name}."id") = 0})
-        .group(:id)
-    })
-    .or(where(id: CalendarEvent.where(context: group_contexts).select(:id)))
-    .or(where({
-      id: CalendarEvent
-        .joins(:calendar_event_contexts)
-        .where(context: effectively_course_contexts)
-        .merge(CalendarEventContext.for_contexts(supplied_contexts))
-        .select(:id)
-    }))
   }
 
   scope :undated, -> { where(:start_at => nil, :end_at => nil) }
@@ -213,8 +205,6 @@ class CalendarEvent < ActiveRecord::Base
 
   def populate_appointment_group_defaults
     self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
-    maintain_calendar_event_contexts(context.appointment_group_contexts.pluck(:context_type, :context_id))
-
     if new_record?
       AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
       if locked?
@@ -229,59 +219,14 @@ class CalendarEvent < ActiveRecord::Base
   protected :populate_appointment_group_defaults
 
   def populate_with_parent_event
-    if appointment_group
-      if appointment_group.participant_type == 'User'
-        self.effective_context_code = appointment_group.appointment_group_contexts.map(&:context_code).join(',')
-        context_pairs = appointment_group.appointment_group_contexts.pluck(:context_type, :context_id)
-        maintain_calendar_event_contexts(context_pairs)
-      end
-    else
-      self.effective_context_code = parent_event.context_code
-      maintain_calendar_event_contexts([[parent_event.context_type, parent_event.context_id]])
-    end
+    self.effective_context_code = if appointment_group # appointment participant
+                                    appointment_group.appointment_group_contexts.map(&:context_code).join(',') if appointment_group.participant_type == 'User'
+                                  else # e.g. section-level event
+                                    parent_event.context_code
+                                  end
     (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each{ |attr| send("#{attr}=", parent_event.send(attr)) }
   end
   protected :populate_with_parent_event
-
-  protected def maintain_calendar_event_contexts(context_pairs)
-    if new_record?
-      context_pairs.each do |(effective_context_type, effective_context_id)|
-        calendar_event_contexts << CalendarEventContext.new({
-          calendar_event: self,
-          context_type: effective_context_type,
-          context_id: effective_context_id,
-        })
-      end
-    else
-      context_map = context_pairs.inject(Hash.new { |h, k| h[k] = [] }) do |memo, (context_type, context_id)|
-        memo[context_type] << context_id
-        memo
-      end
-      first_type = context_map.keys.first
-      first_ids = context_map.delete(first_type)
-      initial_scope = calendar_event_contexts.where.not(context_type: first_type, context_id: first_ids)
-
-      delete_scope = context_map.inject(initial_scope) do |scope, type, ids|
-        scope.or(calendar_event_contexts.where.not(context_type: type, context_id: ids))
-      end
-
-      self.class.transaction do
-        delete_scope.update_all(workflow_state: 'deleted')
-
-        context_pairs.each do |(effective_context_type, effective_context_id)|
-          CalendarEvent.unique_constraint_retry do
-            cec = calendar_event_contexts
-              .create_with(workflow_state: 'active')
-              .find_or_initialize_by(context_type: effective_context_type, context_id: effective_context_id)
-            # When we're creating a new record there isn't an ID yet so we can't
-            # save the context join records yet, fortunately Rails is nice enough
-            # to do it for us in that case.
-            cec.save! unless self.new_record?
-          end
-        end
-      end
-    end
-  end
 
   # Populate the start and end dates if they are not set, or if they are invalid
   def populate_missing_dates

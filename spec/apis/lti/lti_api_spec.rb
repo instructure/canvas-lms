@@ -39,6 +39,11 @@ describe LtiApiController, type: :request do
     }
   end
 
+  before do
+    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+    allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+  end
+
 
   def lti_api_call(method, path, body = nil)
     consumer = OAuth::Consumer.new(tool.consumer_key, tool.shared_secret, :site => "https://www.example.com", :signature_method => "HMAC-SHA1")

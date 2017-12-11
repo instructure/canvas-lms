@@ -1,16 +1,16 @@
 <div>
   <p>
-  {{#t "modal.notAllSectionsAssigned"}}Not all sections will be assigned this item.{{/t}}
+    {{#t}}Not all sections will be assigned this item.{{/t}}
   </p>
-  {{#t "modal.goBackToInclude"}}Would you like to go back to include:{{/t}}
-  <ul>
-  {{#each sections}}<li><b>{{this}}</b></li>{{/each}}
+  {{#t}}Would you like to go back to include:{{/t}}
+  <ul aria-label="{{#toSentence sections}}{{this}}{{/toSentence}}">
+    {{#each sections}}<li><b>{{this}}</b></li>{{/each}}
   </ul>
 
   <div class="button-container form-actions">
-    <button type="button" class="btn">{{#t "buttons.goBack"}}Go Back{{/t}}</button>
+    <button type="button" class="btn">{{#t}}Go Back{{/t}}</button>
     <button type="button" class="btn btn-primary">
-      {{#t "buttons.continue"}}Continue{{/t}}
+      {{#t}}Continue{{/t}}
     </button>
   </div>
 </div>

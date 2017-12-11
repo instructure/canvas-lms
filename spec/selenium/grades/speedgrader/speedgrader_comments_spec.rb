@@ -71,10 +71,11 @@ describe "speed grader" do
       expect(f("#comment_attachments")).not_to contain_css("input")
 
       # add comment
-      f('#add_a_comment > textarea').send_keys('grader comment')
+      f('#add_a_comment textarea').send_keys('grader comment')
       submit_form('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
       expect(f('#comments > .comment')).to include_text('grader comment')
+      expect(f('#add_a_comment textarea').text).to be_empty
 
       # make sure gradebook link works
       expect_new_page_load do
@@ -99,7 +100,7 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       # add comment
-      f('#add_a_comment > textarea').send_keys('grader comment')
+      f('#add_a_comment textarea').send_keys('grader comment')
       submit_form('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
       @submission.reload
@@ -131,7 +132,7 @@ describe "speed grader" do
       expect(f("#avatar_image")).not_to have_attribute('src', 'blank.png')
 
       # add comment
-      f('#add_a_comment > textarea').send_keys('grader comment')
+      f('#add_a_comment textarea').send_keys('grader comment')
       submit_form('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
       expect(f('#comments > .comment')).to include_text('grader comment')
@@ -175,7 +176,7 @@ describe "speed grader" do
       expect(f('#comments > .comment .author_name')).to include_text('Student')
 
       # add teacher comment
-      f('#add_a_comment > textarea').send_keys('grader comment')
+      f('#add_a_comment textarea').send_keys('grader comment')
       scroll_into_view("#comment_submit_button")
       submit_form('#add_a_comment')
       expect(ff('#comments > .comment')).to have_size(2)

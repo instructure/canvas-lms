@@ -82,18 +82,42 @@
 
 #assignment_show {
   .assignment-title {
-    word-wrap: break-word; /* for IE support */
-    overflow-wrap: break-word;
+    margin-bottom: $ic-sp * 2;
+
+    @include breakpoint(desktop) {
+      display: flex;
+      align-items: center;
+    }
   }
   .title-content {
-    flex-grow: 1;
-    vertical-align: bottom;
+    box-sizing: border-box;
+
+    @include breakpoint(desktop) {
+      flex: 1;
+      min-width: 1px;
+    }
+
+    .title {
+      margin: 0 0 $ic-sp;
+      line-height: $ic-label-line-height;
+      word-wrap: break-word;
+      hyphens: auto;
+
+      @include breakpoint(desktop) {
+        margin: 0;
+      }
+    }
   }
   .assignment-buttons {
-    vertical-align: bottom;
-    text-align: right;
-    min-width: 335px;
-    padding-bottom: 12px;
+    @include breakpoint(desktop) {
+      padding-left: $ic-sp * 1.5;
+      text-align: right;
+      .Button,
+      .btn,
+      .ui-button {
+        margin: 0.125rem; // Add small margin in case buttons stack
+      }
+    }
   }
   .undo-main-margins {
     margin-left: -1em;
@@ -102,12 +126,11 @@
   }
   .student-assignment-overview {
     list-style: none;
-    width: 100%;
-    border-top: 1px solid #BBB;
-    border-bottom: 1px solid #BBB;
-    font-size: 1.1em;
-    padding: 0.5em 0.25em;
-    margin: 0 0 1em 0;
+    box-sizing: border-box;
+    border-top: 1px solid $ic-border-light;
+    border-bottom: 1px solid $ic-border-light;
+    padding: $ic-sp 0;
+    margin: 0 0 ($ic-sp * 1.5) 0;
     li {
       display: inline-block;
     }

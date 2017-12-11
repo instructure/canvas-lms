@@ -193,9 +193,10 @@ define [
     params = store._generateParams('manual', data)
     deepEqual params, {
       consumer_key: "KEY"
-      "custom_fields[a]": "1"
-      "custom_fields[b]": "2"
-      "custom_fields[c]": "3"
+      custom_fields:
+        "a": "1"
+        "b": "2"
+        "c": "3"
       description: "This is a description"
       domain: undefined
       name: "My App"

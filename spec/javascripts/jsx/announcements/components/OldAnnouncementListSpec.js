@@ -17,7 +17,7 @@
  */
 
 define([
-  'react', 'react-addons-test-utils', 'jsx/announcements/AnnouncementList',
+  'react', 'react-addons-test-utils', 'jsx/announcements/components/OldAnnouncementList',
 ], (React, TestUtils, AnnouncementList) => {
   QUnit.module('AnnouncementList')
 

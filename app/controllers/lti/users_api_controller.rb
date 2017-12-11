@@ -19,34 +19,6 @@
 module Lti
 # @API Plagiarism Detection Platform Users
 # **Plagiarism Detection Platform API for Users (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
-#
-# @model User
-#     {
-#       "id": "User",
-#       "description": "A Canvas user",
-#       "properties": {
-#         "id": {
-#           "example": 4,
-#           "type": "integer"
-#         },
-#         "name": {
-#           "example": "John Smith",
-#           "type": "string"
-#         },
-#         "sortable_name": {
-#           "example": "Smith, John",
-#           "type": "string"
-#         },
-#         "email": {
-#           "example": "john@test.com",
-#           "type": "string"
-#         },
-#         "lti_id": {
-#           "example": "86157096483e6b3a50bfedc6bac902c0b20a824f",
-#           "type": "string"
-#         }
-#       }
-#     }
   class UsersApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
     include Api::V1::User
@@ -68,10 +40,12 @@ module Lti
       USER_SERVICE
     end
 
-    # @API Get a single user
+    # @API Get a single user (lti)
     #
     # Get a single Canvas user by Canvas id or LTI id. Tool providers may only access
     # users that have been assigned an assignment associated with their tool.
+    #
+    # @returns User
     def show
       render json: user_json(user, user, nil, %w(email lti_id), tool_proxy.context)
     end

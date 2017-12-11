@@ -169,6 +169,9 @@ define [
 
     update: =>
       @restoreCaret()
-      RceCommandShim.send(@$editor, 'insert_code', @generateImageHtml())
+      if @$selectedNode.is('img')
+        @$selectedNode.attr(@getAttributes())
+      else
+        RceCommandShim.send(@$editor, 'insert_code', @generateImageHtml())
       @editor.focus()
       @close()

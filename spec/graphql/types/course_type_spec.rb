@@ -76,20 +76,75 @@ describe Types::CourseType do
       ).to eq [@student2a1_submission]
     end
 
-    it "takes sorting criteria" do
+    context "sorting criteria" do
+      it "takes sorting criteria" do
+        expect(
+          course_type.submissionsConnection(
+            current_user: @teacher,
+            args: {
+              studentIds: [@student1.id.to_s, @student2.id.to_s],
+              orderBy: [{field: "graded_at", direction: "desc"}],
+            }
+          )
+        ).to eq [
+          @student1a2_submission,
+          @student2a1_submission,
+          @student1a1_submission,
+        ]
+      end
+
+      it "sorts null last" do
+        @student2a1_submission.update_attribute :graded_at, nil
+
+        # the code that turns enums->values runs at the schema- (not type-)
+        # level doing it by hand here
+        direction = Types::SubmissionOrderInputType.arguments["direction"].
+          type.values["descending"].value
+
+        expect(
+          course_type.submissionsConnection(
+            current_user: @teacher,
+            args: {
+              studentIds: [@student1.id.to_s, @student2.id.to_s],
+              orderBy: [{field: "graded_at", direction: direction}],
+            }
+          )
+        ).to eq [
+          @student1a2_submission,
+          @student1a1_submission,
+          @student2a1_submission,
+        ]
+      end
+    end
+  end
+
+  describe "usersConnection" do
+    before(:once) do
+      @student1 = @student
+      @student2 = student_in_course(active_all: true).user
+    end
+
+    it "returns all visible users" do
       expect(
-        course_type.submissionsConnection(
+        course_type.usersConnection(current_user: @teacher)
+      ).to eq [@teacher, @student1, @student2]
+    end
+
+    it "returns only the specified users" do
+      expect(
+        course_type.usersConnection(
           current_user: @teacher,
-          args: {
-            studentIds: [@student1.id.to_s, @student2.id.to_s],
-            orderBy: [{field: "graded_at", direction: "desc"}],
-          }
+          args: {userIds: @student1}
         )
-      ).to eq [
-        @student1a2_submission,
-        @student2a1_submission,
-        @student1a1_submission,
-      ]
+      ).to eq [@student1]
+    end
+
+    it "doesn't return users that aren't visible to you" do
+      other_teacher = teacher_in_course(active_all: true,
+                                        course: Course.create!).user
+      expect(
+        course_type.usersConnection(current_user: other_teacher)
+      ).to be_nil
     end
   end
 

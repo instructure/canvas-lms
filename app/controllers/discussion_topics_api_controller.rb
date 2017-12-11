@@ -651,7 +651,7 @@ class DiscussionTopicsApiController < ApplicationController
       @entry.update_topic
       log_asset_access(@topic, 'topics', 'topics', 'participate')
       if has_attachment
-        @attachment = (@current_user || @context).attachments.create(:uploaded_data => params[:attachment])
+        @attachment = create_attachment
         @attachment.handle_duplicates(:rename)
         @entry.attachment = @attachment
         @entry.save
@@ -660,6 +660,18 @@ class DiscussionTopicsApiController < ApplicationController
     else
       render :json => @entry.errors, :status => :bad_request
     end
+  end
+
+  def create_attachment
+    context = (@current_user || @context)
+    attachment_params = { :uploaded_data => params[:attachment] }
+
+    if @topic.for_assignment?
+      attachment_params.merge!(:folder_id => @current_user.submissions_folder(@context))
+      context = @current_user
+    end
+
+    context.attachments.create(attachment_params)
   end
 
   def visible_topics(topic)

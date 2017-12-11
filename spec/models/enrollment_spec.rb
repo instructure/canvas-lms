@@ -2431,6 +2431,14 @@ describe Enrollment do
       expect(DueDateCacher).to receive(:recompute_course).never
       @enrollment.save
     end
+
+    it "does not trigger when set_update_cached_due_dates callback is suspended" do
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).never
+      Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
+        @course.enroll_student(user_factory)
+      end
+    end
   end
 
   describe "#student_with_conditions?" do

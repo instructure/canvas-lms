@@ -14,5 +14,5 @@ manifest_key_seperator: $$$$$$$$$$$
 variants:
   new_styles_normal_contrast: {}
   new_styles_high_contrast: {}
-  new_typography_normal_contrast: {}
-  new_typography_high_contrast: {}
+  responsive_layout_normal_contrast: {}
+  responsive_layout_high_contrast: {}

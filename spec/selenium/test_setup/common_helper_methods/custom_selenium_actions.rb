@@ -87,7 +87,7 @@ module CustomSeleniumActions
     end
   end
 
-  # short for find with xpath
+  # Find an element via xpath
   def fxpath(xpath, scope = nil)
     stale_element_protection do
       (scope || driver).find_element :xpath, xpath
@@ -120,6 +120,7 @@ module CustomSeleniumActions
     end
   end
 
+  # Find a collection of elements via xpath
   def ffxpath(xpath, scope = nil)
     reloadable_collection do
       (scope || driver).find_elements(:xpath, xpath)
@@ -151,6 +152,7 @@ module CustomSeleniumActions
     end
   end
 
+  # Find the parent of an element via xpath
   def parent_fxpath(element)
     stale_element_protection do
       element.find_element(:xpath,"..")
@@ -159,6 +161,7 @@ module CustomSeleniumActions
     raise "Parent node for given element was not found"
   end
 
+  # Find the parent of an element via JS
   def parent_fjs(element)
     stale_element_protection do
       driver.execute_script("return arguments[0].parentNode;", element)
@@ -167,6 +170,7 @@ module CustomSeleniumActions
     raise "Parent node for given element was not found"
   end
 
+  # Find the grandparent of an element via xpath
   def grandparent_fxpath(element)
     stale_element_protection do
       element.find_element(:xpath,"../..")
@@ -175,6 +179,7 @@ module CustomSeleniumActions
     raise "Grandparent node for given element was not found, please check if parent nodes are present"
   end
 
+  # Find an element with reference to another element, via xpath
   def find_from_element_fxpath(element, xpath)
     stale_element_protection do
       element.find_element(:xpath, xpath)
@@ -189,6 +194,18 @@ module CustomSeleniumActions
     element.attribute(attr)
   rescue Selenium::WebDriver::Error::UnknownError
     raise "Attribute may not be passed correctly. Please recheck attribute passed, and its format : #{attr}"
+  end
+
+  # find button with fj, and the text it contains
+  # usage example: find_button ("Save")
+  def find_button(label = "", scope = nil)
+    fj("button:contains('#{label}')", scope)
+  end
+
+  # find table with fj, and the caption it contains
+  # usage example: find_table ("Grade Changes")
+  def find_table(caption = "", scope = nil)
+    fj("table:contains('#{caption}')", scope)
   end
 
   def is_checked(css_selector)

@@ -93,9 +93,9 @@ describe 'Student Gradebook' do
 
       get "/courses/#{@course.id}/grades/#{student.id}"
       [course1, course2, course3].each do |course|
-        options = Selenium::WebDriver::Support::Select.new f('#course_url')
+        options = Selenium::WebDriver::Support::Select.new f('#course_select_menu')
         options.select_by :text, course.name
-
+        expect_new_page_load { f('#apply_select_menus').click }
         details = ff('[id^="submission_"].assignment_graded .grade')
         details.each {|detail| scores.push detail.text[/\d+/].to_i}
       end

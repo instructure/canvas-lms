@@ -202,12 +202,12 @@ class Course < ActiveRecord::Base
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
-  after_save :update_cached_due_dates
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
   after_save :touch_students_if_necessary
   after_save :set_self_enrollment_code
+  after_commit :update_cached_due_dates
 
   before_update :handle_syllabus_changes_for_master_migration
 
@@ -1046,7 +1046,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    DueDateCacher.recompute_course(self) if enrollment_term_id_changed?
+    DueDateCacher.recompute_course(self) if previous_changes.key?(:enrollment_term_id)
   end
 
   def update_final_scores_on_weighting_scheme_change
@@ -2175,27 +2175,28 @@ class Course < ActiveRecord::Base
   ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}
   def section_visibilities_for(user, opts={})
     RequestCache.cache('section_visibilities_for', user, self, opts) do
-      Rails.cache.fetch(['section_visibilities_for', user, self, opts].cache_key) do
-        workflow_not = opts[:excluded_workflows] || 'deleted'
+      shard.activate do
+        Rails.cache.fetch(['section_visibilities_for', user, self, opts].cache_key) do
+          workflow_not = opts[:excluded_workflows] || 'deleted'
 
-        enrollment_rows = all_enrollments
-          .where(user: user)
-          .where.not(workflow_state: workflow_not)
-          .pluck(
-            :course_section_id,
-            :limit_privileges_to_course_section,
-            :type,
-            :associated_user_id
-          )
+          enrollment_rows = all_enrollments.
+            where(user: user).
+            where.not(workflow_state: workflow_not).
+            pluck(
+              :course_section_id,
+              :limit_privileges_to_course_section,
+              :type,
+              :associated_user_id)
 
-        enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
-          {
-            :course_section_id => section_id,
-            :limit_privileges_to_course_section => limit_privileges,
-            :type => type,
-            :associated_user_id => associated_user_id,
-            :admin => ADMIN_TYPES.include?(type)
-          }
+          enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
+            {
+              :course_section_id => section_id,
+              :limit_privileges_to_course_section => limit_privileges,
+              :type => type,
+              :associated_user_id => associated_user_id,
+              :admin => ADMIN_TYPES.include?(type)
+            }
+          end
         end
       end
     end
@@ -2427,62 +2428,62 @@ class Course < ActiveRecord::Base
       :css_class => 'grades',
       :href => :course_grades_path,
     }, {
-        :id => TAB_PEOPLE,
-        :label => t('#tabs.people', "People"),
-        :css_class => 'people',
-        :href => :course_users_path
-      }, {
-        :id => TAB_PAGES,
-        :label => t('#tabs.pages', "Pages"),
-        :css_class => 'pages',
-        :href => :course_wiki_path
-      }, {
-        :id => TAB_FILES,
-        :label => t('#tabs.files', "Files"),
-        :css_class => 'files',
-        :href => :course_files_path,
-        :icon => 'icon-folder'
-      }, {
-        :id => TAB_SYLLABUS,
-        :label => t('#tabs.syllabus', "Syllabus"),
-        :css_class => 'syllabus',
-        :href => :syllabus_course_assignments_path
-      }, {
-        :id => TAB_OUTCOMES,
-        :label => t('#tabs.outcomes', "Outcomes"),
-        :css_class => 'outcomes',
-        :href => :course_outcomes_path
-      }, {
-        :id => TAB_QUIZZES,
-        :label => t('#tabs.quizzes', "Quizzes"),
-        :css_class => 'quizzes',
-        :href => :course_quizzes_path
-      }, {
-        :id => TAB_MODULES,
-        :label => t('#tabs.modules', "Modules"),
-        :css_class => 'modules',
-        :href => :course_context_modules_path
-      }, {
-        :id => TAB_CONFERENCES,
-        :label => t('#tabs.conferences', "Conferences"),
-        :css_class => 'conferences',
-        :href => :course_conferences_path
-      }, {
-        :id => TAB_COLLABORATIONS,
-        :label => t('#tabs.collaborations', "Collaborations"),
-        :css_class => 'collaborations',
-        :href => :course_collaborations_path
-      }, {
-        :id => TAB_COLLABORATIONS_NEW,
-        :label => t('#tabs.collaborations', "Collaborations"),
-        :css_class => 'collaborations',
-        :href => :course_lti_collaborations_path
-      }, {
-        :id => TAB_SETTINGS,
-        :label => t('#tabs.settings', "Settings"),
-        :css_class => 'settings',
-        :href => :course_settings_path,
-      }]
+      :id => TAB_PEOPLE,
+      :label => t('#tabs.people', "People"),
+      :css_class => 'people',
+      :href => :course_users_path
+    }, {
+      :id => TAB_PAGES,
+      :label => t('#tabs.pages', "Pages"),
+      :css_class => 'pages',
+      :href => :course_wiki_path
+    }, {
+      :id => TAB_FILES,
+      :label => t('#tabs.files', "Files"),
+      :css_class => 'files',
+      :href => :course_files_path,
+      :icon => 'icon-folder'
+    }, {
+      :id => TAB_SYLLABUS,
+      :label => t('#tabs.syllabus', "Syllabus"),
+      :css_class => 'syllabus',
+      :href => :syllabus_course_assignments_path
+    }, {
+      :id => TAB_OUTCOMES,
+      :label => t('#tabs.outcomes', "Outcomes"),
+      :css_class => 'outcomes',
+      :href => :course_outcomes_path
+    }, {
+      :id => TAB_QUIZZES,
+      :label => t('#tabs.quizzes', "Quizzes"),
+      :css_class => 'quizzes',
+      :href => :course_quizzes_path
+    }, {
+      :id => TAB_MODULES,
+      :label => t('#tabs.modules', "Modules"),
+      :css_class => 'modules',
+      :href => :course_context_modules_path
+    }, {
+      :id => TAB_CONFERENCES,
+      :label => t('#tabs.conferences', "Conferences"),
+      :css_class => 'conferences',
+      :href => :course_conferences_path
+    }, {
+      :id => TAB_COLLABORATIONS,
+      :label => t('#tabs.collaborations', "Collaborations"),
+      :css_class => 'collaborations',
+      :href => :course_collaborations_path
+    }, {
+      :id => TAB_COLLABORATIONS_NEW,
+      :label => t('#tabs.collaborations', "Collaborations"),
+      :css_class => 'collaborations',
+      :href => :course_lti_collaborations_path
+    }, {
+      :id => TAB_SETTINGS,
+      :label => t('#tabs.settings', "Settings"),
+      :css_class => 'settings',
+      :href => :course_settings_path,
+    }]
   end
 
   def tab_hidden?(id)
@@ -2830,7 +2831,7 @@ class Course < ActiveRecord::Base
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
     self.default_section unless course_sections.active.any?
-    Enrollment.suspend_callbacks(:update_cached_due_dates) do
+    Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
       self.course_sections.active.each do |section|
         # enroll fake_student will only create the enrollment if it doesn't already exist
         self.enroll_user(fake_student, 'StudentViewEnrollment',
@@ -3080,6 +3081,22 @@ class Course < ActiveRecord::Base
     !!settings[:show_total_grade_as_points] &&
       group_weighting_scheme != "percent" &&
       !relevant_grading_period_group&.weighted?
+  end
+
+  # This method will be around while we still have two
+  # gradebooks. This method should be used in situations where we want
+  # to identify the user can't move backwards, such as feature flags
+  def gradebook_backwards_incompatible_features_enabled?
+    # The old gradebook can't deal with late policies at all
+    return true if late_policy&.missing_submission_deduction_enabled? || late_policy&.late_submission_deduction_enabled?
+
+    # If you've used the grade tray status changes at all, you can't
+    # go back. Even if set to none, it'll break "Message Students
+    # Who..." for unsubmitted.
+    expire_time = Setting.get('late_policy_tainted_submissions', 1.hour).to_i
+    Rails.cache.fetch(['late_policy_tainted_submissions', self].cache_key, expires_in: expire_time) do
+      submissions.except(:order).where(late_policy_status: ['missing', 'late', 'none']).exists?
+    end
   end
 
   private

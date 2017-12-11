@@ -33,8 +33,7 @@ class GradebookSettingsModal extends React.Component {
     courseId: string.isRequired,
     locale: string.isRequired,
     onClose: func.isRequired,
-    gradedLateOrMissingSubmissionsExist: bool.isRequired,
-    newGradebookDevelopmentEnabled: bool.isRequired,
+    gradedLateSubmissionsExist: bool.isRequired,
     onLatePolicyUpdate: func.isRequired
   }
 
@@ -144,8 +143,7 @@ class GradebookSettingsModal extends React.Component {
                 latePolicy={latePolicy}
                 changeLatePolicy={this.changeLatePolicy}
                 locale={this.props.locale}
-                showContentComingSoon={!this.props.newGradebookDevelopmentEnabled}
-                showAlert={this.props.gradedLateOrMissingSubmissionsExist}
+                showAlert={this.props.gradedLateSubmissionsExist}
               />
             </TabPanel>
           </TabList>

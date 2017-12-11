@@ -766,6 +766,22 @@ describe AccountsController do
     account_with_admin_logged_in(account: account)
   end
 
+  describe "terms of service" do
+    before do
+      @account = Account.create!
+    end
+
+    it "should return the terms of service content" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+
+      admin_logged_in(@account)
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"content\":\"custom content\"/)
+    end
+  end
+
   describe "#account_courses" do
     before do
       @account = Account.create!

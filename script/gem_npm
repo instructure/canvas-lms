@@ -1,4 +1,10 @@
 #!/bin/bash
+set -e
+
+# TODO: remove this line when we no longer have to support upgrading yarn 0.x to 1.x
+# Having the entry in "engines" is all we need for yarn >= 1
+$(node --eval "if (!(require('child_process').execSync('yarn --version').toString().match(require('./package.json').engines.yarn))) throw new Error('you need to upgrade yarn')")
+
 # little shortcut for doing yarn install/update/whatever for each of our
 # gems that do node-y stuff
 

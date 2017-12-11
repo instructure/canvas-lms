@@ -30,6 +30,7 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :content_tag,
                                      :discussion_topic,
                                      :learning_outcome,
+                                     :learning_outcome_group,
                                      :rubric,
                                      :wiki_page,
                                      quiz: 'Quizzes::Quiz'

@@ -8143,3 +8143,44 @@ QUnit.module('#setEditedCommentId', function () {
     strictEqual(gradebook.gridDisplaySettings.submissionTray.editedCommentId, '23');
   });
 });
+
+QUnit.module('#renderGradebookSettingsModal', (hooks) => {
+  let gradebook;
+
+  function gradebookSettingsModalProps () {
+    return ReactDOM.render.firstCall.args[0].props;
+  }
+
+  hooks.beforeEach(() => {
+    sinon.stub(ReactDOM, 'render');
+  });
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore();
+  });
+
+  test('renders the GradebookSettingsModal component', function () {
+    gradebook = createGradebook();
+    gradebook.renderGradebookSettingsModal();
+    const componentName = ReactDOM.render.firstCall.args[0].type.name;
+    strictEqual(componentName, 'GradebookSettingsModal');
+  });
+
+  test('passes graded_late_submissions_exist option to the modal as a prop', function () {
+    gradebook = createGradebook({ graded_late_submissions_exist: true });
+    gradebook.renderGradebookSettingsModal();
+    strictEqual(gradebookSettingsModalProps().gradedLateSubmissionsExist, true);
+  });
+
+  test('passes the context_id option to the modal as a prop', function () {
+    gradebook = createGradebook({ context_id: '8473' });
+    gradebook.renderGradebookSettingsModal();
+    strictEqual(gradebookSettingsModalProps().courseId, '8473');
+  });
+
+  test('passes the locale option to the modal as a prop', function () {
+    gradebook = createGradebook({ locale: 'de' });
+    gradebook.renderGradebookSettingsModal();
+    strictEqual(gradebookSettingsModalProps().locale, 'de');
+  });
+});

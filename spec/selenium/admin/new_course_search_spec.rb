@@ -111,6 +111,26 @@ describe "new account course search" do
     expect(rows.first).to include_text(match_course.name)
   end
 
+  it "should bring up course page when clicking name", priority: "1", test_id: 3415212 do
+    named_course = course_factory(:account => @account, :course_name => "named_course")
+    named_course.default_view = 'feed'
+    named_course.save
+    get "/accounts/#{@account.id}"
+
+    f('.courses-list a').click
+    wait_for_ajax_requests
+    expect(f("#content h2")).to include_text named_course.name
+  end
+
+  it "should search but not find bogus course", priority: "1", test_id: 3415214 do
+    bogus = 'jtsdumbthing'
+    get "/accounts/#{@account.id}"
+
+    f('.course_search_bar input[type=search]').send_keys(bogus)
+
+    expect(f("#content")).not_to contain_css('.courses-list [role=row]')
+  end
+
   it "should show teachers" do
     course_factory(:account => @account)
     user_factory(:name => "some teacher")

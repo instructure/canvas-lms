@@ -111,6 +111,7 @@ define [
         )
 
       this.prototype.cellWrapper(grade, {
+        needsGrading: opts.needsGrading,
         submission: submission,
         assignment: assignment,
         editable: false,
@@ -142,8 +143,8 @@ define [
         tooltips.push(opts.tooltip)
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade && opts.submission.workflow_state != 'pending_review'
-      innerContents = null if opts.submission.workflow_state == 'pending_review' && !isNaN(innerContents)
-      innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '–'
+      innerContents = '<i class="icon-not-graded"></i>' if opts.needsGrading
+      innerContents ?= '–'
 
       if turnitin = extractDataTurnitin(opts.submission)
         styles.push('turnitin')
@@ -181,27 +182,6 @@ define [
       classes.push('muted') if assignment.muted
       classes.push(submission.submission_type) if submission.submission_type
       classes
-
-    @submissionIcon: (submission_type) ->
-      klass = SubmissionCell.iconFromSubmissionType(submission_type)
-      "<i class='icon-#{htmlEscape klass}' ></i>"
-
-    @iconFromSubmissionType: (submission_type) ->
-      switch submission_type
-        when "online_upload"
-          "document"
-        when "discussion_topic"
-          "discussion"
-        when "online_text_entry"
-          "text"
-        when "online_url"
-          "link"
-        when "media_recording"
-          "filmstrip"
-        when "online_quiz"
-          "quiz"
-        else
-          "document"
 
   class SubmissionCell.out_of extends SubmissionCell
     init: () ->
@@ -289,13 +269,18 @@ define [
           data-value="#{htmlEscape(options.submission.entered_grade || '')}"
           class="Button Button--icon-action gradebook-checkbox gradebook-checkbox-#{htmlEscape cssClass} #{htmlEscape(editable)}"
           type="button"
-          aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape(passFailMessage(cssClass))}</span>#{checkboxButtonTemplate(iconClass)}</button>
+          aria-label="#{htmlEscape cssClass}">
+          <span class="screenreader-only">#{htmlEscape(passFailMessage(cssClass))}</span>
+          #{checkboxButtonTemplate(iconClass)}
+        </button>
         """, options)
 
     # Complete/Incomplete (pass_fail) formatter
     @formatter: (row, col, submission, assignment, student, opts={}) ->
       return SubmissionCell.formatter.apply(this, arguments) unless submission.grade?
-      pass_fail::htmlFromSubmission({ submission, assignment, editable: false, isLocked: opts.isLocked, tooltip: opts.tooltip })
+      pass_fail::htmlFromSubmission({
+        submission, assignment, editable: false, isLocked: opts.isLocked, tooltip: opts.tooltip, needsGrading: opts.needsGrading
+      })
 
     init: () ->
       @$wrapper = $(@cellWrapper())

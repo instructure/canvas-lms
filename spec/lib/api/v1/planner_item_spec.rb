@@ -38,7 +38,7 @@ describe Api::V1::PlannerItem do
     @course.root_account.enable_feature!(:student_planner)
 
     teacher_in_course active_all: true
-    student_in_course active_all: true
+    student_in_course course: @course, active_all: true
     for_course = { course: @course }
 
     assignment_quiz [], for_course
@@ -75,6 +75,13 @@ describe Api::V1::PlannerItem do
       annc = announcement_model context: @couse, posted_at: annc_post_date
       annc_hash = api.planner_item_json(annc, @student, session)
       expect(annc_hash[:plannable_date]).to eq annc_post_date
+    end
+
+    it 'should show the assignment for the plannable_id if one exists' do
+      asg = assignment_model course: @couse, submission_types: 'online_text_entry'
+      dt = @course.discussion_topics.create!(assignment: asg, title: 'Assignment DT')
+      dt_hash = api.planner_item_json(dt, @student, session)
+      expect(dt_hash[:plannable_id]).to eq asg.id
     end
 
     context 'with an existing planner override' do
@@ -137,13 +144,15 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:excused]).to be true
       end
 
-      it 'should indicate that an assignment is graded' do
+      it 'should indicate that a graded assignment is graded' do
         submission = @assignment.submit_homework(@student, body: "o")
         submission.update(score: 10)
         submission.grade_it!
 
         json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:graded]).to be true
+        # just because it's graded, doesn't mean there's feedback
+        expect(json[:submissions][:has_feedback]).to be false
       end
 
       it 'should indicate that an assignment is late' do
@@ -161,19 +170,36 @@ describe Api::V1::PlannerItem do
         expect(json[:submissions][:needs_grading]).to be true
       end
 
-      it 'should indicate that an assignment has feedback' do
+      it 'should indicate that a graded assignment with comment has feedback and is graded' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @teacher, comment: "nice work, fam")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:graded]).to be true
+      end
+
+      it 'should indicate that a not-yet-graded assignment has feedback' do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         submission.add_comment(user: @teacher, comment: "nice work, fam")
         submission.grade_it!
 
         json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
         expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:graded]).to be false
       end
     end
   end
 
   describe '#new_activity' do
+    before :once do
+      discussion_topic_model
+    end
+
     it 'should return true for assignments with new grades' do
+      group_discussion_assignment
       graded_submission(@quiz, @student)
       graded_submission_model(assignment: @assignment, user: @student).update_attributes(score: 5)
       graded_submission_model(assignment: @topic.assignment, user: @student).update_attributes(score: 5)
@@ -192,22 +218,36 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
     end
 
+    it 'should return true for unread discussions' do
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
+    end
+
+    it 'should return false for a read discussion' do
+      @topic.change_read_state('read', @student)
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be false
+    end
+
+    it 'should return false for discussions with replies that has been marked read' do
+      @topic.reply_from(user: @teacher, text: 'reply')
+      @topic.change_all_read_state('read', @student)
+      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be false
+    end
+
     it 'should return true for discussions with new replies' do
-      student_in_course active_all: true
       @group_category = nil
-      announcement_model(context: @course).reply_from(user: @teacher, text: 'reply')
-      group_discussion_assignment.reply_from(user: @teacher, text: 'reply')
+      announcement_model(context: @course)
+      @a.change_read_state('read', @student)
+      @topic.change_read_state('read', @student)
+      @a.reply_from(user: @teacher, text: 'reply')
+      @topic.reply_from(user: @teacher, text: 'reply')
       expect(api.planner_item_json(@a, @student, session)[:new_activity]).to be true
       expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
     end
 
     it 'should return false for items without new activity' do
       student_in_course active_all: true
-      announcement_model(context: @course)
       expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be false
       expect(api.planner_item_json(@assignment, @student, session)[:new_activity]).to be false
-      expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be false
-      expect(api.planner_item_json(@a, @student, session)[:new_activity]).to be false
     end
 
     it 'should return false for items that cannot have new activity' do

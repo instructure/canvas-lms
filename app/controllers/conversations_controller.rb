@@ -782,8 +782,12 @@ class ConversationsController < ApplicationController
   #
   def add_recipients
     if @recipients.present?
-      @conversation.add_participants(@recipients, :tags => @tags, :root_account_id => @domain_root_account.id)
-      render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [@conversation.messages.first])
+      if @conversation.conversation.can_add_participants?(@recipients)
+        @conversation.add_participants(@recipients, :tags => @tags, :root_account_id => @domain_root_account.id)
+        render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [@conversation.messages.first])
+      else
+        render_error('recipients', 'too many participants for group conversation')
+      end
     else
       render :json => {}, :status => :bad_request
     end
@@ -868,6 +872,9 @@ class ConversationsController < ApplicationController
       params[:from_conversation_id] = @conversation.conversation_id
       # not a before_action because we need to set the above parameter.
       normalize_recipients
+      if @recipients && !@conversation.conversation.can_add_participants?(@recipients)
+        return render_error('recipients', 'too many participants for group conversation')
+      end
       # find included_messages
       message_ids = params[:included_messages]
       message_ids = message_ids.split(/,/) if message_ids.is_a?(String)

@@ -16,18 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const data = ENV.BLUEPRINT_COURSES_DATA
+import actions from 'jsx/announcements/actions'
+import reducer from 'jsx/announcements/reducer'
+import sampleData from './sampleData'
 
-require.ensure([], (require) => {
-  const App = data.isMasterCourse
-    ? require('../blueprint_courses/apps/BlueprintCourse')
-    : require('../blueprint_courses/apps/ChildCourse')
+QUnit.module('Announcements reducer')
 
-  const wrapper = document.getElementById('wrapper')
-  const root = document.createElement('div')
-  root.className = 'blueprint__root'
-  wrapper.appendChild(root)
+const reduce = (action, state = {}) => reducer(state, action)
 
-  const app = new App(root, data, ENV.DEBUG_BLUEPRINT_COURSES)
-  app.start()
-})
+// test('does something on SOME_ACTION', () => {
+//   const newState = reduce(actions.someAction())
+//   deepEqual(newState.foo, 'bar')
+// })

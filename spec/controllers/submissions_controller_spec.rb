@@ -783,6 +783,8 @@ describe SubmissionsController do
       @assessor = @student
       outcome_with_rubric
       @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'
+      @assignment.peer_reviews = true
+      @assignment.save!
       @assignment.assign_peer_review(@assessor, @submission.user)
       @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading'})
       user_session(@assessor)

@@ -144,6 +144,22 @@ describe RubricAssessment do
       expect(@assessment.artifact.score).to eql(nil)
     end
 
+    it "should allow points to exceed max points possible for criterion" do
+      @assessment = @association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => "11"
+          }
+        }
+      })
+      expect(@assessment.score).to eql(11.0)
+      expect(@assessment.artifact.score).to eql(11.0)
+    end
+
     it "should not update scores if not used for grading" do
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,5 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$use_high_contrast: false;
-$use_new_typography: true;
+import { createStore, applyMiddleware } from 'redux'
+import ReduxThunk from 'redux-thunk'
+import rootReducer from 'jsx/announcements/reducer'
+
+export default function mockStore (initialState) {
+  return applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)
+}

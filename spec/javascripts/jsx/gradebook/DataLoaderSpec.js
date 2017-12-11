@@ -178,7 +178,7 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
         () => {
           const studentIds = studentIdParam([2, 5]);
           respondToXhr(`/submissions?${studentIds}submission_params=blahblahblah`,
-                       200, {}, SUBMISSIONS_CHUNK_1)
+            200, {Link: ''}, SUBMISSIONS_CHUNK_1)
         },
         () => {
           respondToXhr("/students?page=2&student_params=whatever",
@@ -187,7 +187,7 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
         () => {
           const studentIds = studentIdParam([3, 7]);
           respondToXhr(`/submissions?${studentIds}submission_params=blahblahblah`,
-                       200, {}, SUBMISSIONS_CHUNK_2)
+            200, {Link: ''}, SUBMISSIONS_CHUNK_2)
         },
       ];
 
@@ -216,6 +216,51 @@ define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
         ok(dataLoader.gotStudents.isResolved(),
            "students finish loading first");
         ok(submissionsCbCalled === 2);
+        submissionsDone();
+      });
+    });
+
+    test("requests submissions with pagination", (assert) => {
+      const studentIdParam = (studentIds) => (
+        studentIds.reduce(
+          (str, id) => `${str}student_ids%5B%5D=${id}&`,
+          ""
+        )
+      );
+
+      XHR_HANDLERS = [
+        () => {
+          respondToXhr("/students?student_params=whatever",
+                       200,
+                       {Link: '</students?page=1>; rel="last"'},
+                       STUDENTS_PAGE_1)
+        },
+        () => {
+          const studentIds = studentIdParam([2, 5]);
+          respondToXhr(`/submissions?${studentIds}submission_params=blahblahblah`,
+            200, {Link: '</submissions?page=2>; rel="last"'}, SUBMISSIONS_CHUNK_1)
+        },
+        () => {
+          const studentIds = studentIdParam([2, 5]);
+          respondToXhr(`/submissions?page=2&${studentIds}submission_params=blahblahblah`,
+            200, {Link: ''}, SUBMISSIONS_CHUNK_2)
+        },
+      ];
+
+      const submissionsDone = assert.async();
+
+      let submissionsCbCalled = 0;
+      let submissionsCbValue;
+
+      const submissionsCb = (submissions) => {
+        submissionsCbCalled++;
+        submissionsCbValue = submissions;
+      };
+
+      const dataLoader = callLoadGradebookData({ submissionsChunkCb: submissionsCb });
+      dataLoader.gotSubmissions.then(() => {
+        deepEqual(submissionsCbValue, [...SUBMISSIONS_CHUNK_1, ...SUBMISSIONS_CHUNK_2]);
+        strictEqual(submissionsCbCalled, 1);
         submissionsDone();
       });
     });

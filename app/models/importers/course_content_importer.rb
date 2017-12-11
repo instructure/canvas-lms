@@ -316,8 +316,8 @@ module Importers
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
       course.settings_will_change! unless atts.empty?
 
-      # superhax to force new wiki front page if home view changed
-      if settings['default_view'] && settings['default_view'] != course.default_view && data[:wikis]
+      # superhax to force new wiki front page if home view changed (or is master course sync)
+      if settings['default_view'] && data[:wikis] && (migration.for_master_course_import? || (settings['default_view'] != course.default_view))
         if page_hash = data[:wikis].detect{|h| h[:front_page]}
           if page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id])
             page.set_as_front_page!

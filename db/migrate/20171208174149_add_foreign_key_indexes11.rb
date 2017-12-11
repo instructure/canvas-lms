@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,21 +14,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-require 'spec_helper'
+class AddForeignKeyIndexes11 < ActiveRecord::Migration[5.0]
+  tag :postdeploy
+  disable_ddl_transaction!
 
-RSpec.describe DataFixup::PopulateCalendarEventContexts do
-  it 'must create a calendar event context for each effective context' do
-    course_with_student
-    group = AppointmentGroup.create!({
-      title: 'foo',
-      contexts: [@course],
-    })
-    ce = CalendarEvent.create!(context: group)
-    CalendarEventContext.delete_all # because we have code in place to create them automatically
-    expect(ce.calendar_event_contexts.count).to eq 0
-    expect {
-      DataFixup::PopulateCalendarEventContexts.run
-    }.to change { ce.calendar_event_contexts.count }.by(1)
+  def change
+    add_index :gradebook_csvs, :course_id, algorithm: :concurrently
   end
 end

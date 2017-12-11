@@ -113,8 +113,12 @@ module Lti
     # ensures that only this launch of the tool can modify the score.
     def encode_source_id(assignment)
       @tool.shard.activate do
-        payload = [@tool.id, @context.id, assignment.id, @user.id].join('-')
-        "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
+        if @root_account.feature_enabled?(:encrypted_sourcedids)
+          BasicLTI::Sourcedid.new(@tool, @context, assignment, @user).to_s
+        else
+          payload = [@tool.id, @context.id, assignment.id, @user.id].join('-')
+          "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
+        end
       end
     end
 

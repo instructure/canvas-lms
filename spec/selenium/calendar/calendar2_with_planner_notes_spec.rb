@@ -24,7 +24,7 @@ describe "calendar2" do
 
   before(:once) do
     # or some stuff we need to click is "below the fold"
-    driver.manage.window.maximize
+    make_full_screen
 
     Account.default.enable_feature!(:student_planner)
     course_with_teacher(active_all: true, new_user: true)
@@ -50,18 +50,7 @@ describe "calendar2" do
       expect(note).to include_text('Student To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should show course calendar todo" do
-      @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
-      get '/calendar2'
-      wait_for_ajax_requests
-      note = f('a.fc-event')
-      expect(note.attribute('class')).to include("group_course_#{@course.id}") # the course calendar
-      expect(note).to include_text('Unnamed Course')
-      expect(note).to include_text('To Do:')
-      expect(note).to include_text('Course To Do')
-      expect(note).to contain_css('i.icon-note-light')
-    end
-    it "should create a new todo" do
+    it "should create a new student calendar todo" do
       title = "new todo title"
       get '/calendar2'
       wait_for_ajax_requests
@@ -78,7 +67,7 @@ describe "calendar2" do
       expect(note).to include_text(title)
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should delete a todo" do
+    it "should delete a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       get '/calendar2'
       wait_for_ajax_requests
@@ -88,7 +77,7 @@ describe "calendar2" do
       f('.btn-primary').click       # delete button in the confirmation dialog
       expect(f('.fc-view-container')).not_to contain_css('a.fc-event')
     end
-    it "should edit a todo" do
+    it "should edit a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       new_title = "new todo title"
       get '/calendar2'
@@ -100,6 +89,61 @@ describe "calendar2" do
       wait_for_ajaximations
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
+    end
+    it "should show course calendar todo" do
+      @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
+      get '/calendar2'
+      wait_for_ajax_requests
+      note = f('a.fc-event')
+      expect(note.attribute('class')).to include("group_course_#{@course.id}") # the course calendar
+      expect(note).to include_text('Unnamed Course')
+      expect(note).to include_text('To Do:')
+      expect(note).to include_text('Course To Do')
+      expect(note).to contain_css('i.icon-note-light')
+    end
+    it "should edit a course calendar todo" do
+      @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
+      new_title = "new course todo title"
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('a.fc-event').click # click the note
+      f('button.edit_event_link').click # the Edit button
+      replace_content(f('#planner_note_title'), new_title)
+      f('button.save_note').click
+      wait_for_ajaximations
+      note = f('a.fc-event')
+      expect(note).to include_text(new_title)
+    end
+    it "should move a course calendar todo to the student calendar" do
+      @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('a.fc-event').click # click the note
+      f('button.edit_event_link').click # the Edit button
+      course_select = f('#planner_note_context')
+      course_select.click
+      course_select.find_elements( :tag_name => "option" ).find do |option|
+        option.attribute("value") == "user_#{@student1.id}"
+      end.click # select the student's calendar
+
+      f('button.save_note').click
+      wait_for_ajaximations
+      note = f('a.fc-event')
+      expect(note.attribute('class')).to include("group_user_#{@student1.id}")
+    end
+
+    context "with student planner disabled" do
+      before :each do
+        Account.default.disable_feature!(:student_planner)
+      end
+
+      it "should not show todo tab" do
+        get '/calendar2'
+        wait_for_ajax_requests
+        f('.fc-week td').click # click the first day of the month
+        expect(f('#edit_event_tabs')).to be_displayed
+        expect(f('#edit_event_tabs')).not_to contain_css('[aria-controls="edit_planner_note_form_holder"]')
+      end
     end
   end
 end

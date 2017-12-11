@@ -16,91 +16,95 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'react-addons-test-utils',
-  'jsx/course_settings/components/CourseImagePicker',
-  'jsx/course_settings/store/initialState'
-], (React, ReactDOM, TestUtils, CourseImagePicker, initialState) => {
-  const wrapper = document.getElementById('fixtures');
+import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-addons-test-utils'
+import Button from 'instructure-ui/lib/components/Button'
+import CourseImagePicker from 'jsx/course_settings/components/CourseImagePicker'
 
-  QUnit.module('CourseImagePicker Component', {
-    renderComponent(props = {}) {
-      const element = React.createElement(CourseImagePicker, props);
-      return ReactDOM.render(element, wrapper);
-    },
+const wrapper = document.getElementById('fixtures');
 
-    teardown() {
-      ReactDOM.unmountComponentAtNode(wrapper);
+QUnit.module('CourseImagePicker Component', {
+  renderComponent(props = {}) {
+    let courseImagePicker
+    const element = React.createElement(CourseImagePicker, {
+      ref: (node) => { courseImagePicker = node },
+      courseId: 0,
+      ...props
+    });
+    ReactDOM.render(element, wrapper);
+    return courseImagePicker
+  },
+
+  teardown() {
+    ReactDOM.unmountComponentAtNode(wrapper);
+  }
+});
+
+test('calls handleClose prop when the close button is clicked', function() {
+  let called = false;
+  const handleCloseFunc = () => { called = true };
+  const component = this.renderComponent({ handleClose: handleCloseFunc });
+  const componentButton = TestUtils.findRenderedComponentWithType(component, Button);
+  const domButton = TestUtils.findRenderedDOMComponentWithTag(componentButton, 'button')
+
+  TestUtils.Simulate.click(domButton);
+
+  ok(called, 'handleClose was called');
+});
+
+test('dragging overlay modal appears when accepting a drag', function() {
+  const component = this.renderComponent();
+
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
+
+  TestUtils.Simulate.dragEnter(area, {
+    dataTransfer: {
+      types: ['Files']
     }
   });
 
-  test('calls handleClose prop when the close button is clicked', function() {
-    let called = false;
-    const handleCloseFunc = () => called = true;
-    let component = this.renderComponent({ handleClose: handleCloseFunc });
+  ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 1, 'the dragging overlay appeared');
+});
 
-    const btn = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker__CloseBtn');
+test('dragging overlay modal does not appear when denying a non-file drag', function() {
+  const component = this.renderComponent();
 
-    TestUtils.Simulate.click(btn);
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
 
-    ok(called, 'handleClose was called');
-  });
-  
-  test('dragging overlay modal appears when accepting a drag', function() {
-    let component = this.renderComponent();
-
-    const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
-
-    TestUtils.Simulate.dragEnter(area, {
-      dataTransfer: {
-        types: ['Files']
-      }
-    });
-
-    ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 1, 'the dragging overlay appeared');
+  TestUtils.Simulate.dragEnter(area, {
+    dataTransfer: {
+      types: ['notFile']
+    }
   });
 
-  test('dragging overlay modal does not appear when denying a non-file drag', function() {
-    let component = this.renderComponent();
+  ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 0, 'the dragging overlay did not appear');
+});
 
-    const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
+test('dragging overlay modal disappears when you leave the drag area', function() {
+  const component = this.renderComponent();
 
-    TestUtils.Simulate.dragEnter(area, {
-      dataTransfer: {
-        types: ['notFile']
-      }
-    });
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
 
-    ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 0, 'the dragging overlay did not appear');
+  TestUtils.Simulate.dragEnter(area, {
+    dataTransfer: {
+      types: ['Files']
+    }
   });
 
-  test('dragging overlay modal disappears when you leave the drag area', function() {
-    let component = this.renderComponent();
+  ok(component.state.draggingFile, 'draggingFile state is set');
+  TestUtils.Simulate.dragLeave(area);
+  ok(!component.state.draggingFile, 'draggingFile state is correctly false');
+});
 
-    const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
+test('calls the handleFileUpload prop when drop occurs', function() {
+  let called = false;
+  const handleFileUploadFunc = () => { called = true };
+  const component = this.renderComponent({ courseId: "101", handleFileUpload: handleFileUploadFunc });
 
-    TestUtils.Simulate.dragEnter(area, {
-      dataTransfer: {
-        types: ['Files']
-      }
-    });
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
 
-    ok(component.state.draggingFile, 'draggingFile state is set');
-    TestUtils.Simulate.dragLeave(area);
-    ok(!component.state.draggingFile, 'draggingFile state is correctly false');
-  });
+  TestUtils.Simulate.drop(area);
 
-  test('calls the handleFileUpload prop when drop occurs', function() {
-    let called = false;
-    const handleFileUploadFunc = () => called = true;
-    let component = this.renderComponent({ courseId: "101", handleFileUpload: handleFileUploadFunc });
-
-    const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
-
-    TestUtils.Simulate.drop(area);
-
-    ok(called, 'handleFileUpload was called');
-  });
+  ok(called, 'handleFileUpload was called');
 });

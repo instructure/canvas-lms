@@ -24,7 +24,7 @@ describe "calendar2" do
 
   before(:once) do
     # or some stuff we need to click is "below the fold"
-    driver.manage.window.maximize
+    make_full_screen
   end
 
   before(:each) do

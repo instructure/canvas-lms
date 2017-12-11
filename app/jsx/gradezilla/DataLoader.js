@@ -25,7 +25,8 @@ const submissionsParams = {
   response_fields: [
     'id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id',
     'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused',
-    'points_deducted', 'seconds_late', 'cached_due_date', 'entered_score', 'entered_grade', 'grading_period_id'
+    'points_deducted', 'seconds_late', 'cached_due_date', 'entered_score', 'entered_grade', 'grading_period_id',
+    'late_policy_status'
   ]
 };
 
@@ -74,12 +75,7 @@ function getPendingSubmissions () {
   while (pendingStudentsForSubmissions.length) {
     const studentIds = pendingStudentsForSubmissions.splice(0, submissionChunkSize);
     submissionChunkCount++;
-    $.ajaxJSON(
-      submissionURL,
-      'GET',
-      { student_ids: studentIds, ...submissionsParams },
-      gotSubmissionsChunk
-    );
+    cheaterDepaginate(submissionURL, { student_ids: studentIds, ...submissionsParams }).then(gotSubmissionsChunk);
   }
 }
 

@@ -24,15 +24,26 @@ describe GradeSummaryPresenter do
       let(:course) { Course.create! }
       let(:presenter) { GradeSummaryPresenter.new(course, @user, nil) }
       let(:assignment) { assignment_model(:course => course) }
+      let(:enrollment) { course.enroll_student(@user, enrollment_state: 'active') }
 
-      before do
+      before :each do
         user_factory
-        enrollment = StudentEnrollment.create!(:course => course, :user => @user)
-        enrollment.update_attribute(:workflow_state, 'active')
-        course.update_attribute(:workflow_state, 'available')
+        enrollment
+        course.offer
       end
 
       it 'includes courses where the user is enrolled' do
+        expect(presenter.courses_with_grades).to include(course)
+      end
+
+      it "includes concluded courses" do
+        course.soft_conclude!
+        course.save
+        expect(presenter.courses_with_grades).to include(course)
+      end
+
+      it "includes courses for concluded enrollments" do
+        enrollment.conclude
         expect(presenter.courses_with_grades).to include(course)
       end
     end
@@ -88,6 +99,37 @@ describe GradeSummaryPresenter do
         presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
         expect(presenter.courses_with_grades).to match_array([@course, @course2])
       end
+    end
+  end
+
+  describe '#students' do
+    before(:once) do
+      @course = Course.create!
+      @student = User.create!
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher, active_all: true)
+      @course.enroll_student(@student, active_all: true)
+    end
+
+    it 'returns all of the observed students, if there are multiple' do
+      student_two = User.create!
+      @observer = User.create!
+      @course.enroll_student(student_two, active_all: true)
+      @course.observer_enrollments.create!(user_id: @observer, associated_user_id: @student)
+      @course.observer_enrollments.create!(user_id: @observer, associated_user_id: student_two)
+
+      presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
+      expect(presenter.students.map(&:id)).to match_array [@student.id, student_two.id]
+    end
+
+    it 'returns an array with a single student if there is only one student' do
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.students.map(&:id)).to match_array [@student.id]
+    end
+
+    it 'returns an empty array if there are no students' do
+      presenter = GradeSummaryPresenter.new(@course, @teacher, nil)
+      expect(presenter.students).to be_empty
     end
   end
 

@@ -86,6 +86,39 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
+  it "should support account stickiness" do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,active",
+      "A002,,Humanities,active",
+      "A003,,Humanities,active",
+      "A004,,Humanities,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,A001,,active"
+    )
+    @account.all_courses.where(sis_source_id: "test_1").first.tap do |course|
+      expect(course.account).to eq Account.where(sis_source_id: 'A001').take
+    end
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,A002,,active"
+    )
+    @account.all_courses.where(sis_source_id: "test_1").first.tap do |course|
+      expect(course.account).to eq Account.where(sis_source_id: 'A002').take
+      course.account = Account.where(sis_source_id: 'A003').first
+      course.save!
+    end
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,A004,,active"
+    )
+    @account.all_courses.where(sis_source_id: "test_1").first.tap do |course|
+      expect(course.account).to eq Account.where(sis_source_id: 'A003').take
+    end
+  end
+
   it "should support term stickiness from abstract courses" do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -354,7 +387,7 @@ describe SIS::CSV::CourseImporter do
       "c1,TC 104,Test Course 4,A004,T004,active,2011-04-16 00:00:00,2011-05-16 00:00:00"
     )
     Course.where(sis_source_id: 'c1').each do |c|
-      expect(c.account).to eq Account.where(sis_source_id: 'A004').first
+      expect(c.account).to eq Account.where(sis_source_id: 'A003').first
       expect(c.name).to eq 'Test Course 3'
       expect(c.course_code).to eq 'TC 103'
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: 'T003').first
@@ -363,7 +396,7 @@ describe SIS::CSV::CourseImporter do
       expect(c.restrict_enrollments_to_course_dates).to be_truthy
     end
     Course.where(sis_source_id: ['c2', 'c3']).each do |c|
-      expect(c.account).to eq Account.where(sis_source_id: 'A004').first
+      expect(c.account).to eq Account.where(sis_source_id: 'A002').first
       expect(c.name).to eq 'Test Course 2'
       expect(c.course_code).to eq 'TC 102'
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: 'T002').first
@@ -452,7 +485,7 @@ describe SIS::CSV::CourseImporter do
       "c1,TC 104,Test Course 4,A004,T004,active,2011-04-16 00:00:00,2011-05-16 00:00:00"
     )
     Course.where(sis_source_id: ['c2', 'c3']).each do |c|
-      expect(c.account).to eq Account.where(sis_source_id: 'A004').first
+      expect(c.account).to eq Account.where(sis_source_id: 'A003').first
       expect(c.name).to eq 'Test Course 3'
       expect(c.course_code).to eq 'TC 103'
       expect(c.enrollment_term).to eq EnrollmentTerm.where(sis_source_id: 'T003').first

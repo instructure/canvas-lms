@@ -15,32 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class CalendarEventContext < ActiveRecord::Base
-  include Workflow
 
-  belongs_to :calendar_event
-  belongs_to :context,
-    polymorphic: %i{course user group appointment_group course_section},
-    polymorphic_prefix: true
-
-  validates :calendar_event, presence: true
-
-  validates :context, presence: true # Ensure that the record exists too
-  validates :context_id, uniqueness: {scope: %i{calendar_event context_type}}
-
-  class << self
-    def active
-      where(workflow_state: 'active')
-    end
-
-    def for_context(context)
-      where(context: context)
-    end
-    alias_method :for_contexts, :for_context
-  end
-
-  workflow do
-    state :active
-    state :deleted
+module Factories
+  def external_tool_model(context: nil)
+    context ||= course_model
+    context.context_external_tools.create(
+      :name => "a",
+      :url => "http://google.com",
+      :consumer_key => '12345',
+      :shared_secret => 'secret'
+    )
   end
 end

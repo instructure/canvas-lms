@@ -183,6 +183,11 @@ en:
     samara: "Samara"
     zurich: "Zurich"
     philippines: "Philippines"
+    noronha: "Noronha"
+    fortaleza: "Fortaleza"
+    manaus: "Manaus"
+    cuiaba: "Cuiaba"
+    eirunepe: "Eirunepe"
   support:
     array:
       or:

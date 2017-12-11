@@ -32,6 +32,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  layout :application_layout
+
   attr_accessor :active_tab
   attr_reader :context
 
@@ -120,10 +122,17 @@ class ApplicationController < ActionController::Base
         active_brand_config_url('css'),
         view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
       ]
+
+      editor_hc_css = [
+        active_brand_config_url('css', { force_high_contrast: true }),
+        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
+      ]
+
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
         active_brand_config_json_url: active_brand_config_url('json'),
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
+        url_for_high_contrast_tinymce_editor_css: editor_hc_css,
         current_user_id: @current_user.try(:id),
         current_user: Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile) },
         current_user_roles: @current_user.try(:roles, @domain_root_account),
@@ -131,7 +140,7 @@ class ApplicationController < ActionController::Base
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         k12: k12?,
-        use_new_typography: use_new_typography?,
+        use_responsive_layout: use_responsive_layout?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -185,9 +194,13 @@ class ApplicationController < ActionController::Base
   helper_method :rce_js_env
 
   def conditional_release_js_env(assignment = nil, includes: [])
-    return unless ConditionalRelease::Service.enabled_in_context?(@context)
+    currentContext = @context
+    if currentContext.is_a?(Group)
+      currentContext = @context.context
+    end
+    return unless ConditionalRelease::Service.enabled_in_context?(currentContext)
     cr_env = ConditionalRelease::Service.env_for(
-      @context,
+      currentContext,
       @current_user,
       session: session,
       assignment: assignment,
@@ -238,10 +251,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :k12?
 
-  def use_new_typography?
-    @domain_root_account && @domain_root_account.feature_enabled?(:new_typography)
+  def use_responsive_layout?
+    @domain_root_account&.feature_enabled?(:responsive_layout)
   end
-  helper_method :use_new_typography?
+  helper_method :use_responsive_layout?
+
+  def application_layout
+    use_responsive_layout? ? "ic_layout" : "application"
+  end
+  private :application_layout
 
   def grading_periods?
     !!@context.try(:grading_periods?)
@@ -287,11 +305,10 @@ class ApplicationController < ActionController::Base
 
     return unless is_master || is_child
 
-    js_bundle :blueprint_courses
+    js_bundle(is_master ? :blueprint_course_master : :blueprint_course_child)
     css_bundle :blueprint_courses
 
     master_course = is_master ? @context : MasterCourses::MasterTemplate.master_course_for_child_course(@context)
-    js_env :DEBUG_BLUEPRINT_COURSES => Rails.env.development? || Rails.env.test?
     bc_data = {
       isMasterCourse: is_master,
       isChildCourse: is_child,
@@ -2331,5 +2348,4 @@ class ApplicationController < ActionController::Base
     })
     render html: '', layout: true
   end
-
 end

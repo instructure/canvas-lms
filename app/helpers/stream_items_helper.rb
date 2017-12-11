@@ -55,7 +55,7 @@ module StreamItemsHelper
         # may be out of sync with the underlying conversation.
         item.unread = participant.unread?
       elsif category == "AssessmentRequest"
-        next unless item.data.asset.assignment.published?
+        next unless item.data.asset.grants_right?(user, :read)
       end
 
       if topic_types.include? category

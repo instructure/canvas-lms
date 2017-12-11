@@ -25,7 +25,7 @@ en-AU:
 en-CA:
   locales:
     en-CA: English (Canada)
-  en-GB:
+en-GB:
   locales:
     en-GB: English (United Kingdom)
   dow_offset: 1
@@ -73,6 +73,11 @@ is:
   locales:
     is: Íslenska
   bigeasy_locale: is_IS
+  dow_offset: 1
+it:
+  locales:
+    it: Italiano
+  bigeasy_locale: it_IT
   dow_offset: 1
 ja:
   locales:

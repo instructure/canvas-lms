@@ -1333,6 +1333,17 @@ describe ConversationsController, type: :request do
       })
     end
 
+    it "should return an error if trying to add more participants than the maximum group size on add_message" do
+      conversation = conversation(@bob, private: false)
+
+      Setting.set("max_group_conversation_size", 2)
+
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+        { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+        { :body => "another", :recipients => [@billy.id]}, {}, {:expected_status => 400})
+      expect(json.first["message"]).to include("too many participants")
+    end
+
     it "should add participants for the given messages to the given recipients" do
       conversation = conversation(@bob, private: false)
       message = conversation.add_message("another one")
@@ -1580,6 +1591,17 @@ describe ConversationsController, type: :request do
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "jane, joe, and tommy were added to the conversation by nobody@example.com", "author_id" => @me.id, "generated" => true, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id, @bob.id, @jane.id, @joe.id, @tommy.id].sort}
         ]
       })
+    end
+
+    it "should return an error if trying to add more participants than the maximum group size on add_recipients" do
+      conversation = conversation(@bob, @billy)
+
+      Setting.set("max_group_conversation_size", 2)
+
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_recipients",
+        { :controller => 'conversations', :action => 'add_recipients', :id => conversation.conversation_id.to_s, :format => 'json' },
+        { :recipients => [@jane.id.to_s, "course_#{@course.id}"] }, {}, {:expected_status => 400})
+      expect(json.first["message"]).to include("too many participants")
     end
 
     it "should not cache an old audience when adding recipients" do

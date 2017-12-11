@@ -18,10 +18,15 @@
 
 import { createStore, applyMiddleware } from 'redux'
 import ReduxThunk from 'redux-thunk'
-import ReduxLogger from 'redux-logger'
 import rootReducer from './reducer'
 
-export default function configStore (initialState, debug) {
-  const middleware = [ReduxThunk, debug && ReduxLogger()].filter(x => x)
+export default function configStore (initialState) {
+  const middleware = [
+    ReduxThunk,
+
+    // this is so redux-logger is not included in the production webpack bundle
+    (process.env.NODE_ENV !== 'production') && require('redux-logger')()
+
+  ].filter(Boolean)
   return applyMiddleware(...middleware)(createStore)(rootReducer, initialState)
 }

@@ -723,6 +723,17 @@ define [
     view.handleSubmissionTypeChange()
     equal view.$('#similarity_detection_tools').css('display'), 'block'
 
+    view.$('#assignment_submission_type').val('online')
+    view.$('#assignment_text_entry').attr('checked', false)
+    view.$('#assignment_online_upload').attr('checked', false)
+    view.handleSubmissionTypeChange()
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
+
+    view.$('#assignment_submission_type').val('online')
+    view.$('#assignment_text_entry').attr('checked', true)
+    view.handleSubmissionTypeChange()
+    equal view.$('#similarity_detection_tools').css('display'), 'block'
+
   test 'it is hidden if the plagiarism_detection_platform flag is disabled', ->
     ENV.PLAGIARISM_DETECTION_PLATFORM = false
     view = @editView()

@@ -105,18 +105,26 @@ class GradebooksController < ApplicationController
     grading_scheme = @context.grading_standard.try(:data) ||
                      GradingStandard.default_grading_standard
 
-    js_env(submissions: submissions_json,
-           assignment_groups: ags_json,
-           group_weighting_scheme: @context.group_weighting_scheme,
-           show_total_grade_as_points: @context.show_total_grade_as_points?,
-           grading_scheme: grading_scheme,
-           grading_period_set: grading_period_group_json,
-           grading_period: grading_period,
-           grading_periods: @grading_periods,
-           effective_due_dates: effective_due_dates,
-           exclude_total: @exclude_total,
-           student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
-           student_id: @presenter.student_id)
+    js_env(
+      submissions: submissions_json,
+      assignment_groups: ags_json,
+      assignment_sort_options: @presenter.sort_options,
+      group_weighting_scheme: @context.group_weighting_scheme,
+      show_total_grade_as_points: @context.show_total_grade_as_points?,
+      grading_scheme: grading_scheme,
+      current_grading_period_id: @current_grading_period_id,
+      current_assignment_sort_order: @presenter.assignment_order,
+      grading_period_set: grading_period_group_json,
+      grading_period: grading_period,
+      grading_periods: @grading_periods,
+      courses_with_grades: courses_with_grades_json,
+      effective_due_dates: effective_due_dates,
+      exclude_total: @exclude_total,
+      save_assignment_order_url: course_save_assignment_order_url(@context),
+      student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
+      student_id: @presenter.student_id,
+      students: @presenter.students.as_json(include_root: false)
+    )
   end
 
   def save_assignment_order
@@ -707,14 +715,12 @@ class GradebooksController < ApplicationController
   private
 
   def new_gradebook_env
-    graded_late_or_missing_submissions_exist =
-      new_gradebook_development_enabled? &&
-      (@context.submissions.graded.late.exists? || @context.submissions.graded.missing.exists?)
+    graded_late_submissions_exist = @context.submissions.graded.late.exists?
 
     {
       GRADEBOOK_OPTIONS: {
         colors: gradebook_settings.fetch(:colors, {}),
-        graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
+        graded_late_submissions_exist: graded_late_submissions_exist,
         grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
         gradezilla: true,
         new_gradebook_development_enabled: new_gradebook_development_enabled?,
@@ -946,5 +952,18 @@ class GradebooksController < ApplicationController
 
   def gradebook_settings
     @current_user.preferences.fetch(:gradebook_settings, {})
+  end
+
+  def courses_with_grades_json
+    courses = @presenter.courses_with_grades
+    courses << @context if courses.empty?
+
+    courses.map do |course|
+      {
+        id: course.id,
+        nickname: course.nickname_for(@current_user),
+        url: context_url(course, :context_grades_url)
+      }
+    end.as_json
   end
 end

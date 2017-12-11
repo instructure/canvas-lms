@@ -42,6 +42,7 @@ module Importers
           where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
         item ||= context.learning_outcome_groups.temp_record
         item.context = context
+        item.mark_as_importing!(migration)
       end
       item.workflow_state = 'active' # restore deleted ones
       item.migration_id = hash[:migration_id]
@@ -65,6 +66,11 @@ module Importers
       end
 
       item.save!
+
+      # don't import contents of deleted outcome groups
+      # (blueprint migration will not undelete outcome groups deleted downstream)
+      return item if item.deleted?
+
       if hash[:parent_group]
         hash[:parent_group].adopt_outcome_group(item)
       else

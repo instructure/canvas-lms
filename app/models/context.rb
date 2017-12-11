@@ -154,16 +154,6 @@ module Context
     "#{record.context_type.underscore}_#{record.context_id}"
   end
 
-  def self.classes_and_ids_from_context_codes(codes)
-    code_map = Hash.new { |h,k| h[k] = [] }
-    codes.each do |code|
-      match = /\A(?<type>\w+)_(?<id>\d+)\z/.match(code)
-      type = match[:type].classify.constantize
-      code_map[type] << match[:id].to_i
-    end
-    code_map
-  end
-
   def self.find_polymorphic(context_type, context_id)
     klass_name = context_type.classify.to_sym
     if CONTEXT_TYPES.include?(klass_name)
@@ -174,12 +164,6 @@ module Context
     end
   rescue => e
     nil
-  end
-
-  def self.find_all_by_context_codes(strings)
-    classes_and_ids_from_context_codes(strings).map do |context_type, context_ids|
-      context_type.where(id: context_ids)
-    end.inject(:+)
   end
 
   def self.find_by_asset_string(string)
@@ -215,15 +199,11 @@ module Context
   end
 
   def self.asset_name(asset)
-    if asset.respond_to?(:display_name)
-      asset.display_name
-    elsif asset.respond_to?(:title)
-      asset.title
-     elsif asset.respond_to?(:short_description)
-      asset.short_description
-    else
-      asset.name
-    end
+    name = asset.display_name.presence if asset.respond_to?(:display_name)
+    name ||= asset.title.presence if asset.respond_to?(:title)
+    name ||= asset.short_description.presence if asset.respond_to?(:short_description)
+    name ||= asset.name
+    name
   end
 
   def self.get_account(context)

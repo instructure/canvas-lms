@@ -36,6 +36,8 @@ class LiveEventsObserver < ActiveRecord::Observer
 
   def after_update(obj)
     changes = obj.changes
+    return nil if changes.except("updated_at").empty?
+
     obj.class.connection.after_transaction_commit do
     case obj
     when ContentExport

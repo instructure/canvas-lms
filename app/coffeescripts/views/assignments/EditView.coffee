@@ -63,6 +63,7 @@ define [
     ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
     NAME = '[name="name"]'
     ALLOW_FILE_UPLOADS = '#assignment_online_upload'
+    ALLOW_TEXT_ENTRY = '#assignment_text_entry'
     RESTRICT_FILE_UPLOADS = '#assignment_restrict_file_extensions'
     RESTRICT_FILE_UPLOADS_OPTIONS = '#restrict_file_extensions_container'
     ALLOWED_EXTENSIONS = '#allowed_extensions_container'
@@ -292,7 +293,8 @@ define [
         @handleOnlineSubmissionTypeChange()
 
     handleOnlineSubmissionTypeChange: (env) =>
-      showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked')
+      showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked') ||
+        @$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).attr('checked')
       @$similarityDetectionTools.toggleAccessibly showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM
 
     afterRender: =>

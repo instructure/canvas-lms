@@ -14,12 +14,25 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-class PopulateCalendarEventContexts < ActiveRecord::Migration[5.0]
-  tag :postdeploy
 
-  def up
-    DataFixup::PopulateCalendarEventContexts.send_later_if_production(:run)
+module SIS
+  module Models
+    class DataChange
+      attr_accessor :old_id, :new_id, :old_integration_id, :new_integration_id, :type
+
+      def initialize(old_id: nil, new_id: nil, old_integration_id: nil, new_integration_id: nil, type: nil)
+        self.old_id = old_id
+        self.new_id = new_id
+        self.old_integration_id = old_integration_id
+        self.new_integration_id = new_integration_id
+        self.type = type
+      end
+
+      def to_a
+        [old_id, new_id, old_integration_id, new_integration_id, type]
+      end
+    end
   end
-
-  def down; end
 end
+
+

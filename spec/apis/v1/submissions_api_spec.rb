@@ -1262,7 +1262,7 @@ describe 'Submissions API', type: :request do
         "score"=>9.0,
         "entered_score"=>9.0,
         "rubric_assessment"=>
-         {"crit2"=>{"comments"=>"Hmm", "points"=>2},
+         {"crit2"=>{"comments"=>"Hmm", "points"=>2.0},
           "crit1"=>{"comments"=>nil, "points"=>7.0}},
         "workflow_state"=>"graded",
         "late"=>false,
@@ -1916,50 +1916,71 @@ describe 'Submissions API', type: :request do
     end
   end
 
-  it "returns student submissions grouped by student" do
-    student1 = user_factory(active_all: true)
-    student2 = user_with_pseudonym(:active_all => true)
+  context "grouped submissions" do
+    before :once do
+      @student1 = user_factory(active_all: true)
+      @student2 = user_with_pseudonym(:active_all => true)
 
-    course_with_teacher(:active_all => true)
+      course_with_teacher(:active_all => true)
 
-    @course.enroll_student(student1).accept!
-    @course.enroll_student(student2).accept!
+      @course.enroll_student(@student1).accept!
+      @course.enroll_student(@student2).accept!
 
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
+      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+      @a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
 
-    submit_homework(a1, student1)
-    submit_homework(a2, student1)
-    submit_homework(a1, student2)
+      submit_homework(@a1, @student1)
+      submit_homework(@a2, @student1)
+      submit_homework(@a1, @student2)
+    end
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param], :grouped => '1' })
+    it "returns student submissions grouped by student" do
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param], :grouped => '1' })
 
-    expect(json.size).to eq 1
-    expect(json.first['submissions'].size).to eq 2
-    json.each { |user| expect(user['user_id']).to eq student1.id }
+      expect(json.size).to eq 1
+      expect(json.first['submissions'].size).to eq 2
+      json.each { |user| expect(user['user_id']).to eq @student1.id }
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, student2.to_param], :grouped => '1' })
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param, @student2.to_param], :grouped => '1' })
 
-    expect(json.size).to eq 2
-    expect(json.map { |u| u['submissions'] }.flatten.size).to eq 4
+      expect(json.size).to eq 2
+      expect(json.map { |u| u['submissions'] }.flatten.size).to eq 4
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, student2.to_param],
-            :assignment_ids => [a1.to_param], :grouped => '1' })
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param, @student2.to_param],
+              :assignment_ids => [@a1.to_param], :grouped => '1' })
 
-    expect(json.size).to eq 2
-    json.each { |user| user['submissions'].each { |s| expect(s['assignment_id']).to eq a1.id } }
+      expect(json.size).to eq 2
+      json.each { |user| user['submissions'].each { |s| expect(s['assignment_id']).to eq @a1.id } }
+    end
+
+    it "paginates" do
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/students/submissions.json",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :course_id => @course.to_param },
+        { :student_ids => ["all"], :grouped => '1', :per_page => '1' })
+      expect(json.size).to eq 1
+
+      json2 = api_call(:get,
+        "/api/v1/courses/#{@course.id}/students/submissions.json",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :course_id => @course.to_param },
+        { :student_ids => ["all"], :grouped => '1', :per_page => '1', :page => 2 })
+      expect(json2.size).to eq 1
+      expect((json + json2).map{|r| r["user_id"]}).to match_array([@student1.id, @student2.id])
+    end
   end
 
   context "with grading periods" do

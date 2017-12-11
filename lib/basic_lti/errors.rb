@@ -14,15 +14,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module DataFixup::PopulateCalendarEventContexts
-  def self.run
-    CalendarEvent.where('"effective_context_code" IS NOT NULL').find_each do |ce|
-      ActiveRecord::Base.parse_asset_string_list(ce.effective_context_code).each do |(context_type, context_id)|
-        ce
-          .calendar_event_contexts
-          .find_or_create_by(context_type: context_type, context_id: context_id)
-      end
+module BasicLTI
+  module Errors
+    class InvalidSourceId < StandardError
     end
   end
 end

@@ -220,7 +220,7 @@ class GroupsController < ApplicationController
       end
 
       format.json do
-        @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope) do |scope|
+        @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope.order(:name, :id)) do |scope|
           scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
           scope.preload(:group_category, :context)
         end
@@ -354,6 +354,10 @@ class GroupsController < ApplicationController
         if @group.deleted? && @group.context
           flash[:notice] = t('notices.already_deleted', "That group has been deleted")
           redirect_to named_context_url(@group.context, :context_url)
+          return
+        elsif @group.context.concluded? && !@group.context.grants_right?(@current_user, session, :read_roster)
+          flash[:error] = t("Cannot access group in concluded course")
+          redirect_to dashboard_url
           return
         end
         @current_conferences = @group.web_conferences.active.select{|c| c.active? && c.users.include?(@current_user) } rescue []

@@ -108,6 +108,14 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
+    'section_specific_announcements' =>
+    {
+      display_name: -> { I18n.t('Section Specific Announcements') },
+      description: -> { I18n.t('Allows creating announcements for a specific section') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
+    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
@@ -215,9 +223,14 @@ END
 
       custom_transition_proc: ->(user, context, _from_state, transitions) do
         if context.is_a?(Course)
-          user_may_change_flag = context.account.grants_right?(user, :manage_account_settings)
-          transitions['on']['locked'] = !user_may_change_flag if transitions&.dig('on')
-          transitions['off']['locked'] = !user_may_change_flag if transitions&.dig('off')
+          if !context.grants_right?(user, :change_course_state)
+            transitions['on']['locked'] = true if transitions&.dig('on')
+            transitions['off']['locked'] = true if transitions&.dig('off')
+          else
+            should_lock = context.gradebook_backwards_incompatible_features_enabled?
+            transitions['on']['locked'] = should_lock if transitions&.dig('on')
+            transitions['off']['locked'] = should_lock if transitions&.dig('off')
+          end
         elsif context.is_a?(Account)
           transitions['on']['locked'] = true if transitions&.dig('on')
         end
@@ -410,10 +423,10 @@ END
       development: true,
       root_opt_in: false
     },
-    'new_typography' =>
+    'responsive_layout' =>
     {
-      display_name: -> { I18n.t('New Typography') },
-      description: -> { I18n.t('This is a feature to allow product design to remove all the various font-size overrides throughout the application.') },
+      display_name: -> { I18n.t('Responsive Layout') },
+      description: -> { I18n.t('This is a feature to allow the development of a responsive layout ') },
       applies_to: 'RootAccount',
       state: 'hidden',
       development: true,
@@ -557,6 +570,12 @@ END
       state: "allowed",
       root_opt_in: true
     },
+    'encrypted_sourcedids' => {
+      display_name: -> { I18n.t('Encrypted Sourcedids for Basic Outcomes') },
+      description: -> { I18n.t('If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.') },
+      applies_to: 'RootAccount',
+      state: 'allowed'
+    }
   )
 
   def self.definitions

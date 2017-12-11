@@ -2599,7 +2599,6 @@ class CoursesController < ApplicationController
   #        "14": { "due_at": "2015-08-05", "grading_period_id": 3, "in_closed_grading_period": true }
   #     }
   #   }
-  # @returns {EffectiveDueDates}
   def effective_due_dates
     return unless authorized_action(@context, @current_user, :read_as_admin)
 

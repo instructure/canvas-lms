@@ -44,7 +44,7 @@ module Canvas::Migration
         @nested_dir = nil
         base_entries = zip_file.glob("*")
         unless base_entries.any?{|e| !e.directory?}
-          root_dirs = base_entries.reject{|e| File.basename(e.name) =~ UnzipAttachment::THINGS_TO_IGNORE_REGEX}
+          root_dirs = base_entries.reject{|e| e.name.split('/').any?{|p| p =~ UnzipAttachment::THINGS_TO_IGNORE_REGEX}}
           @nested_dir = root_dirs.first.name if root_dirs.count == 1
         end
       end

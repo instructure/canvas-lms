@@ -235,6 +235,18 @@ class AccountsController < ApplicationController
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
+  # @API Returns the terms of service for that account
+  #
+  # @returns TermsOfService
+  def terms_of_service
+    return unless authorized_action(@account, @current_user, :read)
+    keys = %w(id terms_type passive account_id)
+    tos = @account.root_account.terms_of_service
+    res = tos.attributes.slice(*keys)
+    res['content'] = tos.terms_of_service_content&.content
+    render :json => res
+  end
+
   include Api::V1::Course
 
   # @API List active courses in an account

@@ -271,6 +271,7 @@ class CalendarEventsApiController < ApplicationController
   before_action :require_user_or_observer, :only => [:user_index]
   before_action :require_authorization, :only => %w(index user_index)
 
+  RECURRING_EVENT_LIMIT = 200
   # @API List calendar events
   #
   # Retrieve the paginated list of calendar events or assignments for the current user
@@ -414,7 +415,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
   # @argument calendar_event[duplicate][count] [Number]
-  #   Number of times to copy/duplicate the event.
+  #   Number of times to copy/duplicate the event.  Count cannot exceed 200.
   # @argument calendar_event[duplicate][interval] [Number]
   #   Defaults to 1 if duplicate `count` is set.  The interval between the duplicated events.
   # @argument calendar_event[duplicate][frequency] [String, "daily"|"weekly"|"monthly"]
@@ -447,17 +448,17 @@ class CalendarEventsApiController < ApplicationController
       events = []
       dup_options = get_duplicate_params(params[:calendar_event])
       title = dup_options[:title]
-
       if dup_options[:count] > 0
         events += create_event_and_duplicates(dup_options)
       else
         events = [@event]
       end
 
-      if dup_options[:count] > 100
+      if dup_options[:count] > RECURRING_EVENT_LIMIT
         return render :json => {
-                        message: t("only a maximum of 100 events can be created")
-                      }, :status => :bad_request
+          message: t("only a maximum of %{limit} events can be created",
+            limit: RECURRING_EVENT_LIMIT)
+          }, :status => :bad_request
       end
 
       CalendarEvent.transaction do
@@ -669,12 +670,12 @@ class CalendarEventsApiController < ApplicationController
       get_options(nil)
 
       Shackles.activate(:slave) do
-        @events.concat assignment_scope(@current_user).to_a
+        @events.concat assignment_scope(@current_user).paginate(per_page: 1000, max: 1000)
         @events = apply_assignment_overrides(@events, @current_user)
-        @events.concat calendar_event_scope(@current_user).events_without_child_events.to_a
+        @events.concat calendar_event_scope(@current_user) { |relation| relation.events_without_child_events }.paginate(per_page: 1000, max: 1000)
 
         # Add in any appointment groups this user can manage and someone has reserved
-        appointment_codes = manageable_appointment_group_codes(@current_user)
+        appointment_codes = manageable_appointment_groups(@current_user).map(&:asset_string)
         @events.concat CalendarEvent.active.
                          for_user_and_context_codes(@current_user, appointment_codes).
                          send(*date_scope_and_args).
@@ -1013,54 +1014,79 @@ class CalendarEventsApiController < ApplicationController
       end
 
       # filter the contexts to only the requested contexts
-      selected_contexts = @contexts.select { |c| codes.include?(c.asset_string) }
+      @selected_contexts = @contexts.select { |c| codes.include?(c.asset_string) }
     else
-      selected_contexts = @contexts
+      @selected_contexts = @contexts
     end
-    @context_codes = selected_contexts.map(&:asset_string)
+    @context_codes = @selected_contexts.map(&:asset_string)
     @section_codes = []
     if user
-      is_admin = user.roles(@domain_root_account).include?('admin') # if we're an admin - don't try to figure out which sections we belong to; just include all of them
-      @section_codes = user.section_context_codes(@context_codes, is_admin)
+      @is_admin = user.roles(@domain_root_account).include?('admin') # if we're an admin - don't try to figure out which sections we belong to; just include all of them
+      @section_codes = user.section_context_codes(@context_codes, @is_admin)
     end
 
     if @type == :event && @start_date && user
       # pull in reservable appointment group events, if requested
       group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map { |m| m.sub(/.*_/, '').to_i }
       if group_codes.present?
-        @context_codes += AppointmentGroup.
+        ags = AppointmentGroup.
           reservable_by(user).
           where(id: group_codes).
-          select('appointment_groups.id').
-          map(&:asset_string)
+          select(:id).to_a
+        @selected_contexts += ags
+        @context_codes += ags.map(&:asset_string)
       end
       # include manageable appointment group events for the specified contexts
       # and dates
-      @context_codes += manageable_appointment_group_codes(user)
+      ags = manageable_appointment_groups(user).to_a
+      @selected_contexts += ags
+      @context_codes += ags.map(&:asset_string)
     end
   end
 
   def assignment_scope(user)
-    # Fully ordering by due_at requires examining all the overrides linked and as it applies to
-    # specific people, sections, etc. This applies the base assignment due_at for ordering
-    # as a more sane default then natural DB order. No, it isn't perfect but much better.
-    scope = assignment_context_scope(user).active.order_by_base_due_at.order('assignments.id ASC')
+    collections = []
+    bookmarker = BookmarkedCollection::SimpleBookmarker.new(Assignment, :due_at, :id)
+    last_scope = nil
+    Shard.with_each_shard(user&.in_region_associated_shards || [Shard.current]) do
+      # Fully ordering by due_at requires examining all the overrides linked and as it applies to
+      # specific people, sections, etc. This applies the base assignment due_at for ordering
+      # as a more sane default then natural DB order. No, it isn't perfect but much better.
+      scope = assignment_context_scope(user)
+      next unless scope
 
-    scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
-    scope
+      scope = scope.active.order(:due_at, :id)
+      scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
+      last_scope = scope
+      collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, scope)]
+    end
+
+    return Assignment.none if collections.empty?
+    return last_scope if collections.length == 1
+    BookmarkedCollection.merge(*collections)
   end
 
   def assignment_context_scope(user)
+    contexts = @selected_contexts.select { |c| c.is_a?(Course) && c.shard == Shard.current }
+    return nil if contexts.empty?
+
     # contexts have to be partitioned into two groups so they can be queried effectively
-    contexts = @contexts.select { |c| @context_codes.include?(c.asset_string) }
     view_unpublished, other = contexts.partition { |c| c.grants_right?(user, session, :view_unpublished_items) }
 
-    base_scope = Assignment
-      .shard(user&.in_region_associated_shards || Shard.current)
+    sql = []
+    conditions = []
+    unless view_unpublished.empty?
+      sql << '(assignments.context_code IN (?))'
+      conditions << view_unpublished.map(&:asset_string)
+    end
 
-    scope = base_scope
-      .where(context: other, workflow_state: 'published')
-      .or(base_scope.where(context: view_unpublished))
+    unless other.empty?
+      sql << '(assignments.context_code IN (?) AND assignments.workflow_state = ?)'
+      conditions << other.map(&:asset_string)
+      conditions << 'published'
+    end
+
+    scope = Assignment.where([sql.join(' OR ')] + conditions)
     return scope if @public_to_auth || !user
 
     student_ids = [user.id]
@@ -1090,18 +1116,25 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_scope(user)
-    scope = CalendarEvent
-      .shard(user&.in_region_associated_shards || Shard.current)
-      .active
-      .order_by_start_at
-      .order(:id)
+    scope = CalendarEvent.
+      active.
+      order(:start_at, :id)
     if user && !@public_to_auth
-      scope = scope.for_user_and_context_codes(user, @context_codes, @section_codes)
+      bookmarker = BookmarkedCollection::SimpleBookmarker.new(CalendarEvent, :start_at, :id)
+      scope = ShardedBookmarkedCollection.build(bookmarker, scope.shard(user.in_region_associated_shards)) do |relation|
+        contexts = @selected_contexts.select { |context| context.shard == Shard.current }
+        next if contexts.empty?
+        context_codes = contexts.map(&:asset_string)
+        relation = relation.for_user_and_context_codes(user, context_codes, user.section_context_codes(context_codes, @is_admin))
+        relation = yield relation if block_given?
+        relation = relation.send(*date_scope_and_args) unless @all_events
+        relation
+      end
     else
       scope = scope.for_context_codes(@context_codes)
+      scope = scope.send(*date_scope_and_args) unless @all_events
     end
 
-    scope = scope.send(*date_scope_and_args) unless @all_events
     scope
   end
 
@@ -1179,13 +1212,12 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def manageable_appointment_group_codes(user)
+  def manageable_appointment_groups(user)
     return [] unless user
 
     AppointmentGroup.
       manageable_by(user, @context_codes).
-      intersecting(@start_date, @end_date).
-      pluck(:id).map{|id| "appointment_group_#{id}"}
+      intersecting(@start_date, @end_date).select(:id)
   end
 
   def duplicate(options = {})

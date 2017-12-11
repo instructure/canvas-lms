@@ -85,7 +85,8 @@ Style/IndentationWidth:
 Style/AlignParameters:
   Enabled: false
 Style/DotPosition:
-  Enabled: false
+  Enabled: true
+  EnforcedStyle: trailing
 Style/TrailingWhitespace:
   Enabled: false
 Style/MultilineOperationIndentation:

@@ -377,6 +377,18 @@ class Assignment < ActiveRecord::Base
 
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
+  def update_activity_stream_items
+    return if self.deleted?
+    return unless self.context.is_a?(Course)
+
+    students = self.students_with_visibility.pluck(:id)
+    StreamItem
+      .to_dashboard
+      .for_assignment(self.id)
+      .not_for_users(students)
+      .each(&:destroy)
+  end
+
   def validate_assignment_overrides(opts={})
     if opts[:force_override_destroy] || group_category_id_changed?
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
@@ -2217,8 +2229,6 @@ class Assignment < ActiveRecord::Base
       :now => Time.zone.now)
   }
 
-  scope :order_by_base_due_at, -> { order("assignments.due_at") }
-
   scope :unpublished, -> { where(:workflow_state => 'unpublished') }
   scope :published, -> { where(:workflow_state => 'published') }
   scope :api_id, lambda { |api_id|
@@ -2553,7 +2563,9 @@ class Assignment < ActiveRecord::Base
   def run_if_overrides_changed!(student_ids=nil)
     relocked_modules = []
     self.relock_modules!(relocked_modules, student_ids)
-    each_submission_type { |submission| submission.relock_modules!(relocked_modules, student_ids) if submission }
+    each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids)}
+
+    DueDateCacher.recompute(self)
 
     if only_visible_to_overrides?
       Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."

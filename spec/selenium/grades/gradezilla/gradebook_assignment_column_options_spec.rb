@@ -18,6 +18,7 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/groups_common'
 require_relative '../pages/gradezilla_page'
+require_relative '../pages/gradezilla_cells_page'
 
 describe "Gradezilla - Assignment Column Options" do
   include_context "in-process server selenium tests"
@@ -36,19 +37,20 @@ describe "Gradezilla - Assignment Column Options" do
 
     @assignment = @course.assignments.create!(
       title: "An Assignment",
+      grading_type: 'letter_grade',
       points_possible: 10,
       due_at: 1.day.from_now
     )
 
     @course.student_enrollments.collect(&:user).each do |student|
       @assignment.submit_homework(student, body: 'a body')
-      @assignment.grade_student(student, grade: 10, grader: @teacher)
+      @assignment.grade_student(student, grade: 'A', grader: @teacher)
     end
   end
 
   before(:each) { user_session(@teacher) }
 
-  describe "Sorting" do
+  context "Sorting" do
     it "sorts by Missing" do
       third_student = @course.students.find_by!(name: 'Student 3')
       @assignment.submissions.find_by!(user: third_student).update!(late_policy_status: "missing")
@@ -68,6 +70,31 @@ describe "Gradezilla - Assignment Column Options" do
       Gradezilla.click_assignment_popover_sort_by('Late')
 
       expect(Gradezilla.fetch_student_names).to eq ["Student 3", "Student 1", "Student 2"]
+    end
+  end
+
+  context "Enter Grades As Menu" do
+    before(:each) do
+      Gradezilla.visit(@course)
+    end
+
+    it "Can switch from grading-scheme to points", priority: "1", test_id: 3415925 do
+      # Initial grade is letter-grade
+      expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq 'A'
+
+      # Change grade type to points
+      Gradezilla.click_assignment_header_menu(@assignment.id)
+      Gradezilla.click_assignment_popover_enter_grade_as('Points')
+      wait_for_ajaximations
+
+      expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq '10'
+    end
+
+    it "Active grade-type displays a check", priority: "2", test_id: 3415924 do
+      # Initial grade is letter-grade
+      Gradezilla.click_assignment_header_menu(@assignment.id)
+
+      expect(Gradezilla.enter_grade_as_popover_menu_item_checked?('Grading Scheme')).to eq 'true'
     end
   end
 end

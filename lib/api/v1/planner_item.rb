@@ -35,6 +35,7 @@ module Api::V1::PlannerItem
   }.freeze
 
   def planner_item_json(item, user, session, opts = {})
+    item = item.assignment if item.respond_to?(:assignment) && item.assignment
     context_data(item).merge({
       :plannable_id => item.id,
       :plannable_date => item.planner_date,
@@ -45,7 +46,8 @@ module Api::V1::PlannerItem
       if item.is_a?(PlannerNote)
         hash[:plannable_type] = 'planner_note'
         hash[:plannable] = api_json(item, user, session)
-        hash[:html_url] = api_v1_planner_notes_show_path(item)
+        # TODO: We don't currently have an html_url for individual planner items.
+        # hash[:html_url] = ???
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_type] = 'quiz'
@@ -111,7 +113,7 @@ module Api::V1::PlannerItem
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
-      return true if topic && topic.unread_count(user) > 0
+      return true if topic && (topic.unread?(user) || topic.unread_count(user) > 0)
     end
     false
   end

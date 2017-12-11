@@ -105,6 +105,8 @@ describe "external tool assignments" do
   end
 
   it "should show module sequence even without module_item_id param" do
+    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+    allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
     a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
     a.create_external_tool_tag(:url => @t1.url)
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')

@@ -35,7 +35,7 @@ const latePolicyData = {
 };
 
 function mountComponent (latePolicyProps = {}, otherProps = {}) {
-  const defaults = { showContentComingSoon: false, changeLatePolicy () {}, locale: 'en', showAlert: false };
+  const defaults = { changeLatePolicy () {}, locale: 'en', showAlert: false };
   const props = {
     latePolicy: { changes: {}, validationErrors: {}, data: latePolicyData, ...latePolicyProps },
     ...defaults,
@@ -76,10 +76,6 @@ function missingDeductionInput (wrapper) {
   return missingPenaltiesForm(wrapper).find('input[type="text"]').at(0);
 }
 
-function comingSoonBanner (wrapper) {
-  return wrapper.find('.ComingSoonContent__Container');
-}
-
 function gradedSubmissionsAlert (wrapper) {
   return wrapper.find(Alert);
 }
@@ -88,41 +84,66 @@ function spinner (wrapper) {
   return wrapper.find(Spinner);
 }
 
-QUnit.module('LatePoliciesTabPanel: New Gradebook Development flag', {
-  teardown () {
-    this.wrapper.unmount();
-  }
-});
+QUnit.module('LatePoliciesTabPanel: Alert', (hooks) => {
+  let wrapper;
 
-test('shows a "Coming Soon" banner if showContentComingSoon is true', function () {
-  const server = sinon.fakeServer.create({ respondImmediately: true });
-  server.respondWith('GET', /^\/images\/.*\.svg$/, [
-    200, { 'Content-Type': 'img/svg+xml' }, '{}'
-  ]);
-  this.wrapper = mountComponent({}, { showContentComingSoon: true });
-  strictEqual(comingSoonBanner(this.wrapper).length, 1);
-  server.restore();
-});
+  hooks.afterEach(() => {
+    wrapper.unmount();
+  });
 
-test('does not show a "Coming Soon" banner if showContentComingSoon is false', function () {
-  this.wrapper = mountComponent();
-  strictEqual(comingSoonBanner(this.wrapper).length, 0);
-});
+  test('initializes with an alert showing if passed showAlert: true', function () {
+    wrapper = mountComponent({}, { showAlert: true });
+    strictEqual(gradedSubmissionsAlert(wrapper).length, 1);
+  });
 
-QUnit.module('LatePoliciesTabPanel: Alert', {
-  teardown () {
-    this.wrapper.unmount();
-  }
-});
+  test('does not initialize with an alert showing if passed showAlert: false', function () {
+    wrapper = mountComponent();
+    strictEqual(gradedSubmissionsAlert(wrapper).length, 0);
+  });
 
-test('initializes with an alert showing if passed showAlert: true', function () {
-  this.wrapper = mountComponent({}, { showAlert: true });
-  strictEqual(gradedSubmissionsAlert(this.wrapper).length, 1);
-});
+  test('focuses on the missing submission input when the alert closes', function () {
+    wrapper = mountComponent({}, { showAlert: true });
+    const instance = wrapper.instance();
+    const input = instance.missingSubmissionDeductionInput;
+    sinon.stub(input, 'focus');
+    instance.closeAlert();
+    strictEqual(input.focus.callCount, 1);
+    input.focus.restore();
+  });
 
-test('does not initialize with an alert showing if passed showAlert: false', function () {
-  this.wrapper = mountComponent();
-  strictEqual(gradedSubmissionsAlert(this.wrapper).length, 0);
+  test('does not focus on the missing submission checkbox when the alert closes', function () {
+    wrapper = mountComponent({}, { showAlert: true });
+    const instance = wrapper.instance();
+    const checkbox = instance.missingSubmissionCheckbox;
+    sinon.stub(checkbox, 'focus');
+    instance.closeAlert();
+    strictEqual(checkbox.focus.callCount, 0);
+    checkbox.focus.restore();
+  });
+
+  test('focuses on the missing submission checkbox when the alert closes if the' +
+    'missing submission input is disabled', function () {
+    const data = { ...latePolicyData, missingSubmissionDeductionEnabled: false };
+    wrapper = mountComponent({ data }, { showAlert: true });
+    const instance = wrapper.instance();
+    const checkbox = instance.missingSubmissionCheckbox;
+    sinon.stub(checkbox, 'focus');
+    instance.closeAlert();
+    strictEqual(checkbox.focus.callCount, 1);
+    checkbox.focus.restore();
+  });
+
+  test('does not focus on the missing submission input when the alert closes if the' +
+    'missing submission input is disabled', function () {
+    const data = { ...latePolicyData, missingSubmissionDeductionEnabled: false };
+    wrapper = mountComponent({ data }, { showAlert: true });
+    const instance = wrapper.instance();
+    const input = instance.missingSubmissionDeductionInput;
+    sinon.stub(input, 'focus');
+    instance.closeAlert();
+    strictEqual(input.focus.callCount, 0);
+    input.focus.restore();
+  });
 });
 
 QUnit.module('LatePoliciesTabPanel: spinner', {

@@ -371,7 +371,7 @@ module Lti
       end
 
       it "should return previous lti context_ids" do
-        expect(subject.previous_lti_context_ids).to eq 'abc,def'
+        expect(subject.previous_lti_context_ids.split(",")).to match_array %w{abc def}
       end
     end
 

@@ -5,7 +5,7 @@ you just want to set up a Canvas development environment with a minimum of
 effort, run:
 
 ```
-./scripts/docker_dev_setup.sh
+./script/docker_dev_setup.sh
 ```
 
 The script will guide you through the process of installing docker and setting
