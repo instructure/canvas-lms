@@ -16,17 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-import { encodeQueryString } from '../shared/queryString'
+import { shape, string } from 'prop-types'
 
-// not using default because we will add more api calls in near future
+// we might add more comprehensive user shapes in the future
 // eslint-disable-next-line
-export function getAnnouncements ({ courseId, announcements }, { page }) {
-  const params = encodeQueryString([
-    { only_announcements: true },
-    { per_page: 40 },
-    { page: page || announcements.currentPage },
-  ])
-
-  return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
-}
+export const author = shape({
+  id: string.isRequired,
+  display_name: string.isRequired,
+  avatar_image_url: string,
+  html_url: string.isRequired,
+})

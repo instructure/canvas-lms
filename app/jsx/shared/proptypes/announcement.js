@@ -16,17 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-import { encodeQueryString } from '../shared/queryString'
+import { shape, arrayOf, string, number, bool, oneOf } from 'prop-types'
+import { author } from './user'
 
-// not using default because we will add more api calls in near future
-// eslint-disable-next-line
-export function getAnnouncements ({ courseId, announcements }, { page }) {
-  const params = encodeQueryString([
-    { only_announcements: true },
-    { per_page: 40 },
-    { page: page || announcements.currentPage },
-  ])
+const announcement = shape({
+  id: string.isRequired,
+  position: number.isRequired,
+  published: bool.isRequired,
+  title: string.isRequired,
+  message: string.isRequired,
+  posted_at: string,
+  delayed_post_at: string,
+  author: author.isRequired,
+  read_state: oneOf(['read', 'unread']),
+  discussion_subentry_count: number.isRequired,
+  unread_count: number.isRequired,
+  locked: bool.isRequired,
+  html_url: string.isRequired,
+})
 
-  return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
-}
+export const announcementList = arrayOf(announcement)
+
+export default announcement

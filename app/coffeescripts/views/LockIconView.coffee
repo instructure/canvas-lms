@@ -17,7 +17,7 @@
 
 define [
   'compiled/views/LockButtonView'
-], (LockButtonView, _) ->
+], (LockButtonView) ->
 
   class LockIconView extends LockButtonView
     lockClass: 'lock-icon-lock'

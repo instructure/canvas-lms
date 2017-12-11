@@ -220,6 +220,7 @@ export function selectPaginationState (state, name) {
   return {
     [name]: page.items || [],
     [`${name}Page`]: itemsState.currentPage,
+    [`${name}LastPage`]: itemsState.lastPage,
     [`isLoading${capitalizedName}`]: LoadStates.isLoading(page.loadState),
     [`hasLoaded${capitalizedName}`]: LoadStates.hasLoaded(page.loadState),
   }

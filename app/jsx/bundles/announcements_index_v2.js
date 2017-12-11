@@ -20,6 +20,9 @@ import createAnnIndex from 'jsx/announcements'
 
 const root = document.querySelector('#content')
 const app = createAnnIndex(root, {
-  contextCodes: [ENV.context_asset_string],
+  courseId: [ENV.COURSE_ID],
+  permissions: ENV.permissions,
+  masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
 })
+
 app.render()

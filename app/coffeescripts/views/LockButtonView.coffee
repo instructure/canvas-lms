@@ -215,8 +215,6 @@ define [
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
         iconClass:   'icon-blueprint'
 
-
-
     renderState: (options) ->
       @reset()
       @$el.addClass options.buttonClass

@@ -16,17 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-import { encodeQueryString } from '../shared/queryString'
+.ic-unread-badge {
+  background: var(--ic-brand-primary);
+  border-radius: 100px;
+  overflow: hidden;
+  display: inline-block;
+  font-size: 0.9rem;
+  text-align: center;
+}
 
-// not using default because we will add more api calls in near future
-// eslint-disable-next-line
-export function getAnnouncements ({ courseId, announcements }, { page }) {
-  const params = encodeQueryString([
-    { only_announcements: true },
-    { per_page: 40 },
-    { page: page || announcements.currentPage },
-  ])
+.ic-unread-badge__count {
+  min-width: 5px;
+  padding: 1px 10px;
+  display: inline-block;
+}
 
-  return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
+.ic-unread-badge__unread-count {
+  color: $white;
+}
+
+.ic-unread-badge__total-count {
+  background: $ic-bg-light-primary;
 }

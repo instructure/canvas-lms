@@ -16,17 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-import { encodeQueryString } from '../shared/queryString'
+import { shape, bool, string, number, oneOfType } from 'prop-types'
 
-// not using default because we will add more api calls in near future
-// eslint-disable-next-line
-export function getAnnouncements ({ courseId, announcements }, { page }) {
-  const params = encodeQueryString([
-    { only_announcements: true },
-    { per_page: 40 },
-    { page: page || announcements.currentPage },
-  ])
+const masterCourseData = shape({
+  canManageCourse: bool,
+  isChildCourse: bool,
+  isMasterCourse: bool,
+  accountId: oneOfType([string, number]),
+  masterCourse: shape({
+    id: oneOfType([string, number]).isRequired,
+  }),
+})
 
-  return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
-}
+export default masterCourseData

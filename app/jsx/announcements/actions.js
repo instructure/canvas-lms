@@ -20,16 +20,12 @@ import I18n from 'i18n!announcements_v2'
 import { createActions } from 'redux-actions'
 
 import { getAnnouncements } from './apiClient'
-import { notificationActions } from '../shared/reduxNotifications'
 import { createPaginationActions } from '../shared/reduxPagination'
 
 function fetchAnnouncements(dispatch, getState, payload) {
   return (resolve, reject) => {
     getAnnouncements(getState(), payload)
-      .then((res) => {
-        resolve(res)
-        dispatch(notificationActions.notifyInfo(I18n.t('Announcements Loaded!'))) // dummy notification, remove me later
-      })
+      .then(resolve)
       .catch(err => reject({ err, message: I18n.t('An error ocurred while loading announcements') }))
   }
 }
