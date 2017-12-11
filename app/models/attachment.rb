@@ -464,7 +464,7 @@ class Attachment < ActiveRecord::Base
     if splits[1] == "localstorage"
       splits[3].to_i
     else
-      Shard.relative_id_for(splits[1], Shard.birth, shard)
+      splits[1].to_i
     end
   end
 
