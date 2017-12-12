@@ -3,7 +3,7 @@
   "version": "1.2.1",
   "description": "An accessibility checker plugin for TinyMCE.",
   "main": "lib/plugin.js",
-  "module": "lib/en/modules/plugin.js",
+  "module": "lib/modules/plugin.js",
   "scripts": {
     "test": "jest src",
     "test-watch": "jest --watch src",

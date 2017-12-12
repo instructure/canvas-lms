@@ -22,5 +22,5 @@ ls locales/*.json | \
 
 node scripts/build-translations.js
 
-$(npm bin)/babel --out-dir lib/modules --ignore __*/* --quiet src
+$(npm bin)/babel --out-dir lib/modules --ignore __*/* --quiet --copy-files src
 NODE_ENV=transpile $(npm bin)/babel --out-dir lib/ --ignore __*/* --quiet --copy-files src
