@@ -20,129 +20,93 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!course_images'
 import _ from 'underscore'
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import Grid, {GridCol, GridRow} from 'instructure-ui/lib/components/Grid'
-import Button from 'instructure-ui/lib/components/Button'
-import Heading from 'instructure-ui/lib/components/Heading'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Grid, {GridCol, GridRow} from '@instructure/ui-core/lib/components/Grid'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Heading from '@instructure/ui-core/lib/components/Heading'
 import IconXLine from 'instructure-icons/lib/Line/IconXLine'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
 
-  class CourseImagePicker extends React.Component {
+export default class CourseImagePicker extends React.Component {
+  static propTypes = {
+    courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    handleClose: PropTypes.func,
+    handleFileUpload: PropTypes.func,
+    handleFlickrUrlUpload: PropTypes.func,
+    uploadingImage: PropTypes.bool
+  }
 
-    static propTypes = {
-      courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      handleClose: PropTypes.func,
-      handleFileUpload: PropTypes.func,
-      handleFlickrUrlUpload: PropTypes.func,
-      uploadingImage: PropTypes.bool
-    }
+  static defaultProps = {
+    handleClose: () => {},
+    handleFileUpload: () => {},
+    handleFlickrUrlUpload: () => {},
+    uploadingImage: false
+  }
 
-    static defaultProps = {
-      handleClose: () => {},
-      handleFileUpload: () => {},
-      handleFlickrUrlUpload: () => {},
-      uploadingImage: false
-    }
+  state = {
+    draggingFile: false
+  }
 
-    constructor (props) {
-      super(props);
+  onDrop = e => {
+    this.setState({draggingFile: false})
+    this.props.handleFileUpload(e, this.props.courseId)
+    e.preventDefault()
+    e.stopPropagation()
+  }
 
-      this.state = {
-        draggingFile: false
-      };
+  onDragLeave = () => {
+    this.setState({draggingFile: false})
+  }
 
-      this.onDrop = this.onDrop.bind(this);
-      this.onDragLeave = this.onDragLeave.bind(this);
-      this.onDragEnter = this.onDragEnter.bind(this);
-      this.shouldAcceptDrop = this.shouldAcceptDrop.bind(this);
-    }
-
-    onDrop (e) {
-      this.setState({draggingFile: false});
-      this.props.handleFileUpload(e, this.props.courseId);
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    onDragLeave () {
-      this.setState({draggingFile: false});
-    }
-
-    onDragEnter (e) {
-      if (this.shouldAcceptDrop(e.dataTransfer)) {
-        this.setState({draggingFile: true});
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }
-
-    shouldAcceptDrop (dataTransfer) {
-      if (dataTransfer) {
-        return (_.indexOf(dataTransfer.types, 'Files') >= 0);
-      }
-    }
-
-    render () {
-      return (
-        <div className="CourseImagePicker"
-          onDrop={this.onDrop}
-          onDragLeave={this.onDragLeave}
-          onDragOver={this.onDragEnter}
-          onDragEnter={this.onDragEnter}>
-          { this.props.uploadingImage ?
-            <div className="CourseImagePicker__Overlay">
-              <Spinner title="Loading"/>
-            </div>
-            :
-            null
-          }
-          { this.state.draggingFile ?
-            <div className="DraggingOverlay CourseImagePicker__Overlay">
-              <div className="DraggingOverlay__Content">
-                <div className="DraggingOverlay__Icon">
-                  <i className="icon-upload" />
-                </div>
-                <div className="DraggingOverlay__Instructions">
-                  {I18n.t('Drop Image')}
-                </div>
-              </div>
-            </div>
-            :
-            null
-          }
-          <div className="CourseImagePicker__Header">
-            <Grid
-              vAlign="middle"
-              colSpacing="none">
-              <GridRow>
-                <GridCol>
-                  <Heading>{I18n.t('Choose Image')}</Heading>
-                </GridCol>
-                <GridCol width="auto">
-                  <Button
-                    variant="icon"
-                    title="Cancel"
-                    onClick={this.props.handleClose}
-                  >
-                    <span className="screenreader-only">
-                      {I18n.t('Close')}
-                    </span>
-                    <IconXLine />
-                  </Button>
-                </GridCol>
-              </GridRow>
-            </Grid>
-          </div>
-          <div className="CourseImagePicker__Content">
-            <UploadArea
-              courseId={this.props.courseId}
-              handleFileUpload={this.props.handleFileUpload}/>
-            <FlickrSearch selectImage={(flickrUrl) => this.props.handleFlickrUrlUpload(flickrUrl)} />
-          </div>
-        </div>
-      );
+  onDragEnter = e => {
+    if (this.shouldAcceptDrop(e.dataTransfer)) {
+      this.setState({draggingFile: true})
+      e.preventDefault()
+      e.stopPropagation()
     }
   }
 
-export default CourseImagePicker
+  shouldAcceptDrop = dataTransfer => {
+    if (dataTransfer) {
+      return (_.indexOf(dataTransfer.types, 'Files') >= 0)
+    }
+  }
+
+  render () {
+    return (
+      <div className="CourseImagePicker"
+        onDrop={this.onDrop}
+        onDragLeave={this.onDragLeave}
+        onDragOver={this.onDragEnter}
+        onDragEnter={this.onDragEnter}>
+        { this.props.uploadingImage &&
+          <div className="CourseImagePicker__Overlay">
+            <Spinner title="Loading"/>
+          </div>
+        }
+        { this.state.draggingFile &&
+          <div className="DraggingOverlay CourseImagePicker__Overlay">
+            <div className="DraggingOverlay__Content">
+              <div className="DraggingOverlay__Icon">
+                <i className="icon-upload" />
+              </div>
+              <div className="DraggingOverlay__Instructions">
+                {I18n.t('Drop Image')}
+              </div>
+            </div>
+          </div>
+        }
+        <div className="CourseImagePicker__Content">
+          <UploadArea
+            courseId={this.props.courseId}
+            handleFileUpload={this.props.handleFileUpload}
+          />
+          <FlickrSearch selectImage={(flickrUrl) => this.props.handleFlickrUrlUpload(flickrUrl)} />
+        </div>
+      </div>
+    )
+  }
+}
+
+

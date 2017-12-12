@@ -21,7 +21,6 @@ import $ from 'jquery'
 import I18n from 'i18n!actions'
 import Helpers from './helpers'
 import rawUploadFile from '../shared/upload_file'
-import 'compiled/jquery.rails_flash_notifications'
 
   const Actions = {
 

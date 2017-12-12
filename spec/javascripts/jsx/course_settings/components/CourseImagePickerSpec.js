@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
-import Button from 'instructure-ui/lib/components/Button'
+import Button from '@instructure/ui-core/lib/components/Button'
 import CourseImagePicker from 'jsx/course_settings/components/CourseImagePicker'
 
 const wrapper = document.getElementById('fixtures');
@@ -39,18 +39,6 @@ QUnit.module('CourseImagePicker Component', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper);
   }
-});
-
-test('calls handleClose prop when the close button is clicked', function() {
-  let called = false;
-  const handleCloseFunc = () => { called = true };
-  const component = this.renderComponent({ handleClose: handleCloseFunc });
-  const componentButton = TestUtils.findRenderedComponentWithType(component, Button);
-  const domButton = TestUtils.findRenderedDOMComponentWithTag(componentButton, 'button')
-
-  TestUtils.Simulate.click(domButton);
-
-  ok(called, 'handleClose was called');
 });
 
 test('dragging overlay modal appears when accepting a drag', function() {
