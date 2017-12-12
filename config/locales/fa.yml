@@ -5633,6 +5633,7 @@ fa:
     bottom: 
       student: 
         count: "تعداد دانشجویان با پایین ترین نمره ها"
+    column_delimiter: ","
     correct: 
       bottom: 
         student: 
@@ -7579,6 +7580,7 @@ fa:
     warning: هشدار
   global_navigation_8bee3501: "پیمایش سراسری"
   go_30af2a7b: برو
+  go_back_ed239e69: بازگشت
   go_to_name_s_profile_eaa1826b: "به نمایه %{name} برو"
   go_to_settings_for_name_812308b5: "رفتن به تنظیمات مربوط به %{name}"
   go_to_statistics_for_name_2ee6b6f3: "رفتن به آمار مربوط به %{name}"
@@ -8205,6 +8207,7 @@ fa:
   grades_a61eba0a: "نمره ها"
   grades_are_now_reverted_to_original_scores_e6deade1: "نمره ها اکنون به نمره های اصلی تبدیل شده اند"
   grades_are_now_showing_what_if_scores_711a8be2: "نمره ها اکنون نمره های احتمالی را نشان می دهند"
+  grades_for_student_aff00ba: "نمره های %{student}"
   gradezilla: 
     alerts: 
       scores_updated: 
@@ -11983,6 +11986,7 @@ fa:
   no_grading_periods_set_up_a20a8819: "هیچ دوره نمره گذاری ایجاد نشده است"
   no_grading_schemes_to_display_8b0e92e7: "هیچ طرح نمره گذاری برای نمایش موجود نیست"
   no_items_in_module_21f111a2: "هیچ موردی در ماژول موجود نیست"
+  no_marks_5e7d2b59: "نمره موجود نیست"
   no_matching_users_found_83889c10: "هیج کاربر نظیر یافت نشد."
   no_migration_file: "برای انتقال محتوا، فایل لازم است."
   no_more_results_to_load_6774fb1c: "نتایج بیشتر برای بارگذاری وجود ندارد."
@@ -12015,6 +12019,7 @@ fa:
   none_9b6c9bec: هیچکدام
   norway_47_bc598662: "نروژ (+47)"
   not_a_number: "باید یک عدد مثبت باشد"
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "این مورد به برخی بخش ها تخصیص داده نخواهد شد."
   not_anonymously_graded_87574f91: "به طور ناشناس نمره‌گذاری نشده است."
   not_available_487d3648: "در دسترس نیست"
   not_available_during_sync_ae645e8c: "در طول همگام‌سازی، موجود نیست."
@@ -18770,6 +18775,7 @@ fa:
   work_and_create_together_c65f358b: "کار و ایجاد با هم"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "مایلید این بهنگام سازی قبول یا رد شود؟"
   would_you_like_to_enable_this_app_ccdf735d: "مایلید این برنامه فعال شود؟"
+  would_you_like_to_go_back_to_include_1d279044: "مایلید برای شامل سازی برگردید؟"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "مایلید به دانشجویان اجازه دهید به درس ادامه دهند یا می خواهید این ماژول ها را تا زمان تکمیل شدن الزامات جدید دوباره قفل کنید؟"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "مخفی کردن عنوان های رویداد در نمای ماه تقویم"
   x_y_4a86b3ab: "%{x}/%{y}"
@@ -18825,6 +18831,7 @@ fa:
   you_can_update_some_of_this_user_s_information_but_8e99a045: "شما می توانید بعضی از اطلاعات این کاربر را بهنگام کنید ولی این کاربر می تواند تغییرات را به حالت اولیه برگرداند."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "می توانید از یک فایل 16x16، 32x32، 48x48 ico استفاده کنید."
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "شما می‌توانید نمرات خود را بر اساس نمرات \"چه می‌شود اگر\" ببینید تا تأثیر تکالیف دوباره ارسال شده یا تکالیف آینده را بر نمره ببینید. هم‌چنین می‌توانید امتیازها را برای یک تکلیف که هم‌اکنون امتیاز دارد  و یا برای تکلیفی که هنوز نمره‌گذاری نشده است نیز تست کنید."
+  you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "نمی توانید به یک گروه خارج از مجموعه گروه تکلیف تخصیص دهید"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "نمی توانید زمینه های موجود در این زیرحساب را ویرایش کنید."
   you_cannot_remove_this_enrollment_c87be1cb: "نمی توانید این ثبت نام را حذف کنید."
   you_cannot_remove_your_default_email_address_8ed68e52: "نمی توانید نشانی پست الکترونیکی پیش فرض خود را حذف کنید"
@@ -18862,6 +18869,7 @@ fa:
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "حداقل باید امکان یک قرار ملاقات در هر بازه زمانی را فراهم سازید"
   you_must_allow_at_least_one_group_to_attend_68531eab: "باید حداقل به یک گروه اجازه حضور بدهید"
   you_must_enter_a_date_f8eabfb1: "شما باید یک تاریخ وارد کنید."
+  you_must_have_a_student_or_section_selected_a99e45df: "باید یک دانشجو یا بخش را انتخاب کنید"
   you_must_log_in_to_view_replies_9ccd4da0: "برای مشاهده پاسخ ها باید وارد شوید"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "باید یک مقدار آماده و یا گزینه را از حالت انتخاب خارج کنید."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "باید یک درس را برای کپی کردن محتوا از آن، انتخاب کنید"
