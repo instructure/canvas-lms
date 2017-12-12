@@ -23,8 +23,8 @@ import { bindActionCreators } from 'redux'
 import I18n from 'i18n!blueprint_settings'
 import select from '../../shared/select'
 
-import Typography from 'instructure-ui/lib/components/Typography'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import SyncHistoryItem from './SyncHistoryItem'
 
 import actions from '../actions'
@@ -82,7 +82,7 @@ export default class SyncHistory extends Component {
       return (
         <div style={{textAlign: 'center'}}>
           <Spinner title={title} />
-          <Typography as="p">{title}</Typography>
+          <Text as="p">{title}</Text>
         </div>
       )
     }

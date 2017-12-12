@@ -19,8 +19,8 @@
 import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import Alert from 'instructure-ui/lib/components/Alert'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Alert from '@instructure/ui-core/lib/components/Alert'
+import Text from '@instructure/ui-core/lib/components/Text'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 import {formatLockObject} from '../LockItemFormat'
@@ -60,8 +60,8 @@ export default class LockBanner extends Component {
     if (this.props.isLocked) {
       return (
         <Alert>
-          <Typography weight="bold" size="small">{I18n.t('Locked:')}&nbsp;</Typography>
-          <Typography size="small">{formatLockObject(this.props.itemLocks)}</Typography>
+          <Text weight="bold" size="small">{I18n.t('Locked:')}&nbsp;</Text>
+          <Text size="small">{formatLockObject(this.props.itemLocks)}</Text>
         </Alert>
       )
     }

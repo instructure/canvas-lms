@@ -18,8 +18,8 @@
 
 import I18n from 'i18n!blueprint_courses'
 import React from 'react'
-import Tooltip from 'instructure-ui/lib/components/Tooltip'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import IconBlueprintLockSolid from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
 import IconBlueprintSolid from 'instructure-icons/lib/Solid/IconBlueprintSolid'
 

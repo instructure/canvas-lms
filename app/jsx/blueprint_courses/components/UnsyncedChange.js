@@ -18,8 +18,8 @@
 
 import React from 'react'
 
-import Typography from 'instructure-ui/lib/components/Typography'
-import Container from 'instructure-ui/lib/components/Container'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Container from '@instructure/ui-core/lib/components/Container'
 
 import { IconLock, IconUnlock } from './BlueprintLocks'
 import propTypes from '../propTypes'
@@ -34,19 +34,19 @@ const UnsyncedChange = (props) => {
     <tr className="bcs__unsynced-item">
       <td>
         <div className="bcs__unsynced-item__name">
-          <Typography size="large" color="secondary">
+          <Text size="large" color="secondary">
             {locked ? <IconLock /> : <IconUnlock />}
-          </Typography>
+          </Text>
           <Container padding="0 0 0 small">
-            <Typography size="small" weight="bold">{asset_name}</Typography>
+            <Text size="small" weight="bold">{asset_name}</Text>
           </Container>
         </div>
       </td>
       <td>
-        <Typography size="small" weight="bold">{changeLabel}</Typography>
+        <Text size="small" weight="bold">{changeLabel}</Text>
       </td>
       <td>
-        <Typography size="small" weight="bold">{typeLabel}</Typography>
+        <Text size="small" weight="bold">{typeLabel}</Text>
       </td>
     </tr>
   )

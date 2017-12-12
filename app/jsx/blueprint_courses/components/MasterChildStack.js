@@ -20,7 +20,7 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
 import cx from 'classnames'
 
-import Typography from 'instructure-ui/lib/components/Typography'
+import Text from '@instructure/ui-core/lib/components/Text'
 
 import propTypes from '../propTypes'
 
@@ -40,12 +40,12 @@ export default class MasterChildStack extends Component {
     return (
       <div className={classes}>
         <header>
-          <Typography as="p" size="small">{isMaster ? I18n.t('Blueprint') : I18n.t('Your Course')}</Typography>
+          <Text as="p" size="small">{isMaster ? I18n.t('Blueprint') : I18n.t('Your Course')}</Text>
         </header>
-        <Typography as="p">{termName} - {course.name}</Typography>
+        <Text as="p">{termName} - {course.name}</Text>
         <div className="bcc__master-child-stack__box__footer">
-          <Typography size="small" color={isMaster ? 'secondary-inverse' : 'secondary'}>{course.sis_course_id}</Typography>
-          <Typography size="small" color={isMaster ? 'secondary-inverse' : 'secondary'}>courses/{course.id}</Typography>
+          <Text size="small" color={isMaster ? 'secondary-inverse' : 'secondary'}>{course.sis_course_id}</Text>
+          <Text size="small" color={isMaster ? 'secondary-inverse' : 'secondary'}>courses/{course.id}</Text>
         </div>
       </div>
     )

@@ -24,11 +24,11 @@ import { bindActionCreators } from 'redux'
 import select from '../../shared/select'
 import {showFlashAlert} from '../../shared/FlashAlert'
 
-import Button from 'instructure-ui/lib/components/Button'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import Tooltip from 'instructure-ui/lib/components/Tooltip'
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 
 import propTypes from '../propTypes'
 import actions from '../actions'
@@ -278,10 +278,10 @@ export default class CourseSidebar extends Component {
             variant="link"
             onClick={this.handleUnsyncedChangesClick}
           >
-            <Typography>{I18n.t('Unsynced Changes')}</Typography>
+            <Text>{I18n.t('Unsynced Changes')}</Text>
           </Button>
           <PresentationContent>
-            <Typography><span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span></Typography>
+            <Text><span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span></Text>
           </PresentationContent>
           <MigrationOptions />
         </div>
@@ -305,10 +305,10 @@ export default class CourseSidebar extends Component {
           variant="link"
           onClick={this.handleAssociationsClick}
         >
-          <Typography>{I18n.t('Associations')}</Typography>
+          <Text>{I18n.t('Associations')}</Text>
         </Button>
         <PresentationContent>
-          <Typography><span className="bcs__row-right-content">{length}</span></Typography>
+          <Text><span className="bcs__row-right-content">{length}</span></Text>
         </PresentationContent>
       </div>
     )
@@ -324,7 +324,7 @@ export default class CourseSidebar extends Component {
     return (
       <div style={{textAlign: 'center'}}>
         <Spinner size="small" title={title} />
-        <Typography size="small" as="p">{title}</Typography>
+        <Text size="small" as="p">{title}</Text>
       </div>
     )
   }
@@ -349,7 +349,7 @@ export default class CourseSidebar extends Component {
           {this.maybeRenderAssociations()}
           <div className="bcs__row">
             <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
-              <Typography>{I18n.t('Sync History')}</Typography>
+              <Text>{I18n.t('Sync History')}</Text>
             </Button>
           </div>
           {this.maybeRenderUnsyncedChanges()}

@@ -26,11 +26,11 @@ import { bindActionCreators } from 'redux'
 import select from '../../shared/select'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Heading from 'instructure-ui/lib/components/Heading'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import Alert from 'instructure-ui/lib/components/Alert'
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Alert from '@instructure/ui-core/lib/components/Alert'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 
 import CoursePicker from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
@@ -100,8 +100,8 @@ export default class BlueprintAssociations extends React.Component {
       return (
         <Alert variant="warning" closeButtonLabel={I18n.t('Close')} margin="0 0 large">
           <p style={{margin: '0 -10px'}}>
-            <Typography weight="bold">{I18n.t('Warning:')}</Typography>&nbsp;
-            <Typography>{I18n.t('You have unsynced changes that will sync to all associated courses when a new association is saved.')}</Typography>
+            <Text weight="bold">{I18n.t('Warning:')}</Text>&nbsp;
+            <Text>{I18n.t('You have unsynced changes that will sync to all associated courses when a new association is saved.')}</Text>
           </p>
         </Alert>
       )
@@ -117,7 +117,7 @@ export default class BlueprintAssociations extends React.Component {
         <div className="bca__overlay">
           <div className="bca__overlay__save-wrapper">
             <Spinner title={title} />
-            <Typography as="p">{title}</Typography>
+            <Text as="p">{title}</Text>
           </div>
         </div>
       )

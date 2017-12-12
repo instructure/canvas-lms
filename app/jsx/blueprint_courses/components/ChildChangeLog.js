@@ -20,9 +20,9 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import Typography from 'instructure-ui/lib/components/Typography'
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 
 import ChangeLogRow, { ChangeRow } from './ChangeLogRow'
 import SyncHistoryItem from './SyncHistoryItem'
@@ -48,7 +48,7 @@ export default class ChildChangeLog extends Component {
         <div className="bcc__change-log__loading" style={{textAlign: 'center'}}>
           <Spinner title={title} />
           <PresentationContent>
-            <Typography as="p">{title}</Typography>
+            <Text as="p">{title}</Text>
           </PresentationContent>
         </div>
       )
