@@ -20,9 +20,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import classnames from 'classnames'
-import Heading from 'instructure-ui/lib/components/Heading'
-import InstUIRating from 'instructure-ui/lib/components/Rating'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import InstUIRating from '@instructure/ui-core/lib/components/Rating'
+import Text from '@instructure/ui-core/lib/components/Text'
 
   class Rating extends React.Component {
     static propTypes = {
@@ -57,9 +57,9 @@ import Typography from 'instructure-ui/lib/components/Typography'
               valueMax={3}
             />
             <div>
-              <Typography size="small" color="brand">
+              <Text size="small" color="brand">
                 {this.formatValueText(metric.level, 3)}
-              </Typography>
+              </Text>
             </div>
           </div>
         </div>

@@ -20,11 +20,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import classnames from 'classnames'
-import Heading from 'instructure-ui/lib/components/Heading'
-import Progress from 'instructure-ui/lib/components/Progress'
-import Tooltip from 'instructure-ui/lib/components/Tooltip'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Link from 'instructure-ui/lib/components/Link'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Progress from '@instructure/ui-core/lib/components/Progress'
+import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Link from '@instructure/ui-core/lib/components/Link'
 
   class SubmissionProgressBars extends React.Component {
     static propTypes = {
@@ -124,9 +124,9 @@ import Link from 'instructure-ui/lib/components/Link'
                       valueNow={submission.score || 0}
                       formatValueText={() => SubmissionProgressBars.displayScreenreaderGrade(submission)}
                       formatDisplayedValue={() => (
-                        <Typography size="x-small" color="secondary">
+                        <Text size="x-small" color="secondary">
                           {SubmissionProgressBars.displayGrade(submission)}
-                        </Typography>
+                        </Text>
                       )}
                     />
                   </Tooltip>
