@@ -5206,6 +5206,7 @@ nn:
     bottom: 
       student: 
         count: "Lågaste studenttal"
+    column_delimiter: ","
     correct: 
       bottom: 
         student: 
@@ -6885,6 +6886,7 @@ nn:
     warning: åtvaring
   global_navigation_8bee3501: "Global navigasjon"
   go_30af2a7b: "Gå til"
+  go_back_ed239e69: "Gå tilbake"
   go_to_name_s_profile_eaa1826b: "Gå til %{name} sin profil"
   go_to_settings_for_name_812308b5: "Gå til innstillingar for %{name}"
   go_to_statistics_for_name_2ee6b6f3: "Gå til statistikk for %{name}"
@@ -7476,6 +7478,7 @@ nn:
   grades_a61eba0a: Karakterar
   grades_are_now_reverted_to_original_scores_e6deade1: "Karakterane blir no tilbakestilt til det opphavlege resultatet"
   grades_are_now_showing_what_if_scores_711a8be2: "Karakterar viser no kva-skjer-dersom-resultat"
+  grades_for_student_aff00ba: "Karakterar for %{student}"
   gradezilla: 
     alerts: 
       scores_updated: 
@@ -10819,6 +10822,7 @@ nn:
   no_grading_periods_configured_for_this_term_ca22393e: "ingen karaktersetjingsperiodar er konfigurert for dette semesteret "
   no_grading_schemes_to_display_8b0e92e7: "Ingen karaktersetjingsskjema å vise"
   no_items_in_module_21f111a2: "Ingen element i modulen"
+  no_marks_5e7d2b59: "Ingen resultat"
   no_matching_users_found_83889c10: "Finn ikkje samsvarande brukarar."
   no_migration_file: "Fil er nødvendig for overføring av innhald."
   no_outcome_file_or_authority_given_c90f9c5f: "Resultatfil eller autoritet er ikkje gitt"
@@ -10845,6 +10849,7 @@ nn:
   norway_47_bc598662: "Noreg (+47)"
   norway_c11471b3: Noreg
   not_a_number: "må vere eit positivt tal"
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Ikkje alle klassene blir tildelte dette elementet."
   not_available_487d3648: "Ikkje tilgjengeleg"
   not_available_until_next_submission_2175158: "Ikkje tilgjengeleg før neste innlevering"
   not_completed_d70acea3: "Ikkje fullført"
@@ -16928,6 +16933,7 @@ nn:
   windows_tile_wide_4d40910: "Flis i Windows: Brei"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Vil du godta eller avslå oppdateringa?"
   would_you_like_to_enable_this_app_ccdf735d: "Vil du aktivere denne appen?"
+  would_you_like_to_go_back_to_include_1d279044: "Vil du gå tilbake og inkludere:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Vil du at studentane skal halde fram på emnet eller vil du låse modulane på nytt til nye krav er fullførte?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Bryt tekst i titlar i kalenderen si månadsvising "
   x_y_4a86b3ab: "%{x}/%{y}"
@@ -16964,6 +16970,7 @@ nn:
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge på igjen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan oppdatere noko av denne brukaren sin informasjon, men dei kan endre det om dei vil."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan bruke ei enkelt ico-fil på 16 x 16, 32 x 32, 48 x 48."
+  you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan ikkje tilordne ei gruppe utanfor oppgåva sitt gruppesett"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikkje redigere emne for denne underkontoen."
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan ikkje fjerne denne påmeldinga."
   you_cannot_remove_your_default_email_address_8ed68e52: "Du kan ikkje fjerne standard e-postadresse"
@@ -16992,6 +16999,7 @@ nn:
   you_must_agree_to_the_terms_99723f97: "Du må godta vilkåra"
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "Du må tillate minst ein avtale per deltakar."
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Du må tillate minst ein avtale per tidsluke."
+  you_must_have_a_student_or_section_selected_a99e45df: "Du må velje ein student eller ei klasse"
   you_must_log_in_to_view_replies_9ccd4da0: "Du må logge på for å vise svar"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du må velje eit emne å kopiere innhald frå"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du må innstille med eit tal som er større enn eller likt %{min}"
