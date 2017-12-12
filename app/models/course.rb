@@ -325,6 +325,17 @@ class Course < ActiveRecord::Base
     end
 
     tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    return tags if user.blank? || user_is_teacher
+
+    if ConditionalRelease::Service.enabled_in_context?(self)
+      path_visible_pages = self.wiki_pages.left_outer_joins(assignment: :submissions).
+        except(:preload).
+        where("assignments.id is null or submissions.user_id = ?", user.id).
+        select(:id)
+
+      tags = tags.where.not(content_type: 'WikiPage')
+      tags = tags.union(ContentTag.where(content_type: 'WikiPage', content_id: path_visible_pages))
+    end
 
     tags
   end
@@ -1062,6 +1073,11 @@ class Course < ActiveRecord::Base
     if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
       # if we have all default args, let's queue this job in a singleton to avoid duplicates
       inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
+    elsif student_ids.blank? && grading_period_id.present?
+      # A migration that changes a lot of due dates in a grading period
+      # situation can kick off a job storm and redo work. Let's avoid
+      # that by putting it into a singleton.
+      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
     end
 
     send_later_if_production_enqueue_args(
