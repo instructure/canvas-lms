@@ -3911,6 +3911,7 @@ ko:
     bottom: 
       student: 
         count: "하위 학생 수"
+    column_delimiter: ","
     correct: 
       bottom: 
         student: 
@@ -5092,6 +5093,7 @@ ko:
     invitation: 초대
     question: 문제
     warning: 경고
+  go_back_ed239e69: "뒤로 가기"
   google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: "Google Docs 도메인 제한을 이용하면 Google Docs 제출물과 협업을 단일 도메인으로 제한할 수 있습니다. 승인되지 않은 도메인에서 과제를 제출하거나 협업에 참여하려는 학생은 Google Docs 통합을 업데이트할 필요가 있다는 것을 알리는 오류 메시지를 받게 됩니다."
   grade_display_warning_dialog: 
@@ -5501,6 +5503,7 @@ ko:
   graded_quiz_7fabdf1f: "평가된 퀴즈"
   graded_survey_c0f0c395: "평가된 설문"
   grades_a61eba0a: 평점
+  grades_for_student_aff00ba: "%{student}의 평점"
   grading_box: 
     out_of_points_possible: "/ %{assignment.points_possible}"
   grading_cell: 
@@ -8123,6 +8126,7 @@ ko:
   next_steps_ce0f0d0c: "다음 단계"
   no_due_date_44271c53: "기한 없음"
   no_e16d9132: 아니요
+  no_marks_5e7d2b59: "표시 없음"
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   no_password_was_given_472222e5: "암호가 없음"
   no_results_found_58717065: "결과 없음"
