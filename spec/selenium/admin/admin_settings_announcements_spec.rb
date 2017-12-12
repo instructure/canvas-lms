@@ -48,11 +48,9 @@ describe "settings tabs" do
       expect(f("#tab-announcements .announcement-details")).to include_text(displayed_username)
       dismiss_flash_messages
 
-      # close the "user account" reactTray that opened so we could read the displayed username
-      if tray_close = f('.ic-NavMenu__closeButton')
-       tray_close.click
-      end
-      expect(f('body')).not_to contain_css('.ReactTray__Overlay')
+      # close the "user account" Tray that opened so we could read the displayed username
+      f('body').click
+      expect(f('body')).not_to contain_css('[aria-label="Global navigation tray"]')
 
       expect(f("#tab-announcements .notification_subject").text).to eq subject
       expect(f("#tab-announcements .notification_message").text).to eq "this is a message"

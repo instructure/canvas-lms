@@ -122,13 +122,14 @@ module LoginAndSessionMethods
 
   def displayed_username
     f('[aria-label="Global Navigation"] a[href="/profile"]').click
-    f('#global_nav_profile_display_name').text
+    f('[aria-label="Global navigation tray"] h1').text
   end
 
 
   def expect_logout_link_present
     logout_element = begin
       f('[aria-label="Global Navigation"] a[href="/profile"]').click
+      wait_for_animations
       fj('form[action="/logout"] button:contains("Logout")')
     end
     expect(logout_element).to be_present

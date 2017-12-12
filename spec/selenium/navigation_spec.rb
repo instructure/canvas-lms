@@ -29,7 +29,7 @@ describe 'Global Navigation' do
       it 'should show the profile tray upon clicking' do
         get "/"
         f('#global_nav_profile_link').click
-        expect(f('#global_nav_profile_header')).to be_displayed
+        expect(f('[aria-label="Global navigation tray"] [aria-label="User profile picture"]')).to be_displayed
       end
 
       # Profile links are hardcoded, so check that something is appearing for
@@ -45,7 +45,7 @@ describe 'Global Navigation' do
         get "/"
         f('#global_nav_courses_link').click
         wait_for_ajaximations
-        expect(f('.ic-NavMenu__primary-content')).to be_displayed
+        expect(f("[aria-label='Global navigation tray']")).to be_displayed
       end
 
       it 'should populate the courses tray when using the keyboard to open it' do
@@ -53,7 +53,7 @@ describe 'Global Navigation' do
         driver.execute_script('$("#global_nav_courses_link").focus()')
         f('#global_nav_courses_link').send_keys(:enter)
         wait_for_ajaximations
-        links = ff('.ic-NavMenu__link-list li')
+        links = ff('[aria-label="Global navigation tray"] li a')
         expect(links.count).to eql 2
       end
     end
@@ -76,7 +76,7 @@ describe 'Global Navigation' do
         get "/"
         f('#global_nav_groups_link').click
         wait_for_ajaximations
-        links = ff('.ic-NavMenu__link-list li')
+        links = ff('[aria-label="Global navigation tray"] li a')
         expect(links.map(&:text)).to eq(['Z Current Group', 'All Groups'])
       end
     end

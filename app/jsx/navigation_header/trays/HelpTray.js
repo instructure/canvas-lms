@@ -18,50 +18,30 @@
 
 import I18n from 'i18n!new_nav'
 import React from 'react'
-import PropTypes from 'prop-types'
+import {bool, array, func, string} from 'prop-types'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Heading from '@instructure/ui-core/lib/components/Heading'
 import HelpDialog from '../../help_dialog/HelpDialog'
 
-  var HelpTray = React.createClass({
-    propTypes: {
-      trayTitle: PropTypes.string,
-      closeTray: PropTypes.func.isRequired,
-      links: PropTypes.array,
-      hasLoaded: PropTypes.bool
-    },
+export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
+  return (
+    <Container as="div" padding="medium" id="help_tray">
+      <Heading level="h3" as="h1">{trayTitle}</Heading>
+      <hr />
+      <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray}/>
+    </Container>
+  )
+}
 
-    getDefaultProps() {
-      return {
-        trayTitle: I18n.t('Help'),
-        hasLoaded: false,
-        links: []
-      };
-    },
+HelpTray.propTypes = {
+  trayTitle: string,
+  closeTray: func.isRequired,
+  links: array,
+  hasLoaded: bool
+}
 
-    render() {
-      return (
-        <div id="help_tray">
-          <div className="ic-NavMenu__header">
-            <h1 className="ic-NavMenu__headline">
-              {this.props.trayTitle}
-            </h1>
-            <button
-              className="Button Button--icon-action ic-NavMenu__closeButton"
-              type="button"
-              onClick={this.props.closeTray}
-            >
-              <i className="icon-x" aria-hidden="true"></i>
-              <span className="screenreader-only">
-                {I18n.t('Close')}
-              </span>
-            </button>
-          </div>
-          <HelpDialog
-            links={this.props.links}
-            hasLoaded={this.props.hasLoaded}
-            onFormSubmit={this.props.closeTray} />
-        </div>
-      );
-    }
-  });
-
-export default HelpTray
+HelpTray.defaultProps = {
+  trayTitle: I18n.t('Help'),
+  hasLoaded: false,
+  links: []
+}
