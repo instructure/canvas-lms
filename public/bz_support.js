@@ -107,7 +107,7 @@ function bzRetainedInfoSetup() {
         if (el.classList.contains("bz-optional-magic-field"))
           optional = true;
 
-        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"));
+        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"));
 
         // we also need to update other views on the same page
         var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
@@ -469,7 +469,7 @@ function BZ_GoToMasterPage(master_page_id) {
 
 var BZ_MagicFieldSaveTimeouts = {};
 
-function BZ_SaveMagicField(field_name, field_value, optional, type) {
+function BZ_SaveMagicField(field_name, field_value, optional, type, answer) {
   if(optional == null)
     optional = true; // the default is to skip grading; assume api updates are optional fields
   if(type == null)
@@ -486,6 +486,8 @@ function BZ_SaveMagicField(field_name, field_value, optional, type) {
   var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + type;
   if (optional)
     data += "&optional=true";
+  if (answer !== null)
+    data += "&answer=" + encodeURIComponent(answer);
   http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   http.onreadystatechange = function() {
     if(http.readyState == 4) {
@@ -498,7 +500,7 @@ function BZ_SaveMagicField(field_name, field_value, optional, type) {
           // automatically retry in a little while
           var timeout = setTimeout(function() {
             BZ_MagicFieldSaveTimeouts[field_name] = null;
-            BZ_SaveMagicField(field_name, field_value, optional, type);
+            BZ_SaveMagicField(field_name, field_value, optional, type, answer);
           }, 5000);
           BZ_MagicFieldSaveTimeouts[field_name] = timeout;
         } else {

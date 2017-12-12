@@ -434,6 +434,7 @@ class BzController < ApplicationController
     # so i don't mind it being passed to us from the client.
     was_optional = params[:optional]
     field_type = params[:type]
+    answer = params[:answer]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
@@ -450,7 +451,7 @@ class BzController < ApplicationController
     # now that the user's work is safely saved, we will go back and do addon work
     # like micrograding
 
-    if was_new && !was_optional && field_type != 'checkbox' # Checkboxes are optional by nature
+    if was_new && !was_optional && (field_type != 'checkbox' || answer != "yes") # Checkboxes are optional by nature unless there is an answer
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
       module_item_id = request.referrer[/module_item_id=(\d+)/, 1]
       if module_item_id.nil?
@@ -524,7 +525,7 @@ class BzController < ApplicationController
               doc.css(selector).each do |o|
                 n = o.attr('data-bz-retained')
                 next if names[n]
-                next if o.attr('type') == 'checkbox'
+                next if o.attr('type') == 'checkbox' && o.attr('data-bz-answer').nil?
                 names[n] = true
                 count += 1
                 Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
@@ -543,6 +544,9 @@ class BzController < ApplicationController
           participation_assignment = res.first
 
           step = participation_assignment.points_possible.to_f / magic_field_count
+          if !answer.nil? && params[:value] != answer
+            step = 0 # wrong answer = no points
+          end
 
           submission = participation_assignment.find_or_create_submission(@current_user)
 
