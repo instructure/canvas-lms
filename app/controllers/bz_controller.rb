@@ -493,8 +493,10 @@ class BzController < ApplicationController
         # However, given that we can just round up the points at the end of the semester and most the
         # steps will be fractional points, and most the content will be written ahead of time, this
         # shouldn't be a real problem.
-        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.day) do
-          count = 0
+        # old one was magic_field_count, now it is magic_field_counts -- new cache returns an array for more detail
+        magic_field_counts = Rails.cache.fetch("magic_field_counts_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.day) do
+          total_count = 0
+          graded_checkboxes_that_are_supposed_to_be_empty_count = 0
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
           # NOTE: Now that we have separate Course Participation assignments to track engagement on a per module basis, 
@@ -527,14 +529,20 @@ class BzController < ApplicationController
                 next if names[n]
                 next if o.attr('type') == 'checkbox' && o.attr('data-bz-answer').nil?
                 names[n] = true
-                count += 1
-                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
+                total_count += 1
+                if o.attr('type') == 'checkbox' && o.attr('data-bz-answer') == ''
+                  graded_checkboxes_that_are_supposed_to_be_empty_count += 1
+                end
+                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, total_count = #{total_count}, graded_checkboxes_that_are_supposed_to_be_empty_count = #{graded_checkboxes_that_are_supposed_to_be_empty_count}")
               end
             end
           end
-          count == 0 ? 1 : count
+          [total_count == 0 ? 1 : total_count, graded_checkboxes_that_are_supposed_to_be_empty_count]
         end
-        Rails.logger.debug("### set_user_retained_data - magic_field_count = #{magic_field_count}")
+        Rails.logger.debug("### set_user_retained_data - magic_field_counts = #{magic_field_counts}")
+
+        magic_field_count = magic_field_counts[0]
+        graded_checkboxes_that_are_supposed_to_be_empty_count = magic_field_counts[1]
 
         # This is hacky, but we tie modules to participation tracking assignments using the name.
         # E.g. #Course Participation - Onboarding" would track the Onboarding Module.
@@ -544,14 +552,16 @@ class BzController < ApplicationController
           participation_assignment = res.first
 
           step = participation_assignment.points_possible.to_f / magic_field_count
-          if !answer.nil? && params[:value] != answer
+          if(!answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
+            step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
+          elsif !answer.nil? && params[:value] != answer
             step = 0 # wrong answer = no points
           end
 
           submission = participation_assignment.find_or_create_submission(@current_user)
 
           submission.with_lock do
-            existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
+            existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * step) : submission.grade.to_f
             new_grade = existing_grade + step 
             if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
               Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
