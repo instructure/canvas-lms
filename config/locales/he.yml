@@ -5511,6 +5511,7 @@ he:
     bottom: 
       student: 
         count: "ספירת תלמידים שבתחתית"
+    column_delimiter: ","
     correct: 
       bottom: 
         student: 
@@ -7415,6 +7416,7 @@ he:
     warning: אזהרה
   global_navigation_8bee3501: "ניווט ראשי"
   go_30af2a7b: בצע
+  go_back_ed239e69: חזרה
   go_to_settings_for_name_812308b5: "עבור להגדרות של %{name}"
   go_to_statistics_for_name_2ee6b6f3: "עבור לסטטיסטיקות של %{name}"
   good_284a7a8f: טוב
@@ -8029,6 +8031,7 @@ he:
   grades_a61eba0a: ציונים
   grades_are_now_reverted_to_original_scores_e6deade1: "הציונים כעת חזרו לניקוד המקורי"
   grades_are_now_showing_what_if_scores_711a8be2: "ההערכות מראות כעת ציוני מה-היה-אילו"
+  grades_for_student_aff00ba: "ציונים של %{student}"
   gradezilla: 
     alerts: 
       scores_updated: 
@@ -11424,6 +11427,7 @@ he:
   no_grading_schemes_to_display_8b0e92e7: "אין סכימת הערכה להצגה"
   no_items_in_module_21f111a2: "אין פריטים במודול"
   no_ltis_configured_f4b9bc6b: "אף LTI אל קונפג"
+  no_marks_5e7d2b59: "ללא הערות"
   no_matching_users_found_83889c10: "לא נמצאו משתמשים מתאימים"
   no_migration_file: "נדרש קובץ עבור תוכן ההגירה"
   no_outcome_file_or_authority_given_c90f9c5f: "אין קובץ תוצאות למידה או הרשאות אליו"
@@ -11450,6 +11454,7 @@ he:
   norway_47_bc598662: "נורבגיה (+47)"
   norway_c11471b3: נורבגיה
   not_a_number: "הערך חייב להיות מספר חיובי"
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "פריט זה יוקצה לכל ההקבצות ."
   not_available_487d3648: "לא זמין"
   not_available_until_next_submission_2175158: "לא זמין עד ההגשה הבאה"
   not_completed_d70acea3: "טרם הושלם"
@@ -17836,6 +17841,7 @@ he:
   windows_tile_wide_4d40910: "Windows Tile: רוחב"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "האם ברצונך לקבל או לדחות את העדכון הזה?"
   would_you_like_to_enable_this_app_ccdf735d: "האם ברצונך להפוך אפליקציה זו לפעילה?"
+  would_you_like_to_go_back_to_include_1d279044: "האם ברצנוך לחזור אחורנית כדי לכלול:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "האם ברצונך לאפשר לתלמידים להמשיך בקורס או ברצונך לנעול מחדש מודולים אלו עד אשר הדרישות החדשות ימולאו?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "עטיפת כותרות אירועים בתצוגת יומן חדשי"
   x_y_4a86b3ab: "%{x}/%{y}"
@@ -17879,6 +17885,7 @@ he:
   you_can_update_some_of_this_user_s_information_but_8e99a045: "ניתן לעדכן חלק מהמידע על המשתמש, אך הם יכולים לשנות זאת חזרה אם ירצו בכך."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "ניתן להשתמש בקובץ יחיד מסוג ICO בגודל  16x16, 32x32, 48x48."
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "תוכל/י להציג את הערכותיך בעזרת ציוני \"היה אם...\" כך שניתן לדעת כיצד ההערכות תשתננה עבור הגשות מחדש או עתידיות. ניתן לבחון ציונים להגשות שיש להן כבר ציונים או כאלו שעדין לא הוערכו. "
+  you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "אין אפשרות לשבץ בקבוצה אשר מחוץ למערך הקבוצות של משימה"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "אינך יכול/ה לערוך ערכות נושא בחשבון משנה זה."
   you_cannot_remove_this_enrollment_c87be1cb: "אין אפשרות להסיר הרשמה זו."
   you_cannot_remove_your_default_email_address_8ed68e52: "אין אפשרות להסיר את כתובת הדוא\"ל המשמשת כברירת מחדל"
@@ -17913,6 +17920,7 @@ he:
   you_must_agree_to_the_terms_99723f97: "חובה להסכים לתנאים"
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "עליכם לאפשר לפחות פגישה אחת לכל משתתף"
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "עליכם לאפשר לפחות פגישה אחת לכל חלון זמן"
+  you_must_have_a_student_or_section_selected_a99e45df: "יש לבחור תלמיד או הקבצה"
   you_must_log_in_to_view_replies_9ccd4da0: "יש להתחבר כדי לעיין בתגובות"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "יש להקליד ערך או לא לסמן אפשרות זו"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "יש לבחור קורס כדי להעתיק תוכן ממנו"
