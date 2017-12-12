@@ -349,13 +349,8 @@ class GroupCategoriesController < ApplicationController
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
-    if includes.include? 'group_submissions'
-      assignments = @group_category.assignments.active
-      submissions = Submission.active.where(assignment_id: assignments, workflow_state: 'submitted').select(:id, :user_id)
-      submissions_by_user = submissions.each_with_object({}) do |sub, obj|
-        obj[sub.user_id] = (obj[sub.user_id] || []).push(sub.id)
-      end
-
+    if includes.include?('group_submissions') && @group_category.context_type == "Course"
+      submissions_by_user = @group_category.submission_ids_by_user_id(users.map(&:id))
       json_users.each do |user|
         user[:group_submissions] = submissions_by_user[user[:id]]
       end
