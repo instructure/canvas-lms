@@ -33,6 +33,7 @@ class Assignment < ActiveRecord::Base
   include SearchTermHelper
   include Canvas::DraftStateValidations
   include TurnitinID
+  include ContentLibraryHelper
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
@@ -48,15 +49,25 @@ class Assignment < ActiveRecord::Base
   def duplicate_across_courses
     if self.description_changed?
       Assignment.where(:clone_of_id => id).each do |assignment|
-        assignment.description = description
+        # Look for links to other pages / assignments in the Content Library and update those
+        # be links to the associated pages / assignment in the local course.
+        local_course_id = assignment.context_id
+        assignment.description = replace_content_library_links_with_local_links(description, local_course_id)
         assignment.name = name
         assignment.submission_types = submission_types
 
         if rubric != assignment.rubric
           assignment.rubric_association.destroy if assignment.rubric_association
-          assignment.rubric_association = rubric_association.clone if rubric_association
+          if rubric_association
+            rubric_association_clone_of_master = rubric_association.clone
+            rubric_association_clone_of_master.context_id = assignment.context_id
+            rubric_association_clone_of_master.context_code = assignment.context_code
+            assignment.rubric_association = rubric_association_clone_of_master
+            assignment.rubric_association.save
+          end
         end
 
+        assignment.is_content_library_sync = true
         assignment.save
       end
     end
@@ -66,18 +77,40 @@ class Assignment < ActiveRecord::Base
   before_create :clone_from_master_bank
   def clone_from_master_bank
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
+      self.is_content_library_sync = true
       master = Assignment.find(self.clone_of_id)
-      self.description = master.description
+      # Look for links to other pages / assignments in the Content Library and update those
+      # be links to the associated pages / assignment in the local course.
+      local_course_id = self.context_id
+      self.description = replace_content_library_links_with_local_links(master.description, local_course_id)
       self.name = master.name
       self.submission_types = master.submission_types
       if self.rubric != master.rubric
         self.rubric_association.destroy if self.rubric_association
-        self.rubric_association = master.rubric_association.clone if master.rubric_association
+        if master.rubric_association
+          if self.id # Can't run on before create b/c there is no id for this assignment yet to associate with the rubric
+            rubric_association_clone_of_master = master.rubric_association.clone
+            rubric_association_clone_of_master.context_id = self.context_id
+            rubric_association_clone_of_master.context_code = self.context_code
+            rubric_association_clone_of_master.association_id = self.id
+            self.rubric_association = rubric_association_clone_of_master
+            self.rubric_association.save
+          end
+        end
       end
     end
   end
 
+  # Set to true if the update of this assignment is running for a content library sync to prevent
+  # some default logic from running
+  def is_content_library_sync=(val)
+    @content_library_sync = Canvas::Plugin.value_to_boolean(val)
+  end
 
+  after_save :remove_content_library_sync_flag
+  def remove_content_library_sync_flag
+    @content_library_sync = false
+  end
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
@@ -1149,7 +1182,7 @@ class Assignment < ActiveRecord::Base
   def grade_student(original_student, opts={})
     raise GradeError.new("Student is required") unless original_student
     unless context.includes_user?(original_student, context.admin_visible_student_enrollments) # allows inactive users to be graded
-      raise GradeError.new("Student must be enrolled in the course as a student to be graded")
+      raise GradeError.new("Student must be enrolled in the course as a student to be graded: student = #{original_student.inspect}")
     end
     raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
 

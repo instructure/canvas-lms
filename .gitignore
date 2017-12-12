@@ -82,3 +82,6 @@ docker-compose.override.yml
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
+
+# Local Development only files
+*.dev

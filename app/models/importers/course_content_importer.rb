@@ -239,6 +239,7 @@ module Importers
       return unless data[:course]
       settings = data[:course]
       course.intro_title = settings[:intro_title]
+      course.gradebook_text = settings[:gradebook_text]
       course.intro_text = settings[:intro_text]
       if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
         tab_config = []

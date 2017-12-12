@@ -17,7 +17,7 @@
   }
 </script>
 
-<div id="page-mapper-container" class="show-content">
+<div id="page-mapper-container" class="show-content pages show">
   <% @pages.each do |page| %>
     <div class="page-mapper-page" id="portion-<%= page.id %>">
       <h1 class="page-mapper-title page-title"><%= link_to page.title, "/courses/#{@course_id}/pages/#{page.id}" %></h1>

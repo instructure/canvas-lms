@@ -56,6 +56,14 @@ module CopyAuthorizedLinks
     end
     
     def copy_authorized_links_to_context
+
+      # When this runs while we're trying to set the linked local courses to the
+      # updated Content Library body, if the page is owned by a user it can sometimes
+      # adjust the local links to things like inline rubrics and files to point at the
+      # local course instead of at the Content Library, so we're disabling this until something
+      # else breaks!
+      return if @content_library_sync
+
       block = self.class.copy_authorized_links_block rescue nil
       columns = (self.class.copy_authorized_links_columns || []).compact
       columns.each do |column|

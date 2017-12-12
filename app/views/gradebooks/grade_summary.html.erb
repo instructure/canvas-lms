@@ -80,6 +80,12 @@
 <% }) %>
 </h2>
 
+<% if !@context.gradebook_text.blank? %>
+  <div class="bz-gradebook-note">
+    <%= @context.gradebook_text.html_safe %>
+  </div>
+<% end %>
+
 <div class="dropdowns">
   <% if @presenter.has_courses_with_grades? %>
     <div id="course-selector-dropdown" style="margin-left: 10px; float: left;" class="course_selector">

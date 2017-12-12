@@ -16,9 +16,9 @@
   function BZAssignmentEditPostProcess() {
     <% if @assignment.clone_of_id %>
       var a = document.getElementById("assignment_submission_type");
-      a.setAttribute("disabled", "disabled");
+      a.setAttribute("readonly", "readonly");
       a = document.getElementById("assignment_description");
-      a.setAttribute("disabled", "disabled");
+      a.setAttribute("readonly", "readonly");
       return false; // skip description editor initialization
     <% end %>
 

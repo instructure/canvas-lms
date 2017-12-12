@@ -12,13 +12,21 @@ CanvasRails::Application.routes.draw do
   post 'bz/last_user_url' => 'bz#last_user_url'
   post 'bz/video_link' => 'bz#video_link'
   get 'bz/event_rsvps' => 'bz#event_rsvps'
+  get 'bz/load_wiki_pages' => 'bz#load_wiki_pages'
   get 'bz/user_retained_data' => 'bz#user_retained_data'
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
 
+  # both get and post work in batch mode for longer lists
+  get 'bz/user_retained_data_batch' => 'bz#user_retained_data_batch'
+  post 'bz/user_retained_data_batch' => 'bz#user_retained_data_batch'
+
   get 'bz/retained_data_stats' => 'bz#retained_data_stats'
   get 'bz/retained_data_export' => 'bz#retained_data_export'
+  get 'bz/magic_field_dump' => 'bz#magic_field_dump'
 
   get 'bz/user_linkedin_url' => 'bz#user_linkedin_url'
+
+  get 'bz/grades_download' => 'bz#grades_download', defaults: { format: 'csv' }
 
   get 'bz/linked_in_auth' => 'bz#linked_in_auth'
   get 'bz/linked_in_export' => 'bz#linked_in_export'
