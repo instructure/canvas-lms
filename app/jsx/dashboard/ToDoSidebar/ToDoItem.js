@@ -17,11 +17,11 @@
  */
 
 import React from 'react';
-import Button from 'instructure-ui/lib/components/Button';
-import Link from 'instructure-ui/lib/components/Link';
-import Typography from 'instructure-ui/lib/components/Typography';
-import List from 'instructure-ui/lib/components/List';
-import ListItem from 'instructure-ui/lib/components/List/ListItem';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Link from '@instructure/ui-core/lib/components/Link';
+import Text from '@instructure/ui-core/lib/components/Text';
+import List from '@instructure/ui-core/lib/components/List';
+import ListItem from '@instructure/ui-core/lib/components/List/ListItem';
 import AssignmentIcon from 'instructure-icons/lib/Line/IconAssignmentLine';
 import QuizIcon from 'instructure-icons/lib/Line/IconQuizLine';
 import AnnouncementIcon from 'instructure-icons/lib/Line/IconAnnouncementLine';
@@ -80,11 +80,11 @@ const getInformationRow = (dueAt, points) => {
 }
 
 export default function ToDoItem (props) {
-  const title = <Typography size="small" lineHeight="fit">{props.title}</Typography>
+  const title = <Text size="small" lineHeight="fit">{props.title}</Text>
   const titleComponent = props.href ? (
     <Link href={props.href}>{title}</Link>
   ) : (
-    <Typography>{title}</Typography>
+    <Text>{title}</Text>
   );
 
   const handleClick = () => {
@@ -98,9 +98,9 @@ export default function ToDoItem (props) {
         <div className="ToDoSidebarItem__Title">
           {titleComponent}
         </div>
-        <Typography color="secondary" size="small" weight="bold" lineHeight="fit">
+        <Text color="secondary" size="small" weight="bold" lineHeight="fit">
           {getContextShortName(props.courses, props.courseId)}
-        </Typography>
+        </Text>
         <List variant="pipe">
           {getInformationRow(props.dueAt, props.points)}
         </List>

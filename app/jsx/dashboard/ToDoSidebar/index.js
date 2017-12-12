@@ -22,12 +22,12 @@ import { func, arrayOf, object, bool, string } from 'prop-types';
 import moment from 'moment-timezone';
 
 import I18n from 'i18n!todo_sidebar';
-import Heading from 'instructure-ui/lib/components/Heading';
-import List from 'instructure-ui/lib/components/List';
-import ListItem from 'instructure-ui/lib/components/List/ListItem';
-import Container from 'instructure-ui/lib/components/Container';
-import Spinner from 'instructure-ui/lib/components/Spinner';
-import ButtonLink from 'instructure-ui/lib/components/Link';
+import Heading from '@instructure/ui-core/lib/components/Heading';
+import List from '@instructure/ui-core/lib/components/List';
+import ListItem from '@instructure/ui-core/lib/components/List/ListItem';
+import Container from '@instructure/ui-core/lib/components/Container';
+import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import ButtonLink from '@instructure/ui-core/lib/components/Link';
 
 import { loadInitialItems, completeItem } from './actions';
 import ToDoItem from './ToDoItem';
