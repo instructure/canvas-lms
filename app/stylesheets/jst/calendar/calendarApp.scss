@@ -147,8 +147,13 @@
   opacity: 0.5;
 }
 
-#attendees li {
-  @include name_bubbles;
+#attendees {
+  margin: 0;
+  li {
+    list-style: none;
+    margin: 2px;
+    @include name_bubbles;
+  }
 }
 
 .calendar .fc-button {
