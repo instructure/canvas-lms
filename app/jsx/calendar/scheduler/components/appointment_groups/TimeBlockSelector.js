@@ -21,8 +21,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Button from 'instructure-ui/lib/components/Button'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Button from '@instructure/ui-core/lib/components/Button'
 import TimeBlockSelectRow from './TimeBlockSelectRow'
 import TimeBlockListManager from 'compiled/calendar/TimeBlockListManager'
 import 'jquery.instructure_date_and_time'
@@ -147,7 +147,7 @@ export default class TimeBlockSelector extends React.Component {
           ))}
         </div>
         <div className="TimeBlockSelector__DivideSection">
-          <Typography>
+          <Text>
             <label
               dangerouslySetInnerHTML={{
                 __html: I18n.t('Divide into equal slots of %{input_value} minutes. ', {
@@ -159,7 +159,7 @@ export default class TimeBlockSelector extends React.Component {
             <Button size="small" onClick={this.handleSlotDivision}>
               {I18n.t('Create Slots')}
             </Button>
-          </Typography>
+          </Text>
         </div>
       </div>
     )
