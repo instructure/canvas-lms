@@ -4688,6 +4688,7 @@ hy:
     bottom: 
       student: 
         count: "Վատագույն ունկնդիրների թիվը"
+    column_delimiter: ","
     comments: Մեկնաբանություններ
     correct: 
       bottom: 
@@ -6295,6 +6296,7 @@ hy:
     question: հարց
     warning: նախազգուշացում
   global_navigation_8bee3501: "Գլոբալ նավարկում"
+  go_back_ed239e69: Վերադառնալ
   google_apps_domain_eddc8dee: "Google Apps դոմեն"
   google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
@@ -6790,6 +6792,7 @@ hy:
   graded_quiz_7fabdf1f: "Գնահատվող թեստ"
   graded_survey_c0f0c395: "Գնահատվող հարցում"
   grades_a61eba0a: Գնահատականներ
+  grades_for_student_aff00ba: "%{student} գնահատականները"
   grading_box: 
     out_of_points_possible: "%{assignment.points_possible} հնարավոր միավորներից"
   grading_cell: 
@@ -9945,6 +9948,7 @@ hy:
   no_grading_schemes_to_display_8b0e92e7: "Ցուցադրման համար բացակայում են գնահատման սխեմաները"
   no_icon_1f6ea5f4: "պատկեր չկա"
   no_items_in_module_21f111a2: "Ոչ արարկա չկա  մոդուլում"
+  no_marks_5e7d2b59: "Գնահատականներ չկան"
   no_migration_file: "Բովանդակության տեղափոխման համար անհրաժեշտ ֆայլ"
   no_password_was_given_472222e5: "Գաղտնաբառ տրված չէ "
   no_placements_enabled_f705f28: "Տեղադրումները միացված չեն"
@@ -9957,6 +9961,7 @@ hy:
   no_usage_rights_object_supplied_304b8d40: "Տրված չէ 'օգտագործման իրավունքներ' օբյեկտը"
   no_users_found_64a043ff: "Որեւէ օգտատեր չի գտնվել"
   not_a_number: "պետք է դրական թիվ լինի "
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Այս տարրը կնշանակվի ոչ բոլոր բաժինների համար "
   not_available_487d3648: "Հասանելի չէ"
   not_available_until_next_submission_2175158: "Հասանելի չէ մինչև հաջորդ հանձնարարության հանձնումը"
   not_completed_d70acea3: "Ավարտված չէ"
@@ -15592,6 +15597,7 @@ hy:
   windows_tile_wide_4d40910: "Windows սալիկ. լայնություն"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Դուք ցանկանում եք այս թարմացումը ընդունել թե՞ մերժել: "
   would_you_like_to_enable_this_app_ccdf735d: "Կցանկանայի՞ք միացնել այս հավելվածը:"
+  would_you_like_to_go_back_to_include_1d279044: "Կցանկանայի՞ք վերադառնալ ինչ-որ բան ներառելու համար"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Կցանկանայի՞ք թույլ տալ ունկնդիրներին շարունակել դասընթացը, թե՞ ցանկանում եք կրկին արգելափակել մոդուլները մինչև նոր պահանջների կատարումը:"
   xml_configuration_5ea1b942: "XML կոնֆիգուրացիա"
   yellow_4cf93785: Դեղին
@@ -15638,6 +15644,7 @@ hy:
   you_may_not_see_all_comments_right_now_because_the_96cf2051: "Դուք չեք կարող այս պահին տեսնել բոլոր մեկնաբանությունները, քանի որ հանձնարարությունը դեռեւս գնահատման փուլում է:"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Դուք կարող եք նշանակել մի քանի օգնական՝ դասընթացի աշխատանքներում ձեզ օժանդակելու նպատակով: Օգնականները կարող են գնահատել ունկնդիրների ուղարկած ֆայլերը, օգնել ձեզ վարելու քննարկումները և նույնիսկ թարմացնել կատարման ժամկետները և հանձնարարությունների տվյալները:"
   you_must_agree_to_the_terms_99723f97: "Դուք պետք է համաձայնվեք պայմանների հետ"
+  you_must_have_a_student_or_section_selected_a99e45df: "Անհրաժեշտ է ունենալ ընտրված ունկնդիր կամ բաժին"
   you_must_log_in_to_view_replies_9ccd4da0: "Դուք պետք է մուտք գործեք համակարգ պատասխանները դիտելու համար"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Դուք պետք է ընտրեք դասընթացը այդտեղից բովանդակություն պատճենելու համար"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Դուք պետք է սահմանեք մի թիվ, որը մեծ կամ հավասար է %{min}"
