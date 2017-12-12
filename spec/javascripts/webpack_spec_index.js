@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { canvas } from 'instructure-ui/lib/themes'
+import { canvas } from '@instructure/ui-themes/lib'
 import './support/sinon/sinon-qunit-1.0.0'
 
 const fixturesDiv = document.createElement('div')
