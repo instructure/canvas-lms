@@ -20,11 +20,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!outcomes'
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
-import Button from 'instructure-ui/lib/components/Button'
-import { MenuItem } from 'instructure-ui/lib/components/Menu'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import AddToCourseModal from '../outcomes/AddToCourseModal'
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Button from '@instructure/ui-core/lib/components/Button'
+import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import AddToCourseModal from './AddToCourseModal'
 
 export default React.createClass({
     propTypes: {
