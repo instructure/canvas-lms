@@ -72,6 +72,12 @@ module Types
         .then { assignment.context }
     }
 
+    field :assignmentGroup, AssignmentGroupType, resolve: ->(assignment, _, _) {
+      Loaders::AssociationLoader.for(Assignment, :assignment_group)
+        .load(assignment)
+        .then { assignment.assignment_group }
+    }
+
     field :onlyVisibleToOverrides, types.Boolean,
       "specifies that this assignment is only assigned to students for whom an
        `AssignmentOverride` applies.",
