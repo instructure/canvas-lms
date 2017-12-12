@@ -3561,7 +3561,7 @@ format-message-formats@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/format-message-formats/-/format-message-formats-5.1.0.tgz#c9c49334a0891bf74dd9d4bbb3f626ab2de30b1d"
 
-format-message-generate-id@^5.1.0:
+format-message-generate-id@^5.1.0, format-message-generate-id@^5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/format-message-generate-id/-/format-message-generate-id-5.2.1.tgz#d317091c69b6f1e8e9b088604cfea4bd9f4cb214"
   dependencies:
@@ -3584,7 +3584,7 @@ format-message-print@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/format-message-print/-/format-message-print-5.1.2.tgz#eb8621ff53764b9b5aaae2f077582a8d9a3e2527"
 
-format-message@^5.1.0, format-message@^5.1.2:
+format-message@^5.1.0, format-message@^5.1.2, format-message@^5.2.0:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/format-message/-/format-message-5.2.1.tgz#5a2ad53315fdffe2786399db0a2bf7f0ede127dc"
   dependencies:
@@ -8550,10 +8550,12 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
-tinymce-a11y-checker@1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.1.3.tgz#abed73ac28a0d37523d3e1c3ea2fe6f4bc8c6b37"
+tinymce-a11y-checker@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.2.2.tgz#66c6e67d8a095d5168a13ea9866f9fe6317382a6"
   dependencies:
+    format-message "^5.2.0"
+    format-message-generate-id "^5.2.1"
     instructure-icons "4.x"
     instructure-ui "3.x"
     react "^0.14.8 || ^15.0.0"
