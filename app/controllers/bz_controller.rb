@@ -552,7 +552,7 @@ class BzController < ApplicationController
           participation_assignment = res.first
 
           step = participation_assignment.points_possible.to_f / magic_field_count
-          if(!answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
+          if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
             step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
           elsif !answer.nil? && params[:value] != answer
             step = 0 # wrong answer = no points
