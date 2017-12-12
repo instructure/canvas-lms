@@ -261,7 +261,10 @@ describe Api::V1::User do
 
     context "computed scores" do
       before :once do
-        @enrollment.scores.create!(current_score: 95.0, final_score: 85.0)
+        @enrollment.scores.create!
+        assignment_group = @course.assignment_groups.create!
+        @enrollment.find_score(course_score: true).update!(current_score: 95.0, final_score: 85.0)
+        @enrollment.find_score(assignment_group_id: assignment_group).update!(current_score: 50.0, final_score: 40.0)
         @student1_enrollment = @enrollment
         @student2 = course_with_student(:course => @course).user
       end
@@ -271,7 +274,7 @@ describe Api::V1::User do
         @course.save!
       end
 
-      it "should return scores as admin" do
+      it "should return course scores as admin" do
         json = @test_api.user_json(@student, @admin, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
           "html_url" => "",
@@ -282,7 +285,7 @@ describe Api::V1::User do
         })
       end
 
-      it "should not return scores as another student" do
+      it "should not return course scores as another student" do
         json = @test_api.user_json(@student, @student2, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades'].keys).to eq ["html_url"]
       end
