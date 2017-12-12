@@ -71,6 +71,53 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
+"@instructure/ui-core@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.2.0.tgz#ddbe43863f16b3f2e67874cdfd7ffe069f866fce"
+  dependencies:
+    "@instructure/ui-themeable" "^4.2.0"
+    "@instructure/ui-utils" "^4.2.0"
+    bowser "^1.7.0"
+    classnames "^2.2.5"
+    decimal.js "^7.2.1"
+    deep-equal "^1.0.1"
+    keycode "^2.1.8"
+    moment "^2.10.6"
+    moment-timezone "^0.5.13"
+    no-scroll "^2.1.0"
+    numeral "^2.0.6"
+    prop-types "^15.5.10"
+    shortid "^2.2.8"
+
+"@instructure/ui-themeable@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.2.0.tgz#a3148b92881b8413409462b96dbdac39ea0109d3"
+  dependencies:
+    "@instructure/ui-utils" "^4.2.0"
+    bowser "^1.7.0"
+    deep-equal "^1.0.1"
+    glamor "^2.20.37"
+    prop-types "^15.5.10"
+    shortid "^2.2.8"
+    tinycolor2 "^1.4.1"
+
+"@instructure/ui-utils@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.2.0.tgz#2236b7016da33b85ab928f0e76c99b27e588fa35"
+  dependencies:
+    bowser "^1.7.0"
+    decimal.js "^7.2.1"
+    deep-equal "^1.0.1"
+    keycode "^2.1.8"
+    moment "^2.10.6"
+    moment-timezone "^0.5.13"
+    no-scroll "^2.1.0"
+    numeral "^2.0.6"
+    object.omit "^2.0.1"
+    object.pick "^1.2.0"
+    prop-types "^15.5.10"
+    shortid "^2.2.8"
+
 "@types/graphql@0.10.2":
   version "0.10.2"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.10.2.tgz#d7c79acbaa17453b6681c80c34b38fcb10c4c08c"
@@ -5901,7 +5948,7 @@ moment-timezone@^0.5.13:
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@>=1.6.0, moment@>=2.5.0, moment@~2.10.6:
+"moment@>= 2.9.0", moment@>=1.6.0, moment@>=2.5.0, moment@^2.10.6, moment@~2.10.6:
   version "2.10.6"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.10.6.tgz#6cb21967c79cba7b0ca5e66644f173662b3efa77"
 
