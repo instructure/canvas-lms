@@ -1142,8 +1142,6 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_reports)
       @student_ids = @context.student_ids
-      @range_start = Date.parse("Jan 1 2000")
-      @range_end = Date.tomorrow
 
       query = "SELECT COUNT(id), SUM(size) FROM #{Attachment.quoted_table_name} WHERE context_id=%s AND context_type='Course' AND root_attachment_id IS NULL AND file_state != 'deleted'"
       row = Attachment.connection.select_rows(query % [@context.id]).first
@@ -1151,22 +1149,6 @@ class CoursesController < ApplicationController
       query = "SELECT COUNT(id), SUM(max_size) FROM #{MediaObject.quoted_table_name} WHERE context_id=%s AND context_type='Course' AND attachment_id IS NULL AND workflow_state != 'deleted'"
       row = MediaObject.connection.select_rows(query % [@context.id]).first
       @media_file_count, @media_files_size = [row[0].to_i, row[1].to_i]
-
-      if params[:range] && params[:date]
-        date = Date.parse(params[:date]) rescue nil
-        date ||= Time.zone.today
-        if params[:range] == 'week'
-          @view_week = (date - 1) - (date - 1).wday + 1
-          @range_start = @view_week
-          @range_end = @view_week + 6
-          @old_range_start = @view_week - 7.days
-        elsif params[:range] == 'month'
-          @view_month = Date.new(date.year, date.month, d=1) #view.created_at.strftime("%m:%Y")
-          @range_start = @view_month
-          @range_end = (@view_month >> 1) - 1
-          @old_range_start = @view_month << 1
-        end
-      end
 
       respond_to do |format|
         format.html do

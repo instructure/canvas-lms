@@ -26,21 +26,17 @@
 <div style="padding: 0 20px;" id="stats">
 <h1><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h1>
 
-<% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").enrolled_before(@range_end).count %>
-<% inactive_students = @context.student_enrollments.before(@range_end).select{|e| e.invited? }.length %>
+<% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").count %>
+<% inactive_students = @context.student_enrollments.select{|e| e.invited? }.length %>
 
-<% active_topics =  @context.discussion_topics.active.before(@range_end).pluck(:id) %>
+<% active_topics =  @context.discussion_topics.active.pluck(:id) %>
 <% total_topics = active_topics.length %>
 <% total_entries = DiscussionEntry.active.where(:discussion_topic_id => active_topics).count %>
-<% new_topics = @context.discussion_topics.active.before(@range_end).select{|t| t.created_at > @range_start}.length %>
-<% new_entries = DiscussionEntry.active.after(@range_start).where(:discussion_topic_id => active_topics).count %>
-<% new_assignments = @context.assignments.active.before(@range_end).select{|a| a.expects_submission? && a.created_at > @range_start }.length %>
-<% new_submissions = @context.submissions.before(@range_end).having_submission.where('submitted_at > ?', @range_start).count %>
-<% total_assignments = @context.assignments.active.before(@range_end).select{|a| a.expects_submission? }.length %>
-<% total_submissions = @context.submissions.before(@range_end).having_submission.count %>
+<% total_assignments = @context.assignments.active.select{|a| a.expects_submission? }.length %>
+<% total_submissions = @context.submissions.having_submission.count %>
 
 <%
-  rubric_associations = @context.rubric_associations.bookmarked.before(@range_end).distinct.pluck(:rubric_id)
+  rubric_associations = @context.rubric_associations.bookmarked.distinct.pluck(:rubric_id)
 %>
 <div id="reports-tabs" style="display:none;">
   <ul>
@@ -59,17 +55,11 @@
         <td class="indent"><%= t('discussion_posts', %{Discussion Posts}) %></td>
         <td class="indent"><%= total_entries %></td>
       </tr><tr>
-        <td class="indent"><%= t('new_discussions', %{New Discussions}) %></td>
-        <td class="indent"><%= new_topics %></td>
-      </tr><tr>
-        <td class="indent"><%= t('new_discussion_entries', %{New Discussion Entries}) %></td>
-        <td class="indent"><%= new_entries %></td>
-          </tr><tr>
         <td><%= t('assignments', %{Assignments}) %></td>
-        <td><%= @context.assignments.active.before(@range_end).count %></td>
+        <td><%= @context.assignments.active.count %></td>
       </tr><tr>
         <td class="indent"><%= t('assignment_groups', %{Assignment Groups}) %></td>
-        <td class="indent"><%= @context.assignment_groups.active.before(@range_end).count %></td>
+        <td class="indent"><%= @context.assignment_groups.active.count %></td>
       </tr><tr>
         <td class="indent"><%= t('course_rubrics', %{Course Rubrics}) %></td>
         <td class="indent"><%= rubric_associations.count %></td>
@@ -84,13 +74,13 @@
         <td class="indent"><%= inactive_students %></td>
       </tr><tr>
         <td><%= t('quizzes', %{Quizzes}) %></td>
-        <td class="quiz_count"><%= @context.quizzes.active.before(@range_end).count %></td>
+        <td class="quiz_count"><%= @context.quizzes.active.count %></td>
       </tr><tr>
         <td class="indent"><%= t('quiz_questions', %{Quiz Questions}) %></td>
-        <td class="indent quiz_question_count"><%= @context.quizzes.active.before(@range_end).map{|q| (q.quiz_data || []).length}.sum %></td>
+        <td class="indent quiz_question_count"><%= @context.quizzes.active.map{|q| (q.quiz_data || []).length}.sum %></td>
       </tr><tr>
         <td class="indent"><%= t('quiz_submissions', %{Quiz Submissions}) %></td>
-        <td class="indent quiz_submission_count"><%= Quizzes::QuizSubmission.where(quiz_id: @context.quizzes.active.before(@range_end)).count %></td>
+        <td class="indent quiz_submission_count"><%= Quizzes::QuizSubmission.where(quiz_id: @context.quizzes.active).count %></td>
       </tr>
     </table>
   </div>
@@ -105,35 +95,31 @@
       </thead>
       <tfoot>
       <tr>
-        <th><%= t('new', %{New}) %></th>
-        <th><%= new_assignments %></th>
-        <th><%= new_submissions %></th>
-      </tr><tr>
-        <th><%= t('any', %{Any}) %></th>
+        <th><%= t("All Assignments") %></th>
         <th><%= total_assignments %></th>
         <th><%= total_submissions %></th>
       </tr></tfoot>
       <tbody>
       <tr>
         <td><%= t('file_upload', %{File Upload}) %></td>
-        <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_upload/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_upload').count %></td>
+        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_upload/) }.length %></td>
+        <td><%= @context.submissions.where(:submission_type => 'online_upload').count %></td>
       </tr><tr>
         <td><%= t('text_entry', %{Text Entry}) %></td>
-        <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_text_entry/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_text_entry').count %></td>
+        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_text_entry/) }.length %></td>
+        <td><%= @context.submissions.where(:submission_type => 'online_text_entry').count %></td>
       </tr><tr>
         <td><%= t('website_url', %{Website URL}) %></td>
-        <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_url/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_url').count %></td>
+        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_url/) }.length %></td>
+        <td><%= @context.submissions.where(:submission_type => 'online_url').count %></td>
       </tr><tr>
         <td><%= t('quiz', %{Quiz}) %></td>
-        <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_quiz/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_quiz').count %></td>
+        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_quiz/) }.length %></td>
+        <td><%= @context.submissions.where(:submission_type => 'online_quiz').count %></td>
       </tr><tr>
         <td><%= t('discussion_topic', %{Discussion Topic}) %></td>
-        <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/discussion_topic/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'discussion_topic').count %></td>
+        <td><%= @context.assignments.active.select{|a| a.submission_types.match(/discussion_topic/) }.length %></td>
+        <td><%= @context.submissions.where(:submission_type => 'discussion_topic').count %></td>
       </tr>
       </tbody>
     </table>
