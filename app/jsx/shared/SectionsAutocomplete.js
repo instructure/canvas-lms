@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import Autocomplete from 'instructure-ui/lib/components/Autocomplete'
-import Container from 'instructure-ui/lib/components/Container'
-import AccessibleContent from 'instructure-ui/lib/components/AccessibleContent'
+import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete'
+import Container from '@instructure/ui-core/lib/components/Container'
+import AccessibleContent from '@instructure/ui-core/lib/components/AccessibleContent'
 import React from 'react'
 import I18n from 'i18n!sections_autocomplete'
 import propTypes from './proptypes/sectionShape'

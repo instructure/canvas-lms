@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import axios from 'axios'
 import MessageStudents from 'jsx/shared/MessageStudents'
-import Transition from 'instructure-ui/lib/components/Transition'
+import Transition from '@instructure/ui-core/lib/components/Transition'
 
 let $domNode, subject, fixtures
 

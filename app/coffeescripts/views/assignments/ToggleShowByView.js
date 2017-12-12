@@ -24,9 +24,9 @@ import Backbone from 'Backbone'
 import Cache from '../../class/cache'
 import hasLocalStorage from '../../util/hasLocalStorage'
 import AssignmentGroup from '../../models/AssignmentGroup'
-import RadioInputGroup from 'instructure-ui/lib/components/RadioInputGroup'
-import RadioInput from 'instructure-ui/lib/components/RadioInput'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 export default class ToggleShowByView extends Backbone.View {
   initialize(...args) {

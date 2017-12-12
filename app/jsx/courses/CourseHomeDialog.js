@@ -19,15 +19,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from 'instructure-ui/lib/components/Modal'
-import Heading from 'instructure-ui/lib/components/Heading'
-import RadioInputGroup from 'instructure-ui/lib/components/RadioInputGroup'
-import RadioInput from 'instructure-ui/lib/components/RadioInput'
-import Button from 'instructure-ui/lib/components/Button'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Link from 'instructure-ui/lib/components/Link'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import AccessibleContent from 'instructure-ui/lib/components/AccessibleContent'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Link from '@instructure/ui-core/lib/components/Link'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import AccessibleContent from '@instructure/ui-core/lib/components/AccessibleContent'
 import I18n from 'i18n!course_home_dialog'
 import plainStoreShape from '../shared/proptypes/plainStoreShape'
 
@@ -59,12 +59,12 @@ class CourseHomeDialog extends React.Component {
     if (wikiFrontPageTitle) {
       return (
         <span>
-          <Typography size="small" color="secondary">
+          <Text size="small" color="secondary">
             &nbsp;&nbsp;
             <i>{wikiFrontPageTitle}</i>
             &nbsp;
             [<Link href={wikiUrl}>{I18n.t('Change')}</Link>]
-          </Typography>
+          </Text>
         </span>
       )
     }
@@ -142,9 +142,9 @@ class CourseHomeDialog extends React.Component {
         <ModalBody>
           <div className="content-box-mini" style={{marginTop: '0'}}>
             <AccessibleContent>
-              <Typography weight="bold" size="small">
+              <Text weight="bold" size="small">
                 {instructions}
-              </Typography>
+              </Text>
             </AccessibleContent>
           </div>
           <RadioInputGroup
