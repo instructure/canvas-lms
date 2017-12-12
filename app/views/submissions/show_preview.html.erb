@@ -132,7 +132,6 @@
                 </span>
               </a>
             </span>
-
           <% elsif can_do(@submission, @current_user, :view_turnitin_report) &&
             (turnitin_score = @submission.originality_data[attachment.asset_string]) &&
             (@submission.originality_data[:provider] == nil || @submission.originality_reports.present?) &&

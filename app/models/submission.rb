@@ -633,8 +633,8 @@ class Submission < ActiveRecord::Base
   # This method pulls data from the OriginalityReport table
   # Preload OriginalityReport before using this method in a collection of submissions
   def originality_data
-    data = OriginalityReport.where(attachment_id: attachment_ids_for_version).each_with_object({}) do |originality_report, hash|
-      hash[Attachment.asset_string(originality_report.attachment_id)] = {
+    data = originality_reports_for_display.each_with_object({}) do |originality_report, hash|
+      hash[originality_report.asset_key] = {
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         report_url: originality_report.originality_report_url,
@@ -644,6 +644,14 @@ class Submission < ActiveRecord::Base
     ret_val = turnitin_data.merge(data)
     ret_val.delete(:provider)
     ret_val
+  end
+
+  def text_entry_originality_reports
+    originality_reports.where(attachment: nil)
+  end
+
+  def originality_reports_for_display
+    (OriginalityReport.where(attachment_id: attachment_ids_for_version) + text_entry_originality_reports).uniq
   end
 
   def turnitin_assets
@@ -658,13 +666,13 @@ class Submission < ActiveRecord::Base
 
   # Preload OriginalityReport before using this method
   def originality_report_url(asset_string, user)
-    url = nil
-    if self.grants_right?(user, :view_turnitin_report)
+    if asset_string == self.asset_string
+      originality_reports.where(attachment_id: nil).first&.report_launch_path
+    elsif self.grants_right?(user, :view_turnitin_report)
       requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
       report = self.originality_reports.find_by(attachment: requested_attachment)
-      url = report&.report_launch_path
+      report&.report_launch_path
     end
-    url
   end
 
   def all_versioned_attachments

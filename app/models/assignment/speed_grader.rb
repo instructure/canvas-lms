@@ -208,7 +208,8 @@ class Assignment
             version.assignment = sub.assignment
             version.as_json(only: submission_fields,
                             methods: %i[versioned_attachments late missing external_tool_url]).tap do |version_json|
-              version_json['submission']['has_originality_report'] = version.versioned_originality_reports.present?
+              version_json['submission']['has_originality_report'] = version.versioned_originality_reports.present? ||
+                                                                     version.text_entry_originality_reports.present?
               version_json['submission']['has_plagiarism_tool'] = version.assignment.assignment_configuration_tool_lookup_ids.present?
               version_json['submission']['has_originality_score'] = version.originality_reports.any? { |o| o.originality_score.present? }
 

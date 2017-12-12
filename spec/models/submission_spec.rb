@@ -1894,6 +1894,19 @@ describe Submission do
           }
         })
       end
+
+      it "finds originality data text entry submissions" do
+        submission.update_attributes!(attachment_ids: attachment.id.to_s)
+        originality_report.update_attributes!(attachment: nil)
+        expect(submission.originality_data).to eq({
+          submission.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
+      end
     end
 
     describe '#attachment_ids_for_version' do
@@ -1948,6 +1961,11 @@ describe Submission do
 
       it 'returns the originality_report_url if present' do
         expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq(report_url)
+      end
+
+      it 'returns the report url for text entry submission reports' do
+        originality_report.update_attributes!(attachment: nil)
+        expect(submission.originality_report_url(submission.asset_string, test_teacher)).to eq report_url
       end
 
       it 'requires the :grade permission' do

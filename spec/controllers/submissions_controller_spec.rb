@@ -829,7 +829,6 @@ describe SubmissionsController do
       expect(response).to redirect_to originality_report.originality_report_url
     end
 
-
     it 'returns 400 if submission_id is not integer' do
       get 'originality_report', params: {:course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{ user_id }', :asset_string => attachment.asset_string}
       expect(response.response_code).to eq 400

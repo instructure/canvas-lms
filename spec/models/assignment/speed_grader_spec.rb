@@ -692,6 +692,15 @@ describe Assignment::SpeedGrader do
       expect(tii_data[attachment.asset_string]['state']).to eq 'acceptable'
     end
 
+    it "includes 'has_originality_report' in the json for text entry submissions" do
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {blah: 1})
+      OriginalityReport.create!(originality_score: '1', submission: submission)
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      has_report = json['submissions'].first['submission_history'].first['submission']['has_originality_report']
+      expect(has_report).to be_truthy
+    end
+
     it "includes 'has_originality_report' in the json" do
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
       submission.update_attribute(:turnitin_data, {blah: 1})

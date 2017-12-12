@@ -68,6 +68,7 @@ module Lti
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
     MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch&.instance_of?(Lti::Launch) }
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
+    ORIGINALITY_REPORT_ATTACHMENT_GUARD = -> { @originality_report&.attachment.present? }
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
     EDITOR_CONTENTS_GAURD = -> { @editor_contents.present? }
     EDITOR_SELECTION_GAURD = -> { @editor_contents.present? }
@@ -217,7 +218,7 @@ module Lti
     #   ```
     register_expansion 'com.instructure.File.id', [],
                      -> { @originality_report.attachment.id },
-                     ORIGINALITY_REPORT_GUARD,
+                     ORIGINALITY_REPORT_ATTACHMENT_GUARD,
                      default_name: 'com_instructure_file_id'
 
     # the LIS identifier for the course offering

@@ -678,6 +678,23 @@ module Lti
         expect(response.status).to eq 401
       end
 
+      it "does not require an attachment if submission type includes online text entry" do
+        @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
+        @submission.update_attributes!(body: 'some text')
+        score = 0.25
+        post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
+
+        expect(assigns[:report].attachment).to be_nil
+        expect(assigns[:report].originality_score).to eq score
+      end
+
+      it "does not requre an attachment if submission type does not include online text entry" do
+        @submission.update_attributes!(body: 'some text')
+        score = 0.25
+        post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
+        expect(response).to be_not_found
+      end
+
       it 'sets the resource type code of the associated tool setting' do
         score = 0.25
         post @endpoints[:create],
@@ -747,6 +764,28 @@ module Lti
              },
              headers: request_headers
 
+        response_body = JSON.parse(response.body)
+        expect(response_body['originality_score']).to eq 50
+      end
+
+      it 'updates the originality report if it has already been created without an attachment' do
+        @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
+        originality_score = 50
+        post @endpoints[:create],
+             params: {
+               originality_report: {
+                 workflow_state: 'pending'
+               }
+             },
+             headers: request_headers
+
+        post @endpoints[:create],
+             params: {
+               originality_report: {
+                 originality_score: originality_score
+               }
+             },
+             headers: request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['originality_score']).to eq 50
       end

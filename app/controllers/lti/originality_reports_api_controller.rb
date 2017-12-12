@@ -119,8 +119,9 @@ module Lti
     # @API Create an Originality Report
     # Create a new OriginalityReport for the specified file
     #
-    # @argument originality_report[file_id] [Required, Integer]
-    #   The id of the file being given an originality score.
+    # @argument originality_report[file_id] [Integer]
+    #   The id of the file being given an originality score. Required
+    #   if creating a report associated with a file.
     #
     # @argument originality_report[originality_score] [Required, Float]
     #   A number between 0 and 100 representing the measure of the
@@ -324,12 +325,20 @@ module Lti
       end
     end
 
+    def attachment_required?
+      !submission.assignment.submission_types.include?('online_text_entry')
+    end
+
     def attachment_in_context
       verify_submission_attachment(attachment, submission)
     end
 
     def find_originality_report
-      @report = OriginalityReport.find_by(id: params[:id]) || OriginalityReport.find_by(attachment_id: attachment&.id)
+      raise ActiveRecord::RecordNotFound if submission.blank?
+      @report = OriginalityReport.find_by(id: params[:id])
+      @report ||= (OriginalityReport.find_by(attachment_id: attachment&.id) if attachment.present?)
+      return if params[:originality_report].blank? || attachment.present?
+      @report ||= submission.originality_reports.find_by(attachment: nil) unless attachment_required?
     end
 
     def report_in_context
@@ -338,8 +347,10 @@ module Lti
     end
 
     def verify_submission_attachment(attachment, submission)
-      raise ActiveRecord::RecordNotFound unless attachment.present? && submission.present?
-      render_unauthorized_action unless submission.assignment == assignment && submission.attachments.include?(attachment)
+      raise ActiveRecord::RecordNotFound if submission.blank? || (attachment_required? && attachment.blank?)
+      if submission.assignment != assignment || (attachment_required? && !submission.attachments.include?(attachment))
+        render_unauthorized_action
+      end
     end
 
     # @!appendix Originality Report UI Locations
