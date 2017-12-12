@@ -4244,6 +4244,12 @@ describe Submission do
     end
   end
 
+  describe "scope: with_assignment" do
+    it "excludes submissions to deleted assignments" do
+      expect { @assignment.destroy }.to change { @student.submissions.with_assignment.count }.by(-1)
+    end
+  end
+
   describe '#filter_attributes_for_user' do
     let(:user) { instance_double('User', id: 1) }
     let(:session) { {} }

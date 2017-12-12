@@ -1664,7 +1664,7 @@ class Submission < ActiveRecord::Base
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
-  scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
+  scope :with_assignment, -> { joins(:assignment).merge(Assignment.active)}
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
 

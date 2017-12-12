@@ -33,7 +33,7 @@
 <% total_topics = active_topics.length %>
 <% total_entries = DiscussionEntry.active.where(:discussion_topic_id => active_topics).count %>
 <% total_assignments = @context.assignments.active.select{|a| a.expects_submission? }.length %>
-<% total_submissions = @context.submissions.having_submission.count %>
+<% total_submissions = @context.submissions.having_submission.with_assignment.count %>
 
 <%
   rubric_associations = @context.rubric_associations.bookmarked.distinct.pluck(:rubric_id)
@@ -103,23 +103,23 @@
       <tr>
         <td><%= t('file_upload', %{File Upload}) %></td>
         <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_upload/) }.length %></td>
-        <td><%= @context.submissions.where(:submission_type => 'online_upload').count %></td>
+        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_upload').count %></td>
       </tr><tr>
         <td><%= t('text_entry', %{Text Entry}) %></td>
         <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_text_entry/) }.length %></td>
-        <td><%= @context.submissions.where(:submission_type => 'online_text_entry').count %></td>
+        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_text_entry').count %></td>
       </tr><tr>
         <td><%= t('website_url', %{Website URL}) %></td>
         <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_url/) }.length %></td>
-        <td><%= @context.submissions.where(:submission_type => 'online_url').count %></td>
+        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_url').count %></td>
       </tr><tr>
         <td><%= t('quiz', %{Quiz}) %></td>
         <td><%= @context.assignments.active.select{|a| a.submission_types.match(/online_quiz/) }.length %></td>
-        <td><%= @context.submissions.where(:submission_type => 'online_quiz').count %></td>
+        <td><%= @context.submissions.with_assignment.where(:submission_type => 'online_quiz').count %></td>
       </tr><tr>
         <td><%= t('discussion_topic', %{Discussion Topic}) %></td>
         <td><%= @context.assignments.active.select{|a| a.submission_types.match(/discussion_topic/) }.length %></td>
-        <td><%= @context.submissions.where(:submission_type => 'discussion_topic').count %></td>
+        <td><%= @context.submissions.with_assignment.where(:submission_type => 'discussion_topic').count %></td>
       </tr>
       </tbody>
     </table>
