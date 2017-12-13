@@ -542,20 +542,26 @@ class BzController < ApplicationController
         if !res.empty?
           participation_assignment = res.first
 
-          step = participation_assignment.points_possible.to_f / magic_field_count
+          # only update score if we are not yet at the due date
+          # participation doesn't count if it is done late.
+          if participation_assignment.due_at > DateTime.today
 
-          submission = participation_assignment.find_or_create_submission(@current_user)
+            step = participation_assignment.points_possible.to_f / magic_field_count
 
-          submission.with_lock do
-            existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
-            new_grade = existing_grade + step 
-            if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
-              Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
-              new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
-                                                                        # to account for floating point inaccuracies.
+            submission = participation_assignment.find_or_create_submission(@current_user)
+
+            submission.with_lock do
+              existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
+              new_grade = existing_grade + step 
+              if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
+                Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
+                new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
+                                                                          # to account for floating point inaccuracies.
+              end
+              Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
+              participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
             end
-            Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
-            participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
+
           end
         end
       elsif is_student
