@@ -326,6 +326,20 @@ describe AccountsController do
   end
 
   describe "update" do
+    it "should update 'app_center_access_token'" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      access_token = SecureRandom.uuid
+      post 'update', params: { id: @account.id,
+                               account: {
+                                settings: {
+                                  app_center_access_token: access_token
+                                }
+                              }}
+      @account.reload
+      expect(@account.settings[:app_center_access_token]).to eq access_token
+    end
+
     it "should update account with sis_assignment_name_length_input with value less than 255" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
