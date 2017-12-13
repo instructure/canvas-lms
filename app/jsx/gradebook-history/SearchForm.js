@@ -26,6 +26,7 @@ import Button from 'instructure-ui/lib/components/Button';
 import Container from 'instructure-ui/lib/components/Container';
 import DateInput from 'instructure-ui/lib/components/DateInput';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
+import { GridCol } from 'instructure-ui/lib/components/Grid';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import SearchFormActions from 'jsx/gradebook-history/actions/SearchFormActions';
@@ -230,12 +231,12 @@ class SearchFormComponent extends Component {
 
   render () {
     return (
-      <Container as="div" margin="0 0 xx-large x-small">
+      <Container as="div" margin="0 0 xx-large">
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Search Form')}</ScreenReaderContent>}
           as="div"
           layout="columns"
-          colSpacing="large"
+          colSpacing="small"
           vAlign="top"
           startAt="large"
         >
@@ -289,6 +290,7 @@ class SearchFormComponent extends Component {
               {this.renderAsOptions(this.props.assignments.items)}
             </Autocomplete>
           </FormFieldGroup>
+
           <FormFieldGroup
             description={<ScreenReaderContent>{I18n.t('Dates')}</ScreenReaderContent>}
             layout="columns"
@@ -309,16 +311,19 @@ class SearchFormComponent extends Component {
               onDateChange={this.setSelectedTo}
             />
           </FormFieldGroup>
-          <div style={{margin: "1.85rem 0 0 0"}}>
-            <Button
-              onClick={this.handleSubmit}
-              type="submit"
-              variant="primary"
-              disabled={this.hasDateInputErrors()}
-            >
-              {I18n.t('Filter')}
-            </Button>
-          </div>
+
+          <GridCol width="auto">
+            <div style={{ margin: "1.85rem 0 0 0" }}>
+              <Button
+                onClick={this.handleSubmit}
+                type="submit"
+                variant="primary"
+                disabled={this.hasDateInputErrors()}
+              >
+                {I18n.t('Filter')}
+              </Button>
+            </div>
+          </GridCol>
         </FormFieldGroup>
       </Container>
     );
