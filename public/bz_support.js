@@ -107,7 +107,7 @@ function bzRetainedInfoSetup() {
         if (el.classList.contains("bz-optional-magic-field"))
           optional = true;
 
-        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"));
+        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer") ? el.getAttribute("data-bz-answer") : el.getAttribute("data-bz-range-answer"));
 
         // we also need to update other views on the same page
         var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
