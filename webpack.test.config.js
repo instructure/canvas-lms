@@ -35,7 +35,6 @@ testWebpackConfig.module.rules.unshift({
   // We should get rid of this and just change our actual source to s/test/qunit.test/ and s/module/qunit.module/
   loaders: [
     'imports-loader?test=>QUnit.test',
-    'imports-loader?asyncTest=>QUnit.asyncTest',
     'imports-loader?start=>QUnit.start',
   ]
 })
