@@ -51,7 +51,8 @@ define([
     }
   })
 
-  asyncTest('save', function () {
+  test('save', function (assert) {
+    const done = assert.async()
     let component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
     const updatedBrandConfig = {}
     this.stub(jQuery, 'ajaxJSON').callsArgOnWith(3, component, updatedBrandConfig)
@@ -83,7 +84,7 @@ define([
         jQuery.ajaxJSON.calledWithMatch(props.accountID, 'POST'),
         'makes a post request with the correct account id'
       )
-      start()
+      done()
     })
   })
 
