@@ -760,7 +760,7 @@ class Assignment < ActiveRecord::Base
       mod.completion_requirements && mod.completion_requirements.any?{|req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id])}
     end
     return unless modules.any?
-    student_ids = self.submissions.having_submission.distinct.pluck(:user_id)
+    student_ids = self.submissions.having_submission.or(self.submissions.graded).distinct.pluck(:user_id)
     return unless student_ids.any?
 
     modules.each do |mod|
