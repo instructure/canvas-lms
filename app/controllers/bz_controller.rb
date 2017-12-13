@@ -9,7 +9,8 @@ require 'csv'
 
 class BzController < ApplicationController
 
-  before_filter :require_user
+  # magic field dump uses an access token instead
+  before_filter :require_user, :except => [:magic_field_dump]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
 
@@ -551,33 +552,38 @@ class BzController < ApplicationController
         if !res.empty?
           participation_assignment = res.first
 
-          step = participation_assignment.points_possible.to_f / magic_field_count
-          if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
-            step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
-          elsif !answer.nil? && params[:value] != answer
-            step = 0 # wrong answer = no points
-          end
 
-          submission = participation_assignment.find_or_create_submission(@current_user)
-
-          submission.with_lock do
-            existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * step) : submission.grade.to_f
-            new_grade = existing_grade + step 
-            if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
-              Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
-              new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
-                                                                        # to account for floating point inaccuracies.
+          # only update score if we are not yet at the due date
+          # participation doesn't count if it is done late.
+          if participation_assignment.due_at >= DateTime.today
+            
+            step = participation_assignment.points_possible.to_f / magic_field_count
+            if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
+              step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
+            elsif !answer.nil? && params[:value] != answer
+              step = 0 # wrong answer = no points
             end
-            Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
-            participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
+
+            submission = participation_assignment.find_or_create_submission(@current_user)
+            submission.with_lock do
+              existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * step) : submission.grade.to_f
+              new_grade = existing_grade + step 
+              if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
+                Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
+                new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
+                                                                        # to account for floating point inaccuracies.
+              end
+              Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
+              participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
+            end
+          else
+            Rails.logger.warn("### set_user_retained_data - for user #{@current_user.name} the magic field #{params[:name]} was completed on #{DateTime.today} which is after the due date of #{participation_assignment.due_at}")
           end
         end
       elsif is_student
         Rails.logger.error("### set_user_retained_data - missing either course_id = #{course_id} or module_item_id = #{module_item_id}. Can't update the Course Participation grade without that! user = #{@current_user.inspect}")
       end
     end
-
-
     render :nothing => true
   end
 
