@@ -44,7 +44,9 @@ define [
       @view.remove()
       $(".ui-dialog").remove()
 
-  asyncTest 'loads given file', 3, ->
+  test 'loads given file', (assert) ->
+    assert.expect(3)
+    start = assert.async()
     # initial state
     ok @view.$el.find('.avatar-preview').length == 0, 'picker begins without preview image'
 
@@ -60,7 +62,9 @@ define [
       start()
     )
 
-  asyncTest 'getImage returns cropped image object', 1, ->
+  test 'getImage returns cropped image object', (assert) ->
+    assert.expect(1)
+    start = assert.async()
     $.when(@file).pipe(@view.loadPreview)
     @imageLoaded.then(=>
       @view.getImage().then((image) ->

@@ -69,8 +69,8 @@ define [
   test "saveUrl", ->
     equal @component.get('saveURL'), '/api/v1/custom_gradebook_columns/22/45'
 
-  asyncTest "focusOut", ->
-    expect(1)
+  test "focusOut", (assert) ->
+    assert.expect(1)
     stub = @stub @component, 'boundSaveSuccess'
 
     requestStub = null
@@ -86,7 +86,6 @@ define [
     run =>
       @component.set('value', 'such success')
       @component.send('focusOut')
-      start()
 
     ok stub.called
 

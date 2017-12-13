@@ -79,11 +79,12 @@ define [
     })
     @dispatchEvent('initLinks')
 
-  asyncTest 'builds new image view on RCE event', ->
-    expect(1)
+  test 'builds new image view on RCE event', (assert) ->
+    done = assert.async()
+    assert.expect(1)
     loadEventListeners({imagePickerCB: (view)=>
-      start()
       ok(view instanceof InsertUpdateImageView)
+      done()
     })
 
     event = document.createEvent('CustomEvent')
@@ -91,12 +92,13 @@ define [
     event.initCustomEvent("tinyRCE/initImagePicker", true, true, eventData)
     document.dispatchEvent(event)
 
-  asyncTest 'initializes equella plugin', ->
+  test 'initializes equella plugin', (assert) ->
+    done = assert.async()
     alertSpy = sinon.spy(window, "alert");
-    expect(1)
+    assert.expect(1)
     loadEventListeners({equellaCB:()->
-      start()
       ok alertSpy.calledWith("Equella is not properly configured for this account, please notify your system administrator.")
+      done()
     })
 
     event = document.createEvent('CustomEvent')
@@ -113,12 +115,13 @@ define [
     document.dispatchEvent(event)
     ok commandSpy.calledWith("instructureExternalButton__BUTTON_ID__")
 
-  asyncTest 'initializes recording plugin', ->
+  test 'initializes recording plugin', (assert) ->
+    done = assert.async()
     logSpy = sinon.spy(console, "log")
-    expect(1)
+    assert.expect(1)
     loadEventListeners({recordCB:()->
-      start()
       ok logSpy.calledWith("Kaltura has not been enabled for this account")
+      done()
     })
 
     event = document.createEvent('CustomEvent')
