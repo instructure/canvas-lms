@@ -134,7 +134,7 @@ class Account < ActiveRecord::Base
   validate :no_active_sub_accounts, if: lambda { |a| a.workflow_state_changed? && !a.active? }
 
   include StickySisFields
-  are_sis_sticky :name
+  are_sis_sticky :name, :parent_account_id
 
   include FeatureFlags
   def feature_flag_cache

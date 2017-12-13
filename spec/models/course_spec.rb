@@ -937,8 +937,9 @@ describe Course do
       sub = @course.root_account.sub_accounts.create
       @course.sis_source_id = 'sis_id'
       @course.course_code = "cid"
-      @course.save!
       @course.stuck_sis_fields = [].to_set
+      @course.save!
+      @course.reload
       @course.name = "course_name"
       expect(@course.stuck_sis_fields).to eq [:name].to_set
       profile = @course.profile

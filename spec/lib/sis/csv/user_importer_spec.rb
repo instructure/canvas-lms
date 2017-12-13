@@ -896,28 +896,6 @@ describe SIS::CSV::UserImporter do
     expect(p.sis_user_id).to eq "user_2"
   end
 
-  it "should use an existing pseudonym if it wasn't imported from sis and has the same email address" do
-    u = User.create!
-    u.register!
-    p_count = Pseudonym.count
-    p = u.pseudonyms.create!(:unique_id => "user2@example.com", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
-    expect(Pseudonym.by_unique_id('user1').first).to be_nil
-    expect(Pseudonym.by_unique_id('user2').first).to be_nil
-    expect(Pseudonym.by_unique_id('user2@example.com').first).not_to be_nil
-    expect(p.sis_user_id).to be_nil
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user1@example.com,active",
-      "user_2,user2,User,Dos,user2@example.com,active"
-    )
-    p.reload
-    expect(Pseudonym.by_unique_id('user1').first).not_to be_nil
-    expect(Pseudonym.by_unique_id('user2').first).not_to be_nil
-    expect(Pseudonym.by_unique_id('user2@example.com').first).to be_nil
-    expect(Pseudonym.count).to eq(p_count + 2)
-    expect(p.sis_user_id).to eq "user_2"
-  end
-
   it "should strip white space on fields" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,short_name,sortable_name,email,status",

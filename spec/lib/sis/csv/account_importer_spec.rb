@@ -140,6 +140,32 @@ describe SIS::CSV::AccountImporter do
     expect(Account.where(sis_source_id: 'A001').first.name).to eq "Science"
   end
 
+  it 'should treat parent_account_id as stickyish' do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Math,active",
+      "A002,,Humanities,active",
+      "S001,A001,Submath,active",
+      {:add_sis_stickiness => true}
+    )
+    sub = Account.where(sis_source_id: 'S001').first
+    expect(sub.reload.parent_account.sis_source_id).to eq "A001"
+    expect(sub.stuck_sis_fields).to include(:parent_account_id)
+
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "S001,A002,Submath,active"
+    )
+    expect(sub.reload.parent_account.sis_source_id).to eq "A001" # should not update
+
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "S001,A002,Submath,active",
+      {:add_sis_stickiness => true}
+    )
+    expect(sub.reload.parent_account.sis_source_id).to eq "A002" # should override
+  end
+
   it 'should match headers case-insensitively' do
     before_count = Account.count
     process_csv_data_cleanly(
