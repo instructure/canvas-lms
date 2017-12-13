@@ -80,7 +80,7 @@ export default class DatetimeField {
         timePicker: this.allowTime,
         beforeShow: () => this.$field.trigger('detachTooltip'),
         onClose: () => this.$field.trigger('reattachTooltip'),
-        firstDay: moment.localeData(ENV.LOCALE).firstDayOfWeek(),
+        firstDay: moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek(),
       }, options.datepicker)
       this.$field.datepicker(datepickerOptions)
 
