@@ -84,6 +84,14 @@ module PlannerPageObject
     validate_url(url_type, object)
   end
 
+  def view_todo_item
+    @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now,
+                                                     title: "Student to do", course_id: @course.id)
+    go_to_list_view
+    fln(@student_to_do.title).click
+    @modal = todo_sidebar_modal(@student_to_do.title)
+  end
+
   def open_opportunities_dropdown
     fj("button:contains('opportunit')").click
   end

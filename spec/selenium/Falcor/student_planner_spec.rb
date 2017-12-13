@@ -284,22 +284,32 @@ describe "student planner" do
       expect(fj("h2:contains('No Due Dates Assigned')")).to be_displayed
     end
 
-    it "allows editing the date of a to-do item", priority: "1", test_id: 3402913 do
-      skip('fragile')
-      @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now, title: "Student to do")
-      go_to_list_view
-      fln(@student_to_do.title).click
-      modal = todo_sidebar_modal(@student_to_do.title)
-      element = ff('input', modal)[1]
+    it "allows date of a to-do item to be edited", priority: "1", test_id: 3402913 do
+      view_todo_item
+      element = ff('input', @modal)[1]
       element.click
       date = format_date_for_view(Time.zone.now, :long).split(" ")
-      day = date[0] + ' 15, ' + date[2]
-      fj("button:contains('15')").click
+      day = if date[1] == '15'
+              date[1] = '20'
+              date[0] + ' 20, ' + date[2]
+            else
+              date[1] = '15'
+              date[0] + ' 15, ' + date[2]
+            end
+      fj("button:contains('#{date[1]}')").click
       todo_save_button.click
-      expect(f('body')).to contain_jqcss("h2:contains(#{day})")
+      expect(f('body')).to contain_jqcss("h2:contains(#{day.split(',')[0]})")
       @student_to_do.reload
-      expect(format_date_for_view(@student_to_do.todo_date, :long)).
-        to eq(day)
+      expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
+    end
+
+    it "allows editing the course of a to-do item", priority: "1", test_id: 3418827 do
+      view_todo_item
+      element = fj("select:contains('Unnamed Course')")
+      fj("option:contains('Optional: Add Course')", element).click
+      todo_save_button.click
+      @student_to_do.reload
+      expect(@student_to_do.course_id).to be nil
     end
 
     it "has courses in the course combo box", priority: "1", test_id: 3263160 do
