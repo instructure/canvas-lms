@@ -88,17 +88,18 @@ QUnit.module('MessageStudents', hooks => {
   })
 
   QUnit.module('sendMessage()', hooks => {
-    let data
-    const successPromise = Promise.resolve()
-    const errorResponse = {
-      data: {
-        attribute: 'subject',
-        message: 'blank'
-      }
-    }
-    const errorPromise = Promise.reject(errorResponse)
+    let data, successPromise, errorPromise
 
     hooks.beforeEach(() => {
+      successPromise = Promise.resolve()
+      const errorResponse = {
+        data: {
+          attribute: 'subject',
+          message: 'blank'
+        }
+      }
+      errorPromise = Promise.reject(errorResponse)
+
       subject = renderComponent({
         title: 'Send a message',
         contextCode: 'course_1',
