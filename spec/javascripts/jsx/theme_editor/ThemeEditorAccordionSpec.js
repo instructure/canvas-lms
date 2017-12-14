@@ -46,7 +46,7 @@ define([
     sinon.spy(jQuery.fn, 'accordion')
     const component = ReactDOM.render(<ThemeEditorAccordion {...props} />, elem)
     ok(
-      jQuery(jQuery.fn.accordion.calledOn(component.getDOMNode())),
+      jQuery(jQuery.fn.accordion.calledOn(component.node)),
       'called jquery accordion plugin on dom node'
     )
     ok(
@@ -214,7 +214,7 @@ define([
       variables: []
     }]
     const component = ReactDOM.render(<ThemeEditorAccordion {...props} />, elem)
-    const node = component.getDOMNode()
+    const { node } = component
     const headings = node.querySelectorAll('.Theme__editor-accordion > h3')
     props.variableSchema.forEach((group, index) => {
       equal(
