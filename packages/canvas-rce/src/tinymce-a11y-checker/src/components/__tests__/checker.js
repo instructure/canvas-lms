@@ -257,7 +257,7 @@ describe("fixIssue", () => {
     component.update()
     error = instance.state.errors[0]
     ev = { preventDefault: jest.fn() }
-    jest.spyOn(instance, "_check")
+    jest.spyOn(instance, "check")
   })
 
   test("updates the real node", () => {
@@ -268,7 +268,7 @@ describe("fixIssue", () => {
 
   test("checks everything after applying a fix", () => {
     instance.fixIssue(ev)
-    expect(instance._check).toHaveBeenCalled()
+    expect(instance.check).toHaveBeenCalled()
   })
 })
 
