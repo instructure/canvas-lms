@@ -89,16 +89,21 @@ class LatePolicyApplicator
     end
   end
 
+  def submissions(assignment)
+    enrollments = assignment.course.admin_visible_student_enrollments
+    assignment.submissions.for_enrollments(enrollments)
+  end
+
   def late_submissions_for(assignment)
-    assignment.submissions.late.where.not(score: nil)
+    submissions(assignment).late.where.not(score: nil)
   end
 
   def no_longer_late_submissions_for(assignment)
-    assignment.submissions.not_late.where("submissions.points_deducted > 0")
+    submissions(assignment).not_late.where("submissions.points_deducted > 0")
   end
 
   def missing_submissions_for(assignment)
-    assignment.submissions.missing.where(score: nil, grade: nil)
+    submissions(assignment).missing.where(score: nil, grade: nil)
   end
 
   def needs_processing?
