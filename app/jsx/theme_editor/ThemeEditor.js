@@ -26,25 +26,10 @@ import Progress from 'compiled/models/Progress'
 import customTypes from './PropTypes'
 import submitHtmlForm from './submitHtmlForm'
 import SaveThemeButton from './SaveThemeButton'
-import ThemeEditorAccordion from './ThemeEditorAccordion'
-import ThemeEditorFileUpload from './ThemeEditorFileUpload'
 import ThemeEditorModal from './ThemeEditorModal'
+import ThemeEditorSidebar from './ThemeEditorSidebar'
 
 /* eslint no-alert:0 */
-const TABS = [
-  {
-    id: 'te-editor',
-    label: I18n.t('Edit'),
-    value: 'edit',
-    selected: true
-  },
-  {
-    id: 'te-upload',
-    label: I18n.t('Upload'),
-    value: 'upload',
-    selected: false
-  }
-]
 
 function findVarDef(variableSchema, variableName) {
   for (let i = 0; i < variableSchema.length; i++) {
@@ -195,7 +180,7 @@ export default class ThemeEditor extends React.Component {
     $.ajax({
       url: `/accounts/${this.props.accountID}/brand_configs`,
       type: 'POST',
-      data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
+      data: new FormData(this.themeEditorForm),
       processData: false,
       contentType: false,
       dataType: 'json'
@@ -231,7 +216,7 @@ export default class ThemeEditor extends React.Component {
     $.ajax({
       url: `/accounts/${this.props.accountID}/brand_configs/save_to_account`,
       type: 'POST',
-      data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
+      data: new FormData(this.themeEditorForm),
       processData: false,
       contentType: false,
       dataType: 'json'
@@ -264,35 +249,6 @@ export default class ThemeEditor extends React.Component {
   closeSubAccountProgressModal = () => {
     this.setState({showSubAccountProgress: false})
   }
-
-  renderTabInputs = () =>
-    this.props.allowGlobalIncludes
-      ? TABS.map(tab => (
-          <input
-            type="radio"
-            id={tab.id}
-            key={tab.id}
-            name="te-action"
-            defaultValue={tab.value}
-            className="Theme__editor-tabs_input"
-            defaultChecked={tab.selected}
-          />
-        ))
-      : null
-
-  renderTabLabels = () =>
-    this.props.allowGlobalIncludes
-      ? TABS.map(tab => (
-          <label
-            htmlFor={tab.id}
-            key={`${tab.id}-tab`}
-            className="Theme__editor-tabs_item"
-            id={`${tab.id}-tab`}
-          >
-            {tab.label}
-          </label>
-        ))
-      : null
 
   renderHeader(tooltipForWhyApplyIsDisabled) {
     return (
@@ -382,7 +338,7 @@ export default class ThemeEditor extends React.Component {
           </div>
         )}
         <form
-          ref="ThemeEditorForm"
+          ref={component => (this.themeEditorForm = component)}
           onSubmit={preventDefault(this.handleFormSubmit)}
           encType="multipart/form-data"
           acceptCharset="UTF-8"
@@ -398,107 +354,15 @@ export default class ThemeEditor extends React.Component {
               'Theme__layout--is-active-theme'}`}
           >
             <div className="Theme__editor">
-              <div className="Theme__editor-tabs">
-                {this.renderTabInputs()}
-
-                <div className="Theme__editor-tab-label-layout">{this.renderTabLabels()}</div>
-
-                <div id="te-editor-panel" className="Theme__editor-tabs_panel">
-                  <ThemeEditorAccordion
-                    variableSchema={this.props.variableSchema}
-                    brandConfigVariables={this.props.brandConfig.variables}
-                    getDisplayValue={this.getDisplayValue}
-                    changedValues={this.state.changedValues}
-                    changeSomething={this.changeSomething}
-                  />
-                </div>
-
-                {this.props.allowGlobalIncludes ? (
-                  <div id="te-upload-panel" className="Theme__editor-tabs_panel">
-                    <div className="Theme__editor-upload-overrides">
-                      <div className="Theme__editor-upload-warning">
-                        <div className="Theme__editor-upload-warning_icon">
-                          <i className="icon-warning" />
-                        </div>
-                        <div>
-                          <p className="Theme__editor-upload-warning_text-emphasis">
-                            {I18n.t(
-                              'Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!'
-                            )}
-                          </p>
-                          <p
-                            dangerouslySetInnerHTML={{
-                              __html: I18n.t(
-                                'Before implementing custom CSS or Javascript, please refer to *our documentation*.',
-                                {
-                                  wrappers: [
-                                    '<a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank">$1</a>'
-                                  ]
-                                }
-                              )
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="Theme__editor-upload-overrides_header">
-                        {I18n.t(
-                          'File(s) will be included on all pages in the Canvas desktop application.'
-                        )}
-                      </div>
-
-                      <div className="Theme__editor-upload-overrides_form">
-                        <ThemeEditorFileUpload
-                          label={I18n.t('CSS file')}
-                          accept=".css"
-                          name="css_overrides"
-                          currentValue={this.props.brandConfig.css_overrides}
-                          userInput={this.state.changedValues.css_overrides}
-                          onChange={this.changeSomething.bind(null, 'css_overrides')}
-                        />
-
-                        <ThemeEditorFileUpload
-                          label={I18n.t('JavaScript file')}
-                          accept=".js"
-                          name="js_overrides"
-                          currentValue={this.props.brandConfig.js_overrides}
-                          userInput={this.state.changedValues.js_overrides}
-                          onChange={this.changeSomething.bind(null, 'js_overrides')}
-                        />
-                      </div>
-                    </div>
-                    <div className="Theme__editor-upload-overrides">
-                      <div className="Theme__editor-upload-overrides_header">
-                        {I18n.t(
-                          'File(s) will be included when user content is displayed within the Canvas iOS or Android apps, and in third-party apps built on our API.'
-                        )}
-                      </div>
-
-                      <div className="Theme__editor-upload-overrides_form">
-                        <ThemeEditorFileUpload
-                          label={I18n.t('Mobile app CSS file')}
-                          accept=".css"
-                          name="mobile_css_overrides"
-                          currentValue={this.props.brandConfig.mobile_css_overrides}
-                          userInput={this.state.changedValues.mobile_css_overrides}
-                          onChange={this.changeSomething.bind(null, 'mobile_css_overrides')}
-                        />
-
-                        <ThemeEditorFileUpload
-                          label={I18n.t('Mobile app JavaScript file')}
-                          accept=".js"
-                          name="mobile_js_overrides"
-                          currentValue={this.props.brandConfig.mobile_js_overrides}
-                          userInput={this.state.changedValues.mobile_js_overrides}
-                          onChange={this.changeSomething.bind(null, 'mobile_js_overrides')}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+              <ThemeEditorSidebar
+                allowGlobalIncludes={this.props.allowGlobalIncludes}
+                brandConfig={this.props.brandConfig}
+                variableSchema={this.props.variableSchema}
+                getDisplayValue={this.getDisplayValue}
+                changeSomething={this.changeSomething}
+                changedValues={this.state.changedValues}
+              />
             </div>
-
             <div className="Theme__preview">
               {this.somethingHasChanged() ? (
                 <div className="Theme__preview-overlay">
