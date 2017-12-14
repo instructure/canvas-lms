@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from './vendor/i18n_js_extension'
 import $ from 'jquery'
-import _ from 'underscore'
-import htmlEscape from './str/htmlEscape'
 import i18nLolcalize from 'compiled/str/i18nLolcalize'
+import I18n from './vendor/i18n_js_extension'
+import htmlEscape from './str/htmlEscape'
 import './vendor/date'
 
 /*
