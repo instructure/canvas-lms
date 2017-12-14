@@ -9132,9 +9132,9 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
-tinymce-a11y-checker@1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.2.2.tgz#66c6e67d8a095d5168a13ea9866f9fe6317382a6"
+tinymce-a11y-checker@1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.2.3.tgz#540bf165666fc6191dcffa36117e2536e45968a1"
   dependencies:
     format-message "^5.2.0"
     format-message-generate-id "^5.2.1"
