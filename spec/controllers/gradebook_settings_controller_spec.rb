@@ -161,6 +161,26 @@ RSpec.describe GradebookSettingsController, type: :controller do
           }]
         )
       end
+
+      it "does not store invalid status colors" do
+        malevolent_color = "; background: url(https://httpbin.org/basic-auth/user/passwd)"
+        invalid_params = {
+          "course_id" => @course.id,
+          "gradebook_settings" => {
+            "colors" => {
+              "dropped" => "#FEF0E5",
+              "excused" => "#FEF7E5",
+              "late" => "#cccccc",
+              "missing" => malevolent_color,
+              "resubmitted" => "#E5F7E5"
+            }
+          }
+        }
+        put :update, params: invalid_params
+
+        expect(response).to be_ok
+        expect(json_response["gradebook_settings"]["colors"]).not_to have_key("missing")
+      end
     end
   end
 end
