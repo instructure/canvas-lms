@@ -70,7 +70,7 @@ describe "announcements index v2" do
       AnnouncementIndex.visit(@course)
     end
 
-    it "announcements can be filered" do
+    it "announcements can be filtered" do
       skip('Add in with 	COMMS-560')
       AnnouncementIndex.select_filter("Delayed")
       expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
@@ -84,7 +84,7 @@ describe "announcements index v2" do
       expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
     end
 
-    it "an announcment can be locked for commenting" do
+    it "an announcement can be locked for commenting" do
       skip('Add in with COMMS-561')
       AnnouncementIndex.check_announcment(announcement1_title)
       AnnouncementIndex.toggle_lock
@@ -103,7 +103,7 @@ describe "announcements index v2" do
       expect(Announcement.where(title: announcement2_title).first.locked).to be true
     end
 
-    it 'an announcment can be deleted' do
+    it 'an announcement can be deleted' do
       skip('Add in with COMMS-561')
       AnnouncementIndex.check_announcment(announcement1_title)
       AnnouncementIndex.click_delete
@@ -138,6 +138,20 @@ describe "announcements index v2" do
       skip('Add in with 	COMMS-555')
       # create 2 replies for @announcement1
       expect(AnnouncementIndex.announcement_unread_number(announcement1_title)).to eq 2
+    end
+
+    it 'RSS feed info displayed' do
+      skip('Add with COMMS-590')
+      AnnouncementIndex.open_external_feeds
+      ExternalFeed.click_rss_feed_link
+      expect(driver.current_url).to include('.atom')
+    end
+
+    it 'an external feed can be added' do
+      skip('Add with COMMS-589')
+      AnnouncementIndex.open_external_feeds
+      ExternalFeed.add_external_feed('/someurl', 'Truncated')
+      expect(ExternalFeed.feed_name).to be_displayed
     end
   end
 end
