@@ -19,7 +19,7 @@
 require_relative '../sharding_spec_helper'
 
 describe GradeCalculator do
-  before :once do
+  before :each do
     course_with_student active_all: true
   end
 
@@ -113,6 +113,49 @@ describe GradeCalculator do
       expect {
         GradeCalculator.recompute_final_score(@user.id, @course.id)
       }.to change{stale_score.reload.workflow_state}.from('active').to('deleted')
+    end
+
+    it "gracefully handles missing submissions" do
+      # Create at least one alternate section for this course
+      section = @course.course_sections.create!(name: 'Section #2')
+
+      # Enroll multiple students in a course
+      students = [@student]
+      students << course_with_student(active_all: true, course: @course).user
+      students << course_with_student(active_all: true, course: @course).user
+
+      # Enroll the last student into both sections
+      course_with_student(active_all: true, course: @course, user: students[-1], section: section, allow_multiple_enrollments: true)
+
+      # Create an assignment...
+      assignments = []
+      assignments << @course.assignments.create!(title: 'Assignment #1', points_possible: 10)
+
+      # ...and grade it for the three students
+      students.each { |student| assignments[0].grade_student(student, grade: '5', grader: @teacher) }
+
+      # Conclude all enrollments for the last student so no submissions are created for them...
+      @course.enrollments.where(user_id: students.last).map(&:conclude)
+
+      # ...and create an assignment now so there's no corresponding submission for the concluded user
+      assignments << @course.assignments.create!(title: 'Assignment #2', points_possible: 10)
+      assignments << @course.assignments.create!(title: 'Assignment #3', points_possible: 10)
+
+      # ...and grade it for the first two students
+      assignments[1..2].each do |assignment|
+        students[0..1].each { |student| assignment.grade_student(student, grade: '6', grader: @teacher) }
+      end
+
+      # Update the assignment group to drop the lowest score
+      assignments.first.assignment_group.rules_hash = { drop_lowest: 1 }
+      assignments.first.assignment_group.save!
+
+      calculator = GradeCalculator.new(students.map(&:id), @course)
+      computed_scores = calculator.compute_scores
+
+      # Verify the grades for the third student are what we expect
+      expect(computed_scores[2][:current][:grade]).to eq(50.0)
+      expect(computed_scores[2][:final][:grade]).to eq(50.0)
     end
 
     context "sharding" do
@@ -373,7 +416,7 @@ describe GradeCalculator do
       end
 
       context "muted assignments" do
-        before do
+        before :each do
           @assignment2.mute!
         end
 
@@ -773,7 +816,7 @@ describe GradeCalculator do
   end
 
   describe '#compute_and_save_scores' do
-    before(:once) do
+    before :each do
       @first_period, @second_period = grading_periods(count: 2)
       @first_assignment = @course.assignments.create!(
         due_at: 1.day.from_now(@first_period.start_date),
@@ -882,7 +925,7 @@ describe GradeCalculator do
     end
 
     context 'weighted grading periods' do
-      before(:once) do
+      before :each do
         group = @first_period.grading_period_group
         group.update!(weighted: true)
         @ungraded_assignment = @course.assignments.create!(
@@ -1201,7 +1244,7 @@ describe GradeCalculator do
 
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
-    before do
+    before :each do
       @group = @group1 = @course.assignment_groups.create!(:name => 'group 1')
     end
 
@@ -1352,8 +1395,9 @@ describe GradeCalculator do
     end
 
     context "assignment groups with 0 points possible" do
-      before do
-        @group1.update_attribute :group_weight, 50
+      before :each do
+        @group1.group_weight = 50
+        @group1.save!
         @group2 = @course.assignment_groups.create! :name => 'group 2',
                                                     :group_weight => 25
         @group3 = @course.assignment_groups.create! :name => 'empty group',
@@ -1383,13 +1427,13 @@ describe GradeCalculator do
     end
 
     context "grading periods" do
-      before :once do
+      before :each do
         student_in_course active_all: true
         @gp1, @gp2 = grading_periods count: 2
-        @a1, @a2 = [@gp1, @gp2].map { |gp|
+        @a1, @a2 = [@gp1, @gp2].map do |gp|
           @course.assignments.create! due_at: 1.minute.from_now(gp.start_date),
             points_possible: 100
-        }
+        end
         @a1.grade_student(@student, grade: 25, grader: @teacher)
         @a2.grade_student(@student, grade: 75, grader: @teacher)
       end
@@ -1438,7 +1482,7 @@ describe GradeCalculator do
       end
 
       context "DA" do
-        before do
+        before :each do
           set_up_course_for_differentiated_assignments
         end
         it "should calculate scores based on visible assignments only" do
@@ -1519,7 +1563,7 @@ describe GradeCalculator do
     end
 
     context "excused assignments" do
-      before :once  do
+      before :each do
         student_in_course(active_all: true)
         @a1 = @course.assignments.create! points_possible: 10
         @a2 = @course.assignments.create! points_possible: 90
