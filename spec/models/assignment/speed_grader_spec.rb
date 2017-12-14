@@ -701,6 +701,28 @@ describe Assignment::SpeedGrader do
       expect(has_report).to be_truthy
     end
 
+    it "includes 'has_originality_report' in the json for group assignments" do
+      user_two = test_student.dup
+      user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+      assignment.course.enroll_student(user_two)
+
+      group = group_model(context: assignment.course)
+      group.update_attributes!(users: [user_two, test_student])
+
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+
+      assignment.submissions.each do |s|
+        s.update_attributes!(group: group, turnitin_data: {blah: 1})
+      end
+
+      OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
+
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+
+      has_report = json['submissions'].map{ |s| s['submission_history'].first['submission']['has_originality_report'] }.uniq
+      expect(has_report).to match_array [true]
+    end
+
     it "includes 'has_originality_report' in the json" do
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
       submission.update_attribute(:turnitin_data, {blah: 1})

@@ -670,9 +670,20 @@ class Submission < ActiveRecord::Base
       originality_reports.where(attachment_id: nil).first&.report_launch_path
     elsif self.grants_right?(user, :view_turnitin_report)
       requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
-      report = self.originality_reports.find_by(attachment: requested_attachment)
+      report = assignment_group_originality_reports.find_by(attachment: requested_attachment)
       report&.report_launch_path
     end
+  end
+
+  def has_originality_report?
+    versioned_originality_reports.present? ||
+    text_entry_originality_reports.present? ||
+    assignment_group_originality_reports.present?
+  end
+
+  def assignment_group_originality_reports
+    submission_ids = assignment.submissions.where(group_id: group_id).active.pluck(:id)
+    OriginalityReport.where(submission_id: submission_ids)
   end
 
   def all_versioned_attachments

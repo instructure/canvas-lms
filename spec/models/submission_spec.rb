@@ -1928,6 +1928,134 @@ describe Submission do
       end
     end
 
+    describe '#has_originality_report?' do
+      let(:test_course) do
+        test_course = course_model
+        test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+        test_course.enroll_student(test_student, enrollment_state: 'active')
+        test_course
+      end
+      let(:test_teacher) { User.create }
+      let(:test_student) { User.create }
+      let(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+      let(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+      let(:report_url) { 'http://www.test-score.com' }
+
+      it 'returns true for standard reports' do
+        submission = assignment.submit_homework(test_student, attachments: [attachment])
+        OriginalityReport.create!(
+          attachment: attachment,
+          submission: submission,
+          originality_score: 0.5,
+          originality_report_url: report_url
+        )
+        expect(submission.has_originality_report?). to eq true
+      end
+
+      it 'returns true for text entry reports' do
+        submission = assignment.submit_homework(test_student)
+        OriginalityReport.create!(
+          submission: submission,
+          originality_score: 0.5,
+          originality_report_url: report_url
+        )
+        expect(submission.has_originality_report?). to eq true
+      end
+
+      it 'returns true for group reports' do
+        user_two = test_student.dup
+        user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+        assignment.course.enroll_student(user_two)
+
+        group = group_model(context: assignment.course)
+        group.update_attributes!(users: [user_two, test_student])
+
+        submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+
+        assignment.submissions.each do |s|
+          s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        end
+
+        OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
+
+        expect(assignment.submissions.map(&:has_originality_report?).uniq).to match_array [true]
+      end
+
+      it 'returns false when no reports are present' do
+        submission = assignment.submit_homework(test_student, attachments: [attachment])
+        expect(submission.has_originality_report?). to eq false
+      end
+    end
+
+    describe '#assignment_group_originality_reports' do
+      let(:test_course) do
+        test_course = course_model
+        test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+        test_course.enroll_student(test_student, enrollment_state: 'active')
+        test_course
+      end
+      let(:test_teacher) { User.create }
+      let(:test_student) { User.create }
+      let(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+      let(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+      let(:report_url) { 'http://www.test-score.com' }
+
+      before do
+        user_two = test_student.dup
+        user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+        assignment.course.enroll_student(user_two)
+
+        group = group_model(context: assignment.course)
+        group.update_attributes!(users: [user_two, test_student])
+
+        @submission = assignment.submit_homework(
+          test_student,
+          submission_type: 'online_upload',
+          attachments: [attachment]
+        )
+
+        assignment.submissions.each do |s|
+          s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        end
+      end
+
+      it 'returns originality reports from the same submission group' do
+        report = OriginalityReport.create!(originality_score: '1', submission: @submission, attachment: attachment)
+        expect(Submission.last.assignment_group_originality_reports).to match_array [report]
+      end
+
+      it 'does not return reports from another group' do
+        user_three = test_student.dup
+        user_four = test_student.dup
+
+        user_three.update_attributes!(lti_context_id: SecureRandom.uuid)
+        user_four.update_attributes!(lti_context_id: SecureRandom.uuid)
+
+        assignment.course.enroll_student(user_three)
+        assignment.course.enroll_student(user_four)
+
+        group = group_model(context: assignment.course)
+        group.update_attributes!(users: [user_three, user_four])
+
+        second_submission = assignment.submit_homework(
+          user_four,
+          submission_type: 'online_upload',
+          attachments: [attachment]
+        )
+
+        assignment.submissions.each do |s|
+          s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        end
+
+        expect(second_submission.reload.assignment_group_originality_reports).to match_array []
+      end
+
+      it 'includes self originality reports' do
+        report = OriginalityReport.create!(originality_score: '1', submission: @submission, attachment: attachment)
+        expect(@submission.reload.assignment_group_originality_reports).to match_array [report]
+      end
+    end
+
     describe '#originality_report_url' do
       let_once(:test_course) do
         test_course = course_model
