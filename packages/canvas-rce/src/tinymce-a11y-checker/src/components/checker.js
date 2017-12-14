@@ -240,7 +240,7 @@ export default class Checker extends React.Component {
       rule.update(node, this.state.formState)
       this.updateErrorNode(node)
       const errorIndex = this.state.errorIndex
-      this._check(() => this.setErrorIndex(errorIndex))
+      this.check(() => this.setErrorIndex(errorIndex))
     }
   }
 
