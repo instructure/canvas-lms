@@ -103,6 +103,7 @@ class Submission < ActiveRecord::Base
   validate :ensure_grader_can_grade
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
+  scope :for_enrollments, -> (enrollments) { where(user_id: enrollments.select(:user_id)) }
   scope :with_comments, -> { preload(:submission_comments) }
   scope :unread_for, -> (user_id) do
     joins(:content_participations).

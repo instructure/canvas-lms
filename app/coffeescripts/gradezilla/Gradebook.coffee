@@ -2537,6 +2537,8 @@ define [
 
       forEachSubmission(@students, (submission) =>
         assignment = @assignments[submission.assignment_id]
+        student = @student(submission.user_id)
+        return if student?.isConcluded
         return if @getGradingPeriod(submission.grading_period_id)?.isClosed
         if LatePolicyApplicator.processSubmission(submission, assignment, gradingStandard, latePolicy)
           studentsToInvalidate[submission.user_id] = true
