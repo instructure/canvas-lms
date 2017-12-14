@@ -24,12 +24,14 @@ import { bindActionCreators } from 'redux'
 
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import Container from '@instructure/ui-core/lib/components/Container'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Text from '@instructure/ui-core/lib/components/Text'
-import Pagination from '@instructure/ui-core/lib/components/Pagination'
-import PaginationButton from '@instructure/ui-core/lib/components/Pagination/PaginationButton'
+import Pagination, { PaginationButton } from '@instructure/ui-core/lib/components/Pagination'
 
 import AnnouncementRow from '../../shared/components/AnnouncementRow'
+import { ConnectedIndexHeader } from './IndexHeader'
+
 import select from '../../shared/select'
 import { selectPaginationState } from '../../shared/reduxPagination'
 import { announcementList } from '../../shared/proptypes/announcement'
@@ -120,9 +122,15 @@ export default class AnnouncementsIndex extends Component {
   render () {
     return (
       <div className="announcements-v2__wrapper">
-        <Heading>{I18n.t('Announcements')}</Heading>
+        <ScreenReaderContent>
+          <Heading level="h1">{I18n.t('Announcements')}</Heading>
+        </ScreenReaderContent>
+        {this.props.permissions.manage_content && <ConnectedIndexHeader />}
         {this.renderSpinner(this.props.isLoadingAnnouncements, I18n.t('Loading Announcements'))}
         <Container margin="medium">
+          <ScreenReaderContent>
+            <Heading level="h2">{I18n.t('Announcements List')}</Heading>
+          </ScreenReaderContent>
           {this.renderAnnouncements()}
         </Container>
         {this.renderPagination()}

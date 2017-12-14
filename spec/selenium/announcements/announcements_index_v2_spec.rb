@@ -51,18 +51,24 @@ describe "announcements index v2" do
     before :once do
       @teacher = user_with_pseudonym(active_user: true)
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
+      course_with_student(course: @course, active_enrollment: true)
       AnnouncementIndex.set_section_specific_announcements_flag(@course,'on')
 
       # Announcement attributes: title, message, delayed_post_at, allow_rating, user
       @announcement1 = @course.announcements.create!(
         title: announcement1_title,
         message: 'In the cafe!',
-        delayed_post_at: 1.day.from_now
+        user: @teacher
       )
       @announcement2 = @course.announcements.create!(
         title: announcement2_title,
-        message: 'In the cafe!'
+        message: 'In the cafe!',
+        delayed_post_at: 1.day.from_now,
+        user: @teacher
       )
+
+      @announcement1.discussion_entries.create!(user: @student, message: "I'm coming!")
+      @announcement1.discussion_entries.create!(user: @student, message: "It's already gone! :(")
     end
 
     before :each do
@@ -71,7 +77,7 @@ describe "announcements index v2" do
     end
 
     it "announcements can be filtered" do
-      skip('Add in with 	COMMS-560')
+      skip('Add in with COMMS-560')
       AnnouncementIndex.select_filter("Delayed")
       expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
       expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
@@ -86,58 +92,54 @@ describe "announcements index v2" do
 
     it "an announcement can be locked for commenting" do
       skip('Add in with COMMS-561')
-      AnnouncementIndex.check_announcment(announcement1_title)
+      AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.toggle_lock
-      expect(AnnouncementIndex.announcment_locked_icon(announcement1_title)).to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).to be_displayed
       expect(Announcement.where(title: announcement1_title).first.locked).to be true
     end
 
     it 'multiple announcements can be locked for commenting' do
       skip('Add in with COMMS-561')
-      AnnouncementIndex.check_announcment(announcement1_title)
-      AnnouncementIndex.check_announcment(announcement2_title)
+      AnnouncementIndex.check_announcement(announcement1_title)
+      AnnouncementIndex.check_announcement(announcement2_title)
       AnnouncementIndex.toggle_lock
-      expect(AnnouncementIndex.announcment_locked_icon(announcement1_title)).to be_displayed
-      expect(AnnouncementIndex.announcment_locked_icon(announcement2_title)).to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement2_title)).to be_displayed
       expect(Announcement.where(title: announcement1_title).first.locked).to be true
       expect(Announcement.where(title: announcement2_title).first.locked).to be true
     end
 
     it 'an announcement can be deleted' do
       skip('Add in with COMMS-561')
-      AnnouncementIndex.check_announcment(announcement1_title)
+      AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.click_delete
-      expect(AnnouncementIndex.announcment_locked_icon(announcement1_title)).not_to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).not_to be_displayed
       expect(Announcement.where(title: announcement1_title).first.workflow_state).to be 'deleted'
     end
 
     it 'multiple announcements can be deleted' do
       skip('Add in with COMMS-561')
-      AnnouncementIndex.check_announcment(announcement1_title)
-      AnnouncementIndex.check_announcment(announcement2_title)
+      AnnouncementIndex.check_announcement(announcement1_title)
+      AnnouncementIndex.check_announcement(announcement2_title)
       AnnouncementIndex.click_delete
-      expect(AnnouncementIndex.announcment_locked_icon(announcement1_title)).not_to be_displayed
-      expect(AnnouncementIndex.announcment_locked_icon(announcement2_title)).not_to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).not_to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement2_title)).not_to be_displayed
       expect(Announcement.where(title: announcement1_title).first.workflow_state).to be 'deleted'
       expect(Announcement.where(title: announcement2_title).first.workflow_state).to be 'deleted'
     end
 
     it 'clicking the Add Announcement button redirects to new announcement page' do
-      skip('Add in with COMMS-562')
-      AnnouncementIndex.click_add_announcement
+      expect_new_page_load { AnnouncementIndex.click_add_announcement }
       expect(driver.current_url).to include(AnnouncementIndex.new_announcement_url)
     end
 
     it 'clicking the announcement goes to the discussion page for that announcement' do
-      skip('Add in with COMMS-555')
-      AnnouncementIndex.click_on_announcement(announcement1_title)
+      expect_new_page_load { AnnouncementIndex.click_on_announcement(announcement1_title) }
       expect(driver.current_url).to include(AnnouncementIndex.individual_announcement_url(@announcement1))
     end
 
     it 'pill on announcement displays correct number of unread replies' do
-      skip('Add in with 	COMMS-555')
-      # create 2 replies for @announcement1
-      expect(AnnouncementIndex.announcement_unread_number(announcement1_title)).to eq 2
+      expect(AnnouncementIndex.announcement_unread_number(announcement1_title)).to eq "2"
     end
 
     it 'RSS feed info displayed' do

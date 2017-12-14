@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createAnnIndex from 'jsx/announcements'
+import createAnnouncementsIndex from 'jsx/announcements'
 
 const root = document.querySelector('#content')
-const app = createAnnIndex(root, {
-  courseId: [ENV.COURSE_ID],
+const app = createAnnouncementsIndex(root, {
+  courseId: ENV.COURSE_ID,
   permissions: ENV.permissions,
   masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
 })

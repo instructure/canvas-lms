@@ -96,7 +96,7 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
       }
       actionsContent={readCount}
     >
-      <Heading level="h4">{announcement.title}</Heading>
+      <Heading level="h3">{announcement.title}</Heading>
       <Text as="p" size="small">{/* TODO: real sections */} Section 1, Section 3</Text>
       <div className="ic-announcement-row__content" {...content} />
     </CourseItemRow>

@@ -131,7 +131,11 @@ export default class CourseItemRow extends Component {
           />
         </div>)}
         {(this.props.showAvatar && <div className="ic-item-row__author-col">
-          <Avatar size="small" name={this.props.author.display_name} src={this.props.author.avatar_image_url} />
+          <Avatar
+            size="small"
+            name={this.props.author.display_name || I18n.t('Unknown')}
+            src={this.props.author.avatar_image_url}
+          />
         </div>)}
         <div className="ic-item-row__content-col">
           {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}

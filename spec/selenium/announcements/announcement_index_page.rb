@@ -22,6 +22,7 @@ class AnnouncementIndex
     # ---------------------- Page ----------------------
     def visit(course)
       get("/courses/#{course.id}/announcements/")
+      wait_for_ajaximations
     end
 
     def set_section_specific_announcements_flag(course, state)
@@ -58,7 +59,7 @@ class AnnouncementIndex
     end
 
     def add_announcement_button
-      # f('#add_announcement')
+      f('#add_announcement')
     end
 
     def open_external_feeds
@@ -72,11 +73,11 @@ class AnnouncementIndex
     # end
 
     def announcement(title)
-      # f("li:contains('#{title}'")
+      fj(".ic-announcement-row:contains('#{title}')")
     end
 
     def announcement_title(title)
-      # f('.title', announcment(title))
+      f('h3', announcement(title))
     end
 
     def announcement_checkbox(title)
@@ -89,14 +90,14 @@ class AnnouncementIndex
     end
 
     def announcement_unread_pill(title)
-      # f('.pill', announcement(title))
+      f('.ic-unread-badge__unread-count', announcement(title))
     end
 
     def announcement_unread_number(title)
-      # announcement_unread_pill(title).text
+      announcement_unread_pill(title).text
     end
 
-    def announcment_locked_icon(title)
+    def announcement_locked_icon(title)
       # f('.lock', announcement(title))
     end
 
@@ -114,7 +115,7 @@ class AnnouncementIndex
       driver.action.send_keys(:enter).perform
     end
 
-    def check_announcment(title)
+    def check_announcement(title)
       announcement_checkbox(title).click
     end
 
@@ -127,11 +128,11 @@ class AnnouncementIndex
     end
 
     def click_on_announcement(title)
-      expect_new_page_load { announcment_title(title).click }
+      announcement_title(title).click
     end
 
     def click_add_announcement
-      expect_new_page_load { add_announcement_button.click }
+       add_announcement_button.click
     end
   end
 end
