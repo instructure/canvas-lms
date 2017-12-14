@@ -1165,22 +1165,52 @@ describe User do
       expect(@user.avatar_image_url).to be_nil
     end
 
-    it "should not allow external url's to be assigned" do
+    it "should not allow external urls to be assigned" do
       @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq nil
     end
 
-    it "should allow external url's that match avatar_external_url_patterns to be assigned" do
-      @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.instructure.com/image.jpg' }
+    it "should allow external urls that match avatar_external_url_patterns to be assigned" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://www.instructure.com/image.jpg' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq "https://www.instructure.com/image.jpg"
+    end
+
+    it "should not allow external urls that do not match avatar_external_url_patterns to be assigned (apple.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://apple.com/image.jpg' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq nil
     end
 
-    it "should allow gravatar url's to be assigned" do
+    it "should not allow external urls that do not match avatar_external_url_patterns to be assigned (ddinstructure.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://ddinstructure.com/image' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should not allow external  urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://3510111291#sdf.instructure.com/image' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should allow gravatar urls to be assigned" do
       @user.avatar_image = { 'type' => 'gravatar', 'url' => 'http://www.gravatar.com/image.jpg' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq 'http://www.gravatar.com/image.jpg'
+    end
+
+    it "should not allow non gravatar urls to be assigned (ddgravatar.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://ddgravatar.com/@google.com' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should not allow non gravatar external urls to be assigned (3510111291#secure.gravatar.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://3510111291#secure.gravatar.com/@google.com' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
     end
 
     it "should return a useful avatar_fallback_url" do
