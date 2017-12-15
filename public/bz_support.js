@@ -49,6 +49,9 @@ function bzRetainedInfoSetup() {
     } else {
       element.textContent = value;
     }
+
+    if(element.getAttribute("data-bz-answer"))
+      element.setAttribute("readonly", "readonly"); // locked since they set an answer already and mastery cannot be reedited
   }
 
   if(window.ENV && ENV.current_user) {
