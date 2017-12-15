@@ -19,3 +19,9 @@
   height: 1em;
   text-align: center;
 }
+
+/* canvas automatic grammar check */
+g {
+  text-decoration: none;
+  border-bottom: 1px dotted red;
+}
