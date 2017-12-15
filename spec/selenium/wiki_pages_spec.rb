@@ -426,7 +426,7 @@ describe "Wiki Pages" do
       it "should alert user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
         add_text_to_tiny("derp")
         fln('Home').click
-        expect(driver.switch_to.alert.text).to be_present
+        expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept
       end
 
@@ -435,7 +435,7 @@ describe "Wiki Pages" do
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys("derp")
         fln('Home').click
-        expect(driver.switch_to.alert.text).to be_present
+        expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept
       end
 
@@ -444,7 +444,7 @@ describe "Wiki Pages" do
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys('derp')
         fln('Home').click
-        expect(driver.switch_to.alert.text).to be_present
+        expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept
         get "/courses/#{@course.id}/pages/bar/edit"
         expect(f('textarea')).not_to include_text('derp')
@@ -456,7 +456,7 @@ describe "Wiki Pages" do
         f('.title').clear()
         f('.title').send_keys("derpy-title")
         fln('Home').click
-        expect(driver.switch_to.alert.text).to be_present
+        expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept
       end
 
