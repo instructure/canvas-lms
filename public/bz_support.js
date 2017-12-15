@@ -50,8 +50,8 @@ function bzRetainedInfoSetup() {
       element.textContent = value;
     }
 
-    if(element.getAttribute("data-bz-answer"))
-      element.setAttribute("readonly", "readonly"); // locked since they set an answer already and mastery cannot be reedited
+    if(value != "" && element.getAttribute("data-bz-answer"))
+      element.setAttribute("disabled", "disabled"); // locked since they set an answer already and mastery cannot be reedited
   }
 
   if(window.ENV && ENV.current_user) {
@@ -110,16 +110,40 @@ function bzRetainedInfoSetup() {
         if (el.classList.contains("bz-optional-magic-field"))
           optional = true;
 
-        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"));
+        var actualSave = function() {
+          BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"));
 
-        // we also need to update other views on the same page
-        var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
-        for(var idx = 0; idx < magicElementsDOM.length; idx++) {
-            var item = magicElementsDOM[idx];
-            if(item == el)
-              continue;
-            if(item.getAttribute("data-bz-retained") == name)
-              bzChangeRetainedItem(item, value);
+          // we also need to update other views on the same page
+          var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
+          for(var idx = 0; idx < magicElementsDOM.length; idx++) {
+              var item = magicElementsDOM[idx];
+              if(item == el)
+                continue;
+              if(item.getAttribute("data-bz-retained") == name)
+                bzChangeRetainedItem(item, value);
+          }
+        };
+
+        if(el.hasAttribute("data-bz-answer")) {
+          // it is a mastery answer, don't actually save until the next button is pressed (if present)
+          var p = el;
+          while(p && !p.classList.contains("bz-box"))
+            p = p.parentNode;
+          if(p) {
+            var btn = p.querySelector(".bz-toggle-all-next");
+            var wrapper = function() {
+              actualSave();
+              btn.removeEventListener("click", wrapper);
+            };
+            if(btn)
+              btn.addEventListener("click", wrapper);
+            else
+              actualSave();
+          } else {
+            actualSave();
+          }
+        } else {
+          actualSave();
         }
       };
 
