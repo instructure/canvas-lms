@@ -257,8 +257,9 @@ describe LiveEventsObserver do
   describe "quiz_export_complete" do
     it "posts update events for quizzes2" do
       expect(Canvas::LiveEvents).to receive(:quiz_export_complete).once
-      Account.default.enable_feature!(:quizzes2_exporter)
       course = Account.default.courses.create!
+      enable_quizzes_next(course)
+
       Account.default.context_external_tools.create!(
         name: 'Quizzes.Next',
         consumer_key: 'test_key',
@@ -280,6 +281,14 @@ describe LiveEventsObserver do
       course = Account.default.courses.create!
       ce = course.content_exports.create!
       ce.export_without_send_later
+    end
+
+    def enable_quizzes_next(course)
+      course.enable_feature!(:quizzes_next)
+      # do quizzes next provision
+      # quizzes_next is available to users only after quizzes next provisioning
+      course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      course.root_account.save!
     end
   end
 end

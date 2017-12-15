@@ -49,6 +49,12 @@ module Factories
     account.enable_feature!(:rich_content_service_high_risk)
   end
 
+  def provision_quizzes_next(account)
+    # quizzes_next feature is turned on only if a root account is provisioned
+    account.root_account.settings[:provision] = {'lti' => 'lti url'}
+    account.root_account.save!
+  end
+
   def valid_account_attributes
     {
       :name => "value for name"

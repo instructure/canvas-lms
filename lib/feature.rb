@@ -19,7 +19,7 @@
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state,
            :root_opt_in, :enable_at, :beta, :development,
-           :release_notes_url, :custom_transition_proc,
+           :release_notes_url, :custom_transition_proc, :visible_on,
            :after_state_change_proc, :autoexpand, :touch_context].freeze
   attr_reader *ATTRS
 
@@ -554,14 +554,6 @@ END
       beta: true,
       development: false
     },
-    'quizzes2_exporter' =>
-    {
-      display_name: -> { I18n.t('Export to Quizzes 2 format') },
-      description: -> { I18n.t('Export an existing quiz to new Quizzes 2 format') },
-      applies_to: "RootAccount",
-      state: "hidden",
-      root_opt_in: true
-    },
     'graphql' =>
     {
       display_name: -> { I18n.t("GraphQL API") },
@@ -583,6 +575,16 @@ END
       description: -> { I18n.t('If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.') },
       applies_to: 'RootAccount',
       state: 'allowed'
+    },
+    'quizzes_next' =>
+    {
+      display_name: -> { I18n.t('Quizzes') + '.' + I18n.t('Next') },
+      description: -> { I18n.t('Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.') },
+      applies_to: 'Course',
+      state: 'allowed',
+      visible_on: ->(context) do
+        context.root_account.settings&.dig(:provision, 'lti').present?
+      end
     }
   )
 
