@@ -558,6 +558,7 @@ class BzController < ApplicationController
           if participation_assignment.due_at >= DateTime.today
             
             step = participation_assignment.points_possible.to_f / magic_field_count
+            original_step = step
             if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
               step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
             elsif !answer.nil? && params[:value] != answer
@@ -566,7 +567,7 @@ class BzController < ApplicationController
 
             submission = participation_assignment.find_or_create_submission(@current_user)
             submission.with_lock do
-              existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * step) : submission.grade.to_f
+              existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * original_step) : submission.grade.to_f
               new_grade = existing_grade + step 
               if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
                 Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
