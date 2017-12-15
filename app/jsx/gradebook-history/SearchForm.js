@@ -21,14 +21,14 @@ import { connect } from 'react-redux';
 import { arrayOf, func, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook_history';
 import moment from 'moment';
-import Autocomplete from 'instructure-ui/lib/components/Autocomplete';
-import Button from 'instructure-ui/lib/components/Button';
-import Container from 'instructure-ui/lib/components/Container';
-import DateInput from 'instructure-ui/lib/components/DateInput';
-import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
-import { GridCol } from 'instructure-ui/lib/components/Grid';
-import Spinner from 'instructure-ui/lib/components/Spinner';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Container from '@instructure/ui-core/lib/components/Container';
+import DateInput from '@instructure/ui-core/lib/components/DateInput';
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import { GridCol } from '@instructure/ui-core/lib/components/Grid';
+import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import SearchFormActions from '../gradebook-history/actions/SearchFormActions';
 import { showFlashAlert } from '../shared/FlashAlert';
 
@@ -199,10 +199,19 @@ class SearchFormComponent extends Component {
     });
   }
 
-  handleSearchEntry = (event) => {
-    const target = event.target.id;
-    const searchTerm = event.target.value;
+  handleAssignmentChange = (_event, value) => {
+    this.handleSearchEntry('assignments', value);
+  }
 
+  handleGraderChange = (_event, value) => {
+    this.handleSearchEntry('graders', value);
+  }
+
+  handleStudentChange = (_event, value) => {
+    this.handleSearchEntry('students', value);
+  }
+
+  handleSearchEntry = (target, searchTerm) => {
     if (searchTerm.length <= 2) {
       if (this.props[target].items.length > 0) {
         this.props.clearSearchOptions(target);
@@ -259,7 +268,7 @@ class SearchFormComponent extends Component {
               loadingOption={<Spinner size="small" title={I18n.t('Loading Students')} />}
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedStudent}
-              onInputChange={this.handleSearchEntry}
+              onInputChange={this.handleStudentChange}
             >
               {this.renderAsOptions(this.props.students.items)}
             </Autocomplete>
@@ -273,7 +282,7 @@ class SearchFormComponent extends Component {
               loadingOption={<Spinner size="small" title={I18n.t('Loading Graders')} />}
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedGrader}
-              onInputChange={this.handleSearchEntry}
+              onInputChange={this.handleGraderChange}
             >
               {this.renderAsOptions(this.props.graders.items)}
             </Autocomplete>
@@ -287,7 +296,7 @@ class SearchFormComponent extends Component {
               loadingOption={<Spinner size="small" title={I18n.t('Loading Assignments')} />}
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedAssignment}
-              onInputChange={this.handleSearchEntry}
+              onInputChange={this.handleAssignmentChange}
             >
               {this.renderAsOptions(this.props.assignments.items)}
             </Autocomplete>
