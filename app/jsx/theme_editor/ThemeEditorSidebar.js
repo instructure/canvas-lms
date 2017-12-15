@@ -20,6 +20,7 @@ import I18n from 'i18n!theme_editor'
 import React from 'react'
 import {bool, func, object} from 'prop-types'
 import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
+import Container from '@instructure/ui-core/lib/components/Container'
 import types from './PropTypes'
 import ThemeEditorAccordion from './ThemeEditorAccordion'
 import ThemeEditorFileUpload from './ThemeEditorFileUpload'
@@ -29,7 +30,7 @@ export default function ThemeEditorSidebar(props) {
   if (props.allowGlobalIncludes) {
     return (
       <TabList variant="minimal" size="medium" padding="0">
-        <TabPanel title={I18n.t('Edit')} padding="0">
+        <TabPanel title={I18n.t('Edit')}>
           <ThemeEditorAccordion
             variableSchema={props.variableSchema}
             brandConfigVariables={props.brandConfig.variables}
@@ -121,13 +122,15 @@ export default function ThemeEditorSidebar(props) {
     )
   }
   return (
-    <ThemeEditorAccordion
-      variableSchema={props.variableSchema}
-      brandConfigVariables={props.brandConfig.variables}
-      getDisplayValue={props.getDisplayValue}
-      changedValues={props.changedValues}
-      changeSomething={props.changeSomething}
-    />
+    <Container padding="small" display="block">
+      <ThemeEditorAccordion
+        variableSchema={props.variableSchema}
+        brandConfigVariables={props.brandConfig.variables}
+        getDisplayValue={props.getDisplayValue}
+        changedValues={props.changedValues}
+        changeSomething={props.changeSomething}
+      />
+    </Container>
   )
 }
 

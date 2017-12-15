@@ -23,8 +23,10 @@ import ThemeEditorColorRow from './ThemeEditorColorRow'
 import ThemeEditorImageRow from './ThemeEditorImageRow'
 import RangeInput from './RangeInput'
 import customTypes from './PropTypes'
-import $ from 'jquery'
-import 'jqueryui/accordion'
+import ThemeEditorVariableGroup from './ThemeEditorVariableGroup'
+
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Text from '@instructure/ui-core/lib/components/Text'
 
 const activeIndexKey = 'Theme__editor-accordion-index'
 
@@ -37,47 +39,23 @@ export default class ThemeEditorAccordion extends React.Component {
     getDisplayValue: PropTypes.func.isRequired
   }
 
-  componentDidMount() {
-    // HACK: Doing this temporarily to get around a spec failure, the next commit gets rid of this
-    //       so in the end it doesn't matter that we are binding rather than using an arrow func property initializer
-    this.initAccordion.bind(this)()
-  }
-
-  getStoredAccordionIndex() {
-    // Note that "Number(null)" returns 0
-    return Number(window.sessionStorage.getItem(activeIndexKey))
+  state = {
+    expandedIndex: Number(window.sessionStorage.getItem(activeIndexKey))
   }
 
   setStoredAccordionIndex(index) {
     window.sessionStorage.setItem(activeIndexKey, index)
   }
 
-  // Returns the index of the current accordion pane open
-  getCurrentIndex = () => $(this.node).accordion('option', 'active')
-
-  // Remembers which accordion pane is open
-  rememberActiveIndex() {
-    const index = this.getCurrentIndex()
-    this.setStoredAccordionIndex(index)
-  }
-
-  initAccordion() {
-    const index = this.getStoredAccordionIndex()
-    $(this.node).accordion({
-      active: index,
-      header: 'h3',
-      heightStyle: 'content',
-      beforeActivate(event, ui) {
-        const previewIframe = $('#previewIframe')
-        if ($.trim(ui.newHeader[0].innerText) === 'Login Screen') {
-          const loginPreview = previewIframe.contents().find('#login-preview')
-          if (loginPreview) previewIframe.scrollTo(loginPreview)
-        } else {
-          previewIframe.scrollTo(0)
-        }
+  handleToggle = (event, expanded, index) => {
+    this.setState(
+      {
+        expandedIndex: index
       },
-      activate: this.rememberActiveIndex
-    })
+      () => {
+        this.setStoredAccordionIndex(index)
+      }
+    )
   }
 
   renderRow = varDef => {
@@ -117,21 +95,22 @@ export default class ThemeEditorAccordion extends React.Component {
 
   render() {
     return (
-      <div
-        className="accordion ui-accordion--mini Theme__editor-accordion"
-        ref={node => (this.node = node)}
-      >
-        {this.props.variableSchema.map(variableGroup => [
-          <h3>
-            <a href="#">
-              <div className="te-Flex">
-                <span className="te-Flex__block">{variableGroup.group_name}</span>
-                <i className="Theme__editor-accordion-icon icon-mini-arrow-right" />
-              </div>
-            </a>
-          </h3>,
-          <div>{variableGroup.variables.map(this.renderRow)}</div>
-        ])}
+      <div>
+        {this.props.variableSchema.map((variableGroup, index) => (
+          <ThemeEditorVariableGroup
+            key={variableGroup.group_name}
+            summary={
+              <Text as="h3" weight="bold">
+                {variableGroup.group_name}
+              </Text>
+            }
+            index={index}
+            expanded={index === this.state.expandedIndex}
+            onToggle={this.handleToggle}
+          >
+            {variableGroup.variables.map(this.renderRow)}
+          </ThemeEditorVariableGroup>
+        ))}
       </div>
     )
   }

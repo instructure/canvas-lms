@@ -5966,6 +5966,10 @@ jest-leak-detector@^22.0.3:
   optionalDependencies:
     weak "^1.0.1"
 
+jest-localstorage-mock@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/jest-localstorage-mock/-/jest-localstorage-mock-2.0.1.tgz#6bea41d1d7b70c1725a3d34f8cc261ef6cdb12fa"
+
 jest-matcher-utils@^22.0.3:
   version "22.0.3"
   resolved "https://registry.yarnpkg.com/jest-matcher-utils/-/jest-matcher-utils-22.0.3.tgz#2ec15ca1af7dcabf4daddc894ccce224b948674e"
