@@ -336,7 +336,7 @@ function bzActivateInstantSurvey(magic_field_name) {
 	var inputs = i.querySelectorAll("input");
 	for(var a = 0; a < inputs.length; a++) {
 		inputs[a].onchange = function() {
-			save(this.value, this.className == "bz-optional-magic-field");
+			save(this.value, this.classList.contains("bz-optional-magic-field"));
 		};
 	}
 }
