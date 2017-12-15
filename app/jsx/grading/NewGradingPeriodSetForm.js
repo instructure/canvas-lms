@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from 'instructure-ui/lib/components/Button'
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import I18n from 'i18n!grading_periods'
 import setsApi from 'compiled/api/gradingPeriodSetsApi'
 import EnrollmentTermInput from '../grading/EnrollmentTermInput'
