@@ -18,16 +18,16 @@
 
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
-import Alert from 'instructure-ui/lib/components/Alert';
-import Container from 'instructure-ui/lib/components/Container';
-import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
-import NumberInput from 'instructure-ui/lib/components/NumberInput';
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent';
-import Spinner from 'instructure-ui/lib/components/Spinner';
-import Typography from 'instructure-ui/lib/components/Typography';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import Checkbox from 'instructure-ui/lib/components/Checkbox';
-import Select from 'instructure-ui/lib/components/Select';
+import Alert from '@instructure/ui-core/lib/components/Alert';
+import Container from '@instructure/ui-core/lib/components/Container';
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
+import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import Text from '@instructure/ui-core/lib/components/Text';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox';
+import Select from '@instructure/ui-core/lib/components/Select';
 import Round from 'compiled/util/round';
 import NumberHelper from '../../../shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook';
@@ -244,7 +244,7 @@ class LatePoliciesTabPanel extends React.Component {
               <PresentationContent>
                 <Container as="div" margin="0 0 x-small 0">
                   <label htmlFor="missing-submission-grade">
-                    <Typography size="small" weight="bold">{I18n.t('Missing submission grade')}</Typography>
+                    <Text size="small" weight="bold">{I18n.t('Missing submission grade')}</Text>
                   </label>
                 </Container>
               </PresentationContent>
@@ -266,7 +266,7 @@ class LatePoliciesTabPanel extends React.Component {
 
                 <PresentationContent>
                   <Container as="div" margin="0 small">
-                    <Typography>{I18n.t('%')}</Typography>
+                    <Text>{I18n.t('%')}</Text>
                   </Container>
                 </PresentationContent>
               </div>
@@ -305,7 +305,7 @@ class LatePoliciesTabPanel extends React.Component {
                 <PresentationContent>
                   <Container as="div" margin="0 0 x-small 0">
                     <label htmlFor="late-submission-deduction">
-                      <Typography size="small" weight="bold">{I18n.t('Deduct')}</Typography>
+                      <Text size="small" weight="bold">{I18n.t('Deduct')}</Text>
                     </label>
                   </Container>
                 </PresentationContent>
@@ -326,7 +326,7 @@ class LatePoliciesTabPanel extends React.Component {
                   />
                   <PresentationContent>
                     <Container as="div" margin="0 small">
-                      <Typography>{I18n.t('%')}</Typography>
+                      <Text>{I18n.t('%')}</Text>
                     </Container>
                   </PresentationContent>
                 </div>
@@ -336,7 +336,7 @@ class LatePoliciesTabPanel extends React.Component {
                 <PresentationContent>
                   <Container as="div" margin="0 0 x-small 0">
                     <label htmlFor="late-submission-interval">
-                      <Typography size="small" weight="bold">{I18n.t('For each late')}</Typography>
+                      <Text size="small" weight="bold">{I18n.t('For each late')}</Text>
                     </label>
                   </Container>
                 </PresentationContent>
@@ -362,7 +362,7 @@ class LatePoliciesTabPanel extends React.Component {
               <PresentationContent>
                 <Container as="div" margin="0 0 x-small 0">
                   <label htmlFor="late-submission-minimum-percent">
-                    <Typography size="small" weight="bold">{I18n.t('Lowest possible grade')}</Typography>
+                    <Text size="small" weight="bold">{I18n.t('Lowest possible grade')}</Text>
                   </label>
                 </Container>
               </PresentationContent>
@@ -384,7 +384,7 @@ class LatePoliciesTabPanel extends React.Component {
 
                 <PresentationContent>
                   <Container as="div" margin="0 small">
-                    <Typography>{I18n.t('%')}</Typography>
+                    <Text>{I18n.t('%')}</Text>
                   </Container>
                 </PresentationContent>
               </div>

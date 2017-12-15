@@ -19,12 +19,12 @@
 import React from 'react';
 import { func, string, bool } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Button from 'instructure-ui/lib/components/Button';
-import Popover, { PopoverTrigger, PopoverContent } from 'instructure-ui/lib/components/Popover';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-core/lib/components/Popover';
+import Text from '@instructure/ui-core/lib/components/Text';
 import IconDiscussionReplySolid from 'instructure-icons/lib/Solid/IconDiscussionReplySolid';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid';
 import ColorPicker from '../../../shared/ColorPicker';
 import { statusesTitleMap } from '../../../gradezilla/default_gradebook/constants/statuses';
 import { defaultColors } from '../../../gradezilla/default_gradebook/constants/colors';
@@ -86,9 +86,9 @@ class StatusColorListItem extends React.Component {
           <GridRow>
             <GridCol>
 
-              <Typography>
+              <Text>
                 {statusesTitleMap[status]}
-              </Typography>
+              </Text>
 
             </GridCol>
             <GridCol width="auto">
@@ -107,10 +107,10 @@ class StatusColorListItem extends React.Component {
                     variant="icon"
                     size="small"
                   >
-                    <Typography size="medium">
+                    <Text size="medium">
                       <ScreenReaderContent>{I18n.t('%{status} Color Picker', { status })}</ScreenReaderContent>
                       <IconDiscussionReplySolid />
-                    </Typography>
+                    </Text>
                   </Button>
 
                 </PopoverTrigger>

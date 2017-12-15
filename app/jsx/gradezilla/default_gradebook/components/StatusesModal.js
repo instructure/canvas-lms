@@ -21,10 +21,10 @@ import ReactDOM from 'react-dom';
 import { func, shape, string } from 'prop-types';
 import update from 'immutability-helper';
 import I18n from 'i18n!gradebook';
-import Button from 'instructure-ui/lib/components/Button';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from 'instructure-ui/lib/components/Modal';
-import Heading from 'instructure-ui/lib/components/Heading';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-core/lib/components/Modal';
+import Heading from '@instructure/ui-core/lib/components/Heading';
+import Text from '@instructure/ui-core/lib/components/Text';
 import { statuses } from '../../../gradezilla/default_gradebook/constants/statuses';
 import StatusColorListItem from '../../../gradezilla/default_gradebook/components/StatusColorListItem';
 
@@ -151,9 +151,9 @@ class StatusesModal extends React.Component {
 
         <ModalBody>
           <ul className="Gradebook__StatusModalList">
-            <Typography>
+            <Text>
               {this.renderListItems()}
-            </Typography>
+            </Text>
           </ul>
         </ModalBody>
 

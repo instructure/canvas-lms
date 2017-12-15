@@ -19,23 +19,23 @@
 import React from 'react';
 import { bool, shape } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Container from 'instructure-ui/lib/components/Container';
-import Pill from 'instructure-ui/lib/components/Pill';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Container from '@instructure/ui-core/lib/components/Container';
+import Pill from '@instructure/ui-core/lib/components/Pill';
+import Text from '@instructure/ui-core/lib/components/Text';
 import IconWarningLine from 'instructure-icons/lib/Line/IconWarningLine';
 
 function renderWarning (message) {
   return (
     <div style={{display: 'flex', alignItems: 'flex-start'}}>
       <Container as="span" padding="xx-small 0 0 0">
-        <Typography color="error">
+        <Text color="error">
           <IconWarningLine title={message} />
-        </Typography>
+        </Text>
       </Container>
       <Container as="span" padding="0 0 0 x-small">
-        <Typography size="small">
+        <Text size="small">
           {message}
-        </Typography>
+        </Text>
       </Container>
     </div>
   );

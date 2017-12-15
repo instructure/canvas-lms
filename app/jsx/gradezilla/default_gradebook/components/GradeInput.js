@@ -18,9 +18,9 @@
 
 import React from 'react';
 import { bool, func, number, oneOf, shape, string } from 'prop-types';
-import Select from 'instructure-ui/lib/components/Select';
-import TextInput from 'instructure-ui/lib/components/TextInput';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Select from '@instructure/ui-core/lib/components/Select';
+import TextInput from '@instructure/ui-core/lib/components/TextInput';
+import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 
@@ -169,7 +169,7 @@ export default class GradeInput extends React.Component {
 
   render () {
     if (this.props.assignment.gradingType === 'not_graded') {
-      return <Typography size="small" weight="bold">{ I18n.t('This assignment is not graded.') }</Typography>
+      return <Text size="small" weight="bold">{ I18n.t('This assignment is not graded.') }</Text>
     }
 
     const inputProps = {

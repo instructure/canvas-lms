@@ -78,7 +78,7 @@ define [
   'jsx/gradezilla/shared/helpers/TextMeasure'
   'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/grading/LatePolicyApplicator'
-  'instructure-ui/lib/components/Button'
+  '@instructure/ui-core/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
   'jsx/shared/FlashAlert'
   'jquery.ajaxJSON'

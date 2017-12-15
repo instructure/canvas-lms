@@ -19,9 +19,9 @@
 import { head, tail } from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Select from 'instructure-ui/lib/components/Select'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Select from '@instructure/ui-core/lib/components/Select'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradebook'
 
   const INDIVIDUAL_GRADEBOOK = 'IndividualGradebook';
@@ -121,7 +121,7 @@ import I18n from 'i18n!gradebook'
     render () {
       return (
         <div style={{display: 'flex', alignItems: 'center'}}>
-          <Typography>{I18n.t('Gradebook')}</Typography>
+          <Text>{I18n.t('Gradebook')}</Text>
           &nbsp;
           <Select
             onChange={this.handleOnChange}

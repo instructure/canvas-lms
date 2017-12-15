@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { number, shape, string } from 'prop-types';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 
@@ -37,26 +37,26 @@ export default function LatePolicyGrade (props) {
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <div style={{ paddingRight: '.5rem' }}>
         <div>
-          <Typography color="error" as="span">
+          <Text color="error" as="span">
             { I18n.t('Late Penalty:') }
-          </Typography>
+          </Text>
         </div>
         <div>
-          <Typography color="secondary" as="span">
+          <Text color="secondary" as="span">
             { I18n.t('Final Grade:') }
-          </Typography>
+          </Text>
         </div>
       </div>
       <div style={{ flex: 1 }}>
         <div id="late-penalty-value">
-          <Typography color="error" as="span">
+          <Text color="error" as="span">
             { pointsDeducted }
-          </Typography>
+          </Text>
         </div>
         <div id="final-grade-value">
-          <Typography color="secondary" as="span">
+          <Text color="secondary" as="span">
             { finalGrade }
-          </Typography>
+          </Text>
         </div>
       </div>
     </div>

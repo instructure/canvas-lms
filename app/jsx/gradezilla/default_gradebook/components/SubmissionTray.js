@@ -19,14 +19,14 @@
 import React from 'react';
 import { arrayOf, bool, func, number, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Avatar from 'instructure-ui/lib/components/Avatar';
-import Button from 'instructure-ui/lib/components/Button';
-import Container from 'instructure-ui/lib/components/Container';
-import Heading from 'instructure-ui/lib/components/Heading';
-import Link from 'instructure-ui/lib/components/Link';
-import Spinner from 'instructure-ui/lib/components/Spinner';
-import Tray from 'instructure-ui/lib/components/Tray';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Avatar from '@instructure/ui-core/lib/components/Avatar';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Container from '@instructure/ui-core/lib/components/Container';
+import Heading from '@instructure/ui-core/lib/components/Heading';
+import Link from '@instructure/ui-core/lib/components/Link';
+import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import Tray from '@instructure/ui-core/lib/components/Tray';
+import Text from '@instructure/ui-core/lib/components/Text';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
 import Carousel from '../../../gradezilla/default_gradebook/components/Carousel';
 import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput';
@@ -59,9 +59,9 @@ function renderSpeedGraderLink (speedGraderUrl) {
 function renderTraySubHeading (headingText) {
   return (
     <Heading level="h4" as="h2" margin="auto auto small">
-      <Typography weight="bold">
+      <Text weight="bold">
         {headingText}
-      </Typography>
+      </Text>
     </Heading>
   );
 }

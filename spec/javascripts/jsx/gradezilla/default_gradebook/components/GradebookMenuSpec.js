@@ -91,7 +91,7 @@ define([
   });
 
   test('Menu Item Separator is third in the PopoverMenu', function () {
-    equal(this.menuItems[2].getAttribute('role'), 'separator');
+    equal(this.menuItems[2].getAttribute('role'), 'presentation');
   });
 
   test('Gradebook History Menu Item is fourth in the PopoverMenu', function () {
@@ -121,7 +121,7 @@ define([
   });
 
   test('Menu Item Separator is second in the PopoverMenu', function () {
-    equal(this.menuItems[1].getAttribute('role'), 'separator');
+    equal(this.menuItems[1].getAttribute('role'), 'presentation');
   });
 
   test('Gradebook History Menu Item is second in the PopoverMenu', function () {
@@ -165,7 +165,7 @@ define([
   });
 
   test('Menu Item Separator is third in the PopoverMenu', function () {
-    equal(this.menuItems[2].getAttribute('role'), 'separator');
+    equal(this.menuItems[2].getAttribute('role'), 'presentation');
   });
 
   test('Gradebook History Menu Item is fourth in the PopoverMenu', function () {
