@@ -140,6 +140,9 @@ function bzRetainedInfoSetup() {
           }
         };
 
+        if(!window.bzQueuedListeners)
+          window.bzQueuedListeners = {};
+
         if(el.hasAttribute("data-bz-answer")) {
           // it is a mastery answer, don't actually save until the next button is pressed (if present)
           var p = el;
@@ -150,10 +153,14 @@ function bzRetainedInfoSetup() {
             var wrapper = function() {
               actualSave();
               btn.removeEventListener("click", wrapper);
+              window.bzQueuedListeners[name] = null;
             };
-            if(btn)
+            if(btn) {
+              if(window.bzQueuedListeners[name])
+                btn.removeEventListener("click", window.bzQueuedListeners[name]);
               btn.addEventListener("click", wrapper);
-            else
+              window.bzQueuedListeners[name] = wrapper;
+            } else
               actualSave();
           } else {
             actualSave();
