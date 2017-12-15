@@ -35,6 +35,22 @@ function addOnMagicFieldsLoaded(func) {
 }
 
 function bzRetainedInfoSetup() {
+  function lockRelatedCheckboxes(el) {
+    // or if we are a graded checkbox, disable other graded checkboxes inside the same bz-box since they are all related
+    if(el.getAttribute("type") == "checkbox") {
+      var p = el;
+      while(p && !p.classList.contains("bz-box"))
+        p = p.parentNode;
+      if(p) {
+        var otherBoxes = p.querySelectorAll("[data-bz-retained][type=checkbox][data-bz-answer]");
+        for(var idx = 0; idx < otherBoxes.length; idx++) {
+          var item = otherBoxes[idx];
+          item.setAttribute("disabled", "disabled");
+        }
+      }
+    }
+  }
+
   function bzChangeRetainedItem(element, value) {
     if(element.tagName == "INPUT" && element.getAttribute("type") == "checkbox"){
       element.checked = (value == "yes") ? true : false;
@@ -50,8 +66,10 @@ function bzRetainedInfoSetup() {
       element.textContent = value;
     }
 
-    if(value != "" && element.hasAttribute("data-bz-answer"))
+    if(value != "" && element.hasAttribute("data-bz-answer")) {
       element.setAttribute("disabled", "disabled"); // locked since they set an answer already and mastery cannot be reedited
+      lockRelatedCheckboxes(element);
+    }
   }
 
   if(window.ENV && ENV.current_user) {
@@ -117,8 +135,6 @@ function bzRetainedInfoSetup() {
           var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
           for(var idx = 0; idx < magicElementsDOM.length; idx++) {
               var item = magicElementsDOM[idx];
-              if(item == el)
-                continue;
               if(item.getAttribute("data-bz-retained") == name)
                 bzChangeRetainedItem(item, value);
           }
@@ -336,7 +352,7 @@ function bzActivateInstantSurvey(magic_field_name) {
 	var inputs = i.querySelectorAll("input");
 	for(var a = 0; a < inputs.length; a++) {
 		inputs[a].onchange = function() {
-			save(this.value, this.className == "bz-optional-magic-field");
+			save(this.value, this.classList.contains("bz-optional-magic-field"));
 		};
 	}
 }

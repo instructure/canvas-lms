@@ -452,7 +452,7 @@ class BzController < ApplicationController
     # now that the user's work is safely saved, we will go back and do addon work
     # like micrograding
 
-    if was_new && !was_optional && (field_type != 'checkbox' || answer != "yes") # Checkboxes are optional by nature unless there is an answer
+    if was_new && !was_optional && (field_type != 'checkbox' || !answer.nil?) # Checkboxes are optional by nature unless there is an answer
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
       module_item_id = request.referrer[/module_item_id=(\d+)/, 1]
       if module_item_id.nil?
@@ -540,7 +540,7 @@ class BzController < ApplicationController
           end
           [total_count == 0 ? 1 : total_count, graded_checkboxes_that_are_supposed_to_be_empty_count]
         end
-        Rails.logger.debug("### set_user_retained_data - magic_field_counts = #{magic_field_counts}")
+        Rails.logger.debug("### set_user_retained_data - magic_field_counts(total, supposed_to_be_blank) = #{magic_field_counts}")
 
         magic_field_count = magic_field_counts[0]
         graded_checkboxes_that_are_supposed_to_be_empty_count = magic_field_counts[1]
