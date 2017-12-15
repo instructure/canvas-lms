@@ -40,32 +40,46 @@ module SIS
         @success_count = 0
       end
 
-      def add_term(term_id, name, status, start_date=nil, end_date=nil, integration_id=nil)
-        @logger.debug("Processing Term #{[term_id, name, status, start_date, end_date].inspect}")
+      def add_term(term_id, name, status, start_date=nil, end_date=nil, integration_id=nil, date_override_enrollment_type=nil)
+        @logger.debug("Processing Term #{[term_id, name, status, start_date, end_date, integration_id, date_override_enrollment_type].inspect}")
 
         raise ImportError, "No term_id given for a term" if term_id.blank?
-        raise ImportError, "No name given for term #{term_id}" if name.blank?
         raise ImportError, "Improper status \"#{status}\" for term #{term_id}" unless status =~ /\Aactive|\Adeleted/i
 
         term = @root_account.enrollment_terms.where(sis_source_id: term_id).first_or_initialize
-
-        # only update the name on new records, and ones that haven't been
-        # changed since the last sis import
-        if term.new_record? || !term.stuck_sis_fields.include?(:name)
-          term.name = name
-        end
-
-        term.integration_id = integration_id
         term.sis_batch_id = @batch.id if @batch
-        if status =~ /active/i
-          term.workflow_state = 'active'
-        elsif status =~ /deleted/i
-          term.workflow_state = 'deleted'
-        end
 
-        if (term.stuck_sis_fields & [:start_at, :end_at]).empty?
-          term.start_at = start_date
-          term.end_at = end_date
+        if date_override_enrollment_type
+          # only configure the date override if this row is present
+          raise ImportError, "Cannot set date override on non-existent term" if term.new_record?
+          unless %w(StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment).include?(date_override_enrollment_type)
+            raise ImportError, "Invalid date_override_enrollment_type"
+          end
+
+          if status =~ /active/i
+            term.set_overrides(@root_account, {date_override_enrollment_type => {:start_at => start_date, :end_at => end_date}})
+          elsif status =~ /deleted/i
+            term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).destroy_all
+          end
+        else
+          raise ImportError, "No name given for term #{term_id}" if name.blank?
+          # only update the name on new records, and ones that haven't been
+          # changed since the last sis import
+          if term.new_record? || !term.stuck_sis_fields.include?(:name)
+            term.name = name
+          end
+
+          term.integration_id = integration_id
+
+          if status =~ /active/i
+            term.workflow_state = 'active'
+          elsif status =~ /deleted/i
+            term.workflow_state = 'deleted'
+          end
+          if (term.stuck_sis_fields & [:start_at, :end_at]).empty?
+            term.start_at = start_date
+            term.end_at = end_date
+          end
         end
 
         if term.save

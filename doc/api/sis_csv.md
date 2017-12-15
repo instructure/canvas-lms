@@ -401,6 +401,19 @@ interface, this is called the SIS ID.</td>
 <td>Sets the integration_id of the term</td>
 </tr>
 <tr>
+<td>date_override_enrollment_type</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>
+When set, all columns except term_id, status, start_date, and end_date will be ignored for this row.
+ Can only be used for an existing term.
+ If status is active, the term dates will be set to apply only to enrollments of the given type.
+ If status is deleted, the currently set dates for the given enrollment type will be removed.
+ Must be one of StudentEnrollment, TeacherEnrollment, TaEnrollment, or DesignerEnrollment.
+</td>
+</tr>
+<tr>
 <td>start_date</td>
 <td>date</td>
 <td></td>
