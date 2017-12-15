@@ -161,6 +161,17 @@ describe AssignmentOverrideStudent do
 
       expect(@ao.workflow_state).to eq("deleted")
     end
+
+    it "trying to update an orphaned override student (one without an enrollment) removes it" do
+      adhoc_override_with_student
+      Score.where(enrollment_id: @user.enrollments).each(&:destroy_permanently!)
+      @user.enrollments.each(&:destroy_permanently!)
+
+      # using update instead of touch in order to trigger validations
+      expect { AssignmentOverrideStudent.find(@override_student.id).update(updated_at: Time.zone.now) }.to change {
+        AssignmentOverrideStudent.where(id: @override_student.id).count
+      }.from(1).to(0)
+    end
   end
 
   describe "default_values" do

@@ -26,6 +26,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   after_create :update_cached_due_dates
   after_destroy :update_cached_due_dates
   after_destroy :destroy_override_if_needed
+  before_validation :default_values
+  before_validation :clean_up_assignment_if_override_student_orphaned
 
   validates_presence_of :assignment_override, :user
   validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id],
@@ -44,7 +46,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   validate :user do |record|
-    if record.user && record.context_id && !record.user.student_enrollments.shard(record.shard).where(:course_id => record.context_id).exists?
+    if no_enrollment?(record)
       record.errors.add :user, "is not in the assignment's course"
     end
   end
@@ -65,7 +67,6 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     end
   end
 
-  before_validation :default_values
   def default_values
     if assignment_override
       self.assignment_id = assignment_override.assignment_id
@@ -95,6 +96,22 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   private
+
+  def clean_up_assignment_if_override_student_orphaned
+    if no_enrollment? && persisted? && assignment_id
+      self.class.clean_up_for_assignment(assignment)
+      @no_enrollment = false
+      # return something other than false to avoid halting the callback chain
+      nil
+    end
+  end
+
+  def no_enrollment?(record=self)
+    return @no_enrollment if defined?(@no_enrollment)
+
+    return false unless record.user_id && record.context_id
+    @no_enrollment = !record.user.student_enrollments.shard(record.shard).where(course_id: record.context_id).exists?
+  end
 
   def update_cached_due_dates
     DueDateCacher.recompute(assignment) if assignment.present?
