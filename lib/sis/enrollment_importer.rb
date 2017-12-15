@@ -242,8 +242,8 @@ module SIS
 
             unless enrollment
               enrollment = Enrollment.typed_enrollment(type).new
+              enrollment.root_account = @root_account
             end
-            enrollment.root_account = @root_account
             enrollment.user = user
             enrollment.type = type
             enrollment.associated_user_id = associated_user_id
