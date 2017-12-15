@@ -50,7 +50,7 @@ function bzRetainedInfoSetup() {
       element.textContent = value;
     }
 
-    if(value != "" && element.getAttribute("data-bz-answer"))
+    if(value != "" && element.hasAttribute("data-bz-answer"))
       element.setAttribute("disabled", "disabled"); // locked since they set an answer already and mastery cannot be reedited
   }
 
