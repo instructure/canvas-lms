@@ -558,6 +558,10 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  def self.find_active_external_tool_by_consumer_key(consumer_key, context)
+    self.active.where(:consumer_key => consumer_key).polymorphic_where(:context => contexts_to_search(context)).first
+  end
+
   def self.find_external_tool_by_id(id, context)
     self.where(:id => id).polymorphic_where(:context => contexts_to_search(context)).first
   end
