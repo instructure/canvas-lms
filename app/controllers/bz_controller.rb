@@ -561,6 +561,12 @@ class BzController < ApplicationController
             original_step = step
             if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
               step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
+            elsif !answer.nil? && answer == '' && params[:value] == '' && field_type == 'checkbox'
+              # they checked then unchecked a box, triggering an explicit save. We assume there is no
+              # explicit save so the points are already there... but here, there is one, so the points
+              # are already there! Thus, despite them putting in the correct answer, since it is a checkbox
+              # we want to give them zero points here so they don't get double credit.
+              step = 0 # don't award double credit
             elsif !answer.nil? && params[:value] != answer
               step = 0 # wrong answer = no points
             end
