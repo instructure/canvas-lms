@@ -18,6 +18,19 @@
 define ['../main', 'ember'], (Application, Ember) ->
   startApp = () ->
     App = null
+
+    # supresses this from logging during tests:
+    # DEBUG LOG: 'DEBUG: -------------------------------'
+    # DEBUG LOG: 'DEBUG: Ember      : 1.4.0'
+    # DEBUG LOG: 'DEBUG: Handlebars : 1.3.0'
+    # DEBUG LOG: 'DEBUG: jQuery     : 1.7.2'
+    # DEBUG LOG: 'DEBUG: -------------------------------'
+    Ember.LOG_VERSION = false
+
+    # since we don't plan on upgrading any of our ember code to new versions
+    # and we consider it "done" we don't care about deprecation warnings
+    Ember.TESTING_DEPRECATION = true
+
     Ember.run.join ->
       App = Application.create
         rootElement: '#fixtures'
