@@ -18,12 +18,13 @@
 define [
   "jquery",
   "i18n!context.roster_user",
+  "jsx/student_last_attended/index"
   "jquery.ajaxJSON",
   "jquery.instructure_misc_plugins",
   "jquery.loadingImg",
   "../../jquery.rails_flash_notifications",
   "link_enrollment"
-], ($, I18n) ->
+], ($, I18n, initLastAttended) ->
   $(document).ready ->
     $(".show_user_services_checkbox").change ->
       $.ajaxJSON $(".profile_url").attr("href"), "PUT",
@@ -38,7 +39,6 @@ define [
         $enrollment.find(".conclude_enrollment_link_holder").show()
         $enrollment.find(".unconclude_enrollment_link_holder").hide()
         $enrollment.find(".completed_at_holder").hide()
-
 
     $(".conclude_enrollment_link").click (event) ->
       event.preventDefault()
@@ -82,4 +82,4 @@ define [
       $(".more_user_information").slideDown()
       $(this).hide()
 
-
+    initLastAttended(document.getElementById("student_last_attended__component"), ENV.COURSE_ID, ENV.USER_ID, ENV.LAST_ATTENDED_DATE)

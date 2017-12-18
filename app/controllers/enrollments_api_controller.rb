@@ -738,6 +738,26 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
+  # @API Adds last attended date to student enrollment in course
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/user/:user_id/last_attended"
+  #     -X PUT => date="Thu%20Dec%2021%202017%2000:00:00%20GMT-0700%20(MST)
+  #
+  #
+  # @returns Enrollment
+  def last_attended
+    return unless authorized_action(@context, @current_user, [:view_all_grades, :manage_grades])
+    date = Time.zone.parse(params[:date])
+    if date
+      enrollments = Enrollment.where(:course_id => params[:course_id], :user_id => params[:user_id])
+      enrollments.update_all(last_attended_at: date)
+      render :json => {:date => date}
+    else
+      render :json => { :message => 'Invalid date time input' }, :status => :bad_request
+    end
+  end
+
   protected
   # Internal: Collect course enrollments that @current_user has permissions to
   # read.
