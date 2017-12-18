@@ -11,7 +11,7 @@
     "axios": "^0.16.0",
     "backbone": "1.1.1",
     "brandable_css": "0.1.0",
-    "canvas-planner": "1.0.13",
+    "canvas-planner": "1.0.14",
     "canvas-rce": "2.6.2",
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
@@ -183,8 +183,6 @@
     }
   },
   "resolutions": {
-    "canvas-planner/instructure-icons": "remove these 2 canvas-planner lines when we upgrade canvas-planner with g/135761",
-    "canvas-planner/instructure-icons": "4.3.2",
     "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d"
   }
 }

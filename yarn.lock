@@ -1816,9 +1816,9 @@ caniuse-lite@^1.0.30000748, caniuse-lite@^1.0.30000760:
   version "1.0.30000769"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000769.tgz#d68c5aa0772ea3eac6c97d42e239c9b4d3261b93"
 
-canvas-planner@1.0.13:
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.13.tgz#0d6e5d083de28c82eea4b9024ef68096d502be30"
+canvas-planner@1.0.14:
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.14.tgz#a281f6f03b1306520ef4448a60240e8e51d44a5c"
   dependencies:
     axios "^0.16.0"
     babel-plugin-inline-react-svg "^0.4.0"
@@ -1828,8 +1828,8 @@ canvas-planner@1.0.13:
     format-message "^5.1.2"
     format-message-parse "^5.1.2"
     format-message-print "^5.1.2"
-    instructure-icons "4.3.0"
-    instructure-ui "3.3.4"
+    instructure-icons "^4.3.0"
+    instructure-ui "^3.3.4"
     keycode "^2.1.9"
     moment "~2.10.6"
     moment-timezone "^0.5.13"
@@ -1842,6 +1842,7 @@ canvas-planner@1.0.13:
     redux-actions "^2.0.1"
     redux-logger "^3.0.1"
     redux-promise "^0.5.3"
+    redux-saga "^0.16.0"
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
@@ -4745,7 +4746,7 @@ install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
 
-"instructure-icons@3 || 4", instructure-icons@4.3.0, instructure-icons@4.3.2, instructure-icons@4.x, instructure-icons@^4.3.0, instructure-icons@^4.3.1:
+"instructure-icons@3 || 4", instructure-icons@4.3.2, instructure-icons@4.x, instructure-icons@^4.3.0, instructure-icons@^4.3.1:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-4.3.2.tgz#bdcd677ba39c4cac9d2bd80cab6638336a2ab9cd"
   dependencies:
@@ -4753,7 +4754,7 @@ install@~0.1.7:
     shortid "^2.2.8"
     svg-to-jsx "^0.0.20"
 
-instructure-ui@3.3.4, instructure-ui@3.x, "instructure-ui@^2.1.0 || 3":
+instructure-ui@3.3.4, instructure-ui@3.x, "instructure-ui@^2.1.0 || 3", instructure-ui@^3.3.4:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-3.3.4.tgz#6a5640f60d5cd5c0c4462c021350407a8975f556"
   dependencies:
@@ -8024,6 +8025,10 @@ redux-promise@^0.5.3:
   resolved "https://registry.yarnpkg.com/redux-promise/-/redux-promise-0.5.3.tgz#e97e6c9d3bf376eacb79babe6d906da20112d6d8"
   dependencies:
     flux-standard-action "^0.6.1"
+
+redux-saga@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/redux-saga/-/redux-saga-0.16.0.tgz#0a231db0a1489301dd980f6f2f88d8ced418f724"
 
 redux-thunk@2.1.0, redux-thunk@~2.1.0:
   version "2.1.0"
