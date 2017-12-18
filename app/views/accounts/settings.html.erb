@@ -92,6 +92,10 @@
               <td><%= f.blabel :name, :en => "Account Name" %></td>
               <td><%= f.text_field :name, :class => 'same-width-as-select' %></td>
             </tr>
+            <tr>
+              <td><label>Domain Name</label></td>
+              <td><input name="account[settings][domains][]" type="text" class="same-width-as-select"/></td>
+            </tr>
             <% if !@account.root_account? && (@context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis)) %>
               <tr>
                 <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
