@@ -236,7 +236,7 @@ import TimeBlockSelector from './TimeBlockSelector'
             </h1>
           </ScreenReaderContent>
           <div className="EditPage__Header">
-            <Grid>
+            <Grid vAlign="middle">
               <GridRow hAlign="end">
                 <GridCol width="auto">
                   <Button onClick={this.deleteGroup} disabled={this.state.isDeleting}>{I18n.t('Delete Group')}</Button>

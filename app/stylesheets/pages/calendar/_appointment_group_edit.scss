@@ -79,11 +79,18 @@
   width: 135px;
 }
 
-.TimeBlockSelector__DivideSection-Input {
-  width: 40px;
+.TimeBlockSelectorRow {  // until container supports flex this is a wrapping div for alignment
+  font-family: $ic-font-family;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $ic-sp;
 }
 
-.TimeBlockSelectorRow__Date,
+.TimeBlockSelectorColumn {
+  margin-right: $ic-sp;
+}
+
+.TimeBlockSelectorRow__Date,  // will remove once inputs are switched over to use instui
 .TimeBlockSelectorRow__StartTime,
 .TimeBlockSelectorRow__EndTime {
   width: 130px;
