@@ -407,10 +407,10 @@ class AccountsController < ApplicationController
     if params[:search_term]
       search_term = params[:search_term]
       is_id = search_term.to_s =~ Api::ID_REGEX
-      if is_id && course = @courses.where(id: search_term).first
-        @courses = [course]
+      if is_id && @courses.except(:order).where(id: search_term).exists?
+        @courses = Course.where(id: search_term)
       elsif is_id && !SearchTermHelper.valid_search_term?(search_term)
-        @courses = []
+        @courses = Course.none
       else
         SearchTermHelper.validate_search_term(search_term)
 

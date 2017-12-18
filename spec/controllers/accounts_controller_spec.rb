@@ -1048,6 +1048,12 @@ describe AccountsController do
           {"name" => "foo", "total_students" => 0}
         ].map{ |attrs| a_hash_including(attrs) })
       end
+
+      it "should not explode when calculating total_students and searching by course id" do
+        admin_logged_in(@account)
+        get 'courses_api', params: {account_id: @account.id, sort: "total_students", search_term: @course.id.to_s}
+        expect(response).to be_success
+      end
     end
 
     it "should be able to search by teacher" do
