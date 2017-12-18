@@ -1,0 +1,135 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders all future items loaded regardless of other props 1`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="x-large"
+    textAlign="center"
+  >
+    <Text
+      as="span"
+      color="secondary"
+      letterSpacing="normal"
+      size="small"
+    >
+      All items loaded
+    </Text>
+  </Container>
+</div>
+`;
+
+exports[`renders load more by default 1`] = `
+<div>
+  <Waypoint
+    bottomOffset="0px"
+    fireOnRapidScroll={true}
+    horizontal={false}
+    onEnter={[Function]}
+    onLeave={[Function]}
+    onPositionChange={[Function]}
+    topOffset="0px"
+  />
+  <Container
+    as="div"
+    display={null}
+    padding="x-large"
+    textAlign="center"
+  >
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
+      onClick={[Function]}
+      size="medium"
+      type="button"
+      variant="link"
+    >
+      Load more
+    </Button>
+  </Container>
+</div>
+`;
+
+exports[`renders loading when indicated 1`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="x-large"
+    textAlign="center"
+  >
+    <Container
+      display={null}
+    >
+      <Container
+        display="inline"
+      >
+        <Spinner
+          margin="0 x-small 0 0"
+          size="small"
+          title="Loading..."
+          variant="default"
+        />
+      </Container>
+      <Text
+        as="span"
+        color="secondary"
+        letterSpacing="normal"
+        size="small"
+      >
+        Loading...
+      </Text>
+    </Container>
+  </Container>
+</div>
+`;
+
+exports[`shows an Alert when there's a query error 1`] = `
+<div>
+  <Waypoint
+    bottomOffset="0px"
+    fireOnRapidScroll={true}
+    horizontal={false}
+    onEnter={[Function]}
+    onLeave={[Function]}
+    onPositionChange={[Function]}
+    topOffset="0px"
+  />
+  <Container
+    as="div"
+    display={null}
+    padding="x-large"
+    textAlign="center"
+  >
+    <div
+      style={
+        Object {
+          "margin": "0 auto",
+          "width": "50%",
+        }
+      }
+    >
+      <ErrorAlert
+        error="uh oh"
+      >
+        Error loading more items
+      </ErrorAlert>
+    </div>
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      fluidWidth={false}
+      margin="0"
+      onClick={[Function]}
+      size="medium"
+      type="button"
+      variant="link"
+    >
+      Load more
+    </Button>
+  </Container>
+</div>
+`;

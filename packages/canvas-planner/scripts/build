@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo '############################################################'
+echo '# Building fully Babelified CommonJS version of the module #'
+echo '############################################################'
+yarn run build:lib
+
+# Commenting this out for now since canvas only actually uses the CJS version.
+# echo '############################################################'
+# echo '#    Building fully Babelified ES version of the module    #'
+# echo '############################################################'
+# yarn run build:es

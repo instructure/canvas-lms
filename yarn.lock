@@ -96,7 +96,7 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
-"@instructure/ui-themeable@^4.7.0", "@instructure/ui-themeable@^4.7.1":
+"@instructure/ui-themeable@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.1.tgz#fe99079b8748391e939b98bf5e662d6e69d71206"
   dependencies:
@@ -111,7 +111,7 @@
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.1.tgz#b4b51ddea50d94e83517297b46e470f5a2755e1a"
 
-"@instructure/ui-utils@^4.7.0", "@instructure/ui-utils@^4.7.1":
+"@instructure/ui-utils@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.1.tgz#93884d08cfecbc55c510a52dc71b70918ff14c4b"
   dependencies:
@@ -2078,9 +2078,8 @@ caniuse-lite@^1.0.30000784:
   version "1.0.30000784"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000784.tgz#129ced74e9a1280a441880b6cd2bce30ef59e6c0"
 
-canvas-planner@1.0.16:
+"canvas-planner@file:./packages/canvas-planner":
   version "1.0.16"
-  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.16.tgz#6bf1c85934b6fbd9f7e5c041532ec221b80c0826"
   dependencies:
     "@instructure/ui-core" "^4.6.0"
     axios "^0.16.0"

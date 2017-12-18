@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders empty page 1`] = `
+<div>
+  <DesertSvg
+    aria-hidden="true"
+  />
+  <div>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      No Due Dates Assigned
+    </Heading>
+  </div>
+  <div>
+    <div>
+      Looks like there isn't anything here
+    </div>
+    <Link
+      as="button"
+      ellipsis={false}
+      linkRef={[Function]}
+      onClick={[Function]}
+      variant="default"
+    >
+      Go to Dashboard Card View
+    </Link>
+  </div>
+</div>
+`;

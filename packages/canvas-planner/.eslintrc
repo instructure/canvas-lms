@@ -1,0 +1,17 @@
+{
+  "extends": ["react-app", "plugin:react/recommended"],
+  "plugins": [
+    "react",
+    "notice"
+  ],
+  "rules": {
+    "no-extra-semi": "error",
+    "no-trailing-spaces": "error",
+    "semi": "error",
+    "semi-spacing": "error",
+    "notice/notice": ["error", {
+      "mustMatch": "Copyright \\(C\\) [0-9]{0,4} - present Instructure, Inc.",
+      "templateFile": "copyright-template.js"
+    }]
+  }
+}

@@ -1,0 +1,404 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders the item to update if provided 1`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="large medium medium"
+  >
+    <FormFieldGroup
+      as="fieldset"
+      colSpacing="small"
+      description={
+        <ScreenReaderContent
+          as="span"
+        >
+          <h2>
+            Edit Planner Item
+          </h2>
+        </ScreenReaderContent>
+      }
+      disabled={false}
+      rowSpacing="small"
+      vAlign="middle"
+    >
+      <TextInput
+        disabled={false}
+        inline={false}
+        inputRef={[Function]}
+        label="Title"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        size="medium"
+        textAlign="start"
+        type="text"
+        value="Planner Item"
+      />
+      <DateInput
+        datePickerRef={[Function]}
+        dateValue="2017-04-25 01:49:00-0700"
+        disabled={false}
+        format="LL"
+        inline={false}
+        inputRef={[Function]}
+        invalidDateMessage={[Function]}
+        label="Date"
+        layout="stacked"
+        locale="en"
+        messages={Array []}
+        nextLabel="Next Month"
+        onDateChange={[Function]}
+        placement="start"
+        previousLabel="Previous Month"
+        required={true}
+        size="medium"
+        timeZone="Asia/Tokyo"
+        validationFeedback={true}
+      />
+      <Select
+        disabled={false}
+        inline={false}
+        label="Course"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        selectRef={[Function]}
+        size="medium"
+        type="text"
+        value="1"
+      >
+        <option
+          value="none"
+        >
+          Optional: Add Course
+        </option>
+        <option
+          value="1"
+        >
+          a course
+        </option>
+      </Select>
+      <TextArea
+        autoGrow={false}
+        disabled={false}
+        height="10rem"
+        inline={false}
+        label="Details"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        resize="none"
+        size="medium"
+        textareaRef={[Function]}
+        value="You made this item to remind you of something, but you forgot what."
+      />
+    </FormFieldGroup>
+    <Container
+      as="div"
+      display={null}
+      margin="small 0 0"
+      textAlign="end"
+    >
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        fluidWidth={false}
+        margin="0 x-small 0 0"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="light"
+      >
+        Delete
+      </Button>
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        disabled={false}
+        fluidWidth={false}
+        margin="0 0 0 x-small"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="primary"
+      >
+        Save
+      </Button>
+    </Container>
+  </Container>
+</div>
+`;
+
+exports[`updates state when new note is passed in 1`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="large medium medium"
+  >
+    <FormFieldGroup
+      as="fieldset"
+      colSpacing="small"
+      description={
+        <ScreenReaderContent
+          as="span"
+        >
+          <h2>
+            Edit Planner Item 1
+          </h2>
+        </ScreenReaderContent>
+      }
+      disabled={false}
+      rowSpacing="small"
+      vAlign="middle"
+    >
+      <TextInput
+        disabled={false}
+        inline={false}
+        inputRef={[Function]}
+        label="Title"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        size="medium"
+        textAlign="start"
+        type="text"
+        value="Planner Item 1"
+      />
+      <DateInput
+        datePickerRef={[Function]}
+        dateValue="2017-04-25"
+        disabled={false}
+        format="LL"
+        inline={false}
+        inputRef={[Function]}
+        invalidDateMessage={[Function]}
+        label="Date"
+        layout="stacked"
+        locale="en"
+        messages={Array []}
+        nextLabel="Next Month"
+        onDateChange={[Function]}
+        placement="start"
+        previousLabel="Previous Month"
+        required={true}
+        size="medium"
+        timeZone="Asia/Tokyo"
+        validationFeedback={true}
+      />
+      <Select
+        disabled={false}
+        inline={false}
+        label="Course"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        selectRef={[Function]}
+        size="medium"
+        type="text"
+        value="1"
+      >
+        <option
+          value="none"
+        >
+          Optional: Add Course
+        </option>
+        <option
+          value="1"
+        >
+          first course
+        </option>
+        <option
+          value="2"
+        >
+          second course
+        </option>
+      </Select>
+      <TextArea
+        autoGrow={false}
+        disabled={false}
+        height="10rem"
+        inline={false}
+        label="Details"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        resize="none"
+        size="medium"
+        textareaRef={[Function]}
+        value="You made this item to remind you of something, but you forgot what."
+      />
+    </FormFieldGroup>
+    <Container
+      as="div"
+      display={null}
+      margin="small 0 0"
+      textAlign="end"
+    >
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        fluidWidth={false}
+        margin="0 x-small 0 0"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="light"
+      >
+        Delete
+      </Button>
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        disabled={false}
+        fluidWidth={false}
+        margin="0 0 0 x-small"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="primary"
+      >
+        Save
+      </Button>
+    </Container>
+  </Container>
+</div>
+`;
+
+exports[`updates state when new note is passed in 2`] = `
+<div>
+  <Container
+    as="div"
+    display={null}
+    padding="large medium medium"
+  >
+    <FormFieldGroup
+      as="fieldset"
+      colSpacing="small"
+      description={
+        <ScreenReaderContent
+          as="span"
+        >
+          <h2>
+            Edit Planner Item 2
+          </h2>
+        </ScreenReaderContent>
+      }
+      disabled={false}
+      rowSpacing="small"
+      vAlign="middle"
+    >
+      <TextInput
+        disabled={false}
+        inline={false}
+        inputRef={[Function]}
+        label="Title"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        size="medium"
+        textAlign="start"
+        type="text"
+        value="Planner Item 2"
+      />
+      <DateInput
+        datePickerRef={[Function]}
+        dateValue="2017-12-25"
+        disabled={false}
+        format="LL"
+        inline={false}
+        inputRef={[Function]}
+        invalidDateMessage={[Function]}
+        label="Date"
+        layout="stacked"
+        locale="en"
+        messages={Array []}
+        nextLabel="Next Month"
+        onDateChange={[Function]}
+        placement="start"
+        previousLabel="Previous Month"
+        required={true}
+        size="medium"
+        timeZone="Asia/Tokyo"
+        validationFeedback={true}
+      />
+      <Select
+        disabled={false}
+        inline={false}
+        label="Course"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        selectRef={[Function]}
+        size="medium"
+        type="text"
+        value="2"
+      >
+        <option
+          value="none"
+        >
+          Optional: Add Course
+        </option>
+        <option
+          value="1"
+        >
+          first course
+        </option>
+        <option
+          value="2"
+        >
+          second course
+        </option>
+      </Select>
+      <TextArea
+        autoGrow={false}
+        disabled={false}
+        height="10rem"
+        inline={false}
+        label="Details"
+        layout="stacked"
+        messages={Array []}
+        onChange={[Function]}
+        resize="none"
+        size="medium"
+        textareaRef={[Function]}
+        value="This is another reminder"
+      />
+    </FormFieldGroup>
+    <Container
+      as="div"
+      display={null}
+      margin="small 0 0"
+      textAlign="end"
+    >
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        fluidWidth={false}
+        margin="0 x-small 0 0"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="light"
+      >
+        Delete
+      </Button>
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        disabled={false}
+        fluidWidth={false}
+        margin="0 0 0 x-small"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="primary"
+      >
+        Save
+      </Button>
+    </Container>
+  </Container>
+</div>
+`;

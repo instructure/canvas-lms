@@ -1,0 +1,206 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "Ajoute Lis Tach"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Tout eleman yo chaje"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Èske vrèman ou vle elemine eleman planifikatè sa a?"
+  },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } konplete"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } enkonplè"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Kòmansman Istwa Tach ou yo"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Planifikatè Canvas"
+  },
+  "close_d634289d": {
+    "message": "Fèmen"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "Fèmen ti fenèt opòtinite a"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# opòtinite}\n    one {# opòtinite}\n  other {# opòtinite}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Afiche # eleman konplete}\n  other {Afiche # eleman konplete}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "Kou"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } POU FÈ"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } nan { time }"
+  },
+  "date_ee500367": {
+    "message": "Dat"
+  },
+  "date_is_required_8660ec22": {
+    "message": "Dat obligatwa"
+  },
+  "delete_a6efa79d": {
+    "message": "Efase"
+  },
+  "details_98a31b68": {
+    "message": "Detay"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Rejte { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Delè:"
+  },
+  "due_date_8ce289b6": {
+    "message": "DELÈ: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Modifye { title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Erè chajman plis eleman"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Erè chajman eleman pase yo"
+  },
+  "excused_cf8792eb": {
+    "message": "Egzante"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Echèk eliminasyon tach"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Echwe nan chèche nouvo aktivite"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Echèk chajman opòtinite"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Echèk anrejistreman tach"
+  },
+  "feedback_6dcc1991": {
+    "message": "Kòmantè"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "Ale nan Afichaj Tablo"
+  },
+  "graded_25cd3fcd": {
+    "message": "Klase"
+  },
+  "late_2be42b88": {
+    "message": "An reta"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Chaje plis"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Chaje dat avan"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Chaje { count, plural,\n     =0{# eleman}\n    one {# eleman}\n  other {# eleman}\n}"
+  },
+  "loading_25990131": {
+    "message": "Chajman..."
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Chaje eleman pase"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Chajman Eleman Planifikatè"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Ta sanble pa gen anyen la a"
+  },
+  "missing_1a256b3b": {
+    "message": "Manke"
+  },
+  "missing_items_for_5ef30cea": {
+    "message": "Eleman manke pou "
+  },
+  "new_activity_8b84847d": {
+    "message": "Nouvo Aktivite"
+  },
+  "new_activity_for_ac84f6e6": {
+    "message": "Nouvo aktivite pou "
+  },
+  "next_month_749b1778": {
+    "message": "Mwa Pwochen"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Yo Pa Bay Delè"
+  },
+  "no_to_do_s_for_this_day_yet_90c5873d": {
+    "message": "Poko gen \"Okenn Tach\" pou jou sa a "
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Pa gen anyen nouvo ki mande atansyon."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Opsyonèl: Ajoute Kou"
+  },
+  "points_bceb5005": {
+    "message": "pwen"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } pwen"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Mwa Pase"
+  },
+  "pts_699bd9aa": {
+    "message": "pts"
+  },
+  "replies_4a8577c8": {
+    "message": "Repons"
+  },
+  "save_11a80ec3": {
+    "message": "Anrejistre"
+  },
+  "submitted_318fad53": {
+    "message": "Soumèt"
+  },
+  "task_16b0ef38": {
+    "message": "Tach"
+  },
+  "title_ee03d132": {
+    "message": "Tit"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "tit obligatwa"
+  },
+  "to_do_1d554f36": {
+    "message": "Pou Fè"
+  },
+  "today_76e10f9c": {
+    "message": "Jodi a"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Jodi a a { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Demen"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Demen a { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Enposib pou make kòm konplè."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Yè a { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Yè"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Ou retounan nan premye Tach ou yo!"
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "إضافة قائمة مهام"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "تم تحميل كافة العناصر"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
+  },
+  "assignmenttype_title_is_complete_813e54f8": {
+    "message": "{ assignmentType } { title } مكتمل"
+  },
+  "assignmenttype_title_is_incomplete_a1d5fac0": {
+    "message": "{ assignmentType } { title } غير مكتمل"
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "بداية سجل قائمة المهام الخاصة بك"
+  },
+  "canvas_planner_98ed106": {
+    "message": "مخطِط Canvas"
+  },
+  "close_d634289d": {
+    "message": "إغلاق"
+  },
+  "close_opportunities_popover_f4e50551": {
+    "message": "إغلاق الصفحات المنبثقة العلوية للفرص"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# فرص}\n    one {# فرصة}\n  other {# فرص}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # عناصر مكتملة}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "المساق"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } قائمة مهام"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } في { time }"
+  },
+  "date_ee500367": {
+    "message": "التاريخ"
+  },
+  "date_is_required_8660ec22": {
+    "message": "التاريخ مطلوب"
+  },
+  "delete_a6efa79d": {
+    "message": "حذف"
+  },
+  "details_98a31b68": {
+    "message": "التفاصيل"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "تجاهل { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "تاريخ الاستحقاق:"
+  },
+  "due_date_8ce289b6": {
+    "message": "تاريخ الاستحقاق: { date }"
+  },
+  "edit_title_72e5a21e": {
+    "message": "تحرير { title }"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "حدث خطأ في تحميل المزيد من العناصر"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "حدث خطأ في تحميل العناصر السابقة"
+  },
+  "excused_cf8792eb": {
+    "message": "غير إجباري"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "تعذر حذف قائمة مهام"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "تعذر الحصول على نشاط جديد"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "تعذر تحميل الفرص"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "تعذر حفظ قائمة مهام"
+  },
+  "feedback_6dcc1991": {
+    "message": "التعليقات"
+  },
+  "go_to_dashboard_card_view_10398ef6": {
+    "message": "اذهب إلى طريقة عرض بطاقة لوحة المعلومات"
+  },
+  "graded_25cd3fcd": {
+    "message": "تم منح الدرجات"
+  },
+  "late_2be42b88": {
+    "message": "متأخر"
+  },
+  "load_more_a36f9cf9": {
+    "message": "تحميل المزيد"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "تحميل تواريخ سابقة"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "{ count, plural,\n     =0{# عناصر}\n    one {# عنصر}\n  other {# عناصر تم تحميلها}\n}"
+  },
+  "loading_25990131": {
+    "message": "يتم الآن التحميل..."
+  },
+  "loading_past_items_ca499e75": {
+    "message": "جارٍ تحميل العناصر السابقة"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "جارٍ تحميل عناصر المخطِط"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "يبدو أنه لا يوجد أي شيء هنا"
+  },
+  "missing_1a256b3b": {
+    "message": "مفقود"
+  },
+  "missing_items_for_5ef30cea": {
+    "message": "عناصر مفقودة لـ "
+  },
+  "new_activity_8b84847d": {
+    "message": "نشاط جديد"
+  },
+  "new_activity_for_ac84f6e6": {
+    "message": "نشاط جديد لـ "
+  },
+  "next_month_749b1778": {
+    "message": "الشهر القادم"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "لم يتم تعيين تواريخ الاستحقاق"
+  },
+  "no_to_do_s_for_this_day_yet_90c5873d": {
+    "message": "لا توجد \"قوائم مهام\" في هذا اليوم حتى الآن."
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "لا يوجد شيء جديد يستدعي الاهتمام."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "اختياري: إضافة مساق"
+  },
+  "points_bceb5005": {
+    "message": "نقاط"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } نقاط"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "الشهر السابق"
+  },
+  "pts_699bd9aa": {
+    "message": "نقاط"
+  },
+  "replies_4a8577c8": {
+    "message": "ردود"
+  },
+  "save_11a80ec3": {
+    "message": "حفظ"
+  },
+  "submitted_318fad53": {
+    "message": "تم الإرسال"
+  },
+  "task_16b0ef38": {
+    "message": "مهمة"
+  },
+  "title_ee03d132": {
+    "message": "العنوان"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "العنوان مطلوب"
+  },
+  "to_do_1d554f36": {
+    "message": "قائمة مهام"
+  },
+  "today_76e10f9c": {
+    "message": "اليوم"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "اليوم الساعة { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "غدًا"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "غدًا الساعة { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "يتعذر وضع علامة مكتمل."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "أمس الساعة { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "أمس"
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "لقد قمت بالتمرير للخلف إلى أول قائمة مهام خاصة بك!"
+  }
+}

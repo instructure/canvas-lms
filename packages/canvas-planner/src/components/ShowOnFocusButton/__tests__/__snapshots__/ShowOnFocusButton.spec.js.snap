@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders a ScreenReaderContent by default 1`] = `
+<ScreenReaderContent
+  as="span"
+>
+  <Button
+    as="button"
+    buttonRef={[Function]}
+    fluidWidth={false}
+    margin="0"
+    onBlur={[Function]}
+    onFocus={[Function]}
+    size="medium"
+    type="button"
+    variant="link"
+  >
+    Button
+  </Button>
+</ScreenReaderContent>
+`;

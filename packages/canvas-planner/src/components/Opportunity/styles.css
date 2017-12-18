@@ -1,0 +1,87 @@
+.root {
+  position: relative;
+  font-size: var(--fontSize);
+  font-family: var(--fontFamily);
+  font-weight: var(--fontWeight);
+  color: var(--color);
+  background: var(--background);
+  padding: var(--padding);
+  box-sizing: border-box;
+  line-height: var(--lineHeight);
+}
+
+.header {
+  width: calc(100% - 2rem);
+}
+
+.oppName {
+  box-sizing: border-box;
+  min-width: 1px;
+  flex: 1;
+  padding-top: var(--namePaddingTop);
+  text-transform: uppercase;
+  letter-spacing: 0.0625rem;
+  color: var(--secondaryColor);
+  font-size: var(--nameFontSize);
+}
+
+.title {
+  margin-bottom: var(--titleMargin);
+}
+
+.oppName,
+.title {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.footer {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  padding-right: var(--footerPadding);
+}
+
+.status {
+  box-sizing: border-box;
+  min-width: 1px;
+  flex: 1;
+  padding-right: var(--statusPadding);
+}
+
+.points {
+  box-sizing: border-box;
+  min-width: 1px;
+  flex: 0 0 30%;
+  text-align: right;
+  color: var(--secondaryColor);
+  text-transform: uppercase;
+  font-size: var(--pointsFontSize);
+  line-height: var(--pointsLineHeight);
+}
+
+.pointsNumber {
+  display: block;
+  font-size: var(--pointsNumberFontSize);
+}
+
+.due {
+  margin-top: var(--dueMargin);
+  font-size: var(--dueFontSize);
+  color: var(--secondaryColor);
+}
+
+.dueText {
+  font-weight: var(--dueTextFontWeight);
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: -0.375rem;
+}
+
+.closeButtonIcon {
+  font-size: var(--closeButtonIconSize);
+}

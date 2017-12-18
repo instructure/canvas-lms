@@ -1,0 +1,68 @@
+{
+  "close_d634289d": {
+    "message": "Lukk"
+  },
+  "course_8a63b4a3": {
+    "message": "Emne"
+  },
+  "date_ee500367": {
+    "message": "Dato"
+  },
+  "delete_a6efa79d": {
+    "message": "Slett"
+  },
+  "details_98a31b68": {
+    "message": "Detaljar"
+  },
+  "due_5d7267be": {
+    "message": "Frist:"
+  },
+  "excused_cf8792eb": {
+    "message": "Fritak er innvilga"
+  },
+  "graded_25cd3fcd": {
+    "message": "Karaktersett"
+  },
+  "late_2be42b88": {
+    "message": "Sein"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Last opp meir"
+  },
+  "loading_25990131": {
+    "message": "Lastar..."
+  },
+  "missing_1a256b3b": {
+    "message": "Manglar"
+  },
+  "points_bceb5005": {
+    "message": "poeng"
+  },
+  "pts_699bd9aa": {
+    "message": "poeng"
+  },
+  "replies_4a8577c8": {
+    "message": "Svar"
+  },
+  "save_11a80ec3": {
+    "message": "Lagre"
+  },
+  "submitted_318fad53": {
+    "message": "Innlevert"
+  },
+  "title_ee03d132": {
+    "message": "Tittel"
+  },
+  "to_do_1d554f36": {
+    "message": "Å gjere"
+  },
+  "today_76e10f9c": {
+    "message": "I dag"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "I morgon"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "I går"
+  }
+}
