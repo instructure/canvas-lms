@@ -99,6 +99,9 @@ class AssessmentRequest < ActiveRecord::Base
     self.rubric_assessment.assessor_name rescue ((self.assessor.name rescue nil) || t("#unknown", "Unknown"))
   end
 
+  def incomplete?
+    workflow_state == 'assigned'
+  end
 
   on_create_send_to_streams do
     self.assessor
