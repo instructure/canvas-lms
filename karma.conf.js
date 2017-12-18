@@ -11,9 +11,21 @@ const karmaConfig = {
   exclude: [],
 
   // 'dots', 'progress', 'junit', 'growl', 'coverage', 'spec'
-  reporters: ['progress'],
+  reporters: ['spec', 'junit'],
   // enable the verbose reporter if you want to have more information of where/how specs fail
   // reporters: ['verbose'],
+
+  // this is to make a nice "spec failures" report in the jenkins build instead of having to look at the log output
+  junitReporter: {
+    outputDir: 'coverage-js', // just reusing same dir as the coverage stuff so it doesn't need its own .gitignore
+    outputFile: 'karma-test-results.xml', // if included, results will be saved as $outputDir/$browserName/$outputFile
+    useBrowserName: false, // add browser name to report and classes names
+  },
+  specReporter: {
+    maxLogLines: 50, // limit number of lines logged per test
+    suppressErrorSummary: false, // print error summary
+    showSpecTiming: true, // print the time elapsed for each spec
+  },
 
   port: 9876,
 
