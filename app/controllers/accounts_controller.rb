@@ -509,7 +509,8 @@ class AccountsController < ApplicationController
                                                :restrict_student_future_view,
                                                :restrict_student_future_listing,
                                                :lock_all_announcements,
-                                               :sis_assignment_name_length_input)
+                                               :sis_assignment_name_length_input,
+                                               :domains)
             ensure_sis_max_name_length_value!(account_settings)
           end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
