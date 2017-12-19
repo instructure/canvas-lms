@@ -20,6 +20,9 @@
 @import "base/mixins/misc";
 
 /* header */
+.header-bar-right {
+  margin-bottom: $ic-sp;  // the buttons need some space between the input
+}
 
 #edit_assignment_header-cr {
   padding: 0;

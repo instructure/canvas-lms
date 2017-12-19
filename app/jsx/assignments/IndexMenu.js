@@ -142,8 +142,8 @@ export default React.createClass({
           title={I18n.t('Assignments Settings')}
           aria-label={I18n.t('Assignments Settings')}
         >
-          <span className="screenreader-only">{I18n.t('Assignments Settings')}</span>
-          <i className="icon-settings" /><i className="icon-mini-arrow-down" />
+          <i className="icon-more" aria-hidden="true"/>
+          <span className="screenreader-only">{I18n.t('Assignment Options')}</span>
         </a>
         <ul
           className="al-options"

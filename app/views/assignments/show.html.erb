@@ -72,8 +72,7 @@
 
         <% if @assignment_menu_tools.present? %>
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
-            <i class="icon-settings"></i>
-            <i class="icon-mini-arrow-down"></i>
+            <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
           </a>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
