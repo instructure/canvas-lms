@@ -8,29 +8,66 @@ AllCops:
   TargetRubyVersion: 2.3
 
 # our style changes: disabling style rules we aren't interested in
+Layout/AlignParameters:
+  Enabled: false
+Layout/EmptyLines:
+  Enabled: false
+Layout/EmptyLinesAroundAccessModifier:
+  Enabled: false
+Layout/EmptyLinesAroundArguments:
+  Enabled: false
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: false
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: false
+Layout/IndentHash:
+  Enabled: false
+Layout/IndentationConsistency:
+  Enabled: false
+Layout/IndentationWidth:
+  Enabled: false
+Layout/MultilineOperationIndentation:
+  Enabled: false
+Layout/SpaceAfterColon:
+  Enabled: false
+Layout/SpaceAfterComma:
+  Enabled: false
+Layout/SpaceAroundEqualsInParameterDefault:
+  Enabled: false
+Layout/SpaceAroundOperators:
+  Enabled: false
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+Layout/SpaceBeforeFirstArg:
+  Enabled: false
+Layout/SpaceInLambdaLiteral:
+  Enabled: false
+Layout/SpaceInsideArrayLiteralBrackets:
+  Enabled: false
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+Layout/SpaceInsideReferenceBrackets:
+  Enabled: false
+Layout/TrailingBlankLines:
+  Enabled: false
+Layout/TrailingWhitespace:
+  Enabled: false
+
 Style/StringLiterals:
   Enabled: false
 Style/SignalException:
-  Enabled: false
-Style/SpaceBeforeBlockBraces:
-  Enabled: false
-Style/SpaceInsideBlockBraces:
   Enabled: false
 Style/NumericLiterals:
   Enabled: false
 Style/BracesAroundHashParameters:
   Enabled: false
-Style/SpaceInsideBrackets:
-  Enabled: false
-Style/SpaceInsideHashLiteralBraces:
-  Enabled: false
 Style/PercentLiteralDelimiters:
-  Enabled: false
-Style/SpaceAroundOperators:
-  Enabled: false
-Style/SpaceAfterColon:
-  Enabled: false
-Style/SpaceAfterComma:
   Enabled: false
 Style/Documentation:
   Enabled: false
@@ -38,33 +75,15 @@ Style/ClassAndModuleChildren:
   Enabled: false
 Style/RegexpLiteral:
   Enabled: false
-Style/EmptyLines:
-  Enabled: false
-Style/EmptyLinesAroundMethodBody:
-  Enabled: false
-Style/EmptyLinesAroundClassBody:
-  Enabled: false
-Style/EmptyLinesAroundModuleBody:
-  Enabled: false
-Style/EmptyLinesAroundBlockBody:
-  Enabled: false
 Style/GuardClause:
   Enabled: false
 Style/RedundantSelf:
-  Enabled: false
-Style/SpaceAroundEqualsInParameterDefault:
-  Enabled: false
-Style/SpaceBeforeFirstArg:
-  Enabled: false
-Style/EmptyLinesAroundAccessModifier:
   Enabled: false
 Style/IfUnlessModifier:
   Enabled: false
 Style/WordArray:
   Enabled: false
 Style/PercentQLiterals:
-  Enabled: false
-Style/IndentHash:
   Enabled: false
 Style/DoubleNegation:
   Enabled: false
@@ -76,21 +95,9 @@ Style/MethodCallWithoutArgsParentheses:
   Enabled: false
 Style/MethodCallWithArgsParentheses:
   Enabled: false
-Style/TrailingBlankLines:
-  Enabled: false
-Style/IndentationConsistency:
-  Enabled: false
-Style/IndentationWidth:
-  Enabled: false
-Style/AlignParameters:
-  Enabled: false
 Style/DotPosition:
   Enabled: true
   EnforcedStyle: trailing
-Style/TrailingWhitespace:
-  Enabled: false
-Style/MultilineOperationIndentation:
-  Enabled: false
 Style/AlignHash:
   Enabled: false
 Style/AlignParameters:
@@ -103,13 +110,9 @@ Style/ParallelAssignment:
   Enabled: false
 Style/ZeroLengthPredicate:
   Enabled: false
-Style/SpaceInLambdaLiteral:
-  Enabled: false
 Style/NumericPredicate:
   Enabled: false
 Style/VariableNumber:
-  Enabled: false
-Style/SpaceInLambdaLiteral:
   Enabled: false
 Style/Dir:
   Enabled: false
@@ -139,6 +142,8 @@ RSpec/RepeatedDescription:
 Bundler/OrderedGems:
   Enabled: false
 Gemspec/OrderedDependencies:
+  Enabled: false
+Gemspec/RequiredRubyVersion:
   Enabled: false
 
 # Rails style changes
