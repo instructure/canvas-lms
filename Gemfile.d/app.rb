@@ -63,7 +63,7 @@ gem 'inst-jobs-autoscaling', '1.0.2'
   gem 'aws-sdk-autoscaling', '1.4.0', require: false
 gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
-gem 'highline', '1.7.8', require: false
+gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.15.6'
 gem 'i18n', '0.9.0'
 gem 'i18nliner', '0.0.14'
