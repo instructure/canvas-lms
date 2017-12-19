@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore';
-import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper';
+import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper';
 
 function submissionGradingPeriodInformation (assignment, student) {
   const submissionInfo = assignment.effectiveDueDates[student.id] || {};

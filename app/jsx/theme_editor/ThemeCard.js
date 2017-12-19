@@ -19,7 +19,7 @@
 import I18n from 'i18n!theme_editor'
 import React from 'react'
 import {string, func, bool} from 'prop-types'
-import SVGWrapper from 'jsx/shared/SVGWrapper'
+import SVGWrapper from '../shared/SVGWrapper'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 export default function ThemeCard (props) {

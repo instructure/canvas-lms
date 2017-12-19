@@ -32,7 +32,7 @@ import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
 import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
+import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader';
 
 function renderTrigger (ref) {
   return (

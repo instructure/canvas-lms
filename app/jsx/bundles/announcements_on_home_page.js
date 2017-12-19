@@ -20,7 +20,7 @@ import I18n from 'i18n!announcements_on_home_page'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
-import AnnouncementList from 'jsx/announcements/components/OldAnnouncementList'
+import AnnouncementList from '../announcements/components/OldAnnouncementList'
 import Spinner from '@instructure/ui-core/lib/components/Spinner'
 
 if (ENV.SHOW_ANNOUNCEMENTS) {

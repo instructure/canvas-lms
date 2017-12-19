@@ -21,7 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!assignment_index_menu'
-import ExternalToolModalLauncher from 'jsx/shared/ExternalToolModalLauncher'
+import ExternalToolModalLauncher from '../shared/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
 
 export default React.createClass({

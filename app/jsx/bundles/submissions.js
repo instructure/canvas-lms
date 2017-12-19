@@ -17,7 +17,7 @@
  */
 
 import { setup } from 'submissions';
-import StatusPill from 'jsx/grading/StatusPill';
+import StatusPill from '../grading/StatusPill';
 
 setup()
 StatusPill.renderPills()

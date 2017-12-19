@@ -25,10 +25,10 @@ import Link from 'instructure-ui/lib/components/Link';
 import IconEditLine from 'instructure-icons/lib/Line/IconEditLine';
 import IconTrashLine from 'instructure-icons/lib/Line/IconTrashLine';
 import Typography from 'instructure-ui/lib/components/Typography';
-import DateHelper from 'jsx/shared/helpers/dateHelper';
+import DateHelper from '../../../shared/helpers/dateHelper';
 import TextHelper from 'compiled/str/TextHelper';
-import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
-import SubmissionCommentUpdateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentUpdateForm';
+import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes';
+import SubmissionCommentUpdateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentUpdateForm';
 
 function submissionCommentDate (date) {
   return DateHelper.formatDatetimeForDisplay(date, 'short');

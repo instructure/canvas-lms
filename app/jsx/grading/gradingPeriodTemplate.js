@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'
-import DateHelper from 'jsx/shared/helpers/dateHelper'
+import DateHelper from '../shared/helpers/dateHelper'
 import 'jquery.instructure_date_and_time'
   const Types = PropTypes;
 

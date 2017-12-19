@@ -20,9 +20,9 @@ import React from 'react';
 import { bool, shape, string } from 'prop-types';
 import $ from 'jquery';
 import 'jquery.instructure_date_and_time'
-import environment from 'jsx/gradebook-history/environment';
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
-import NumberHelper from 'jsx/shared/helpers/numberHelper';
+import environment from '../gradebook-history/environment';
+import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper';
+import NumberHelper from '../shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook_history';
 import IconOffLine from 'instructure-icons/lib/Line/IconOffLine';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';

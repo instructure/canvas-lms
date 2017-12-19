@@ -20,7 +20,7 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
-import ConfigOptionField from 'jsx/external_apps/components/ConfigOptionField'
+import ConfigOptionField from '../../external_apps/components/ConfigOptionField'
 
   const modalOverrides = {
     overlay : {

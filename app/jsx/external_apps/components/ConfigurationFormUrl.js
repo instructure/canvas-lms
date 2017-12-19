@@ -21,7 +21,7 @@ import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from 'jsx/external_apps/components/TextInput'
+import TextInput from '../../external_apps/components/TextInput'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default React.createClass({

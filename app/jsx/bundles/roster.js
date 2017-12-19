@@ -34,7 +34,7 @@ import RosterView from 'compiled/views/courses/roster/RosterView'
 import RosterTabsView from 'compiled/views/courses/roster/RosterTabsView'
 import ResendInvitationsView from 'compiled/views/courses/roster/ResendInvitationsView'
 import $ from 'jquery'
-import 'jsx/context_cards/StudentContextCardTrigger'
+import '../context_cards/StudentContextCardTrigger'
 
 const fetchOptions = {
   include: ['avatar_url', 'enrollments', 'email', 'observed_users', 'can_be_removed', 'custom_links'],

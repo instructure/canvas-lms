@@ -29,8 +29,8 @@ import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import { GridCol } from 'instructure-ui/lib/components/Grid';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import SearchFormActions from 'jsx/gradebook-history/actions/SearchFormActions';
-import { showFlashAlert } from 'jsx/shared/FlashAlert';
+import SearchFormActions from '../gradebook-history/actions/SearchFormActions';
+import { showFlashAlert } from '../shared/FlashAlert';
 
 const recordShape = shape({
   fetchStatus: string.isRequired,

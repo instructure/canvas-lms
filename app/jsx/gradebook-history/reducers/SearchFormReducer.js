@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseLinkHeader from 'jsx/shared/parseLinkHeader';
+import parseLinkHeader from '../../shared/parseLinkHeader';
 import {
   CLEAR_RECORDS,
   FETCH_RECORDS_START,
@@ -25,7 +25,7 @@ import {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE
-} from 'jsx/gradebook-history/actions/SearchFormActions';
+} from '../../gradebook-history/actions/SearchFormActions';
 
 const initialState = {
   records: {

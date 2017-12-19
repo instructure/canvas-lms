@@ -45,7 +45,7 @@ if (!('require' in window)) {
     underscore: () => import('underscore'),
     'jsx/course_wizard/ListItems': () => new Promise(resolve => {
       require.ensure([], require => {
-        resolve(require('jsx/course_wizard/ListItems'))
+        resolve(require('./course_wizard/ListItems'))
       }, 'course_wizardListItemsAsyncChunk')
     })
   }

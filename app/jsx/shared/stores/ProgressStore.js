@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'underscore'
-import createStore from 'jsx/shared/helpers/createStore'
+import createStore from '../helpers/createStore'
 import $ from 'jquery'
   var ProgressStore = createStore({}),
     _progresses = {};

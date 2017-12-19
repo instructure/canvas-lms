@@ -18,7 +18,7 @@
 
 import _ from 'lodash';
 import timezone from 'timezone';
-import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper';
+import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper';
 
 export function scopeToUser (dueDateData, userId) {
   const scopedData = {};

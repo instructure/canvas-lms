@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
-import { RCELOADED_EVENT_NAME, send, destroy, focus } from 'jsx/shared/rce/RceCommandShim'
-import Sidebar from 'jsx/shared/rce/Sidebar'
-import featureFlag from 'jsx/shared/rce/featureFlag'
+import serviceRCELoader from '../rce/serviceRCELoader'
+import { RCELOADED_EVENT_NAME, send, destroy, focus } from '../rce/RceCommandShim'
+import Sidebar from '../rce/Sidebar'
+import featureFlag from '../rce/featureFlag'
 import $ from 'jquery'
 
 function loadServiceRCE (target, tinyMCEInitOptions, callback) {

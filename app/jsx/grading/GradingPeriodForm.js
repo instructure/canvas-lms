@@ -23,9 +23,9 @@ import update from 'immutability-helper'
 import _ from 'underscore'
 import Button from 'instructure-ui/lib/components/Button'
 import I18n from 'i18n!external_tools'
-import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
-import accessibleDateFormat from 'jsx/shared/helpers/accessibleDateFormat'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
+import DueDateCalendarPicker from '../due_dates/DueDateCalendarPicker'
+import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
+import numberHelper from '../shared/helpers/numberHelper'
 import round from 'compiled/util/round'
 
   const Types = PropTypes;

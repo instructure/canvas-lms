@@ -24,10 +24,10 @@ import OverrideView from 'compiled/views/assignments/DueDateOverride'
 import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
 import SectionCollection from 'compiled/collections/SectionCollection'
 import splitAssetString from 'compiled/str/splitAssetString'
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import LockManager from '../blueprint_courses/apps/LockManager'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SectionsAutocomplete from 'jsx/shared/SectionsAutocomplete'
+import SectionsAutocomplete from '../shared/SectionsAutocomplete'
 import 'grading_standards'
 
 const lockManager = new LockManager()

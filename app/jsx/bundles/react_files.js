@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import router from 'jsx/files/router'
+import router from '../files/router'
 
 router.start()

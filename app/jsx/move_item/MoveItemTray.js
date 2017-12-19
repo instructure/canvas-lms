@@ -24,7 +24,7 @@ import Tray from 'instructure-ui/lib/components/Tray'
 import Heading from 'instructure-ui/lib/components/Heading'
 import Container from 'instructure-ui/lib/components/Container'
 
-import { showFlashError } from 'jsx/shared/FlashAlert'
+import { showFlashError } from '../shared/FlashAlert'
 import { itemShape, moveOptionsType } from './propTypes'
 import MoveSelect from './MoveSelect'
 

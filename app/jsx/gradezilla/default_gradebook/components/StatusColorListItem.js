@@ -25,9 +25,9 @@ import Typography from 'instructure-ui/lib/components/Typography';
 import IconDiscussionReplySolid from 'instructure-icons/lib/Solid/IconDiscussionReplySolid';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid';
-import ColorPicker from 'jsx/shared/ColorPicker';
-import { statusesTitleMap } from 'jsx/gradezilla/default_gradebook/constants/statuses';
-import { defaultColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
+import ColorPicker from '../../../shared/ColorPicker';
+import { statusesTitleMap } from '../../../gradezilla/default_gradebook/constants/statuses';
+import { defaultColors } from '../../../gradezilla/default_gradebook/constants/colors';
 
 const colorPickerColors = Object.keys(defaultColors).reduce((obj, key) => {
   obj.push({ hexcode: defaultColors[key], name: key });

@@ -23,7 +23,7 @@ import 'quiz_rubric'
 import 'message_students'
 import 'jquery.disableWhileLoading'
 import 'compiled/jquery/ModuleSequenceFooter'
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'quiz', page: 'show' })

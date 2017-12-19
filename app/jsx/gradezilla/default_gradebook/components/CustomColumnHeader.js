@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Text from '@instructure/ui-core/lib/components/Text'
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader'
+import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader'
 
 const { string } = PropTypes;
 

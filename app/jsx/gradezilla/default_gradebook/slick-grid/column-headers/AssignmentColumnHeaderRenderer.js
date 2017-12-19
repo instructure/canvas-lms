@@ -18,8 +18,8 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import AssignmentColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader';
-import { optionsForGradingType } from 'jsx/gradezilla/shared/EnterGradesAsSetting';
+import AssignmentColumnHeader from '../../../../gradezilla/default_gradebook/components/AssignmentColumnHeader';
+import { optionsForGradingType } from '../../../../gradezilla/shared/EnterGradesAsSetting';
 
 function getSubmission (student, assignmentId) {
   const submission = student[`assignment_${assignmentId}`];

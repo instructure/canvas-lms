@@ -19,8 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import categoryHelper from 'jsx/shared/helpers/assignment-categories'
-import {transformScore} from 'jsx/shared/conditional_release/score'
+import categoryHelper from '../../shared/helpers/assignment-categories'
+import {transformScore} from '../../shared/conditional_release/score'
 import assignmentShape from '../shapes/assignment'
   const { object, number } = PropTypes
 

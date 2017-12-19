@@ -20,8 +20,8 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import page from 'page'
-import Header from 'jsx/external_apps/components/Header'
-import AddApp from 'jsx/external_apps/components/AddApp'
+import Header from '../../external_apps/components/Header'
+import AddApp from '../../external_apps/components/AddApp'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default React.createClass({

@@ -22,8 +22,8 @@ import Button from 'instructure-ui/lib/components/Button'
 import Checkbox from 'instructure-ui/lib/components/Checkbox'
 import I18n from 'i18n!grading_periods'
 import setsApi from 'compiled/api/gradingPeriodSetsApi'
-import EnrollmentTermInput from 'jsx/grading/EnrollmentTermInput'
-import { showFlashAlert } from 'jsx/shared/FlashAlert';
+import EnrollmentTermInput from '../grading/EnrollmentTermInput'
+import { showFlashAlert } from '../shared/FlashAlert';
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {

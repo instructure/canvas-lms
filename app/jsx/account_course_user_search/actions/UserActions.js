@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import UsersStore from 'jsx/account_course_user_search/UsersStore'
+import UsersStore from '../../account_course_user_search/UsersStore'
 import I18n from 'i18n!user_actions'
 
 export default {

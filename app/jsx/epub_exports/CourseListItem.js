@@ -19,12 +19,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import GenerateLink from 'jsx/epub_exports/GenerateLink'
-import DownloadLink from 'jsx/epub_exports/DownloadLink'
-import ApiProgressBar from 'jsx/shared/ApiProgressBar'
-import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
+import GenerateLink from '../epub_exports/GenerateLink'
+import DownloadLink from '../epub_exports/DownloadLink'
+import ApiProgressBar from '../shared/ApiProgressBar'
+import CourseEpubExportStore from '../epub_exports/CourseStore'
 import I18n from 'i18n!epub_exports'
-import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import FriendlyDatetime from '../shared/FriendlyDatetime'
 import classnames from 'classnames'
   var CourseListItem = React.createClass({
     displayName: 'CourseListItem',

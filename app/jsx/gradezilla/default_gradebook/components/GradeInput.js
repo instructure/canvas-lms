@@ -22,7 +22,7 @@ import Select from 'instructure-ui/lib/components/Select';
 import TextInput from 'instructure-ui/lib/components/TextInput';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 
 function normalizeGrade (grade) {
   return GradeFormatHelper.formatGrade(grade, { defaultValue: '' });

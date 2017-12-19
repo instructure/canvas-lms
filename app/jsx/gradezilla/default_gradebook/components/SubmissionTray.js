@@ -28,14 +28,14 @@ import Spinner from 'instructure-ui/lib/components/Spinner';
 import Tray from 'instructure-ui/lib/components/Tray';
 import Typography from 'instructure-ui/lib/components/Typography';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
-import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
-import GradeInput from 'jsx/gradezilla/default_gradebook/components/GradeInput';
-import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
-import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
-import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem';
-import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
-import SubmissionStatus from 'jsx/gradezilla/default_gradebook/components/SubmissionStatus';
-import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
+import Carousel from '../../../gradezilla/default_gradebook/components/Carousel';
+import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput';
+import LatePolicyGrade from '../../../gradezilla/default_gradebook/components/LatePolicyGrade';
+import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes';
+import SubmissionCommentListItem from '../../../gradezilla/default_gradebook/components/SubmissionCommentListItem';
+import SubmissionCommentCreateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
+import SubmissionStatus from '../../../gradezilla/default_gradebook/components/SubmissionStatus';
+import SubmissionTrayRadioInputGroup from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 
 function renderAvatar (name, avatarUrl) {
   return (

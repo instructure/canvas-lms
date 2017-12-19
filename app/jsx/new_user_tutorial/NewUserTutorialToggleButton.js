@@ -22,7 +22,7 @@ import I18n from 'i18n!new_user_tutorial'
 import Button from 'instructure-ui/lib/components/Button'
 import IconMoveLeftLine from 'instructure-icons/lib/Line/IconMoveLeftLine'
 import IconMoveRightLine from 'instructure-icons/lib/Line/IconMoveRightLine'
-import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
+import plainStoreShape from '../shared/proptypes/plainStoreShape'
 
   class NewUserTutorialToggleButton extends React.Component {
 

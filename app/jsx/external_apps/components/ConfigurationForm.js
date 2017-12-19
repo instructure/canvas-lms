@@ -20,11 +20,11 @@ import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
-import ConfigurationFormUrl from 'jsx/external_apps/components/ConfigurationFormUrl'
-import ConfigurationFormXml from 'jsx/external_apps/components/ConfigurationFormXml'
-import ConfigurationFormLti2 from 'jsx/external_apps/components/ConfigurationFormLti2'
-import ConfigurationTypeSelector from 'jsx/external_apps/components/ConfigurationTypeSelector'
+import ConfigurationFormManual from '../../external_apps/components/ConfigurationFormManual'
+import ConfigurationFormUrl from '../../external_apps/components/ConfigurationFormUrl'
+import ConfigurationFormXml from '../../external_apps/components/ConfigurationFormXml'
+import ConfigurationFormLti2 from '../../external_apps/components/ConfigurationFormLti2'
+import ConfigurationTypeSelector from '../../external_apps/components/ConfigurationTypeSelector'
 
 export default React.createClass({
     displayName: 'ConfigurationForm',

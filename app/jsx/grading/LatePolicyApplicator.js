@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ScoreToGradeHelper from 'jsx/gradebook/shared/helpers/ScoreToGradeHelper';
+import ScoreToGradeHelper from '../gradebook/shared/helpers/ScoreToGradeHelper';
 
 const equivalentToNull = [undefined, null, '', 0];
 const intervalTypes = ['day', 'hour'];

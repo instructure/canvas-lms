@@ -4,7 +4,7 @@ import axios from 'axios'
 import classnames from 'classnames'
 import I18n from 'i18n!lock_btn_module'
 import FilesystemObject from 'compiled/models/FilesystemObject'
-import { showFlashError } from 'jsx/shared/FlashAlert'
+import { showFlashError } from './FlashAlert'
 
 class MasterCourseLock extends React.Component {
   static propTypes = {

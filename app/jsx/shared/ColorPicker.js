@@ -25,7 +25,7 @@ import Button from 'instructure-ui/lib/components/Button'
 import TextInput from 'instructure-ui/lib/components/TextInput'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import I18n from 'i18n!calendar_color_picker'
-import CourseNicknameEdit from 'jsx/shared/CourseNicknameEdit'
+import CourseNicknameEdit from './CourseNicknameEdit'
 import classnames from 'classnames'
 import 'compiled/jquery.rails_flash_notifications'
 

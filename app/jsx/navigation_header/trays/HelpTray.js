@@ -19,7 +19,7 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import PropTypes from 'prop-types'
-import HelpDialog from 'jsx/help_dialog/HelpDialog'
+import HelpDialog from '../../help_dialog/HelpDialog'
 
   var HelpTray = React.createClass({
     propTypes: {

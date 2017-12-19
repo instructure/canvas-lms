@@ -29,7 +29,7 @@ import {
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
-import { filterLabels } from 'jsx/gradezilla/default_gradebook/constants/ViewOptions';
+import { filterLabels } from '../../../gradezilla/default_gradebook/constants/ViewOptions';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 
 function renderTriggerButton (bindButton) {

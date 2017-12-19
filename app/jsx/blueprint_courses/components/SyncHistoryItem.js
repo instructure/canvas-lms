@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 
 import Heading from 'instructure-ui/lib/components/Heading'
 import Typography from 'instructure-ui/lib/components/Typography'
-import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import SyncChange from './SyncChange'
 
 import propTypes from '../propTypes'

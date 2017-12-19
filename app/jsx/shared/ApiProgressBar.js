@@ -19,8 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import ProgressStore from 'jsx/shared/stores/ProgressStore'
-import ProgressBar from 'jsx/shared/ProgressBar'
+import ProgressStore from './stores/ProgressStore'
+import ProgressBar from './ProgressBar'
   var ApiProgressBar = React.createClass({
     displayName: 'ProgressBar',
     propTypes: {

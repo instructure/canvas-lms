@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
-import classMunger from 'jsx/external_apps/lib/classMunger'
+import classMunger from '../../external_apps/lib/classMunger'
 
 export default {
     getInitialState() {

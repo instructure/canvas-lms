@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import I18n from 'i18n!blueprint_settings'
-import select from 'jsx/shared/select'
+import select from '../../shared/select'
 
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'

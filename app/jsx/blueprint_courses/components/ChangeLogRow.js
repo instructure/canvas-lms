@@ -20,7 +20,7 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
-import shortId from 'jsx/shared/shortid'
+import shortId from '../../shared/shortid'
 
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'

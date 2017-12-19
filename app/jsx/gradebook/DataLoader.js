@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import cheaterDepaginate from 'jsx/shared/CheatDepaginator'
+import cheaterDepaginate from '../shared/CheatDepaginator'
 import _ from 'underscore'
 
 function getGradingPeriodAssignments (courseId) {

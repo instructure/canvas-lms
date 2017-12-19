@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!modules'
-import PostGradesDialog from 'jsx/gradebook/SISGradePassback/PostGradesDialog'
+import PostGradesDialog from '../../gradebook/SISGradePassback/PostGradesDialog'
 import classnames from 'classnames'
 
   // The PostGradesApp mounts a single "Sync Grades" button, which pops up

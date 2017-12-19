@@ -18,7 +18,7 @@
 
 import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import gradebookHistory from 'jsx/gradebook-history/reducers/Reducer';
+import gradebookHistory from '../../gradebook-history/reducers/Reducer';
 
 const GradebookHistoryStore = createStore(
   gradebookHistory,

@@ -29,7 +29,7 @@ import Link from 'instructure-ui/lib/components/Link'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import AccessibleContent from 'instructure-ui/lib/components/AccessibleContent'
 import I18n from 'i18n!course_home_dialog'
-import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
+import plainStoreShape from '../shared/proptypes/plainStoreShape'
 
 class CourseHomeDialog extends React.Component {
   static propTypes = {

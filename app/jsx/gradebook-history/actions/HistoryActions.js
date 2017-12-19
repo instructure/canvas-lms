@@ -17,7 +17,7 @@
  */
 
 import 'jquery.instructure_date_and_time'
-import parseLinkHeader from 'jsx/shared/parseLinkHeader';
+import parseLinkHeader from '../../shared/parseLinkHeader';
 
 const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
 const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';

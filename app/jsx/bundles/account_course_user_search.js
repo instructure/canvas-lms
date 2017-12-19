@@ -19,10 +19,10 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from 'jsx/account_course_user_search/index'
-import router from 'jsx/account_course_user_search/router'
-import configureStore from 'jsx/account_course_user_search/store/configureStore'
-import initialState from 'jsx/account_course_user_search/store/initialState'
+import App from '../account_course_user_search/index'
+import router from '../account_course_user_search/router'
+import configureStore from '../account_course_user_search/store/configureStore'
+import initialState from '../account_course_user_search/store/initialState'
 
 // eg: '/accounts/xxx' for anything like '/accounts/xxx/whatever`
 initialState.tabList.basePath = window.location.pathname.match(/.*accounts\/[^/]*/)[0]

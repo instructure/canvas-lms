@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import StudentContextTray from "jsx/context_cards/StudentContextTray";
-import StudentCardStore from "jsx/context_cards/StudentCardStore";
+import StudentContextTray from "../context_cards/StudentContextTray";
+import StudentCardStore from "../context_cards/StudentCardStore";
 
 export default class RestStudentContextTray extends React.Component {
   static propTypes = {

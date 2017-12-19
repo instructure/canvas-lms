@@ -21,7 +21,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import InputMixin from 'jsx/external_apps/mixins/InputMixin'
+import InputMixin from '../../external_apps/mixins/InputMixin'
 
 export default React.createClass({
     displayName: 'SelectInput',

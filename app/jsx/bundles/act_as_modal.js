@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ActAsModal from 'jsx/actAs/ActAsModal'
+import ActAsModal from '../actAs/ActAsModal'
 
 ReactDOM.render((
   <ActAsModal user={ENV.act_as_user_data.user} />

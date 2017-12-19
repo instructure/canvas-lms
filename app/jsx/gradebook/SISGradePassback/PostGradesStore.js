@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!modules'
-import createStore from 'jsx/shared/helpers/createStore'
-import assignmentUtils from 'jsx/gradebook/SISGradePassback/assignmentUtils'
+import createStore from '../../shared/helpers/createStore'
+import assignmentUtils from '../../gradebook/SISGradePassback/assignmentUtils'
 
   var PostGradesStore = (state) => {
     var store = $.extend(createStore(state), {

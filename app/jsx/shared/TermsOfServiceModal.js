@@ -23,7 +23,7 @@ import Link from 'instructure-ui/lib/components/Link'
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!terms_of_service_modal'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import RichContentEditor from './rce/RichContentEditor'
 
 const { bool } = PropTypes
 const termsOfServiceText = I18n.t('Terms of Service')

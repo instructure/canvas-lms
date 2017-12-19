@@ -22,9 +22,9 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
-import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
-import Lti2Edit from 'jsx/external_apps/components/Lti2Edit'
+import store from '../../external_apps/lib/ExternalAppsStore'
+import ConfigurationForm from '../../external_apps/components/ConfigurationForm'
+import Lti2Edit from '../../external_apps/components/Lti2Edit'
 import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {

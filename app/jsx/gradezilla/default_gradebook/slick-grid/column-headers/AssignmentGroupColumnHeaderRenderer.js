@@ -18,7 +18,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import AssignmentGroupColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader';
+import AssignmentGroupColumnHeader from '../../../../gradezilla/default_gradebook/components/AssignmentGroupColumnHeader';
 
 function getProps (column, gradebook, options) {
   const columnId = column.id;

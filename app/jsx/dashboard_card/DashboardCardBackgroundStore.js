@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'underscore'
-import createStore from 'jsx/shared/helpers/createStore'
+import createStore from '../shared/helpers/createStore'
 import ContextColorer from 'compiled/contextColorer'
 
   var DEFAULT_COLOR_OPTIONS = [

@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
-import CustomHelpLinkSettings from 'jsx/custom_help_link_settings/CustomHelpLinkSettings'
+import CustomHelpLinkSettings from '../custom_help_link_settings/CustomHelpLinkSettings'
 import 'account_settings'
 import 'compiled/bundles/modules/account_quota_settings'
 

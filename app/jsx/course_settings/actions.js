@@ -20,7 +20,7 @@ import axios from 'axios'
 import $ from 'jquery'
 import I18n from 'i18n!actions'
 import Helpers from './helpers'
-import rawUploadFile from 'jsx/shared/upload_file'
+import rawUploadFile from '../shared/upload_file'
 import 'compiled/jquery.rails_flash_notifications'
 
   const Actions = {

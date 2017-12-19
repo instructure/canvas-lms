@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!blueprint_settings'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import select from 'jsx/shared/select'
+import select from '../../shared/select'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 

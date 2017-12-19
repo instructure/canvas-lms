@@ -19,7 +19,7 @@
 /**
 * Flash alerts, especially for ajax error messages
 * Typical usage:
-* import {showFlashError} from 'jsx/shared/FlashAlert'
+* import {showFlashError} from './FlashAlert'
 * ...
 * axios.put(url, data).then((response) => {
 *     // do something with response

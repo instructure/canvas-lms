@@ -21,9 +21,9 @@ import ReactDOM from 'react-dom'
 import page from 'page'
 import qs from 'qs'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
-import FilesApp from 'jsx/files/FilesApp'
-import ShowFolder from 'jsx/files/ShowFolder'
-import SearchResults from 'jsx/files/SearchResults'
+import FilesApp from '../files/FilesApp'
+import ShowFolder from '../files/ShowFolder'
+import SearchResults from '../files/SearchResults'
 
   /**
    * Route Handlers

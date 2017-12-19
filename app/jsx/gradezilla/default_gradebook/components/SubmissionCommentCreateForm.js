@@ -18,7 +18,7 @@
 
 import {func} from 'prop-types';
 import I18n from 'i18n!gradebook';
-import SubmissionCommentForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentForm';
+import SubmissionCommentForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentForm';
 
 export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   static propTypes = {

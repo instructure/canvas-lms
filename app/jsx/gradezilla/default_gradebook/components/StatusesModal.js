@@ -25,8 +25,8 @@ import Button from 'instructure-ui/lib/components/Button';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from 'instructure-ui/lib/components/Modal';
 import Heading from 'instructure-ui/lib/components/Heading';
 import Typography from 'instructure-ui/lib/components/Typography';
-import { statuses } from 'jsx/gradezilla/default_gradebook/constants/statuses';
-import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem';
+import { statuses } from '../../../gradezilla/default_gradebook/constants/statuses';
+import StatusColorListItem from '../../../gradezilla/default_gradebook/components/StatusColorListItem';
 
 class StatusesModal extends React.Component {
   static propTypes = {

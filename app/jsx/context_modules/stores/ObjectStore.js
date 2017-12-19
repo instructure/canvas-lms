@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import createStore from 'jsx/shared/helpers/createStore'
+import createStore from '../../shared/helpers/createStore'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 import 'compiled/jquery.rails_flash_notifications'
 

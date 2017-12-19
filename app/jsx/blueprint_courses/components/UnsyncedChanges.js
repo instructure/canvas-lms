@@ -20,7 +20,7 @@ import React, { Component } from 'react'
 import I18n from 'i18n!blueprint_settings'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import select from 'jsx/shared/select'
+import select from '../../shared/select'
 
 import Alert from 'instructure-ui/lib/components/Alert'
 import Heading from 'instructure-ui/lib/components/Heading'

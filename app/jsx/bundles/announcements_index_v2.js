@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createAnnouncementsIndex from 'jsx/announcements'
+import createAnnouncementsIndex from '../announcements'
 
 const root = document.querySelector('#content')
 const app = createAnnouncementsIndex(root, {

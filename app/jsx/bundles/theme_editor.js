@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ThemeEditor from 'jsx/theme_editor/ThemeEditor'
+import ThemeEditor from '../theme_editor/ThemeEditor'
 
   // framebust out so we don't ever get theme editor inside theme editor
 if (window.top.location !== self.location) {

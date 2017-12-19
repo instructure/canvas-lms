@@ -19,7 +19,7 @@
 import _ from 'underscore'
 import tz from 'timezone'
 import I18n from 'i18n!gradebook'
-import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
+import GradingPeriodsHelper from '../grading/helpers/GradingPeriodsHelper'
 
   const TOOLTIP_KEYS = {
     NOT_IN_ANY_GP: "not_in_any_grading_period",

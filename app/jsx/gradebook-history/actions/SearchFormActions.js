@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentApi from 'jsx/gradebook-history/api/AssignmentApi';
-import HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
-import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
-import UserApi from 'jsx/gradebook-history/api/UserApi';
-import environment from 'jsx/gradebook-history/environment';
+import AssignmentApi from '../../gradebook-history/api/AssignmentApi';
+import HistoryActions from '../../gradebook-history/actions/HistoryActions';
+import HistoryApi from '../../gradebook-history/api/HistoryApi';
+import UserApi from '../../gradebook-history/api/UserApi';
+import environment from '../../gradebook-history/environment';
 
 const CLEAR_RECORDS = 'CLEAR_RECORDS';
 const FETCH_RECORDS_START = 'FETCH_RECORDS_START';

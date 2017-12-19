@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
-import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
+import FilesystemObjectThumbnail from '../files/FilesystemObjectThumbnail'
 
   var MAX_THUMBNAILS_TO_SHOW = 5;
 

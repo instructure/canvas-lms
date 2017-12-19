@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createStore from 'jsx/shared/helpers/createStore';
+import createStore from '../../shared/helpers/createStore';
 
   const defaultState = Object.freeze({
     isCollapsed: false

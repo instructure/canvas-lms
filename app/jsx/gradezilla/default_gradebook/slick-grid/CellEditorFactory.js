@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor';
+import AssignmentCellEditor from '../../../gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor';
 
 class CellEditorFactory {
   getEditor (column) {

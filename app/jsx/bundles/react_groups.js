@@ -17,6 +17,6 @@
  */
 
 import ReactDOM from 'react-dom'
-import StudentView from 'jsx/groups/StudentView'
+import StudentView from '../groups/StudentView'
 
 ReactDOM.render(StudentView, document.getElementById('content'))

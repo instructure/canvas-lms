@@ -18,8 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DashboardCardBox from 'jsx/dashboard_card/DashboardCardBox'
-import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
+import DashboardCardBox from '../dashboard_card/DashboardCardBox'
+import getDroppableDashboardCardBox from '../dashboard_card/getDroppableDashboardCardBox'
 
 const Box = ENV.DASHBOARD_REORDERING_ENABLED ? getDroppableDashboardCardBox() : DashboardCardBox
 

@@ -24,7 +24,7 @@ import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import Button from 'instructure-ui/lib/components/Button'
 import { MenuItem } from 'instructure-ui/lib/components/Menu'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import AddToCourseModal from 'jsx/outcomes/AddToCourseModal'
+import AddToCourseModal from '../outcomes/AddToCourseModal'
 
 export default React.createClass({
     propTypes: {

@@ -25,7 +25,7 @@ import IconMessageLine from 'instructure-icons/lib/Line/IconMessageLine'
 import IconEditLine from 'instructure-icons/lib/Line/IconEditLine'
 import I18n from 'i18n!account_course_user_search'
 import {datetimeString} from 'jquery.instructure_date_and_time'
-import EditUserDetailsDialog from 'jsx/shared/EditUserDetailsDialog'
+import EditUserDetailsDialog from '../shared/EditUserDetailsDialog'
 
 export default function UsersListRow({accountId, user, permissions, handlers, timezones}) {
   return (

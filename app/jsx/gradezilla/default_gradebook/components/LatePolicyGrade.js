@@ -20,7 +20,7 @@ import React from 'react';
 import { number, shape, string } from 'prop-types';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 
 export default function LatePolicyGrade (props) {
   const { grade } = props.submission;

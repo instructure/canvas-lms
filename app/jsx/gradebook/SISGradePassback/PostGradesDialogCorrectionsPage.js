@@ -19,8 +19,8 @@
 import _ from 'underscore'
 import I18n from 'i18n!modules'
 import React from 'react'
-import assignmentUtils from 'jsx/gradebook/SISGradePassback/assignmentUtils'
-import AssignmentCorrectionRow from 'jsx/gradebook/SISGradePassback/AssignmentCorrectionRow'
+import assignmentUtils from '../../gradebook/SISGradePassback/assignmentUtils'
+import AssignmentCorrectionRow from '../../gradebook/SISGradePassback/AssignmentCorrectionRow'
 
   var PostGradesDialogCorrectionsPage = React.createClass({
     componentDidMount () {

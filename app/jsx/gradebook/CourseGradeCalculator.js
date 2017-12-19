@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import round from 'compiled/util/round'
-import AssignmentGroupGradeCalculator from 'jsx/gradebook/AssignmentGroupGradeCalculator'
+import AssignmentGroupGradeCalculator from '../gradebook/AssignmentGroupGradeCalculator'
 
 function sum (collection) {
   return _.reduce(collection, (total, value) => (total + value), 0);

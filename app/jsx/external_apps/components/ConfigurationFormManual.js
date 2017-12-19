@@ -21,9 +21,9 @@ import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from 'jsx/external_apps/components/TextInput'
-import TextAreaInput from 'jsx/external_apps/components/TextAreaInput'
-import SelectInput from 'jsx/external_apps/components/SelectInput'
+import TextInput from '../../external_apps/components/TextInput'
+import TextAreaInput from '../../external_apps/components/TextAreaInput'
+import SelectInput from '../../external_apps/components/SelectInput'
 import 'compiled/jquery.rails_flash_notifications'
 
   var PRIVACY_OPTIONS = {

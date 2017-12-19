@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import accessibleDateFormat from 'jsx/shared/helpers/accessibleDateFormat'
+import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
 import tz from 'timezone'
 import 'jquery.instructure_forms'
 import cx from 'classnames'

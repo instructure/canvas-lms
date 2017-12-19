@@ -25,9 +25,9 @@ import PresentationContent from 'instructure-ui/lib/components/PresentationConte
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import Typography from 'instructure-ui/lib/components/Typography';
 
-import {showFlashError} from 'jsx/shared/FlashAlert';
+import {showFlashError} from '../shared/FlashAlert';
 import I18n from 'i18n!grade_summary';
-import SelectMenu from 'jsx/grade_summary/SelectMenu';
+import SelectMenu from '../grade_summary/SelectMenu';
 
 export default class SelectMenuGroup extends React.Component {
   static propTypes = {

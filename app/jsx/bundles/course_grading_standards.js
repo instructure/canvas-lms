@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import CourseTabContainer from 'jsx/grading/CourseTabContainer'
+import CourseTabContainer from '../grading/CourseTabContainer'
 
 ReactDOM.render(
   <CourseTabContainer hasGradingPeriods={ENV.HAS_GRADING_PERIODS} />,

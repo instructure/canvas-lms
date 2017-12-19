@@ -29,7 +29,7 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
 import Checkbox from 'instructure-ui/lib/components/Checkbox';
 import Select from 'instructure-ui/lib/components/Select';
 import Round from 'compiled/util/round';
-import NumberHelper from 'jsx/shared/helpers/numberHelper';
+import NumberHelper from '../../../shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook';
 
 function isNumeric (input) {

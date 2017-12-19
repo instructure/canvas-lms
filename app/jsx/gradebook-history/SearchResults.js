@@ -27,8 +27,8 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
 import Typography from 'instructure-ui/lib/components/Typography';
-import { getHistoryNextPage } from 'jsx/gradebook-history/actions/SearchResultsActions';
-import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow';
+import { getHistoryNextPage } from '../gradebook-history/actions/SearchResultsActions';
+import SearchResultsRow from '../gradebook-history/SearchResultsRow';
 
 const colHeaders = [
   I18n.t('Date'),

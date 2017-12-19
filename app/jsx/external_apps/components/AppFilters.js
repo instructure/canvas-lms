@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import store from 'jsx/external_apps/lib/AppCenterStore'
+import store from '../../external_apps/lib/AppCenterStore'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 

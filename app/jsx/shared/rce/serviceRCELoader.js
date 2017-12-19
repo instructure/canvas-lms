@@ -18,10 +18,10 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import {refreshFn as refreshToken} from 'jsx/shared/jwt'
-import editorOptions from 'jsx/shared/rce/editorOptions'
-import loadEventListeners from 'jsx/shared/rce/loadEventListeners'
-import polyfill from 'jsx/shared/rce/polyfill'
+import {refreshFn as refreshToken} from '../jwt'
+import editorOptions from '../rce/editorOptions'
+import loadEventListeners from '../rce/loadEventListeners'
+import polyfill from '../rce/polyfill'
 import splitAssetString from 'compiled/str/splitAssetString'
 
   const RCELoader = {
