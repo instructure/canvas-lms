@@ -520,7 +520,11 @@ class Account < ActiveRecord::Base
   end
 
   def file_namespace
-    Shard.birth.activate { "account_#{self.root_account.id}" }
+    if Shard.current == Shard.birth
+      "account_#{root_account.local_id}"
+    else
+      root_account.global_asset_string
+    end
   end
 
   def self.account_lookup_cache_key(id)

@@ -286,10 +286,12 @@ class Attachment < ActiveRecord::Base
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
-    if Attachment.s3_storage? && context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
-      dup.save_without_broadcasting!
-      dup.make_rootless
-      dup.change_namespace(context.root_account.file_namespace)
+    dup.shard.activate do
+      if Attachment.s3_storage? && context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+        dup.save_without_broadcasting!
+        dup.make_rootless
+        dup.change_namespace(context.root_account.file_namespace)
+      end
     end
     dup.updated_at = Time.zone.now
     dup.clone_updated = true
@@ -473,23 +475,25 @@ class Attachment < ActiveRecord::Base
   end
 
   def infer_namespace
-    # If you are thinking about changing the format of this, take note: some
-    # code relies on the namespace as a hacky way to efficiently get the
-    # attachment's account id. Look for anybody who is accessing namespace and
-    # splitting the string, etc.
-    #
-    # I've added the root_account_id accessor above, but I didn't verify there
-    # isn't any code still accessing the namespace for the account id directly.
-    ns = root_attachment.try(:namespace) if root_attachment_id
-    ns ||= Attachment.domain_namespace
-    ns ||= self.context.root_account.file_namespace rescue nil
-    ns ||= self.context.account.file_namespace rescue nil
-    if Rails.env.development? && Attachment.local_storage?
-      ns ||= ""
-      ns = "_localstorage_/#{ns}" unless ns.start_with?('_localstorage_/')
+    shard.activate do
+      # If you are thinking about changing the format of this, take note: some
+      # code relies on the namespace as a hacky way to efficiently get the
+      # attachment's account id. Look for anybody who is accessing namespace and
+      # splitting the string, etc.
+      #
+      # I've added the root_account_id accessor above, but I didn't verify there
+      # isn't any code still accessing the namespace for the account id directly.
+      ns = root_attachment.try(:namespace) if root_attachment_id
+      ns ||= Attachment.domain_namespace
+      ns ||= self.context.root_account.file_namespace rescue nil
+      ns ||= self.context.account.file_namespace rescue nil
+      if Rails.env.development? && Attachment.local_storage?
+        ns ||= ""
+        ns = "_localstorage_/#{ns}" unless ns.start_with?('_localstorage_/')
+      end
+      ns = nil if ns && ns.empty?
+      ns
     end
-    ns = nil if ns && ns.empty?
-    ns
   end
 
   def change_namespace(new_namespace)
@@ -1602,11 +1606,11 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.domain_namespace=(val)
-    @@domain_namespace = val
+    @domain_namespace = val
   end
 
   def self.domain_namespace
-    @@domain_namespace ||= nil
+    @domain_namespace.respond_to?(:file_namespace) ? @domain_namespace.file_namespace : @domain_namespace
   end
 
   def self.serialization_methods; [:mime_class, :currently_locked, :crocodoc_available?]; end
