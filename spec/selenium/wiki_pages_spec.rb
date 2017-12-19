@@ -393,7 +393,7 @@ describe "Wiki Pages" do
 
       it "should validate that revision restored is displayed", priority: "1", test_id: 126832 do
         get "/courses/#{@course.id}/pages/#{@vpage.url}"
-        f('.icon-settings').click
+        f('.al-trigger').click
         expect(f('.icon-clock')).to be_present
         f('.view_page_history').click
         wait_for_ajaximations
