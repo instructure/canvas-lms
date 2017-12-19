@@ -17,7 +17,7 @@
 
 group :redis do
   gem 'redis-rails', '5.0.2'
-  gem 'redis-store', '1.4.1', github: 'ccutrer/redis-store', ref: 'b2ffdf5d183d9c545faa0bd8510184f7fb8b988f'
+  gem 'redis-store', '1.4.1', github: 'redis-store/redis-store', ref: 'af2303747d701a49622d3884285324f1be665d94'
 
   gem 'redis', '4.0.0'
   gem 'redis-scripting', '1.0.1'
