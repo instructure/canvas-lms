@@ -9,7 +9,8 @@ require 'csv'
 
 class BzController < ApplicationController
 
-  before_filter :require_user
+  # magic field dump uses an access token instead
+  before_filter :require_user, :except => [:magic_field_dump]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
 
@@ -434,6 +435,7 @@ class BzController < ApplicationController
     # so i don't mind it being passed to us from the client.
     was_optional = params[:optional]
     field_type = params[:type]
+    answer = params[:answer]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
@@ -450,7 +452,7 @@ class BzController < ApplicationController
     # now that the user's work is safely saved, we will go back and do addon work
     # like micrograding
 
-    if was_new && !was_optional && field_type != 'checkbox' # Checkboxes are optional by nature
+    if was_new && !was_optional && (field_type != 'checkbox' || !answer.nil?) # Checkboxes are optional by nature unless there is an answer
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
       module_item_id = request.referrer[/module_item_id=(\d+)/, 1]
       if module_item_id.nil?
@@ -492,8 +494,10 @@ class BzController < ApplicationController
         # However, given that we can just round up the points at the end of the semester and most the
         # steps will be fractional points, and most the content will be written ahead of time, this
         # shouldn't be a real problem.
-        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.day) do
-          count = 0
+        # old one was magic_field_count, now it is magic_field_counts -- new cache returns an array for more detail
+        magic_field_counts = Rails.cache.fetch("magic_field_counts_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.day) do
+          total_count = 0
+          graded_checkboxes_that_are_supposed_to_be_empty_count = 0
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
           # NOTE: Now that we have separate Course Participation assignments to track engagement on a per module basis, 
@@ -524,16 +528,22 @@ class BzController < ApplicationController
               doc.css(selector).each do |o|
                 n = o.attr('data-bz-retained')
                 next if names[n]
-                next if o.attr('type') == 'checkbox'
+                next if o.attr('type') == 'checkbox' && o.attr('data-bz-answer').nil?
                 names[n] = true
-                count += 1
-                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
+                total_count += 1
+                if o.attr('type') == 'checkbox' && o.attr('data-bz-answer') == ''
+                  graded_checkboxes_that_are_supposed_to_be_empty_count += 1
+                end
+                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, total_count = #{total_count}, graded_checkboxes_that_are_supposed_to_be_empty_count = #{graded_checkboxes_that_are_supposed_to_be_empty_count}")
               end
             end
           end
-          count == 0 ? 1 : count
+          [total_count == 0 ? 1 : total_count, graded_checkboxes_that_are_supposed_to_be_empty_count]
         end
-        Rails.logger.debug("### set_user_retained_data - magic_field_count = #{magic_field_count}")
+        Rails.logger.debug("### set_user_retained_data - magic_field_counts(total, supposed_to_be_blank) = #{magic_field_counts}")
+
+        magic_field_count = magic_field_counts[0]
+        graded_checkboxes_that_are_supposed_to_be_empty_count = magic_field_counts[1]
 
         # This is hacky, but we tie modules to participation tracking assignments using the name.
         # E.g. #Course Participation - Onboarding" would track the Onboarding Module.
@@ -542,28 +552,48 @@ class BzController < ApplicationController
         if !res.empty?
           participation_assignment = res.first
 
-          step = participation_assignment.points_possible.to_f / magic_field_count
+          # only update score if we are not yet at the due date or there is no due date
+          # participation doesn't count if it is done late.
+          # this accounts for a due date being set the same for everyone on the assignment or set differently per section
+          overridden = participation_assignment.overridden_for(@current_user)
+          effective_due_at = overridden.due_at
+          effective_due_at = participation_assignment.due_at if overridden.due_at.nil?
+          if effective_due_at.nil? || effective_due_at >= DateTime.now
 
-          submission = participation_assignment.find_or_create_submission(@current_user)
-
-          submission.with_lock do
-            existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
-            new_grade = existing_grade + step 
-            if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
-              Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
-              new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
-                                                                        # to account for floating point inaccuracies.
+            step = participation_assignment.points_possible.to_f / magic_field_count
+            original_step = step
+            if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
+              step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
+            elsif !answer.nil? && answer == '' && params[:value] == '' && field_type == 'checkbox'
+              # they checked then unchecked a box, triggering an explicit save. We assume there is no
+              # explicit save so the points are already there... but here, there is one, so the points
+              # are already there! Thus, despite them putting in the correct answer, since it is a checkbox
+              # we want to give them zero points here so they don't get double credit.
+              step = 0 # don't award double credit
+            elsif !answer.nil? && params[:value] != answer
+              step = 0 # wrong answer = no points
             end
-            Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
-            participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
+
+            submission = participation_assignment.find_or_create_submission(@current_user)
+            submission.with_lock do
+              existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * original_step) : submission.grade.to_f
+              new_grade = existing_grade + step 
+              if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
+                Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
+                new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
+                                                                        # to account for floating point inaccuracies.
+              end
+              Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
+              participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
+            end
+          else
+            Rails.logger.warn("### set_user_retained_data - for user #{@current_user.name} the magic field #{params[:name]} was completed on #{DateTime.now} which is after the due date of #{effective_due_at}")
           end
         end
       elsif is_student
         Rails.logger.error("### set_user_retained_data - missing either course_id = #{course_id} or module_item_id = #{module_item_id}. Can't update the Course Participation grade without that! user = #{@current_user.inspect}")
       end
     end
-
-
     render :nothing => true
   end
 

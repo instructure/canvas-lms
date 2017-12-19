@@ -35,6 +35,22 @@ function addOnMagicFieldsLoaded(func) {
 }
 
 function bzRetainedInfoSetup() {
+  function lockRelatedCheckboxes(el) {
+    // or if we are a graded checkbox, disable other graded checkboxes inside the same bz-box since they are all related
+    if(el.getAttribute("type") == "checkbox") {
+      var p = el;
+      while(p && !p.classList.contains("bz-box"))
+        p = p.parentNode;
+      if(p) {
+        var otherBoxes = p.querySelectorAll("[data-bz-retained][type=checkbox][data-bz-answer]");
+        for(var idx = 0; idx < otherBoxes.length; idx++) {
+          var item = otherBoxes[idx];
+          item.setAttribute("disabled", "disabled");
+        }
+      }
+    }
+  }
+
   function bzChangeRetainedItem(element, value) {
     if(element.tagName == "INPUT" && element.getAttribute("type") == "checkbox"){
       element.checked = (value == "yes") ? true : false;
@@ -48,6 +64,11 @@ function bzRetainedInfoSetup() {
       element.value = value;
     } else {
       element.textContent = value;
+    }
+
+    if(value != "" && element.hasAttribute("data-bz-answer")) {
+      element.setAttribute("disabled", "disabled"); // locked since they set an answer already and mastery cannot be reedited
+      lockRelatedCheckboxes(element);
     }
   }
 
@@ -107,16 +128,45 @@ function bzRetainedInfoSetup() {
         if (el.classList.contains("bz-optional-magic-field"))
           optional = true;
 
-        BZ_SaveMagicField(name, value, optional, el.getAttribute("type"));
+        var actualSave = function() {
+          BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"));
 
-        // we also need to update other views on the same page
-        var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
-        for(var idx = 0; idx < magicElementsDOM.length; idx++) {
-            var item = magicElementsDOM[idx];
-            if(item == el)
-              continue;
-            if(item.getAttribute("data-bz-retained") == name)
-              bzChangeRetainedItem(item, value);
+          // we also need to update other views on the same page
+          var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
+          for(var idx = 0; idx < magicElementsDOM.length; idx++) {
+              var item = magicElementsDOM[idx];
+              if(item.getAttribute("data-bz-retained") == name)
+                bzChangeRetainedItem(item, value);
+          }
+        };
+
+        if(!window.bzQueuedListeners)
+          window.bzQueuedListeners = {};
+
+        if(el.hasAttribute("data-bz-answer")) {
+          // it is a mastery answer, don't actually save until the next button is pressed (if present)
+          var p = el;
+          while(p && !p.classList.contains("bz-box"))
+            p = p.parentNode;
+          if(p) {
+            var btn = p.querySelector(".bz-toggle-all-next");
+            var wrapper = function() {
+              actualSave();
+              btn.removeEventListener("click", wrapper);
+              window.bzQueuedListeners[name] = null;
+            };
+            if(btn) {
+              if(window.bzQueuedListeners[name])
+                btn.removeEventListener("click", window.bzQueuedListeners[name]);
+              btn.addEventListener("click", wrapper);
+              window.bzQueuedListeners[name] = wrapper;
+            } else
+              actualSave();
+          } else {
+            actualSave();
+          }
+        } else {
+          actualSave();
         }
       };
 
@@ -309,7 +359,7 @@ function bzActivateInstantSurvey(magic_field_name) {
 	var inputs = i.querySelectorAll("input");
 	for(var a = 0; a < inputs.length; a++) {
 		inputs[a].onchange = function() {
-			save(this.value, this.className == "bz-optional-magic-field");
+			save(this.value, this.classList.contains("bz-optional-magic-field"));
 		};
 	}
 }
@@ -469,7 +519,7 @@ function BZ_GoToMasterPage(master_page_id) {
 
 var BZ_MagicFieldSaveTimeouts = {};
 
-function BZ_SaveMagicField(field_name, field_value, optional, type) {
+function BZ_SaveMagicField(field_name, field_value, optional, type, answer) {
   if(optional == null)
     optional = true; // the default is to skip grading; assume api updates are optional fields
   if(type == null)
@@ -486,6 +536,8 @@ function BZ_SaveMagicField(field_name, field_value, optional, type) {
   var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + type;
   if (optional)
     data += "&optional=true";
+  if (answer !== null)
+    data += "&answer=" + encodeURIComponent(answer);
   http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   http.onreadystatechange = function() {
     if(http.readyState == 4) {
@@ -498,7 +550,7 @@ function BZ_SaveMagicField(field_name, field_value, optional, type) {
           // automatically retry in a little while
           var timeout = setTimeout(function() {
             BZ_MagicFieldSaveTimeouts[field_name] = null;
-            BZ_SaveMagicField(field_name, field_value, optional, type);
+            BZ_SaveMagicField(field_name, field_value, optional, type, answer);
           }, 5000);
           BZ_MagicFieldSaveTimeouts[field_name] = timeout;
         } else {
