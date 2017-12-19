@@ -24,7 +24,7 @@ import Button from 'instructure-ui/lib/components/Button';
 import DateInput from 'instructure-ui/lib/components/DateInput';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import { destroyContainer } from 'jsx/shared/FlashAlert';
-import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
+import Fixtures from '../gradebook-history/Fixtures';
 
 const defaultProps = () => (
   {

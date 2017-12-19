@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
+import Fixtures from '../../gradebook-history/Fixtures';
 import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 import reducer from 'jsx/gradebook-history/reducers/SearchFormReducer';
 import {

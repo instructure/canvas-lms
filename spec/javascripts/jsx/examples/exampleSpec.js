@@ -17,7 +17,7 @@
  */
 
 define([
-  'spec/jsx/examples/exampleSpecHelper'
+  '../examples/exampleSpecHelper'
 ], function (exampleSpecHelper) {
   QUnit.module('Example JSX Spec');
 

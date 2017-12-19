@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
+import Fixtures from '../../gradebook-history/Fixtures';
 import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore';
 import HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
 import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
