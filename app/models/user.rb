@@ -1673,13 +1673,8 @@ class User < ActiveRecord::Base
   def arguments_for_needing_viewing(object_type, shard_course_ids, opts)
     scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
     scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
-    scope_todo = scope.todo_date_between(opts[:due_after], opts[:due_before])
-    if object_type == 'DiscussionTopic' && opts[:new_activity]
-      scope_todo = scope_todo.or(scope.where(assignment_id:
-        Assignment.active.where(context_id: shard_course_ids, context_type: 'Course', submission_types: 'discussion_topic').
-        due_between_with_overrides(opts[:due_after], opts[:due_before]).pluck(:id)))
-    end
-    [scope_todo, opts.merge(:shard_course_ids => shard_course_ids)]
+    scope = scope.todo_date_between(opts[:due_after], opts[:due_before])
+    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
   end
 
   def discussion_topics_needing_viewing(opts={})

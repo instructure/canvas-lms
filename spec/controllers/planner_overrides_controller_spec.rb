@@ -291,13 +291,16 @@ describe PlannerOverridesController do
             override.override_due_at(2.days.from_now)
             override.save!
 
+            graded_topic = @course.assignments.create!(submission_types: 'discussion_topic', due_at: 5.days.from_now)
+            graded_topic.discussion_topic.change_all_read_state('unread', @student)
+
             @assignment3.grade_student @student, grade: 10, grader: @teacher
             @assignment.grade_student @student, grade: 10, grader: @teacher
 
             get :items_index, params: {filter: "new_activity"}
             response_json = json_parse(response.body)
-            expect(response_json.length).to eq 3
-            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, dt.id, @assignment.id]
+            expect(response_json.length).to eq 4
+            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, dt.id, graded_topic.id, @assignment.id]
           end
         end
 
