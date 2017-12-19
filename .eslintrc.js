@@ -38,6 +38,7 @@ module.exports = {
     "func-names": [0],
     "max-len": [1, {"code": 140}],
     "no-continue": [0],
+    "react/no-typos": [0],
     "no-else-return": [0],
     "no-plusplus": [0],
     "no-return-assign": ['error', 'except-parens'],
