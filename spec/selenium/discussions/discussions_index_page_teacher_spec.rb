@@ -244,7 +244,7 @@ describe "discussions" do
 
           3.times do |n|
             topic = topics[2-n]
-            fj("[data-id=#{topic.id}] .al-trigger .icon-settings").click
+            fj("[data-id=#{topic.id}] .al-trigger").click
             wait_for_ajaximations
             fj('.move_item:visible').click
             wait_for_ajaximations
