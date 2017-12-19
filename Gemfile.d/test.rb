@@ -44,7 +44,7 @@ group :test do
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '2.53.4'
     gem 'childprocess', '0.8.0', require: false
-    gem 'websocket', '1.2.4', require: false
+    gem 'websocket', '1.2.5', require: false
   gem 'chromedriver-helper', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test-queue', github: 'instructure/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false
