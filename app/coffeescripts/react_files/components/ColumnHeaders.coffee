@@ -20,7 +20,7 @@ define [
   'underscore'
   'react'
   'prop-types'
-  'compiled/fn/preventDefault'
+  '../../fn/preventDefault'
 ], (I18n, _, React, PropTypes, preventDefault) ->
 
   columns = [

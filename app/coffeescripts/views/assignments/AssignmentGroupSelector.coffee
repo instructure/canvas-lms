@@ -20,7 +20,7 @@ define [
   'Backbone'
   'underscore'
   'jquery'
-  'compiled/views/assignments/AssignmentGroupCreateDialog'
+  './AssignmentGroupCreateDialog'
   'jst/assignments/AssignmentGroupSelector'
 ], (I18n, Backbone, _, $, AssignmentGroupCreateDialog, template) ->
 

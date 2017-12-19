@@ -17,7 +17,7 @@
 
 define [
   'Backbone'
-  'compiled/models/Assignment'
+  '../models/Assignment'
 ], (Backbone, Assignment) ->
 
   class AssignmentCollection extends Backbone.Collection

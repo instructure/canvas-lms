@@ -19,10 +19,10 @@ define [
   'jquery'
   'i18n!assignments'
   'underscore'
-  'compiled/views/DialogFormView'
+  '../DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSyncSettings'
-  "compiled/jquery.rails_flash_notifications"
+  "../../jquery.rails_flash_notifications"
 ], ($, I18n, _, DialogFormView, wrapper, assignmentSyncSettingsTemplate) ->
 
   class AssignmentSyncSettingsView extends DialogFormView

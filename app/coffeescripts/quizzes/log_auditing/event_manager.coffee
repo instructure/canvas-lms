@@ -20,8 +20,8 @@ define (require) ->
   QuizEvent = require('./event')
   EventBuffer = require('./event_buffer')
   jQuery = require('jquery')
-  eraseFromArray = require('compiled/arr/erase')
-  debugConsole = require('compiled/util/debugConsole')
+  eraseFromArray = require('../../arr/erase')
+  debugConsole = require('../../util/debugConsole')
   _ = require('underscore')
 
   {extend} = _

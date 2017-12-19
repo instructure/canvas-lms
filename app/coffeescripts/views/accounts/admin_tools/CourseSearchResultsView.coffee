@@ -21,7 +21,7 @@ define [
   'jquery'
   'jst/accounts/admin_tools/CourseSearchResults',
   'i18n!course_search_results',
-  'compiled/jquery.rails_flash_notifications'
+  '../../../jquery.rails_flash_notifications'
 ], (_, Backbone, $, template, I18n) ->
   class CourseSearchResultsView extends Backbone.View
     template: template

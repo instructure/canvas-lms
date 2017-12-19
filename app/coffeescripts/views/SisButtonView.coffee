@@ -20,7 +20,7 @@ define [
   'Backbone',
   'jquery',
   'jst/_sisButton',
-  'compiled/util/SisValidationHelper'
+  '../util/SisValidationHelper'
 ], (I18n, Backbone, $, template, SisValidationHelper) ->
 
   class SisButtonView extends Backbone.View

@@ -22,11 +22,11 @@ define [
   'react-dom'
   'prop-types'
   '../modules/BBTreeBrowserView'
-  'compiled/views/RootFoldersFinder'
+  '../../views/RootFoldersFinder'
   '../modules/customPropTypes'
-  'compiled/react_files/modules/filesEnv',
+  '../../react_files/modules/filesEnv',
   'page',
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], ($, I18n, React, ReactDOM, PropTypes, BBTreeBrowserView, RootFoldersFinder, customPropTypes, filesEnv, page) ->
 
   FolderTree =

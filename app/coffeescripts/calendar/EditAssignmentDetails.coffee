@@ -20,12 +20,12 @@ define [
   'jquery'
   'underscore'
   'timezone'
-  'compiled/util/fcUtil'
-  'compiled/util/natcompare'
-  'compiled/calendar/commonEventFactory'
-  'compiled/views/ValidatedFormView'
-  'compiled/calendar/CommonEvent.CalendarEvent'
-  'compiled/util/SisValidationHelper'
+  '../util/fcUtil'
+  '../util/natcompare'
+  '../calendar/commonEventFactory'
+  '../views/ValidatedFormView'
+  '../calendar/CommonEvent.CalendarEvent'
+  '../util/SisValidationHelper'
   'jst/calendar/editAssignment'
   'jst/calendar/editAssignmentOverride'
   'jst/EmptyDialogFormWrapper'
@@ -34,7 +34,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
-  'compiled/calendar/fcMomentHandlebarsHelpers'
+  '../calendar/fcMomentHandlebarsHelpers'
 ], (I18n, $, _, tz, fcUtil, natcompare, commonEventFactory, ValidatedFormView,
     CalendarEvent, SisValidationHelper, editAssignmentTemplate,
     editAssignmentOverrideTemplate, wrapper, genericSelectOptionsTemplate,

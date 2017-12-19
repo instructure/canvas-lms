@@ -19,7 +19,7 @@ define [
   'Backbone'
   'jquery'
   'underscore'
-  'compiled/fn/preventDefault'
+  '../fn/preventDefault'
   'str/htmlEscape'
   'jquery.toJSON'
   'jquery.disableWhileLoading'

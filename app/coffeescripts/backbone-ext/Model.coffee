@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/util/mixin'
+  '../util/mixin'
   'underscore'
   'node_modules-version-of-backbone'
-  'compiled/backbone-ext/Model/computedAttributes'
-  'compiled/backbone-ext/Model/dateAttributes'
-  'compiled/backbone-ext/Model/errors'
+  './Model/computedAttributes'
+  './Model/dateAttributes'
+  './Model/errors'
 ], (mixin, _, Backbone) ->
 
   class Backbone.Model extends Backbone.Model

@@ -18,7 +18,7 @@
 
 define [
   'Backbone'
-  'compiled/collections/GroupUserCollection'
+  '../collections/GroupUserCollection'
 ], (Backbone, GroupUserCollection) ->
 
   class Group extends Backbone.Model

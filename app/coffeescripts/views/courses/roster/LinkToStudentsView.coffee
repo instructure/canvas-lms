@@ -19,8 +19,8 @@ define [
   'i18n!course_settings'
   'jquery'
   'underscore'
-  'compiled/views/DialogBaseView'
-  'compiled/views/courses/roster/RosterDialogMixin'
+  '../../DialogBaseView'
+  './RosterDialogMixin'
   'jst/courses/roster/LinkToStudentsView'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, DialogBaseView, RosterDialogMixin, linkToStudentsViewTemplate) ->

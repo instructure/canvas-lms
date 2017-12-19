@@ -17,11 +17,11 @@
 
 define [
   'require'
-  'compiled/models/FilesystemObject'
+  '../models/FilesystemObject'
   'vendor/backbone-identity-map'
-  'compiled/collections/PaginatedCollection'
-  'compiled/collections/FilesCollection'
-  'compiled/util/natcompare'
+  '../collections/PaginatedCollection'
+  '../collections/FilesCollection'
+  '../util/natcompare'
   'jsx/shared/helpers/urlHelper'
 ], (require, FilesystemObject, identityMapMixin, PaginatedCollection, FilesCollection, natcompare, urlHelper) ->
 
@@ -113,7 +113,7 @@ define [
         encodeURIComponent(component)
       ).join('/')
 
-      filesEnv ||= require('compiled/react_files/modules/filesEnv') # circular dep
+      filesEnv ||= require('../react_files/modules/filesEnv') # circular dep
 
       # when we are viewing all files we need to pad the context_asset_string on the front of the url
       # so it would be something like /files/folder/users_1/some/sub/folder
@@ -181,7 +181,7 @@ define [
 
   # FoldersCollection is defined inside of this file, and not where it
   # should be, because RequireJS sucks at figuring out circular dependencies.
-  # 'compiled/collections/FoldersCollection' just grabs this and re-exports it.
+  # '../collections/FoldersCollection' just grabs this and re-exports it.
   Folder.FoldersCollection = class FoldersCollection extends PaginatedCollection
     @optionProperty 'parentFolder'
 

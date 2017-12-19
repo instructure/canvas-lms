@@ -20,12 +20,12 @@ define [
   'i18n!outcomes'
   'jquery'
   'underscore'
-  'compiled/views/outcomes/OutcomesDirectoryView'
-  'compiled/views/outcomes/AccountDirectoryView'
-  'compiled/views/outcomes/StateStandardsDirectoryView'
-  'compiled/models/OutcomeGroup'
-  'compiled/collections/OutcomeCollection'
-  'compiled/collections/OutcomeGroupCollection'
+  './OutcomesDirectoryView'
+  './AccountDirectoryView'
+  './StateStandardsDirectoryView'
+  '../../models/OutcomeGroup'
+  '../../collections/OutcomeCollection'
+  '../../collections/OutcomeGroupCollection'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, OutcomesDirectoryView, AccountDirectoryView, StateStandardsDirectoryView, OutcomeGroup, OutcomeCollection, OutcomeGroupCollection) ->
 

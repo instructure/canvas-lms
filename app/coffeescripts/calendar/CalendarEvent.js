@@ -21,7 +21,7 @@ import Spinner from 'instructure-ui/lib/components/Spinner'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
-import splitAssetString from 'compiled/str/splitAssetString'
+import splitAssetString from '../str/splitAssetString'
 import Depaginate from 'jsx/shared/CheatDepaginator'
 import I18n from 'i18n!calendar.edit'
 

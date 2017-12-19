@@ -19,9 +19,9 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/profiles/AvatarUploadBaseView'
+  './AvatarUploadBaseView'
   'jst/profiles/takePictureView'
-  'compiled/util/BlobFactory'
+  '../../util/BlobFactory'
 ], ($, _, BaseView, template, BlobFactory) ->
 
   class TakePictureView extends BaseView

@@ -20,7 +20,7 @@ define [
   'Backbone'
   'underscore'
   'i18n!content_migrations'
-  'compiled/util/natcompare'
+  '../../../util/natcompare'
   'jst/content_migrations/subviews/CourseFindSelect'
   'jst/courses/autocomplete_item'
   'jquery.ajaxJSON'

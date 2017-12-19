@@ -24,13 +24,13 @@ define [
   'react-dom'
   'Backbone'
   'vendor/slickgrid'
-  'compiled/gradezilla/OutcomeGradebookGrid'
-  'compiled/views/gradezilla/CheckboxView'
-  'compiled/views/gradebook/SectionMenuView'
+  '../../gradezilla/OutcomeGradebookGrid'
+  '../gradezilla/CheckboxView'
+  '../gradebook/SectionMenuView'
   'jsx/gradezilla/default_gradebook/components/SectionFilter'
   'jst/gradezilla/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
   'jquery.instructure_misc_plugins'
 ], (I18n, $, _, React, ReactDOM, {View}, Slick, Grid, CheckboxView, SectionMenuView, SectionFilter, template, cellTemplate) ->
 

@@ -19,9 +19,9 @@ define [
   'i18n!course_settings'
   'jquery'
   'underscore'
-  'compiled/views/DialogBaseView'
+  '../../DialogBaseView'
   'jst/courses/roster/InvitationsView'
-  'compiled/jquery.rails_flash_notifications'
+  '../../../jquery.rails_flash_notifications'
 ], (I18n, $, _, DialogBaseView, invitationsViewTemplate) ->
 
   class InvitationsView extends DialogBaseView

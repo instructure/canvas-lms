@@ -25,7 +25,7 @@ define [
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
-  'compiled/jquery/fixDialogButtons'
+  '../jquery/fixDialogButtons'
 
   # this is a partial needed by the 'SetDefaultGradeDialog' template
   # since you cant declare a dependency in a handlebars file, we need to do it here

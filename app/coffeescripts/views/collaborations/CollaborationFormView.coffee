@@ -19,7 +19,7 @@
 define [
   'i18n!collaborations'
   'Backbone'
-  'compiled/views/collaborations/CollaboratorPickerView'
+  './CollaboratorPickerView'
 ], (I18n, {View}, CollaboratorPickerView) ->
 
   class CollaborationFormView extends View

@@ -20,11 +20,11 @@ define [
   'Backbone'
   'jsx/shared/rce/RichContentEditor'
   'jst/wiki/WikiPageEdit'
-  'compiled/views/ValidatedFormView'
-  'compiled/views/wiki/WikiPageDeleteDialog'
-  'compiled/views/wiki/WikiPageReloadView'
+  '../ValidatedFormView'
+  './WikiPageDeleteDialog'
+  './WikiPageReloadView'
   'i18n!pages'
-  'compiled/views/editor/KeyboardShortcuts'
+  '../editor/KeyboardShortcuts'
   'jquery.instructure_date_and_time'
 ], ($, Backbone, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
 

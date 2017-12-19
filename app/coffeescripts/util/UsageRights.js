@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox' // Usage rights select boxes (React component)
-import splitAssetString from 'compiled/str/splitAssetString'
+import splitAssetString from '../str/splitAssetString'
 
 
 export default class UsageRights {

@@ -21,8 +21,8 @@ define [
   'i18n!observees'
   'jst/UserObservees'
   'jst/ExternalAuthUserObservees'
-  'compiled/views/UserObserveeView'
-  'compiled/views/PaginatedCollectionView'
+  './UserObserveeView'
+  './PaginatedCollectionView'
 ], ($, _, I18n, template, extAuthTemplate, itemView, PaginatedCollectionView) ->
 
   class UserObserveesView extends PaginatedCollectionView

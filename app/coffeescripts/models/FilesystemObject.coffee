@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'underscore'
-  'compiled/str/splitAssetString'
+  '../str/splitAssetString'
 ], (Backbone, _, splitAssetString) ->
 
   # this is an abstract base class that both File and Folder inherit from.

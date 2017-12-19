@@ -20,13 +20,13 @@ define [
   'jquery'
   'underscore'
   'str/htmlEscape'
-  'compiled/fn/preventDefault'
-  'compiled/views/DialogBaseView'
+  '../../fn/preventDefault'
+  '../DialogBaseView'
   'jst/tinymce/InsertUpdateImageView'
   'jsx/shared/rce/RceCommandShim'
-  'compiled/views/TreeBrowserView'
-  'compiled/views/RootFoldersFinder'
-  'compiled/views/FindFlickrImageView'
+  '../TreeBrowserView'
+  '../RootFoldersFinder'
+  '../FindFlickrImageView'
 ], (I18n, $, _, h, preventDefault, DialogBaseView, template, RceCommandShim, TreeBrowserView, RootFoldersFinder, FindFlickrImageView) ->
 
   class InsertUpdateImageView extends DialogBaseView

@@ -19,9 +19,9 @@ define [
   'Backbone'
   'jquery'
   'underscore'
-  'compiled/fn/preventDefault'
-  'compiled/views/PaginatedCollectionView'
-  'compiled/views/TreeItemView'
+  '../fn/preventDefault'
+  './PaginatedCollectionView'
+  './TreeItemView'
   'jst/TreeCollection'
   'str/htmlEscape'
 ], (Backbone, $, _, preventDefault, PaginatedCollectionView, TreeItemView, collectionTemplate, htmlEscape) ->

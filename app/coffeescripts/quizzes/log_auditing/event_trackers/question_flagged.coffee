@@ -19,7 +19,7 @@ define (require) ->
   EventTracker = require('../event_tracker')
   K = require('../constants')
   $ = require('jquery')
-  debugConsole = require('compiled/util/debugConsole')
+  debugConsole = require('../../../util/debugConsole')
   parseQuestionId = require('../util/parse_question_id')
 
   class QuestionFlagged extends EventTracker

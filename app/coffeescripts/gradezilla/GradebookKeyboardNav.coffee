@@ -18,7 +18,7 @@
 
 define [
   'i18n!gradezilla'
-  'compiled/gradezilla/GradebookTranslations'
+  '../gradezilla/GradebookTranslations'
   'jquery'
   'jquery.keycodes'
 ], (I18n, GRADEBOOK_TRANSLATIONS, $) ->

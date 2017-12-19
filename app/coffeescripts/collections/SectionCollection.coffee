@@ -18,7 +18,7 @@
 
 define [
   'Backbone'
-  'compiled/models/Section'
+  '../models/Section'
 ], ({Collection}, Section) ->
 
   # A collection for working with course sections returned from

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/views/InputView'
+  './InputView'
 ], (InputView) ->
 
   class SelectView extends InputView

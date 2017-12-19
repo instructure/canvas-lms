@@ -17,8 +17,8 @@
 
 define [
   'underscore'
-  'compiled/views/CollectionView'
-  'compiled/views/feature_flags/FeatureFlagView'
+  '../CollectionView'
+  '../feature_flags/FeatureFlagView'
   'jst/feature_flags/featureFlagList'
 ], (_, CollectionView, FeatureFlagView, template) ->
 

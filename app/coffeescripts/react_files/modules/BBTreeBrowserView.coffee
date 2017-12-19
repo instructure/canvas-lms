@@ -18,7 +18,7 @@
 define [
   'jquery'
   'i18n!BBTreeBrowserView'
-  'compiled/views/TreeBrowserView'
+  '../../views/TreeBrowserView'
 ], ($, I18n, TreeBrowserView) ->
 
   class BBTreeBrowserView

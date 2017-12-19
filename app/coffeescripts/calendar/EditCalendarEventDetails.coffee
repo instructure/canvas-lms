@@ -20,17 +20,17 @@ define [
   'jquery'
   'underscore'
   'timezone'
-  'compiled/util/fcUtil'
-  'compiled/calendar/commonEventFactory'
-  'compiled/calendar/TimeBlockList'
+  '../util/fcUtil'
+  '../calendar/commonEventFactory'
+  '../calendar/TimeBlockList'
   'jst/calendar/editCalendarEvent'
-  'compiled/util/coupleTimeFields'
+  '../util/coupleTimeFields'
   'jsx/shared/helpers/datePickerFormat'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
   'vendor/date'
-  'compiled/calendar/fcMomentHandlebarsHelpers'
+  '../calendar/fcMomentHandlebarsHelpers'
 ], (I18n, $, _, tz, fcUtil, commonEventFactory, TimeBlockList, editCalendarEventTemplate, coupleTimeFields, datePickerFormat) ->
 
   class EditCalendarEventDetails

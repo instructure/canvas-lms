@@ -20,7 +20,7 @@ define [
   "i18n!external_content.success",
   "jquery.ajaxJSON",
   "jquery.instructure_misc_helpers",
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], ($, I18n) ->
 
   dataReady = (data, service_id) ->

@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/RosterUser'
+  '../collections/PaginatedCollection'
+  '../models/RosterUser'
 ], (PaginatedCollection, RosterUser) ->
 
   class RosterUserCollection extends PaginatedCollection

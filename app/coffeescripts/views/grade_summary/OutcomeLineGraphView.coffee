@@ -19,10 +19,10 @@ define [
   'underscore'
   'Backbone'
   'i18n!outcomes'
-  'compiled/collections/OutcomeResultCollection'
+  '../../collections/OutcomeResultCollection'
   'd3'
   'jst/outcomes/accessibleLineGraph'
-  'compiled/underscore-ext/sum'
+  '../../underscore-ext/sum'
 ], (_, Backbone, I18n, OutcomeResultCollection, d3, accessibleTemplate) ->
   # Trend class based on formulae found here:
   # http://classroom.synonym.com/calculate-trendline-2709.html

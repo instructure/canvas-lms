@@ -23,12 +23,12 @@ define [
   'timezone'
   'Backbone'
   'jst/calendar/editCalendarEventFull'
-  'compiled/views/calendar/MissingDateDialogView'
+  '../views/calendar/MissingDateDialogView'
   'jsx/shared/rce/RichContentEditor'
-  'compiled/object/unflatten'
-  'compiled/util/deparam'
-  'compiled/views/editor/KeyboardShortcuts'
-  'compiled/util/coupleTimeFields'
+  '../object/unflatten'
+  '../util/deparam'
+  '../views/editor/KeyboardShortcuts'
+  '../util/coupleTimeFields'
   'jsx/shared/helpers/datePickerFormat'
 ], ($, _, I18n, { showFlashAlert }, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts, coupleTimeFields, datePickerFormat) ->
 

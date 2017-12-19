@@ -17,9 +17,9 @@
 
 define [
   'underscore'
-  'compiled/models/Folder'
-  'compiled/models/File'
-  'compiled/models/ModuleFile'
+  '../../models/Folder'
+  '../../models/File'
+  '../../models/ModuleFile'
 ], (_, Folder, File, ModuleFile) ->
 
   ###

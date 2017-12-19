@@ -19,8 +19,8 @@ define (require) ->
   EventTracker = require('../event_tracker')
   K = require('../constants')
   $ = require('jquery')
-  inViewport = require('compiled/jquery/expressions/in_viewport')
-  debugConsole = require('compiled/util/debugConsole')
+  inViewport = require('../../../jquery/expressions/in_viewport')
+  debugConsole = require('../../../util/debugConsole')
   parseQuestionId = require('../util/parse_question_id')
 
   class QuestionViewed extends EventTracker

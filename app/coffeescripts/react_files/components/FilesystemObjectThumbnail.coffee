@@ -18,9 +18,9 @@
 define [
   'react'
   '../mixins/BackboneMixin'
-  'compiled/models/Folder'
+  '../../models/Folder'
   '../modules/customPropTypes'
-  'compiled/util/mimeClass'
+  '../../util/mimeClass'
 ], (React, BackboneMixin, Folder, customPropTypes, mimeClass) ->
 
   FilesystemObjectThumbnail =

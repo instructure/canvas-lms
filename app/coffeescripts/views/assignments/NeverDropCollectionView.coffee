@@ -17,8 +17,8 @@
 
 define [
   'underscore'
-  'compiled/views/CollectionView'
-  'compiled/views/assignments/NeverDropView'
+  '../CollectionView'
+  './NeverDropView'
   'jst/assignments/NeverDropCollection'
 ], (_, CollectionView, NeverDropView, template) ->
 

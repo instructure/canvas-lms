@@ -17,8 +17,8 @@
 
 define [
   'i18n!rootFoldersFinder'
-  'compiled/models/Folder'
-  'compiled/str/splitAssetString'
+  '../models/Folder'
+  '../str/splitAssetString'
 ], (I18n, Folder, splitAssetString) ->
 
   class RootFoldersFinder

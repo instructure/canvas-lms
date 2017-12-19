@@ -21,9 +21,9 @@ define [
   'i18n!content_migrations'
   'jst/content_migrations/ContentCheckbox'
   'jst/content_migrations/ContentCheckboxCollection'
-  'compiled/collections/content_migrations/ContentCheckboxCollection'
-  'compiled/views/CollectionView'
-  'compiled/str/TextHelper'
+  '../../collections/content_migrations/ContentCheckboxCollection'
+  '../CollectionView'
+  '../../str/TextHelper'
 ], ($, Backbone, I18n, template, checkboxCollectionTemplate, CheckboxCollection, CollectionView, TextHelper) ->
   class ContentCheckboxView extends Backbone.View
     template: template

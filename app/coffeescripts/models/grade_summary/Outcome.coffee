@@ -19,7 +19,7 @@ define [
   'i18n!outcomes'
   'underscore'
   'Backbone'
-  'compiled/models/Outcome'
+  '../../models/Outcome'
   'timezone'
 ], (I18n, _, {Model, Collection}, Outcome, tz) ->
 

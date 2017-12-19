@@ -18,13 +18,13 @@
 define [
   'jquery'
   'i18n!pages'
-  'compiled/models/WikiPage'
-  'compiled/views/PaginatedCollectionView'
-  'compiled/views/wiki/WikiPageEditView'
-  'compiled/views/wiki/WikiPageIndexItemView'
+  '../../models/WikiPage'
+  '../PaginatedCollectionView'
+  './WikiPageEditView'
+  './WikiPageIndexItemView'
   'jst/wiki/WikiPageIndex'
-  'compiled/views/StickyHeaderMixin'
-  'compiled/str/splitAssetString'
+  '../StickyHeaderMixin'
+  '../../str/splitAssetString'
   'jquery.disableWhileLoading'
 ], ($, I18n, WikiPage, PaginatedCollectionView, WikiPageEditView, itemView, template, StickyHeaderMixin, splitAssetString) ->
 

@@ -19,9 +19,9 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/Account'
-  'compiled/views/accounts/settings/QuotasView'
-  'compiled/views/accounts/settings/ManualQuotasView'
+  '../../models/Account'
+  '../../views/accounts/settings/QuotasView'
+  '../../views/accounts/settings/ManualQuotasView'
 ], ($, _, Backbone, Account, QuotasView, ManualQuotasView) ->
 
   if ENV.ACCOUNT

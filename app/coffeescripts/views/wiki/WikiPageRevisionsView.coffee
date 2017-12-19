@@ -19,10 +19,10 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/CollectionView'
-  'compiled/views/wiki/WikiPageRevisionView'
+  '../CollectionView'
+  './WikiPageRevisionView'
   'jst/wiki/WikiPageRevisions'
-  'compiled/jquery/floatingSticky'
+  '../../jquery/floatingSticky'
 ], ($, _, Backbone, CollectionView, WikiPageRevisionView, template) ->
 
   class WikiPageRevisionsView extends CollectionView

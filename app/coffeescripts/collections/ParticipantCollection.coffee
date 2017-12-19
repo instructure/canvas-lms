@@ -18,7 +18,7 @@
 define [
   'i18n!discussions'
   'Backbone'
-  'compiled/models/Participant'
+  '../models/Participant'
 ], (I18n, Backbone, Participant) ->
 
   class ParticipantCollection extends Backbone.Collection

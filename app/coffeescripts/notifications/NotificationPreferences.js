@@ -19,12 +19,12 @@
 import I18n from 'i18n!notification_preferences'
 import $ from 'jquery'
 import _ from 'underscore'
-import NotificationGroupMappings from 'compiled/notifications/NotificationGroupMappings'
+import NotificationGroupMappings from '../notifications/NotificationGroupMappings'
 import notificationPreferencesTemplate from 'jst/profiles/notification_preferences'
 import PolicyCell from 'jsx/notification_preferences/PolicyCell'
 import 'jquery.disableWhileLoading'
 import 'jquery.ajaxJSON'
-import 'compiled/jquery.rails_flash_notifications'
+import '../jquery.rails_flash_notifications'
 import 'jqueryui/tooltip'
 
 export default class NotificationPreferences {

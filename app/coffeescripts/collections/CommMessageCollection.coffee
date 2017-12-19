@@ -17,7 +17,7 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
+  '../collections/PaginatedCollection'
 ], (PaginatedCollection) ->
 
   class CommMessageCollection extends PaginatedCollection

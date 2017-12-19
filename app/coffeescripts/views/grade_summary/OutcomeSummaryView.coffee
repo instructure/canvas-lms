@@ -19,9 +19,9 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/CollectionView'
-  'compiled/views/grade_summary/SectionView'
-  'compiled/views/grade_summary/OutcomeDetailView'
+  '../CollectionView'
+  './SectionView'
+  './OutcomeDetailView'
 ], ($, _, Backbone, CollectionView, SectionView, OutcomeDetailView) ->
   class OutcomeSummaryView extends CollectionView
     @optionProperty 'toggles'

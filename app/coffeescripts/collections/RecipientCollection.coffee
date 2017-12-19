@@ -17,8 +17,8 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/RecipientModel'
+  '../collections/PaginatedCollection'
+  '../models/RecipientModel'
 ], (PaginatedCollection, RecipientModel) ->
 
   class RecipientCollection extends PaginatedCollection

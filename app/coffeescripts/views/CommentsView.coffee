@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'underscore'
-  'compiled/fn/preventDefault'
+  '../fn/preventDefault'
   'jst/CommentsView'
 
   # needed by CommentsView

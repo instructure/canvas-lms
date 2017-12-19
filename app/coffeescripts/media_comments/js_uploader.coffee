@@ -18,12 +18,12 @@
 define [
   'jquery',
   'i18n!media_comments',
-  'compiled/media_comments/dialog_manager',
-  'compiled/media_comments/comment_ui_loader',
+  '../media_comments/dialog_manager',
+  '../media_comments/comment_ui_loader',
   'bower/k5uploader/k5uploader',
-  'compiled/media_comments/upload_view_manager',
-  'compiled/media_comments/kaltura_session_loader',
-  'compiled/media_comments/file_input_manager'
+  '../media_comments/upload_view_manager',
+  '../media_comments/kaltura_session_loader',
+  '../media_comments/file_input_manager'
 ], ($,
     I18n,
     DialogManager,

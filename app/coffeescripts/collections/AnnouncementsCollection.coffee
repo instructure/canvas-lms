@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/DiscussionTopicsCollection'
-  'compiled/models/Announcement'
-  'compiled/str/splitAssetString'
+  '../collections/DiscussionTopicsCollection'
+  '../models/Announcement'
+  '../str/splitAssetString'
 ], (DiscussionTopicsCollection, Announcement, splitAssetString) ->
 
   class AnnouncementsCollection extends DiscussionTopicsCollection

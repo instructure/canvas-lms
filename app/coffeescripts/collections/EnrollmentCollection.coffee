@@ -18,8 +18,8 @@
 
 define [
   'underscore'
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/Enrollment'
+  '../collections/PaginatedCollection'
+  '../models/Enrollment'
 ], (_, PaginatedCollection, Enrollment) ->
 
   # A collection for managing responses from EnrollmentsApiController.

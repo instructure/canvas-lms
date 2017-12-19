@@ -21,12 +21,12 @@ define [
   'underscore'
   'Backbone'
   'vendor/slickgrid'
-  'compiled/gradebook/OutcomeGradebookGrid'
-  'compiled/views/gradebook/CheckboxView'
-  'compiled/views/gradebook/SectionMenuView'
+  '../../gradebook/OutcomeGradebookGrid'
+  '../gradebook/CheckboxView'
+  '../gradebook/SectionMenuView'
   'jst/gradebook/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
   'jquery.instructure_misc_plugins'
 ], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 

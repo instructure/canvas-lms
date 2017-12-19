@@ -18,8 +18,8 @@
 define [
   'node_modules-version-of-backbone'
   'underscore'
-  'compiled/util/mixin'
-  'compiled/backbone-ext/DefaultUrlMixin'
+  '../util/mixin'
+  './DefaultUrlMixin'
 ], (Backbone, _, mixin, DefaultUrlMixin) ->
   class Backbone.Collection extends Backbone.Collection
     ##

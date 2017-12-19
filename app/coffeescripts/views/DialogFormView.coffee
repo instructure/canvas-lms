@@ -17,11 +17,11 @@
 
 define [
   'jquery'
-  'compiled/views/ValidatedFormView'
-  'compiled/fn/preventDefault'
+  './ValidatedFormView'
+  '../fn/preventDefault'
   'jst/DialogFormWrapper'
   'jqueryui/dialog'
-  'compiled/jquery/fixDialogButtons'
+  '../jquery/fixDialogButtons'
 ], ($, ValidatedFormView, preventDefault, wrapper) ->
 
   ##

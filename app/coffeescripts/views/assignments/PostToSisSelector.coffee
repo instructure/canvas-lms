@@ -20,7 +20,7 @@ define [
   'underscore'
   'jquery'
   'jst/assignments/PostToSisSelector'
-  'compiled/jquery/toggleAccessibly'
+  '../../jquery/toggleAccessibly'
 ], (Backbone, _, $, template, toggleAccessibly) ->
 
   class PostToSisSelector extends Backbone.View

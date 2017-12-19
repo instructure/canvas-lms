@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import rgb2hex from 'compiled/util/rgb2hex'
+import rgb2hex from './util/rgb2hex'
 
 export default {
   persistContextColors (colorsByContext, userId) {

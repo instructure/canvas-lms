@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define (require) ->
-  eventManager = require('compiled/quizzes/log_auditing')
+  eventManager = require('../quizzes/log_auditing')
   (unregister) ->
     if unregister
       eventManager.unregisterAllTrackers()

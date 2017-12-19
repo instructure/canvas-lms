@@ -23,11 +23,11 @@ define [
   'jsx/shared/conditional_release/CyoeHelper'
   'jsx/move_item'
   'jst/DiscussionTopics/discussion'
-  'compiled/models/DiscussionTopic'
-  'compiled/views/PublishIconView'
-  'compiled/views/LockIconView'
-  'compiled/views/ToggleableSubscriptionIconView'
-  'compiled/views/assignments/DateDueColumnView'
+  '../../models/DiscussionTopic'
+  '../PublishIconView'
+  '../LockIconView'
+  '../ToggleableSubscriptionIconView'
+  '../assignments/DateDueColumnView'
 ], (I18n, $, _, {View}, CyoeHelper, MoveItem, template, DiscussionTopic, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView) ->
 
   class DiscussionView extends View

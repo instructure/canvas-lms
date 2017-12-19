@@ -20,7 +20,7 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/str/TextHelper'
+  '../str/TextHelper'
 ], (I18n, $, _, {Model, Collection}, TextHelper) ->
 
   class Message extends Model

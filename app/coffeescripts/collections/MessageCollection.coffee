@@ -17,8 +17,8 @@
 
 define [
   'underscore'
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/Message'
+  '../collections/PaginatedCollection'
+  '../models/Message'
 ], (_, PaginatedCollection, Message) ->
 
   class MessageCollection extends PaginatedCollection

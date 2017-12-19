@@ -20,7 +20,7 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/roles/NewRoleView'
+  './NewRoleView'
   'jst/roles/roleHeader'
 ], (I18n, $, _, Backbone, NewRoleView, template) ->
   class RoleHeaderView extends Backbone.View

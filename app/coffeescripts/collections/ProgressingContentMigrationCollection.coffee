@@ -17,10 +17,10 @@
 
 define [
   'underscore'
-  'compiled/collections/ContentMigrationIssueCollection'
-  'compiled/models/ContentMigrationProgress'
-  'compiled/models/ProgressingContentMigration'
-  'compiled/collections/PaginatedCollection'
+  '../collections/ContentMigrationIssueCollection'
+  '../models/ContentMigrationProgress'
+  '../models/ProgressingContentMigration'
+  '../collections/PaginatedCollection'
 ], (_, MigrationIssueCollection, MigrationProgress, ProgressingContentMigration, PaginatedCollection) -> 
   class ProgressingContentMigrationCollection extends PaginatedCollection
     model: ProgressingContentMigration

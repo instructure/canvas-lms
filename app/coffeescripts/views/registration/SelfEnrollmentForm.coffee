@@ -21,7 +21,7 @@ define [
   'underscore'
   'Backbone'
   'i18n!registration'
-  'compiled/registration/registrationErrors'
+  '../../registration/registrationErrors'
   'jquery.instructure_forms'
   'jquery.ajaxJSON'
 ], ($, _, Backbone, I18n, registrationErrors) ->

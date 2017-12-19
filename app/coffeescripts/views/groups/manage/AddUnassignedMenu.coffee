@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/views/groups/manage/PopoverMenuView'
-  'compiled/views/groups/manage/AddUnassignedUsersView'
-  'compiled/views/InputFilterView'
+  './PopoverMenuView'
+  './AddUnassignedUsersView'
+  '../../InputFilterView'
   'jst/groups/manage/addUnassignedMenu'
   'jquery'
   'underscore'
-  'compiled/jquery/outerclick'
+  '../../../jquery/outerclick'
 ], (PopoverMenuView, AddUnassignedUsersView, InputFilterView, template, $, _) ->
 
   class AddUnassignedMenu extends PopoverMenuView

@@ -18,8 +18,8 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/WikiPageRevision'
+  '../collections/PaginatedCollection'
+  '../models/WikiPageRevision'
 ], (_, Backbone, PaginatedCollection, WikiPageRevision) ->
 
   revisionOptions = ['parentModel']

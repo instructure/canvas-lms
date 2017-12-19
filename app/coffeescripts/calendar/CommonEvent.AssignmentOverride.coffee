@@ -18,8 +18,8 @@
 define [
   'i18n!calendar'
   'jquery'
-  'compiled/calendar/CommonEvent'
-  'compiled/util/fcUtil'
+  '../calendar/CommonEvent'
+  '../util/fcUtil'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
 ], (I18n, $, CommonEvent, fcUtil) ->

@@ -17,9 +17,9 @@
 
 define [
   'jquery'
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/DiscussionTopic'
-  'compiled/util/NumberCompare'
+  '../collections/PaginatedCollection'
+  '../models/DiscussionTopic'
+  '../util/NumberCompare'
 ], ($, PaginatedCollection, DiscussionTopic, numberCompare) ->
 
   class DiscussionTopicsCollection extends PaginatedCollection

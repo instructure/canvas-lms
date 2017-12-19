@@ -18,7 +18,7 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/util/natcompare'
+  '../../util/natcompare'
 ], (_, {Model, Collection}, natcompare) ->
   class Group extends Model
     initialize: ->

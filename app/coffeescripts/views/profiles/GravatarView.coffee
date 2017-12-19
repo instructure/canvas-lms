@@ -18,7 +18,7 @@
 
 define [
   'jquery'
-  'compiled/views/profiles/AvatarUploadBaseView'
+  './AvatarUploadBaseView'
   'jst/profiles/gravatarView'
   'md5'
   'jquery.ajaxJSON'

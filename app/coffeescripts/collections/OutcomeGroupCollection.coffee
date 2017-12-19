@@ -18,8 +18,8 @@
 
 define [
   'underscore'
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/OutcomeGroup'
+  '../collections/PaginatedCollection'
+  '../models/OutcomeGroup'
 ], (_, PaginatedCollection, OutcomeGroup) ->
 
   class OutcomeGroupCollection extends PaginatedCollection

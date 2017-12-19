@@ -22,7 +22,7 @@ define [
   'jquery'
   'underscore'
   'str/htmlEscape'
-  'compiled/jquery/fixDialogButtons'
+  '../../jquery/fixDialogButtons'
 ], (turnitinSettingsDialog, vericiteSettingsDialog, { View }, $, _, htmlEscape) ->
 
   class TurnitinSettingsDialog extends View

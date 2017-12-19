@@ -18,7 +18,7 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/outcomes/OutcomeContentBase'
+  './OutcomeContentBase'
   'jst/outcomes/outcomeGroup'
   'jst/outcomes/outcomeGroupForm'
 ], ($, _, OutcomeContentBase, outcomeGroupTemplate, outcomeGroupFormTemplate) ->

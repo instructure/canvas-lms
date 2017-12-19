@@ -21,8 +21,8 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/Outcome'
-  'compiled/models/OutcomeGroup'
+  '../../models/Outcome'
+  '../../models/OutcomeGroup'
 ], (I18n, $, _, Backbone, Outcome, OutcomeGroup) ->
 
   # Manage the toolbar buttons.

@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'jst/content_migrations/CommonCartridge'
-  'compiled/views/content_migrations/MigrationView'
+  './MigrationView'
 ],(Backbone, template, MigrationView) -> 
   class CommonCartridge extends MigrationView
     template: template

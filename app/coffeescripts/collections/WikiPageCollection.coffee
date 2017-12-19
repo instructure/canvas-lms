@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/WikiPage'
+  '../collections/PaginatedCollection'
+  '../models/WikiPage'
 ], (PaginatedCollection, WikiPage) ->
 
   class WikiPageCollection extends PaginatedCollection

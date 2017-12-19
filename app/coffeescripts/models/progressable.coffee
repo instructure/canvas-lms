@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/models/Progress'
+  '../models/Progress'
   'underscore'
 ], (Progress, _) ->
 

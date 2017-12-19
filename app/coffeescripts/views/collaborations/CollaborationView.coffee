@@ -21,7 +21,7 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/collaborations/CollaboratorPickerView'
+  './CollaboratorPickerView'
   'jst/collaborations/edit'
   'jst/collaborations/EditIframe'
 ], (I18n, $, {extend}, {View}, CollaboratorPickerView, editForm, editIframe) ->

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/PaginatedCollection'
+  '../collections/PaginatedCollection'
 ], (PaginatedCollection) -> 
   class ContentMigrationIssueCollection extends PaginatedCollection
     @optionProperty 'course_id'

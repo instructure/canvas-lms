@@ -18,7 +18,7 @@
 define [
   'underscore'
   'i18n!groups'
-  'compiled/views/groups/manage/GroupCategoryEditView'
+  './GroupCategoryEditView'
   'jst/groups/manage/groupCategoryCreate'
 ], (_, I18n, GroupCategoryEditView, template) ->
 

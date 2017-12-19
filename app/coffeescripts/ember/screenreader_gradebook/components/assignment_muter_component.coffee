@@ -18,7 +18,7 @@
 define [
   'i18n!sr_gradebook'
   'ember'
-  'compiled/AssignmentMuter'
+  '../../../AssignmentMuter'
   ], (I18n, Ember, AssignmentMuter) ->
 
   # http://emberjs.com/guides/components/

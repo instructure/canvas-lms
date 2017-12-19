@@ -18,9 +18,9 @@
 
 define [
   'underscore'
-  'compiled/views/profiles/AvatarUploadBaseView'
+  './AvatarUploadBaseView'
   'jst/profiles/uploadFileView'
-  'compiled/util/BlobFactory'
+  '../../util/BlobFactory'
   'jsx/canvas_cropper/cropperMaker'
 ], (_, BaseView, template, BlobFactory, CropperMaker) ->
 

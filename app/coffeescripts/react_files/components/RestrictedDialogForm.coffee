@@ -21,7 +21,7 @@ define [
   'react-dom'
   'prop-types'
   'i18n!restrict_student_access'
-  'compiled/models/Folder'
+  '../../models/Folder'
   '../modules/customPropTypes'
   '../utils/setUsageRights'
   '../utils/updateModelsUsageRights'

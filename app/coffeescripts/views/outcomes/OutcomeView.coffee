@@ -21,8 +21,8 @@ define [
   'jsx/shared/helpers/numberHelper'
   'jquery'
   'underscore'
-  'compiled/views/outcomes/OutcomeContentBase'
-  'compiled/views/outcomes/CalculationMethodFormView'
+  './OutcomeContentBase'
+  './CalculationMethodFormView'
   'jst/outcomes/outcome'
   'jst/outcomes/outcomeForm'
   'jst/outcomes/_criterion' # for outcomeForm

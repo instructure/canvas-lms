@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'jst/content_migrations/CanvasExport'
-  'compiled/views/content_migrations/MigrationView'
+  './MigrationView'
 ], (Backbone, template, MigrationView) -> 
   class CanvasExportView extends MigrationView
     template: template

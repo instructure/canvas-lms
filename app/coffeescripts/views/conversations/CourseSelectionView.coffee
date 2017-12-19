@@ -20,7 +20,7 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/conversations/SearchableSubmenuView'
+  '../conversations/SearchableSubmenuView'
   'jst/conversations/courseOptions'
   'jquery.instructure_date_and_time'
   'vendor/bootstrap/bootstrap-dropdown'

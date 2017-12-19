@@ -21,7 +21,7 @@ define [
   'Backbone'
   'jquery'
   'jst/profiles/addLinkRow'
-  'compiled/util/AvatarWidget'
+  '../../util/AvatarWidget'
   'jquery.instructure_forms'
 ], (I18n, Backbone, $, addLinkRow, AvatarWidget) ->
 

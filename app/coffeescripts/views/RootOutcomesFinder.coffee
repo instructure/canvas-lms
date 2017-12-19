@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/models/OutcomeGroup'
-  'compiled/str/splitAssetString'
+  '../models/OutcomeGroup'
+  '../str/splitAssetString'
 ], (OutcomeGroup, splitAssetString) ->
 
   class RootOutcomesFinder

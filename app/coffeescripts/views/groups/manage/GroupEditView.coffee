@@ -17,7 +17,7 @@
 
 define [
   'i18n!groups'
-  'compiled/views/DialogFormView'
+  '../../DialogFormView'
   'jst/groups/manage/groupEdit'
   'jst/EmptyDialogFormWrapper'
 ], (I18n, DialogFormView, template, wrapper) ->

@@ -19,7 +19,7 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/PaginatedView'
+  '../PaginatedView'
   'jst/contexts/PageView'
 ], ($, _, PaginatedView, pageViewTemplate) ->
 

@@ -17,9 +17,9 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!profile'
-import preventDefault from 'compiled/fn/preventDefault'
+import preventDefault from '../fn/preventDefault'
 import 'jquery.ajaxJSON'
-import 'compiled/jquery.rails_flash_notifications'
+import '../jquery.rails_flash_notifications'
 
 $(() => {
   let resending = false

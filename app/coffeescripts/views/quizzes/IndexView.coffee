@@ -20,9 +20,9 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/quizzes/QuizItemGroupView'
+  './QuizItemGroupView'
   'jst/quizzes/IndexView'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (I18n, $, _, Backbone, QuizItemGroupView, template) ->
 
   class IndexView extends Backbone.View

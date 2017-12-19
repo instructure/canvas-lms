@@ -21,7 +21,7 @@ define [
   "jquery.ajaxJSON",
   "jquery.instructure_misc_plugins",
   "jquery.loadingImg",
-  "compiled/jquery.rails_flash_notifications",
+  "../../jquery.rails_flash_notifications",
   "link_enrollment"
 ], ($, I18n) ->
   $(document).ready ->

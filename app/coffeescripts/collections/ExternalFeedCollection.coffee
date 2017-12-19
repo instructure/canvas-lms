@@ -17,8 +17,8 @@
 
 define [
   'Backbone'
-  'compiled/models/ExternalFeed'
-  'compiled/str/splitAssetString'
+  '../models/ExternalFeed'
+  '../str/splitAssetString'
 ], (Backbone, ExternalFeed, splitAssetString) ->
 
   class ExternalFeedCollection extends Backbone.Collection

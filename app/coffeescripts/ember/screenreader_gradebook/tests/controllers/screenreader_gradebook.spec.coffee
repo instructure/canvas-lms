@@ -24,7 +24,7 @@ define [
   '../shared_ajax_fixtures'
   'spec/jsx/gradebook/GradeCalculatorSpecHelper'
   '../../controllers/screenreader_gradebook_controller'
-  'compiled/userSettings'
+  '../../../../userSettings'
   'jsx/gradebook/CourseGradeCalculator'
   'vendor/jquery.ba-tinypubsub'
 ], (

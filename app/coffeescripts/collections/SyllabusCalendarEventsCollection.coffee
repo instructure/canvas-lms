@@ -18,7 +18,7 @@
 
 define [
   'underscore'
-  'compiled/collections/PaginatedCollection'
+  '../collections/PaginatedCollection'
 ], (_, PaginatedCollection) ->
 
   class SyllabusCalendarEventsCollection extends PaginatedCollection

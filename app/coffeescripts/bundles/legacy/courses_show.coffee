@@ -22,10 +22,10 @@ define [
   "jsx/courses/show",
   "jquery.ajaxJSON",
   "jqueryui/dialog",
-  "compiled/jquery/fixDialogButtons",
+  "../../jquery/fixDialogButtons",
   "jquery.loadingImg",
   "vendor/jquery.scrollTo",
-  "compiled/behaviors/openAsDialog"
+  "../../behaviors/openAsDialog"
 ], ($, I18n, htmlEscape) ->
   $(document).ready ->
     $selfUnenrollmentDialog = $("#self_unenrollment_dialog")

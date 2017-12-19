@@ -17,7 +17,7 @@
 
 define [
   'Backbone'
-  'compiled/models/ExternalTool'
+  '../models/ExternalTool'
 ], (Backbone, ExternalTool) ->
 
   class ExternalToolCollection extends Backbone.Collection

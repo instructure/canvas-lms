@@ -17,7 +17,7 @@
 
 define [
   'Backbone'
-  'compiled/backbone-ext/DefaultUrlMixin'
+  '../backbone-ext/DefaultUrlMixin'
 ], (Backbone, DefaultUrlMixin) ->
 
   class ExternalFeed  extends Backbone.Model

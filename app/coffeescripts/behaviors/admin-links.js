@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from  'jquery'
-import KyleMenu from 'compiled/jquery.kylemenu'
+import KyleMenu from '../jquery.kylemenu'
 
 // this is a behaviour that will automatically set up a set of .admin-links
 // when the button is clicked, see _admin_links.scss for markup

@@ -19,7 +19,7 @@ define [
   'jquery'
   'i18n!calendar'
   'underscore'
-  'compiled/calendar/CalendarDefaults'
+  '../calendar/CalendarDefaults'
   'vendor/jquery.ba-tinypubsub'
 ], ($, I18n, _, calendarDefaults) ->
   class MiniCalendar

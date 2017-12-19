@@ -20,7 +20,7 @@ define [
   'Backbone'
   'underscore'
   'jst/TreeBrowser'
-  'compiled/views/TreeView'
+  './TreeView'
 ], (I18n, Backbone, _, template, TreeView) ->
 
   class TreeBrowserView extends Backbone.View

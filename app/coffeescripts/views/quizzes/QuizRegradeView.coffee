@@ -21,7 +21,7 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/DialogBaseView'
+  '../DialogBaseView'
   'jst/quiz/regrade'
 ], (I18n, $, _, Backbone, DialogBaseView, template) ->
 

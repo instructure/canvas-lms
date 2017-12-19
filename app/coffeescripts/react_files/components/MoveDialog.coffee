@@ -20,10 +20,10 @@ define [
   'jquery'
   'react'
   'prop-types'
-  'compiled/fn/preventDefault'
+  '../../fn/preventDefault'
   '../modules/customPropTypes'
   '../utils/moveStuff'
-  'compiled/str/splitAssetString'
+  '../../str/splitAssetString'
 ], (I18n, $, React, PropTypes, preventDefault,  customPropTypes, moveStuff, splitAssetString) ->
 
   MoveDialog =

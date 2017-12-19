@@ -19,9 +19,9 @@ define [
   'jquery'
   'i18n!calendar'
   'jst/calendar/TimeBlockRow'
-  'compiled/util/fcUtil'
+  '../util/fcUtil'
   'jsx/shared/helpers/datePickerFormat'
-  'compiled/calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
+  '../calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
 ], ($, I18n, timeBlockRowTemplate, fcUtil, datePickerFormat) ->
 
   class TimeBlockRow

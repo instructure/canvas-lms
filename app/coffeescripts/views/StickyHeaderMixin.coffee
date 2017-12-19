@@ -17,7 +17,7 @@
 
 define [
   'jquery'
-  'compiled/jquery/sticky'
+  '../jquery/sticky'
 ], ($) ->
 
   # Remember, you must define a toolbar with data attribute 'data-sticky'

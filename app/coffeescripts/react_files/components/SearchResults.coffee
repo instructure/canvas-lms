@@ -19,7 +19,7 @@ define [
   'underscore'
   'i18n!react_files'
   'react',
-  'compiled/collections/FilesCollection'
+  '../../collections/FilesCollection'
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'

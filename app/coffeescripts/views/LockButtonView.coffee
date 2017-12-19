@@ -18,7 +18,7 @@
 define [
   'i18n!lock_btn_module'
   'jquery'
-  'compiled/fn/preventDefault'
+  '../fn/preventDefault'
   'Backbone'
   'str/htmlEscape'
   'jquery.instructure_forms'

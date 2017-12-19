@@ -17,28 +17,28 @@
 
 define [
   'i18n!discussion_topics'
-  'compiled/views/ValidatedFormView'
-  'compiled/views/assignments/AssignmentGroupSelector'
-  'compiled/views/assignments/GradingTypeSelector'
-  'compiled/views/assignments/GroupCategorySelector'
-  'compiled/views/assignments/PeerReviewsSelector'
-  'compiled/views/assignments/PostToSisSelector'
+  '../ValidatedFormView'
+  '../assignments/AssignmentGroupSelector'
+  '../assignments/GradingTypeSelector'
+  '../assignments/GroupCategorySelector'
+  '../assignments/PeerReviewsSelector'
+  '../assignments/PostToSisSelector'
   'underscore'
   'jst/DiscussionTopics/EditView'
   'jsx/shared/rce/RichContentEditor'
   'str/htmlEscape'
-  'compiled/models/DiscussionTopic'
-  'compiled/models/Announcement'
-  'compiled/models/Assignment'
+  '../../models/DiscussionTopic'
+  '../../models/Announcement'
+  '../../models/Assignment'
   'jquery'
-  'compiled/fn/preventDefault'
-  'compiled/views/calendar/MissingDateDialogView'
-  'compiled/views/editor/KeyboardShortcuts'
+  '../../fn/preventDefault'
+  '../calendar/MissingDateDialogView'
+  '../editor/KeyboardShortcuts'
   'jsx/shared/conditional_release/ConditionalRelease'
-  'compiled/util/deparam'
-  'compiled/jquery.rails_flash_notifications' #flashMessage
+  '../../util/deparam'
+  '../../jquery.rails_flash_notifications' #flashMessage
   'jsx/shared/helpers/numberHelper'
-  'compiled/util/SisValidationHelper'
+  '../../util/SisValidationHelper'
 ], (
     I18n,
     ValidatedFormView,

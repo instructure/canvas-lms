@@ -19,10 +19,10 @@ define [
   'jst/discussions/noResults'
   'jquery'
   'underscore'
-  'compiled/views/DiscussionTopic/FilterEntryView'
-  'compiled/views/DiscussionTopic/EntryCollectionView'
-  'compiled/collections/EntryCollection'
-  'compiled/regexp/rEscape'
+  '../DiscussionTopic/FilterEntryView'
+  '../DiscussionTopic/EntryCollectionView'
+  '../../collections/EntryCollection'
+  '../../regexp/rEscape'
 ], (noResultsTemplate, $, _, FilterEntryView, EntryCollectionView, EntryCollection, rEscape) ->
 
   class DiscussionFilterResultsView extends EntryCollectionView

@@ -21,11 +21,11 @@ define [
   'i18n!gradebook'
   'jsx/shared/helpers/numberHelper'
   'jsx/gradebook/shared/helpers/GradeFormatHelper'
-  'compiled/gradebook/GradebookTranslations'
+  '../gradebook/GradebookTranslations'
   'jsx/grading/helpers/OutlierScoreHelper'
   'str/htmlEscape'
-  'compiled/gradebook/Turnitin'
-  'compiled/util/round'
+  '../gradebook/Turnitin'
+  '../util/round'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # raw
 ], ($, _, I18n, numberHelper, GradeFormatHelper, GRADEBOOK_TRANSLATIONS,
