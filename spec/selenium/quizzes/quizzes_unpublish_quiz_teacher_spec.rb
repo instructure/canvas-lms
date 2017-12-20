@@ -26,6 +26,7 @@ describe 'unpublishing a quiz on the quiz show page' do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     wait_for_quiz_publish_button_to_populate
     f('#quiz-publish-link').click
+    wait_for_ajaximations
   end
 
   context 'as a teacher' do
