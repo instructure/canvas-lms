@@ -153,6 +153,10 @@ module Lti
       previous_course_ids_and_context_ids.map(&:lti_context_id).compact.join(',')
     end
 
+    def recursively_fetch_previous_lti_context_ids
+      recursively_fetch_previous_course_ids_and_context_ids.map(&:lti_context_id).compact.join(',')
+    end
+
     def previous_course_ids
       previous_course_ids_and_context_ids.map(&:id).sort.join(',')
     end
@@ -189,6 +193,13 @@ module Lti
     end
 
     def previous_course_ids_and_context_ids
+      return [] unless @context.is_a?(Course)
+      @previous_ids ||= Course.where(
+        "EXISTS (?)", ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id")
+      ).select("id, lti_context_id")
+    end
+
+    def recursively_fetch_previous_course_ids_and_context_ids
       return [] unless @context.is_a?(Course)
 
       # now find all parents for locked folders

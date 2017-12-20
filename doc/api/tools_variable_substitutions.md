@@ -527,16 +527,25 @@ This is a list of IMS LIS roles should have a different key.
 urn:lti:sysrole:ims/lis/None
 ```
 ## Canvas.course.previousContextIds
-Returns the context ids from the course that the current course was copied from (excludes cartridge imports).
+With respect to the current course, returns the context ids of the courses from which content has been copied (excludes cartridge imports).
 
 **Availability**: *when launched in a course*  
 
 
 ```
-1234
+1234,4567
+```
+## Canvas.course.previousContextIds.recursive
+With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
+
+**Availability**: *when launched in a course*  
+
+
+```
+1234,4567
 ```
 ## Canvas.course.previousCourseIds
-Returns the course ids of the course that the current course was copied from (excludes cartridge imports).
+With respect to the current course, returns the course ids of the courses from which content has been copied (excludes cartridge imports).
 
 **Availability**: *when launched in a course*  
 

@@ -567,17 +567,27 @@ module Lti
                        -> { lti_helper.concluded_lis_roles },
                        COURSE_GUARD
 
-    # Returns the context ids from the course that the current course was copied from (excludes cartridge imports).
+    # With respect to the current course, returns the context ids of the courses from which content has been copied (excludes cartridge imports).
     #
     # @example
     #   ```
-    #   1234
+    #   1234,4567
     #   ```
     register_expansion 'Canvas.course.previousContextIds', [],
                        -> { lti_helper.previous_lti_context_ids },
                        COURSE_GUARD
 
-    # Returns the course ids of the course that the current course was copied from (excludes cartridge imports).
+    # With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
+    #
+    # @example
+    #   ```
+    #   1234,4567
+    #   ```
+    register_expansion 'Canvas.course.previousContextIds.recursive', [],
+                       -> { lti_helper.recursively_fetch_previous_lti_context_ids },
+                       COURSE_GUARD
+
+    # With respect to the current course, returns the course ids of the courses from which content has been copied (excludes cartridge imports).
     #
     # @example
     #   ```

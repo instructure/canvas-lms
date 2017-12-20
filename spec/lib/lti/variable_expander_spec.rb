@@ -688,6 +688,14 @@ module Lti
           expect(exp_hash[:test]).to eq 'abc,xyz'
         end
 
+        it 'has substitution for $Canvas.course.previousContextIds.recursive' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:recursively_fetch_previous_lti_context_ids).and_return('abc,xyz')
+          exp_hash = {test: '$Canvas.course.previousContextIds.recursive'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'abc,xyz'
+        end
+
         it 'has substitution for $Canvas.course.previousCourseIds' do
           allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           allow(substitution_helper).to receive(:previous_course_ids).and_return('1,2')

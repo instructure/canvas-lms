@@ -343,6 +343,7 @@ module Lti
         @c2 = Course.create!
         @c2.root_account = root_account
         @c2.account = account
+        @c2.lti_context_id = 'def'
         @c2.save!
 
         course.content_migrations.create!.tap do |cm|
@@ -355,11 +356,11 @@ module Lti
         @c3 = Course.create!
         @c3.root_account = root_account
         @c3.account = account
-        @c3.lti_context_id = 'def'
+        @c3.lti_context_id = 'hij'
         @c3.save!
 
         @c1.content_migrations.create!.tap do |cm|
-          cm.context = course
+          cm.context = @c1
           cm.workflow_state = 'imported'
           cm.source_course = @c3
           cm.save!
@@ -367,11 +368,59 @@ module Lti
       end
 
       it "should return previous canvas course ids" do
-        expect(subject.previous_course_ids).to eq [@c1.id, @c2.id, @c3.id].sort.join(',')
+        expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(',')
       end
 
       it "should return previous lti context_ids" do
         expect(subject.previous_lti_context_ids.split(",")).to match_array %w{abc def}
+      end
+    end
+
+    describe '#recursively_fetch_previous_course_ids_and_context_ids' do
+      before do
+        course.save!
+        @c1 = Course.create!
+        @c1.root_account = root_account
+        @c1.account = account
+        @c1.lti_context_id = 'abc'
+        @c1.save
+
+        course.content_migrations.create!.tap do |cm|
+          cm.context = course
+          cm.workflow_state = 'imported'
+          cm.source_course = @c1
+          cm.save!
+        end
+
+        @c2 = Course.create!
+        @c2.root_account = root_account
+        @c2.account = account
+        @c2.lti_context_id = 'def'
+        @c2.save!
+
+        course.content_migrations.create!.tap do |cm|
+          cm.context = course
+          cm.workflow_state = 'imported'
+          cm.source_course = @c2
+          cm.save!
+        end
+
+        @c3 = Course.create!
+        @c3.root_account = root_account
+        @c3.account = account
+        @c3.lti_context_id = 'ghi'
+        @c3.save!
+
+        @c1.content_migrations.create!.tap do |cm|
+          cm.context = @c1
+          cm.workflow_state = 'imported'
+          cm.source_course = @c3
+          cm.save!
+        end
+      end
+
+      it "should return previous lti context_ids" do
+        expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi}
       end
     end
 
