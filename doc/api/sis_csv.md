@@ -277,8 +277,8 @@ still be provided.</td>
 </tr>
 </table>
 
-<p>The user's name (either first_name and last_name, or full_name) should always
-be provided. Otherwise, the name will be blanked out.</p>
+<p>At least one form of name should be supplied. If a user is being created and no name is given,
+the login_id will be used as the name.</p>
 
 
 <p>When a user is 'deleted' it will delete the login tied to the sis_id.

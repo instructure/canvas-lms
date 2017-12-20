@@ -194,20 +194,41 @@ describe SIS::CSV::UserImporter do
     expect(user.last_name).to eq 'St. Clair'
   end
 
-  it "should tolerate blank first and last names" do
+  it "uses sortable_name if none of first_name/last_name/full_name is given" do
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,,,user@example.com,active"
+        "user_id,login_id,sortable_name,short_name,email,status",
+        "user_1,user1,blah,bleh,user@example.com,active"
     )
-    user = CommunicationChannel.by_path('user@example.com').first.user
-    expect(user.name).to eql(" ")
+    user = Pseudonym.by_unique_id('user1').first.user
+    expect(user.name).to eq 'blah'
+  end
 
+  it "uses short_name is none of first_name/last_name/full_name/sortable_name is given" do
     process_csv_data_cleanly(
-        "user_id,login_id,email,status",
-        "user_2,user2,user2@example.com,active"
+        "user_id,login_id,short_name,email,status",
+        "user_1,user1,bleh,user@example.com,active"
     )
-    user = CommunicationChannel.by_path('user2@example.com').first.user
-    expect(user.name).to eql(" ")
+    user = Pseudonym.by_unique_id('user1').first.user
+    expect(user.name).to eq 'bleh'
+  end
+
+  it "uses login_id as a name if no form of name is given" do
+    process_csv_data_cleanly(
+      "user_id,login_id,status",
+      "user_1,user1,active"
+    )
+    user = Pseudonym.by_unique_id('user1').first.user
+    expect(user.name).to eq 'user1'
+  end
+
+  it "should leave the name alone if no name is supplied for an existing user" do
+    user = User.create!(:name => 'Greeble')
+    user.pseudonyms.create!(:account => @account, :sis_user_id => 'greeble', :unique_id => 'greeble@example.com')
+    process_csv_data_cleanly(
+      "user_id,login_id,status",
+      "greeble,greeble@example.com,active"
+    )
+    expect(user.reload.name).to eq 'Greeble'
   end
 
   it "should ignore first and last names if full name is provided" do
