@@ -131,7 +131,7 @@ nb:
     tab_sis_import: SIS-import
     tab_statistics: Statistikk
     tab_sub_accounts: Underkontoer
-    tab_terms: Bruksvilkår
+    tab_terms: Semestre
     tab_users: Brukere
     turnitin_pledge: "Denne oppgaveinnleveringen er mitt eget, originale arbeid"
   account_97b34646: Konto
@@ -9978,7 +9978,7 @@ nb:
   master_courses_2aaa4841: "Videregående emne"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Mastery: %{n_mastery_points_precision_2_str} Poeng"
   mastery_path_processing_f4471152: Mestringsveibehandling
-  mastery_paths_breakdown_6e0b5fce: "Læringsstier Sammenbrudd"
+  mastery_paths_breakdown_6e0b5fce: "Læringsstier Sammendrag"
   mastery_paths_cc4096c2: Læringsstier
   mastery_paths_editor_930655bb: "Rediger mestringsveier"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Ekspertiseresultat reflekterer den høyeste poengsum i den karaktersatte oppgaven eller testen."
@@ -14339,7 +14339,7 @@ nb:
     essay_score: "Resultat: %{score}"
     loading_questions: "Spørsmålsstatistikk blir lastet. Vennligst vent en stund."
     no_answer: "Intet svar"
-    question_breakdown: Spørsmålsammenbrudd
+    question_breakdown: "Sammendrag av spørsmål"
     question_header: "Spørsmål %{position}"
     quiz-stats-noshow-warning: "Enda magi har grenser. Vi kan ikke gjengi statistikk for denne testen, men du kan laste ned rapportene."
     response_student_count: 
@@ -14357,7 +14357,7 @@ nb:
       low_score: "Laveste resultat"
       mean: "Gjennomsnittlig resultat"
       not_available_abbrev: N/A
-      quiz_summary: "Test Sammendrag"
+      quiz_summary: "Sammendrag av test"
       stdev: Standardavvik
       students_who_got_a_certain_score: 
         one: "En elev har fått en poeng på %{score}%."
@@ -17771,7 +17771,7 @@ nb:
         term_start: semesterstart
         unspecified: "når som helst"
       timespan: "%{start_at} *til* %{end_at}"
-  terms_35d91184: "Bruksvilkår:"
+  terms_35d91184: "Semestre:"
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Semestere ikke funnet. Semester må inkluderes med multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Attributter for brukervilkår ikke gyldige"
   terms_of_service_bedefcaf: Brukervilkår
