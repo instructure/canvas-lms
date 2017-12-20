@@ -3797,6 +3797,7 @@ tr:
   confirmation_failed_please_try_again_ae566d37: "Onaylama başarısız. Lütfen tekrar deneyin."
   consumer_key_57d9fcf1: "Kullanıcı anahtarı"
   consumer_key_6f94ba11: "Kullanıcı Anahtarı"
+  content_1440204b: İçerik
   content_exports: 
     buttons: 
       process: "Veriyi İşle"
@@ -5081,6 +5082,9 @@ tr:
     master_course_restrictions: 
       labels: 
         availability_dates: "Geçerlilik Tarihleri"
+        content: İçerik
+        due_dates: "Bitiş Tarihi"
+        points: Puanlar
     notices: 
       backup_restored: "Yedek Başarı ile Yeniden Yüklendi!"
       concluded: "Ders başarılı bir şekilde sonlandırıldı"
@@ -5241,6 +5245,7 @@ tr:
         course_format: Format
         course_lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         course_name: Ad
+        course_offline_export: "Çevrimdışı Ders"
         course_section_name: "Yeni Bölüm Ekle"
         course_status_published: "Ders Yayınlanıyor"
         course_status_unpublished: "Ders Yayınlanmıyor"
@@ -6314,6 +6319,7 @@ tr:
     due_at: "bitiş: %{assignment_due_date_time}"
     multiple_due_dates: "Bitiş: Çoklu Tarih"
     no_due_date: "bitiş: Bitiş Tarihi Yok"
+  due_dates_520a6c08: "Bitiş Tarihi"
   due_datetime_f5a81b81: "Teslim Tarihi: %{dateTime}"
   due_dueat_39d7d6c2: "Bitiş %{dueAt}"
   due_dueat_ef67f6f4: "Bitiş: %{dueAt}"
