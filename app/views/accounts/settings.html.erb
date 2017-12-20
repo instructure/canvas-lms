@@ -98,7 +98,10 @@
               </td>
               <td>
                   <div id="domains-form-container">
-                  <% domains = JSON.parse(@account.settings[:domains]) %>
+                  <%
+                    domains = [] 
+                    domains := JSON.parse(@account.settings[:domains]) 
+                  %>
                   <% if domains.length > 0 -%>
                       <%  domains.each do |domain| -%>
                         <% unless domain == "" -%>
