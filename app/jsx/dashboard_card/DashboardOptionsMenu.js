@@ -25,7 +25,7 @@ import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReade
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
 import Button from '@instructure/ui-core/lib/components/Button'
-import IconSettings2Line from 'instructure-icons/lib/Line/IconSettings2Line'
+import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
 
 import {sharedDashboardInstance} from '../dashboardPlannerHelper'
 
@@ -163,7 +163,7 @@ export default class DashboardOptionsMenu extends React.Component {
         trigger={
           <Button variant="icon">
             <ScreenReaderContent>{I18n.t('Dashboard Options')}</ScreenReaderContent>
-            <IconSettings2Line />
+            <IconMoreLine />
           </Button>
         }
         contentRef={(el) => { this.menuContentRef = el; }}
