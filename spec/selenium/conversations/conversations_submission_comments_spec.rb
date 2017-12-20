@@ -63,7 +63,7 @@ describe "conversations new" do
       end
 
       it 'filters by course', priority: "2", test_id: 197518 do
-        select_course(@course1.id)
+        select_course(@course1.name)
         expect(conversation_elements.size).to eq 1
       end
 

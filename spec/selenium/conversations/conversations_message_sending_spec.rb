@@ -94,7 +94,7 @@ describe "conversations new" do
       conversations
       fj('#compose-btn').click
       wait_for_ajaximations
-      select_message_course(@group, true)
+      select_message_course(@group)
       add_message_recipient @s2
       write_message_subject('blah')
       write_message_body('bluh')
@@ -113,7 +113,7 @@ describe "conversations new" do
       conversations
       fj('#compose-btn').click
       wait_for_ajaximations
-      select_message_course(@group, true)
+      select_message_course(@group)
       add_message_recipient @s2
       f("#bulk_message").click
       write_message_subject('blah')
@@ -183,7 +183,8 @@ describe "conversations new" do
 
         get '/conversations'
         move_to_click('.icon-compose')
-        expect(fj("#compose-message-course option:contains('#{@course.name}')")).to be
+        move_to_click("#compose-message-course-group-filter")
+        expect(f("#compose-message-course-group-filter")).to include_text(@course.name)
       end
 
       it "should not show course before begin date", priority: "1", test_id: 478994 do
@@ -193,7 +194,8 @@ describe "conversations new" do
 
         get '/conversations'
         move_to_click('.icon-compose')
-        expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
+        move_to_click("#compose-message-course-group-filter")
+        expect(f("#compose-message-course-group-filter")).not_to include_text(@course.name)
       end
 
       it "should not show course after end date", priority: "1", test_id: 478995 do
@@ -203,7 +205,9 @@ describe "conversations new" do
 
         get '/conversations'
         move_to_click('.icon-compose')
-        expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
+        f("#compose-message-course-group-filter").click
+        wait_for_ajaximations
+        expect(f("#compose-message-course-group-filter")).not_to include_text(@course.name)
       end
     end
 
@@ -257,12 +261,10 @@ describe "conversations new" do
       it "can compose a message to a single user", priority: "1", test_id: 117958 do
         conversations
         goto_compose_modal
-        fj('.btn.dropdown-toggle :contains("Select course")').click
-        wait_for_ajaximations
-
-        expect(f('.dropdown-menu.open')).to be_truthy
-
-        fj('.message-header-input .text:contains("Unnamed Course")').click
+        move_to_click("#compose-message-course-group-filter")
+        list_id = f("#compose-message-course-group-filter ul").attribute("id")
+        list_item_id = "##{list_id}_course_#{@course.id}"
+        f(list_item_id).click
         wait_for_ajaximations
 
         # check for auto complete to fill in 'first student'
@@ -290,12 +292,11 @@ describe "conversations new" do
 
           conversations
           goto_compose_modal
-          fj('.btn.dropdown-toggle :contains("Select course")').click
+          f("#compose-message-course-group-filter").click
           wait_for_ajaximations
-
-          f('.dropdown-menu.open')
-
-          fj('.message-header-input .text:contains("Unnamed Course")').click
+          list_id = f("#compose-message-course-group-filter ul").attribute("id")
+          list_item_id = "##{list_id}_course_#{@course.id}"
+          f(list_item_id).click
           wait_for_ajaximations
 
           f('.message-header-input .icon-address-book').click
