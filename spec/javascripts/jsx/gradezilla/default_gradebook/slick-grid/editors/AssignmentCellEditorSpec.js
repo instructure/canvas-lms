@@ -19,34 +19,38 @@
 import ReactDOM from 'react-dom';
 import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory';
 import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor';
+import GridEvent from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport/GridEvent';
+import { createGradebook } from '../../GradebookSpecHelper';
 
-QUnit.module('AssignmentCellEditor', {
-  setup () {
-    const assignment = {
-      grading_type: 'points',
-      id: '2301',
-      points_possible: 10
-    };
-    this.$fixtures = document.querySelector('#fixtures');
-    const getSubmissionTrayState = () => ({ open: false, studentId: '1101', assignmentId: '2301' });
-    this.gridSupport = {
+QUnit.module('AssignmentCellEditor', (suiteHooks) => {
+  let $container;
+  let editor;
+  let editorOptions;
+  let gridSupport;
+
+  function createEditor () {
+    editor = new AssignmentCellEditor({ ...editorOptions, container: $container });
+  }
+
+  suiteHooks.beforeEach(() => {
+    $container = document.createElement('div');
+    document.body.appendChild($container);
+
+    gridSupport = {
       events: {
-        onKeyDown: {
-          subscribe () {},
-          unsubscribe () {}
-        }
+        onKeyDown: new GridEvent()
       }
     };
-    this.options = {
+
+    const assignment = { grading_type: 'points', id: '2301', points_possible: 10 };
+
+    editorOptions = {
       column: {
         assignmentId: '2301',
         field: 'assignment_2301',
-        getGridSupport: () => this.gridSupport,
+        getGridSupport () { return gridSupport },
         object: assignment,
-        propFactory: new AssignmentRowCellPropFactory(
-          assignment,
-          { options: {}, getSubmissionTrayState, toggleSubmissionTrayOpen () {} }
-        )
+        propFactory: new AssignmentRowCellPropFactory(assignment, createGradebook())
       },
       grid: {
         onKeyDown: {
@@ -61,147 +65,180 @@ QUnit.module('AssignmentCellEditor', {
         }
       }
     };
-  },
+  });
 
-  createEditor (options = {}) {
-    this.editor = new AssignmentCellEditor({ ...this.options, ...options, container: this.$fixtures });
-  },
-
-  teardown () {
-    if (this.$fixtures.childNodes.length > 0) {
-      this.editor.destroy();
+  suiteHooks.afterEach(() => {
+    if ($container.childNodes.length > 0) {
+      editor.destroy();
     }
-    this.$fixtures.innerHTML = '';
-  }
-});
+    $container.remove();
+  });
 
-test('creates an AssignmentRowCell in the given container', function () {
-  this.spy(ReactDOM, 'render');
-  this.createEditor();
-  strictEqual(ReactDOM.render.callCount, 1, 'renders once with React');
-  const [element, container] = ReactDOM.render.lastCall.args;
-  equal(element.type.name, 'AssignmentRowCell');
-  equal(container, this.$fixtures, 'container is the test #fixtures element');
-});
+  QUnit.module('initialization', (hooks) => {
+    hooks.beforeEach(() => {
+      sinon.spy(ReactDOM, 'render');
+    });
 
-test('stores a reference to the rendered AssignmentRowCell component', function () {
-  this.createEditor();
-  equal(this.editor.component.constructor.name, 'AssignmentRowCell');
-});
+    hooks.afterEach(() => {
+      ReactDOM.render.restore();
+    });
 
-test('includes editor options in AssignmentRowCell props', function () {
-  this.createEditor();
-  equal(this.editor.component.props.editorOptions, this.editor.options);
-});
+    test('renders with React', () => {
+      createEditor();
+      strictEqual(ReactDOM.render.callCount, 1);
+    });
 
-test('subscribes to gridSupport.events.onKeyDown', function () {
-  this.spy(this.gridSupport.events.onKeyDown, 'subscribe');
-  this.createEditor();
-  strictEqual(this.gridSupport.events.onKeyDown.subscribe.callCount, 1, 'calls grid.onKeyDown.subscribe');
-  const [handleKeyDown] = this.gridSupport.events.onKeyDown.subscribe.lastCall.args;
-  equal(handleKeyDown, this.editor.handleKeyDown, 'subscribes using the editor handleKeyDown function');
-});
+    test('renders an AssignmentRowCell', () => {
+      createEditor();
+      const [element] = ReactDOM.render.lastCall.args;
+      equal(element.type.name, 'AssignmentRowCell');
+    });
 
-test('#handleKeyDown delegates to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.spy(this.editor.component, 'handleKeyDown');
-  const keyboardEvent = new KeyboardEvent('example');
-  this.editor.handleKeyDown(keyboardEvent);
-  strictEqual(this.editor.component.handleKeyDown.callCount, 1);
-});
+    test('renders into the given container', () => {
+      createEditor();
+      const [/* element */, container] = ReactDOM.render.lastCall.args;
+      strictEqual(container, $container);
+    });
 
-test('#handleKeyDown passes the event when delegating handleKeyDown', function () {
-  this.createEditor();
-  this.spy(this.editor.component, 'handleKeyDown');
-  const keyboardEvent = new KeyboardEvent('example');
-  this.editor.handleKeyDown(keyboardEvent);
-  const [event] = this.editor.component.handleKeyDown.lastCall.args;
-  equal(event, keyboardEvent);
-});
+    test('stores a reference to the rendered AssignmentRowCell component', () => {
+      createEditor();
+      equal(editor.component.constructor.name, 'AssignmentRowCell');
+    });
 
-test('#handleKeyDown returns the return value from the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.stub(this.editor.component, 'handleKeyDown').returns(true);
-  const keyboardEvent = new KeyboardEvent('example');
-  const returnValue = this.editor.handleKeyDown(keyboardEvent);
-  strictEqual(returnValue, true);
-});
+    test('includes editor options in AssignmentRowCell props', () => {
+      createEditor();
+      equal(editor.component.props.editorOptions, editor.options);
+    });
+  });
 
-test('#destroy removes the reference to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.editor.destroy();
-  strictEqual(this.editor.component, null);
-});
+  QUnit.module('handleKeyDown event', () => {
+    test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
+      createEditor();
+      sinon.spy(editor.component, 'handleKeyDown');
+      const keyboardEvent = new KeyboardEvent('example');
+      gridSupport.events.onKeyDown.trigger(keyboardEvent);
+      strictEqual(editor.component.handleKeyDown.callCount, 1);
+    });
 
-test('#destroy unsubscribes from gridSupport.events.onKeyDown', function () {
-  this.createEditor();
-  this.spy(this.gridSupport.events.onKeyDown, 'unsubscribe');
-  this.editor.destroy();
-  strictEqual(this.gridSupport.events.onKeyDown.unsubscribe.callCount, 1, 'calls grid.onKeyDown.unsubscribe');
-  const [handleKeyDown] = this.gridSupport.events.onKeyDown.unsubscribe.lastCall.args;
-  equal(handleKeyDown, this.editor.handleKeyDown, 'unsubscribes using the editor handleKeyDown function');
-});
+    test('passes the event when calling handleKeyDown', () => {
+      createEditor();
+      sinon.spy(editor.component, 'handleKeyDown');
+      const keyboardEvent = new KeyboardEvent('example');
+      gridSupport.events.onKeyDown.trigger(keyboardEvent);
+      const [event] = editor.component.handleKeyDown.lastCall.args;
+      strictEqual(event, keyboardEvent);
+    });
 
-test('#destroy unmounts the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.editor.destroy();
-  const unmounted = ReactDOM.unmountComponentAtNode(this.$fixtures);
-  strictEqual(unmounted, false, 'component was already unmounted');
-});
+    test('returns the return value from the AssignmentRowCell component', () => {
+      createEditor();
+      sinon.stub(editor.component, 'handleKeyDown').returns(false);
+      const keyboardEvent = new KeyboardEvent('example');
+      const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent);
+      strictEqual(returnValue, false);
+    });
+  });
 
-test('#focus delegates to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.spy(this.editor.component, 'focus');
-  this.editor.focus();
-  strictEqual(this.editor.component.focus.callCount, 1);
-});
+  QUnit.module('#destroy', () => {
+    test('removes the reference to the AssignmentRowCell component', () => {
+      createEditor();
+      editor.destroy();
+      strictEqual(editor.component, null);
+    });
 
-test('#isValueChanged delegates to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.stub(this.editor.component, 'isValueChanged').returns(true);
-  const changed = this.editor.isValueChanged();
-  strictEqual(this.editor.component.isValueChanged.callCount, 1);
-  strictEqual(changed, true);
-});
+    test('unsubscribes from gridSupport.events.onKeyDown', () => {
+      createEditor();
+      editor.destroy();
+      const keyboardEvent = new KeyboardEvent('example');
+      const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent);
+      strictEqual(returnValue, true, '"true" is the default return value when the event has no subscribers');
+    });
 
-test('#serializeValue delegates to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.stub(this.editor.component, 'serializeValue').returns('9.7');
-  const value = this.editor.serializeValue();
-  strictEqual(this.editor.component.serializeValue.callCount, 1);
-  strictEqual(value, '9.7');
-});
+    test('unmounts the AssignmentRowCell component', () => {
+      createEditor();
+      editor.destroy();
+      const unmounted = ReactDOM.unmountComponentAtNode($container);
+      strictEqual(unmounted, false, 'component was already unmounted');
+    });
+  });
 
-test('#loadValue delegates to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.spy(this.editor.component, 'loadValue');
-  this.editor.loadValue('9.7');
-  strictEqual(this.editor.component.loadValue.callCount, 1);
-  const [value] = this.editor.component.loadValue.lastCall.args;
-  strictEqual(value, '9.7');
-});
+  QUnit.module('#focus', () => {
+    test('calls .focus on the AssignmentRowCell component', () => {
+      createEditor();
+      sinon.spy(editor.component, 'focus');
+      editor.focus();
+      strictEqual(editor.component.focus.callCount, 1);
+    });
+  });
 
-test('#loadValue renders the component', function () {
-  this.createEditor();
-  this.stub(this.editor, 'renderComponent');
-  this.editor.loadValue('9.7');
-  strictEqual(this.editor.renderComponent.callCount, 1);
-});
+  QUnit.module('#isValueChanged', () => {
+    test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
+      createEditor();
+      sinon.stub(editor.component, 'isValueChanged').returns(true);
+      strictEqual(editor.isValueChanged(), true);
+    });
+  });
 
-test('#applyValue delegates to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.stub(this.editor.component, 'applyValue');
-  this.editor.applyValue({ id: '1101' }, '9.7');
-  strictEqual(this.editor.component.applyValue.callCount, 1);
-  const [item, value] = this.editor.component.applyValue.lastCall.args;
-  deepEqual(item, { id: '1101' });
-  strictEqual(value, '9.7');
-});
+  QUnit.module('#serializeValue', () => {
+    test('returns the result of calling .serializeValue on the AssignmentRowCell component', function () {
+      createEditor();
+      sinon.stub(editor.component, 'serializeValue').returns('9.7');
+      strictEqual(editor.serializeValue(), '9.7');
+    });
+  });
 
-test('#validate delegates to the AssignmentRowCell component', function () {
-  this.createEditor();
-  this.stub(this.editor.component, 'validate').returns({ valid: true });
-  const validation = this.editor.validate();
-  strictEqual(this.editor.component.validate.callCount, 1);
-  deepEqual(validation, { valid: true });
+  QUnit.module('#loadValue', () => {
+    test('calls .loadValue on the AssignmentRowCell component', () => {
+      createEditor();
+      sinon.spy(editor.component, 'loadValue');
+      editor.loadValue('9.7');
+      strictEqual(editor.component.loadValue.callCount, 1);
+    });
+
+    test('calls the AssignmentRowCell .loadValue method with the given value', () => {
+      createEditor();
+      sinon.spy(editor.component, 'loadValue');
+      editor.loadValue('9.7');
+      const [value] = editor.component.loadValue.lastCall.args;
+      strictEqual(value, '9.7');
+    });
+
+    test('renders the component', () => {
+      createEditor();
+      sinon.stub(editor, 'renderComponent');
+      editor.loadValue('9.7');
+      strictEqual(editor.renderComponent.callCount, 1);
+    });
+  });
+
+  QUnit.module('#applyValue', (hooks) => {
+    hooks.beforeEach(() => {
+      createEditor();
+      sinon.stub(editor.component, 'applyValue');
+    });
+
+    test('calls .applyValue on the AssignmentRowCell component', () => {
+      editor.applyValue({ id: '1101' }, '9.7');
+      strictEqual(editor.component.applyValue.callCount, 1);
+    });
+
+    test('includes the given item when applying the value', () => {
+      editor.applyValue({ id: '1101' }, '9.7');
+      const [item] = editor.component.applyValue.lastCall.args;
+      deepEqual(item, { id: '1101' });
+    });
+
+    test('includes the given value when applying the value', () => {
+      editor.applyValue({ id: '1101' }, '9.7');
+      const [/* item */, value] = editor.component.applyValue.lastCall.args;
+      strictEqual(value, '9.7');
+    });
+  });
+
+  QUnit.module('#validate', () => {
+    test('returns the result of calling .validate on the AssignmentRowCell component', () => {
+      createEditor();
+      sinon.stub(editor.component, 'validate').returns({ valid: true });
+      deepEqual(editor.validate(), { valid: true });
+    });
+  });
 });
