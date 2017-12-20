@@ -64,18 +64,18 @@ describe "Gradezilla view menu" do
       Gradezilla.click_assignment_group_header_options(@group.name,'Grade - Low to High')
       gradebook_student_names = Gradezilla.fetch_student_names
 
-      expect(gradebook_student_names[0]).to eq(@course.students[1].name)
-      expect(gradebook_student_names[1]).to eq(@course.students[2].name)
-      expect(gradebook_student_names[2]).to eq(@course.students[0].name)
+      expect(gradebook_student_names[0]).to eq(@student_name_2)
+      expect(gradebook_student_names[1]).to eq(@student_name_3)
+      expect(gradebook_student_names[2]).to eq(@student_name_1)
     end
 
     it "sorts assignments by grade - High to Low", priority: "1", test_id: 3253346 do
       Gradezilla.click_assignment_group_header_options(@group.name,'Grade - High to Low')
       gradebook_student_names = Gradezilla.fetch_student_names
 
-      expect(gradebook_student_names[0]).to eq(@course.students[0].name)
-      expect(gradebook_student_names[1]).to eq(@course.students[2].name)
-      expect(gradebook_student_names[2]).to eq(@course.students[1].name)
+      expect(gradebook_student_names[0]).to eq(@student_name_1)
+      expect(gradebook_student_names[1]).to eq(@student_name_3)
+      expect(gradebook_student_names[2]).to eq(@student_name_2)
     end
   end
 end
