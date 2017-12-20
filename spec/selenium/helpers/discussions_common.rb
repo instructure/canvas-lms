@@ -37,6 +37,7 @@ module DiscussionsCommon
   end
 
   def edit_topic(discussion_name, message)
+    wait_for_tiny(f('textarea[name=message]'))
     replace_content(f('input[name=title]'), discussion_name)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }
