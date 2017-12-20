@@ -205,4 +205,102 @@ describe "Announcements API", type: :request do
       expect(json).to be_empty
     end
   end
+
+  describe "section specific announcements" do
+    before(:once) do
+      course_with_teacher(active_course: true)
+      @course.account.set_feature_flag! :section_specific_announcements, 'on'
+      @section = @course.course_sections.create!(name: 'test section')
+
+      @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+      @announcement.is_section_specific = true
+      @announcement.course_sections = [@section]
+      @announcement.save!
+
+      @student1, @student2 = create_users(2, return_type: :record)
+      @course.enroll_student(@student1, :enrollment_state => 'active')
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+      student_in_section(@section, user: @student1)
+    end
+
+    it "teacher should be able to see section specific announcements" do
+      json = api_call_as_user(@teacher,
+        :get, "/api/v1/announcements",
+        {
+          controller: "announcements_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"]
+        })
+
+      expect(json.count).to eq(1)
+      expect(json[0]['id']).to eq(@announcement.id)
+      expect(json[0]['is_section_specific']).to eq(true)
+    end
+
+    it "teacher should be able to see section specific announcements and include sections" do
+      json = api_call_as_user(@teacher,
+        :get, "/api/v1/announcements",
+        {
+          controller: "announcements_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          include: ['sections'],
+        })
+
+      expect(json.count).to eq(1)
+      expect(json[0]['id']).to eq(@announcement.id)
+      expect(json[0]['is_section_specific']).to eq(true)
+      expect(json[0]['sections'].count).to eq(1)
+      expect(json[0]['sections'][0]['id']).to eq(@section.id)
+    end
+
+    it "teacher should be able to see section specific announcements and include sections and sections user count" do
+        json = api_call_as_user(@teacher,
+        :get, "/api/v1/announcements",
+        {
+          controller: "announcements_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          include: ['sections', 'sections_user_count'],
+        })
+
+      expect(json.count).to eq(1)
+      expect(json[0]['id']).to eq(@announcement.id)
+      expect(json[0]['is_section_specific']).to eq(true)
+      expect(json[0]['sections'].count).to eq(1)
+      expect(json[0]['sections'][0]['id']).to eq(@section.id)
+      expect(json[0]['sections'][0]['user_count']).to eq(1)
+    end
+
+    it "student in section should be able to see section specific announcements" do
+      json = api_call_as_user(@student1,
+        :get, "/api/v1/announcements",
+        {
+          controller: "announcements_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"]
+        })
+
+      expect(json.count).to eq(1)
+      expect(json[0]['id']).to eq(@announcement.id)
+      expect(json[0]['is_section_specific']).to eq(true)
+    end
+
+    it "student not in section should not be able to see section specific announcements" do
+      json = api_call_as_user(@student2,
+        :get, "/api/v1/announcements",
+        {
+          controller: "announcements_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"]
+        })
+
+      expect(json.count).to eq(0)
+    end
+  end
 end

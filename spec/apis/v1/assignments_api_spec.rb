@@ -3509,6 +3509,7 @@ describe AssignmentsApiController, type: :request do
         expect(json['discussion_topic']).to eq({
           'author' => {},
           'id' => @topic.id,
+          'is_section_specific' => @topic.is_section_specific,
           'title' => 'assignment1',
           'message' => nil,
           'posted_at' => @topic.posted_at.as_json,
@@ -3540,7 +3541,7 @@ describe AssignmentsApiController, type: :request do
           'html_url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
           'attachments' => [],
-          'permissions' => {'delete' => true, 'attach' => true, 'update' => true, 'reply' => true},
+          'permissions' => {'attach' => true, 'update' => true, 'reply' => true, 'delete' => true},
           'discussion_type' => 'side_comment',
           'group_category_id' => nil,
           'can_group' => true,

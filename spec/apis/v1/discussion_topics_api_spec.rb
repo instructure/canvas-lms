@@ -347,6 +347,7 @@ describe DiscussionTopicsController, type: :request do
        "title" => "Topic 1",
        "discussion_subentry_count" => 0,
        "assignment_id" => nil,
+       "is_section_specific" => @topic.is_section_specific,
        "published" => true,
        "can_unpublish" => true,
        "delayed_post_at" => nil,
@@ -533,6 +534,109 @@ describe DiscussionTopicsController, type: :request do
           expect(link).to match('only_announcements=true')
           expect(link).to match('order_by=recent_activity')
           expect(link).to match('scope=unlocked')
+        end
+      end
+
+      describe "section specific announcements" do
+        before(:once) do
+          course_with_teacher(active_course: true)
+          @course.account.set_feature_flag! :section_specific_announcements, 'on'
+          @section = @course.course_sections.create!(name: 'test section')
+
+          @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+          @announcement.is_section_specific = true
+          @announcement.course_sections = [@section]
+          @announcement.save!
+
+          @student1, @student2 = create_users(2, return_type: :record)
+          @course.enroll_student(@student1, :enrollment_state => 'active')
+          @course.enroll_student(@student2, :enrollment_state => 'active')
+          student_in_section(@section, user: @student1)
+        end
+
+        it "teacher should be able to see section specific announcements" do
+          json = api_call_as_user(@teacher,
+            :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+            {
+              controller: "discussion_topics",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              only_announcements: 1,
+            })
+
+          expect(json.count).to eq(1)
+          expect(json[0]['id']).to eq(@announcement.id)
+          expect(json[0]['is_section_specific']).to eq(true)
+        end
+
+        it "teacher should be able to see section specific announcements and include sections" do
+          json = api_call_as_user(@teacher,
+            :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+            {
+              controller: "discussion_topics",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              only_announcements: 1,
+              include: ['sections'],
+            })
+
+          expect(json.count).to eq(1)
+          expect(json[0]['id']).to eq(@announcement.id)
+          expect(json[0]['is_section_specific']).to eq(true)
+          expect(json[0]['sections'].count).to eq(1)
+          expect(json[0]['sections'][0]['id']).to eq(@section.id)
+        end
+
+        it "teacher should be able to see section specific announcements and include sections and sections user count" do
+          json = api_call_as_user(@teacher,
+            :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+            {
+              controller: "discussion_topics",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              only_announcements: 1,
+              include: ['sections', 'sections_user_count'],
+            })
+
+          expect(json.count).to eq(1)
+          expect(json[0]['id']).to eq(@announcement.id)
+          expect(json[0]['is_section_specific']).to eq(true)
+          expect(json[0]['sections'].count).to eq(1)
+          expect(json[0]['sections'][0]['id']).to eq(@section.id)
+          expect(json[0]['sections'][0]['user_count']).to eq(1)
+        end
+
+        it "student in section should be able to see section specific announcements" do
+          json = api_call_as_user(@student1,
+            :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+            {
+              controller: "discussion_topics",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              only_announcements: 1,
+            })
+
+          expect(json.count).to eq(1)
+          expect(json[0]['id']).to eq(@announcement.id)
+          expect(json[0]['is_section_specific']).to eq(true)
+        end
+
+        it "student not in section should not be able to see section specific announcements" do
+          json = api_call_as_user(@student2,
+            :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+            {
+              controller: "discussion_topics",
+              action: "index",
+              format: "json",
+              course_id: @course.id.to_s,
+              only_announcements: 1,
+            })
+
+          expect(json.count).to eq(0)
         end
       end
     end
@@ -1225,6 +1329,7 @@ describe DiscussionTopicsController, type: :request do
       "read_state" => "read",
       "unread_count" => 0,
       "user_can_see_posts" => true,
+      "is_section_specific" => gtopic.is_section_specific,
       "subscribed" => true,
       "podcast_url" => nil,
       "podcast_has_student_posts" => false,

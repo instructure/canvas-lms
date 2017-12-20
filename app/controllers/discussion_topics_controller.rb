@@ -249,7 +249,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument include[] [String, "all_dates"]
+  # @argument include[] [String, "all_dates", "sections", "sections_user_count"]
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
   #
@@ -387,6 +387,8 @@ class DiscussionTopicsController < ApplicationController
           plain_messages: value_to_boolean(params[:plain_messages]),
           exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
           include_all_dates: include_params.include?('all_dates'),
+          :include_sections => include_params.include?('sections'),
+          :include_sections_user_count => include_params.include?('sections_user_count'),
           master_course_status: mc_status,
           root_topic_fields: root_topic_fields)
       end

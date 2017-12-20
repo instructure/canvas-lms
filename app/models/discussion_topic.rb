@@ -1226,7 +1226,7 @@ class DiscussionTopic < ActiveRecord::Base
       # user is an account admin with appropriate permission
       next true if context.grants_any_right?(user, :manage, :read_course_content)
 
-      # assignment exists and isnt assigned to user (differentiated assignments)
+      # assignment exists and isn't assigned to user (differentiated assignments)
       if for_assignment? && !self.assignment.visible_to_user?(user)
         next false
       end
@@ -1237,6 +1237,11 @@ class DiscussionTopic < ActiveRecord::Base
       elsif is_announcement && unlock_at = available_from_for(user)
       # unlock date exists and has passed
         next unlock_at < Time.now.utc
+      # check section specific stuff
+      elsif is_section_specific
+        sections = user.enrollments.active.
+          where(course_section_id: self.discussion_topic_section_visibilities.select(:course_section_id))
+        next sections.any?
       # everything else
       else
         next true

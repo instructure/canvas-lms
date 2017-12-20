@@ -68,6 +68,32 @@ describe Announcement do
     end
   end
 
+  context "section specific announcements" do
+    before(:once) do
+      course_with_teacher(active_course: true)
+      @course.account.set_feature_flag! :section_specific_announcements, 'on'
+      @section = @course.course_sections.create!(name: 'test section')
+
+      @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+      @announcement.is_section_specific = true
+      @announcement.course_sections = [@section]
+      @announcement.save!
+
+      @student1, @student2 = create_users(2, return_type: :record)
+      @course.enroll_student(@student1, :enrollment_state => 'active')
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+      student_in_section(@section, user: @student1)
+    end
+
+    it "should be visible to students in specific section" do
+      expect(@announcement.visible_for?(@student1)).to be_truthy
+    end
+
+    it "should not be visible to students not in specific section" do
+      expect(@announcement.visible_for?(@student2)).to be_falsey
+    end
+  end
+
   context "permissions" do
     it "should not allow announcements on a course" do
       course_with_student(:active_user => 1)

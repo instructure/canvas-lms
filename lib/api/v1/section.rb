@@ -49,6 +49,10 @@ module Api::V1::Section
       res['passback_status'] = post_grades_status_json(section)
     end
 
+    if includes.include?('user_count')
+      res['user_count'] = section.enrollments.active.count
+    end
+
     res
   end
 
