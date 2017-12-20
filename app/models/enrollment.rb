@@ -1383,17 +1383,14 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restore_deleted_scores
-    assignment_groups = course.assignment_groups.active
+    assignment_groups = course.assignment_groups.active.except(:order)
     grading_periods = GradingPeriod.for(course)
 
-    Score.
-      where(enrollment_id: id, workflow_state: "deleted").
-      where(course_score: true).or(
-        Score.where(assignment_group: assignment_groups)
-      ).or(
-        Score.where(grading_period: grading_periods)
-      ).
-      in_batches.
+    Score.where(course_score: true).or(
+      Score.where(assignment_group: assignment_groups)
+    ).or(
+      Score.where(grading_period: grading_periods)
+    ).where(enrollment_id: id, workflow_state: "deleted").
       update_all(workflow_state: "active")
   end
 
