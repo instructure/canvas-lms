@@ -104,8 +104,6 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
 }
 
 AnnouncementRow.propTypes = {
-  // there's a bug in this rule that doesn't recognized required custom propTypes
-  // eslint-disable-next-line
   announcement: announcementShape.isRequired,
   canManage: bool,
   masterCourseData: masterCourseDataShape,

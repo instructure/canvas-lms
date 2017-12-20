@@ -594,6 +594,15 @@ class DiscussionTopicsController < ApplicationController
             @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
             @sequence_asset = @context_module_tag.try(:content)
 
+            if @context.is_a?(Course) &&
+                @context.account.feature_enabled?(:section_specific_announcements) &&
+                @topic.is_section_specific
+              user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
+                                             course_id: @context).active.group(:course_section_id).count
+              section_data = @topic.course_sections.map do |cs|
+                cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
+              end
+            end
             api_url = lambda do |endpoint, *params|
               endpoint = "api_v1_context_discussion_#{endpoint}_url"
               named_context_url(@context, endpoint, @topic, *params)
@@ -606,6 +615,8 @@ class DiscussionTopicsController < ApplicationController
                 :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
                 :IS_PUBLISHED  => @topic.published?,
                 :CAN_UNPUBLISH => @topic.can_unpublish?,
+                :IS_ANNOUNCEMENT => @topic.is_announcement,
+                :COURSE_SECTIONS => @topic.is_section_specific ? section_data : nil,
               },
               :PERMISSIONS => {
                 # Can reply
@@ -660,8 +671,14 @@ class DiscussionTopicsController < ApplicationController
             end
 
             js_hash = {:DISCUSSION => env_hash}
+
+            if @context.account.feature_enabled?(:section_specific_announcements)
+              js_hash[:TOTAL_USER_COUNT] = Enrollment.where(course_id: @context).active.count
+            end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
+              feature_enabled?(:section_specific_announcements)
             js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
               @domain_root_account.feature_enabled?(:student_context_cards) &&
               @context.grants_right?(@current_user, session, :manage)

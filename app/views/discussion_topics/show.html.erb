@@ -213,6 +213,7 @@
                                                 @presenter.author_link_attrs %>
                 <% end %>
               </div>
+              <div id="section_tooltip_root"></div>
               <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
                 <span class="discussion-subtitle">
                   <%= t(:from_context, "From *%{context_name}*", {
