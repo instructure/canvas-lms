@@ -64,6 +64,13 @@ module Types
       end
     end
 
+    field :submissionTypes, types[!AssignmentSubmissionType],
+      resolve: ->(assignment, _, _) {
+        # there's some weird data in the db so we'll just ignore anything that
+        # doesn't match a value that is expected
+        (SUBMISSION_TYPES & assignment.submission_types_array).to_a
+      }
+
     field :course, Types::CourseType, resolve: -> (assignment, _, _) {
       # course is polymorphicly associated with assignment through :context
       # it could also be queried by assignment.assignment_group.course
@@ -107,5 +114,28 @@ module Types
     value "unpublished"
     value "published"
     value "deleted"
+  end
+
+  SUBMISSION_TYPES = %w[
+    attendance
+    discussion_topic
+    external_tool
+    media_recording
+    none
+    not_graded
+    on_paper
+    online_quiz
+    online_text_entry
+    online_upload
+    online_url
+    wiki_page
+  ].to_set
+
+  AssignmentSubmissionType = GraphQL::EnumType.define do
+    name "SubmissionType"
+    description "Types of submissions an assignment accepts"
+    SUBMISSION_TYPES.each { |submission_type|
+      value(submission_type)
+    }
   end
 end

@@ -79,4 +79,9 @@ describe Types::AssignmentType do
   it "has an assignmentGroup" do
     expect(assignment_type.assignmentGroup).to eq assignment.assignment_group
   end
+
+  it "only returns valid submission types" do
+    assignment.update_attribute :submission_types, "none,foodfight"
+    expect(assignment_type.submissionTypes).to eq ["none"]
+  end
 end
