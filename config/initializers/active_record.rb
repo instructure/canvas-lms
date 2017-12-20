@@ -597,7 +597,11 @@ class ActiveRecord::Base
   def self.current_xlog_location
     Shard.current(shard_category).database_server.unshackle do
       Shackles.activate(:master) do
-        connection.select_value("SELECT pg_current_xlog_location()")
+        if connection.send(:postgresql_version) >= 100000
+          connection.select_value("SELECT pg_current_wal_lsn()")
+        else
+          connection.select_value("SELECT pg_current_xlog_location()")
+        end
       end
     end
   end
@@ -607,7 +611,10 @@ class ActiveRecord::Base
 
     start ||= current_xlog_location
     Shackles.activate(:slave) do
-      while connection.select_value("SELECT pg_last_xlog_replay_location()") < start
+      fn = connection.send(:postgresql_version) >= 100000 ?
+        "pg_last_wal_replay_lsn()" :
+        "pg_last_xlog_replay_location()"
+      while connection.select_value("SELECT #{fn}") < start
         sleep 0.1
       end
     end
