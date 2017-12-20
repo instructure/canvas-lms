@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import IconSettingsLine from 'instructure-icons/lib/Line/IconSettingsLine'
-import IconMiniArrowDownLine from 'instructure-icons/lib/Line/IconMiniArrowDownLine'
+import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
+import IconEditLine from 'instructure-icons/lib/Line/IconEditLine'
+import IconTrashLine from 'instructure-icons/lib/Line/IconTrashLine'
 import Button from '@instructure/ui-core/lib/components/Button'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import {MenuItem} from '@instructure/ui-core/lib/components/Menu'
@@ -59,16 +60,17 @@ export default class CourseImageSelector extends React.Component {
           ) : this.state.imageUrl ? (
             <PopoverMenu
               trigger={
-                <div style={{position: 'absolute', top: 6, right: 6}}>
-                  <Button size="small" variant="ghost-inverse">
-                    <IconSettingsLine title={I18n.t('Course image settings')} />
-                    <IconMiniArrowDownLine />
+                <div className="CourseImageSelector__Button">
+                  <Button size="small" variant="circle-primary">
+                    <IconMoreLine title={I18n.t('Course image settings')} />
                   </Button>
                 </div>
               }
             >
-              <MenuItem onClick={this.changeImage}>{I18n.t('Choose image')}</MenuItem>
-              <MenuItem onClick={this.removeImage}>{I18n.t('Remove image')}</MenuItem>
+              <MenuItem onClick={this.changeImage}>
+                <IconEditLine /> {I18n.t('Choose image')}</MenuItem>
+              <MenuItem onClick={this.removeImage}>
+                <IconTrashLine /> {I18n.t('Remove image')}</MenuItem>
             </PopoverMenu>
           ) : (
             <Button onClick={this.changeImage}>{I18n.t('Choose Image')}</Button>
