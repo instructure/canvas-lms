@@ -149,7 +149,7 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
 .btn,       // <-- deprecated- do not use
 .Button {
   @include canvas-button($ic-color-medium-light, $ic-color-dark, true);
-  border-radius: $baseBorderRadius;
+  border-radius: 4px;
   transition: background-color 0.2s ease-in-out;
   display: inline-block;
   position: relative;
@@ -246,14 +246,17 @@ input[type="button"] {
   @if $use_high_contrast {
     @include canvas-button($ic-brand-primary, $ic-color-light);
   } @else {
-    @include canvas-button(
-      var(--ic-brand-button--primary-bgd),
-      var(--ic-brand-button--primary-text),
-      false,
-      var(--ic-brand-button--primary-bgd-darkened-5),
-      var(--ic-brand-button--primary-bgd-darkened-15)
-    );
-  }
+    background: $sm-blue-6;
+    color: $sm-base-1;
+    border: 2px solid $sm-blue-6;
+    cursor: pointer;
+
+    &:hover{
+      background: $sm-blue-8;
+      color: $sm-base-1;
+      border: 2px solid $sm-blue-8;
+    }
+}
 }
 // Warning appears as orange
 .btn-warning, // <-- deprecated- do not use
@@ -276,13 +279,16 @@ input[type="button"] {
   @if $use_high_contrast {
     @include canvas-button($ic-color-dark, $ic-color-light);
   } @else {
-    @include canvas-button(
-      var(--ic-brand-button--secondary-bgd),
-      var(--ic-brand-button--secondary-text),
-      false,
-      var(--ic-brand-button--secondary-bgd-darkened-5),
-      var(--ic-brand-button--secondary-bgd-darkened-15)
-    );
+    background: transparent;
+    color: $sm-blue-6;
+    border: 2px solid $sm-blue-6;
+    cursor: pointer;
+
+    &:hover{
+      background: $sm-blue-6;
+      color: $sm-base-1;
+      border: 2px solid $sm-blue-6;
+    }
   }
 }
 

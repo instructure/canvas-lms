@@ -37,23 +37,23 @@
   },{
     "variable_name": "ic-brand-button--primary-bgd",
     "type": "color",
-    "default": "$ic-brand-secondary"
+    "default": "#2E85B6"
   },{
     "variable_name": "ic-brand-button--primary-text",
     "type": "color",
-    "default": "$ic-brand-primary"
+    "default": "#F5F5F6"
   },{
     "variable_name": "ic-brand-button--secondary-bgd",
     "type": "color",
-    "default": "transparent"
+    "default": "#F5F5F6"
   },{
     "variable_name": "ic-brand-button--secondary-text",
     "type": "color",
-    "default": "$ic-brand-primary"
+    "default": "#2E85B6"
   },{
     "variable_name": "ic-brand-button--secondary-border-color",
     "type": "color",
-    "default": "$ic-brand-primary"
+    "default": "#2E85B6"
   }
 ]},
 {

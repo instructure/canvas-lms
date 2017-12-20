@@ -345,7 +345,8 @@
 ) {
   background: $button-color;
   color: $text-color;
-  border: 1px solid;
+  border: 2px solid;
+  cursor: pointer;
 
   &:focus { color: $text-color; }
   &:hover {
