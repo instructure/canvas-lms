@@ -57,11 +57,13 @@ nn:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ein partnar-ID er nødvendig for å bruke Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Ein partnarnøkkel er nødvendig for å bruke Academic Benchmarks"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppstod eit problem då nye fagfellevurderarar blei lagt til."
+  a_sis_integration_is_not_configured_and_the_enable_3c560d89: "SIS-integrasjon er ikkje satt opp og dei nye integrasjonsinnstillingane for Enable er ikkje aktivert"
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Ein tabell som inneheld namnet på karakterskjemaet og knappar for redigering eller sletting av skjemaet."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Ein tabell med svar og overordna statistikk om studentars svaralternativer."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ein tabell som inneheld data frå graderingsskjemaet. Kvar rad inneheld eit namn, ein maksimum prosentverdi og ein minimum prosentverdi. Kvar rad inneheld også ein knapp for å legge til ei ny rad nedanfor, og ein knapp for å slette gjeldande rad."
   a_z_243c3301: A–Å
   a_z_29d8e67c: "A - Å"
+  about_this_service_b10bc808: "Om denne tenesta"
   academic_benchmark: 
     no_api_key: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
     no_file: "Resultatfil eller autoritet er ikkje gitt"
@@ -83,6 +85,7 @@ nn:
   accepted_user_role_type_course_course_2ce91589: "Godkjend: %{user}, %{role_type}, emne, %{course}"
   access_report_80d28095: Tilgangsrapport
   access_token_3be22221: Tilgangstoken
+  access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig til"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangstoken kan gi andre applikasjonar lov til å gjere API-kall på dine vegne. Du kan óg generere tilgangstoken og *bruke Canvas sine opne API-ar* til å sette opp eigne integrasjonar. "
   accordion_section_1_7888782d: "Accordion-klasse 1"
@@ -234,6 +237,7 @@ nn:
   account_course_and_user_search_22bf297a: "Konto, emne- og brukarsøk"
   account_domain_78f43049: Kontoområde
   account_id_2c3b4f15: konto-ID
+  account_id_73966078: konto_id
   account_id_f6e26867: Konto-ID
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonamn
@@ -698,6 +702,12 @@ nn:
     default_account_quotas_not_updated: "Standard kontokvoter er ikkje oppdaterte"
     default_account_quotas_updated: "Standard kontokvoter er oppdaterte"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Dato for aktivitet:"
       dcr2: 
         parameters: 
           custom_reports: 
@@ -714,6 +724,24 @@ nn:
               parameters: 
                 header: "Startar den:"
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -806,6 +834,25 @@ nn:
         penn_harris: 
           parameters: 
             note: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
+    proservices: 
+      provisioning: 
+        parameters: 
+          account_reports: 
+            default: 
+              accounts: 
+                check_box: "CSV-fil for kontoar"
+              courses: 
+                check_box: "CSV-fil for emne"
+              enrollments: 
+                check_box: "CSV-fil over påmeldingar"
+              group_categories: 
+                login: 
+                  check_box: "CSV-fil for gruppekategoriar"
+              group_membership: 
+                login: 
+                  check_box: "CSV-fil for gruppemedlemskap"
+              groups: 
+                check_box: "CSV-fil for grupper"
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -3360,6 +3407,7 @@ nn:
   collapsed_510aa02a: Skjult
   colombia_57_c6c75620: "Colombia (+57)"
   colombia_919c87f9: Colombia
+  color_a363e1b0: Farge
   columns_464bd055: Kolonnar
   coming_up_4348b0bd: "Kjem snart"
   comm_messages: 
@@ -4420,7 +4468,7 @@ nn:
       teachers_students: "Faglærarar og studentar"
   course_8a63b4a3: Emne
   course_8dcfb195: emne
-  course_activity_stream_40091c17: "Emnet sin aktivitetsstaum"
+  course_activity_stream_40091c17: "Emnet sin aktivitetsstraum"
   course_and_user_search_ebc1ae41: "Kurs- og brukarsøk"
   course_announcements_76b07340: Emnekunngjeringar
   course_assignments_833b8cf1: Emneoppgåver
@@ -8534,6 +8582,7 @@ nn:
     no_comment: "Ingen kommentar"
     no_description: "Inga skildring"
   leave_5e852989: Forlate
+  leave_a_comment_7991725b: "Gi eit svar"
   leave_group_group_name_6847c632: "Forlate gruppa %{group_name}"
   left_group_group_name_aac4e813: "Forlét gruppa %{group_name}"
   let_students_see_the_correct_answers_dacc2faf: "La  studentane sjå dei korrekte svara"
