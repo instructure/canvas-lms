@@ -638,7 +638,8 @@ class Gradezilla
       assignment_header_popover_sub_item_element(sort_by_item).click
     end
 
-    def click_assignment_popover_enter_grade_as(grade_type)
+    def click_assignment_popover_enter_grade_as(assignment_id, grade_type)
+      assignment_header_menu_element(assignment_id).click
       hover(assignment_header_popover_menu_element("Enter Grades as"))
       assignment_header_popover_sub_item_element(grade_type).click
     end
