@@ -3,7 +3,7 @@
 You can use Docker in your development environment for a more seamless
 way to get started developing Canvas.
 
-**Note for previous docker for canvas development users**
+**Note for previous Docker for Canvas development users**
 If you have a `docker-compose.override.yml`, you'll need to update it to version 2 or delete it.
 
 ## Automated setup script
@@ -163,7 +163,7 @@ docker-compose exec jobs bin/byebug-remote
 
 ### Prefer pry?
 
-Unfortunately you can't start a pry session in a remote byebug session. What
+Unfortunately, you can't start a pry session in a remote byebug session. What
 you can do instead is use `pry-remote`.
 
 1. Add `pry-remote` to your Gemfile
@@ -232,12 +232,12 @@ To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `C
 
 Email is often sent through background jobs if you spin up the `jobs` container.
 If you would like to test or preview any notifications, simply trigger the email
-through it's normal actions, and it should immediately show up in the emulated
+through its normal actions, and it should immediately show up in the emulated
 webmail inbox available here: http://mailcatcher.canvaslms.docker/
 
 ## Tips
 
-It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm web` because that can get tiring to type over and overe. Here's some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
+It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
 
 ```
 alias dc='docker-compose'
@@ -256,7 +256,7 @@ If you are having trouble running the `web` container, make sure that permission
 chown -R 1000:1000 canvas-lms
 ```
 
-Or the permissions change (which will make docker work, but causes the git working directory to become filthy):
+Or the permissions change (which will make Docker work, but causes the git working directory to become filthy):
 
 ```
 chmod a+rwx -R canvas-lms
