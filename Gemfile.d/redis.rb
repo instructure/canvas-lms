@@ -19,6 +19,6 @@ group :redis do
   gem 'redis-rails', '5.0.2'
   gem 'redis-store', '1.4.1', github: 'redis-store/redis-store', ref: 'af2303747d701a49622d3884285324f1be665d94'
 
-  gem 'redis', '4.0.0'
+  gem 'redis', '4.0.1'
   gem 'redis-scripting', '1.0.1'
 end
