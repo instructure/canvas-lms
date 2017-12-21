@@ -177,10 +177,18 @@ describe CoursesController do
         course6.offer!
         enrollment6 = course_with_student course: course6, user: @student, active_all: true
 
+        # past course date, restricted past view & enrollment dates not concluded
+        course7 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+          restrict_enrollments_to_course_dates: false,
+          name: 'Ptheven',
+          restrict_student_past_view: true
+        course7.offer!
+        enrollment7 = course_with_student course: course7, user: @student, active_all: true
+
         user_session(@student)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to match_array([enrollment6, enrollment5, enrollment3, enrollment2, enrollment1])
+        expect(assigns[:past_enrollments]).to match_array([enrollment7, enrollment5, enrollment3, enrollment2, enrollment1])
         expect(assigns[:current_enrollments]).to eq [enrollment4]
         expect(assigns[:future_enrollments]).to be_empty
       end
@@ -248,7 +256,7 @@ describe CoursesController do
         user_session(@student)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to match_array([enrollment])
+        expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
@@ -257,7 +265,7 @@ describe CoursesController do
         user_session(observer)
         get 'index'
         expect(response).to be_success
-        expect(assigns[:past_enrollments]).to match_array([o.observer.enrollments.first])
+        expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
@@ -265,6 +273,27 @@ describe CoursesController do
         get 'index'
         expect(response).to be_success
         expect(assigns[:past_enrollments]).to eq [teacher_enrollment]
+        expect(assigns[:current_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      it "should include the student's course when the course restricts students viewing courses after the end date if they're not actually soft-concluded" do
+        course1 = Account.default.courses.create!(:restrict_student_past_view => true)
+        course1.offer!
+
+        enrollment = course_with_student course: course1
+        enrollment.accept!
+
+        course1.start_at = 2.months.ago
+        course1.conclude_at = 1.month.ago
+        course1.save!
+
+        course1.enrollment_term.update_attribute(:end_at, 1.month.from_now)
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to eq [enrollment]
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
       end
