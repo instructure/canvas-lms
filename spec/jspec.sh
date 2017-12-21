@@ -10,11 +10,11 @@ export JSPEC_WD=$(pwd)
 # error messages if there is a spec that fails.
 if [ "$1" == "--watch" ]; then
   export JSPEC_PATH=$2
-  yarn run test-watch --silent || true
+  yarn test:karma:watch --silent || true
 elif [ "$1" == "--a11y" ]; then
   export JSPEC_PATH=$2
-  A11Y_REPORT=1 yarn run test-watch --silent || true
+  A11Y_REPORT=1 yarn test:karma:watch --silent || true
 else
   export JSPEC_PATH=$1
-  yarn run test || true
+  yarn test:karma || true
 fi

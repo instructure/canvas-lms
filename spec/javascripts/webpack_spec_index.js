@@ -28,20 +28,33 @@ if (!window.ENV) window.ENV = {}
 // setup the inst-ui default theme
 canvas.use()
 
-function requireAll (requireContext) {
-  return requireContext.keys().map(requireContext);
-}
+const requireAll = context => context.keys().map(context)
 
-if (__SPEC_FILE) {
-  require(__SPEC_FILE)
-} else if (__SPEC_DIR) {
-  requireAll(require.context(__SPEC_DIR, true, /Spec$/))
+if (process.env.JSPEC_PATH) {
+  let isFile = false
+  try {
+    isFile = __webpack_modules__[require.resolveWeak(`../../${process.env.JSPEC_PATH}`)]
+  } catch (e) {}
+  if (isFile) {
+    require(`../../${process.env.JSPEC_PATH}`)
+  } else {
+    requireAll(require.context(`../../${process.env.JSPEC_PATH}`))
+  }
 } else {
+  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'coffee')) {
+    // run specs for ember screenreader gradebook
+    requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/))
 
-  // run specs for ember screenreader gradebook
-  requireAll(require.context('../../app/coffeescripts', true, /\.spec.coffee$/))
+    requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))
+  }
 
-  // run all the specs for the rest of canvas
-  requireAll(require.context('../coffeescripts', true, /Spec.coffee$/))
-  requireAll(require.context('./jsx', true, /Spec$/))
+  // Run the js tests in 2 different groups, half in each.
+  // In testing, the letter "q" was the midpoint. If one of these takes a lot
+  // longer than the other, we can adjust which letter of the alphabet we split on
+  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'js1')) {
+    requireAll(require.context('./jsx', !!'includeSubdirectories', /[a-q]Spec$/))
+  }
+  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'js2')) {
+    requireAll(require.context('./jsx', !!'includeSubdirectories', /[^a-q]Spec$/))
+  }
 }

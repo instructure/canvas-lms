@@ -14,6 +14,7 @@ module.exports = {
     'jest-localstorage-mock',
     '<rootDir>/jest/jest-setup.js'
   ],
+  testResultsProcessor: 'jest-junit',
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.jsx?$': 'babel-jest'
