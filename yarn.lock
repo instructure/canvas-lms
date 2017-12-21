@@ -98,6 +98,10 @@
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
 
+"@instructure/ui-themes@^4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.5.0.tgz#34cd8e1efb9cef1d43bba0450672a65e7a28834f"
+
 "@instructure/ui-utils@^4.5.0":
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.5.0.tgz#6b2a2724ca0687d1848e138ea26889b7f77aa88e"
@@ -4746,7 +4750,7 @@ install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
 
-"instructure-icons@3 || 4", instructure-icons@4.3.2, instructure-icons@4.x, instructure-icons@^4.3.0, instructure-icons@^4.3.1:
+"instructure-icons@3 || 4", instructure-icons@4.x, instructure-icons@^4.3.0, instructure-icons@^4.3.1:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-4.3.2.tgz#bdcd677ba39c4cac9d2bd80cab6638336a2ab9cd"
   dependencies:

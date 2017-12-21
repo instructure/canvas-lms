@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "@instructure/ui-core": "^4.5.0",
+    "@instructure/ui-themeable": "^4.5.0",
+    "@instructure/ui-themes": "^4.5.0",
     "axios": "^0.16.0",
     "backbone": "1.1.1",
     "brandable_css": "0.1.0",
