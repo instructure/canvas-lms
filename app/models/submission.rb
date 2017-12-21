@@ -1815,7 +1815,7 @@ class Submission < ActiveRecord::Base
     pg.final = !!attrs[:final]
     pg.grade = attrs[:grade] unless attrs[:grade].nil?
     pg.score = attrs[:score] unless attrs[:score].nil?
-    pg.source_provisional_grade = attrs[:source_provisional_grade]
+    pg.source_provisional_grade = attrs[:source_provisional_grade] if attrs.key?(:source_provisional_grade)
     pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
     pg.force_save = !!attrs[:force_save]
   end

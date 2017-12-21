@@ -4444,6 +4444,27 @@ describe Submission do
     end
   end
 
+  describe '#update_provisional_grade' do
+    before(:once) do
+      @submission = @assignment.submissions.find_by!(user_id: @student)
+      @provisional_grade = ModeratedGrading::ProvisionalGrade.new
+      @source = ModeratedGrading::ProvisionalGrade.new
+      @provisional_grade.source_provisional_grade = @source
+      @scorer = User.new
+    end
+
+    it 'sets the source provisional grade if one is provided' do
+      new_source = ModeratedGrading::ProvisionalGrade.new
+      @submission.update_provisional_grade(@provisional_grade, @scorer, source_provisional_grade: new_source)
+      expect(@provisional_grade.source_provisional_grade).to be new_source
+    end
+
+    it 'does not wipe out the existing source provisional grade, if a source_provisional_grade is not provided' do
+      @submission.update_provisional_grade(@provisional_grade, @scorer)
+      expect(@provisional_grade.source_provisional_grade).to be @source
+    end
+  end
+
   def submission_spec_model(opts={})
     opts = @valid_attributes.merge(opts)
     assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))
