@@ -20,6 +20,7 @@ define [
   'jquery'
   'underscore'
   'timezone'
+  'moment'
   '../util/fcUtil'
   '../util/natcompare'
   '../calendar/commonEventFactory'
@@ -31,14 +32,16 @@ define [
   'jst/EmptyDialogFormWrapper'
   'jst/calendar/genericSelectOptions'
   'jsx/shared/helpers/datePickerFormat'
+  'jsx/shared/FlashAlert'
+  'jsx/shared/helpers/momentDateHelper'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
   '../calendar/fcMomentHandlebarsHelpers'
-], (I18n, $, _, tz, fcUtil, natcompare, commonEventFactory, ValidatedFormView,
+], (I18n, $, _, tz, moment, fcUtil, natcompare, commonEventFactory, ValidatedFormView,
     CalendarEvent, SisValidationHelper, editAssignmentTemplate,
     editAssignmentOverrideTemplate, wrapper, genericSelectOptionsTemplate,
-    datePickerFormat) ->
+    datePickerFormat, { showFlashAlert }, withinMomentDates) ->
 
   class EditAssignmentDetailsRewrite extends ValidatedFormView
 
@@ -188,6 +191,9 @@ define [
       @closeCB()
 
     onSaveFail: (xhr) =>
+      if resp = JSON.parse(xhr.responseText)
+        showFlashAlert({ message: resp.error, err: null, type: 'error' })
+      @closeCB()
       @disableWhileLoadingOpts = {}
       super(xhr)
 
@@ -227,6 +233,20 @@ define [
       errors
 
     _validateDueDate: (data, errors) ->
+      if @event.eventType == "assignment" && @event.assignment.unlock_at && @event.assignment.lock_at
+        startDate = moment(@event.assignment.unlock_at)
+        endDate = moment(@event.assignment.lock_at)
+        dueDate = moment(@event.start)
+        if !withinMomentDates(dueDate, startDate, endDate)
+          rangeErrorMessage = I18n.t("Assignment has a locked date. Due date cannot be set outside of locked date range.")
+          errors["lock_range"] = [
+            message: rangeErrorMessage
+          ]
+          showFlashAlert({
+            message: rangeErrorMessage,
+            err: null,
+            type: 'error'
+          })
       post_to_sis = data.post_to_sis == '1'
       return errors unless post_to_sis
 

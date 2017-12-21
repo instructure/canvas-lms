@@ -27,6 +27,8 @@ define [
   'underscore'
   'timezone'
   'moment'
+  'jsx/shared/FlashAlert'
+  'jsx/shared/helpers/momentDateHelper'
   '../util/fcUtil'
   '../userSettings'
   '../util/hsvToRgb'
@@ -53,7 +55,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter, schedulerActions) ->
+], (I18n, $, _, tz, moment, { showFlashAlert }, withinMomentDates, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter, schedulerActions) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -335,6 +337,20 @@ define [
       if @currentView == 'week' && allDay && event.eventType == "assignment"
         revertFunc()
         return
+
+      if event.eventType == "assignment" && event.assignment.unlock_at && event.assignment.lock_at
+        startDate = moment(event.assignment.unlock_at)
+        endDate = moment(event.assignment.lock_at)
+        if !withinMomentDates(event.start, startDate, endDate)
+          revertFunc()
+          showFlashAlert({
+            message: I18n.t(
+              "Assignment has a locked date. Due date cannot be set outside of locked date range."
+            ),
+            err: null,
+            type: 'error'
+          })
+          return
 
       if event.midnightFudged
         event.start = fcUtil.addMinuteDelta(event.originalStart, minuteDelta)
