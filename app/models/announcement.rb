@@ -92,7 +92,7 @@ class Announcement < DiscussionTopic
     end
     can :read_replies
 
-    given { |user, session| self.context.grants_right?(user, session, :read_announcements) }
+    given { |user, session| self.context.grants_right?(user, session, :read_announcements) && self.visible_for?(user) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked?}

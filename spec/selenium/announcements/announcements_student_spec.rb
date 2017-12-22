@@ -160,5 +160,36 @@ describe "announcements" do
 
       expect(f("#content")).not_to contain_css('.discussion-rate-action')
     end
+
+    context "section specific announcements" do
+      before (:once) do
+        course_with_teacher(active_course: true)
+        @course.account.set_feature_flag! :section_specific_announcements, 'on'
+        @section = @course.course_sections.create!(name: 'test section')
+
+        @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+        @announcement.is_section_specific = true
+        @announcement.course_sections = [@section]
+        @announcement.save!
+
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, :enrollment_state => 'active')
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        student_in_section(@section, user: @student1)
+      end
+
+      it "should be visible to students in the specific section" do
+        user_session(@student1)
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+        expect(f(".discussion-title")).to include_text(@announcement.title)
+      end
+
+      it "should not be visible to students not in the specific section" do
+        user_session(@student2)
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+        expect(driver.current_url).to eq course_announcements_url @course
+        expect_flash_message :error, 'You do not have access to the requested announcement.'
+      end
+    end
   end
 end

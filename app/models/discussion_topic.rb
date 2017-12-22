@@ -1221,7 +1221,7 @@ class DiscussionTopic < ActiveRecord::Base
       # unlock date exists and has passed
         next unlock_at < Time.now.utc
       # check section specific stuff
-      elsif is_section_specific
+      elsif self.try(:is_section_specific)
         sections = user.enrollments.active.
           where(course_section_id: self.discussion_topic_section_visibilities.select(:course_section_id))
         next sections.any?
