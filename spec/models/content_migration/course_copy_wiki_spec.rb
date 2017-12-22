@@ -91,6 +91,12 @@ describe ContentMigration do
 
       vanilla_page_to = @copy_to.wiki_pages.where(migration_id: mig_id(vanilla_page_from)).take!
       expect(vanilla_page_to.assignment).to be_nil
+
+      # ensure assignment is unlinked
+      @page.assignment = nil
+      @page.save!
+      run_course_copy
+      expect(page_to.reload.assignment).to be_nil
     end
 
     it "re-imports updated/deleted page" do

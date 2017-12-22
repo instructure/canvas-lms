@@ -226,6 +226,8 @@ module Importers
           hash[:assignment][:title] ||= item.title
           item.assignment = Importers::AssignmentImporter.import_from_migration(
             hash[:assignment], context, migration)
+        else
+          item.assignment = nil
         end
         if item.changed?
           item.user = nil
