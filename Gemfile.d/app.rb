@@ -76,7 +76,7 @@ gem 'json', '2.1.0'
 gem 'oj', '3.3.9'
 gem 'jwt', '1.5.6', require: false
 gem 'json-jwt', '1.7.2', require: false
-gem 'twilio-ruby', '4.2.1'
+gem 'twilio-ruby', '5.6.0'
 
 gem 'mail', '2.6.6', require: false
 gem 'marginalia', '1.5.0', require: false
