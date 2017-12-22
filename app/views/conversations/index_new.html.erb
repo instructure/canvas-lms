@@ -32,19 +32,7 @@
           <span class="current-selection-label"></span>
         </span>
         <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
-        <span aria-hidden="true" class="screenreader-only" id="type-filter-description">
-          <%= t(:filter_messages_by_type, "Filter messages by type") %>
-          &nbsp;
-          <span class="current-selection-label"></span>
-        </span>
-        <select class="type-filter show-tick" id="type-filter" aria-haspopup="true" aria-labelledby="type-filter-description">
-          <option value="inbox"><%= t(:inbox, "Inbox") %></option>
-          <option value="unread"><%= t(:unread, "Unread") %></option>
-          <option value="starred"><%= t(:starred, "Starred") %></option>
-          <option value="sent"><%= t(:sent, "Sent") %></option>
-          <option value="archived"><%= t(:archived, "Archived") %></option>
-          <option value="submission_comments"><%= t(:submission_comments, "Submission Comments") %></option>
-        </select>
+        <div id="conversation_filter" style="display:inline-block; vertical-align: middle;"></div>
       </div>
       </div>
       <div class="panel__secondary">

@@ -32,6 +32,10 @@ import FavoriteCourseCollection from 'compiled/collections/FavoriteCourseCollect
 import GroupCollection from 'compiled/collections/GroupCollection'
 import 'compiled/behaviors/unread_conversations'
 import 'jquery.disableWhileLoading'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { decodeQueryString } from 'jsx/shared/queryString'
+import ConversationStatusFilter from 'jsx/shared/components/ConversationStatusFilter'
 
 const ConversationsRouter = Backbone.Router.extend({
 
@@ -450,8 +454,44 @@ const ConversationsRouter = Backbone.Router.extend({
   },
 
   _initHeaderView () {
+    const defaultFilter = 'inbox'
+    const filters = {
+        inbox: I18n.t('Inbox'),
+        unread: I18n.t('Unread'),
+        starred: I18n.t('Starred'),
+        sent: I18n.t('Sent'),
+        archived: I18n.t('Archived'),
+        submission_comments: I18n.t('Submission Comments')
+    }
+
+    // The onArchive function requires the filter to always be set in the url.
+    // If you are accessing the page iniitially, the filter will be set to
+    // inbox, but we have to update the url here manually to match. Further
+    // updates to the url are handled by the filter trigger and backbone history
+    const hash = window.location.hash
+    const hashParams = hash.substring("#filter=".length)
+    const filterType = decodeQueryString(hashParams).filter(i => i.type !== undefined)
+    const validFilter = filterType.length === 1 && Object.keys(filters).includes(filterType[0].type)
+
+    let initialFilter
+    if (hash.startsWith("#filter=") && validFilter) {
+      initialFilter = filterType[0].type
+    } else {
+      window.location.hash = `#filter=type=${defaultFilter}`
+      initialFilter = defaultFilter
+    }
+
     this.header = new InboxHeaderView({el: $('header.panel'), courses: this.courses})
     this.header.render()
+    ReactDOM.render(
+      <ConversationStatusFilter
+        router={this}
+        filters={filters}
+        defaultFilter={defaultFilter}
+        initialFilter={initialFilter}
+      />,
+      document.getElementById('conversation_filter')
+    );
   },
 
   _initComposeDialog () {

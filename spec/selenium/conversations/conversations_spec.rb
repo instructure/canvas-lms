@@ -97,20 +97,21 @@ describe "conversations new" do
     end
 
     it "should have a type dropdown", priority: "1", test_id: 446594 do
-      f("[data-id = 'type-filter']").click
+      element = view_filter
+      element.click
       wait_for_ajaximations
 
       # Verify type filter is open
-      expect(f('.type-filter.open')).to be
+      expect(element.enabled?).to be true
 
       # Verify type filter names and order
-      dropdown_array = ff('#type-filter-bs .text')
-      expect(dropdown_array[0]).to include_text('Inbox')
-      expect(dropdown_array[1]).to include_text('Unread')
-      expect(dropdown_array[2]).to include_text('Starred')
-      expect(dropdown_array[3]).to include_text('Sent')
-      expect(dropdown_array[4]).to include_text('Archived')
-      expect(dropdown_array[5]).to include_text('Submission Comments')
+      options = element.find_elements(tag_name: 'option')
+      expect(options[0].text).to eq 'Inbox'
+      expect(options[1].text).to eq 'Unread'
+      expect(options[2].text).to eq 'Starred'
+      expect(options[3].text).to eq 'Sent'
+      expect(options[4].text).to eq 'Archived'
+      expect(options[5].text).to eq 'Submission Comments'
     end
 
     it "should have action buttons", priority: "1", test_id: 446595 do
@@ -339,31 +340,35 @@ describe "conversations new" do
 
     it "should default to inbox view", priority: "1", test_id: 86601 do
       conversations
-      expect(bootstrap_select_value(view_filter)).to eq 'inbox'
+      expect(selected_view_filter).to eq 'inbox'
       expect(conversation_elements.size).to eq 2
     end
 
     it "should have an unread view", priority: "1", test_id: 197523 do
       conversations
       select_view('unread')
+      expect(selected_view_filter).to eq 'unread'
       expect(conversation_elements.size).to eq 1
     end
 
     it "should have an starred view", priority: "1", test_id: 197524 do
       conversations
       select_view('starred')
+      expect(selected_view_filter).to eq 'starred'
       expect(conversation_elements.size).to eq 2
     end
 
     it "should have an sent view", priority: "1", test_id: 197525 do
       conversations
       select_view('sent')
+      expect(selected_view_filter).to eq 'sent'
       expect(conversation_elements.size).to eq 3
     end
 
     it "should have an archived view", priority: "1", test_id: 197526 do
       conversations
       select_view('archived')
+      expect(selected_view_filter).to eq 'archived'
       expect(conversation_elements.size).to eq 1
     end
 
