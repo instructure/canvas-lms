@@ -85,10 +85,9 @@ describe "announcements index v2" do
     end
 
     it "search by title works correctly" do
-      skip('Add in with COMMS-556')
       AnnouncementIndex.enter_search("Free food!")
       expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
-      expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
+      expect(f('#content')).not_to contain_jqcss(".ic-announcement-row:contains('#{announcement2_title}')")
     end
 
     it "an announcement can be locked for commenting" do

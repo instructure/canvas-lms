@@ -47,7 +47,7 @@ class AnnouncementIndex
     # end
 
     def search_box
-      # f('.search')
+      f('input[name="announcements_search"]')
     end
 
     def lock_button
@@ -113,6 +113,7 @@ class AnnouncementIndex
     def enter_search(title)
       set_value(search_box, title)
       driver.action.send_keys(:enter).perform
+      wait_for_ajaximations
     end
 
     def check_announcement(title)

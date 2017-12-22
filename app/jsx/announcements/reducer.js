@@ -17,10 +17,12 @@
  */
 
 import { combineReducers } from 'redux'
-// TODO: import { handleActions } from 'redux-actions'
-// TODO: import { actionTypes } from './actions'
+import { handleActions } from 'redux-actions'
+import { actionTypes } from './actions'
 import { reduceNotifications } from '../shared/reduxNotifications'
 import { createPaginatedReducer } from '../shared/reduxPagination'
+
+const MIN_SEATCH_LENGTH = 3
 
 const identity = (defaultState = null) => (
   state => (state === undefined ? defaultState : state)
@@ -32,5 +34,19 @@ export default combineReducers({
   masterCourseData: identity(null),
   atomFeedUrl: identity(null),
   announcements: createPaginatedReducer('announcements'),
+  announcementsSearch: combineReducers({
+    term: handleActions({
+      [actionTypes.UPDATE_ANNOUNCEMENTS_SEARCH]: (state, action) => {
+        const term = action.payload && action.payload.term
+        if (term === undefined) {
+          return state
+        } else if (term.length < MIN_SEATCH_LENGTH) {
+          return ''
+        } else {
+          return term
+        }
+      }
+    }, ''),
+  }),
   notifications: reduceNotifications,
 })

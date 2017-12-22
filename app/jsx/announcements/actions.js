@@ -33,11 +33,23 @@ const announcementActions = createPaginationActions('announcements', fetchAnnoun
 
 const types = [
   ...announcementActions.actionTypes,
+  'UPDATE_ANNOUNCEMENTS_SEARCH',
 ]
 const actions = Object.assign(
   createActions(...types),
   announcementActions.actionCreators,
 )
+
+actions.searchAnnouncements = function searchAnnouncements (searchOpts) {
+  return (dispatch, getState) => {
+    const oldTerm = getState().announcementsSearch.term
+    dispatch(actions.updateAnnouncementsSearch(searchOpts))
+    const newTerm = getState().announcementsSearch.term
+    if (oldTerm !== newTerm) {
+      dispatch(actions.getAnnouncements({ page: 1, select: true, forceGet: true }))
+    }
+  }
+}
 
 const actionTypes = types.reduce((typesMap, actionType) =>
   Object.assign(typesMap, { [actionType]: actionType }), {})

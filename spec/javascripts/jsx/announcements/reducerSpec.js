@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,13 +18,35 @@
 
 import actions from 'jsx/announcements/actions'
 import reducer from 'jsx/announcements/reducer'
-import sampleData from './sampleData'
 
 QUnit.module('Announcements reducer')
 
 const reduce = (action, state = {}) => reducer(state, action)
 
-// test('does something on SOME_ACTION', () => {
-//   const newState = reduce(actions.someAction())
-//   deepEqual(newState.foo, 'bar')
-// })
+test('UPDATE_ANNOUNCEMENTS_SEARCH should not update term when term is not defined', () => {
+  const newState = reduce(actions.updateAnnouncementsSearch({}), {
+    announcementsSearch: { term: 'test' },
+  })
+  deepEqual(newState.announcementsSearch.term, 'test')
+})
+
+test('UPDATE_ANNOUNCEMENTS_SEARCH should update term to empty string when term is shorter than 3 chars', () => {
+  const newState = reduce(actions.updateAnnouncementsSearch({ term: 'te' }), {
+    announcementsSearch: { term: 'test' },
+  })
+  deepEqual(newState.announcementsSearch.term, '')
+})
+
+test('UPDATE_ANNOUNCEMENTS_SEARCH should update term to empty string when term is empty string', () => {
+  const newState = reduce(actions.updateAnnouncementsSearch({ term: '' }), {
+    announcementsSearch: { term: 'test' },
+  })
+  deepEqual(newState.announcementsSearch.term, '')
+})
+
+test('UPDATE_ANNOUNCEMENTS_SEARCH should update term to term in payload when term is at least 3 chars', () => {
+  const newState = reduce(actions.updateAnnouncementsSearch({ term: 'foo' }), {
+    announcementsSearch: { term: 'test' },
+  })
+  deepEqual(newState.announcementsSearch.term, 'foo')
+})
