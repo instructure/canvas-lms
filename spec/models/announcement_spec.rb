@@ -125,6 +125,20 @@ describe Announcement do
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(false)
     end
+
+    it 'does allows announcements to be viewed only if visible_for? is true' do
+      course_with_student(active_all: true)
+      a = @course.announcements.create!(valid_announcement_attributes)
+      allow(a).to receive(:visible_for?).and_return true
+      expect(a.grants_right?(@user, :read)).to be(true)
+    end
+
+    it 'does not allow announcements to be viewed if visible_for? is false' do
+      course_with_student(active_all: true)
+      a = @course.announcements.create!(valid_announcement_attributes)
+      allow(a).to receive(:visible_for?).and_return false
+      expect(a.grants_right?(@user, :read)).to be(false)
+    end
   end
 
   context "broadcast policy" do
