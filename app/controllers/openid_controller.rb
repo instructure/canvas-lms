@@ -183,7 +183,7 @@ EOS
   end
 
   def approved(trust_root)
-    URI(trust_root).host == Rails.application.secrets.qa_host
+    URI(trust_root).host == URI(BeyondZConfiguration.help_url).host
   end
 
   def is_authorized(identity_url, trust_root)
