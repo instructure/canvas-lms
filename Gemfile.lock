@@ -804,6 +804,7 @@ GEM
       activesupport (>= 3.0.0)
       i18n
       iso8601
+    ruby-openid (2.7.0)
     ruby-progressbar (1.7.5)
     ruby-saml-mod (0.3.1)
       ffi
@@ -1091,6 +1092,7 @@ DEPENDENCIES
   rubocop-canvas!
   rubocop-rspec
   ruby-duration (= 3.2.0)
+  ruby-openid
   ruby-progressbar (= 1.7.5)
   ruby-saml-mod (= 0.3.1)
   ruby2ruby (= 2.0.8)
