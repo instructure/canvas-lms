@@ -1976,7 +1976,7 @@ fa:
   assignment_group_1a781505: "گروه تکلیف"
   assignment_group_filter_c03f8a1d: "فیلتر گروه تکلیف"
   assignment_group_was_saved_successfully_5caa27d3: "گروه تکلیف با موفقیت ذخیره شد"
-  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "وزن گروه تکالیف و قوانین رهاکردن را نمی‌توان ویرایش کرد، زیرا در یکی از گروه ها، تکالیفی وجود دارد که تاریخ مهلت آن به پایان رسیده است."
+  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "وزن گروه تکلیف و قوانین رهاکردن را نمی‌توان ویرایش کرد، زیرا در یکی از گروه ها، تکلیف هایی وجود دارد که تاریخ مهلت آن به پایان رسیده است."
   assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "وزنهای گروه تکالیف  را نمی‌توان ویرایش کرد، زیرا در یکی از گروه ها، تکالیفی وجود دارد که تاریخ مهلت آن به پایان رسیده است."
   assignment_group_weights_dialog: 
     buttons: 
@@ -2000,7 +2000,7 @@ fa:
   assignment_id_b040cee0: "شناسه تکلیف"
   assignment_menu_91fe3716: "منوی تکلیف"
   assignment_muted_4cb590a4: "تکلیف غیر فعال شد"
-  assignment_muted_8d74bfa0: "Assignment muted"
+  assignment_muted_8d74bfa0: "تکلیف غیر فعال شد"
   assignment_muter: 
     mute_assignment: "غیر فعال کردن تکلیف"
     muting_assignment: "در حال غیر فعال کردن تکلیف..."
@@ -2021,10 +2021,10 @@ fa:
     student_count: 
       one: "%{count} دانشجو"
       other: "%{count} دانشجو"
-  assignment_path_selected_e80191d1: "مسیر تکلیف انتخاب شده است."
+  assignment_path_selected_e80191d1: "مسیر تکلیف انتخاب شد"
   assignment_preview_3833e819: "پیش نمایش %{assignment}"
   assignment_selection_6bff05c4: "انتخاب تکلیف"
-  assignment_title_82b4422e: "عنوان تکلیف"
+  assignment_title_82b4422e: "عنوان تکلیف:"
   assignment_was_deleted_8320d26d: "تکلیف حذف شد"
   assignment_weights_d4bcf9ab: "وزن های تکلیف"
   assignments: 
@@ -2281,14 +2281,14 @@ fa:
     index_view: 
       add_assignment: تکلیف
       add_group: گروه
-      add_quiz_lti: "امتحان / کوئیز"
+      add_quiz_lti: آزمون/امتحان
       assignments: "تکلیف ها"
       assignments_settings: "تنظیمات تکلیف ها"
       assignments_settings_screenreader: "تنظیمات تکلیف ها"
       search_for_assignment: "جستجوی تکلیف"
       title_add_assignment: "افزودن تکلیف"
       title_add_group: "افزودن گروه تکلیف"
-      title_add_quiz_lti: "افزودن امتحان / کوئیز"
+      title_add_quiz_lti: "افزودن آزمون/امتحان"
     invalid_file_retrieval: "در هنگام بازیابی فایل ارسال شده از این ابزار، اشکالی رخ داد."
     invalid_tool_return: "ابزار راه اندازی شده یک منبع غیر معتبر را برای این تکلیف برگرداند"
     keyboard_add_item: "افزودن تکلیف به گروه انتخاب شده"
@@ -2433,7 +2433,7 @@ fa:
       until: تا
       vericite: VeriCite
       vericite_enabled: "VeriCite برای این تکلیف فعال شده است."
-      vericite_enabled_short: "(VeriCite  فعال شد.)"
+      vericite_enabled_short: "(VeriCite  فعال شد)"
     show_locked: 
       labels: 
         assignment: تکلیف
@@ -2478,7 +2478,7 @@ fa:
         external_tool_new_tab: "بارگذاری این ابزار در یک زبانه جدید"
         external_tool_url: "نشانی اینترنتی ابزار بیرونی"
         turnitin_enabled: "فعال سازی موردهای ارسالی Turnitin"
-        vericite_enabled: "فعال سازی موردهای ارسالی VeriCite "
+        vericite_enabled: "فعال سازی موردهای ارسالی VeriCite"
       labels: 
         allow_file_uploads: "بارگذاری های فایل"
         allow_media_recordings: "ضبط های رسانه"
@@ -2608,7 +2608,7 @@ fa:
         originality_report_never: هرگز
         originality_report_visibility: "دانشجویان می توانند گزارش اصلیت را ببینند"
         originality_report_visible_after_due_date: "بعد از تاریخ مهلت"
-        originality_report_visible_after_grading: "بعد از اینکه تکلیف نمره گذاری شد."
+        originality_report_visible_after_grading: "بعد از اینکه تکلیف نمره گذاری شد"
         originality_report_visible_immediately: بلافاصله
   assignments_1e02582c: "تکلیف ها"
   assignments_api: 
@@ -2624,7 +2624,7 @@ fa:
   associated_account_name_91854e37: "نام مرتبط حساب"
   associated_course_name_9b5b1945: "نام مرتبط درس"
   associations_3fd4abe8: "انجمن ها"
-  associations_saved_successfully_48b9eae3: "انجمن‌ها با موفقیت ذخیره شدند."
+  associations_saved_successfully_48b9eae3: "انجمن‌ها با موفقیت ذخیره شدند"
   at_the_bottom_a6a5f0fe: "در پایین"
   at_the_top_fa836591: "در بالا"
   attach_terms_2b8770a5: "پیوست کردن نیمسال ها"
@@ -2670,10 +2670,10 @@ fa:
   author_s_name_b35e905a: "نام نویسنده"
   authorize_e3f25bb4: "اجازه دادن"
   auto_leader_7791c30a: auto_leader
-  automatically_apply_deduction_to_late_submissions_2b68166e: "به طور خودکار به ارسال‌هایی که دیر انجام شده، کسر اعمال می شود."
-  automatically_apply_grade_for_missing_submissions_2b5c1a72: "به طور خودکار به ارسال‌های از دست رفته، نمره اعمال می شود."
-  availability_dates_438d71e0: "تاریخ‌های دسترسی"
-  availability_dates_changed_exceptions_465ba375: "تاریخ‌های دسترسی استثنائات را تغییر داد."
+  automatically_apply_deduction_to_late_submissions_2b68166e: "به طور خودکار به ارسال‌هایی که دیر انجام شده، کسر اعمال شود"
+  automatically_apply_grade_for_missing_submissions_2b5c1a72: "به طور خودکار به ارسال‌های از دست رفته، نمره اعمال شود"
+  availability_dates_438d71e0: "تاریخ‌های دسترس پذیری"
+  availability_dates_changed_exceptions_465ba375: "تاریخ‌های دسترس پذیری استثناء ها را تغییر داد:"
   available_8606e40c: "در دسترس"
   available_after_unlock_at_b5682224: "بعد از %{unlock_at} در دسترس است"
   available_after_unlock_at_until_lock_at_499e8092: "بعد از %{unlock_at} تا %{lock_at} در دسترس است"
@@ -2692,7 +2692,7 @@ fa:
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "قابل دسترسی تا - قالب مانند YYYY-MM-DD hh:mm"
   available_until_lock_at_ab022445: "تا %{lock_at} قابل دسترسی است"
   availableslots_available_87b8b69d: "%{availableSlots} قابل دسترس"
-  availableslots_more_available_be5193a8: "%{availableSlots} بیشتر در دسترس  است."
+  availableslots_more_available_be5193a8: "%{availableSlots} بیشتر در دسترس  است"
   avatar_for_author_2eabbf55: "آواتار برای %{author}"
   avatar_for_studentname_8ea511ae: "آواتار برای %{studentName}"
   average_49c63f9b: میانگین
@@ -2706,8 +2706,8 @@ fa:
   background_image_1a401e1a: "تصویر پس زمینه"
   base_847aca7c: مبنا
   base_message_please_make_sure_name_has_a_due_date_928ae7ab: "%{base_message} مطمئن شوید که %{name} تاریخ مهلت دارد."
-  base_message_please_make_sure_name_has_a_due_date__9e9b0cfd: "%{base_message} مطمئن شوید که %{name} تاریخ مهلت دارد و نام خیلی طولانی نیست."
-  base_message_please_make_sure_name_name_is_not_too_d0c9454f: "%{base_message} مطمئن شوید که نام %{name} خیلی طولانی نیست."
+  base_message_please_make_sure_name_has_a_due_date__9e9b0cfd: "%{base_message} مطمئن شوید که %{name} تاریخ مهلت دارد و نام طولانی نیست."
+  base_message_please_make_sure_name_name_is_not_too_d0c9454f: "%{base_message} مطمئن شوید که نام %{name} طولانی نیست."
   base_role_type_a9cc892d: نوع_نقش_پایه
   base_url_for_mathman_service_bdd4b10b: "نشانی اینترنتی پایه برای سرویس MathMan"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "بر اساس نمره های احتمالی، مجموع جدید اکنون %{grade} است"
@@ -2715,14 +2715,14 @@ fa:
   bb_file_description: "فایل .zip صدور 6/7/8/9 Blackboard"
   bb_name: "مبدل Blackboard"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "یک قهرمان باش و از استاد خود درخواست کن که این پیوند را اصلاح کند."
-  before_44c686b4: "قبل از "
-  before_cb32fc0: "قبل از ..."
+  before_44c686b4: "قبل از"
+  before_cb32fc0: "قبل از.."
   before_implementing_custom_css_or_javascript_pleas_128da8cd: "قبل از اجرایی کردن CSS یا جاوااسکریپت سفارشی، لطفا به * اسناد ما* مراجعه کنید."
   before_implementing_custom_css_or_javascript_pleas_65423572: "قبل از اجرایی کردن CSS یا جاوااسکریپت سفارشی، لطفا به *اسناد ما* مراجعه کنید."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "قبل از انتشار این فایل، باید حقوق استفاده را تعیین کنید."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "قبل از انتشار، باید حقوق استفاده مربوط به فایل های خود را تعیین کنید."
-  before_publishing_your_course_you_must_either_publ_cdfdc78c: "قبل از انتشار درس خود، باید یک ماژول منتشر و یا یک صفحه اصلی متفاوت انتخاب کنید."
-  before_publishing_your_course_you_must_either_publ_cf84cad9: "قبل از انتشار درس خود، باید در صفحه ماژول‌ها یک ماژول منتشر و یا یک صفحه اصلی متفاوت انتخاب کنید."
+  before_publishing_your_course_you_must_either_publ_cdfdc78c: "قبل از انتشار درس خود، باید یک ماژول منتشر و یا یک صفحه اصلی دیگر انتخاب کنید."
+  before_publishing_your_course_you_must_either_publ_cf84cad9: "قبل از انتشار درس خود، باید در صفحه ماژول‌ها یک ماژول منتشر و یا یک صفحه اصلی دیگر انتخاب کنید."
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "قبل از اینکه بتوانید رخ نمای خود را ویرایش کنید، باید با کلیک کردن روی پیوند موجود در نامه الکترونیکی که  برای شما فرستاده ایم، نشانی پست الکترونیکی خود (%{email}) را تأیید کنید. اگر آن را ندیدید، *برای ارسال دوباره نامه الکترونیکی کلیک کنید* و حتما صندوق هرزنامه خود بازبینی کنید."
   beginning_date_2d2a29ac: "تاریخ شروع"
   behind_31e4e0fe: پشت
@@ -2752,7 +2752,7 @@ fa:
   blueprint_course_e16ed131: "دوره طرح"
   blueprint_course_information_term_course_10d5cf30: "اطلاعات دوره طرح: %{term} -  %{course}"
   blueprint_courses_9dd321b8: "دوره‌های طرح"
-  blueprint_courses_create_edit_associate_delete_bf41988e: "دوره‌های طرح (ایجاد/ ویرایش/ مرتب کردن/ حذف کردن )"
+  blueprint_courses_create_edit_associate_delete_bf41988e: "دوره‌های طرح (ایجاد/ ویرایش/ مرتبط کردن/ حذف کردن )"
   blueprint_settings_233e909a: "تنظیمات طرح"
   body_9f663faf: بدنه
   body_shadow_d36e8c2e: "سایه متن"
