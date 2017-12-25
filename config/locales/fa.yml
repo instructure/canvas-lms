@@ -2754,7 +2754,7 @@ fa:
   blueprint_courses_9dd321b8: "دوره‌های طرح"
   blueprint_courses_create_edit_associate_delete_bf41988e: "دوره‌های طرح (ایجاد/ ویرایش/ مرتبط کردن/ حذف کردن )"
   blueprint_settings_233e909a: "تنظیمات طرح"
-  body_9f663faf: بدنه
+  body_9f663faf: "متن اصلی"
   body_shadow_d36e8c2e: "سایه متن"
   bolivia_591_9b8a7a5c: "بولیوی (+591)"
   bookmark_bank_46d729be: "نشانه %{bank}"
@@ -2767,8 +2767,8 @@ fa:
   brazil_55_34103ffa: "برزیل (+55)"
   breadcrumb_1_cb3c504: "برد کرامپ 1"
   breadcrumb_2_95ba94be: "برد کرامپ 2"
-  bring_existing_content_from_another_course_or_cour_6e740692: "محتوای موجود را از یک  درس یا سیستم مدیریت درس دیگر به دوره Canvas خود بیفزایید."
-  bring_your_content_into_your_course_c0f3df7e: "محتوای خود را در دوره خود قرار دهید"
+  bring_existing_content_from_another_course_or_cour_6e740692: "محتوای موجود از یک  درس یا سامانه مدیریت درس دیگر را به درس کانواس خود بیفزایید."
+  bring_your_content_into_your_course_c0f3df7e: "افزودن محتوای خود به درس"
   broccoli_cloud: 
     hidden_title: "مخفی. از طریق یک پیوند قابل دسترسی است"
     published_title: "منتشر شده"
