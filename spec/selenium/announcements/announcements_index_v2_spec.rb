@@ -17,6 +17,7 @@
 
 require_relative '../common'
 require_relative './announcement_index_page'
+require_relative './external_feed_page'
 
 describe "announcements index v2" do
   include_context "in-process server selenium tests"
@@ -143,16 +144,15 @@ describe "announcements index v2" do
     end
 
     it 'RSS feed info displayed' do
-      skip('Add with COMMS-590')
       AnnouncementIndex.open_external_feeds
-      ExternalFeed.click_rss_feed_link
+      ExternalFeedPage.click_rss_feed_link
       expect(driver.current_url).to include('.atom')
     end
 
     it 'an external feed can be added' do
       skip('Add with COMMS-589')
       AnnouncementIndex.open_external_feeds
-      ExternalFeed.add_external_feed('/someurl', 'Truncated')
+      ExternalFeedPage.add_external_feed('/someurl', 'Truncated')
       expect(ExternalFeed.feed_name).to be_displayed
     end
   end

@@ -29,6 +29,7 @@ import Container from '@instructure/ui-core/lib/components/Container'
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 
 import select from '../../shared/select'
+import ExternalFeedsTray from './ExternalFeedsTray'
 import propTypes from '../propTypes'
 
 // disable suggestion to make functional component, this component will get more complex soon
@@ -37,20 +38,28 @@ export default class IndexHeader extends Component {
   static propTypes = {
     courseId: string.isRequired,
     permissions: propTypes.permissions.isRequired,
+    atomFeedUrl: string,
   }
+
+  static defaultProps = {
+    atomFeedUrl: null,
+   }
 
   render () {
     return (
-      <Container margin="0 0 large" display="block" textAlign="end">
-        {this.props.permissions.create && <Button
-          href={`/courses/${this.props.courseId}/discussion_topics/new?is_announcement=true`}
-          variant="primary"
-          size="large"
-          id="add_announcement"
-        >
-          <IconPlus />
-          {I18n.t('Announcement')}
-        </Button>}
+      <Container>
+        <Container margin="0 0 medium" display="block" textAlign="end">
+          {this.props.permissions.create && <Button
+            href={`/courses/${this.props.courseId}/discussion_topics/new?is_announcement=true`}
+            variant="primary"
+            size="medium"
+            id="add_announcement"
+          >
+            <IconPlus />
+            {I18n.t('Announcement')}
+          </Button>}
+        </Container>
+        <ExternalFeedsTray atomFeedUrl={this.props.atomFeedUrl} />
       </Container>
     )
   }
@@ -58,6 +67,6 @@ export default class IndexHeader extends Component {
 
 const connectState = state => Object.assign({
   // props derived from state here
-}, select(state, ['courseId', 'permissions']))
+}, select(state, ['courseId', 'permissions', 'atomFeedUrl']))
 // const connectActions = dispatch => bindActionCreators(select(actions, ['getAnnouncements']), dispatch)
 export const ConnectedIndexHeader = connect(connectState)(IndexHeader)

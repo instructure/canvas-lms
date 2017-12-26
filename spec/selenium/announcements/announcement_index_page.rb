@@ -63,7 +63,7 @@ class AnnouncementIndex
     end
 
     def open_external_feeds
-      # f('#external_feed').click
+      f('#external_feed').click
     end
 
     # ---------------------- Announcement ----------------------

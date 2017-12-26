@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../common'
 
-class ExternalFeed
+class ExternalFeedPage
   class << self
     include SeleniumDependencies
 
     # ---------------------- Controls ----------------------
     def rss_feed_link
-      # f('.rss')
+      f('#rss-feed-link')
     end
 
     def add_external_feed_expander

@@ -30,6 +30,7 @@ export default combineReducers({
   courseId: identity(null),
   permissions: identity({}),
   masterCourseData: identity(null),
+  atomFeedUrl: identity(null),
   announcements: createPaginatedReducer('announcements'),
   notifications: reduceNotifications,
 })
