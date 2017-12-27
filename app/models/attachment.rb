@@ -979,7 +979,6 @@ class Attachment < ActiveRecord::Base
     default = Setting.get('attachment_url_ttl', 1.hour.to_s).to_i.seconds
     (root_account_id && Account.find_cached(root_account_id)&.settings[:s3_url_ttl_seconds]&.to_i&.seconds) || default
   end
-  protected :url_ttl
 
   def disposition_filename
     ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
