@@ -55,6 +55,15 @@
   },
   "jest": {
     "setupFiles": ["./jest-setup.js"],
-    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"]
+    "snapshotSerializers": ["<rootDir>/node_modules/enzyme-to-json/serializer"],
+    "coveragePathIgnorePatterns": ["/node_modules/", "placeholder-svg.js"],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    }
   }
 }
