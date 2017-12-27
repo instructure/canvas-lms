@@ -7,11 +7,10 @@ export default {
       return true
     }
     const caption = elem.querySelector("caption")
-    return !!caption && caption.textContent.replace("/s/g") !== ""
+    return !!caption && caption.textContent.replace(/\s/g, "") !== ""
   },
 
   data: elem => {
-    const alt = elem.attributes.getNamedItem("alt")
     return {
       caption: ""
     }
