@@ -92,3 +92,33 @@ describe("nodeByPath", () => {
     expect(dom.nodeByPath(a, [2, 1])).toBe(c)
   })
 })
+
+describe("onlyContainsLink", () => {
+  test("returns true when a link is the only text present", () => {
+    const elem = document.createElement("div")
+    const link = document.createElement("a")
+    link.setAttribute("href", "http://example.com")
+    link.textContent = "Example Site"
+    elem.appendChild(link)
+    expect(dom.onlyContainsLink(elem)).toBe(true)
+  })
+
+  test("returns true when a link is deeply nested", () => {
+    const elem = document.createElement("div")
+    const elem1 = document.createElement("div")
+    const elem2 = document.createElement("div")
+    const elem3 = document.createElement("span")
+    const link = document.createElement("a")
+    elem3.appendChild(link)
+    elem2.appendChild(elem3)
+    elem1.appendChild(elem2)
+    elem.appendChild(elem1)
+    expect(dom.onlyContainsLink(elem)).toBe(true)
+  })
+
+  test("returns false when there are no links", () => {
+    const elem = document.createElement("div")
+    elem.textContent = "I'm just some text, not a link"
+    expect(dom.onlyContainsLink(elem)).toBe(false)
+  })
+})

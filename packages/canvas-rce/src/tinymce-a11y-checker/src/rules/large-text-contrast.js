@@ -1,12 +1,18 @@
 import formatMessage from "../format-message"
 import contrast from "wcag-element-contrast"
 import smallTextContrast from "./small-text-contrast"
+import { onlyContainsLink } from "../utils/dom"
 
 export default {
   test: (elem, config = {}) => {
     const disabled = config.disableContrastCheck == true
     const noText = elem.textContent.replace(/\s/g, "") === ""
-    if (disabled || noText || !contrast.isLargeText(elem)) {
+    if (
+      disabled ||
+      noText ||
+      onlyContainsLink(elem) ||
+      !contrast.isLargeText(elem)
+    ) {
       return true
     }
     return contrast(elem)

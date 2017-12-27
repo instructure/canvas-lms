@@ -25,6 +25,18 @@ describe("test", () => {
     expect(rule.test(elem, { disableContrastCheck: true })).toBe(true)
   })
 
+  test("returns true if the only content of a text node is a link", () => {
+    const elem = document.createElement("div")
+    const link = document.createElement("a")
+    elem.style.fontSize = "10px"
+    elem.style.backgroundColor = "#fff"
+    elem.style.color = "#eee"
+    link.setAttribute("href", "http://example.com")
+    link.textContent = "Example Site"
+    elem.appendChild(link)
+    expect(rule.test(elem)).toBe(true)
+  })
+
   test("returns false if large text does not have high enough contrast", () => {
     const elem = document.createElement("div")
     elem.style.fontSize = "10px"
