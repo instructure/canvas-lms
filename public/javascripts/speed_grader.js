@@ -70,94 +70,89 @@ import 'compiled/jquery/fixDialogButtons';
 
 const selectors = new JQuerySelectorCache();
 const SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speedgrader_comment_textarea_mount_point';
-// PRIVATE VARIABLES AND FUNCTIONS
-// all of the $ variables here are to speed up access to dom nodes,
-// so that the jquery selector does not have to be run every time.
-// note, this assumes that this js file is being loaded at the bottom of the page
-// so that all these dom nodes already exists.
-var $window = $(window),
-    $full_width_container = $('#full_width_container'),
-    $left_side = $('#left_side'),
-    $resize_overlay = $('#resize_overlay'),
-    $right_side = $('#right_side'),
-    $width_resizer = $('#width_resizer'),
-    $gradebook_header = $('#gradebook_header'),
-    assignmentUrl = $('#assignment_url').attr('href'),
-    $rightside_inner = $('#rightside_inner'),
-    $moderation_bar = $('#moderation_bar'),
-    $moderation_tabs_div = $('#moderation_tabs'),
-    $moderation_tabs = $('#moderation_tabs > ul > li'),
-    $moderation_tab_2nd = $moderation_tabs.eq(1),
-    $moderation_tab_final = $moderation_tabs.eq(2),
-    $new_mark_container = $('#new_mark_container'),
-    $new_mark_link = $('#new_mark_link'),
-    $new_mark_link_menu_item = $new_mark_link.parent(),
-    $new_mark_copy_link1 = $('#new_mark_copy_link1'),
-    $new_mark_copy_link2 = $('#new_mark_copy_link2'),
-    $new_mark_copy_link2_menu_item = $new_mark_copy_link2.parent(),
-    $new_mark_final_link = $('#new_mark_final_link'),
-    $new_mark_final_link_menu_item = $new_mark_final_link.parent(),
-    $not_gradeable_message = $('#not_gradeable_message'),
-    $comments = $('#comments'),
-    $comment_blank = $('#comment_blank').removeAttr('id').detach(),
-    $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach(),
-    $add_a_comment = $('#add_a_comment'),
-    $add_a_comment_submit_button = $add_a_comment.find('button:submit'),
-    $add_a_comment_textarea = null,
-    $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach(),
-    fileIndex = 1,
-    $add_attachment = $('#add_attachment'),
-    $submissions_container = $('#submissions_container'),
-    $iframe_holder = $('#iframe_holder'),
-    $avatar_image = $('#avatar_image'),
-    $x_of_x_students = $('#x_of_x_students_frd'),
-    $grded_so_far = $('#x_of_x_graded'),
-    $average_score = $('#average_score'),
-    $this_student_does_not_have_a_submission = $('#this_student_does_not_have_a_submission').hide(),
-    $this_student_has_a_submission = $('#this_student_has_a_submission').hide(),
-    $grade_container = $('#grade_container'),
-    $grade = $grade_container.find('input, select'),
-    $score = $grade_container.find('.score'),
-    $deduction_box = $('#deduction-box'),
-    $points_deducted = $('#points-deducted'),
-    $final_grade = $('#final-grade'),
-    $average_score_wrapper = $('#average-score-wrapper'),
-    $submission_details = $('#submission_details'),
-    $multiple_submissions = $('#multiple_submissions'),
-    $submission_late_notice = $('#submission_late_notice'),
-    $submission_not_newest_notice = $('#submission_not_newest_notice'),
-    $enrollment_inactive_notice = $('#enrollment_inactive_notice'),
-    $enrollment_concluded_notice = $('#enrollment_concluded_notice'),
-    $closed_gp_notice = $('#closed_gp_notice'),
-    $submission_files_container = $('#submission_files_container'),
-    $submission_files_list = $('#submission_files_list'),
-    $submission_attachment_viewed_at = $('#submission_attachment_viewed_at_container'),
-    $submission_file_hidden = $('#submission_file_hidden').removeAttr('id').detach(),
-    $assignment_submission_turnitin_report_url = $('#assignment_submission_turnitin_report_url'),
-    $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url'),
-    $assignment_submission_resubmit_to_turnitin_url = $('#assignment_submission_resubmit_to_turnitin_url'),
-    $assignment_submission_vericite_report_url = $('#assignment_submission_vericite_report_url'),
-    $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url'),
-    $rubric_holder = $('#rubric_holder'),
-    $rubric_full_resizer_handle = $('#rubric_full_resizer_handle'),
-    $no_annotation_warning = $('#no_annotation_warning'),
-    $comment_submitted = $('#comment_submitted'),
-    $comment_submitted_message = $('#comment_submitted_message'),
-    $comment_saved = $('#comment_saved'),
-    $comment_saved_message = $('#comment_saved_message'),
-    $selectmenu = null,
-    browserableCssClasses = /^(image|html|code)$/,
-    snapshotCache = {},
-    sectionToShow,
-    header,
-    studentLabel = I18n.t('student', 'Student'),
-    groupLabel = I18n.t('group', 'Group'),
-    gradeeLabel = studentLabel,
-    utils,
-    sessionTimer,
-    isAdmin = _.include(ENV.current_user_roles, 'admin'),
-    showSubmissionOverride,
-    EG;
+
+let $window
+let $full_width_container
+let $left_side
+let $resize_overlay
+let $right_side
+let $width_resizer
+let $gradebook_header
+let assignmentUrl
+let $rightside_inner
+let $moderation_bar
+let $moderation_tabs_div
+let $moderation_tabs
+let $moderation_tab_2nd
+let $moderation_tab_final
+let $new_mark_container
+let $new_mark_link
+let $new_mark_link_menu_item
+let $new_mark_copy_link1
+let $new_mark_copy_link2
+let $new_mark_copy_link2_menu_item
+let $new_mark_final_link
+let $new_mark_final_link_menu_item
+let $not_gradeable_message
+let $comments
+let $comment_blank
+let $comment_attachment_blank
+let $add_a_comment
+let $add_a_comment_submit_button
+let $add_a_comment_textarea
+let $comment_attachment_input_blank
+let fileIndex
+let $add_attachment
+let $submissions_container
+let $iframe_holder
+let $avatar_image
+let $x_of_x_students
+let $grded_so_far
+let $average_score
+let $this_student_does_not_have_a_submission
+let $this_student_has_a_submission
+let $grade_container
+let $grade
+let $score
+let $deduction_box
+let $points_deducted
+let $final_grade
+let $average_score_wrapper
+let $submission_details
+let $multiple_submissions
+let $submission_late_notice
+let $submission_not_newest_notice
+let $enrollment_inactive_notice
+let $enrollment_concluded_notice
+let $closed_gp_notice
+let $submission_files_container
+let $submission_files_list
+let $submission_attachment_viewed_at
+let $submission_file_hidden
+let $assignment_submission_turnitin_report_url
+let $assignment_submission_originality_report_url
+let $assignment_submission_vericite_report_url
+let $assignment_submission_resubmit_to_vericite_url
+let $rubric_holder
+let $rubric_full_resizer_handle
+let $no_annotation_warning
+let $comment_submitted
+let $comment_submitted_message
+let $comment_saved
+let $comment_saved_message
+let $selectmenu
+let browserableCssClasses
+let snapshotCache
+let sectionToShow
+let header
+let studentLabel
+let groupLabel
+let gradeeLabel
+let utils
+let sessionTimer
+let isAdmin
+let showSubmissionOverride
+let EG
 
 utils = {
   getParam: function(name){
@@ -398,168 +393,170 @@ function initDropdown(){
   }
 }
 
-header = {
-  elements: {
-    mute: {
-      icon: $('#mute_link i'),
-      label: $('#mute_link .mute_label'),
-      link: $('#mute_link'),
-      modal: $('#mute_dialog')
-    },
-    unmute: {
-      modal: $('#unmute_dialog')
-    },
-    nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
-    settings: {
-      form: $('#settings_form'),
-      link: $('#settings_link')
-    },
-    keyinfo: {
-      icon: $('#keyboard-shortcut-info-icon')
-    }
-  },
-  courseId: utils.getParam('courses'),
-  assignmentId: utils.getParam('assignment_id'),
-  init: function(){
-    this.muted = this.elements.mute.link.data('muted');
-    this.addEvents();
-    this.createModals();
-    return this;
-  },
-  addEvents: function(){
-    this.elements.nav.click($.proxy(this.toAssignment, this));
-    this.elements.mute.link.click($.proxy(this.onMuteClick, this));
-    this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
-    this.elements.settings.link.click(this.showSettingsModal.bind(this));
-    this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
-  },
-  createModals: function(){
-    this.elements.settings.form.dialog({
-      autoOpen: false,
-      modal: true,
-      resizable: false,
-      width: 400
-    }).fixDialogButtons();
-    // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
-    // button. So here we'll manually re-enable it.
-    this.elements.settings.form.find(".submit_button").removeAttr('disabled')
-    this.elements.mute.modal.dialog({
-      autoOpen: false,
-      buttons: [{
-        text: I18n.t('cancel_button', 'Cancel'),
-        click: $.proxy(function(){
-          this.elements.mute.modal.dialog('close');
-        }, this)
-      },{
-        text: I18n.t('mute_assignment', 'Mute Assignment'),
-        class: 'btn-primary btn-mute',
-        click: $.proxy(function(){
-          this.toggleMute();
-          this.elements.mute.modal.dialog('close');
-        }, this)
-      }],
-      modal: true,
-      resizable: false,
-      title: this.elements.mute.modal.data('title'),
-      width: 400
-    });
-    this.elements.unmute.modal.dialog({
-      autoOpen: false,
-      buttons: [{
-        text: I18n.t('Cancel'),
-        click: $.proxy(function () {
-          this.elements.unmute.modal.dialog('close');
-        }, this)
-      }, {
-        text: I18n.t('Unmute Assignment'),
-        class: 'btn-primary btn-unmute',
-        click: $.proxy(function () {
-          this.toggleMute();
-          this.elements.unmute.modal.dialog('close');
-        }, this)
-      }],
-      modal: true,
-      resizable: false,
-      title: this.elements.unmute.modal.data('title'),
-      width: 400
-    });
-  },
-
-  toAssignment: function(e){
-    e.preventDefault();
-    var classes = e.target.getAttribute("class").split(" ");
-    if (_.contains(classes, "prev")) {
-      EG.prev();
-    } else if (_.contains(classes, "next")) {
-      EG.next();
-    }
-  },
-
-  keyboardShortcutInfoModal: function(e) {
-    var questionMarkKeyDown = $.Event('keydown', { keyCode: 191 });
-    $(document).trigger(questionMarkKeyDown);
-  },
-
-  submitSettingsForm: function(e){
-    e.preventDefault();
-
-    userSettings.set('eg_sort_by', $('#eg_sort_by').val());
-    if (!ENV.force_anonymous_grading) {
-      userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked'));
-    }
-
-    $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
-    var gradeByQuestion = $("#enable_speedgrader_grade_by_question").prop('checked');
-    $.post(ENV.settings_url, {
-      enable_speedgrader_grade_by_question: gradeByQuestion
-    }).then(function() {
-      window.location.reload();
-    });
-  },
-
-  showSettingsModal: function(e){
-    e.preventDefault();
-    this.elements.settings.form.dialog('open');
-  },
-
-  onMuteClick: function(e){
-    e.preventDefault();
-    if (this.muted) {
-      this.elements.unmute.modal.dialog('open');
-    } else {
-      this.elements.mute.modal.dialog('open');
-    }
-  },
-
-  muteUrl: function(){
-    return '/courses/' + this.courseId + '/assignments/' + this.assignmentId + '/mute';
-  },
-
-  toggleMute: function(){
-    this.muted = !this.muted;
-    var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment'),
-    action = this.muted ? 'mute' : 'unmute',
-    actions = {
-      /* Mute action */
-      mute: function(){
-        this.elements.mute.icon.removeClass("icon-unmuted").addClass("icon-muted");
-        $.ajaxJSON(this.muteUrl(), 'put', { status: true }, $.proxy(function(res){
-          this.elements.mute.label.text(label);
-        }, this));
+function setupHeader () {
+  return {
+    elements: {
+      mute: {
+        icon: $('#mute_link i'),
+        label: $('#mute_link .mute_label'),
+        link: $('#mute_link'),
+        modal: $('#mute_dialog')
       },
-
-      /* Unmute action */
-      unmute: function(){
-        this.elements.mute.icon.removeClass("icon-muted").addClass("icon-unmuted");
-        $.ajaxJSON(this.muteUrl(), 'put', { status: false }, $.proxy(function(res){
-          this.elements.mute.label.text(label);
-        }, this));
+      unmute: {
+        modal: $('#unmute_dialog')
+      },
+      nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
+      settings: {
+        form: $('#settings_form'),
+        link: $('#settings_link')
+      },
+      keyinfo: {
+        icon: $('#keyboard-shortcut-info-icon')
       }
-    };
+    },
+    courseId: utils.getParam('courses'),
+    assignmentId: utils.getParam('assignment_id'),
+    init () {
+      this.muted = this.elements.mute.link.data('muted');
+      this.addEvents();
+      this.createModals();
+      return this;
+    },
+    addEvents () {
+      this.elements.nav.click($.proxy(this.toAssignment, this));
+      this.elements.mute.link.click($.proxy(this.onMuteClick, this));
+      this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
+      this.elements.settings.link.click(this.showSettingsModal.bind(this));
+      this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
+    },
+    createModals () {
+      this.elements.settings.form.dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        width: 400
+      }).fixDialogButtons();
+      // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
+      // button. So here we'll manually re-enable it.
+      this.elements.settings.form.find(".submit_button").removeAttr('disabled')
+      this.elements.mute.modal.dialog({
+        autoOpen: false,
+        buttons: [{
+          text: I18n.t('cancel_button', 'Cancel'),
+          click: $.proxy(function(){
+            this.elements.mute.modal.dialog('close');
+          }, this)
+        },{
+          text: I18n.t('mute_assignment', 'Mute Assignment'),
+          class: 'btn-primary btn-mute',
+          click: $.proxy(function(){
+            this.toggleMute();
+            this.elements.mute.modal.dialog('close');
+          }, this)
+        }],
+        modal: true,
+        resizable: false,
+        title: this.elements.mute.modal.data('title'),
+        width: 400
+      });
+      this.elements.unmute.modal.dialog({
+        autoOpen: false,
+        buttons: [{
+          text: I18n.t('Cancel'),
+          click: $.proxy(function () {
+            this.elements.unmute.modal.dialog('close');
+          }, this)
+        }, {
+          text: I18n.t('Unmute Assignment'),
+          class: 'btn-primary btn-unmute',
+          click: $.proxy(function () {
+            this.toggleMute();
+            this.elements.unmute.modal.dialog('close');
+          }, this)
+        }],
+        modal: true,
+        resizable: false,
+        title: this.elements.unmute.modal.data('title'),
+        width: 400
+      });
+    },
 
-    actions[action].apply(this);
-  }
-};
+    toAssignment (e) {
+      e.preventDefault();
+      const classes = e.target.getAttribute("class").split(" ");
+      if (_.contains(classes, "prev")) {
+        EG.prev();
+      } else if (_.contains(classes, "next")) {
+        EG.next();
+      }
+    },
+
+    keyboardShortcutInfoModal () {
+      var questionMarkKeyDown = $.Event('keydown', { keyCode: 191 });
+      $(document).trigger(questionMarkKeyDown);
+    },
+
+    submitSettingsForm (e) {
+      e.preventDefault();
+
+      userSettings.set('eg_sort_by', $('#eg_sort_by').val());
+      if (!ENV.force_anonymous_grading) {
+        userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked'));
+      }
+
+      $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
+      const gradeByQuestion = $("#enable_speedgrader_grade_by_question").prop('checked');
+      $.post(ENV.settings_url, {
+        enable_speedgrader_grade_by_question: gradeByQuestion
+      }).then(function() {
+        window.location.reload();
+      });
+    },
+
+    showSettingsModal (e) {
+      e.preventDefault();
+      this.elements.settings.form.dialog('open');
+    },
+
+    onMuteClick (e) {
+      e.preventDefault();
+      if (this.muted) {
+        this.elements.unmute.modal.dialog('open');
+      } else {
+        this.elements.mute.modal.dialog('open');
+      }
+    },
+
+    muteUrl () {
+      return '/courses/' + this.courseId + '/assignments/' + this.assignmentId + '/mute';
+    },
+
+    toggleMute () {
+      this.muted = !this.muted;
+      const label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment'),
+        action = this.muted ? 'mute' : 'unmute',
+        actions = {
+          /* Mute action */
+          mute () {
+            this.elements.mute.icon.removeClass("icon-unmuted").addClass("icon-muted");
+            $.ajaxJSON(this.muteUrl(), 'put', { status: true }, $.proxy(function() {
+              this.elements.mute.label.text(label);
+            }, this));
+          },
+
+          /* Unmute action */
+          unmute () {
+            this.elements.mute.icon.removeClass("icon-muted").addClass("icon-unmuted");
+            $.ajaxJSON(this.muteUrl(), 'put', { status: false }, $.proxy(function() {
+              this.elements.mute.label.text(label);
+            }, this));
+          }
+        };
+
+      actions[action].apply(this);
+    }
+  };
+}
 
 function unmountCommentTextArea () {
   const node = document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT);
@@ -1927,15 +1924,14 @@ EG = {
   },
 
   showSubmissionDetails: function(){
-    //if there is a submission
+    // if there is a submission
     var currentSubmission = this.currentStudent.submission;
-    if (currentSubmission) {
+    if (currentSubmission && currentSubmission.workflow_state !== 'unsubmitted') {
       this.refreshSubmissionsToView();
       var lastIndex = currentSubmission.submission_history.length - 1;
       $("#submission_to_view option:eq(" + lastIndex + ")").attr("selected", "selected");
       $submission_details.show();
-    }
-    else { //there's no submission
+    } else { // there's no submission
       $submission_details.hide();
     }
     this.handleSubmissionSelectionChange();
@@ -2793,8 +2789,93 @@ function speedGraderJSONErrorFn (data, _xhr, _textStatus, _errorThrown) {
   }
 }
 
+function setupSelectors() {
+  // PRIVATE VARIABLES AND FUNCTIONS
+  // all of the $ variables here are to speed up access to dom nodes,
+  // so that the jquery selector does not have to be run every time.
+  $add_a_comment = $('#add_a_comment')
+  $add_a_comment_submit_button = $add_a_comment.find('button:submit')
+  $add_a_comment_textarea = null
+  $add_attachment = $('#add_attachment')
+  $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url')
+  $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url')
+  $assignment_submission_turnitin_report_url = $('#assignment_submission_turnitin_report_url')
+  $assignment_submission_vericite_report_url = $('#assignment_submission_vericite_report_url')
+  $avatar_image = $('#avatar_image')
+  $average_score = $('#average_score')
+  $average_score_wrapper = $('#average-score-wrapper')
+  $closed_gp_notice = $('#closed_gp_notice')
+  $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach()
+  $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach()
+  $comment_blank = $('#comment_blank').removeAttr('id').detach()
+  $comment_saved = $('#comment_saved')
+  $comment_saved_message = $('#comment_saved_message')
+  $comment_submitted = $('#comment_submitted')
+  $comment_submitted_message = $('#comment_submitted_message')
+  $comments = $('#comments')
+  $deduction_box = $('#deduction-box')
+  $enrollment_concluded_notice = $('#enrollment_concluded_notice')
+  $enrollment_inactive_notice = $('#enrollment_inactive_notice')
+  $final_grade = $('#final-grade')
+  $full_width_container = $('#full_width_container')
+  $grade_container = $('#grade_container')
+  $grade = $grade_container.find('input, select')
+  $gradebook_header = $('#gradebook_header')
+  $grded_so_far = $('#x_of_x_graded')
+  $iframe_holder = $('#iframe_holder')
+  $left_side = $('#left_side')
+  $moderation_bar = $('#moderation_bar')
+  $moderation_tabs = $('#moderation_tabs > ul > li')
+  $moderation_tab_2nd = $moderation_tabs.eq(1)
+  $moderation_tab_final = $moderation_tabs.eq(2)
+  $moderation_tabs_div = $('#moderation_tabs')
+  $multiple_submissions = $('#multiple_submissions')
+  $new_mark_container = $('#new_mark_container')
+  $new_mark_copy_link1 = $('#new_mark_copy_link1')
+  $new_mark_copy_link2 = $('#new_mark_copy_link2')
+  $new_mark_copy_link2_menu_item = $new_mark_copy_link2.parent()
+  $new_mark_final_link = $('#new_mark_final_link')
+  $new_mark_final_link_menu_item = $new_mark_final_link.parent()
+  $new_mark_link = $('#new_mark_link')
+  $new_mark_link_menu_item = $new_mark_link.parent()
+  $no_annotation_warning = $('#no_annotation_warning')
+  $not_gradeable_message = $('#not_gradeable_message')
+  $points_deducted = $('#points-deducted')
+  $resize_overlay = $('#resize_overlay')
+  $right_side = $('#right_side')
+  $rightside_inner = $('#rightside_inner')
+  $rubric_full_resizer_handle = $('#rubric_full_resizer_handle')
+  $rubric_holder = $('#rubric_holder')
+  $score = $grade_container.find('.score')
+  $selectmenu = null
+  $submission_attachment_viewed_at = $('#submission_attachment_viewed_at_container')
+  $submission_details = $('#submission_details')
+  $submission_file_hidden = $('#submission_file_hidden').removeAttr('id').detach()
+  $submission_files_container = $('#submission_files_container')
+  $submission_files_list = $('#submission_files_list')
+  $submission_late_notice = $('#submission_late_notice')
+  $submission_not_newest_notice = $('#submission_not_newest_notice')
+  $submissions_container = $('#submissions_container')
+  $this_student_does_not_have_a_submission = $('#this_student_does_not_have_a_submission').hide()
+  $this_student_has_a_submission = $('#this_student_has_a_submission').hide()
+  $width_resizer = $('#width_resizer')
+  $window = $(window)
+  $x_of_x_students = $('#x_of_x_students_frd')
+  assignmentUrl = $('#assignment_url').attr('href')
+  browserableCssClasses = /^(image|html|code)$/
+  fileIndex = 1
+  gradeeLabel = studentLabel
+  groupLabel = I18n.t('group', 'Group')
+  isAdmin = _.include(ENV.current_user_roles, 'admin');
+  snapshotCache = {}
+  studentLabel = I18n.t('student', 'Student')
+  header = setupHeader()
+}
+
 export default {
-  setup: function() {
+  setup () {
+    setupSelectors()
+
     function registerQuizzesNext (overriddenShowSubmission) {
       showSubmissionOverride = overriddenShowSubmission;
     }
@@ -2812,5 +2893,6 @@ export default {
       EG.domReady();
     });
   },
-  EG: EG
+
+  EG
 };
