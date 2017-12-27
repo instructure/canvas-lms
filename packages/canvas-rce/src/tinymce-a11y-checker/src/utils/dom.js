@@ -92,3 +92,12 @@ export function nodeByPath(ancestor, path) {
   }
   return node
 }
+
+export function onlyContainsLink(elem) {
+  const links = elem.getElementsByTagName("a")
+  if (links.length) {
+    return links[0].textContent === elem.textContent
+  } else {
+    return false
+  }
+}
