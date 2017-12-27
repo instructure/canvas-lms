@@ -66,6 +66,7 @@ describe GradebookExporter do
       end
 
       it "can automatically determine the column separator to use" do
+        pending 'TRANSLATE-39'
         @course.assignments.create!(title: "Verkefni 1", points_possible: 8.5)
         csv = exporter(locale: :is).to_csv
         expect(csv).to match(/;8,5;/)
@@ -85,6 +86,7 @@ describe GradebookExporter do
 
       describe "grades" do
         before :each do
+          pending 'TRANSLATE-39'
           @assignment = @course.assignments.create!(title: 'Verkefni 1', points_possible: 10, grading_type: 'gpa_scale')
           student = student_in_course(course: @course, active_all: true).user
           @assignment.grade_student(student, grader: @teacher, score: 7.5)
