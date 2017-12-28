@@ -38,20 +38,13 @@ describe("test", () => {
 
 describe("data", () => {
   test("returns empty caption object", () => {
-    expect(rule.data()).toEqual({
-      caption: ""
-    })
+    expect(rule.data()).toMatchSnapshot()
   })
 })
 
 describe("form", () => {
   test("returns the appropriate object", () => {
-    expect(rule.form()).toEqual([
-      {
-        label: "Add a caption",
-        dataKey: "caption"
-      }
-    ])
+    expect(rule.form()).toMatchSnapshot()
   })
 })
 
@@ -71,16 +64,12 @@ describe("update", () => {
 
 describe("message", () => {
   test("returns the proper message", () => {
-    expect(rule.message()).toBe(
-      "Tables should include a caption describing the contents of the table."
-    )
+    expect(rule.message()).toMatchSnapshot()
   })
 })
 
 describe("why", () => {
   test("returns the proper why message", () => {
-    expect(rule.why()).toBe(
-      "Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table."
-    )
+    expect(rule.why()).toMatchSnapshot()
   })
 })
