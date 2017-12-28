@@ -125,7 +125,7 @@ describe 'Grade Detail Tray:' do
     end
   end
 
-  context 'navigation' do
+  context 'navigation within tray' do
     before(:each) do
       user_session(@teacher)
     end

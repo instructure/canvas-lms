@@ -104,5 +104,12 @@ describe "Gradezilla - Assignment Column Options" do
       Gradezilla::Cells.open_tray(@course.students[2], @assignment)
       expect(Gradezilla::GradeDetailTray.grade_input.attribute('value')).to eq '100%'
     end
+
+    it "replace EX with Excused in Gradebook Cells", priority: "2", test_id: 3424906 do
+      # excuse the student by entering 'EX' in the cell
+      Gradezilla::Cells.edit_grade(@course.students[2],@assignment, 'EX')
+
+      expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq 'Excused'
+    end
   end
 end
