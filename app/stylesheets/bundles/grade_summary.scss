@@ -144,6 +144,9 @@
     &:hover, &:focus {
       color: $ic-icon-link-color-hover;
     }
+    &.turnitin_similarity_score {
+      color: $ic-color-light;
+    }
   }
 }
 
