@@ -5100,7 +5100,7 @@ is:
     bottom: 
       student: 
         count: "Lægsti nemendahópur"
-    column_delimiter: ","
+    column_delimiter: ;
     correct: 
       bottom: 
         student: 
