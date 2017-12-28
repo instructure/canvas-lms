@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`form returns the proper object 1`] = `
+Array [
+  Object {
+    "dataKey": "alt",
+    "label": "Change alt text",
+    "textarea": true,
+  },
+]
+`;
+
+exports[`message returns the proper message 1`] = `"Alt attribute text should not contain more than 120 characters."`;
+
+exports[`why returns the proper why message 1`] = `"Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image. Alternative text should be simple and concise."`;

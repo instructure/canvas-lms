@@ -7,6 +7,11 @@ beforeEach(() => {
 })
 
 describe("test", () => {
+  test("returns true if element is not an image", () => {
+    const elem = document.createElement("div")
+    expect(rule.test(elem)).toBe(true)
+  })
+
   test("returns true if alt text is not empty", () => {
     el.setAttribute("alt", "some text")
     expect(rule.test(el)).toBeTruthy()
@@ -90,5 +95,17 @@ describe("update", () => {
     el.setAttribute("data-decorative", "")
     rule.update(el, { decorative: false })
     expect(el.hasAttribute("data-decorative")).toBeFalsy()
+  })
+})
+
+describe("message", () => {
+  test("returns the proper message", () => {
+    expect(rule.message()).toMatchSnapshot()
+  })
+})
+
+describe("why", () => {
+  test("returns the proper why message", () => {
+    expect(rule.why()).toMatchSnapshot()
   })
 })
