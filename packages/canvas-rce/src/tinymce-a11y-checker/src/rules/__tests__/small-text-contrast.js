@@ -47,12 +47,40 @@ describe("test", () => {
   })
 })
 
-describe("data", () => {})
+describe("data", () => {
+  test("returns the color matching the elements existing color", () => {
+    el.style.color = "blue"
+    expect(rule.data(el)).toEqual({
+      color: "blue"
+    })
+  })
+})
 
-describe("form", () => {})
+describe("form", () => {
+  test("returns the proper object", () => {
+    expect(rule.form()).toMatchSnapshot()
+  })
+})
 
 describe("update", () => {
   test("returns same element", () => {
     expect(rule.update(el, {})).toBe(el)
+  })
+
+  test("sets the elements style color based on the color option", () => {
+    rule.update(el, { color: "#fff" })
+    expect(el.style.color).toBe("rgb(255, 255, 255)") // Seems like this always comes back as rgb
+  })
+})
+
+describe("message", () => {
+  test("returns the proper message", () => {
+    expect(rule.message()).toMatchSnapshot()
+  })
+})
+
+describe("why", () => {
+  test("returns the proper why message", () => {
+    expect(rule.why()).toMatchSnapshot()
   })
 })

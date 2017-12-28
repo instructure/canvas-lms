@@ -47,12 +47,20 @@ describe("test", () => {
   })
 })
 
-describe("data", () => {})
-
-describe("form", () => {})
-
 describe("update", () => {
   test("returns same element", () => {
     expect(rule.update(el, {})).toBe(el)
+  })
+})
+
+describe("message", () => {
+  test("returns the proper message", () => {
+    expect(rule.message()).toMatchSnapshot()
+  })
+})
+
+describe("why", () => {
+  test("returns the proper why message", () => {
+    expect(rule.why()).toMatchSnapshot()
   })
 })
