@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`message returns the proper message 1`] = `"Heading levels should not be skipped."`;
+
+exports[`why returns the proper why message 1`] = `"Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."`;

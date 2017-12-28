@@ -68,3 +68,15 @@ describe("update", () => {
     expect(rule.update(h2, { action: "elem" }).tagName).toBe("H1")
   })
 })
+
+describe("message", () => {
+  test("returns the proper message", () => {
+    expect(rule.message()).toMatchSnapshot()
+  })
+})
+
+describe("why", () => {
+  test("returns the proper why message", () => {
+    expect(rule.why()).toMatchSnapshot()
+  })
+})
