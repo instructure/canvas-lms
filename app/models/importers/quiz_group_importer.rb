@@ -26,6 +26,7 @@ module Importers
       hash = hash.with_indifferent_access
       item ||= Quizzes::QuizGroup.where(quiz_id: quiz, migration_id: hash[:migration_id].try(:to_s)).first
       item ||= quiz.quiz_groups.temp_record
+      item.mark_as_importing!(migration)
       item.migration_id = hash[:migration_id]
       item.question_points = hash[:question_points]
       item.pick_count = hash[:pick_count]
