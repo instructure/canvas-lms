@@ -275,6 +275,26 @@ exports[`render matches snapshot with errors 1`] = `
           <Container
             as="div"
             display={null}
+            key="textarea"
+            margin="medium 0 0"
+          >
+            <TextArea
+              autoGrow={true}
+              disabled={false}
+              inline={false}
+              label="Text Area"
+              layout="stacked"
+              messages={Array []}
+              name="textarea"
+              onChange={[Function]}
+              resize="none"
+              size="medium"
+              textareaRef={[Function]}
+            />
+          </Container>
+          <Container
+            as="div"
+            display={null}
             margin="medium 0"
           >
             <Grid

@@ -6,6 +6,8 @@
   "module": "lib/modules/plugin.js",
   "scripts": {
     "test": "jest src",
+    "test:all": "npm run test && npm run cypress:run",
+    "test:coverage": "jest src --coverage",
     "test-watch": "jest --watch src",
     "cypress:open": "cypress open",
     "cypress:run": "node cypress/run.js",
@@ -59,7 +61,7 @@
     "coveragePathIgnorePatterns": ["/node_modules/", "placeholder-svg.js"],
     "coverageThreshold": {
       "global": {
-        "branches": 90,
+        "branches": 85,
         "functions": 90,
         "lines": 90,
         "statements": 90
