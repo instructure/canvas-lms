@@ -41,8 +41,8 @@ module Canvas::SoftDeletable
     end
 
     # `restore` was taken by too many other methods...
-    def undestroy
-      self.workflow_state = 'active'
+    def undestroy(active_state: 'active')
+      self.workflow_state = active_state
       save!
       true
     end
