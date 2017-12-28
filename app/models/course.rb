@@ -209,6 +209,8 @@ class Course < ActiveRecord::Base
   after_save :set_self_enrollment_code
   after_commit :update_cached_due_dates
 
+  after_update :clear_cached_short_name, :if => :course_code_changed?
+
   before_update :handle_syllabus_changes_for_master_migration
 
   before_save :touch_root_folder_if_necessary

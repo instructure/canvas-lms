@@ -108,6 +108,8 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
   after_update :clear_special_account_cache_if_special
 
+  after_update :clear_cached_short_name, :if => :name_changed?
+
   after_create :create_default_objects
 
   serialize :settings, Hash

@@ -54,6 +54,12 @@ module Context
       Eportfolio: :Eportfolio
   }.freeze
 
+  def clear_cached_short_name
+    self.class.connection.after_transaction_commit do
+      Rails.cache.delete(['short_name_lookup', self.asset_string].cache_key)
+    end
+  end
+
   def add_aggregate_entries(entries, feed)
     entries.each do |entry|
       user = entry.user || feed.user

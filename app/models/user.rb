@@ -36,6 +36,8 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   after_create :set_default_feature_flags
+  after_update :clear_cached_short_name, if: -> (user) {user.short_name_changed? || (user.read_attribute(:short_name).nil? && user.name_changed?)}
+
   serialize :preferences
   include TimeZoneHelper
   time_zone_attribute :time_zone
