@@ -27,6 +27,11 @@ export default [
         label: "Text Field",
         dataKey: "text",
         disabledIf: () => true
+      },
+      {
+        label: "Text Area",
+        dataKey: "textarea",
+        textarea: true
       }
     ]),
     rootNode: jest.fn(),

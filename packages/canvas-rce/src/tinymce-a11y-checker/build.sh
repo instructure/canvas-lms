@@ -1,7 +1,7 @@
 #!/bin/bash
 bash scripts/build-image .
 
-docker run tinymce-a11y-checker npm test
+docker run tinymce-a11y-checker npm run test:coverage
 unit_status=$?
 ((unit_status)) && echo "[!] Failed unit tests."
 

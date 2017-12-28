@@ -130,6 +130,20 @@ describe("check", () => {
     instance.setConfig(conf)
     await promisify(instance.check.bind(instance))()
   })
+
+  test("does nothing if props.getBody() returns falsy", () => {
+    component = shallow(<Checker getBody={() => false} />)
+    instance = component.instance()
+    const spy = jest.fn()
+    instance.check(spy)
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  test("does not try to call done if it is not a function", () => {
+    expect(() => {
+      instance.check("123")
+    }).not.toThrow()
+  })
 })
 
 describe("setErrorIndex", () => {
@@ -269,6 +283,12 @@ describe("fixIssue", () => {
   test("checks everything after applying a fix", () => {
     instance.fixIssue(ev)
     expect(instance.check).toHaveBeenCalled()
+  })
+
+  test("does nothing if there are no errors", () => {
+    instance.state.errors = []
+    instance.fixIssue(ev)
+    expect(instance.check).not.toHaveBeenCalled()
   })
 })
 
