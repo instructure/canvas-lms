@@ -24,9 +24,17 @@ describe("test", () => {
   })
 })
 
-describe("data", () => {})
+describe("data", () => {
+  test("returns the proper object", () => {
+    expect(rule.data()).toMatchSnapshot()
+  })
+})
 
-describe("form", () => {})
+describe("form", () => {
+  test("returns the appropriate object", () => {
+    expect(rule.form()).toMatchSnapshot()
+  })
+})
 
 describe("update", () => {
   test("returns same element", () => {
@@ -36,5 +44,17 @@ describe("update", () => {
   test("returns P elment if 'change' is true", () => {
     document.createElement("body").appendChild(el)
     expect(rule.update(el, { change: true }).tagName).toBe("P")
+  })
+})
+
+describe("message", () => {
+  test("returns the proper message", () => {
+    expect(rule.message()).toMatchSnapshot()
+  })
+})
+
+describe("why", () => {
+  test("returns the proper why message", () => {
+    expect(rule.why()).toMatchSnapshot()
   })
 })
