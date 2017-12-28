@@ -35,9 +35,17 @@ describe("test", () => {
   })
 })
 
-describe("data", () => {})
+describe("data", () => {
+  test("returns the proper object", () => {
+    expect(rule.data()).toMatchSnapshot()
+  })
+})
 
-describe("form", () => {})
+describe("form", () => {
+  test("returns the proper object", () => {
+    expect(rule.form()).toMatchSnapshot()
+  })
+})
 
 describe("update", () => {
   test("returns same element", () => {
@@ -156,5 +164,23 @@ describe("update", () => {
       const newA = rule.update(a1, { combine: true })
       expect(newA.firstElementChild.getAttribute("alt")).toBe("")
     })
+  })
+})
+
+describe("rootNode", () => {
+  test("returns the parentNode of an element", () => {
+    expect(rule.rootNode(a1).tagName).toBe("BODY")
+  })
+})
+
+describe("message", () => {
+  test("returns the proper message", () => {
+    expect(rule.message()).toMatchSnapshot()
+  })
+})
+
+describe("why", () => {
+  test("returns the proper why message", () => {
+    expect(rule.why()).toMatchSnapshot()
   })
 })
