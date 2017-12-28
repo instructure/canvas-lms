@@ -39,7 +39,11 @@ describe("data", () => {
   })
 })
 
-describe("form", () => {})
+describe("form", () => {
+  test("returns the proper object", () => {
+    expect(rule.form()).toMatchSnapshot()
+  })
+})
 
 describe("update", () => {
   test("returns same element", () => {
@@ -50,5 +54,17 @@ describe("update", () => {
     const text = "this is my text"
     el.setAttribute("alt", "thisismy.txt")
     expect(rule.update(el, { alt: text }).getAttribute("alt")).toBe(text)
+  })
+})
+
+describe("message", () => {
+  test("returns the proper message", () => {
+    expect(rule.message()).toMatchSnapshot()
+  })
+})
+
+describe("why", () => {
+  test("returns the proper why message", () => {
+    expect(rule.why()).toMatchSnapshot()
   })
 })
