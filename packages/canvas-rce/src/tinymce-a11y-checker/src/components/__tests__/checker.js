@@ -302,4 +302,20 @@ describe("render", () => {
     component.update()
     expect(component).toMatchSnapshot()
   })
+
+  test("does not render a Learn more link if the rule has an empty link", async () => {
+    await promisify(instance.check.bind(instance))()
+    const newErrors = component.state("errors").slice()
+    newErrors.forEach(err => (err.rule.link = ""))
+    component.setState({ errors: newErrors })
+    expect(component.find("Link").exists()).toBe(false)
+  })
+
+  test("does not render a Learn more link if the rule has no link property", async () => {
+    await promisify(instance.check.bind(instance))()
+    const newErrors = component.state("errors").slice()
+    newErrors.forEach(err => delete err.rule.link)
+    component.setState({ errors: newErrors })
+    expect(component.find("Link").exists()).toBe(false)
+  })
 })
