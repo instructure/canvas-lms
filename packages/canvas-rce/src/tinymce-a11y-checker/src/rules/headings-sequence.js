@@ -155,7 +155,7 @@ export default {
         return changeTag(elem, `H${hIdx + 1}`)
       }
       case "modify": {
-        return changeTag(elem, "div")
+        return changeTag(elem, "p")
       }
     }
   },
