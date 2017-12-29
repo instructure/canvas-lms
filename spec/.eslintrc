@@ -20,6 +20,7 @@
   "rules": {
     "func-names": "off",
     "prefer-arrow-callback": "off",
+    "jest/no-identical-title": "off",
     "qunit/no-global-assertions": "off",
     "qunit/no-global-module-test": "off",
     "qunit/require-expect": "off",
