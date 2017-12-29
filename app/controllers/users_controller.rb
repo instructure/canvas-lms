@@ -2219,6 +2219,7 @@ class UsersController < ApplicationController
 
     # find all ungraded submissions in one query
     ungraded_submissions = course.submissions.
+        where.not(:assignments => {:workflow_state => 'deleted'}).
         preload(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
         except(:order).
