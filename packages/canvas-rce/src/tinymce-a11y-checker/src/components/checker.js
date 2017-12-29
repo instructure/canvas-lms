@@ -375,9 +375,12 @@ export default class Checker extends React.Component {
                               <Typography>
                                 <p>
                                   {rule.why() + " "}
-                                  <Link href={rule.link} target="_blank">
-                                    {formatMessage("Learn more")}
-                                  </Link>
+                                  {rule.link &&
+                                    rule.link.length && (
+                                      <Link href={rule.link} target="_blank">
+                                        {formatMessage("Learn more")}
+                                      </Link>
+                                    )}
                                 </p>
                               </Typography>
                             </Container>
