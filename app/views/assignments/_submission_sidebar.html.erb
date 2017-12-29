@@ -17,7 +17,8 @@
 %>
 
 <% cache([
-  'submission_sidebar_render',
+  'submission_sidebar_render2',
+  @current_user.id,
   @current_user_submission,
   Time.zone.utc_offset,
   @assigned_assessments.count,
