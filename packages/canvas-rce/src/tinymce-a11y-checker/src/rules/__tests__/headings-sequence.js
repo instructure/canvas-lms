@@ -60,8 +60,8 @@ describe("update", () => {
     expect(rule.update(h4, { action: "elem" }).tagName).toBe("H3")
   })
 
-  test("returns div element on 'modify' action", () => {
-    expect(rule.update(h2, { action: "modify" }).tagName).toBe("DIV")
+  test("returns p element on 'modify' action", () => {
+    expect(rule.update(h2, { action: "modify" }).tagName).toBe("P")
   })
 
   test("returns h1 element on 'modify' and prior elem unassigned", () => {
