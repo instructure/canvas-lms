@@ -1716,9 +1716,9 @@ canvas-planner@1.0.12:
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
-canvas-rce@2.6.2:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.6.2.tgz#393efe1dbfa4cd4b9791a9c64240ca037a5bfd49"
+canvas-rce@2.6.3:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.6.3.tgz#45aadd6bbeba49776b7dc915c2a6f699ce5732a6"
   dependencies:
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
