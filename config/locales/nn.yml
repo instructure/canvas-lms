@@ -57,11 +57,13 @@ nn:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ein partnar-ID er nødvendig for å bruke Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Ein partnarnøkkel er nødvendig for å bruke Academic Benchmarks"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppstod eit problem då nye fagfellevurderarar blei lagt til."
+  a_sis_integration_is_not_configured_and_the_enable_3c560d89: "SIS-integrasjon er ikkje satt opp og dei nye integrasjonsinnstillingane for Enable er ikkje aktivert"
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Ein tabell som inneheld namnet på karakterskjemaet og knappar for redigering eller sletting av skjemaet."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Ein tabell med svar og overordna statistikk om studentars svaralternativer."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ein tabell som inneheld data frå graderingsskjemaet. Kvar rad inneheld eit namn, ein maksimum prosentverdi og ein minimum prosentverdi. Kvar rad inneheld også ein knapp for å legge til ei ny rad nedanfor, og ein knapp for å slette gjeldande rad."
   a_z_243c3301: A–Å
   a_z_29d8e67c: "A - Å"
+  about_this_service_b10bc808: "Om denne tenesta"
   academic_benchmark: 
     no_api_key: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
     no_file: "Resultatfil eller autoritet er ikkje gitt"
@@ -83,6 +85,7 @@ nn:
   accepted_user_role_type_course_course_2ce91589: "Godkjend: %{user}, %{role_type}, emne, %{course}"
   access_report_80d28095: Tilgangsrapport
   access_token_3be22221: Tilgangstoken
+  access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig til"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangstoken kan gi andre applikasjonar lov til å gjere API-kall på dine vegne. Du kan óg generere tilgangstoken og *bruke Canvas sine opne API-ar* til å sette opp eigne integrasjonar. "
   accordion_section_1_7888782d: "Accordion-klasse 1"
@@ -234,6 +237,7 @@ nn:
   account_course_and_user_search_22bf297a: "Konto, emne- og brukarsøk"
   account_domain_78f43049: Kontoområde
   account_id_2c3b4f15: konto-ID
+  account_id_73966078: konto_id
   account_id_f6e26867: Konto-ID
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonamn
@@ -698,6 +702,12 @@ nn:
     default_account_quotas_not_updated: "Standard kontokvoter er ikkje oppdaterte"
     default_account_quotas_updated: "Standard kontokvoter er oppdaterte"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Dato for aktivitet:"
       dcr2: 
         parameters: 
           custom_reports: 
@@ -714,6 +724,24 @@ nn:
               parameters: 
                 header: "Startar den:"
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -806,6 +834,25 @@ nn:
         penn_harris: 
           parameters: 
             note: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
+    proservices: 
+      provisioning: 
+        parameters: 
+          account_reports: 
+            default: 
+              accounts: 
+                check_box: "CSV-fil for kontoar"
+              courses: 
+                check_box: "CSV-fil for emne"
+              enrollments: 
+                check_box: "CSV-fil over påmeldingar"
+              group_categories: 
+                login: 
+                  check_box: "CSV-fil for gruppekategoriar"
+              group_membership: 
+                login: 
+                  check_box: "CSV-fil for gruppemedlemskap"
+              groups: 
+                check_box: "CSV-fil for grupper"
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -3360,6 +3407,7 @@ nn:
   collapsed_510aa02a: Skjult
   colombia_57_c6c75620: "Colombia (+57)"
   colombia_919c87f9: Colombia
+  color_a363e1b0: Farge
   columns_464bd055: Kolonnar
   coming_up_4348b0bd: "Kjem snart"
   comm_messages: 
@@ -4420,7 +4468,7 @@ nn:
       teachers_students: "Faglærarar og studentar"
   course_8a63b4a3: Emne
   course_8dcfb195: emne
-  course_activity_stream_40091c17: "Emnet sin aktivitetsstaum"
+  course_activity_stream_40091c17: "Emnet sin aktivitetsstraum"
   course_and_user_search_ebc1ae41: "Kurs- og brukarsøk"
   course_announcements_76b07340: Emnekunngjeringar
   course_assignments_833b8cf1: Emneoppgåver
@@ -5206,6 +5254,7 @@ nn:
     bottom: 
       student: 
         count: "Lågaste studenttal"
+    column_delimiter: ","
     correct: 
       bottom: 
         student: 
@@ -6885,6 +6934,7 @@ nn:
     warning: åtvaring
   global_navigation_8bee3501: "Global navigasjon"
   go_30af2a7b: "Gå til"
+  go_back_ed239e69: "Gå tilbake"
   go_to_name_s_profile_eaa1826b: "Gå til %{name} sin profil"
   go_to_settings_for_name_812308b5: "Gå til innstillingar for %{name}"
   go_to_statistics_for_name_2ee6b6f3: "Gå til statistikk for %{name}"
@@ -7476,6 +7526,7 @@ nn:
   grades_a61eba0a: Karakterar
   grades_are_now_reverted_to_original_scores_e6deade1: "Karakterane blir no tilbakestilt til det opphavlege resultatet"
   grades_are_now_showing_what_if_scores_711a8be2: "Karakterar viser no kva-skjer-dersom-resultat"
+  grades_for_student_aff00ba: "Karakterar for %{student}"
   gradezilla: 
     alerts: 
       scores_updated: 
@@ -8531,6 +8582,7 @@ nn:
     no_comment: "Ingen kommentar"
     no_description: "Inga skildring"
   leave_5e852989: Forlate
+  leave_a_comment_7991725b: "Gi eit svar"
   leave_group_group_name_6847c632: "Forlate gruppa %{group_name}"
   left_group_group_name_aac4e813: "Forlét gruppa %{group_name}"
   let_students_see_the_correct_answers_dacc2faf: "La  studentane sjå dei korrekte svara"
@@ -10819,6 +10871,7 @@ nn:
   no_grading_periods_configured_for_this_term_ca22393e: "ingen karaktersetjingsperiodar er konfigurert for dette semesteret "
   no_grading_schemes_to_display_8b0e92e7: "Ingen karaktersetjingsskjema å vise"
   no_items_in_module_21f111a2: "Ingen element i modulen"
+  no_marks_5e7d2b59: "Ingen resultat"
   no_matching_users_found_83889c10: "Finn ikkje samsvarande brukarar."
   no_migration_file: "Fil er nødvendig for overføring av innhald."
   no_outcome_file_or_authority_given_c90f9c5f: "Resultatfil eller autoritet er ikkje gitt"
@@ -10845,6 +10898,7 @@ nn:
   norway_47_bc598662: "Noreg (+47)"
   norway_c11471b3: Noreg
   not_a_number: "må vere eit positivt tal"
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Ikkje alle klassene blir tildelte dette elementet."
   not_available_487d3648: "Ikkje tilgjengeleg"
   not_available_until_next_submission_2175158: "Ikkje tilgjengeleg før neste innlevering"
   not_completed_d70acea3: "Ikkje fullført"
@@ -16928,6 +16982,7 @@ nn:
   windows_tile_wide_4d40910: "Flis i Windows: Brei"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Vil du godta eller avslå oppdateringa?"
   would_you_like_to_enable_this_app_ccdf735d: "Vil du aktivere denne appen?"
+  would_you_like_to_go_back_to_include_1d279044: "Vil du gå tilbake og inkludere:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Vil du at studentane skal halde fram på emnet eller vil du låse modulane på nytt til nye krav er fullførte?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Bryt tekst i titlar i kalenderen si månadsvising "
   x_y_4a86b3ab: "%{x}/%{y}"
@@ -16964,6 +17019,7 @@ nn:
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge på igjen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan oppdatere noko av denne brukaren sin informasjon, men dei kan endre det om dei vil."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan bruke ei enkelt ico-fil på 16 x 16, 32 x 32, 48 x 48."
+  you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan ikkje tilordne ei gruppe utanfor oppgåva sitt gruppesett"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikkje redigere emne for denne underkontoen."
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan ikkje fjerne denne påmeldinga."
   you_cannot_remove_your_default_email_address_8ed68e52: "Du kan ikkje fjerne standard e-postadresse"
@@ -16992,6 +17048,7 @@ nn:
   you_must_agree_to_the_terms_99723f97: "Du må godta vilkåra"
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "Du må tillate minst ein avtale per deltakar."
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Du må tillate minst ein avtale per tidsluke."
+  you_must_have_a_student_or_section_selected_a99e45df: "Du må velje ein student eller ei klasse"
   you_must_log_in_to_view_replies_9ccd4da0: "Du må logge på for å vise svar"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du må velje eit emne å kopiere innhald frå"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du må innstille med eit tal som er større enn eller likt %{min}"

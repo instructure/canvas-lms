@@ -24,7 +24,8 @@ define [
   'timezone/pt_PT'
   'helpers/I18nStubber'
   'helpers/fakeENV'
-], (DatetimeField, $, tz, detroit, juneau, portuguese, I18nStubber, fakeENV) ->
+  'moment'
+], (DatetimeField, $, tz, detroit, juneau, portuguese, I18nStubber, fakeENV, moment) ->
 
   moonwalk = tz.parse('1969-07-21T02:56:00Z')
 
@@ -95,6 +96,17 @@ define [
     @field.addDatePicker(datepicker: {buttonText: 'pick me!'})
     $trigger = @$field.next()
     equal $trigger.text(), 'pick me!', 'used provided buttonText'
+
+  test 'uses first day of week for moment locale', ->
+    momentLocale = 'MOMENT_LOCALE'
+    firstDayOfWeek = 1
+    fakeENV.setup(MOMENT_LOCALE: momentLocale)
+    @stub(moment, 'localeData').returns(firstDayOfWeek: => firstDayOfWeek)
+    @stub(@$field, 'datepicker')
+    @field.addDatePicker({})
+    ok moment.localeData.calledWith(momentLocale)
+    ok @$field.datepicker.calledWithMatch(firstDay: firstDayOfWeek)
+    fakeENV.teardown()
 
   QUnit.module 'addSuggests',
     setup: ->

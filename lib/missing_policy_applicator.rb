@@ -34,6 +34,7 @@ class MissingPolicyApplicator
     Submission.active.
       joins(assignment: {course: :late_policy}).
       eager_load(:grading_period, assignment: { course: :late_policy }).
+      for_enrollments(Enrollment.all_active_or_pending).
       missing.
       merge(Assignment.submittable).
       where(score: nil, grade: nil, cached_due_date: 1.day.ago(now)..now,

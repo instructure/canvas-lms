@@ -494,6 +494,39 @@ describe CoursesController, type: :request do
       course_ids = json.select{ |c| c["id"]}
       expect(course_ids.length).to eq 2
     end
+
+    it "should check include permissions against the caller" do
+      json = api_call_as_user(@admin, :get, "/api/v1/users/#{@student.id}/courses",
+                              { :user_id => @student.to_param, :controller => 'courses', :action => 'user_index',
+                                :format => 'json' })
+      entry = json.detect { |course| course['id'] == @course.id }
+      expect(entry['sis_course_id']).to eq 'TEST-SIS-ONE.2011'
+    end
+
+    it "should return course progress for the subject" do
+      mod = @course.context_modules.create!(:name => "some module")
+      assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+      tag = mod.add_item({:id => assignment.id, :type => 'assignment'})
+      mod.completion_requirements = {tag.id => {:type => 'must_submit'}}
+      mod.publish
+      mod.save!
+      assignment.submit_homework(@student, :submission_type => "online_text_entry", :body => "herp")
+      json = api_call_as_user(@admin, :get, "/api/v1/users/#{@student.id}/courses?include[]=course_progress",
+                              { :user_id => @student.to_param, :controller => 'courses', :action => 'user_index',
+                                :format => 'json', :include => ['course_progress'] })
+      entry = json.detect { |course| course['id'] == @course.id }
+      expect(entry['course_progress']['requirement_completed_count']).to eq 1
+    end
+
+    it "should use the caller's course nickname, not the subject's" do
+      @student.course_nicknames[@course.id] = 'terrible'; @student.save!
+      @admin.course_nicknames[@course.id] = 'meh'; @admin.save!
+      json = api_call_as_user(@admin, :get, "/api/v1/users/#{@student.id}/courses",
+                              { :user_id => @student.to_param, :controller => 'courses', :action => 'user_index',
+                                :format => 'json' })
+      entry = json.detect { |course| course['id'] == @course.id }
+      expect(entry['name']).to eq 'meh'
+    end
   end
 
   it 'should paginate the course list' do

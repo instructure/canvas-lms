@@ -389,7 +389,7 @@ class OutcomeGroupsApiController < ApplicationController
   # If linking an existing outcome, the outcome_id must identify an outcome
   # available to this context; i.e. an outcome owned by this group's context,
   # an outcome owned by an associated account, or a global outcome. With
-  # outcome_id present, any other parameters are ignored.
+  # outcome_id present, any other parameters (except move_from) are ignored.
   #
   # If defining a new outcome, the outcome is created in the outcome group's
   # context using the provided title, description, ratings, and mastery points;
@@ -406,6 +406,9 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @argument outcome_id [Integer]
   #   The ID of the existing outcome to link.
+  #
+  # @argument move_from [Integer]
+  #   The ID of the old outcome group. Only used if outcome_id is present.
   #
   # @argument title [String]
   #   The title of the new outcome. Required if outcome_id is absent.
@@ -486,6 +489,19 @@ class OutcomeGroupsApiController < ApplicationController
 
     @outcome_group = context_outcome_groups.find(params[:id])
     if params[:outcome_id]
+      if params[:move_from]
+        old_outcome_group = context_outcome_groups.find(params[:move_from])
+        @outcome_link = old_outcome_group.child_outcome_links.active.where(content_id: params[:outcome_id]).first
+        unless @outcome_link
+          render json: 'error'.to_json, status: :bad_request
+          return
+        end
+
+        @outcome_group.adopt_outcome_link(@outcome_link)
+        render json: outcome_link_json(@outcome_link, @current_user, session)
+        return
+      end
+
       @outcome = context_available_outcome(params[:outcome_id])
       unless @outcome
         render :json => 'error'.to_json, :status => :bad_request

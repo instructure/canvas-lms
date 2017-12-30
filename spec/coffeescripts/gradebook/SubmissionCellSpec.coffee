@@ -239,8 +239,18 @@ define [
     @getCell({ foo: { entered_grade: 'complete' }})
     strictEqual(@cell.$input.data('value'), 'complete')
 
+  test "#pass_fail#htmlFromSubmission sets the data value for the button" +
+  "to grade when it is complete and entered_grade is not present", ->
+    @getCell({ foo: { grade: 'complete' }})
+    strictEqual(@cell.$input.data('value'), 'complete')
+
   test "#pass_fail#htmlFromSubmission sets the data value for the button to entered_grade when it is incomplete", ->
     @getCell({ foo: { entered_grade: 'incomplete' }})
+    strictEqual(@cell.$input.data('value'), 'incomplete')
+
+  test "#pass_fail#htmlFromSubmission sets the data value for the button" +
+  "to grade when it is incomplete and entered_grade is not present", ->
+    @getCell({ foo: { grade: 'incomplete' }})
     strictEqual(@cell.$input.data('value'), 'incomplete')
 
   test "#pass_fail#transitionValue adds the 'dontblur' class so the user can continue toggling pass/fail state", ->
@@ -260,3 +270,13 @@ define [
     @cell.$input = $("<button><i></i></button>")
     @cell.transitionValue('pass')
     ok @cell.$input.find('i').hasClass('icon-check')
+
+  test "#loadValue sets the value to entered_grade when available", ->
+    @getCell({ foo: { entered_grade: 'complete', grade: 'foo' }})
+    @cell.loadValue()
+    strictEqual(@cell.val, 'complete')
+
+  test "#loadValue sets the value to grade when entered_grade is not available", ->
+    @getCell({ foo: { grade: 'complete' }})
+    @cell.loadValue()
+    strictEqual(@cell.val, 'complete')

@@ -1187,7 +1187,8 @@ class AccountsController < ApplicationController
                                    {:sis_syncing => [:value, :locked]}.freeze,
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
-                                   :turnitin_host, :turnitin_account_id, :users_can_edit_name].freeze
+                                   :turnitin_host, :turnitin_account_id, :users_can_edit_name,
+                                   :app_center_access_token].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret,

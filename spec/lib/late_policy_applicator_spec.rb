@@ -265,6 +265,13 @@ describe LatePolicyApplicator do
         expect { @late_policy_applicator.process }.to change { @late_submission2.reload.score }.by(-10)
       end
 
+      it 'does not apply the late policy to late submissions for concluded students' do
+        @course.enrollments.find_by(user: @late_submission2.user_id).conclude
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to(change { @late_submission2.reload.score })
+      end
+
       it 'recalculates late penalties with current due date in the open grading period' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
@@ -284,10 +291,17 @@ describe LatePolicyApplicator do
         expect { @late_policy_applicator.process }.to change { @missing_submission2.reload.score }.to(1)
       end
 
+      it 'does not apply the missing policy to missing submissions for concluded students' do
+        @course.enrollments.find_by(user: @missing_submission2.user_id).conclude
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to(change { @missing_submission2.reload.score })
+      end
+
       it 'does not apply the late policy to timely submissions in the open grading period' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
-        expect { @late_policy_applicator.process }.not_to change { @timely_submission2.reload.score }
+        expect { @late_policy_applicator.process }.not_to(change { @timely_submission2.reload.score })
       end
 
       it 'does not apply the late policy to late submissions in the closed grading period' do

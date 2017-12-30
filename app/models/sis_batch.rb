@@ -537,7 +537,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def cleanup_error_files
-    atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).to_a
+    atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).order(:id).to_a
     atts.each do |a|
       a.reload
       a.make_childless
@@ -545,6 +545,9 @@ class SisBatch < ActiveRecord::Base
     end
     self.sis_batch_error_files.scope.delete_all
     Attachment.where(id: atts).delete_all
+  rescue => e
+    # just in case
+    Canvas::Errors.capture(e, {type: :sis_import, message: message, during_tests: false})
   end
 
   def write_warnings_and_errors_to_file
