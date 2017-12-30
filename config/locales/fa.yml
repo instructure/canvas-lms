@@ -4032,8 +4032,8 @@ fa:
         aria_new_label: "ایجاد مخزن پرسش جدید"
         create_new_question: "-- ایجاد مخزن پرسش جدید --"
         default_question_bank_label: "مخزن پیش فرض پرسش"
-        question_bank_placeholder: "نام مخزن سوال"
-        question_bank_placeholder_aria: "نام بانک سوال جدید را وارد کنید."
+        question_bank_placeholder: "نام مخزن پرسش"
+        question_bank_placeholder_aria: "نام مخزن پرسش جدید را وارد کنید"
         question_bank_title: "نام مخزن جدید پرسش"
         select_question_bank: "انتخاب مخزن پرسش"
       select_content_checkbox: 
@@ -4077,7 +4077,7 @@ fa:
         media_playback: "پخش رسانه"
     media_objects_not_configured: "اشیاء رسانه ای پیکربندی نشده اند"
     new_roster_user: 
-      completed_enrollment: "*%{completed_at}* کمل شده است."
+      completed_enrollment: "*%{completed_at}* کامل شده است"
       enrolled_as: "به عنوان %{enrollment_type} ثبت نام شد"
       enrollment_linked_to: "به *%{linked_user}* پیوند داده شد"
       labels: 
@@ -4216,7 +4216,7 @@ fa:
   context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
     url_or_domain_required: "نشانی اینترنتی یا دامنه باید تعیین شود."
-  context_id_83fdfe0d: context_id
+  context_id_83fdfe0d: شناسه_زمینه
   context_level_56d88f5b: "(%{context} level)"
   context_module: 
     requirements: 
@@ -4437,8 +4437,8 @@ fa:
     invalid_position: "موقعیت معتبر نیست"
   context_nav_link_8d15d95: "پیوند پیمایش زمینه"
   context_nav_link_active_78adb0fa: "پیوند پیمایش زمینه فعال است"
-  context_navigation_menu_514c5889: "منوی هدایت حساب کاربری"
-  context_type_eb76a7b9: context_type
+  context_navigation_menu_514c5889: "منوی پیمایش زمینه"
+  context_type_eb76a7b9: نوع_زمینه
   contextname_and_count_others_9dda769b: 
     one: "%{contextName} و %{count} نفر دیگر"
     other: "%{contextName} و %{count} نفر دیگر"
@@ -4635,13 +4635,13 @@ fa:
   correct_answers_will_be_available_on_date_48137: "پاسخ های درست در %{date} در دسترس خواهند بود."
   correct_check_icon_617da6c3: "اصلاح نماد بازبینی"
   costa_rica_506_d63d2ea1: "کاستاریکا (+506)"
-  could_not_duplicate_discussion_953ed67f: "نمی‌توانید بحث را تکرار کنید."
+  could_not_duplicate_discussion_953ed67f: "نمی‌توانید بحث را تکرار کنید"
   could_not_save_chosencolor_741b74ce: "امکان ذخیره سازی '%{chosenColor}' وجود ندارد"
   couldn_t_find_an_authority_to_update_44d9407e: "امکان یافتن یک مرجع برای بهنگام سازی وجود ندارد"
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "قادر به یافتن عنوان های ورود CSV کانواس نیست"
   couldn_t_generate_diff_message_a0528b20: "امکان ایجاد diff: %{message} وجود ندارد"
   couldn_t_update_standards_for_authority_auth_81206187: "امکان بهنگام سازی استانداردها برای مرجع %{auth} وجود ندارد"
-  count_apps_found_f4d86860: "%{count} برنامه یافت شد."
+  count_apps_found_f4d86860: "%{count} برنامه یافت شد"
   count_assignments_found_17520826: 
     one: "1 تکلیف موجود است."
     other: "%{count} تکلیف موجود است."
@@ -4677,7 +4677,7 @@ fa:
     one: "1 ذقیقه"
     other: "%{count} دقیقه"
     zero: "کمتر از1 دقیقه"
-  count_of_max_maximum_characters_fcb6ddf8: "%{count} و %{max} حداکثر کاراکتر"
+  count_of_max_maximum_characters_fcb6ddf8: "%{count} از %{max} حداکثر نویسه"
   count_options_190d6373: 
     one: "%{count} گزینه"
     other: "%{count} گزینه"
@@ -4713,7 +4713,7 @@ fa:
     other: "%{count} دانشجو"
   count_students_in_percentile_percentile_d0adecfe: 
     one: "%{count} داشجو در %{percentile} درصد"
-    other: "%{count} داشجو در %{percentile} درصد"
+    other: "%{count} دانشجو در %{percentile} درصد."
   count_students_will_get_num_points_c970fc01: 
     one: "%{count} دانشجو، %{num} امتیاز کسب خواهند کرد"
     other: "%{count} دانشجو، %{num} امتیاز کسب خواهند کرد"
@@ -4723,7 +4723,7 @@ fa:
   count_submissions_need_grading_d34bae25: 
     one: "%{count} مورد ارسالی به نمره گذاری نیاز دارد"
     other: "%{count} مورد ارسالی به نمره گذاری نیاز دارد"
-  count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count}%{type} حذف خواهد شد و از آستانه %{change_threshold} فراتر می‌رود."
+  count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count}%{type} حذف خواهد شد و از آستانه تعیین شده %{change_threshold} فراتر می‌رود"
   count_unsynced_changes_1fc147e5: "%{count} تغییر همگام نشده"
   country_is_required_b0afbf52: "کشور لازم است"
   course: 
@@ -4731,7 +4731,7 @@ fa:
     batch_update_message: 
       one: "%{count} درس پردازش شد"
       other: "%{count} درس پردازش شد"
-    course: "درس ها"
+    course: درس
     course_format: 
       blended: ترکیبی
       not_set: "تعیین نشده"
@@ -4810,7 +4810,7 @@ fa:
   course_copy_not_allowed_error: "مجاز به کپی کردن درس منبع نیستید."
   course_discussions_38c0b74f: "بحث‌های درس"
   course_ends_at_e8b166df: "پایان درس در"
-  course_export_from_date_file_not_available_8a775e53: "صدور درس از %{date} (فایل موجود نیست)."
+  course_export_from_date_file_not_available_8a775e53: "صدور درس از %{date} (فایل موجود نیست)"
   course_exports: 
     errors: 
       assignment: "صدور تکلیف \"%{title}\" انجام نشد"
@@ -4839,7 +4839,7 @@ fa:
       quizzes: "صدور برخی آزمون ها انجام نشد"
       resources: "پیوند دادن به برخی منابع انجام نشد"
       rubrics: "صدور دستورالعمل های ارزیابی انجام نشد"
-      tool_profiles: "صدور برخی ابزارهای نمایه انجام نشد."
+      tool_profiles: "صدور برخی نمایه های ابزار انجام نشد"
       topic: "صدور موضوع بحث \"%{title}\" انجام نشد"
       topic_is_locked: "موضوع \"%{title}\" را نمی توان کپی گرفت، زیرا قفل شده است."
       topics: "صدور برخی موضوع ها انجام نشد"
@@ -4853,8 +4853,8 @@ fa:
       topic: "موضوع ناشناس"
       wiki_page: "صفحه ویکی ناشناس"
   course_files_62deb8f8: "فایل های درس"
-  course_found_f5a40cd3: "درس پیدا شد."
-  course_found_not_deleted_a20f72f0: "درس پیدا شد (حذف نشده است)."
+  course_found_f5a40cd3: "درس پیدا شد"
+  course_found_not_deleted_a20f72f0: "درس پیدا شد (حذف نشده است)"
   course_grades_22adc27e: "نمره های درس"
   course_home_4c4c0107: "صفحه اصلی درس"
   course_home_sub_navigation_b1ee6b03: "پیمایش فرعی صفحه اصلی درس"
@@ -4864,7 +4864,7 @@ fa:
   course_image_for_course_cfbb08df: "تصویر درس برای %{course}"
   course_image_settings_eba3ec55: "تنظیمات تصویر درس"
   course_implemented_apps_fa658f5a: "برنامه های اجرایی شده درس"
-  course_is_already_associated_with_a_blueprint_4d9407cb: "درس در حال حاضر با یک طرح مرتبط است."
+  course_is_already_associated_with_a_blueprint_4d9407cb: "درس در حال حاضر با یک طرح مرتبط است"
   course_list: 
     favorited_tooltip: "برای حذف از منوی درس ها، کلیک کنید."
     nonfavorited_tooltip: "برای افزودن به منوی درس ها، کلیک کنید."
@@ -4947,7 +4947,7 @@ fa:
   course_name_is_required_90919349: "نام درس لازم است"
   course_name_successfully_added_48116a50: "%{course_name} با موفقیت افزوده شد!"
   course_navigation_dd035109: "پیمایش درس"
-  course_not_found_c248a721: "درس  یافت نشد."
+  course_not_found_c248a721: "درس  یافت نشد"
   course_option_links_a79d263d: "پیوندهای گزنیه درس"
   course_outcomes_7dc1cbc7: "نتیجه های درس"
   course_pages_449f1dd4: "صفحه‌های درس"
@@ -4965,8 +4965,8 @@ fa:
   course_section_7a988066: "بخش درس"
   course_section_name_ea880ed1: "بخش درس %{name}"
   course_selection_245808bf: "انتخاب درس"
-  course_set_up_tutorial_6ab7c2d1: "راهنمای ایجاد درس"
-  course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "خودآموز ایجاد درس در مورد چگونگی استفاده از ویژگیهای کانواس روش‌هایی را ارائه می‌دهد. به خصوص در مواردی که این تازه به کانواس وارد شده‌اید و یا بعد از مدتی طولانی، یک چند دوره جدید را ایجاد می‌کنید مفید است."
+  course_set_up_tutorial_6ab7c2d1: "خودآموز راه اندازی درس"
+  course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "خودآموز راه اندازی درس درباره چگونگی استفاده از ویژگیهای کانواس در هر صفحه کانواس نکاتی را ارائه می‌دهد. به خصوص در مواردی که تازه به کانواس وارد شده‌اید و یا بعد از مدتی طولانی، یک چند درس جدید را راه اندازی می‌کنید مفید است."
   course_settings: 
     buttons: 
       add_section: "افزودن بخش"
@@ -5023,7 +5023,7 @@ fa:
   course_users: 
     greater_than_three: "لطفا یک عبارت جستجو با سه یا چند نویسه وارد نمایید"
     unknown_error: "جستجوی شما با اشکال مواجه شد، لطفا دوباره سعی کنید."
-  course_visibility_options_ca8ab3a8: "گزینه‌های نمایش دوره"
+  course_visibility_options_ca8ab3a8: "گزینه‌های قابلیت دید درس"
   courses: 
     assignments_needing_grading: 
       headings: 
@@ -5345,13 +5345,13 @@ fa:
         grading_standard_enabled: "فعال کردن طرح نمره گذاری درس"
         hide_distribution_graphs: "مخفی کردن نمودارهای توزیع نمره از دید دانشجویان"
         hide_final_grades: "مخفی کردن نمره های کل در خلاصه نمره های دانشجو"
-        home_page_announcement_limit: "تعداد آگهی‌های نشان داده شده در صفحه اصلی"
+        home_page_announcement_limit: "تعداد اطلاعیه های نشان داده شده در صفحه اصلی"
         image: تصویر
         indexed: "شامل سازی این درس در فهرست عمومی درس"
         is_public_to_auth_users: "قابل مشاهده ساختن این درس برای کاربران اعتبارسنجی شده"
         language: زبان
         license: مجوز
-        lock_all_announcements: "غیر فعال سازی نظرها در اطلاعیه ها"
+        lock_all_announcements: "غیر فعالسازی نظرها در اطلاعیه ها"
         open_enrollment: "افزودن پیوند \"پیوستن به این درس\" به صفحه اصلی درس"
         public_syllabus: "عمومی کردن مشاهده سرفصل مربوط به این درس"
         restrict_enrollments_to_course_dates: "کاربران فقط می توانند در این درس بین این تاریخ ها شرکت نمایند"
@@ -5359,7 +5359,7 @@ fa:
         restrict_student_past_view: "محدود کردن دانشجویان برای مشاهده درس بعد از تاریخ پایان"
         root_account: "حساب ریشه"
         root_account_id: "حساب ریشه"
-        show_announcements_on_home_page: "نمایش آگهی‌های اخیر در صفحه اصلی درس"
+        show_announcements_on_home_page: "نمایش اطلاعیه های اخیر در صفحه اصلی درس"
         sis_source_id: "شناسه سامانه اطلاعات دانشجو"
         start_at: "شروع در"
         storage_quota: "ذخیره فایل"
@@ -5543,20 +5543,22 @@ fa:
     unauthorized: 
       invalid_link: "پیوند ثبت نامی که شما استفاده کردید ظاهرا دیگر معتبر نیست. لطفا با استاد درس تماس بگیرید و مطمئن شوید که هنوز به صورت صحیح ثبت نام شده اید."
   courses_43204aae: "درس ها"
-  courses_navigation_menu_b3638384: "منوی هدایت درس‌ها"
+  courses_navigation_menu_b3638384: "منوی پیمایش درس‌ها"
   courses_people_680bb173: "درس‌ها و افراد"
   create_132b3be1: ایجاد
   create_a_new_account_4cf7c0f9: "ایجاد حساب جدید"
-  create_a_new_module_6f31b0fe: "یک ماژول جدید ایجاد کنید."
-  create_a_new_user_for_address_7487e9c9: "یک کاربر جدید برای ‍‍%{address} ایجاد کنید."
+  create_a_new_module_6f31b0fe: "یک ماژول جدید ایجاد کنید"
+  create_a_new_user_for_address_7487e9c9: "یک کاربر جدید برای ‍‍%{address} ایجاد کنید"
   create_account_263ec6: "ایجاد حساب"
-  create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "ایجاد و اجرای آزمون‌ها و نظرسنجی‌های آنلاین ارزیابی شده ارزیابی نشده"
-  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: "هر تعداد مورد نیاز موضوع برای بحث، تکلیف برای نمره‌گذاری یا انجمن برای اطلاعات و ایده ها ایجاد کنید."
+  create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "ایجاد و اجرای آزمون‌ها و نظرسنجی‌های آنلاین نمره گذاری شده یا نمره گذاری نشده."
+  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
+      هر تعداد مورد نیاز موضوع بحث، تکلیف برای نمره‌گذاری یا
+      نشست برای اطلاعات و ایده های مشترک ایجاد کنید.
   create_assignment_68532ceb: "ایجاد تکلیف"
-  create_assignments_on_the_assignments_page_organiz_90c78fdc: "تکالیف را در صفحه تکالیف ایجاد کنید. تکالیفرا به گروه هایی مانند تکالیف خانه، کار در کلاس، مقالات، بحث ها و آزمون‌ها سازماندهی کنید. گروه‌های تکلیف می توانند وزن‌دار شوند."
-  create_content_for_your_course_500a7032: "برای درستان محتوا ایجاد کنید."
+  create_assignments_on_the_assignments_page_organiz_90c78fdc: "تکالیف را در صفحه تکالیف ایجاد کنید. تکالیف را به گروه هایی مانند تکالیف خانه، کار در کلاس، مقالات، بحث ها و آزمون‌ها سازماندهی کنید. گروه‌های تکلیف می توانند وزن‌دار شوند."
+  create_content_for_your_course_500a7032: "برای درس خود محتوا ایجاد کنید"
   create_criterion_6df4d4ad: "ایجاد معیار"
-  create_educational_resources_8219326e: "منابع آموزشی ایجاد کنید."
+  create_educational_resources_8219326e: "منابع آموزشی ایجاد کنید"
   create_failed_15d07ad4: "ایجاد انجام نشد"
   create_item_base: 
     there_was_an_error: "در هنگام ذخیره سازی \"%{title}\" خطایی رخ داد، لطفا دوباره سعی کنید."
@@ -5575,7 +5577,7 @@ fa:
     ungrded_survey: "نظرسنجی نمره گذاری نشده"
     url: "نشانی اینترنتی"
   create_new_e0946c49: "ایجاد جدید"
-  create_slots_71dbb2f8: "اسلات‌ها را ایجاد کنید."
+  create_slots_71dbb2f8: "ایجاد بازه ها"
   create_theme_based_on_40651ed3: "ایجاد زمینه بر اساس"
   create_users_view: 
     required: "لطفا چند نشانی پست الکترونیکی وارد کنید"
@@ -5585,16 +5587,16 @@ fa:
   created_by_b39b9c8b: "ایجاد شده توسط"
   created_by_sis_93fbb66b: "ایجاد شده_توسط_سامانه اطلاعات دانشجو"
   created_by_sis_e1449c31: "ایجاد شده توسط سامانه اطلاعات دانشجو"
-  created_created_bf5714b8: "%{created} ایجاد شد."
+  created_created_bf5714b8: "%{created} ایجاد شد"
   created_group_group_name_2097306b: "گروه %{group_name} ایجاد شد"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "ایجاد صدور مورد ارسالی به شما امکان می دهد فایل فشرده همه تکلیف های ارسالی خود را در همه درس های فعلی و قبلی خود بارگیری کنید. این فایل می تواند یک فایل بزرگ باشد و بنابراین ممکن است مدتی طول بکشد. می تواند از صفحه خارج شوید و بعدا برگردید."
   creative_commons_714a065f: "کریتیو کامنز"
   creative_commons_license_725584ae: "مجوز کریتیو کامنز:"
-  creative_commons_licenses_7d557d9a: "مجوزهای عمومی پدیدآورنده"
+  creative_commons_licenses_7d557d9a: "مجوزهای کریتیو کامنز"
   criterion_5f0b62f8: معیار
-  criterion_created_42669293: "معیار ایجاد شد."
+  criterion_created_42669293: "معیار ایجاد شد"
   criterion_long_description_e9a97247: "شرح طولانی معیار"
-  criterion_updated_36c0b3dc: "معیار به روز شد."
+  criterion_updated_36c0b3dc: "معیار به روز شد"
   crowdsourced: true
   crumbs: 
     access_report: "گزارش دسترسی"
@@ -5684,14 +5686,14 @@ fa:
   current_367624e9: فعلی
   current_courses_d5287d50: "درس های فعلی"
   current_grading_scheme_for_this_assignment_d525463e: "طرح نمره گذاری فعلی برای این درس"
-  current_letter_grade_50f4ebb1: "نمره برگه فعلی"
+  current_letter_grade_50f4ebb1: "نمره الفبایی فعلی"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "نمره تسلط فعلی: %{score} از %{mastery_points}"
   current_provider_6c3f7f96: "ارائه دهنده فعلی"
   current_score_6c81792: "نمره فعلی"
   current_score_74777363: "نمره فعلی"
   current_theme_62e5e8cf: "زمینه فعلی"
   current_total_67bf5f72: "مجموع فعلی:"
-  currently_assigned_to_tokenname_click_to_remove_5a853a84: "در حال حاضر به %{tokenName} مرتبط شده است، برای انتقال کلیک کنید."
+  currently_assigned_to_tokenname_click_to_remove_5a853a84: "در حال حاضر به %{tokenName} مرتبط شده است، برای حذف کلیک کنید"
   curve_grades_b7a75443: "روی منحنی بردن نمره ها"
   curve_grades_dialog: 
     average_score: "میانگین نمره"
@@ -5710,7 +5712,7 @@ fa:
   custom_link_details_35fd38fc: "جزئیات پیوند سفارشی"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "پیوندهای سفارشی برای درج در منوی فرعی گفتگوی راهنما"
   customize_help_link_62cd05eb: "سفارشی کردن پیوند راهنما"
-  customize_this_menu_efa72a9: "این منو را سفارشی کنید."
+  customize_this_menu_efa72a9: "این منو را سفارشی کنید"
   cutoff_score_74254c89: "نمره حذف کننده"
   cyan_c1d5f68a: "آبی تیره"
   d2l_display: Desire2Learn
@@ -5752,7 +5754,7 @@ fa:
       show_more: "نمایش بیشتر"
   dashboard_7f1dbf71: داشبورد
   dashboard_options_b240ed5a: "گزینه‌های داشبورد"
-  dashboard_view_d7d85969: "نمایش داشبورد"
+  dashboard_view_d7d85969: "نمای داشبورد"
   data_exports: "صدور داده ها"
   data_point_over_time_8d0a54cc: "بیش از وقت معین %{data_point}"
   data_set_identifier_data_set_id_c228b5df: "شناسه مجموعه داده: %{data_set_id}"
