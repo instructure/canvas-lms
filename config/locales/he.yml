@@ -4392,7 +4392,7 @@ he:
     batch_update_message: 
       one: "שיחה אחת עובדה"
       other: "%{count} שיחות עובדו"
-    not_participating: "המשתמש אינו משתתף בשיחה זו"
+    not_participating: "המשתמש אינו משתתף בדיון זה"
   conversations: 
     add_attachment: 
       titles: 
@@ -4425,7 +4425,7 @@ he:
     conversation_context: "משיחה עם"
     conversation_item: 
       has_attachments: "לדיון זה תצריף אחד או יותר"
-      has_media: "לשיחה זו הודעת מדיה אחת או יותר"
+      has_media: "לדיון זה הודעת מדיה אחת או יותר"
       inbox_actions: 
         action_star: "הוספת כוכבית"
         action_unstar: "הסרת כוכבית"
@@ -5442,7 +5442,7 @@ he:
   create_a_new_user_for_address_7487e9c9: "יצירת משתמש חדש עבור \"%{address}\""
   create_account_263ec6: "יצירת חשבון"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "יצירת וניהול בחנים וסקרים מקוונים, בין אם להערכה או בלעדיה"
-  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: "יצירת נושאי שיחה רבים ככל שנחוץ. כמטלות להערכה או כפורום לשיתוף רעיונות ומידע"
+  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: "יצירת נושאי דיון רבים ככל שנחוץ. כמטלות להערכה או כפורום לשיתוף רעיונות ומידע"
   create_assignment_68532ceb: "יצירת משימה"
   create_assignments_on_the_assignments_page_organiz_8838b18a: |-
       יצירת מטלות בדף המטלות. ארגון מטלות בקבוצות
@@ -6001,7 +6001,7 @@ he:
     atom_no_author: "אין עורך"
     default_user_name: "שם משתמש"
   discussion_group_category_locked: " אין להגדיר קטגוריות קבוצה ישירות במשימת דיון, אך ניתן להגדיר אותן בדיון עצמו."
-  discussion_submission_781d5d33: "הגשת שיחה"
+  discussion_submission_781d5d33: "הגשת דיון"
   discussion_topic: 
     atom_no_author: "אין עורכ/ת"
     default_title: "אין כותרת"
@@ -6011,7 +6011,7 @@ he:
   discussion_topic_menu_3d4684c6: "תפריט נושא דיון"
   discussion_topic_will_be_available_starting_at_46aa7477: "נושא הדיון יהיה זמין החל מ"
   discussion_topic_will_be_available_until_f5e3abc8: "נושא דיון יהיה זמין עד"
-  discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "נושא השיחה יופיע ברשימת המטלות של התלמיד לתאריך"
+  discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "נושא הדיון יופיע ברשימת המטלות של התלמיד לתאריך"
   discussion_topics: 
     assignment_details: 
       available_from: "זמין מתאריך"
@@ -6029,7 +6029,7 @@ he:
       other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} ההכרזות האלה?"
     confirm_delete_discussion_topic: 
       one: "האם את/ה בטוח/ה שרוצה לבטל את נושא השיחה הזה?"
-      other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} נושאי השיחה האלה?"
+      other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} נושאי דיון אלה?"
     create_new_crumb: "יצירת חדש"
     default_discussion_title: "אין כותרת"
     deleted_topic_notice: "הנושא בוטל"
@@ -6103,7 +6103,7 @@ he:
     error_draft_state_with_posts: "אין להגדיר נושא זה כטיוטה כיון שהוא כולל פרסומים"
     error_group_announcement: "אין אפשרות להשתמש בדיון קבוצתי להכרזה זו"
     error_group_change: "אין אפשרות לשנות קיבוץ בדיון שכולל תגובות"
-    error_todo_date_assignment: "תאריך לא ניתן להוספה אם נושא השיחה מוערך"
+    error_todo_date_assignment: "תאריך לא ניתן להוספה אם נושא הדיון מוערך"
     error_todo_date_unauthorized: "אין לך הרשאות להוסיף נושא זה לרשימת המטלות של התלמיד"
     flash: 
       fail: "הביטול של ההכרזה נכשל"
@@ -9095,8 +9095,8 @@ he:
   join_6cafecca: הצטרפות
   join_course_511e6cb3: "הצטרף/י ל %{course}"
   join_group_group_name_871a5e3f: "הצטרפות לקבוצה %{group_name}"
-  join_the_conversation_using_the_link_below_54ab1f0e: "הצטרפות לשיחה בעזרת הקישור שלהלן:."
-  join_the_conversation_using_this_link_link_9017499: "הצטרפות לשיחה בעזרת קישור זה: %{link}."
+  join_the_conversation_using_the_link_below_54ab1f0e: "הצטרפות לדיון בעזרת הקישור שלהלן:."
+  join_the_conversation_using_this_link_link_9017499: "הצטרפות לדיון בעזרת קישור זה: %{link}."
   joined_group_group_name_e3802c04: "הצטרפת לקבוצה %{group_name}"
   joining_81f8b6c9: מצטרפים
   jpg_png_or_gif_files_14e360d2: "קבצי jpg, png, או gif "
@@ -9704,19 +9704,19 @@ he:
     added_to_conversation: 
       email: 
         html: 
-          body: "%{user_name} הוסיף אותך לשיחה בקנבס"
-          link_text: "הצגת שיחה"
-          subject: "%{user_name} הוסיף אותך לשיחה בקנבס "
+          body: "%{user_name} הוסיף אותך לדיון בקנבס"
+          link_text: "הצגת דיון"
+          subject: "%{user_name} הוסיף אותך לדיון בקנבס "
           unknown_user: "משתמש לא מוכר"
-        subject: "%{user_name} הוסיף אותך לשיחה בקנבס "
+        subject: "%{user_name} הוסיף אותך לדיון בקנבס "
         unknown_user: "משתמש לא מוכר"
       sms: 
-        body: "%{user_name} הוסיף אותך לשיחה בקנבס "
+        body: "%{user_name} הוסיף אותך לדיון בקנבס "
         more_info: "פרטים נוספים ב- %{url}"
         unknown_user: "משתמש לא מוכר"
       summary: 
-        body: "%{user_name} הוסיף אותך לשיחה בקנבס "
-        subject: "%{user_name} הוסיף אותך לשיחה בקנבס "
+        body: "%{user_name} הוסיף אותך לדיון בקנבס "
+        subject: "%{user_name} הוסיף אותך לדיון בקנבס "
         unknown_user: "משתמש לא מוכר"
       twitter: 
         tweet: "התראת קנבס - התווספת לדיון ע\"י %{user_name}."
@@ -10199,9 +10199,25 @@ he:
       summary: 
         body: "סינכרון של תבנית הדוגמה: שינויים נונכרנו עם %{name}."
         subject: "סינכרון של תבנית הדוגמה:: %{name}"
+      twitter: 
+        tweet: "אתראת קנבס - שינויי קורס תבנית דוגמה סונכרנו עם  %{name}"
     blueprint_sync_complete: 
+      email: 
+        body: "שינויי קורס תבנית דוגמה שלך %{name}, סונכרנו עם כל הקורסים הקשורים ."
+        details_link: "מידע נוסף: %{link}"
+        html: 
+          body: "שינויי קורס תבנית דוגמה שלך %{name}, סונכרנו עם כל הקורסים הקשורים ."
+          details_link: "מידע נוסף"
+          subject: "הסינכרון של תבנית הדוגמה נסתים: %{name}"
+        subject: "הסינכרון של תבנית הדוגמה נסתים: %{name}"
       sms: 
+        body: "שינויי תבנית קורס לדוגמה סונכרנו מתוך %{name}."
         link_message: "פרטים נוספים ב- %{url} "
+      summary: 
+        body: "סינכרון תבנית לדוגמה: השינויים נסונכרונו מתוך %{name}."
+        subject: "הסינכרון של תבנית הדוגמה נסתים: %{name}"
+      twitter: 
+        tweet: "אתראת קנבס - שינויי קורס תבנית דוגמה סונכרנו מתוך%{name}"
     collaboration_invitation: 
       email: 
         body: |-
@@ -10790,8 +10806,8 @@ he:
         body: "%{user} פרסם הערה חדשה בשרשור  %{discussion_topic}  של %{course}:"
         html: 
           body: "%{user} פרסם הערה חדשה בשרשור  %{discussion_topic}  של %{course}: "
-          discussion_entry_reply_message: "ניתן להצטרף לדיון בעזרת הקישור שבהמשך, או להעיר ע\"י תגובה להודעה זו."
-          link: "הקלק/י כאן כדי להצטרף לשיחה"
+          discussion_entry_reply_message: "הצטרפות לדיון בעזרת הקישור שלהלן, או תגובה כתשובה להערה זו. אם מורשה, וברצונך לכלול תצריף, יש להתחבר לקנבס ולהגיב להכרזה."
+          link: "הקלק/י כאן כדי להצטרף לדיון"
           subject: "הערה חדשה עבור %{discussion_topic}: %{course}"
         subject: "הערה חדשה עבור %{discussion_topic}: %{course} "
       sms: 
@@ -10804,12 +10820,12 @@ he:
     new_discussion_topic: 
       email: 
         body: "החל דיון חדש שיכול לענין אותך:"
-        details: "הצטרפות לשיחה כאן:"
+        details: "הצטרפות לדיון כאן:"
         html: 
           attached_file: "קובץ מצורף "
           body: "החל דיון חדש שיכול לענין אותך:"
           download: "הורדה "
-          link: "הקלק/י כאן כדי להצטרף לשיחה"
+          link: "הקלק/י כאן כדי להצטרף לדיון"
           subject: "דיון חדש -  %{discussion_topic}: %{course}"
         labels: 
           file_included: "קבצים שנכללו "
@@ -11266,6 +11282,9 @@ he:
         subject: "הקלטת שיחת הועידה מוכנה: %{name}"
       twitter: 
         tweet: "התראת קנבס - הקלטה מוכנה: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: "ההודעה בוטלה!"
+    other: "ההודעה בוטלה!"
   mexico_52_60d635c7: "מכסיקו (+52)"
   mexico_b2d7a271: מקסיקו
   mgp_grade_export_d29b471f: "ייצוא ציונים ל MPG"
@@ -11292,18 +11311,29 @@ he:
     webct: 
       course_not_found: "קורס ה Blackboard לא נמצא"
     wiki_page_type: "דף וויקי"
+  migration_in_progress_6f0ed4f9: "הגירת נתונים בביצוע"
   migration_issues: 
     errors: 
       valid_workflow_state: "יש לשגר אות תקינות של זרימת התהליך."
   migration_selection_5f1c5f55: "בחירת תהליך הגירה"
   migration_successful_f1811ef3: "ההגירה הצליחה"
+  min_e10fe94c: מינימום
   mini_calendar_fe8003e4: מיני-יומן
   minimize_global_navigation_2d839351: "צמצום הניווט המרכזי"
   minimum_score_e6d1c134: "ציון מינימלי"
   minutes_4aee5a41: דקות
   minutes_per_slot_5b7169e5: "דקות לחלון הקצאה"
   missing_1a256b3b: חסר
+  missing_d59852a7: חסר
+  missing_eaddacbd: חסר
   missing_percent_94534638: "חסר: %{percent}"
+  missing_policies_4f195e0b: "חסרה מדיניות"
+  missing_required_values_missing_values_f3be2ff8: "חסרים ערכי חובה: %{missing_values}"
+  missing_submission_ec204c33: "חסרה הגשה"
+  missing_submission_grade_ed2756d1: "חסרה הערכת הגשה"
+  missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: "הערכת הגשה חסרה צריכה להיות בין 0 ל 100"
+  missing_submission_grade_must_be_numeric_1a142ef2: "הערכת הגשה חסרה צריכה להיות נומרית"
+  missing_submission_grade_percent_34428feb: "הערכת הגשה חסרה ציון באחוזים"
   mobile_app_css_file_abbf06bd: "קובץ CSS עבור אפליקצית סמארטפון"
   mobile_app_javascript_file_faea55d5: "קובץ  JavaScript לאפליקצית סמארטפון"
   mobile_css_file_b86ded7f: "קובץ CSS לסמארטפון"
@@ -11325,8 +11355,11 @@ he:
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "אין אפשרות להגדיר הערכה מבוקרת למשימות שעברו ביקורת עמיתים"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "אין אפשרות להפעיל הערכה מבוקרת עבור משימות ללא הערכה"
   moderator_49b9f2e1: מפקח
+  moderator_sortorder_18063692: "מנחה%{sortOrder}"
   module_90d9fd32: מודול
   module_completed_50c50762: "המודול הושלם"
+  module_filter_63b17d11: "מסנן מודולים"
+  module_first_to_last_6921f3ec: "מודולים - מראשון לאחרון"
   module_in_progress_fa600662: "המודול בתהליך"
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "פריטי המודול הושלמו לאחר השגת ציון של לפחות %{score}"
   module_item_has_been_viewed_and_is_complete_6d180117: "פריטי המודול נבדקו והוא הושלם"
@@ -11343,6 +11376,7 @@ he:
     page: דף
     quiz: בוחן
     sub_header: "כותרת משנה"
+  module_last_to_first_8cdb7a8e: "מודולים - אחרון עד ראשון"
   module_locked_f6a7ea9d: "מודול נעול"
   module_menu_3201af4e: "תפריט מודול"
   module_module_name_was_successfully_deleted_fc9e9d47: "מודול %{module_name} בוטל בהצלחה"
@@ -11406,9 +11440,11 @@ he:
   moodle_dropdown_warning_title: "שאלות מרובות רשימות נפתחות בבנק שאלות זה. יתכן ויובא שלא כהלכה"
   moodle_formula_many_warning_title: "יש %{count} שאלות נוסחה בבנק שאלות זה אשר יהיה צורך לייצר מחדש את התשובות האפשריות שלהן"
   moodle_formula_warning_title: " יהיה צורך לייצר מחדש תשובות אפשריות עבור שאלות נוסחה"
+  more_cf9cc661: עוד
   more_courses_5ebbe998: "קורסים נוספים"
   more_info_at_course_name_56dc8c10: "מידע נוסף ב %{course_name}"
   more_information_3dfb76b5: "מידע נוסף"
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: "עוד תוצאות נוספו בתחתית הדף "
   more_than_999_submissions_need_grading_bc087dd0: "יותר מ 999 הגשות ממתינות להערכה"
   more_than_9_submissions_need_grading_30157d49: "יותר מ 9 הגשות ממתינות להערכה"
   more_than_a19b440: "%{more_than}+"
@@ -11417,8 +11453,13 @@ he:
   most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "התוצאות המאוחרות יותר נספרות כ %{calculation_int}% של שקלול ההתמחות, ממוצע של כל שאר התוצאות נספר כ %{remainder}% מהשקלול. אם יש רק תוצאה אחת, ציון יחיד זה יהיה הקובע."
   most_recent_score_13a87e8c: "ציון מעודכן ביותר"
   move_abf00365: העברה
+  move_assignment_6f890f64: "העברת מטלה"
+  move_assignment_contents_245c61bb: "העברת תוכן מטלה"
   move_assignment_group_46e09fc3: "העברת קבוצת משימה"
   move_assignment_name_aa253f26: "העברת משימה %{name}"
+  move_contents_29713356: "העברת תוכן..."
+  move_contents_cefe9e92: "העברת תוכן"
+  move_contents_into_f3e4fd9d: "העברת המידע על התכנים"
   move_dialog: 
     cancel: ביטול
     save: שמירה
@@ -11426,29 +11467,41 @@ he:
     where_to_move: "לאן היית רוצה להעביר את *%{name}*?"
   move_dialog_select: 
     move_to_end: "-- בתחתית --"
+  move_discussion_9ff5b2d1: "העברת דיון"
+  move_group_3dd7f76e: "העברת קבוצה"
+  move_group_77ae285d: "העברת קבוצה..."
   move_item_e94a8103: "העברת פריט"
+  move_item_failed_8e4c1db6: "העברת פריט נכשלה"
   move_left_8c364375: "העברה שמאלה"
+  move_module_346b8112: "העברת מודול..."
+  move_module_90e6927e: "העברת מודול"
   move_module_after_31fc870b: "העברת מודול אחרי"
   move_module_before_32153dc8: "העברת מודול לפני"
+  move_module_contents_74fa15d5: "העברת תכני מודול"
   move_module_item_77754119: "העברת מודול/פריט"
   move_module_item_after_bbcfe2d6: "העברת פריט מודול אחרי"
   move_module_item_before_13e940eb: "העברת פריט מודול לפני"
+  move_module_item_f525d6c8: "העברת פריט מודול"
+  move_navigation_item_f034cd8a: "העברת פריט ניווט"
   move_outcome_ce497e6c: "העברה של תוצאות הלמידה"
   move_outcome_group_cfa1a505: "העברה של קבוצת תוצאות למידה"
   move_page_e25b123d: "העברת דף"
   move_right_e4ddc6bf: "העברה ימינה"
   move_section_d3866941: "העברת הקבצה"
+  move_student_49d6bc9d: "העברת תלמיד"
   move_text_down_7176acd4: "העברת %{text} כלפי מטה"
   move_text_up_91fb4241: "העברת %{text} כלפי מעלה"
   move_this_item_41145b2d: "העברת פריט זה"
+  move_this_module_4a262aaf: "העברת מודול זה"
   move_this_page_4a05c813: "העברת דף זה"
   move_this_section_890bee38: "העברת הקבצה זו"
+  move_to_25d7ef11: "העבר ל"
   move_to_9b91c6e0: "העברה אל..."
   move_to_dde1a5e1: "העברה אל..."
   move_to_end_c6bfbcf5: "העברה לסוף"
   move_to_end_fef2fa15: "העברה לתחתית"
   move_to_front_7eae2e90: "העברה להתחלה"
-  move_to_front_bf6f0194: "העברה להתחלה"
+  move_to_front_bf6f0194: "מעבר להתחלה"
   move_to_the_beginning_636b342c: "העברה להתחלה"
   move_to_the_end_bc05abf6: "העברה לסוף"
   moving_a4d552df: העברה...
@@ -11663,8 +11716,8 @@ he:
   notice_inactive_student_bcc4248a: "שימו לב: תלמיד לא פעיל"
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "שימו לב: תקופת הערכה נסגרה לתלמיד זה"
   notification: 
-    added_to_conversation_description: "נתווספת לשיחה"
-    added_to_conversation_display: "התווספות לשיחה"
+    added_to_conversation_description: "נתווספת לדיון"
+    added_to_conversation_display: "התווספות לדיון"
     all_submissions_description: |-
         *מדריכים ומנהלי מערכת בלבד*
         
@@ -11713,10 +11766,10 @@ he:
       reminder: תזכורת
       student_appointment_signups: "הרשמות לפגישת תלמידים"
       submission_comment: "הערת הגשה"
-    conversation_created_description: "יצרת שיחה"
+    conversation_created_description: "יצרת דיון"
     conversation_created_display: "שיחות שיצרתי"
     conversation_message_description: "הודעות דוא\"ל חדשות"
-    conversation_message_display: "הודעת שיחה"
+    conversation_message_display: "הודעת דיון"
     course_content_description: |-
         שינוי לתוכן הקורס:
         
@@ -11790,7 +11843,7 @@ he:
       confirm_sms_communication_channel: "אישור ערוץ תקשורת מסרונים"
       content_export_failed: "ייצוא תוכן נכשל"
       content_export_finished: "ייצוא תוכן נסתיים"
-      conversation_created: "נוצרה שיחה"
+      conversation_created: "נוצר דיון "
       conversation_message: "הודעת דיון"
       enrollment_accepted: "הרשמה נתקבלה"
       enrollment_invitation: "הזמנה להרשמה"
@@ -12953,7 +13006,7 @@ he:
         change_password: "שינוי סיסמה"
         confirm_password: "אישור סיסמה"
         default_email: "דוא\"ל ברירת מחדל"
-        disable_inbox: "הפסקת הפעלת סימנית ההודעות שטרם נקראו בתיבת הדואר של שיחה זו, ושיגור מיידי של כל הודעת שיחה והתראות דרך דוא\"ל."
+        disable_inbox: "הפסקת הפעלת סימנית ההודעות שטרם נקראו בתיבת הדואר של דיון זה, ושיגור מיידי של כל הודעת דיון והתראות דרך דוא\"ל."
         expires_at: "פג תוקף "
         headers: 
           approved_integrations: "אינטגרציות שאושרו"
@@ -16723,7 +16776,7 @@ he:
       תודה.
       תמיכת קנבס
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
-      ההודעה עם הכותרת "%{subject}"  לא הגיעה ליעדה כיון שנושא השיחה בוטל. אם את/ה מנסה ליצור קשר עם מישהו דרך קנבס תוכל/י לנסות להתחבר לחשבונך ולשלוח להם הודעה תוך שימוש בתיבת הדוא"ל הנכנס.
+      ההודעה עם הכותרת "%{subject}"  לא הגיעה ליעדה כיון שנושא הדיון בוטל. אם את/ה מנסה ליצור קשר עם מישהו דרך קנבס תוכל/י לנסות להתחבר לחשבונך ולשלוח להם הודעה תוך שימוש בתיבת הדוא"ל הנכנס.
       
       תודה,
       תמיכת קנבס
@@ -17405,7 +17458,7 @@ he:
       updating_user_details: "עדכון פרטי משתמש..."
     notices: 
       image_reported: "תמונה זו דווחה"
-  user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} הוסיף אותך כרגע לשיחת קנבס. להצגת השיחה יש להקליק על הקישור הזה: %{link}."
+  user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} הוסיף אותך כרגע לדיון קנבס. להצגת השיחה יש להקליק על הקישור הזה: %{link}."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} שלח לך זה עתה הודעה דרך קנבס."
   user_name_successfully_added_79af8365: "%{user_name} נתווסף בהצלחה!"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, תצטרך/י  *להתחבר* לפני שתוכל/י לעיין בדף הזה."
