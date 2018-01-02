@@ -703,30 +703,55 @@ test('the Assignment Muting dialog has focus when it is invoked', function () {
   dialogCloseButton.click();
 });
 
-QUnit.module('AssignmentColumnHeader: non-standard assignment', {
-  setup () {
-    this.props = defaultProps();
-  },
+QUnit.module('AssignmentColumnHeader: non-standard assignment', function (hooks) {
+  let props;
+  let wrapper;
 
-  teardown () {
-    this.wrapper.unmount();
-  }
-});
+  hooks.beforeEach(function () {
+    props = defaultProps();
+  });
 
-test('renders a muted status when the assignment is muted', function () {
-  this.props.assignment.muted = true;
-  this.wrapper = mountComponent(this.props);
-  const secondaryDetail = this.wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
-  ok(secondaryDetail.text().includes('Muted'));
-});
+  hooks.afterEach(function () {
+    wrapper.unmount();
+  });
 
-test('renders 0 points possible when the assignment has no possible points', function () {
-  this.props.assignment.pointsPossible = undefined;
-  this.wrapper = mountComponent(this.props);
-  const pointsPossible = this.wrapper.find('.assignment-points-possible');
+  test('renders a muted status when the assignment is muted', function () {
+    props.assignment.muted = true;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    ok(secondaryDetail.text().includes('Muted'));
+  });
 
-  equal(pointsPossible.length, 1);
-  equal(pointsPossible.text().trim(), 'Out of 0');
+  test('renders an unpublished status when the assignment is unpublished', function () {
+    props.assignment.published = false;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    strictEqual(secondaryDetail.text(), 'Unpublished');
+  });
+
+  test('renders an unpublished status when the assignment is unpublished and muted', function () {
+    props.assignment.muted = true;
+    props.assignment.published = false;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    strictEqual(secondaryDetail.text(), 'Unpublished');
+  });
+
+  test('does not render points possible when the assignment is unpublished', function () {
+    props.assignment.published = false;
+    wrapper = mountComponent(props);
+    const pointsPossible = wrapper.find('.assignment-points-possible');
+    strictEqual(pointsPossible.length, 0);
+  });
+
+  test('renders 0 points possible when the assignment has no possible points', function () {
+    props.assignment.pointsPossible = undefined;
+    wrapper = mountComponent(props);
+    const pointsPossible = wrapper.find('.assignment-points-possible');
+
+    equal(pointsPossible.length, 1);
+    equal(pointsPossible.text().trim(), 'Out of 0');
+  });
 });
 
 QUnit.module('AssignmentColumnHeader: Set Default Grade Action', {

@@ -36,6 +36,48 @@ import I18n from 'i18n!gradebook';
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader';
 
+function SecondaryDetailLine (props) {
+  if (!props.assignment.published) {
+    return (
+      <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
+        <Text color="error" size="x-small" transform="uppercase" weight="bold">
+          { I18n.t('Unpublished') }
+        </Text>
+      </span>
+    );
+  }
+
+  const pointsPossible = I18n.n(props.assignment.pointsPossible || 0);
+  return (
+    <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
+      <span className="assignment-points-possible">
+        <Text weight="normal" fontStyle="normal" size="x-small">
+          { I18n.t('Out of %{pointsPossible}', { pointsPossible }) }
+        </Text>
+      </span>
+
+      {
+        props.assignment.muted && (
+          <span>
+            &nbsp;
+            <Text size="x-small" transform="uppercase" weight="bold">
+              { I18n.t('Muted') }
+            </Text>
+          </span>
+        )
+      }
+    </span>
+  );
+}
+
+SecondaryDetailLine.propTypes = {
+  assignment: shape({
+    muted: bool.isRequired,
+    pointsPossible: number,
+    published: bool.isRequired
+  }).isRequired
+};
+
 export default class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
     ...ColumnHeader.propTypes,
@@ -170,12 +212,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         </Link>
       </span>
     );
-  }
-
-  renderPointsPossible () {
-    const pointsPossible = I18n.n(this.props.assignment.pointsPossible || 0);
-
-    return I18n.t('Out of %{pointsPossible}', { pointsPossible });
   }
 
   renderTrigger () {
@@ -351,24 +387,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
                     { this.renderAssignmentLink() }
                   </span>
 
-                  <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
-                    <span className="assignment-points-possible">
-                      <Text weight="normal" fontStyle="normal" size="x-small">
-                        { this.renderPointsPossible() }
-                      </Text>
-                    </span>
-
-                    {
-                      this.props.assignment.muted && (
-                        <span>
-                          &nbsp;
-                          <Text size="x-small" transform="uppercase" weight="bold">
-                            { I18n.t('Muted') }
-                          </Text>
-                        </span>
-                      )
-                    }
-                  </span>
+                  <SecondaryDetailLine assignment={this.props.assignment} />
                 </span>
               </GridCol>
 
