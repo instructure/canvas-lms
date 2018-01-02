@@ -99,8 +99,11 @@
               <td>
                   <div id="domains-form-container">
                   <%
-                    domains = [] 
-                    domains := JSON.parse(@account.settings[:domains]) 
+                    begin
+                      domains = JSON.parse(@account.settings[:domains])
+                    rescue
+                      domains = []
+                    end
                   %>
                   <% if domains.length > 0 -%>
                       <%  domains.each do |domain| -%>
@@ -117,7 +120,7 @@
                   <% end -%>
                   </div>
                   <div>
-                    <a id="add-domain-input" class="Button Button--secondary">Add Domain</a>
+                    <a id="add-domain-input" class="Button Button--secondary">Add Another Domain</a>
                   </div>
                   <br>
               </td>
