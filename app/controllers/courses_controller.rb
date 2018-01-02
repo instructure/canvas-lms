@@ -2584,6 +2584,9 @@ class CoursesController < ApplicationController
   def reset_content
     get_context
     return unless authorized_action(@context, @current_user, :reset_content)
+    if MasterCourses::MasterTemplate.is_master_course?(@context)
+      return render :json => { :message => 'cannot reset_content on a blueprint course' }, :status => :bad_request
+    end
     @new_course = @context.reset_content
     Auditors::Course.record_reset(@context, @new_course, @current_user, source: api_request? ? :api : :manual)
     if api_request?

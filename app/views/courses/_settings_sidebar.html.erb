@@ -75,7 +75,7 @@
     <% end %>
   <% end %>
 
-  <% if can_do(@context, @current_user, :reset_content) %>
+  <% if can_do(@context, @current_user, :reset_content) && !MasterCourses::MasterTemplate.is_master_course?(@context) %>
     <%= link_to context_url(@context, :course_reset_url), :class => ' Button Button--link Button--link--has-divider Button--course-settings reset_course_content_button' do %>
       <i class="icon-reset"></i><%= t('links.reset', 'Reset Course Content') %>
     <% end %>

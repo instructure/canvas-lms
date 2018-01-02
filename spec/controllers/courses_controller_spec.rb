@@ -2080,6 +2080,13 @@ describe CoursesController do
       expect(@course.reload).to be_available
     end
 
+    it "does not allow resetting blueprint courses" do
+      MasterCourses::MasterTemplate.set_as_master_course(@course)
+      user_session(@teacher)
+      post 'reset_content', params: {:course_id => @course.id}
+      expect(response).to be_bad_request
+    end
+
     it "should log reset audit event" do
       user_session(@teacher)
       expect(Auditors::Course).to receive(:record_reset).once.
