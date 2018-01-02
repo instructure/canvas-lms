@@ -56,7 +56,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
           next
         else
           options[:lock_nonce] = lock_nonce
-          return nil
+          break
         end
       end
       entry
