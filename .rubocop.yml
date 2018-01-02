@@ -95,12 +95,12 @@ Style/MethodCallWithoutArgsParentheses:
   Enabled: false
 Style/MethodCallWithArgsParentheses:
   Enabled: false
-Style/DotPosition:
+Layout/DotPosition:
   Enabled: true
   EnforcedStyle: trailing
-Style/AlignHash:
+Layout/AlignHash:
   Enabled: false
-Style/AlignParameters:
+Layout/AlignParameters:
   Enabled: false
 Style/Lambda:
   Enabled: false
@@ -112,7 +112,7 @@ Style/ZeroLengthPredicate:
   Enabled: false
 Style/NumericPredicate:
   Enabled: false
-Style/VariableNumber:
+Naming/VariableNumber:
   Enabled: false
 Style/Dir:
   Enabled: false
@@ -179,9 +179,9 @@ Style/AndOr:
   EnforcedStyle: conditionals
 Style/RescueModifier:
   Severity: warning
-Style/MultilineMethodCallIndentation:
+Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
-Style/IndentArray:
+Layout/IndentArray:
   EnforcedStyle: consistent
 
 # these don't make sense pre-Rails 4
@@ -230,5 +230,5 @@ RSpec/MultipleExpectations:
   Enabled: false
 RSpec/ScatteredSetup:
   Enabled: false
-Lint/RescueWithoutErrorClass:
+Style/RescueStandardError:
   Enabled: false
