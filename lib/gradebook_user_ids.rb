@@ -72,11 +72,29 @@ class GradebookUserIds
   end
 
   def sort_by_total_grade
-    students.
-      left_joins(enrollments: :scores).
-      where(scores: { grading_period_id: grading_period_id }).
+    score_scope = grading_period_id ? "scores.grading_period_id=#{grading_period_id}" : "scores.course_score IS TRUE"
+
+    # In this query we need to jump through enrollments to go see if
+    # there are scores for the user. Because of some AR internal
+    # stuff, if we did students.joins("LEFT JOIN scores ON
+    # enrollments.id=scores.enrollment_id AND ...") as you'd expect,
+    # it plops the new join before the enrollments join and the
+    # database gets angry because it doesn't know what what this
+    # "enrollments" we're querying against is. Because of this, we
+    # have to WET up the method and hand do the enrollment join
+    # here. Without doing the score conditions in the join, we lose
+    # data, so it has to be this way... For example, we might lose
+    # concluded enrollments who don't have a Score.
+    #
+    # That is a super long way of saying, make sure this stays in sync
+    # with what happens in the students method below in reguards to
+    # enrollments and enrollments scoping.
+    User.joins("LEFT JOIN #{Enrollment.quoted_table_name} on users.id=enrollments.user_id
+                LEFT JOIN #{Score.quoted_table_name} ON scores.enrollment_id=enrollments.id AND
+                scores.workflow_state='active' AND #{score_scope}").
+      merge(student_enrollments_scope).
       order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
-      order("#{Score.table_name}.current_score #{sort_direction} NULLS LAST").
+      order("#{Score.table_name}.unposted_current_score #{sort_direction} NULLS LAST").
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).uniq
   end

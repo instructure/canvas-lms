@@ -5545,18 +5545,6 @@ test('excludes "sort rows by" settings when sorting by an assignment group', fun
   notOk('sort_rows_by_direction' in requestData.gradebook_settings, 'request excludes "sort_rows_by_direction"');
 });
 
-test('excludes "sort rows by" settings when sorting by total grade', function () {
-  // This is temporary until the Gradebook `user_ids` supports this sorting.
-  const ajaxJSONStub = this.stub($, 'ajaxJSON');
-  const gradebook = createGradebook();
-  gradebook.gridDisplaySettings.sortRowsBy = { columnId: 'total_grade', settingKey: 'grade', direction: 'direction' };
-  gradebook.saveSettings();
-  const requestData = ajaxJSONStub.firstCall.args[2];
-  notOk('sort_rows_by_column_id' in requestData.gradebook_settings, 'request excludes "sort_rows_by_column_id"');
-  notOk('sort_rows_by_setting_key' in requestData.gradebook_settings, 'request excludes "sort_rows_by_setting_key"');
-  notOk('sort_rows_by_direction' in requestData.gradebook_settings, 'request excludes "sort_rows_by_direction"');
-});
-
 QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks) {
   let gradebook;
 

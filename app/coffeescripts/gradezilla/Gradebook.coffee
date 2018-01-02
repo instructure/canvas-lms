@@ -1728,10 +1728,9 @@ define [
           sort_rows_by_direction: sortRowsBy.direction
           colors: colors
 
-      # TODO: include the "sort rows by" setting for Assignment Groups and Total
-      # Grade when fully supported by the Gradebook `user_ids` endpoint.
+      # TODO: include the "sort rows by" setting for Assignment Groups
+      # when fully supported by the Gradebook `user_ids` endpoint.
       sortingByIncompleteSortFeature = data.gradebook_settings.sort_rows_by_column_id.match(/^assignment_group_/)
-      sortingByIncompleteSortFeature ||= data.gradebook_settings.sort_rows_by_column_id == 'total_grade'
       if sortingByIncompleteSortFeature
         delete data.gradebook_settings.sort_rows_by_column_id
         delete data.gradebook_settings.sort_rows_by_setting_key

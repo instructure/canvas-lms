@@ -607,7 +607,10 @@ describe GradebookUserIds do
     before(:once) do
       @now = Time.zone.now
       @assignment1 = @course.assignments.create!(points_possible: 10, due_at: 1.month.from_now(@now))
-      @assignment2 = @course.assignments.create!(points_possible: 100, due_at: 3.months.from_now(@now))
+      second_assignment_group = @course.assignment_groups.create(name: 'second group')
+      @assignment2 = @course.assignments.create!(
+        points_possible: 100, due_at: 3.months.from_now(@now), assignment_group: second_assignment_group
+      )
 
       @assignment1.grade_student(@student1, grade: 1, grader: @teacher)
       @assignment1.grade_student(@student2, grade: 10, grader: @teacher)
