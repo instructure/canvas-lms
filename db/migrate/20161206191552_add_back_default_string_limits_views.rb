@@ -39,6 +39,8 @@ class AddBackDefaultStringLimitsViews < ActiveRecord::Migration[4.2]
     add_string_limit_if_missing :quizzes, :context_type
     add_string_limit_if_missing :quizzes, :workflow_state
 
+    add_string_limit_if_missing :submissions, :workflow_state
+
     readd_override_views
   end
 

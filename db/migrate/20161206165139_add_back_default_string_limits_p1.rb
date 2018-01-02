@@ -174,7 +174,6 @@ class AddBackDefaultStringLimitsP1 < ActiveRecord::Migration[4.2]
     add_string_limit_if_missing :submissions, :url
     add_string_limit_if_missing :submissions, :grade
     add_string_limit_if_missing :submissions, :submission_type
-    add_string_limit_if_missing :submissions, :workflow_state
     add_string_limit_if_missing :submissions, :published_grade
     add_string_limit_if_missing :submissions, :media_comment_id
     add_string_limit_if_missing :submissions, :media_comment_type
