@@ -78,7 +78,7 @@ module Api::V1::Attachment
         url = thumbnail_image_url(attachment)
       else
         h = { :download => '1', :download_frd => '1' }
-        h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && respond_to?(:in_app?, true) && in_app?
+        h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
         url = file_download_url(attachment, h.merge(url_options))
       end
     else
