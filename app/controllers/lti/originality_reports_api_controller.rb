@@ -308,10 +308,8 @@ module Lti
 
     def lti_link_params
       @_lti_link_params ||= begin
-        tool_settings = params.require(:originality_report).permit(lti_link_attributes).to_unsafe_h
-
-        if tool_settings&.dig('tool_setting', 'resource_type_code')
-          tool_settings['tool_setting'].merge({
+        if lti_link_settings&.dig('tool_setting', 'resource_type_code')
+          lti_link_settings['tool_setting'].merge({
             id: @report&.lti_link&.id,
             product_code: tool_proxy.product_family.product_code,
             vendor_code: tool_proxy.product_family.vendor_code
@@ -323,6 +321,18 @@ module Lti
           }
         end
       end
+    end
+
+    def lti_link_settings
+      @_lti_link_settings ||= begin
+        link_attributes = params.require(:originality_report).permit(lti_link_attributes).to_unsafe_h
+        link_attributes = current_lti_link if link_attributes.blank?
+        link_attributes
+      end
+    end
+
+    def current_lti_link
+      @report&.lti_link&.as_json(only: [:resource_url, :resource_type_code])&.tap { |v| v['tool_setting'] = v.delete 'link' }
     end
 
     def attachment_required?

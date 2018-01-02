@@ -306,7 +306,6 @@ module Lti
 
       it "does not update originality score if out of range" do
         put @endpoints[:update], params: {originality_report: {originality_score: 150}}, headers: request_headers
-
         expect(response.status).to eq 400
         expect(JSON.parse(response.body)['errors'].key? 'originality_score').to be_truthy
       end
@@ -348,7 +347,7 @@ module Lti
         expect(tool_setting.resource_url).to eq "http://www.lti-test.com"
       end
 
-      it "removes the lti link when tool_setting is not supplied" do
+      it "does not remove the lti link when tool_setting is not supplied" do
         put @endpoints[:update],
             params: {
               originality_report: {
@@ -370,10 +369,37 @@ module Lti
             },
             headers: request_headers
         expect(response).to be_success
+        expect(Lti::Link.find_by(id: lti_link_id)).to eq OriginalityReport.find(@report.id).lti_link
+      end
+
+      it "removes the lti link when tool_setting is null" do
+        put @endpoints[:update],
+            params: {
+              originality_report: {
+                originality_score: 5,
+                tool_setting: {
+                  resource_url: 'http://www.lti-test.com',
+                  resource_type_code: 'code'
+                }
+              }
+            },
+            headers: request_headers
+
+        lti_link_id = OriginalityReport.find(@report.id).lti_link.id
+        expect(Lti::Link.find_by(id: lti_link_id)).not_to be_nil
+
+        put @endpoints[:update],
+            params: {
+              originality_report: {
+                originality_score: nil,
+                tool_setting: {
+                  resource_type_code: nil
+                }
+              }
+            },
+            headers: request_headers
+
         expect(Lti::Link.find_by(id: lti_link_id)).to be_nil
-        report = OriginalityReport.find(@report.id)
-        expect(report.lti_link).to be_nil
-        expect(report.originality_score).to be_nil
       end
 
       it "requires the plagiarism feature flag" do
