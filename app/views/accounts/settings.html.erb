@@ -92,6 +92,53 @@
               <td><%= f.blabel :name, :en => "Account Name" %></td>
               <td><%= f.text_field :name, :class => 'same-width-as-select' %></td>
             </tr>
+            <tr>
+              <td>
+                <label>Domain Name</label>
+              </td>
+              <td>
+                  <div id="domains-form-container">
+                  <%
+                    begin
+                      domains = JSON.parse(@account.settings[:domains])
+                    rescue
+                      domains = []
+                    end
+                  %>
+                  <% if domains.length > 0 -%>
+                      <%  domains.each do |domain| -%>
+                        <% unless domain == "" -%>
+                          <div>
+                            <input name="account[settings][domains][]" type="text" value="<%= domain %>" class="same-width-as-select"/>
+                          </div>
+                        <% end -%>
+                      <% end -%>
+                  <% else %>
+                    <div>
+                      <input name="account[settings][domains][]" type="text" class="same-width-as-select"/>
+                    </div>
+                  <% end -%>
+                  </div>
+                  <div>
+                    <a id="add-domain-input" class="Button Button--secondary">Add Another Domain</a>
+                  </div>
+                  <br>
+              </td>
+            </tr>
+            <script type="text/javascript">
+                function htmlToElement(html) {
+                    var template = document.createElement('template');
+                    template.innerHTML = html;
+                    return template.content.firstChild;
+                }
+                function addInput(){  
+                  let input = '<div><input name="account[settings][domains][]" type="text" class="same-width-as-select"/></div>';
+                  let domainInput = htmlToElement(input)
+                  document.getElementById("domains-form-container").appendChild(domainInput)
+                }
+                let el = document.getElementById("add-domain-input");
+                el.addEventListener('click', addInput, false);
+            </script>
             <% if !@account.root_account? && (@context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis)) %>
               <tr>
                 <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
