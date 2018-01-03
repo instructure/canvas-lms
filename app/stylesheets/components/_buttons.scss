@@ -246,15 +246,15 @@ input[type="button"] {
   @if $use_high_contrast {
     @include canvas-button($ic-brand-primary, $ic-color-light);
   } @else {
-    background: $sm-blue-6;
+    background: $sm-blue-8;
     color: $sm-base-1;
-    border: 2px solid $sm-blue-6;
+    border: 2px solid $sm-blue-8;
     cursor: pointer;
 
     &:hover{
-      background: $sm-blue-8;
+      background: $sm-blue-10;
       color: $sm-base-1;
-      border: 2px solid $sm-blue-8;
+      border: 2px solid $sm-blue-10;
     }
 }
 }
@@ -280,14 +280,14 @@ input[type="button"] {
     @include canvas-button($ic-color-dark, $ic-color-light);
   } @else {
     background: transparent;
-    color: $sm-blue-6;
-    border: 2px solid $sm-blue-6;
+    color: $sm-blue-8;
+    border: 2px solid $sm-blue-8;
     cursor: pointer;
 
     &:hover{
-      background: $sm-blue-6;
+      background: $sm-blue-8;
       color: $sm-base-1;
-      border: 2px solid $sm-blue-6;
+      border: 2px solid $sm-blue-8;
     }
   }
 }
