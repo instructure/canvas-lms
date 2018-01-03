@@ -30,18 +30,14 @@ module Api::V1::Section
     end
     res['sis_import_id'] = section.sis_batch_id if section.course.grants_right?(user, session, :manage_sis)
     if includes.include?('students')
-      proxy = section.enrollments
-      if user_json_is_admin?
-        proxy = proxy.preload(user: :pseudonyms)
-      else
-        proxy = proxy.preload(:user)
-      end
+      proxy = section.enrollments.preload(:root_account, :sis_pseudonym, user: :pseudonyms)
       include_enrollments = includes.include?('enrollments')
-      res['students'] = proxy.where(:type => 'StudentEnrollment').
-        map { |e|
-          enrollments = include_enrollments ? [e] : nil
-          user_json(e.user, user, session, includes, @context, enrollments)
-        }
+      res['students'] = []
+      proxy.where(:type => 'StudentEnrollment').preload(:root_account, :sis_pseudonym).find_each do |e|
+        enrollments = include_enrollments ? [e] : nil
+        res['students'] << user_json(e.user, user, session, includes, @context, enrollments, [], e)
+      end
+      res['students'] = nil if res['students'].empty?
     end
     res['total_students'] = section.students.not_fake_student.count if includes.include?('total_students')
 

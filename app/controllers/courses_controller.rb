@@ -991,7 +991,7 @@ class CoursesController < ApplicationController
         ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course})
       end
       user = users.first or raise ActiveRecord::RecordNotFound
-      enrollments = user.not_ended_enrollments if includes.include?('enrollments')
+      enrollments = user.not_ended_enrollments.preload(:root_account, :sis_pseudonym) if includes.include?('enrollments')
       render :json => user_json(user, @current_user, session, includes, @context, enrollments)
     end
   end

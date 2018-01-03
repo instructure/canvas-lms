@@ -30,10 +30,11 @@ class Enrollment < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :course, :touch => true, :inverse_of => :enrollments
-  belongs_to :course_section
-  belongs_to :root_account, :class_name => 'Account'
-  belongs_to :user
+  belongs_to :course, touch: true, inverse_of: :enrollments
+  belongs_to :course_section, inverse_of: :enrollments
+  belongs_to :root_account, class_name: 'Account', inverse_of: :enrollments
+  belongs_to :user, inverse_of: :enrollments
+  belongs_to :sis_pseudonym, class_name: 'Pseudonym', inverse_of: :sis_enrollments
   belongs_to :associated_user, :class_name => 'User'
 
   belongs_to :role

@@ -33,7 +33,9 @@ class SisPseudonym
   end
 
   def pseudonym
-    result = find_in_home_account || find_in_other_accounts
+    result = @context.sis_pseudonym if @context.class <= Enrollment
+    result ||= find_in_home_account
+    result ||= find_in_other_accounts
     if result
       result.account = root_account if result.account_id == root_account.id
     end

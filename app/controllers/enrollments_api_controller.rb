@@ -389,7 +389,7 @@ class EnrollmentsApiController < ApplicationController
       enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, [:user, :course, :course_section])
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, [:user, :course, :course_section, :root_account, :sis_pseudonym])
 
     include_group_ids = Array(params[:include]).include?("group_ids")
     includes = [:user] + Array(params[:include])

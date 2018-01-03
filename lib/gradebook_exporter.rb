@@ -58,7 +58,7 @@ class GradebookExporter
 
   def csv_data
     enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
-                                                           include: gradebook_includes)
+                                                           include: gradebook_includes).preload(:root_account, :sis_pseudonym)
     student_enrollments = enrollments_for_csv(enrollment_scope)
 
     student_section_names = {}
@@ -183,7 +183,7 @@ class GradebookExporter
             end
           end
           row = [student_name(student), student.id]
-          pseudonym = SisPseudonym.for(student, @course, type: :implicit, require_sis: false)
+          pseudonym = SisPseudonym.for(student, student_enrollment, type: :implicit, require_sis: false)
           row << pseudonym.try(:sis_user_id) if include_sis_id
           row << pseudonym.try(:unique_id)
           row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_sis_id && include_root_account

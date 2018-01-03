@@ -946,8 +946,8 @@ describe "Default Account Reports" do
             @user2 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'James John',
                                                  username: 'other_shar2d@example.com', sis_user_id: 'other_shard2')
           end
-          allow(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
-          allow(@account).to receive(:trust_exists?).and_return(true)
+          allow_any_instantiation_of(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
+          allow_any_instantiation_of(@account).to receive(:trust_exists?).and_return(true)
           @e1 = @course1.enroll_user(@user1)
           @course1.enroll_user(@user2)
 
