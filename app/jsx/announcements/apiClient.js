@@ -54,3 +54,17 @@ export function deleteAnnouncements ({ courseId }, announcements) {
     poolSize: MAX_CONCURRENT_REQS,
   })
 }
+
+export function getExternalFeeds ({ courseId}) {
+  return axios.get(`/api/v1/courses/${courseId}/external_feeds`)
+}
+
+export function addExternalFeed ({ courseId, url, verbosity, header_match }) {
+  const params = encodeQueryString([
+    { url },
+    { verbosity },
+    { header_match: header_match || null }
+  ])
+
+  return axios.post(`/api/v1/courses/${courseId}/external_feeds?${params}`)
+}

@@ -69,6 +69,7 @@ function reduceAnnouncements (announcements, action) {
 
 export default combineReducers({
   courseId: identity(null),
+  feedId: identity(null),
   permissions: identity({}),
   masterCourseData: identity(null),
   atomFeedUrl: identity(null),
@@ -125,5 +126,12 @@ export default combineReducers({
     [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => false,
     [actionTypes.DELETE_ANNOUNCEMENTS_FAIL]: () => false,
   }, false),
+  externalRssFeed: combineReducers({
+    isSaving: handleActions({
+      [actionTypes.ADD_EXTERNAL_FEED_START]: () => true,
+      [actionTypes.ADD_EXTERNAL_FEED_FAIL]: () => false,
+      [actionTypes.ADD_EXTERNAL_FEED_SUCCESS]: () => false
+    }, false)
+  }),
   notifications: reduceNotifications,
 })

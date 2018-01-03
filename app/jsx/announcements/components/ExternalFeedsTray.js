@@ -25,10 +25,15 @@ import Link from '@instructure/ui-core/lib/components/Link'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
+import Text from '@instructure/ui-core/lib/components/Text'
+
+import propTypes from '../propTypes'
+import { ConnectedAddExternalFeed } from './AddExternalFeed'
 
 export default class ExternalFeedsTray extends Component {
   static propTypes = {
     atomFeedUrl: string,
+    permissions: propTypes.permissions.isRequired
   }
 
   static defaultProps = {
@@ -44,6 +49,7 @@ export default class ExternalFeedsTray extends Component {
       <Container>
         {this.renderHeader()}
         {this.renderRssFeed()}
+        {this.props.permissions.create && this.renderAddExternalFeed()}
       </Container>
     )
   }
@@ -79,6 +85,28 @@ export default class ExternalFeedsTray extends Component {
       )
     }
     return null
+  }
+
+  renderAddExternalFeed() {
+    return (
+      <Container
+        margin="medium"
+        display="block"
+        textAlign="start"
+        className="announcements-tray__add-rss-root"
+      >
+        <Text size="medium" as="h2" weight="bold">{I18n.t("Feeds")}</Text>
+        <div className="announcements-tray-row">
+          <Container
+            margin="small 0"
+            display="block"
+            textAlign="start"
+          >
+            <ConnectedAddExternalFeed defaultOpen={false}/>
+          </Container>
+        </div>
+      </Container>
+    )
   }
 
   render () {

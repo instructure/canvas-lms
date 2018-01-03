@@ -64,7 +64,6 @@ test('UPDATE_ANNOUNCEMENTS_SEARCH should update filter to filter in payload', ()
   })
   deepEqual(newState.announcementsSearch.filter, 'unread')
 })
-
 test('LOCK_ANNOUNCEMENTS_START should set isLockingAnnouncements to true', () => {
   const newState = reduce(actions.lockAnnouncementsStart(), {
     isLockingAnnouncements: false,
@@ -200,4 +199,27 @@ test('DELETE_ANNOUNCEMENTS_SUCCESS should reset selectedAnnouncements', () => {
     selectedAnnouncements: [2, 3],
   })
   deepEqual(newState.selectedAnnouncements, [])
+})
+
+test('ADD_EXTERNAL_FEED_START should set saving to true', () => {
+  const newState = reduce(actions.addExternalFeedStart(), {
+    addExternalFeed: {
+      isSaving: false
+    }
+  })
+  equal(newState.externalRssFeed.isSaving, true)
+})
+
+test('ADD_EXTERNAL_FEED_FAIL should set saving to false', () => {
+  const newState = reduce(actions.addExternalFeedFail(), {
+    addExternalFeed: { isSaving: true },
+  })
+  equal(newState.externalRssFeed.isSaving, false)
+})
+
+test('ADD_EXTERNAL_FEED_SUCCESS should set saving to false', () => {
+  const newState = reduce(actions.addExternalFeedSuccess(), {
+    addExternalFeed: { isSaving: true },
+  })
+  equal(newState.externalRssFeed.isSaving, false)
 })

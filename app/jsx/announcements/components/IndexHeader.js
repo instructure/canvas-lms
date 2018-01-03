@@ -126,7 +126,7 @@ export default class IndexHeader extends Component {
             </GridRow>
           </Grid>
         </Container>
-        <ExternalFeedsTray atomFeedUrl={this.props.atomFeedUrl} />
+        <ExternalFeedsTray atomFeedUrl={this.props.atomFeedUrl} permissions={this.props.permissions} />
       </Container>
     )
   }

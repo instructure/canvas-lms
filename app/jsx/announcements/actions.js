@@ -50,7 +50,11 @@ const types = [
   'DELETE_ANNOUNCEMENTS_START',
   'DELETE_ANNOUNCEMENTS_SUCCESS',
   'DELETE_ANNOUNCEMENTS_FAIL',
+  'ADD_EXTERNAL_FEED_START',
+  'ADD_EXTERNAL_FEED_SUCCESS',
+  'ADD_EXTERNAL_FEED_FAIL'
 ]
+
 const actions = Object.assign(
   createActions(...types),
   announcementActions.actionCreators,
@@ -135,6 +139,27 @@ actions.deleteAnnouncements = () => (dispatch, getState) => {
         message: I18n.t('An error occurred while deleting announcements.'),
       }))
     })
+}
+
+actions.addExternalFeed = function (payload) {
+  return (dispatch, getState) => {
+    dispatch(actions.addExternalFeedStart())
+    apiClient.addExternalFeed({ courseId : getState().courseId, ...payload })
+      .then(() => {
+        dispatch(actions.addExternalFeedSuccess())
+        const successMessage = I18n.t('External feed successfully added')
+        $.screenReaderFlashMessage(successMessage)
+        dispatch(notificationActions.notifyInfo({ message: successMessage }))
+      })
+      .catch((err) => {
+        const failMessage = I18n.t('Failed to add new feed')
+        $.screenReaderFlashMessage(failMessage)
+        dispatch(actions.addExternalFeedFail({
+          message: failMessage,
+          err
+        }))
+      })
+  }
 }
 
 const actionTypes = types.reduce((typesMap, actionType) =>
