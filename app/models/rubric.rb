@@ -111,8 +111,14 @@ class Rubric < ActiveRecord::Base
   # a rubric_association are 'grading' and 'bookmark'.  Confusing,
   # I know.
   def destroy_for(context)
-    rubric_associations.where(:context_id => context, :context_type => context.class.to_s).
-        update_all(:bookmarked => false, :updated_at => Time.now.utc)
+    ras = rubric_associations.where(:context_id => context, :context_type => context.class.to_s)
+    if context.class.to_s == 'Course'
+      # if rubric is removed at the course level, we want to destroy any
+      # assignment associations found in the context of the course
+      ras.each(&:destroy)
+    else
+      ras.update_all(:bookmarked => false, :updated_at => Time.now.utc)
+    end
     unless rubric_associations.bookmarked.exists?
       self.destroy
     end
