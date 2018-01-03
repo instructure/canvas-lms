@@ -26,6 +26,7 @@ import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
+import SectionsTooltip from 'jsx/shared/SectionsTooltip'
 
 import AnnouncementModel from 'compiled/models/Announcement'
 import CourseItemRow from './CourseItemRow'
@@ -64,7 +65,6 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
 
   // necessary because announcements return html from RCE
   const content = { dangerouslySetInnerHTML: { __html: announcement.message } }
-
   return (
     <CourseItemRow
       ref={rowRef}
@@ -97,7 +97,9 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
       actionsContent={readCount}
     >
       <Heading level="h3">{announcement.title}</Heading>
-      <Text as="p" size="small">{/* TODO: real sections */} Section 1, Section 3</Text>
+      <SectionsTooltip
+        totalUserCount={announcement.user_count}
+        sections={announcement.sections}/>
       <div className="ic-announcement-row__content" {...content} />
     </CourseItemRow>
   )

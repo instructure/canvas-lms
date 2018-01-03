@@ -48,7 +48,7 @@ export default function SectionsTooltip ({ sections, totalUserCount}) {
   return (
     <span className='ic-section-tooltip'>
       <Tooltip tip={tipContent} placement='bottom'>
-        <Link href='#'>
+        <Link>
           {
             sections ?
             <Text size='small'>{I18n.t('%{section_count} Sections', {section_count: sections.length})}</Text>

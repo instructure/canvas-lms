@@ -25,6 +25,8 @@ export function getAnnouncements ({ courseId, announcements, announcementsSearch
   const { term } = announcementsSearch
   const params = encodeQueryString([
     { only_announcements: true },
+    { 'include[]': 'sections_user_count' },
+    { 'include[]': 'sections' },
     { per_page: 40 },
     { page: page || announcements.currentPage },
     { search_term: term || null }
