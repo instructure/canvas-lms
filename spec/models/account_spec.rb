@@ -672,27 +672,17 @@ describe Account do
 
   end
 
-  it "group_categories should not include deleted categories" do
+  it "group_categories.active should not include deleted categories" do
     account = Account.default
-    expect(account.group_categories.count).to eq 0
-    category1 = account.group_categories.create(:name => 'category 1')
-    category2 = account.group_categories.create(:name => 'category 2')
+    expect(account.group_categories.active.count).to eq 0
+    category1 = account.group_categories.create(name: 'category 1')
+    category2 = account.group_categories.create(name: 'category 2')
+    expect(account.group_categories.active.count).to eq 2
+    category1.destroy
+    account.reload
+    expect(account.group_categories.active.count).to eq 1
     expect(account.group_categories.count).to eq 2
-    category1.destroy
-    account.reload
-    expect(account.group_categories.count).to eq 1
-    expect(account.group_categories.to_a).to eq [category2]
-  end
-
-  it "all_group_categories should include deleted categories" do
-    account = Account.default
-    expect(account.all_group_categories.count).to eq 0
-    category1 = account.group_categories.create(:name => 'category 1')
-    category2 = account.group_categories.create(:name => 'category 2')
-    expect(account.all_group_categories.count).to eq 2
-    category1.destroy
-    account.reload
-    expect(account.all_group_categories.count).to eq 2
+    expect(account.group_categories.active.to_a).to eq [category2]
   end
 
   it "should return correct values for login_handle_name_with_inference" do

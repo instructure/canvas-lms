@@ -65,7 +65,7 @@ describe "Groups API", type: :request do
   end
 
   def group_category_json(group_category, user)
-    {
+    json = {
       "auto_leader" => group_category.auto_leader,
       "group_limit" => group_category.group_limit,
       "id" => group_category.id,
@@ -78,6 +78,9 @@ describe "Groups API", type: :request do
       "allows_multiple_memberships" => group_category.allows_multiple_memberships?,
       "is_member" => group_category.is_member?(user)
     }
+    json['sis_group_category_id'] = group_category.sis_source_id if group_category.context.grants_any_right?(user, :read_sis, :manage_sis)
+    json['sis_import_id'] = group_category.sis_batch_id if group_category.context.grants_right?(user, :manage_sis)
+    json
   end
 
   def users_json(users, opts)
@@ -106,6 +109,7 @@ describe "Groups API", type: :request do
       'moderator' => membership.moderator,
     }
     json['sis_import_id'] = membership.sis_batch_id if membership.group.context_type == 'Account' && is_admin
+    json['sis_group_id'] = membership.group.sis_source_id if membership.group.context_type == 'Account' && is_admin
     json
   end
 

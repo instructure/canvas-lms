@@ -208,7 +208,7 @@ class GroupsController < ApplicationController
       format.html do
         groups_scope = groups_scope.by_name
         groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
-        groups_scope = groups_scope.preload(:group_category, :context)
+        groups_scope = groups_scope.preload(:group_category, :context, :root_account)
 
         groups = groups_scope.shard(@current_user).to_a
         groups.select!{|group| group.context_type != 'Course' || group.context.grants_right?(@current_user, :read)}
@@ -248,9 +248,9 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
-    @groups      = all_groups = @context.groups.active
-                                  .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-                                  .eager_load(:group_category)
+    @groups = all_groups = @context.groups.active.
+                             order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by).
+                             eager_load(:group_category).preload(:root_account)
 
     unless api_request?
       if @context.is_a?(Account)
@@ -274,14 +274,14 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name'))
+        @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name')).preload(:root_account)
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
         if @context.grants_right?(@current_user, session, :manage_groups)
           categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
           uncategorized = @context.groups.active.uncategorized.to_a
           if uncategorized.present?
-            json = group_category_json(GroupCategory.uncategorized, @current_user, session)
+            json = group_category_json(GroupCategory.uncategorized.preload(:root_account), @current_user, session)
             json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
             categories_json << json
           end
@@ -427,6 +427,9 @@ class GroupsController < ApplicationController
   #   The allowed file storage for the group, in megabytes. This parameter is
   #   ignored if the caller does not have the manage_storage_quotas permission.
   #
+  # @argument sis_group_id [String]
+  #   The sis ID of the group. Must have manage_sis permission to set.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/groups \
   #          -F 'name=Math Teachers' \
@@ -466,6 +469,13 @@ class GroupsController < ApplicationController
     @group = @context.groups.temp_record(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
+      if (sis_id = params.delete :sis_group_id)
+        if @group.root_account.grants_right?(@current_user, :manage_sis)
+          @group.sis_source_id = sis_id
+        else
+          return render json: { message: "You must have manage_sis permission to set sis attributes" }, status: :unauthorized
+        end
+      end
       respond_to do |format|
         if @group.save
           @group.add_user(@current_user, 'accepted', true) if @group.should_add_creator?(@current_user)
@@ -514,6 +524,9 @@ class GroupsController < ApplicationController
   #   Users not in the group will be sent invitations. Existing group
   #   members who aren't in the list will be removed from the group.
   #
+  # @argument sis_group_id [String]
+  #   The sis ID of the group. Must have manage_sis permission to set.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \
   #          -X PUT \
@@ -547,6 +560,13 @@ class GroupsController < ApplicationController
     end
 
     if authorized_action(@group, @current_user, :update)
+      if (sis_id = params.delete :sis_group_id)
+        if @group.root_account.grants_right?(@current_user, :manage_sis)
+          @group.sis_source_id = sis_id
+        else
+          return render json: { message: "You must have manage_sis permission to update sis attributes" }, status: :unauthorized
+        end
+      end
       respond_to do |format|
         @group.transaction do
           @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))

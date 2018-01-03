@@ -22,6 +22,7 @@ class GroupCategory < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :sis_batch
+  belongs_to :root_account, class_name: 'Account', inverse_of: :all_group_categories
   has_many :groups, :dependent => :destroy
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'

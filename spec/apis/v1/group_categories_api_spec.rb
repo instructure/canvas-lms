@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe "Group Categories API", type: :request do
-  def category_json(category)
-    {
+  def category_json(category, user=@user)
+    json = {
       'id' => category.id,
       'name' => category.name,
       'role' => category.role,
@@ -36,6 +36,9 @@ describe "Group Categories API", type: :request do
       'auto_leader' => category.auto_leader,
       'is_member' => false
     }
+    json['sis_group_category_id'] = category.sis_source_id if category.root_account.grants_any_right?(user, :read_sis, :manage_sis)
+    json['sis_import_id'] = category.sis_batch_id if category.root_account.grants_right?(user, :manage_sis)
+    json
   end
 
   before :once do
@@ -563,23 +566,26 @@ describe "Group Categories API", type: :request do
       it "should allow an admin to create an account group category" do
         json = api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
+                                                     :sis_group_category_id => 'gc101',
                                                      :account_id => @account.to_param),
                         {'name' => 'name'})
         category = GroupCategory.find(json["id"])
         expect(json["context_type"]).to eq "Account"
         expect(category.name).to eq 'name'
+        expect(category.sis_source_id).to eq 'gc101'
         expect(json).to eq category_json(category)
       end
 
       it "should allow an admin to update a category for an account" do
         api_call :put, "/api/v1/group_categories/#{@communities.id}",
                  @category_path_options.merge(:action => 'update',
+                                              :sis_group_category_id => 'gc101',
                                               :group_category_id => @communities.to_param),
                  {:name => 'name'}
         category = GroupCategory.find(@communities.id)
         expect(category.name).to eq 'name'
+        expect(category.sis_source_id).to eq 'gc101'
       end
-
 
       it "should allow an admin to delete a category for an account" do
         account_category = GroupCategory.create(:name => 'Groups', :context => @account)

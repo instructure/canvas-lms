@@ -32,8 +32,8 @@ class Account < ActiveRecord::Base
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_one :terms_of_service, :dependent => :destroy
   has_one :terms_of_service_content, :dependent => :destroy
-  has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
-  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
+  has_many :group_categories, as: :context, inverse_of: :context
+  has_many :all_group_categories, :class_name => 'GroupCategory', foreign_key: 'root_account_id', inverse_of: :root_account
   has_many :groups, :as => :context, :inverse_of => :context
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
