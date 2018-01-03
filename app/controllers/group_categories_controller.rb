@@ -504,7 +504,8 @@ class GroupCategoriesController < ApplicationController
   protected
   def get_category_context
     begin
-      @group_category = api_request? ? GroupCategory.active.find(params[:group_category_id]) : GroupCategory.active.find(params[:id])
+      id = api_request? ? params[:group_category_id] : params[:id]
+      @group_category = api_find(GroupCategory.active, id)
     rescue ActiveRecord::RecordNotFound
       return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
     end

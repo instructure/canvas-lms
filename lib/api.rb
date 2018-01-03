@@ -135,6 +135,11 @@ module Api
                         'id' => 'id' }.freeze,
           :is_not_scoped_to_account => ['id'].freeze,
           :scope => 'root_account_id' }.freeze,
+    'group_categories' =>
+        { :lookups => { 'sis_group_category_id' => 'sis_source_id',
+                        'id' => 'id' }.freeze,
+          :is_not_scoped_to_account => ['id'].freeze,
+          :scope => 'root_account_id' }.freeze,
   }.freeze
 
   MAX_ID_LENGTH = (2**63 - 1).to_s.length
