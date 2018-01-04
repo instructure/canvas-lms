@@ -33,7 +33,7 @@ module Api::V1::Section
       proxy = section.enrollments.preload(:root_account, :sis_pseudonym, user: :pseudonyms)
       include_enrollments = includes.include?('enrollments')
       res['students'] = []
-      proxy.where(:type => 'StudentEnrollment').preload(:root_account, :sis_pseudonym).find_each do |e|
+      proxy.where(:type => 'StudentEnrollment').find_each do |e|
         enrollments = include_enrollments ? [e] : nil
         res['students'] << user_json(e.user, user, session, includes, @context, enrollments, [], e)
       end
