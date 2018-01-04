@@ -33,8 +33,8 @@
     <% end %>
   <% else %>
     <h1><%= t('headings.confirm_conclude', %{Confirm Grade Out}) %></h1>
-    <p><%= t 'details.confirm_conclude', %{Hold on! You should know that you’re about to grade out all students for this particular course section. This will lock all student grades and end this class.} %></p>
-    <p><%= t 'details.conclude_alt_text', %{If you would like to remove student access and still have the ability to change grades, please use the Course Dates settings inside of this course’s Settings page. You can learn more about course date settings in our guides *here*.}, :wrapper => link_to('\1', "https://community.canvaslms.com/docs/DOC-2910") %></p>
+    <p><%= t 'details.confirm_conclude', %{Hold on! You’re about to grade out all students for this particular course section. This will lock all student grades and end this class.} %></p>
+    <p><%= t 'details.conclude_alt_text', %{If you would like to remove student access and still have the ability to change grades, please configure the start and end dates inside of the Course Settings page. You can learn more about course date settings in our guides *here*.}, :wrapper => link_to('\1', "https://community.canvaslms.com/docs/DOC-2910") %></p>
 
     <%= form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="conclude"/>

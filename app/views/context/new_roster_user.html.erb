@@ -114,25 +114,23 @@
             <td style="width: 20%; <%= hidden unless enrollment.completed? %>">
               <p class="completed_at_holder"><%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %></p>
             </td>
-            <td style="width: 10%;">
+            <td style="width: 12%;" align="right">
             <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
               <% unless @context.completed? %>
                 <p class="conclude_enrollment_link_holder" style="<%= hidden if enrollment.completed? %>">
-                  <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Grade Out Student}) %></a>
+                  <a class="conclude_enrollment_link btn btn-secondary" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Grade Out}) %></a>
                 </p>
                 <p class="unconclude_enrollment_link_holder" style="<%= hidden unless enrollment.explicitly_completed? || enrollment.inactive? %>">
-                  <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore}) %></a>
+                  <a class="unconclude_enrollment_link btn btn-secondary" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore}) %></a>
                 </p>
               <% end %>
             </td>
-            <td style="width: 10%;">
-              <p>
+            <td style="width: 8%" align="right">
                 <% if enrollment.defined_by_sis? %>
                   <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
                 <% else %>
-                  <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>"><%= t('links.delete_enrollment', %{Delete}) %></a>
+                  <a class="delete_enrollment_link btn btn-danger" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>"><%= t('links.delete_enrollment', %{Delete}) %></a>
                 <% end %>
-              </p>
             </td>
             <% end %>
           </tr>
