@@ -51,11 +51,11 @@ class AnnouncementIndex
     end
 
     def lock_button
-      # f('#lock_button')
+      f('#lock_announcements')
     end
 
     def delete_button
-      # f('#delete_button')
+      f('#delete_announcements')
     end
 
     def add_announcement_button
@@ -85,7 +85,7 @@ class AnnouncementIndex
     end
 
     def announcement_checkbox(title)
-      # f('.check', announcement(title))
+      f('input[type="checkbox"] + label', announcement(title))
     end
 
     def announcement_sections(title)

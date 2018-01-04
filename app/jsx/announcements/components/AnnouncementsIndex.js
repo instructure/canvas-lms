@@ -47,6 +47,7 @@ export default class AnnouncementsIndex extends Component {
     isLoadingAnnouncements: bool.isRequired,
     hasLoadedAnnouncements: bool.isRequired,
     getAnnouncements: func.isRequired,
+    setAnnouncementSelection: func.isRequired,
     permissions: propTypes.permissions.isRequired,
     masterCourseData: masterCourseDataShape,
   }
@@ -86,6 +87,7 @@ export default class AnnouncementsIndex extends Component {
           announcement={announcement}
           canManage={this.props.permissions.manage_content}
           masterCourseData={this.props.masterCourseData}
+          onSelectedChanged={this.props.setAnnouncementSelection}
         />
       ))
     } else {
@@ -125,7 +127,7 @@ export default class AnnouncementsIndex extends Component {
         <ScreenReaderContent>
           <Heading level="h1">{I18n.t('Announcements')}</Heading>
         </ScreenReaderContent>
-        {this.props.permissions.manage_content && <ConnectedIndexHeader />}
+        <ConnectedIndexHeader />
         {this.renderSpinner(this.props.isLoadingAnnouncements, I18n.t('Loading Announcements'))}
         <Container margin="medium">
           <ScreenReaderContent>
@@ -142,5 +144,5 @@ export default class AnnouncementsIndex extends Component {
 const connectState = state => Object.assign({
   // props derived from state here
 }, selectPaginationState(state, 'announcements'), select(state, ['permissions', 'masterCourseData']))
-const connectActions = dispatch => bindActionCreators(select(actions, ['getAnnouncements']), dispatch)
+const connectActions = dispatch => bindActionCreators(select(actions, ['getAnnouncements', 'setAnnouncementSelection']), dispatch)
 export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)

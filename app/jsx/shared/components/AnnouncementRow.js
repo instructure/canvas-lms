@@ -26,9 +26,10 @@ import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
-import SectionsTooltip from 'jsx/shared/SectionsTooltip'
+import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
 
 import AnnouncementModel from 'compiled/models/Announcement'
+import SectionsTooltip from '../SectionsTooltip'
 import CourseItemRow from './CourseItemRow'
 import UnreadBadge from './UnreadBadge'
 import announcementShape from '../proptypes/announcement'
@@ -50,7 +51,7 @@ function makeTimestamp ({ delayed_post_at, posted_at }) {
   : { title: I18n.t('Posted on:'), date: posted_at }
 }
 
-export default function AnnouncementRow ({ announcement, canManage, masterCourseData, rowRef }) {
+export default function AnnouncementRow ({ announcement, canManage, masterCourseData, rowRef, onSelectedChanged }) {
   const timestamp = makeTimestamp(announcement)
   const readCount = announcement.discussion_subentry_count > 0
     ? (
@@ -71,10 +72,12 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
       className="ic-announcement-row"
       selectable={canManage}
       showAvatar
+      id={announcement.id}
       isRead={announcement.read_state === 'read'}
       author={announcement.author}
       title={announcement.title}
       itemUrl={announcement.html_url}
+      onSelectedChanged={onSelectedChanged}
       masterCourse={{
         courseData: masterCourseData || {},
         getLockOptions: () => ({
@@ -99,8 +102,12 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
       <Heading level="h3">{announcement.title}</Heading>
       <SectionsTooltip
         totalUserCount={announcement.user_count}
-        sections={announcement.sections}/>
+        sections={announcement.sections} />
       <div className="ic-announcement-row__content" {...content} />
+      {!announcement.locked &&
+        <Container display="block" margin="x-small 0 0">
+          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
+        </Container>}
     </CourseItemRow>
   )
 }
@@ -110,10 +117,12 @@ AnnouncementRow.propTypes = {
   canManage: bool,
   masterCourseData: masterCourseDataShape,
   rowRef: func,
+  onSelectedChanged: func,
 }
 
 AnnouncementRow.defaultProps = {
   canManage: false,
   masterCourseData: null,
-  rowRef: () => {},
+  rowRef () {},
+  onSelectedChanged () {},
 }

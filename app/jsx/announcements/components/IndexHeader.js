@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!announcements_v2'
 import React, { Component } from 'react'
-import { string, func } from 'prop-types'
+import { string, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { debounce } from 'lodash'
 
@@ -26,12 +26,14 @@ import { bindActionCreators } from 'redux'
 
 import Button from '@instructure/ui-core/lib/components/Button'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
+import Select from '@instructure/ui-core/lib/components/Select'
 import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
 import Container from '@instructure/ui-core/lib/components/Container'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
-import Select from '@instructure/ui-core/lib/components/Select'
+import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
+import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
 
 import select from '../../shared/select'
 import ExternalFeedsTray from './ExternalFeedsTray'
@@ -46,13 +48,19 @@ const filters = {
 export default class IndexHeader extends Component {
   static propTypes = {
     courseId: string.isRequired,
+    isBusy: bool,
+    hasSelectedAnnouncements: bool,
     permissions: propTypes.permissions.isRequired,
     atomFeedUrl: string,
     searchAnnouncements: func.isRequired,
+    lockAnnouncements: func.isRequired,
+    deleteAnnouncements: func.isRequired,
   }
 
   static defaultProps = {
+    isBusy: false,
     atomFeedUrl: null,
+    hasSelectedAnnouncements: false,
   }
 
   onSearch = debounce(() => {
@@ -82,6 +90,7 @@ export default class IndexHeader extends Component {
               </GridCol>
               <GridCol width={4}>
                 <TextInput
+                  disabled={this.props.isBusy}
                   label={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search')}
                   icon={() => <IconSearchLine />}
@@ -91,15 +100,28 @@ export default class IndexHeader extends Component {
                 />
               </GridCol>
               <GridCol width={6} textAlign="end">
+                {this.props.permissions.manage_content &&
+                  <Button
+                    disabled={this.props.isBusy || !this.props.hasSelectedAnnouncements}
+                    size="medium"
+                    margin="0 small 0 0"
+                    id="lock_announcements"
+                    onClick={this.props.lockAnnouncements}
+                  ><IconReply title={I18n.t('Lock Selected Announcements')} /></Button>}
+                {this.props.permissions.manage_content &&
+                  <Button
+                    disabled={this.props.isBusy || !this.props.hasSelectedAnnouncements}
+                    size="medium"
+                    margin="0 small 0 0"
+                    id="delete_announcements"
+                    onClick={this.props.deleteAnnouncements}
+                  ><IconTrash title={I18n.t('Delete Selected Announcements')} /></Button>}
                 {this.props.permissions.create &&
                   <Button
                     href={`/courses/${this.props.courseId}/discussion_topics/new?is_announcement=true`}
                     variant="primary"
                     id="add_announcement"
-                  >
-                  <IconPlus />
-                  {I18n.t('Announcement')}
-                </Button>}
+                  ><IconPlus />{I18n.t('Announcement')}</Button>}
               </GridCol>
             </GridRow>
           </Grid>
@@ -111,7 +133,9 @@ export default class IndexHeader extends Component {
 }
 
 const connectState = state => Object.assign({
-  // props derived from state here
+  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
+  hasSelectedAnnouncements: state.selectedAnnouncements.length > 0,
 }, select(state, ['courseId', 'permissions', 'atomFeedUrl']))
-const connectActions = dispatch => bindActionCreators(select(actions, ['searchAnnouncements']), dispatch)
+const selectedActions = ['searchAnnouncements', 'lockAnnouncements', 'deleteAnnouncements']
+const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

@@ -29,7 +29,11 @@ const makeProps = (props = {}) => _.merge({
     manage_content: true,
     moderate: true,
   },
+  isBusy: false,
+  hasSelectedAnnouncements: false,
   searchAnnouncements () {},
+  lockAnnouncements () {},
+  deleteAnnouncements () {},
 }, props)
 
 QUnit.module('IndexHeader component')
@@ -54,6 +58,14 @@ test('does not render create announcement button if we do not have create permis
   )
   const node = tree.find('#add_announcement')
   notOk(node.exists())
+})
+
+test('search text box is disabled if isBusy', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ isBusy: true })} />
+  )
+  const node = tree.find('input[name="announcements_search"]')
+  ok(node.is('[disabled]'))
 })
 
 test('onSearch calls searchAnnouncements with searchInput value after debounce timeout', (assert) => {
@@ -116,4 +128,96 @@ test('onChange on the filter select calls searchAnnouncements with filter value'
   node.props().onChange({target: {value: 'unread'}})
   deepEqual(filterSpy.firstCall.args[0], { filter: 'unread' })
   equal(filterSpy.callCount, 1)
+})
+
+test('renders lock announcements button if we have manage_content permissions', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ permissions: { manage_content: true } })} />
+  )
+  const node = tree.find('#lock_announcements')
+  ok(node.exists())
+})
+
+test('does not render lock announcements button if we do not have manage_content permissions', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ permissions: { manage_content: false } })} />
+  )
+  const node = tree.find('#lock_announcements')
+  notOk(node.exists())
+})
+
+test('lock announcements button is disabled if isBusy', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ isBusy: true })} />
+  )
+  const node = tree.find('#lock_announcements')
+  ok(node.is('[disabled]'))
+})
+
+test('lock announcements button is disabled if hasSelectedAnnouncements is false', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ hasSelectedAnnouncements: false })} />
+  )
+  const node = tree.find('#lock_announcements')
+  ok(node.is('[disabled]'))
+})
+
+test('renders delete announcements button if we have manage_content permissions', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ permissions: { manage_content: true } })} />
+  )
+  const node = tree.find('#delete_announcements')
+  ok(node.exists())
+})
+
+test('does not render delete announcements button if we do not have manage_content permissions', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ permissions: { manage_content: false } })} />
+  )
+  const node = tree.find('#delete_announcements')
+  notOk(node.exists())
+})
+
+test('delete announcements button is disabled if isBusy', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ isBusy: true })} />
+  )
+  const node = tree.find('#delete_announcements')
+  ok(node.is('[disabled]'))
+})
+
+test('delete announcements button is disabled if hasSelectedAnnouncements is false', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps({ hasSelectedAnnouncements: false })} />
+  )
+  const node = tree.find('#delete_announcements')
+  ok(node.is('[disabled]'))
+})
+
+test('clicking lock announcements button should call lockAnnouncements prop', (assert) => {
+  const done = assert.async()
+  const lockSpy = sinon.spy()
+  const tree = mount(
+    <IndexHeader {...makeProps({ lockAnnouncements: lockSpy, hasSelectedAnnouncements: true })} />
+  )
+
+  tree.find('#lock_announcements').simulate('click')
+  setTimeout(() => {
+    equal(lockSpy.callCount, 1)
+    done()
+  })
+})
+
+test('clicking delete announcements button should call deleteAnnouncements prop', (assert) => {
+  const done = assert.async()
+  const deleteSpy = sinon.spy()
+  const tree = mount(
+    <IndexHeader {...makeProps({ deleteAnnouncements: deleteSpy, hasSelectedAnnouncements: true })} />
+  )
+
+  tree.find('#delete_announcements').simulate('click')
+  setTimeout(() => {
+    equal(deleteSpy.callCount, 1)
+    done()
+  })
 })

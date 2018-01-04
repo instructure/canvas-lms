@@ -67,7 +67,7 @@ export default class CourseItemRow extends Component {
     defaultSelected: false,
     isRead: true,
     showAvatar: false,
-    onSelectedChanged: () => {},
+    onSelectedChanged () {},
   }
 
   state = {

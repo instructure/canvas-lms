@@ -28,12 +28,55 @@ const identity = (defaultState = null) => (
   state => (state === undefined ? defaultState : state)
 )
 
+const reduceAnnouncementsPagination = createPaginatedReducer('announcements')
+
+const reduceItems = handleActions({
+  [actionTypes.LOCK_ANNOUNCEMENTS_SUCCESS]: (state, action) => {
+    const successIds = action.payload.res.successes.map(success => success.data)
+    return state.map(item => {
+      return successIds.includes(item.id)
+      ? ({ ...item, locked: action.payload.locked })
+      : item
+    })
+  },
+}, [])
+
+function reducePage (page = {}, action) {
+  return ({ ...page, items: reduceItems(page.items, action) })
+}
+
+function reduceCurrentPage (currentPage) {
+  return (announcements = {}, action) =>
+    ({
+      ...announcements,
+      pages: {
+        ...announcements.pages,
+        [currentPage]: reducePage(announcements.pages[currentPage], action),
+      },
+    })
+}
+
+function reduceAnnouncements (announcements, action) {
+  const { currentPage, pages } = announcements
+  let newState = { ...announcements }
+
+  if (currentPage && pages && pages[currentPage]) {
+    newState = reduceCurrentPage(currentPage)(announcements, action)
+  }
+
+  return newState
+}
+
 export default combineReducers({
   courseId: identity(null),
   permissions: identity({}),
   masterCourseData: identity(null),
   atomFeedUrl: identity(null),
-  announcements: createPaginatedReducer('announcements'),
+  announcements: (state, action) => {
+    const paginatedState = reduceAnnouncementsPagination(state, action)
+    const newState = reduceAnnouncements(paginatedState, action)
+    return newState
+  },
   announcementsSearch: combineReducers({
     term: handleActions({
       [actionTypes.UPDATE_ANNOUNCEMENTS_SEARCH]: (state, action) => {
@@ -58,5 +101,29 @@ export default combineReducers({
       }
     }, 'all'),
   }),
+  selectedAnnouncements: handleActions({
+    [actionTypes.SET_ANNOUNCEMENT_SELECTION]: (state, action) => {
+      if (action.payload.selected) {
+        // use of Set ensures we don't have duplicates
+        return Array.from(new Set([...state, action.payload.id]))
+      } else {
+        const set = new Set(state)
+        set.delete(action.payload.id)
+        return Array.from(set)
+      }
+    },
+    [actionTypes.CLEAR_ANNOUNCEMENT_SELECTIONS]: () => [],
+    [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => [],
+  }, []),
+  isLockingAnnouncements: handleActions({
+    [actionTypes.LOCK_ANNOUNCEMENTS_START]: () => true,
+    [actionTypes.LOCK_ANNOUNCEMENTS_SUCCESS]: () => false,
+    [actionTypes.LOCK_ANNOUNCEMENTS_FAIL]: () => false,
+  }, false),
+  isDeletingAnnouncements: handleActions({
+    [actionTypes.DELETE_ANNOUNCEMENTS_START]: () => true,
+    [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => false,
+    [actionTypes.DELETE_ANNOUNCEMENTS_FAIL]: () => false,
+  }, false),
   notifications: reduceNotifications,
 })

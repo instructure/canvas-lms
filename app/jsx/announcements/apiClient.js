@@ -18,9 +18,10 @@
 
 import axios from 'axios'
 import { encodeQueryString } from '../shared/queryString'
+import makePromisePool from '../shared/makePromisePool'
 
-// not using default because we will add more api calls in near future
-// eslint-disable-next-line
+const MAX_CONCURRENT_REQS = 5
+
 export function getAnnouncements ({ courseId, announcements, announcementsSearch }, { page }) {
   const { term, filter } = announcementsSearch
   const params = encodeQueryString([
@@ -34,4 +35,22 @@ export function getAnnouncements ({ courseId, announcements, announcementsSearch
   ])
 
   return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
+}
+
+export function lockAnnouncements ({ courseId }, announcements, locked = true) {
+  return makePromisePool(announcements, (annId) => {
+    const url = `/api/v1/courses/${courseId}/discussion_topics/${annId}`
+    return axios.put(url, { locked })
+  }, {
+    poolSize: MAX_CONCURRENT_REQS,
+  })
+}
+
+export function deleteAnnouncements ({ courseId }, announcements) {
+  return makePromisePool(announcements, (annId) => {
+    const url = `/api/v1/courses/${courseId}/discussion_topics/${annId}`
+    return axios.delete(url)
+  }, {
+    poolSize: MAX_CONCURRENT_REQS,
+  })
 }
