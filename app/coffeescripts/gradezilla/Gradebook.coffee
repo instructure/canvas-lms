@@ -1728,14 +1728,6 @@ define [
           sort_rows_by_direction: sortRowsBy.direction
           colors: colors
 
-      # TODO: include the "sort rows by" setting for Assignment Groups
-      # when fully supported by the Gradebook `user_ids` endpoint.
-      sortingByIncompleteSortFeature = data.gradebook_settings.sort_rows_by_column_id.match(/^assignment_group_/)
-      if sortingByIncompleteSortFeature
-        delete data.gradebook_settings.sort_rows_by_column_id
-        delete data.gradebook_settings.sort_rows_by_setting_key
-        delete data.gradebook_settings.sort_rows_by_direction
-
       $.ajaxJSON(@options.settings_update_url, 'PUT', data, successFn, errorFn)
 
     ## Grid Sorting Methods

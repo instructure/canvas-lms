@@ -5533,18 +5533,6 @@ test('calls errorFn when response is not successful', function () {
   strictEqual(errorFn.callCount, 1);
 });
 
-test('excludes "sort rows by" settings when sorting by an assignment group', function () {
-  // This is temporary until the Gradebook `user_ids` supports this sorting.
-  const ajaxJSONStub = this.stub($, 'ajaxJSON');
-  const gradebook = createGradebook();
-  gradebook.setSortRowsBySetting('assignment_group_2301', 'grade', 'ascending');
-  gradebook.saveSettings();
-  const requestData = ajaxJSONStub.firstCall.args[2];
-  notOk('sort_rows_by_column_id' in requestData.gradebook_settings, 'request excludes "sort_rows_by_column_id"');
-  notOk('sort_rows_by_setting_key' in requestData.gradebook_settings, 'request excludes "sort_rows_by_setting_key"');
-  notOk('sort_rows_by_direction' in requestData.gradebook_settings, 'request excludes "sort_rows_by_direction"');
-});
-
 QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks) {
   let gradebook;
 

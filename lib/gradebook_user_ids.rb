@@ -31,9 +31,12 @@ class GradebookUserIds
   def user_ids
     if @column == "student"
       sort_by_student_name
-    elsif @column&.include?("assignment")
+    elsif @column =~ /assignment_\d+$/
       assignment_id = @column[/\d+$/]
       send("sort_by_assignment_#{@sort_by}", assignment_id)
+    elsif @column =~ /^assignment_group_\d+$/
+      assignment_id = @column[/\d+$/]
+      sort_by_assignment_group(assignment_id)
     elsif @column == "total_grade"
       sort_by_total_grade
     else
@@ -54,7 +57,8 @@ class GradebookUserIds
   def sort_by_assignment_grade(assignment_id)
     students.
       joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id=users.id AND
-             submissions.workflow_state<>'deleted' AND submissions.assignment_id=#{assignment_id}").
+             submissions.workflow_state<>'deleted' AND
+             submissions.assignment_id=#{Submission.sanitize(assignment_id)}").
       order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
       order("#{Submission.table_name}.score #{sort_direction} NULLS LAST").
       order("#{Submission.table_name}.id IS NULL").
@@ -72,31 +76,11 @@ class GradebookUserIds
   end
 
   def sort_by_total_grade
-    score_scope = grading_period_id ? "scores.grading_period_id=#{grading_period_id}" : "scores.course_score IS TRUE"
+    grading_period_id ? sort_by_scores(:grading_period, grading_period_id) : sort_by_scores(:total_grade)
+  end
 
-    # In this query we need to jump through enrollments to go see if
-    # there are scores for the user. Because of some AR internal
-    # stuff, if we did students.joins("LEFT JOIN scores ON
-    # enrollments.id=scores.enrollment_id AND ...") as you'd expect,
-    # it plops the new join before the enrollments join and the
-    # database gets angry because it doesn't know what what this
-    # "enrollments" we're querying against is. Because of this, we
-    # have to WET up the method and hand do the enrollment join
-    # here. Without doing the score conditions in the join, we lose
-    # data, so it has to be this way... For example, we might lose
-    # concluded enrollments who don't have a Score.
-    #
-    # That is a super long way of saying, make sure this stays in sync
-    # with what happens in the students method below in reguards to
-    # enrollments and enrollments scoping.
-    User.joins("LEFT JOIN #{Enrollment.quoted_table_name} on users.id=enrollments.user_id
-                LEFT JOIN #{Score.quoted_table_name} ON scores.enrollment_id=enrollments.id AND
-                scores.workflow_state='active' AND #{score_scope}").
-      merge(student_enrollments_scope).
-      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
-      order("#{Score.table_name}.unposted_current_score #{sort_direction} NULLS LAST").
-      order_by_sortable_name(direction: @direction.to_sym).
-      pluck(:id).uniq
+  def sort_by_assignment_group(assignment_group_id)
+    sort_by_scores(:assignment_group, assignment_group_id)
   end
 
   def all_user_ids
@@ -157,6 +141,40 @@ class GradebookUserIds
 
   def students
     User.left_joins(:enrollments).merge(student_enrollments_scope)
+  end
+
+  def sort_by_scores(type = :total_grade, id = nil)
+    score_scope = if type == :assignment_group
+      "scores.assignment_group_id=#{Score.sanitize(id)}"
+    elsif type == :grading_period
+      "scores.grading_period_id=#{Score.sanitize(id)}"
+    else
+      "scores.course_score IS TRUE"
+    end
+
+    # In this query we need to jump through enrollments to go see if
+    # there are scores for the user. Because of some AR internal
+    # stuff, if we did students.joins("LEFT JOIN scores ON
+    # enrollments.id=scores.enrollment_id AND ...") as you'd expect,
+    # it plops the new join before the enrollments join and the
+    # database gets angry because it doesn't know what what this
+    # "enrollments" we're querying against is. Because of this, we
+    # have to WET up the method and hand do the enrollment join
+    # here. Without doing the score conditions in the join, we lose
+    # data, so it has to be this way... For example, we might lose
+    # concluded enrollments who don't have a Score.
+    #
+    # That is a super long way of saying, make sure this stays in sync
+    # with what happens in the students method above in regards to
+    # enrollments and enrollments scoping.
+    User.joins("LEFT JOIN #{Enrollment.quoted_table_name} on users.id=enrollments.user_id
+                LEFT JOIN #{Score.quoted_table_name} ON scores.enrollment_id=enrollments.id AND
+                scores.workflow_state='active' AND #{score_scope}").
+      merge(student_enrollments_scope).
+      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
+      order("#{Score.table_name}.unposted_current_score #{sort_direction} NULLS LAST").
+      order_by_sortable_name(direction: @direction.to_sym).
+      pluck(:id).uniq
   end
 
   def sort_direction
