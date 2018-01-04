@@ -55,6 +55,7 @@ module InstFS
         context_id: context.global_id.to_s,
         user_id: user.global_id.to_s,
         folder_id: folder && folder.global_id.to_s,
+        root_account_id: context.account.root_account.global_id.to_s,
         quota_exempt: !!quota_exempt,
         on_duplicate: on_duplicate)
 
