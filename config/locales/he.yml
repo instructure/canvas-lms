@@ -239,14 +239,14 @@ he:
   account_course_and_user_search_22bf297a: "חשבון הקורס וחיפוש משתמשים"
   account_domain_78f43049: "דומיין החשבון"
   account_id_2c3b4f15: "מזהה חשבון"
-  account_id_73966078: מזהה_חשבון
+  account_id_73966078: account_id
   account_id_f6e26867: "מזהה חשבון"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "שם חשבון"
   account_name_analytics_62bf60ae: "ניתוח פעילות  של %{account.name} "
   account_name_bff54ed5: "שם חשבון"
   account_navigation_80bbefd4: "ניתוב בדף חשבון משתמש"
-  account_navigation_menu_10c05bf9: "תפריט ניווט בחשבון"
+  account_navigation_menu_10c05bf9: "תפריט ניווט בחשבונות"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "זמן סיום של הודעת חשבון משתמש צריכה להיות מאוחרת מזמן תחילה."
@@ -272,7 +272,7 @@ he:
       limited: "רכיבים שבוטלו מוגבלים במספר הימים שהוגדר;"
     outcomes: 
       order: "הזמנה:  %{order}"
-    report_header_account_id: מזהה_חשבון
+    report_header_account_id: account_id
     report_header_assessment_id: "זיהוי הערכה"
     report_header_assessment_question: "שאלת הערכה"
     report_header_assessment_question_id: "זיהוי שאלת הערכה"
@@ -281,22 +281,22 @@ he:
     report_header_assignment_id: "מזהה משימה"
     report_header_assignment_title: "כותרת משימה"
     report_header_assignment_url: "קישור למשימה"
-    report_header_associated_user_id: מזהה_משתמש_משויך
+    report_header_associated_user_id: associated_user_id
     report_header_attempt: ניסיון
     report_header_authentication_provider_id: authentication_provider_id
-    report_header_canvas_account_id: מזהה_חשבון_קנבס
-    report_header_canvas_associated_user_id: מזהה_משתמש_קנבס_משויך
-    report_header_canvas_course_id: מזהה_קורס_קנבס
-    report_header_canvas_group_id: מזהה_קבוצת_קנבס
+    report_header_canvas_account_id: canvas_account_id
+    report_header_canvas_associated_user_id: canvas_associated_user_id
+    report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_group_id: canvas_group_id
     report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
     report_header_canvas_parent_id: canvas_parent_id
     report_header_canvas_section_id: canvas_section_id
     report_header_canvas_term_id: canvas_term_id
-    report_header_canvas_user_id: מזהה_משתמש_קנבס
+    report_header_canvas_user_id: canvas_user_id
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: קורס
-    report_header_course__id: מזהה_קורס
-    report_header_course_format: תצורת_קורס
+    report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "מזהה קורס"
     report_header_course_name: "שם קורס"
     report_header_course_sis: "קורס של המערכת הבית ספרית"
@@ -304,20 +304,20 @@ he:
     report_header_created_at: "נוצר ב"
     report_header_current_score: "ציון נוכחי"
     report_header_email: דואל
-    report_header_end__date: תאריך_סיום
+    report_header_end__date: end_date
     report_header_end_date: "תאריך סיום"
     report_header_enrollment_state: "מצב הרשמה"
     report_header_expiration: "פקיעת תוקף"
     report_header_final_score: "ציון סופי"
-    report_header_first_name: שם_פרטי
-    report_header_full_name: שם_מלא
-    report_header_group_id: מזהה_קבוצה
+    report_header_first_name: first_name
+    report_header_full_name: full_name
+    report_header_group_id: group_id
     report_header_id: מזהה
     report_header_integration_id: integration_id
     report_header_last_access_at: "ניגש לאחרונה בתאריך"
     report_header_last_activity_at: "פעילות אחרונה בתאריך"
     report_header_last_ip: "IP אחרון"
-    report_header_last_name: שם_משפחה
+    report_header_last_name: last_name
     report_header_learning_outcome_id: "מזהה הישגי למידה"
     report_header_learning_outcome_name: "שם הישגי הלמידה"
     report_header_login_id: login_id
@@ -328,7 +328,7 @@ he:
     report_header_outcome_score: "ציון הישגי הלמידה"
     report_header_parent_account_id: parent_account_id
     report_header_role: תפקיד
-    report_header_role_id: מזהה_תפקיד
+    report_header_role_id: role_id
     report_header_section: הקבצה
     report_header_section__id: section_id
     report_header_section_id: "מזהה הקבצה"
@@ -847,7 +847,7 @@ he:
                 check_box: "קובץ CSV של רשימת X "
             sis_default: 
               parameters: 
-                note: "*הגדרות תקופת הלימוד משפיעות רק על קובצי CSV של קורסים, פרקים, הרשמות, ורשימת X ."
+                note: "*הגדרות תקופת הלימוד משפיעות רק על קובצי CSV של קורסים, הקבצות, הרשמות, ורשימת X ."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -1065,10 +1065,10 @@ he:
         turnitin_account_id: "מזהה חשבון Turnitin"
         turnitin_comments: "הערות הגשה"
         turnitin_host: "שרת Turnitin "
-        turnitin_pledge: "הבטחת תאימות"
+        turnitin_pledge: "מחוייבות תאימות"
         turnitin_shared_secret: "מלה סודית משותפת של Turnitin "
         users_can_edit_name: "משתמשים יכולים לערוך את שמם"
-        value: "נטרול תגובות בהודעות"
+        value: "נטרול תגובות להודעות"
       links: 
         add_admins: "מנהלי חשבון"
         configure_report: הגדרות...
@@ -1505,7 +1505,7 @@ he:
   after_4c71e718: לאחר
   after_date_981cd41b: "אחרי %{date}"
   after_last_attempt_c9168da2: "בתום הנסיון האחרון"
-  after_the_assignment_is_graded_53754607: "אחרי שהמטלה מצויננת"
+  after_the_assignment_is_graded_53754607: "אחרי שהמטלה מוערכת"
   after_the_due_date_eee89c9c: "אחרי תאריך היעד"
   ahead_21f22939: בהמשך
   ajax_errors: 
@@ -1604,6 +1604,7 @@ he:
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "התרה לתלמידים לראות מי נרשם לחלונות זמן"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "אפשר/י את היכולת לשגר תזכורות באמצעות תור השדרים שלנו"
   allowed_attempts_4e229caa: "נסיונות מותרים"
+  allows_creating_announcements_for_a_specific_secti_14e0a63d: "מאפשר יצירת הכרזות לסעיף יעודי"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "התרה למורים לסמן נתוני הערכה לייצוא במנות לסינכרון עם המערכת הבית ספרית"
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "הרשאה לשכפל מודולים בקנבס"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "אפשר / י תזמון של אירועים נשנים ביומן האירועים"
@@ -1623,6 +1624,7 @@ he:
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "אירעה שגיאה בעת שינוי מצב הנעילה של  \"%{fileName}\""
   an_error_occurred_making_a_network_request_d1bda348: "אירעה שגיאה ביצירת בקשת רשת"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*אירעה שגיאה*, בבקשה לפרסם שוב את תשובתך מאוחר יותר"
+  an_error_occurred_please_try_again_95361e05: "אירעה שגיאה. נא לנסות שוב."
   an_error_occurred_please_try_again_later_84223241: "אירעה שגיאה. נא לנסות מאוחר יותר"
   an_error_occurred_publishing_grades_cfdf7631: "אירעה שגיאה בעת פרסום הציונים."
   an_error_occurred_selecting_provisional_grades_9d7bcda: "אירעה שגיאה בעת בחירת הציונים הזמניים"
@@ -1641,12 +1643,13 @@ he:
   an_error_occurred_while_starting_migration_8e6015e2: "אירעה שגיארה בעת תחילת הייצוא"
   an_error_occurred_while_updating_late_policies_a95b707f: "אירעה שגיאה בעת עדכון מסמכי מדיניות אחרונים"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "אירעה תקלה בעת נסיון ביטול פגישה קבוצתית"
+  an_error_ocurred_while_loading_announcements_32af2ce4: "אירעה שגיאה בעת טעינות הכרזות"
   an_error_ocurred_while_loading_sync_history_ad9dc6df: "אירעה שגיאה בעת טעינת היסטוריית הסנכרון"
   an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "אירעה שגיאה בעת טעינת השינויים הלא-מסונכרנים"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "אירעה תקלה בעת נסיון לשמור פגישה קבוצתית"
-  an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "משתמש קנבס קיים עם מזהה בית ספרי זה %{user_id} כבר ביקש %{other_user_id}'s user_id . מתעלם."
-  an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "משתמש קנבס קיים  %{user_id} %{other_user_id}'s user_id כבר ביקש מידע על קוד הכניסה. מתעלם. "
-  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "משתמש קנבס קיים עם %{user_id}  %{other_user_id}'s ביקש כבר  integration_id,  מתעלם"
+  an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "משתמש קנבס קיים עם מזהה בית ספרי זה %{user_id} כבר ביקש %{other_user_id}של user_id . מתעלם."
+  an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "משתמש קנבס קיים  %{user_id} %{other_user_id}'של user_id כבר ביקש מידע על קוד הכניסה. מתעלם. "
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "משתמש קנבס קיים %{user_id} כבר ביקש את %{other_user_id}' integration_id, מתעלם."
   an_export_is_already_in_progress_54270f01: "תהליך ייצוא כבר בפעולה"
   an_internal_error_occurred_83b8a685: "אירעה תקלה פנימית"
   an_item_named_name_already_exists_in_this_location_147b7312: "פריט בשם  \"%{name}\"  כבר קיים במיקום זה. האם בכוונתך להחליף את הקובץ הקיים?"
@@ -1730,6 +1733,7 @@ he:
     podcast_feed_description_group: "כל קובץ מדיה המקושר או מוטבע בתוך הכרזות הקבוצה \"%{group}\" יוצג בפיד זה"
     podcast_feed_name: "פודקאסט פיד של הכרזות הקורס %{course} "
   announcements_a4b8ed4a: הכרזות
+  announcements_loaded_e9335d5f: "הכרזות נטענו"
   announcements_tutorial_tray_994287d6: "מגש מדריך ההכרזות"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "הפוך לאנונימי את כל ההערות שבוצעו ע\"י מנחים על הגשות של מטלה זו ב SpeedGrader"
   anonymous_e1b8ad27: אנונימי
@@ -1738,7 +1742,7 @@ he:
   anonymous_instructor_annotations_2b6c822: "הערות אנונימיות של מנחה"
   anonymous_user: "משתמש אנונימי"
   anonymous_user_d984b9ce: "משתמש אנונימי"
-  anonymously_graded_59149570: "צוינן אנונימית"
+  anonymously_graded_59149570: "הוערך אנונימית"
   another_assignment_name_369f8481: "שם מטלה נוסף"
   another_configuration_is_currently_selected_select_95b394e: "קונפיגורציה שונה נבחרה כבר. בחירה של קונפיגורציה זו תבטל בחירה קודמת."
   answer_address_book_queries_through_76842372: "מענה לחיפוש רשימת הכתובות באמצעות"
@@ -1759,7 +1763,7 @@ he:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "מרכז האפליקציות יופיע בלשונית ה\"אפלקציות\" בדף ההגדרות של הקורס או החשבון. הכתובת המסופקת בהמשך צריכה להצביע אל נקודת מרכז אפליקציות תקף. (לדוגמה:   %{url} -- יש וודא שה / שבסוף הכתובת מוסר."
   app_placements_6d877225: "מיקומי אפליקציות"
   app_reregistration_87cc8817: "הרשמה מחודשת של אפליקציה"
-  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} הוקנה ע\"י מנהל המערכת והנה נעולה"
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} הותקנה ע\"י מנהל המערכת והנה נעולה"
   app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} הותקנה ע\"י מנהל הקורס והנה נעולה"
   app_was_installed_by_the_master_course_e55ba1d7: "%{app} הותקנה ע\"י מנהל הקורס"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "מצרף מספר לסיומת כל כותרת אירוע (למשל אירוע 1, אירוע 2, וכו')"
@@ -1810,6 +1814,7 @@ he:
   application_secret_e6803c7e: "סיסמה סודית של היישום"
   applied_cc7be774: ייושם
   apply_781a2546: החל
+  apply_filters_note_clicking_this_button_will_cause_753f04: "הפעלת מסננים. שימו לב: הקשה על כפתור זה תגרום לטעינת הדף מחדש"
   apply_theme_7af08387: "החלת ערכת נושא"
   applying_new_styles_to_subaccounts_e8aeeef2: "החלת סגנונות חדשים לחשבונות המשנה"
   applying_please_be_patient_f7b5f244: "מיישם, נא להתאזר בסבלנות"
@@ -1853,7 +1858,7 @@ he:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "בטוח/ה שרוצה לבטל את סכימת ההערכה הזו?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "האם אתם בטוחים שרוצים לבטל פריט משימה זה?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
-    one: "האם אתם בטוחים שרוצים לבטל עותק של שיחות אלו? אין אפשרות לשחזר את הביטול."
+    one: "האם אתם בטוחים שרוצים לבטל עותק של שיחה זו? אין אפשרות לשחזר את הביטול."
     other: "האם אתם בטוחים שרוצים לבטל עותק של שיחות אלו? אין אפשרות לשחזר את הביטול."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "בטוחים שרוצים לבטל את הרשמתכם לאירוע זה?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "האם אתם בטוחים שרוצים למנוע את הסיכנכרוניזציה ל %{sisName} לכל המשימות האלו?"
@@ -1862,9 +1867,9 @@ he:
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "בטוח/ה שרוצה להסיר כלי זה?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "האם בטוחים שרוצים להסיר משתמש זה"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "בטוח/ה שרוצה לדווח על תמונת הפרופיל הזו?"
-  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "האם אתם בטוחים שרוצים לבצע סינכרוניזציה מחודשת של ציונים אלו למערת המידע של התלמיד?"
+  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "האם אתם בטוחים שרוצים לבצע סינכרוניזציה מחודשת של ציונים אלו למערכת המידע של התלמיד?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "האם בטוחים שרוצים לשגר הודעה זו"
-  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "האם אתם בטוחים שרוצים לבצע סינכרוניזציה מחודשת של ציונים אלו למערת המידע של התלמיד? יש לבצע זאת רק לאחר שכל הציונים הם סופיים."
+  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "האם אתם בטוחים שרוצים לבצע סינכרוניזציה מחודשת של ציונים אלו למערכת המידע של התלמיד? יש לבצע זאת רק לאחר שכל הציונים הם סופיים."
   are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
     one: "האם אתם בטוחים שרוצים להחזיר שיחות אלו מהארכיון?"
     other: "האם אתם בטוחים שרוצים להחזיר שיחות אלו מהארכיון?"
@@ -1932,7 +1937,7 @@ he:
       grading_scheme_info: "הצגת/עריכת סכימת הערכה"
     vericite_submission_types_validation: "VeriCite תומך רק בהגשת קבצים והקלדת טקסט"
   assignment_976578a8: משימה
-  assignment_assignment_submission_paper_view_8a4c9776: "הגשת משימה%{assignment} בתצוגת ספר"
+  assignment_assignment_submission_paper_view_8a4c9776: "הגשת משימה%{assignment} בתצוגת מאמר"
   assignment_assignment_submission_plain_text_view_b217d372: "הגשת משימה%{assignment} בתצוגה טקסטואלית"
   assignment_comments_e43ed898: "הערות משימה"
   assignment_created_assignment_name_course_name_324a5639: "משימה נפתחה - %{assignment_name}, %{course_name}"
@@ -2636,7 +2641,7 @@ he:
   authorize_e3f25bb4: הרשאה
   auto_leader_7791c30a: auto_leader
   automatically_apply_deduction_to_late_submissions_2b68166e: "הפעלה אוטומטית של קנס על הגשות מאוחרות"
-  automatically_apply_grade_for_missing_submissions_2b5c1a72: "בצע ציון אוטומטי להגשות חסרות"
+  automatically_apply_grade_for_missing_submissions_2b5c1a72: "מתן ציון אוטומטי להגשות חסרות"
   availability_dates_438d71e0: "תאריכי זמינות"
   availability_dates_changed_exceptions_465ba375: "חריג שינוי זמינות מועדים"
   available_8606e40c: זמין
@@ -2709,7 +2714,7 @@ he:
   blank_38df4238: "תו ריק"
   blocked_by_running_migration_d8a57cb7: "חסום ע\"י תהליך הגירת נתונים"
   blue_daf8fea9: כחול
-  blueprint_5cca2ef: תבנית
+  blueprint_5cca2ef: "תבנית דוגמה"
   blueprint_course_associations_72c9609: "שיוכים לקורס לדוגמה"
   blueprint_course_e16ed131: "תבנית קורס"
   blueprint_course_information_term_course_10d5cf30: "מידע על תבנית קורס לדוגמה: %{term} - %{course}"
@@ -3256,6 +3261,7 @@ he:
   cancel_custom_link_creation_39ec70bd: "ביטול יצירת קישורים יעודיים"
   cancel_submitting_comment_2666e98b: "ביטול שליחת תגובה"
   cancel_updating_comment_6816d855: "ביטול עדכון תגובה"
+  cannot_access_group_in_concluded_course_90a8db52: "אין אפשרות להכנס לקבוצה בקורס שסוכם"
   cannot_autograde_at_this_time_a146ad9d: "לא ניתן לבצע כרגע הערכה אוטומטית"
   cannot_be_associated_with_a_different_account_ac863be2: "אין אפשרות לקשר לחשבון אחר"
   cannot_be_associated_with_different_accounts_f461814f: "אין אפשרות לשייך לחשבונות שונים"
@@ -3298,7 +3304,7 @@ he:
         login_expiration_minimum: "פקיעת תוקף Session חייבת להיות 20 דקות או יותר"
         need_integer: "בבקשה לספק ערך מספרי שלם עבור המטמון של רשימת הנגן"
         stream_name_required: "נדרש שם לרצף התנועה"
-  canvas_account_id_97b0471f: מזהה_חשבון_קנבס
+  canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "התראת קנבס - יש לשנות:%{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "התראת קנבס - הוזמנת: %{course} כ %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "התראת קנבס - הוזמנת: קורס כ %{role_type}"
@@ -3326,7 +3332,7 @@ he:
   canvas_student_id_c74f57bf: canvas_student_id
   canvas_ticketing_email_connector_27e253ae: "מחבר הדוא\"ל של מערכת דווח תקלות של קנבס."
   canvas_ticketing_web_post_connector_11158897: "מחבר הודעות אינטרנט של מערכת דווח תקלות של קנבס"
-  canvas_user_id_4c18b78a: מזהה_משתמש_קנבס
+  canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "קנבס ישערך מחדש את כל ההגשות שלך לאחר שמירת הבוחן, הפעולה יכולה להמשף כמה דקות"
   card_view_eaf73185: "תצוגת כרטיס"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "זהירות! שינויים לחברות בקבוצה יופעלו בקבוצות אשר כבר הוגשו להן משימות. הגשות משימה קבוצתית יתכן שלא יתישרו עם השינוי.  האם תרצו להקים קבוצה חדשה לטובת הגשות עתידיות"
@@ -3367,6 +3373,7 @@ he:
   changed_item_1d16a85f: "פריט ששונה"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "השינוי ישאר בתוקף גם לאחר עזיבת דף זה."
   changes_you_made_may_not_be_saved_4e8db973: "תיקונים שבצעת יתכן שלא ישמרו"
+  changing_the_late_policy_will_affect_previously_gr_49071db7: "שינוי הכללים האחרונים ישפיע על הגשות קודמות שהוערכו"
   changing_your_policy_now_will_affect_previously_gr_62063898: "שינוי הכללים כעת ישפיע על ציוני הגשות קודמות."
   chars_written_max_character_length_len_fec9bd18: "%{chars} תווים נכתבו, מספר תווים מירבי %{len}"
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "תרשים של ציוני התלמיד בכל מטלה"
@@ -3394,6 +3401,7 @@ he:
   choose_attribute_to_add_866e128d: "בחירת מאפיין להוספה"
   choose_course_home_page_d8642f9e: "בחירת דף הבית של הקורס"
   choose_home_page_80cef4ee: "בחירת דף הבית "
+  choose_image_242f727e: "בחירת תמונה"
   choose_image_e5ee5d7a: "בחירת תמונה"
   choose_student_1513fcd1: "-- בחירת תלמיד --"
   choose_the_next_mastery_path_b035b727: "בחירת מסלול ההתמחות הבא"
@@ -3449,7 +3457,7 @@ he:
   close_and_return_to_canvas_80544344: "סגירה וחזרה לקנבס"
   close_d634289d: סגירה
   close_date_a2f617b3: "תאריך סגירה"
-  close_details_sidebar_ff8f663d: "סגירת סרגל פרטים"
+  close_details_sidebar_ff8f663d: "סגירת פירוט סרגל צדי"
   close_for_comments_37783f56: "סגור להערות"
   close_grade_info_58ef5a20: "סגור/י את המידע על ציונים"
   close_move_tray_8609e988: "סגירת העברת תיבה"
@@ -3692,7 +3700,7 @@ he:
   conditional_content_7d39e313: "תוכן מותנה"
   conditional_content_b284da8f: "תוכן מותנה"
   conditional_release_d206e93b: "שיחרור גירסה מותנה"
-  conduct_virtual_lectures_virtual_office_hours_and__cc05907b: "בצע שיעורים וירטואליים, שעות משרד וירטואלי, וקבוצות תלמידים. שדר אודיו ווידאו בזמן אמת, שתף מצגות, הגדם אפליקציות ומשאבים מקוונים ועוד."
+  conduct_virtual_lectures_virtual_office_hours_and__cc05907b: "בצע שיעורים וירטואליים, שעות משרד וירטואלי, וקבוצות תלמידים. שדר אודיו ווידאו בזמן אמת, שתף מצגות, הדגם אפליקציות ומשאבים מקוונים ועוד."
   conference_was_deleted_30869390: "שיחת הועידה בוטלה"
   conferences: 
     concluded_conference: 
@@ -3781,7 +3789,7 @@ he:
   content_1440204b: תוכן
   content_changed_exceptions_e8bff81e: "חריגי תוכן ששונה"
   content_choice_51f4ca0f: "אפשרויות תוכן"
-  content_export_files_cannot_be_downloaded_after_da_2872b0e4: "לא ניתן להוריד קובצי תוחכן מיוצאים אחרי %{days} ימים."
+  content_export_files_cannot_be_downloaded_after_da_2872b0e4: "לא ניתן להוריד קובצי תוכן מיוצאים אחרי %{days} ימים."
   content_exports: 
     buttons: 
       process: "עיבוד מידע"
@@ -4034,7 +4042,7 @@ he:
         media_playback: "הפעלת מדיה"
     media_objects_not_configured: "רכיבי המדיה לא קונפגו"
     new_roster_user: 
-      completed_enrollment: "חושב *%{completed_at}*    "
+      completed_enrollment: "סוים *%{completed_at}*    "
       enrolled_as: "נרשם כ %{enrollment_type}"
       enrollment_linked_to: "מקושר אל *%{linked_user}*"
       labels: 
@@ -4087,7 +4095,7 @@ he:
       confirm: 
         conclude: "האם אתם בטוחים שרוצים לסכם הרשמה זו?"
         conclude_student: "בטוח/ה שרוצה לסכם את הרשמת תלמיד זה?"
-        delete_enrollment: "בטוח/ה שרוצה לבטל את הרשמת תלמיד זה?"
+        delete_enrollment: "האם בטוחים שרוצים לבטל הרשמה זו?"
       enrolled_as: "נרשם כ %{enrollment_type}"
       enrollment_change_failed: "השינוי בזכויות ההרשמה נכשל, יש לנסות שוב"
       enrollment_linked_to: "קשור אל *%{linked_user}*"
@@ -4384,7 +4392,7 @@ he:
     batch_update_message: 
       one: "שיחה אחת עובדה"
       other: "%{count} שיחות עובדו"
-    not_participating: "המשתמש אינו משתתף בשיחה זו"
+    not_participating: "המשתמש אינו משתתף בדיון זה"
   conversations: 
     add_attachment: 
       titles: 
@@ -4417,7 +4425,7 @@ he:
     conversation_context: "משיחה עם"
     conversation_item: 
       has_attachments: "לדיון זה תצריף אחד או יותר"
-      has_media: "לשיחה זו הודעת מדיה אחת או יותר"
+      has_media: "לדיון זה הודעת מדיה אחת או יותר"
       inbox_actions: 
         action_star: "הוספת כוכבית"
         action_unstar: "הסרת כוכבית"
@@ -4588,6 +4596,7 @@ he:
   count_items_deleted_successfully_a287aa53: 
     one: "%{name}  בוטל בהצלחה"
     other: "%{count} פריטים בוטלו בהצלחה"
+  count_items_on_page_page_961fc0c7: "%{count} פריטים בדף %{page}"
   count_items_selected_91814713: 
     one: "%{count} פריטים נבחרו"
     other: "%{count} פריטים נבחרו"
@@ -5433,7 +5442,7 @@ he:
   create_a_new_user_for_address_7487e9c9: "יצירת משתמש חדש עבור \"%{address}\""
   create_account_263ec6: "יצירת חשבון"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "יצירת וניהול בחנים וסקרים מקוונים, בין אם להערכה או בלעדיה"
-  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: "יצירת נושאי שיחה רבים ככל שנחוץ. כמטלות להערכה או כפורום לשיתוף רעיונות ומידע"
+  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: "יצירת נושאי דיון רבים ככל שנחוץ. כמטלות להערכה או כפורום לשיתוף רעיונות ומידע"
   create_assignment_68532ceb: "יצירת משימה"
   create_assignments_on_the_assignments_page_organiz_8838b18a: |-
       יצירת מטלות בדף המטלות. ארגון מטלות בקבוצות
@@ -5527,6 +5536,7 @@ he:
           count: "תיקון ספירת תלמידים מרף עליון"
     difficulty: 
       index: "מדד רמת הקושי"
+    encoding: UTF-8
     middle: 
       student: 
         count: "ספירת תלמידים באמצע"
@@ -5991,7 +6001,7 @@ he:
     atom_no_author: "אין עורך"
     default_user_name: "שם משתמש"
   discussion_group_category_locked: " אין להגדיר קטגוריות קבוצה ישירות במשימת דיון, אך ניתן להגדיר אותן בדיון עצמו."
-  discussion_submission_781d5d33: "הגשת שיחה"
+  discussion_submission_781d5d33: "הגשת דיון"
   discussion_topic: 
     atom_no_author: "אין עורכ/ת"
     default_title: "אין כותרת"
@@ -6001,7 +6011,7 @@ he:
   discussion_topic_menu_3d4684c6: "תפריט נושא דיון"
   discussion_topic_will_be_available_starting_at_46aa7477: "נושא הדיון יהיה זמין החל מ"
   discussion_topic_will_be_available_until_f5e3abc8: "נושא דיון יהיה זמין עד"
-  discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "נושא השיחה יופיע ברשימת המטלות של התלמיד לתאריך"
+  discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "נושא הדיון יופיע ברשימת המטלות של התלמיד לתאריך"
   discussion_topics: 
     assignment_details: 
       available_from: "זמין מתאריך"
@@ -6019,7 +6029,7 @@ he:
       other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} ההכרזות האלה?"
     confirm_delete_discussion_topic: 
       one: "האם את/ה בטוח/ה שרוצה לבטל את נושא השיחה הזה?"
-      other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} נושאי השיחה האלה?"
+      other: "האם את/ה בטוח/ה שרוצה לבטל את %{count} נושאי דיון אלה?"
     create_new_crumb: "יצירת חדש"
     default_discussion_title: "אין כותרת"
     deleted_topic_notice: "הנושא בוטל"
@@ -6093,7 +6103,7 @@ he:
     error_draft_state_with_posts: "אין להגדיר נושא זה כטיוטה כיון שהוא כולל פרסומים"
     error_group_announcement: "אין אפשרות להשתמש בדיון קבוצתי להכרזה זו"
     error_group_change: "אין אפשרות לשנות קיבוץ בדיון שכולל תגובות"
-    error_todo_date_assignment: "תאריך לא ניתן להוספה אם נושא השיחה מוערך"
+    error_todo_date_assignment: "תאריך לא ניתן להוספה אם נושא הדיון מוערך"
     error_todo_date_unauthorized: "אין לך הרשאות להוסיף נושא זה לרשימת המטלות של התלמיד"
     flash: 
       fail: "הביטול של ההכרזה נכשל"
@@ -6299,7 +6309,7 @@ he:
   dismiss_this_5c74dddc: "התעלם מזה"
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "הצגת כל מלל הקישורים בקנבס כ *מלל עם קו תחתי*"
   display_as_e2a5c383: "הצגה כ"
-  display_as_percentage_3e755dc: "הצגה כאחוז"
+  display_as_percentage_3e755dc: "הצגה כאחוזים"
   display_as_points_63084235: "הצגה כניקוד"
   display_course_catalog: "הצגת רשימה ניתנת לחיפוש של קורסים מחשבון בסיס זה המאפשרים \"הכללת קורס זה באינדקס הקורסים הפתוחים לכל\" "
   display_name_6c2cfc58: "הצגת השם:"
@@ -6570,6 +6580,7 @@ he:
   enabled_links_be110215: "קישורים במצב פעיל"
   enabled_web_services_f620b2be: "שרותי ווב משופעלים"
   encourage_class_participation_4e069479: "עידוד השתתפות בכתה"
+  encrypted_sourcedids_for_basic_outcomes_87fa11ea: "הצפנת Sourcedids עבור תוצאות בסיסיות"
   end_course_set_up_tutorial_dialog_5b812ec6: "דיאלוג הגדרות סיום קורס"
   end_course_set_up_tutorial_f358b85d: "מדריך הגדרות סיום קורס"
   end_date_cannot_be_before_start_date_eb62ed6d: "תאריך סיום אינו יכול להיות קודם לתאריך תחילה"
@@ -6640,6 +6651,7 @@ he:
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "הקלד/י שאלתך, תוך הגדרת המיקום שכל רשימה נפתחת צריכה להשתלב. ואז הגדר/י תשובות אפשריות לכל רשימה נפתחת."
   enter_your_question_text_4729b886: "הזנת מלל שאלתך"
   enter_your_question_text_students_will_see_the_que_f19af9e9: "הזנת מלל שאלתך. תלמידים יראו את השאלה המלווה בתיבת מלל קטנה אליה יקלידו את תשובתם"
+  entity_entity_id_not_found_in_federation_name_meta_e622124: "ישות%{entity_id} לא נמצאה ב %{federation_name} מטה-נתונים"
   entity_entity_id_not_found_in_incommon_metadata_2efb5131: "הישות %{entity_id} אינה מופיעה במילון הנתונים המשותף"
   eportfolio: 
     buttons: 
@@ -6892,9 +6904,12 @@ he:
   error_59293a2c: שגיאה
   error_98e81528: שגיאה
   error_deleting_name_reason_11f9d399: "שגיאת נסיון ביטול %{name}: מסיבה %{reason}"
+  error_duplicating_module_4b023042: "שגיאת מודול כפול"
   error_exporting_gradebook_msg_6ea31e2f: "שגיאת ייצוא ספר הציונים: %{msg}"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} בטווח מסלולי התמחות %{index}"
+  error_loading_gradebook_history_try_again_19032437: "שגיאה בעת טעינת ספר הציונים. האם לנסות שוב?"
   error_message_2b9d12ee: "שגיאה: %{message}"
+  error_rendering_duplicated_module_db821097: "Error rendering duplicated module"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "תקלה בהעלאת כלי זיהוי העתקות"
   error_running_quizzes_2_export_cfecedba: "שגיאה בריצת ייצוא של בחנים"
   error_uploading_file_e2d31b56: "שגיאת העלאת קובץ"
@@ -6930,6 +6945,7 @@ he:
       invalid: "אינו תקין"
       less_than: "חייב להיות פחות מ- %{count}"
       less_than_or_equal_to: "חייב להיות פחות או שווה ל- %{count}"
+      model_invalid: "ואילידאציה נכשלה: %{errors}"
       not_a_number: "אינו מספר"
       not_an_integer: "חייב להיות מספר שלם"
       odd: "חייב להיות אי-זוגי"
@@ -7158,9 +7174,13 @@ he:
   failed_276786d: נכשל
   failed_307449e1: "נכשל:"
   failed_creating_user_b706a1c5: "יצירת משתמש נכשלה"
+  failed_loading_associations_component_is_your_netw_fa49fb32: "כשלון בטעינת רכיב קשור. האם החיבור לרשת תקין?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "טעינת חלקי הקורס נכשלה. יש לרענן ולנסות שוב"
+  failed_loading_sync_history_component_is_your_netw_2d04fc10: "כשלון בטעינת רכיב הסינכרון של ההיסטוריה. האם החיבור לרשת תקין?"
+  failed_loading_unsynced_changes_component_is_your__89f863d6: "כשלון בטעינת רכיב השינויים שטרם סונכרנו. האם החיבור לרשת תקין?"
   failed_to_create_webhook_b766cf5c: "נכשל ביצירת webhook."
   failed_to_create_zip_file_1a943d06: "נכשל ביצירת קובץ זיפ"
+  failed_to_export_some_tool_settings_c992fc56: "כשלון ביצוא הגדרות כלים מסויימות"
   failed_to_import_media_objects_4c1fcb4f: "נכשל בייבוא רכיבי מדיה"
   failed_to_log_in_7ceec561: "נכשל בהתחברות למערכת"
   failed_to_save_please_try_again_later_bb7070fb: "תקלה בנסיון לשמירה. יש לנסות שוב מאוחר יותר"
@@ -7228,6 +7248,7 @@ he:
   file_list_updated_38e2a5ad: "רשימת קבצים עודכנה"
   file_menu_cc0ca54: "תפריט קבצים"
   file_name_2fe68ec1: "שם קובץ"
+  file_not_available_1869c733: "הקובץ אינו זמין"
   file_not_found_9eec054c: "קובץ לא נמצא"
   file_preview_eedb43f2: "תצוגה מקדימה של קובץ"
   file_previews: 
@@ -7250,6 +7271,13 @@ he:
     unpublished_status: "לא פורסם"
   file_upload_submission_740711f: "הגשת העלאת קובץ"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename}  פורסם עם זכויות השימוש הבאות: %{usage_right}"
+  filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} מוסתר. זמין עם קישור. הקש/י כדי לעדכן"
+  filename_is_locked_click_to_modify_bf711763: "%{fileName}  נעול - הקש/י כדי לעדכן"
+  filename_is_published_click_to_modify_38a4a269: "%{fileName} פורסם. - הקש/י כדי לעדכן"
+  filename_is_restricted_9aaf9250: "%{fileName} הנו%{restricted}"
+  filename_is_restricted_click_to_modify_c0bb77f8: "%{fileName} הנו %{restricted} - הקש/י כדי לעדכן"
+  filename_is_unlocked_click_to_modify_99e847be: "%{fileName}  אינו נעול - הקש/י כדי לעדכן"
+  filename_is_unpublished_click_to_modify_7e731102: "%{fileName} טרם פורסם - הקש/י כדי לעדכן"
   filename_progress_percent_uploaded_1f465e66: " אחוז התקדמות %{progress} בהעלאת קובץ %{fileName}"
   filename_uploaded_successfully_edd8e825: "%{fileName} הועלה בהצלחה!"
   files: 
@@ -7345,6 +7373,7 @@ he:
   first_last_name_9820d256: "שפ פרטי, משפחה"
   first_name_d5c12500: "שם פרטי"
   first_reviewer_9ea05caa: "בודק/ת ראשון/ה"
+  first_reviewer_sortorder_e2184140: "סוקר/ת ראשון %{sortOrder}"
   flash_6afbf65a: פלאש
   folder: 
     course_content_folder_name: "תוכן הקורס"
@@ -7392,6 +7421,8 @@ he:
   full_name_is_required_8efbdc84: "נדרש שם מלא"
   future_5416ea92: עתיד
   future_terms_7fba2ae6: "עונות עתידיות"
+  general_locked_objects_6a9adafb: "פריטים כלליים שנעולים"
+  generate_activity_for_user_2b0af749: "יצירת פעילות עבור %{user}"
   generate_epub_80e89ea4: "צור/י ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "הפקת דוח ניתוח פריטים %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "הפקת דוח ניתוח תלמידים %{statusLabel}"
@@ -7401,10 +7432,13 @@ he:
   generating_preview_45b53be0: "מכין תצוגה מקדימה..."
   germany_49_fc5b8179: "גרמניה (+49)"
   germany_b02d91c9: גרמניה
+  get_started_b9507525: "ניתן להתחיל"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "הבאת אלו מתוך אפליקצית Salesforce המקושרת שלך"
   get_your_users_error_reports_posted_to_salesforce__76f57839: " הבאת דוחות שגויי משתמשיך אשר פורסמו בשרות הענן של Salesforce"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "הבאת דוחות שגויי משתמשים אשר פורסמו ב Salesforce"
   getting_started_with_collaborations_794240ba: "תחילת פעילות בשיתופי פעולה"
+  give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "מתן ציון אחיד לכל תלמידים עבור *%{assignment.name}* באמצעות כניסה ושליחה של ערך הציון הבא:"
+  give_all_students_the_same_percent_grade_for_assig_6a008004: "מתן ציון *באחוזים* אחיד לכל תלמידים עבור **%{assignment.name}** באמצעות כניסה ושליחה של ערך הציון הבא:"
   global_branding_df1cae12: "מיתוג גלובלי"
   global_message_icons: 
     announcement: הכרזה
@@ -7417,6 +7451,7 @@ he:
   global_navigation_8bee3501: "ניווט ראשי"
   go_30af2a7b: בצע
   go_back_ed239e69: חזרה
+  go_to_name_s_profile_eaa1826b: "עבור לפרופיל של  %{name}"
   go_to_settings_for_name_812308b5: "עבור להגדרות של %{name}"
   go_to_statistics_for_name_2ee6b6f3: "עבור לסטטיסטיקות של %{name}"
   good_284a7a8f: טוב
@@ -7438,20 +7473,30 @@ he:
   gpa_scale_a6d1cdea: "סולם GPA"
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: ציון
+  grade_a91e433e: "הערכה:"
   grade_assignment_7c1abc11: "הערכת %{assignment}"
+  grade_change_activity_75fb525: "מתן ציון לפעילות ששונתה"
+  grade_changes_cb5a57a8: "שינויי הערכה"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "אין להציג לקורס זה שנית"
       warning: אזהרה
   grade_distribution_e52c9256: "התפלגות ציונים"
   grade_export_title: "ייצוא ציונים"
+  grade_for_name_b9df168a: "הערכה של: %{name}"
+  grade_high_to_low_1cea0381: "הערכה - מהגבוה לנמוך"
   grade_history_9c51ad49: "הסטורית הערכות..."
   grade_info_19fb9875: "מידע ציונים"
+  grade_low_to_high_1678b713: "הערכה - מהנמוך לגבוה"
+  grade_out_of_percentage_1972bf52: "ציון מתוך %{percentage}"
+  grade_out_of_points_d401b79d: "ציון מתוך %{points}"
+  grade_point_average_2976cc59: "ממוצע ציונים"
   grade_summary: 
     graph_title: "ממוצע %{mean}, גבוה %{high},  נמוך %{low}"
     outcome: 
       alignment_count: "*%{count}* עימודים"
       alignment_count_summary: "*8* מתוך *%{count}* עימודים"
+  grade_syncing_e78475e8: "סינכרון הציון"
   gradebook: 
     alerts: 
       no_active_students: "מצטערים, או שאין תלמידים פעילים בקורס או שאף אחד מהם אינו בר הערכה על ידך."
@@ -7470,6 +7515,7 @@ he:
       submit_comment: "שליחת הערה"
       submitting: מבצע...
     cancel_button: ביטול
+    canvadoc_expiring: "ה DocViewer שלך בקנבס עומד לפוג. נא לטעון את החלון מחדש כדי למנוע איבוד עבודה."
     click_to_change: "הקלק/י כדי לקבל ציון אחר"
     column_header: 
       assignment_options: "אפשרויות מטלה"
@@ -7587,8 +7633,8 @@ he:
       switch_to_percent: "מעבר לתצוגת אחוזים"
       switch_to_points: "מעבר לתצוגת נקודות"
     turnitin: 
-      error_message: "אירעה שגיאה בהגשית turnitin. יש לנסות להגיש את הקובץ שוב לפני שפונים לתמיכה הטכנית"
-      info_message: "קובץ זה עדיין בעיבוד ע\"י turnitin. יש לבדוק שוב מאוחר יותר כדי לעיין בציון"
+      error_message: "אירעה שגיאה בעת השליחה לשרות בדיקת התאימות. יש לנסות לשלוח את הקובץ שוב לפני שפונים לסיוע טכני."
+      info_message: "הקובץ עדיין בתהליך עיבוד של כלי בדיקת העתקות הקשור למטלה זו. נא לבדוק שוב את ההערכה מאוחר יותר."
       resubmitting: "משגר מחדש..."
       tooltip: 
         error: "ניקוד תאימות - ראו פרטי שגיאות הגשה"
@@ -7711,12 +7757,16 @@ he:
     ungraded: "לא שוקלל בהערכה"
   gradebook_1620a0aa: "ספר הציונים"
   gradebook_5fd8ef0: "ספר הציונים..."
+  gradebook_context_name_9dbae5bc: "ספר הציונים - %{context_name}"
   gradebook_csvs: 
     grades_filename: ציונים
   gradebook_export_failed_reason_2b0f6c53: "ייצוא ספר הציונים נכשל: %{reason}"
   gradebook_export_started_723461b9: "ייצוא ספר הציונים החל"
+  gradebook_history_a3e8e0b4: "הסטורית ספר ציונים"
+  gradebook_history_b03f8524: "הסטורית ספר ציונים..."
   gradebook_individual_view_8846598e: "ספר הציונים: תצוגה אישית"
   gradebook_performance_764d8b3d: "ביצועי ספר הציונים"
+  gradebook_settings_b45c6df9: "הגדרות ספר ציונים"
   gradebook_tutorial_tray_d835c750: "איזור מדריך ספר הציונים"
   gradebook_uploads: 
     new: 
@@ -7823,7 +7873,7 @@ he:
       media_comment: "זוהי הערת מדיה,"
       not_official: "*יש לשים לב*. זהו אינו הציון הרשמי שלך."
       page_title: "ציונים ל %{student}"
-      print_grades: "הדפסת ציונים"
+      print_grades: הדפסה
       score_details: "פרטי ציונים"
       see_rubric_results: "ראה/י תוצאות הרובריקה"
       see_rubric_results_screenreader: "ראה/י תוצאות הרובריקה"
@@ -8028,6 +8078,7 @@ he:
   graded_discussion_a873bb3e: "דיון מוערך"
   graded_quiz_7fabdf1f: "בוחן מוערך"
   graded_survey_c0f0c395: "סקר מוערך"
+  grader_d1198a9c: בוחן
   grades_a61eba0a: ציונים
   grades_are_now_reverted_to_original_scores_e6deade1: "הציונים כעת חזרו לניקוד המקורי"
   grades_are_now_showing_what_if_scores_711a8be2: "ההערכות מראות כעת ציוני מה-היה-אילו"
@@ -8056,9 +8107,9 @@ he:
       one: "הציון אינו כולל %{groups} כיון שאין לקבוצות אלו נקודות אפשריות"
       other: "הציון אינו כולל %{groups} כיון שאין לקבוצות אלו נקודות אפשריות"
     keyboard_assignment_desc: "מעבר אל דף פירוט משימה נוכחית"
-    keyboard_close_menu: "סגירת תפריט משימות הפעיל כרגע"
+    keyboard_close_menu: "בבקשה לסגור את התפריט הפעיל כרגע"
     keyboard_comment_desc: "הערות להגשה הפעילה"
-    keyboard_menu_desc: "פתיחת התפריט של עמודת המשימה הפעילה"
+    keyboard_menu_desc: "פתיחת התפריט לעמודה הפעילה"
     keyboard_sort_desc: "מיון הטבלה לפי העמודה הפעילה הנוכחית "
     keyboard_tooltip_desc: "הצגת סוג ההגשה להגשה הפעילה"
     keycodes: 
@@ -8100,6 +8151,7 @@ he:
       overlap_message: "תקופת הערכה אינה יכולה לחפוף תקופות הערכה נוכחיות לקבוצה"
   grading_period_8b0a4a10: "תקופת הערכה"
   grading_period_close_date_precedes_end_date_7628a691: "תאריך סגירה של תקופת הערכה צריך להקדים לתאריך הסיום של התקופה"
+  grading_period_filter_e1bf635a: "מסנן תקופת הערכה"
   grading_period_name_31ceb3e3: "שם תקופת הערכה"
   grading_period_set_f49fe74c: "אוגדן תקופות הערכה"
   grading_period_set_for_account_name_b9823b2a: "אוגדן תקופות הערכה עבור %{account_name}"
@@ -8107,9 +8159,12 @@ he:
   grading_period_set_title_880a6ec4: "כותרת אוגדן תקופות הערכה"
   grading_period_title_23b7f8ac: "כותרת תקופת הערכה"
   grading_period_weight_99b66906: "משקלות תקופות הערכה"
+  grading_period_weights_aaea757f: "משקלות תקופות הערכה"
   grading_periods_81941e66: "תקופות הערכה"
+  grading_periods_are_weighted_4f3663ab: "תקופות ההערכה משתקללות"
   grading_periods_must_not_overlap_f45336fb: "תקופות הערכה אינן יכולות לחפוף"
   grading_scheme_deleted_7ae5a072: "סכימת הערכה בוטלה"
+  grading_scheme_f151d195: "סכימת הערכה"
   grading_scheme_saved_85535151: "סכימת הערכה נשמרה"
   grading_schemes_1c3c3252: "סכימות הערכה"
   grading_standard: 
@@ -8147,6 +8202,7 @@ he:
   graph_of_student_page_views_by_category_7cb49887: "תרשים של הצגת דפי תלמיד לפי קטגוריה"
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "תרשים התפלגות הציונים במחלקה"
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "תרשים שמראה את שיעור העמידה במועד של ההגשות לכל מטלה"
+  graphql_api_af4deb45: "GraphQL API"
   graphs_89fcfeb: גרפים
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "מצויין, כעת יש לך קורס. מה הלאה? ובכן, לפני שמפרסמים אותו לעולם, כדאי לוודא שהבסיס טופל כהלכה. מוצע לעבור על רשימת התיוג שבצד הדף כדי לוודא שהקורס מוכן לשימוש."
   green_15af4778: ירוק
@@ -8212,6 +8268,7 @@ he:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} ב %{group_category_name} קטגורית קבוצה"
   group_name_is_required_5547bc0b: "נדרש שם קבוצה"
   group_roster_1846bf84: "לוח משתתפי הקבוצה"
+  group_select_330df8bd: "בחירה קבוצתית"
   group_set_name_2aed2347: "שם אוסף קבוצות"
   group_settings: 
     invitation_sent: "נשלחה הזמנה"
@@ -8562,6 +8619,7 @@ he:
       על פרויקט מוגדר יותר.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "אין להגביל גודל קבוצות כדי לאכלס לפי הקבצות"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "קבוצות צריכות להיות ריקות כדי לאכלס לפי הקבצה"
+  groups_navigation_menu_76b5acc6: "תפריט ניווט קבוצות"
   groupweight_of_total_9579ae8c: "%{groupWeight}% מהסך הכל"
   handlebars_helpers: 
     time: 
@@ -8666,6 +8724,7 @@ he:
   hide_notes_column_7749f408: "הסתרת עמודת ההערות"
   hide_sidebar_2b5b3776: "הסתרת ניווט צידי"
   hide_student_names_3e59e862: "הסתרת שמות התלמידים"
+  hide_sub_accounts_for_account_name_a6de98bd: "הסתרת חשבונות משנה של %{account_name}"
   high_b5cbd048: גבוה
   high_contrast_description: |-
       קונטרסט רב מטפל בניגודי הצבעים של ממשק המשתמש (מלל, כפתורים וכדומה), שהופך פריטים אלה יותר בולטים
@@ -8682,6 +8741,9 @@ he:
   hong_kong_852_98e3b3fe: "הונג קונג (+852)"
   host_8be927e0: Host
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: " ה Host אינו נגיש או שכתובתו אינה בקטלוג"
+  hour_34d02553: שעה
+  hour_s_b6e8d238: שעה(ות)
+  hours_late_989e9081: "שעות איחור"
   hover_over_me_496521b9: "רחף/י מעלי"
   how_is_this_affecting_you_b3b6a639: "כיצד הדבר משפיע עליך?"
   how_many_minutes_ecca5ee7: "כמה דקות?"
@@ -8689,7 +8751,9 @@ he:
       כברירת מחדל, קנבס ינסה להשתמש בפלאש להצגת וידאו. אפשר להפעיל אפשרות זו כדי  להשתמש קודם כל ב HTML5.
       ורק אם הדבר לא מצליח להשתמש בפלאש.
   html_editor_fb2ab713: "עורך HTML"
+  i_agree_to_the_34aa16ce: "מסכים/ה ל"
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "אני מסכים/ה ל*תנאי השימוש* ול**מדיניות הפרטיות**."
+  i_agree_to_the_tool_s_270301a5: "מסכים לתנאי הכלי"
   i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "אין אפשרות לטפל בענין לפני שנשמע ממך שוב"
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "קיבלתי הרשאות להשתמש בקובץ זה"
@@ -8697,6 +8761,7 @@ he:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "נדרשת עזרה, אבל הדבר אינו דחוף"
   ic_actions: 
     manage: ניהול
+  iceland_354_1a03c558: איסלנד(+354)
   icon_215a1dc6: צלמית
   icons: 
     discussion_submission: "הגשת דיון"
@@ -8707,11 +8772,13 @@ he:
     text_entry_submission: "הגשת קלט טקסט"
   id_ac7afadf: מזהה
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "המזהה כבר בשימוש לחשבון זה ולספק אימות ההזדהות"
+  id_id_4e148481: "מזהה: %{id}"
   idp_entity_id_25c51837: "IdP Entity ID"
   idp_metadata_uri_dae5314a: "מזהה של כתובת URI של מילון הנתונים"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "אם תכונה מסומנת כתחליפית, אז היא תשומש רק בעת יצירת מקוונת של משתמש ולא תתעדכן כל פעם שהמשתמש מתחבר."
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "אם מופעל, מעצבי תוכן חייבים לספק זכויות יוצרים ולבצע רישוי למידע בקבצים אלו לפני שיוכלו לפרסם. רלוונטי רק אם Better File Browsing גם כן מופעל."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "אם מופעל, הפרמטרים של השאילתה לא יועתקו לגוף דף כתובות היעד בעת תחילת מהלך LTI"
+  if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "אם מופעל, Sourcedids שמשמש בקנבס לתוצאות בסיסיות יוצפן."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(אם אף אחד לא נבחר ישלח לכולם שבחשבון זה)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(אם אף אחד לא נבחר ישלח לכולם שבחשבון המשנה הזה)"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "אם תשנו את הניקוד האפשרי של מטלה יש לבצע הערכה מחודשת של המשימה."
@@ -8757,7 +8824,9 @@ he:
   import_1b31507: ייבוא
   import_content_b2fd6620: "ייבוא תוכן"
   import_sis_data_428cc803: "יבוא נתוני המערכת הבית ספרית"
+  import_tutorial_tray_8b92e956: "יבוא Tutorial Tray"
   important_note_educational_institutions_have_an_ob_c9350304: "*הערה חשובה: מוסדות חינוך חייבים לאפשר נגישות גבוהה ככל שאפשר לחומרי הלימוד שלהם. אנו ממליצים לפחות יחס של 3:1 בקונטרסט הכתוביות מול צבע רקע כדי לשמור על התוכן קריא. בקלות ניתן לבחון את רמת הקונטרסט עם **WebAIM Color Contrast Checker***."
+  imported_from_posttosisname_f7cc9258: "מיובא מ %{postToSISName}"
   imported_from_sis_3006b19c: "ייבוא מהמערכת הבית סיפרית"
   importers/assignment_importer: 
     errors: 
@@ -8792,8 +8861,10 @@ he:
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "כדי להשלים את התהליך תנותב/י לדף הזדהות שם יש צורך להזדהות עם הרשאות ילדך."
   in_progress_9d1ce8b9: בתהליך
   inactive_cd40317f: "לא פעיל"
+  inactive_enrollments_3b84be3d: "הרשמות לא פעילות"
   inbox_bb245a60: "תיבת הדוא\"ל הנכנס"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "שילוב קישור לצילום מסך או צילום שידור בעזרת כלי כמו *Jing*."
+  include_course_settings_c4c08764: "הכללת הגדרות הקורס"
   include_deleted_enrollments_1c87684a: "הכללת הרשמות שבוטלו"
   include_deleted_objects_3cced3b5: "הכללת פריטים שבוטלו"
   include_scores_when_alerting_about_grade_changes_623ec201: "שילוב הציונים בהתראה לגבי שינויי הערכה."
@@ -8802,8 +8873,10 @@ he:
       הכללת ציונים כאשר מתריאים על גליון הערכה.
       אם כתובת הדוא"ל שלך אינה של מוסד משמעו שתוכן רגיש ישלח אל מחוץ למוסד.
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "הכלילו ציוני המשימה הזו בעת הפרסום למערכת המידע של תלמידי ביה\"ס"
+  include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "הכלילו ציוני המשימה הזו בעת סינכרון עם מערכת המידע של תלמידי ביה\"ס"
   include_unpublished_assignments_83ebbaec: "הכללת משימות שלא פורסמו"
   include_unpublished_courses_7a0e7aab: "הכללת קורסים שלא פורסמו"
+  incomplete_95612d72: "לא הושלם"
   incomplete_da3c2ea2: "לא הושלם"
   incorrect_answer_7c17e63b: "תשובה שגויה"
   incorrect_username_and_or_password_2de73abb: "שם משתמש או סיסמה שגויים"
@@ -8829,6 +8902,10 @@ he:
   inner_box_background_6f9092f: "רקע  תיבה פנימית"
   inner_box_border_d0524b03: "גבולות תיבה פנימית"
   input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
+      הקלדת והפצת הערכות עבור התלמידים. הצגת ההערכות כציונים
+      אחוזים או כלא הושלמו, עברו, נכשלו, או בסולם GPA והערכה מילולית
+      ההערכה של משימות קבוצתיות ממתינה
+  input_and_distribute_grades_for_students_display_g_9a2e46a0: |-
       הקלדת והפצת הערכות עבור התלמידים. הצגת ההערכות כציונים
       אחוזים או כלא הושלמו, עברו, נכשלו, או בסולם GPA והערכה מילולית
       ההערכה של משימות קבוצתיות ממתינה
@@ -8904,18 +8981,24 @@ he:
       view_in_new_window: "תצוגה בחלון חדש"
     tooltips: 
       enter_search_terms: "הקלדת מונחי חיפוש"
+  instructure_default_73317bb1: "ברירת מחדל של Instructure"
+  integration_id_a6977535: "מזהה אינטגרציה:"
   integration_id_int_id_is_already_in_use_f30f03b5: "מזהה אינטגרציה \"%{int_id}\" כבר בשימוש"
   interactions_report_47c1219e: "דוח אינטרקציות"
   international_sms_9edb9868: "מסרון בינלאומי"
   international_sms_send_from_recipient_s_country_43881ea4: "מסרון בינלאומי - שיגור ממדינת הנמען"
   international_text_messaging_rates_may_apply_d4b4a97a: "יתכן חיוב לפי שיעורי עלות מסרונים בינלאומיים"
+  internet2_254c6ca6: Internet2
   invalid_address_book_strategy_904a7ada: "איסטרטגיה לא תקינה של פנקס הכתובות"
   invalid_authenticity_token_b753558c: "אסימון הזדהות לא תקין"
   invalid_aws_configuration_e8a6ae0f: "הגדרות לא תקינות של AWS"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "קובץ CSV לא תקין. ההערכות לא עודכנו"
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "קובץ CSV לא תקין, הציונים לא עודכנו."
+  invalid_date_or_invalid_datetime_for_attr_6661103f: "תאריך או זמן לא תקינים עבור %{attr}"
   invalid_points_possible: "ערך הנקודות האפשריות למשימה זו חייב להיות אפס או יותר."
   invalid_recipient_name_56b22b86: "שם נמען שגוי"
+  invalid_restrictions_316cd740: "הגבלות לא תקינות"
+  invalid_sis_sync_status_b68db497: "סטטוס סינכרון עם SIS אינו תקין"
   invalid_state_parameter_7a5aa108: "פרמטר מצב אינו תקין"
   invalid_url_in_xml: "כתובת אינטרנט שגויה ב XML. אין לכלול אמפרסנדים - &"
   invalid_username_or_password_b60aa240: "שם משתמש או סיסמה שגויים"
@@ -8931,9 +9014,12 @@ he:
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "נראה שהתוכן שלך לא יעלה. ניתן להשתמש בכפתור זה כדי לנסות ולהעלות אות בלשונית חדשה."
   it_took_too_long_to_login_please_try_again_c1ed2e28: "לקח יותר מדי זמן להתחבר. בבקשה לנסות שוב."
   italy_39_cfad867a: "איטליה (+39)"
+  item_cannot_be_duplicated_cebf3109: "פריט אינו יכול להיות כפול"
   item_complete_d334fd43: "(הפריט הושלם)"
+  item_filter_ca3987d7: "מסנן פריט"
   item_incomplete_d6a16040: "(הפריט לא הושלם)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name}  אינו נתמך בשלב זה"
+  item_select_fe0f320a: "בחירת פריט"
   item_type_assignment_13a1132e: "סוג פריט: משימה"
   item_type_choice_aebcf2ef: "סוג פריט: בחירה"
   item_type_discussion_e3ddae9b: "סוג פריט: דיון"
@@ -8996,6 +9082,7 @@ he:
         original_job_id: "מזהה מקורי של תהליך עיבוד"
         priority: עדיפות
         run_at: "ריצה ב-"
+        source: מקור
         strand: strand
         tag: תג
         total_jobs: סה"כ
@@ -9008,6 +9095,8 @@ he:
   join_6cafecca: הצטרפות
   join_course_511e6cb3: "הצטרף/י ל %{course}"
   join_group_group_name_871a5e3f: "הצטרפות לקבוצה %{group_name}"
+  join_the_conversation_using_the_link_below_54ab1f0e: "הצטרפות לדיון בעזרת הקישור שלהלן:."
+  join_the_conversation_using_this_link_link_9017499: "הצטרפות לדיון בעזרת קישור זה: %{link}."
   joined_group_group_name_e3802c04: "הצטרפת לקבוצה %{group_name}"
   joining_81f8b6c9: מצטרפים
   jpg_png_or_gif_files_14e360d2: "קבצי jpg, png, או gif "
@@ -9021,7 +9110,9 @@ he:
       תכונות, הגדרות ועיצוב אשר מתאימים יותר לסביבת בתי הספר.
       בשלב זה הדבר מתיחס רק למספר שינויי עיצוב, אך בהמשך יפותחו יותר נושאים יעודיים לבתי ספר.
   k_2521301c: k
+  keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "יש לזכור, הגשה זו נספרת לכל אחד בקבוצה %{groupType} שלך."
   keep_submissions_anonymous_5cbaf419: "שמירת הגשות כאנונימיות"
+  key_api_key_68bf80ae: "מפתח: *%{api_key}*"
   keyboard_instructions_e032939f: "הוראות שימוש במקלדת"
   keyboard_nav_dialog: 
     esc_key_notification: "יש להקיש על מקש ה Esc טרם השימוש בקיצורי המקלדת כאשר מנווטים ברשת ספר הציונים"
@@ -9031,6 +9122,7 @@ he:
     lock_module_until: "נעילה עד"
   last_enrollment_activity_10fe15ba: "פעילות הרשמה אחרונה"
   last_export_899a04c5: "ייצוא אחרון:"
+  last_first_name_95a078f5: "שם משפחה, פרטי"
   last_item_79583712: "פריט אחרון:"
   last_length_graded_items_6db7374e: "  %{length} פריטים אחרונים שהוערכו"
   last_login_54565109: "התחברות אחרונה"
@@ -9039,12 +9131,26 @@ he:
   last_name_303122f3: "שם משפחה"
   last_post_display_last_reply_at_b9896355: "הפרסום האחרון %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "העדכון האחרון שנשלח: %{last_export_at}"
+  last_used_f9457313: "שומש לאחרונה:"
   last_user_access_title: "כניסת משתמש אחרונה"
   late_2be42b88: איחור
+  late_8bd684b6: מאוחר
+  late_bd436902: מאוחר
+  late_penalty_78099d18: "קנס פיגור:"
+  late_penalty_817fff4e: "קנס פיגור:"
+  late_penalty_9c312b22: "קנס פיגור"
   late_percent_b91d01b3: "איחור של: %{percent}"
+  late_policies_42bac80: "מדיניות אחרונה"
+  late_policies_fd5dced6: "מדיניות אחרונה"
+  late_policies_updated_2ecf9aff: "מדיניות אחרונה עודכנה"
+  late_submission_deduction_interval_b9fca334: "מרווח קנס להגשות בפיגור"
+  late_submission_deduction_must_be_between_0_and_10_9cde872d: "מרווח קנס של הגשות בפיגור צריך להיות בין 0 ל 100"
+  late_submission_deduction_must_be_numeric_5b3f468e: "מרווח הגשות בפיגור צריך להיות נומרי"
+  late_submission_deduction_percent_52516a62: "שיעור הקנס של הגשה מאוחרת"
   latest_assessment_a85280ef: "הערכה אחרונה"
   latest_f604a75: אחרון
   latest_score_905aa87b: "ציון אחרון"
+  launch_external_tool_672c0409: "הפעלת כלי חיצוני"
   launch_registration_tool_38d4781: "הפעלת כלי הרשמה"
   launch_url_e150bd41: "פתיחת דף בכתובת"
   layouts: 
@@ -9079,12 +9185,17 @@ he:
       ספר הציונים של לימוד להתמחות מספק אמצעי למורים לעיין בזריזות בתלמיד ובהתקדמות הישגי הלמידה של הקורס.
       הישגי למידה מוצגות במעין פורמט ספר ציונים
       והתקדמות התלמיד מוצגת גם כציון וגם כהתמחה/קרוב להתמחות /טעון שיפור
+  learning_object_1f9e5dd8: "פריט למידה"
   learning_outcome: 
     no_comment: "אין הערות"
     no_description: "אין תיאור"
   leave_5e852989: עזיבה
+  leave_a_comment_7991725b: "השארת הערה"
   leave_group_group_name_6847c632: "עזיבת קבוצה %{group_name}"
   left_group_group_name_aac4e813: "עזבת קבוצה %{group_name}"
+  len_maxlen_97f1c88d: "%{len}/%{maxLen}"
+  length_notifications_found_25276610: "%{length} הודעות נמצאו"
+  length_results_found_3afd01e5: "%{length} תוצאות נמצאו"
   let_students_see_the_correct_answers_dacc2faf: "אפשר/י לתלמידים לעיין בתשובות הנכונות"
   let_students_see_their_quiz_responses_fbc07d14: "אפשר/י לתלמידים לעיין בתשובות הבוחן שלהם"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "אפשר/י לתלמידים לעיין בתשובות הבחנים שלהם (תשובות לא נכונות תסומנה במשוב לתלמיד)"
@@ -9100,8 +9211,11 @@ he:
       over_quota: "גודל הקובץ מעבר למכסה"
     auth: 
       api: 
+        bad_request_message: bad_request
         bad_request_messagee: bad_request
         bad_request_status: "bad_request "
+        not_found_message: not_found
+        not_found_status: not_found
       authentication_required: "נדרשת הרשאת המשתמש"
       errors: 
         not_authenticated: "יש צורך להתחבר כדי לעיין בדף זה"
@@ -9138,6 +9252,7 @@ he:
         quizzes: בחנים
         rubrics: רובריקות
         syllabus_body: "תוכן הסילבוס"
+        tool_profiles: "הפרופילים של הכלי"
         wikis: "דפי וויקי"
     cc: 
       standard: 
@@ -9171,6 +9286,7 @@ he:
       word_separator: " "
   license_help: 
     content_license_help: "עזרה ברישוי תוכן"
+  license_type_6b74b543: "סוג רשיון"
   life_preserver_icon_8660b6ce: "צלמית מצילת חיים"
   light_blue_5374f600: "כחול בהיר"
   light_green_c1cd020d: "ירוק בהיר"
@@ -9182,7 +9298,10 @@ he:
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "הגבלת משתתפים להיות נוכחים ב%{num_appointments} פגישות"
   limit_search_to_activity_after_c1ac2449: "הגבלת חיפוש לפעילות לאחר"
   limit_search_to_activity_before_e05aad05: "הגבלת חיפוש לפעילות לפני"
+  limit_section_privileges_e6425dfd: limit_section_privileges
   limit_students_to_attend_input_value_slot_s_9a5bf576: "הגבלת תלמידים בהשתתפות ב %{input_value} חלונ(ות) זמן. "
+  limit_this_slot_to_input_type_number_name_max_part_1580add0: "הגבלת חלון זה ל %{input_type_number_name_max_parti} קבוצות."
+  limit_this_slot_to_input_type_number_name_max_part_8344547a: "הגבלת חלון זה ל %{input_type_number_name_max_parti} משתמשים."
   link_7262adec: קישור
   link_color_55f8b835: "צבע קישור"
   link_description_4355ca82: "תיאור הקישור"
@@ -9221,18 +9340,24 @@ he:
       feedback: "יש להקליק כאן כדי לומר לנו מה קרה"
     show_me_where: "להראות לי היכן"
   links_14b70841: קישורים
+  list_view_430aecce: "תצוגת רשימה"
+  live_events_subscriptions_service_is_not_configure_8c6024e2: "שרות הרשמה לאירועים מקוונים אינו מוגדר"
   load_bank: 
     error_loading_banks: "שגיאה בטעינת מאגרים"
     loading_banks: "טוען מאגרים..."
   load_more_9ca37ccc: "טעינה של עוד..."
   loaded_more_collaborations_13f1d630: "נטענו שיתופים נוספים"
   loading_25990131: טוען...
+  loading_6ac402e1: טוען...
   loading_725811ca: טוען
   loading_announcements_b927a86c: "טוען הכרזות"
+  loading_assignments_352ec769: "טוען מטלות"
   loading_associations_9da66c4e: "טעינת פריטים נלווים"
   loading_associations_complete_b93a9c6e: "טעינת פריטים נלווים הסתיימה"
   loading_associations_started_1f65d8d: "טעינת פריטים נלווים החלה"
   loading_bde52856: טוען
+  loading_change_log_94ac6073: "טוען לוג שינויים"
+  loading_comments_32366acf: "טוען הערת"
   loading_courses_409a3641: "טעינת קורסים"
   loading_courses_bd1bffe: "טעינת קורסים..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -9240,12 +9365,19 @@ he:
     other: "טעינת קורסים הסתיימה: %{count} קורסים נמצאו"
   loading_courses_started_6e6d742c: "טעינת קורסים החלה"
   loading_data_ecd89ba: "טוען נתונים..."
+  loading_graders_f6a76142: "טוען בוחנים"
   loading_mastery_paths_c558a766: "טעינת נתיבי התמחות..."
+  loading_more_gradebook_history_results_810f6d2e: "טוען יותר תוצאות של הסטורית ספר הציונים"
   loading_more_results_def6df65: "טוען תוצאות נוספות..."
+  loading_results_769c8819: "טוען תוצאות"
+  loading_students_30b71301: "טוען תלמידים"
+  loading_sync_history_9f342cbf: "טוען את הסטורית הסינכרון"
+  loading_unsynced_changes_b5d7b202: "טוען שינויים שלא סונכרנו"
   locales: 
     he: "עברית (crowd-sourced)"
   location_e17bd402: מיקום
   lock_at_time_3c8a044e: "נעילה ב: %{time}"
+  lock_c341af13: נעילה
   lock_date_cannot_be_after_course_end_a473158b: "תאריך נעילה אינו יכול להיות אחרי מועד סיום הקורס"
   lock_date_cannot_be_after_section_end_d37da70c: "תאריך נעילה אינו יכול להיות לאחר סיום ההקבצה"
   lock_date_cannot_be_after_term_end_cf1a188f: "תאריך נעילה אינו יכול להיות אחרי מועד סיום המחצית/רבעון"
@@ -9253,12 +9385,20 @@ he:
   lock_questions_after_answering_5aecef9d: "נעילת שאלות אחרי שנתקבלו תשובות"
   lock_this_setting_for_sub_accounts_2ae5af17: "נעילת הגדרות אלו לחשבונות משנה"
   locked_762f138b: נעול
+  locked_796957c7: "נעול:"
+  locked_click_to_unlock_50747e11: "נעול: הקש/י להסרת נעילה"
   locked_content_f4ef2968: "תוכן נעול"
+  locked_object_configuration_d1fb1b82: "הגדרות של פריט נעול:"
+  locked_objects_by_type_ff376c6c: "פריטים נעולים לפי סוג"
+  locked_objects_cannot_be_edited_in_associated_cour_1af858c8: "פריטים נעולים אינם ניתנים לעריכה בקורסים משוייכים"
   locked_until_item_name_is_graded_3b8d967f: "נעול עד אשר \"%{item_name}\" יוערך"
+  locked_until_mastery_path_is_processed_for_item_na_48766cf7: "נעול עד אשר מסלול ההתמחות יעובד עבור  \"%{item_name}\""
   locked_until_unlock_date_498ead5f: "נעול עד %{unlock_date}"
+  locking_91f476a5: נועל...
   log_on_url_fc166e4c: "כתובת דף ההתחברות"
   log_out_379ba28a: "התנתקות מהמערכת"
   log_out_url_2605c2c1: "כתובת דף ההתנתקות"
+  logged_out_724b3717: מנותק
   logged_out_user: "התנתקו %{user_counter} משתמשים"
   login: 
     canvas: 
@@ -9304,6 +9444,8 @@ he:
         log_out: "האם את/ה בטוח/ה שברצונך להתנתק מקנבס?"
       log_out: "התנתקות מהמערכת "
       page_title: "התנתקות מהמערכת "
+    logout_landing: 
+      page_title: מנותק
     otp: 
       errors: 
         invalid_otp: "קוד אימות שגוי, יש לנסות שוב"
@@ -9347,6 +9489,8 @@ he:
   login_footer_link_badb3898: "קישור להתחברות בסרגל ניווט תחתון"
   login_footer_link_hover_1b474e6c: "ריחוף מעל קישור התחברות בסרגל ניווט תחתון"
   login_id_12109693: "מזהה לוג-אין"
+  login_id_bc943b97: "מזהה התחברות:"
+  login_info_d1d9f11e: "מידע התחברות"
   login_instructure_logo_8f2332db: "לוגו הלוג-אין  של Instructure "
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "ההתחברות אינה תקינה: נדרשת כתובת דוא\"ל או תווים אלפאנומריים"
   login_is_too_long_25373f95: "הלוג-אין ארוך מדי"
@@ -9357,12 +9501,17 @@ he:
   login_with_auth_type_a0aaa52a: "התחברות עם *%{auth_type}*"
   login_with_provider_3fd3998e: "התחברות עם %{provider}"
   logout_a9312e35: התנתקות
+  long_description_7d89285c: "תיאור ארוך"
   looks_great_e4d883ed: "נראה טוב מאד!"
   low_eab1cadd: נמוך
   low_score_4eeb95b2: "נמוך: %{score}"
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} עד %{upper_bound}"
   lower_limit_of_range_6ddd4983: "גבול תחתון לטווח"
   lowerbound_to_upperbound_352a3c0b: "%{lowerBound}+ ל %{upperBound}"
+  lowest_possible_grade_ae5510be: "הציון הנמוך ביותר האפשרי"
+  lowest_possible_grade_must_be_between_0_and_100_51256ea5: "הציון הנמוך ביותר האפשרי הנו בין 0 ל 100"
+  lowest_possible_grade_must_be_numeric_3d97659d: "הציון הנמוך ביותר האפשרי צריך להיות נומרי"
+  lowest_possible_grade_percent_20474418: "אחוז הציון הנמוך ביותר האפשרי"
   lti: 
     lti_message: 
       load_tool_new_tab_button: "טעינת %{tool}  בחלון חדש"
@@ -9400,6 +9549,7 @@ he:
       delete_avatar: "בטוח/ה שרוצה לבטל תמונת פרופיל זו של המשתמש?"
       lock_avatar: "נעילת תמונה זו תאשר אותה ותמנע מהמשתמש לבצע עדכון שלה. להמשיך?"
   manage_b88f7150: ניהול
+  manage_discussion_title_a2ecb3fb: "ניהול דיון %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "סטטוס ניהול רישום, יצירת קבוצות והוספת משתמשים מדף זה"
   manage_grading_schemes_in_context_name_e3678273: "ניהול סכימות הערכה ב %{context_name}"
   manage_group_group_name_ac8578c6: "ניהול קבוצה %{group_name}"
@@ -9417,11 +9567,14 @@ he:
   manual_entry_e4a4f99a: "מופע ידני"
   mark_as_done_6fa48d2f: "סימון כבוצע"
   mark_as_done_779556d7: "סימון כבוצע"
+  mark_as_read_e7de2ce3: "סימון כנקרא"
+  mark_as_unread_4a413c41: "סימון כלא נקרא"
   mark_done_9d81bcd9: "סימון כבוצע"
   marked_done_9fd646f: "מסומן כבוצע"
   masquerade_as_name_8bb004c5: "התחזות ל %{name}"
   masquerade_fdbc9594: Masquerade
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "התמחות: %{n_mastery_points_precision_2_str} נקודות"
+  mastery_path_processing_f4471152: "עיבוד מסליל התמחות"
   mastery_paths_breakdown_6e0b5fce: "מסלולי התמחות לא תקינים"
   mastery_paths_cc4096c2: "מסלולי התמחות"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "ציון ההתמחות משקף את הציון הגבוה ביותר של המשימה המוערכת או הבוחן"
@@ -9437,6 +9590,8 @@ he:
       miscellaneous: אחר
       operators: מפעילים
       relationships: יחסים
+  max_dd02d615: מכסימום
+  max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "מספר מרבי של משתמשים/קבוצות לפגישה"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "מספר מרבי של פגישות שמשתתף יכול להיות נוכח"
   media_comment_e494a952: "הערת מדיה"
@@ -9512,13 +9667,14 @@ he:
     recipients: "נמענים:"
   message_students_who_369b8488: "הודעות תלמידים אשר..."
   message_students_who_57f07a41: "הודעות לתלמידים אשר..."
+  message_text_5f692459: "תוכן הודעה"
   message_this_student_6d14043d: "הודעה לתלמיד זה"
   message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "הודעה תשלח לכל המורים ועוזרי ההוראה בקורס"
   messageableuser_library_767eed20: "ספרית המשתמשים שמקבלים הודעות"
   messages: 
     account_suspended: 
       email: 
-        body: "%{institution} הושעה. יש ליצור קשר עם מנהל המערכת שלך כדי לברר את הסיבה"
+        body: "%{institution} הושעה. יש לפנות למנהל הלקוחות שלך כדי לברר מדוע."
         subject: "מוסד / ארגון זה הושעה"
     account_user_notification: 
       email: 
@@ -9548,19 +9704,19 @@ he:
     added_to_conversation: 
       email: 
         html: 
-          body: "%{user_name} הוסיף אותך לשיחה בקנבס"
-          link_text: "הצגת שיחה"
-          subject: "%{user_name} הוסיף אותך לשיחה בקנבס "
+          body: "%{user_name} הוסיף אותך לדיון בקנבס"
+          link_text: "הצגת דיון"
+          subject: "%{user_name} הוסיף אותך לדיון בקנבס "
           unknown_user: "משתמש לא מוכר"
-        subject: "%{user_name} הוסיף אותך לשיחה בקנבס "
+        subject: "%{user_name} הוסיף אותך לדיון בקנבס "
         unknown_user: "משתמש לא מוכר"
       sms: 
-        body: "%{user_name} הוסיף אותך לשיחה בקנבס "
+        body: "%{user_name} הוסיף אותך לדיון בקנבס "
         more_info: "פרטים נוספים ב- %{url}"
         unknown_user: "משתמש לא מוכר"
       summary: 
-        body: "%{user_name} הוסיף אותך לשיחה בקנבס "
-        subject: "%{user_name} הוסיף אותך לשיחה בקנבס "
+        body: "%{user_name} הוסיף אותך לדיון בקנבס "
+        subject: "%{user_name} הוסיף אותך לדיון בקנבס "
         unknown_user: "משתמש לא מוכר"
       twitter: 
         tweet: "התראת קנבס - התווספת לדיון ע\"י %{user_name}."
@@ -9636,7 +9792,7 @@ he:
         body: "%{user} פרסם/ה הערה חדשה להכרזה: %{discussion_topic} בקורס %{course}:"
         html: 
           body: "%{user} פרסם/ה הערה חדשה להכרזה: %{discussion_topic} בקורס %{course}: "
-          discussion_entry_reply_message: "ניתן להצטרף לדיון בעזרת הקישור שבהמשך, או להעיר ע\"י תגובה להודעה זו. "
+          discussion_entry_reply_message: "הצטרפות לדיון בעזרת הקישור שלהלן, או תגובה כתשובה להערה זו. אם מורשה, וברצונך לכלול תצריף, יש להתחבר לקנבס ולהגיב להכרזה."
           link: "ניתן להקליק כאן כדי להצטרף לצפיה בהכרזה"
           subject: "הערה חדשה המתיחסת להכרזה %{discussion_topic} בקורס: %{course}"
         subject: "הערה חדשה המתיחסת להכרזה %{discussion_topic} בקורס: %{course} "
@@ -10028,6 +10184,40 @@ he:
       summary: 
         subject: "ציונים והערות פורסמו עבור: %{title}, %{course}"
     assignment_unpublished_module: "המשימה הנה חלק ממודול שלא פורסם ועדיין אינה זמינה."
+    blueprint_content_added: 
+      email: 
+        body: "התבצע סנכרון לשינויים בתבנית דוגמה של הקורס %{name}."
+        details_link: "עיון בשינויים: %{link}"
+        html: 
+          body: "התבצע סנכרון לשינויים בתבנית דוגמה של הקורס %{name}."
+          details_link: "עיון בשינויים"
+          subject: "סינכרון של תבנית הדוגמה: %{name}"
+        subject: "סינכרון של תבנית הדוגמה: %{name}"
+      sms: 
+        body: "התבצע סנכרון לשינויים בתבנית דוגמה של הקורס %{name}."
+        link_message: "פרטים נוספים ב- %{url} "
+      summary: 
+        body: "סינכרון של תבנית הדוגמה: שינויים נונכרנו עם %{name}."
+        subject: "סינכרון של תבנית הדוגמה:: %{name}"
+      twitter: 
+        tweet: "אתראת קנבס - שינויי קורס תבנית דוגמה סונכרנו עם  %{name}"
+    blueprint_sync_complete: 
+      email: 
+        body: "שינויי קורס תבנית דוגמה שלך %{name}, סונכרנו עם כל הקורסים הקשורים ."
+        details_link: "מידע נוסף: %{link}"
+        html: 
+          body: "שינויי קורס תבנית דוגמה שלך %{name}, סונכרנו עם כל הקורסים הקשורים ."
+          details_link: "מידע נוסף"
+          subject: "הסינכרון של תבנית הדוגמה נסתים: %{name}"
+        subject: "הסינכרון של תבנית הדוגמה נסתים: %{name}"
+      sms: 
+        body: "שינויי תבנית קורס לדוגמה סונכרנו מתוך %{name}."
+        link_message: "פרטים נוספים ב- %{url} "
+      summary: 
+        body: "סינכרון תבנית לדוגמה: השינויים נסונכרונו מתוך %{name}."
+        subject: "הסינכרון של תבנית הדוגמה נסתים: %{name}"
+      twitter: 
+        tweet: "אתראת קנבס - שינויי קורס תבנית דוגמה סונכרנו מתוך%{name}"
     collaboration_invitation: 
       email: 
         body: |-
@@ -10616,8 +10806,8 @@ he:
         body: "%{user} פרסם הערה חדשה בשרשור  %{discussion_topic}  של %{course}:"
         html: 
           body: "%{user} פרסם הערה חדשה בשרשור  %{discussion_topic}  של %{course}: "
-          discussion_entry_reply_message: "ניתן להצטרף לדיון בעזרת הקישור שבהמשך, או להעיר ע\"י תגובה להודעה זו."
-          link: "הקלק/י כאן כדי להצטרף לשיחה"
+          discussion_entry_reply_message: "הצטרפות לדיון בעזרת הקישור שלהלן, או תגובה כתשובה להערה זו. אם מורשה, וברצונך לכלול תצריף, יש להתחבר לקנבס ולהגיב להכרזה."
+          link: "הקלק/י כאן כדי להצטרף לדיון"
           subject: "הערה חדשה עבור %{discussion_topic}: %{course}"
         subject: "הערה חדשה עבור %{discussion_topic}: %{course} "
       sms: 
@@ -10630,12 +10820,12 @@ he:
     new_discussion_topic: 
       email: 
         body: "החל דיון חדש שיכול לענין אותך:"
-        details: "הצטרפות לשיחה כאן:"
+        details: "הצטרפות לדיון כאן:"
         html: 
           attached_file: "קובץ מצורף "
           body: "החל דיון חדש שיכול לענין אותך:"
           download: "הורדה "
-          link: "הקלק/י כאן כדי להצטרף לשיחה"
+          link: "הקלק/י כאן כדי להצטרף לדיון"
           subject: "דיון חדש -  %{discussion_topic}: %{course}"
         labels: 
           file_included: "קבצים שנכללו "
@@ -11092,6 +11282,9 @@ he:
         subject: "הקלטת שיחת הועידה מוכנה: %{name}"
       twitter: 
         tweet: "התראת קנבס - הקלטה מוכנה: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: "ההודעה בוטלה!"
+    other: "ההודעה בוטלה!"
   mexico_52_60d635c7: "מכסיקו (+52)"
   mexico_b2d7a271: מקסיקו
   mgp_grade_export_d29b471f: "ייצוא ציונים ל MPG"
@@ -11118,18 +11311,29 @@ he:
     webct: 
       course_not_found: "קורס ה Blackboard לא נמצא"
     wiki_page_type: "דף וויקי"
+  migration_in_progress_6f0ed4f9: "הגירת נתונים בביצוע"
   migration_issues: 
     errors: 
       valid_workflow_state: "יש לשגר אות תקינות של זרימת התהליך."
   migration_selection_5f1c5f55: "בחירת תהליך הגירה"
   migration_successful_f1811ef3: "ההגירה הצליחה"
+  min_e10fe94c: מינימום
   mini_calendar_fe8003e4: מיני-יומן
   minimize_global_navigation_2d839351: "צמצום הניווט המרכזי"
   minimum_score_e6d1c134: "ציון מינימלי"
   minutes_4aee5a41: דקות
   minutes_per_slot_5b7169e5: "דקות לחלון הקצאה"
   missing_1a256b3b: חסר
+  missing_d59852a7: חסר
+  missing_eaddacbd: חסר
   missing_percent_94534638: "חסר: %{percent}"
+  missing_policies_4f195e0b: "חסרה מדיניות"
+  missing_required_values_missing_values_f3be2ff8: "חסרים ערכי חובה: %{missing_values}"
+  missing_submission_ec204c33: "חסרה הגשה"
+  missing_submission_grade_ed2756d1: "חסרה הערכת הגשה"
+  missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: "הערכת הגשה חסרה צריכה להיות בין 0 ל 100"
+  missing_submission_grade_must_be_numeric_1a142ef2: "הערכת הגשה חסרה צריכה להיות נומרית"
+  missing_submission_grade_percent_34428feb: "הערכת הגשה חסרה ציון באחוזים"
   mobile_app_css_file_abbf06bd: "קובץ CSS עבור אפליקצית סמארטפון"
   mobile_app_javascript_file_faea55d5: "קובץ  JavaScript לאפליקצית סמארטפון"
   mobile_css_file_b86ded7f: "קובץ CSS לסמארטפון"
@@ -11151,8 +11355,11 @@ he:
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "אין אפשרות להגדיר הערכה מבוקרת למשימות שעברו ביקורת עמיתים"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "אין אפשרות להפעיל הערכה מבוקרת עבור משימות ללא הערכה"
   moderator_49b9f2e1: מפקח
+  moderator_sortorder_18063692: "מנחה%{sortOrder}"
   module_90d9fd32: מודול
   module_completed_50c50762: "המודול הושלם"
+  module_filter_63b17d11: "מסנן מודולים"
+  module_first_to_last_6921f3ec: "מודולים - מראשון לאחרון"
   module_in_progress_fa600662: "המודול בתהליך"
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "פריטי המודול הושלמו לאחר השגת ציון של לפחות %{score}"
   module_item_has_been_viewed_and_is_complete_6d180117: "פריטי המודול נבדקו והוא הושלם"
@@ -11169,6 +11376,7 @@ he:
     page: דף
     quiz: בוחן
     sub_header: "כותרת משנה"
+  module_last_to_first_8cdb7a8e: "מודולים - אחרון עד ראשון"
   module_locked_f6a7ea9d: "מודול נעול"
   module_menu_3201af4e: "תפריט מודול"
   module_module_name_was_successfully_deleted_fc9e9d47: "מודול %{module_name} בוטל בהצלחה"
@@ -11232,9 +11440,11 @@ he:
   moodle_dropdown_warning_title: "שאלות מרובות רשימות נפתחות בבנק שאלות זה. יתכן ויובא שלא כהלכה"
   moodle_formula_many_warning_title: "יש %{count} שאלות נוסחה בבנק שאלות זה אשר יהיה צורך לייצר מחדש את התשובות האפשריות שלהן"
   moodle_formula_warning_title: " יהיה צורך לייצר מחדש תשובות אפשריות עבור שאלות נוסחה"
+  more_cf9cc661: עוד
   more_courses_5ebbe998: "קורסים נוספים"
   more_info_at_course_name_56dc8c10: "מידע נוסף ב %{course_name}"
   more_information_3dfb76b5: "מידע נוסף"
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: "עוד תוצאות נוספו בתחתית הדף "
   more_than_999_submissions_need_grading_bc087dd0: "יותר מ 999 הגשות ממתינות להערכה"
   more_than_9_submissions_need_grading_30157d49: "יותר מ 9 הגשות ממתינות להערכה"
   more_than_a19b440: "%{more_than}+"
@@ -11243,8 +11453,13 @@ he:
   most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "התוצאות המאוחרות יותר נספרות כ %{calculation_int}% של שקלול ההתמחות, ממוצע של כל שאר התוצאות נספר כ %{remainder}% מהשקלול. אם יש רק תוצאה אחת, ציון יחיד זה יהיה הקובע."
   most_recent_score_13a87e8c: "ציון מעודכן ביותר"
   move_abf00365: העברה
+  move_assignment_6f890f64: "העברת מטלה"
+  move_assignment_contents_245c61bb: "העברת תוכן מטלה"
   move_assignment_group_46e09fc3: "העברת קבוצת משימה"
   move_assignment_name_aa253f26: "העברת משימה %{name}"
+  move_contents_29713356: "העברת תוכן..."
+  move_contents_cefe9e92: "העברת תוכן"
+  move_contents_into_f3e4fd9d: "העברת המידע על התכנים"
   move_dialog: 
     cancel: ביטול
     save: שמירה
@@ -11252,29 +11467,41 @@ he:
     where_to_move: "לאן היית רוצה להעביר את *%{name}*?"
   move_dialog_select: 
     move_to_end: "-- בתחתית --"
+  move_discussion_9ff5b2d1: "העברת דיון"
+  move_group_3dd7f76e: "העברת קבוצה"
+  move_group_77ae285d: "העברת קבוצה..."
   move_item_e94a8103: "העברת פריט"
+  move_item_failed_8e4c1db6: "העברת פריט נכשלה"
   move_left_8c364375: "העברה שמאלה"
+  move_module_346b8112: "העברת מודול..."
+  move_module_90e6927e: "העברת מודול"
   move_module_after_31fc870b: "העברת מודול אחרי"
   move_module_before_32153dc8: "העברת מודול לפני"
+  move_module_contents_74fa15d5: "העברת תכני מודול"
   move_module_item_77754119: "העברת מודול/פריט"
   move_module_item_after_bbcfe2d6: "העברת פריט מודול אחרי"
   move_module_item_before_13e940eb: "העברת פריט מודול לפני"
+  move_module_item_f525d6c8: "העברת פריט מודול"
+  move_navigation_item_f034cd8a: "העברת פריט ניווט"
   move_outcome_ce497e6c: "העברה של תוצאות הלמידה"
   move_outcome_group_cfa1a505: "העברה של קבוצת תוצאות למידה"
   move_page_e25b123d: "העברת דף"
   move_right_e4ddc6bf: "העברה ימינה"
   move_section_d3866941: "העברת הקבצה"
+  move_student_49d6bc9d: "העברת תלמיד"
   move_text_down_7176acd4: "העברת %{text} כלפי מטה"
   move_text_up_91fb4241: "העברת %{text} כלפי מעלה"
   move_this_item_41145b2d: "העברת פריט זה"
+  move_this_module_4a262aaf: "העברת מודול זה"
   move_this_page_4a05c813: "העברת דף זה"
   move_this_section_890bee38: "העברת הקבצה זו"
+  move_to_25d7ef11: "העבר ל"
   move_to_9b91c6e0: "העברה אל..."
   move_to_dde1a5e1: "העברה אל..."
   move_to_end_c6bfbcf5: "העברה לסוף"
   move_to_end_fef2fa15: "העברה לתחתית"
   move_to_front_7eae2e90: "העברה להתחלה"
-  move_to_front_bf6f0194: "העברה להתחלה"
+  move_to_front_bf6f0194: "מעבר להתחלה"
   move_to_the_beginning_636b342c: "העברה להתחלה"
   move_to_the_end_bc05abf6: "העברה לסוף"
   moving_a4d552df: העברה...
@@ -11489,8 +11716,8 @@ he:
   notice_inactive_student_bcc4248a: "שימו לב: תלמיד לא פעיל"
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "שימו לב: תקופת הערכה נסגרה לתלמיד זה"
   notification: 
-    added_to_conversation_description: "נתווספת לשיחה"
-    added_to_conversation_display: "התווספות לשיחה"
+    added_to_conversation_description: "נתווספת לדיון"
+    added_to_conversation_display: "התווספות לדיון"
     all_submissions_description: |-
         *מדריכים ומנהלי מערכת בלבד*
         
@@ -11539,10 +11766,10 @@ he:
       reminder: תזכורת
       student_appointment_signups: "הרשמות לפגישת תלמידים"
       submission_comment: "הערת הגשה"
-    conversation_created_description: "יצרת שיחה"
+    conversation_created_description: "יצרת דיון"
     conversation_created_display: "שיחות שיצרתי"
     conversation_message_description: "הודעות דוא\"ל חדשות"
-    conversation_message_display: "הודעת שיחה"
+    conversation_message_display: "הודעת דיון"
     course_content_description: |-
         שינוי לתוכן הקורס:
         
@@ -11616,7 +11843,7 @@ he:
       confirm_sms_communication_channel: "אישור ערוץ תקשורת מסרונים"
       content_export_failed: "ייצוא תוכן נכשל"
       content_export_finished: "ייצוא תוכן נסתיים"
-      conversation_created: "נוצרה שיחה"
+      conversation_created: "נוצר דיון "
       conversation_message: "הודעת דיון"
       enrollment_accepted: "הרשמה נתקבלה"
       enrollment_invitation: "הזמנה להרשמה"
@@ -12779,7 +13006,7 @@ he:
         change_password: "שינוי סיסמה"
         confirm_password: "אישור סיסמה"
         default_email: "דוא\"ל ברירת מחדל"
-        disable_inbox: "הפסקת הפעלת סימנית ההודעות שטרם נקראו בתיבת הדואר של שיחה זו, ושיגור מיידי של כל הודעת שיחה והתראות דרך דוא\"ל."
+        disable_inbox: "הפסקת הפעלת סימנית ההודעות שטרם נקראו בתיבת הדואר של דיון זה, ושיגור מיידי של כל הודעת דיון והתראות דרך דוא\"ל."
         expires_at: "פג תוקף "
         headers: 
           approved_integrations: "אינטגרציות שאושרו"
@@ -16549,7 +16776,7 @@ he:
       תודה.
       תמיכת קנבס
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
-      ההודעה עם הכותרת "%{subject}"  לא הגיעה ליעדה כיון שנושא השיחה בוטל. אם את/ה מנסה ליצור קשר עם מישהו דרך קנבס תוכל/י לנסות להתחבר לחשבונך ולשלוח להם הודעה תוך שימוש בתיבת הדוא"ל הנכנס.
+      ההודעה עם הכותרת "%{subject}"  לא הגיעה ליעדה כיון שנושא הדיון בוטל. אם את/ה מנסה ליצור קשר עם מישהו דרך קנבס תוכל/י לנסות להתחבר לחשבונך ולשלוח להם הודעה תוך שימוש בתיבת הדוא"ל הנכנס.
       
       תודה,
       תמיכת קנבס
@@ -16610,6 +16837,7 @@ he:
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "אירעה שגיאה בעת הנסיון לשמור את הנתונים לקורס"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "אירעה תקלה בעת שמירת ההערה. יש לנסות שוב"
   there_was_an_error_setting_usage_rights_53739e1d: "אירעה תקלה בעת הגדרת זכויות שימוש"
+  there_was_an_error_submitting_to_the_similarity_de_eb6a261: "אירעה שגיאה בעת השליחה לשרות בדיקת התאימות. יש לנסות לשלוח את הקובץ שוב לפני שפונים לסיוע טכני."
   there_was_an_error_updating_this_assignment_please_59fc608d: "אירעה שגיאה בעת עדכון מטלה זו. בבקשה לרענן את הדף ולנסות שוב"
   there_was_an_error_uploading_the_image_932fc4ce: "אירעה שגיאה בעת העלאת התמונה"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "אירעה תקלה בשאילתה שלך. יש לנסות חיפוש אחר."
@@ -17230,7 +17458,7 @@ he:
       updating_user_details: "עדכון פרטי משתמש..."
     notices: 
       image_reported: "תמונה זו דווחה"
-  user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} הוסיף אותך כרגע לשיחת קנבס. להצגת השיחה יש להקליק על הקישור הזה: %{link}."
+  user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} הוסיף אותך כרגע לדיון קנבס. להצגת השיחה יש להקליק על הקישור הזה: %{link}."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} שלח לך זה עתה הודעה דרך קנבס."
   user_name_successfully_added_79af8365: "%{user_name} נתווסף בהצלחה!"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, תצטרך/י  *להתחבר* לפני שתוכל/י לעיין בדף הזה."
