@@ -61,22 +61,22 @@ import 'jqueryui/dialog'
       var html = '';
       switch (type) {
         case "quiz":
-          html += I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.", {module: data.context_module.name, wrapper: '<b>$1</b>'});
           break;
         case "assignment":
-          html += I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.", {module: data.context_module.name, wrapper: '<b>$1</b>'});
           break;
         case "topic":
-          html += I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.", {module: data.context_module.name, wrapper: '<b>$1</b>'});
           break;
         case "file":
-          html += I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.", {module: data.context_module.name, wrapper: '<b>$1</b>'});
           break;
         case "page":
-          html += I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.", {module: data.context_module.name, wrapper: '<b>$1</b>'});
           break;
         default:
-          html += I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.", {module: htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+          html += I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.", {module: data.context_module.name, wrapper: '<b>$1</b>'});
           break;
       }
       if ($("#context_modules_url").length > 0) {
