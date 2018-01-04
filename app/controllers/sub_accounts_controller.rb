@@ -136,6 +136,9 @@ class SubAccountsController < ApplicationController
     if params[:account][:is_root]
       @sub_account.parent_account_id = nil
       @sub_account.root_account_id = nil
+      if params[:account][:settings] && params[:account][:settings][:domains]
+         @sub_account.settings[:domains] = params[:account][:settings][:domains]
+      end
     end
     if @sub_account.save
       if params[:account][:is_root]
