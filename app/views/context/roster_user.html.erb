@@ -160,7 +160,7 @@
                 <td>
                   <% unless @context.completed? %>
                     <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
-                      <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
+                      <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Grade Out Student}) %></a>
                     </div>
                     <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? || enrollment.inactive? %>">
                       <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
