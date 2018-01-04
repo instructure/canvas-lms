@@ -32,15 +32,15 @@
       </div>
     <% end %>
   <% else %>
-    <h1><%= t('headings.confirm_conclude', %{Confirm Conclude Course}) %></h1>
-    <p><%= t 'details.confirm_conclude', %{Warning: Concluding the course will archive all course content and prevent you from modifying grades.} %></p>
-    <p><%= t 'details.conclude_alt_text', %{If you would like to retain the ability to change grades while limiting student access to the course, please utilize the course dates settings. You can learn about course date settings in our guides *here*.}, :wrapper => link_to('\1', "https://community.canvaslms.com/docs/DOC-2910") %></p>
+    <h1><%= t('headings.confirm_conclude', %{Confirm Grade Out}) %></h1>
+    <p><%= t 'details.confirm_conclude', %{Hold on! You should know that you’re about to grade out all students for this particular course section. This will lock all student grades and end this class.} %></p>
+    <p><%= t 'details.conclude_alt_text', %{If you would like to remove student access and still have the ability to change grades, please use the Course Dates settings inside of this course’s Settings page. You can learn more about course date settings in our guides *here*.}, :wrapper => link_to('\1', "https://community.canvaslms.com/docs/DOC-2910") %></p>
 
     <%= form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="conclude"/>
       <div class="form-actions">
-        <a href="<%= course_settings_url(@context) %>" class="btn"><%= t('#buttons.cancel', %{Cancel}) %></a>
-        <button class="btn btn-primary" type="submit"><%= t('buttons.conclude_course', %{Conclude Course}) %></button>
+        <button class="btn btn-secondary" type="submit"><%= t('buttons.conclude_course', %{Grade Out All Students}) %></button>
+        <a href="<%= course_settings_url(@context) %>" class="btn btn-primary"><%= t('#buttons.cancel', %{Cancel}) %></a>
       </div>
     <% end %>
 
