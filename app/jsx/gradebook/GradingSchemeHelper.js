@@ -17,21 +17,43 @@
  */
 
 import round from 'compiled/util/round'
-import _ from 'underscore'
 
-export function scoreToGrade (score, gradingScheme) {
-  const roundedScore = round(score, 4);
-  const scoreWithLowerBound = Math.max(roundedScore, 0);
-  const letter = _.find(gradingScheme, (row, i) => {
-    const schemeScore = (row[1] * 100).toPrecision(4);
+export function gradeToScore(grade, gradingScheme) {
+  const cleanGrade = `${grade}`.trim().toLowerCase()
+  const index = gradingScheme.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
+
+  if (index === -1) {
+    // if the given grade is not in the scheme, return null
+    return null
+  }
+
+  if (index === 0) {
+    // if the given grade is the highest in the scheme, return 100 (percent)
+    return 100
+  }
+
+  const matchingSchemeValue = gradingScheme[index][1]
+  const nextHigherSchemeValue = gradingScheme[index - 1][1]
+
+  let percentageOffset = 1
+  if (round(nextHigherSchemeValue - matchingSchemeValue, 4) <= 0.01) {
+    // if the two scheme values are less than 1% apart, reduce the offset to 0.1%
+    // this is the minimum granularity currently supported for grading schemes
+    percentageOffset = 0.1
+  }
+
+  return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
+}
+
+export function scoreToGrade(score, gradingScheme) {
+  const roundedScore = round(score, 4)
+  const scoreWithLowerBound = Math.max(roundedScore, 0)
+  const letter = gradingScheme.find((row, i) => {
+    const schemeScore = (row[1] * 100).toPrecision(4)
     // The precision of the lower bound (* 100) must be limited to eliminate
     // floating-point errors.
     // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
-    return scoreWithLowerBound >= schemeScore || i === (gradingScheme.length - 1);
-  });
-  return letter[0];
-}
-
-export default {
-  scoreToGrade
+    return scoreWithLowerBound >= schemeScore || i === gradingScheme.length - 1
+  })
+  return letter[0]
 }

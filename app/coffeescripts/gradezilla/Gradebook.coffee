@@ -2646,11 +2646,15 @@ define [
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
 
-    gradeSubmission: (submission) =>
-      if submission.excused
+    gradeSubmission: (submission, gradingData) =>
+      if gradingData.excused
         submissionData = { excuse: true }
+      else if gradingData.enteredAs == null
+        submissionData = { posted_grade: '' }
+      else if ['passFail', 'gradingScheme'].includes(gradingData.enteredAs)
+        submissionData = { posted_grade: gradingData.grade }
       else
-        submissionData = { posted_grade: GradeFormatHelper.delocalizeGrade(submission.enteredGrade) }
+        submissionData = { posted_grade: gradingData.score }
       @updateSubmissionAndRenderSubmissionTray(submissionData)
         .then((response) =>
           assignment = @getAssignment(submission.assignmentId)

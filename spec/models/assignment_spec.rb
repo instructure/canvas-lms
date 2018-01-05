@@ -1425,6 +1425,16 @@ describe Assignment do
         expect(@assignment.interpret_grade("75.2%")).to eq 7.52
       end
     end
+
+    context "with gpa_scale" do
+      before(:once) do
+        @assignment.update!(grading_type: 'gpa_scale', points_possible: 10.0)
+      end
+
+      it "accepts numbers" do
+        expect(@assignment.interpret_grade("9.5")).to eq 9.5
+      end
+    end
   end
 
   describe '#submit_homework' do

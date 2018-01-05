@@ -20,7 +20,7 @@ define [
   'ember'
   '../../../util/round'
   'jsx/gradebook/GradingSchemeHelper'
-], (I18n, Ember, round, GradingSchemeHelper) ->
+], (I18n, Ember, round, {scoreToGrade}) ->
 
   AssignmentSubtotalGradesComponent = Ember.Component.extend
 
@@ -36,7 +36,7 @@ define [
       standard = @get('gradingStandard')
       return null unless standard and @get('hasGrade')
       percentage = parseFloat(@get('rawPercent').toPrecision(4))
-      GradingSchemeHelper.scoreToGrade(percentage, standard)
+      scoreToGrade(percentage, standard)
     ).property('gradingStandard', 'hasGrade')
 
     values:(->

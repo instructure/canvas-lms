@@ -988,12 +988,9 @@ class Assignment < ActiveRecord::Base
       percentage = grade.to_f / 100.0
       points_possible.to_f * percentage
     when %r{^[+-]?\d*\.?\d+$}
-      if grading_type == "gpa_scale"
-        # if it matches something in a scheme, take that, else return nil
-        return nil unless standard_based_score = grading_standard_or_default.grade_to_score(grade)
+      if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
         (points_possible || 0.0) * standard_based_score / 100.0
       else
-        # interpret as a numerical score
         grade.to_f
       end
     when "pass", "complete"

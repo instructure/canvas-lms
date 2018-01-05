@@ -37,7 +37,7 @@ QUnit.module('GradeInput', suiteHooks => {
       excused: false,
       id: '2501'
     }
-    const gradingScheme = [['A', 0.9], ['B+', 0.85], ['B', 0.8], ['B-', 0.75]]
+    const gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0]]
     props = {
       assignment,
       disabled: false,
@@ -140,13 +140,85 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
 
-    test('calls the onSubmissionUpdate prop with the updated submission', () => {
+    test('calls the onSubmissionUpdate prop with the submission', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: '8.9'}})
       wrapper.find('input').simulate('blur')
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-      strictEqual(updatedSubmission.enteredGrade, '8.9')
+      strictEqual(updatedSubmission, props.submission)
+    })
+
+    QUnit.module('when a point value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the entered grade', () => {
+        strictEqual(gradingData.grade, '8.9')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "points"', () => {
+        strictEqual(gradingData.enteredAs, 'points')
+      })
+    })
+
+    QUnit.module('when a percent value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '89%'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the points form of the entered grade', () => {
+        strictEqual(gradingData.grade, '8.9')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "percent"', () => {
+        strictEqual(gradingData.enteredAs, 'percent')
+      })
+    })
+
+    QUnit.module('when a grading scheme value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the points form of the entered grade', () => {
+        strictEqual(gradingData.grade, '8.9')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "gradingScheme"', () => {
+        strictEqual(gradingData.enteredAs, 'gradingScheme')
+      })
     })
 
     test('does not call the onSubmissionUpdate prop when the value has changed and input maintains focus', () => {
@@ -366,13 +438,85 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
 
-    test('calls the onSubmissionUpdate prop with the updated submission', () => {
+    test('calls the onSubmissionUpdate prop with the submission', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: '89%'}})
       wrapper.find('input').simulate('blur')
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-      strictEqual(updatedSubmission.enteredGrade, '89%')
+      strictEqual(updatedSubmission, props.submission)
+    })
+
+    QUnit.module('when a point value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the percent form of the entered grade', () => {
+        strictEqual(gradingData.grade, '8.9%')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 0.89)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "percent"', () => {
+        strictEqual(gradingData.enteredAs, 'percent')
+      })
+    })
+
+    QUnit.module('when a percent value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '89%'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the entered grade', () => {
+        strictEqual(gradingData.grade, '89%')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "percent"', () => {
+        strictEqual(gradingData.enteredAs, 'percent')
+      })
+    })
+
+    QUnit.module('when a grading scheme value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the percent form of the entered grade', () => {
+        strictEqual(gradingData.grade, '89%')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "gradingScheme"', () => {
+        strictEqual(gradingData.enteredAs, 'gradingScheme')
+      })
     })
 
     test('does not call the onSubmissionUpdate prop when the value has changed and input maintains focus', () => {
@@ -485,7 +629,7 @@ QUnit.module('GradeInput', suiteHooks => {
       props.assignment.gradingType = 'letter_grade'
       props.assignment.pointsPossible = 10
       props.enterGradesAs = 'gradingScheme'
-      props.submission.enteredGrade = 'B'
+      props.submission.enteredGrade = 'C'
       props.submission.enteredScore = 7.8
     })
 
@@ -503,7 +647,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('sets as the input value the grade corresponding to the entered score', () => {
       mountComponent()
       const input = wrapper.find('input')
-      equal(input.prop('value'), 'B-')
+      equal(input.prop('value'), 'C')
     })
 
     test('is blank when the submission is not graded', () => {
@@ -555,13 +699,94 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
 
-    test('calls the onSubmissionUpdate prop with the updated submission', () => {
+    QUnit.module('when a point value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the grading scheme form of the entered grade', () => {
+        strictEqual(gradingData.grade, 'B')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "points"', () => {
+        strictEqual(gradingData.enteredAs, 'points')
+      })
+    })
+
+    QUnit.module('when a percent value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '89%'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the grading scheme form of the entered grade', () => {
+        strictEqual(gradingData.grade, 'B')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "percent"', () => {
+        strictEqual(gradingData.enteredAs, 'percent')
+      })
+    })
+
+    QUnit.module('when a grading scheme value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        wrapper.find('input').simulate('blur')
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the points form of the entered grade', () => {
+        strictEqual(gradingData.grade, 'B')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 8.9)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "gradingScheme"', () => {
+        strictEqual(gradingData.enteredAs, 'gradingScheme')
+      })
+    })
+
+    test('calls the onSubmissionUpdate prop with the submission', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: 'A'}})
       wrapper.find('input').simulate('blur')
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-      strictEqual(updatedSubmission.enteredGrade, 'A')
+      strictEqual(updatedSubmission, props.submission)
+    })
+
+    test('calls the onSubmissionUpdate prop with the entered grade', () => {
+      props.onSubmissionUpdate = sinon.spy()
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: 'A'}})
+      wrapper.find('input').simulate('blur')
+      const [, gradingData] = props.onSubmissionUpdate.lastCall.args
+      strictEqual(gradingData.grade, 'A')
     })
 
     test('does not call the onSubmissionUpdate prop when the value has changed and input maintains focus', () => {
@@ -575,7 +800,7 @@ QUnit.module('GradeInput', suiteHooks => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: 'A'}})
-      wrapper.find('input').simulate('change', {target: {value: 'B'}})
+      wrapper.find('input').simulate('change', {target: {value: 'C'}})
       wrapper.find('input').simulate('blur')
       strictEqual(props.onSubmissionUpdate.callCount, 0)
     })
@@ -593,7 +818,7 @@ QUnit.module('GradeInput', suiteHooks => {
       const updatedSubmission = {...submission, enteredScore: 10, enteredGrade: 'A'}
       wrapper.setProps({submission: updatedSubmission, submissionUpdating: true})
       const input = wrapper.find('input')
-      strictEqual(input.prop('value'), 'B-')
+      strictEqual(input.prop('value'), 'C')
     })
 
     test('updates the input value when the submission has updated', () => {
@@ -747,12 +972,35 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(props.onSubmissionUpdate.callCount, 1)
     })
 
-    test('calls the onSubmissionUpdate prop with the updated submission', () => {
+    test('calls the onSubmissionUpdate prop with the submission', () => {
       props.onSubmissionUpdate = sinon.spy()
       mountComponent()
       wrapper.find('select').simulate('change', {target: {value: 'complete'}})
       const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-      strictEqual(updatedSubmission.enteredGrade, 'complete')
+      strictEqual(updatedSubmission, props.submission)
+    })
+
+    QUnit.module('when a pass/fail value is entered', contextHooks => {
+      let gradingData
+
+      contextHooks.beforeEach(() => {
+        props.onSubmissionUpdate = sinon.spy()
+        mountComponent()
+        wrapper.find('select').simulate('change', {target: {value: 'complete'}})
+        gradingData = props.onSubmissionUpdate.lastCall.args[1]
+      })
+
+      test('calls the onSubmissionUpdate prop with the entered grade', () => {
+        strictEqual(gradingData.grade, 'complete')
+      })
+
+      test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
+        strictEqual(gradingData.score, 10)
+      })
+
+      test('calls the onSubmissionUpdate prop with the enteredAs set to "passFail"', () => {
+        strictEqual(gradingData.enteredAs, 'passFail')
+      })
     })
 
     test('does not update the input value when the submission begins updating', () => {

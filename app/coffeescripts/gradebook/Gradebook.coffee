@@ -79,7 +79,7 @@ define [
 ], (
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   TotalColumnHeaderView, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
-  EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, SubmissionDetailsDialog,
+  EffectiveDueDates, {scoreToGrade}, GradeFormatHelper, UserSettings, Spinner, SubmissionDetailsDialog,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
   GradebookHeaderMenu, NumberCompare, natcompare, htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap,
   ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
@@ -751,7 +751,7 @@ define [
       possible = if possible then I18n.n(possible) else possible
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
-        letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
+        letterGrade = scoreToGrade(percentage, @options.grading_standard)
 
       templateOpts =
         score: I18n.n(round(val.score, round.DEFAULT))

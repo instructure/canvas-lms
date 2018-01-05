@@ -19,7 +19,7 @@
 import $ from 'jquery';
 import round from 'compiled/util/round';
 import I18n from 'i18n!gradebook';
-import GradingSchemeHelper from '../../../../gradebook/GradingSchemeHelper';
+import {scoreToGrade} from '../../../../gradebook/GradingSchemeHelper'
 import 'jquery.instructure_misc_helpers'; // $.toSentence
 
 function getGradePercentage (score, pointsPossible) {
@@ -142,7 +142,7 @@ export default class TotalGradeCellFormatter {
 
     let letterGrade;
     if (grade.possible && this.options.getGradingStandard()) {
-      letterGrade = GradingSchemeHelper.scoreToGrade(percentage, this.options.getGradingStandard());
+      letterGrade = scoreToGrade(percentage, this.options.getGradingStandard())
     }
 
     let warning;
