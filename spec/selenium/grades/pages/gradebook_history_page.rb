@@ -17,7 +17,6 @@
 
 require_relative '../../common'
 
-
 class GradeBookHistory
   class << self
     include SeleniumDependencies
@@ -148,7 +147,6 @@ class GradeBookHistory
       test_passed
     end
 
-
     def check_arr_unique_element(arr)
       test_passed = false
       unless arr.uniq.size == 1
@@ -156,8 +154,6 @@ class GradeBookHistory
       end
       test_passed
     end
-
-    # private
 
     def student_name_textfield
       f('#students')
@@ -197,20 +193,20 @@ class GradeBookHistory
       ffxpath("//table/tbody/tr")
     end
 
-    def results_table_current_col(index)
-      fxpath("//table/tbody/tr[#{index}]/td[8]")
+    def results_table_current_col(row_index)
+      fxpath_table_cell("Grade Changes", row_index, 8)
     end
 
-    def results_table_assignment_col(index)
-      fxpath("//table/tbody/tr[#{index}]/td[5]")
+    def results_table_assignment_col(row_index)
+      fxpath_table_cell("Grade Changes", row_index, 5)
     end
 
-    def results_table_grader_col(index)
-      fxpath("//table/tbody/tr[#{index}]/td[4]")
+    def results_table_grader_col(row_index)
+      fxpath_table_cell("Grade Changes", row_index, 4)
     end
 
-    def results_table_student_col(index)
-      fxpath("//table/tbody/tr[#{index}]/td[3]")
+    def results_table_student_col(row_index)
+      fxpath_table_cell("Grade Changes", row_index, 3)
     end
   end
 end

@@ -208,6 +208,10 @@ module CustomSeleniumActions
     fj("table:contains('#{caption}')", scope)
   end
 
+  def fxpath_table_cell(caption, row_index, col_index)
+    fxpath("//table[caption= '#{caption}']/tbody/tr[#{row_index}]/td[#{col_index}]")
+  end
+
   def is_checked(css_selector)
     !!fj(css_selector)[:checked]
   end
