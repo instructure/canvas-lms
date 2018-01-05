@@ -135,6 +135,10 @@ describe ApplicationController do
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
     end
 
+    it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do
+      expect(@controller.js_env[:LTI_LAUNCH_FRAME_ALLOWANCES]).to eq Lti::Launch::FRAME_ALLOWANCES
+    end
+
     context "sharding" do
       specs_require_sharding
 

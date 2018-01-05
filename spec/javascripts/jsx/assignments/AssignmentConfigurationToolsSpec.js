@@ -101,6 +101,10 @@ define([
         }
       ]
       this.stub($, 'ajax').returns({status: 200, data: toolDefinitions});
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
+    },
+    teardown () {
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
     }
   });
 
@@ -135,7 +139,7 @@ define([
     );
     wrapper.setState({tools: toolDefinitions})
 
-    ok(wrapper.find('option[data-launch="none"]').exists());
+    ok(wrapper.find('option[data-launch="about:blank"]').exists());
   });
 
   test('it renders "none" for tool type when no tool is selected', () => {
@@ -324,5 +328,17 @@ define([
     );
     wrapper.setState({tools: toolDefinitions})
     ok(!wrapper.find('#report_visibility_picker').node.disabled)
+  });
+
+  test('sets the iframe allowances', () => {
+    const wrapper = mount(
+      <AssignmentConfigurationTools.configTools
+        courseId={1}
+        secureParams={secureParams}
+        selectedTool={5}
+        selectedToolType="ContextExternalTool"
+      />
+    );
+    ok(wrapper.find('.tool_launch').node.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
   });
 });

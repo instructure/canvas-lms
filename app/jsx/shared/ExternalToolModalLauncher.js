@@ -23,6 +23,7 @@ import PropTypes from 'prop-types'
 import Modal from './modal'
 import ModalContent from './modal-content'
 import I18n from 'i18n!external_tools'
+import iframeAllowances from '../external_apps/lib/iframeAllowances'
 
 export default React.createClass({
   displayName: 'ExternalToolModalLauncher',
@@ -159,6 +160,12 @@ export default React.createClass({
     this.setState(newState)
   },
 
+  onAfterOpen () {
+    if (this.iframe) {
+      this.iframe.setAttribute('allow', iframeAllowances());
+    }
+  },
+
   render () {
     const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
     const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
@@ -173,6 +180,7 @@ export default React.createClass({
         style={styles.modalStyle}
         isOpen={this.props.isOpen}
         onRequestClose={this.props.onRequestClose}
+        onAfterOpen={this.onAfterOpen}
         title={this.props.title}
       >
         <ModalContent style={styles.modalBodyStyle}>

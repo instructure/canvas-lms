@@ -17,9 +17,10 @@
 
 define [
   'jquery'
-  'jst/PostGradesFrameDialog'
-  'jqueryui/dialog'
-], ($, postGradesFrameDialog) ->
+  'jst/PostGradesFrameDialog',
+  'jsx/external_apps/lib/iframeAllowances'
+  'jqueryui/dialog',
+], ($, postGradesFrameDialog, iframeAllowances) ->
 
   class PostGradesFrameDialog
     constructor: (options) ->
@@ -30,7 +31,7 @@ define [
         @baseUrl = options.baseUrl
 
       # init dialog
-      @$dialog = $(postGradesFrameDialog())
+      @$dialog = $(postGradesFrameDialog({allowances: iframeAllowances()}))
       @$iframe = @$dialog.find('.post-grades-frame')
       @$dialog.on('dialogopen', @onDialogOpen)
       @$dialog.on('dialogclose', @onDialogClose)

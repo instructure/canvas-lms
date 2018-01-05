@@ -20,6 +20,7 @@ import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
+import iframeAllowances from '../lib/iframeAllowances'
 
 export default React.createClass({
   displayName: 'Lti2Iframe',
@@ -49,6 +50,10 @@ export default React.createClass({
         this.props.handleInstall(message, e);
       }
     }.bind(this), false);
+
+    if (this.iframe) {
+      this.iframe.setAttribute('allow', iframeAllowances());
+    }
   },
 
   getLaunchUrl () {

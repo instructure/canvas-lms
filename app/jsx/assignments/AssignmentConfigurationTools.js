@@ -22,6 +22,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!moderated_grading'
 import 'compiled/jquery.rails_flash_notifications'
+import iframeAllowances from '../external_apps/lib/iframeAllowances'
 import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPicker'
 
   const AssignmentConfigurationTools = React.createClass({
@@ -41,11 +42,15 @@ import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPick
 
     componentDidMount() {
       this.setToolLaunchUrl();
+
+      if (this.iframe) {
+        this.iframe.setAttribute('allow', iframeAllowances());
+      }
     },
 
     getInitialState() {
       return {
-        toolLaunchUrl: 'none',
+        toolLaunchUrl: 'about:blank',
         toolType: '',
         tools: [],
         selectedToolValue: `${this.props.selectedToolType}_${this.props.selectedTool}`,
@@ -82,7 +87,7 @@ import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPick
           this.setState({
             tools: data,
             toolType: this.props.selectedToolType,
-            toolLaunchUrl: prevToolLaunch || 'none'
+            toolLaunchUrl: prevToolLaunch || 'about:blank'
           });
         }, self),
         error: function(xhr) {
@@ -160,7 +165,7 @@ import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPick
           ref={(c) => { this.similarityDetectionTool = c; }}
           value={this.state.selectedToolValue}
         >
-          <option title="Plagiarism Review Tool" data-launch="none" data-type="none">
+          <option title="Plagiarism Review Tool" data-launch="about:blank" data-type="none">
             None
           </option>
           {
@@ -192,46 +197,44 @@ import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPick
     },
 
     renderConfigTool() {
-      if (this.state.toolLaunchUrl !== 'none') {
-        const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-        const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
-        return(
-          <div>
-            <div
-              onFocus={this.handleAlertFocus}
-              onBlur={this.handleAlertBlur}
-              className={beforeAlertStyles}
-              tabIndex="0"
-            >
-              <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
-                <div className="ic-flash__icon" aria-hidden="true">
-                  <i className="icon-info" />
-                </div>
-                {I18n.t('The following content is partner provided')}
+      const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+      const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
+      return(
+        <div style={{ display: this.state.toolLaunchUrl === 'about:blank' ? 'none' : 'block' }}>
+          <div
+            onFocus={this.handleAlertFocus}
+            onBlur={this.handleAlertBlur}
+            className={beforeAlertStyles}
+            tabIndex="0"
+          >
+            <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
+              <div className="ic-flash__icon" aria-hidden="true">
+                <i className="icon-info" />
               </div>
-            </div>
-            <iframe
-              src={this.state.toolLaunchUrl}
-              className="tool_launch"
-              style={this.state.iframeStyle}
-              ref={(e) => { this.iframe = e; }}
-            />
-            <div
-              onFocus={this.handleAlertFocus}
-              onBlur={this.handleAlertBlur}
-              className={afterAlertStyles}
-              tabIndex="0"
-            >
-              <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
-                <div className="ic-flash__icon" aria-hidden="true">
-                  <i className="icon-info" />
-                </div>
-                {I18n.t('The preceding content is partner provided')}
-              </div>
+              {I18n.t('The following content is partner provided')}
             </div>
           </div>
-        );
-      }
+          <iframe
+            src={this.state.toolLaunchUrl}
+            className="tool_launch"
+            style={this.state.iframeStyle}
+            ref={(e) => { this.iframe = e; }}
+          />
+          <div
+            onFocus={this.handleAlertFocus}
+            onBlur={this.handleAlertBlur}
+            className={afterAlertStyles}
+            tabIndex="0"
+          >
+            <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
+              <div className="ic-flash__icon" aria-hidden="true">
+                <i className="icon-info" />
+              </div>
+              {I18n.t('The preceding content is partner provided')}
+            </div>
+          </div>
+        </div>
+      );
     },
 
     render() {

@@ -99,7 +99,12 @@ HEREDOC
     <%= t('The following content is partner provided') %>
   </div>
 </div>
-<iframe class="tool_launch" id="lti_new_collaboration_iframe"></iframe>
+<iframe
+  class="tool_launch"
+  id="lti_new_collaboration_iframe"
+  allow="<%= Lti::Launch::FRAME_ALLOWANCES.join('; ') %>"
+>
+</iframe>
 <div class="after_external_content_info_alert screenreader-only" tabindex="0">
   <div class="ic-flash-info">
     <div class="ic-flash__icon" aria-hidden="true">
