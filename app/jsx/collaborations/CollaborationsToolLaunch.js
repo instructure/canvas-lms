@@ -18,6 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!collaborations'
+import iframeAllowances from '../external_apps/lib/iframeAllowances'
 
 let main
 
@@ -40,6 +41,10 @@ class CollaborationsToolLaunch extends React.Component {
   componentDidMount () {
     this.setHeight()
     window.addEventListener('resize', this.setHeight)
+
+    if (this.iframe) {
+      this.iframe.setAttribute('allow', iframeAllowances());
+    }
   }
 
   componentWillUnmount () {

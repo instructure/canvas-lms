@@ -37,8 +37,12 @@ define [
     ReactDOM.render(createElement(data), wrapper)
 
   QUnit.module 'ExternalApps.Lti2Iframe',
+    setup: ->
+      @allowances = ['midi', 'media']
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = @allowances
     teardown: ->
       ReactDOM.unmountComponentAtNode wrapper
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
 
   test 'renders', ->
     data =
@@ -71,3 +75,11 @@ define [
       reregistration: false
     component = renderComponent(data)
     equal component.getLaunchUrl(), 'about:blank'
+
+  test 'renders any children after the iframe', ->
+    element = React.createElement(Lti2Iframe,{
+      registrationUrl: 'http://www.test.com',
+      handleInstall: ->
+    }, React.createElement('div', {id: 'test-child'}))
+    component = TestUtils.renderIntoDocument(element)
+    equal component.iframe.getAttribute('allow'), @allowances.join('; ')

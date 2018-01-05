@@ -26,6 +26,8 @@ define [
 
   QUnit.module "SelectContentDialog",
     setup: ->
+      @allowances = ['midi', 'media']
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = @allowances
       fixtures = document.getElementById('fixtures')
       fixtures.innerHTML = '<div id="context_external_tools_select">
       <div class="tools"><div id="test-tool" class="tool resource_selection"></div></div></div>'
@@ -44,6 +46,7 @@ define [
         }
       })
     teardown: ->
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
       $(window).off('beforeunload')
       clickEvent = {}
       fixtures.innerHTML = ""
@@ -56,6 +59,14 @@ define [
     $dialog = $("#resource_selection_dialog")
     $dialog.dialog('close')
     ok window.confirm.called
+
+
+  test "sets the iframe allowances", ()->
+    l = document.getElementById('test-tool')
+    @stub(window, "confirm").returns(true)
+    SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    $dialog = $("#resource_selection_dialog")
+    equal $dialog.find('#resource_selection_iframe').attr('allow'), @allowances.join('; ')
 
   test "it removes the confirm alert if a selection is passed back", ()->
     l = document.getElementById('test-tool')
