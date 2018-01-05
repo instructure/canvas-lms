@@ -285,12 +285,18 @@ class SubmissionsApiController < ApplicationController
   #   The current state of the enrollments. If omitted will include all
   #   enrollments that are not deleted.
   #
+  # @argument state_based_on_date [Boolean]
+  #   If omitted it is set to true. When set to false it will ignore the effective
+  #   state of the student enrollments and use the workflow_state for the
+  #   enrollments. The argument is ignored unless enrollment_state argument is
+  #   also passed.
+  #
   # @argument order [String, "id"|"graded_at"]
   #   The order submissions will be returned in.  Defaults to "id".  Doesn't
   #   affect results for "grouped" mode.
   #
   # @argument order_direction [String, "ascending"|"descending"]
-  #   Determines whether ordered results are retured in ascending or descending
+  #   Determines whether ordered results are returned in ascending or descending
   #   order.  Defaults to "ascending".  Doesn't affect results for "grouped" mode.
   #
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"]
@@ -361,14 +367,21 @@ class SubmissionsApiController < ApplicationController
     end
 
     if (enrollment_state = params[:enrollment_state].presence)
-      case enrollment_state
-      when 'active'
-        student_ids = (@section || @context).all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
-      when 'concluded'
-        student_ids = (@section || @context).all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
+      enrollments = (@section || @context).all_student_enrollments
+      state_based_on_date = params[:state_based_on_date] ? value_to_boolean(params[:state_based_on_date]) : true
+      case [enrollment_state, state_based_on_date]
+      when ['active', true]
+        enrollments = enrollments.active_by_date
+      when ['concluded', true]
+        enrollments = enrollments.completed_by_date
+      when ['active', false]
+        enrollments = enrollments.where(workflow_state: 'active')
+      when ['concluded', false]
+        enrollments = enrollments.where(workflow_state: 'completed')
       else
         return render json: {error: 'invalid enrollment_state'}, status: :bad_request
       end
+      student_ids = enrollments.where(user_id: student_ids).select(:user_id)
     end
 
     if value_to_boolean(params[:post_to_sis])
