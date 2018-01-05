@@ -60,6 +60,7 @@ class Enrollment < ActiveRecord::Base
 
   before_save :assign_uuid
   before_validation :assert_section
+  after_save :recalculate_enrollment_state
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   before_validation :ensure_role_id
@@ -76,7 +77,6 @@ class Enrollment < ActiveRecord::Base
   after_save :reset_notifications_cache
   after_save :update_assignment_overrides_if_needed
   after_save :dispatch_invitations_later
-  after_save :recalculate_enrollment_state
   after_save :add_to_favorites_later
   after_commit :update_cached_due_dates
   after_save :update_assignment_overrides_if_needed
@@ -742,7 +742,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
+    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state, self.changed?) do
       if %w{invited active completed}.include?(self.workflow_state)
         self.enrollment_state.get_effective_state
       else
