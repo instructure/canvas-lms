@@ -379,6 +379,18 @@ describe "student planner" do
       open_opportunities_dropdown
       expect(f('#opportunities_parent')).to contain_jqcss('span:contains("Missing")')
     end
+
+    it "shows the new activity button", priority: "1", test_id: 3263164 do
+      # create discussions in the future and in the past to be able to see the new activity button
+      past_discussion = graded_discussion_in_the_past
+      graded_discussion_in_the_future
+      go_to_list_view
+      # confirm the past discussion is not loaded
+      expect(f('.PlannerApp')).not_to contain_link(past_discussion.title.to_s)
+      expect(f('.PlannerApp')).to contain_jqcss("button:contains('New Activity')")
+      new_activity_button.click
+      expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
+    end
   end
 
   context "History" do

@@ -93,6 +93,28 @@ module PlannerPageObject
     @modal = todo_sidebar_modal(@student_to_do.title)
   end
 
+  def graded_discussion_in_the_past
+    assignment = @course.assignments.create!(name: 'assignment 1',
+                                              due_at: Time.zone.now - 2.days)
+    discussion = @course.discussion_topics.create!(user: @teacher,
+                                                    title: 'Graded discussion',
+                                                    message: 'Discussion topic message',
+                                                    assignment: assignment)
+    discussion.discussion_entries.create!(user: @teacher,
+                                           message: "new reply from teacher")
+  end
+
+  def graded_discussion_in_the_future
+    assignment = @course.assignments.create!(name: 'assignment 2',
+                                              due_at: Time.zone.now + 2.days)
+    discussion = @course.discussion_topics.create!(user: @teacher,
+                                                    title: 'Graded discussion 2',
+                                                    message: 'Discussion topic message',
+                                                    assignment: assignment)
+    discussion.discussion_entries.create!(user: @teacher,
+                                           message: "new reply from teacher")
+  end
+
   def open_opportunities_dropdown
     fj("button:contains('opportunit')").click
   end
@@ -103,6 +125,10 @@ module PlannerPageObject
 
   def todo_modal_button
     fj("button:contains('Add To Do')")
+  end
+
+  def new_activity_button
+    fj("button:contains('New Activity')")
   end
 
   def wait_for_planner_load
