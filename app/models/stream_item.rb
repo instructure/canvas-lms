@@ -113,10 +113,6 @@ class StreamItem < ActiveRecord::Base
     res
   end
 
-  def remove_users(users)
-    self.stream_item_instances.where(user_id: users).try(:destroy_all)
-  end
-
   def prepare_conversation(conversation)
     res = conversation.attributes.slice('id', 'has_attachments', 'updated_at')
     res['private'] = conversation.private?

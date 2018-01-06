@@ -89,7 +89,6 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :touch_context
   after_save :schedule_delayed_transitions
   after_save :update_materialized_view_if_changed
-  after_update :update_stream_items
   after_update :clear_streams_if_not_published
   after_create :create_participant
   after_create :create_materialized_view
@@ -212,22 +211,6 @@ class DiscussionTopic < ActiveRecord::Base
       end
     end
   end
-
-  def unsubscribe_users(users)
-    users.each { |user| self.unsubscribe(user) }
-    self.stream_item.remove_users(users)
-  end
-
-  def update_stream_items
-    return if self.stream_item&.users.nil?
-    return if self.deleted?
-    return unless self.assignment&.context_type == "Course"
-
-    active_users = self.active_participants_with_visibility
-    users_to_remove = self.stream_item.users - active_users
-    self.unsubscribe_users(users_to_remove)
-  end
-  protected :update_stream_items
 
   attr_accessor :saved_by
   def update_assignment
