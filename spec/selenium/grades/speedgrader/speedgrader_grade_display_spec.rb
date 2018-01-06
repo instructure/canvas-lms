@@ -63,10 +63,7 @@ describe "speed grader - grade display" do
       grade_assignments
     end
 
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
-
     before(:each) do
-      ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
     end
 

@@ -79,14 +79,14 @@ class ArgumentView < HashView
 
   def swagger_type
     type = (types.first || 'string')
+    type = "number" if type.downcase == "float"
     builtin?(type) ? type.downcase : type
   end
 
   def swagger_format
-    case swagger_type
-    when 'integer' then 'int64'
-    else nil
-    end
+    type = (types.first || 'string')
+    return "int64" if swagger_type == "integer"
+    return "float" if type.downcase == "float"
   end
 
   def optional?

@@ -1115,20 +1115,6 @@ describe Attachment do
       expect(@attachment.namespace).to be_nil
       expect(@attachment.read_attribute(:namespace)).to be_nil
     end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "returns the account_id relative to the current shard" do
-        birth_account = Shard.default.activate { Account.first }
-        Attachment.domain_namespace = birth_account.file_namespace
-
-        @shard1.activate {
-          a = Attachment.new
-          expect(a.root_account_id).to eq birth_account.global_id
-        }
-      end
-    end
   end
 
   context "encoding detection" do

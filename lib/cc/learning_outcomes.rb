@@ -95,9 +95,9 @@ module CC
           out_node.external_identifier item.id
         end
 
-        if item.alignments.exists?
+        if item.alignments.polymorphic_where(context: @course).exists?
           out_node.alignments do |alignments_node|
-            item.alignments.each do |alignment|
+            item.alignments.polymorphic_where(context: @course).each do |alignment|
               alignments_node.alignment do |alignment_node|
                 alignment_node.content_type alignment.content_type
                 alignment_node.content_id create_key(alignment.content)

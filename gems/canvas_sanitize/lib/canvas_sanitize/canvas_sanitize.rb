@@ -158,7 +158,7 @@ module CanvasSanitize #:nodoc:
                       'allowscriptaccess', 'width', 'height'].freeze,
           'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height', 'controls', 'playsinline'].freeze,
           'track' => ['default', 'kind', 'label', 'src', 'srclang'].freeze,
-          'audio' => ['name', 'src', 'muted'].freeze,
+          'audio' => ['name', 'src', 'muted', 'controls'].freeze,
           'font' => ['face', 'color', 'size'].freeze,
           # MathML
           'annotation' => ['href', 'xref', 'definitionURL', 'encoding', 'cd', 'name', 'src'].freeze,

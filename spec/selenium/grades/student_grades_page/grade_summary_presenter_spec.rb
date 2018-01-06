@@ -64,7 +64,7 @@ describe GradeSummaryPresenter do
       user_session(observer)
       get "/courses/#{observed_courses.first.id}/grades"
 
-      expect(f('.course_selector')).to be_displayed
+      expect(f('#course_select_menu')).to be_displayed
     end
 
     it 'maintains focus on show what-if/revert to original buttons', priority: 2, test_id: 229660 do

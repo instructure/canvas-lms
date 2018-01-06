@@ -18,6 +18,7 @@
 
 class GradebookExporter
   include GradebookSettingsHelpers
+  include LocaleSelection
 
   def initialize(course, user, options = {})
     @course  = course
@@ -26,6 +27,36 @@ class GradebookExporter
   end
 
   def to_csv
+    I18n.locale = @options[:locale] || infer_locale(
+      context:      @course,
+      user:         @user,
+      root_account: @course.root_account
+    )
+
+    @options[:col_sep] ||= determine_column_separator
+    @options[:encoding] ||= I18n.t('csv.encoding', 'UTF-8')
+
+    # Wikipedia: Microsoft compilers and interpreters, and many pieces of software on Microsoft Windows such as
+    # Notepad treat the BOM as a required magic number rather than use heuristics. These tools add a BOM when saving
+    # text as UTF-8, and cannot interpret UTF-8 unless the BOM is present or the file contains only ASCII.
+    # https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
+    bom = @options[:encoding] == 'UTF-8' ? "\xEF\xBB\xBF" : ''
+    csv_data.prepend(bom)
+  end
+
+  private
+
+  def determine_column_separator
+    default_separator = I18n.t('number.format.separator', '.') == ',' ? ';' : ','
+
+    if I18n.exists?('csv.column_delimiter')
+      I18n.t('csv.column_delimiter', ',')
+    else
+      default_separator
+    end
+  end
+
+  def csv_data
     enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
                                                            include: gradebook_includes)
     student_enrollments = enrollments_for_csv(enrollment_scope)
@@ -66,7 +97,8 @@ class GradebookExporter
     include_root_account = @course.root_account.trust_exists?
     should_show_totals = show_totals?
     include_sis_id = @options[:include_sis_id]
-    CSV.generate do |csv|
+
+    CSV.generate(@options.slice(:encoding, :col_sep)) do |csv|
       # First row
       row = ["Student", "ID"]
       row << "SIS User ID" if include_sis_id
@@ -116,7 +148,7 @@ class GradebookExporter
         row << nil
         row << nil if include_root_account
       end
-      row.concat assignments.map(&:points_possible)
+      row.concat(assignments.map{ |a| I18n.n(a.points_possible) })
 
       if should_show_totals
         row.concat([read_only] * group_filler_length)
@@ -146,7 +178,7 @@ class GradebookExporter
               elsif a.grading_type == "gpa_scale" && submission.try(:score)
                 a.score_to_grade(submission.score)
               else
-                submission.try(:score)
+                I18n.n(submission.try(:score))
               end
             end
           end
@@ -168,8 +200,6 @@ class GradebookExporter
     end
   end
 
-  private
-
   def enrollments_for_csv(scope)
     # user: used for name in csv output
     # course_section: used for display_name in csv output
@@ -181,26 +211,35 @@ class GradebookExporter
     enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten
   end
 
+  def format_numbers(number)
+    # We only need ; as a column separator for those locales that use numbers not formatted similar to
+    # US numbers: 1,234.56.  The check below is essentially indirectly checking whether the current locale needs to have
+    # numbers reformatted
+    return I18n.n(number) if @options[:col_sep] == ';'
+
+    number
+  end
+
   def show_totals(grade, groups, include_points)
     result = []
 
     groups.each do |group|
       if include_points
-        result << grade[:current_groups][group.id][:score]
-        result << grade[:final_groups][group.id][:score]
+        result << format_numbers(grade[:current_groups][group.id][:score])
+        result << format_numbers(grade[:final_groups][group.id][:score])
       end
 
-      result << grade[:current_groups][group.id][:grade]
-      result << grade[:final_groups][group.id][:grade]
+      result << format_numbers(grade[:current_groups][group.id][:grade])
+      result << format_numbers(grade[:final_groups][group.id][:grade])
     end
 
     if include_points
-      result << grade[:current][:total]
-      result << grade[:final][:total]
+      result << format_numbers(grade[:current][:total])
+      result << format_numbers(grade[:final][:total])
     end
 
-    result << grade[:current][:grade]
-    result << grade[:final][:grade]
+    result << format_numbers(grade[:current][:grade])
+    result << format_numbers(grade[:final][:grade])
 
     if @course.grading_standard_enabled?
       result << @course.score_to_grade(grade[:current][:grade])

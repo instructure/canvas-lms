@@ -409,6 +409,11 @@ class DiscussionTopicsController < ApplicationController
 
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
+
+    if @topic.root_topic_id && @topic.has_group_category?
+      return redirect_to edit_course_discussion_topic_url(@context.context_id, @topic.root_topic_id)
+    end
+
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
       can_set_group_category = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not a student
       hash =  {
@@ -717,9 +722,6 @@ class DiscussionTopicsController < ApplicationController
   # @argument group_category_id [Integer]
   #   If present, the topic will become a group discussion assigned
   #   to the group.
-  #
-  # @argument allow_rating [Boolean]
-  #   If true, users will be allowed to rate entries.
   #
   # @argument only_graders_can_rate [Boolean]
   #   If true, only graders will be allowed to rate entries.

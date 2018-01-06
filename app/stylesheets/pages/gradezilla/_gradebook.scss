@@ -713,32 +713,6 @@ $gradebook_checkbox_size: 16px;
   display: inline-block;
 }
 
-.submission_type_icon {
-  display: block;
-  width: 100%;
-  height: 22px;
-  background-position: center center;
-  background-repeat: no-repeat;
-  .online_text_entry & {
-    background-image: url("/images/text_entry.png");
-  }
-  .discussion_topic & {
-    background-image: url("/images/word_bubble.png");
-  }
-  .online_upload & {
-    background-image: url("/images/file.png");
-  }
-  .pending_review & {
-    background-image: url("/images/pending_review.png");
-  }
-  .media_comment &, .media_recording & {
-    background-image: url("/images/media_comment.gif");
-  }
-  .quiz & {
-    background-image: url("/images/quiz.png");
-  }
-}
-
 .letter-grade-points,
 .gpa-scale-points {
   position: absolute;
@@ -827,15 +801,6 @@ $gradebook_checkbox_size: 16px;
 .Gradebook__StatusModalList {
   margin: 0px;
   list-style-type: none;
-}
-
-.ComingSoonContent__Container {
-  text-align: center;
-}
-
-.ComingSoonContent__Body {
-  display: inline-block;
-  margin-top: 2rem;
 }
 
 #LatePoliciesTabPanel__Container-noContent {

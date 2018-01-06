@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,10 +14,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-define [
-  "jquery"
-], ($) ->
-  $(document).ready ->
-    $("#course_url").change ->
-      location.href = $(this).val() unless location.href is $(this).val()
+class AddForeignKeyIndexes11 < ActiveRecord::Migration[5.0]
+  tag :postdeploy
+  disable_ddl_transaction!
+
+  def change
+    add_index :gradebook_csvs, :course_id, algorithm: :concurrently
+  end
+end

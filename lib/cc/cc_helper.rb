@@ -277,10 +277,10 @@ module CCHelper
       meta_html = ""
       meta_fields.each_pair do |k, v|
         next unless v.present?
-        meta_html += %{<meta name="#{k}" content="#{v}"/>\n}
+        meta_html += %{<meta name="#{HtmlTextHelper.escape_html(k.to_s)}" content="#{HtmlTextHelper.escape_html(v.to_s)}"/>\n}
       end
 
-      %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
+      %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>\n<title>#{HtmlTextHelper.escape_html(title)}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
     end
 
     def html_content(html)

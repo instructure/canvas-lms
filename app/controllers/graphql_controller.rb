@@ -12,8 +12,14 @@ class GraphQLController < ApplicationController
       session: session,
       request: request,
     }
-    result = CanvasSchema.execute(query, variables: variables, context: context)
-    render json: result
+
+    ActiveRecord::Base.transaction do
+      timeout = Integer(Setting.get('graphql_statement_timeout', '60_000'))
+      ActiveRecord::Base.connection.execute "SET statement_timeout = #{timeout}"
+
+      result = CanvasSchema.execute(query, variables: variables, context: context)
+      render json: result
+    end
   end
 
   def graphiql

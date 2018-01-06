@@ -60,8 +60,13 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcomes.
   def outcome_results_include_outcomes_json(outcomes)
+    alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
-      ActiveRecord::Associations::Preloader.new.preload(outcomes_slice, [:context, :alignments])
+      ActiveRecord::Associations::Preloader.new.preload(outcomes_slice, [:context])
+      ContentTag.learning_outcome_alignments.not_deleted.where(:learning_outcome_id => outcomes_slice).
+          pluck(:learning_outcome_id, :content_type, :content_id).each do |lo_id, content_type, content_id|
+        (alignment_asset_string_map[lo_id] ||= []) << "#{content_type.underscore}_#{content_id}"
+      end
     end
     assessed_outcomes = []
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
@@ -69,7 +74,7 @@ module Api::V1::OutcomeResults
     end
     outcomes.map do |o|
       hash = outcome_json(o, @current_user, session, assessed_outcomes: assessed_outcomes)
-      hash.merge!(alignments: o.alignments.map(&:content_asset_string))
+      hash.merge!(alignments: alignment_asset_string_map[o.id])
       hash
     end
   end

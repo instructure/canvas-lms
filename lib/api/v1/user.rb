@@ -271,13 +271,14 @@ module Api::V1::User
     }
 
     if grade_permissions?(user, enrollment)
-      gpid = grading_period(enrollment.course, opts)&.id
+      period = grading_period(enrollment.course, opts)
+      score_opts = period ? { grading_period_id: period.id } : Score.params_for_course
 
-      grades[:current_score] = enrollment.computed_current_score(grading_period_id: gpid)
-      grades[:current_grade] = enrollment.computed_current_grade(grading_period_id: gpid)
-      grades[:final_score]   = enrollment.computed_final_score(grading_period_id: gpid)
-      grades[:final_grade]   = enrollment.computed_final_grade(grading_period_id: gpid)
-      grades[:grading_period_id] = gpid if opts[:current_grading_period_scores]
+      grades[:current_score] = enrollment.computed_current_score(score_opts)
+      grades[:current_grade] = enrollment.computed_current_grade(score_opts)
+      grades[:final_score]   = enrollment.computed_final_score(score_opts)
+      grades[:final_grade]   = enrollment.computed_final_grade(score_opts)
+      grades[:grading_period_id] = period&.id if opts[:current_grading_period_scores]
     end
     grades
   end

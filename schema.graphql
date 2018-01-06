@@ -1,6 +1,7 @@
 type Assignment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
+  course: Course
   createdAt: Time
   description: String
   discussion: Discussion
@@ -18,6 +19,22 @@ type Assignment implements Node, Timestamped {
   # determines the order this assignment is displayed in in its assignment group
   position: Int
   quiz: Quiz
+  state: AssignmentState!
+
+  # submissions for this assignment
+  submissionsConnection(
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): SubmissionConnection
   updatedAt: Time
 }
 
@@ -101,6 +118,13 @@ enum AssignmentGroupState {
 input AssignmentInput {
   courseId: ID!
   name: String!
+}
+
+# States that an Assignment can be in
+enum AssignmentState {
+  deleted
+  published
+  unpublished
 }
 
 type Course implements Node, Timestamped {

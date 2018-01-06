@@ -1805,7 +1805,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           postToSIS: data['quiz[post_to_sis]'] == '1'
         }
 
-        const errs = overrideView.validateBeforeSave(validationData,{})
+        const overrideErrs = overrideView.validateBeforeSave(validationData,{})
 
         let validationHelper = new SisValidationHelper({
           postToSIS: validationData.postToSIS,
@@ -1814,8 +1814,9 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           name: quiz_title
         })
 
-        if (_.keys(errs).length > 0) {
+        if (_.keys(overrideErrs).length > 0) {
           valid = false
+          _.each(overrideErrs, (err) => { err.showError(err.element, err.message) })
         }
         if (validationHelper.nameTooLong()) {
           valid = false

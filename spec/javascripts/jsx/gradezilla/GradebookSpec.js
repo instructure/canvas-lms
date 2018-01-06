@@ -7528,7 +7528,7 @@ QUnit.module('Gradebook#applyLatePolicy', {
     this.gradingStandard = [['A', 0]];
     this.gradebook = createGradebook({ grading_standard: this.gradingStandard });
     this.gradebook.gradingPeriodSet = { gradingPeriods: [{ id: 100, isClosed: true }, { id: 101, isClosed: false }] };
-    this.latePolicyApplicator = this.stub(LatePolicyApplicator, 'processSubmission');
+    this.latePolicyApplicator = this.stub(LatePolicyApplicator, 'processSubmission').returns(true);
 
     this.submission1 = {
       user_id: 10,
@@ -7548,6 +7548,12 @@ QUnit.module('Gradebook#applyLatePolicy', {
       grading_period_id: 101
     };
 
+    this.submission4 = {
+      user_id: 12,
+      assignment_id: 'assignment_1',
+      grading_period_id: null
+    };
+
     this.gradebook.assignments = { assignment_1: 'assignment1value', assignment_2: 'assignment2value' };
     this.gradebook.students = {
       10: {
@@ -7556,6 +7562,10 @@ QUnit.module('Gradebook#applyLatePolicy', {
       },
       11: {
         assignment_2: this.submission3
+      },
+      12: {
+        assignment_1: this.submission4,
+        isConcluded: true
       }
     }
     this.gradebook.courseContent.latePolicy = 'latepolicy';
@@ -7565,6 +7575,14 @@ QUnit.module('Gradebook#applyLatePolicy', {
 test('does not affect submissions in closed grading periods', function () {
   this.gradebook.applyLatePolicy();
   notOk(this.latePolicyApplicator.calledWith(this.submission2, 'assignment2value', this.gradingStandard, 'latepolicy'));
+});
+
+test('does not grade submissions for concluded students', function () {
+  sinon.stub(this.gradebook, 'calculateStudentGrade');
+  this.gradebook.applyLatePolicy();
+  const gradesCalculated = this.gradebook.calculateStudentGrade.calledWith(this.gradebook.students[12]);
+  strictEqual(gradesCalculated, false);
+  this.gradebook.calculateStudentGrade.restore();
 });
 
 test('affects submissions that are not in a grading period', function () {
@@ -8141,5 +8159,46 @@ QUnit.module('#setEditedCommentId', function () {
     const gradebook = createGradebook();
     gradebook.setEditedCommentId('23');
     strictEqual(gradebook.gridDisplaySettings.submissionTray.editedCommentId, '23');
+  });
+});
+
+QUnit.module('#renderGradebookSettingsModal', (hooks) => {
+  let gradebook;
+
+  function gradebookSettingsModalProps () {
+    return ReactDOM.render.firstCall.args[0].props;
+  }
+
+  hooks.beforeEach(() => {
+    sinon.stub(ReactDOM, 'render');
+  });
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore();
+  });
+
+  test('renders the GradebookSettingsModal component', function () {
+    gradebook = createGradebook();
+    gradebook.renderGradebookSettingsModal();
+    const componentName = ReactDOM.render.firstCall.args[0].type.name;
+    strictEqual(componentName, 'GradebookSettingsModal');
+  });
+
+  test('passes graded_late_submissions_exist option to the modal as a prop', function () {
+    gradebook = createGradebook({ graded_late_submissions_exist: true });
+    gradebook.renderGradebookSettingsModal();
+    strictEqual(gradebookSettingsModalProps().gradedLateSubmissionsExist, true);
+  });
+
+  test('passes the context_id option to the modal as a prop', function () {
+    gradebook = createGradebook({ context_id: '8473' });
+    gradebook.renderGradebookSettingsModal();
+    strictEqual(gradebookSettingsModalProps().courseId, '8473');
+  });
+
+  test('passes the locale option to the modal as a prop', function () {
+    gradebook = createGradebook({ locale: 'de' });
+    gradebook.renderGradebookSettingsModal();
+    strictEqual(gradebookSettingsModalProps().locale, 'de');
   });
 });

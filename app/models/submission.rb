@@ -103,6 +103,7 @@ class Submission < ActiveRecord::Base
   validate :ensure_grader_can_grade
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
+  scope :for_enrollments, -> (enrollments) { where(user_id: enrollments.select(:user_id)) }
   scope :with_comments, -> { preload(:submission_comments) }
   scope :unread_for, -> (user_id) do
     joins(:content_participations).
@@ -406,6 +407,8 @@ class Submission < ActiveRecord::Base
 
     given do |user|
       self.assignment.published? &&
+        self.assignment.peer_reviews &&
+        self.assignment.context.participating_students.where(id: self.user).exists? &&
         user &&
         self.assessment_requests.map(&:assessor_id).include?(user.id)
     end

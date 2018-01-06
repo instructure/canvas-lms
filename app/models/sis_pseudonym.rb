@@ -115,7 +115,9 @@ class SisPseudonym
                  # false sorts before true
                  relation.order("sis_user_id IS NULL")
                end
-    relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id))
+    relation.primary_shard.activate do
+      relation = relation.order(Pseudonym.best_unicode_collation_key(:unique_id))
+    end
     if type == :implicit
       relation.detect { |p| p.works_for_account?(root_account, true) }
     else

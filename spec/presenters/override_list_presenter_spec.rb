@@ -31,11 +31,12 @@ describe OverrideListPresenter do
     Timecop.freeze(Time.zone.local(2013,3,13,0,0), &example)
   end
 
-  let(:assignment) { Assignment.new :title => "Testing" }
-  let(:user) { User.new :name => "Testing" }
+  let(:course) { course_factory(active_all: true) }
+  let(:assignment) { course.assignments.create!(title: "Testing") }
+  let(:user) { student_in_course(course: course, name: "Testing").user }
+  let(:second_user) { student_in_course(course: course, name: "Testing 2").user }
   let(:overridden_assignment) { assignment }
   let(:presenter) { OverrideListPresenter.new assignment,user }
-
 
   describe "#initialize" do
 
@@ -159,6 +160,42 @@ describe OverrideListPresenter do
         I18n.t('overrides.everyone', 'Everyone')
       )
     end
+
+    context "for ADHOC overrides" do
+      before :each do
+        override = assignment.assignment_overrides.build(due_at: 1.week.from_now)
+        override.assignment_override_students.build(user: user)
+        override.assignment_override_students.build(user: second_user)
+        override.save!
+
+        @due_date = presenter.assignment.dates_hash_visible_to(user).first
+      end
+
+      it "returns a dynamically generated title based on the number of current and invited users" do
+        expect(presenter.due_for(@due_date)).to eql('2 students')
+      end
+
+      it "does not count concluded students" do
+        course.enrollments.find_by(user: second_user).conclude
+        expect(presenter.due_for(@due_date)).to eql('1 student')
+      end
+
+      it "does not count inactive students" do
+        course.enrollments.find_by(user: second_user).deactivate
+        expect(presenter.due_for(@due_date)).to eql('1 student')
+      end
+
+      it "does not count deleted students" do
+        course.enrollments.find_by(user: second_user).destroy
+        expect(presenter.due_for(@due_date)).to eql('1 student')
+      end
+
+      it "does not double-count students that have multiple enrollments in the course" do
+        section = course.course_sections.create!
+        course.enroll_student(user, section: section, enrollment_state: 'active', allow_multiple_enrollments: true)
+        expect(presenter.due_for(@due_date)).to eql('2 students')
+      end
+    end
   end
 
   describe "#visible_due_dates" do
@@ -186,8 +223,8 @@ describe OverrideListPresenter do
     context "when all sections have overrides" do
 
       before do
-        allow(assignment).to receive(:context).
-          and_return double(:active_section_count => sections.count)
+        allow(assignment.context).to receive(:active_section_count).
+          and_return sections.count
         allow(assignment).to receive(:all_dates_visible_to).with(user).
           and_return dates_visible_to_user
         @visible_due_dates = presenter.visible_due_dates
@@ -222,8 +259,8 @@ describe OverrideListPresenter do
       let(:dates_visible) { dates_visible_to_user[1..-1] }
 
       before do
-        allow(assignment).to receive(:context).
-          and_return double(:active_section_count => sections.count)
+        allow(assignment.context).to receive(:active_section_count).
+          and_return sections.count
         allow(assignment).to receive(:all_dates_visible_to).with(user).
           and_return dates_visible
         @visible_due_dates = presenter.visible_due_dates

@@ -244,16 +244,16 @@ module ApplicationHelper
     Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
-  def css_variant
-    variant = use_new_typography? ? 'new_typography' : 'new_styles'
-    use_high_contrast = @current_user && @current_user.prefers_high_contrast?
+  def css_variant(opts = {})
+    variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
+    use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
     variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
   end
 
-  def css_url_for(bundle_name, plugin=false)
+  def css_url_for(bundle_name, plugin=false, opts = {})
     bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
-    cache = BrandableCSS.cache_for(bundle_path, css_variant)
-    base_dir = cache[:includesNoVariables] ? 'no_variables' : css_variant
+    cache = BrandableCSS.cache_for(bundle_path, css_variant(opts))
+    base_dir = cache[:includesNoVariables] ? 'no_variables' : css_variant(opts)
     File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
   end
 
@@ -617,7 +617,7 @@ module ApplicationHelper
   def active_brand_config(opts={})
     return active_brand_config_cache[opts] if active_brand_config_cache.key?(opts)
 
-    ignore_branding = (@current_user.try(:prefers_high_contrast?) && !opts[:ignore_high_contrast_preference])
+    ignore_branding = (@current_user.try(:prefers_high_contrast?) && !opts[:ignore_high_contrast_preference]) || opts[:force_high_contrast]
     active_brand_config_cache[opts] = if ignore_branding
       nil
     else
@@ -640,7 +640,7 @@ module ApplicationHelper
 
   def active_brand_config_url(type, opts={})
     path = active_brand_config(opts).try("public_#{type}_path")
-    path ||= BrandableCSS.public_default_path(type, @current_user&.prefers_high_contrast?)
+    path ||= BrandableCSS.public_default_path(type, @current_user&.prefers_high_contrast? || opts[:force_high_contrast])
     "#{Canvas::Cdn.config.host}/#{path}"
   end
 

@@ -22,7 +22,6 @@ class GroupCategory < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :account]
   has_many :groups, :dependent => :destroy
-  has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'
 
@@ -463,6 +462,19 @@ class GroupCategory < ActiveRecord::Base
   def discussion_topics
     self.shard.activate do
       DiscussionTopic.where(context_type: self.context_type, context_id: self.context_id, group_category_id: self)
+    end
+  end
+
+  def submission_ids_by_user_id(user_ids=nil)
+    self.shard.activate do
+      assignments = Assignment.active.where(:context_type => self.context_type, :context_id => self.context_id, :group_category_id => self.id)
+      submissions = Submission.active.where(assignment_id: assignments, workflow_state: 'submitted')
+      submissions = submissions.where(:user_id => user_ids) if user_ids
+      rows = submissions.pluck(:id, :user_id)
+      rows.each_with_object({}) do |row, obj|
+        id, user_id = row
+        obj[user_id] = (obj[user_id] || []).push(id)
+      end
     end
   end
 

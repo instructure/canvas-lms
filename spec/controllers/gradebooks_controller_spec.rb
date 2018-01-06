@@ -183,6 +183,47 @@ describe GradebooksController do
       expect(assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"]).to be_nil
     end
 
+    it "includes assignment sort options in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:assignment_sort_options]).to match_array [["Due Date", "due_at"], ["Title", "title"]]
+    end
+
+    it "includes the current assignment sort order in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      order = assigns[:js_env][:current_assignment_sort_order]
+      expect(order).to eq :due_at
+    end
+
+    it "includes the current grading period id in the ENV" do
+      group = @course.root_account.grading_period_groups.create!
+      period = group.grading_periods.create!(title: "GP", start_date: 3.months.ago, end_date: 3.months.from_now)
+      group.enrollment_terms << @course.enrollment_term
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:current_grading_period_id]).to eq period.id
+    end
+
+    it "includes courses_with_grades, with each course having an id, nickname, and URL" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      courses = assigns[:js_env][:courses_with_grades]
+      expect(courses).to all include("id", "nickname", "url")
+    end
+
+    it "includes the URL to save the assignment order in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env]).to have_key :save_assignment_order_url
+    end
+
+    it "includes the students for the grade summary page in the ENV" do
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:students]).to match_array [@student].as_json(include_root: false)
+    end
+
     it "includes muted assignments" do
       user_session(@student)
       assignment = @course.assignments.create!(title: "Example Assignment")
@@ -772,19 +813,15 @@ describe GradebooksController do
         expect(section).to have_key :sis_section_id
       end
 
-      describe "graded_late_or_missing_submissions_exist" do
+      describe "graded_late_submissions_exist" do
         it "is not included if New Gradebook is disabled" do
           get :show, params: {course_id: @course.id}
-          expect(gradebook_options).not_to have_key :graded_late_or_missing_submissions_exist
+          expect(gradebook_options).not_to have_key :graded_late_submissions_exist
         end
 
         context "New Gradebook is enabled" do
           before(:once) do
             @course.enable_feature!(:new_gradebook)
-          end
-
-          after(:each) do
-            ENV.delete("GRADEBOOK_DEVELOPMENT")
           end
 
           let(:assignment) do
@@ -795,59 +832,32 @@ describe GradebooksController do
             )
           end
 
-          let(:graded_late_or_missing_submissions_exist) do
-            gradebook_options.fetch(:graded_late_or_missing_submissions_exist)
+          let(:graded_late_submissions_exist) do
+            gradebook_options.fetch(:graded_late_submissions_exist)
           end
 
           it "is included if New Gradebook is enabled" do
             get :show, params: {course_id: @course.id}
             gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
-            expect(gradebook_options).to have_key :graded_late_or_missing_submissions_exist
+            expect(gradebook_options).to have_key :graded_late_submissions_exist
           end
 
-          it "is true if graded late submissions exist and the development flag is on" do
-            ENV["GRADEBOOK_DEVELOPMENT"] = "true"
+          it "is true if graded late submissions exist" do
             assignment.submit_homework(@student, body: "a body")
             assignment.grade_student(@student, grader: @teacher, grade: 8)
             get :show, params: {course_id: @course.id}
-            expect(graded_late_or_missing_submissions_exist).to be true
-          end
-
-          it "is false if graded late submissions exist and the development flag is off" do
-            assignment.submit_homework(@student, body: "a body")
-            assignment.grade_student(@student, grader: @teacher, grade: 8)
-            get :show, params: {course_id: @course.id}
-            expect(graded_late_or_missing_submissions_exist).to be false
+            expect(graded_late_submissions_exist).to be true
           end
 
           it "is false if late submissions exist, but they are not graded" do
             assignment.submit_homework(@student, body: "a body")
             get :show, params: {course_id: @course.id}
-            expect(graded_late_or_missing_submissions_exist).to be false
+            expect(graded_late_submissions_exist).to be false
           end
 
-          it "is true if graded missing submissions exist and the development flag is on" do
-            ENV["GRADEBOOK_DEVELOPMENT"] = "true"
-            assignment.grade_student(@student, grader: @teacher, grade: 8)
+          it "is false if there are no late submissions" do
             get :show, params: {course_id: @course.id}
-            expect(graded_late_or_missing_submissions_exist).to be true
-          end
-
-          it "is false if graded missing submissions exist and the development flag is off" do
-            assignment.grade_student(@student, grader: @teacher, grade: 8)
-            get :show, params: {course_id: @course.id}
-            expect(graded_late_or_missing_submissions_exist).to be false
-          end
-
-          it "is false if missing submissions exist, but they are not graded" do
-            assignment # create the assignment so that missing submissions exist
-            get :show, params: {course_id: @course.id}
-            expect(graded_late_or_missing_submissions_exist).to be false
-          end
-
-          it "is false if there are no graded late or missing submissions" do
-            get :show, params: {course_id: @course.id}
-            expect(graded_late_or_missing_submissions_exist).to be false
+            expect(graded_late_submissions_exist).to be false
           end
         end
       end

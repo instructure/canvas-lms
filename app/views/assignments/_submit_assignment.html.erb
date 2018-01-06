@@ -390,7 +390,10 @@
       <div id="submit_from_external_tool_form_<%= external_tool.id %>" style="padding: 5px 5px 0 5px;"></div>
     <% end %>
 
-    <% if @external_tools.length > 3 %>
+    <% if @external_tools.length > 3
+      user_group = @assignment.group_category.try(:group_for, @current_user)
+      file_upload_path = user_group ? api_v1_group_files_path(user_group) : "/api/v1/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@current_user.id}/files"
+    %>
       <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
         <%= hidden_field :submission, :submission_type, :value => "online_url", :id => 'external_tool_submission_type' %>
         <%= hidden_field :submission, :filename, :id => 'external_tool_filename' %>
@@ -398,7 +401,7 @@
         <%= hidden_field :submission, :url, :id => 'external_tool_url' %>
         <%= hidden_field :submission, :content_type, :id => 'external_tool_content_type' %>
         <a href="<%= context_url(@context, :homework_submissions_context_external_tools_url) %>" id="external_tools_url"></a>
-        <a href="/api/v1/courses/<%= @context.id %>/assignments/<%= @assignment.id %>/submissions/<%= @current_user.id %>/files" id="homework_file_url"></a>
+        <a href="<%= file_upload_path %>" id="homework_file_url"></a>
         <table role="presentation" class="formtable" style="width: 100%;">
           <tr>
             <td colspan="2">

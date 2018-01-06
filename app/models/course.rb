@@ -202,12 +202,12 @@ class Course < ActiveRecord::Base
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
-  after_save :update_cached_due_dates
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
   after_save :touch_students_if_necessary
   after_save :set_self_enrollment_code
+  after_commit :update_cached_due_dates
 
   before_update :handle_syllabus_changes_for_master_migration
 
@@ -327,13 +327,17 @@ class Course < ActiveRecord::Base
     tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
     return tags if user.blank? || user_is_teacher
 
-    path_visible_pages = self.wiki_pages.left_outer_joins(assignment: :submissions).
-      except(:preload).
-      where("assignments.id is null or submissions.user_id = ?", user.id).
-      select(:id)
+    if ConditionalRelease::Service.enabled_in_context?(self)
+      path_visible_pages = self.wiki_pages.left_outer_joins(assignment: :submissions).
+        except(:preload).
+        where("assignments.id is null or submissions.user_id = ?", user.id).
+        select(:id)
 
-    tags.where("content_tags.content_type <> 'WikiPage' or
-      content_tags.content_id in (?)", path_visible_pages)
+      tags = tags.where.not(content_type: 'WikiPage')
+      tags = tags.union(ContentTag.where(content_type: 'WikiPage', content_id: path_visible_pages))
+    end
+
+    tags
   end
 
   def sequential_module_item_ids
@@ -1053,7 +1057,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    DueDateCacher.recompute_course(self) if enrollment_term_id_changed?
+    DueDateCacher.recompute_course(self) if previous_changes.key?(:enrollment_term_id)
   end
 
   def update_final_scores_on_weighting_scheme_change
@@ -1069,6 +1073,11 @@ class Course < ActiveRecord::Base
     if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
       # if we have all default args, let's queue this job in a singleton to avoid duplicates
       inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
+    elsif student_ids.blank? && grading_period_id.present?
+      # A migration that changes a lot of due dates in a grading period
+      # situation can kick off a job storm and redo work. Let's avoid
+      # that by putting it into a singleton.
+      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
     end
 
     send_later_if_production_enqueue_args(
@@ -2838,7 +2847,7 @@ class Course < ActiveRecord::Base
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
     self.default_section unless course_sections.active.any?
-    Enrollment.suspend_callbacks(:update_cached_due_dates) do
+    Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
       self.course_sections.active.each do |section|
         # enroll fake_student will only create the enrollment if it doesn't already exist
         self.enroll_user(fake_student, 'StudentViewEnrollment',
@@ -3088,6 +3097,22 @@ class Course < ActiveRecord::Base
     !!settings[:show_total_grade_as_points] &&
       group_weighting_scheme != "percent" &&
       !relevant_grading_period_group&.weighted?
+  end
+
+  # This method will be around while we still have two
+  # gradebooks. This method should be used in situations where we want
+  # to identify the user can't move backwards, such as feature flags
+  def gradebook_backwards_incompatible_features_enabled?
+    # The old gradebook can't deal with late policies at all
+    return true if late_policy&.missing_submission_deduction_enabled? || late_policy&.late_submission_deduction_enabled?
+
+    # If you've used the grade tray status changes at all, you can't
+    # go back. Even if set to none, it'll break "Message Students
+    # Who..." for unsubmitted.
+    expire_time = Setting.get('late_policy_tainted_submissions', 1.hour).to_i
+    Rails.cache.fetch(['late_policy_tainted_submissions', self].cache_key, expires_in: expire_time) do
+      submissions.except(:order).where(late_policy_status: ['missing', 'late', 'none']).exists?
+    end
   end
 
   private

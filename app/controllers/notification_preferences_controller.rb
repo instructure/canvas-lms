@@ -70,7 +70,6 @@ class NotificationPreferencesController < ApplicationController
 
   # @API List of preference categories
   # Fetch all notification preference categories for the given communication channel
-  # @returns []
   def category_index
     policies = NotificationPolicy.find_all_for(@cc)
     render json: { categories: policies.map { |p| p.notification.try(:category_slug) }.compact.uniq }

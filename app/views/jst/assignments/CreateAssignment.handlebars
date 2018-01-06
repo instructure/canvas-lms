@@ -67,7 +67,7 @@
             {{#each allDates}}
               <div class="clearfix">
                 <dt>{{dueFor}}</dt>
-                <dd>{{#if dueAt}} {{tDateToString (fudge dueAt) 'short'}} {{else}} - {{/if}}</dd>
+                <dd>{{#if dueAt}} {{tDateToString dueAt 'short'}} {{else}} - {{/if}}</dd>
               </div>
             {{/each}}
           </dl>

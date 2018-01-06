@@ -16,20 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import SVGWrapper from 'jsx/shared/SVGWrapper';
-import Typography from 'instructure-ui/lib/components/Typography';
-import I18n from 'i18n!gradebook';
+const data = ENV.BLUEPRINT_COURSES_DATA
 
-export default function ContentComingSoon () {
-  return (
-    <div className="ComingSoonContent__Container">
-      <div className="ComingSoonContent__Body">
-        <SVGWrapper url="/images/gift_closed.svg" />
-        <Typography size="xx-large" weight="light">{I18n.t('New goodies coming soon!')}</Typography>
-        <br />
-        <Typography weight="bold">{I18n.t('Check back in a little while.')}</Typography>
-      </div>
-    </div>
-  );
+export default function startApp(App) {
+  const wrapper = document.getElementById('wrapper')
+  const root = document.createElement('div')
+  root.className = 'blueprint__root'
+  wrapper.appendChild(root)
+
+  const app = new App(root, data)
+  app.start()
 }

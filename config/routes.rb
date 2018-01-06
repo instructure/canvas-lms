@@ -687,8 +687,6 @@ CanvasRails::Application.routes.draw do
 
   get 'login/canvas' => 'login/canvas#new', as: :canvas_login
   post 'login/canvas' => 'login/canvas#create'
-  # deprecated alias
-  post 'login' => 'login/canvas#create'
 
   get 'login/ldap' => 'login/ldap#new'
   post 'login/ldap' => 'login/ldap#create'
@@ -989,7 +987,7 @@ CanvasRails::Application.routes.draw do
 
       put 'courses/:course_id/enrollments/:id/reactivate', :action => :reactivate, :as => 'reactivate_enrollment'
 
-      delete 'courses/:course_id/enrollments/:id', action: :destroy
+      delete 'courses/:course_id/enrollments/:id', action: :destroy, :as => "destroy_enrollment"
     end
 
     scope(controller: :terms_api) do
@@ -1302,6 +1300,7 @@ CanvasRails::Application.routes.draw do
       get 'course_accounts', :action => :course_accounts, :as => :course_accounts
       get 'accounts/:id', action: :show, as: :account
       put 'accounts/:id', action: :update
+      get 'accounts/:account_id/terms_of_service', action: :terms_of_service
       get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
       get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'

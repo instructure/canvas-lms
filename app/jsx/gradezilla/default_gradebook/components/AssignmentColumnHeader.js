@@ -70,6 +70,8 @@ class AssignmentColumnHeader extends ColumnHeader {
       id: string.isRequired,
       name: string.isRequired,
       submission: shape({
+        excused: bool.isRequired,
+        latePolicyStatus: string,
         score: number,
         submittedAt: instanceOf(Date)
       }).isRequired,
@@ -163,9 +165,11 @@ class AssignmentColumnHeader extends ColumnHeader {
   activeStudentDetails () {
     const activeStudents = this.props.students.filter(student => !student.isInactive);
     return activeStudents.map((student) => {
-      const { score, submittedAt } = student.submission;
+      const { excused, score, latePolicyStatus, submittedAt } = student.submission;
       return {
+        excused,
         id: student.id,
+        latePolicyStatus,
         name: student.name,
         score,
         submittedAt

@@ -36,22 +36,22 @@ define [
 
   QUnit.module 'brandableCss.getCssVariant'
   test 'should be new_styles_normal_contrast by default', ->
-    window.ENV.use_new_typography = undefined
+    window.ENV.use_responsive_layout = undefined
     equal brandableCss.getCssVariant(), 'new_styles_normal_contrast'
 
-  test 'should be new_typography_normal_contrast by if env var from feature flag is set', ->
-    window.ENV.use_new_typography = true
-    equal brandableCss.getCssVariant(), 'new_typography_normal_contrast'
+  test 'should be responsive_layout_normal_contrast by if env var from feature flag is set', ->
+    window.ENV.use_responsive_layout = true
+    equal brandableCss.getCssVariant(), 'responsive_layout_normal_contrast'
 
   test 'should pick up ENV settings', ->
-    window.ENV.use_new_typography = undefined
+    window.ENV.use_responsive_layout = undefined
     stubENV()
     equal brandableCss.getCssVariant(), 'new_styles_high_contrast'
 
-  test 'should pick up ENV & new_typography', ->
+  test 'should pick up ENV & responsive_layout', ->
     stubENV()
-    window.ENV.use_new_typography = true
-    equal brandableCss.getCssVariant(), 'new_typography_high_contrast'
+    window.ENV.use_responsive_layout = true
+    equal brandableCss.getCssVariant(), 'responsive_layout_high_contrast'
 
   QUnit.module 'brandableCss.urlFor'
   test 'should have right default', ->
@@ -71,8 +71,8 @@ define [
     expected = "http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
     equal brandableCss.urlFor(testBundleId,{combinedChecksum: testFingerprint}), expected
 
-  test 'should pick up ENV settings & new typography feature flag', ->
+  test 'should pick up ENV settings & responsive layout feature flag', ->
     stubENV()
-    window.ENV.use_new_typography = true
-    expected = "http://cdn.example.com/dist/brandable_css/new_typography_high_contrast/#{testBundleId}-#{testFingerprint}.css"
+    window.ENV.use_responsive_layout = true
+    expected = "http://cdn.example.com/dist/brandable_css/responsive_layout_high_contrast/#{testBundleId}-#{testFingerprint}.css"
     equal brandableCss.urlFor(testBundleId,{combinedChecksum: testFingerprint}), expected

@@ -40,6 +40,7 @@ module.exports = {
     "no-return-assign": ['error', 'except-parens'],
     "no-underscore-dangle": [0],
     "no-unused-vars": [2, { "argsIgnorePattern": "^_"}],
+    "one-var": ["error", { initialized: "never" }], // allow `let foo, bar` but not `let foo=1, bar=2`
     "object-curly-spacing": [0],
     "padded-blocks": [0], // so we can have space between the define([... and the callback
     "semi": [0],

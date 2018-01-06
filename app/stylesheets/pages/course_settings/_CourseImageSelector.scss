@@ -23,7 +23,7 @@
   border: 1px solid $ic-border-dark;
   position: relative;
   background-size: cover;
-  background-position: center center; 
+  background-position: center center;
   background-repeat: no-repeat;
   margin-bottom: $ic-sp;
   display: flex;
@@ -70,18 +70,6 @@
 .CourseImagePicker__Header {
   border-bottom: 1px solid $ic-border-color;
   padding-bottom: $ic-sp;
-}
-
-.CourseImagePicker__CloseBtn {
-  background-color: $ic-color-dark;
-  color: $ic-color-light;
-  border-radius: 50%;
-  height: $ic-sp*2.5;
-  width: $ic-sp*2.5;
-  box-shadow: none;
-  border: 0;
-  padding-left: $ic-sp/2;
-  @include overwrite-default-icon-size($ic-sp*1.5);
 }
 
 .CourseImagePicker__Content {

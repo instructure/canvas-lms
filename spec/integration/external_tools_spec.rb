@@ -23,6 +23,8 @@ require 'nokogiri'
 describe "External Tools" do
   describe "Assignments" do
     before do
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
       course_factory(active_all: true)
       assignment_model(:course => @course, :submission_types => "external_tool", :points_possible => 25)
       @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
@@ -50,16 +52,17 @@ describe "External Tools" do
     end
 
     it "should include outcome service params when viewing as student" do
+      allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
+      allow(Canvas::Security).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
-      allow(Canvas::Security).to receive(:hmac_sha1).and_return('some_sha')
-      payload = [@tool.id, @course.id, @assignment.id, @user.id].join('-')
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_success
       doc = Nokogiri::HTML.parse(response.body)
 
-      expect(doc.at_css('form#tool_form input#lis_result_sourcedid')['value']).to eq "#{payload}-some_sha"
+      expect(doc.at_css('form#tool_form input#lis_result_sourcedid')['value']).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
       expect(doc.at_css('form#tool_form input#lis_outcome_service_url')['value']).to eq lti_grade_passback_api_url(@tool)
       expect(doc.at_css('form#tool_form input#ext_ims_lis_basic_outcome_url')['value']).to eq blti_legacy_grade_passback_api_url(@tool)
     end

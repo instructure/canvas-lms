@@ -3797,6 +3797,7 @@ tr:
   confirmation_failed_please_try_again_ae566d37: "Onaylama başarısız. Lütfen tekrar deneyin."
   consumer_key_57d9fcf1: "Kullanıcı anahtarı"
   consumer_key_6f94ba11: "Kullanıcı Anahtarı"
+  content_1440204b: İçerik
   content_exports: 
     buttons: 
       process: "Veriyi İşle"
@@ -5081,6 +5082,9 @@ tr:
     master_course_restrictions: 
       labels: 
         availability_dates: "Geçerlilik Tarihleri"
+        content: İçerik
+        due_dates: "Bitiş Tarihi"
+        points: Puanlar
     notices: 
       backup_restored: "Yedek Başarı ile Yeniden Yüklendi!"
       concluded: "Ders başarılı bir şekilde sonlandırıldı"
@@ -5241,6 +5245,7 @@ tr:
         course_format: Format
         course_lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         course_name: Ad
+        course_offline_export: "Çevrimdışı Ders"
         course_section_name: "Yeni Bölüm Ekle"
         course_status_published: "Ders Yayınlanıyor"
         course_status_unpublished: "Ders Yayınlanmıyor"
@@ -5526,6 +5531,7 @@ tr:
     bottom: 
       student: 
         count: "Alt Öğrenci Sayısı"
+    column_delimiter: ","
     comments: Yorumlar
     correct: 
       bottom: 
@@ -6313,6 +6319,7 @@ tr:
     due_at: "bitiş: %{assignment_due_date_time}"
     multiple_due_dates: "Bitiş: Çoklu Tarih"
     no_due_date: "bitiş: Bitiş Tarihi Yok"
+  due_dates_520a6c08: "Bitiş Tarihi"
   due_datetime_f5a81b81: "Teslim Tarihi: %{dateTime}"
   due_dueat_39d7d6c2: "Bitiş %{dueAt}"
   due_dueat_ef67f6f4: "Bitiş: %{dueAt}"
@@ -7236,6 +7243,7 @@ tr:
     warning: uyarı
   global_navigation_8bee3501: "Genel Gezinme"
   go_30af2a7b: Git
+  go_back_ed239e69: "Geri Git"
   good_284a7a8f: İyi
   good_score_b02f3587: "İyi Puan"
   google_apps_domain_eddc8dee: "Google Uygulamalar Alan Adı"
@@ -7747,6 +7755,7 @@ tr:
   graded_quiz_7fabdf1f: "Notlandırılmış Kısa Sınav"
   graded_survey_c0f0c395: "Notlandırılmış Anket"
   grades_a61eba0a: Notlar
+  grades_for_student_aff00ba: "%{student}'nin Notları"
   grading_aa6de9: Notlandırma
   grading_box: 
     out_of_points_possible: "%{assignment.points_possible} üzerinden"
@@ -11055,6 +11064,7 @@ tr:
   no_final_grade_selected_3595c9c: "Seçili final notu yok"
   no_grade_3fa326c: "not yok"
   no_grading_schemes_to_display_8b0e92e7: "Gösterilecek notlandırma şeması yok"
+  no_marks_5e7d2b59: "Puan Yok"
   no_matching_users_found_83889c10: "Eşleşen kullanıcı bulunamadı."
   no_migration_file: "İçerik taşıma için dosya gereklidir."
   no_password_was_given_472222e5: "Şifre verilmedi"
@@ -11069,6 +11079,7 @@ tr:
   no_users_found_64a043ff: "Hiç kullanıcı bulunamadı"
   norway_47_bc598662: "Norveç (+47)"
   not_a_number: "pozitif bir sayı olmalı"
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Bu öğeye tüm bölümler atanmayacak."
   not_available_487d3648: "Mevcut değil"
   not_available_until_next_submission_2175158: "Bir sonraki gönderime kadar kullanılamaz"
   not_completed_d70acea3: Tamamlanmadı
@@ -16692,6 +16703,7 @@ tr:
       archive_link: "Arşiv(leri) görüntüle"
   windows_tile_color_2b786bd9: "Pencere Döşeme Rengi"
   would_you_like_to_enable_this_app_ccdf735d: "Bu uygulamayı etkinleştirmek ister misiniz?"
+  would_you_like_to_go_back_to_include_1d279044: "Aşağıdakileri dahil etmek için geri dönmek ister misiniz:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Öğrenciler derse devam etsinler mi yoksa yeni gereksinimler tamamlanana kadar bu modülleri yeniden kilitlemek mi istersiniz?"
   xml_configuration_5ea1b942: "XML Ayarları"
   yellow_4cf93785: Sarı
@@ -16717,6 +16729,7 @@ tr:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Derste size yardımcı olması için asistan öğretmenler atamak isteyebilirsiniz. Asistan Öğretmenler öğrenci ödevlerini notlandırabilir, tartışmaları yönetmeye yardımcı olabilir ve hatta ödev ayrıntılarını ve teslim tarihlerini sizin için güncelleyebilirler."
   you_must_agree_to_the_terms_99723f97: "Şarları kabul etmelisiniz"
   you_must_enter_a_date_f8eabfb1: "Bir tarih girmelisiniz"
+  you_must_have_a_student_or_section_selected_a99e45df: "Bir öğrenci veya kısım seçmelisiniz"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "İçeriğini kopyalacağınız bir ders seçmelisiniz"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "%{min} a eşit ya da büyük bir sayıya ayarlamalısınız"
   you_must_specify_a_usage_right_5eb57f87: "Bir kullanım hakkı belirtmelisiniz."

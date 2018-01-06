@@ -114,6 +114,22 @@ describe CC::CCHelper do
       expect(doc.at_css('html body div').to_s).to eq "<div>My Title\302\240</div>"
     end
 
+    it "html-escapes the title" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      exported = @exporter.html_page('', '<style> upon style')
+      doc = Nokogiri::HTML.parse(exported)
+      expect(doc.title).to eq '<style> upon style'
+      expect(doc.at_css('style')).to be_nil
+    end
+
+    it "html-escapes the meta fields" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      exported = @exporter.html_page('', 'title', { name: '"/><script>alert("wat")</script><meta name="lol' })
+      doc = Nokogiri::HTML.parse(exported)
+      expect(doc.at_css('meta[name="name"]').attr('content')).to include '<script>'
+      expect(doc.at_css('script')).to be_nil
+    end
+
     it "should only translate course when trying to translate /cousers/x/users/y type links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy=>true)
       orig = <<-HTML

@@ -52,11 +52,13 @@ module Quizzes
         @submission.submission = assignment_submission
       end
       @submission.with_versioning(true) do |s|
-        s.save
+        original_score = s.kept_score
+        if s.save
+          track_outcomes(s.attempt) if s.quiz.assignment? && kept_score_updating?(original_score)
+        end
       end
       @submission.context_module_action
       quiz = @submission.quiz
-      track_outcomes(@submission.attempt) if quiz.assignment?
       previous_version = quiz.versions.where(number: @submission.quiz_version).first
       if previous_version && @submission.quiz_version != quiz.version_number
         quiz = previous_version.model.reload
@@ -112,14 +114,24 @@ module Quizzes
     def update_outcomes(question_ids, submission_id, attempt)
       questions, alignments = questions_and_alignments(question_ids)
       return if questions.empty? || alignments.empty?
-
       submission = Quizzes::QuizSubmission.find(submission_id)
+
       versioned_submission = submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
       builder = Quizzes::QuizOutcomeResultBuilder.new(versioned_submission)
       builder.build_outcome_results(questions, alignments)
     end
 
     private
+
+    def kept_score_updating?(original_score)
+      # three scoring policies exist, highest, latest, and avg.
+      # for the latter two, the kept score is always updating and
+      # we'll need this method to return true. if the method is highest,
+      # the kept score only updates if it's higher than the original score
+      quiz = @submission.quiz
+      return true if quiz.scoring_policy != 'keep_highest' || quiz.points_possible.to_i == 0
+      @submission.kept_score != original_score
+    end
 
     def questions_and_alignments(question_ids)
       return [], [] if question_ids.empty?

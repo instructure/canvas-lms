@@ -181,7 +181,7 @@ class UnzipAttachment
 
   def should_skip?(entry)
     entry.directory? ||
-    entry.name =~ THINGS_TO_IGNORE_REGEX ||
+    entry.name.split('/').any?{|p| p =~ THINGS_TO_IGNORE_REGEX} ||
     (@valid_paths && !@valid_paths.include?(entry.name))
   end
 

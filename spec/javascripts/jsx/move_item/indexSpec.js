@@ -40,6 +40,16 @@ test('reorderElements puts elements in correct order', () => {
   deepEqual(desiredOrder, newOrder)
 })
 
+test('reorderElements ignores non-existent elements', () => {
+  container.innerHTML = `
+    <div id="id2"></div>
+    <div id="id1"></div>
+  `
+  reorderElements(['id1', 'id3', 'id2'], container)
+  const newOrder = Array.prototype.map.call(container.children, node => node.getAttribute('id'))
+  deepEqual(['id1', 'id2'], newOrder)
+})
+
 test('backbone.collectionToItems parses collection correctly', () => {
   const coll = {
     models: [

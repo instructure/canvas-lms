@@ -47,6 +47,7 @@ function createStudentsProp () {
       name: 'Clark Kent',
       isInactive: false,
       submission: {
+        excused: false,
         score: 7,
         submittedAt: null
       }
@@ -56,6 +57,7 @@ function createStudentsProp () {
       name: 'Barry Allen',
       isInactive: false,
       submission: {
+        excused: false,
         score: 8,
         submittedAt: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)')
       }
@@ -65,6 +67,7 @@ function createStudentsProp () {
       name: 'Bruce Wayne',
       isInactive: false,
       submission: {
+        excused: false,
         score: undefined,
         submittedAt: undefined
       }

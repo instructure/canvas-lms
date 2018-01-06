@@ -21,7 +21,9 @@
 <tr>
   <td>
     <% if item.unread %>
-      <div class="unread"><span class="accessibly-hidden"><%= t(:unread, "Unread") %></span></div>
+      <div class="unread">
+        <span class="screenreader-only"><%= t(:unread, "Unread") %></span>
+      </div>
     <% end %>
   </td>
   <td>
@@ -35,7 +37,9 @@
     <%= friendly_datetime(item.updated_at, context: item.context, tag_type: :span) %>
   </td>
   <td class="remove">
-    <% translated_close = t 'Ignore' %>
-    <a class="close ignore-item" href="#" data-url="<%= dashboard_ignore_stream_item_url(item.stream_item_id) %>" data-remove='tr' title="<%= translated_close %>" aria-label="<%= translated_close %>" role="button">×</a>
+    <% translated_close = t "Ignore %{item}", :item => item.summary %>
+    <a class="close ignore-item" href="#" data-url="<%= dashboard_ignore_stream_item_url(item.stream_item_id) %>" data-remove='tr' title="<%= translated_close %>" aria-label="<%= translated_close %>" role="button">
+      <i class="icon-x" aria-hidden="true"></i>
+    </a>
   </td>
 </tr>

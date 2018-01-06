@@ -104,6 +104,14 @@ class GradeSummaryPresenter
     end
   end
 
+  def students
+    if multiple_observed_students?
+      linkable_observed_students
+    else
+      Array.wrap(student)
+    end
+  end
+
   def validate_id
     raise ActiveRecord::RecordNotFound if ( !@id_param.is_a?(User) && (@id_param.to_s =~ Api::ID_REGEX).nil? )
     true
@@ -252,14 +260,16 @@ class GradeSummaryPresenter
     @courses_with_grades ||= begin
       student.shard.activate do
         if student_is_user?
-          Course.where(:id => student.participating_student_course_ids).to_a
+          Course.where(id: student.participating_student_current_and_concluded_course_ids).to_a
         elsif user_an_observer_of_student?
           observed_courses = []
-          Shard.partition_by_shard(student.participating_student_course_ids) do |student_course_ids|
-            observed_course_ids = ObserverEnrollment.not_deleted.where(:course_id => student_course_ids,
-              :user_id => @current_user, :associated_user_id => student).pluck(:course_id)
+          Shard.partition_by_shard(student.participating_student_current_and_concluded_course_ids) do |course_ids|
+            observed_course_ids = ObserverEnrollment.
+              not_deleted.
+              where(course_id: course_ids, user_id: @current_user, associated_user_id: student).
+              pluck(:course_id)
             next unless observed_course_ids.any?
-            observed_courses += Course.where(:id => observed_course_ids).to_a
+            observed_courses += Course.where(id: observed_course_ids).to_a
           end
           observed_courses
         else

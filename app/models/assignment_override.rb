@@ -79,9 +79,9 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
   after_save :update_grading_period_grades
+  after_commit :update_cached_due_dates
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
@@ -104,7 +104,7 @@ class AssignmentOverride < ActiveRecord::Base
 
     if grading_period_was
       # recalculate just the old grading period's score
-      course.recompute_student_scores(students, grading_period_id: grading_period_was, update_course_score: false)
+      course.recompute_student_scores(students, grading_period_id: grading_period_was.id, update_course_score: false)
     end
     # recalculate the new grading period's score. If the grading period group is
     # weighted, then we need to recalculate the overall course score too. (If
@@ -112,21 +112,33 @@ class AssignmentOverride < ActiveRecord::Base
     # so we can use a singleton job.)
     course.recompute_student_scores(
       students,
-      grading_period_id: grading_period,
-      update_course_score: !grading_period || grading_period.grading_period_group&.weighted?
+      grading_period_id: grading_period&.id,
+      update_course_score: grading_period.blank? || grading_period.grading_period_group&.weighted?
     )
     true
   end
   private :update_grading_period_grades
 
+  # This method is meant to be used in an after_commit setting
+  def update_cached_due_dates?
+    return false if assignment.blank?
+
+    set_id_changed = previous_changes.key?(:set_id)
+    set_type_changed_to_non_adhoc = previous_changes.key?(:set_type) && set_type != 'ADHOC'
+    due_at_overridden_changed = previous_changes.key?(:due_at_overridden)
+    due_at_changed = previous_changes.key?(:due_at) && due_at_overridden?
+    workflow_state_changed = previous_changes.key?(:workflow_state)
+
+    due_at_overridden_changed ||
+      set_id_changed ||
+      set_type_changed_to_non_adhoc ||
+      due_at_changed ||
+      workflow_state_changed
+  end
+  private :update_cached_due_dates?
+
   def update_cached_due_dates
-    return unless assignment?
-    if due_at_overridden_changed? || set_id_changed? ||
-      (set_type_changed? && set_type != 'ADHOC') ||
-      (due_at_overridden && due_at_changed?) ||
-      workflow_state_changed?
-      DueDateCacher.recompute(assignment)
-    end
+    DueDateCacher.recompute(assignment) if update_cached_due_dates?
   end
 
   def touch_assignment
@@ -343,13 +355,11 @@ class AssignmentOverride < ActiveRecord::Base
 
   def title_from_students(students)
     return t("No Students") if students.blank?
-    t(:student_count,
-      {
-        one: '%{count} student',
-        other: '%{count} students'
-      },
-      count: students.count
-     )
+    self.class.title_from_student_count(students.count)
+  end
+
+  def self.title_from_student_count(student_count)
+    t(:student_count, { one: '%{count} student', other: '%{count} students' }, count: student_count)
   end
 
   def destroy_if_empty_set

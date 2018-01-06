@@ -2122,23 +2122,28 @@ describe User do
 
   describe "submissions_needing_peer_review" do
     before(:each) do
-      course_with_student(:active_all => true)
-      @assessor = @student
+      @reviewer = course_with_student(active_all: true).user
+      @reviewee = course_with_student(course: @course, active_all: true).user
       assignment_model(course: @course, peer_reviews: true)
-      @submission = submission_model(assignment: @assignment)
-      @assessor_submission = submission_model(assignment: @assignment, user: @assessor)
-      @assessment_request = AssessmentRequest.create!(assessor: @assessor, asset: @submission, user: @student, assessor_asset: @assessor_submission)
-      @assessment_request.workflow_state = 'assigned'
-      @assessment_request.save
+
+      @reviewer_submission = submission_model(assignment: @assignment, user: @reviewer)
+      @reviewee_submission = submission_model(assignment: @assignment, user: @reviewee)
+      @assessment_request = @assignment.assign_peer_review(@reviewer, @reviewee)
     end
 
     it "should included assessment requests where the user is the assessor" do
-      expect(@assessor.submissions_needing_peer_review.length).to eq 1
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 1
     end
 
-    it "should note include assessment requests that have been ignored" do
-      Ignore.create!(asset: @assessment_request, user: @assessor, purpose: 'reviewing')
-      expect(@assessor.submissions_needing_peer_review.length).to eq 0
+    it "should not include assessment requests that have been ignored" do
+      Ignore.create!(asset: @assessment_request, user: @reviewer, purpose: 'reviewing')
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 0
+    end
+
+    it "should not include assessment requests the user does not have permission to perform" do
+      @assignment.peer_reviews = false
+      @assignment.save!
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 0
     end
   end
 
@@ -2337,13 +2342,22 @@ describe User do
         expect(@student.discussion_topics_needing_viewing(opts)).to eq []
       end
 
-      it 'should not show discussions that are graded' do
-        a = @course.assignments.create!(title: "some assignment", points_possible: 5)
+      it 'should not show discussions that are graded unless new_activity is true' do
+        a = @course.assignments.create!(title: "some assignment", points_possible: 5, due_at: 1.day.from_now)
         t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
         t.save
         expect(t.assignment_id).to eql(a.id)
         expect(t.assignment).to eql(a)
         expect(@student.discussion_topics_needing_viewing(opts)).not_to include t
+      end
+
+      it 'should show graded discussion if new activity is true' do
+        a = @course.assignments.create!(title: "some assignment", points_possible: 5, due_at: 1.day.from_now)
+        t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
+        t.save
+        expect(t.assignment_id).to eql(a.id)
+        expect(t.assignment).to eql(a)
+        expect(@student.discussion_topics_needing_viewing(opts.merge({new_activity: true}))).to include t
       end
 
       context "locked discussion topics" do
@@ -2536,6 +2550,7 @@ describe User do
       submission.grade_it!
 
       expect(@student.submission_statuses[:graded]).to match_array([@assignment.id])
+      expect(@student.submission_statuses[:has_feedback]).to match_array([])
     end
 
     it 'should indicate that an assignment is late' do
@@ -3977,6 +3992,29 @@ describe User do
     it "returns false when user is designer" do
         course_with_designer(:user => user)
         expect(user.has_student_enrollment?).to eq false
+    end
+  end
+
+  describe "#participating_student_current_and_concluded_course_ids" do
+    let(:user) { User.create! }
+
+    before :each do
+      course_with_student(user: user, active_all: true)
+    end
+
+    it "includes courses for current enrollments" do
+      expect(user.participating_student_current_and_concluded_course_ids).to include(@course.id)
+    end
+
+    it "includes concluded courses" do
+      @course.soft_conclude!
+      @course.save
+      expect(user.participating_student_current_and_concluded_course_ids).to include(@course.id)
+    end
+
+    it "includes courses for concluded enrollments" do
+      user.enrollments.last.conclude
+      expect(user.participating_student_current_and_concluded_course_ids).to include(@course.id)
     end
   end
 

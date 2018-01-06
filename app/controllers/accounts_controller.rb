@@ -235,6 +235,18 @@ class AccountsController < ApplicationController
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
+  # @API Returns the terms of service for that account
+  #
+  # @returns TermsOfService
+  def terms_of_service
+    return unless authorized_action(@account, @current_user, :read)
+    keys = %w(id terms_type passive account_id)
+    tos = @account.root_account.terms_of_service
+    res = tos.attributes.slice(*keys)
+    res['content'] = tos.terms_of_service_content&.content
+    render :json => res
+  end
+
   include Api::V1::Course
 
   # @API List active courses in an account
@@ -1175,7 +1187,8 @@ class AccountsController < ApplicationController
                                    {:sis_syncing => [:value, :locked]}.freeze,
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
-                                   :turnitin_host, :turnitin_account_id, :users_can_edit_name].freeze
+                                   :turnitin_host, :turnitin_account_id, :users_can_edit_name,
+                                   :app_center_access_token].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret,

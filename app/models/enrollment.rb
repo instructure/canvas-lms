@@ -70,13 +70,14 @@ class Enrollment < ActiveRecord::Base
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
-  after_save :update_cached_due_dates
+  after_save :set_update_cached_due_dates
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
   after_save :update_assignment_overrides_if_needed
   after_save :dispatch_invitations_later
   after_save :recalculate_enrollment_state
   after_save :add_to_favorites_later
+  after_commit :update_cached_due_dates
   after_destroy :update_assignment_overrides_if_needed
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
@@ -446,10 +447,16 @@ class Enrollment < ActiveRecord::Base
     enrollment
   end
 
+  # This is Part 1 of the update_cached_due_dates callback.  It sets @update_cached_due_dates which determines
+  # whether or not the update_cached_due_dates after_commit callback runs after this record has been committed.
+  # This split allows us to suspend this callback and affect the update_cached_due_dates callback since after_commit
+  # callbacks aren't being suspended properly.  We suspend this callback during some bulk operations.
+  def set_update_cached_due_dates
+    @update_cached_due_dates = workflow_state_changed? && (student? || fake_student?) && course
+  end
+
   def update_cached_due_dates
-    if workflow_state_changed? && (student? || fake_student?) && course
-      DueDateCacher.recompute_course(course)
-    end
+    DueDateCacher.recompute_course(course) if @update_cached_due_dates
   end
 
   def update_from(other, skip_broadcasts=false)
@@ -1376,17 +1383,14 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restore_deleted_scores
-    assignment_groups = course.assignment_groups.active
+    assignment_groups = course.assignment_groups.active.except(:order)
     grading_periods = GradingPeriod.for(course)
 
-    Score.
-      where(enrollment_id: id, workflow_state: "deleted").
-      where(course_score: true).or(
-        Score.where(assignment_group: assignment_groups)
-      ).or(
-        Score.where(grading_period: grading_periods)
-      ).
-      in_batches.
+    Score.where(course_score: true).or(
+      Score.where(assignment_group: assignment_groups)
+    ).or(
+      Score.where(grading_period: grading_periods)
+    ).where(enrollment_id: id, workflow_state: "deleted").
       update_all(workflow_state: "active")
   end
 

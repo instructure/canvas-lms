@@ -109,7 +109,7 @@ describe 'Grade Detail Tray:' do
       expect(Gradezilla::GradeDetailTray.late_penalty_text.to_f.to_s).to eq late_penalty_value
     end
 
-    it 'late submission has final grade', test_id: 3337210, priority: '2' do
+    it 'late submission has final grade', test_id: 3415931, priority: '2' do
       final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
 
       expect(Gradezilla::GradeDetailTray.final_grade_text).to eq final_grade_value

@@ -23,6 +23,7 @@ define [
   'react-dom'
   'jst/assignments/DueDateOverride'
   'compiled/util/DateValidator'
+  'compiled/views/ValidatedMixin'
   'i18n!overrides'
   'jsx/due_dates/DueDates'
   'jsx/due_dates/StudentGroupStore'
@@ -37,6 +38,7 @@ define [
   ReactDOM,
   DueDateOverride,
   DateValidator,
+  ValidatedMixin,
   I18n,
   DueDates,
   StudentGroupStore,
@@ -45,7 +47,7 @@ define [
 ) ->
 
   class DueDateOverrideView extends Backbone.View
-
+    @mixin ValidatedMixin
     template: DueDateOverride
 
     # =================
@@ -96,7 +98,15 @@ define [
         post_to_sis = valid_grading_type && data_post_to_sis
       post_to_sis
 
+    clearExistingDueDateErrors: =>
+      for element in ['due_at', 'unlock_at', 'lock_at']
+        $dateInput = $('[data-date-type="'+element+'"]')
+        $dateInput.removeAttr('data-error-type')
+
     validateDatetimes: (data, errors) =>
+      # Need to clear these out each pass in order to ensure proper
+      # focus handling for accessibility
+      @clearExistingDueDateErrors(data)
       checkedRows = []
       for override in data.assignment_overrides
         continue if _.contains(checkedRows, override.rowKey)
@@ -109,24 +119,29 @@ define [
           postToSIS: @postToSIS(data)
         })
         rowErrors = dateValidator.validateDatetimes()
+        _.keys(rowErrors).forEach((key, val) =>
+          rowErrors[key] = {message: rowErrors[key]}
+        )
         errors = _.extend(errors, rowErrors)
         for own element, msg of rowErrors
           $dateInput = $('[data-date-type="'+element+'"][data-row-key="'+override.rowKey+'"]')
-          $dateInput.errorBox msg
+          $dateInput.attr('data-error-type', element)
+          msg = _.extend(msg, { element: $dateInput, showError: @showError })
         checkedRows.push(override.rowKey)
       errors
 
     validateTokenInput: (data, errors) =>
       validRowKeys = _.pluck(data.assignment_overrides, "rowKey")
-      blankOverrideMsg = I18n.t('blank_override', 'You must have a student or section selected')
+      blankOverrideMsg = I18n.t('You must have a student or section selected')
       for row in $('.Container__DueDateRow-item')
         rowKey = "#{$(row).attr('data-row-key')}"
-        continue if _.contains(validRowKeys, rowKey)
         identifier = 'tokenInputFor' + rowKey
         $inputWrapper = $('[data-row-identifier="'+identifier+'"]')[0]
         $nameInput = $($inputWrapper).find("input")
-        errors = _.extend(errors, { blankOverrides: [message: blankOverrideMsg] })
-        $nameInput.errorBox(blankOverrideMsg).css("z-index", "20")
+        $nameInput.removeAttr('data-error-type')
+        continue if _.contains(validRowKeys, rowKey)
+        errors = _.extend(errors, { blankOverrides: {message: blankOverrideMsg, element: $nameInput, showError: @showError} })
+        $nameInput.attr('data-error-type', "blankOverrides")
       errors
 
     validateGroupOverrides: (data, errors) =>
@@ -143,15 +158,20 @@ define [
         ao.group_id not in validGroupIds
       )
       invalidGroupOverrideRowKeys = _.pluck(invalidGroupOverrides, "rowKey")
-      invalidGroupOverrideMessage = I18n.t('invalid_group_override', "You cannot assign to a group outside of the assignment's group set")
+      invalidGroupOverrideMessage = I18n.t("You cannot assign to a group outside of the assignment's group set")
       for row in $('.Container__DueDateRow-item')
         rowKey = "#{$(row).attr('data-row-key')}"
         continue unless _.contains(invalidGroupOverrideRowKeys, rowKey)
         identifier = 'tokenInputFor' + rowKey
         $nameInput = $('[data-row-identifier="'+identifier+'"]').find("input")
-        errors = _.extend(errors, { invalidGroupOverride: [message: invalidGroupOverrideMessage] })
-        $nameInput.errorBox(invalidGroupOverrideMessage).css("z-index", "20")
+        errors = _.extend(errors, { invalidGroupOverride: {message: invalidGroupOverrideMessage, element: $nameInput, showError: @showError} })
       errors
+
+    showError: (element, message) =>
+      # some forms will already handle this on their own, this exists
+      # as a fallback for forms that do not
+      return unless element
+      element.errorBox(message).css("z-index", "20").attr('role', 'alert')
 
     # ==============================
     #     syncing with react data

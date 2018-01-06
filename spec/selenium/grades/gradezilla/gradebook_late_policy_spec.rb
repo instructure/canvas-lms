@@ -107,12 +107,9 @@ describe 'Late Policies:' do
     end
 
     before(:each) do
-      ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
       Gradezilla.visit(@course)
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it 'late policy adjusts grades correctly', test_id: 3196973, priority: '1' do
       expect(Gradezilla::Cells.get_grade(@student, @a1)).to eq "80"
@@ -166,13 +163,10 @@ describe 'Late Policies:' do
     end
 
     before(:each) do
-      ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
       Gradezilla.visit(@course)
       Gradezilla.settings_cog_select
     end
-
-    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it 'saves late policy', test_id: 3196970, priority: '1' do
       percentage = 10

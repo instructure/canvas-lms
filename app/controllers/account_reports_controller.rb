@@ -39,9 +39,10 @@
 #           "example": "https://example.com/some/path",
 #           "type": "string"
 #         },
-#         // The attachment api object of the report. Only available after the report has completed.
-#         // Abbreviated attachment object File (see files API).
-#         "attachment": {},
+#         "attachment": {
+#           "description": "The attachment api object of the report. Only available after the report has completed.",
+#           "$ref": "File"
+#         },
 #         "status": {
 #           "description": "The status of the report",
 #           "example": "complete",

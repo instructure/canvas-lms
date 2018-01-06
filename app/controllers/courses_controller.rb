@@ -2599,7 +2599,6 @@ class CoursesController < ApplicationController
   #        "14": { "due_at": "2015-08-05", "grading_period_id": 3, "in_closed_grading_period": true }
   #     }
   #   }
-  # @returns {EffectiveDueDates}
   def effective_due_dates
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
@@ -2865,7 +2864,7 @@ class CoursesController < ApplicationController
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course.sort_by! do |course_enrollments|
-      Canvas::ICU.collation_key(course_enrollments.first.course.nickname_for(user))
+      Canvas::ICU.collation_key(course_enrollments.first.course.nickname_for(@current_user))
     end
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
@@ -2884,7 +2883,7 @@ class CoursesController < ApplicationController
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
-      hash << course_json(course, user, session, includes, course_enrollments)
+      hash << course_json(course, @current_user, session, includes, course_enrollments, user)
     end
     hash
   end

@@ -464,7 +464,7 @@ class Attachment < ActiveRecord::Base
     if splits[1] == "localstorage"
       splits[3].to_i
     else
-      Shard.relative_id_for(splits[1], Shard.birth, shard)
+      splits[1].to_i
     end
   end
 
@@ -1378,7 +1378,7 @@ class Attachment < ActiveRecord::Base
 
   def make_childless(preferred_child = nil)
     return if root_attachment_id
-    child = preferred_child || children.take
+    child = preferred_child || children.first
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
@@ -1387,6 +1387,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def copy_attachment_content(destination)
+    # parent is broken; if child is probably broken too, make sure it gets marked as broken
+    if file_state == 'broken' && destination.md5.nil?
+      Attachment.where(id: destination).update_all(file_state: 'broken')
+      return
+    end
+
     destination.write_attribute(:filename, filename) if filename
     if Attachment.s3_storage?
       if filename && s3object.exists? && !destination.s3object.exists?
@@ -1395,9 +1401,10 @@ class Attachment < ActiveRecord::Base
     else
       return if destination.store.exists? && open == destination.open
       old_content_type = self.content_type
-      Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
+      scope = Attachment.where(:md5 => self.md5, :namespace => self.namespace, :root_attachment_id => nil)
+      scope.update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
       destination.uploaded_data = open
-      Attachment.where(:id => self).update_all(:content_type => old_content_type)
+      scope.where.not(:id => destination).update_all(:content_type => old_content_type)
     end
     destination.save!
   end

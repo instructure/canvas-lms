@@ -361,6 +361,9 @@ describe 'Speedgrader' do
       replace_content list[1], "1", :tab_out => true
       replace_content f('#fudge_points_entry'), "7", :tab_out => true
 
+      # after_fudge_points_total is updated, even before update button is clicked
+      expect(f('#after_fudge_points_total')).to include_text '8'
+
       expect_new_page_load {f('button.update-scores').click}
       expect(f('#after_fudge_points_total')).to include_text '8'
     end

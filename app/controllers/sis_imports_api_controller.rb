@@ -161,9 +161,10 @@
 #           "example": "100",
 #           "type": "string"
 #         },
-#         // The errors_attachment api object of the SIS import. Only available if there are errors or warning and import has completed.
-#         // Abbreviated file object File (see files API).
-#         "errors_attachment": {},
+#         "errors_attachment": {
+#           "description": "The errors_attachment api object of the SIS import. Only available if there are errors or warning and import has completed.",
+#           "$ref": "File"
+#         },
 #         "processing_warnings": {
 #           "description": "Only imports that are complete will get this data. An array of CSV_file/warning_message pairs.",
 #           "example": [["students.csv","user John Doe has already claimed john_doe's requested login information, skipping"]],

@@ -61,12 +61,12 @@ class Gradezilla
       f("span[data-menu-item-id=#{item_name}]")
     end
 
-    def assignment_header_menu_sort_by_element
-      fj('button:contains("Sort by")')
+    def assignment_header_popover_menu_element(menu_name)
+      fj("button:contains('#{menu_name}')")
     end
 
-    def assignment_header_sort_by_item_element(item)
-      fj("span[role=menuitemradio] span:contains(#{item})")
+    def assignment_header_popover_sub_item_element(item)
+      fj("span[role=menuitemradio]:contains(#{item})")
     end
 
     def assignment_header_cell_label_element(title)
@@ -633,7 +633,7 @@ class Gradezilla
     end
 
     def click_assignment_popover_sort_by(sort_type)
-      hover(assignment_header_menu_sort_by_element)
+      hover(assignment_header_popover_menu_element("Sort by"))
       sort_by_item = ""
 
       if sort_type =~ /(low[\s\-]to[\s\-]high)/i
@@ -647,7 +647,18 @@ class Gradezilla
       elsif sort_type =~ /(unposted)/i
         sort_by_item = 'Unposted'
       end
-      assignment_header_sort_by_item_element(sort_by_item).click
+      assignment_header_popover_sub_item_element(sort_by_item).click
+    end
+
+    def click_assignment_popover_enter_grade_as(grade_type)
+      hover(assignment_header_popover_menu_element("Enter Grades as"))
+      assignment_header_popover_sub_item_element(grade_type).click
+    end
+
+    def enter_grade_as_popover_menu_item_checked?(grade_type)
+      hover(assignment_header_popover_menu_element("Enter Grades as"))
+      menu_item = assignment_header_popover_sub_item_element(grade_type)
+      menu_item.attribute('aria-checked')
     end
 
     def select_assignment_header_cell_element(name)

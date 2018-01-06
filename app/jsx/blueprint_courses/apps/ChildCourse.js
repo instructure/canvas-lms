@@ -26,9 +26,9 @@ import createStore from '../store'
 import Router from '../router'
 
 export default class ChildCourse {
-  constructor (root, data, debug) {
+  constructor (root, data) {
     this.root = root
-    this.store = createStore(data, debug)
+    this.store = createStore(data)
     this.router = new Router()
   }
 

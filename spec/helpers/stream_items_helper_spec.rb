@@ -21,20 +21,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe StreamItemsHelper do
   before :once do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
-    course_with_teacher(:active_all => true)
-    course_with_student(:active_all => true, :course => @course)
+    course_with_teacher(active_all: true)
+    @reviewee_student = course_with_student(active_all: true, course: @course).user
+    @reviewer_student = course_with_student(active_all: true, course: @course).user
     @other_user = user_factory
     @another_user = user_factory
 
     @context = @course
     @discussion = discussion_topic_model
     @announcement = announcement_model
-    @assignment = assignment_model(:course => @course)
-    @submission = submission_model(assignment: @assignment, user: @student)
-    @assessor_submission = submission_model(assignment: @assignment, user: @teacher)
-    @assessment_request = AssessmentRequest.create!(assessor: @teacher, asset: @submission, user: @student, assessor_asset: @assessor_submission)
-    @assessment_request.workflow_state = 'assigned'
-    @assessment_request.save
+    @assignment = assignment_model(:course => @course, peer_reviews: true)
+    @assignment.assign_peer_review(@teacher, @student)
+    @assignment.assign_peer_review(@reviewer_student, @reviewee_student)
     # this conversation will not be shown, since the teacher is the last author
     conversation(@another_user, @teacher).conversation.add_message(@teacher, 'zomg')
     # whereas this one will be shown
@@ -81,6 +79,18 @@ describe StreamItemsHelper do
       })
       expect(@student.recent_stream_items).not_to include @group_assignment_discussion
       expect(@teacher.recent_stream_items).not_to include @group_assignment_discussion
+    end
+
+    it "should skip assessment requests the user doesn't have permission to read" do
+      @items = @reviewer_student.recent_stream_items
+      @categorized = helper.categorize_stream_items(@items, @reviewer_student)
+      expect(@categorized["AssessmentRequest"].size).to eq 1
+      @assignment.peer_reviews = false
+      @assignment.save!
+      AdheresToPolicy::Cache.clear
+      @items = @reviewer_student.recent_stream_items
+      @categorized = helper.categorize_stream_items(@items, @reviewer_student)
+      expect(@categorized["AssessmentRequest"].size).to eq 0
     end
 
     context "across shards" do

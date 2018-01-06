@@ -500,6 +500,40 @@ describe Enrollment do
         end
       end
     end
+
+    describe 'restoring enrollments directly from soft-deleted to completed state' do
+      before :each do
+        # Create two enrollments for this course
+        @enrollment.save!
+        user2 = User.create!
+        @enrollment2 = StudentEnrollment.create!(user: user2, course: @course)
+
+        # and ensure the course has two assignment groups with one assignment in each group
+        @course.assignments.create!(title: 'Assignment #1', points_possible: 10)
+        group2 = @course.assignment_groups.create!(name: 'Assignment Group #2')
+        @course.assignments.create!(title: 'Assignment #2', points_possible: 10, assignment_group: group2)
+
+        # Soft-delete both enrollments so their corresponding scores are also soft-deleted
+        @enrollment.destroy
+        @enrollment2.destroy
+      end
+
+      it 'restores deleted scores belonging to the specific enrollment' do
+        expect do
+          # Restore an enrollment directly from "deleted" to "completed" state
+          @enrollment.workflow_state = 'completed'
+          @enrollment.save!
+        end.to change { @enrollment.reload.scores.size }.from(0).to(3)
+      end
+
+      it 'does not restore deleted scores belonging to the other enrollment' do
+        expect do
+          # Restore an enrollment directly from "deleted" to "completed" state
+          @enrollment.workflow_state = 'completed'
+          @enrollment.save!
+        end.not_to change { @enrollment2.reload.scores.size }
+      end
+    end
   end
 
   it "should not allow an associated_user_id on a non-observer enrollment" do
@@ -2430,6 +2464,14 @@ describe Enrollment do
       expect(DueDateCacher).to receive(:recompute).never
       expect(DueDateCacher).to receive(:recompute_course).never
       @enrollment.save
+    end
+
+    it "does not trigger when set_update_cached_due_dates callback is suspended" do
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).never
+      Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
+        @course.enroll_student(user_factory)
+      end
     end
   end
 

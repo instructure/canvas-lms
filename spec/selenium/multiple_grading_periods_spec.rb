@@ -185,17 +185,19 @@ describe "interaction with grading periods" do
     end
 
     it 'should display the current grading period and assignments in grades page', priority: "1", test_id: 202326 do
-      expect(f(".grading_periods_selector option[selected='selected']")).to include_text('Course Grading Period 1')
+      expect(f("#grading_period_select_menu option[selected]")).to include_text('Course Grading Period 1')
       expect(f("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
     end
 
     it 'should update assignments when a different period is selected in grades page', priority: "1", test_id: 562596 do
-      fj(".grading_periods_selector option:nth-child(3)").click
+      fj("#grading_period_select_menu option:nth-child(3)").click
+      expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
     end
 
     it 'should update assignments when a all periods are selected in grades page', priority: "1", test_id: 571756 do
-      fj(".grading_periods_selector option:nth-child(1)").click
+      fj("#grading_period_select_menu option:nth-child(1)").click
+      expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
     end

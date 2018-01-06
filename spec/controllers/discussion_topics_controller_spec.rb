@@ -92,6 +92,7 @@ describe DiscussionTopicsController do
 
         group_discussion_assignment
         @child_topic = @topic.child_topics.first
+        @child_topic.root_topic_id = @topic.id
         @group = @child_topic.context
         @group.add_user(@student)
         @assignment.only_visible_to_overrides = true
@@ -115,6 +116,15 @@ describe DiscussionTopicsController do
         get 'index', params: {:group_id => @group.id}
         expect(response).to be_success
         expect(assigns["topics"]).not_to include(@child_topic)
+      end
+
+      it 'should redirect to correct mastery paths edit page' do
+        user_session(@teacher)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'value' })
+        get :edit, params: {group_id: @group.id, id: @child_topic.id}
+        redirect_path = "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+        expect(response).to redirect_to(redirect_path)
       end
     end
 

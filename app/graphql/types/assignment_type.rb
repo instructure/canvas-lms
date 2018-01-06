@@ -22,6 +22,14 @@ module Types
       "when this assignment is due",
       property: :due_at
 
+    field :state, !AssignmentState, property: :workflow_state
+
+    field :assignmentGroup, AssignmentGroupType, resolve: ->(assignment, _, _) {
+      Loaders::AssociationLoader.for(Assignment, :assignment_group)
+        .load(assignment)
+        .then { assignment.assignment_group }
+    }
+
     field :quiz, Types::QuizType, resolve: -> (assignment, _, _) {
       Loaders::AssociationLoader.for(Assignment, :quiz)
         .load(assignment)
@@ -55,5 +63,38 @@ module Types
         ).count
       end
     end
+
+    field :course, Types::CourseType, resolve: -> (assignment, _, _) {
+      # course is polymorphicly associated with assignment through :context
+      # it could also be queried by assignment.assignment_group.course
+      Loaders::AssociationLoader.for(Assignment, :context)
+        .load(assignment)
+        .then { assignment.context }
+    }
+
+    connection :submissionsConnection, SubmissionType.connection_type do
+      description "submissions for this assignment"
+      resolve ->(assignment, _, ctx) {
+        current_user = ctx[:current_user]
+        session = ctx[:session]
+        course = assignment.course
+
+        if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+          # a user can see all submissions
+          assignment.submissions.where.not(workflow_state: "unsubmitted")
+        elsif course.grants_right?(current_user, session, :read_grades)
+          # a user can see their own submission
+          assignment.submissions.where(user_id: current_user.id).where.not(workflow_state: "unsubmitted")
+        end
+      }
+    end
+  end
+
+  AssignmentState = GraphQL::EnumType.define do
+    name "AssignmentState"
+    description "States that an Assignment can be in"
+    value "unpublished"
+    value "published"
+    value "deleted"
   end
 end

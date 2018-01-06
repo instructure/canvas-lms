@@ -63,7 +63,6 @@ define [
       else
         $template = noMessage(options)
       @$el.html($template)
-      @$el.find('.subject').focus()
 
       @$archiveToggle = @$el.find('.archive-btn')
       @$starToggle = @$el.find('.star-toggle-btn')

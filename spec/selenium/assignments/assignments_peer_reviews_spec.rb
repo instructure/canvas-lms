@@ -77,7 +77,7 @@ describe "assignments" do
         user_factory(:active_all => true)
         @student1 = @user
         student_in_course(:user => @student1, :active_all => true)
-        @student2 = student_in_course.user
+        @student2 = student_in_course(:active_all => true).user
 
         @assignment = assignment_model({course: @course, peer_reviews: true, automatic_peer_reviews: false})
       end

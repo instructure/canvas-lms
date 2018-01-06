@@ -1346,8 +1346,7 @@ define [
         locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
         onLatePolicyUpdate: @onLatePolicyUpdate
-        newGradebookDevelopmentEnabled: @options.new_gradebook_development_enabled
-        gradedLateOrMissingSubmissionsExist: @options.graded_late_or_missing_submissions_exist
+        gradedLateSubmissionsExist: @options.graded_late_submissions_exist
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,
         gradebookSettingsModalMountPoint,
@@ -2538,6 +2537,8 @@ define [
 
       forEachSubmission(@students, (submission) =>
         assignment = @assignments[submission.assignment_id]
+        student = @student(submission.user_id)
+        return if student?.isConcluded
         return if @getGradingPeriod(submission.grading_period_id)?.isClosed
         if LatePolicyApplicator.processSubmission(submission, assignment, gradingStandard, latePolicy)
           studentsToInvalidate[submission.user_id] = true

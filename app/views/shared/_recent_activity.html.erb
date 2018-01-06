@@ -52,7 +52,7 @@
             <% unread_count = items.select { |i| i.unread }.size %>
             <% if unread_count > 0 %>
               <strong class="unread-count">
-                <span class="accessibly-hidden"><%= t(:unread_count_badge, { :one => "1 *unread item*", :other => "%{count} *unread items*" },
+                <span class="screenreader-only"><%= t(:unread_count_badge, { :one => "1 *unread item*", :other => "%{count} *unread items*" },
                       :count => unread_count,
                       :wrapper => '<span>\1</span>') %>
                 </span>
@@ -70,16 +70,18 @@
 
       <div class='details_container'>
         <table id="<%= category_class %>-details" class="stream-details">
-          <caption class="accessibly-hidden"><%= category_details_label(category) %></caption>
-          <thead class="accessibly-hidden">
+          <caption class="screenreader-only"><%= category_details_label(category) %></caption>
+          <thead class="screenreader-only">
             <tr>
               <th scope="col"><%= t(:unread_column, "Unread") %></th>
               <th scope="col"><%= t(:message_column, "Message") %></th>
               <th scope="col"><%= t(:date_column, "Date") %></th>
-              <th></th>
+              <th scope="col"></th>
             </tr>
           </thead>
-          <%= render :partial => 'shared/recent_activity_item', :collection => items %>
+          <tbody>
+            <%= render :partial => 'shared/recent_activity_item', :collection => items %>
+          </tbody>
         </table>
       </div>
     </li>

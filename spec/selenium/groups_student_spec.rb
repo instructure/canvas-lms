@@ -27,7 +27,6 @@ describe "student groups" do
 
   describe "as a student" do
 
-
     before(:each) do
       course_with_student_logged_in(:active_all => true)
     end

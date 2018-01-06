@@ -161,7 +161,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     raise "Cannot view data for uncompleted quiz" unless self.completed?
     raise "Cannot view data for uncompleted quiz" if !graded?
 
-    self.submission_data
+    Utf8Cleaner.recursively_strip_invalid_utf8!(self.submission_data, true)
   end
 
   def results_visible?(user: nil)
@@ -237,7 +237,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def questions
-    self.quiz_data
+    Utf8Cleaner.recursively_strip_invalid_utf8!(self.quiz_data, true)
   end
 
   def backup_submission_data(params)
@@ -721,7 +721,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       self.without_versioning(&:save)
     end
     self.reload
-    Quizzes::SubmissionGrader.new(self).track_outcomes(version.model.attempt)
     true
   end
 

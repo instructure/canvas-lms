@@ -20,10 +20,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Alert from 'instructure-ui/lib/components/Alert';
+import TextArea from 'instructure-ui/lib/components/TextArea';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import MGP from 'jsx/speed_grader/gradingPeriod';
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper';
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading';
 import StatusPill from 'jsx/grading/StatusPill';
+import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at';
@@ -59,13 +62,14 @@ import './jquery.templateData';
 import './media_comments';
 import 'compiled/jquery/mediaCommentThumbnail';
 import 'compiled/jquery.rails_flash_notifications';
-import 'jquery.elastic';
 import 'jquery-getscrollbarwidth';
 import './vendor/jquery.scrollTo';
 import './vendor/ui.selectmenu';
 import './jquery.disableWhileLoading';
 import 'compiled/jquery/fixDialogButtons';
 
+const selectors = new JQuerySelectorCache();
+const SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speedgrader_comment_textarea_mount_point';
 // PRIVATE VARIABLES AND FUNCTIONS
 // all of the $ variables here are to speed up access to dom nodes,
 // so that the jquery selector does not have to be run every time.
@@ -99,7 +103,7 @@ var $window = $(window),
     $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach(),
     $add_a_comment = $('#add_a_comment'),
     $add_a_comment_submit_button = $add_a_comment.find('button:submit'),
-    $add_a_comment_textarea = $add_a_comment.find('textarea'),
+    $add_a_comment_textarea = null,
     $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach(),
     fileIndex = 1,
     $add_attachment = $('#add_attachment'),
@@ -111,7 +115,6 @@ var $window = $(window),
     $average_score = $('#average_score'),
     $this_student_does_not_have_a_submission = $('#this_student_does_not_have_a_submission').hide(),
     $this_student_has_a_submission = $('#this_student_has_a_submission').hide(),
-    $rubric_assessments_select = $('#rubric_assessments_select'),
     $grade_container = $('#grade_container'),
     $grade = $grade_container.find('input, select'),
     $score = $grade_container.find('.score'),
@@ -135,7 +138,6 @@ var $window = $(window),
     $assignment_submission_resubmit_to_turnitin_url = $('#assignment_submission_resubmit_to_turnitin_url'),
     $assignment_submission_vericite_report_url = $('#assignment_submission_vericite_report_url'),
     $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url'),
-    $rubric_full = $('#rubric_full'),
     $rubric_holder = $('#rubric_holder'),
     $rubric_full_resizer_handle = $('#rubric_full_resizer_handle'),
     $no_annotation_warning = $('#no_annotation_warning'),
@@ -559,9 +561,36 @@ header = {
   }
 };
 
+function unmountCommentTextArea () {
+  const node = document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT);
+  ReactDOM.unmountComponentAtNode(node);
+}
+
+function renderCommentTextArea () {
+  // unmounting is a temporary workaround for INSTUI-870 to allow
+  // for textarea minheight to be reset
+  unmountCommentTextArea();
+  function textareaRef (textarea) {
+    $add_a_comment_textarea = $(textarea);
+  }
+
+  const textAreaProps = {
+    autoGrow: true,
+    id: 'speedgrader_comment_textarea',
+    label: React.createElement(ScreenReaderContent, null, I18n.t('Add a Comment')),
+    placeholder: I18n.t('Add a Comment'),
+    resize: 'vertical',
+    textareaRef
+  };
+
+  ReactDOM.render(
+    React.createElement(TextArea, textAreaProps),
+    document.getElementById(SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT)
+  );
+}
+
 function initCommentBox(){
-  //initialize the auto height resizing on the textarea
-  $('#add_a_comment textarea').elastic();
+  renderCommentTextArea();
 
   $(".media_comment_link").click(function(event) {
     event.preventDefault();
@@ -722,9 +751,11 @@ function isAssessmentEditableByMe(assessment){
 }
 
 function getSelectedAssessment(){
-  return $.grep(EG.currentStudent.rubric_assessments, function(n,i){
-    return n.id == $rubric_assessments_select.val();
-  })[0];
+  const selectMenu = selectors.get('#rubric_assessments_select');
+
+  return $.grep(EG.currentStudent.rubric_assessments, (n) => (
+    n.id == selectMenu.val()
+  ))[0];
 }
 
 function initRubricStuff(){
@@ -736,9 +767,13 @@ function initRubricStuff(){
     EG.toggleFullRubric();
   });
 
-  $rubric_assessments_select.change(function(){
+  selectors.get('#rubric_assessments_select').change(() => {
     var selectedAssessment = getSelectedAssessment();
-    rubricAssessment.populateRubricSummary($("#rubric_summary_holder .rubric_summary"), selectedAssessment, isAssessmentEditableByMe(selectedAssessment));
+    rubricAssessment.populateRubricSummary(
+      $("#rubric_summary_holder .rubric_summary"),
+      selectedAssessment,
+      isAssessmentEditableByMe(selectedAssessment)
+    );
   });
 
   $rubric_full_resizer_handle.draggable({
@@ -757,7 +792,7 @@ function initRubricStuff(){
     drag: function(event, ui) {
       var offset = ui.offset,
       windowWidth = $window.width();
-      $rubric_full.width(windowWidth - offset.left);
+      selectors.get('#rubric_full').width(windowWidth - offset.left);
       $rubric_full_resizer_handle.css("left","0");
     },
     stop: function(event, ui) {
@@ -932,12 +967,22 @@ function unexcuseSubmission (grade, submission, assignment) {
   return grade === "" && submission.excused && assignment.grading_type === "pass_fail";
 }
 
+function rubricAssessmentToPopulate () {
+  const assessment = getSelectedAssessment();
+  const userIsNotAssessor = !!assessment && assessment.assessor_id !== ENV.current_user_id;
+
+  if (userIsNotAssessor) {
+    return { ...assessment, data: [] };
+  }
+
+  return assessment;
+}
+
 // Public Variables and Methods
 EG = {
   options: {},
   publicVariable: [],
   currentStudent: null,
-
   refreshGrades,
 
   domReady: function(){
@@ -1042,7 +1087,6 @@ EG = {
     header.init();
     initKeyCodes();
 
-
     $('.dismiss_alert').click(function(e){
       e.preventDefault();
       $(this).closest(".alert").hide();
@@ -1117,30 +1161,36 @@ EG = {
   },
 
   toggleFullRubric: function(force){
+    const rubricFull = selectors.get('#rubric_full');
     // if there is no rubric associated with this assignment, then the edit
     // rubric thing should never be shown.  the view should make sure that
     // the edit rubric html is not even there but we also want to make sure
     // that pressing "r" wont make it appear either
     if (!jsonData.rubric_association){ return false; }
 
-    if ($rubric_full.filter(":visible").length || force === "close") {
+    if (rubricFull.filter(":visible").length || force === "close") {
       $("#grading").show().height("auto");
-      $rubric_full.fadeOut();
+      rubricFull.fadeOut();
       $(".toggle_full_rubric").focus()
     } else {
-      $rubric_full.fadeIn();
+      rubricFull.fadeIn();
       $("#grading").hide();
       this.refreshFullRubric();
-      $rubric_full.find('.rubric_title .title').focus()
+      rubricFull.find('.rubric_title .title').focus()
     }
   },
 
   refreshFullRubric: function() {
+    const rubricFull = selectors.get('#rubric_full');
     if (!jsonData.rubric_association) { return; }
-    if (!$rubric_full.filter(":visible").length) { return; }
+    if (!rubricFull.filter(":visible").length) { return; }
 
-    rubricAssessment.populateRubric($rubric_full.find(".rubric"), getSelectedAssessment() );
-    $("#grading").height($rubric_full.height());
+    rubricAssessment.populateRubric(
+      rubricFull.find(".rubric"),
+      rubricAssessmentToPopulate()
+    );
+
+    $("#grading").height(rubricFull.height());
   },
 
   handleFragmentChange: function(){
@@ -2115,6 +2165,7 @@ EG = {
   },
 
   showRubric: function(){
+    const selectMenu = selectors.get('#rubric_assessments_select');
     //if this has some rubric_assessments
     if (jsonData.rubric_association) {
       ENV.RUBRIC_ASSESSMENT.assessment_user_id = this.currentStudent.id;
@@ -2126,9 +2177,9 @@ EG = {
         return n.assessment_type == 'grading';
       });
 
-      $rubric_assessments_select.find("option").remove();
+      selectMenu.find("option").remove();
       $.each(this.currentStudent.rubric_assessments, function(){
-        $rubric_assessments_select.append('<option value="' + htmlEscape(this.id) + '">' + htmlEscape(this.assessor_name) + '</option>');
+        selectMenu.append(`<option value="${htmlEscape(this.id)}">${htmlEscape(this.assessor_name)}</option>`);
       });
 
       //select the assessment that meets these rules:
@@ -2142,12 +2193,12 @@ EG = {
         idToSelect = assessmentsByMe[0].id;
       }
       if (idToSelect) {
-        $rubric_assessments_select.val(idToSelect);
+        selectMenu.val(idToSelect);
       }
 
       // hide the select box if there is not >1 option
-      $("#rubric_assessments_list").showIf($rubric_assessments_select.find("option").length > 1);
-      $rubric_assessments_select.change();
+      $("#rubric_assessments_list").showIf(selectMenu.find("option").length > 1);
+      selectMenu.change();
     }
   },
 
@@ -2359,12 +2410,7 @@ EG = {
     }
 
     EG.showDiscussion();
-    $add_a_comment_textarea.val("");
-    // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
-    // type it the textarea after you do that.  but I put it in a setTimeout it works.  so this is a hack for webkit,
-    // but it still works in all other browsers.
-    setTimeout(function(){ $add_a_comment_textarea.trigger('keyup'); }, 0);
-
+    renderCommentTextArea();
     $add_a_comment.find(":input").prop("disabled", false);
     if (jsonData.GROUP_GRADING_MODE) {
       disableGroupCommentCheckbox();
@@ -2553,7 +2599,7 @@ EG = {
   },
 
   showGrade: function() {
-    const submission = EG.currentStudent.submission;
+    const submission = EG.currentStudent.submission || {};
     const grade = EG.getGradeToShow(submission, ENV.grading_role);
 
     if (submission.grading_type === 'pass_fail' || ['complete', 'incomplete', 'pass', 'fail'].indexOf(submission.grade) > -1) {

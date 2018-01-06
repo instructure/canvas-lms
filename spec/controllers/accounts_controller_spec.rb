@@ -326,6 +326,20 @@ describe AccountsController do
   end
 
   describe "update" do
+    it "should update 'app_center_access_token'" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      access_token = SecureRandom.uuid
+      post 'update', params: { id: @account.id,
+                               account: {
+                                settings: {
+                                  app_center_access_token: access_token
+                                }
+                              }}
+      @account.reload
+      expect(@account.settings[:app_center_access_token]).to eq access_token
+    end
+
     it "should update account with sis_assignment_name_length_input with value less than 255" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
@@ -764,6 +778,22 @@ describe AccountsController do
     user_session(user_factory)
     Account.site_admin.account_users.create!(user: @user)
     account_with_admin_logged_in(account: account)
+  end
+
+  describe "terms of service" do
+    before do
+      @account = Account.create!
+    end
+
+    it "should return the terms of service content" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+
+      admin_logged_in(@account)
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"content\":\"custom content\"/)
+    end
   end
 
   describe "#account_courses" do

@@ -48,6 +48,8 @@ module Api::V1::MasterCourses
       course_external_tool_url(:course_id => asset.context.id, :id => asset.id)
     when 'LearningOutcome'
       course_outcome_url(:course_id => asset.context.id, :id => asset.id)
+    when 'LearningOutcomeGroup'
+      course_outcome_group_url(:course_id => asset.context.id, :id => asset.id)
     else
       polymorphic_url([asset.context, asset])
     end

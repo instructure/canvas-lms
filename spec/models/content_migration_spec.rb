@@ -84,9 +84,9 @@ describe ContentMigration do
   end
 
   context "zip file import" do
-    def test_zip_import(context)
-      zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/file.zip")
-      cm = ContentMigration.new(:context => context, :user => @user,)
+    def test_zip_import(context, filename="file.zip", filecount=1)
+      zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/#{filename}")
+      cm = ContentMigration.new(:context => context, :user => @user)
       cm.migration_type = 'zip_file_importer'
       cm.migration_settings[:folder_id] = Folder.root_folders(context).first.id
       cm.save!
@@ -94,7 +94,7 @@ describe ContentMigration do
       attachment = Attachment.new
       attachment.context = cm
       attachment.uploaded_data = File.open(zip_path, 'rb')
-      attachment.filename = 'file.zip'
+      attachment.filename = filename
       attachment.save!
 
       cm.attachment = attachment
@@ -102,7 +102,7 @@ describe ContentMigration do
 
       cm.queue_migration
       run_jobs
-      expect(context.reload.attachments.count).to eq 1
+      expect(context.reload.attachments.count).to eq filecount
     end
 
     it "should import into a course" do
@@ -116,6 +116,11 @@ describe ContentMigration do
     it "should import into a group" do
       group_with_user
       test_zip_import(@group)
+    end
+
+    it "should not expand the mac system folder" do
+      test_zip_import(@course, "macfile.zip", 4)
+      expect(@course.folders.pluck(:name)).to_not include("__MACOSX")
     end
   end
 

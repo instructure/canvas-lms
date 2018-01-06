@@ -19,7 +19,7 @@ const loadedStylesheets = {}
 
 const brandableCss = {
   getCssVariant () {
-    const variant = window.ENV.use_new_typography ? 'new_typography' : 'new_styles'
+    const variant = window.ENV.use_responsive_layout ? 'responsive_layout' : 'new_styles'
     const contrast = window.ENV.use_high_contrast ? 'high_contrast' : 'normal_contrast'
     return `${variant}_${contrast}`
   },

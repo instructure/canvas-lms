@@ -19,7 +19,7 @@ module Lti
 # @API Plagiarism Detection Platform Assignments
 # **Plagiarism Detection Platform API for Assignments (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
 #
-# @model Assignment
+# @model LtiAssignment
 #     {
 #       "id": "Assignment",
 #       "description": "A Canvas assignment",
@@ -71,13 +71,13 @@ module Lti
       ASSIGNMENT_SERVICE
     end
 
-    # @API Get a single assignment
+    # @API Get a single assignment (lti)
     #
     # Get a single Canvas assignment by Canvas id or LTI id. Tool providers may only access
     # assignments that are associated with their tool.
     # @argument user_id [String]
     #   The id of the user. Can be a Canvas or LTI id for the user.
-    # @returns Assignment
+    # @returns LtiAssignment
     def show
       render json: assignment_json(user.present? ? assignment.overridden_for(user) : assignment)
     end

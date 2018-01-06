@@ -150,6 +150,8 @@ define [
         params.course_id = data.context_code.replace('course_', '')
       else
         # is in the user's calendar
+        if !@event.isNewEvent()
+          params.course_id = ""
         params.user_id = data.context_code.replace('user_', '')
 
       params

@@ -26,8 +26,10 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
   let gradebook;
   let assignment;
   let column;
-  let renderer;
   let component;
+  let renderer;
+  let student;
+  let submission;
 
   function render () {
     renderer.render(column, $container, {} /* gridSupport */, { ref (ref) { component = ref } });
@@ -54,9 +56,28 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       submission_types: ['online_text_entry']
     };
 
+    submission =  {
+      id: '93',
+      assignment_id: '2301',
+      excused: false,
+      late_policy_status: null,
+      score: null,
+      submitted_at: null,
+      user_id: '441'
+    };
+
+    student = {
+      id: '441',
+      assignment_2301: submission,
+      isInactive: false,
+      name: 'Guy B. Studying',
+      enrollments: [{ type: 'StudentEnrollment', user_id: '441', course_section_id: '1' }]
+    };
+
     gradebook.gotAllAssignmentGroups([
       { id: '2201', position: 1, name: 'Assignments', assignments: [assignment] }
     ]);
+
     column = { id: gradebook.getAssignmentColumnId('2301'), assignmentId: '2301' };
     renderer = new AssignmentColumnHeaderRenderer(gradebook);
   });
@@ -267,6 +288,75 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       sinon.spy(gradebook, 'getMuteAssignmentAction');
       render();
       equal(component.props.muteAssignmentAction, gradebook.getMuteAssignmentAction.returnValues[0]);
+    });
+
+    test('student submissions for the assignment include "excused"', function () {
+      submission.excused = true;
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.excused, true);
+    });
+
+    test('"excused" is false if the student does not have a submission', function () {
+      submission.excused = true;
+      delete student.assignment_2301;
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.excused, false);
+    });
+
+    test('student submissions for the assignment include "latePolicyStatus"', function () {
+      submission.late_policy_status = 'missing';
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.latePolicyStatus, 'missing');
+    });
+
+    test('"latePolicyStatus" is null if the student does not have a submission', function () {
+      submission.late_policy_status = 'missing';
+      delete student.assignment_2301;
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.latePolicyStatus, null);
+    });
+
+    test('student submissions for the assignment include "score"', function () {
+      submission.score = 9;
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.score, 9);
+    });
+
+    test('"score" is null if the student does not have a submission', function () {
+      submission.score = 9;
+      delete student.assignment_2301;
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.score, null);
+    });
+
+    test('student submissions for the assignment include "submittedAt"', function () {
+      const submittedAt = new Date("Mon Nov 3 2016");
+      submission.submitted_at = submittedAt;
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.submittedAt, submittedAt);
+    });
+
+    test('"submittedAt" is null if the student does not have a submission', function () {
+      submission.submittedAt = new Date("Mon Nov 3 2016");
+      delete student.assignment_2301;
+      gradebook.gotChunkOfStudents([student]);
+      render();
+      const studentProp = component.props.students.find(s => s.id === student.id);
+      strictEqual(studentProp.submission.submittedAt, null);
     });
 
     test('includes a callback for keyDown events', function () {

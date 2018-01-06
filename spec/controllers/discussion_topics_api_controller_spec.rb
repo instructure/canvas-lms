@@ -64,6 +64,22 @@ describe DiscussionTopicsApiController do
       allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
     end
 
+    it "uploads attachment to submissions folder if topic is graded" do
+      assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.save
+      Setting.set('user_default_quota', -1)
+      expect(@student.attachments.count).to eq 0
+
+      post 'add_entry', params: {:topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message',
+        :read_state => 'read', :attachment => default_uploaded_data}, :format => 'json'
+
+      expect(response).to be_success
+      expect(@student.attachments.count).to eq 1
+      expect(@student.attachments.first.folder.for_submissions?).to be_truthy
+      expect(@student.attachments.pluck(:filename)).to include(default_uploaded_data.original_filename)
+    end
+
     it "fails if attachment a file over student quota (not course)" do
       Setting.set('user_default_quota', -1)
 

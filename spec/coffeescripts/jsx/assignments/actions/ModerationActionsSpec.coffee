@@ -71,7 +71,10 @@ define [
 
     equal action.type, expected.type, "type matches"
     equal action.payload.message, expected.payload.message, "message matches"
-    ok expected.payload.time - action.payload.time < 5, "time within 5 seconds"
+    ok(
+      expected.payload.time - action.payload.time < 10, 
+      "time within 10 seconds expected:#{expected.payload.time} action: #{action.payload.time}"
+    )
 
   test "creates the UPDATE_MODERATION_SET_FAILED action", ->
     action = ModerationActions.moderationSetUpdateFailed()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,5 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$use_high_contrast: true;
-$use_new_typography: true;
+const data = {
+  announcements: [{
+    id: '1',
+    position: 2,
+    published: true,
+    title: 'hello world',
+    posted_at: (new Date).toString(),
+    author: {
+      display_name: 'John Doe',
+    },
+    read_state: 'read',
+    unread_count: 0,
+  }],
+}
+
+export default data

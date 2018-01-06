@@ -183,6 +183,11 @@ en:
     samara: "Samara"
     zurich: "Zurich"
     philippines: "Philippines"
+    noronha: "Noronha"
+    fortaleza: "Fortaleza"
+    manaus: "Manaus"
+    cuiaba: "Cuiaba"
+    eirunepe: "Eirunepe"
   support:
     array:
       or:
@@ -195,7 +200,7 @@ en:
       networking_academy_faqs: 'Networking Academy FAQs'
       curriculum_assessment_errata: 'Curriculum/Assessment Errata'
       community_support_description: 'Interact with and get assistance from your peers.'
-      global_support_desk: 'Global Support Desk'
+      global_support_desk: 'NetAcad Support'
       global_support_desk_description: 'Our ASCs are your first line of support, and can connect you with our Global Support Desk for issues that require additional assistance.'
       cisco_netacad_facebook: 'Support Community'
       cisco_netacad_facebook_description: 'Please visit our Networking Academy Facebook page for community support or contact your instructor.'

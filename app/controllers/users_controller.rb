@@ -512,7 +512,6 @@ class UsersController < ApplicationController
 
   def user_dashboard
     if planner_enabled?
-      js_env :DEBUG_PLANNER => Rails.env.development? || Rails.env.test?
       js_bundle :react_todo_sidebar
       css_bundle :react_todo_sidebar
     end

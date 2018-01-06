@@ -33,9 +33,9 @@ class GroupMembership < ActiveRecord::Base
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
-  after_save :update_cached_due_dates
   after_save :update_group_leadership
   after_save :invalidate_user_membership_cache
+  after_commit :update_cached_due_dates
   after_destroy :touch_groups
   after_destroy :update_group_leadership
   after_destroy :invalidate_user_membership_cache
@@ -149,10 +149,21 @@ class GroupMembership < ActiveRecord::Base
   end
   protected :capture_old_group_id
 
+  # This method is meant to be used in an after_commit setting
+  def update_cached_due_dates?
+    workflow_state_changed = previous_changes.key?(:workflow_state)
+
+    workflow_state_changed && group.group_category_id && group.context_type == 'Course'
+  end
+  private :update_cached_due_dates?
+
   def update_cached_due_dates
-    if workflow_state_changed? && group.group_category_id && group.context_type == 'Course'
-      DueDateCacher.recompute_course(group.context_id, Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).pluck(:id))
-    end
+    return unless update_cached_due_dates?
+
+    assignments = Assignment.where(context_type: group.context_type, context_id: group.context_id).
+      where(group_category_id: group.group_category_id).pluck(:id)
+
+    DueDateCacher.recompute_course(group.context_id, assignments)
   end
 
   def touch_groups

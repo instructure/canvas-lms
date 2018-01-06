@@ -57,5 +57,24 @@ describe Types::AssignmentType do
   it "has the same data" do
     expect(assignment_type._id).to eq assignment.id
     expect(assignment_type.name).to eq assignment_type.name
+    expect(assignment_type.state).to eq assignment.workflow_state
+  end
+
+  it "returns submissions from submission connection (with permissions)" do
+    test_course.enroll_student(test_student, enrollment_state: 'active')
+    submission = assignment.submit_homework(test_student, { :body => "sub1", :submission_type => 'online_text_entry' })
+
+    expect(assignment_type.submissionsConnection(current_user: @teacher).length).to eq 1
+    expect(assignment_type.submissionsConnection(current_user: @teacher)[0].id).to eq submission.id
+
+    expect(assignment_type.submissionsConnection(current_user: @student)).to eq nil
+  end
+
+  it "can access it's parent course" do
+    expect(assignment_type.course).to eq test_course
+  end
+
+  it "has an assignmentGroup" do
+    expect(assignment_type.assignmentGroup).to eq assignment.assignment_group
   end
 end

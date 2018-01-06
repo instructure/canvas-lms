@@ -378,22 +378,22 @@ describe "grades" do
       user_session(@obs)
       get "/courses/#{@course.id}/grades"
 
-      expect(f("#observer_user_url")).to be_displayed
-      expect(f("#observer_user_url option[selected]")).to include_text "Student 1"
+      expect(f("#student_select_menu")).to be_displayed
+      expect(f("#student_select_menu option[selected]")).to include_text "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
 
-      click_option("#observer_user_url", "Student 2")
-      wait_for_ajaximations
+      click_option("#student_select_menu", "Student 2")
+      expect_new_page_load { f('#apply_select_menus').click }
 
-      expect(f("#observer_user_url")).to be_displayed
-      expect(f("#observer_user_url option[selected]")).to include_text "Student 2"
+      expect(f("#student_select_menu")).to be_displayed
+      expect(f("#student_select_menu option[selected]")).to include_text "Student 2"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
 
-      click_option("#observer_user_url", "Student 1")
-      wait_for_ajaximations
+      click_option("#student_select_menu", "Student 1")
+      expect_new_page_load { f('#apply_select_menus').click }
 
-      expect(f("#observer_user_url")).to be_displayed
-      expect(f("#observer_user_url option[selected]")).to include_text "Student 1"
+      expect(f("#student_select_menu")).to be_displayed
+      expect(f("#student_select_menu option[selected]")).to include_text "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
     end
   end

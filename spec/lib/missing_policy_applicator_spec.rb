@@ -166,7 +166,7 @@ describe MissingPolicyApplicator do
       expect(submission.grade).to be nil
     end
 
-    it 'does not apply deductions to assignments expecting on paper submissions' do
+    it 'does not apply deductions to assignments expecting on paper submissions if the due date is past' do
       late_policy_missing_enabled
       create_recent_paper_assignment
       applicator.apply_missing_deductions
@@ -175,6 +175,18 @@ describe MissingPolicyApplicator do
 
       expect(submission.score).to be nil
       expect(submission.grade).to be nil
+    end
+
+    it 'applies deductions to assignments expecting on paper submissions if the ' \
+      'submission status has been set to "Missing"' do
+      late_policy_missing_enabled
+      create_recent_paper_assignment
+      submission = @course.submissions.first
+      submission.update!(late_policy_status: :missing)
+      applicator.apply_missing_deductions
+
+      expect(submission.reload.score).to be 0.375
+      expect(submission.reload.grade).to eql 'F'
     end
 
     it 'does not apply deductions to assignments expecting no submission' do
@@ -186,6 +198,26 @@ describe MissingPolicyApplicator do
 
       expect(submission.score).to be nil
       expect(submission.grade).to be nil
+    end
+
+    it 'does not change the score on missing submissions for concluded students' do
+      create_recent_assignment
+      @course.student_enrollments.find_by(user_id: @student).conclude
+      late_policy_missing_enabled
+      submission = @course.submissions.find_by(user_id: @student)
+      submission.update_columns(score: nil, grade: nil)
+
+      expect { applicator.apply_missing_deductions }.not_to(change { submission.reload.score })
+    end
+
+    it 'does not change the grade on missing submissions for concluded students' do
+      create_recent_assignment
+      @course.student_enrollments.find_by(user_id: @student).conclude
+      late_policy_missing_enabled
+      submission = @course.submissions.find_by(user_id: @student)
+      submission.update_columns(score: nil, grade: nil)
+
+      expect { applicator.apply_missing_deductions }.not_to(change { submission.reload.grade })
     end
 
     it 'recomputes student scores for affected students' do

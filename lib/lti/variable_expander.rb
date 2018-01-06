@@ -52,6 +52,7 @@ module Lti
     COURSE_GUARD = -> { @context.is_a? Course }
     TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
                                  @context.enrollment_term.start_at }
+    TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { @current_user && @current_user.pseudonym && @current_user.pseudonym.sis_user_id }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
@@ -516,6 +517,16 @@ module Lti
                        -> { @context.enrollment_term.start_at },
                        TERM_START_DATE_GUARD
 
+    # returns the current course's term name.
+    # @example
+    #   ```
+    #   W1 2017
+    #   ```
+    register_expansion 'Canvas.term.name', [],
+                        -> { @context.enrollment_term.name },
+                        TERM_NAME_GUARD,
+                        default_name: 'canvas_term_name'
+
     # returns the current course sis source id
     # to return the section source id use Canvas.course.sectionIds
     # @launch_parameter lis_course_section_sourcedid
@@ -585,6 +596,17 @@ module Lti
                        -> { @current_user.name },
                        USER_GUARD,
                        default_name: 'lis_person_name_full'
+
+    # Returns the display name of the launching user.
+    # @launch_parameter lis_person_name_full
+    # @example
+    #   ```
+    #   John Doe
+    #   ```
+    register_expansion 'Person.name.display', [],
+                       -> { @current_user.short_name },
+                       USER_GUARD,
+                       default_name: 'person_name_display'
 
     # Returns the last name of the launching user.
     # @launch_parameter lis_person_name_family

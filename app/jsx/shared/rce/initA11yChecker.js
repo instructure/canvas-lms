@@ -16,11 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { getInstance } from 'tinymce-a11y-checker'
+import { getInstance, setLocale } from 'tinymce-a11y-checker'
+import { beforeCheck, afterCheck } from './a11yCheckerHooks';
 
-// disable contrast checking unless in high contrast mode
-// this is only temporary, until the checker supports forcing high contrast
-// styles durring the check.
-if (ENV.use_high_contrast !== true) {
-  getInstance(c => c.setConfig({ disableContrastCheck: true }))
+getInstance(c => c.setConfig({
+  beforeCheck,
+  afterCheck
+}))
+
+if (ENV && ENV.LOCALE) {
+  let locale = ENV.LOCALE
+  if (locale === 'zh-Hant') {
+    locale = 'zh-HK'
+  }
+  setLocale(locale)
 }

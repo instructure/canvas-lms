@@ -28,7 +28,6 @@ module SIS
       if @batch
         types = {
           'user' => {scope: @root_account.pseudonyms},
-          'user_integration_id' => {scope: @root_account.pseudonyms},
           'course' => {scope: @root_account.all_courses},
           'section' => {scope: @root_account.course_sections},
           'term' => {scope: @root_account.enrollment_terms},
@@ -64,21 +63,18 @@ module SIS
         @things_to_update_batch_ids = {}
       end
 
-      def process_change_sis_id(old_id: nil, new_id: nil, type: nil)
-        @logger.debug("Processing change_sis_id #{[type, old_id, new_id].inspect}")
+      def process_change_sis_id(data_change)
+        @logger.debug("Processing change_sis_id #{data_change.to_a.inspect}")
 
-        raise ImportError, "No type given for change_sis_id" if type.blank?
-        raise ImportError, "No old_id given for change_sis_id" if old_id.blank?
-        unless type == 'user_integration_id'
-          raise ImportError, "No new_id given for change_sis_id" if new_id.blank?
-        end
+        raise ImportError, "No type given for change_sis_id" if data_change.type.blank?
+        raise ImportError, "No old_id or old_integration_id given for change_sis_id" if data_change.old_id.blank? && data_change.old_integration_id.blank?
+        raise ImportError, "No new_id or new_integration_id given for change_sis_id" if data_change.new_id.blank? && data_change.new_integration_id.blank?
 
-        type = type.downcase.strip
+        type = data_change.type.downcase.strip
         things_to_update_batch_ids[type] ||= Set.new
 
         types = {
           'user' => {scope: @root_account.pseudonyms, column: :sis_user_id},
-          'user_integration_id' => {scope: @root_account.pseudonyms, column: :integration_id},
           'course' => {scope: @root_account.all_courses},
           'section' => {scope: @root_account.course_sections},
           'term' => {scope: @root_account.enrollment_terms},
@@ -89,14 +85,56 @@ module SIS
         details = types[type]
         raise ImportError, "Invalid type '#{type}' for change_sis_id" unless details
         column = details[:column] || :sis_source_id
-        check_new = details[:scope].where(column => new_id).exists? if new_id.present?
-        raise ImportError, "A new_id, '#{new_id}', referenced an existing #{type} and the #{type} with #{column} '#{old_id}' was not updated" if check_new
-        old_pseudo = details[:scope].where(column => old_id).take
-        raise ImportError, "An old_id, '#{old_id}', referenced a non-existent #{type} and was not changed to '#{new_id}'" unless old_pseudo
-        details[:scope].where(id: old_pseudo.id).update_all(column => new_id)
-        @things_to_update_batch_ids[type] << old_pseudo.id
+        check_for_conflicting_ids(column, details, type, data_change)
+        old_item = find_item_to_update(column, details, type, data_change)
+        updates = ids_to_change(column, data_change)
+        details[:scope].where(id: old_item.id).update_all(updates)
+        @things_to_update_batch_ids[type] << old_item.id
         @success_count += 1
       end
+
+      def ids_to_change(column, data_change)
+        updates = {}
+        if data_change.new_id.present?
+          updates[column] = data_change.new_id
+        end
+        if data_change.new_integration_id.present?
+          updates['integration_id'] = data_change.new_integration_id
+          if data_change.new_integration_id == '<delete>'
+            updates['integration_id'] = nil
+          end
+        end
+        updates
+      end
+
+      def check_for_conflicting_ids(column, details, type, data_change)
+        check_new = details[:scope].where(column => data_change.new_id).exists? if data_change.new_id.present?
+        raise ImportError, "A new_id, '#{data_change.new_id}', referenced an existing #{type} and the #{type} with #{column} '#{data_change.old_id}' was not updated" if check_new
+        check_int = details[:scope].where(integration_id: data_change.new_integration_id).exists? if data_change.new_integration_id.present?
+        raise ImportError, "A new_integration_id, '#{data_change.new_integration_id}', referenced an existing #{type} and the #{type} with integration_id '#{data_change.old_integration_id}' was not updated" if check_int
+      end
+
+      def find_item_to_update(column, details, type, data_change)
+        if data_change.old_id.present?
+          old_item = details[:scope].where(column => data_change.old_id).take
+        end
+        if data_change.old_integration_id.present?
+          old_int_item = details[:scope].where(integration_id: data_change.old_integration_id).take if data_change.old_integration_id.present?
+        end
+        if data_change.old_id.present? && data_change.old_integration_id.present?
+          raise ImportError, "An old_id, '#{data_change.old_id}', referenced a different #{type} than the old_integration_id, '#{data_change.old_integration_id}'" unless old_item == old_int_item
+          return old_item
+        end
+        if data_change.old_id.present? && data_change.old_integration_id.blank?
+          raise ImportError, "An old_id, '#{data_change.old_id}', referenced a non-existent #{type} and was not changed." unless old_item
+          return old_item
+        end
+        if data_change.old_id.blank? && data_change.old_integration_id.present?
+          raise ImportError, "An old_integration_id, '#{data_change.old_integration_id}', referenced a non-existent #{type} and was not changed." unless old_int_item
+          return old_int_item
+        end
+      end
+
     end
   end
 end

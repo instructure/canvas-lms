@@ -89,25 +89,33 @@ define [
     #   }
     showErrors: (errors) ->
       for fieldName, field of errors
-        $input = @findField fieldName
-        # check for a translations option first, fall back to just displaying otherwise
-        html = (htmlEscape(@translations?[message] or message) for {message} in field).join('</p><p>')
-        errorDescription = @findOrCreateDescription($input)
-        errorDescription.text($.raw("#{html}"))
-        $input.attr('aria-describedby', errorDescription.attr('id'))
-        $input.errorBox $.raw("<div>#{html}</div>")
+        $input = field.element || @findField fieldName
+        html = field.message || (htmlEscape(@translations?[message] or message) for {message} in field).join('</p><p>')
+        $input.errorBox($.raw("#{html}"))?.css("z-index", "20")?.attr('role', 'alert')
+        @attachErrorDescription($input, html)
         field.$input = $input
         field.$errorBox = $input.data 'associated_error_box'
 
-    findOrCreateDescription: ($input) ->
+    attachErrorDescription: ($input, message) ->
+      errorDescriptionField = @findOrCreateDescriptionField($input)
+      errorDescriptionField["description"].text($.raw("#{message}"))
+      $input.attr('aria-describedby',
+        errorDescriptionField["description"].attr('id') + " " +
+        errorDescriptionField["originalDescriptionIds"]
+      )
+
+    findOrCreateDescriptionField: ($input) ->
       id = $input.attr('id')
-      existingDescription = $("##{id}_sr_description")
-      if existingDescription.length > 0
-        return existingDescription
-      else
-        newDescripton = $('<div>').attr({
-          id: "##{id}_sr_description"
+      unless $("##{id}_sr_description").length > 0
+        $('<div>').attr({
+          id: "#{id}_sr_description"
           class: "screenreader-only"
-        })
-        newDescripton.insertBefore($input)
-        newDescripton
+        }).insertBefore($input)
+      description = $("##{id}_sr_description")
+      originalDescriptionIds = @getExistingDescriptionIds($input, id)
+      {description: description, originalDescriptionIds: originalDescriptionIds}
+
+    getExistingDescriptionIds: ($input, id) ->
+      descriptionIds = $input.attr('aria-describedby')
+      idArray = if descriptionIds then descriptionIds.split(" ") else []
+      _.without(idArray,"#{id}_sr_description")

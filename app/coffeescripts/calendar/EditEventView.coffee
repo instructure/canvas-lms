@@ -19,6 +19,7 @@ define [
   'jquery'
   'underscore'
   'i18n!calendar.edit'
+  'jsx/shared/FlashAlert'
   'timezone'
   'Backbone'
   'jst/calendar/editCalendarEventFull'
@@ -29,7 +30,7 @@ define [
   'compiled/views/editor/KeyboardShortcuts'
   'compiled/util/coupleTimeFields'
   'jsx/shared/helpers/datePickerFormat'
-], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts, coupleTimeFields, datePickerFormat) ->
+], ($, _, I18n, { showFlashAlert }, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts, coupleTimeFields, datePickerFormat) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -164,8 +165,19 @@ define [
       @saveEvent(eventData)
 
     saveEvent: (eventData) ->
-      @$el.disableWhileLoading @model.save eventData, success: =>
-        @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'
+      @$el.disableWhileLoading(
+        @model.save(eventData, {
+          success: => @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully',
+          error: (model, response, options) => showFlashAlert({
+            message: response.responseText, err: null, type: 'error'
+          })
+        })
+      )
+
+    toJSON: ->
+      result = super
+      result.recurringEventLimit = 200
+      result
 
     getFormData: ->
       data = @$el.getFormData()
