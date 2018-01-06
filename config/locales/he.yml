@@ -13503,6 +13503,7 @@ he:
       discrimination_index: "מדד אי השויון"
       discrimination_index_dialog_title: "גרף מדד אי השויון"
       discrimination_index_dialog_trigger: "ללימוד מעמיק יותר על מדד אי השויון."
+    discrimination_index_help: "* המדד הזה מספק מדידה של ההבדל (או מפלה) בין תלמידים אשר הצטיינו במבחן לבין אלו שלא, על בסיס של שאלה אחת מתוך המבחן. * ** הוא מחלק תלמידים לשלש קבוצות על בסיס הציון של כלל הבוחן ומציג קבוצות אלו לפי המענה הנכון לשאלה. ** *** ***מידע נוסף זמין כאן.*** ***"
     download_submissions: "הורדת כל הקבצים"
     duration_in_hours: 
       one: "שעה אחת"

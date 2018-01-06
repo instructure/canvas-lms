@@ -65,21 +65,6 @@ describe StreamItem do
     end
   end
 
-  describe "remove_users" do
-    it "should remove users" do
-      course = Course.create!
-      students = n_students_in_course(3, course: course)
-      dt = DiscussionTopic.create!(:context => course, :require_initial_post => true)
-      dt.generate_stream_items(students)
-      si = dt.stream_item
-
-      si.remove_users(students[0, 2])
-      expect(si.stream_item_instances.count).to be_equal 1
-      expect(si.users.count).to be_equal 1
-      expect(si.users.first.id).to be_equal students.last.id
-    end
-  end
-
   context "across shards" do
     specs_require_sharding
 
