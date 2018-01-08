@@ -31,7 +31,6 @@ class SisBatch < ActiveRecord::Base
   belongs_to :user
 
   before_save :limit_size_of_messages
-  after_save :cleanup_error_files_when_finished
 
   validates_presence_of :account_id, :workflow_state
   validates_length_of :diffing_data_set_identifier, maximum: 128
