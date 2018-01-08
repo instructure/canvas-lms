@@ -113,7 +113,7 @@ import Link from '@instructure/ui-core/lib/components/Link'
                   <Tooltip
                     tip={submission.assignment.name}
                     as={Link}
-                    href={`${submission.assignment.html_url}/submissions/${submission.user_id}`}
+                    href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
                     placement="top"
                   >
                     <Progress
