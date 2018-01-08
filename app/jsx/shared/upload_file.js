@@ -70,6 +70,7 @@ export function completeUpload(preflightResponse, file, options={}) {
   upload_params = upload_params || {};
   success_url = success_url || upload_params.success_url;
   const ajaxLib = options.ajaxLib || axios;
+  const isToS3 = !!success_url;
 
   // post upload
   // xsslint xssable.receiver.whitelist formData
@@ -77,8 +78,9 @@ export function completeUpload(preflightResponse, file, options={}) {
   Object.entries(upload_params).forEach(([key, value]) => formData.append(key, value));
   formData.append(file_param, file, options.filename);
   const upload = ajaxLib.post(upload_url, formData, {
-    responseType: (success_url ? 'document' : 'json'),
-    onUploadProgress: options.onProgress
+    responseType: (isToS3 ? 'document' : 'json'),
+    onUploadProgress: options.onProgress,
+    withCredentials: !isToS3
   });
 
   // finalize upload

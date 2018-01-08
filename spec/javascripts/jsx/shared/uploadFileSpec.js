@@ -273,3 +273,57 @@ test('completeUpload appends avatar include in GET after inst-fs upload if optio
     done();
   });
 })
+
+test('completeUpload to S3 posts withCredentials false', assert => {
+  const done = assert.async()
+  const successUrl = 'http://successUrl';
+
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.returns(Promise.resolve({ data: {} }));
+  getStub.returns(Promise.resolve({ data: {} }));
+
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
+
+  const preflightResponse = {
+    upload_url: 'http://uploadUrl',
+    success_url: successUrl
+  };
+  const file = sinon.stub();
+  const options = { ajaxLib: fakeAjaxLib };
+
+  completeUpload(preflightResponse, file, options).then(() => {
+    ok(postStub.calledWith(sinon.match.any, sinon.match.any, sinon.match({
+      withCredentials: false
+    })), 'withCredentials is false');
+    done();
+  });
+})
+
+test('completeUpload to non-S3 posts withCredentials true', assert => {
+  const done = assert.async()
+
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.returns(Promise.resolve({ data: {} }));
+  getStub.returns(Promise.resolve({ data: {} }));
+
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
+
+  const preflightResponse = { upload_url: 'http://uploadUrl' };
+  const file = sinon.stub();
+  const options = { ajaxLib: fakeAjaxLib };
+
+  completeUpload(preflightResponse, file, options).then(() => {
+    ok(postStub.calledWith(sinon.match.any, sinon.match.any, sinon.match({
+      withCredentials: true
+    })), 'withCredentials is true');
+    done();
+  });
+})
