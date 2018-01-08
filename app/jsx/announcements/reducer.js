@@ -47,6 +47,16 @@ export default combineReducers({
         }
       }
     }, ''),
+    filter: handleActions({
+      [actionTypes.UPDATE_ANNOUNCEMENTS_SEARCH]: (state, action) => {
+        const filter = action.payload && action.payload.filter
+        if (filter === undefined) {
+          return state
+        } else {
+          return filter
+        }
+      }
+    }, 'all'),
   }),
   notifications: reduceNotifications,
 })

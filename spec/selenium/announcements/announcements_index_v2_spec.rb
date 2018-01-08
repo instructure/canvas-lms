@@ -78,16 +78,15 @@ describe "announcements index v2" do
     end
 
     it "announcements can be filtered" do
-      skip('Add in with COMMS-560')
-      AnnouncementIndex.select_filter("Delayed")
+      AnnouncementIndex.select_filter("Unread")
       expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
-      expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
+      expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement2_title))
     end
 
     it "search by title works correctly" do
       AnnouncementIndex.enter_search("Free food!")
       expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
-      expect(f('#content')).not_to contain_jqcss(".ic-announcement-row:contains('#{announcement2_title}')")
+      expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement2_title))
     end
 
     it "an announcement can be locked for commenting" do

@@ -90,3 +90,30 @@ test('onSearch calls searchAnnouncements with searchInput value only once within
     done()
   }, SEARCH_TIME_DELAY)
 })
+
+test('renders the filter select component', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps()} />
+  )
+  const node = tree.find('Select')
+  ok(node.exists())
+})
+
+test('renders two options in the filter select component', () => {
+  const tree = mount(
+    <IndexHeader {...makeProps()} />
+  )
+  const node = tree.find('option')
+  equal(node.length, 2)
+})
+
+test('onChange on the filter select calls searchAnnouncements with filter value', () => {
+  const filterSpy = sinon.spy()
+  const tree = mount(
+    <IndexHeader {...makeProps({ searchAnnouncements: filterSpy })} />
+  )
+  const node = tree.find('Select')
+  node.props().onChange({target: {value: 'unread'}})
+  deepEqual(filterSpy.firstCall.args[0], { filter: 'unread' })
+  equal(filterSpy.callCount, 1)
+})

@@ -36,7 +36,7 @@ test('searchAnnouncements calls actions.getAnnouncements when search term update
     forceGet: true,
     page: 1,
     select: true,
-	})
+  })
   getAnnouncementsSpy.restore()
 })
 
@@ -46,5 +46,27 @@ test('searchAnnouncements does not call actions.getAnnouncements when search ter
   const getAnnouncementsSpy = sinon.spy(actions, 'getAnnouncements')
   actions.searchAnnouncements({ term: 'test' })(dispatchSpy, getState)
   equal(getAnnouncementsSpy.callCount, 0)
+  getAnnouncementsSpy.restore()
+})
+
+test('searchAnnouncements does not call actions.getAnnouncements when filter stays the same', () => {
+  const getState = () => ({ announcementsSearch: { filter: 'all' } })
+  const dispatchSpy = sinon.spy()
+  const getAnnouncementsSpy = sinon.spy(actions, 'getAnnouncements')
+  actions.searchAnnouncements({ term: 'all' })(dispatchSpy, getState)
+  equal(getAnnouncementsSpy.callCount, 0)
+  getAnnouncementsSpy.restore()
+})
+
+test('searchAnnouncements calls actions.getAnnouncements when filter updates', () => {
+  const getState = () => ({ announcementsSearch: { filter: Math.random().toString() } })
+  const dispatchSpy = sinon.spy()
+  const getAnnouncementsSpy = sinon.spy(actions, 'getAnnouncements')
+  actions.searchAnnouncements({ filter: 'unread' })(dispatchSpy, getState)
+  deepEqual(getAnnouncementsSpy.firstCall.args[0], {
+    forceGet: true,
+    page: 1,
+    select: true,
+  })
   getAnnouncementsSpy.restore()
 })

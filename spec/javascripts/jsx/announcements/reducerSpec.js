@@ -50,3 +50,17 @@ test('UPDATE_ANNOUNCEMENTS_SEARCH should update term to term in payload when ter
   })
   deepEqual(newState.announcementsSearch.term, 'foo')
 })
+
+test('UPDATE_ANNOUNCEMENTS_SEARCH should not update filter when filter is not defined', () => {
+  const newState = reduce(actions.updateAnnouncementsSearch({}), {
+    announcementsSearch: { filter : 'all' },
+  })
+  deepEqual(newState.announcementsSearch.filter, 'all')
+})
+
+test('UPDATE_ANNOUNCEMENTS_SEARCH should update filter to filter in payload', () => {
+  const newState = reduce(actions.updateAnnouncementsSearch({ filter: 'unread' }), {
+    announcementsSearch: { filter: 'all' },
+  })
+  deepEqual(newState.announcementsSearch.filter, 'unread')
+})

@@ -43,9 +43,11 @@ const actions = Object.assign(
 actions.searchAnnouncements = function searchAnnouncements (searchOpts) {
   return (dispatch, getState) => {
     const oldTerm = getState().announcementsSearch.term
+    const oldFilter = getState().announcementsSearch.filter
     dispatch(actions.updateAnnouncementsSearch(searchOpts))
     const newTerm = getState().announcementsSearch.term
-    if (oldTerm !== newTerm) {
+    const newFilter = getState().announcementsSearch.filter
+    if (oldTerm !== newTerm || oldFilter !== newFilter) {
       dispatch(actions.getAnnouncements({ page: 1, select: true, forceGet: true }))
     }
   }

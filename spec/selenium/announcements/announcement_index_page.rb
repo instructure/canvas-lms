@@ -39,12 +39,12 @@ class AnnouncementIndex
 
     # ---------------------- Controls ----------------------
     def filter_dropdown
-      # f('.filter_dropdown')
+      fj('select[name="filter-dropdown"]')
     end
 
-    # def filter_item(item_name)
-    #   fj("option:contains(\"#{item_name}\")")
-    # end
+    def filter_item(item_name)
+      fj("option:contains(\"#{item_name}\")")
+    end
 
     def search_box
       f('input[name="announcements_search"]')
@@ -76,6 +76,10 @@ class AnnouncementIndex
       fj(".ic-announcement-row:contains('#{title}')")
     end
 
+    def announcement_title_css(title)
+      ".ic-announcement-row:contains('#{title}')"
+    end
+
     def announcement_title(title)
       f('h3', announcement(title))
     end
@@ -103,11 +107,8 @@ class AnnouncementIndex
 
     # ---------------------- Actions ----------------------
     def select_filter(filter_name)
-      click_option(search_box, filter_name, :text)
-      wait_for_ajaximations
-      # if ^ doesn't work uncomment filter_item above and try this
-      # filter_dropdown.click
-      # filter_item(filter_name).click
+      filter_dropdown.click
+      filter_item(filter_name).click
     end
 
     def enter_search(title)

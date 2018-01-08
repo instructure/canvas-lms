@@ -22,14 +22,15 @@ import { encodeQueryString } from '../shared/queryString'
 // not using default because we will add more api calls in near future
 // eslint-disable-next-line
 export function getAnnouncements ({ courseId, announcements, announcementsSearch }, { page }) {
-  const { term } = announcementsSearch
+  const { term, filter } = announcementsSearch
   const params = encodeQueryString([
     { only_announcements: true },
     { 'include[]': 'sections_user_count' },
     { 'include[]': 'sections' },
     { per_page: 40 },
     { page: page || announcements.currentPage },
-    { search_term: term || null }
+    { search_term: term || null },
+    { filter_by: filter || null }
   ])
 
   return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)

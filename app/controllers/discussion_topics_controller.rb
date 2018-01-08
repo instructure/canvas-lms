@@ -265,6 +265,9 @@ class DiscussionTopicsController < ApplicationController
   # @argument only_announcements [Boolean]
   #   Return announcements instead of discussion topics. Defaults to false
   #
+  # @argument filter_by [String, "all", "unread"]
+  #   The state of the discussion topic to return. Currently only supports unread state.
+  #
   # @argument search_term [String]
   #   The partial title of the discussion topics to match and return.
   #
@@ -310,6 +313,8 @@ class DiscussionTopicsController < ApplicationController
             end
 
     scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
+
+    scope = scope.unread_for(@current_user) if params[:filter_by] == "unread"
 
     states = params[:scope].split(',').map{|s| s.strip} if params[:scope]
     if states.present?

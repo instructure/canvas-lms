@@ -31,6 +31,7 @@ import Container from '@instructure/ui-core/lib/components/Container'
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Select from '@instructure/ui-core/lib/components/Select'
 
 import select from '../../shared/select'
 import ExternalFeedsTray from './ExternalFeedsTray'
@@ -38,7 +39,10 @@ import propTypes from '../propTypes'
 import actions from '../actions'
 
 export const SEARCH_TIME_DELAY = 300
-
+const filters = {
+  all: I18n.t('All'),
+  unread: I18n.t('Unread')
+}
 export default class IndexHeader extends Component {
   static propTypes = {
     courseId: string.isRequired,
@@ -65,6 +69,17 @@ export default class IndexHeader extends Component {
         <Container margin="0 0 medium" display="block">
           <Grid>
             <GridRow hAlign="space-between">
+              <GridCol width={2}>
+                <Select
+                  name="filter-dropdown"
+                  onChange={(e) => this.props.searchAnnouncements({filter: e.target.value})}
+                  size="medium"
+                  label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}>
+                  {
+                    Object.keys(filters).map((filter) => (<option key={filter} value={filter}>{filters[filter]}</option>))
+                  }
+                </Select>
+              </GridCol>
               <GridCol width={4}>
                 <TextInput
                   label={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
