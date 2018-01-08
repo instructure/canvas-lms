@@ -6712,9 +6712,9 @@ fa:
   end_tutorial_7fb16b6f: "پایان دادن به خودآموز"
   end_user_license_agreement_6d2c666b: "توافقنامه مجوز کاربر نهایی."
   ending_date_e1ea13a4: "تاریخ پایان"
-  ends_4fcb632: "پایان می‌دهد:"
-  ends_at_9a62b528: "پایان می‌دهد در"
-  enrolled_a6a517cd: "ثبت شده"
+  ends_4fcb632: "پایان می‌یابد:"
+  ends_at_9a62b528: "پایان می یابد در"
+  enrolled_a6a517cd: "ثبت نام شده"
   enrolled_as_272da3b9: "ثبت نام شده به عنوان"
   enrollment: 
     default_course_name: درس
@@ -6758,21 +6758,21 @@ fa:
   enrollment_term_7bfe840: "نیمسال ثبت نام"
   enrollments_e250c9c3: "ثبت نام ها"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "در اینجا یک کد هگزا برای استفاده از رنگ سفارشی وارد نمایید."
-  enter_a_what_if_score_668c91a3: "وارد کردن  یک نمره احتمالی"
+  enter_a_what_if_score_668c91a3: "یک نمره احتمالی وارد کنید."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "\"{{ACCOUNT_DOMAIN}}\" را برای جایگزین کردن دامنه حساب ریشه کاربر وارد کنید"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "\"{{CANVAS_USER_ID}}\" را برای جایگزین کردن شناسه یکتای کانواس کاربر وارد کنید"
   enter_grades_as_e113e606: "وارد کردن نمره به عنوان"
   enter_or_find_an_external_tool_url_6aebbd0d: "نشانی اینترنتی یک ابزار بیرونی را وارد کنید یا بیابید "
   enter_the_access_token_for_your_organization_from__cc77493d: "نشانه دسترسی سازمان خود را از *eduappcenter.com* وارد کنید. به محض اعمال، فقط برنامه هایی که سازمان شما در EduAppCenter تأیید کرده است در صفحه برنامه های بیرونی فهرست خواهد شد. با شیوه **ایجاد نشانه دسترسی** آشنا شوید."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "نشانی های پست الکترونیکی کاربرانی که باید اضافه شوند به نحوی که با ویرگول یا خط از هم جدا شده باشند وارد کنید"
-  enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "شناسه کاربری ورود کاربرانی که باید اضافه شوند را به نحوی که با ویرگول یا خط از هم جدا شده باشند، وارد کنید."
-  enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "شناسه کسامنه اطلاعات دانشجویان کاربرانی که باید اضافه شوند را به نحوی که با ویرگول یا خط از هم جدا شده باشند، وارد کنید."
+  enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "شناسه ورود کاربرانی که باید اضافه شوند را به نحوی که با ویرگول یا خط از هم جدا شده باشند، وارد کنید"
+  enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "شناسه سامانه اطلاعات دانشجو کاربرانی که باید اضافه شوند را به نحوی که با ویرگول یا خط از هم جدا شده باشند، وارد کنید"
   enter_your_question_and_multiple_answers_31370054: "پرسش و پاسخ های آن را وارد کنید."
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "پرسش خود را وارد کنید، و تعیین کنید که هر جای خالی باید کجا قرار بگیرد. دانشجویان باید پاسخ ها را در کادرهای متنی موجود در هر جای خالی تایپ کنند."
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "پرسش خود را وارد کنید، و تعیین کنید که هر منوی بازشونده باید کجا قرار بگیرد. سپس پاسخ های احتمالی را برای هر منوی بازشونده تعیین کنید."
   enter_your_question_text_4729b886: "متن پرسش خود را وارد کنید"
   enter_your_question_text_students_will_see_the_que_f19af9e9: "متن پرسش خود را وارد کنید. دانشجویان پرسش را به همراه یک کادر متنی کوچک برای تایپ کردن پاسخ خود مشاهده خواهند کرد."
-  entity_entity_id_not_found_in_federation_name_meta_e622124: "موجودیت %{entity_id} در %{federation_name} یافت نشد."
+  entity_entity_id_not_found_in_federation_name_meta_e622124: "ورودی %{entity_id} در فراداده %{federation_name} یافت نشد"
   entity_entity_id_not_found_in_incommon_metadata_2efb5131: "موجودیت %{entity_id} در InCommon Metadata موجود نیست"
   eportfolio: 
     buttons: 
@@ -7032,7 +7032,7 @@ fa:
   error_59293a2c: خطا
   error_98e81528: خطا
   error_deleting_name_reason_11f9d399: "خطا در حذف %{name}: %{reason}"
-  error_duplicating_module_4b023042: "خطای ماژول تکراری"
+  error_duplicating_module_4b023042: "خطا در تکرار ماژول"
   error_exporting_gradebook_msg_6ea31e2f: "خطای صدور دفتر نمره: %{msg} "
   error_in_mastery_paths_range_index_7d17ddac: "%{error} در محدوده مسیر اصلی %{index}"
   error_loading_gradebook_history_try_again_19032437: "خطای بارگیری تاریخچه دفتر نمره. دوبار تلاش می‌کنید؟"
