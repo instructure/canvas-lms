@@ -224,6 +224,41 @@ describe Enrollment do
         end
       end
 
+      describe '#unposted_current_score' do
+        it 'uses the value from the associated score object, if one exists' do
+          @enrollment.scores.create!(unposted_current_score: 80.3)
+          expect(@enrollment.unposted_current_score).to eq 80.3
+        end
+
+        it 'uses the value from the associated score object, even if it is nil' do
+          @enrollment.scores.create!(unposted_current_score: nil)
+          expect(@enrollment.unposted_current_score).to be_nil
+        end
+
+        it 'ignores grading period scores when passed no arguments' do
+          @enrollment.scores.create!(unposted_current_score: 80.3, grading_period: period)
+          expect(@enrollment.unposted_current_score).to be_nil
+        end
+
+        it 'ignores soft-deleted scores' do
+          score = @enrollment.scores.create!(unposted_current_score: 80.3)
+          score.destroy
+          expect(@enrollment.unposted_current_score).to be_nil
+        end
+
+        it 'computes current score for a given grading period id' do
+          @enrollment.scores.create!(current_score: 80.3)
+          @enrollment.scores.create!(current_score: 70.6, grading_period: period)
+          current_score = @enrollment.computed_current_score(grading_period_id: period.id)
+          expect(current_score).to eq 70.6
+        end
+
+        it 'returns nil if a grading period score is requested and does not exist' do
+          current_score = @enrollment.computed_current_score(grading_period_id: period.id)
+          expect(current_score).to be_nil
+        end
+      end
+
       describe '#computed_current_grade' do
         before(:each) do
           @course.grading_standard_enabled = true
@@ -255,6 +290,40 @@ describe Enrollment do
         it 'returns nil if a grading period grade is requested and does not exist' do
           current_grade = @enrollment.computed_current_grade(grading_period_id: period.id)
           expect(current_grade).to be_nil
+        end
+      end
+
+      describe '#unposted_current_grade' do
+        before(:each) do
+          @course.grading_standard_enabled = true
+          @course.save!
+        end
+
+        it 'uses the value from the associated score object, if one exists' do
+          @enrollment.scores.create!(unposted_current_score: 80.3)
+          expect(@enrollment.unposted_current_grade).to eq 'B-'
+        end
+
+        it 'ignores grading period grades when passed no arguments' do
+          @enrollment.scores.create!(unposted_current_score: 80.3, grading_period: period)
+          expect(@enrollment.unposted_current_grade).to be_nil
+        end
+
+        it 'ignores grades from soft-deleted scores' do
+          score = @enrollment.scores.create!(unposted_current_score: 80.3)
+          score.destroy
+          expect(@enrollment.unposted_current_grade).to be_nil
+        end
+
+        it 'computes current grade for a given grading period id' do
+          @enrollment.scores.create!(unposted_current_score: 70.6, grading_period: period)
+          unposted_current_grade = @enrollment.unposted_current_grade(grading_period_id: period.id)
+          expect(unposted_current_grade).to eq 'C-'
+        end
+
+        it 'returns nil if a grading period grade is requested and does not exist' do
+          unposted_current_grade = @enrollment.unposted_current_grade(grading_period_id: period.id)
+          expect(unposted_current_grade).to be_nil
         end
       end
 

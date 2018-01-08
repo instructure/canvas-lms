@@ -66,6 +66,10 @@ describe EnrollmentsApiController, type: :request do
             'current_score' => nil,
             'final_grade' => nil,
             'current_grade' => nil,
+            'unposted_final_score' => nil,
+            'unposted_current_score' => nil,
+            'unposted_final_grade' => nil,
+            'unposted_current_grade' => nil
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
@@ -575,6 +579,10 @@ describe EnrollmentsApiController, type: :request do
             'current_score' => nil,
             'final_grade' => nil,
             'current_grade' => nil,
+            'unposted_final_score' => nil,
+            'unposted_current_score' => nil,
+            'unposted_final_grade' => nil,
+            'unposted_current_grade' => nil
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
@@ -907,6 +915,10 @@ describe EnrollmentsApiController, type: :request do
                 'current_score' => nil,
                 'final_grade' => nil,
                 'current_grade' => nil,
+                'unposted_final_score' => nil,
+                'unposted_current_score' => nil,
+                'unposted_final_grade' => nil,
+                'unposted_current_grade' => nil
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
@@ -962,6 +974,10 @@ describe EnrollmentsApiController, type: :request do
               'current_score' => nil,
               'final_grade' => nil,
               'current_grade' => nil,
+              'unposted_final_score' => nil,
+              'unposted_current_score' => nil,
+              'unposted_final_grade' => nil,
+              'unposted_current_grade' => nil
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
@@ -1168,6 +1184,10 @@ describe EnrollmentsApiController, type: :request do
               'current_score' => nil,
               'final_grade' => nil,
               'current_grade' => nil,
+              "unposted_current_score"=>nil,
+              "unposted_current_grade"=>nil,
+              "unposted_final_score"=>nil,
+              "unposted_final_grade"=>nil
             },
             'associated_user_id' => nil,
             'updated_at'         => e.updated_at.xmlschema,
@@ -1583,6 +1603,10 @@ describe EnrollmentsApiController, type: :request do
             'current_score' => nil,
             'final_grade' => nil,
             'current_grade' => nil,
+            "unposted_current_score"=>nil,
+            "unposted_current_grade"=>nil,
+            "unposted_final_score"=>nil,
+            "unposted_final_grade"=>nil
           } if e.student?
           h
         end)
@@ -1816,6 +1840,10 @@ describe EnrollmentsApiController, type: :request do
               'current_score' => nil,
               'final_grade' => nil,
               'current_grade' => nil,
+              "unposted_current_score"=>nil,
+              "unposted_current_grade"=>nil,
+              "unposted_final_score"=>nil,
+              "unposted_final_grade"=>nil
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
@@ -1874,6 +1902,10 @@ describe EnrollmentsApiController, type: :request do
               'current_score' => nil,
               'final_grade' => nil,
               'current_grade' => nil,
+              "unposted_current_score"=>nil,
+              "unposted_current_grade"=>nil,
+              "unposted_final_score"=>nil,
+              "unposted_final_grade"=>nil
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,

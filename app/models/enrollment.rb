@@ -1028,24 +1028,42 @@ class Enrollment < ActiveRecord::Base
   end
 
   def computed_current_grade(id_opts=nil)
-    cached_score_or_grade(:current, :grade, id_opts)
+    cached_score_or_grade(:current, :grade, :posted, id_opts)
   end
 
   def computed_final_grade(id_opts=nil)
-    cached_score_or_grade(:final, :grade, id_opts)
+    cached_score_or_grade(:final, :grade, :posted, id_opts)
   end
 
   def computed_current_score(id_opts=nil)
-    cached_score_or_grade(:current, :score, id_opts)
+    cached_score_or_grade(:current, :score, :posted, id_opts)
   end
 
   def computed_final_score(id_opts=nil)
-    cached_score_or_grade(:final, :score, id_opts)
+    cached_score_or_grade(:final, :score, :posted, id_opts)
   end
 
-  def cached_score_or_grade(current_or_final, score_or_grade, id_opts=nil)
+  def unposted_current_grade(id_opts=nil)
+    cached_score_or_grade(:current, :grade, :unposted, id_opts)
+  end
+
+  def unposted_final_grade(id_opts=nil)
+    cached_score_or_grade(:final, :grade, :unposted, id_opts)
+  end
+
+  def unposted_current_score(id_opts=nil)
+    cached_score_or_grade(:current, :score, :unposted, id_opts)
+  end
+
+  def unposted_final_score(id_opts=nil)
+    cached_score_or_grade(:final, :score, :unposted, id_opts)
+  end
+
+  def cached_score_or_grade(current_or_final, score_or_grade, posted_or_unposted, id_opts=nil)
     score = find_score(id_opts)
-    score&.send("#{current_or_final}_#{score_or_grade}")
+    method = "#{current_or_final}_#{score_or_grade}"
+    method.prepend("unposted_") if posted_or_unposted == :unposted
+    score&.send(method)
   end
   private :cached_score_or_grade
 
