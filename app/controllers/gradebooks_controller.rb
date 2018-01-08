@@ -297,17 +297,12 @@ class GradebooksController < ApplicationController
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
     ag_includes = [:assignments, :assignment_visibility]
-    chunk_size = if @context.assignments.published.count < Setting.get('gradebook2.assignments_threshold', '20').to_i
-                   Setting.get('gradebook2.submissions_chunk_size', '35').to_i
-                 else
-                   Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
-                 end
-    js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     {
+      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
-        chunk_size: chunk_size,
+        chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
         assignment_groups_url: api_v1_course_assignment_groups_url(
           @context,
           include: ag_includes,
