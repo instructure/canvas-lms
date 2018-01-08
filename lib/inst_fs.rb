@@ -21,6 +21,14 @@ module InstFS
       Canvas::Plugin.find('inst_fs').enabled?
     end
 
+    def login_pixel(user, session)
+      if !session[:shown_instfs_pixel] && user && app_host
+        session[:shown_instfs_pixel] = true
+        pixel_url = login_pixel_url(token: session_jwt(user))
+        %Q(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
+      end
+    end
+
     def authenticated_url(attachment, options={})
       query_params = { token: access_jwt(attachment, options) }
       query_params[:download] = 1 if options[:download]
@@ -68,19 +76,27 @@ module InstFS
       nil
     end
 
+    def service_url(path, query_params=nil)
+      url = "#{app_host}#{path}"
+      url += "?#{query_params.to_query}" if query_params
+      url
+    end
+
+    def login_pixel_url(query_params)
+      service_url("/session/ensure", query_params)
+    end
+
     def access_url(attachment, query_params)
-      "#{app_host}/files/#{attachment.instfs_uuid}/#{attachment.filename}?#{query_params.to_query}"
+      service_url("/files/#{attachment.instfs_uuid}/#{attachment.filename}", query_params)
     end
 
     def thumbnail_url(attachment, query_params)
-      "#{app_host}/thumbnails/#{attachment.instfs_uuid}?#{query_params.to_query}"
+      service_url("/thumbnails/#{attachment.instfs_uuid}", query_params)
     end
 
     def upload_url(token=nil)
-      query_string = { token: token }.to_query if token
-      url = "#{app_host}/files"
-      url += "?#{query_string}" if query_string
-      url
+      query_string = { token: token } if token
+      service_url("/files", query_string)
     end
 
     def access_jwt(attachment, options={})
@@ -101,6 +117,15 @@ module InstFS
         resource: upload_url,
         capture_url: capture_url,
         capture_params: capture_params
+      }, expires_in.from_now, self.jwt_secret)
+    end
+
+    def session_jwt(user)
+      expires_in = Setting.get('instfs.session_jwt.expiration_minutes', '5').to_i.minutes
+      Canvas::Security.create_jwt({
+        iat: Time.now.utc.to_i,
+        user_id: user.global_id&.to_s,
+        resource: '/session/ensure'
       }, expires_in.from_now, self.jwt_secret)
     end
   end

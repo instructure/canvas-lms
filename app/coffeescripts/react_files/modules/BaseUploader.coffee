@@ -74,6 +74,7 @@ define [
       @_xhr.onload = @onUploadPosted
       @_xhr.onerror = @deferred.reject
       @_xhr.onabort = @deferred.reject
+      @_xhr.withCredentials = true
       @_xhr.open 'POST', @uploadData.upload_url, true
       @_xhr.send @createFormData()
 

@@ -47,6 +47,10 @@ module Login::Shared
       end
     end
 
+    # ensure the next page rendered includes an instfs pixel to log them in
+    # there
+    session.delete(:shown_instfs_pixel)
+
     if pseudonym.account_id != (@real_domain_root_account || @domain_root_account).id
       flash[:notice] = t("You are logged in at %{institution1} using your credentials from %{institution2}",
                          institution1: (@real_domain_root_account || @domain_root_account).name,
