@@ -120,7 +120,8 @@ describe 'Submissions API', type: :request do
                         '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
                         { controller: 'submissions_api', action: 'for_students',
                           format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
-                        enrollment_state: @enrollment_state, student_ids: [@student1.id])
+                        enrollment_state: @enrollment_state, student_ids: [@student1.id],
+                        state_based_on_date: @state_based_on_date)
         expect(json.size).to eq @active_count
 
         e.workflow_state = 'completed'
@@ -129,7 +130,8 @@ describe 'Submissions API', type: :request do
                         '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
                         { controller: 'submissions_api', action: 'for_students',
                           format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
-                        enrollment_state: @enrollment_state, student_ids: [@student1.id])
+                        enrollment_state: @enrollment_state, student_ids: [@student1.id],
+                        state_based_on_date: @state_based_on_date)
         expect(json.size).to eq @concluded_count
       end
     end
@@ -154,9 +156,40 @@ describe 'Submissions API', type: :request do
       end
     end
 
+    context 'active enrollment_state state_based_on_date=false' do
+      include_examples 'enrollment_state'
+      before do
+        @course.start_at = 10.days.ago
+        @course.conclude_at = 2.days.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @state_based_on_date = false
+        @enrollment_state = 'active'
+        @active_count = 1
+        @concluded_count = 0
+      end
+    end
+
     context 'conclude enrollment_state' do
       include_examples 'enrollment_state'
       before do
+        @state_based_on_date = true
+        @enrollment_state = 'concluded'
+        @active_count = 0
+        @concluded_count = 1
+      end
+    end
+
+    context 'conclude enrollment_state state_based_on_date=false' do
+      include_examples 'enrollment_state'
+      before do
+        @course.start_at = 10.days.ago
+        @course.conclude_at = 2.days.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @state_based_on_date = false
         @enrollment_state = 'concluded'
         @active_count = 0
         @concluded_count = 1
