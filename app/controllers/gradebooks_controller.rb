@@ -591,23 +591,26 @@ class GradebooksController < ApplicationController
       :grader
     end
 
+    @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
+
     respond_to do |format|
       format.html do
         @headers = false
         @outer_frame = true
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
-          :CONTEXT_ACTION_SOURCE => :speed_grader,
-          :settings_url => speed_grader_settings_course_gradebook_path,
-          :force_anonymous_grading => force_anonymous_grading?(@assignment),
-          :grading_role => grading_role,
-          :grading_type => @assignment.grading_type,
-          :lti_retrieve_url => retrieve_course_external_tools_url(
+          CONTEXT_ACTION_SOURCE: :speed_grader,
+          settings_url: speed_grader_settings_course_gradebook_path,
+          force_anonymous_grading: force_anonymous_grading?(@assignment),
+          grading_role: grading_role,
+          grading_type: @assignment.grading_type,
+          lti_retrieve_url: retrieve_course_external_tools_url(
             @context.id, assignment_id: @assignment.id, display: 'borderless'
           ),
-          :course_id => @context.id,
-          :assignment_id => @assignment.id,
-          :assignment_title => @assignment.title
+          course_id: @context.id,
+          assignment_id: @assignment.id,
+          assignment_title: @assignment.title,
+          can_comment_on_submission: @can_comment_on_submission
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)

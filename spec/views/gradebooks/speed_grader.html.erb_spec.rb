@@ -58,6 +58,22 @@ describe "/gradebooks/speed_grader" do
     render 'gradebooks/speed_grader'
     expect(rendered).to include "<div id='plagiarism_platform_info_container'>"
   end
+
+  describe 'submission comments form' do
+    it 'is rendered when @can_comment_on_submission is true' do
+      assign(:can_comment_on_submission, true)
+      render 'gradebooks/speed_grader'
+
+      expect(rendered).to match(/form id="add_a_comment"/)
+    end
+
+    it 'is not rendered when @can_comment_on_submission is false' do
+      assign(:can_comment_on_submission, false)
+      render 'gradebooks/speed_grader'
+
+      expect(rendered).not_to match(/form id="add_a_comment"/)
+    end
+  end
 end
 
 

@@ -1223,3 +1223,38 @@ QUnit.module('SpeedGrader#refreshFullRubric', function(hooks) {
     propEqual(data, [{ points: 2, criterion_id: '9' }]);
   });
 });
+
+QUnit.module('SpeedGrader', function() {
+  QUnit.module('#renderCommentTextArea', function(hooks) {
+    hooks.beforeEach(function() {
+      fakeENV.setup()
+      $('#fixtures').html(`
+        <div id="speedgrader_comment_textarea_mount_point"/>
+      `)
+
+      sinon.stub($, 'getJSON')
+      sinon.stub($, 'ajaxJSON')
+    })
+
+    hooks.afterEach(function() {
+      $.ajaxJSON.restore()
+      $.getJSON.restore()
+      $('#fixtures').html('')
+      fakeENV.teardown()
+    })
+
+    test('mounts the comment text area when there is an element to mount it in', function() {
+      ENV.can_comment_on_submission = true
+      SpeedGrader.setup()
+
+      strictEqual($('#speedgrader_comment_textarea').length, 1)
+    })
+
+    test('does not mount the comment text area when there is no element to mount it in', function() {
+      ENV.can_comment_on_submission = false
+      SpeedGrader.setup()
+
+      strictEqual($('#speedgrader_comment_textarea').length, 0)
+    })
+  })
+})
