@@ -32,7 +32,6 @@ module DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView
         :run_for_course_range,
         {
           n_strand: ["DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView", Shard.current.database_server.id],
-          max_concurrency: 4,
           priority: Delayed::MAX_PRIORITY
         },
         min_id, max_id
