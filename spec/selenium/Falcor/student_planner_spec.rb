@@ -67,6 +67,13 @@ describe "student planner" do
       validate_link_to_url(@assignment, 'assignments')
     end
 
+    it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
+      @assignment.submit_homework(@student1, submission_type: "online_text_entry", 
+                                  body: "Assignment submitted")
+      go_to_list_view
+      expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
+    end
+
     it "shows submitted tag for assignments that have submissions", priority: "1", test_id: 3263151 do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "Assignment submitted")
       go_to_list_view
@@ -131,8 +138,20 @@ describe "student planner" do
       go_to_list_view
       validate_pill('Replies')
     end
-  end
 
+    it "shows the new activity button", priority: "1", test_id: 3263164 do
+      # create discussions in the future and in the past to be able to see the new activity button
+      past_discussion = graded_discussion_in_the_past
+      graded_discussion_in_the_future
+      go_to_list_view
+      # confirm the past discussion is not loaded
+      expect(f('.PlannerApp')).not_to contain_link(past_discussion.title.to_s)
+      expect(f('.PlannerApp')).to contain_jqcss("button:contains('New Activity')")
+      new_activity_button.click
+      expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
+    end
+  end
+  
   it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
     discussion = @course.discussion_topics.create!(user: @teacher, title: 'somebody topic title',
                                                    message: 'somebody topic message',
@@ -378,18 +397,6 @@ describe "student planner" do
       go_to_list_view
       open_opportunities_dropdown
       expect(f('#opportunities_parent')).to contain_jqcss('span:contains("Missing")')
-    end
-
-    it "shows the new activity button", priority: "1", test_id: 3263164 do
-      # create discussions in the future and in the past to be able to see the new activity button
-      past_discussion = graded_discussion_in_the_past
-      graded_discussion_in_the_future
-      go_to_list_view
-      # confirm the past discussion is not loaded
-      expect(f('.PlannerApp')).not_to contain_link(past_discussion.title.to_s)
-      expect(f('.PlannerApp')).to contain_jqcss("button:contains('New Activity')")
-      new_activity_button.click
-      expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
     end
   end
 
