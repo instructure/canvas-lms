@@ -306,7 +306,7 @@ class AccountsController < ApplicationController
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
-  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"subaccount"|"total_students"]
+  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"subaccount"]
   #   The column to sort results by.
   #
   # @argument order [String, "asc"|"desc"]
@@ -343,8 +343,6 @@ class AccountsController < ApplicationController
                 AND #{Enrollment.quoted_table_name}.type = 'TeacherEnrollment'
                 AND #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
                 ORDER BY #{sortable_name_col} LIMIT 1)"
-            elsif params[:sort] == 'total_students'
-              "student_count"
             elsif params[:sort] == 'subaccount'
               "(SELECT #{name_col} FROM #{Account.quoted_table_name}
                 WHERE #{Account.quoted_table_name}.id
@@ -439,23 +437,18 @@ class AccountsController < ApplicationController
     # sections, needs_grading_count, and total_score not valid as enrollments are needed
     includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
 
-    includes << "total_students" if params[:sort] == "total_students"
-    if includes.include?("total_students")
-      @courses = @courses.select("*, (
-        SELECT COUNT(*) from #{Enrollment.quoted_table_name}
-        WHERE
-          #{Enrollment.quoted_table_name}.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND
-          #{Enrollment.quoted_table_name}.type IN ('StudentEnrollment') AND
-          #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
-      ) AS student_count")
-    end
-
     page_opts = {}
     page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account])
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
+
+    if includes.include?("total_students")
+      student_counts = StudentEnrollment.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
+        where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
+      @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
+    end
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end

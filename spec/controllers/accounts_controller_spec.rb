@@ -1023,51 +1023,6 @@ describe AccountsController do
       end
     end
 
-    describe "sorting by total_students" do
-      before do
-        course_with_teacher(account: @account, course_name: "Course with lots of TAs but no students", active_all: true)
-        create_users_in_course(@course, 3, enrollment_type: "TaEnrollment")
-        3.times.to_a.shuffle.each do |i|
-          course_with_teacher(account: @account, course_name: "Course with #{i} students", active_all: true)
-          create_users_in_course(@course, i)
-        end
-      end
-
-      it "should be able to sort courses by total_students ascending" do
-        admin_logged_in(@account)
-        get 'courses_api', params: {account_id: @account.id, sort: "total_students"}
-        expect(response).to be_success
-        expect(json_parse(response.body)).to match([
-          {"name" => "Course with 0 students", "total_students" => 0},
-          {"name" => "Course with lots of TAs but no students", "total_students" => 0},
-          {"name" => "bar", "total_students" => 0},
-          {"name" => "foo", "total_students" => 0},
-          {"name" => "Course with 1 students", "total_students" => 1},
-          {"name" => "Course with 2 students", "total_students" => 2}
-        ].map{ |attrs| a_hash_including(attrs) })
-      end
-
-      it "should be able to sort courses by total_students descending" do
-        admin_logged_in(@account)
-        get 'courses_api', params: {account_id: @account.id, sort: "total_students", order: "desc"}
-        expect(response).to be_success
-        expect(json_parse(response.body)).to match([
-          {"name" => "Course with 2 students", "total_students" => 2},
-          {"name" => "Course with 1 students", "total_students" => 1},
-          {"name" => "Course with 0 students", "total_students" => 0},
-          {"name" => "Course with lots of TAs but no students", "total_students" => 0},
-          {"name" => "bar", "total_students" => 0},
-          {"name" => "foo", "total_students" => 0}
-        ].map{ |attrs| a_hash_including(attrs) })
-      end
-
-      it "should not explode when calculating total_students and searching by course id" do
-        admin_logged_in(@account)
-        get 'courses_api', params: {account_id: @account.id, sort: "total_students", search_term: @course.id.to_s}
-        expect(response).to be_success
-      end
-    end
-
     it "should be able to search by teacher" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
