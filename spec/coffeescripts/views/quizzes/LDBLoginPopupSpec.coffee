@@ -99,7 +99,9 @@ define [
 
     whnd = popup.exec()
 
-  asyncTest "it should pop back in if student closes it", 5, ->
+  test "it should pop back in if student closes it", (assert) ->
+    assert.expect(5)
+    done = assert.async()
     latestWindow = undefined
     onFailure = @spy()
     onOpen = @spy()
@@ -129,7 +131,6 @@ define [
       popup.one "close", ->
         # we need to defer because #open will not be called in the close handler
         _.defer ->
-          start()
           ok onOpen.calledTwice, "popup popped back in"
           ok onClose.calledOnce, "popup closed"
 
@@ -137,6 +138,7 @@ define [
           popup.off "close.sticky"
           latestWindow.close()
           ok onClose.calledTwice, "popup closed for good"
+          done()
 
     whnd = popup.exec()
     ok onOpen.called, "popup opened"

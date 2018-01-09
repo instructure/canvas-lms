@@ -20,10 +20,10 @@ define [
   'underscore'
   'Backbone'
   'i18n!pages'
-  'compiled/backbone-ext/DefaultUrlMixin'
-  'compiled/str/splitAssetString'
-  'compiled/util/PandaPubPoller'
-  'compiled/jquery.rails_flash_notifications'
+  '../backbone-ext/DefaultUrlMixin'
+  '../str/splitAssetString'
+  '../util/PandaPubPoller'
+  '../jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
 ], ($, _, Backbone, I18n, DefaultUrlMixin, splitAssetString, PandaPubPoller) ->
 

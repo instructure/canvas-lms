@@ -249,7 +249,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument include[] [String, "all_dates"]
+  # @argument include[] [String, "all_dates", "sections", "sections_user_count"]
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
   #
@@ -387,6 +387,8 @@ class DiscussionTopicsController < ApplicationController
           plain_messages: value_to_boolean(params[:plain_messages]),
           exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
           include_all_dates: include_params.include?('all_dates'),
+          :include_sections => include_params.include?('sections'),
+          :include_sections_user_count => include_params.include?('sections_user_count'),
           master_course_status: mc_status,
           root_topic_fields: root_topic_fields)
       end
@@ -454,7 +456,7 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
-      sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
+      sections = @context.respond_to?(:course_sections) ? @context.course_sections.active.to_a : []
 
       js_hash = {
         CONTEXT_ACTION_SOURCE: :discussion_topic,
@@ -476,13 +478,26 @@ class DiscussionTopicsController < ApplicationController
         js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
       end
 
+      if @context.account.feature_enabled?(:section_specific_announcements) &&
+          @topic.is_section_specific
+        selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
+        js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
+          {
+            id: section.id,
+            name: section.name
+          }
+        end
+      end
+      js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
+        feature_enabled?(:section_specific_announcements)
+
       js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
       js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
       js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context)
 
       if @context.is_a?(Course)
-        js_hash['SECTION_LIST'] = sections.map { |section|
+        js_hash['SECTION_LIST'] = sections.map do |section|
           {
             id: section.id,
             name: section.name,
@@ -490,7 +505,7 @@ class DiscussionTopicsController < ApplicationController
             end_at: section.end_at,
             override_course_and_term_dates: section.restrict_enrollments_to_section_dates
           }
-        }
+        end
         js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
       end
       js_hash[:CANCEL_TO] = cancel_redirect_url
@@ -579,6 +594,15 @@ class DiscussionTopicsController < ApplicationController
             @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
             @sequence_asset = @context_module_tag.try(:content)
 
+            if @context.is_a?(Course) &&
+                @context.account.feature_enabled?(:section_specific_announcements) &&
+                @topic.is_section_specific
+              user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
+                                             course_id: @context).active.group(:course_section_id).count
+              section_data = @topic.course_sections.map do |cs|
+                cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
+              end
+            end
             api_url = lambda do |endpoint, *params|
               endpoint = "api_v1_context_discussion_#{endpoint}_url"
               named_context_url(@context, endpoint, @topic, *params)
@@ -591,6 +615,8 @@ class DiscussionTopicsController < ApplicationController
                 :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
                 :IS_PUBLISHED  => @topic.published?,
                 :CAN_UNPUBLISH => @topic.can_unpublish?,
+                :IS_ANNOUNCEMENT => @topic.is_announcement,
+                :COURSE_SECTIONS => @topic.is_section_specific ? section_data : nil,
               },
               :PERMISSIONS => {
                 # Can reply
@@ -645,8 +671,14 @@ class DiscussionTopicsController < ApplicationController
             end
 
             js_hash = {:DISCUSSION => env_hash}
+
+            if @context.account.feature_enabled?(:section_specific_announcements)
+              js_hash[:TOTAL_USER_COUNT] = Enrollment.where(course_id: @context).active.count
+            end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
+              feature_enabled?(:section_specific_announcements)
             js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
               @domain_root_account.feature_enabled?(:student_context_cards) &&
               @context.grants_right?(@current_user, session, :manage)
@@ -934,22 +966,46 @@ class DiscussionTopicsController < ApplicationController
                                           allow_rating only_graders_can_rate sort_by_rating).freeze
 
 
+  def set_sections
+    return unless params[:specific_sections]
+    @topic.is_section_specific = true
+    @topic.course_sections = CourseSection.find(params[:specific_sections].split(","))
+  end
+
   def process_discussion_topic(is_new = false)
     @errors = {}
-    model_type = value_to_boolean(params[:is_announcement]) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
+    model_type = if value_to_boolean(params[:is_announcement]) &&
+        @context.announcements.temp_record.grants_right?(@current_user, session, :create)
+                    :announcements
+                 else
+                    :discussion_topics
+                 end
     if is_new
       @topic = @context.send(model_type).build
       prior_version = @topic.dup
+      set_sections if model_type == :announcements &&
+        @context.account.feature_enabled?(:section_specific_announcements) &&
+        params[:specific_sections] != "all"
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
       prior_version = DiscussionTopic.find(@topic.id)
+      if model_type == :announcements &&
+              @context.account.feature_enabled?(:section_specific_announcements) &&
+              @topic.is_section_specific &&
+              params[:specific_sections] == "all"
+        @topic.is_section_specific = false
+      elsif model_type == :announcements &&
+              @context.account.feature_enabled?(:section_specific_announcements)
+        set_sections
+      end
     end
 
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
     only_pinning = discussion_topic_hash.except(*%w{pinned}).blank?
 
-    topic_to_check = only_pinning && @topic.root_topic ? @topic.root_topic : @topic # allow pinning/unpinning if a subtopic and we can update the root
+    # allow pinning/unpinning if a subtopic and we can update the root
+    topic_to_check = only_pinning && @topic.root_topic ? @topic.root_topic : @topic
     return unless authorized_action(topic_to_check, @current_user, (is_new ? :create : :update))
 
     process_podcast_parameters(discussion_topic_hash)

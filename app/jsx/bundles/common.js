@@ -21,7 +21,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!common'
 import Backbone from 'Backbone'
-import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
+import updateSubnavMenuToggle from '../subnav_menu/updateSubnavMenuToggle'
 import splitAssetString from 'compiled/str/splitAssetString'
 import {isMathMLOnPage, loadMathJax} from 'mathml'
 
@@ -113,7 +113,7 @@ if (
   (window.ENV.context_asset_string && (splitAssetString(window.ENV.context_asset_string)[0] === 'courses'))
 ) {
   require.ensure([], (require) => {
-    const initializeNewUserTutorials = require('jsx/new_user_tutorial/initializeNewUserTutorials')
+    const initializeNewUserTutorials = require('../new_user_tutorial/initializeNewUserTutorials')
     initializeNewUserTutorials()
   }, 'NewUserTutorialsAsyncChunk')
 }
@@ -124,7 +124,7 @@ const edge = window.navigator.userAgent.indexOf("Edge") > -1
 const supportsCSSVars = !edge && window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
 if (!supportsCSSVars) {
   require.ensure([], (require) => {
-    window.canvasCssVariablesPolyfill = require('jsx/canvasCssVariablesPolyfill')
+    window.canvasCssVariablesPolyfill = require('../canvasCssVariablesPolyfill')
   }, 'canvasCssVariablesPolyfill')
 }
 

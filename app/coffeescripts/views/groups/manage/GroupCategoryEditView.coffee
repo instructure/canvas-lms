@@ -18,7 +18,7 @@
 define [
   'underscore'
   'i18n!groups'
-  'compiled/views/DialogFormView'
+  '../../DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/groups/manage/groupCategoryEdit'
   'str/htmlEscape'

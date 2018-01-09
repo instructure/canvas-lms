@@ -17,11 +17,11 @@
 
 define [
   'underscore'
-  'compiled/views/PaginatedCollectionView'
-  'compiled/views/groups/manage/GroupView'
-  'compiled/views/groups/manage/GroupUsersView'
-  'compiled/views/groups/manage/GroupDetailView'
-  'compiled/views/Filterable'
+  '../../PaginatedCollectionView'
+  './GroupView'
+  './GroupUsersView'
+  './GroupDetailView'
+  '../../Filterable'
   'jst/groups/manage/groups'
 ], (_, PaginatedCollectionView, GroupView, GroupUsersView, GroupDetailView, Filterable, template) ->
 

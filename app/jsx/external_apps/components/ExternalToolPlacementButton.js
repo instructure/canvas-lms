@@ -21,7 +21,7 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import store from '../../external_apps/lib/ExternalAppsStore'
 import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {

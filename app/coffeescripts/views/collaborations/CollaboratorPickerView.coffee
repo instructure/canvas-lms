@@ -20,8 +20,8 @@ define [
   'i18n!collaborations'
   'jquery'
   'Backbone'
-  'compiled/views/collaborations/ListView'
-  'compiled/views/collaborations/MemberListView'
+  './ListView'
+  './MemberListView'
   'jst/collaborations/CollaboratorPicker'
 ], (I18n, $, {View}, ListView, MemberListView, widgetTemplate) ->
 

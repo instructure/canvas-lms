@@ -19,7 +19,7 @@
 // On click of the given element, display the profile picture picker dialog.
 
 import $ from 'jquery'
-import AvatarDialogView from 'compiled/views/profiles/AvatarDialogView'
+import AvatarDialogView from '../views/profiles/AvatarDialogView'
 
 export default class AvatarWidget {
   constructor (el) {

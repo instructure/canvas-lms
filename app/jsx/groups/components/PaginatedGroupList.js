@@ -18,8 +18,8 @@
 
 import I18n from 'i18n!student_groups'
 import React from 'react'
-import InfiniteScroll from 'jsx/groups/mixins/InfiniteScroll'
-import Group from 'jsx/groups/components/Group'
+import InfiniteScroll from '../../groups/mixins/InfiniteScroll'
+import Group from '../../groups/components/Group'
   var PaginatedGroupList = React.createClass({
     mixins: [InfiniteScroll],
 

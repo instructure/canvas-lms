@@ -18,7 +18,7 @@
 // an extraction of the deparam method from Ben Alman's jQuery BBQ
 // http://benalman.com/projects/jquery-bbq-plugin/
 
-import unflatten from 'compiled/object/unflatten'
+import unflatten from '../object/unflatten'
 
 const coerceTypes = {
   true: true,

@@ -20,7 +20,7 @@ define [
   'jquery'
   'underscore'
   'str/htmlEscape'
-  'compiled/views/outcomes/OutcomeIconBase'
+  './OutcomeIconBase'
 ], ($, _, h, OutcomeIconBase) ->
 
   class OutcomeIconView extends OutcomeIconBase

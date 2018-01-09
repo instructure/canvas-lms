@@ -17,10 +17,10 @@
 
 define [
   'Backbone'
-  'compiled/views/ValidatedMixin'
+  './ValidatedMixin'
   'jquery'
   'underscore'
-  'compiled/fn/preventDefault'
+  '../fn/preventDefault'
   'i18n!errors'
   'jquery.toJSON'
   'jquery.disableWhileLoading'

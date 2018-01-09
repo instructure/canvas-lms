@@ -20,7 +20,7 @@
 import Backbone from 'node_modules-version-of-backbone'
 import _ from 'underscore'
 import $ from 'jquery'
-import authenticity_token from 'compiled/behaviors/authenticity_token'
+import authenticity_token from '../behaviors/authenticity_token'
 import htmlEscape from 'str/htmlEscape'
 /*
 xsslint safeString.identifier iframeId httpMethod

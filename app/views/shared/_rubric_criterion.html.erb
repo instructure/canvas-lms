@@ -51,8 +51,8 @@
           <div class="long_description small_description"><%= h((criterion.try(:long_description) || '')) %></div>
         <% end %>
         <div style="<%= "display: none;" if !learning_outcome_criterion %>" class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
-          <a href="#" class="long_description_link <%= "hidden" if !criterion || criterion.long_description.blank? %>"><%= t 'links.view_longer_description', "view longer description" %></a>
-          <textarea class="long_description" aria-label="<%= t 'labels.long_description', "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
+          <a href="#" class="long_description_link <%= "hidden" if !criterion || criterion.long_description.blank? %>"><%= t "view longer description" %></a>
+          <textarea class="long_description" aria-label="<%= t "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
         </div>
         <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
           <div class="criterion_use_range_div editing">
@@ -69,7 +69,7 @@
     </div>
     <% if rubric && !rubric.free_form_criterion_comments && assessment_rating && assessment_rating[:comments] %>
       <div class="assessment-comments">
-        <h6><%= t('instructor_comments', 'Instructor Comments') %></h6>
+        <h6><%= t('Instructor Comments') %></h6>
         <div><%= format_message( assessment_rating[:comments] ).first %></div>
       </div>
     <% end %>
@@ -79,16 +79,16 @@
       <div class="custom_ratings_entry assessing">
         <div style="margin-left: 5px; margin-top: 2px; <%= hidden unless rubric_association && rubric_association.summary_data && rubric_association.summary_data[:saved_comments] && rubric_association.summary_data[:saved_comments][criterion.id.to_s] %>" class="saved_custom_rating_holder">
           <select class="saved_custom_rating">
-            <option value=""><%= t 'options.select', "[ Select ]" %></option>
+            <option value=""><%= t "[ Select ]" %></option>
             <% (rubric_association.summary_data[:saved_comments][criterion.id.to_s] || [] rescue []).each do |comment| %>
-              <option value="<%= URI.escape(comment) %>" class="comment"><%= comment[0..50] %></option>
+              <option value="<%= comment %>" class="comment"><%= comment[0..50] %></option>
             <% end %>
           </select>
         </div>
         <textarea style="margin: 5px; min-width: 100px; height: 35px;" class="custom_rating_field"></textarea>
         <div>
           <input type="checkbox" id="save_criterion_message_<%= criterion ? criterion.id : "blank" %>" class="save_custom_rating" value="1"/>
-          <label for="save_criterion_message_<%= criterion ? criterion.id : "blank" %>"><%= t 'labels.save_criterion_for_reuse', "Save this comment for reuse" %></label>
+          <label for="save_criterion_message_<%= criterion ? criterion.id : "blank" %>"><%= t "Save this comment for reuse" %></label>
         </div>
       </div>
       <div class="displaying custom_rating_comments not_assessing" style="font-size: 0.8em; padding: 0px 5px;">
@@ -131,8 +131,7 @@
         <% end %>
       </tr></table>
       <div style="<%= hidden unless rubric && rubric.free_form_criterion_comments %> font-style: italic; font-size: 0.8em; margin: 5px;" class="custom_ratings">
-        <%= t 'description.custom_comments_area', "This area will be used by the assessor to leave
-        comments related to this criterion." %>
+        <%= t "This area will be used by the assessor to leave comments related to this criterion." %>
       </div>
     <% end %>
   </td>
@@ -175,8 +174,8 @@
     </div>
     <div class="criterion_comments">
       <% if !rubric || !rubric.free_form_criterion_comments %>
-        <a href="#" class="no-hover criterion_comments_link" title="<%= t 'links.additional_comments', "Additional Comments" %>">
-          <%= image_tag "rubric_comment.png", :alt => t('icons.additional_comments', 'Additional Comments') %>
+        <a href="#" class="no-hover criterion_comments_link" title="<%= t "Additional Comments" %>">
+          <%= image_tag "rubric_comment.png", :alt => t('Additional Comments') %>
         </a>
         <div class="custom_rating" style="display: none;"><%= assessment_rating ? assessment_rating[:comments] : '' %></div>
       <% end %>

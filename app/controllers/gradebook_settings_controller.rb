@@ -63,6 +63,10 @@ class GradebookSettingsController < ApplicationController
     gradebook_settings_params.permit!
   end
 
+  def valid_colors(color_params)
+    color_params.select { |_key, value| value =~ /^#([0-9A-F]{3}){1,2}$/i }
+  end
+
   def nilify_strings(hash)
     massaged_hash = {}
     hash.each do |key, value|
@@ -100,7 +104,7 @@ class GradebookSettingsController < ApplicationController
       gradebook_settings: {
        @context.id => nilify_strings(gradebook_settings_params.except(:colors).to_h),
        # when new_gradebook is the only gradebook this can change to .fetch('colors')
-       colors: gradebook_settings_params.fetch('colors', {}).to_unsafe_h
+       colors: valid_colors(gradebook_settings_params.fetch('colors', {})).to_unsafe_h
       }
     })
   end

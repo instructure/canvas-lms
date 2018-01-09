@@ -21,10 +21,10 @@ define [
   'underscore'
   'jquery'
   'jst/assignments/GroupCategorySelector'
-  'compiled/jquery/toggleAccessibly',
+  '../../jquery/toggleAccessibly',
   'jsx/due_dates/StudentGroupStore',
-  'compiled/views/groups/manage/GroupCategoryCreateView',
-  'compiled/models/GroupCategory',
+  '../groups/manage/GroupCategoryCreateView',
+  '../../models/GroupCategory',
 ], (I18n, Backbone, _, $, template, toggleAccessibly, StudentGroupStore, GroupCategoryCreateView, GroupCategory) ->
 
   class GroupCategorySelector extends Backbone.View

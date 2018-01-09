@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { enhanceUserContent } from 'instructure'
+import {enhanceUserContent} from 'instructure'
 
 let elem
 QUnit.module('Enhance User Content', {

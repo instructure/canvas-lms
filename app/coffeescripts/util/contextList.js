@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import h from 'str/htmlEscape'
-import listWithOthers from 'compiled/util/listWithOthers'
+import listWithOthers from '../util/listWithOthers'
 import 'jquery.instructure_misc_helpers'
 
 function prepare (context, filters) {

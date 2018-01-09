@@ -109,4 +109,8 @@ module Login::Shared
   def remember_me_cookie_domain
     otp_remember_me_cookie_domain
   end
+
+  def delegated_auth_redirect_uri(uri)
+    uri
+  end
 end

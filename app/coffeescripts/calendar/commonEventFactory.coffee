@@ -17,12 +17,12 @@
 
 define [
   'jquery'
-  'compiled/calendar/CommonEvent'
-  'compiled/calendar/CommonEvent.Assignment',
-  'compiled/calendar/CommonEvent.AssignmentOverride'
-  'compiled/calendar/CommonEvent.CalendarEvent'
-  'compiled/calendar/CommonEvent.PlannerNote'
-  'compiled/str/splitAssetString'
+  '../calendar/CommonEvent'
+  '../calendar/CommonEvent.Assignment',
+  '../calendar/CommonEvent.AssignmentOverride'
+  '../calendar/CommonEvent.CalendarEvent'
+  '../calendar/CommonEvent.PlannerNote'
+  '../str/splitAssetString'
 ], ($, CommonEvent, Assignment, AssignmentOverride, CalendarEvent, PlannerNote, splitAssetString) ->
 
   (data, contexts) ->

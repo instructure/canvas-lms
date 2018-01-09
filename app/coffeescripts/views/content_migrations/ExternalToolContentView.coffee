@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'jst/content_migrations/ExternalToolContent'
-  'compiled/views/content_migrations/MigrationView'
+  './MigrationView'
 ],(Backbone, template, MigrationView) ->
   class ExternalToolContentView extends MigrationView
     template: template

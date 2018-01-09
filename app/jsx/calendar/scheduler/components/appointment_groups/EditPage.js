@@ -20,19 +20,23 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
-import Breadcrumb, { BreadcrumbLink } from 'instructure-ui/lib/components/Breadcrumb'
-import Button from 'instructure-ui/lib/components/Button'
-import Grid, { GridCol, GridRow } from 'instructure-ui/lib/components/Grid'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import axios from 'axios'
-import AppointmentGroupList from './AppointmentGroupList'
-import EventDataSource from 'compiled/calendar/EventDataSource'
-import MessageParticipantsDialog from 'compiled/calendar/MessageParticipantsDialog'
-import ContextSelector from './ContextSelector'
-import TimeBlockSelector from './TimeBlockSelector'
+import Breadcrumb, { BreadcrumbLink } from '@instructure/ui-core/lib/components/Breadcrumb'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import TextArea from '@instructure/ui-core/lib/components/TextArea'
+import TextInput from '@instructure/ui-core/lib/components/TextInput'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import 'compiled/jquery.rails_flash_notifications'
 import 'jquery.instructure_forms'
 import 'jquery.instructure_date_and_time'
+import EventDataSource from 'compiled/calendar/EventDataSource'
+import MessageParticipantsDialog from 'compiled/calendar/MessageParticipantsDialog'
+import axios from 'axios'
+import AppointmentGroupList from './AppointmentGroupList'
+import ContextSelector from './ContextSelector'
+import TimeBlockSelector from './TimeBlockSelector'
 
   const parseFormValues = data => ({
     description: data.description,
@@ -232,7 +236,7 @@ import 'jquery.instructure_date_and_time'
             </h1>
           </ScreenReaderContent>
           <div className="EditPage__Header">
-            <Grid startAt="tablet" vAlign="middle">
+            <Grid>
               <GridRow hAlign="end">
                 <GridCol width="auto">
                   <Button onClick={this.deleteGroup} disabled={this.state.isDeleting}>{I18n.t('Delete Group')}</Button>
@@ -244,74 +248,64 @@ import 'jquery.instructure_date_and_time'
               </GridRow>
             </Grid>
           </div>
-          <form className="EditPage__Form ic-Form-group ic-Form-group--horizontal">
-            <div className="ic-Form-control">
-              <label className="ic-Label"htmlFor="context">{I18n.t('Calendars')}</label>
+          <FormFieldGroup
+            description={<ScreenReaderContent>{I18n.t('Edit Assignment Group')}</ScreenReaderContent>}
+            >
+            <FormFieldGroup
+              description={I18n.t('Calendars')}
+              layout="inline"
+            >
               <ContextSelector
                 ref={(c) => { this.contextSelector = c; }}
                 id="context"
-                className="ic-Input"
                 appointmentGroup={this.state.appointmentGroup}
                 contexts={this.state.contexts}
               />
-            </div>
-            <div className="ic-Form-control">
-              <label className="ic-Label" htmlFor="title">{I18n.t('Title')}</label>
-              <input
-                className="ic-Input"
-                type="text"
-                name="title"
-                id="title"
-                value={this.state.formValues.title}
-                onChange={this.handleChange}
+            </FormFieldGroup>
+            <TextInput
+              label={I18n.t('Title')}
+              name="title"
+              value={this.state.formValues.title}
+              onChange={this.handleChange}
+              layout="inline"
               />
-            </div>
-            <div className="ic-Form-control">
-              <label className="ic-Label" htmlFor="timeblocks">{I18n.t('Time Block')}</label>
+            <FormFieldGroup
+              description={I18n.t('Time Block')}
+              layout="inline"
+              >
               <TimeBlockSelector
                 timeData={parseTimeData(this.state.appointmentGroup)}
                 onChange={this.setTimeBlocks}
               />
-            </div>
-            <div className="ic-Form-control">
-              <label className="ic-Label" htmlFor="location">{I18n.t('Location')}</label>
-              <input
-                className="ic-Input"
-                type="text"
-                name="location"
-                id="location"
-                value={this.state.formValues.location}
-                onChange={this.handleChange}
+            </FormFieldGroup>
+            <TextInput
+              label ={I18n.t('Location')}
+              name="location"
+              value={this.state.formValues.location}
+              onChange={this.handleChange}
+              layout="inline"
               />
-            </div>
-            <div className="ic-Form-control">
-              <label className="ic-Label" htmlFor="description">{I18n.t('Details')}</label>
-              <textarea
-                className="ic-Input"
-                type="text"
-                name="description"
-                id="description"
-                value={this.state.formValues.description}
-                onChange={this.handleChange}
+            <TextArea
+              resize="vertical"
+              layout="inline"
+              label={I18n.t('Details')}
+              name="description"
+              value={this.state.formValues.description}
+              onChange={this.handleChange}
               />
-            </div>
-            <div ref={(c) => { this.optionFields = c; }} className="ic-Form-control EditPage__Options">
-              <span className="ic-Label">{I18n.t('Options')}</span>
-              <div className="ic-Checkbox-group">
-                <div className="ic-Form-control ic-Form-control--checkbox EditPage__Options-GroupCheckbox">
-                  <input
-                    type="checkbox"
-                    checked={this.state.appointmentGroup.participant_type === 'Group'}
-                    id="group_signup_required"
-                    aria-disabled="true"
-                  />
-                  <label
-                    className="ic-Label"
-                    htmlFor="group_signup_required"
-                  >
-                    {I18n.t('Students must sign up in groups')}
-                  </label>
-                </div>
+            <div ref={(c) => { this.optionFields = c; }} className="EditPage__Options">
+              <FormFieldGroup
+                description={I18n.t('Options')}
+                rowSpacing="small"
+                layout="inline"
+                vAlign="middle"
+              >
+                <Checkbox
+                  checked={this.state.appointmentGroup.participant_type === 'Group'}
+                  id="group_signup_required"
+                  aria-disabled="true"
+                  label={I18n.t('Students must sign up in groups')}
+                />
                 <div className="ic-Form-control ic-Form-control--checkbox">
                   <input
                     type="checkbox"
@@ -330,21 +324,12 @@ import 'jquery.instructure_date_and_time'
                     }}
                   />
                 </div>
-                <div className="ic-Form-control ic-Form-control--checkbox">
-                  <input
-                    type="checkbox"
-                    checked={this.state.formValues.allowStudentsToView}
-                    id="allow_students_to_view_signups"
-                    name="allowStudentsToView"
-                    onChange={this.handleCheckboxChange}
-                  />
-                  <label
-                    className="ic-Label"
-                    htmlFor="allow_students_to_view_signups"
-                  >
-                    {I18n.t('Allow students to see who was signed up for time slots')}
-                  </label>
-                </div>
+                <Checkbox
+                  label={I18n.t('Allow students to see who was signed up for time slots')}
+                  checked={this.state.formValues.allowStudentsToView}
+                  name="allowStudentsToView"
+                  onChange={this.handleCheckboxChange}
+                />
                 <div className="ic-Form-control ic-Form-control--checkbox">
                   <input
                     type="checkbox"
@@ -363,14 +348,16 @@ import 'jquery.instructure_date_and_time'
                     }}
                   />
                 </div>
-              </div>
+              </FormFieldGroup>
             </div>
-            <div className="ic-Form-control">
-              <span className="ic-Label" htmlFor="appointments">{I18n.t('Appointments')}</span>
+            <FormFieldGroup
+              description={I18n.t('Appointments')}
+              layout="inline"
+            >
               <Button ref={(c) => { this.messageStudentsButton = c }} onClick={this.messageStudents} disabled={this.state.appointmentGroup.appointments_count === 0}>{I18n.t('Message Students')}</Button>
               <AppointmentGroupList appointmentGroup={this.state.appointmentGroup} />
-            </div>
-          </form>
+            </FormFieldGroup>
+          </FormFieldGroup>
         </div>
       )
     }

@@ -18,6 +18,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp';
+import GradebookHistoryApp from '../gradebook-history/GradebookHistoryApp';
 
 ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'));

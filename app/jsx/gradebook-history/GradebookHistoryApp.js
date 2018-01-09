@@ -18,13 +18,12 @@
 
 import React from 'react';
 import { Provider } from 'react-redux';
-import 'instructure-ui/lib/themes/canvas';
 import I18n from 'i18n!gradebook_history';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import SearchForm from 'jsx/gradebook-history/SearchForm';
-import SearchResults from 'jsx/gradebook-history/SearchResults';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import SearchForm from '../gradebook-history/SearchForm';
+import SearchResults from '../gradebook-history/SearchResults';
 
-import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore';
+import GradebookHistoryStore from '../gradebook-history/store/GradebookHistoryStore';
 
 const GradebookHistoryApp = () => (
   (

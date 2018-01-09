@@ -21,7 +21,7 @@ define [
   'Backbone'
   'jst/conferences/newConference'
   'jquery.google-analytics'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (I18n, $, {View}, template) ->
 
   class ConferenceView extends View

@@ -18,7 +18,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import StudentColumnHeader from 'jsx/gradezilla/default_gradebook/components/StudentColumnHeader';
+import StudentColumnHeader from '../../../../gradezilla/default_gradebook/components/StudentColumnHeader';
 
 function getProps (gradebook, options) {
   const columnId = 'student';

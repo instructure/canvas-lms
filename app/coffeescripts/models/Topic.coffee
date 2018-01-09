@@ -24,9 +24,9 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/util/BackoffPoller'
-  'compiled/arr/walk'
-  'compiled/arr/erase'
+  '../util/BackoffPoller'
+  '../arr/walk'
+  '../arr/erase'
   'jquery.ajaxJSON'
 ], (I18n, $, {each, extend, values}, Backbone, BackoffPoller, walk, erase) ->
 

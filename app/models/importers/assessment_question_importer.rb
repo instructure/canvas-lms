@@ -169,18 +169,18 @@ module Importers
           t("This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank"))
       end
 
-      if hash[:question_text] && hash[:question_text].length > 16.kilobytes
-        hash[:question_text] = t("The imported question text for this question was too long.")
-        migration.add_warning(t("The question text for the question \"%{question_name}\" was too long.",
-          :question_name => hash[:question_name]))
-      end
-
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
         if hash[field].present?
           hash[field] = migration.convert_html(
             hash[field], item_type, hash[:migration_id], field, {:remove_outer_nodes_if_one_child => true}
           )
         end
+      end
+
+      if hash[:question_text]&.length&.> 16.kilobytes
+        hash[:question_text] = t("The imported question text for this question was too long.")
+        migration.add_warning(t("The question text for the question \"%{question_name}\" was too long.",
+          :question_name => hash[:question_name]))
       end
 
       [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|

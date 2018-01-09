@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/util/fcUtil'
+  '../util/fcUtil'
 ], (fcUtil) ->
   # We want to filter events received from the datasource. It seems like you should be able
   # to do this at render time as well, and return "false" in eventRender, but on the agenda

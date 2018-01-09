@@ -21,6 +21,56 @@ require_dependency "lti/membership_service_controller"
 
 module Lti
   describe MembershipServiceController do
+    context 'lti tool access', type: :request do
+      before(:each) do
+        course_with_teacher
+        @course.offer!
+        @tool = external_tool_model(context: @course)
+        @tool.allow_membership_service_access = true
+        @tool.save!
+      end
+
+      it 'returns the members' do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
+        consumer = OAuth::Consumer.new(@tool.consumer_key, @tool.shared_secret, :site => "http://www.example.com/")
+        path = "/api/lti/courses/#{@course.id}/membership_service"
+        req = consumer.create_signed_request(:get, path)
+        get path, headers: { 'Authorization' => req.get_fields('authorization').first }
+        assert_status(200)
+        hash = json_parse.with_indifferent_access
+        @teacher.reload
+        expect(hash.dig('pageOf', 'membershipSubject', 'membership').first.dig('member', 'userId')).to eq @teacher.lti_context_id
+      end
+
+      it 'returns unauthorized if the tool is not found' do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
+        consumer = OAuth::Consumer.new(@tool.consumer_key+"1", @tool.shared_secret, :site => "http://www.example.com/")
+        path = "/api/lti/courses/#{@course.id}/membership_service"
+        req = consumer.create_signed_request(:get, path)
+        get path, headers: { 'Authorization' => req.get_fields('authorization').first }
+        assert_unauthorized
+      end
+
+      it 'returns unauthorized if the tool does not have access to the api' do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
+        @tool.allow_membership_service_access = false
+        @tool.save!
+        consumer = OAuth::Consumer.new(@tool.consumer_key, @tool.shared_secret, :site => "http://www.example.com/")
+        path = "/api/lti/courses/#{@course.id}/membership_service"
+        req = consumer.create_signed_request(:get, path)
+        get path, headers: { 'Authorization' => req.get_fields('authorization').first }
+        assert_unauthorized
+      end
+
+      it 'returns unauthorized if the membership service access feature flag is disabled' do
+        consumer = OAuth::Consumer.new(@tool.consumer_key, @tool.shared_secret, :site => "http://www.example.com/")
+        path = "/api/lti/courses/#{@course.id}/membership_service"
+        req = consumer.create_signed_request(:get, path)
+        get path, headers: { 'Authorization' => req.get_fields('authorization').first }
+        assert_unauthorized
+      end
+    end
+
     context 'user not enrolled in course' do
       before(:each) do
         course_model

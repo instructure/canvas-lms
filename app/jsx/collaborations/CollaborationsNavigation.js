@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!react_collaborations'
-import NewCollaborationsDropDown from 'jsx/collaborations/NewCollaborationsDropDown'
+import NewCollaborationsDropDown from '../collaborations/NewCollaborationsDropDown'
 
 class CollaborationsNavigation extends React.Component {
 

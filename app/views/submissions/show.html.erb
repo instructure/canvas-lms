@@ -54,58 +54,61 @@
   </div>
 <% end %>
   <div class="submission-details-header submission_details">
-    <div class="submission-details-header__grade-summary">
-      <% if @assignment.muted? %>
-        <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
-      <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-      <table class="grade-values">
-        <tbody>
-          <tr>
-            <th><%= I18n.t('Grade:') %></td>
-            <td class="bold">
-              <% if can_do(@assignment, @current_user, :grade) %>
-                <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
-              <% else %>
-                <span class="entered_grade">
-                  <% if @submission.excused? %>
-                    <%= t "Excused" %>
-                  <% else %>
-                    <%= i18n_grade(round_if_whole @submission.entered_grade) %>
-                  <% end %>
-                </span>
-              <% end %>
-              <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible %>
-                <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
-              <% end %>
-            </td>
-          </tr>
-          <% if can_do(@assignment, @current_user, :grade) || @submission.user_can_read_grade?(@current_user, session)
-              points_deducted = I18n.n(-@submission.points_deducted) if @submission.points_deducted&.> 0
-              points_possible = I18n.n(round_if_whole(@assignment.points_possible))
-              grade_breakdown_style = hidden unless points_deducted && !@submission.excused?
-          %>
-            <tr class="error late-penalty-display" style="<%= grade_breakdown_style %>">
-              <th><%= I18n.t('Late penalty:') %></td>
-              <td class="late_penalty bold"><%= points_deducted %></td>
-            </tr>
-            <tr class="late-penalty-display" style="<%= grade_breakdown_style %>">
-              <th><%= I18n.t('Final grade:') %></td>
+    <div class="submission-details-header__heading-and-grades">
+      <h2 class="submission-details-header__heading submission_header">
+        <%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %>
+      </h2>
+      <div class="submission-details-header__grade-summary">
+        <% if @assignment.muted? %>
+          <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
+        <% elsif @submission.user_can_read_grade?(@current_user, session) %>
+        <table class="grade-values">
+          <tbody>
+            <tr>
+              <th><%= I18n.t('Grade:') %></td>
               <td class="bold">
                 <% if can_do(@assignment, @current_user, :grade) %>
-                  <span class="published_grade"><%= i18n_grade(round_if_whole @submission.grade) %></span>
-                <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-                  <span class="grade"><%= i18n_grade(round_if_whole @submission.published_grade) %></span>
+                  <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
+                <% else %>
+                  <span class="entered_grade">
+                    <% if @submission.excused? %>
+                      <%= t "Excused" %>
+                    <% else %>
+                      <%= i18n_grade(round_if_whole @submission.entered_grade) %>
+                    <% end %>
+                  </span>
                 <% end %>
-
-                <% if @assignment.grading_type == 'points' %>
-                  / <%= points_possible %>
+                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible %>
+                  <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
                 <% end %>
               </td>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+            <% if can_do(@assignment, @current_user, :grade) || @submission.user_can_read_grade?(@current_user, session)
+                points_deducted = I18n.n(-@submission.points_deducted) if @submission.points_deducted&.> 0
+                points_possible = I18n.n(round_if_whole(@assignment.points_possible))
+                grade_breakdown_style = hidden unless points_deducted && !@submission.excused?
+            %>
+              <tr class="error late-penalty-display" style="<%= grade_breakdown_style %>">
+                <th><%= I18n.t('Late penalty:') %></td>
+                <td class="late_penalty bold"><%= points_deducted %></td>
+              </tr>
+              <tr class="late-penalty-display" style="<%= grade_breakdown_style %>">
+                <th><%= I18n.t('Final grade:') %></td>
+                <td class="bold">
+                  <% if can_do(@assignment, @current_user, :grade) %>
+                    <span class="published_grade"><%= i18n_grade(round_if_whole @submission.grade) %></span>
+                  <% elsif @submission.user_can_read_grade?(@current_user, session) %>
+                    <span class="grade"><%= i18n_grade(round_if_whole @submission.published_grade) %></span>
+                  <% end %>
 
+                  <% if @assignment.grading_type == 'points' %>
+                    / <%= points_possible %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) &&
             @submission.turnitin_data[:provider] == nil && turnitin_score[:similarity_score] %>
@@ -115,52 +118,63 @@
             </span>
           <% end %>
         <% end %>
-      <% elsif @submission.can_view_plagiarism_report('vericite', @current_user, session) && !@assignment.muted? %>
-        <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
-          <span class="turnitin_score_container">
-            <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
-            <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" title="Similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
-              <%= vericite_score[:similarity_score] %>%
-              <span class="tooltip_wrap right">
-                <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
-              </span>
-            </a>
-          </span>
+        <% elsif @submission.can_view_plagiarism_report('vericite', @current_user, session) && !@assignment.muted? %>
+          <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
+            <span class="turnitin_score_container">
+              <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
+              <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" title="Similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
+                <%= vericite_score[:similarity_score] %>%
+                <span class="tooltip_wrap right">
+                  <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
+                </span>
+              </a>
+            </span>
+          <% end %>
         <% end %>
-      <% end %>
-      <% if @assignment.rubric_association && (
-           @submission.user_can_read_grade?(@current_user, session) ||
-           @assignment.rubric_association.user_can_assess_for?(assessor: @current_user, assessee: @submission.user) ||
-           can_do(@assignment.rubric, @current_user, :read)
-         )
-      %>
-        <a href="#" class="assess_submission_link Submission__Link--has-icon" style="font-size: 0.8em;" tabindex='0'>
-          <i class="icon-rubric" aria-hidden="true"></i>
-          <%= t('show_rubric', 'Show Rubric') %>
-        </a>
-      <% end %>
+        <% if @assignment.rubric_association && (
+             @submission.user_can_read_grade?(@current_user, session) ||
+             @assignment.rubric_association.user_can_assess_for?(assessor: @current_user, assessee: @submission.user) ||
+             can_do(@assignment.rubric, @current_user, :read)
+           )
+        %>
+          <div class="submission-details-header__rubric <% if can_do(@assignment, @current_user, :grade) %>submission-details-header__rubric--can-grade<% end %>">
+            <a href="#" class="assess_submission_link Button Button--small Button--link" tabindex='0'>
+              <i class="icon-rubric" aria-hidden="true"></i><%= t('show_rubric', 'Show Rubric') %>
+            </a>
+          </div>
+        <% end %>
+      </div>
     </div>
-    <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
-    <span class="SubmissionDetails__Text"><%= @assignment.title %>, <%= submission_author_name_for @assessment_request %></span>
-    <span class="SubmissionDetails__Text <%='late' if @submission.late? %> <%= 'hidden' unless @submission.submitted_at %>">
-      <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
-    </span>
-
-    <% if @context.feature_enabled?(:new_gradebook) %>
-      <% if @submission.late? %>
-        <span class="submission-late-pill"></span>
-      <% elsif @submission.missing? %>
-        <span class="submission-missing-pill"></span>
-      <% end %>
-    <% end %>
-    <% if can_do(@context, @current_user, :grade) %>
-      <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;"><%= t('speedgrader', 'SpeedGrader™') %></a>
-    <% end %>
-    <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
-      <span><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="Button Button--primary" >
-        <%= @submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
-      </a></span>
-    <% end %>
+    <div class="ic-Action-header">
+      <div class="ic-Action-header__Primary">
+        <h3 class="submission-details-header__heading"><%= @assignment.title %></h3>
+        <div class="submission-details-header__info">
+          <span class="submission-details-header__time <%='late' if @submission.late? %> <%= 'hidden' unless @submission.submitted_at %>">
+            <%= submission_author_name_for @assessment_request %> <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
+          </span>
+          <% if @context.feature_enabled?(:new_gradebook) %>
+            <% if @submission.late? %>
+              <span class="submission-late-pill"></span>
+            <% elsif @submission.missing? %>
+              <span class="submission-missing-pill"></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      <div class="ic-Action-header__Secondary ic-Action-header__Secondary--auto">
+        <% if can_do(@context, @current_user, :grade) %>
+          <a class="Button" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>">
+            <i class="icon-speed-grader" aria-hidden="true"></i>
+            <%= t('speedgrader', 'SpeedGrader™') %>
+          </a>
+        <% end %>
+        <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
+          <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="Button Button--primary" >
+            <%= @submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
+          </a>
+        <% end %>
+      </div>
+    </div>
     <% if @assessment_request %>
       <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
         <%= t('peer_review_steps_complete', 'You have finished the required steps for this peer review.') %>
@@ -177,7 +191,6 @@
     <div>
     </div>
     <% end %>
-    <div class="clear"></div>
   </div>
 
   <% if @assignment.rubric_association %>

@@ -163,9 +163,9 @@ describe OverrideListPresenter do
 
     context "for ADHOC overrides" do
       before :each do
-        override = assignment.assignment_overrides.build(due_at: 1.week.from_now)
-        override.assignment_override_students.build(user: user)
-        override.assignment_override_students.build(user: second_user)
+        override = assignment.assignment_overrides.create!(due_at: 1.week.from_now)
+        override.assignment_override_students.create!(user: user, assignment: assignment)
+        override.assignment_override_students.create!(user: second_user, assignment: assignment)
         override.save!
 
         @due_date = presenter.assignment.dates_hash_visible_to(user).first

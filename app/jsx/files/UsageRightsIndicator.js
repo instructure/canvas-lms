@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
-import UsageRightsDialog from 'jsx/files/UsageRightsDialog'
+import UsageRightsDialog from '../files/UsageRightsDialog'
 
   var UsageRightsIndicator = React.createClass({
     displayName: 'UsageRightsIndicator',

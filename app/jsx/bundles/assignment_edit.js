@@ -28,7 +28,7 @@ import GradingTypeSelector from 'compiled/views/assignments/GradingTypeSelector'
 import GroupCategorySelector from 'compiled/views/assignments/GroupCategorySelector'
 import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
 import 'grading_standards'
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'assignment', page: 'edit' })

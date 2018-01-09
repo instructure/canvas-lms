@@ -20,11 +20,11 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import Button from 'instructure-ui/lib/components/Button'
-import Tooltip from 'instructure-ui/lib/components/Tooltip'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 
 import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
 import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
@@ -147,7 +147,7 @@ export default class LockToggle extends Component {
       toggle = (
         <span className="bpc__lock-no__toggle">
           <span className="bpc__lock-no__toggle-icon"><Icon /></span>
-          <Typography size="small">{text}</Typography>
+          <Text size="small">{text}</Text>
         </span>
       )
     }

@@ -19,7 +19,7 @@
 import _ from 'underscore'
 import I18n from 'i18n!modules'
 import React from 'react'
-import assignmentUtils from 'jsx/gradebook/SISGradePassback/assignmentUtils'
+import assignmentUtils from '../../gradebook/SISGradePassback/assignmentUtils'
 import classnames from 'classnames'
 
   var AssignmentCorrectionRow = React.createClass({

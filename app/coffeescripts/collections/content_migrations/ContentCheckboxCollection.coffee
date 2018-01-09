@@ -17,7 +17,7 @@
 
 define [
   'Backbone'
-  'compiled/models/content_migrations/ContentCheckbox'
+  '../../models/content_migrations/ContentCheckbox'
 ], (Backbone, CheckboxModel) -> 
   class ContentCheckboxCollection extends Backbone.Collection
     @optionProperty 'courseID'

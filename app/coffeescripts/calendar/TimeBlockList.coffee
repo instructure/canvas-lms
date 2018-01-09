@@ -18,8 +18,8 @@
 define [
   'jquery'
   'i18n!calendar'
-  'compiled/calendar/TimeBlockListManager'
-  'compiled/calendar/TimeBlockRow'
+  '../calendar/TimeBlockListManager'
+  '../calendar/TimeBlockRow'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'vendor/date'

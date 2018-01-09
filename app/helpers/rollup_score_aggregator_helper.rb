@@ -58,7 +58,12 @@ module RollupScoreAggregatorHelper
     @outcome_results.reduce({total: 0.0, weighted: 0.0}) do |aggregate, lor|
       if is_match?(result, lor) && lor.possible
         aggregate[:total] += lor.possible
-        aggregate[:weighted] += lor.possible * lor.percent
+        begin
+          aggregate[:weighted] += lor.possible * lor.percent
+        rescue NoMethodError, TypeError => e
+          Canvas::Errors.capture_exception(:missing_percent_or_points_possible, e)
+          raise e
+        end
       end
       aggregate
     end
@@ -66,7 +71,8 @@ module RollupScoreAggregatorHelper
 
   def alignment_aggregate_score(result_aggregates)
     return if result_aggregates[:total] == 0
-    (result_aggregates[:weighted] / result_aggregates[:total]) * @outcome.rubric_criterion[:points_possible]
+    possible = @points_possible > 0 ? @points_possible : @mastery_points
+    (result_aggregates[:weighted] / result_aggregates[:total]) * possible
   end
 
   def is_match?(current_result, compared_result)
@@ -77,7 +83,11 @@ module RollupScoreAggregatorHelper
 
   def result_score(result)
     return result.score unless result.try(:percent)
-    result.percent * @points_possible
+    if @points_possible > 0
+      result.percent * @points_possible
+    else
+      result.percent * @mastery_points
+    end
   end
 
   def scores

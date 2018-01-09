@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {changeMonth} from 'calendar_move' // calendarMonths
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
-import KeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts'
+import KeyboardShortcuts from '../views/editor/KeyboardShortcuts'
 import 'jquery.instructure_date_and_time' // dateString, datepicker
 import 'jquery.instructure_forms' // formSubmit, formErrors
 import 'jquery.instructure_misc_plugins' // ifExists, showIf

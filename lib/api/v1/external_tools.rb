@@ -28,9 +28,10 @@ module Api::V1::ExternalTools
   def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement::PLACEMENTS)
     methods = %w[privacy_level custom_fields workflow_state vendor_help_link]
     methods += extension_types
+    only = %w(id name description url domain consumer_key created_at updated_at description)
+    only << 'allow_membership_service_access' if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
     json = api_json(tool, user, session,
-                  :only => %w(id name description url domain consumer_key
-                              created_at updated_at description),
+                  :only => only,
                   :methods => methods
     )
 

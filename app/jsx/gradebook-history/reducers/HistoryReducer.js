@@ -23,7 +23,7 @@ import {
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
   FETCH_HISTORY_NEXT_PAGE_FAILURE
-} from 'jsx/gradebook-history/actions/HistoryActions';
+} from '../../gradebook-history/actions/HistoryActions';
 
 function history (state = {}, { type, payload }) {
   switch (type) {

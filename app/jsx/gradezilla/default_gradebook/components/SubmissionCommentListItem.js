@@ -19,16 +19,16 @@
 import React from 'react';
 import { bool, func } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Avatar from 'instructure-ui/lib/components/Avatar';
-import Button from 'instructure-ui/lib/components/Button';
-import Link from 'instructure-ui/lib/components/Link';
+import Avatar from '@instructure/ui-core/lib/components/Avatar';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Link from '@instructure/ui-core/lib/components/Link';
 import IconEditLine from 'instructure-icons/lib/Line/IconEditLine';
 import IconTrashLine from 'instructure-icons/lib/Line/IconTrashLine';
-import Typography from 'instructure-ui/lib/components/Typography';
-import DateHelper from 'jsx/shared/helpers/dateHelper';
+import Text from '@instructure/ui-core/lib/components/Text';
+import DateHelper from '../../../shared/helpers/dateHelper';
 import TextHelper from 'compiled/str/TextHelper';
-import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
-import SubmissionCommentUpdateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentUpdateForm';
+import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes';
+import SubmissionCommentUpdateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentUpdateForm';
 
 function submissionCommentDate (date) {
   return DateHelper.formatDatetimeForDisplay(date, 'short');
@@ -85,9 +85,9 @@ export default class SubmissionCommentListItem extends React.Component {
 
     return (
       <div>
-        <Typography size="small" lineHeight="condensed">
+        <Text size="small" lineHeight="condensed">
           <p style={{ margin: '0 0 0.75rem' }}>{this.props.comment}</p>
-        </Typography>
+        </Text>
       </div>
     );
   }
@@ -114,15 +114,15 @@ export default class SubmissionCommentListItem extends React.Component {
 
             <div>
               <div style={{ margin: '0 0 0 0.375rem' }}>
-                <Typography weight="bold" size="small" lineHeight="fit">
+                <Text weight="bold" size="small" lineHeight="fit">
                   <Link href={this.props.authorUrl}>{TextHelper.truncateText(this.props.author, { max: 22 })}</Link>
-                </Typography>
+                </Text>
               </div>
 
               <div style={{ margin: '0 0 0 0.375rem' }}>
-                <Typography size="small" lineHeight="fit">
+                <Text size="small" lineHeight="fit">
                   {this.commentTimestamp()}
-                </Typography>
+                </Text>
               </div>
             </div>
           </div>

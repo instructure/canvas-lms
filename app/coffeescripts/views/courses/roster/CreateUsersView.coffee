@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/models/CreateUserList'
+  '../../../models/CreateUserList'
   'underscore'
   'i18n!create_users_view'
-  'compiled/views/DialogFormView'
+  '../../DialogFormView'
   'jst/courses/roster/createUsers'
   'jst/EmptyDialogFormWrapper'
 ], (CreateUserList, _, I18n, DialogFormView, template, wrapper) ->

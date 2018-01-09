@@ -662,6 +662,13 @@ define [
       jqXHR: { getResponseHeader: -> {} }
       textStatus: 'success'
 
+    # the qUnit specs were sending a request for this that was 404'ing so I just
+    # added this so it wouldn't
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.custom_columns_url + '/1',
+      response: {}
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: 'success'
+
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.setting_update_url,
       response: true
       jqXHR: { getResponseHeader: -> {} }

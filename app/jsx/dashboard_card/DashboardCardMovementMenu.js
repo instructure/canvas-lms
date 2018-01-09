@@ -19,8 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import Menu, { MenuItem } from 'instructure-ui/lib/components/Menu'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Menu, { MenuItem } from '@instructure/ui-core/lib/components/Menu'
+import Text from '@instructure/ui-core/lib/components/Text'
 import IconMoveUpTopSolid from 'instructure-icons/lib/Solid/IconMoveUpTopSolid'
 import IconMoveUpSolid from 'instructure-icons/lib/Solid/IconMoveUpSolid'
 import IconMoveDownSolid from 'instructure-icons/lib/Solid/IconMoveDownSolid'
@@ -66,7 +66,7 @@ import IconMoveDownBottomSolid from 'instructure-icons/lib/Solid/IconMoveDownBot
             >
               <span className="DashboardCardMenu__MovementItem">
                 <IconMoveUpTopSolid className="DashboardCardMenu__MovementIcon" />
-                <Typography weight="bold" size="small">{I18n.t('Top')}</Typography>
+                <Text weight="bold" size="small">{I18n.t('Top')}</Text>
               </span>
             </MenuItem>
           )}
@@ -76,7 +76,7 @@ import IconMoveDownBottomSolid from 'instructure-icons/lib/Solid/IconMoveDownBot
             >
               <span className="DashboardCardMenu__MovementItem">
                 <IconMoveUpSolid className="DashboardCardMenu__MovementIcon" />
-                <Typography weight="bold" size="small">{I18n.t('Ahead')}</Typography>
+                <Text weight="bold" size="small">{I18n.t('Ahead')}</Text>
               </span>
             </MenuItem>
           )}
@@ -86,7 +86,7 @@ import IconMoveDownBottomSolid from 'instructure-icons/lib/Solid/IconMoveDownBot
             >
               <span className="DashboardCardMenu__MovementItem">
                 <IconMoveDownSolid className="DashboardCardMenu__MovementIcon" />
-                <Typography weight="bold" size="small">{I18n.t('Behind')}</Typography>
+                <Text weight="bold" size="small">{I18n.t('Behind')}</Text>
               </span>
             </MenuItem>
           )}
@@ -96,7 +96,7 @@ import IconMoveDownBottomSolid from 'instructure-icons/lib/Solid/IconMoveDownBot
             >
               <span className="DashboardCardMenu__MovementItem">
                 <IconMoveDownBottomSolid className="DashboardCardMenu__MovementIcon"/>
-                <Typography weight="bold" size="small">{I18n.t('Bottom')}</Typography>
+                <Text weight="bold" size="small">{I18n.t('Bottom')}</Text>
               </span>
             </MenuItem>
           )}

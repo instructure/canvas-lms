@@ -20,12 +20,12 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/MessageStudentsDialog',
-  'compiled/views/groups/manage/RandomlyAssignMembersView'
-  'compiled/views/groups/manage/GroupCreateView'
-  'compiled/views/groups/manage/GroupCategoryEditView'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
-  'compiled/models/Group'
+  '../../MessageStudentsDialog',
+  './RandomlyAssignMembersView'
+  './GroupCreateView'
+  './GroupCategoryEditView'
+  './GroupCategoryCloneView'
+  '../../../models/Group'
   'jst/groups/manage/groupCategoryDetail'
 ], (I18n, $, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupCreateView, GroupCategoryEditView, GroupCategoryCloneView, Group, template) ->
 

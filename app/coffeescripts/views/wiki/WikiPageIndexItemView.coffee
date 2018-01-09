@@ -18,12 +18,12 @@
 define [
   'Backbone'
   'i18n!pages'
-  'compiled/views/wiki/WikiPageIndexEditDialog'
-  'compiled/views/wiki/WikiPageDeleteDialog'
-  'compiled/views/PublishIconView'
-  'compiled/views/LockIconView'
+  './WikiPageIndexEditDialog'
+  './WikiPageDeleteDialog'
+  '../PublishIconView'
+  '../LockIconView'
   'jst/wiki/WikiPageIndexItem'
-  'compiled/jquery/redirectClickTo'
+  '../../jquery/redirectClickTo'
 ], (Backbone, I18n, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, LockIconView, template) ->
 
   class WikiPageIndexItemView extends Backbone.View

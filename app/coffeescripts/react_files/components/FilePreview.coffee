@@ -26,17 +26,17 @@ define [
   '../modules/customPropTypes'
   'Backbone'
   'i18n!file_preview'
-  'compiled/util/friendlyBytes'
-  'compiled/models/Folder'
-  'compiled/models/File'
-  'compiled/models/FilesystemObject'
-  'compiled/fn/preventDefault'
+  '../../util/friendlyBytes'
+  '../../models/Folder'
+  '../../models/File'
+  '../../models/FilesystemObject'
+  '../../fn/preventDefault'
   '../utils/collectionHandler'
   'jsx/files/FilePreviewInfoPanel'
   '../modules/filesEnv'
   '../modules/FocusStore'
   'jsx/files/codeToRemoveLater'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], ($, _, React, PureRenderMixin, PropTypes, page, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
 
   FilePreview =

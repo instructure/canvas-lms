@@ -88,3 +88,27 @@ define [
     component = renderComponent(data)
     ok component.isValid()
     deepEqual component.state.errors, {}
+
+  test 'sets verifyUniqueness to true', ->
+    data =
+      name: 'My App'
+      consumerKey: 'A'
+      sharedSecret: 'B'
+      url: 'http://google.com'
+      domain: ''
+      privacyLevel: ''
+      customFields: {}
+      description: ''
+
+    expectedData =
+      name: 'My App'
+      consumerKey: 'A'
+      sharedSecret: 'B'
+      url: 'http://google.com'
+      domain: ''
+      privacyLevel: ''
+      customFields: ''
+      description: ''
+      verifyUniqueness: 'true'
+    component = renderComponent(data)
+    deepEqual component.getFormData(), expectedData

@@ -137,7 +137,7 @@ function mountComponent (props, mountOptions = {}) {
 
 function mountAndOpenOptions (props, mountOptions = {}) {
   const wrapper = mountComponent(props, mountOptions);
-  wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
   return wrapper;
 }
 
@@ -187,7 +187,7 @@ test('does not render a PopoverMenu if assignment is not published', function ()
 });
 
 test('renders a PopoverMenu with a trigger', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
+  const optionsMenuTrigger = this.wrapper.find('.Gradebook__ColumnHeaderAction button');
 
   equal(optionsMenuTrigger.length, 1);
 });
@@ -195,7 +195,7 @@ test('renders a PopoverMenu with a trigger', function () {
 test('calls addGradebookElement prop on open', function () {
   notOk(this.props.addGradebookElement.called);
 
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   ok(this.props.addGradebookElement.called);
 });
@@ -203,24 +203,23 @@ test('calls addGradebookElement prop on open', function () {
 test('calls removeGradebookElement prop on close', function () {
   notOk(this.props.removeGradebookElement.called);
 
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   ok(this.props.removeGradebookElement.called);
 });
 
 test('calls onMenuClose prop on close', function () {
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   strictEqual(this.props.onMenuClose.callCount, 1);
 });
 
-test('adds a class to the trigger when the PopoverMenu is opened', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
-  optionsMenuTrigger.simulate('click');
-
-  ok(optionsMenuTrigger.hasClass('menuShown'));
+test('adds a class to the action container when the PopoverMenu is opened', function () {
+  const actionContainer = this.wrapper.find('.Gradebook__ColumnHeaderAction');
+  actionContainer.find('button').simulate('click');
+  ok(actionContainer.hasClass('menuShown'));
 });
 
 test('renders a title for the More icon based on the assignment name', function () {
@@ -704,75 +703,55 @@ test('the Assignment Muting dialog has focus when it is invoked', function () {
   dialogCloseButton.click();
 });
 
-QUnit.module('AssignmentColumnHeader: non-standard assignment', {
-  setup () {
-    this.props = defaultProps();
-  },
+QUnit.module('AssignmentColumnHeader: non-standard assignment', function (hooks) {
+  let props;
+  let wrapper;
 
-  teardown () {
-    this.wrapper.unmount();
-  }
-});
+  hooks.beforeEach(function () {
+    props = defaultProps();
+  });
 
-test('renders 0 points possible when the assignment has no possible points', function () {
-  this.props.assignment.pointsPossible = undefined;
-  this.wrapper = mountComponent(this.props);
-  const pointsPossible = this.wrapper.find('.assignment-points-possible');
+  hooks.afterEach(function () {
+    wrapper.unmount();
+  });
 
-  equal(pointsPossible.length, 1);
-  equal(pointsPossible.text().trim(), 'Out of 0');
-});
+  test('renders a muted status when the assignment is muted', function () {
+    props.assignment.muted = true;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    ok(secondaryDetail.text().includes('Muted'));
+  });
 
-test('renders a muted icon when the assignment is muted', function () {
-  this.props.assignment.muted = true;
-  this.wrapper = mountComponent(this.props);
-  const link = this.wrapper.find('.assignment-name Link');
-  const icon = link.find('IconMutedSolid');
-  const expectedLinkTitle = 'This assignment is muted';
+  test('renders an unpublished status when the assignment is unpublished', function () {
+    props.assignment.published = false;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    strictEqual(secondaryDetail.text(), 'Unpublished');
+  });
 
-  equal(link.length, 1);
-  deepEqual(link.props().title, expectedLinkTitle);
-  equal(icon.length, 1);
-  equal(icon.props().title, expectedLinkTitle);
-});
+  test('renders an unpublished status when the assignment is unpublished and muted', function () {
+    props.assignment.muted = true;
+    props.assignment.published = false;
+    wrapper = mountComponent(props);
+    const secondaryDetail = wrapper.find('.Gradebook__ColumnHeaderDetail--secondary');
+    strictEqual(secondaryDetail.text(), 'Unpublished');
+  });
 
-test('renders a warning icon when the assignment does not count towards final grade', function () {
-  this.props.assignment.omitFromFinalGrade = true;
-  this.wrapper = mountComponent(this.props);
-  const link = this.wrapper.find('.assignment-name Link');
-  const icon = link.find('IconWarningSolid');
-  const expectedLinkTitle = 'This assignment does not count toward the final grade';
+  test('does not render points possible when the assignment is unpublished', function () {
+    props.assignment.published = false;
+    wrapper = mountComponent(props);
+    const pointsPossible = wrapper.find('.assignment-points-possible');
+    strictEqual(pointsPossible.length, 0);
+  });
 
-  equal(link.length, 1);
-  deepEqual(link.props().title, expectedLinkTitle);
-  equal(icon.length, 1);
-  equal(icon.props().title, expectedLinkTitle);
-});
+  test('renders 0 points possible when the assignment has no possible points', function () {
+    props.assignment.pointsPossible = undefined;
+    wrapper = mountComponent(props);
+    const pointsPossible = wrapper.find('.assignment-points-possible');
 
-test('renders a warning icon when the assignment has zero points possible', function () {
-  this.props.assignment.pointsPossible = 0;
-  this.wrapper = mountComponent(this.props);
-  const link = this.wrapper.find('.assignment-name Link');
-  const icon = link.find('IconWarningSolid');
-  const expectedLinkTitle = 'This assignment has no points possible and cannot be included in grade calculation';
-
-  equal(link.length, 1);
-  deepEqual(link.props().title, expectedLinkTitle);
-  equal(icon.length, 1);
-  equal(icon.props().title, expectedLinkTitle);
-});
-
-test('renders a warning icon when the assignment has null points possible', function () {
-  this.props.assignment.pointsPossible = null;
-  this.wrapper = mountComponent(this.props);
-  const link = this.wrapper.find('.assignment-name Link');
-  const icon = link.find('IconWarningSolid');
-  const expectedLinkTitle = 'This assignment has no points possible and cannot be included in grade calculation';
-
-  equal(link.length, 1);
-  deepEqual(link.props().title, expectedLinkTitle);
-  equal(icon.length, 1);
-  equal(icon.props().title, expectedLinkTitle);
+    equal(pointsPossible.length, 1);
+    equal(pointsPossible.text().trim(), 'Out of 0');
+  });
 });
 
 QUnit.module('AssignmentColumnHeader: Set Default Grade Action', {

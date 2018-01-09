@@ -21,7 +21,7 @@ define([
   'jquery',
   'i18n!gradebook',
   'helpers/fakeENV',
-  'spec/jsx/gradebook/GradeCalculatorSpecHelper',
+  '../gradebook/GradeCalculatorSpecHelper',
   'jsx/shared/helpers/numberHelper',
   'jsx/gradebook/CourseGradeCalculator',
   'jsx/grading/GradeSummary'

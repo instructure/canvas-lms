@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!upload_button'
 import React from 'react'
-import FileRenameForm from 'jsx/files/FileRenameForm'
+import FileRenameForm from '../files/FileRenameForm'
 import ZipFileOptionsForm from './ZipFileOptionsForm'
 import UploadButton from 'compiled/react_files/components/UploadButton'
   UploadButton.buildPotentialModal = function () {

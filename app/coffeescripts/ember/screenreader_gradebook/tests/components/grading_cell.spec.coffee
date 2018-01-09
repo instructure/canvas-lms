@@ -139,7 +139,8 @@ define [
     @component.submissionDidChange()
     equal(@component.get('value'), '32,4%')
 
-  asyncTest "focusOut", ->
+  test "focusOut", (assert) ->
+    done = assert.async()
     stub = @stub @component, 'boundUpdateSuccess'
     submissions = []
 
@@ -152,9 +153,10 @@ define [
     run =>
       @component.set('value', 'ohai')
       @component.send('focusOut', {target: {id: 'student_and_assignment_grade'}})
-      start()
-
-    ok stub.called
+      
+    Promise.resolve().then ->
+      ok stub.called
+      done()
 
   test "onUpdateSuccess", ->
     run => @assignment.set('points_possible', 100)

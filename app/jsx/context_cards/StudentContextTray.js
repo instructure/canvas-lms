@@ -19,21 +19,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
-import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import FriendlyDatetime from '../shared/FriendlyDatetime'
 import Avatar from './Avatar'
 import LastActivity from './LastActivity'
 import MetricsList from './MetricsList'
 import Rating from './Rating'
 import SectionInfo from './SectionInfo'
 import SubmissionProgressBars from './SubmissionProgressBars'
-import MessageStudents from 'jsx/shared/MessageStudents'
-import Heading from 'instructure-ui/lib/components/Heading'
-import Button from 'instructure-ui/lib/components/Button'
-import Link from 'instructure-ui/lib/components/Link'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import Tray from 'instructure-ui/lib/components/Tray'
+import MessageStudents from '../shared/MessageStudents'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Link from '@instructure/ui-core/lib/components/Link'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Tray from '@instructure/ui-core/lib/components/Tray'
 
 const courseShape = PropTypes.shape({
   permissions: PropTypes.shape({}).isRequired,
@@ -228,16 +228,16 @@ export default class StudentContextTray extends React.Component {
                           </div>
                         ) : null}
                         <div className="StudentContextTray-Header__CourseName">
-                          <Typography size="medium" as="div" lineHeight="condensed">
+                          <Text size="medium" as="div" lineHeight="condensed">
                             {course.name}
-                          </Typography>
+                          </Text>
                         </div>
-                        <Typography size="x-small" color="secondary" as="div">
+                        <Text size="x-small" color="secondary" as="div">
                           <SectionInfo user={user} />
-                        </Typography>
-                        <Typography size="x-small" color="secondary" as="div">
+                        </Text>
+                        <Text size="x-small" color="secondary" as="div">
                           <LastActivity user={user} />
-                        </Typography>
+                        </Text>
                       </div>
                       {course.permissions.send_messages ? (
                         <div className="StudentContextTray-Header__Actions">

@@ -19,7 +19,7 @@ define [
   'i18n!outcomes'
   'underscore'
   'Backbone'
-  'compiled/models/Outcome'
+  '../../models/Outcome'
   'timezone'
 ], (I18n, _, {Model, Collection}, Outcome, tz) ->
 
@@ -73,7 +73,10 @@ define [
     scaledScore: ->
       is_aggregate_score = @get('question_bank_result')
       return unless @scoreDefined() && is_aggregate_score
-      @get('percent') * @get('points_possible')
+      if @get('points_possible') > 0
+        @get('percent') * @get('points_possible')
+      else
+        @get('percent') * @get('mastery_points')
 
     score: ->
       @get('scaled_score') || @get('score')

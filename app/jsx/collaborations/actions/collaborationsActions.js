@@ -20,7 +20,7 @@ import $ from 'jquery'
 import I18n from 'i18n!course_wizard'
 import axios from 'axios'
 import splitAssetString from 'compiled/str/splitAssetString'
-import parseLinkHeader from 'jsx/shared/parseLinkHeader'
+import parseLinkHeader from '../../shared/parseLinkHeader'
 import page from 'page'
   const actions = {}
 

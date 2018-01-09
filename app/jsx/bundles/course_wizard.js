@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import CourseWizard from 'jsx/course_wizard/CourseWizard'
+import CourseWizard from '../course_wizard/CourseWizard'
 
 /*
   * This essentially handles binding the button events and calling out to the

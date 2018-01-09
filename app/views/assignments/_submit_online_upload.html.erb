@@ -1,0 +1,85 @@
+<%
+# Copyright (C) 2018 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
+    <%= hidden_field :submission, :submission_type, :value => "online_upload" %>
+    <%= hidden_field :submission, :attachment_ids, :value => "", :id => "submission_attachment_ids" %>
+    <%= hidden_field :submission, :eula_agreement_timestamp, :id => "eula_agreement_timestamp" %>
+    <table class="formtable" style="width: 100%;">
+      <tr>
+        <td colspan="2">
+          <%= t :upload_or_choose_file, "Upload a file, or choose a file you've already uploaded." %>
+            <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+        </td>
+      </tr><tr>
+        <td><%= blabel :attachment, :uploaded_data, :en => "File", id: 'attachmentLabel' %></td>
+        <td>
+          <a href="#" class="add_another_file_link">
+            <i class="icon-add" aria-hidden="true"></i>
+            <%= t 'links.add_another_file', "Add Another File" %>
+          </a>
+          <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
+            <input aria-labelledby="attachmentLabel" type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
+            <a href="#" class="remove_attachment_link no-hover" style="display: none;"><i class="icon-end" aria-hidden="true"></i><span class="screenreader-only"><%= t('remove empty attachment')%></span></a>
+            <% if @assignment.allowed_extensions.present? -%>
+              <div class='bad_ext_msg error_message' style="display: none">
+                <%= t 'errors.unacceptable_file_type', "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}", :allowed_extensions_list => @assignment.allowed_extensions.to_sentence %>
+              </div>
+            <% end -%>
+          </div>
+        </td>
+      </tr>
+      <% unless @current_user.attachments.active.empty? %>
+      <tr>
+        <td></td>
+        <td style="font-size: 0.8em;">
+        <a href="#" class="toggle_uploaded_files_link"><%= t 'links.find_file', "Click here to find a file you've already uploaded" %></a><br/>
+        <div id="uploaded_files" style="display: none;">
+          <% folders = @current_user.folders.active %>
+          <% content = (render :partial => "files/nested_content", :object => (folders.select{|f| !f.parent_folder_id}), :locals => {:folders => folders}) %>
+          <%= t(:no_files, "No Files") if @current_user.attachments.active.empty? || !content || content.strip.empty? %>
+          <%= content %>
+        </div>
+        </td>
+      </tr>
+      <% end %>
+      <tr>
+        <td colspan="2">
+          <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+        </td>
+      </tr>
+      <%= render :partial => "group_comment" %>
+      <% if @assignment.turnitin_enabled? %>
+        <%= render :partial => "turnitin" %>
+      <% end %>
+      <% if @assignment.vericite_enabled? %>
+        <%= render :partial => "vericite" %>
+      <% end %>
+      <%= render partial: 'assignments/eula_checkbox', locals: { eula_url: eula_url } %>
+      <tr>
+        <td colspan="2" class='button-container'>
+          <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="btn btn-primary" id="submit_file_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+        </td>
+      </tr><tr style="display: none;">
+        <td colspan="2" style="text-align: center;">
+          <%= t 'messages.submitting', "Submitting..." %> <img src=""/>
+        </td>
+      </tr>
+    </table>
+    <% end %>

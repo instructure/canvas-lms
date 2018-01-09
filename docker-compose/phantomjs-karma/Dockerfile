@@ -8,7 +8,7 @@ RUN \
   apt-get update -yqq && \
   apt-get install -fyqq wget curl libfreetype6 libfontconfig
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN  apt-get update -qq \
   && apt-get install -qqy nodejs
 

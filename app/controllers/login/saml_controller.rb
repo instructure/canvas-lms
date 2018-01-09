@@ -26,7 +26,9 @@ class Login::SamlController < ApplicationController
   before_action :fix_ms_office_redirects, only: :new
 
   def new
-    auth_redirect(aac)
+    increment_saml_stat("login_attempt")
+    redirect_to delegated_auth_redirect_uri(aac.generate_authn_request_redirect(host: request.host_with_port,
+                                                                                parent_registration: session[:parent_registration]))
   end
 
   def create
@@ -324,7 +326,10 @@ class Login::SamlController < ApplicationController
 
 
   def observee_validation
-    auth_redirect(@domain_root_account.parent_registration_aac)
+    increment_saml_stat("login_attempt")
+    redirect_to delegated_auth_redirect_uri(
+                  @domain_root_account.parent_registration_aac.generate_authn_request_redirect(host: request.host_with_port,
+                                                                                               parent_registration: session[:parent_registration]))
   end
 
   protected
@@ -338,21 +343,6 @@ class Login::SamlController < ApplicationController
 
   def increment_saml_stat(key)
     CanvasStatsd::Statsd.increment("saml.#{CanvasStatsd::Statsd.escape(request.host)}.#{key}")
-  end
-
-  def auth_redirect(aac)
-    increment_saml_stat("login_attempt")
-    settings = aac.saml_settings(request.host_with_port)
-    request = Onelogin::Saml::AuthRequest.new(settings)
-    forward_url = request.generate_request
-    if aac.debugging? && !aac.debug_get(:request_id)
-      aac.debug_set(:request_id, request.id)
-      aac.debug_set(:to_idp_url, forward_url)
-      aac.debug_set(:to_idp_xml, request.request_xml)
-      aac.debug_set(:debugging, "Forwarding user to IdP for authentication")
-    end
-    forward_url << '&ForceAuthn=true' if session[:parent_registration]
-    redirect_to delegated_auth_redirect_uri(forward_url)
   end
 
   def complete_observee_addition(registration_data)

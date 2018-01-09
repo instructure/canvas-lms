@@ -17,46 +17,45 @@
  */
 
 import React from 'react';
-import { number, shape, string } from 'prop-types';
-import Typography from 'instructure-ui/lib/components/Typography';
+import { arrayOf, number, oneOf, shape, string } from 'prop-types';
+import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 
 export default function LatePolicyGrade (props) {
-  const { grade } = props.submission;
   const pointsDeducted = I18n.n(-props.submission.pointsDeducted);
-  let finalGrade;
-
-  if (isNaN(grade)) {
-    finalGrade = GradeFormatHelper.formatGrade(props.submission.grade);
-  } else {
-    finalGrade = GradeFormatHelper.formatGrade(props.submission.grade, { precision: 2 });
-  }
+  const formatOptions = {
+    formatType: props.enterGradesAs,
+    pointsPossible: props.assignment.pointsPossible,
+    gradingScheme: props.gradingScheme,
+    version: 'final'
+  };
+  const finalGrade = GradeFormatHelper.formatSubmissionGrade(props.submission, formatOptions);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <div style={{ paddingRight: '.5rem' }}>
         <div>
-          <Typography color="error" as="span">
+          <Text color="error" as="span">
             { I18n.t('Late Penalty:') }
-          </Typography>
+          </Text>
         </div>
         <div>
-          <Typography color="secondary" as="span">
+          <Text color="secondary" as="span">
             { I18n.t('Final Grade:') }
-          </Typography>
+          </Text>
         </div>
       </div>
       <div style={{ flex: 1 }}>
         <div id="late-penalty-value">
-          <Typography color="error" as="span">
+          <Text color="error" as="span">
             { pointsDeducted }
-          </Typography>
+          </Text>
         </div>
         <div id="final-grade-value">
-          <Typography color="secondary" as="span">
+          <Text color="secondary" as="span">
             { finalGrade }
-          </Typography>
+          </Text>
         </div>
       </div>
     </div>
@@ -64,8 +63,14 @@ export default function LatePolicyGrade (props) {
 }
 
 LatePolicyGrade.propTypes = {
+  assignment: shape({
+    pointsPossible: number
+  }).isRequired,
+  enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
+  gradingScheme: arrayOf(Array).isRequired,
   submission: shape({
     grade: string,
+    score: number,
     pointsDeducted: number
   }).isRequired
 };

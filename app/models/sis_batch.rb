@@ -31,7 +31,6 @@ class SisBatch < ActiveRecord::Base
   belongs_to :user
 
   before_save :limit_size_of_messages
-  after_save :cleanup_error_files_when_finished
 
   validates_presence_of :account_id, :workflow_state
   validates_length_of :diffing_data_set_identifier, maximum: 128
@@ -537,14 +536,16 @@ class SisBatch < ActiveRecord::Base
   end
 
   def cleanup_error_files
-    atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).order(:id).to_a
-    atts.each do |a|
-      a.reload
-      a.make_childless
-      a.destroy_content unless a.root_attachment_id?
+    Attachment.connection.after_transaction_commit do
+      atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).order(:id).to_a
+      atts.each do |a|
+        a.reload
+        a.make_childless
+        a.destroy_content unless a.root_attachment_id?
+      end
+      self.sis_batch_error_files.scope.delete_all
+      Attachment.where(id: atts).delete_all
     end
-    self.sis_batch_error_files.scope.delete_all
-    Attachment.where(id: atts).delete_all
   rescue => e
     # just in case
     Canvas::Errors.capture(e, {type: :sis_import, message: message, during_tests: false})

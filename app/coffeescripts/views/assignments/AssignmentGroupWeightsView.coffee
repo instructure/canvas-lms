@@ -17,7 +17,7 @@
 
 define [
   'jquery'
-  'compiled/util/round'
+  '../../util/round'
   'Backbone'
   'i18n!assignments'
   'jst/assignments/AssignmentGroupWeights'

@@ -220,7 +220,6 @@ describe "groups" do
         get discussions_page
         expect_new_page_load { f('#new-discussion-btn').click }
         # This creates the discussion and also tests its creation
-        wait_for_tiny(f('#discussion-edit-view'))
         edit_topic('from a student', 'tell me a story')
       end
 

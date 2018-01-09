@@ -126,12 +126,26 @@ module Canvas::Migration
       unless warnings.empty?
         diagnostic_text = ''
         warnings.each do |tag, files|
-          diagnostic_text += tag.to_s + ': ' + files.join(', ') + "\n"
+          message = translate_error(tag)
+          diagnostic_text += I18n.t("Extract error, %{error}: %{file_names}", error: message, file_names: files.to_sentence) + "\n"
         end
         Rails.logger.debug "CanvasUnzip returned warnings: " + diagnostic_text
-        add_warning(I18n.t('canvas.migration.warning.unzip_warning', 'The content package unzipped successfully, but with a warning'), diagnostic_text)
+        add_warning(diagnostic_text)
       end
-      return true
+      true
+    end
+
+    def translate_error(error)
+      case error
+      when :already_exists
+        I18n.t('file already exists')
+      when :unknown_compression_method
+        I18n.t('unknown compression method')
+      when :filename_too_long
+        I18n.t('file name too long')
+      when :unsafe
+        I18n.t('unsafe file link')
+      end
     end
 
     def delete_unzipped_archive

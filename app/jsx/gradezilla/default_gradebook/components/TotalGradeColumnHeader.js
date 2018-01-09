@@ -19,31 +19,30 @@
 import React from 'react';
 import { bool, func, shape, string } from 'prop-types';
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Container from '@instructure/ui-core/lib/components/Container';
+import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
 import {
   MenuItem,
   MenuItemFlyout,
   MenuItemGroup,
   MenuItemSeparator
-} from 'instructure-ui/lib/components/Menu';
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
-import Typography from 'instructure-ui/lib/components/Typography';
+} from '@instructure/ui-core/lib/components/Menu';
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
+import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader';
 
-function renderTrigger (menuShown, ref) {
-  const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
-
+function renderTrigger (ref) {
   return (
-    <span ref={ref} className={classes}>
-      <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-        <IconMoreSolid className="rotated" title={I18n.t('Total Options')} />
-      </Typography>
-    </span>
+    <Button buttonRef={ref} margin="0" size="small" variant="icon">
+      <IconMoreSolid title={I18n.t('Total Options')} />
+    </Button>
   );
 }
 
-class TotalGradeColumnHeader extends ColumnHeader {
+export default class TotalGradeColumnHeader extends ColumnHeader {
   static propTypes = {
     sortBySetting: shape({
       direction: string.isRequired,
@@ -99,80 +98,93 @@ class TotalGradeColumnHeader extends ColumnHeader {
       whiteSpace: 'nowrap'
     };
     const menuShown = this.state.menuShown;
+    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail">
-          <Typography weight="normal" fontStyle="normal" size="small">
-            { I18n.t('Total') }
-          </Typography>
-        </span>
+        <div style={{ flex: 1, minWidth: '1px' }}>
+          <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
+            <GridRow>
+              <GridCol textAlign="center" width="auto">
+                <div className="Gradebook__ColumnHeaderIndicators" />
+              </GridCol>
 
-        <PopoverMenu
-          ref={this.bindOptionsMenu}
-          contentRef={this.bindOptionsMenuContent}
-          shouldFocusTriggerOnClose={false}
-          trigger={renderTrigger(menuShown, this.bindOptionsMenuTrigger)}
-          onToggle={this.onToggle}
-          onClose={this.props.onMenuClose}
-        >
-          <MenuItemFlyout contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
-            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
-              <MenuItem
-                selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
-                disabled={sortBySetting.disabled}
-                onSelect={sortBySetting.onSortByGradeAscending}
-              >
-                <span>{I18n.t('Grade - Low to High')}</span>
-              </MenuItem>
+              <GridCol textAlign="center">
+                <Container className="Gradebook__ColumnHeaderDetail">
+                  <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Total') }</Text>
+                </Container>
+              </GridCol>
 
-              <MenuItem
-                selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
-                disabled={sortBySetting.disabled}
-                onSelect={sortBySetting.onSortByGradeDescending}
-              >
-                <span>{I18n.t('Grade - High to Low')}</span>
-              </MenuItem>
-            </MenuItemGroup>
-          </MenuItemFlyout>
+              <GridCol textAlign="center" width="auto">
+                <div className={classes}>
+                  <PopoverMenu
+                    contentRef={this.bindOptionsMenuContent}
+                    onClose={this.props.onMenuClose}
+                    onToggle={this.onToggle}
+                    ref={this.bindOptionsMenu}
+                    shouldFocusTriggerOnClose={false}
+                    trigger={renderTrigger(this.bindOptionsMenuTrigger)}
+                  >
+                    <MenuItemFlyout contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
+                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+                        <MenuItem
+                          selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
+                          disabled={sortBySetting.disabled}
+                          onSelect={sortBySetting.onSortByGradeAscending}
+                        >
+                          <span>{I18n.t('Grade - Low to High')}</span>
+                        </MenuItem>
 
-          {
-            showSeparator &&
-            <MenuItemSeparator />
-          }
-          {
-            !gradeDisplay.hidden &&
-            <MenuItem
-              disabled={this.props.gradeDisplay.disabled}
-              onSelect={this.switchGradeDisplay}
-            >
-              <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
-                {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}
-              </span>
-            </MenuItem>
-          }
+                        <MenuItem
+                          selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
+                          disabled={sortBySetting.disabled}
+                          onSelect={sortBySetting.onSortByGradeDescending}
+                        >
+                          <span>{I18n.t('Grade - High to Low')}</span>
+                        </MenuItem>
+                      </MenuItemGroup>
+                    </MenuItemFlyout>
 
-          {
-            !position.isInFront &&
-            <MenuItem onSelect={position.onMoveToFront}>
-              <span data-menu-item-id="total-grade-move-to-front">
-                {I18n.t('Move to Front')}
-              </span>
-            </MenuItem>
-          }
+                    {
+                      showSeparator &&
+                      <MenuItemSeparator />
+                    }
+                    {
+                      !gradeDisplay.hidden &&
+                      <MenuItem
+                        disabled={this.props.gradeDisplay.disabled}
+                        onSelect={this.switchGradeDisplay}
+                      >
+                        <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
+                          {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}
+                        </span>
+                      </MenuItem>
+                    }
 
-          {
-            !position.isInBack &&
-            <MenuItem onSelect={position.onMoveToBack}>
-              <span data-menu-item-id="total-grade-move-to-back">
-                {I18n.t('Move to End')}
-              </span>
-            </MenuItem>
-          }
-        </PopoverMenu>
+                    {
+                      !position.isInFront &&
+                      <MenuItem onSelect={position.onMoveToFront}>
+                        <span data-menu-item-id="total-grade-move-to-front">
+                          {I18n.t('Move to Front')}
+                        </span>
+                      </MenuItem>
+                    }
+
+                    {
+                      !position.isInBack &&
+                      <MenuItem onSelect={position.onMoveToBack}>
+                        <span data-menu-item-id="total-grade-move-to-back">
+                          {I18n.t('Move to End')}
+                        </span>
+                      </MenuItem>
+                    }
+                  </PopoverMenu>
+                </div>
+              </GridCol>
+            </GridRow>
+          </Grid>
+        </div>
       </div>
     );
   }
 }
-
-export default TotalGradeColumnHeader;

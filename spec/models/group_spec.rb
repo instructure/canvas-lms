@@ -658,7 +658,7 @@ describe Group do
 
   describe '#destroy' do
     before :once do
-      @gc = GroupCategory.create! name: "groups"
+      @gc = GroupCategory.create! name: "groups", course: @course
       @group = @gc.groups.create! name: "group1", context: @course
     end
 

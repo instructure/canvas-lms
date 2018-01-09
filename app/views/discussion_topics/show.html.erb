@@ -108,7 +108,7 @@
           <% if @current_user.present? %>
             <div class="admin-links">
               <a class="al-trigger btn announcement_cog" href="#" role="button">
-                <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+                <i class="icon-more" aria-hidden="true"></i>
                 <span class="screenreader-only">
                    <% if @topic.is_a?(Announcement) %>
                     <%= t :manage_announcement, 'Manage Announcement' %>
@@ -213,6 +213,7 @@
                                                 @presenter.author_link_attrs %>
                 <% end %>
               </div>
+              <div id="section_tooltip_root"></div>
               <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
                 <span class="discussion-subtitle">
                   <%= t(:from_context, "From *%{context_name}*", {

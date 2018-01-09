@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/views/LockButtonView'
-], (LockButtonView, _) ->
+  './LockButtonView'
+], (LockButtonView) ->
 
   class LockIconView extends LockButtonView
     lockClass: 'lock-icon-lock'

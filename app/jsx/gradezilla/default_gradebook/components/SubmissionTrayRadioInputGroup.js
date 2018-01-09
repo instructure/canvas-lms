@@ -18,11 +18,10 @@
 
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
-import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import SubmissionTrayRadioInput from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
-import { statusesTitleMap } from 'jsx/gradezilla/default_gradebook/constants/statuses';
-import NumberHelper from 'jsx/shared/helpers/numberHelper';
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
+import SubmissionTrayRadioInput from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
+import { statusesTitleMap } from '../../../gradezilla/default_gradebook/constants/statuses';
+import NumberHelper from '../../../shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook';
 
 function checkedValue (submission) {

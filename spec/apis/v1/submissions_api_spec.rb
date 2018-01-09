@@ -183,7 +183,7 @@ describe 'Submissions API', type: :request do
 
     it 'returns submissions based on assignments.post_to_sis' do
       batch = @course.root_account.sis_batches.create
-      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch)
+      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch.id)
 
       json = api_call(:get,
         "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
@@ -208,7 +208,7 @@ describe 'Submissions API', type: :request do
       @a1.post_to_sis = true
       @a1.save!
       batch = @course.root_account.sis_batches.create
-      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch)
+      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch.id)
 
       json = api_call(:get,
                       '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
@@ -231,7 +231,7 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 0
 
       batch = @course.root_account.sis_batches.create
-      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch)
+      @course.enrollments.where(user_id: @student1).update_all(sis_batch_id: batch.id)
 
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",

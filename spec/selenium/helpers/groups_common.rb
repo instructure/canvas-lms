@@ -199,7 +199,7 @@ module GroupsCommon
 
   # Used to enable self-signup on an already created group set by opening Edit Group Set
   def manually_enable_self_signup
-    f('.icon-settings').click
+    f('.icon-more').click
     wait_for_ajaximations
     f('.edit-category').click
     wait_for_ajaximations
@@ -208,7 +208,7 @@ module GroupsCommon
   end
 
   def open_clone_group_set_option
-    move_to_click('.icon-settings')
+    move_to_click('.icon-more')
     wait_for_ajaximations
     move_to_click('.clone-category')
     wait_for_ajaximations
@@ -225,7 +225,7 @@ module GroupsCommon
   end
 
   def select_randomly_assign_students_option
-    f('.group-category-summary .icon-settings').click
+    f('.group-category-summary .icon-more').click
     wait_for_ajaximations
     f('.randomly-assign-members').click
     wait_for_ajaximations
@@ -272,7 +272,7 @@ module GroupsCommon
   end
 
   def manually_delete_group
-    f('.group-actions .icon-settings').click
+    f('.group-actions .icon-more').click
     wait_for_ajaximations
     f('.delete-group').click
 
@@ -281,7 +281,7 @@ module GroupsCommon
   end
 
   def delete_group
-    f(".icon-settings").click
+    f(".icon-more").click
     wait_for_animations
 
     fln('Delete').click

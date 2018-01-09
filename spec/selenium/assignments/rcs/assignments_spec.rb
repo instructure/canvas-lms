@@ -88,8 +88,7 @@ describe "assignments" do
         ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
           f(element).click
         end
-
-        fj(".datePickerDateField[data-date-type='due_at']").send_keys(due_at)
+        f('.DueDateInput').send_keys(due_at)
 
         submit_assignment_form
         #confirm all our settings were saved and are now displayed

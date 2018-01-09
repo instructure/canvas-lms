@@ -20,45 +20,68 @@ import React from 'react';
 import { mount } from 'enzyme';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 
-QUnit.module('LatePolicyGrade', function (hooks) {
+QUnit.module('LatePolicyGrade', function (suiteHooks) {
   let wrapper;
 
-  hooks.afterEach(function () {
+  suiteHooks.afterEach(function () {
     wrapper.unmount();
   });
 
   function mountComponent (props = {}) {
     const defaultProps = {
+      assignment: {
+        pointsPossible: 100
+      },
       submission: {
+        score: 70,
         grade: '70%',
         pointsDeducted: 3
-      }
+      },
+      enterGradesAs: 'percent',
+      gradingScheme: [
+        ['A', 90], ['B', 80], ['C', 70]
+      ]
     };
     wrapper = mount(<LatePolicyGrade {...defaultProps} {...props} />);
   }
 
   test('includes the late penalty as a negative value', function () {
     mountComponent();
-    ok(wrapper.find('#late-penalty-value').text().includes('-3'));
+    strictEqual(wrapper.find('#late-penalty-value').text(), '-3');
   });
 
   test('includes the final grade', function () {
     mountComponent();
-    ok(wrapper.find('#final-grade-value').text().includes('70%'));
+    strictEqual(wrapper.find('#final-grade-value').text(), '70%');
   });
 
   test('rounds the final grade when a decimal value', function () {
-    mountComponent({ submission: { grade: '7.345', pointsDeducted: 3 } });
-    ok(wrapper.find('#final-grade-value').text().includes('7.35'));
+    mountComponent({ submission: { score: 7.345, grade: '7.345', pointsDeducted: 3 } });
+    strictEqual(wrapper.find('#final-grade-value').text(), '7.35%');
   });
 
-  test('rounds the final grade when a decimal percentage', function () {
-    mountComponent({ submission: { grade: '73.456%', pointsDeducted: 3 } });
-    ok(wrapper.find('#final-grade-value').text().includes('73.46%'));
+  test('formats the final grade as points when enterGradesAs is set to points', function () {
+    mountComponent({ submission: { score: 70.25 }, enterGradesAs: 'points' });
+    strictEqual(wrapper.find('#final-grade-value').text(), '70.25');
   });
 
-  test('includes the final grade without formatting when not a number', function () {
-    mountComponent({ submission: { grade: 'C+', pointsDeducted: 3 } });
-    ok(wrapper.find('#final-grade-value').text().includes('C+'));
+  test('formats the final grade as percentage when enterGradesAs is set to percent', function () {
+    mountComponent({ submission: { score: 70.25 }, enterGradesAs: 'percent' });
+    strictEqual(wrapper.find('#final-grade-value').text(), '70.25%');
+  });
+
+  test('formats the final grade as a letter grade when enterGradesAs is set to gradingScheme', function () {
+    mountComponent({ submission: { score: 70.25 }, enterGradesAs: 'gradingScheme' });
+    strictEqual(wrapper.find('#final-grade-value').text(), 'C');
+  });
+
+  test('formats the final grade as "Complete" when enterGradesAs is set to passFail and score > 0', function () {
+    mountComponent({ submission: { score: 70.25 }, enterGradesAs: 'passFail' });
+    strictEqual(wrapper.find('#final-grade-value').text(), 'Complete');
+  });
+
+  test('formats the final grade as "Incomplete" when enterGradesAs is set to passFail and score == 0', function () {
+    mountComponent({ submission: { score: 0 }, enterGradesAs: 'passFail' });
+    strictEqual(wrapper.find('#final-grade-value').text(), 'Incomplete');
   });
 });

@@ -20,9 +20,9 @@ define [
   'react'
   'prop-types'
   'i18n!broccoli_cloud'
-  'compiled/models/FilesystemObject'
+  '../../models/FilesystemObject'
   '../modules/customPropTypes'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], ($, React, PropTypes, I18n, FilesystemObject, customPropTypes) ->
 
   PublishCloud =

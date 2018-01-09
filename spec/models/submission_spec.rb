@@ -260,20 +260,14 @@ describe Submission do
         end
 
         it 'changes if an override is removed for the student' do
-          other_student = User.create!
-          @course.enroll_student(other_student, active_all: true)
           @override.assignment_override_students.create!(user: @student)
-          # need two students for this spec. if there's only one student and we remove the
-          # assignment_override_student, the entire assignment_override gets wiped out and
-          # we're testing something completely different.
-          @override.assignment_override_students.create!(user: other_student)
           expect { @override.assignment_override_students.find_by(user_id: @student).destroy }.to change {
             submission.reload.cached_due_date
           }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
         end
 
         it 'changes if the due date for the override is changed' do
-          @override.assignment_override_students.create!(user: @student)
+          @override.assignment_override_students.create!(user: @student, workflow_state: 'active')
           expect { @override.update!(due_at: 14.minutes.ago(@now)) }.to change {
             submission.reload.cached_due_date
           }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
@@ -1894,6 +1888,19 @@ describe Submission do
           }
         })
       end
+
+      it "finds originality data text entry submissions" do
+        submission.update_attributes!(attachment_ids: attachment.id.to_s)
+        originality_report.update_attributes!(attachment: nil)
+        expect(submission.originality_data).to eq({
+          submission.asset_string => {
+            similarity_score: originality_report.originality_score,
+            state: originality_report.state,
+            report_url: originality_report.originality_report_url,
+            status: originality_report.workflow_state
+          }
+        })
+      end
     end
 
     describe '#attachment_ids_for_version' do
@@ -1912,6 +1919,134 @@ describe Submission do
         submission = @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: attachments)
         submission.update_attributes!(attachment_id: single_attachment)
         expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id) + [single_attachment.id]
+      end
+    end
+
+    describe '#has_originality_report?' do
+      let(:test_course) do
+        test_course = course_model
+        test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+        test_course.enroll_student(test_student, enrollment_state: 'active')
+        test_course
+      end
+      let(:test_teacher) { User.create }
+      let(:test_student) { User.create }
+      let(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+      let(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+      let(:report_url) { 'http://www.test-score.com' }
+
+      it 'returns true for standard reports' do
+        submission = assignment.submit_homework(test_student, attachments: [attachment])
+        OriginalityReport.create!(
+          attachment: attachment,
+          submission: submission,
+          originality_score: 0.5,
+          originality_report_url: report_url
+        )
+        expect(submission.has_originality_report?). to eq true
+      end
+
+      it 'returns true for text entry reports' do
+        submission = assignment.submit_homework(test_student)
+        OriginalityReport.create!(
+          submission: submission,
+          originality_score: 0.5,
+          originality_report_url: report_url
+        )
+        expect(submission.has_originality_report?). to eq true
+      end
+
+      it 'returns true for group reports' do
+        user_two = test_student.dup
+        user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+        assignment.course.enroll_student(user_two)
+
+        group = group_model(context: assignment.course)
+        group.update_attributes!(users: [user_two, test_student])
+
+        submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+
+        assignment.submissions.each do |s|
+          s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        end
+
+        OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
+
+        expect(assignment.submissions.map(&:has_originality_report?).uniq).to match_array [true]
+      end
+
+      it 'returns false when no reports are present' do
+        submission = assignment.submit_homework(test_student, attachments: [attachment])
+        expect(submission.has_originality_report?). to eq false
+      end
+    end
+
+    describe '#assignment_group_originality_reports' do
+      let(:test_course) do
+        test_course = course_model
+        test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+        test_course.enroll_student(test_student, enrollment_state: 'active')
+        test_course
+      end
+      let(:test_teacher) { User.create }
+      let(:test_student) { User.create }
+      let(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+      let(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+      let(:report_url) { 'http://www.test-score.com' }
+
+      before do
+        user_two = test_student.dup
+        user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+        assignment.course.enroll_student(user_two)
+
+        group = group_model(context: assignment.course)
+        group.update_attributes!(users: [user_two, test_student])
+
+        @submission = assignment.submit_homework(
+          test_student,
+          submission_type: 'online_upload',
+          attachments: [attachment]
+        )
+
+        assignment.submissions.each do |s|
+          s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        end
+      end
+
+      it 'returns originality reports from the same submission group' do
+        report = OriginalityReport.create!(originality_score: '1', submission: @submission, attachment: attachment)
+        expect(Submission.last.assignment_group_originality_reports).to match_array [report]
+      end
+
+      it 'does not return reports from another group' do
+        user_three = test_student.dup
+        user_four = test_student.dup
+
+        user_three.update_attributes!(lti_context_id: SecureRandom.uuid)
+        user_four.update_attributes!(lti_context_id: SecureRandom.uuid)
+
+        assignment.course.enroll_student(user_three)
+        assignment.course.enroll_student(user_four)
+
+        group = group_model(context: assignment.course)
+        group.update_attributes!(users: [user_three, user_four])
+
+        second_submission = assignment.submit_homework(
+          user_four,
+          submission_type: 'online_upload',
+          attachments: [attachment]
+        )
+
+        assignment.submissions.each do |s|
+          s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        end
+
+        expect(second_submission.reload.assignment_group_originality_reports).to match_array []
+      end
+
+      it 'includes self originality reports' do
+        report = OriginalityReport.create!(originality_score: '1', submission: @submission, attachment: attachment)
+        expect(@submission.reload.assignment_group_originality_reports).to match_array [report]
       end
     end
 
@@ -1948,6 +2083,11 @@ describe Submission do
 
       it 'returns the originality_report_url if present' do
         expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq(report_url)
+      end
+
+      it 'returns the report url for text entry submission reports' do
+        originality_report.update_attributes!(attachment: nil)
+        expect(submission.originality_report_url(submission.asset_string, test_teacher)).to eq report_url
       end
 
       it 'requires the :grade permission' do
@@ -4244,6 +4384,12 @@ describe Submission do
     end
   end
 
+  describe "scope: with_assignment" do
+    it "excludes submissions to deleted assignments" do
+      expect { @assignment.destroy }.to change { @student.submissions.with_assignment.count }.by(-1)
+    end
+  end
+
   describe '#filter_attributes_for_user' do
     let(:user) { instance_double('User', id: 1) }
     let(:session) { {} }
@@ -4289,6 +4435,27 @@ describe Submission do
         hash = { 'entered_grade' => 10 }
         expect(submission.filter_attributes_for_user(hash, user, session)).not_to have_key('entered_grade')
       end
+    end
+  end
+
+  describe '#update_provisional_grade' do
+    before(:once) do
+      @submission = @assignment.submissions.find_by!(user_id: @student)
+      @provisional_grade = ModeratedGrading::ProvisionalGrade.new
+      @source = ModeratedGrading::ProvisionalGrade.new
+      @provisional_grade.source_provisional_grade = @source
+      @scorer = User.new
+    end
+
+    it 'sets the source provisional grade if one is provided' do
+      new_source = ModeratedGrading::ProvisionalGrade.new
+      @submission.update_provisional_grade(@provisional_grade, @scorer, source_provisional_grade: new_source)
+      expect(@provisional_grade.source_provisional_grade).to be new_source
+    end
+
+    it 'does not wipe out the existing source provisional grade, if a source_provisional_grade is not provided' do
+      @submission.update_provisional_grade(@provisional_grade, @scorer)
+      expect(@provisional_grade.source_provisional_grade).to be @source
     end
   end
 

@@ -21,11 +21,11 @@ define [
   'react'
   'react-dom'
   '../mixins/BackboneMixin'
-  'compiled/models/Folder'
-  'compiled/fn/preventDefault'
+  '../../models/Folder'
+  '../../fn/preventDefault'
   '../modules/FocusStore'
   'classnames'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (_, I18n, React, ReactDOM, BackboneMixin, Folder, preventDefault, FocusStore, classnames) ->
 
   FolderChild =

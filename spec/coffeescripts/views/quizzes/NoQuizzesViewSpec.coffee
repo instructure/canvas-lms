@@ -19,12 +19,17 @@ define [
   'Backbone'
   'compiled/views/quizzes/NoQuizzesView'
   'jquery'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (Backbone, NoQuizzesView, $) ->
+], (Backbone, NoQuizzesView, $, assertions) ->
 
   QUnit.module 'NoQuizzesView',
     setup: ->
       @view = new NoQuizzesView()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @view, done, {'a11yReport': true}
 
   test 'it renders', ->
     ok @view.$el.hasClass('item-group-condensed')

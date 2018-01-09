@@ -58,6 +58,8 @@ describe Types::AssignmentType do
     expect(assignment_type._id).to eq assignment.id
     expect(assignment_type.name).to eq assignment_type.name
     expect(assignment_type.state).to eq assignment.workflow_state
+    expect(assignment_type.onlyVisibleToOverrides).to eq assignment.only_visible_to_overrides
+    expect(assignment_type.assignmentGroup).to eq assignment.assignment_group
   end
 
   it "returns submissions from submission connection (with permissions)" do

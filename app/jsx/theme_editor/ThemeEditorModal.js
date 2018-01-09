@@ -20,7 +20,7 @@ import I18n from 'i18n!theme_editor'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
-import ProgressBar from 'jsx/shared/ProgressBar'
+import ProgressBar from '../shared/ProgressBar'
 
   Modal.setAppElement(document.body)
 

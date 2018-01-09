@@ -19,7 +19,7 @@ define [
   'jquery'
   'i18n!assignments'
   'jst/assignments/ExternalContentHomeworkFileSubmissionView'
-  'compiled/views/assignments/ExternalContentHomeworkSubmissionView'
+  './ExternalContentHomeworkSubmissionView'
 ], ($, I18n, template, ExternalContentHomeworkSubmissionView) ->
 
   class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissionView

@@ -140,13 +140,13 @@ test("focuses on the edit icon if the component is updated to no longer be editi
 
 test("the comment timestamp includes the year if it does not match the current year", function () {
   this.wrapper = this.mountComponent({ createdAt: new Date('Jan 8, 2003') });
-  const dateText = this.wrapper.find('Typography').at(1).text();
+  const dateText = this.wrapper.find('Text').at(1).text();
   strictEqual(dateText.includes(', 2003'), true);
 });
 
 test("the comment timestamp excludes the year if it matches the current year", function () {
   this.wrapper = this.mountComponent();
-  const dateText = this.wrapper.find('Typography').at(1).text();
+  const dateText = this.wrapper.find('Text').at(1).text();
   const year = this.wrapper.instance().props.createdAt.getFullYear();
   strictEqual(dateText.includes(`, ${year}`), false);
 });
@@ -157,7 +157,7 @@ test("uses the edited_at for the timestamp, if one exists", function () {
     editedAt: new Date('Feb 12, 2003')
   });
 
-  const dateText = this.wrapper.find('Typography').at(1).text();
+  const dateText = this.wrapper.find('Text').at(1).text();
   strictEqual(dateText.includes('Feb 12'), true);
 });
 
@@ -167,21 +167,21 @@ test("starts with the text '(Edited)' if the comment has an edited_at", function
     editedAt: new Date('Feb 12, 2003')
   });
 
-  const dateText = this.wrapper.find('Typography').at(1).text();
+  const dateText = this.wrapper.find('Text').at(1).text();
   strictEqual(/^\(Edited\)/.test(dateText), true);
 });
 
 test("uses the created_at for the timestamp if edited_at is null", function () {
   this.wrapper = this.mountComponent({ createdAt: new Date('Jan 8, 2003') });
 
-  const dateText = this.wrapper.find('Typography').at(1).text();
+  const dateText = this.wrapper.find('Text').at(1).text();
   strictEqual(dateText.includes('Jan 8'), true);
 });
 
 test("does not start with the text '(Edited)' if the comment has a null edited_at", function () {
   this.wrapper = this.mountComponent({ createdAt: new Date('Jan 8, 2003') });
 
-  const dateText = this.wrapper.find('Typography').at(1).text();
+  const dateText = this.wrapper.find('Text').at(1).text();
   strictEqual(/^\(Edited\)/.test(dateText), false);
 });
 

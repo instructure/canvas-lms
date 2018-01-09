@@ -20,7 +20,7 @@ import { ToDoSidebar } from 'jsx/dashboard/ToDoSidebar';
 import { shallow, mount } from 'enzyme';
 import React from 'react';
 
-import ButtonLink from 'instructure-ui/lib/components/Link';
+import ButtonLink from '@instructure/ui-core/lib/components/Link';
 
 QUnit.module('ToDoSidebar Index');
 

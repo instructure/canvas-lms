@@ -3,8 +3,8 @@ import submissionDetailsDialog from 'jst/SubmissionDetailsDialog'
 import I18n from 'i18n!submission_details_dialog'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import GradebookHelpers from 'compiled/gradebook/GradebookHelpers'
-import {extractDataForTurnitin} from 'compiled/gradebook/Turnitin'
+import GradebookHelpers from './gradebook/GradebookHelpers'
+import {extractDataForTurnitin} from './gradebook/Turnitin'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import 'jst/_submission_detail' // a partial needed by the SubmissionDetailsDialog template
 import 'jst/_turnitinScore' // a partial needed by the submission_detail partial

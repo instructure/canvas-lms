@@ -18,7 +18,7 @@
 define [
   'i18n!gradezilla'
   'Backbone'
-  'compiled/gradezilla/OutcomeGradebookGrid'
+  '../../gradezilla/OutcomeGradebookGrid'
   'jst/gradezilla/header_filter'
 ], (I18n, {View}, Grid, template) ->
 

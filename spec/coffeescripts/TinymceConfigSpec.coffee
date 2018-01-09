@@ -98,8 +98,9 @@ define [
     teardown: ->
       $("textarea#a42").remove()
 
-  asyncTest "configured not to strip spans", ->
-    expect(1)
+  test "configured not to strip spans", (assert) ->
+    start = assert.async()
+    assert.expect(1)
     $textarea = $("textarea#a42")
     config = new EditorConfig(tinymce, INST, 1000, "a42")
     configHash = $.extend(config.defaultConfig(),{

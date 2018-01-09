@@ -182,11 +182,13 @@ class AccountsController < ApplicationController
         end
         return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, :read_course_list)
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
-        load_course_right_side
+        include_crosslisted_courses = value_to_boolean(params[:include_crosslisted_courses])
+        load_course_right_side(:include_crosslisted_courses => include_crosslisted_courses)
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show,
           :hide_enrollmentless_courses => @hide_enrollmentless_courses,
           :only_master_courses => @only_master_courses,
-          :order => sort_order)
+          :order => sort_order,
+          :include_crosslisted_courses => include_crosslisted_courses)
         ActiveRecord::Associations::Preloader.new.preload(@courses, :enrollment_term)
         build_course_stats
       end
@@ -359,7 +361,8 @@ class AccountsController < ApplicationController
       order += (params[:order] == "desc" ? " DESC, id DESC" : ", id")
     end
 
-    @courses = @account.associated_courses.order(order).where(:workflow_state => params[:state])
+    opts = { :include_crosslisted_courses => value_to_boolean(params[:include_crosslisted_courses]) }
+    @courses = @account.associated_courses(opts).order(order).where(:workflow_state => params[:state])
 
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
@@ -407,10 +410,10 @@ class AccountsController < ApplicationController
     if params[:search_term]
       search_term = params[:search_term]
       is_id = search_term.to_s =~ Api::ID_REGEX
-      if is_id && course = @courses.where(id: search_term).first
-        @courses = [course]
+      if is_id && @courses.except(:order).where(id: search_term).exists?
+        @courses = Course.where(id: search_term)
       elsif is_id && !SearchTermHelper.valid_search_term?(search_term)
-        @courses = []
+        @courses = Course.none
       else
         SearchTermHelper.validate_search_term(search_term)
 
@@ -765,6 +768,7 @@ class AccountsController < ApplicationController
         DEFAULT_HELP_LINKS: Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links),
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
+        MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
         PERMISSIONS: {
@@ -869,7 +873,7 @@ class AccountsController < ApplicationController
     end
   end
 
-  def load_course_right_side
+  def load_course_right_side(opts = {})
     @root_account = @account.root_account
     @maximum_courses_im_gonna_show = 50
     @term = nil
@@ -877,7 +881,7 @@ class AccountsController < ApplicationController
       @term = @root_account.enrollment_terms.active.find(params[:enrollment_term_id]) rescue nil
       @term ||= @root_account.enrollment_terms.active[-1]
     end
-    associated_courses = @account.associated_courses.active
+    associated_courses = @account.associated_courses(opts).active
     associated_courses = associated_courses.for_term(@term) if @term
     @associated_courses_count = associated_courses.count
     @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
@@ -1191,7 +1195,7 @@ class AccountsController < ApplicationController
                                    :app_center_access_token].freeze
 
   def permitted_account_attributes
-    [:name, :turnitin_account_id, :turnitin_shared_secret,
+    [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,
       :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
       :default_time_zone, :parent_account, :default_storage_quota,
       :default_storage_quota_mb, :storage_quota, :default_locale,

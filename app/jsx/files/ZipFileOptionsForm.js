@@ -19,9 +19,9 @@
 import I18n from 'i18n!zip_file_options_form'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from 'jsx/shared/modal'
-import ModalContent from 'jsx/shared/modal-content'
-import ModalButtons from 'jsx/shared/modal-buttons'
+import Modal from '../shared/modal'
+import ModalContent from '../shared/modal-content'
+import ModalButtons from '../shared/modal-buttons'
 
   var ZipFileOptionsForm = React.createClass({
 

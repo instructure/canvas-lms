@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import CourseListItem from 'jsx/epub_exports/CourseListItem'
+import CourseListItem from '../epub_exports/CourseListItem'
 
 const CourseList = React.createClass({
   displayName: 'CourseList',

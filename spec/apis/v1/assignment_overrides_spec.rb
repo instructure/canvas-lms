@@ -574,6 +574,7 @@ describe AssignmentOverridesController, type: :request do
       assignment_override_model(:assignment => @assignment)
       @student = student_in_course(:course => @course).user
       @override_student = @override.assignment_override_students.build
+      @override_student.workflow_state = "active"
       @override_student.user = @student
       @override_student.save!
       @user = @teacher
@@ -832,6 +833,7 @@ describe AssignmentOverridesController, type: :request do
         assignment_override_model(:assignment => @assignment)
         @student = student_in_course(:course => @course).user
         @override_student = @override.assignment_override_students.build
+        @override_student.workflow_state = "active"
         @override_student.user = @student
         @override_student.save!
         @user = @teacher

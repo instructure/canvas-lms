@@ -18,8 +18,8 @@
 define [
   'i18n!editor'
   'jquery'
-  'compiled/editor/EditorToggle'
-  'compiled/str/apiUserContent'
+  '../editor/EditorToggle'
+  '../str/apiUserContent'
   'vendor/jquery.ba-tinypubsub'
   'jsx/shared/rce/RichContentEditor'
 ], (I18n, $, EditorToggle, apiUserContent, {publish}, RichContentEditor) ->

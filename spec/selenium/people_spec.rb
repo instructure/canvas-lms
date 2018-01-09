@@ -416,7 +416,7 @@ describe "people" do
       student = create_user("student@example.com")
       enroll_student(student)
       get "/courses/#{@course.id}/users"
-      f(".StudentEnrollment .icon-settings").click
+      f(".StudentEnrollment .icon-more").click
       fln("Edit Sections").click
       f(".token_input.browsable").click
       section_input_element = driver.find_element(:name, "token_capture")
@@ -433,7 +433,7 @@ describe "people" do
      @course.enroll_student(@student, allow_multiple_enrollments: true)
      @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
      get "/courses/#{@course.id}/users"
-     f(".StudentEnrollment .icon-settings").click
+     f(".StudentEnrollment .icon-more").click
      fln("Edit Sections").click
      fln("Remove user from section2").click
      ff('.ui-button-text')[1].click
@@ -448,7 +448,7 @@ describe "people" do
       @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student1.id, allow_multiple_enrollments: true)
       @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: :active, associated_user_id: @student2.id, allow_multiple_enrollments: true)
       get "/courses/#{@course.id}/users"
-      f(".ObserverEnrollment .icon-settings").click
+      f(".ObserverEnrollment .icon-more").click
       fln("Link to Students").click
       fln("Remove linked student #{@student1.name}", f("#token_#{@student1.id}")).click
       f('.ui-dialog-buttonset .btn-primary').click
@@ -464,7 +464,7 @@ describe "people" do
       e.sis_batch_id = sis.id
       e.save!
       get "/courses/#{@course.id}/users"
-      ff(".icon-settings")[1].click
+      ff(".icon-more")[1].click
       fln("Edit Sections").click
       expect(f('#user_sections li.cannot_remove').text).to include @course.default_section.name
 
@@ -478,7 +478,7 @@ describe "people" do
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
 
-      ff(".icon-settings")[1].click
+      ff(".icon-more")[1].click
       fln("Edit Sections").click
       expect(f('#user_sections li.cannot_remove').text).to include @course.default_section.name
       expect(f("a[title='Remove user from section2']")).not_to be_nil

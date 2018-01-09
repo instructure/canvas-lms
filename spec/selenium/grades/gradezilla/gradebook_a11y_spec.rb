@@ -178,14 +178,6 @@ describe "Gradezilla" do
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
-    it 'pressing "m" closes the assignment header menu if it is open' do
-      Gradezilla::Cells.send_keyboard_shortcut(@student_1, @first_assignment, 'm')
-      expect(Gradezilla.expanded_popover_menu).to be_displayed
-      driver.action.send_keys('m').perform
-
-      expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
-    end
-
     it 'opens the assignment group header menu when a cell has focus and is not in edit mode' do
       Gradezilla::Cells.send_keyboard_shortcut_to_assignment_group(@student_1, @group, 'm')
 
@@ -201,15 +193,6 @@ describe "Gradezilla" do
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
-    it 'pressing "m" closes the assignment group header menu if it is open' do
-      Gradezilla::Cells.send_keyboard_shortcut_to_assignment_group(@student_1, @group, 'm')
-      expect(Gradezilla.expanded_popover_menu).to be_displayed
-
-      driver.action.send_keys('m').perform
-
-      expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
-    end
-
     it 'opens the total header menu when a cell has focus and is not in edit mode' do
       Gradezilla::Cells.send_keyboard_shortcut_to_total(@student_1, 'm')
 
@@ -221,15 +204,6 @@ describe "Gradezilla" do
       expect(Gradezilla.expanded_popover_menu).to be_displayed
 
       driver.action.send_keys(:escape).perform
-
-      expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
-    end
-
-    it 'pressing "m" closes the total header menu if it is open' do
-      Gradezilla.select_total_column_option
-      expect(Gradezilla.expanded_popover_menu).to be_displayed
-
-      driver.action.send_keys('m').perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end

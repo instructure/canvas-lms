@@ -20,10 +20,10 @@ define [
   'i18n!outcomes'
   'jquery'
   'underscore'
-  'compiled/views/ValidatedFormView'
-  'compiled/views/editor/KeyboardShortcuts'
+  '../ValidatedFormView'
+  '../editor/KeyboardShortcuts'
   'jsx/shared/rce/RichContentEditor'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, ValidatedFormView, RCEKeyboardShortcuts, RichContentEditor) ->
 

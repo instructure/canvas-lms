@@ -61,6 +61,5 @@ module.exports = [
   'compiled/str/i18nLolcalize',
   'instructure',
 
-   // 'instructure-ui/Spinner',
    // 'jsx/shared/rce/RichContentEditor'
 ]

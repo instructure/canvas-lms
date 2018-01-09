@@ -22,7 +22,7 @@ import tz from 'timezone'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
 import moment from 'moment'
 import 'jquery.instructure_date_and_time'
-import 'compiled/jquery.rails_flash_notifications'
+import '../jquery.rails_flash_notifications'
 
 // adds datepicker and suggest functionality to the specified $field
 export default class DatetimeField {

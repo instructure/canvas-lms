@@ -20,11 +20,11 @@ import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
-import ConfigurationFormUrl from 'jsx/external_apps/components/ConfigurationFormUrl'
-import ConfigurationFormXml from 'jsx/external_apps/components/ConfigurationFormXml'
-import ConfigurationFormLti2 from 'jsx/external_apps/components/ConfigurationFormLti2'
-import ConfigurationTypeSelector from 'jsx/external_apps/components/ConfigurationTypeSelector'
+import ConfigurationFormManual from '../../external_apps/components/ConfigurationFormManual'
+import ConfigurationFormUrl from '../../external_apps/components/ConfigurationFormUrl'
+import ConfigurationFormXml from '../../external_apps/components/ConfigurationFormXml'
+import ConfigurationFormLti2 from '../../external_apps/components/ConfigurationFormLti2'
+import ConfigurationTypeSelector from '../../external_apps/components/ConfigurationTypeSelector'
 
 export default React.createClass({
     displayName: 'ConfigurationForm',
@@ -35,6 +35,7 @@ export default React.createClass({
       tool: PropTypes.object.isRequired,
       showConfigurationSelector: PropTypes.bool,
       hideComponent: PropTypes.bool,
+      membershipServiceFeatureFlagEnabled: PropTypes.bool,
       children: PropTypes.node
     },
 
@@ -58,6 +59,7 @@ export default React.createClass({
         _state.configUrl = this.props.tool.config_url;
         _state.xml = this.props.tool.xml;
         _state.registrationUrl = this.props.tool.registration_url;
+        _state.allow_membership_service_access = this.props.tool.allow_membership_service_access;
       }
 
       return _state;
@@ -65,35 +67,37 @@ export default React.createClass({
 
     defaultState() {
       return {
-        configurationType         : this.props.configurationType,
-        showConfigurationSelector : this.props.showConfigurationSelector,
-        name                      : '',
-        consumerKey               : '',
-        sharedSecret              : '',
-        url                       : '',
-        domain                    : '',
-        privacy_level             : '',
-        customFields              : {},
-        description               : '',
-        configUrl                 : '',
-        registrationUrl           : '',
-        xml                       : ''
+        configurationType               : this.props.configurationType,
+        showConfigurationSelector       : this.props.showConfigurationSelector,
+        name                            : '',
+        consumerKey                     : '',
+        sharedSecret                    : '',
+        url                             : '',
+        domain                          : '',
+        privacy_level                   : '',
+        customFields                    : {},
+        description                     : '',
+        configUrl                       : '',
+        registrationUrl                 : '',
+        xml                             : '',
+        allow_membership_service_access : false
       };
     },
 
     reset() {
       this.setState({
-        name                      : '',
-        consumerKey               : '',
-        sharedSecret              : '',
-        url                       : '',
-        domain                    : '',
-        privacy_level             : '',
-        customFields              : {},
-        description               : '',
-        configUrl                 : '',
-        registrationUrl           : '',
-        xml                       : ''
+        name                            : '',
+        consumerKey                     : '',
+        sharedSecret                    : '',
+        url                             : '',
+        domain                          : '',
+        privacy_level                   : '',
+        customFields                    : {},
+        description                     : '',
+        configUrl                       : '',
+        registrationUrl                 : '',
+        xml                             : '',
+        allow_membership_service_access : false
       });
     },
 
@@ -126,7 +130,7 @@ export default React.createClass({
           const newObj = {};
 
           for (const prop in obj) {
-            if (obj[prop]) {
+            if (obj[prop] && typeof obj[prop] === 'string') {
               newObj[prop] = obj[prop].trim();
             } else {
               newObj[prop] = obj[prop];
@@ -161,7 +165,9 @@ export default React.createClass({
             domain={this.state.domain}
             privacyLevel={this.state.privacy_level}
             customFields={this.state.customFields}
-            description={this.state.description} />
+            description={this.state.description}
+            allowMembershipServiceAccess={this.state.allow_membership_service_access}
+            membershipServiceFeatureFlagEnabled={this.props.membershipServiceFeatureFlagEnabled} />
         );
       }
 
@@ -172,7 +178,9 @@ export default React.createClass({
             name={this.state.name}
             consumerKey={this.state.consumerKey}
             sharedSecret={this.state.sharedSecret}
-            configUrl={this.state.configUrl} />
+            configUrl={this.state.configUrl}
+            allowMembershipServiceAccess={this.state.allow_membership_service_access}
+            membershipServiceFeatureFlagEnabled={this.props.membershipServiceFeatureFlagEnabled} />
         );
       }
 
@@ -183,7 +191,9 @@ export default React.createClass({
             name={this.state.name}
             consumerKey={this.state.consumerKey}
             sharedSecret={this.state.sharedSecret}
-            xml={this.state.xml} />
+            xml={this.state.xml}
+            allowMembershipServiceAccess={this.state.allow_membership_service_access}
+            membershipServiceFeatureFlagEnabled={this.props.membershipServiceFeatureFlagEnabled} />
         );
       }
 

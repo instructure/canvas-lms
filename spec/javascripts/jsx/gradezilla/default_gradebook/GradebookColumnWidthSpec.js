@@ -18,12 +18,9 @@
 
 import $ from 'jquery';
 import fakeENV from 'helpers/fakeENV';
-import {
-  createGradebook,
-  setFixtureHtml
-} from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
-import SlickGridSpecHelper from 'spec/jsx/gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
+import { createGradebook, setFixtureHtml } from '../../gradezilla/default_gradebook/GradebookSpecHelper';
+import SlickGridSpecHelper from '../../gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
 
 QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {
   let $fixture;
@@ -208,7 +205,7 @@ QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {
   QUnit.module('when initializing the grid', (hooks) => {
     hooks.beforeEach(() => {
       gradebook = createGradebook();
-      gradebook.gradebookColumnSizeSettings = { assignment_2302: 10, assignment_2303: 54 };
+      gradebook.gradebookColumnSizeSettings = { assignment_2302: 10, assignment_2303: 254 };
       gradebook.initialize();
       addGridData();
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid);
@@ -221,18 +218,7 @@ QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {
 
     test('uses a stored width for assignment column headers', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2303');
-      strictEqual(columnNode.offsetWidth, 54);
-    });
-
-    test('hides assignment column header content when the column is minimized', () => {
-      const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2302');
-      ok(columnNode.classList.contains('minimized'));
-    });
-
-    test('hides assignment column cell content when the column is minimized', () => {
-      const columnIndex =  gridSpecHelper.listColumnIds().indexOf('assignment_2302');
-      const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex);
-      ok(cellNode.classList.contains('minimized'));
+      strictEqual(columnNode.offsetWidth, 254);
     });
   });
 
@@ -252,34 +238,6 @@ QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {
       const originalWidth = gridSpecHelper.getColumn('assignment_2304').width;
       resizeColumn('assignment_2304', -20);
       strictEqual(gradebook.gradebookGrid.gridData.columns.definitions.assignment_2304.width, originalWidth - 20);
-    });
-
-    test('hides assignment column header content when the column is minimized', () => {
-      resizeColumn('assignment_2304', -100);
-      const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2304');
-      ok(columnNode.classList.contains('minimized'));
-    });
-
-    test('hides assignment column cell content when the column is minimized', () => {
-      resizeColumn('assignment_2304', -100);
-      const columnIndex =  gridSpecHelper.listColumnIds().indexOf('assignment_2304');
-      const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex);
-      ok(cellNode.classList.contains('minimized'));
-    });
-
-    test('unhides assignment column header content when the column is unminimized', () => {
-      resizeColumn('assignment_2304', -100);
-      resizeColumn('assignment_2304', 1);
-      const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2304');
-      notOk(columnNode.classList.contains('minimized'));
-    });
-
-    test('unhides assignment column cell content when the column is unminimized', () => {
-      resizeColumn('assignment_2304', -100);
-      resizeColumn('assignment_2304', 1);
-      const columnIndex =  gridSpecHelper.listColumnIds().indexOf('assignment_2304');
-      const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex);
-      notOk(cellNode.classList.contains('minimized'));
     });
   });
 });

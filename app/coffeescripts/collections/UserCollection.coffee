@@ -17,8 +17,8 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/User'
+  '../collections/PaginatedCollection'
+  '../models/User'
 ], (PaginatedCollection, User) ->
 
   class UserCollection extends PaginatedCollection

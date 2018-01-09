@@ -82,6 +82,26 @@ describe SisPseudonym do
     expect(SisPseudonym.for(u, course1)).to eq @p
   end
 
+  it "should return pseudonym for specfic enrollment" do
+    @p = u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
+      x.workflow_state = 'active'
+      x.sis_user_id = "user2"
+    end
+    @p2 = u.pseudonyms.create!(pseud_params("user2b@example.com")) do |x|
+      x.workflow_state = 'active'
+      x.sis_user_id = "user2b"
+    end
+    e = course1.enroll_user(u, 'StudentEnrollment', enrollment_state: 'active')
+    e.sis_pseudonym_id = @p.id
+    e.save!
+    section = course1.course_sections.create
+    e2 = course1.enroll_user(u, 'StudentEnrollment', enrollment_state: 'active', section: section, allow_multiple_enrollments: true)
+    e2.sis_pseudonym_id = @p2.id
+    e2.save!
+    expect(SisPseudonym.for(u, e)).to eq @p
+    expect(SisPseudonym.for(u, e2)).to eq @p2
+  end
+
   it "should find the right root account for a course" do
     pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') do |p|
       p.sis_user_id = 'abc'

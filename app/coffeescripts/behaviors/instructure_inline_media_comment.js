@@ -17,9 +17,9 @@
 
 import I18n from 'i18n!media_comments'
 import $ from 'jquery'
-import preventDefault from 'compiled/fn/preventDefault'
+import preventDefault from '../fn/preventDefault'
 import htmlEscape from 'str/htmlEscape'
-import 'compiled/jquery/mediaComment'
+import '../jquery/mediaComment'
 
 const inlineMediaComment = {
   buildMinimizerLink: () => $(

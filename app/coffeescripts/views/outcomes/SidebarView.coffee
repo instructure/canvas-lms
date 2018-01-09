@@ -21,10 +21,10 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/Outcome'
-  'compiled/models/OutcomeGroup'
-  'compiled/views/outcomes/OutcomesDirectoryView'
-  'compiled/views/outcomes/FindDirectoryView'
+  '../../models/Outcome'
+  '../../models/OutcomeGroup'
+  './OutcomesDirectoryView'
+  './FindDirectoryView'
 ], (I18n, $, _, Backbone, Outcome, OutcomeGroup, OutcomesDirectoryView, FindDirectoryView) ->
 
   findDialog = undefined

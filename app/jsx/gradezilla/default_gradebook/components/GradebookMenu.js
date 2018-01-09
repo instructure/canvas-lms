@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
-import Button from 'instructure-ui/lib/components/Button'
-import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Button from '@instructure/ui-core/lib/components/Button'
+import { MenuItem, MenuItemSeparator } from '@instructure/ui-core/lib/components/Menu'
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import Text from '@instructure/ui-core/lib/components/Text'
 import I18n from 'i18n!gradebook'
 
   const { oneOf, bool, string, func } = PropTypes;
@@ -128,9 +128,9 @@ import I18n from 'i18n!gradebook'
       if (this.props.variant === 'DefaultGradebookLearningMastery') label = I18n.t('Learning Mastery');
       return (
         <Button variant="link">
-          <Typography color="primary">
+          <Text color="primary">
             {label} <IconMiniArrowDownSolid />
-          </Typography>
+          </Text>
         </Button>
       );
     }

@@ -32,8 +32,6 @@ describe "calendar2" do
     @course.enroll_student(@student1).accept!
   end
 
-
-
   context "as the student" do
     before :each do
       user_session(@student1)
@@ -117,15 +115,10 @@ describe "calendar2" do
     it "should move a course calendar todo to the student calendar" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'
-      wait_for_ajax_requests
+
       f('a.fc-event').click # click the note
       f('button.edit_event_link').click # the Edit button
-      course_select = f('#planner_note_context')
-      course_select.click
-      course_select.find_elements( :tag_name => "option" ).find do |option|
-        option.attribute("value") == "user_#{@student1.id}"
-      end.click # select the student's calendar
-
+      click_option('#planner_note_context', @student1.name)
       f('button.save_note').click
       wait_for_ajaximations
       note = f('a.fc-event')

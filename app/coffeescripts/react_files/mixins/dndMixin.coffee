@@ -21,7 +21,7 @@ define [
   'react-dom'
   'jsx/files/DragFeedback'
   '../utils/moveStuff'
-  'compiled/models/Folder'
+  '../../models/Folder'
   'jquery'
   'underscore'
 ], (I18n, React, ReactDOM, DragFeedback, moveStuff, Folder, $, _) ->

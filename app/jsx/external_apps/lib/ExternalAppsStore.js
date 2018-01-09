@@ -19,7 +19,7 @@
 import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import _ from 'underscore'
-import createStore from 'jsx/shared/helpers/createStore'
+import createStore from '../../shared/helpers/createStore'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -215,6 +215,7 @@ import 'compiled/jquery.rails_flash_notifications'
     params['privacy_level'] = 'anonymous';
     params['consumer_key'] = 'N/A';
     params['shared_secret'] = 'N/A';
+    params['verify_uniqueness'] = data.verifyUniqueness
     if (data.consumerKey && data.consumerKey.length > 0) {
       params['consumer_key'] = data.consumerKey;
     }
@@ -224,16 +225,16 @@ import 'compiled/jquery.rails_flash_notifications'
     switch(configurationType) {
       case 'manual':
         // Convert custom fields into kv pair
-          if (data.customFields === '' || typeof data.customFields === 'undefined') {
-            params['custom_fields_string'] = '';
-          } else {
-            var pairs = (data.customFields || '').split('\n');
-            params.custom_fields = {}
-            _.forEach(pairs, function(pair) {
-              var vals = pair.trim().split(/=(.+)?/);
-              params.custom_fields[vals[0]] = vals[1];
-            });
-          }
+        if (data.customFields === '' || typeof data.customFields === 'undefined') {
+          params['custom_fields_string'] = '';
+        } else {
+          var pairs = (data.customFields || '').split('\n');
+          params.custom_fields = {}
+          _.forEach(pairs, function(pair) {
+            var vals = pair.trim().split(/=(.+)?/);
+            params.custom_fields[vals[0]] = vals[1];
+          });
+        }
 
         params['domain'] = data.domain;
         params['privacy_level'] = data.privacyLevel;
@@ -249,6 +250,11 @@ import 'compiled/jquery.rails_flash_notifications'
         params['config_xml'] = data.xml;
         break;
     }
+
+    if (data.allow_membership_service_access != null) {
+      params['allow_membership_service_access'] = data.allow_membership_service_access;
+    }
+
     return params;
   };
 

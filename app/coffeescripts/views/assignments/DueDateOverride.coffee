@@ -22,12 +22,12 @@ define [
   'react'
   'react-dom'
   'jst/assignments/DueDateOverride'
-  'compiled/util/DateValidator'
-  'compiled/views/ValidatedMixin'
+  '../../util/DateValidator'
+  '../ValidatedMixin'
   'i18n!overrides'
   'jsx/due_dates/DueDates'
   'jsx/due_dates/StudentGroupStore'
-  'compiled/api/gradingPeriodsApi'
+  '../../api/gradingPeriodsApi'
   'timezone'
   'jquery.instructure_forms.js' # errorBox
 ], (

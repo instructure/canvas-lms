@@ -18,8 +18,8 @@
 define [
   'i18n!course_users'
   'jquery'
-  'compiled/util/mixin'
-  'compiled/views/ValidatedMixin'
+  '../util/mixin'
+  './ValidatedMixin'
   'jquery.instructure_forms'
 ], (I18n, $, mixin, ValidatedMixin) ->
 

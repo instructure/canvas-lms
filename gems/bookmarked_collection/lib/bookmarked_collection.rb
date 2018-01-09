@@ -75,6 +75,7 @@ module BookmarkedCollection
   require 'bookmarked_collection/merge_proxy'
   require 'bookmarked_collection/simple_bookmarker'
   require 'bookmarked_collection/wrap_proxy'
+  require 'bookmarked_collection/transform_proxy'
 
   def self.best_unicode_collation_key(col)
     if @best_unicode_collation_key_proc
@@ -265,5 +266,10 @@ module BookmarkedCollection
   # filter_proc returns true for.
   def self.filter(collection, &filter_proc)
     BookmarkedCollection::FilterProxy.new(collection, &filter_proc)
+  end
+
+  # Transform the results of a collection using the transform_proc
+  def self.transform(collection, &transform_proc)
+    BookmarkedCollection::TransformProxy.new(collection, &transform_proc)
   end
 end

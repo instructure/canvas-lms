@@ -17,8 +17,8 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/PageView'
+  '../collections/PaginatedCollection'
+  '../models/PageView'
 ], (PaginatedCollection, PageView) ->
 
   class PageViewCollection extends PaginatedCollection

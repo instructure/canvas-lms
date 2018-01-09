@@ -17,14 +17,13 @@
  */
 
 import React from 'react'
-import $ from 'jquery';
+import $ from 'jquery'
 import {mount} from 'enzyme'
 import TermsOfServiceModal from 'jsx/shared/TermsOfServiceModal'
-import Link from 'instructure-ui/lib/components/Link'
 
 QUnit.module('Terms of Service Modal Link', {
   setup () {
-    $('#fixtures').html('<div id="main">');
+    $('#fixtures').html('<div id="main">')
   },
   teardown () {
     $('#fixtures').empty()
@@ -34,16 +33,16 @@ QUnit.module('Terms of Service Modal Link', {
 test('renders correct link when preview is provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = "Hello World"
   const wrapper = mount(<TermsOfServiceModal preview/>)
-  const renderedLink = wrapper.find(Link)
+  const renderedLink = wrapper.find('Link')
   equal(renderedLink.text(), 'Preview')
-});
+})
 
 test('renders correct link when preview is provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = "Hello World"
   const wrapper = mount(<TermsOfServiceModal/>)
-  const renderedLink = wrapper.find(Link)
+  const renderedLink = wrapper.find('Link')
   equal(renderedLink.text(), 'Terms of Service')
-});
+})
 
 
 // ---------------- THESE ARE BROKEN DUE TO IMAGE CROPPING FRAGILE SPEC -----------------------------

@@ -22,7 +22,7 @@ define [
   'Backbone'
   'jst/courses/roster/resendInvitations'
   'jquery.ajaxJSON'
-  'compiled/jquery.rails_flash_notifications'
+  '../../../jquery.rails_flash_notifications'
 ], ($, _, I18n, {View}, template) ->
 
   class ResendInvitationsView extends View

@@ -21,8 +21,8 @@ import fakeENV from 'helpers/fakeENV';
 import {
   createGradebook,
   setFixtureHtml
-} from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
-import SlickGridSpecHelper from 'spec/jsx/gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
+} from '../../gradezilla/default_gradebook/GradebookSpecHelper';
+import SlickGridSpecHelper from '../../gradezilla/default_gradebook/slick-grid/SlickGridSpecHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 
 QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {

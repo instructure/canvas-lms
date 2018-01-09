@@ -20,14 +20,14 @@ import React from 'react'
 import keycode from 'keycode'
 import I18n from 'i18n!act_as'
 
-import Modal, {ModalHeader, ModalBody} from 'instructure-ui/lib/components/Modal'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import Container from 'instructure-ui/lib/components/Container'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Button from 'instructure-ui/lib/components/Button'
-import Avatar from 'instructure-ui/lib/components/Avatar'
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import Table from 'instructure-ui/lib/components/Table'
+import Modal, {ModalHeader, ModalBody} from '@instructure/ui-core/lib/components/Modal'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Avatar from '@instructure/ui-core/lib/components/Avatar'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Table from '@instructure/ui-core/lib/components/Table'
 
 import ActAsMask from './ActAsMask'
 import ActAsPanda from './ActAsPanda'
@@ -137,19 +137,19 @@ export default class ActAsModal extends React.Component {
     return (
       <tr>
         <td>
-          <Typography size="small">{category}</Typography>
+          <Text size="small">{category}</Text>
         </td>
         <td>
           <Container
             as="div"
             textAlign="end"
           >
-            <Typography
+            <Text
               size="small"
               weight="bold"
             >
               {info}
-            </Typography>
+            </Text>
           </Container>
         </td>
       </tr>
@@ -172,9 +172,9 @@ export default class ActAsModal extends React.Component {
           open
         >
           <ModalHeader>
-            <Typography size="large">
+            <Text size="large">
               {I18n.t('Act as User')}
-            </Typography>
+            </Text>
           </ModalHeader>
           <ModalBody>
             {this.state.isLoading ?
@@ -201,18 +201,18 @@ export default class ActAsModal extends React.Component {
                       textAlign="center"
                       padding="0 0 x-small 0"
                     >
-                      <Typography
+                      <Text
                         size="x-large"
                         weight="light"
                       >
                         {I18n.t('Act as %{name}', { name: user.short_name })}
-                      </Typography>
+                      </Text>
                     </Container>
                     <Container
                       as="div"
                       textAlign="center"
                     >
-                      <Typography
+                      <Text
                         lineHeight="condensed"
                         size="small"
                       >
@@ -223,7 +223,7 @@ export default class ActAsModal extends React.Component {
                           'audit logs record that you were the one who performed the ' +
                           'actions on behalf of this user.'
                         )}
-                      </Typography>
+                      </Text>
                     </Container>
                     <Container
                       as="div"

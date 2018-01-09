@@ -73,15 +73,24 @@ module PlannerPageObject
   end
 
   def go_to_list_view
+    @student1.preferences[:dashboard_view] = "planner"
+    @student1.save!
     get '/'
-    click_dashboard_settings
-    select_list_view
     wait_for_planner_load
   end
 
-  def validate_link_to_url(object, url_type) # should pass the type of object as a string
+  # should pass the type of object as a string
+  def validate_link_to_url(object, url_type)
     navigate_to_course_object(object)
     validate_url(url_type, object)
+  end
+
+  def view_todo_item
+    @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now,
+                                                     title: "Student to do", course_id: @course.id)
+    go_to_list_view
+    fln(@student_to_do.title).click
+    @modal = todo_sidebar_modal(@student_to_do.title)
   end
 
   def open_opportunities_dropdown

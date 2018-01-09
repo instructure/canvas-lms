@@ -18,8 +18,8 @@
 define [
   'jquery'
   'Backbone'
-  'compiled/views/content_migrations/subviews/DaySubstitutionView'
-  'compiled/models/DaySubstitution'
+  './DaySubstitutionView'
+  '../../../models/DaySubstitution'
   'jst/content_migrations/subviews/DateShift'
 ], ($, Backbone, DaySubView, DaySubModel, template) ->
   class DateShiftView extends Backbone.View

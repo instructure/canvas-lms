@@ -460,7 +460,8 @@ class CoursesController < ApplicationController
           end
 
           state = e.state_based_on_date
-          if [:completed, :rejected].include?(state) || e.section_or_course_date_in_past? # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
+          if [:completed, :rejected].include?(state) ||
+            ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first
@@ -990,7 +991,7 @@ class CoursesController < ApplicationController
         ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course})
       end
       user = users.first or raise ActiveRecord::RecordNotFound
-      enrollments = user.not_ended_enrollments if includes.include?('enrollments')
+      enrollments = user.not_ended_enrollments.preload(:root_account, :sis_pseudonym) if includes.include?('enrollments')
       render :json => user_json(user, @current_user, session, includes, @context, enrollments)
     end
   end
@@ -1051,15 +1052,52 @@ class CoursesController < ApplicationController
   def todo_items
     get_context
     if authorized_action(@context, @current_user, :read)
-      grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'grading') }
-      submitting = @current_user.assignments_needing_submitting(:include_ungraded => true, :contexts => [@context], :limit => ToDoListPresenter::ASSIGNMENT_LIMIT).map { |a|
-        todo_item_json(a, @current_user, session, 'submitting')
-      }
-      if Array(params[:include]).include? 'ungraded_quizzes'
-        submitting += @current_user.ungraded_quizzes(:contexts => [@context], :needing_submitting => true).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
-        submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
+      bookmark = BookmarkedCollection::SimpleBookmarker.new(Assignment, :due_at, :id)
+
+      grading_scope = @current_user.assignments_needing_grading(:contexts => [@context], scope_only: true).
+        reorder(:due_at, :id)
+      submitting_scope = @current_user.assignments_needing_submitting(
+          :contexts => [@context],
+          include_ungraded: true,
+          limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
+          scope_only: true).
+        where('assignments.due_at > ?', Time.zone.now).
+        reorder(:due_at, :id)
+
+      grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
+      grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
+        todo_item_json(a, @current_user, session, 'grading')
       end
-      render :json => (grading + submitting)
+      submitting_collection = BookmarkedCollection.wrap(bookmark, submitting_scope)
+      submitting_collection = BookmarkedCollection.transform(submitting_collection) do |a|
+        todo_item_json(a, @current_user, session, 'submitting')
+      end
+
+      collections = [
+        ['grading', grading_collection],
+        ['submitting', submitting_collection]
+      ]
+
+      if Array(params[:include]).include? 'ungraded_quizzes'
+        quizzes_bookmark = BookmarkedCollection::SimpleBookmarker.new(Quizzes::Quiz, :due_at, :id)
+        quizzes_scope = @current_user.ungraded_quizzes(
+            :contexts => [@context],
+            :needing_submitting => true,
+            :scope_only => true).
+          where('quizzes.due_at > ?', Time.zone.now).
+          reorder(:due_at, :id)
+        quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
+        quizzes_collection = BookmarkedCollection.transform(quizzes_collection) do |a|
+          todo_item_json(a, @current_user, session, 'submitting')
+        end
+
+        collections << ['quizzes', quizzes_collection]
+      end
+
+      paginated_collection = BookmarkedCollection.merge(*collections)
+      todos = Api.paginate(paginated_collection, self, api_v1_course_todo_list_items_url)
+
+      render :json => todos
     end
   end
 
@@ -1105,8 +1143,6 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_reports)
       @student_ids = @context.student_ids
-      @range_start = Date.parse("Jan 1 2000")
-      @range_end = Date.tomorrow
 
       query = "SELECT COUNT(id), SUM(size) FROM #{Attachment.quoted_table_name} WHERE context_id=%s AND context_type='Course' AND root_attachment_id IS NULL AND file_state != 'deleted'"
       row = Attachment.connection.select_rows(query % [@context.id]).first
@@ -1114,22 +1150,6 @@ class CoursesController < ApplicationController
       query = "SELECT COUNT(id), SUM(max_size) FROM #{MediaObject.quoted_table_name} WHERE context_id=%s AND context_type='Course' AND attachment_id IS NULL AND workflow_state != 'deleted'"
       row = MediaObject.connection.select_rows(query % [@context.id]).first
       @media_file_count, @media_files_size = [row[0].to_i, row[1].to_i]
-
-      if params[:range] && params[:date]
-        date = Date.parse(params[:date]) rescue nil
-        date ||= Time.zone.today
-        if params[:range] == 'week'
-          @view_week = (date - 1) - (date - 1).wday + 1
-          @range_start = @view_week
-          @range_end = @view_week + 6
-          @old_range_start = @view_week - 7.days
-        elsif params[:range] == 'month'
-          @view_month = Date.new(date.year, date.month, d=1) #view.created_at.strftime("%m:%Y")
-          @range_start = @view_month
-          @range_end = (@view_month >> 1) - 1
-          @old_range_start = @view_month << 1
-        end
-      end
 
       respond_to do |format|
         format.html do
@@ -1198,6 +1218,7 @@ class CoursesController < ApplicationController
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
+        MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
@@ -2563,6 +2584,9 @@ class CoursesController < ApplicationController
   def reset_content
     get_context
     return unless authorized_action(@context, @current_user, :reset_content)
+    if MasterCourses::MasterTemplate.is_master_course?(@context)
+      return render :json => { :message => 'cannot reset_content on a blueprint course' }, :status => :bad_request
+    end
     @new_course = @context.reset_content
     Auditors::Course.record_reset(@context, @new_course, @current_user, source: api_request? ? :api : :manual)
     if api_request?

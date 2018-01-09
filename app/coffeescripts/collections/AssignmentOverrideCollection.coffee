@@ -19,8 +19,8 @@ define [
   'Backbone'
   'underscore'
   'jquery'
-  'compiled/models/AssignmentOverride'
-  'compiled/models/Section'
+  '../models/AssignmentOverride'
+  '../models/Section'
 ], (Backbone, _, $, AssignmentOverride, Section) ->
 
   # Class Summary

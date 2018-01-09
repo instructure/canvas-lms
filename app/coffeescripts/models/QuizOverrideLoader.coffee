@@ -18,7 +18,7 @@
 define [
   'jquery'
   'underscore'
-  'compiled/collections/PaginatedCollection'
+  '../collections/PaginatedCollection'
 ], ($, _, PaginatedCollection) ->
 
   QuizOverrideLoader = {

@@ -71,17 +71,6 @@ describe "announcements" do
       expect(f("#content")).not_to contain_css(".announcements active")
     end
 
-    it "should not show JSON when loading more announcements via pageless", priority: "2", test_id: 220375 do
-      50.times { @course.announcements.create!(:title => 'Hi there!', :message => 'Announcement time!') }
-      get "/courses/#{@course.id}/announcements"
-
-      start = ff(".discussionTopicIndexList .discussion-topic").length
-      scroll_page_to_bottom
-      expect(ff(".discussionTopicIndexList .discussion-topic")).not_to have_size(start)
-
-      expect(f(".discussionTopicIndexList")).not_to include_text('discussion_topic')
-    end
-
     it "should validate that a student can not see an announcement with a delayed posting date", priority: "1", test_id: 220376 do
       announcement_title = 'Hi there!'
       announcement = @course.announcements.create!(:title => announcement_title, :message => 'Announcement time!', :delayed_post_at => Time.now + 1.day)

@@ -20,7 +20,7 @@ define [
   'Backbone'
   'jst/assignments/DateDueColumnView'
   'jquery'
-  'compiled/behaviors/tooltip'
+  '../../behaviors/tooltip'
 ], (I18n, Backbone, template, $) ->
 
   class DateDueColumnView extends Backbone.View

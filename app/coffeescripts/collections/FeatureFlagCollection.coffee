@@ -18,8 +18,8 @@
 define [
   'underscore',
   'Backbone',
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/FeatureFlag'
+  '../collections/PaginatedCollection'
+  '../models/FeatureFlag'
 ], (_, Backbone, PaginatedCollection, FeatureFlag) ->
 
   class FeatureFlagCollection extends PaginatedCollection

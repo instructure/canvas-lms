@@ -16,54 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'react-addons-test-utils',
-  'jsx/context_cards/Avatar',
-  'instructure-ui/lib/components/Avatar'
-], (React, ReactDOM, TestUtils, Avatar, { default: InstUIAvatar }) => {
-  QUnit.module('StudentContextTray/Avatar', (hooks) => {
-    let subject
+import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-addons-test-utils'
+import Avatar from 'jsx/context_cards/Avatar'
+import InstUIAvatar from '@instructure/ui-core/lib/components/Avatar'
 
-    hooks.afterEach(() => {
-      if (subject) {
-        const componentNode = ReactDOM.findDOMNode(subject)
-        if (componentNode) {
-          ReactDOM.unmountComponentAtNode(componentNode.parentNode)
-        }
-      }
-      subject = null
-    })
+QUnit.module('StudentContextTray/Avatar', (hooks) => {
+  let subject
 
-    test('renders no avatars by default', () => {
-      subject = TestUtils.renderIntoDocument(
-        <Avatar
-          user={{}} courseId="1" canMasquerade
-        />
-      )
-
-      throws(() => { TestUtils.findRenderedComponentWithType(subject, InstUIAvatar) })
-    })
-
-    test('renders avatar with user object when provided', () => {
-      const userName = 'wooper'
-      const avatarUrl = 'http://wooper.com/avatar.png'
-      const user = {
-        name: userName,
-        avatar_url: avatarUrl,
-        _id: '17'
-      }
-      subject = TestUtils.renderIntoDocument(
-        <Avatar user={user} courseId="1" canMasquerade />
-      )
-
-      const avatar = TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
-      equal(avatar.props.name, user.name)
-      equal(avatar.props.src, user.avatar_url)
+  hooks.afterEach(() => {
+    if (subject) {
       const componentNode = ReactDOM.findDOMNode(subject)
-      const link = componentNode.querySelector('a')
-      equal(link.getAttribute('href'), '/courses/1/users/17')
-    })
+      if (componentNode) {
+        ReactDOM.unmountComponentAtNode(componentNode.parentNode)
+      }
+    }
+    subject = null
+  })
+
+  test('renders no avatars by default', () => {
+    subject = TestUtils.renderIntoDocument(
+      <Avatar user={{}} courseId="1" canMasquerade />
+    )
+
+    throws(() => { TestUtils.findRenderedComponentWithType(subject, InstUIAvatar) })
+  })
+
+  test('renders avatar with user object when provided', () => {
+    const userName = 'wooper'
+    const avatarUrl = 'http://wooper.com/avatar.png'
+    const user = {
+      name: userName,
+      avatar_url: avatarUrl,
+      _id: '17'
+    }
+    subject = TestUtils.renderIntoDocument(
+      <Avatar user={user} courseId="1" canMasquerade />
+    )
+
+    const avatar = TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
+    equal(avatar.props.name, user.name)
+    equal(avatar.props.src, user.avatar_url)
+    const componentNode = ReactDOM.findDOMNode(subject)
+    const link = componentNode.querySelector('a')
+    equal(link.getAttribute('href'), '/courses/1/users/17')
   })
 })

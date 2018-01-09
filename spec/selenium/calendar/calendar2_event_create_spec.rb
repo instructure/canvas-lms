@@ -251,6 +251,7 @@ describe "calendar2" do
       end
 
       it "respects the calendars checkboxes" do
+        make_full_screen
         get "/calendar2"
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
 
@@ -270,12 +271,10 @@ describe "calendar2" do
         f("button.event_button.edit_event_link").click
         expect(f('#planner_note_context')).to be_displayed
         # change the calendar
-        select_list = f('#planner_note_context')
-        options=select_list.find_elements(:tag_name => "option")
-        options[1].click
+        click_option('#planner_note_context', @course.name)
         # save
-        scroll_into_view('#edit_planner_note_form_holder button[type="submit"]')
         f('#edit_planner_note_form_holder button[type="submit"]').click
+        wait_for_ajaximations
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
 
         # turn it off

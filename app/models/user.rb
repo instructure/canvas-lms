@@ -19,7 +19,7 @@
 require 'atom'
 
 class User < ActiveRecord::Base
-  GRAVATAR_PATTERN = /^https?:\/\/[^.?&\/]+.gravatar.com\//
+  GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
   include TurnitinID
 
   # this has to be before include Context to prevent a circular dependency in Course
@@ -36,6 +36,8 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   after_create :set_default_feature_flags
+  after_update :clear_cached_short_name, if: -> (user) {user.short_name_changed? || (user.read_attribute(:short_name).nil? && user.name_changed?)}
+
   serialize :preferences
   include TimeZoneHelper
   time_zone_attribute :time_zone
@@ -1215,7 +1217,7 @@ class User < ActiveRecord::Base
     # Return here if we're passed a nil val or any non-hash val (both of which
     # will just nil the user's avatar).
     return unless val.is_a?(Hash)
-    external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[^.?&\/]+.instructure.com/').split(/,/).map {|re| Regexp.new re}
+    external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[a-zA-Z0-9.-]+\.instructure\.com/').split(/,/).map {|re| Regexp.new re}
 
     if val['url'] && val['url'].match?(GRAVATAR_PATTERN)
       self.avatar_image_source = 'gravatar'
@@ -1673,13 +1675,8 @@ class User < ActiveRecord::Base
   def arguments_for_needing_viewing(object_type, shard_course_ids, opts)
     scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
     scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
-    scope_todo = scope.todo_date_between(opts[:due_after], opts[:due_before])
-    if object_type == 'DiscussionTopic' && opts[:new_activity]
-      scope_todo = scope_todo.or(scope.where(assignment_id:
-        Assignment.active.where(context_id: shard_course_ids, context_type: 'Course', submission_types: 'discussion_topic').
-        due_between_with_overrides(opts[:due_after], opts[:due_before]).pluck(:id)))
-    end
-    [scope_todo, opts.merge(:shard_course_ids => shard_course_ids)]
+    scope = scope.todo_date_between(opts[:due_after], opts[:due_before])
+    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
   end
 
   def discussion_topics_needing_viewing(opts={})

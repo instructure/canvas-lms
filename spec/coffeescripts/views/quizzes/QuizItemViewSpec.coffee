@@ -23,8 +23,9 @@ define [
   'jquery'
   'helpers/fakeENV'
   'jsx/shared/conditional_release/CyoeHelper'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (Backbone, Quiz, QuizItemView, PublishIconView, $, fakeENV, CyoeHelper) ->
+], (Backbone, Quiz, QuizItemView, PublishIconView, $, fakeENV, CyoeHelper, assertions) ->
 
   fixtures = $('#fixtures')
 
@@ -73,6 +74,12 @@ define [
       })
       CyoeHelper.reloadEnv()
     teardown: -> fakeENV.teardown()
+
+  test 'it should be accessible', (assert) ->
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true)
+    view = createView(quiz)
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'renders admin if can_update', ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: true)

@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!webzip_exports'
-import ExportListItem from 'jsx/webzip_export/components/ExportListItem'
+import ExportListItem from '../../webzip_export/components/ExportListItem'
   class ExportList extends React.Component {
     static propTypes = {
       exports: PropTypes.arrayOf(PropTypes.shape({

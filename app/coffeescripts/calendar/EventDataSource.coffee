@@ -18,8 +18,8 @@
 define [
   'jquery'
   'underscore'
-  'compiled/util/fcUtil'
-  'compiled/calendar/commonEventFactory'
+  '../util/fcUtil'
+  '../calendar/commonEventFactory'
   'jquery.ajaxJSON'
   'vendor/jquery.ba-tinypubsub'
 ], ($, _, fcUtil, commonEventFactory) ->

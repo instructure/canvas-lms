@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'jst/content_migrations/MoodleZip'
-  'compiled/views/content_migrations/MigrationView'
+  './MigrationView'
 ], (Backbone, template, MigrationView) -> 
   class MoodleZip extends MigrationView
     template: template

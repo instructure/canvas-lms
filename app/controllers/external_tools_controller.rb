@@ -822,7 +822,8 @@ class ExternalToolsController < ApplicationController
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
       end
       set_tool_attributes(@tool, external_tool_params)
-      if @tool.save
+      check_for_duplication(@tool)
+      if @tool.errors.blank? && @tool.save
         invalidate_nav_tabs_cache(@tool)
         if api_request?
           render :json => external_tool_json(@tool, @context, @current_user, session)
@@ -831,6 +832,7 @@ class ExternalToolsController < ApplicationController
         end
       else
         render :json => @tool.errors, :status => :bad_request
+        @tool.destroy if @tool.persisted?
       end
     end
   end
@@ -956,6 +958,12 @@ class ExternalToolsController < ApplicationController
   end
 
   private
+
+  def check_for_duplication(tool)
+    if tool.duplicated_in_context? && params.dig(:external_tool, :verify_uniqueness).present?
+      tool.errors.add(:tool_currently_installed, 'The tool is already installed in this context.')
+    end
+  end
 
   def generate_module_item_sessionless_launch
     module_item_id = params[:module_item_id]
@@ -1086,6 +1094,7 @@ class ExternalToolsController < ApplicationController
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
               :oauth_compliant]
+    attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end

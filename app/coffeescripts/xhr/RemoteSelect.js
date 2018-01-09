@@ -26,7 +26,7 @@ xsslint jqueryObject.property placeholder spinner
 
 import $ from 'jquery'
 import _ from 'underscore'
-import cache from 'compiled/class/cache'
+import cache from '../class/cache'
 import Spinner from 'spin.js'
 import optGroupTpl from 'jst/util/select/optgroups'
 import optsTpl from 'jst/util/select/options'

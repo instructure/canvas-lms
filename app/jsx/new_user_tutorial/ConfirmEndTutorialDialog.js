@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
-import Button from 'instructure-ui/lib/components/Button'
-import Heading from 'instructure-ui/lib/components/Heading'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-core/lib/components/Modal'
 import axios from 'axios'
 
   class ConfirmEndTutorialDialog extends React.Component {

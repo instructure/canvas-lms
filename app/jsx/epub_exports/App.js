@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import CourseStore from 'jsx/epub_exports/CourseStore'
-import CourseList from 'jsx/epub_exports/CourseList'
+import CourseStore from '../epub_exports/CourseStore'
+import CourseList from '../epub_exports/CourseList'
 
   var EpubExportApp = React.createClass({
     displayName: 'EpubExportApp',

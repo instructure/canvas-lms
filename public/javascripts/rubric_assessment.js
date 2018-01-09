@@ -47,7 +47,7 @@ window.rubricAssessment = {
             .find(".editing").hide().end()
             .find(".displaying").show().end()
             .dialog({
-              title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
+              title: I18n.t("Criterion Long Description"),
               width: 400
             });
         }
@@ -56,7 +56,7 @@ window.rubricAssessment = {
         if ($(this).parents('.rubric').hasClass('assessing')) {
           var val = $(this).val();
           if(val && val.length > 0) {
-            $(this).parents(".custom_ratings_entry").find(".custom_rating_field").val(decodeURIComponent(val));
+            $(this).parents(".custom_ratings_entry").find(".custom_rating_field").val(val);
           }
         }
       })
@@ -77,7 +77,7 @@ window.rubricAssessment = {
         $rubric_criterion_comments_dialog.find(".editing").showIf(editing);
         $rubric_criterion_comments_dialog.find(".displaying").showIf(!editing);
         $rubric_criterion_comments_dialog.dialog({
-          title: I18n.t('titles.additional_comments', "Additional Comments"),
+          title: I18n.t("Additional Comments"),
           width: 400,
           close: function() {
             $rubric_criterion_comments_link.focus();
@@ -143,7 +143,7 @@ window.rubricAssessment = {
       $rubric_criterion_comments_dialog.find(".editing").hide();
       $rubric_criterion_comments_dialog.find(".displaying").show();
       $rubric_criterion_comments_dialog.dialog({
-        title: I18n.t('titles.additional_comments', "Additional Comments"),
+        title: I18n.t("Additional Comments"),
         width: 400,
         close: function() {
           $rubric_rating_comments_link.focus();
@@ -232,10 +232,10 @@ window.rubricAssessment = {
             $saved_custom_rating = $holder.find(".saved_custom_rating");
 
         $saved_custom_rating.find(".comment").remove();
-        $saved_custom_rating.empty().append('<option value="">' + htmlEscape(I18n.t('options.select', '[ Select ]')) + '</option>');
+        $saved_custom_rating.empty().append('<option value="">' + htmlEscape(I18n.t('[ Select ]')) + '</option>');
         for(var jdx in comments) {
           if(comments[jdx]) {
-            $saved_custom_rating.append('<option value="' + htmlEscape(comments[jdx])+ '">' + htmlEscape(TextHelper.truncateText(comments[jdx], {max: 50})) + '</option>');
+            $saved_custom_rating.append('<option value="' + htmlEscape(comments[jdx]) + '">' + htmlEscape(TextHelper.truncateText(comments[jdx], {max: 50})) + '</option>');
             $holder.show();
           }
         }

@@ -41,10 +41,10 @@
     <span style="font-size: 0.8em; padding-left: 10px;">
       <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
     </span>
-    <% if @submission.end_at %>
+    <% if @quiz.due_at %>
       <div style="font-size: 0.8em;">
         <%= before_label(:attempt_due, "Attempt due") %>
-        <%= datetime_string(@submission.end_at) %>
+        <%= datetime_string(@quiz.due_at) %>
       </div>
     <% end %>
     <div class="clear"></div>

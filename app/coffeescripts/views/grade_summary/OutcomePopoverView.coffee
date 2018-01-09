@@ -19,8 +19,8 @@ define [
   'i18n!outcomes'
   'underscore'
   'Backbone'
-  'compiled/util/Popover'
-  'compiled/views/grade_summary/OutcomeLineGraphView'
+  '../../util/Popover'
+  './OutcomeLineGraphView'
   'jst/outcomes/outcomePopover'
 ], (I18n, _, Backbone, Popover, OutcomeLineGraphView, template) ->
   class OutcomePopoverView extends Backbone.View

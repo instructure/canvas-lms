@@ -19,11 +19,11 @@
 import I18n from 'i18n!roster'
 import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from 'instructure-ui/lib/components/Modal'
-import Heading from 'instructure-ui/lib/components/Heading'
-import Button from 'instructure-ui/lib/components/Button'
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-core/lib/components/Modal'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import {
   courseParamsShape,
   apiStateShape,

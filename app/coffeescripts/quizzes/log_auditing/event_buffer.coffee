@@ -19,7 +19,7 @@ define (require) ->
   K = require('./constants')
   QuizEvent = require('./event')
   QuizEventSet = require('./event_set')
-  debugConsole = require('compiled/util/debugConsole')
+  debugConsole = require('../../util/debugConsole')
 
   STORAGE_ADAPTERS = [
     K.EVT_STORAGE_MEMORY,

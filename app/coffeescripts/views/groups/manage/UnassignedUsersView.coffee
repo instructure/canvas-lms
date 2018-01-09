@@ -18,12 +18,12 @@
 define [
   'i18n!groups'
   'jquery'
-  'compiled/views/groups/manage/GroupUsersView'
-  'compiled/views/groups/manage/AssignToGroupMenu'
-  'compiled/views/groups/manage/Scrollable'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
+  './GroupUsersView'
+  './AssignToGroupMenu'
+  './Scrollable'
+  './GroupCategoryCloneView'
   'jst/groups/manage/groupUsers'
-  'compiled/util/groupHasSubmissions'
+  '../../../util/groupHasSubmissions'
 ], (I18n, $, GroupUsersView, AssignToGroupMenu, Scrollable, GroupCategoryCloneView, template, groupHasSubmissions) ->
 
   class UnassignedUsersView extends GroupUsersView

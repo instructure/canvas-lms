@@ -19,11 +19,11 @@
 import I18n from 'i18n!move_select'
 import React from 'react'
 import { func, arrayOf } from 'prop-types'
-import Select from 'instructure-ui/lib/components/Select'
-import Button from 'instructure-ui/lib/components/Button'
-import Container from 'instructure-ui/lib/components/Container'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Select from '@instructure/ui-core/lib/components/Select'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Container from '@instructure/ui-core/lib/components/Container'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 import ConnectorIcon from './ConnectorIcon'
 import { itemShape, moveOptionsType } from './propTypes'
@@ -179,7 +179,7 @@ export default class MoveSelect extends React.Component {
       I18n.t('Place') :
       I18n.t('Place "%{title}"', { title: this.props.items[0].title })
     return (
-      <Typography paragraphMargin="medium 0" weight="bold">{title}</Typography>
+      <Text paragraphMargin="medium 0" weight="bold">{title}</Text>
     );
   }
 
@@ -188,7 +188,7 @@ export default class MoveSelect extends React.Component {
     return (
       <div className="move-select">
         {this.props.moveOptions.groupsLabel &&
-          <Typography paragraphMargin="medium 0" weight="bold">{this.props.moveOptions.groupsLabel}</Typography>}
+          <Text paragraphMargin="medium 0" weight="bold">{this.props.moveOptions.groupsLabel}</Text>}
         {groups
           ? this.renderSelectGroup()
           : this.renderSelectPosition(siblings)}

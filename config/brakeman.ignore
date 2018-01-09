@@ -75,6 +75,28 @@
         },
         "user_input": "Enrollment.active_student_conditions",
         "confidence": "High"
+      },
+      {
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "d8e0d77e896b3da629e04233f458668fff1d130a6b969287822c292af1daeaad",
+        "check_name": "SQL",
+        "message": "Possible SQL injection",
+        "file": "app/models/account.rb",
+        "line": 486,
+        "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "self.associated_courses(:include_crosslisted_courses => opts[:include_crosslisted_courses]).active.order(\"#{Course.best_unicode_collation_key(\"courses.name\")} ASC\")",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "Account",
+          "method": "fast_course_base"
+        },
+        "user_input": "Course.best_unicode_collation_key(\"courses.name\")",
+        "confidence": "High",
+        "note": "No user input is passed in to via opts['order'] in this function (see accounts_controller:sort_order)"
       }
-    ]
+    ],
+    "updated": "2017-12-19 10:36:25 -0700",
+    "brakeman_version": "4.1.0"
 }

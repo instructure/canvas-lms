@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'oauth/request_proxy/action_controller_request'
+
 module Lti
   class MembershipServiceController < ApplicationController
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
 
     def course_index
@@ -32,7 +33,18 @@ module Lti
     private
 
     def check_authorized_action
-      authorized_action(@context, @current_user, :read)
+      if @current_user
+        require_user
+        authorized_action(@context, @current_user, :read)
+      elsif lti_tool_access_enabled?
+        req = OAuth::RequestProxy.proxy(request)
+        consumer_key, timestamp, nonce = req.oauth_consumer_key, req.oauth_timestamp, req.oauth_nonce
+        return head :unauthorized unless Security::check_and_store_nonce("lti_nonce_#{consumer_key}_#{nonce}", timestamp, 10.minutes)
+        tool = ContextExternalTool.find_active_external_tool_by_consumer_key(consumer_key, @context.is_a?(Course) ? @context : @context.context)
+        head :unauthorized unless tool && tool.allow_membership_service_access && OAuth::Signature.verify(request, consumer_secret: tool.shared_secret)
+      else
+        head :unauthorized
+      end
     end
 
     def render_page_presenter
@@ -47,6 +59,10 @@ module Lti
     def membership_service_params
       keys = %w(role page per_page)
       params.select { |k,_| keys.include?(k) }
+    end
+
+    def lti_tool_access_enabled?
+      @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
     end
   end
 end

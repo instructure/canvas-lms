@@ -19,7 +19,7 @@ define [
   'i18n!discussion_topics'
   'Backbone'
   'jquery'
-  'compiled/views/LockIconView',
+  '../LockIconView',
   'jst/DiscussionTopics/SummaryView'
   'jst/_avatar'
 ], (I18n, Backbone, $, LockIconView, template) ->

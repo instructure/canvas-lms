@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/views/conferences/ConferenceView'
+  '../conferences/ConferenceView'
   'jst/conferences/concludedConference'
 ], (ConferenceView, template) ->
 

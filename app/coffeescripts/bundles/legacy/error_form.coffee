@@ -21,7 +21,7 @@ define [
   "str/htmlEscape",
   "jquery.instructure_forms",
   "jquery.loadingImg",
-  "compiled/jquery.rails_flash_notifications"
+  "../../jquery.rails_flash_notifications"
 ], (I18n, $, htmlEscape) ->
   $(document).ready ->
     $("#error_username").hide()

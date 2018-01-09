@@ -379,10 +379,11 @@ TEXT
                   <%= settings.check_box :admins_can_view_notifications, :checked => @account.settings[:admins_can_view_notifications] %>
                   <%= settings.label :admins_can_view_notifications, :en => "Admins can view notifications" %>
                 </div>
-                <div>
+                <!-- The 'Prefer Office 365 file viewer' setting is disabled until we can get it working. See Content team. -->
+                <!-- <div>
                   <%= settings.check_box :canvadocs_prefer_office_online, :checked => @account.settings[:canvadocs_prefer_office_online] %>
                   <%= settings.label :canvadocs_prefer_office_online, :en => "Prefer Office 365 file viewer" %>
-                </div>
+                </div> -->
                 <% unless @account.site_admin? %>
                   <div>
                     <%= f.check_box :enable_user_notes, :checked => @account.enable_user_notes %>

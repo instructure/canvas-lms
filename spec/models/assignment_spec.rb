@@ -147,38 +147,6 @@ describe Assignment do
     end
   end
 
-  describe "on update remove unnecessary stream items" do
-    before(:each) do
-      Notification.create(:name => 'Assignment Created', category: 'Due Date')
-      @course = course_factory(active_course: true)
-      @student1, @student2 = create_users(2, return_type: :record)
-
-      @course.enroll_student(@student1, :enrollment_state => 'active')
-      @course.enroll_student(@student2, :enrollment_state => 'active')
-      @assignment = @course.assignments.create!(title: 'some assignment')
-
-      create_adhoc_override_for_assignment(@assignment, @student1)
-      @assignment.update(only_visible_to_overrides: true)
-      @assignment.update_activity_stream_items
-    end
-
-    it "only for students removed from the assignment" do
-      items1 = StreamItem
-        .to_dashboard
-        .for_assignment(@assignment.id)
-        .for_users([@student2.id])
-
-      expect(items1.count).to eq 0
-
-      items2 = StreamItem
-        .to_dashboard
-        .for_assignment(@assignment.id)
-        .for_users([@student1.id])
-
-      expect(items2.count).to eq 1
-    end
-  end
-
   describe "default values for boolean attributes" do
     before(:once) do
       @assignment = @course.assignments.create!
@@ -4621,6 +4589,70 @@ describe Assignment do
           'due_at' => nil
       }]
       expect{assignment.validate_overrides_for_sis(overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe "when sis sync with required due dates is enabled" do
+    before :each do
+      @assignment = assignment_model(course: @course)
+      @overrides = {
+          :overrides_to_create=>[],
+          :overrides_to_update=>[],
+          :overrides_to_delete=>[],
+          :override_errors=>[]
+      }
+      allow(AssignmentUtil).to receive(:due_date_required?).and_return(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
+      allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
+    end
+
+    context "checking if overrides are valid" do
+      it "is valid if a new override has a due date" do
+        override = assignment_override_model(assignment: @assignment, due_at: 2.days.from_now)
+        @overrides[:overrides_to_create].push(override)
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.not_to raise_error
+      end
+
+      it "is valid if an override has a due date and everyone else does not have a due date" do
+        @assignment.due_at = nil
+        create_section_override_for_assignment(@assignment)
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.not_to raise_error
+      end
+
+      it "is invalid if a new override does not have a due date" do
+        override = assignment_override_model(assignment: @assignment, due_at: nil, due_at_overridden: false)
+        @overrides[:overrides_to_create].push(override)
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "is invalid if an active existing override does not have a due date" do
+        create_section_override_for_assignment(@assignment, due_at: nil, due_at_overridden: false)
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "is valid if a deleted existing override does not have a due date" do
+        create_section_override_for_assignment(@assignment, due_at: nil, due_at_overridden: false,
+                                               workflow_state: 'deleted')
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.not_to raise_error
+      end
+
+      it "is invalid if updating an override to not set a due date" do
+        db_override = create_section_override_for_assignment(@assignment)
+        update_override = db_override.clone
+        update_override[:id] = db_override[:id]
+        update_override[:due_at] = nil
+        @overrides[:overrides_to_update].push(update_override)
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "is valid if an existing override has no due date, but the update sets a due date" do
+        db_override = assignment_override_model(assignment: @assignment, due_at: nil)
+        update_override = db_override.clone
+        update_override[:id] = db_override[:id]
+        update_override[:due_at] = 2.days.from_now
+        @overrides[:overrides_to_update].push(update_override)
+        expect{@assignment.validate_overrides_for_sis(@overrides)}.not_to raise_error
+      end
     end
   end
 

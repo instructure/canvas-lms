@@ -17,9 +17,9 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
+  '../collections/PaginatedCollection'
   'underscore'
-  'compiled/models/File'
+  '../models/File'
 ], (PaginatedCollection, _, File) ->
 
   class FilesCollection extends PaginatedCollection

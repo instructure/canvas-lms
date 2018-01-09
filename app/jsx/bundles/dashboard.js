@@ -22,7 +22,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!dashboard'
 import newCourseForm from 'compiled/util/newCourseForm'
-import DashboardHeader from 'jsx/dashboard/DashboardHeader'
+import DashboardHeader from '../dashboard/DashboardHeader'
 import showMoreTemplate from 'jst/dashboard/show_more_link'
 
 import 'jquery.disableWhileLoading'

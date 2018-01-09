@@ -323,11 +323,4 @@ module AuthenticationMethods
     reset_session
     saved.each_pair { |k, v| session[k] = v }
   end
-
-  # this really belongs on Login::Shared, but is left here for plugins that
-  # have always overridden it here
-  def delegated_auth_redirect_uri(uri)
-    uri
-  end
-
 end

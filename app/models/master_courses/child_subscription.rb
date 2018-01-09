@@ -106,4 +106,8 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
       c.wiki_pages
     ]
   end
+
+  def last_migration_id
+    child_course.content_migrations.where(child_subscription_id: self).order('id desc').limit(1).pluck(:id).first
+  end
 end

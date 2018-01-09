@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import LoginFormSwitcher from 'jsx/login/LoginFormSwitcher'
+import LoginFormSwitcher from '../login/LoginFormSwitcher'
 import 'login'
 
 const switcher = new LoginFormSwitcher(

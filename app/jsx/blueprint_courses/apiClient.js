@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import parseLinkHeader from 'jsx/shared/helpers/parseLinkHeader'
+import parseLinkHeader from '../shared/helpers/parseLinkHeader'
 import MigrationStates from './migrationStates'
 
 const ApiClient = {

@@ -30,14 +30,19 @@ module Lti
       private
 
       def users
+        @users ||= user_scope
+                     .preload(:communication_channels, :not_ended_enrollments)
+                     .offset(@page * @per_page)
+                     .limit(@per_page + 1)
+      end
+
+      def user_scope
         options = {
           enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student'],
           include_inactive_enrollments: false
         }
-        @users ||= UserSearch.scope_for(@context, @user, options)
-                             .preload(:communication_channels, :not_ended_enrollments)
-                             .offset(@page * @per_page)
-                             .limit(@per_page + 1)
+
+        @user_scope ||= @user.nil? ? @context.current_users : UserSearch.scope_for(@context, @user, options)
       end
 
       def generate_roles(user)

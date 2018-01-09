@@ -18,8 +18,8 @@
 define [
   'Backbone'
   'underscore'
-  'compiled/backbone-ext/DefaultUrlMixin'
-  'compiled/collections/AssignmentCollection'
+  '../backbone-ext/DefaultUrlMixin'
+  '../collections/AssignmentCollection'
 ], (Backbone, _, DefaultUrlMixin, AssignmentCollection) ->
 
   isAdmin = ->

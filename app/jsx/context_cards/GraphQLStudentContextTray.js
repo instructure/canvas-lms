@@ -2,7 +2,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
 import {ApolloProvider, ApolloClient, createNetworkInterface, gql, graphql} from 'react-apollo'
-import StudentContextTray from 'jsx/context_cards/StudentContextTray'
+import StudentContextTray from '../context_cards/StudentContextTray'
 
 const client = new ApolloClient({
   networkInterface: createNetworkInterface({

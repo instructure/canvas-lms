@@ -18,9 +18,9 @@
 
 import React from 'react'
 import FileRenameForm from 'compiled/react_files/components/FileRenameForm'
-import Modal from 'jsx/shared/modal'
-import ModalContent from 'jsx/shared/modal-content'
-import ModalButtons from 'jsx/shared/modal-buttons'
+import Modal from '../shared/modal'
+import ModalContent from '../shared/modal-content'
+import ModalButtons from '../shared/modal-buttons'
 import I18n from 'i18n!file_rename_form'
 
   FileRenameForm.buildContent = function () {

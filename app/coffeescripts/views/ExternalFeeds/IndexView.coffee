@@ -18,13 +18,13 @@
 define [
   'underscore'
   'i18n!external_feeds'
-  'compiled/views/ValidatedFormView'
-  'compiled/models/ExternalFeed'
+  '../ValidatedFormView'
+  '../../models/ExternalFeed'
   'jst/ExternalFeeds/IndexView'
-  'compiled/fn/preventDefault'
+  '../../fn/preventDefault'
   'jquery'
   'jquery.toJSON'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (_, I18n, ValidatedFormView, ExternalFeed, template, preventDefault, $) ->
 
   class IndexView extends ValidatedFormView

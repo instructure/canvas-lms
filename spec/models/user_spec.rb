@@ -1165,22 +1165,52 @@ describe User do
       expect(@user.avatar_image_url).to be_nil
     end
 
-    it "should not allow external url's to be assigned" do
+    it "should not allow external urls to be assigned" do
       @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq nil
     end
 
-    it "should allow external url's that match avatar_external_url_patterns to be assigned" do
-      @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.instructure.com/image.jpg' }
+    it "should allow external urls that match avatar_external_url_patterns to be assigned" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://www.instructure.com/image.jpg' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq "https://www.instructure.com/image.jpg"
+    end
+
+    it "should not allow external urls that do not match avatar_external_url_patterns to be assigned (apple.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://apple.com/image.jpg' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq nil
     end
 
-    it "should allow gravatar url's to be assigned" do
+    it "should not allow external urls that do not match avatar_external_url_patterns to be assigned (ddinstructure.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://ddinstructure.com/image' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should not allow external  urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'https://3510111291#sdf.instructure.com/image' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should allow gravatar urls to be assigned" do
       @user.avatar_image = { 'type' => 'gravatar', 'url' => 'http://www.gravatar.com/image.jpg' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq 'http://www.gravatar.com/image.jpg'
+    end
+
+    it "should not allow non gravatar urls to be assigned (ddgravatar.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://ddgravatar.com/@google.com' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
+    end
+
+    it "should not allow non gravatar external urls to be assigned (3510111291#secure.gravatar.com)" do
+      @user.avatar_image = { 'type' => 'external', 'url' => 'http://3510111291#secure.gravatar.com/@google.com' }
+      @user.save!
+      expect(@user.reload.avatar_image_url).to eq nil
     end
 
     it "should return a useful avatar_fallback_url" do
@@ -2342,22 +2372,13 @@ describe User do
         expect(@student.discussion_topics_needing_viewing(opts)).to eq []
       end
 
-      it 'should not show discussions that are graded unless new_activity is true' do
+      it 'should not show discussions that are graded' do
         a = @course.assignments.create!(title: "some assignment", points_possible: 5, due_at: 1.day.from_now)
         t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
         t.save
         expect(t.assignment_id).to eql(a.id)
         expect(t.assignment).to eql(a)
         expect(@student.discussion_topics_needing_viewing(opts)).not_to include t
-      end
-
-      it 'should show graded discussion if new activity is true' do
-        a = @course.assignments.create!(title: "some assignment", points_possible: 5, due_at: 1.day.from_now)
-        t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
-        t.save
-        expect(t.assignment_id).to eql(a.id)
-        expect(t.assignment).to eql(a)
-        expect(@student.discussion_topics_needing_viewing(opts.merge({new_activity: true}))).to include t
       end
 
       context "locked discussion topics" do

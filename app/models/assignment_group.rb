@@ -17,8 +17,13 @@
 #
 
 class AssignmentGroup < ActiveRecord::Base
-
   include Workflow
+  # Unlike our other soft-deletable models, assignment groups use 'available' instead of 'active'
+  # to indicate a not-deleted state. This means we have to add the 'available' state here before
+  # Canvas::SoftDeletable adds the 'active' and 'deleted' states, so that 'available' becomes the
+  # initial state for this model.
+  workflow { state :available }
+  include Canvas::SoftDeletable
 
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course]
@@ -47,6 +52,8 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :course_grading_change
   after_save :touch_context
   after_save :update_student_grades
+
+  before_destroy :destroy_scores
 
   def generate_default_values
     if self.name.blank?
@@ -85,18 +92,6 @@ class AssignmentGroup < ActiveRecord::Base
     can :delete
   end
 
-  workflow do
-    state :available
-    state :deleted
-  end
-
-  alias_method :destroy_permanently!, :destroy
-  def destroy
-    self.workflow_state = 'deleted'
-    self.assignments.active.include_submittables.each(&:destroy)
-    self.save
-  end
-
   def restore(try_to_selectively_undelete_assignments = true)
     to_restore = self.assignments.include_submittables
     if try_to_selectively_undelete_assignments
@@ -106,8 +101,8 @@ class AssignmentGroup < ActiveRecord::Base
       # were deleted earlier.
       to_restore = to_restore.where('updated_at >= ?', self.updated_at.utc)
     end
-    self.workflow_state = 'available'
-    self.save
+    undestroy(active_state: 'available')
+    restore_scores
     to_restore.each { |assignment| assignment.restore(:assignment_group) }
   end
 
@@ -208,11 +203,6 @@ class AssignmentGroup < ActiveRecord::Base
     effective_due_dates.any_in_closed_grading_period?
   end
 
-  def effective_due_dates
-    @effective_due_dates ||= EffectiveDueDates.for_course(context, published_assignments)
-  end
-  private :effective_due_dates
-
   def visible_assignments(user, includes=[])
     self.class.visible_assignments(user, self.context, [self], includes)
   end
@@ -238,5 +228,38 @@ class AssignmentGroup < ActiveRecord::Base
     Assignment.where(id: order).first.update_order(order) unless order.empty?
     new_group.touch
     self.reload
+  end
+
+  private
+
+  def destroy_scores
+    # TODO: soft-delete score metadata as part of GRADE-746
+    set_scores_workflow_state_in_batches(:deleted)
+  end
+
+  def restore_scores
+    # TODO: restore score metadata as part of GRADE-746
+    set_scores_workflow_state_in_batches(:active, exclude_workflow_states: [:completed, :deleted])
+  end
+
+  def set_scores_workflow_state_in_batches(new_workflow_state, exclude_workflow_states: [:completed])
+    student_enrollments = Enrollment.where(
+      course_id: context_id,
+      type: [:StudentEnrollment, :StudentViewEnrollment]
+    ).where.not(workflow_state: exclude_workflow_states)
+
+    score_ids = Score.where(
+      assignment_group_id: self,
+      enrollment_id: student_enrollments,
+      workflow_state: new_workflow_state == :active ? :deleted : :active
+    ).pluck(:id)
+
+    score_ids.each_slice(1000) do |score_ids_batch|
+      Score.where(id: score_ids_batch).update_all(workflow_state: new_workflow_state, updated_at: Time.zone.now)
+    end
+  end
+
+  def effective_due_dates
+    @effective_due_dates ||= EffectiveDueDates.for_course(context, published_assignments)
   end
 end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
 
 const DEFAULT_GRADE = '';
 

@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import Button from 'instructure-ui/lib/components/Button'
+import Button from '@instructure/ui-core/lib/components/Button'
 import axios from 'axios'
 import I18n from 'i18n!grading_periods'
 import tz from 'timezone'
-import DateHelper from 'jsx/shared/helpers/dateHelper'
+import DateHelper from '../shared/helpers/dateHelper'
 import 'jquery.instructure_misc_helpers'
 
   const Types = PropTypes;

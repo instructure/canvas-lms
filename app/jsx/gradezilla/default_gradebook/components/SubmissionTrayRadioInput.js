@@ -19,12 +19,12 @@
 import React from 'react';
 import { func, number, shape, string, bool } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Container from 'instructure-ui/lib/components/Container';
-import NumberInput from 'instructure-ui/lib/components/NumberInput';
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent';
-import Typography from 'instructure-ui/lib/components/Typography';
-import RadioInput from 'instructure-ui/lib/components/RadioInput';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import Container from '@instructure/ui-core/lib/components/Container';
+import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
+import Text from '@instructure/ui-core/lib/components/Text';
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import classnames from 'classnames';
 import round from 'coffeescripts/util/round';
 
@@ -81,7 +81,7 @@ export default function SubmissionTrayRadioInput (props) {
 
             <PresentationContent>
               <Container as="div" margin="0 small">
-                <Typography>{numberInputText}</Typography>
+                <Text>{numberInputText}</Text>
               </Container>
             </PresentationContent>
           </span>

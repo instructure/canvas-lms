@@ -306,7 +306,6 @@ module Lti
 
       it "does not update originality score if out of range" do
         put @endpoints[:update], params: {originality_report: {originality_score: 150}}, headers: request_headers
-
         expect(response.status).to eq 400
         expect(JSON.parse(response.body)['errors'].key? 'originality_score').to be_truthy
       end
@@ -348,7 +347,7 @@ module Lti
         expect(tool_setting.resource_url).to eq "http://www.lti-test.com"
       end
 
-      it "removes the lti link when tool_setting is not supplied" do
+      it "does not remove the lti link when tool_setting is not supplied" do
         put @endpoints[:update],
             params: {
               originality_report: {
@@ -370,10 +369,37 @@ module Lti
             },
             headers: request_headers
         expect(response).to be_success
+        expect(Lti::Link.find_by(id: lti_link_id)).to eq OriginalityReport.find(@report.id).lti_link
+      end
+
+      it "removes the lti link when tool_setting is null" do
+        put @endpoints[:update],
+            params: {
+              originality_report: {
+                originality_score: 5,
+                tool_setting: {
+                  resource_url: 'http://www.lti-test.com',
+                  resource_type_code: 'code'
+                }
+              }
+            },
+            headers: request_headers
+
+        lti_link_id = OriginalityReport.find(@report.id).lti_link.id
+        expect(Lti::Link.find_by(id: lti_link_id)).not_to be_nil
+
+        put @endpoints[:update],
+            params: {
+              originality_report: {
+                originality_score: nil,
+                tool_setting: {
+                  resource_type_code: nil
+                }
+              }
+            },
+            headers: request_headers
+
         expect(Lti::Link.find_by(id: lti_link_id)).to be_nil
-        report = OriginalityReport.find(@report.id)
-        expect(report.lti_link).to be_nil
-        expect(report.originality_score).to be_nil
       end
 
       it "requires the plagiarism feature flag" do
@@ -678,6 +704,23 @@ module Lti
         expect(response.status).to eq 401
       end
 
+      it "does not require an attachment if submission type includes online text entry" do
+        @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
+        @submission.update_attributes!(body: 'some text')
+        score = 0.25
+        post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
+
+        expect(assigns[:report].attachment).to be_nil
+        expect(assigns[:report].originality_score).to eq score
+      end
+
+      it "does not requre an attachment if submission type does not include online text entry" do
+        @submission.update_attributes!(body: 'some text')
+        score = 0.25
+        post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
+        expect(response).to be_not_found
+      end
+
       it 'sets the resource type code of the associated tool setting' do
         score = 0.25
         post @endpoints[:create],
@@ -747,6 +790,28 @@ module Lti
              },
              headers: request_headers
 
+        response_body = JSON.parse(response.body)
+        expect(response_body['originality_score']).to eq 50
+      end
+
+      it 'updates the originality report if it has already been created without an attachment' do
+        @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
+        originality_score = 50
+        post @endpoints[:create],
+             params: {
+               originality_report: {
+                 workflow_state: 'pending'
+               }
+             },
+             headers: request_headers
+
+        post @endpoints[:create],
+             params: {
+               originality_report: {
+                 originality_score: originality_score
+               }
+             },
+             headers: request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['originality_score']).to eq 50
       end

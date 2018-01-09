@@ -279,6 +279,25 @@ describe ContextModuleProgression do
       expect(progression.reload).to be_completed
     end
 
+    it "should complete when the assignment is unmuted after a grade is assigned without a submission" do
+      assignment = @course.assignments.create(:title => "some assignment", :points_possible => 100, :submission_types => "online_text_entry")
+      assignment.mute!
+      tag = @module.add_item({:id => assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+      @module.save!
+
+      progression = @module.evaluate_for(@user)
+      expect(progression).to be_unlocked
+
+      # no submission here
+      assignment.grade_student(@user, :score => 100, :grader => @teacher)
+      expect(progression.reload).to be_started
+      expect(progression.requirements_met).to be_blank
+
+      assignment.unmute!
+      expect(progression.reload).to be_completed
+    end
+
     it "should work with muted quiz assignments" do
       quiz = @course.quizzes.create(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest', :workflow_state => 'available')
       quiz.assignment.mute!

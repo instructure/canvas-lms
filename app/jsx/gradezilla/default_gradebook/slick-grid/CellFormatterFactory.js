@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/AssignmentCellFormatter';
-import AssignmentGroupCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/AssignmentGroupCellFormatter';
-import CustomColumnCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/CustomColumnCellFormatter';
-import StudentCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/StudentCellFormatter';
-import TotalGradeCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/TotalGradeCellFormatter';
+import AssignmentCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/AssignmentCellFormatter';
+import AssignmentGroupCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/AssignmentGroupCellFormatter';
+import CustomColumnCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/CustomColumnCellFormatter';
+import StudentCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/StudentCellFormatter';
+import TotalGradeCellFormatter from '../../../gradezilla/default_gradebook/slick-grid/formatters/TotalGradeCellFormatter';
 
 class CellFormatterFactory {
   constructor (gradebook) {

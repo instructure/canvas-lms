@@ -19,11 +19,11 @@ define [
   'i18n!GroupDetailView'
   'jquery'
   'Backbone'
-  'compiled/views/groups/manage/GroupEditView'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
+  './GroupEditView'
+  './GroupCategoryCloneView'
   'jst/groups/manage/groupDetail'
-  'compiled/util/groupHasSubmissions'
-  'compiled/jquery.rails_flash_notifications'
+  '../../../util/groupHasSubmissions'
+  '../../../jquery.rails_flash_notifications'
   'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, $, {View}, GroupEditView, GroupCategoryCloneView, template, groupHasSubmissions) ->
 

@@ -18,7 +18,7 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/CollectionView'
+  './CollectionView'
   'jst/paginatedCollection'
 ], ($, _, CollectionView, template) ->
 

@@ -20,8 +20,8 @@ define (require) ->
   EventManager = require('./log_auditing/event_manager')
   EventBuffer = require('./log_auditing/event_buffer')
   EventTracker = require('./log_auditing/event_tracker')
-  hasLocalStorage = require('compiled/util/hasLocalStorage')
-  debugConsole = require('compiled/util/debugConsole')
+  hasLocalStorage = require('../util/hasLocalStorage')
+  debugConsole = require('../util/debugConsole')
 
   # ---------------------------
   # Trackers.

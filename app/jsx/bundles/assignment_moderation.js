@@ -19,9 +19,9 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ModerationApp from 'jsx/assignments/ModerationApp'
-import configureStore from 'jsx/assignments/store/configureStore'
-import 'jsx/context_cards/StudentContextCardTrigger'
+import ModerationApp from '../assignments/ModerationApp'
+import configureStore from '../assignments/store/configureStore'
+import '../context_cards/StudentContextCardTrigger'
 
 const store = configureStore({
   studentList: {

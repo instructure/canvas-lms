@@ -18,13 +18,13 @@
 define [
   'i18n!quizzes'
   'jquery'
-  'compiled/views/DialogFormView'
+  './DialogFormView'
   'jst/messageStudentsDialog'
   'jst/EmptyDialogFormWrapper'
-  'compiled/models/ConversationCreator'
+  '../models/ConversationCreator'
   'jst/_messageStudentsWhoRecipientList'
   'underscore'
-  'compiled/jquery/serializeForm'
+  '../jquery/serializeForm'
 ], (I18n, $, DialogFormView, template, wrapperTemplate, ConversationCreator, recipientListTemplate, _) ->
 
   class MessageStudentsDialog extends DialogFormView

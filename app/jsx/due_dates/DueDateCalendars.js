@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
+import DueDateCalendarPicker from '../due_dates/DueDateCalendarPicker'
 import I18n from 'i18n!assignments'
 import cx from 'classnames'
 

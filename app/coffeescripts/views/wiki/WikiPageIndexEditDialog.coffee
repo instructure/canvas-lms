@@ -20,7 +20,7 @@ define [
   'underscore'
   'i18n!pages'
   'str/htmlEscape'
-  'compiled/views/DialogFormView'
+  '../DialogFormView'
   'jst/wiki/WikiPageIndexEditDialog'
 ], ($, _, I18n, htmlEscape, DialogFormView, wrapperTemplate) ->
 

@@ -19,8 +19,8 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/SortableCollectionView'
-  'compiled/views/assignments/AssignmentGroupListItemView'
+  '../SortableCollectionView'
+  './AssignmentGroupListItemView'
   'jst/assignments/AssignmentGroupList'
   'jst/assignments/NoAssignmentsListItem'
 ], ($, _, Backbone, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->

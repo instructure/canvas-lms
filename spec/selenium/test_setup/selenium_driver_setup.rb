@@ -321,7 +321,7 @@ module SeleniumDriverSetup
 
     def ruby_chrome_driver
       puts "Thread: provisioning local chrome driver"
-      Chromedriver.set_version "2.33"
+      Chromedriver.set_version "2.34"
       Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
     end
 

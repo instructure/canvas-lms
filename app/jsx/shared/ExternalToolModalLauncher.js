@@ -20,8 +20,8 @@ import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from 'jsx/shared/modal'
-import ModalContent from 'jsx/shared/modal-content'
+import Modal from './modal'
+import ModalContent from './modal-content'
 import I18n from 'i18n!external_tools'
 
 export default React.createClass({

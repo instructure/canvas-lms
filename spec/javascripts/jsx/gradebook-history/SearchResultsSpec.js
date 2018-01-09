@@ -18,9 +18,9 @@
 
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import Spinner from 'instructure-ui/lib/components/Spinner';
-import Table from 'instructure-ui/lib/components/Table';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import Table from '@instructure/ui-core/lib/components/Table';
+import Text from '@instructure/ui-core/lib/components/Text';
 import { SearchResultsComponent } from 'jsx/gradebook-history/SearchResults';
 
 function defaultHistoryItems () {
@@ -127,7 +127,7 @@ test('shows a Spinner if requestingResults true', function () {
 test('Table shows text if request was made but no results were found', function () {
   const props = { ...defaultProps(), fetchHistoryStatus: 'success', historyItems: [] };
   const wrapper = mount(<SearchResultsComponent {...props} />);
-  const textBox = wrapper.find(Typography);
+  const textBox = wrapper.find(Text);
   ok(textBox.exists());
   equal(textBox.text(), 'No results found.');
   wrapper.unmount();
@@ -137,7 +137,7 @@ test('shows text indicating that the end of results was reached', function () {
   const historyItems = defaultHistoryItems();
   const props = { ...defaultProps(), nextPage: '', requestingResults: false, historyItems };
   const wrapper = mount(<SearchResultsComponent {...props} />);
-  const textBox = wrapper.find(Typography);
+  const textBox = wrapper.find(Text);
   ok(textBox.exists());
   equal(textBox.text(), 'No more results to load.');
   wrapper.unmount();

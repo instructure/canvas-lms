@@ -19,19 +19,19 @@ define [
   'jquery',
   'underscore'
   'i18n!calendar'
-  'compiled/util/fcUtil'
+  '../util/fcUtil'
   'jst/calendar/appointmentGroupList'
   'jst/calendar/schedulerRightSideAdminSection'
-  'compiled/calendar/EditAppointmentGroupDialog'
-  'compiled/calendar/MessageParticipantsDialog'
+  '../calendar/EditAppointmentGroupDialog'
+  '../calendar/MessageParticipantsDialog'
   'jst/calendar/deleteItem'
-  'compiled/util/semanticDateRange'
+  '../util/semanticDateRange'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'spin.js/jquery.spin'
-  'compiled/behaviors/activate'
+  '../behaviors/activate'
 ], ($, _, I18n, fcUtil, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate, semanticDateRange) ->
 
   class Scheduler

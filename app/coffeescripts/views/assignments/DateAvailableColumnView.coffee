@@ -21,7 +21,7 @@ define [
   'jst/assignments/DateAvailableColumnView'
   'jquery'
   'underscore'
-  'compiled/behaviors/tooltip'
+  '../../behaviors/tooltip'
 ], (I18n, Backbone, template, $, _) ->
 
   class DateAvailableColumnView extends Backbone.View

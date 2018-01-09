@@ -22,8 +22,8 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'
-import GradingPeriodTemplate from 'jsx/grading/gradingPeriodTemplate'
-import DateHelper from 'jsx/shared/helpers/dateHelper'
+import GradingPeriodTemplate from '../grading/gradingPeriodTemplate'
+import DateHelper from '../shared/helpers/dateHelper'
   var Types = PropTypes;
 
   var GradingPeriod = React.createClass({

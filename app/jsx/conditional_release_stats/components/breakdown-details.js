@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from 'instructure-ui/lib/components/Button'
-import Tray from 'instructure-ui/lib/components/Tray'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Tray from '@instructure/ui-core/lib/components/Tray'
 import IconX from 'instructure-icons/lib/Solid/IconXSolid'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import StudentRangeView from './student-ranges-view'

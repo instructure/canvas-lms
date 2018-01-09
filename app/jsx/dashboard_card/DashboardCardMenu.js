@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import Popover, {PopoverTrigger, PopoverContent} from 'instructure-ui/lib/components/Popover'
-import TabList, {TabPanel} from 'instructure-ui/lib/components/TabList'
-import ColorPicker from 'jsx/shared/ColorPicker'
+import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-core/lib/components/Popover'
+import TabList, {TabPanel} from '@instructure/ui-core/lib/components/TabList'
+import ColorPicker from '../shared/ColorPicker'
 import DashboardCardMovementMenu from './DashboardCardMovementMenu'
 
 export default class DashboardCardMenu extends React.Component {

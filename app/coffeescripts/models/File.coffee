@@ -18,7 +18,7 @@
 define [
   'jquery'
   'underscore'
-  'compiled/models/FilesystemObject'
+  '../models/FilesystemObject'
   'jquery.ajaxJSON'
 ], ($, _, FilesystemObject) ->
 

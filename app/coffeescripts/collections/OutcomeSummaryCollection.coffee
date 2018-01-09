@@ -19,12 +19,12 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/grade_summary/Section'
-  'compiled/models/grade_summary/Group'
-  'compiled/models/grade_summary/Outcome'
-  'compiled/collections/PaginatedCollection'
-  'compiled/collections/WrappedCollection'
-  'compiled/util/natcompare'
+  '../models/grade_summary/Section'
+  '../models/grade_summary/Group'
+  '../models/grade_summary/Outcome'
+  '../collections/PaginatedCollection'
+  '../collections/WrappedCollection'
+  '../util/natcompare'
 ], ($, _, {Collection}, Section, Group, Outcome, PaginatedCollection, WrappedCollection, natcompare) ->
   class GroupCollection extends PaginatedCollection
     @optionProperty 'course_id'

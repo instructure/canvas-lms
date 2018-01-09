@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import router from 'jsx/collaborations/router'
+import router from '../collaborations/router'
 
 router.start()

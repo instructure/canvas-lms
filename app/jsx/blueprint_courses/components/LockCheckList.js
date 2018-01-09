@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import propTypes from '../propTypes'
 import {lockLabels} from '../labels'
 

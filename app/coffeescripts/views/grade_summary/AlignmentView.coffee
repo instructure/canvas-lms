@@ -19,7 +19,7 @@ define [
   'i18n!outcomes'
   'underscore'
   'Backbone'
-  'compiled/views/grade_summary/ProgressBarView'
+  './ProgressBarView'
   'jst/grade_summary/alignment'
 ], (I18n, _, Backbone, ProgressBarView, template) ->
   class AlignmentView extends Backbone.View

@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/views/groups/manage/PopoverMenuView'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
-  'compiled/models/GroupUser'
+  './PopoverMenuView'
+  './GroupCategoryCloneView'
+  '../../../models/GroupUser'
   'jst/groups/manage/assignToGroupMenu'
   'jquery'
-  'compiled/util/groupHasSubmissions'
-  'compiled/jquery/outerclick'
+  '../../../util/groupHasSubmissions'
+  '../../../jquery/outerclick'
 ], (PopoverMenuView, GroupCategoryCloneView, GroupUser, template, $, groupHasSubmissions) ->
 
   class AssignToGroupMenu extends PopoverMenuView

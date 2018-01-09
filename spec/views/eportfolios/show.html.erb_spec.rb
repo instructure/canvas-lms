@@ -57,14 +57,65 @@ describe "/eportfolios/show" do
     expect(doc.at_css('#eportfolio_share_link').text).to match %r{https?://.*/eportfolios/#{@portfolio.id}\?verifier=.*}
   end
 
-  it "shows the right submission preview link" do
-    course_with_student(user: @user)
+  it "shows submitted submissions and the right submission preview link" do
+    course_with_student(user: @user, active_all: true)
     submission_model(course: @course, user: @user)
     assign(:owner_view, true)
+    @submission.update_column('workflow_state', 'submitted')
     render "eportfolios/show"
     doc = Nokogiri::HTML.parse(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url").attributes['href'].value).to match(
       %r{/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}}
     )
+  end
+
+  it "shows graded submissions" do
+    course_with_student(user: @user, active_all: true)
+    submission_model(course: @course, user: @user)
+    assign(:owner_view, true)
+    @submission.update_columns({workflow_state: 'graded', score: 0})
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_present
+  end
+
+  it "does not show submissions for unpublished assignments" do
+    course_with_student(user: @user, active_all: true)
+    submission_model(course: @course, user: @user)
+    assign(:owner_view, true)
+    @submission.update_column('workflow_state', 'submitted')
+    @assignment.update_column('workflow_state', 'unpublished')
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
+  end
+
+  it "does not show submissions for unpublished courses" do
+    course_with_student(user: @user)
+    submission_model(course: @course, user: @user)
+    assign(:owner_view, true)
+    @submission.update_column('workflow_state', 'submitted')
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
+  end
+
+  it "does not show submissions unless submission is submitted" do
+    course_with_student(user: @user, active_all: true)
+    submission_model(course: @course, user: @user)
+    assign(:owner_view, true)
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
+  end
+
+  it "does not show submissions that are pending review" do
+    course_with_student(user: @user, active_all: true)
+    submission_model(course: @course, user: @user)
+    assign(:owner_view, true)
+    @submission.update_column('workflow_state', 'pending_review')
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_nil
   end
 end

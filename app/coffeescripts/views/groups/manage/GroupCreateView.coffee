@@ -18,7 +18,7 @@
 define [
   'i18n!groups'
   'underscore'
-  'compiled/views/groups/manage/GroupEditView'
+  './GroupEditView'
 ], (I18n, _, GroupEditView) ->
 
   class GroupCreateView extends GroupEditView

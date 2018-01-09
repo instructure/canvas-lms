@@ -20,7 +20,7 @@ import React from 'react'
 import I18n from 'i18n!react_files'
 import classnames from 'classnames'
 import UploadProgress from 'compiled/react_files/components/UploadProgress'
-import ProgressBar from 'jsx/shared/ProgressBar'
+import ProgressBar from '../shared/ProgressBar'
 import mimeClass from 'compiled/util/mimeClass'
 
     UploadProgress.renderProgressBar = function () {

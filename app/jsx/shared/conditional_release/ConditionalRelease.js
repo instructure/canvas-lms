@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import Modal from 'react-modal'
 import classNames from 'classnames'
 import I18n from 'i18n!conditional_release'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
+import numberHelper from '../helpers/numberHelper'
 import 'jquery.instructure_forms'
 
   const SAVE_TIMEOUT = 15000

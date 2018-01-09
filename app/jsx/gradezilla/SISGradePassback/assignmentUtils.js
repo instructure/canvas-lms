@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import createStore from 'react'
-import 'jsx/shared/helpers/createStore'
+import '../../shared/helpers/createStore'
 
   let assignmentUtils = {
     copyFromGradebook (assignment) {

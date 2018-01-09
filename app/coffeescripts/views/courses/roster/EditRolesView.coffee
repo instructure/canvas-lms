@@ -19,10 +19,10 @@ define [
   'i18n!course_settings'
   'jquery'
   'underscore'
-  'compiled/views/DialogBaseView'
-  'compiled/views/courses/roster/RosterDialogMixin'
+  '../../DialogBaseView'
+  './RosterDialogMixin'
   'jst/courses/roster/editRolesView'
-  'compiled/jquery.rails_flash_notifications'
+  '../../../jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, DialogBaseView, RosterDialogMixin, template) ->
 

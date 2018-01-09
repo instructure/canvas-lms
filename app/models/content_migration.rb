@@ -492,6 +492,17 @@ class ContentMigration < ActiveRecord::Base
 
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
+        if source_export.selective_export?
+          # load in existing attachments to path resolution map
+          file_mig_ids = source_export.settings[:referenced_file_migration_ids]
+          if file_mig_ids.present?
+            # ripped from copy_attachments_from_course
+            root_folder_name = Folder.root_folders(self.context).first.name + '/'
+            self.context.attachments.where(:migration_id => file_mig_ids).each do |file|
+              self.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), file.migration_id)
+            end
+          end
+        end
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
         MasterCourses::FolderLockingHelper.recalculate_locked_folders(self.context)
 

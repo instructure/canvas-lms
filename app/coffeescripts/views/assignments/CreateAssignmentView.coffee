@@ -17,17 +17,17 @@
 
 define [
   'underscore'
-  'compiled/models/Assignment'
-  'compiled/views/DialogFormView'
-  'compiled/util/DateValidator'
+  '../../models/Assignment'
+  '../DialogFormView'
+  '../../util/DateValidator'
   'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
   'jsx/shared/helpers/numberHelper'
   'i18n!assignments'
-  'compiled/util/round'
+  '../../util/round'
   'jquery'
-  'compiled/api/gradingPeriodsApi'
-  'compiled/util/SisValidationHelper'
+  '../../api/gradingPeriodsApi'
+  '../../util/SisValidationHelper'
   'jquery.instructure_date_and_time'
 ], (_, Assignment, DialogFormView, DateValidator, template, wrapper,
   numberHelper, I18n, round, $, GradingPeriodsAPI, SisValidationHelper) ->

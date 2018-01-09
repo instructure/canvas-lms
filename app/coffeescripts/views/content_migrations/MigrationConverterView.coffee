@@ -19,7 +19,7 @@ define [
   'jquery'
   'underscore'
   'jst/content_migrations/MigrationConverter'
-  'compiled/views/ValidatedFormView'
+  '../ValidatedFormView'
   'i18n!content_migrations'
   'vendor/jquery.ba-tinypubsub'
   'jquery.disableWhileLoading'

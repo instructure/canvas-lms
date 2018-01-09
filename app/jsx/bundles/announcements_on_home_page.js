@@ -20,8 +20,8 @@ import I18n from 'i18n!announcements_on_home_page'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
-import AnnouncementList from 'jsx/announcements/components/OldAnnouncementList'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import AnnouncementList from '../announcements/components/OldAnnouncementList'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 
 if (ENV.SHOW_ANNOUNCEMENTS) {
   const container = document.querySelector('#announcements_on_home_page')
@@ -46,7 +46,7 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
     active_only: true
   }
 
-  axios.get(url, { params }).then(response =>
+  axios.get(url, { params }).then(response => {
     ReactDOM.render(<AnnouncementList announcements={response.data.map(presentAnnouncement)} />, container)
-  )
+  })
 }

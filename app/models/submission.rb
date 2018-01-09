@@ -634,8 +634,8 @@ class Submission < ActiveRecord::Base
   # This method pulls data from the OriginalityReport table
   # Preload OriginalityReport before using this method in a collection of submissions
   def originality_data
-    data = OriginalityReport.where(attachment_id: attachment_ids_for_version).each_with_object({}) do |originality_report, hash|
-      hash[Attachment.asset_string(originality_report.attachment_id)] = {
+    data = originality_reports_for_display.each_with_object({}) do |originality_report, hash|
+      hash[originality_report.asset_key] = {
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         report_url: originality_report.originality_report_url,
@@ -645,6 +645,14 @@ class Submission < ActiveRecord::Base
     ret_val = turnitin_data.merge(data)
     ret_val.delete(:provider)
     ret_val
+  end
+
+  def text_entry_originality_reports
+    originality_reports.where(attachment: nil)
+  end
+
+  def originality_reports_for_display
+    (OriginalityReport.where(attachment_id: attachment_ids_for_version) + text_entry_originality_reports).uniq
   end
 
   def turnitin_assets
@@ -659,13 +667,24 @@ class Submission < ActiveRecord::Base
 
   # Preload OriginalityReport before using this method
   def originality_report_url(asset_string, user)
-    url = nil
-    if self.grants_right?(user, :view_turnitin_report)
+    if asset_string == self.asset_string
+      originality_reports.where(attachment_id: nil).first&.report_launch_path
+    elsif self.grants_right?(user, :view_turnitin_report)
       requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
-      report = self.originality_reports.find_by(attachment: requested_attachment)
-      url = report&.report_launch_path
+      report = assignment_group_originality_reports.find_by(attachment: requested_attachment)
+      report&.report_launch_path
     end
-    url
+  end
+
+  def has_originality_report?
+    versioned_originality_reports.present? ||
+    text_entry_originality_reports.present? ||
+    assignment_group_originality_reports.present?
+  end
+
+  def assignment_group_originality_reports
+    submission_ids = assignment.submissions.where(group_id: group_id).active.pluck(:id)
+    OriginalityReport.where(submission_id: submission_ids)
   end
 
   def all_versioned_attachments
@@ -1665,7 +1684,7 @@ class Submission < ActiveRecord::Base
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
-  scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
+  scope :with_assignment, -> { joins(:assignment).merge(Assignment.active)}
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
 
@@ -1796,7 +1815,7 @@ class Submission < ActiveRecord::Base
     pg.final = !!attrs[:final]
     pg.grade = attrs[:grade] unless attrs[:grade].nil?
     pg.score = attrs[:score] unless attrs[:score].nil?
-    pg.source_provisional_grade = attrs[:source_provisional_grade]
+    pg.source_provisional_grade = attrs[:source_provisional_grade] if attrs.key?(:source_provisional_grade)
     pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
     pg.force_save = !!attrs[:force_save]
   end

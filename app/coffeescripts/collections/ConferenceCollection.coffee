@@ -17,7 +17,7 @@
 
 define [
   'Backbone'
-  'compiled/models/Conference'
+  '../models/Conference'
 ], ({Collection}, Conference) ->
 
   class ConferenceCollection extends Collection

@@ -20,14 +20,14 @@ define [
   'jquery'
   'moment'
   'timezone_core'
-  'compiled/util/fcUtil'
-  'compiled/calendar/CalendarEventFilter'
+  '../../util/fcUtil'
+  '../../calendar/CalendarEventFilter'
   'underscore'
   'Backbone'
-  'compiled/collections/CalendarEventCollection'
-  'compiled/calendar/ShowEventDetailsDialog'
+  '../../collections/CalendarEventCollection'
+  '../../calendar/ShowEventDetailsDialog'
   'jst/calendar/agendaView'
-  'compiled/calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString is available to agendaView.handlebars
+  '../../calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString is available to agendaView.handlebars
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, moment, tz, fcUtil, calendarEventFilter, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
 

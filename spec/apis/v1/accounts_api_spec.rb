@@ -696,8 +696,28 @@ describe "Accounts API", type: :request do
         @account1.account_users.create!(user: @user)
         json = api_call(:get, "/api/v1/accounts/#{@account1.id}/courses",
           { :controller => 'accounts', :action => 'courses_api',
-            :account_id => @account1.to_param, :format => 'json',
-          })
+            :account_id => @account1.to_param, :format => 'json' })
+        expect(json.length).to eq 1
+        expect(json.first["name"]).to eq "course1"
+      end
+
+      it "include crosslisted course when querying account section was crosslisted from if requested" do
+        @account2.account_users.create!(user: @user)
+        json = api_call(:get, "/api/v1/accounts/#{@account2.id}/courses?include_crosslisted_courses=true",
+          { :controller => 'accounts', :action => 'courses_api',
+            :include_crosslisted_courses => true,
+            :account_id => @account2.to_param, :format => 'json' })
+        expect(json.length).to eq 2
+        names = json.pluck("name")
+        expect(names.include?("course1")).to be_truthy
+        expect(names.include?("course2")).to be_truthy
+      end
+
+      it "don't include crosslisted course when querying account section was crosslisted to even if requested" do
+        @account1.account_users.create!(user: @user)
+        json = api_call(:get, "/api/v1/accounts/#{@account1.id}/courses",
+          { :controller => 'accounts', :action => 'courses_api',
+            :account_id => @account1.to_param, :format => 'json' })
         expect(json.length).to eq 1
         expect(json.first["name"]).to eq "course1"
       end

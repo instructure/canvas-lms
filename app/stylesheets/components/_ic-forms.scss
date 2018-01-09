@@ -1969,13 +1969,15 @@ form.ic-Form-group { margin: 0; }
       flex: 1;
       box-sizing: border-box;
       text-align: right;
+      &--auto {
+        flex: 0 0 auto;
+      }
       > .Button,
       > .btn,
       > .ui-button { margin-left: $ic-sp/4; }
     }
 
     .ic-Action-header__Primary + .ic-Action-header__Secondary {
-      flex: 1;
       padding-left: $ic-sp*2;
     }
   }

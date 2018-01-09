@@ -18,7 +18,7 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/util/UniqueDropdownCollection'
+  '../util/UniqueDropdownCollection'
 ], (_, Backbone, UniqueDropdownCollection) ->
 
   class NeverDropCollection extends UniqueDropdownCollection

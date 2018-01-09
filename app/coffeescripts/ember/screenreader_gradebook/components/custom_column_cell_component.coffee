@@ -18,7 +18,7 @@
 define [
   'ember'
   'underscore'
-  'compiled/gradebook/GradebookHelpers'
+  '../../../gradebook/GradebookHelpers'
   'jsx/gradebook/shared/constants'
 ], (Ember, _, GradebookHelpers, GradebookConstants) ->
 

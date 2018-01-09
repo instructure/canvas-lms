@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Text from '@instructure/ui-core/lib/components/Text';
 import IconDiscussionReplySolid from 'instructure-icons/lib/Solid/IconDiscussionReplySolid';
 import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem';
 
@@ -56,7 +56,7 @@ test('parentCompontent is StatusColorListItem', function () {
 });
 
 test('status is displayed', function () {
-  ok(this.wrapper.contains(<Typography>Late</Typography>));
+  ok(this.wrapper.contains(<Text>Late</Text>));
 });
 
 test('popover trigger is a kabob', function () {

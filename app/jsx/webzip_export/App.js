@@ -18,12 +18,12 @@
 
 import React from 'react'
 import axios from 'axios'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import I18n from 'i18n!webzip_exports'
 import splitAssetString from 'compiled/str/splitAssetString'
-import ExportList from 'jsx/webzip_export/components/ExportList'
-import ExportInProgress from 'jsx/webzip_export/components/ExportInProgress'
-import Errors from 'jsx/webzip_export/components/Errors'
+import ExportList from '../webzip_export/components/ExportList'
+import ExportInProgress from '../webzip_export/components/ExportInProgress'
+import Errors from '../webzip_export/components/Errors'
   class WebZipExportApp extends React.Component {
 
     static webZipFormat (webZipExports, newExportId = null) {

@@ -18,10 +18,10 @@
 define [
   'i18n!discussions'
   'jquery'
-  'compiled/fn/preventDefault'
+  '../fn/preventDefault'
   'Backbone'
   'jqueryui/tooltip'
-  'compiled/jquery.rails_flash_notifications'
+  '../jquery.rails_flash_notifications'
 ], (I18n, $, preventDefault, {View}) ->
 
   class ToggleableSubscriptionIconView extends View

@@ -134,6 +134,20 @@ module Lti
             expect(proxy_setting['custom']).to eq({"proxy" => "setting", "a" => 1, "c" => 3, "d" => 4})
           end
 
+          it 'finds the tool setting by "resource_link_id"' do
+            resource_link_id = SecureRandom.uuid
+            custom = { test: 'value' }.with_indifferent_access
+            tool_setting = Lti::ToolSetting.create!(
+              tool_proxy: tool_proxy,
+              resource_link_id: resource_link_id,
+              custom: custom,
+              context: tool_proxy.context
+            )
+            get "/api/lti/tool_proxy/#{tool_proxy.guid}/accounts/#{tool_proxy.context.id}/resource_link_id/#{resource_link_id}/tool_setting",
+                headers: {'HTTP_ACCEPT' => 'application/vnd.ims.lti.v2.toolsettings.simple+json', 'Authorization' => "bearer #{access_token}"}
+            response_body = JSON.parse(response.body)
+            expect(response_body).to eq custom
+          end
         end
 
         context 'binding' do

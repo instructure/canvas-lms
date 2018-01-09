@@ -18,7 +18,7 @@
 define [
   "i18n!quizzes.quiz_submission",
   "jquery",
-  "compiled/behaviors/quiz_selectmenu"
+  "../../behaviors/quiz_selectmenu"
 ], (I18n, $) ->
   $(document).ready ->
     $("#questions.assessment_results .question").hover (->

@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/views/CollectionView'
-  'compiled/views/conversations/ContextMessageView'
+  '../CollectionView'
+  '../conversations/ContextMessageView'
 ], (CollectionView, ContextMessageView) ->
 
   class ContextMessagesView extends CollectionView

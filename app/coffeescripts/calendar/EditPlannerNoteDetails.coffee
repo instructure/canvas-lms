@@ -21,18 +21,18 @@ define [
   'underscore'
   'timezone'
   'str/htmlEscape'
-  'compiled/util/fcUtil'
-  'compiled/calendar/commonEventFactory'
-  'compiled/views/ValidatedFormView'
+  '../util/fcUtil'
+  '../calendar/commonEventFactory'
+  '../views/ValidatedFormView'
   'jst/calendar/editPlannerNote'
   'jst/EmptyDialogFormWrapper'
-  'compiled/util/coupleTimeFields'
+  '../util/coupleTimeFields'
   'jsx/shared/helpers/datePickerFormat'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
   'vendor/date'
-  'compiled/calendar/fcMomentHandlebarsHelpers'
+  '../calendar/fcMomentHandlebarsHelpers'
 ], (I18n, $, _, tz, htmlEscape, fcUtil, commonEventFactory, ValidatedFormView, editPlannerNoteTemplate, wrapper, coupleTimeFields, datePickerFormat) ->
 
   class EditPlannerNoteDetails extends ValidatedFormView

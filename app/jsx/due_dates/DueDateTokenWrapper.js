@@ -20,13 +20,13 @@ import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
-import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
+import OverrideStudentStore from '../due_dates/OverrideStudentStore'
 import Override from 'compiled/models/AssignmentOverride'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 import I18n from 'i18n!assignments'
 import $ from 'jquery'
-import SearchHelpers from 'jsx/shared/helpers/searchHelpers'
-import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
+import SearchHelpers from '../shared/helpers/searchHelpers'
+import DisabledTokenInput from '../due_dates/DisabledTokenInput'
 
   var DueDateWrapperConsts = {
     MINIMUM_SEARCH_LENGTH: 3,

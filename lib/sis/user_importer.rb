@@ -79,6 +79,36 @@ module SIS
         return @batched_users.size > 0
       end
 
+      def infer_user_name(user_row, prior_name = nil)
+        if user_row.full_name.present?
+          user_row.full_name
+        elsif user_row.first_name.present? || user_row.last_name.present?
+          [user_row.first_name, user_row.last_name].join(' ')
+        elsif prior_name.present?
+          prior_name
+        elsif user_row.sortable_name.present?
+          user_row.sortable_name
+        elsif user_row.short_name.present?
+          user_row.short_name
+        elsif user_row.login_id.present?
+          user_row.login_id
+        else
+          raise ImportError, "No name given for user"
+        end
+      end
+
+      def infer_sortable_name(user_row, prior_sortable_name = nil)
+        if user_row.full_name.present?
+          nil # force User model to infer sortable name from the full name
+        elsif user_row.sortable_name.present?
+          user_row.sortable_name
+        elsif user_row.last_name.present? || user_row.first_name.present?
+          [user_row.last_name, user_row.first_name].join(', ')
+        else
+          prior_sortable_name
+        end
+      end
+
       def process_batch
         return unless any_left_to_process?
         transaction_timeout = Setting.get('sis_transaction_seconds', '1').to_i.seconds
@@ -110,24 +140,18 @@ module SIS
 
               user = pseudo.user
               unless user.stuck_sis_fields.include?(:name)
-                user.name = "#{user_row.first_name} #{user_row.last_name}"
-                user.name = user_row.full_name if user_row.full_name.present?
+                user.name = infer_user_name(user_row, user.name)
               end
               unless user.stuck_sis_fields.include?(:sortable_name)
-                user.sortable_name = user_row.last_name.present? && user_row.first_name.present? ? "#{user_row.last_name}, #{user_row.first_name}" : "#{user_row.first_name}#{user_row.last_name}"
-                user.sortable_name = nil if user_row.full_name.present? # force User model to infer sortable name from the full name
-                user.sortable_name = user_row.sortable_name if user_row.sortable_name.present?
+                user.sortable_name = infer_sortable_name(user_row, user.sortable_name)
               end
               unless user.stuck_sis_fields.include?(:short_name)
                 user.short_name = user_row.short_name if user_row.short_name.present?
               end
             else
               user = User.new
-              user.name = "#{user_row.first_name} #{user_row.last_name}"
-              user.name = user_row.full_name if user_row.full_name.present?
-              user.sortable_name = user_row.last_name.present? && user_row.first_name.present? ? "#{user_row.last_name}, #{user_row.first_name}" : "#{user_row.first_name}#{user_row.last_name}"
-              user.sortable_name = nil if user_row.full_name.present? # force User model to infer sortable name from the full name
-              user.sortable_name = user_row.sortable_name if user_row.sortable_name.present?
+              user.name = infer_user_name(user_row)
+              user.sortable_name = infer_sortable_name(user_row)
               user.short_name = user_row.short_name if user_row.short_name.present?
             end
 

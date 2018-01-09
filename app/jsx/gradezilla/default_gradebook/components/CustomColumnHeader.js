@@ -18,27 +18,25 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader'
 
 const { string } = PropTypes;
 
-class CustomColumnHeader extends ColumnHeader {
+export default class CustomColumnHeader extends ColumnHeader {
+  static propTypes = {
+    title: string.isRequired
+  };
+
   render () {
     return (
       <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail">
-          <Typography tag="span" size="small">
+        <span className="Gradebook__ColumnHeaderDetail" style={{ textAlign: 'center', width: '100%' }}>
+          <Text tag="span" size="x-small">
             { this.props.title }
-          </Typography>
+          </Text>
         </span>
       </div>
     );
   }
 }
-
-CustomColumnHeader.propTypes = {
-  title: string.isRequired
-};
-
-export default CustomColumnHeader

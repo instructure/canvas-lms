@@ -24,7 +24,7 @@ define [
   '../shared_ajax_fixtures'
   'spec/jsx/gradebook/GradeCalculatorSpecHelper'
   '../../controllers/screenreader_gradebook_controller'
-  'compiled/userSettings'
+  '../../../../userSettings'
   'jsx/gradebook/CourseGradeCalculator'
   'vendor/jquery.ba-tinypubsub'
 ], (
@@ -102,13 +102,15 @@ define [
     _.each @srgb.studentsHash(), (obj) =>
       strictEqual @srgb.get('students').findBy('id', obj.id), obj
 
-  asyncTest 'assignmentGroupsHash retuns the expected hash', ->
+  test 'assignmentGroupsHash retuns the expected hash', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       _.each @srgb.assignmentGroupsHash(), (obj) =>
         strictEqual @srgb.get('assignment_groups').findBy('id', obj.id), obj
       start()
 
-  asyncTest 'student objects have isLoaded flag set to true once submissions are loaded', ->
+  test 'student objects have isLoaded flag set to true once submissions are loaded', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       @srgb.get('students').forEach (s) ->
         equal Ember.get(s, 'isLoaded'), true
@@ -145,7 +147,8 @@ define [
     equal @srgb.get('studentsInSelectedSection.length'), 6
     equal @srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy'
 
-  asyncTest 'sorting assignments by position', ->
+  test 'sorting assignments by position', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       Ember.run =>
         @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
@@ -153,7 +156,8 @@ define [
       equal @srgb.get('assignments.lastObject.name'), 'Da Fish and Chips!'
       start()
 
-  asyncTest 'updates assignment_visibility on an assignment', ->
+  test 'updates assignment_visibility on an assignment', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       assignments = @srgb.get('assignments')
       assgn = assignments.objectAt(2)
@@ -161,7 +165,8 @@ define [
       ok !assgn.assignment_visibility.contains('3')
       start()
 
-  asyncTest 'studentsThatCanSeeAssignment doesnt return all students', ->
+  test 'studentsThatCanSeeAssignment doesnt return all students', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       assgn = @srgb.get('assignments.firstObject')
       students = @srgb.studentsThatCanSeeAssignment(assgn)
@@ -170,7 +175,8 @@ define [
       equal ids[0], '1'
       start()
 
-  asyncTest 'sorting assignments alphabetically', ->
+  test 'sorting assignments alphabetically', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       Ember.run =>
         @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
@@ -178,7 +184,8 @@ define [
       equal @srgb.get('assignments.lastObject.name'), 'Z Eats Soup'
       start()
 
-  asyncTest 'sorting assignments by due date', ->
+  test 'sorting assignments by due date', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       Ember.run =>
         @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
@@ -414,7 +421,8 @@ define [
     teardown: ->
       teardown.call this
 
-  asyncTest 'selectedSubmission should be null when just selectedStudent is set', ->
+  test 'selectedSubmission should be null when just selectedStudent is set', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       strictEqual @srgb.get('selectedSubmission'), null
       start()
@@ -435,7 +443,8 @@ define [
     teardown: ->
       teardown.call this
 
-  asyncTest 'assignmentDetails is computed properly', ->
+  test 'assignmentDetails is computed properly', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       ad = @srgb.get('assignmentDetails')
       selectedAssignment = @srgb.get('selectedAssignment')
@@ -443,14 +452,16 @@ define [
       strictEqual ad.cnt, '1'
       start()
 
-  asyncTest 'outcomeDetails is computed properly', ->
+  test 'outcomeDetails is computed properly', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       od = @srgb.get('outcomeDetails')
       selectedOutcome = @srgb.get('selectedOutcome')
       strictEqual od.cnt, 1
       start()
 
-  asyncTest 'selectedSubmission is computed properly', ->
+  test 'selectedSubmission is computed properly', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       selectedSubmission = @srgb.get('selectedSubmission')
       sub = _.find(fixtures.submissions, (s) => s.user_id == @student.id)
@@ -459,13 +470,15 @@ define [
         equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
       start()
 
-  asyncTest 'selectedSubmission sets gradeLocked', ->
+  test 'selectedSubmission sets gradeLocked', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       selectedSubmission = @srgb.get('selectedSubmission')
       equal selectedSubmission.gradeLocked, false
       start()
 
-  asyncTest 'selectedSubmission sets gradeLocked for unassigned students', ->
+  test 'selectedSubmission sets gradeLocked for unassigned students', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       @student = @srgb.get('students')[1]
       Ember.run =>
@@ -488,7 +501,8 @@ define [
       @contextSetStub.restore()
       Ember.run App, 'destroy'
 
-  asyncTest 'gets the submission types', ->
+  test 'gets the submission types', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       equal @srgb.get('assignmentSubmissionTypes'), 'None'
       Ember.run =>
@@ -497,8 +511,8 @@ define [
       equal @srgb.get('assignmentSubmissionTypes'), 'Online URL, Online text entry'
       start()
 
-  asyncTest 'assignmentInClosedGradingPeriod returns false when the selected assignment does not have
-    a due date in a closed grading period', ->
+  test 'assignmentInClosedGradingPeriod returns false when the selected assignment does not have a due date in a closed grading period', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       Ember.run =>
         assignment = @srgb.get('assignments.lastObject')
@@ -507,8 +521,8 @@ define [
       equal @srgb.get('assignmentInClosedGradingPeriod'), false
       start()
 
-  asyncTest 'assignmentInClosedGradingPeriod returns true when the selected assignment has
-    a due date in a closed grading period', ->
+  test 'assignmentInClosedGradingPeriod returns true when the selected assignment has a due date in a closed grading period', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       Ember.run =>
         assignment = @srgb.get('assignments.lastObject')
@@ -544,7 +558,8 @@ define [
     teardown: ->
       teardown.call this
 
-  asyncTest 'calculates assignments properly', ->
+  test 'calculates assignments properly', (assert) ->
+    start = assert.async()
     @completeSetup().then =>
       equal @srgb.get('assignments.length'), 7
       ok !@srgb.get('assignments').findBy('name', 'Unpublished Assignment')
@@ -591,7 +606,8 @@ define [
     setup: ->
       calculationSetup.call this
 
-  asyncTest 'calculates final grade', ->
+  test 'calculates final grade', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       equal @srgb.get('students.firstObject.total_percent'), 79.55
       start()
@@ -600,7 +616,8 @@ define [
     setup: ->
       calculationSetup.call this, calc_stub_with_0_possible
 
-  asyncTest 'calculates final grade', ->
+  test 'calculates final grade', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       equal @srgb.get('students.firstObject.total_percent'), 0
       start()
@@ -847,7 +864,8 @@ define [
       @srgb.set('selectedStudent', student)
       equal @srgb.get('selectedSubmissionHidden'), false
 
-  asyncTest 'selectedSubmissionHidden is true when students dont have visibility', ->
+  test 'selectedSubmissionHidden is true when students dont have visibility', (assert) ->
+    start = assert.async()
     ajax.request().then =>
       student = @srgb.get('students').objectAt(2)
       assignment = @srgb.get('assignments.firstObject')

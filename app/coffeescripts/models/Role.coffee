@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'underscore'
-  'compiled/models/Account'
+  '../models/Account'
 ], ({Model}, _, Account) ->
   class Role extends Model
     initialize: ->

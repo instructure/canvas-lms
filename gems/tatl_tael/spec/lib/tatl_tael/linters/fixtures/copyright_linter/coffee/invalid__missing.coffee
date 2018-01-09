@@ -1,22 +1,13 @@
-define [
-  'react'
-  'react-dom'
-  'instructure-ui/lib/components/Spinner'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'compiled/str/splitAssetString'
-  'jsx/shared/CheatDepaginator'
-  "i18n!calendar.edit"
-], (React, ReactDOM, {default: Spinner}, $, _, Backbone, splitAssetString, Depaginate, I18n) ->
-  class CalendarEvent extends Backbone.Model
+import Backbone from 'Backbone'
 
-    urlRoot: '/api/v1/calendar_events/'
+class CalendarEvent extends Backbone.Model
 
-    dateAttributes: ['created_at', 'end_at', 'start_at', 'updated_at']
+  urlRoot: '/api/v1/calendar_events/'
 
-    present: ->
-      result = Backbone.Model::toJSON.call(this)
-      result.newRecord = !result.id
-      result
+  dateAttributes: ['created_at', 'end_at', 'start_at', 'updated_at']
+
+  present: ->
+    result = Backbone.Model::toJSON.call(this)
+    result.newRecord = !result.id
+    result
 

@@ -61,7 +61,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 .ic-DashboardCard {
   box-sizing: border-box;
   box-shadow: 0 2px 5px rgba(black, 0.3);
-  border-radius: $ic-border-radius;
+  border-radius: 4px; // to keep consistency between dashboard cards and planner app
   overflow: hidden;
   background: $ic-color-light;
   width: $ic-DashboardCard-width;

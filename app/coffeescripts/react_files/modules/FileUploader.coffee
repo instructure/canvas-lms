@@ -18,7 +18,7 @@
 define [
   'i18n!react_files'
   'jquery'
-  'compiled/models/File'
+  '../../models/File'
   './BaseUploader'
   'jquery.ajaxJSON'
 ], (I18n, $, BBFile, BaseUploader) ->

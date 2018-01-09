@@ -168,17 +168,17 @@ module Lti
         @_tool_setting ||= begin
           tool_setting_id = params[:tool_setting_id]
           ts = if tool_setting_id.present?
-                 tool_proxy.tool_settings.find(tool_setting_id)
-               else
-                 tool_proxy_guid = params[:tool_proxy_guid]
-                 context = params[:context_id].present? ? get_context && @context : nil
-                 resource_link_id = params[:resource_link_id]
-                 render_unauthorized and return unless tool_proxy_guid == tool_proxy.guid
-                 tool_proxy.tool_settings.find_by(
-                   context: context,
-                   resource_link_id: resource_link_id
-                 )
-               end
+            tool_proxy.tool_settings.find(tool_setting_id)
+          else
+            get_context
+            tool_proxy_guid = params[:tool_proxy_guid]
+            resource_link_id = params[:resource_link_id]
+            render_unauthorized and return unless tool_proxy_guid == tool_proxy.guid
+            tool_proxy.tool_settings.find_by(
+              context: @context,
+              resource_link_id: resource_link_id
+            )
+          end
           raise ActiveRecord::RecordNotFound if ts.blank?
           ts
         end

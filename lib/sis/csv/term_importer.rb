@@ -46,7 +46,7 @@ module SIS
             end
 
             begin
-              importer.add_term(row['term_id'], row['name'], row['status'], start_date, end_date, row['integration_id'])
+              importer.add_term(row['term_id'], row['name'], row['status'], start_date, end_date, row['integration_id'], row['date_override_enrollment_type'])
             rescue ImportError => e
               add_warning(csv, "#{e}")
             end

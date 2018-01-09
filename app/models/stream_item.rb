@@ -35,14 +35,6 @@ class StreamItem < ActiveRecord::Base
 
   before_save :ensure_notification_category
 
-  scope :to_dashboard, -> { where('data like ?', '%to: dashboard%') }
-  scope :for_assignment, -> (id) {
-    where('data like ?', '%context_type: Assignment%')
-    .where('data like ?', "%context_id: #{id}\n%")
-  }
-  scope :for_users, -> (users) { where('data similar to ?', "%user_id: (#{users.join('|')})\n%") }
-  scope :not_for_users, -> (users) { where('data not similar to ?', "%user_id: (#{users.join('|')})\n%") }
-
   def ensure_notification_category
     if self.asset_type == 'Message'
       self.notification_category ||= get_notification_category
@@ -119,10 +111,6 @@ class StreamItem < ActiveRecord::Base
     res = user.attributes.slice('id', 'name', 'short_name')
     res['short_name'] ||= res['name']
     res
-  end
-
-  def remove_users(users)
-    self.stream_item_instances.where(user_id: users).try(:destroy_all)
   end
 
   def prepare_conversation(conversation)
@@ -207,7 +195,7 @@ class StreamItem < ActiveRecord::Base
       raise "Unexpected stream item type: #{object.class}"
     end
     if self.context_type
-      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', self.context_type, self.context_id].cache_key) do
+      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', "#{self.context_type.underscore}_#{self.context_id}"].cache_key) do
         self.context.short_name rescue ''
       end
     end

@@ -21,11 +21,11 @@ define [
   'jquery'
   'underscore'
   'jst/assignments/homework_submission_tool'
-  'compiled/views/ExternalTools/ExternalContentReturnView',
-  'compiled/external_tools/ExternalToolCollection'
-  'compiled/views/assignments/ExternalContentFileSubmissionView'
-  'compiled/views/assignments/ExternalContentUrlSubmissionView'
-  'compiled/views/assignments/ExternalContentLtiLinkSubmissionView'
+  '../views/ExternalTools/ExternalContentReturnView',
+  '../external_tools/ExternalToolCollection'
+  '../views/assignments/ExternalContentFileSubmissionView'
+  '../views/assignments/ExternalContentUrlSubmissionView'
+  '../views/assignments/ExternalContentLtiLinkSubmissionView'
   'jquery.disableWhileLoading'
 ], ( Backbone, I18n, $, _, homeworkSubmissionTool, ExternalContentReturnView,
      ExternalToolCollection, ExternalContentFileSubmissionView,

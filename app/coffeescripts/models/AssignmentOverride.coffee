@@ -19,7 +19,7 @@ define [
   'Backbone'
   'underscore'
   'jquery'
-  'compiled/models/Section'
+  '../models/Section'
   'i18n!assignments',
 ], (Backbone, _, $, Section, I18n) ->
 

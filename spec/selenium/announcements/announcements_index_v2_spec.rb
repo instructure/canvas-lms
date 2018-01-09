@@ -16,12 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
+require_relative './announcement_index_page'
+require_relative './external_feed_page'
 
 describe "announcements index v2" do
   include_context "in-process server selenium tests"
-  let(:url) { "/courses/#{@course.id}/announcements/" }
 
-  context "announcements as a teacher" do
+  context "as a teacher the correct page version is displayed" do
     before :once do
       @teacher = user_with_pseudonym(active_user: true)
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
@@ -31,16 +32,128 @@ describe "announcements index v2" do
       user_session(@teacher)
     end
 
-    it 'should display the old announcements if the feature flas is off' do
-      @course.account.set_feature_flag! :section_specific_announcements, 'off'
-      get url
+    it 'when the feature flas is off' do
+      AnnouncementIndex.set_section_specific_announcements_flag(@course,'off')
+      AnnouncementIndex.visit(@course)
       expect(f('#external_feed_url')).not_to be_nil
     end
 
-    it 'should display the new announcements if the feature flas is on' do
-      @course.account.set_feature_flag! :section_specific_announcements, 'on'
-      get url
+    it 'when the feature flag is on' do
+      AnnouncementIndex.set_section_specific_announcements_flag(@course,'on')
+      AnnouncementIndex.visit(@course)
       expect(f('.announcements-v2__wrapper')).not_to be_nil
+    end
+  end
+
+  context "as a teacher" do
+    announcement1_title = 'Free food!'
+    announcement2_title = 'Flu Shot'
+
+    before :once do
+      @teacher = user_with_pseudonym(active_user: true)
+      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
+      course_with_student(course: @course, active_enrollment: true)
+      AnnouncementIndex.set_section_specific_announcements_flag(@course,'on')
+
+      # Announcement attributes: title, message, delayed_post_at, allow_rating, user
+      @announcement1 = @course.announcements.create!(
+        title: announcement1_title,
+        message: 'In the cafe!',
+        user: @teacher
+      )
+      @announcement2 = @course.announcements.create!(
+        title: announcement2_title,
+        message: 'In the cafe!',
+        delayed_post_at: 1.day.from_now,
+        user: @teacher
+      )
+
+      @announcement1.discussion_entries.create!(user: @student, message: "I'm coming!")
+      @announcement1.discussion_entries.create!(user: @student, message: "It's already gone! :(")
+    end
+
+    before :each do
+      user_session(@teacher)
+      AnnouncementIndex.visit(@course)
+    end
+
+    it "announcements can be filtered" do
+      skip('Add in with COMMS-560')
+      AnnouncementIndex.select_filter("Delayed")
+      expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
+      expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
+    end
+
+    it "search by title works correctly" do
+      skip('Add in with COMMS-556')
+      AnnouncementIndex.enter_search("Free food!")
+      expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
+      expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
+    end
+
+    it "an announcement can be locked for commenting" do
+      skip('Add in with COMMS-561')
+      AnnouncementIndex.check_announcement(announcement1_title)
+      AnnouncementIndex.toggle_lock
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).to be_displayed
+      expect(Announcement.where(title: announcement1_title).first.locked).to be true
+    end
+
+    it 'multiple announcements can be locked for commenting' do
+      skip('Add in with COMMS-561')
+      AnnouncementIndex.check_announcement(announcement1_title)
+      AnnouncementIndex.check_announcement(announcement2_title)
+      AnnouncementIndex.toggle_lock
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement2_title)).to be_displayed
+      expect(Announcement.where(title: announcement1_title).first.locked).to be true
+      expect(Announcement.where(title: announcement2_title).first.locked).to be true
+    end
+
+    it 'an announcement can be deleted' do
+      skip('Add in with COMMS-561')
+      AnnouncementIndex.check_announcement(announcement1_title)
+      AnnouncementIndex.click_delete
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).not_to be_displayed
+      expect(Announcement.where(title: announcement1_title).first.workflow_state).to be 'deleted'
+    end
+
+    it 'multiple announcements can be deleted' do
+      skip('Add in with COMMS-561')
+      AnnouncementIndex.check_announcement(announcement1_title)
+      AnnouncementIndex.check_announcement(announcement2_title)
+      AnnouncementIndex.click_delete
+      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).not_to be_displayed
+      expect(AnnouncementIndex.announcement_locked_icon(announcement2_title)).not_to be_displayed
+      expect(Announcement.where(title: announcement1_title).first.workflow_state).to be 'deleted'
+      expect(Announcement.where(title: announcement2_title).first.workflow_state).to be 'deleted'
+    end
+
+    it 'clicking the Add Announcement button redirects to new announcement page' do
+      expect_new_page_load { AnnouncementIndex.click_add_announcement }
+      expect(driver.current_url).to include(AnnouncementIndex.new_announcement_url)
+    end
+
+    it 'clicking the announcement goes to the discussion page for that announcement' do
+      expect_new_page_load { AnnouncementIndex.click_on_announcement(announcement1_title) }
+      expect(driver.current_url).to include(AnnouncementIndex.individual_announcement_url(@announcement1))
+    end
+
+    it 'pill on announcement displays correct number of unread replies' do
+      expect(AnnouncementIndex.announcement_unread_number(announcement1_title)).to eq "2"
+    end
+
+    it 'RSS feed info displayed' do
+      AnnouncementIndex.open_external_feeds
+      ExternalFeedPage.click_rss_feed_link
+      expect(driver.current_url).to include('.atom')
+    end
+
+    it 'an external feed can be added' do
+      skip('Add with COMMS-589')
+      AnnouncementIndex.open_external_feeds
+      ExternalFeedPage.add_external_feed('/someurl', 'Truncated')
+      expect(ExternalFeed.feed_name).to be_displayed
     end
   end
 end

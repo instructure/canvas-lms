@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/GroupUserCollection'
-  'compiled/models/GroupUser'
+  '../collections/GroupUserCollection'
+  '../models/GroupUser'
 ], (GroupUserCollection, GroupUser) ->
 
   class UnassignedGroupUserCollection extends GroupUserCollection

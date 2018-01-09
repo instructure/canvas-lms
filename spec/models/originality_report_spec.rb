@@ -48,12 +48,6 @@ describe OriginalityReport do
     expect(subject.errors[:originality_score]).to eq ['score must be between 0 and 100']
   end
 
-  it 'requires an attachment' do
-    subject.attachment = nil
-    subject.valid?
-    expect(subject.errors[:attachment]).to eq ["can't be blank"]
-  end
-
   it 'is invalid if the attachment is already taken' do
     subject
     duplicate = OriginalityReport.create(attachment: attachment, submission: submission_model)
@@ -176,6 +170,28 @@ describe OriginalityReport do
       report_with_score.update_attributes(workflow_state: 'error')
       report_with_score.update_attributes(originality_score: 23.2)
       expect(report_with_score.workflow_state).to eq 'error'
+    end
+  end
+
+  describe '#asset_key' do
+    let(:attachment) { attachment_model }
+    let(:submission) { submission_model }
+
+    it 'returns the attachment asset string if attachment is present' do
+      report = OriginalityReport.create!(
+        submission: submission,
+        attachment: attachment,
+        originality_score: 23
+      )
+      expect(report.asset_key).to eq attachment.asset_string
+    end
+
+    it 'returns the submission asset string if the attachment is blank' do
+      report = OriginalityReport.create!(
+        submission: submission,
+        originality_score: 23
+      )
+      expect(report.asset_key).to eq submission.asset_string
     end
   end
 

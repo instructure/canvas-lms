@@ -26,7 +26,7 @@ import browserTemplate from 'jst/outcomes/browser'
 import instructionsTemplate from 'jst/outcomes/mainInstructions'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import OutcomesActionsPopoverMenu from 'jsx/outcomes/OutcomesActionsPopoverMenu'
+import OutcomesActionsPopoverMenu from '../outcomes/OutcomesActionsPopoverMenu'
 
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 

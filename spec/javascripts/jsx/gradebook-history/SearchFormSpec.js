@@ -19,12 +19,12 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { SearchFormComponent } from 'jsx/gradebook-history/SearchForm';
-import Autocomplete from 'instructure-ui/lib/components/Autocomplete';
-import Button from 'instructure-ui/lib/components/Button';
-import DateInput from 'instructure-ui/lib/components/DateInput';
-import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
+import Autocomplete from '@instructure/ui-core/lib/components/Autocomplete';
+import Button from '@instructure/ui-core/lib/components/Button';
+import DateInput from '@instructure/ui-core/lib/components/DateInput';
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup';
 import { destroyContainer } from 'jsx/shared/FlashAlert';
-import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
+import Fixtures from '../gradebook-history/Fixtures';
 
 const defaultProps = () => (
   {
@@ -100,8 +100,8 @@ test('has a Button for submitting', function () {
 test('disables the submit button if To date is before From date', function () {
   this.wrapper.setState({
     selected: {
-      from: '2017-05-02T00:00:00-05:00',
-      to: '2017-05-01T00:00:00-05:00'
+      from: { value: '2017-05-02T00:00:00-05:00', conversionFailed: false },
+      to: { value: '2017-05-01T00:00:00-05:00', conversionFailed: false }
     }
   }, () => {
     const button = this.wrapper.find(Button);
@@ -112,8 +112,8 @@ test('disables the submit button if To date is before From date', function () {
 test('does not disable the submit button if To date is after From date', function () {
   this.wrapper.setState({
     selected: {
-      from: '2017-05-01T00:00:00-05:00',
-      to: '2017-05-02T00:00:00-05:00'
+      from: { value: '2017-05-01T00:00:00-05:00', conversionFailed: false },
+      to: { value: '2017-05-02T00:00:00-05:00', conversionFailed: false }
     }
   }, () => {
     const button = this.wrapper.find(Button);
@@ -121,18 +121,42 @@ test('does not disable the submit button if To date is after From date', functio
   });
 });
 
+test('disables the submit button if the To date DateInput conversion failed', function () {
+  this.wrapper.setState({
+    selected: {
+      from: { value: '', conversionFailed: false },
+      to: { value: '2017-05-02T00:00:00-05:00', conversionFailed: true }
+    }
+  }, () => {
+    const button = this.wrapper.find(Button);
+    ok(button.props().disabled);
+  });
+});
+
+test('disables the submit button if the From date DateInput conversion failed', function () {
+  this.wrapper.setState({
+    selected: {
+      from: { value: '2017-05-02T00:00:00-05:00', conversionFailed: true },
+      to: { value: '', conversionFailed: false },
+    }
+  }, () => {
+    const button = this.wrapper.find(Button);
+    ok(button.props().disabled);
+  });
+});
+
 test('does not disable the submit button when there are no dates selected', function () {
   const { from, to } = this.wrapper.state().selected;
   const button = this.wrapper.find(Button);
-  ok(!from && !to);
+  ok(!from.value && !to.value);
   notOk(button.props().disabled);
 });
 
 test('does not disable the submit button when only from date is entered', function () {
   this.wrapper.setState({
     selected: {
-      from: '1994-04-08T00:00:00-05:00',
-      to: ''
+      from: { value: '1994-04-08T00:00:00-05:00', conversionFailed: false },
+      to: { value: '', conversionFailed: false }
     }
   }, () => {
     const button = this.wrapper.find(Button);
@@ -143,8 +167,8 @@ test('does not disable the submit button when only from date is entered', functi
 test('does not disable the submit button when only to date is entered', function () {
   this.wrapper.setState({
     selected: {
-      from: '',
-      to: '2017-05-01T00:00:00-05:00'
+      from: { value: '', conversionFailed: false },
+      to: { value: '2017-05-01T00:00:00-05:00', conversionFailed: false }
     }
   }, () => {
     const button = this.wrapper.find(Button);
@@ -175,8 +199,8 @@ test('dispatches with the state of input', function () {
     assignment: '1',
     grader: '2',
     student: '3',
-    from: '2017-05-20T00:00:00-05:00',
-    to: '2017-05-21T00:00:00-05:00'
+    from: { value: '2017-05-20T00:00:00-05:00', conversionFailed: false },
+    to: { value: '2017-05-21T00:00:00-05:00', conversionFailed: false }
   };
 
   this.wrapper.setState({

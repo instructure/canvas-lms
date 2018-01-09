@@ -23,8 +23,9 @@ define [
   'compiled/collections/AnnouncementsCollection'
   'helpers/getFakePage'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-  ], ($, Backbone, IndexView, Announcement, AnnouncementsCollection, fakePage, fakeENV) ->
+  ], ($, Backbone, IndexView, Announcement, AnnouncementsCollection, fakePage, fakeENV, assertions) ->
 
   server = null
   collection = null
@@ -69,6 +70,9 @@ define [
       server.restore()
       view.remove()
 
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'renders', ->
     collection.fetch()

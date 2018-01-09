@@ -454,6 +454,52 @@ describe ApplicationController do
 
       let(:content_tag) { ContentTag.create(content: tool, url: tool.url)}
 
+      context 'display type' do
+        before do
+          allow(controller).to receive(:named_context_url).and_return('wrong_url')
+          allow(controller).to receive(:render)
+          allow(controller).to receive_messages(js_env:[])
+          controller.instance_variable_set(:"@context", course)
+          allow(content_tag).to receive(:id).and_return(42)
+          allow(controller).to receive(:require_user) { user_model }
+          allow(controller).to receive(:lti_launch_params) {{}}
+          content_tag.update_attributes!(context: assignment_model)
+        end
+
+        it 'gives priority to the "display" parameter' do
+          expect(Lti::AppUtil).to receive(:display_template).with('borderless')
+          controller.params['display'] = 'borderless'
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+        end
+
+        it 'uses the tool setting display type if the "display" parameter is absent' do
+          expect(Lti::AppUtil).to receive(:display_template).with('full_width')
+          tool.settings[:assignment_selection] = { "display_type" => "full_width" }
+          tool.save!
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+        end
+
+        it 'does not raise an error if the display type of the placement is not set' do
+          tool.settings[:assignment_selection] = {}
+          tool.save!
+          expect do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+          end.not_to raise_exception
+        end
+
+        it 'does not use the assignment lti header if the display type is "full_width"' do
+          tool.settings[:assignment_selection] = { "display_type" => "full_width" }
+          tool.save!
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:prepend_template]).to be_blank
+        end
+
+        it 'does display the assignment lti header if the display type is not "full_width"' do
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:prepend_template]).to be_present
+        end
+      end
+
       it 'returns the full path for the redirect url' do
         expect(controller).to receive(:named_context_url).with(course, :context_url, {:include_host => true})
         expect(controller).to receive(:named_context_url).with(course, :context_external_content_success_url, 'external_tool_redirect', {:include_host => true}).and_return('wrong_url')

@@ -31,6 +31,22 @@
 #   Api.paginate bookmarked_collection, ...
 #
 module BookmarkedCollection
+  class Bookmark < Array
+    def <=>(other)
+      length = [self.size, other.size].min
+      length.times do |i|
+        if self[i].nil? && other[i].nil?
+          next
+        elsif self[i].nil?
+          return 1
+        elsif other[i].nil?
+          return -1
+        else
+          return self[i] <=> other[i]
+        end
+      end
+    end
+  end
   class SimpleBookmarker
     def initialize(model, *columns)
       @model = model
@@ -38,7 +54,7 @@ module BookmarkedCollection
     end
 
     def bookmark_for(object)
-      object.attributes.values_at *@columns
+      Bookmark.new object.attributes.values_at(*@columns)
     end
 
     TYPE_MAP = {

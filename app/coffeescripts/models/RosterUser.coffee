@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['compiled/models/User', 'compiled/util/secondsToTime', 'underscore'], (User, secondsToTime, _) ->
+define ['../models/User', '../util/secondsToTime', 'underscore'], (User, secondsToTime, _) ->
 
   class RosterUser extends User
 

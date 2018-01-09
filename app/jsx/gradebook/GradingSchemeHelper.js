@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import round from 'compiled/util/round'
 import _ from 'underscore'
 
 export function scoreToGrade (score, gradingScheme) {
-  const scoreWithLowerBound = Math.max(score, 0);
+  const roundedScore = round(score, 4);
+  const scoreWithLowerBound = Math.max(roundedScore, 0);
   const letter = _.find(gradingScheme, (row, i) => {
     const schemeScore = (row[1] * 100).toPrecision(4);
     // The precision of the lower bound (* 100) must be limited to eliminate

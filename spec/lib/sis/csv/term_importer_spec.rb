@@ -133,4 +133,25 @@ describe SIS::CSV::TermImporter do
     expect(t1).to be_deleted
   end
 
+  it 'should allow setting and removing enrollment type date overrides' do
+    process_csv_data(
+      "term_id,name,status,start_date,end_date,date_override_enrollment_type",
+      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00,",
+      "T001,Winter11,active,2012-1-05 00:00:00,2012-4-14 00:00:00,StudentEnrollment"
+    )
+
+    t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
+    override = t1.enrollment_dates_overrides.where(:enrollment_type => "StudentEnrollment").first
+    expect(override.start_at).to eq DateTime.parse("2012-1-05 00:00:00")
+    expect(override.end_at).to eq DateTime.parse("2012-4-14 00:00:00")
+
+    process_csv_data(
+      "term_id,name,status,start_date,end_date,date_override_enrollment_type",
+      "T001,,deleted,,,StudentEnrollment"
+    )
+
+    expect(t1.enrollment_dates_overrides.where(:enrollment_type => "StudentEnrollment").first).to be_nil
+  end
+
+
 end

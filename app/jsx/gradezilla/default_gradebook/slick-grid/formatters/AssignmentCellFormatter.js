@@ -19,8 +19,8 @@
 import htmlEscape from 'str/htmlEscape';
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import { extractDataTurnitin } from 'compiled/gradezilla/Turnitin';
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
-import { classNamesForAssignmentCell } from 'jsx/gradezilla/default_gradebook/slick-grid/shared/CellStyles';
+import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper';
+import { classNamesForAssignmentCell } from '../../../../gradezilla/default_gradebook/slick-grid/shared/CellStyles';
 
 function getTurnitinState (submission) {
   const turnitin = extractDataTurnitin(submission);

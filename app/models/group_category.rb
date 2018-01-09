@@ -21,9 +21,12 @@ class GroupCategory < ActiveRecord::Base
   attr_accessor :assign_unassigned_members, :group_by_section
 
   belongs_to :context, polymorphic: [:course, :account]
+  belongs_to :sis_batch
   has_many :groups, :dependent => :destroy
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'
+
+  before_save :set_root_account_id
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership
@@ -68,6 +71,14 @@ class GroupCategory < ActiveRecord::Base
     next if value.blank?
     unless ['first', 'random'].include?(value)
       record.errors.add attr, t(:invalid_auto_leader, "AutoLeader type needs to be one of the following values: %{values}", values: "null, 'first', 'random'")
+    end
+  end
+
+  validates :context_id, presence: { message: t(:empty_course_or_account_id, 'Must have an account or course ID') }
+
+  validates_each :context_type do |record, attr, value|
+    unless ['Account', 'Course'].include?(value)
+      record.errors.add attr, t(:group_category_must_have_context, 'Must belong to an account or course')
     end
   end
 
@@ -383,6 +394,13 @@ class GroupCategory < ActiveRecord::Base
     @create_group_count = num && num > 0 ?
       [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
       nil
+  end
+
+  def set_root_account_id
+    if self.context.root_account
+      root_account_id = self.context.root_account.id
+      self.root_account_id = root_account_id
+    end
   end
 
   def auto_create_groups

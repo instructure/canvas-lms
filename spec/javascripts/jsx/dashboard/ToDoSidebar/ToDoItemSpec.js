@@ -121,11 +121,11 @@ test('renders the title as a Link when given an href prop', () => {
   equal(link.text(), 'Introduction to Board Games');
 });
 
-test('renders out the title as a Typography when not given an href prop', () => {
+test('renders out the title as a Text when not given an href prop', () => {
   const wrapper = mount(
     <ToDoItem {...getDefaultProps()} />
   );
-  const title = wrapper.find('.ToDoSidebarItem__Title').find('Typography').first();
+  const title = wrapper.find('.ToDoSidebarItem__Title').find('Text').first();
   ok(title.exists());
   equal(title.text(), 'Introduction to Board Games');
 });

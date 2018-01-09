@@ -54,7 +54,7 @@ class Gradezilla
     # ---------------------NEW-----------------------
     # assignment header column elements
     def assignment_header_menu_element(id)
-      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction[id*='PopoverMenu']")
+      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction [id*='PopoverMenu']")
     end
 
     def assignment_header_menu_item_element(item_name)
@@ -71,10 +71,6 @@ class Gradezilla
 
     def assignment_header_cell_label_element(title)
       select_assignment_header_cell_element(title).find('.assignment-name')
-    end
-
-    def assignment_header_warning_icon_element
-      ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]')
     end
 
     # student header column elements
@@ -562,7 +558,7 @@ class Gradezilla
     end
 
     def assignment_header_menu_trigger_element(assignment_name)
-      assignment_header_cell_element(assignment_name).find_element(:css, '.Gradebook__ColumnHeaderAction')
+      assignment_header_cell_element(assignment_name).find_element(:css, '.Gradebook__ColumnHeaderAction button')
     end
 
     def assignment_header_menu_item_selector(item)
@@ -577,16 +573,8 @@ class Gradezilla
       assignment_header_menu_item_element(menu_item_id)
     end
 
-    def assignment_header_mute_icon_selector(assignment_id)
-      ".container_1 .slick-header-column[id*=assignment_#{assignment_id}] svg[name=IconMutedSolid]"
-    end
-
     def close_open_dialog
       fj('.ui-dialog-titlebar-close:visible').click
-    end
-
-    def select_assignment_header_warning_icon
-      assignment_header_warning_icon_element
     end
 
     def select_filters
@@ -650,7 +638,8 @@ class Gradezilla
       assignment_header_popover_sub_item_element(sort_by_item).click
     end
 
-    def click_assignment_popover_enter_grade_as(grade_type)
+    def click_assignment_popover_enter_grade_as(assignment_id, grade_type)
+      assignment_header_menu_element(assignment_id).click
       hover(assignment_header_popover_menu_element("Enter Grades as"))
       assignment_header_popover_sub_item_element(grade_type).click
     end

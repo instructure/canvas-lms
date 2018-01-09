@@ -18,7 +18,7 @@
 define [
   'jquery'
   'lodash'
-  'compiled/models/Conversation'
+  '../models/Conversation'
 ], ($, _, Conversation) ->
 
   class ConversationCreator

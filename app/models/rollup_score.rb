@@ -27,6 +27,7 @@ class RollupScore
     @outcome = @outcome_results.first.learning_outcome
     @count = @outcome_results.size
     @points_possible = @outcome.rubric_criterion[:points_possible]
+    @mastery_points = @outcome.rubric_criterion[:mastery_points]
     @calculation_method = @outcome.calculation_method || "highest"
     @calculation_int = @outcome.calculation_int
     @score = @aggregate ? aggregate_score : calculate_results
@@ -52,8 +53,9 @@ class RollupScore
 
   def n_mastery
     return unless @outcome.rubric_criterion
-    cutoff_score = @outcome.rubric_criterion[:mastery_points]
-    tmp_scores = scores.compact.delete_if{|score| score < cutoff_score}
+    # mastery_points represents the cutoff score for which results
+    # will be considered towards mastery
+    tmp_scores = scores.compact.delete_if{|score| score < @mastery_points}
     return nil if tmp_scores.length < @calculation_int
     (tmp_scores.sum.to_f / tmp_scores.size).round(PRECISION)
   end

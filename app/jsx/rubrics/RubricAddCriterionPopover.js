@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
-import { MenuItem, MenuItemSeparator, MenuItemGroup } from 'instructure-ui/lib/components/Menu'
-import Typography from 'instructure-ui/lib/components/Typography'
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import { MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-core/lib/components/Menu'
+import Text from '@instructure/ui-core/lib/components/Text'
 import I18n from 'i18n!edit_rubric'
 import $ from 'jquery'
 
@@ -47,7 +47,7 @@ class RubricAddCriterionPopover extends React.Component {
           }
         >
           <MenuItem id="add_criterion_button" onClick={() => $("#add_criterion_link").trigger("click")}>
-            <Typography size="small" weight="bold">{I18n.t("New Criterion")}</Typography>
+            <Text size="small" weight="bold">{I18n.t("New Criterion")}</Text>
           </MenuItem>
           <MenuItemSeparator />
           <MenuItemGroup id="criterion_duplicate_menu" label={I18n.t("Duplicate")}>

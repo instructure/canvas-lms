@@ -348,4 +348,15 @@ describe EnrollmentState do
       end
     end
   end
+
+  it "shouldn't cache the wrong state when setting to 'invited'" do
+    course_factory(:active_all => true)
+    e = student_in_course(:course => @course)
+    e.reject!
+    RequestCache.enable do
+      e.workflow_state = 'invited'
+      e.save!
+      expect(e.invited?).to be_truthy
+    end
+  end
 end

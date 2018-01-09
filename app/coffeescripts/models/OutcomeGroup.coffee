@@ -18,8 +18,8 @@
 
 define [
   'Backbone'
-  'compiled/collections/OutcomeCollection'
-  'compiled/collections/PaginatedCollection'
+  '../collections/OutcomeCollection'
+  '../collections/PaginatedCollection'
 ], (Backbone, OutcomeCollection, PaginatedCollection) ->
 
   class OutcomeGroup extends Backbone.Model

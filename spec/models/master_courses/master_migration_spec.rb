@@ -1340,6 +1340,27 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "should work with links to files copied in previous sync" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      Timecop.freeze(1.minute.ago) do
+        @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+      end
+      run_master_migration
+
+      @att_copy = @copy_to.attachments.where(:migration_id => mig_id(@att)).first
+      expect(@att_copy).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        @topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<img src='/courses/#{@copy_from.id}/files/#{@att.id}/download?wrap=1'>")
+      end
+      run_master_migration
+
+      @topic_copy = @copy_to.discussion_topics.where(:migration_id => mig_id(@topic)).first
+      expect(@topic_copy.message).to include("/courses/#{@copy_to.id}/files/#{@att_copy.id}/download?wrap=1")
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")

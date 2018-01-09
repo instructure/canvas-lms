@@ -19,7 +19,7 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/PaginatedView'
+  '../views/PaginatedView'
   'jquery.disableWhileLoading'
 ], ($, _, PaginatedView) ->
 

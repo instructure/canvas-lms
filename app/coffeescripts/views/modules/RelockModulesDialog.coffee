@@ -19,7 +19,7 @@ define [
   'i18n!modules'
   'jquery'
   'underscore'
-  'compiled/views/DialogBaseView'
+  '../DialogBaseView'
   'jst/modules/RelockModulesDialog'
 ], (I18n, $, _, DialogBaseView, template) ->
 

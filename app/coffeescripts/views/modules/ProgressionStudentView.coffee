@@ -19,11 +19,11 @@ define [
   'i18n!context_modules'
   'jquery'
   'Backbone'
-  'compiled/collections/ModuleCollection'
+  '../../collections/ModuleCollection'
   'jst/modules/ProgressionStudentView'
   'jst/modules/ProgressionModuleCollection'
-  'compiled/views/PaginatedCollectionView'
-  'compiled/views/modules/ProgressionModuleView'
+  '../PaginatedCollectionView'
+  '../modules/ProgressionModuleView'
 ], (I18n, $, Backbone, ModuleCollection, template, collectionTemplate, PaginatedCollectionView, ProgressionModuleView) ->
 
   class ProgressionStudentView extends Backbone.View

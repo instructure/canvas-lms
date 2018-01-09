@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import GradingStandardCollection from 'jsx/grading/gradingStandardCollection'
-import GradingPeriodCollection from 'jsx/grading/gradingPeriodCollection'
+import GradingStandardCollection from '../grading/gradingStandardCollection'
+import GradingPeriodCollection from '../grading/gradingPeriodCollection'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import 'jquery.instructure_misc_plugins'

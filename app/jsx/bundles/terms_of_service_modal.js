@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TermsOfServiceModal from 'jsx/shared/TermsOfServiceModal'
+import TermsOfServiceModal from '../shared/TermsOfServiceModal'
 
 let container = document.querySelector('#terms_of_service_preview_link')
 if (container) {

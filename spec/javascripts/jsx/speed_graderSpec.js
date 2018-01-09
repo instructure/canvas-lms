@@ -85,9 +85,14 @@ QUnit.module('SpeedGrader#showDiscussion', {
     `;
 
     $('#fixtures').html(gradeContainerHtml);
+    sinon.stub($, 'getJSON')
+    sinon.stub(SpeedGrader.EG, 'domReady')
+    SpeedGrader.setup()
   },
 
   teardown () {
+    SpeedGrader.EG.domReady.restore()
+    $.getJSON.restore()
     $('#fixtures').empty();
     SpeedGrader.EG.currentStudent = this.originalStudent;
     window.jsonData = this.originalWindowJSONData;
@@ -147,9 +152,14 @@ QUnit.module('SpeedGrader#refreshSubmissionToView', {
         ]
       }
     };
+    sinon.stub($, 'getJSON')
+    sinon.stub(SpeedGrader.EG, 'domReady')
+    SpeedGrader.setup()
   },
 
   teardown () {
+    SpeedGrader.EG.domReady.restore()
+    $.getJSON.restore()
     window.jsonData = this.originalWindowJSONData;
     SpeedGrader.EG.currentStudent = this.originalStudent;
     fakeENV.teardown();
@@ -159,6 +169,57 @@ QUnit.module('SpeedGrader#refreshSubmissionToView', {
 test('can handle non-nested submission history', () => {
   SpeedGrader.EG.refreshSubmissionsToView();
   ok(true, 'should not throw an exception');
+})
+
+QUnit.module('#showSubmissionDetails', function(hooks) {
+  let originalWindowJSONData
+  let originalStudent
+
+  hooks.beforeEach(function() {
+    fakeENV.setup()
+    sinon.stub(SpeedGrader.EG, 'handleSubmissionSelectionChange')
+    originalWindowJSONData = window.jsonData
+    window.jsonData = {
+      id: 27,
+      GROUP_GRADING_MODE: false,
+      points_possible: 10
+    }
+    originalStudent = SpeedGrader.EG.currentStudent
+    SpeedGrader.EG.currentStudent = {
+      id: 4,
+      submission_state: 'not_graded',
+      submission: { score: 7, grade: 70, submission_history: [] }
+    }
+    document.getElementById(
+      'fixtures'
+    ).innerHTML = `<div id="submission_details">Submission Details</div>`
+    sinon.stub($, 'getJSON')
+    sinon.stub($, 'ajaxJSON')
+    sinon.stub(SpeedGrader.EG, 'domReady')
+    SpeedGrader.setup()
+  })
+
+  hooks.afterEach(function() {
+    SpeedGrader.EG.domReady.restore()
+    $.ajaxJSON.restore()
+    $.getJSON.restore()
+    document.getElementById('fixtures').innerHTML = ''
+    window.jsonData = originalWindowJSONData
+    SpeedGrader.EG.currentStudent = originalStudent
+    SpeedGrader.EG.handleSubmissionSelectionChange.restore()
+    fakeENV.teardown()
+  })
+
+  test('shows submission details', function() {
+    SpeedGrader.EG.showSubmissionDetails()
+    strictEqual($('#submission_details').is(':visible'), true)
+  })
+
+  test('hides submission details', function() {
+    SpeedGrader.EG.currentStudent.submission = { workflow_state: 'unsubmitted' }
+    SpeedGrader.EG.showSubmissionDetails()
+    strictEqual($('#submission_details').is(':visible'), false)
+  })
 })
 
 QUnit.module('SpeedGrader#refreshGrades', {
@@ -574,13 +635,11 @@ test('unexcuses the submission if the grade is blank and the assignment is compl
   SpeedgraderHelpers.determineGradeToSubmit.restore();
 });
 
-let $div = null;
 QUnit.module('loading a submission Preview', {
   setup() {
     fakeENV.setup();
     this.stub($, 'ajaxJSON');
-    $div = $("<div id='iframe_holder'>not empty</div>")
-    $("#fixtures").html($div)
+    $('#fixtures').html($("<div id='iframe_holder'>not empty</div>"))
   },
 
   teardown() {
@@ -590,6 +649,7 @@ QUnit.module('loading a submission Preview', {
 });
 
 test('entry point function, loadSubmissionPreview, is a function', () => {
+  // FIXME: loadSubmissionPreview needs a behavioral test
   ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
 })
 
@@ -632,10 +692,6 @@ QUnit.module('emptyIframeHolder', {
   }
 });
 
-test('is a function', () => {
-  ok(typeof SpeedGrader.EG.emptyIframeHolder === 'function');
-});
-
 test('clears the contents of the iframe_holder', () => {
   SpeedGrader.EG.emptyIframeHolder($div);
   ok($div.is(':empty'));
@@ -644,20 +700,22 @@ test('clears the contents of the iframe_holder', () => {
 QUnit.module('renderLtiLaunch', {
   setup() {
     fakeENV.setup();
-    this.stub($, 'ajaxJSON');
     $div = $("<div id='iframe_holder'>not empty</div>")
     $("#fixtures").html($div)
+    sinon.stub($, 'getJSON')
+    sinon.stub($, 'ajaxJSON')
+    sinon.stub(SpeedGrader.EG, 'domReady')
+    SpeedGrader.setup()
   },
 
   teardown() {
+    SpeedGrader.EG.domReady.restore()
+    $.ajaxJSON.restore()
+    $.getJSON.restore()
     fakeENV.teardown();
     $("#fixtures").empty();
   }
 });
-
-test('is a function', () => {
-  ok(typeof SpeedGrader.EG.renderLtiLaunch === 'function')
-})
 
 test('contains iframe with the escaped student submission url', () => {
   const retrieveUrl = 'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22';

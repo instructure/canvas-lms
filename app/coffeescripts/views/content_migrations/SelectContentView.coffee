@@ -23,14 +23,14 @@ define [
   'jst/content_migrations/SelectContent'
   'jst/EmptyDialogFormWrapper'
   'jst/content_migrations/ContentCheckboxCollection'
-  'compiled/views/DialogFormView'
-  'compiled/views/CollectionView'
-  'compiled/collections/content_migrations/ContentCheckboxCollection'
-  'compiled/views/content_migrations/ContentCheckboxView'
-  'compiled/views/content_migrations/NavigationForTree'
-  'compiled/views/content_migrations/ExpandCollapseContentSelectTreeItems'
-  'compiled/views/content_migrations/CheckingCheckboxesForTree'
-  'compiled/views/content_migrations/ScrollPositionForTree'
+  '../DialogFormView'
+  '../CollectionView'
+  '../../collections/content_migrations/ContentCheckboxCollection'
+  './ContentCheckboxView'
+  './NavigationForTree'
+  './ExpandCollapseContentSelectTreeItems'
+  './CheckingCheckboxesForTree'
+  './ScrollPositionForTree'
 ], (Backbone, $, _, I18n, template, wrapperTemplate, checkboxCollectionTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView, NavigationForTree, ExpandCollapseContentSelectTreeItems, CheckingCheckboxesForTree, ScrollPositionForTree) ->
   class SelectContentView extends DialogFormView
 

@@ -18,8 +18,8 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/PaginatedView'
-  'compiled/views/RecentStudents/RecentStudentView'
+  '../PaginatedView'
+  './RecentStudentView'
 ], ($, _, PaginatedView, RecentStudentView) ->
 
   class RecentStudentCollectionView extends PaginatedView

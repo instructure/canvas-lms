@@ -18,12 +18,12 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import store from 'jsx/external_apps/lib/AppCenterStore'
-import extStore from 'jsx/external_apps/lib/ExternalAppsStore'
-import AppTile from 'jsx/external_apps/components/AppTile'
-import Header from 'jsx/external_apps/components/Header'
-import AppFilters from 'jsx/external_apps/components/AppFilters'
-import ManageAppListButton from 'jsx/external_apps/components/ManageAppListButton'
+import store from '../../external_apps/lib/AppCenterStore'
+import extStore from '../../external_apps/lib/ExternalAppsStore'
+import AppTile from '../../external_apps/components/AppTile'
+import Header from '../../external_apps/components/Header'
+import AppFilters from '../../external_apps/components/AppFilters'
+import ManageAppListButton from '../../external_apps/components/ManageAppListButton'
 import splitAssetString from 'compiled/str/splitAssetString'
 
 export default React.createClass({

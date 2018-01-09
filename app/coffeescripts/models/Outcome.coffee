@@ -20,7 +20,7 @@ define [
   'i18n!outcomes'
   'underscore'
   'Backbone'
-  'compiled/models/grade_summary/CalculationMethodContent'
+  '../models/grade_summary/CalculationMethodContent'
 ], (I18n, _, Backbone, CalculationMethodContent) ->
 
   class Outcome extends Backbone.Model
