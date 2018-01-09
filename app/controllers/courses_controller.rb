@@ -656,7 +656,7 @@ class CoursesController < ApplicationController
   #
   # @argument enroll_me [Boolean]
   #   Set to true to enroll the current user as the teacher.
-   #
+  #
   # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
   #   The type of page that users will see when they first visit the course
   #   * 'feed' Recent Activity Dashboard
