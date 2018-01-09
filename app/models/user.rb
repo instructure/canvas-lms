@@ -1635,8 +1635,16 @@ class User < ActiveRecord::Base
               for_context_codes(shard_course_context_codes).
               preload({submission: :assignment}) # avoid n+1 query on grants_right? check below
           end
-          # only include assessment requests they have permission to perform
-          result = result.select { |request| request.submission.grants_right?(self, :read) }
+
+          # only include assessment requests user has permission to perform.
+          # This has 2 parts
+          # 1. the reviewer must have permission to read the submission, and
+          # 2. the submission must still be part of the assignment, which will
+          #    be false if the submitter is no longer assigned the assigment
+          result = result.select do |request|
+            request.submission.grants_right?(self, :read) &&
+            request.submission.assignment.submissions.include?(request.submission)
+          end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
           result
