@@ -103,7 +103,7 @@ var $window = $(window),
     $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach(),
     $add_a_comment = $('#add_a_comment'),
     $add_a_comment_submit_button = $add_a_comment.find('button:submit'),
-    $add_a_comment_textarea = null,
+    $add_a_comment_textarea = $(`#${SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT}`),
     $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach(),
     fileIndex = 1,
     $add_attachment = $('#add_attachment'),
@@ -1082,7 +1082,11 @@ EG = {
     });
 
     initRubricStuff();
-    initCommentBox();
+
+    if (ENV.can_comment_on_submission) {
+      initCommentBox()
+    }
+
     EG.initComments();
     header.init();
     initKeyCodes();

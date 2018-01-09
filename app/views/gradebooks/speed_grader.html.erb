@@ -318,7 +318,7 @@
             </div>
           </div>
 
-          <% unless @context.completed? || @context_enrollment.try(:completed?) %>
+          <% if @can_comment_on_submission %>
             <form id="add_a_comment">
               <div id="speedgrader_comment_textarea_mount_point"></div>
               <div id="media_media_recording" style="display: none;">
