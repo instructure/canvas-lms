@@ -338,6 +338,24 @@ describe SubmissionsController do
         expect(subs.to_a.sum{ |s| s.submission_comments.size }).to eql 1
       end
 
+      it "should not send a comment to the entire group when false" do
+        post(
+          'create',
+          params: {:course_id => @course.id,
+          :assignment_id => @assignment.id,
+          :submission => {
+            :submission_type => 'online_text_entry',
+            :body => 'blah',
+            :comment => "some comment",
+            :group_comment => '0'
+          }
+        })
+
+        subs = @assignment.submissions
+        expect(subs.size).to eq 2
+        expect(subs.to_a.sum{ |s| s.submission_comments.size }).to eql 1
+      end
+
       it "should send a comment to the entire group if requested" do
         post(
           'create',
