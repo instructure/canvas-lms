@@ -28,8 +28,7 @@ module.exports = {
   plugins: [
     "promise",
     "import",
-    "jest",
-    "prettier"
+    "jest"
   ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
@@ -60,7 +59,6 @@ module.exports = {
     "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
     "import/extensions": [1, { "js": "never", "jsx": "never", "json": "always" }],
     "promise/avoid-new": [0],
-    "prettier/prettier": "warn"
   }
 }
 
