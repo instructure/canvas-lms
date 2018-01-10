@@ -733,22 +733,25 @@ describe GroupsController do
     describe "inactive students" do
       before :once do
         course_with_teacher(:active_all => true)
-        students = create_users_in_course(@course, 2, return_type: :record)
-        student1, student2 = students
+        students = create_users_in_course(@course, 3, return_type: :record)
+        @student1, @student2, @student3 = students
         category1 = @course.group_categories.create(:name => "category 1")
         @group = @course.groups.create(:name => "some group", :group_category => category1)
-        @group.add_user(student1)
-        @group.add_user(student2)
-        student2.enrollments.first.deactivate
+        @group.add_user(@student1)
+        @group.add_user(@student2)
+        @group.add_user(@student3)
+        @student2.enrollments.first.deactivate
+        @student3.enrollments.first.update_attributes(:start_at => 1.day.from_now, :end_at => 2.days.from_now) # technically "inactive" but not really
       end
 
       it "include active status if requested" do
         user_session(@teacher)
         get 'users', params: { :group_id => @group.id, include: ['active_status'] }
         json = JSON.parse(response.body[@json_prefix.length, response.body.length])
-        expect(json.length).to eq 2
-        expect(json.first['is_inactive']).to be_falsey
-        expect(json.second['is_inactive']).to be_truthy
+        expect(json.length).to eq 3
+        expect(json.detect{|r| r['id'] == @student1.id}['is_inactive']).to be_falsey
+        expect(json.detect{|r| r['id'] == @student2.id}['is_inactive']).to be_truthy
+        expect(json.detect{|r| r['id'] == @student3.id}['is_inactive']).to be_falsey
       end
 
       it "don't include active status if not requested" do
@@ -756,7 +759,6 @@ describe GroupsController do
         get 'users', params: { :group_id => @group.id }
         json = JSON.parse(response.body[@json_prefix.length, response.body.length])
         expect(json.first['is_inactive']).to be_nil
-        expect(json.second['is_inactive']).to be_nil
       end
     end
   end

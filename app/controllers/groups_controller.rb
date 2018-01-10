@@ -711,10 +711,9 @@ class GroupsController < ApplicationController
     end
 
     if (includes.include? 'active_status') && (@context.context.is_a? Course)
-      user_ids = users.pluck('id')
-      enrollments = Enrollment.where(user_id: user_ids, course_id: @context.context_id)
+      enrollments = Enrollment.where(user_id: json_users.map{|u| u[:id]}, course_id: @context.context_id)
 
-      inactive_students = enrollments.select(&:inactive?).pluck('user_id').to_set
+      inactive_students = enrollments.group_by(&:user_id).select{|_id, enrollments| enrollments.all?(&:hard_inactive?)}.map(&:first)
       json_users.each do |user|
         user[:is_inactive] = inactive_students.include?(user[:id])
       end
