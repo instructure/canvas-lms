@@ -62,6 +62,8 @@ function bzRetainedInfoSetup() {
       }
     } else if(element.tagName == "INPUT" || element.tagName == "TEXTAREA"){
       element.value = value;
+    } else if(element.tagName == "SELECT") {
+      element.value = value;
     } else {
       element.textContent = value;
     }
@@ -179,6 +181,15 @@ function bzRetainedInfoSetup() {
       pendingMagicFieldLoads += 1;
       names.push(name);
       magicElements.push(el);
+
+      if(el.classList.contains("bz-industries")) {
+        BZ_Industries_List.forEach(function(ind) {
+          var option = document.createElement("option");
+          option.value = ind;
+          option.textContent = ind;
+          el.appendChild(option);
+        });
+      }
     })(magicElementsDOM[i]);
   }
 
@@ -652,6 +663,49 @@ function bzWikiPageContentPreload(wikipage, finalize_page_show) {
     } else {
         finalize_page_show_wrapped();
     }
-
-
 }
+
+var BZ_Industries_List = [
+      '',
+      'Accounting',
+      'Advertising',
+      'Aerospace',
+      'Banking',
+      'Beauty / Cosmetics',
+      'Biotechnology ',
+      'Business',
+      'Chemical',
+      'Communications',
+      'Computer Engineering',
+      'Computer Hardware ',
+      'Education',
+      'Electronics',
+      'Employment / Human Resources',
+      'Energy',
+      'Fashion',
+      'Film',
+      'Financial Services',
+      'Fine Arts',
+      'Food & Beverage ',
+      'Health',
+      'Information Technology',
+      'Insurance',
+      'Journalism / News / Media',
+      'Law',
+      'Management / Strategic Consulting',
+      'Manufacturing',
+      'Medical Devices & Supplies',
+      'Performing Arts ',
+      'Pharmaceutical ',
+      'Public Administration',
+      'Public Relations',
+      'Publishing',
+      'Marketing ',
+      'Real Estate ',
+      'Sports ',
+      'Technology ',
+      'Telecommunications',
+      'Tourism',
+      'Transportation / Travel',
+      'Writing'
+    ];
