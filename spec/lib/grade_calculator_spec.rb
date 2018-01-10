@@ -845,8 +845,28 @@ describe GradeCalculator do
     end
 
     it 'updates the overall course score metadata' do
+      metadata = overall_course_score.score_metadata
+      orig_updated_at = metadata.updated_at
       GradeCalculator.new(@student.id, @course).compute_and_save_scores
-      expect(overall_course_score.score_metadata.calculation_details).to eq({'current' => {'dropped' => []}, 'final' => {'dropped' => []}})
+      metadata.reload
+      expect(metadata.calculation_details).to eq({'current' => {'dropped' => []}, 'final' => {'dropped' => []}})
+      expect(orig_updated_at).to be < metadata.updated_at
+    end
+
+    it 'updates the overall course score metadata when only_update_course_gp_metadata: true' do
+      metadata = overall_course_score.score_metadata
+      orig_updated_at = metadata.updated_at
+      GradeCalculator.new(@student.id, @course, only_update_course_gp_metadata: true).compute_and_save_scores
+      metadata.reload
+      expect(metadata.calculation_details).to eq({'current' => {'dropped' => []}, 'final' => {'dropped' => []}})
+      expect(orig_updated_at).to be < metadata.updated_at
+    end
+
+    it 'does not update the overall course score when only_update_course_gp_metadata: true' do
+      updated_at = overall_course_score.updated_at
+      GradeCalculator.new(@student.id, @course, only_update_course_gp_metadata: true).compute_and_save_scores
+      overall_course_score.reload
+      expect(overall_course_score.updated_at).to eq(updated_at)
     end
 
     it 'updates all grading period scores' do

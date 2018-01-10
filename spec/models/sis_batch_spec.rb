@@ -488,7 +488,7 @@ s2,test_1,section2,active},
     expect(batch.processing_errors.last).to eq ['', 'There were 3 more errors']
   end
 
-  it "should write all warnings/errors to a file and cleanup temp files" do
+  it "should write all warnings/errors to a file" do
     Setting.set('sis_batch_max_messages', '3')
     batch = @account.sis_batches.create!
     4.times do |i|
@@ -499,8 +499,6 @@ s2,test_1,section2,active},
     error_file = batch.errors_attachment.reload
     expect(error_file.display_name).to eq "sis_errors_attachment_#{batch.id}.csv"
     expect(CSV.parse(error_file.open).map.to_a.size).to eq 8
-    expect(Attachment.where(context: batch).count).to eq 1
-    expect(Attachment.where(context: batch, id: batch.errors_attachment_id).count).to eq 1
   end
 
   context "csv diffing" do
