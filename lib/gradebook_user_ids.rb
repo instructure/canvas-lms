@@ -19,6 +19,7 @@ class GradebookUserIds
   def initialize(course, user)
     settings = (user.preferences.dig(:gradebook_settings, course.id) || {}).with_indifferent_access
     @course = course
+    @user = user
     @include_inactive = settings[:show_inactive_enrollments] == "true"
     @include_concluded = settings[:show_concluded_enrollments] == "true"
     @column = settings[:sort_rows_by_column_id] || "student"
@@ -135,8 +136,8 @@ class GradebookUserIds
       type: [:StudentEnrollment, :StudentViewEnrollment]
     )
 
-    return student_enrollments.where(course_section_id: section_id) if section_id
-    student_enrollments
+    section_ids = section_id ? [section_id] : nil
+    @course.apply_enrollment_visibility(student_enrollments, @user, section_ids, include: workflow_states)
   end
 
   def students

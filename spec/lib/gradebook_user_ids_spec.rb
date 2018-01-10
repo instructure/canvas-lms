@@ -101,6 +101,64 @@ describe GradebookUserIds do
     expect(gradebook_user_ids.user_ids).to eq([@student1.id])
   end
 
+  context "with viewing user's privileges limited" do
+    let!(:viewable_section) { @course.course_sections.create! }
+
+    before(:each) do
+      teacher_in_section(
+        viewable_section,
+        # we omit allow_multiple_enrollments here to clear this user's existing enrollments
+        limit_privileges_to_course_section: true,
+        user: @teacher
+      )
+
+      student_in_section(
+        viewable_section,
+        user: @student1
+      )
+    end
+
+    it "only returns users in the teacher's sections" do
+      another_viewable_section = @course.course_sections.create!
+      teacher_in_section(
+        another_viewable_section,
+        allow_multiple_enrollments: true,
+        limit_privileges_to_course_section: true,
+        user: @teacher
+      )
+      student_in_section(
+        another_viewable_section,
+        user: @student2
+      )
+
+      unviewable_section = @course.course_sections.create!
+      student_in_section(
+        unviewable_section,
+        user: @student3
+      )
+
+      expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id, @student2.id)
+    end
+
+    it "returns visible inactive/concluded users" do
+      @student1.enrollments.find_by(course_section: viewable_section).deactivate
+
+      student_in_section(
+        viewable_section,
+        user: @student2
+      )
+      @student2.enrollments.find_by(course_section: viewable_section).conclude
+
+      @teacher.preferences[:gradebook_settings] = {
+        @course.id => {
+          show_inactive_enrollments: "true",
+          show_concluded_enrollments: "true"
+        }
+      }
+      expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id, @student2.id)
+    end
+  end
+
   context 'with pg_collkey installed' do
     before do
       skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
