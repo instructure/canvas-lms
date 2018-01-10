@@ -54,6 +54,7 @@ define([
         "  </div>"                                            +
         "  <textarea class='grading_comment'>"                +
         "  Hello again.</textarea>"                           +
+        "  <input type='checkbox' id='submission_group_comment' checked>" +
         "  <div class='save_comment_button'>"                 +
         "  </div>"                                            +
         "</div>"
@@ -83,6 +84,7 @@ define([
     equal($.ajaxJSON.getCall(0).args[2]['submission[assignment_id]'], 27);
     equal($.ajaxJSON.getCall(0).args[2]['submission[comment]'], 'Hello again.');
     equal($.ajaxJSON.getCall(0).args[2]['submission[grade]'], undefined);
+    equal($.ajaxJSON.getCall(0).args[2]['submission[group_comment]'], '1');
   });
 
   test('comment_change does not submit if no comment', ()=>{

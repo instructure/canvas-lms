@@ -456,7 +456,7 @@ class GradebooksController < ApplicationController
 
         submission = submission.permit(:grade, :score, :excuse, :excused,
           :graded_anonymously, :provisional, :final,
-          :comment, :media_comment_id).to_unsafe_h
+          :comment, :media_comment_id, :group_comment).to_unsafe_h
 
         submission[:grader] = @current_user
         submission.delete(:provisional) unless @assignment.moderated_grading?
