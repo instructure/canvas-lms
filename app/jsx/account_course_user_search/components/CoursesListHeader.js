@@ -18,6 +18,7 @@
 
 import IconMiniArrowUpSolid from 'instructure-icons/lib/Solid/IconMiniArrowUpSolid'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
+import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
 import Link from '@instructure/ui-core/lib/components/Link'
 import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
 import React from 'react'
@@ -28,17 +29,19 @@ import CoursesList from './CoursesList'
 
 export default function CourseListHeader ({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
   return (
-    <Tooltip
-      as={Link}
-      tip={sort === id && order === 'asc' ? tipAsc : tipDesc}
-      onClick={preventDefault(() => onChangeSort(id))}
-    >
-      {label}
-      {sort === id
-        ? (order === 'asc' ? <IconMiniArrowDownSolid /> : <IconMiniArrowUpSolid />)
-        : ''
-      }
-    </Tooltip>
+    <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
+      <Tooltip
+        as={Link}
+        tip={sort === id && order === 'asc' ? tipAsc : tipDesc}
+        onClick={preventDefault(() => onChangeSort(id))}
+      >
+        {label}
+        {sort === id
+          ? (order === 'asc' ? <IconMiniArrowDownSolid /> : <IconMiniArrowUpSolid />)
+          : ''
+        }
+      </Tooltip>
+    </ApplyTheme>
   )
 }
 

@@ -105,8 +105,8 @@ Object.entries({
       equal(wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length, 0, `no columns have an ${unexpectedArrow} arrow`)
       const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
-      const header = icons.first().parents('Tooltip')
-      ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
+      const header = icons.closest('UserListHeader')
+      ok(header.find('ScreenReaderContent').text().match(RegExp(expectedTip, 'i')), 'has right tooltip')
       ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
     })
 

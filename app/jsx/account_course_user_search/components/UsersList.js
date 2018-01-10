@@ -19,6 +19,7 @@
 import preventDefault from 'compiled/fn/preventDefault'
 import IconMiniArrowUpSolid from 'instructure-icons/lib/Solid/IconMiniArrowUpSolid'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
+import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
 import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
 import Link from '@instructure/ui-core/lib/components/Link'
 import Table from '@instructure/ui-core/lib/components/Table'
@@ -39,19 +40,21 @@ export default function UsersList (props) {
 
     return (
       <th>
-        <Tooltip
-          as={Link}
-          tip={(sort === id && order === 'asc') ? tipAsc : tipDesc}
-          onClick={preventDefault(() => {
-            props.onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
-          })}
-        >
-          {label}
-          {sort === id ?
-            (order === 'asc' ? <IconMiniArrowDownSolid /> : <IconMiniArrowUpSolid />) :
-            ''
-          }
-        </Tooltip>
+        <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
+          <Tooltip
+            as={Link}
+            tip={(sort === id && order === 'asc') ? tipAsc : tipDesc}
+            onClick={preventDefault(() => {
+              props.onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
+            })}
+          >
+            {label}
+            {sort === id ?
+              (order === 'asc' ? <IconMiniArrowDownSolid /> : <IconMiniArrowUpSolid />) :
+              ''
+            }
+          </Tooltip>
+        </ApplyTheme>
       </th>
     )
   }
