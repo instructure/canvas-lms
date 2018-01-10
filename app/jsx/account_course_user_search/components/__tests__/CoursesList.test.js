@@ -119,8 +119,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
     sis_course_id: 'SIS ID',
     term: 'Term',
     teacher: 'Teacher',
-    subaccount: 'Sub-Account',
-    total_students: 'Students'
+    subaccount: 'Sub-Account'
   }, (label, columnID) => {
 
     test(`sorting by ${columnID} asc puts down-arrow on ${label} only`, () => {

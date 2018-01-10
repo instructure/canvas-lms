@@ -84,13 +84,7 @@ export default function CoursesList(props) {
             />
           </th>
           <th width="1">
-            <CoursesListHeader
-              {...props}
-              id="total_students"
-              label={I18n.t('Students')}
-              tipDesc={I18n.t('Click to sort by number of students ascending')}
-              tipAsc={I18n.t('Click to sort by number of students descending')}
-            />
+            {I18n.t('Students')}
           </th>
           <th width="1">
             <ScreenReaderContent>{I18n.t('Course option links')}</ScreenReaderContent>
