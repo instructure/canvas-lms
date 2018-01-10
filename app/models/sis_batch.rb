@@ -548,7 +548,7 @@ class SisBatch < ActiveRecord::Base
     end
   rescue => e
     # just in case
-    Canvas::Errors.capture(e, {type: :sis_import, message: message, during_tests: false})
+    Canvas::Errors.capture(e, {type: :sis_import, during_tests: false})
   end
 
   def write_warnings_and_errors_to_file
