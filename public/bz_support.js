@@ -62,6 +62,8 @@ function bzRetainedInfoSetup() {
       }
     } else if(element.tagName == "INPUT" || element.tagName == "TEXTAREA"){
       element.value = value;
+    } else if(element.tagName == "SELECT") {
+      element.value = value;
     } else {
       element.textContent = value;
     }
