@@ -1266,11 +1266,19 @@ describe GradeCalculator do
       end
     end
 
-    def check_grades(current, final)
+    def check_grades(current, final, check_current: true, check_final: true)
       GradeCalculator.recompute_final_score(@student.id, @course.id)
       @enrollment.reload
-      expect(@enrollment.computed_current_score).to eq current
-      expect(@enrollment.computed_final_score).to eq final
+      expect(@enrollment.computed_current_score).to eq current if check_current
+      expect(@enrollment.computed_final_score).to eq final if check_final
+    end
+
+    def check_current_grade(current)
+      check_grades(current, nil, check_current: true, check_final: false)
+    end
+
+    def check_final_grade(final)
+      check_grades(nil, final, check_current: false, check_final: true)
     end
 
     it "should work without assignments or submissions" do
@@ -1291,6 +1299,78 @@ describe GradeCalculator do
 
       @group.update_attribute(:rules, 'drop_lowest:1')
       check_grades(200.0, 150.0)
+    end
+
+    it "muted assignments are not considered for the drop list when computing " \
+      "current grade for students (they are just excluded from the computation entirely)" do
+      set_grades([[4, 10], [3, 10], [9, 10]])
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      @assignments.first.mute!
+      # 4/10 is excluded from the computation because it's muted
+      # 3/10 is dropped for being the lowest
+      # 9/10 is included
+      # 9/10 => 90.0%
+      check_current_grade(90.0)
+    end
+
+    it "ungraded assignments are not considered for the drop list when computing " \
+      "current grade for students (they are just excluded from the computation entirely)" do
+      set_grades([[nil, 20], [3, 10], [9, 10]])
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      # nil/20 is excluded from the computation because it's not graded
+      # 3/10 is dropped for being the lowest
+      # 9/10 is included
+      # 9/10 => 90.0%
+      check_current_grade(90.0)
+    end
+
+    it "ungraded + muted assignments are not considered for the drop list when " \
+      "computing current grade for students (they are just excluded from the computation entirely)" do
+      set_grades([[nil, 20], [4, 10], [3, 10], [9, 10]])
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      @assignments.second.mute!
+      # nil/20 is excluded from the computation because it's not graded
+      # 4/10 is exclued from the computation because it's muted
+      # 3/10 is dropped for being the lowest
+      # 9/10 is included
+      # 9/10 => 90.0%
+      check_current_grade(90.0)
+    end
+
+    it "ungraded assignments are treated as 0/points_possible for the drop list " \
+      "when computing final grade for students" do
+      set_grades([[nil, 20], [3, 10], [9, 10]])
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      # nil/20 is treated as 0/20 because it's not graded
+      # 3/10 is included
+      # 9/10 is included
+      # 12/20 => 60.0%
+      check_final_grade(60.0)
+    end
+
+    it "muted assignments are not considered for the drop list when computing " \
+      "final grade for students (but they are included as 0/10 in the final computation)" do
+      set_grades([[4, 10], [3, 10], [9, 10]])
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      @assignments.first.mute!
+      # 4/10 is ignored for drop rules because it is muted. it is included
+      # 3/10 is dropped for being the lowest
+      # 9/10 is included
+      # (4/10 is treated as 0/10 because it is muted) + 9/10 = 9/20 => 45.0%
+      check_final_grade(45.0)
+    end
+
+    it "ungraded are treated as 0/points_possible for the drop list and muted " \
+      "assignments are ignored for the drop list when computing final grade for students" do
+      set_grades([[nil, 20], [4, 10], [3, 10], [9, 10]])
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      @assignments.second.mute!
+      # nil/20 is treated as 0/20 because it's not graded. it is dropped.
+      # 4/10 is ignored for drop rules because it is muted. it is included.
+      # 3/10 is included
+      # 9/10 is included
+      # (4/10 is treated as 0/10 because it is muted) + 3/10 + 9/10 = 12/30 => 40.0%
+      check_final_grade(40.0)
     end
 
     it 'should "work" when no submissions have points possible' do
@@ -1527,23 +1607,49 @@ describe GradeCalculator do
         it "saves dropped submission to group score metadata" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
-          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          enrollment = Enrollment.find_by(user_id: @user.id, course_id: @course.id)
           score = enrollment.find_score(assignment_group: @group)
           expect(score.score_metadata.calculation_details).to eq ({
             'current' => {'dropped' => [find_submission(@overridden_middle)]},
             'final' => {'dropped' => [find_submission(@overridden_middle)]}
           })
         end
+
+        it "does not include muted assignments in the dropped submission list in group score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          @overridden_middle.mute!
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(assignment_group: @group)
+          expect(score.score_metadata.calculation_details).to eq({
+            'current' => {'dropped' => []},
+            'final' => {'dropped' => []}
+          })
+        end
+
         it "saves dropped submissions to course score metadata" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
           enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
           score = enrollment.find_score(course_score: true)
-          expect(score.score_metadata.calculation_details).to eq ({
+          expect(score.score_metadata.calculation_details).to eq({
             'current' => {'dropped' => [find_submission(@overridden_middle)]},
             'final' => {'dropped' => [find_submission(@overridden_middle)]}
           })
         end
+
+        it "does not include muted assignments in the dropped submission list in course score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          @overridden_middle.mute!
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(course_score: true)
+          expect(score.score_metadata.calculation_details).to eq({
+            'current' => {'dropped' => []},
+            'final' => {'dropped' => []}
+          })
+        end
+
         it "updates existing course score metadata" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
