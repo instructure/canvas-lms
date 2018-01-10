@@ -777,7 +777,8 @@ class EnrollmentsApiController < ApplicationController
       if params[:state].present?
         enrollments = user.enrollments.where(enrollment_index_conditions(true))
       else
-        enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions)
+        enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions).
+            joins(:enrollment_state).where("enrollment_states.state<>'completed'")
       end
     else
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
