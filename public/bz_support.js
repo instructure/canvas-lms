@@ -575,6 +575,15 @@ function BZ_SaveMagicField(field_name, field_value, optional, type, answer) {
         var offlineWarning = document.getElementById("bz-offline-warning");
         if(offlineWarning)
           offlineWarning.style.display = "none";
+
+        var responseJson = http.responseText;
+        console.log(responseJson);
+        var res = JSON.parse(responseJson);
+        if(res["points_reason"] == "past_due") {
+          var lateWarning = document.getElementById("bz-late-warning");
+          if(lateWarning)
+            lateWarning.style.display = "none";
+        }
       }
     }
   };

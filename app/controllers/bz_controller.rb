@@ -427,6 +427,10 @@ class BzController < ApplicationController
 
 
   def set_user_retained_data
+    response_object = {}
+    response_object["points_given"] = false
+    response_object["points_reason"] = "N/A"
+
     Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect} for user = #{@current_user.name}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
@@ -561,20 +565,29 @@ class BzController < ApplicationController
             original_step = step
             if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
               step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
+              response_object["points_reason"] = "wrong"
             elsif !answer.nil? && answer == '' && params[:value] == '' && field_type == 'checkbox'
               # they checked then unchecked a box, triggering an explicit save. We assume there is no
               # explicit save so the points are already there... but here, there is one, so the points
               # are already there! Thus, despite them putting in the correct answer, since it is a checkbox
               # we want to give them zero points here so they don't get double credit.
               step = 0 # don't award double credit
+              response_object["points_reason"] = "already_awarded"
             elsif !answer.nil? && params[:value] != answer
               step = 0 # wrong answer = no points
+              response_object["points_reason"] = "wrong"
+            end
+
+            if step > 0
+              response_object["points_given"] = true
+              response_object["points_reason"] = answer.nil? ? "participation" : "mastery"
             end
 
             submission = participation_assignment.find_or_create_submission(@current_user)
             submission.with_lock do
               existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * original_step) : submission.grade.to_f
               new_grade = existing_grade + step 
+              response_object["score_set_to"] = new_grade
               if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
                 Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
                 new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
@@ -584,14 +597,28 @@ class BzController < ApplicationController
               participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
             end
           else
+            response_object["points_reason"] = "past_due"
             Rails.logger.warn("### set_user_retained_data - for user #{@current_user.name} the magic field #{params[:name]} was completed on #{DateTime.today} which is after the due date of #{participation_assignment.due_at}")
+
+            # if they haven't yet made a submission (no participation) and try to past due,
+            # go ahead and make it an automatic 0. This allows TAs to see it was submitted
+            # late so they can give an answer, and gives consistent non-null values in our
+            # grade analysis exports.
+            submission = participation_assignment.find_or_create_submission(@current_user)
+            if submission.grade.nil?
+              response_object["score_set_to"] = 0
+              submission.with_lock do
+                participation_assignment.grade_student(@current_user, {:grade => 0, :suppress_notification => true })
+              end
+            end
           end
         end
       elsif is_student
+        response_object["points_reason"] = "missing_param"
         Rails.logger.error("### set_user_retained_data - missing either course_id = #{course_id} or module_item_id = #{module_item_id}. Can't update the Course Participation grade without that! user = #{@current_user.inspect}")
       end
     end
-    render :nothing => true
+    render :json => response_object
   end
 
   def retained_data_stats
