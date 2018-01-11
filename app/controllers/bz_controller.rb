@@ -556,11 +556,14 @@ class BzController < ApplicationController
         if !res.empty?
           participation_assignment = res.first
 
-
-          # only update score if we are not yet at the due date
+          # only update score if we are not yet at the due date or there is no due date
           # participation doesn't count if it is done late.
-          if participation_assignment.due_at >= DateTime.today
-            
+          # this accounts for a due date being set the same for everyone on the assignment or set differently per section
+          overridden = participation_assignment.overridden_for(@current_user)
+          effective_due_at = overridden.due_at
+          effective_due_at = participation_assignment.due_at if overridden.due_at.nil?
+          if effective_due_at.nil? || effective_due_at >= DateTime.now
+
             step = participation_assignment.points_possible.to_f / magic_field_count
             original_step = step
             if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
@@ -598,7 +601,7 @@ class BzController < ApplicationController
             end
           else
             response_object["points_reason"] = "past_due"
-            Rails.logger.warn("### set_user_retained_data - for user #{@current_user.name} the magic field #{params[:name]} was completed on #{DateTime.today} which is after the due date of #{participation_assignment.due_at}")
+            Rails.logger.warn("### set_user_retained_data - for user #{@current_user.name} the magic field #{params[:name]} was completed on #{DateTime.now} which is after the due date of #{effective_due_at}")
 
             # if they haven't yet made a submission (no participation) and try to past due,
             # go ahead and make it an automatic 0. This allows TAs to see it was submitted
