@@ -25,11 +25,11 @@ module PlannerPageObject
   end
 
   def select_list_view
-    driver.find_element(:xpath, "//span[text()[contains(.,'List View')]]").click
+    fxpath("//span[text()[contains(.,'List View')]]").click
   end
 
   def select_dashboard_view
-    driver.find_element(:xpath, "//span[text()[contains(.,'Card View')]]").click
+    fxpath("//span[contains(text(),'Card View')]").click
   end
 
   def navigate_to_course_object(object)
@@ -46,16 +46,16 @@ module PlannerPageObject
     expect(url).to eq(expected_url)
   end
 
-  def validate_object_displayed(object_type)  # Pass what type of object it is. Ensure object's name starts with a capital letter
-    expect(f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Unnamed Course #{object_type}')]]")).
-      to be_displayed
+  # Pass what type of object it is. Ensure object's name starts with a capital letter
+  def validate_object_displayed(object_type)
+    expect(fxpath("//*[@class='PlannerApp']//span[contains(text(),'Unnamed Course #{object_type}')]")).to be_displayed
   end
 
   def validate_no_due_dates_assigned
-    expect(f('#dashboard-planner').find_element(:xpath, "//h2[text()[contains(.,'No Due Dates Assigned')]]")).
-      to be_displayed
-    expect(f('#dashboard-planner').find_element(:xpath, "//div[text()[contains(.,\"Looks like there isn't anything here\")]]")).
-      to be_displayed
+    expect(fxpath('//*[@id="dashboard-planner"]//h2[contains(text(),"No Due Dates Assigned")]')).to be_displayed
+    expect(
+      fxpath('//*[@id="dashboard-planner"]//div[contains(text(),"Looks like there isn\'t anything here")]')
+    ).to be_displayed
   end
 
   def go_to_dashcard_view
@@ -65,11 +65,11 @@ module PlannerPageObject
   end
 
   def expand_completed_item
-    f('.PlannerApp').find_element(:xpath, "//*[text()[contains(.,'Show 1 completed item')]]").click
+    fxpath('//*[@class="PlannerApp"]//*[contains(text(),"Show 1 completed item")]').click
   end
 
   def validate_pill(pill_type)
-    expect(f('.PlannerApp').find_element(:xpath, "//*[text()[contains(.,'#{pill_type}')]]")).to be_displayed
+    expect(fxpath("//*[@class='PlannerApp']//*[contains(text(),'#{pill_type}')]")).to be_displayed
   end
 
   def go_to_list_view
