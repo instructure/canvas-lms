@@ -100,7 +100,7 @@ class DiscussionTopic < ActiveRecord::Base
   # TODO: Consider merging the following two validations into one to save a
   # db query
   def section_specific_topics_must_have_sections
-    if self.is_section_specific && self.discussion_topic_section_visibilities.none?(&:active?)
+    if !self.deleted? && self.is_section_specific && self.discussion_topic_section_visibilities.none?(&:active?)
       self.errors.add(:is_section_specific, t("Section specific topics must have sections"))
     else
       true

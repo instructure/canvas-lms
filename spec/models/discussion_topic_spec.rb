@@ -1995,6 +1995,20 @@ describe DiscussionTopic do
       expect(announcement.course_sections.first.id).to eq course.course_sections.first.id
     end
 
+    it "should allow deletion of announcement" do
+      course = course_with_two_sections
+      announcement = basic_announcement_model(
+        :course => course,
+        :is_section_specific => true
+      )
+      add_section_to_topic(announcement, course.course_sections.first)
+      add_section_to_topic(announcement, course.course_sections.second)
+      announcement.save!
+      Announcement.find(announcement.id).destroy
+      announcement.reload
+      expect(announcement.workflow_state).to eq "deleted"
+    end
+
     it "scope allows non-section-specific announcements" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
