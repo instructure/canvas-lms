@@ -881,12 +881,7 @@ function initKeyCodes () {
 function initGroupAssignmentMode() {
   if (jsonData.GROUP_GRADING_MODE) {
     gradeeLabel = groupLabel;
-    disableGroupCommentCheckbox();
   }
-}
-
-function disableGroupCommentCheckbox() {
-  $("#submission_group_comment").prop({checked: true, disabled: true});
 }
 
 function refreshGrades (cb) {
@@ -2408,9 +2403,6 @@ EG = {
     EG.showDiscussion();
     renderCommentTextArea();
     $add_a_comment.find(":input").prop("disabled", false);
-    if (jsonData.GROUP_GRADING_MODE) {
-      disableGroupCommentCheckbox();
-    }
 
     if (draftComment) {
       // Show a different message when auto-saving a draft comment

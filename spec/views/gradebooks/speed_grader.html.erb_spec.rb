@@ -18,13 +18,25 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require_relative '../../selenium/helpers/groups_common'
 
 describe "/gradebooks/speed_grader" do
+  include GroupsCommon
+
   before do
-    course_with_student
+    course_with_student(active_all: true)
     view_context
     assign(:students, [@user])
-    assign(:assignment, @course.assignments.create!(:title => "some assignment"))
+
+    @group_category = @course.group_categories.create!(name: "Test Group Set")
+    @group = @course.groups.create!(name: "a group", group_category: @group_category)
+    add_user_to_group(@user, @group, true)
+    @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
+      group_category: @group_category,
+      grade_group_students_individually: true
+    ))
+
+    assign(:assignment, @assignment)
     assign(:submissions, [])
     assign(:assessments, [])
     assign(:body_classes, [])
@@ -74,6 +86,28 @@ describe "/gradebooks/speed_grader" do
       expect(rendered).not_to match(/form id="add_a_comment"/)
     end
   end
+
+  context 'when group assignment' do
+    before do
+      assign(:can_comment_on_submission, true)
+    end
+
+    it 'shows radio buttons if individually graded' do
+      render 'gradebooks/speed_grader'
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 2
+      expect(html.css('#submission_group_comment').size).to eq 1
+    end
+
+    it 'renders hidden checkbox if group graded' do
+      @assignment.grade_group_students_individually = false
+      @assignment.save!
+      render 'gradebooks/speed_grader'
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 0
+      checkbox = html.css('#submission_group_comment')
+      expect(checkbox.attr('checked').value).to eq 'checked'
+      expect(checkbox.attr('style').value).to include('display:none')
+    end
+  end
 end
-
-
