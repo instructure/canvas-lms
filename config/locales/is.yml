@@ -7189,7 +7189,7 @@ is:
   grades_a61eba0a: Einkunnir
   grades_are_now_reverted_to_original_scores_e6deade1: "Einkunnum er nú breytt aftur í upprunaleg stig"
   grades_are_now_showing_what_if_scores_711a8be2: "Einkunnir sýna nú spáða einkunn"
-  grades_for_student_aff00ba: "Einkannir fyrir %{student}"
+  grades_for_student_aff00ba: "Einkunnir fyrir %{student}"
   gradezilla: 
     alerts: 
       scores_updated: 
