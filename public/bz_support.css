@@ -61,3 +61,20 @@
   padding: 0.25em;
   padding-top: 0.5em;
 }
+
+#bz-late-warning {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  z-index: 1500;
+  background-color: #ff8888;
+  height: 2.5em;
+  width: 100%;
+  margin: 0px;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14pt;
+  padding: 0.25em;
+  padding-top: 0.5em;
+}
