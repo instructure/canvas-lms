@@ -100,8 +100,6 @@ define [
 
           tempModel.save null,
             multipart: fileElement 
-            xhrFields:
-              withCredentials: true
             success: (model, xhr) => 
               return dObject.rejectWith(this, xhr.message) if xhr.message
               this.fetch success: => dObject.resolve() # sets the poll url

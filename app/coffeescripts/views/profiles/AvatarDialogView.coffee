@@ -168,8 +168,6 @@ define [
         processData: false
         type: 'POST'
         error: (xhr) => @handleErrorUpdating(xhr.responseText)
-        xhrFields:
-          withCredentials: true
       })
 
     onPostAvatar: (preflightResponse, postAvatarResponse) =>

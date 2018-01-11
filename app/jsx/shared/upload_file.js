@@ -37,10 +37,7 @@ export default function (preflightUrl, preflightData, file, ajaxLib = axios) {
       formData.append(key, value);
     });
     successUrl = response.data.upload_params.success_url
-    const config = {
-      responseType: (successUrl ? 'document' : 'json'),
-      withCredentials: true
-    }
+    const config = { responseType: (successUrl ? 'document' : 'json') }
     formData.append('file', file);
     return ajaxLib.post(response.data.upload_url, formData, config);
   }).then((response) => {

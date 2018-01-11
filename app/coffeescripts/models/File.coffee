@@ -77,8 +77,6 @@ define [
         options.error?(error)
       FilesystemObject::save.call this, null,
         multipart: true
-        xhrFields:
-          withCredentials: true
         success: (data) =>
           if @uploadParams.success_url
             # s3 upload, need to ping success_url to finalize and get back
