@@ -1,7 +1,25 @@
+# A list of students that an `AssignmentOverride` applies to
+type AdhocStudents {
+  students: [User]
+}
+
 type Assignment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
   assignmentGroup: AssignmentGroup
+  assignmentOverrides(
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): AssignmentOverrideConnection
   course: Course
   createdAt: Time
   description: String
@@ -125,6 +143,43 @@ input AssignmentInput {
   courseId: ID!
   name: String!
 }
+
+type AssignmentOverride implements Timestamped {
+  # legacy canvas id
+  _id: ID!
+  allDay: Boolean
+  assignment: Assignment
+  createdAt: Time
+  dueAt: Time
+  lockAt: Time
+
+  # This object specifies what students this override applies to
+  set: AssignmentOverrideSet
+  title: String
+  unlockAt: Time
+  updatedAt: Time
+}
+
+# The connection type for AssignmentOverride.
+type AssignmentOverrideConnection {
+  # A list of edges.
+  edges: [AssignmentOverrideEdge]
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+}
+
+# An edge in a connection.
+type AssignmentOverrideEdge {
+  # A cursor for use in pagination.
+  cursor: String!
+
+  # The item at the end of the edge.
+  node: AssignmentOverride
+}
+
+# Objects that can be assigned overridden dates
+union AssignmentOverrideSet = AdhocStudents | Group | Section
 
 # States that an Assignment can be in
 enum AssignmentState {

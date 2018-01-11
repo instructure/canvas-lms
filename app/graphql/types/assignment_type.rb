@@ -90,6 +90,15 @@ module Types
        `AssignmentOverride` applies.",
       property: :only_visible_to_overrides
 
+    connection :assignmentOverrides, AssignmentOverrideType.connection_type, resolve:
+      ->(assignment, _, ctx) {
+        # this is the assignment overrides index method of loading
+        # overrides... there's also the totally different method found in
+        # assignment_overrides_json. they may not return the same results?
+        # ¯\_(ツ)_/¯
+        AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, ctx[:current_user])
+      }
+
     connection :submissionsConnection, SubmissionType.connection_type do
       description "submissions for this assignment"
       resolve ->(assignment, _, ctx) {
