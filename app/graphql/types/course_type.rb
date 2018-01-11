@@ -92,6 +92,17 @@ module Types
       }
     end
 
+    connection :groupsConnection, GroupType.connection_type, resolve: ->(course, _, ctx) {
+      # TODO: share this with accounts when groups are added there
+      if course.grants_right?(ctx[:current_user], nil, :read_roster)
+        course.groups.active
+          .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+          .eager_load(:group_category)
+      else
+        nil
+      end
+    }
+
     field :permissions, CoursePermissionsType do
       description "returns permission information for the current user in this course"
       resolve ->(course, _, ctx) {
