@@ -4299,9 +4299,9 @@ ftp@~0.3.10:
     readable-stream "1.1.x"
     xregexp "2.0.0"
 
-"fullcalendar@https://github.com/ryankshaw/fullcalendar.git#aa686b36d10cee1e1e3ec7c7784145e46667d47d":
+"fullcalendar@https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97":
   version "2.4.0"
-  resolved "https://github.com/ryankshaw/fullcalendar.git#aa686b36d10cee1e1e3ec7c7784145e46667d47d"
+  resolved "https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97"
   dependencies:
     jquery ">=1.7.1"
     moment ">=2.5.0"
