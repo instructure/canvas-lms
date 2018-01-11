@@ -101,7 +101,7 @@ require 'csv'
 #     }
 #
 class AccountsController < ApplicationController
-  before_action :require_user, :only => [:index]
+  before_action :require_user, :only => [:index, :terms_of_service]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rich_content_service_config, only: [:settings]
@@ -241,7 +241,6 @@ class AccountsController < ApplicationController
   #
   # @returns TermsOfService
   def terms_of_service
-    return unless authorized_action(@account, @current_user, :read)
     keys = %w(id terms_type passive account_id)
     tos = @account.root_account.terms_of_service
     res = tos.attributes.slice(*keys)
