@@ -160,4 +160,26 @@ describe Context do
       expect(Context.get_account(group_model(context: course_model(account: Account.default)))).to eq(Account.default)
     end
   end
+
+  describe 'asset_name' do
+    before :once do
+      course_factory
+    end
+
+    it "finds names for outcomes" do
+      outcome1 = @course.created_learning_outcomes.create! :display_name => 'blah', :title => 'bleh'
+      expect(Context.asset_name(outcome1)).to eq 'blah'
+
+      outcome2 = @course.created_learning_outcomes.create! :title => 'bleh'
+      expect(Context.asset_name(outcome2)).to eq 'bleh'
+    end
+
+    it "finds names for calendar events" do
+      event1 = @course.calendar_events.create! :title => 'thing'
+      expect(Context.asset_name(event1)).to eq 'thing'
+
+      event2 = @course.calendar_events.create! :title => ''
+      expect(Context.asset_name(event2)).to eq ''
+    end
+  end
 end
