@@ -582,7 +582,7 @@ function BZ_SaveMagicField(field_name, field_value, optional, type, answer) {
         if(res["points_reason"] == "past_due") {
           var lateWarning = document.getElementById("bz-late-warning");
           if(lateWarning)
-            lateWarning.style.display = "none";
+            lateWarning.style.display = "";
         }
       }
     }
