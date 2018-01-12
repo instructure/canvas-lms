@@ -39,6 +39,12 @@ class Gradezilla
         grading_cell(student, assignment).text
       end
 
+      def grade_cell_input(student, assignment)
+        cell_selector = grading_cell_selector(student, assignment)
+        f(cell_selector).click
+        f("#{cell_selector} .grade")
+      end
+
       def edit_grade(student, assignment, grade)
         cell_selector = grading_cell_selector(student, assignment)
         f(cell_selector).click
