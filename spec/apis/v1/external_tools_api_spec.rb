@@ -186,7 +186,20 @@ describe ExternalToolsController, type: :request do
             # request/verify the lti launch page
             get json['url']
             expect(response.code).to eq '200'
+          end
 
+          it "returns sessionless launch URL when default URL is not set and placement URL is" do
+            tool.update_attributes!(url: nil)
+            params = { id: tool.id.to_s, launch_type: 'course_navigation' }
+            json = get_sessionless_launch_url(@course, 'course', params)
+            expect(json).to include('url')
+
+            # remove the user session (it's supposed to be sessionless, after all), and make the request
+            remove_user_session
+
+            # request/verify the lti launch page
+            get json['url']
+            expect(response.code).to eq '200'
           end
 
         end
