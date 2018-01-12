@@ -1,6 +1,7 @@
 type Assignment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
+  assignmentGroup: AssignmentGroup
   course: Course
   createdAt: Time
   description: String
@@ -13,6 +14,10 @@ type Assignment implements Node, Timestamped {
   name: String
   needsGradingCount: Int
 
+  # specifies that this assignment is only assigned to students for whom an
+  #        `AssignmentOverride` applies.
+  onlyVisibleToOverrides: Boolean
+
   # the assignment is out of this many points
   pointsPossible: Float
 
@@ -20,6 +25,7 @@ type Assignment implements Node, Timestamped {
   position: Int
   quiz: Quiz
   state: AssignmentState!
+  submissionTypes: [SubmissionType!]
 
   # submissions for this assignment
   submissionsConnection(
@@ -224,6 +230,9 @@ type Course implements Node, Timestamped {
 
     # Returns the last _n_ elements from the list.
     last: Int
+
+    # only include users with the given ids
+    userIds: [ID!]
   ): UserConnection
 }
 
@@ -487,6 +496,22 @@ input SubmissionOrderCriteria {
 enum SubmissionOrderField {
   _id
   gradedAt
+}
+
+# Types of submissions an assignment accepts
+enum SubmissionType {
+  attendance
+  discussion_topic
+  external_tool
+  media_recording
+  none
+  not_graded
+  on_paper
+  online_quiz
+  online_text_entry
+  online_upload
+  online_url
+  wiki_page
 }
 
 # statistics based on timeliness of student submissions
