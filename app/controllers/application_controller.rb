@@ -1121,6 +1121,7 @@ class ApplicationController < ActionController::Base
   end
 
   def update_enrollment_last_activity_at
+    return unless @context_enrollment.is_a?(Enrollment)
     activity = Enrollment::RecentActivity.new(@context_enrollment, @context)
     activity.record_for_access(response)
   end
