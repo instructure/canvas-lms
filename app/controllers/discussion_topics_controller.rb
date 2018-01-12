@@ -977,7 +977,7 @@ class DiscussionTopicsController < ApplicationController
 
 
   def set_sections
-    return unless params[:specific_sections]
+    return unless params[:specific_sections] && params[:specific_sections] != "all"
     @topic.is_section_specific = true
     @topic.course_sections = CourseSection.find(params[:specific_sections].split(","))
   end
