@@ -1582,7 +1582,7 @@ class ApplicationController < ActionController::Base
           return unless require_user
           add_crumb(@resource_title)
           @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
-          @prepend_template = 'assignments/lti_header' unless external_tool_redirect_display_type == 'full_width'
+          @prepend_template = 'assignments/lti_header' unless render_external_tool_full_width?
           @lti_launch.params = lti_launch_params(adapter)
         else
           @lti_launch.params = adapter.generate_post_payload
@@ -1592,7 +1592,7 @@ class ApplicationController < ActionController::Base
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
 
-        @append_template = 'context_modules/tool_sequence_footer'
+        @append_template = 'context_modules/tool_sequence_footer' unless render_external_tool_full_width?
         render Lti::AppUtil.display_template(external_tool_redirect_display_type)
       end
     else
@@ -1610,6 +1610,11 @@ class ApplicationController < ActionController::Base
     params['display'] || @tool&.extension_setting(:assignment_selection)&.dig('display_type')
   end
   private :external_tool_redirect_display_type
+
+  def render_external_tool_full_width?
+    external_tool_redirect_display_type == 'full_width'
+  end
+  private :render_external_tool_full_width?
 
   # pass it a context or an array of contexts and it will give you a link to the
   # person's calendar with only those things checked.
