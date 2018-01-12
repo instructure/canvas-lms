@@ -583,7 +583,16 @@ END
       applies_to: 'Course',
       state: 'allowed',
       visible_on: ->(context) do
-        context.root_account.settings&.dig(:provision, 'lti').present?
+        root_account = context.root_account
+        is_provisioned = Rails.env.development? || root_account.settings&.dig(:provision, 'lti').present?
+
+        if is_provisioned
+          FeatureFlag.where(
+            feature: 'quizzes_next',
+            context: root_account
+          ).first_or_create!(state: 'on') # if it's local or previously provisioned, FF is on
+        end
+        is_provisioned
       end
     }
   )

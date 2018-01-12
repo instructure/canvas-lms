@@ -25,6 +25,7 @@ describe "quiz LTI assignments" do
   before do
     course_with_teacher_logged_in
     provision_quizzes_next @course
+    @course.root_account.enable_feature!(:quizzes_next)
     @course.enable_feature!(:quizzes_next)
     @course.require_assignment_group
     @tool = @course.context_external_tools.create!(

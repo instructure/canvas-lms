@@ -151,6 +151,7 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       @course.root_account.settings[:provision] = {'lti' => 'lti url'}
       @course.root_account.save!
+      @course.root_account.enable_feature!(:quizzes_next)
       @course.enable_feature!(:quizzes_next)
       @course.context_external_tools.create(name: "a",
                                             domain: "google.com",

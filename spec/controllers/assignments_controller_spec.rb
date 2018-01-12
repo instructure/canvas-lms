@@ -151,6 +151,7 @@ describe AssignmentsController do
       )
       @course.root_account.settings[:provision] = {'lti' => 'lti url'}
       @course.root_account.save!
+      @course.root_account.enable_feature! :quizzes_next
       @course.enable_feature! :quizzes_next
       get 'index', params: {course_id: @course.id}
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be true
