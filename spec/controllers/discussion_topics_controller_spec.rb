@@ -993,6 +993,22 @@ describe DiscussionTopicsController do
       expect(DiscussionTopicSectionVisibility.count).to eq 1
     end
 
+    it 'creates an announcement that is locked by default' do
+      user_session(@teacher)
+      post 'create',
+        params: topic_params(@course, {is_announcement: true}), :format => :json
+      expect(response).to have_http_status :success
+      expect(DiscussionTopic.last.locked).to be_truthy
+    end
+
+    it 'creates a discussion topic that is not locked by default' do
+      user_session(@teacher)
+      post 'create',
+        params: topic_params(@course, {is_announcement: false}), :format => :json
+      expect(response).to have_http_status :success
+      expect(DiscussionTopic.last.locked).to be_falsy
+    end
+
     it 'registers a page view' do
       user_session(@student)
       post 'create', params: topic_params(@course), :format => :json

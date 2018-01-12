@@ -143,8 +143,13 @@
                      data-tooltip='{"position":"top","force_position":"true"}'
                      title="{{accessibleDateFormat}}" />
             </label>
+            <label class="checkbox" for="allow_user_comments">
+              {{checkbox "allow_user_comments"
+                checked=unlocked}}
+              {{#t}}Allow users to comment{{/t}}
+            </label>
           {{/if}}
-          <label class="checkbox" for="require_initial_post">
+          <label class="checkbox" for="require_initial_post" {{#if isAnnouncement}}style="margin-left: 2em;"{{/if}}>
             {{checkbox "require_initial_post"}}
             {{#t "users_must_post_before_seeing_replies"}}Users must post before seeing replies{{/t}}
           </label>

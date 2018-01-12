@@ -87,6 +87,8 @@ define [
       '#todo_options': '$todoOptions'
       '#todo_date_input': '$todoDateInput'
       '#allow_todo_date': '$allowTodoDate'
+      '#allow_user_comments': '$allowUserComments'
+      '#require_initial_post' : '$requireInitialPost'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
@@ -97,6 +99,7 @@ define [
       'change' : 'onChange'
       'tabsbeforeactivate #discussion-edit-view' : 'onTabChange'
       'change #allow_todo_date' : 'toggleTodoDateInput'
+      'change #allow_user_comments' : 'updateAllowComments'
     )
 
     messages:
@@ -158,6 +161,7 @@ define [
         inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
         lockedItems: @lockedItems
         allow_todo_date: data.todo_date?
+        unlocked: if data.locked == undefined then !@isAnnouncement() else !data.locked
       json.assignment = json.assignment.toView()
       json
 
@@ -207,6 +211,8 @@ define [
       _.defer(@loadConditionalRelease) if @showConditionalRelease()
 
       @$(".datetime_field").datetime_field()
+
+      @updateAllowComments()
 
       this
 
@@ -491,6 +497,11 @@ define [
         @$todoDateInput.show()
       else
         @$todoDateInput.hide()
+
+    updateAllowComments: ->
+      allowsComments = @$allowUserComments.is(':checked') || !@model.get('is_announcement')
+      @$requireInitialPost.prop('disabled', !allowsComments)
+      @model.set('locked', !allowsComments)
 
     onChange: ->
       if @showConditionalRelease() && @assignmentUpToDate

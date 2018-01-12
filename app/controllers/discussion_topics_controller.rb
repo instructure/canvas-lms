@@ -993,9 +993,11 @@ class DiscussionTopicsController < ApplicationController
     if is_new
       @topic = @context.send(model_type).build
       prior_version = @topic.dup
-      set_sections if model_type == :announcements &&
-        @context.account.feature_enabled?(:section_specific_announcements) &&
-        params[:specific_sections] != "all"
+      if model_type == :announcements
+        @topic.locked = true
+        set_sections if @context.account.feature_enabled?(:section_specific_announcements) &&
+          params[:specific_sections] != "all"
+      end
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
       prior_version = DiscussionTopic.find(@topic.id)
