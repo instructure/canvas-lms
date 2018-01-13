@@ -805,6 +805,15 @@ groups.csv
 This identifier must not change for the group, and must be globally unique.</td>
 </tr>
 <tr>
+<td>group_category_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The group category identifier from group_categories.csv, if none is
+specified the group will be put in the default group category for the account.
+</td>
+</tr>
+<tr>
 <td>account_id</td>
 <td>text</td>
 <td></td>

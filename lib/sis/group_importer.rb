@@ -41,7 +41,7 @@ module SIS
         @accounts_cache = {}
       end
 
-      def add_group(group_id, account_id, name, status)
+      def add_group(group_id, group_category_id, account_id, name, status)
         raise ImportError, "No group_id given for a group" unless group_id.present?
 
         @logger.debug("Processing Group #{[group_id, account_id, name, status].inspect}")
@@ -53,7 +53,16 @@ module SIS
           raise ImportError, "Parent account didn't exist for #{account_id}" unless account
           @accounts_cache[account.sis_source_id] = account
         end
-        account ||= @root_account
+
+        # if the account_id is present and didn't error then look for group_category in account
+        if account && group_category_id.present?
+          group_category = account.group_categories.where(sis_source_id: group_category_id).take
+          raise ImportError, "Group Category #{group_category_id} didn't exist in account #{account_id} for group #{group_id}." unless group_category
+        # look for group_category, account doesn't exist
+        elsif group_category_id.present?
+          group_category = @root_account.all_group_categories.where(deleted_at: nil, sis_source_id: group_category_id).take
+          raise ImportError, "Group Category #{group_category_id} didn't exist for group #{group_id}." unless group_category
+        end
 
         group = @root_account.all_groups.where(sis_source_id: group_id).take
         unless group
@@ -61,6 +70,15 @@ module SIS
           raise ImportError, "Improper status \"#{status}\" for group #{group_id}, skipping" unless status =~ /\A(available|closed|completed|deleted)/i
         end
 
+        # if the group_category exists it is in an account that matches the
+        # groups account_id or is blank, but it should be consistent with the
+        # group_category's account so set the account
+        if group_category
+          account = group_category.context
+          group ? group.group_category = group_category : group = group_category.groups.new
+        end
+        # no account_id and no group_category in an account, set to root_account
+        account ||= @root_account
         group ||= account.groups.new
         # only update the name on new records, and ones that haven't had their name changed since the last sis import
         group.name = name if name.present? && (group.new_record? || (!group.stuck_sis_fields.include?(:name)))
@@ -87,7 +105,7 @@ module SIS
           @success_count += 1
         else
           msg = "A group did not pass validation "
-          msg += "(" + "group: #{group_id}, error: " + 
+          msg += "(" + "group: #{group_id}, error: "
           msg += group.errors.full_messages.join(",") + ")"
           raise ImportError, msg
         end

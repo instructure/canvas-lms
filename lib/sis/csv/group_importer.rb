@@ -36,7 +36,7 @@ module SIS
             update_progress
 
             begin
-              importer.add_group(row['group_id'], row['account_id'], row['name'], row['status'])
+              importer.add_group(row['group_id'], row['group_category_id'], row['account_id'], row['name'], row['status'])
             rescue ImportError => e
               add_warning(csv, "#{e}")
             end

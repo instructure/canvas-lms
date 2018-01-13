@@ -29,18 +29,21 @@ describe SIS::CSV::GroupImporter do
     )
     before_count = Group.count
     importer = process_csv_data(
-      "group_id,account_id,name,status",
-      "G001,A001,Group 1,available",
-      "G002,A001,Group 1,blerged",
-      "G003,A001,,available",
-      "G004,A004,Group 4,available",
-      ",A001,G1,available")
+      "group_id,account_id,name,status,group_category_id",
+      "G001,A001,Group 1,available,",
+      "G002,A001,Group 1,blerged,",
+      "G003,A001,,available,",
+      "G004,A004,Group 4,available,",
+      ",A001,G1,available,",
+      "G006,A001,Group 6,available,invalid",
+    )
     expect(importer.errors).to eq []
     expect(importer.warnings.map(&:last)).to eq(
       ["Improper status \"blerged\" for group G002, skipping",
        "No name given for group G003, skipping",
        "Parent account didn't exist for A004",
-       "No group_id given for a group"]
+       "No group_id given for a group",
+       "Group Category invalid didn't exist in account A001 for group G006."]
     )
     expect(Group.count).to eq before_count + 1
   end
@@ -93,4 +96,19 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:account)).to eq [@account, @sub]
   end
 
+  it "should use group_category_id" do
+    @sub = @account.sub_accounts.create!(:name => 'sub')
+    @sub.update_attribute('sis_source_id', 'A002')
+    process_csv_data_cleanly(
+      "group_category_id,account_id,category_name,status",
+      "Gc001,,Group Cat 1,active",
+      "Gc002,A002,Group Cat 2,active")
+    process_csv_data_cleanly(
+      "group_id,account_id,name,status,group_category_id",
+      "G001,,Group 1,available,Gc001",
+      "G002,,Group 2,available,Gc002")
+    groups = Group.order(:id).to_a
+    expect(groups.map(&:account)).to eq [@account, @sub]
+    expect(groups.map(&:group_category)).to eq GroupCategory.order(:id).to_a
+  end
 end
