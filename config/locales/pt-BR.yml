@@ -7748,7 +7748,7 @@ pt-BR:
   from_date_must_be_before_to_date_79f00046: "Data “A partir de” deve ser antes da data “Até”"
   from_fdd4956d: De
   from_from_to_to_e31f6422: "De %{from} a %{to}"
-  front_page_must_be_set_first_4dbbfdbe: "A página frontal deve ser configurada primeiro"
+  front_page_must_be_set_first_4dbbfdbe: "A primeira página deve ser configurada primeiro"
   full_name_14c958f7: "Nome completo:"
   full_name_23fdfb6d: "Nome Completo"
   full_name_83cf5453: "Nome completo"
@@ -13043,7 +13043,7 @@ pt-BR:
           Substituir essas mudanças?
       unsaved_changes: "Você tem alterações não salvas. Você deseja continuar sem salvar essas alterações?"
   pages_e5414c2c: Páginas
-  pages_front_page_9ce5188: "Página principal das páginas"
+  pages_front_page_9ce5188: "Primeira página das páginas"
   pages_tutorial_tray_169464a9: "Bandeja de Tutoriais de Páginas"
   paginated_collection: 
     no_items: "Nenhum item."
@@ -19173,7 +19173,7 @@ pt-BR:
   wiki: 
     default_course_wiki_name: "%{course_name} Wiki"
     default_group_wiki_name: "%{group_name} Wiki"
-    front_page_name: "Página frontal"
+    front_page_name: "Primeira página"
     sidebar: 
       aria_tree: 
         file: arquivo
@@ -19198,7 +19198,7 @@ pt-BR:
         view_all_pages: "Exibir todas as páginas"
       delete_wiki: Excluir
       labels: 
-        front_page: "Página frontal"
+        front_page: "Primeira página"
       menu: 
         use_front_page: "Utilizar como primeira página"
       published_indicator: Publicado
@@ -19244,7 +19244,7 @@ pt-BR:
       page_title: Título
     wiki_page_index_item: 
       labels: 
-        front_page: "Página frontal"
+        front_page: "Primeira página"
       menu: 
         delete: Excluir
         edit: Editar
@@ -19262,7 +19262,7 @@ pt-BR:
     atom_author: "Página Wiki"
     atom_entry_title: "Página do wiki, %{course_or_group_name}: %{page_title}"
     cannot_set_unpublished_front_page: "Não é possível definir como primeira página porque não foi publicada."
-    cannot_unpublish_front_page: "não é possível cancelar a publicação da página frontal"
+    cannot_unpublish_front_page: "não é possível cancelar a publicação da primeira página"
     defaults: 
       no_content: "sem conteúdo"
     errors: 
