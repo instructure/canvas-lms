@@ -1050,12 +1050,23 @@ describe "Default Account Reports" do
       it 'should run the provisioning report' do
         parameters = {}
         parameters["group_categories"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        parsed = read_report("provisioning_csv", {params: parameters, order: 5})
         expect(parsed.length).to eq 4
-        expect(parsed).to match_array [[@group_category1.id.to_s, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil],
-                                       [@group_category2.id.to_s, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first"],
-                                       [@group_category4.id.to_s, @course3.id.to_s, "Course", "Test Group Category Course", nil, nil, nil, nil],
-                                       [@student_category.id.to_s, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil]]
+        expect(parsed).to match_array [[@group_category1.id.to_s, @group_category1.sis_source_id, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil, 'active'],
+                                       [@group_category2.id.to_s, @group_category2.sis_source_id, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first", 'active'],
+                                       [@group_category4.id.to_s, nil, @course3.id.to_s, "Course", "Test Group Category Course", nil, nil, nil, nil, 'active'],
+                                       [@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
+      end
+
+      it 'should run the sis report' do
+        GroupCategory.where(id: @group_category1).update_all(sis_source_id: 'gc101', sis_batch_id: @sis.id)
+        GroupCategory.where(id: @group_category2).update_all(sis_source_id: 'gc102', sis_batch_id: @sis.id)
+        parameters = {}
+        parameters["group_categories"] = true
+        parsed = read_report("sis_export_csv", {params: parameters, order: 4})
+        expect(parsed.length).to eq 2
+        expect(parsed).to match_array [[@group_category1.reload.sis_source_id, @account.sis_source_id, "Test Group Category", 'active'],
+                                       [@group_category2.reload.sis_source_id, @account.sis_source_id, "Test Group Category2", 'active']]
       end
 
       it 'should run the provisioning report for a sub account' do
@@ -1063,20 +1074,20 @@ describe "Default Account Reports" do
         parameters["group_categories"] = true
         parsed = read_report("provisioning_csv", {params: parameters, order: 4, account: @sub_account})
         expect(parsed.length).to eq 1
-        expect(parsed).to match_array [[@student_category.id.to_s, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil]]
+        expect(parsed).to match_array [[@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
 
       it 'should run the report for deleted categories' do
         parameters = {}
         parameters["group_categories"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        parsed = read_report("provisioning_csv", {params: parameters, order: 5})
         expect(parsed.length).to eq 5
-        expect(parsed).to match_array [[@group_category1.id.to_s, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil],
-                                       [@group_category2.id.to_s, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first"],
-                                       [@group_category3.id.to_s, @account.id.to_s, "Account", "Test Group Category Deleted", nil, nil, nil, nil],
-                                       [@group_category4.id.to_s, @course3.id.to_s, "Course", "Test Group Category Course", nil, nil, nil, nil],
-                                       [@student_category.id.to_s, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil]]
+        expect(parsed).to match_array [[@group_category1.id.to_s, @group_category1.sis_source_id, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil, 'active'],
+                                       [@group_category2.id.to_s, @group_category2.sis_source_id, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first", 'active'],
+                                       [@group_category3.id.to_s, @group_category3.sis_source_id, @account.id.to_s, "Account", "Test Group Category Deleted", nil, nil, nil, nil, 'deleted'],
+                                       [@group_category4.id.to_s, nil, @course3.id.to_s, "Course", "Test Group Category Course", nil, nil, nil, nil, 'active'],
+                                       [@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
     end
 

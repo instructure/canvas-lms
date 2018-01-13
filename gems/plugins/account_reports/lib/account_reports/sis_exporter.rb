@@ -618,41 +618,60 @@ module AccountReports
     end
 
     def group_categories
-      return if @sis_format
-      headers = []
-      headers << I18n.t('canvas_group_category_id')
-      headers << I18n.t('context_id')
-      headers << I18n.t('context_type')
-      headers << I18n.t('name')
-      headers << I18n.t('role')
-      headers << I18n.t('self_signup')
-      headers << I18n.t('group_limit')
-      headers << I18n.t('auto_leader')
+      if @sis_format
+        # headers are not translated on sis_export to maintain import compatibility
+        headers = ['group_category_id', 'account_id', 'category_name', 'status']
+      else
+        headers = []
+        headers << I18n.t('canvas_group_category_id')
+        headers << I18n.t('group_category_id')
+        headers << I18n.t('context_id')
+        headers << I18n.t('context_type')
+        headers << I18n.t('name')
+        headers << I18n.t('role')
+        headers << I18n.t('self_signup')
+        headers << I18n.t('group_limit')
+        headers << I18n.t('auto_leader')
+        headers << I18n.t('status')
+
+      end
 
       root_account.shard.activate do
-        group_categories = GroupCategory.
-          joins("LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id AND group_categories.context_type = 'Course'").
-          joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id AND group_categories.context_type = 'Account'").
-          where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                        OR a.id=?
-                        OR EXISTS (?)",
-                                  account,
-                                  CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
-
-        unless @include_deleted
-          group_categories.where!('group_categories.deleted_at IS NULL')
+        if account != root_account
+          group_categories = GroupCategory.
+            joins("LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
+                   AND group_categories.context_type = 'Course'").
+            joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
+                   AND group_categories.context_type = 'Account'").
+            where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)",
+                  account,
+                  CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
+        else
+          group_categories = root_account.all_group_categories.
+            joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
+                   AND group_categories.context_type = 'Account'")
         end
+        group_categories.where!('group_categories.deleted_at IS NULL') unless @include_deleted
+        if @sis_format
+          group_categories = group_categories.
+            select("group_categories.*, a.sis_source_id AS account_sis_id").
+            where.not(sis_batch_id: nil)
+        end
+
         generate_and_run_report headers do |csv|
           group_categories.order('group_categories.id ASC').find_each do |g|
             row = []
-            row << g.id
-            row << g.context_id
-            row << g.context_type
+            row << g.id unless @sis_format
+            row << g.sis_source_id
+            row << g.account_sis_id if @sis_format
+            row << g.context_id unless @sis_format
+            row << g.context_type unless @sis_format
             row << g.name
-            row << g.role
-            row << g.self_signup
-            row << g.group_limit
-            row << g.auto_leader
+            row << g.role unless @sis_format
+            row << g.self_signup unless @sis_format
+            row << g.group_limit unless @sis_format
+            row << g.auto_leader unless @sis_format
+            row << (g.deleted_at? ? 'deleted' : 'active')
             csv << row
           end
         end
