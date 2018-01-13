@@ -734,6 +734,57 @@ E411208,13834,student,2A,active
 E411208,13aa3,teacher,2A,active
 </pre>
 
+group_categories.csv
+------------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>group_category_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference a group category.
+This identifier must not change for the group category, and must be globally unique.</td>
+</tr>
+<tr>
+<td>account_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The account identifier from accounts.csv, if none is specified the group
+will be attached to the root account.</td>
+</tr>
+<tr>
+<td>category_name</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The name of the group category.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
+</tr>
+</table>
+
+Sample:
+
+<pre>group_category_id,account_id,category_name,status
+GC08,A001,First Group Category,active
+GC07,,GC7,active
+GC10,,GC10,deleted
+</pre>
+
 groups.csv
 ------------
 

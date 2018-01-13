@@ -35,7 +35,7 @@ module SIS
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
       IMPORTERS = %i{change_sis_id account term abstract_course course section
-                     xlist user enrollment admin group group_membership
+                     xlist user enrollment admin group_category group group_membership
                      grade_publishing_results user_observer}.freeze
 
       def initialize(root_account, opts = {})
