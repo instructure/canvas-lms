@@ -554,11 +554,13 @@ module AccountReports
     def groups
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_id', 'account_id', 'name', 'status']
+        headers = ['group_id', 'group_category_id', 'account_id', 'name', 'status']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
         headers << I18n.t('#account_reports.report_header_group_id', 'group_id')
+        headers << I18n.t('canvas_group_category_id')
+        headers << I18n.t('group_category_id')
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
         headers << I18n.t('#account_reports.report_header_name', 'name')
@@ -571,8 +573,9 @@ module AccountReports
       end
 
       groups = root_account.all_groups.
-        select("groups.*, accounts.sis_source_id AS account_sis_id").
-        joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id")
+        select("groups.*, accounts.sis_source_id AS account_sis_id, group_categories.sis_source_id AS gc_sis_id").
+        joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id
+               LEFT JOIN #{GroupCategory.quoted_table_name} ON groups.group_category_id=group_categories.id")
 
       groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
       groups = groups.where.not(groups: {sis_batch_id: nil}) if @created_by_sis
@@ -598,6 +601,8 @@ module AccountReports
           row = []
           row << g.id unless @sis_format
           row << g.sis_source_id
+          row << g.group_category_id unless @sis_format
+          row << g.gc_sis_id
           row << g.account_id unless @sis_format
           row << g.account_sis_id
           row << g.name

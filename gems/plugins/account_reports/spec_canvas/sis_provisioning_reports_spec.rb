@@ -971,14 +971,16 @@ describe "Default Account Reports" do
       end
 
       it "should run the SIS report" do
+        GroupCategory.where(id: @group_category1).update_all(sis_source_id: 'gc101', sis_batch_id: @sis.id)
+        GroupCategory.where(id: @group_category2).update_all(sis_source_id: 'gc102', sis_batch_id: @sis.id)
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["groups"] = true
         parsed = read_report("sis_export_csv", {params: parameters, order: 2})
         expect(parsed.length).to eq 3
-        expect(parsed).to match_array [["group1sis", nil, "group1name", "available"],
-                                       ["group2sis", "sub1", "group2name", "available"],
-                                       ["group5sis", "sub1", "group5name", "available"]]
+        expect(parsed).to match_array [["group1sis", "gc101", nil, "group1name", "available"],
+                                       ["group2sis", "gc102", "sub1", "group2name", "available"],
+                                       ["group5sis", nil, "sub1", "group5name", "available"]]
       end
 
       it "should run the SIS report with deleted groups" do
@@ -987,10 +989,10 @@ describe "Default Account Reports" do
         parameters["groups"] = true
         parsed = read_report("sis_export_csv", {params: parameters, order: 2})
         expect(parsed.length).to eq 4
-        expect(parsed).to match_array [["group1sis", nil, "group1name", "available"],
-                                       ["group2sis", "sub1", "group2name", "available"],
-                                       ["group4sis", nil, "group4name", "deleted",],
-                                       ["group5sis", "sub1", "group5name", "available"]]
+        expect(parsed).to match_array [["group1sis", nil, nil, "group1name", "available"],
+                                       ["group2sis", nil, "sub1", "group2name", "available"],
+                                       ["group4sis", nil, nil, "group4name", "deleted",],
+                                       ["group5sis", nil, "sub1", "group5name", "available"]]
       end
 
       it "should run the provisioning report" do
@@ -998,13 +1000,13 @@ describe "Default Account Reports" do
         parameters["groups"] = true
         parsed = read_report("provisioning_csv", {params: parameters, order: 4})
         expect(parsed.length).to eq 4
-        expect(parsed).to match_array [[@group1.id.to_s, "group1sis", @account.id.to_s,
+        expect(parsed).to match_array [[@group1.id.to_s, "group1sis", @group1.group_category_id.to_s, nil, @account.id.to_s,
                                         nil, "group1name", "available", "true", @account.id.to_s, 'Account', @group1.group_category.id.to_s, nil],
-                                       [@group2.id.to_s, "group2sis", @sub_account.id.to_s,
+                                       [@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil, @sub_account.id.to_s,
                                         "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"],
-                                       [@group3.id.to_s, nil, @sub_account.id.to_s,
+                                       [@group3.id.to_s, nil, nil, nil, @sub_account.id.to_s,
                                         "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil, nil],
-                                       [@group5.id.to_s, "group5sis", @sub_account.id.to_s,
+                                       [@group5.id.to_s, "group5sis", @group5.group_category_id.to_s, nil, @sub_account.id.to_s,
                                         "sub1", "group5name", "available", "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil]]
       end
 
@@ -1013,11 +1015,11 @@ describe "Default Account Reports" do
         parameters["groups"] = true
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
         expect(parsed.length).to eq 3
-        expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @sub_account.id.to_s,
+        expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil, @sub_account.id.to_s,
                                         "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"],
-                                       [@group3.id.to_s, nil, @sub_account.id.to_s,
+                                       [@group3.id.to_s, nil, nil , nil, @sub_account.id.to_s,
                                         "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil, nil],
-                                       [@group5.id.to_s, "group5sis", @sub_account.id.to_s,
+                                       [@group5.id.to_s, "group5sis", @group5.group_category_id.to_s, nil, @sub_account.id.to_s,
                                         "sub1", "group5name", "available", "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil]]
       end
 
@@ -1028,13 +1030,13 @@ describe "Default Account Reports" do
         parameters["groups"] = true
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
         expect(parsed.length).to eq 4
-        expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @sub_account.id.to_s,
+        expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil, @sub_account.id.to_s,
                                         "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"],
-                                       [@group3.id.to_s, nil, @sub_account.id.to_s,
+                                       [@group3.id.to_s, nil, nil, nil, @sub_account.id.to_s,
                                         "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil, nil],
-                                       [@group5.id.to_s, "group5sis", @sub_account.id.to_s,
+                                       [@group5.id.to_s, "group5sis", @group5.group_category_id.to_s, nil, @sub_account.id.to_s,
                                         "sub1", "group5name", "available", "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil],
-                                       [group6.id.to_s, nil, sub_sub_account.id.to_s,
+                                       [group6.id.to_s, nil, nil, nil, sub_sub_account.id.to_s,
                                         nil, "group6name", "available", "false", sub_sub_account.id.to_s, 'Account', nil, nil]]
       end
     end
@@ -1397,7 +1399,7 @@ describe "Default Account Reports" do
       expect(parsed["enrollments.csv"]).to eq [["course_id", "user_id", "role", "role_id", "section_id",
                                                 "status", "associated_user_id",
                                                 "limit_section_privileges"]]
-      expect(parsed["groups.csv"]).to eq [["group_id", "account_id", "name", "status"]]
+      expect(parsed["groups.csv"]).to eq [["group_id", "group_category_id", "account_id", "name", "status"]]
       expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
       expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
     end
@@ -1423,7 +1425,7 @@ describe "Default Account Reports" do
       expect(parsed["courses.csv"]).to eq nil
       expect(parsed["sections.csv"]).to eq nil
       expect(parsed["enrollments.csv"]).to eq nil
-      expect(parsed["groups.csv"]).to eq [["group_id", "account_id", "name", "status"]]
+      expect(parsed["groups.csv"]).to eq [["group_id", "group_category_id", "account_id", "name", "status"]]
       expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
       expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
     end
