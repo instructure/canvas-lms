@@ -264,7 +264,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
                                                    service_provider: sp_metadata)
       authn_request.name_id_policy.format = identifier_format if identifier_format.present?
       if requested_authn_context.present?
-        authn_request.requested_authn_context = RequestedAuthnContext.new
+        authn_request.requested_authn_context = SAML2::RequestedAuthnContext.new
         authn_request.requested_authn_context.class_ref = requested_authn_context
         authn_request.requested_authn_context.comparison = :exact
       end
