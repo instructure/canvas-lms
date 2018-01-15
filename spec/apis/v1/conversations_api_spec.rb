@@ -1369,7 +1369,7 @@ describe ConversationsController, type: :request do
     it "should return an error if trying to add more participants than the maximum group size on add_message" do
       conversation = conversation(@bob, private: false)
 
-      Setting.set("max_group_conversation_size", 2)
+      Setting.set("max_group_conversation_size", 1)
 
       json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
         { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
@@ -1627,7 +1627,7 @@ describe ConversationsController, type: :request do
     end
 
     it "should return an error if trying to add more participants than the maximum group size on add_recipients" do
-      conversation = conversation(@bob, @billy)
+      conversation = conversation(@bob, @billy, @joe)
 
       Setting.set("max_group_conversation_size", 2)
 
