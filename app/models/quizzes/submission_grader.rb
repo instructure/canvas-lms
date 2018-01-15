@@ -54,7 +54,7 @@ module Quizzes
       @submission.with_versioning(true) do |s|
         original_score = s.kept_score
         if s.save
-          track_outcomes(s.attempt) if s.quiz.assignment? && kept_score_updating?(original_score)
+          track_outcomes(s.attempt) if outcomes_require_update(s, original_score)
         end
       end
       @submission.context_module_action
@@ -99,6 +99,10 @@ module Quizzes
       return result
     end
 
+    def outcomes_require_update(submission, original_score)
+      submission.quiz.assignment? && kept_score_updating?(original_score)
+    end
+
     def track_outcomes(attempt)
       return unless @submission.user_id
 
@@ -129,8 +133,8 @@ module Quizzes
       # we'll need this method to return true. if the method is highest,
       # the kept score only updates if it's higher than the original score
       quiz = @submission.quiz
-      return true if quiz.scoring_policy != 'keep_highest' || quiz.points_possible.to_i == 0
-      @submission.kept_score != original_score
+      return true if quiz.scoring_policy != 'keep_highest' || quiz.points_possible.to_i == 0 || original_score.nil?
+      @submission.kept_score && @submission.kept_score > original_score
     end
 
     def questions_and_alignments(question_ids)
