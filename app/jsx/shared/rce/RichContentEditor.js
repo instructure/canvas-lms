@@ -17,13 +17,23 @@
  */
 
 import serviceRCELoader from '../rce/serviceRCELoader'
-import { RCELOADED_EVENT_NAME, send, destroy, focus } from '../rce/RceCommandShim'
+import {RCELOADED_EVENT_NAME, send, destroy, focus} from '../rce/RceCommandShim'
 import Sidebar from '../rce/Sidebar'
 import featureFlag from '../rce/featureFlag'
 import $ from 'jquery'
 
-function loadServiceRCE (target, tinyMCEInitOptions, callback) {
+function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', 'none')
+
+  const originalOnFocus = tinyMCEInitOptions.onFocus
+  // eslint-disable-next-line no-param-reassign
+  tinyMCEInitOptions.onFocus = (...args) => {
+    RichContentEditor.showSidebar()
+    if (originalOnFocus instanceof Function) {
+      originalOnFocus(...args)
+    }
+  }
+
   serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
     const $textarea = freshNode($(textarea))
     $textarea.data('remoteEditor', remoteEditor)
@@ -35,22 +45,26 @@ function loadServiceRCE (target, tinyMCEInitOptions, callback) {
 }
 
 let legacyTinyMCELoaded = false
-function loadLegacyTinyMCE (callback) {
+function loadLegacyTinyMCE(callback) {
   if (legacyTinyMCELoaded) {
     callback()
     return
   }
 
-  require.ensure([], (require) => {
-    legacyTinyMCELoaded = true
-    require('tinymce.editor_box')
-    require('compiled/tinymce')
-    require('./initA11yChecker')
-    callback()
-  }, 'legacyTinymceAsyncChunk')
+  require.ensure(
+    [],
+    require => {
+      legacyTinyMCELoaded = true
+      require('tinymce.editor_box')
+      require('compiled/tinymce')
+      require('./initA11yChecker')
+      callback()
+    },
+    'legacyTinymceAsyncChunk'
+  )
 }
 
-function hideTextareaWhileLoadingLegacyRCE (target, callback) {
+function hideTextareaWhileLoadingLegacyRCE(target, callback) {
   if (legacyTinyMCELoaded) {
     callback()
     return
@@ -64,17 +78,19 @@ function hideTextareaWhileLoadingLegacyRCE (target, callback) {
   })
 }
 
-function loadLegacyRCE (target, tinyMCEInitOptions, callback) {
+function loadLegacyRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', '')
   hideTextareaWhileLoadingLegacyRCE(target, () => {
-    tinyMCEInitOptions.defaultContent ?
-      target.editorBox(tinyMCEInitOptions).editorBox('set_code', tinyMCEInitOptions.defaultContent) :
-      target.editorBox(tinyMCEInitOptions)
+    tinyMCEInitOptions.defaultContent
+      ? target
+          .editorBox(tinyMCEInitOptions)
+          .editorBox('set_code', tinyMCEInitOptions.defaultContent)
+      : target.editorBox(tinyMCEInitOptions)
     if (callback) callback()
   })
 }
 
-function establishParentNode (target) {
+function establishParentNode(target) {
   // some areas would wipe out the whole form
   // if we rendered a new editor into the textarea parent
   // element, so this is some helper functionality to create/reuse
@@ -89,13 +105,13 @@ function establishParentNode (target) {
   }
 }
 
-function hideResizeHandleForScreenReaders () {
+function hideResizeHandleForScreenReaders() {
   $('.mce-resizehandle').attr('aria-hidden', true)
 }
 
 // Returns a unique id
 let _editorUid = 0
-function nextID () {
+function nextID() {
   return `random_editor_id_${_editorUid++}`
 }
 
@@ -104,7 +120,7 @@ function nextID () {
  * doesn't, give it a random one.
  * @private
  */
-function ensureID ($el) {
+function ensureID($el) {
   const id = $el.attr('id')
   if (!id || id == '') {
     $el.attr('id', nextID())
@@ -117,7 +133,7 @@ function ensureID ($el) {
  *
  * @private
  */
-function freshNode ($target) {
+function freshNode($target) {
   // Try to get the id
   const targetId = $target.attr('id')
   if (!targetId || targetId == '') {
@@ -140,7 +156,7 @@ const RichContentEditor = {
    *
    * @public
    */
-  preloadRemoteModule () {
+  preloadRemoteModule() {
     if (featureFlag()) {
       serviceRCELoader.preload()
     }
@@ -152,8 +168,28 @@ const RichContentEditor = {
    *
    * @public
    */
-  initSidebar (subscriptions = {}) {
+  initSidebar(subscriptions = {}) {
     Sidebar.init(subscriptions)
+  },
+
+  /**
+   * show the sidebar if it's around
+   *
+   * @public
+   */
+
+  showSidebar() {
+    Sidebar.show()
+  },
+
+  /**
+   * hide the sidebar if it's around
+   *
+   * @public
+   */
+
+  hideSidebar() {
+    Sidebar.hide()
   },
 
   /**
@@ -171,7 +207,7 @@ const RichContentEditor = {
    *
    * @public
    */
-  loadNewEditor ($target, tinyMCEInitOptions = {}, cb) {
+  loadNewEditor($target, tinyMCEInitOptions = {}, cb) {
     if ($target.length <= 0) {
       // no actual target, just short circuit out
       return
@@ -182,7 +218,7 @@ const RichContentEditor = {
     // avoid modifying the original options object provided
     tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
 
-    let callback = () => {
+    const callback = () => {
       if (tinyMCEInitOptions.focus) {
         // call activateRCE once loaded
         this.activateRCE($target)
@@ -217,7 +253,7 @@ const RichContentEditor = {
    *
    * @public
    */
-  callOnRCE ($target, methodName, ...args) {
+  callOnRCE($target, methodName, ...args) {
     if (featureFlag()) {
       $target = this.freshNode($target)
     }
@@ -229,7 +265,7 @@ const RichContentEditor = {
    *
    * @public
    */
-  destroyRCE ($target) {
+  destroyRCE($target) {
     if (featureFlag()) {
       $target = this.freshNode($target)
     }
@@ -243,7 +279,7 @@ const RichContentEditor = {
    *
    * @private
    */
-  activateRCE ($target) {
+  activateRCE($target) {
     if (featureFlag()) {
       $target = this.freshNode($target)
     }
