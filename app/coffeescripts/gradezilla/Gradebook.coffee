@@ -1425,7 +1425,7 @@ define [
         for assignmentGroupId of @assignmentGroups
           scrollableColumns.push(@gridData.columns.definitions[@getAssignmentGroupColumnId(assignmentGroupId)])
         if @getColumnOrder().freezeTotalGrade
-          parentColumnIds.push('total_grade')
+          parentColumnIds.push('total_grade') unless parentColumnIds.includes('total_grade')
         else
           scrollableColumns.push(@gridData.columns.definitions['total_grade'])
 

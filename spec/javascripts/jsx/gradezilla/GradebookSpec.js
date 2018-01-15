@@ -8212,3 +8212,27 @@ QUnit.module('#renderGradebookSettingsModal', (hooks) => {
     strictEqual(gradebookSettingsModalProps().locale, 'de');
   });
 });
+
+QUnit.module('#setVisibleGridColumns', (hooks) => {
+  let gradebook;
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('adds total_grade to frozen columns if it is not included and total grade should be frozen', function () {
+    gradebook.gradebookColumnOrderSettings.freezeTotalGrade = true
+    deepEqual(gradebook.gridData.columns.frozen, [])
+
+    gradebook.setVisibleGridColumns()
+    deepEqual(gradebook.gridData.columns.frozen, ['total_grade'])
+  })
+
+  test('does not add total_grade to frozen columns if it is already included', function () {
+    gradebook.freezeTotalGradeColumn()
+    deepEqual(gradebook.gridData.columns.frozen, ['total_grade'])
+
+    gradebook.setVisibleGridColumns()
+    deepEqual(gradebook.gridData.columns.frozen, ['total_grade'])
+  })
+})
