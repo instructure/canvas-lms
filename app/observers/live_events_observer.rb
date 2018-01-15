@@ -34,9 +34,10 @@ class LiveEventsObserver < ActiveRecord::Observer
           :account_notification,
           :course_section
 
+  NOP_UPDATE_FIELDS = [ "updated_at", "sis_batch_id" ].freeze
   def after_update(obj)
     changes = obj.changes
-    return nil if changes.except("updated_at").empty?
+    return nil if changes.except(*NOP_UPDATE_FIELDS).empty?
 
     obj.class.connection.after_transaction_commit do
     case obj
