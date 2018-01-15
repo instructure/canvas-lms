@@ -140,7 +140,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     scale_points = (self.possible / scale_percent) - self.possible
     scale_cutoff = self.possible - (self.possible * alignment_mastery)
     percent_to_scale = (self.score + scale_cutoff) - self.possible
-    if percent_to_scale > 0
+    if percent_to_scale > 0 && scale_cutoff > 0
       score_adjustment = (percent_to_scale / scale_cutoff) * scale_points
       scaled_score = self.score + score_adjustment
       (scaled_score / self.possible) * scale_percent
