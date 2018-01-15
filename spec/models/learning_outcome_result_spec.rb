@@ -202,8 +202,7 @@ describe LearningOutcomeResult do
     it 'returns the Assignment from the artifact if one doesnt explicitly exist' do
       lor = create_and_associate_lor(nil)
       lor.artifact = rubric_assessment_model(user: @user, context: @course)
-
-      expect(lor.assignment).to eq(lor.artifact.assignment)
+      expect(lor.assignment).to eq(lor.artifact.submission.assignment)
     end
 
     it 'returns nil if no explicit assignment or artifact exists' do

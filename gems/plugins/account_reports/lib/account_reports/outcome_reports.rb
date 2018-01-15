@@ -47,6 +47,56 @@ module AccountReports
     # - learning outcome id
     # - outcome result score
     def student_assignment_outcome_map
+      headers = {
+        'student name' => I18n.t('student name'),
+        'student id' => I18n.t('student id'),
+        'student sis id' => I18n.t('student sis id'),
+        'assignment title' => I18n.t('assignment title'),
+        'assignment id' => I18n.t('assignment id'),
+        'submission date' => I18n.t('submission date'),
+        'submission score' => I18n.t('submission score'),
+        'learning outcome name' => I18n.t('learning outcome name'),
+        'learning outcome id' => I18n.t('learning outcome id'),
+        'attempt' => I18n.t('attempt'),
+        'outcome score' => I18n.t('outcome score'),
+        'course name' => I18n.t('course name'),
+        'course id' => I18n.t('course id'),
+        'course sis id' => I18n.t('course sis id'),
+        'section name' => I18n.t('section name'),
+        'section id' => I18n.t('section id'),
+        'section sis id' => I18n.t('section sis id'),
+        'assignment url' => I18n.t('assignment url')
+      }
+
+      write_outcomes_report(headers, student_assignment_outcome_map_scope)
+    end
+
+    def outcome_results
+      headers = {
+        'student name' => I18n.t('student name'),
+        'student id' => I18n.t('student id'),
+        'student sis id' => I18n.t('student sis id'),
+        'assessment title' => I18n.t('assessment title'),
+        'assessment id' => I18n.t('assessment id'),
+        'assessment type' => I18n.t('assessment type'),
+        'submission date' => I18n.t('submission date'),
+        'submission score' => I18n.t('submission score'),
+        'learning outcome name' => I18n.t('learning outcome name'),
+        'learning outcome id' => I18n.t('learning outcome id'),
+        'attempt' => I18n.t('attempt'),
+        'outcome score' => I18n.t('outcome score'),
+        'assessment question' => I18n.t('assessment question'),
+        'assessment question id' => I18n.t('assessment question id'),
+        'course name' => I18n.t('course name'),
+        'course id' => I18n.t('course id'),
+        'course sis id' => I18n.t('course sis id')
+      }
+      write_outcomes_report(headers, outcome_results_scope)
+    end
+
+    private
+
+    def student_assignment_outcome_map_scope
 
       parameters = {
         :account_id => account.id,
@@ -109,51 +159,61 @@ module AccountReports
       end
 
       students = add_course_sub_account_scope(students, 'c')
-      students = add_term_scope(students, 'c')
+      add_term_scope(students, 'c')
+    end
 
-      host = root_account.domain
-      headers = ['student name', 'student id', 'student sis id',
-                 'assignment title', 'assignment id', 'submission date',
-                 'submission score', 'learning outcome name',
-                 'learning outcome id', 'attempt', 'outcome score',
-                 'course name', 'course id', 'course sis id', 'section name',
-                 'section id', 'section sis id', 'assignment url']
+    def outcome_results_scope
+      students = account.learning_outcome_links.active.
+        select(<<~SELECT).
+          u.sortable_name                             AS "student name",
+          p.user_id                                   AS "student id",
+          p.sis_user_id                               AS "student sis id",
+          COALESCE(q.title, a.title)                  AS "assessment title",
+          COALESCE(q.id, a.id)                        AS "assessment id",
+          COALESCE(qs.finished_at, subs.submitted_at) AS "submission date",
+          COALESCE(qs.score, subs.score)              AS "submission score",
+          aq.name                                     AS "assessment question",
+          aq.id                                       AS "assessment question id",
+          learning_outcomes.short_description         AS "learning outcome name",
+          learning_outcomes.id                        AS "learning outcome id",
+          COALESCE(qr.attempt, r.attempt)             AS "attempt",
+          COALESCE(qr.score, r.score)                 AS "outcome score",
+          c.name                                      AS "course name",
+          c.id                                        AS "course id",
+          c.sis_source_id                             AS "course sis id",
+          CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN 'quiz'
+               WHEN ct.content_type = 'Assignment' THEN 'assignment'
+          END                                         AS "assessment type"
+        SELECT
+        joins(<<~JOINS).
+          INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
+            AND content_tags.content_type = 'LearningOutcome'
+          INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
+          INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
+          INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
+          INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
+          INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
+          LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
+          LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
+           AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
+          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON a.id = ct.content_id
+           AND ct.content_type = 'Assignment'
+          LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
+           AND subs.user_id = u.id AND subs.workflow_state <> 'deleted'
+          LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
+           AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
+          LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
+           AND qr.associated_asset_type = 'AssessmentQuestion'
+        JOINS
+        where("ct.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
 
-      t_headers = []
-      t_headers << I18n.t('#account_reports.report_header_student_name', 'student name')
-      t_headers << I18n.t('#account_reports.report_header_student_id', 'student id')
-      t_headers << I18n.t('#account_reports.report_header_student_sis_id', 'student sis id')
-      t_headers << I18n.t('#account_reports.report_header_assignment_title', 'assignment title')
-      t_headers << I18n.t('#account_reports.report_header_assignment_id', 'assignment id')
-      t_headers << I18n.t('#account_reports.report_header_submission_date', 'submission date')
-      t_headers << I18n.t('#account_reports.report_header_submission_score', 'submission score')
-      t_headers << I18n.t('#account_reports.report_header_learning_outcome_name', 'learning outcome name')
-      t_headers << I18n.t('#account_reports.report_header_learning_outcome_id', 'learning outcome id')
-      t_headers << I18n.t('#account_reports.report_header_attempt', 'attempt')
-      t_headers << I18n.t('#account_reports.report_header_outcome_score', 'outcome score')
-      t_headers << I18n.t('#account_reports.report_header_course_name', 'course name')
-      t_headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-      t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
-      t_headers << I18n.t('#account_reports.report_header_section_name', 'section name')
-      t_headers << I18n.t('#account_reports.report_header_section_id', 'section id')
-      t_headers << I18n.t('#account_reports.report_header_section_sis_id', 'section sis id')
-      t_headers << I18n.t('#account_reports.report_header_assignment_url', 'assignment url')
-
-      # Generate the CSV report
-      write_report t_headers do |csv|
-
-        total = students.count(:all)
-        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
-        students.find_each do |row|
-          row = row.attributes.dup
-          row['assignment url'] = "https://#{host}"
-          row['assignment url'] << "/courses/#{row['course id']}"
-          row['assignment url'] << "/assignments/#{row['assignment id']}"
-          row['submission date']=default_timezone_format(row['submission date'])
-          csv << headers.map { |h| row[h] }
-        end
-        csv << ['No outcomes found'] if total == 0
+      unless @include_deleted
+       students = students.where("p.workflow_state<>'deleted' AND c.workflow_state='available'")
       end
+
+      students = add_course_sub_account_scope(students, 'c')
+      students = add_term_scope(students, 'c')
+      students.order(outcome_order)
     end
 
     def outcome_order
@@ -175,97 +235,25 @@ module AccountReports
       order
     end
 
-    def outcome_results
-      students = account.learning_outcome_links.active.
-        select(%{u.sortable_name                             AS "student name",
-                 p.user_id                                   AS "student id",
-                 p.sis_user_id                               AS "student sis id",
-                 COALESCE(q.title, a.title)                  AS "assessment title",
-                 COALESCE(q.id, a.id)                        AS "assessment id",
-                 COALESCE(qs.finished_at, subs.submitted_at) AS "submission date",
-                 COALESCE(qs.score, subs.score)              AS "submission score",
-                 aq.name                                     AS "assessment question",
-                 aq.id                                       AS "assessment question id",
-                 learning_outcomes.short_description         AS "learning outcome name",
-                 learning_outcomes.id                        AS "learning outcome id",
-                 COALESCE(qr.attempt, r.attempt)             AS "attempt",
-                 COALESCE(qr.score, r.score)                 AS "outcome score",
-                 c.name                                      AS "course name",
-                 c.id                                        AS "course id",
-                 c.sis_source_id                             AS "course sis id",
-            CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN 'quiz'
-                 WHEN ct.content_type = 'Assignment' THEN 'assignment'
-                 END                                         AS "assessment type"}).
-        joins("INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
-                 AND content_tags.content_type = 'LearningOutcome'
-               INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
-               INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
-               INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
-               INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
-               INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
-               LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
-               LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
-                 AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
-               LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON a.id = ct.content_id
-                 AND ct.content_type = 'Assignment'
-               LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
-                 AND subs.user_id = u.id AND subs.workflow_state <> 'deleted'
-               LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
-                 AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
-               LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
-                 AND qr.associated_asset_type = 'AssessmentQuestion'").
-        where("ct.workflow_state <> 'deleted'
-               AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
+    def write_outcomes_report(headers, scope)
+      header_keys = headers.keys
+      header_names = headers.values
+      host = root_account.domain
 
-      unless @include_deleted
-        students = students.where("p.workflow_state<>'deleted' AND c.workflow_state='available'")
-      end
-
-      students = add_term_scope(students, 'c')
-
-      students = students.order(outcome_order)
-
-      headers = ['student name', 'student id', 'student sis id',
-                 'assessment title', 'assessment id', 'assessment type',
-                 'submission date', 'submission score', 'learning outcome name',
-                 'learning outcome id', 'attempt', 'outcome score',
-                 'assessment question', 'assessment question id',
-                 'course name', 'course id', 'course sis id']
-
-      t_headers = []
-      t_headers << I18n.t('#account_reports.report_header_student_name', 'student name')
-      t_headers << I18n.t('#account_reports.report_header_student_id', 'student id')
-      t_headers << I18n.t('#account_reports.report_header_student_sis_id', 'student sis id')
-      t_headers << I18n.t('#account_reports.report_header_assessment_title', 'assessment title')
-      t_headers << I18n.t('#account_reports.report_header_assessment_id', 'assessment id')
-      t_headers << I18n.t('#account_reports.report_header_assessment_type', 'assessment type')
-      t_headers << I18n.t('#account_reports.report_header_submission_date', 'submission date')
-      t_headers << I18n.t('#account_reports.report_header_submission_score', 'submission score')
-      t_headers << I18n.t('#account_reports.report_header_learning_outcome_name', 'learning outcome name')
-      t_headers << I18n.t('#account_reports.report_header_learning_outcome_id', 'learning outcome id')
-      t_headers << I18n.t('#account_reports.report_header_attempt', 'attempt')
-      t_headers << I18n.t('#account_reports.report_header_outcome_score', 'outcome score')
-      t_headers << I18n.t('#account_reports.report_header_assessment_question', 'assessment question')
-      t_headers << I18n.t('#account_reports.report_header_assessment_question_id', 'assessment question id')
-      t_headers << I18n.t('#account_reports.report_header_course_name', 'course name')
-      t_headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-      t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
-
-      # Generate the CSV report
-      write_report t_headers do |csv|
-
-        total = students.count(:all)
+      write_report header_names do |csv|
+        total = scope.length
         Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
-        students.find_each do |row|
+        scope.each do |row|
           row = row.attributes.dup
-          row['submission date']=default_timezone_format(row['submission date'])
+          row['assignment url'] = "https://#{host}"
+          row['assignment url'] << "/courses/#{row['course id']}"
+          row['assignment url'] << "/assignments/#{row['assignment id']}"
+          row['submission date'] = default_timezone_format(row['submission date'])
 
-          csv << headers.map { |h| row[h] }
-
+          csv << header_keys.map { |h| row[h] }
         end
         csv << ['No outcomes found'] if total == 0
       end
     end
   end
-
 end
