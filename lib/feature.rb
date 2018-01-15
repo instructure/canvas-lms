@@ -116,14 +116,6 @@ class Feature
         state: 'hidden_in_prod',
         beta: true
   },
-    'section_specific_announcements' =>
-    {
-      display_name: -> { I18n.t('Section Specific Announcements') },
-      description: -> { I18n.t('Allows creating announcements for a specific section') },
-      applies_to: 'Account',
-      state: 'allowed',
-      root_opt_in: false
-    },
     'section_specific_discussions' =>
     {
       display_name: -> { I18n.t('Section Specific Discussions') },

@@ -22,29 +22,6 @@ require_relative './external_feed_page'
 describe "announcements index v2" do
   include_context "in-process server selenium tests"
 
-  context "as a teacher the correct page version is displayed" do
-    before :once do
-      @teacher = user_with_pseudonym(active_user: true)
-      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
-    end
-
-    before :each do
-      user_session(@teacher)
-    end
-
-    it 'when the feature flas is off' do
-      AnnouncementIndex.set_section_specific_announcements_flag(@course,'off')
-      AnnouncementIndex.visit(@course)
-      expect(f('#external_feed_url')).not_to be_nil
-    end
-
-    it 'when the feature flag is on' do
-      AnnouncementIndex.set_section_specific_announcements_flag(@course,'on')
-      AnnouncementIndex.visit(@course)
-      expect(f('.announcements-v2__wrapper')).not_to be_nil
-    end
-  end
-
   context "as a teacher" do
     announcement1_title = 'Free food!'
     announcement2_title = 'Flu Shot'
@@ -53,7 +30,6 @@ describe "announcements index v2" do
       @teacher = user_with_pseudonym(active_user: true)
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
       course_with_student(course: @course, active_enrollment: true)
-      AnnouncementIndex.set_section_specific_announcements_flag(@course,'on')
 
       # Announcement attributes: title, message, delayed_post_at, allow_rating, user
       @announcement1 = @course.announcements.create!(

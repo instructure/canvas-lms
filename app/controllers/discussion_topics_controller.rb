@@ -516,9 +516,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
     end
 
-    if @context.account.feature_enabled?(:section_specific_announcements) &&
-        @topic.is_section_specific && @context.is_a?(Course)
-
+    if @topic.is_section_specific && @context.is_a?(Course)
       selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
       js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
         {
@@ -527,9 +525,6 @@ class DiscussionTopicsController < ApplicationController
         }
       end
     end
-    js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
-      feature_enabled?(:section_specific_announcements)
-
 
     js_hash[:SECTION_SPECIFIC_DISCUSSIONS_ENABLED] = @context.account.feature_enabled?(:section_specific_discussions)
 
@@ -640,9 +635,7 @@ class DiscussionTopicsController < ApplicationController
             @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
             @sequence_asset = @context_module_tag.try(:content)
 
-            if @context.is_a?(Course) &&
-                @context.account.feature_enabled?(:section_specific_announcements) &&
-                @topic.is_section_specific
+            if @context.is_a?(Course) && @topic.is_section_specific
               user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
                                              course_id: @context).not_fake.active_or_pending_by_date_ignoring_access.
                                              group(:course_section_id).count
@@ -718,14 +711,12 @@ class DiscussionTopicsController < ApplicationController
             end
 
             js_hash = {:DISCUSSION => env_hash}
-            if @context.account.feature_enabled?(:section_specific_announcements) && @context.is_a?(Course)
+            if @context.is_a?(Course)
               js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.
                 active_or_pending_by_date_ignoring_access.count
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
-            js_hash[:SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED] = @context.account.
-              feature_enabled?(:section_specific_announcements)
             js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
               @domain_root_account.feature_enabled?(:student_context_cards) &&
               @context.grants_right?(@current_user, session, :manage)

@@ -35,7 +35,9 @@ class DiscussionsIndex
     end
 
     def individual_discussion_url(discussion)
-      "/discussion_topics/#{discussion.id}"
+      context_type = discussion.context.is_a?(Course) ? "courses" : "groups"
+      context_id = discussion.context.id
+      "/#{context_type}/#{context_id}/discussion_topics/#{discussion.id}"
     end
 
     # ---------------------- Controls ----------------------
@@ -61,6 +63,10 @@ class DiscussionsIndex
 
     def discussion_css(title)
       "a:contains(#{title})"
+    end
+
+    def discussions_list
+      ff('.ic-item-row')
     end
 
     def discussion_group(group_name)
@@ -120,6 +126,10 @@ class DiscussionsIndex
 
     def pin_menu_option
       f('#togglepinned-discussion-menu-option')
+    end
+
+    def summary_content
+      f('.ic-announcement-row__content')
     end
 
     def close_for_comment_menu_option

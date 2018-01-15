@@ -109,15 +109,12 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def feature_must_be_enabled_for_section_specific
-    return true unless self.is_section_specific
+    return true unless self.is_section_specific && !self.is_announcement
 
-    if self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_announcements)
-      self.errors.add(:is_section_specific, t("Section-specific announcements are disabled"))
-    elsif !self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_discussions)
-      self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
-    else
-      true
+    if !self.context.root_account.feature_enabled?(:section_specific_discussions)
+      return self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
     end
+    return true
   end
 
   def only_course_topics_can_be_section_specific

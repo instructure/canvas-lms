@@ -209,7 +209,6 @@ describe "Announcements API", type: :request do
   describe "section specific announcements" do
     before(:once) do
       course_with_teacher(active_course: true)
-      @course.account.set_feature_flag! :section_specific_announcements, 'on'
       @section = @course.course_sections.create!(name: 'test section')
 
       @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')

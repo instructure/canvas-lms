@@ -236,7 +236,6 @@ describe DiscussionTopicsController do
     end
 
     it "should return unauthorized if a user does not have visibilities" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -250,7 +249,6 @@ describe DiscussionTopicsController do
     end
 
     it "js_env TOTAL_USER_COUNT and IS_ANNOUNCEMENT are set correctly for section specific announcements" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -261,7 +259,6 @@ describe DiscussionTopicsController do
     end
 
     it "js_env COURSE_SECTIONS is set correctly for section specific announcements" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
@@ -271,7 +268,6 @@ describe DiscussionTopicsController do
     end
 
     it "js_env COURSE_SECTIONS should have correct count" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
 
@@ -304,7 +300,6 @@ describe DiscussionTopicsController do
     context 'section specific announcements' do
       before(:once) do
         course_with_teacher(active_course: true)
-        @course.account.set_feature_flag! :section_specific_announcements, 'on'
         @section = @course.course_sections.create!(name: 'test section')
 
         @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
@@ -775,7 +770,6 @@ describe DiscussionTopicsController do
     end
 
     it "js_env SECTION_LIST is set correctly for section specific announcements on a limited privileges user" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -790,7 +784,6 @@ describe DiscussionTopicsController do
     end
 
     it "js_env SECTION_LIST is set correctly for section specific announcements on a not limited privileges user" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -805,7 +798,6 @@ describe DiscussionTopicsController do
     end
 
     it "returns unauthorized for a user that does not have visibilites to view thiss" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -818,7 +810,6 @@ describe DiscussionTopicsController do
     end
 
     it "js_env SELECTED_SECTION_LIST is set correctly for section specific announcements" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = course.course_sections.create!(name: "Section 1")
       section2 = course.course_sections.create!(name: "Section 2")
@@ -1080,7 +1071,6 @@ describe DiscussionTopicsController do
 
     describe 'section specific discussions' do
       before(:each) do
-        @course.root_account.enable_feature!(:section_specific_announcements)
         @course.root_account.enable_feature!(:section_specific_discussions)
         user_session(@teacher)
         @section1 = @course.course_sections.create!(name: "Section 1")
@@ -1099,16 +1089,6 @@ describe DiscussionTopicsController do
         expect(response).to have_http_status :success
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
-      end
-
-      it 'does not create an announcement with sections if the feature is disabled' do
-        @course.root_account.disable_feature!(:section_specific_announcements)
-        post 'create',
-          params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
-          :format => :json
-        expect(response).to have_http_status 400
-        expect(DiscussionTopic.count).to eq 0
-        expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
 
       it 'creates a discussion with sections' do
@@ -1295,7 +1275,6 @@ describe DiscussionTopicsController do
     end
 
     it 'does not allow setting specific sections for group discussions' do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @course.root_account.enable_feature!(:section_specific_discussions)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
@@ -1320,7 +1299,6 @@ describe DiscussionTopicsController do
     end
 
     it "does not allow updating a section specific announcement you do not have visibilities for" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -1423,18 +1401,7 @@ describe DiscussionTopicsController do
       expect(attachment.reload).to be_deleted
     end
 
-    it "can edit topics with section specific flag on" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
-      @announcement = Announcement.create!(context: @course, title: 'Test Announcement',
-        message: 'Foo', delayed_post_at: '2013-01-01T00:00:00UTC',
-        lock_at: '2013-01-02T00:00:00UTC')
-      put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
-        is_announcement: true, specific_sections: "all"})
-      expect(response).to be_success
-    end
-
     it "editing section-specific topic to not-specific should clear out visibilities" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @announcement = Announcement.create!(context: @course, title: 'Test Announcement',
         message: 'Foo', delayed_post_at: '2013-01-01T00:00:00UTC',
         lock_at: '2013-01-02T00:00:00UTC')
@@ -1452,7 +1419,6 @@ describe DiscussionTopicsController do
     end
 
     it 'does not remove specific sections if key is missing in PUT json' do
-      @course.root_account.enable_feature!(:section_specific_announcements)
       @announcement = Announcement.create!(context: @course, title: 'Test Announcement',
         message: 'Foo', delayed_post_at: '2013-01-01T00:00:00UTC',
         lock_at: '2013-01-02T00:00:00UTC')

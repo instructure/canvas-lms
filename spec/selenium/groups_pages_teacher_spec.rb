@@ -19,7 +19,7 @@ require_relative 'common'
 require_relative 'announcements/announcement_index_page'
 require_relative 'announcements/announcement_new_edit_page'
 require_relative 'helpers/groups_common'
-require_relative 'helpers/announcements_common'
+require_relative 'helpers/legacy_announcements_common'
 require_relative 'helpers/discussions_common'
 require_relative 'helpers/wiki_and_tiny_common'
 require_relative 'helpers/files_common'
@@ -57,67 +57,8 @@ describe "groups" do
       it_behaves_like 'home_page', :teacher
     end
 
-    #-------------------------------------------------------------------------------------------------------------------
-    describe "announcements page" do
-      it_behaves_like 'announcements_page', :teacher
-
-      before :once do
-        @course.root_account.disable_feature!(:section_specific_announcements)
-      end
-
-      it "should allow teachers to see announcements", priority: "1", test_id: 287049 do
-        @announcement = @testgroup.first.announcements.create!(
-          title: 'Group Announcement',
-          message: 'Group',
-          user: @students.first
-        )
-        verify_member_sees_announcement
-      end
-
-      it "should allow teachers to create an announcement", priority: "1", test_id: 287050 do
-
-        # Checks that initial user can create an announcement
-        create_group_announcement_manually("Announcement by #{@teacher.name}",'sup')
-        expect(ff('.discussion-topic').size).to eq 1
-      end
-
-      it "should allow teachers to delete their own group announcements", priority: "1", test_id: 326522 do
-        skip_if_safari(:alert)
-        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @teacher)
-
-        get announcements_page
-        expect(ff('.discussion-topic').size).to eq 1
-        delete_via_gear_menu
-        expect(f("#content")).not_to contain_css('.discussion-topic')
-      end
-
-      it "should allow teachers to delete group member announcements", priority: "1", test_id: 326523 do
-        skip_if_safari(:alert)
-        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @students.first)
-
-        get announcements_page
-        expect(ff('.discussion-topic').size).to eq 1
-        delete_via_gear_menu
-        expect(f("#content")).not_to contain_css('.discussion-topic')
-      end
-
-      it "should let teachers edit their own announcements", priority: "1", test_id: 312865 do
-        @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'test message', user: @teacher)
-        edit_group_announcement
-      end
-
-      it "should let teachers edit group member announcements", priority: "2", test_id: 323325 do
-        @testgroup.first.announcements.create!(title: 'Your Announcement', message: 'test message', user: @students.first)
-        edit_group_announcement
-      end
-    end
-
     describe "announcements page v2" do
       it_behaves_like 'announcements_page_v2', :teacher
-
-      before :once do
-        @course.root_account.enable_feature!(:section_specific_announcements)
-      end
 
       it "should allow teachers to see announcements" do
         @announcement = @testgroup.first.announcements.create!(

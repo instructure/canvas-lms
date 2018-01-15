@@ -30,14 +30,14 @@ module AnnouncementsCommon
 
   def create_announcement_manual(title,text)
     get "/courses/#{@course.id}/announcements/"
-    expect_new_page_load { f('#add_announcement').click }
+    expect_new_page_load { f('.btn-primary').click }
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', text)
     expect_new_page_load { submit_form('.form-actions') }
   end
 
   def create_announcement_option(css_checkbox)
-    expect_new_page_load { f('#add_announcement').click }
+    expect_new_page_load { f('.btn-primary').click }
     replace_content(f('input[name=title]'), "First Announcement")
 
     type_in_tiny('textarea[name=message]', 'Hi, this is my first announcement')
@@ -57,15 +57,15 @@ module AnnouncementsCommon
     what_to_create.last.update_attributes(attribute => update_value)
     refresh_page # in order to get the new topic information
     replace_content(f('#searchTerm'), search_term)
-    expect(ff('.ic-announcement-row').count).to eq expected_results
+    expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq expected_results
   end
 
   def refresh_and_filter(filter_type, filter, expected_text, expected_results = 1)
     refresh_page # in order to get the new topic information
     expect(ff('.toggleSelected')).to have_size(what_to_create.count)
     filter_type == :css ? fj(filter).click : replace_content(f('#searchTerm'), filter)
-    expect(ff('.ic-announcement-row').count).to eq expected_results
-    expected_results > 1 ? ff('.ic-announcement-row').each { |topic| expect(topic).to include_text(expected_text) } : (expect(f('.discussionTopicIndexList .discussion-topic')).to include_text(expected_text))
+    expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq expected_results
+    expected_results > 1 ? ff('.discussionTopicIndexList .discussion-topic').each { |topic| expect(topic).to include_text(expected_text) } : (expect(f('.discussionTopicIndexList .discussion-topic')).to include_text(expected_text))
   end
 
   def add_attachment_and_validate
@@ -90,9 +90,9 @@ module AnnouncementsCommon
   def verify_member_sees_announcement(count = 1)
     index = count-1
     get announcements_page
-    expect(ff('.ic-announcement-row').size).to eq count
+    expect(ff('.discussion-topic').size).to eq count
     # Checks that new page is loaded when the indexed announcement is clicked to verify it actually loads the topic
-    expect_new_page_load { ff('.ic-announcement-row')[index].click }
+    expect_new_page_load { ff('.discussion-topic')[index].click }
     # Checks that the announcement is there by verifying the title is present and correct
     expect(f('.discussion-title')).to include_text("#{@announcement.title}")
   end

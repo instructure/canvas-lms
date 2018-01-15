@@ -49,13 +49,8 @@ class AnnouncementsController < ApplicationController
         js_env(COURSE_ID: @context.id.to_s) if @context.is_a?(Course)
         js_env ANNOUNCEMENTS_LOCKED: announcements_locked?
 
-        if @context.account.feature_enabled?(:section_specific_announcements)
-          js_bundle :announcements_index_v2
-          css_bundle :announcements_index
-        else
-          js_bundle :announcements_index
-          css_bundle :discussions_list
-        end
+        js_bundle :announcements_index_v2
+        css_bundle :announcements_index
 
         set_tutorial_js_env
       end

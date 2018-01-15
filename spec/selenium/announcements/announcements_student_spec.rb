@@ -36,7 +36,7 @@ describe "announcements" do
     create_session(teacher.primary_pseudonym)
 
     get "/courses/#{@course.id}/announcements"
-    expect_new_page_load { f('.btn-primary').click }
+    expect_new_page_load { f('#add_announcement').click }
     wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
     replace_content(f('input[name=title]'), topic_title)
     type_in_tiny('textarea[name=message]', 'hi, first announcement')
@@ -79,11 +79,11 @@ describe "announcements" do
       announcement = @course.announcements.create!(:title => announcement_title, :message => 'Announcement time!', :delayed_post_at => Time.now + 1.day)
       get "/courses/#{@course.id}/announcements"
 
-      expect(f('#content')).to include_text('There are no announcements to show')
+      expect(f("#content")).not_to contain_css(".ic-announcement-row")
       announcement.update_attributes(:delayed_post_at => nil)
       announcement.reload
       refresh_page # in order to see the announcement
-      expect(f(".discussion-topic")).to include_text(announcement_title)
+      expect(f(".ic-announcement-row h3")).to include_text(announcement_title)
     end
 
     it "should not allow a student to close/open announcement for comments or delete an announcement", priority: "1", test_id: 220377 do
@@ -96,25 +96,13 @@ describe "announcements" do
       expect(f("#content")).not_to contain_css('.discussion_actions ul.al-options')
     end
 
-    it "should allow a group member to create an announcement", priority: "1", test_id: 220378 do
-      gc = group_category
-      group = gc.groups.create!(:context => @course)
-      group.add_user(@student, 'accepted')
-
-      get "/groups/#{group.id}/announcements"
-      expect {
-        create_announcement_option(nil)
-        expect_new_page_load { submit_form('.form-actions') }
-      }.to change(Announcement, :count).by 1
-    end
-
     it "should have deleted announcement removed from student account", priority: "1", test_id: 220379 do
       @announcement = @course.announcements.create!(:title => 'delete me', :message => 'Here is my message')
       get "/courses/#{@course.id}/announcements/"
-      expect(f(".discussion-title")).to include_text('delete me')
+      expect(f(".ic-announcement-row h3")).to include_text('delete me')
       @announcement.destroy
       get "/courses/#{@course.id}/announcements/"
-      expect(f("#content")).not_to contain_css(".discussion-title")
+      expect(f("#content")).not_to contain_css(".ic-announcement-row h3")
     end
 
     it "should remove notifications from unenrolled courses", priority: "1", test_id: 220380 do
@@ -167,7 +155,6 @@ describe "announcements" do
     context "section specific announcements" do
       before (:once) do
         course_with_teacher(active_course: true)
-        @course.account.set_feature_flag! :section_specific_announcements, 'on'
         @section = @course.course_sections.create!(name: 'test section')
 
         @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
