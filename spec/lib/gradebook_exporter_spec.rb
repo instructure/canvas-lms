@@ -45,10 +45,9 @@ describe GradebookExporter do
 
       it "has headers in a default order" do
         expected_headers = [
-          "\xEF\xBB\xBFStudent", "ID", "SIS Login ID", "Section",
-          "Current Points", "Final Points",
-          "Current Score", "Final Score",
-          "Current Grade", "Final Grade"
+          "\xEF\xBB\xBFStudent", "ID", "SIS Login ID", "Section", "Current Points", "Final Points",
+          "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score",
+          "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"
         ]
         actual_headers = CSV.parse(subject, headers: true).headers
 
@@ -249,6 +248,68 @@ describe GradebookExporter do
       rows = CSV.parse(csv, headers: true)
 
       expect(rows[1][0]).to eql('="=sum(A)"')
+    end
+  end
+
+  context "when a course has unposted assignments" do
+    let(:posted_assignment) { @course.assignments.create!(title: "Posted", points_possible: 10) }
+    let(:unposted_assignment) { @course.assignments.create!(title: "Unposted", points_possible: 10, muted: true) }
+
+    before(:each) do
+      @course.assignments.create!(title: "Ungraded", points_possible: 10)
+
+      student_in_course active_all: true
+
+      posted_assignment.grade_student @student, grade: 9, grader: @teacher
+      unposted_assignment.grade_student @student, grade: 3, grader: @teacher
+    end
+
+    it "calculates assignment group scores correctly" do
+      csv = GradebookExporter.new(@course, @teacher, {}).to_csv
+      rows = CSV.parse(csv, headers: true)
+
+      expect(rows[2]["Assignments Current Score"].try(:to_f)).to eq 90
+      expect(rows[2]["Assignments Unposted Current Score"].try(:to_f)).to eq 60
+      expect(rows[2]["Assignments Final Score"].try(:to_f)).to eq 30
+      expect(rows[2]["Assignments Unposted Final Score"].try(:to_f)).to eq 40
+    end
+
+    it "calculates totals correctly" do
+      csv = GradebookExporter.new(@course, @teacher, {}).to_csv
+      rows = CSV.parse(csv, headers: true)
+
+      expect(rows[2]["Current Score"].try(:to_f)).to eq 90
+      expect(rows[2]["Unposted Current Score"].try(:to_f)).to eq 60
+      expect(rows[2]["Final Score"].try(:to_f)).to eq 30
+      expect(rows[2]["Unposted Final Score"].try(:to_f)).to eq 40
+    end
+  end
+
+  describe "#show_overall_totals" do
+    before(:each) do
+      course_with_teacher
+      student_in_course(course: @course, active_all: true)
+    end
+
+    context "when a grading period is supplied" do
+      it "fetches scores from the Enrollment object using the grading period ID" do
+        @group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+        grading_period = @group.grading_periods.create!(
+          start_date: 1.week.ago, end_date: 1.week.from_now, title: "test period"
+        )
+
+        expect_any_instance_of(StudentEnrollment).to receive(:computed_current_score)
+          .with({ grading_period_id: grading_period.id })
+
+        GradebookExporter.new(@course, @teacher, { grading_period_id: grading_period.id }).to_csv
+      end
+    end
+
+    context "when no grading period is supplied" do
+      it "fetches scores from the Enrollment object using the default Course parameters" do
+        expect_any_instance_of(StudentEnrollment).to receive(:computed_current_score).with(Score.params_for_course)
+        GradebookExporter.new(@course, @teacher, {}).to_csv
+      end
     end
   end
 end

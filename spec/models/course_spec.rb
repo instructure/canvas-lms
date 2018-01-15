@@ -1350,14 +1350,16 @@ describe Course, "gradebook_to_csv" do
 
     csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
-    rows = CSV.parse(csv)
-    expect(rows.length).to equal(3)
-    expect(rows[0][-1]).to eq "Final Score"
-    expect(rows[1][-1]).to eq "(read only)"
-    expect(rows[2][-1]).to eq "50.0"
-    expect(rows[0][-2]).to eq "Current Score"
-    expect(rows[1][-2]).to eq "(read only)"
-    expect(rows[2][-2]).to eq "100.0"
+    rows = CSV.parse(csv, headers: true)
+    expect(rows.length).to equal(2)
+    expect(rows[0]["Unposted Final Score"]).to eq "(read only)"
+    expect(rows[1]["Unposted Final Score"]).to eq "50.0"
+    expect(rows[0]["Final Score"]).to eq "(read only)"
+    expect(rows[1]["Final Score"]).to eq "50.0"
+    expect(rows[0]["Unposted Current Score"]).to eq "(read only)"
+    expect(rows[1]["Unposted Current Score"]).to eq "100.0"
+    expect(rows[0]["Current Score"]).to eq "(read only)"
+    expect(rows[1]["Current Score"]).to eq "100.0"
   end
 
   it "should order assignments and groups by position" do
@@ -1389,27 +1391,33 @@ describe Course, "gradebook_to_csv" do
 
     csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
-    rows = CSV.parse(csv)
-    expect(rows.length).to equal(3)
+    rows = CSV.parse(csv, headers: true)
+    expect(rows.length).to equal(2)
     assignments, groups = [], []
-    rows[0].each do |column|
+    rows.headers.each do |column|
       assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
       groups << column if column =~ /Some Assignment Group/
     end
     expect(assignments).to eq ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05",  "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
-    expect(groups).to eq ["Some Assignment Group 1 Current Points",
-                      "Some Assignment Group 1 Final Points",
-                      "Some Assignment Group 1 Current Score",
-                      "Some Assignment Group 1 Final Score",
-                      "Some Assignment Group 2 Current Points",
-                      "Some Assignment Group 2 Final Points",
-                      "Some Assignment Group 2 Current Score",
-                      "Some Assignment Group 2 Final Score"]
+    expect(groups).to eq [
+      "Some Assignment Group 1 Current Points",
+      "Some Assignment Group 1 Final Points",
+      "Some Assignment Group 1 Current Score",
+      "Some Assignment Group 1 Unposted Current Score",
+      "Some Assignment Group 1 Final Score",
+      "Some Assignment Group 1 Unposted Final Score",
+      "Some Assignment Group 2 Current Points",
+      "Some Assignment Group 2 Final Points",
+      "Some Assignment Group 2 Current Score",
+      "Some Assignment Group 2 Unposted Current Score",
+      "Some Assignment Group 2 Final Score",
+      "Some Assignment Group 2 Unposted Final Score"
+    ]
 
-    expect(rows[2][-10]).to eq "100.0"    # ag1 current score
-    expect(rows[2][-9]).to  eq "50.0"     # ag1 final score
-    expect(rows[2][-6]).to  eq "50.0"     # ag2 current score
-    expect(rows[2][-5]).to  eq "25.0"     # ag2 final score
+    expect(rows[1]["Some Assignment Group 1 Current Score"]).to eq "100.0"
+    expect(rows[1]["Some Assignment Group 1 Final Score"]).to eq "50.0"
+    expect(rows[1]["Some Assignment Group 2 Current Score"]).to eq "50.0"
+    expect(rows[1]["Some Assignment Group 2 Final Score"]).to eq "25.0"
   end
 
   it "handles nil assignment due_dates if the group and position are the same" do
@@ -1517,20 +1525,24 @@ describe Course, "gradebook_to_csv" do
 
     csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
-    rows = CSV.parse(csv)
-    expect(rows.length).to equal(3)
-    expect(rows[0][-1]).to eq "Final Grade"
-    expect(rows[1][-1]).to eq "(read only)"
-    expect(rows[2][-1]).to eq "A-"
-    expect(rows[0][-2]).to eq "Current Grade"
-    expect(rows[1][-2]).to eq "(read only)"
-    expect(rows[2][-2]).to eq "A-"
-    expect(rows[0][-3]).to eq "Final Score"
-    expect(rows[1][-3]).to eq "(read only)"
-    expect(rows[2][-3]).to eq "90.0"
-    expect(rows[0][-4]).to eq "Current Score"
-    expect(rows[1][-4]).to eq "(read only)"
-    expect(rows[2][-4]).to eq "90.0"
+    rows = CSV.parse(csv, headers: true)
+    expect(rows.length).to equal(2)
+    expect(rows[0]["Unposted Final Grade"]).to eq "(read only)"
+    expect(rows[1]["Unposted Final Grade"]).to eq "A-"
+    expect(rows[0]["Final Grade"]).to eq "(read only)"
+    expect(rows[1]["Final Grade"]).to eq "A-"
+    expect(rows[0]["Unposted Current Grade"]).to eq "(read only)"
+    expect(rows[1]["Unposted Current Grade"]).to eq "A-"
+    expect(rows[0]["Current Grade"]).to eq "(read only)"
+    expect(rows[1]["Current Grade"]).to eq "A-"
+    expect(rows[0]["Unposted Final Score"]).to eq "(read only)"
+    expect(rows[1]["Unposted Final Score"]).to eq "90.0"
+    expect(rows[0]["Final Score"]).to eq "(read only)"
+    expect(rows[1]["Final Score"]).to eq "90.0"
+    expect(rows[0]["Unposted Current Score"]).to eq "(read only)"
+    expect(rows[1]["Unposted Current Score"]).to eq "90.0"
+    expect(rows[0]["Current Score"]).to eq "(read only)"
+    expect(rows[1]["Current Score"]).to eq "90.0"
   end
 
   it "should include sis ids if enabled" do
@@ -1646,19 +1658,15 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "includes points for unweighted courses" do
-      csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
-      expect(csv[0][-8]).to eq "Assignments Current Points"
-      expect(csv[0][-7]).to eq "Assignments Final Points"
-      expect(csv[1][-8]).to eq "(read only)"
-      expect(csv[1][-7]).to eq "(read only)"
-      expect(csv[2][-8]).to eq "8.0"
-      expect(csv[2][-7]).to eq "8.0"
-      expect(csv[0][-4]).to eq "Current Points"
-      expect(csv[0][-3]).to eq "Final Points"
-      expect(csv[1][-4]).to eq "(read only)"
-      expect(csv[1][-3]).to eq "(read only)"
-      expect(csv[2][-4]).to eq "8.0"
-      expect(csv[2][-3]).to eq "8.0"
+      csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv, headers: true)
+      expect(csv[0]["Assignments Current Points"]).to eq "(read only)"
+      expect(csv[1]["Assignments Current Points"]).to eq "8.0"
+      expect(csv[0]["Assignments Final Points"]).to eq "(read only)"
+      expect(csv[1]["Assignments Final Points"]).to eq "8.0"
+      expect(csv[0]["Current Points"]).to eq "(read only)"
+      expect(csv[1]["Current Points"]).to eq "8.0"
+      expect(csv[0]["Final Points"]).to eq "(read only)"
+      expect(csv[1]["Final Points"]).to eq "8.0"
     end
 
     it "doesn't include points for weighted courses" do
