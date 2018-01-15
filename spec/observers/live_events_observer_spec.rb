@@ -27,6 +27,16 @@ describe LiveEventsObserver do
       expect(Canvas::LiveEvents).to receive(:user_updated).never
       @user.save!
     end
+    it "doesn't post events for NOP fields" do
+      account_model
+      course_model(name: "CS101", account: @account)
+      sis = @account.sis_batches.create
+
+      @course.name = "CS101"
+      @course.sis_batch_id = sis.id
+      expect(Canvas::LiveEvents).to receive(:course_updated).never
+      @course.save!
+    end
     it "does post event for actual change" do
       user_model(name: "Joey Joe Joe")
 
