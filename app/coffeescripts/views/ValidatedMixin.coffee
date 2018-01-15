@@ -58,9 +58,13 @@ define [
     findSiblingTinymce: ($el)->
       $el.siblings('.mce-tinymce').find(".mce-edit-area")
 
-    findField: (field) ->
+    findField: (field, useGlobalSelector=false) ->
       selector = @fieldSelectors?[field] or "[name='#{field}']"
-      $el = @$(selector)
+      if useGlobalSelector
+        $el = $(selector)
+      else
+        $el = @$(selector)
+
       if $el.data('rich_text')
         $el = @findSiblingTinymce($el)
       $el
@@ -87,11 +91,15 @@ define [
     #       }
     #     ]
     #   }
-    showErrors: (errors) ->
+    #
+    # If globalSelector is true, it will look for this element everywhere
+    # in the DOM instead of only `this` children elements. This is particularly
+    # useful for some modals
+    showErrors: (errors, useGlobalSelector=false) ->
       for fieldName, field of errors
-        $input = field.element || @findField fieldName
+        $input = field.element || @findField(fieldName, useGlobalSelector)
         html = field.message || (htmlEscape(@translations?[message] or message) for {message} in field).join('</p><p>')
-        $input.errorBox($.raw("#{html}"))?.css("z-index", "20")?.attr('role', 'alert')
+        $input.errorBox($.raw("#{html}"))?.css("z-index", "1020")?.attr('role', 'alert')
         @attachErrorDescription($input, html)
         field.$input = $input
         field.$errorBox = $input.data 'associated_error_box'
