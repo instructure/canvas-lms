@@ -1967,6 +1967,22 @@ describe DiscussionTopic do
       expect(errors).to eq ["Section-specific discussions are disabled"]
     end
 
+    it "group topics cannot be section specific" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      group_category = @course.group_categories.create(:name => "new category")
+      @group = @course.groups.create(:name => "group", :group_category => group_category)
+      student_in_course(active_all: true)
+      @group.add_user(@student)
+      announcement = basic_announcement_model(course: @group)
+      announcement.is_section_specific = true
+      add_section_to_topic(announcement, @section)
+      expect(announcement.valid?).to eq false
+      errors = announcement.errors[:is_section_specific]
+      # note that the feature flag validation will also fail here, but we still want this
+      # validation to trigger too.
+      expect(errors.include?("Only course announcements can be section-specific")).to eq true
+    end
+
     it "only announcements can be section-specific" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       topic = DiscussionTopic.create!(:title => "some title", :context => @course,

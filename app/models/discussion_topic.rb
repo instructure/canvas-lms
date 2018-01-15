@@ -80,6 +80,7 @@ class DiscussionTopic < ActiveRecord::Base
   validate :section_specific_topics_must_have_sections
   validate :only_announcements_can_be_section_specific
   validate :feature_must_be_enabled_for_section_specific
+  validate :only_course_topics_can_be_section_specific
 
   sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
@@ -110,6 +111,14 @@ class DiscussionTopic < ActiveRecord::Base
   def only_announcements_can_be_section_specific
     if self.is_section_specific && !self.is_announcement
       self.errors.add(:is_section_specific, t("Only announcements can be section-specific"))
+    else
+      true
+    end
+  end
+
+  def only_course_topics_can_be_section_specific
+    if self.is_section_specific && !(self.context.is_a? Course)
+      self.errors.add(:is_section_specific, t("Only course announcements can be section-specific"))
     else
       true
     end
