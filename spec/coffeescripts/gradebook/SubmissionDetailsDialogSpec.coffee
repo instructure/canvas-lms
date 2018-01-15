@@ -65,6 +65,23 @@ define [
 
     ok dialog.dialog.find('.submission-details').text().match('LATE')
 
+  test 'renders radio buttons if individually graded group assignment', ->
+    @assignment.group_category_id = '42'
+    @assignment.grade_group_students_individually = true
+    dialog = new SubmissionDetailsDialog(@assignment, @user, @options)
+    dialog.open()
+    equal dialog.dialog.find('input[type="radio"][name="comment[group_comment]"]').length, 2
+
+  test 'renders hidden checkbox if group graded group assignment', ->
+    @assignment.group_category_id = '42'
+    @assignment.grade_group_students_individually = false
+    dialog = new SubmissionDetailsDialog(@assignment, @user, @options)
+    dialog.open()
+    equal dialog.dialog.find('input[type="radio"][name="comment[group_comment]"]').length, 0
+    $chk = dialog.dialog.find('input[type="checkbox"][name="comment[group_comment]"]')
+    equal $chk.length, 1
+    equal $chk.attr('checked'), 'checked'
+
   QUnit.module '_submission_detail',
     setup: ->
       defaults =

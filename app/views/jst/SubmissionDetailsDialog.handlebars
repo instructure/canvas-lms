@@ -76,8 +76,23 @@
     <textarea id="add_a_comment" name="comment[text_comment]"></textarea>
     {{#if assignment.group_category_id}}
     <span id="group-comment-container">
-      {{checkbox "comment.group_comment" id="group_comment"}}
-      <label for="group_comment">{{#t "labels.group_comment"}}Send Comment to the Whole Group{{/t}}</label>
+      {{#if assignment.grade_group_students_individually}}
+        <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+          <div class="ic-Form-control" "ic-Form-control--radio">
+            <div class="ic-Radio">
+              <input type="radio" name="comment[group_comment]" id="not_group_comment" value="0" checked>
+              <label for="not_group_comment" class="ic-Label">{{#t}}Send comment to this student only{{/t}}</label>
+            </div>
+            <div class="ic-Radio">
+              <input type="radio" name="comment[group_comment]" id="group_comment" value="1">
+              <label for="group_comment" class="ic-Label">{{#t "labels.group_comment"}}Send comment to the whole group{{/t}}</label>
+            </div>
+          </div>
+        </fieldset>
+      {{else}}
+        <input type="checkbox" style="display:none" name="comment[group_comment]" value="1" checked />
+        {{#t}}All comments are sent to the whole group{{/t}}
+      {{/if}}
     </span>
     {{/if}}
     <button class="btn" type="submit">{{#t "post_comment"}}Post Comment{{/t}}</button>
