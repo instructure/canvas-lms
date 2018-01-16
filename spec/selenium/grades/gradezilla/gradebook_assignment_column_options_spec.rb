@@ -90,6 +90,14 @@ describe "Gradezilla - Assignment Column Options" do
       expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq '10'
     end
 
+    it "can switch from letter grade to percentage and edit grade", priority: "1", test_id: 3434871 do
+      # Change grade type to percentage and re-grade
+      Gradezilla.click_assignment_popover_enter_grade_as(@assignment.id, 'Percentage')
+      Gradezilla::Cells.edit_grade(@course.students[1], @assignment, 8)
+
+      expect { Gradezilla::Cells.get_grade(@course.students[1], @assignment) }.to become '80%'
+    end
+
     it "active grading scheme displays a check", priority: "2", test_id: 3415924 do
       # Initial grade is letter grade
       Gradezilla.click_assignment_header_menu(@assignment.id)
