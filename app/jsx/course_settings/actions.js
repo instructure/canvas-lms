@@ -20,7 +20,8 @@ import axios from 'axios'
 import $ from 'jquery'
 import I18n from 'i18n!actions'
 import Helpers from './helpers'
-import rawUploadFile from '../shared/upload_file'
+import { uploadFile as rawUploadFile } from '../shared/upload_file'
+import 'compiled/jquery.rails_flash_notifications' /* $.flashWarning */
 
   const Actions = {
 
@@ -187,8 +188,8 @@ import rawUploadFile from '../shared/upload_file'
             no_redirect: true
           };
           rawUploadFile(url, data, file, ajaxLib)
-            .then((successResp) => {
-              dispatch(this.prepareSetImage(successResp.data.url, successResp.data.id, courseId, ajaxLib));
+            .then((attachment) => {
+              dispatch(this.prepareSetImage(attachment.url, attachment.id, courseId, ajaxLib));
             }).catch((_response) => {
               dispatch(this.errorUploadingImage());
             });

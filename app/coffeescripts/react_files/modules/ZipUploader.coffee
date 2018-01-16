@@ -48,19 +48,8 @@ define [
       @contentMigrationId = data.id
       @_actualUpload()
 
-    onUploadPosted: (uploadResults) =>
-      if (uploadResults.target && uploadResults.target.status >= 400)
-        @deferred.reject()
-        return
-
-      if @uploadData.upload_params.success_url
-        # s3 upload, need to ping success_url to finalize before polling the
-        # content migration
-        $.getJSON(@uploadData.upload_params.success_url).then(@getContentMigration)
-      else if uploadResponse.target.status == 201
-        # local-storage or inst-fs upload. we don't need to attachment
-        # information, we can just start polling the content migration
-        @getContentMigration()
+    onUploadPosted: =>
+      @getContentMigration()
 
     # get the content migration when ready and use progress api to pull migration progress
     getContentMigration: =>
