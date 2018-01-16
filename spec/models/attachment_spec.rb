@@ -113,6 +113,12 @@ describe Attachment do
       expect(a.authenticated_url(expires_in: 1.day)).to match(/^https:\/\//)
       a.destroy_permanently!
     end
+
+    it "should not send the user, if any, to s3 lib" do
+      u = user_model
+      a = attachment_model
+      expect(-> { a.authenticated_url(user: u, expires_in: 1.day) }).not_to raise_exception
+    end
   end
 
   def configure_crocodoc

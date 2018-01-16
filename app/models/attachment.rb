@@ -772,6 +772,7 @@ class Attachment < ActiveRecord::Base
       InstFS.authenticated_url(self, options)
     else
       # attachment_fu doesn't like the extra option when building s3 urls
+      options.delete(:user)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
