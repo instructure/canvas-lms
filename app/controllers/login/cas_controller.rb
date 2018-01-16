@@ -57,8 +57,10 @@ class Login::CasController < ApplicationController
       reset_session_for_login
 
       sso_user = st.user
+      was_nlu_sso = false
       if !st.extra_attributes["EmployeeNumber"].nil? && cas_login_url.ends_with?('cas/6')
         sso_user = "#{st.extra_attributes["EmployeeNumber"]}@nlu.edu"
+        was_nlu_sso = true
       end
 
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(sso_user, aac)
@@ -73,6 +75,26 @@ class Login::CasController < ApplicationController
 
         successful_login(pseudonym.user, pseudonym)
       else
+        # we don't have a user, but if it was a Braven login for an NLU student, 
+        # we might be able to correct the problem by sending them right to the nlu
+        # login
+        if !was_nlu_sso
+          possibilities = CommunicationChannel.active.where(:path_type => "email", :path => sso_user)
+          if possibilities.any?
+            maybe = Pseudonym.active.where(:user_id => possibilities.first.user_id).where("unique_id LIKE '%@nlu.edu'")
+            if maybe.any?
+              # looks like an NLU user using Braven SSO. Let's send them back to the NLU login
+              # before considering it an error - hopefully they can just log in with that and
+              # not have to bother us
+
+              logger.warn "Received CAS login for unknown user: #{sso_user}, think it is #{possibilities.first.user_id} redirecting to: NLU SSO."
+
+              redirect_to '/nlu'
+              return
+            end
+          end
+        end
+
         unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
         logger.warn "Received CAS login for unknown user: #{sso_user}, redirecting to: #{unknown_user_url}."
         flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => sso_user
