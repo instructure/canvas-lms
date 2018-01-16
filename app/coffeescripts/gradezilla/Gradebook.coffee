@@ -2019,6 +2019,7 @@ define [
       @saveColumnOrder()
       @updateGrid()
       @updateColumnHeaders()
+      @gradebookGrid.gridSupport.columns.scrollToStart()
 
     moveTotalGradeColumnToEnd: =>
       @totalColumnPositionChanged = true
@@ -2035,6 +2036,7 @@ define [
 
       @updateGrid()
       @updateColumnHeaders()
+      @gradebookGrid.gridSupport.columns.scrollToEnd()
 
     totalColumnShouldFocus: ->
       if @totalColumnPositionChanged

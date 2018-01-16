@@ -183,6 +183,55 @@ QUnit.module('GridSupport Columns', (suiteHooks) => {
     });
   });
 
+  QUnit.module('#scrollToStart', () => {
+    test('calls scrollCellIntoView', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      gridSupport.columns.scrollToStart()
+      strictEqual(scrollCellIntoViewSpy.callCount, 1)
+    });
+
+    test('scrolls to the first column', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      gridSupport.columns.scrollToStart()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[1], 0)
+    });
+
+    test('scrolls with the same visible row', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      const { top } = gridSupport.grid.getViewport()
+      gridSupport.columns.scrollToStart()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[0], top)
+    });
+  });
+
+  QUnit.module('#scrollToEnd', () => {
+    test('calls scrollCellIntoView', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      gridSupport.columns.scrollToEnd()
+      strictEqual(scrollCellIntoViewSpy.callCount, 1)
+    });
+
+    test('scrolls to the last column', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      const lastColumn = gridSupport.grid.getColumns().length - 1
+      gridSupport.columns.scrollToEnd()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[1], lastColumn)
+    });
+
+    test('scrolls with the same visible row', () => {
+      createAndInitialize();
+      const scrollCellIntoViewSpy = sinon.spy(gridSupport.grid, 'scrollCellIntoView')
+      const { top } = gridSupport.grid.getViewport()
+      gridSupport.columns.scrollToEnd()
+      strictEqual(scrollCellIntoViewSpy.firstCall.args[0], top)
+    });
+  });
+
   QUnit.module('onHeaderCellRendered', (hooks) => {
     const updateCounts = {};
     let columnHeaderRenderer;

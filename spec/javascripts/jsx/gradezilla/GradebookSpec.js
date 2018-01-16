@@ -2007,6 +2007,12 @@ QUnit.module('Gradebook Column Order', (suiteHooks) => {
       gradebook.freezeTotalGradeColumn();
       strictEqual(gradebook.updateColumnHeaders.callCount, 1);
     });
+
+    test('calls scrollToStart', () => {
+      const scrollToStartStub = sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'scrollToStart')
+      gradebook.freezeTotalGradeColumn()
+      strictEqual(scrollToStartStub.callCount, 1)
+    })
   });
 
   QUnit.module('#moveTotalGradeColumnToEnd', (hooks) => {
@@ -2053,6 +2059,12 @@ QUnit.module('Gradebook Column Order', (suiteHooks) => {
       gradebook.moveTotalGradeColumnToEnd();
       strictEqual(gradebook.updateColumnHeaders.callCount, 1);
     });
+
+    test('calls scrollToEnd', () => {
+      const scrollToEndStub = sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'scrollToEnd')
+      gradebook.moveTotalGradeColumnToEnd()
+      strictEqual(scrollToEndStub.callCount, 1)
+    })
   });
 });
 
