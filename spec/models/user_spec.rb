@@ -139,6 +139,25 @@ describe User do
     expect(@user.associated_accounts.first).to eql(account)
   end
 
+  it "should exclude deleted enrollments from all courses list" do
+    account1 = account_model
+
+    enrollment1 = course_with_student(:account => account1)
+    enrollment2 = course_with_student(:account => account1)
+    enrollment1.user = @user
+    enrollment2.user = @user
+    enrollment1.save!
+    enrollment2.save!
+    @user.reload
+
+    expect(@user.all_courses_for_active_enrollments.length).to be(2)
+
+    expect { enrollment1.destroy! }.
+      to change {
+        @user.reload.all_courses_for_active_enrollments.size
+      }.from(2).to(1)
+  end
+
   it "should populate dashboard_messages" do
     Notification.create(:name => "Assignment Created")
     course_with_teacher(:active_all => true)

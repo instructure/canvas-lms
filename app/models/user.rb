@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
            inverse_of: :observer
   has_many :observed_users, :through => :user_observees, :source => :user
   has_many :all_courses, :source => :course, :through => :enrollments
+  has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
   has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'") }, :through => :group_memberships
   has_many :polls, class_name: 'Polling::Poll'
@@ -1133,7 +1134,7 @@ class User < ActiveRecord::Base
   end
 
   def management_contexts
-    contexts = [self] + self.courses + self.groups.active + self.all_courses
+    contexts = [self] + self.courses + self.groups.active + self.all_courses_for_active_enrollments
     contexts.uniq
   end
 
