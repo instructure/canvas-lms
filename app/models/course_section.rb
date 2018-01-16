@@ -237,9 +237,7 @@ class CourseSection < ActiveRecord::Base
     end
     self.save!
     self.all_enrollments.update_all all_attrs
-    Assignment.joins(:submissions)
-      .where(context: [old_course, self.course])
-      .where(submissions: { user_id: user_ids }).touch_all
+    Assignment.where(context: [old_course, self.course]).touch_all
     EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self)
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
