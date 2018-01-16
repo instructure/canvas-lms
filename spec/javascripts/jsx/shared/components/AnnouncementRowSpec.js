@@ -95,9 +95,7 @@ test('renders "Posted on" date label if announcement is not delayed', () => {
 test('renders the SectionsTooltip component', () => {
   const announcement = { user_count: 200 }
   const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
-  const node = tree.find('SectionsTooltip')
-  ok(node.exists())
-  equal(node.text(), 'All Sections')
+  equal(tree.find('SectionsTooltip Text').text(), 'All Sections')
 })
 
 test('renders the SectionsTooltip component with sections', () => {
@@ -106,9 +104,7 @@ test('renders the SectionsTooltip component with sections', () => {
     { "id": 5, "course_id": 1, "name": "section 2", "user_count": 1 }
   ]}
   const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
-  const node = tree.find('SectionsTooltip')
-  ok(node.exists())
-  equal(node.text(), '2 Sections')
+  equal(tree.find('SectionsTooltip Text').text(), '2 Sections')
 })
 
 test('does not render master course lock icon if masterCourseData is not provided', (assert) => {
