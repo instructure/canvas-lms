@@ -270,6 +270,8 @@ module Api::V1::User
       html_url: course_student_grades_url(enrollment.course_id, enrollment.user_id)
     }
 
+    course = enrollment.course
+
     if grade_permissions?(user, enrollment)
       period = grading_period(enrollment.course, opts)
       score_opts = period ? { grading_period_id: period.id } : Score.params_for_course
@@ -279,6 +281,13 @@ module Api::V1::User
       grades[:final_score]   = enrollment.computed_final_score(score_opts)
       grades[:final_grade]   = enrollment.computed_final_grade(score_opts)
       grades[:grading_period_id] = period&.id if opts[:current_grading_period_scores]
+
+      if course.grants_any_right?(user, :manage_grades, :view_all_grades)
+        grades[:unposted_current_score] = enrollment.unposted_current_score(score_opts)
+        grades[:unposted_current_grade] = enrollment.unposted_current_grade(score_opts)
+        grades[:unposted_final_score]   = enrollment.unposted_final_score(score_opts)
+        grades[:unposted_final_grade]   = enrollment.unposted_final_grade(score_opts)
+      end
     end
     grades
   end
