@@ -37,6 +37,17 @@ export function getAnnouncements ({ courseId, announcements, announcementsSearch
   return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
 }
 
+export function getExternalFeeds ({ courseId }) {
+  const params = encodeQueryString([
+    { per_page: 100 }
+  ])
+  return axios.get(`/api/v1/courses/${courseId}/external_feeds?${params}`)
+}
+
+export function deleteExternalFeed ({ courseId, feedId }) {
+  return axios.delete(`/api/v1/courses/${courseId}/external_feeds/${feedId}`)
+}
+
 export function lockAnnouncements ({ courseId }, announcements, locked = true) {
   return makePromisePool(announcements, (annId) => {
     const url = `/api/v1/courses/${courseId}/discussion_topics/${annId}`
@@ -53,10 +64,6 @@ export function deleteAnnouncements ({ courseId }, announcements) {
   }, {
     poolSize: MAX_CONCURRENT_REQS,
   })
-}
-
-export function getExternalFeeds ({ courseId}) {
-  return axios.get(`/api/v1/courses/${courseId}/external_feeds`)
 }
 
 export function addExternalFeed ({ courseId, url, verbosity, header_match }) {

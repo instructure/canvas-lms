@@ -64,6 +64,7 @@ test('UPDATE_ANNOUNCEMENTS_SEARCH should update filter to filter in payload', ()
   })
   deepEqual(newState.announcementsSearch.filter, 'unread')
 })
+
 test('LOCK_ANNOUNCEMENTS_START should set isLockingAnnouncements to true', () => {
   const newState = reduce(actions.lockAnnouncementsStart(), {
     isLockingAnnouncements: false,
@@ -203,9 +204,7 @@ test('DELETE_ANNOUNCEMENTS_SUCCESS should reset selectedAnnouncements', () => {
 
 test('ADD_EXTERNAL_FEED_START should set saving to true', () => {
   const newState = reduce(actions.addExternalFeedStart(), {
-    addExternalFeed: {
-      isSaving: false
-    }
+    addExternalFeed: { isSaving: false }
   })
   equal(newState.externalRssFeed.isSaving, true)
 })
@@ -222,4 +221,79 @@ test('ADD_EXTERNAL_FEED_SUCCESS should set saving to false', () => {
     addExternalFeed: { isSaving: true },
   })
   equal(newState.externalRssFeed.isSaving, false)
+})
+
+test('LOADING_EXTERNAL_FEED_START should set hasLoadedFeed to false', () => {
+  const newState = reduce(actions.loadingExternalFeedStart(), {
+    externalRssFeed: { hasLoadedFeed: true }
+  })
+  equal(newState.externalRssFeed.hasLoadedFeed, false)
+})
+
+test('LOADING_EXTERNAL_FEED_FAIL should set hasLoadedFeed to true', () => {
+  const newState = reduce(actions.loadingExternalFeedFail(), {
+    externalRssFeed: { hasLoadedFeed: false },
+  })
+  equal(newState.externalRssFeed.hasLoadedFeed, true)
+})
+
+test('LOADING_EXTERNAL_FEED_SUCCESS should set hasLoadedFeed to true', () => {
+  const newState = reduce(actions.loadingExternalFeedSuccess(), {
+    externalRssFeed: { hasLoadedFeed: false },
+  })
+  equal(newState.externalRssFeed.hasLoadedFeed, true)
+})
+
+test('DELETE_EXTERNAL_FEED_START should set isDeleting to true', () => {
+  const newState = reduce(actions.deleteExternalFeedStart(), {
+    externalRssFeed: { isDeleting: false }
+  })
+  equal(newState.externalRssFeed.isDeleting, true)
+})
+
+test('DELETE_EXTERNAL_FEED_FAIL should set isDeleting to false', () => {
+  const newState = reduce(actions.deleteExternalFeedFail(), {
+    externalRssFeed: { isDeleting: true },
+  })
+  equal(newState.externalRssFeed.isDeleting, false)
+})
+
+test('DELETE_EXTERNAL_FEED_SUCCESS should set isDeleting to false', () => {
+  const newState = reduce(actions.deleteExternalFeedSuccess(), {
+    externalRssFeed: { isDeleting: true },
+  })
+  equal(newState.externalRssFeed.isDeleting, false)
+})
+
+test('DELETE_EXTERNAL_FEED_SUCCESS should delete feed from state', () => {
+  const newState = reduce(actions.deleteExternalFeedSuccess({ feedId: 12 }), {
+    externalRssFeed: {
+      feeds: [
+        { id: 12, title: "Felix M" },
+        { id: 34, title: "Aaron H" },
+        { id: 37, title: "Steve B" }
+      ]
+    }
+  })
+  deepEqual(newState.externalRssFeed.feeds, [
+    { id: 34, title: "Aaron H" },
+    { id: 37, title: "Steve B" }
+  ])
+})
+
+test('DELETE_EXTERNAL_FEED_FAIL should not delete feed', () => {
+  const newState = reduce(actions.deleteExternalFeedFail({ feedId: 12 }), {
+    externalRssFeed: {
+      feeds: [
+        { id: 12, title: "Felix M" },
+        { id: 34, title: "Aaron H" },
+        { id: 37, title: "Steve B" }
+      ]
+    }
+  })
+  deepEqual(newState.externalRssFeed.feeds, [
+    { id: 12, title: "Felix M" },
+    { id: 34, title: "Aaron H" },
+    { id: 37, title: "Steve B" }
+  ])
 })

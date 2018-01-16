@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, bool } from 'prop-types'
+import { shape, bool, string, number } from 'prop-types'
 
 const propTypes = {}
 
@@ -24,6 +24,13 @@ propTypes.permissions = shape({
   create: bool.isRequired,
   manage_content: bool.isRequired,
   moderate: bool.isRequired,
+})
+
+propTypes.rssFeed = shape({
+  id: string.isRequired,
+  display_name: string.isRequired,
+  external_feed_entries_count: number.isRequired,
+  url: string.isRequired
 })
 
 export default propTypes

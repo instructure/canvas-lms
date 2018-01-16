@@ -89,8 +89,7 @@ export default combineReducers({
         } else {
           return term
         }
-      }
-    }, ''),
+      }    }, ''),
     filter: handleActions({
       [actionTypes.UPDATE_ANNOUNCEMENTS_SEARCH]: (state, action) => {
         const filter = action.payload && action.payload.filter
@@ -131,6 +130,48 @@ export default combineReducers({
       [actionTypes.ADD_EXTERNAL_FEED_START]: () => true,
       [actionTypes.ADD_EXTERNAL_FEED_FAIL]: () => false,
       [actionTypes.ADD_EXTERNAL_FEED_SUCCESS]: () => false
+    }, false),
+    isDeleting: handleActions({
+      [actionTypes.DELETE_EXTERNAL_FEED_START]: () => true,
+      [actionTypes.DELETE_EXTERNAL_FEED_FAIL]: () => false,
+      [actionTypes.DELETE_EXTERNAL_FEED_SUCCESS]: () => false
+    }, false),
+    feeds: handleActions({
+      [actionTypes.LOADING_EXTERNAL_FEED_SUCCESS]: (state, action) => {
+        const feeds = action.payload && action.payload.feeds
+        if (feeds === undefined || !Array.isArray(feeds)) {
+          return state
+        }
+        return feeds
+      },
+      [actionTypes.LOADING_EXTERNAL_FEED_FAIL]: () => [],
+      [actionTypes.ADD_EXTERNAL_FEED_SUCCESS]: (state, action) => {
+        const feed = action.payload && action.payload.feed
+        if (feed === undefined || !feed.id) {
+          return state
+        }
+
+        const newState = state.slice();
+        newState.push(feed)
+        return newState
+      },
+      [actionTypes.DELETE_EXTERNAL_FEED_SUCCESS]: (state, action) => {
+        const feedId = action.payload && action.payload.feedId
+        if (feedId === undefined) {
+          return state
+        }
+
+        const removedState = state.filter(el => el.id !== feedId )
+        if (removedState.length === state.length) {
+          return state
+        }
+        return removedState
+      }
+    }, []),
+    hasLoadedFeed: handleActions({
+      [actionTypes.LOADING_EXTERNAL_FEED_START]: () => false,
+      [actionTypes.LOADING_EXTERNAL_FEED_SUCCESS]: () => true,
+      [actionTypes.LOADING_EXTERNAL_FEED_FAIL]: () => true
     }, false)
   }),
   notifications: reduceNotifications,

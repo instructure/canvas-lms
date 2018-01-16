@@ -18,7 +18,7 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import AddExternalFeed from '../AddExternalFeed'
 
 const defaultProps = () => ({
@@ -28,38 +28,37 @@ const defaultProps = () => ({
 })
 
 test('renders the AddExternalFeed component', () => {
-  const tree = mount(<AddExternalFeed {...defaultProps()} />)
+  const tree = shallow(<AddExternalFeed {...defaultProps()} />)
   expect(tree.exists()).toBe(true)
 })
 
 test('does not render the AddExternalFeed Tray when closed', () => {
-  const tree = mount(<AddExternalFeed {...defaultProps()} />)
-  const node = tree.find('#external-rss-feed__submit-button-group Button')
+  const tree = shallow(<AddExternalFeed {...defaultProps()} />)
+  const node = tree.find('#external-rss-feed__cancel-button')
   expect(node.exists()).toBe(false)
 })
 
 test('renders the AddExternalFeed submit buttons when open', () => {
   const props = defaultProps()
   props.defaultOpen = true
-  const tree = mount(<AddExternalFeed {...props} />)
-  const node = tree.find('#external-rss-feed__submit-button-group Button')
+  const tree = shallow(<AddExternalFeed {...props} />)
+  const node = tree.find('Button')
   expect(node.exists()).toBe(true)
 })
 
 test('closes the AddExternalFeed when cancel pressed', () => {
   const props = defaultProps()
   props.defaultOpen = true
-  const tree = mount(<AddExternalFeed {...props} />)
+  const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().clearAddRSS()
-  const node = tree.find('#external-rss-feed__submit-button')
-  expect(node.exists()).toBe(false)
+  expect(tree.state().isOpen).toBe(false)
 })
 
 test('submits the AddExternalFeed with correct arguments', () => {
   const props = defaultProps()
   const addFeedSpy = jest.fn()
   props.addExternalFeed = addFeedSpy
-  const tree = mount(<AddExternalFeed {...props} />)
+  const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().handleCheckboxPhraseChecked({
     target: {
       checked: true
@@ -84,7 +83,7 @@ test('isDoneSelecting correctly returns true when all arguments are set', () => 
   const props = defaultProps()
   const addFeedSpy = jest.fn()
   props.addExternalFeed = addFeedSpy
-  const tree = mount(<AddExternalFeed {...props} />)
+  const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().handleCheckboxPhraseChecked({
     target: {
       checked: true
@@ -108,7 +107,7 @@ test('isDoneSelecting correctly returns false when all url is missing', () => {
   const props = defaultProps()
   const addFeedSpy = jest.fn()
   props.addExternalFeed = addFeedSpy
-  const tree = mount(<AddExternalFeed {...props} />)
+  const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().handleRadioSelectionSetVerbosity('full')
   tree.instance().handleTextInputSetFeedURL({
     target: {
@@ -122,7 +121,7 @@ test('isDoneSelecting correctly returns false when all phrase is missing', () =>
   const props = defaultProps()
   const addFeedSpy = jest.fn()
   props.addExternalFeed = addFeedSpy
-  const tree = mount(<AddExternalFeed {...props} />)
+  const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().handleCheckboxPhraseChecked({
     target: {
       checked: true

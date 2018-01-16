@@ -141,10 +141,18 @@ describe "announcements index v2" do
     end
 
     it 'an external feed can be added' do
-      skip('Add with COMMS-589')
       AnnouncementIndex.open_external_feeds
-      ExternalFeedPage.add_external_feed('/someurl', 'Truncated')
-      expect(ExternalFeed.feed_name).to be_displayed
+      ExternalFeedPage.add_external_feed('http://someurl', 'full')
+      ExternalFeedPage.add_external_feed('http://otherurl', 'full')
+      expect(ExternalFeed.all.length).to eq 2
+    end
+
+    it 'an external feed can be deleted' do
+      AnnouncementIndex.open_external_feeds
+      ExternalFeedPage.add_external_feed('http://someurl', 'full')
+      ExternalFeedPage.add_external_feed('http://otherurl', 'full')
+      ExternalFeedPage.delete_first_feed
+      expect(ExternalFeed.all.length).to eq 1
     end
   end
 end

@@ -42,6 +42,15 @@ const announcementActions = createPaginationActions('announcements', fetchAnnoun
 const types = [
   ...announcementActions.actionTypes,
   'UPDATE_ANNOUNCEMENTS_SEARCH',
+  'ADD_EXTERNAL_FEED_START',
+  'ADD_EXTERNAL_FEED_SUCCESS',
+  'ADD_EXTERNAL_FEED_FAIL',
+  'DELETE_EXTERNAL_FEED_START',
+  'DELETE_EXTERNAL_FEED_SUCCESS',
+  'DELETE_EXTERNAL_FEED_FAIL',
+  'LOADING_EXTERNAL_FEED_START',
+  'LOADING_EXTERNAL_FEED_SUCCESS',
+  'LOADING_EXTERNAL_FEED_FAIL',
   'SET_ANNOUNCEMENT_SELECTION',
   'CLEAR_ANNOUNCEMENT_SELECTIONS',
   'LOCK_ANNOUNCEMENTS_START',
@@ -49,10 +58,7 @@ const types = [
   'LOCK_ANNOUNCEMENTS_FAIL',
   'DELETE_ANNOUNCEMENTS_START',
   'DELETE_ANNOUNCEMENTS_SUCCESS',
-  'DELETE_ANNOUNCEMENTS_FAIL',
-  'ADD_EXTERNAL_FEED_START',
-  'ADD_EXTERNAL_FEED_SUCCESS',
-  'ADD_EXTERNAL_FEED_FAIL'
+  'DELETE_ANNOUNCEMENTS_FAIL'
 ]
 
 const actions = Object.assign(
@@ -71,6 +77,44 @@ actions.searchAnnouncements = function searchAnnouncements (searchOpts) {
       // uncache pages if we change the search query
       dispatch(actions.clearAnnouncementsPage({ pages: range(1, state.announcements.lastPage + 1) }))
       dispatch(actions.getAnnouncements({ page: 1, select: true }))
+    }
+  }
+}
+
+actions.getExternalFeeds = function () {
+  return (dispatch, getState) => {
+    dispatch(actions.loadingExternalFeedStart())
+    apiClient.getExternalFeeds({ courseId : getState().courseId })
+      .then(resp => {
+        dispatch(actions.loadingExternalFeedSuccess({ feeds: resp.data }))
+      }).catch((err) => {
+        dispatch(actions.loadingExternalFeedFail({
+          message: I18n.t('Failed to Load External Feeds'),
+          err
+        }))
+      })
+  }
+}
+
+actions.deleteExternalFeed = function ({ feedId }) {
+  return (dispatch, getState) => {
+    if(!getState().externalRssFeed.isDeleting) {
+      dispatch(actions.deleteExternalFeedStart())
+      apiClient.deleteExternalFeed({ courseId : getState().courseId, feedId })
+      .then(() => {
+        dispatch(actions.deleteExternalFeedSuccess({ feedId }))
+        const successMessage = I18n.t('External Feed deleted successfully')
+        $.screenReaderFlashMessage(successMessage)
+        dispatch(notificationActions.notifyInfo({ message: successMessage }))
+      })
+      .catch((err) => {
+        const failMessage = I18n.t('Failed to delete external feed')
+        $.screenReaderFlashMessage(failMessage)
+        dispatch(actions.deleteExternalFeedFail({
+          message: failMessage,
+          err
+        }))
+      })
     }
   }
 }
@@ -145,8 +189,8 @@ actions.addExternalFeed = function (payload) {
   return (dispatch, getState) => {
     dispatch(actions.addExternalFeedStart())
     apiClient.addExternalFeed({ courseId : getState().courseId, ...payload })
-      .then(() => {
-        dispatch(actions.addExternalFeedSuccess())
+      .then(resp => {
+        dispatch(actions.addExternalFeedSuccess({ feed: resp.data}))
         const successMessage = I18n.t('External feed successfully added')
         $.screenReaderFlashMessage(successMessage)
         dispatch(notificationActions.notifyInfo({ message: successMessage }))
