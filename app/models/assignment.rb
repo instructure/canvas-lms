@@ -1803,9 +1803,9 @@ class Assignment < ActiveRecord::Base
                                  []
                                end
     users_with_vericite_data = if vericite_enabled?
-                                 submissions
-                                 .reject { |s| s.turnitin_data.blank? }
-                                 .map(&:user)
+                                 submissions.
+                                   reject {|s| s.turnitin_data.blank?}.
+                                   map(&:user)
                                else
                                  []
                                end

@@ -92,9 +92,9 @@ class CourseProgress
   def requirements_completed
     # find the list of requirements that have been recorded as met for this module, then
     # select only those requirements that are current, and filter out any duplicates
-    @_requirements_completed ||= module_progressions.flat_map { |cmp| cmp.requirements_met }
-                                                    .select { |req| requirements.include?(req) }
-                                                    .uniq
+    @_requirements_completed ||= module_progressions.flat_map { |cmp| cmp.requirements_met }.
+      select { |req| requirements.include?(req) }.
+      uniq
   end
 
   def requirement_completed_count

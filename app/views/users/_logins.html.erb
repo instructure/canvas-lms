@@ -130,10 +130,10 @@
           <td><%= f.blabel :account_id, :en => "Account" %></td>
           <td>
             <%
-              accounts = Account.root_accounts
-                .active
-                .map { |a| [(a.name || t("Unnamed Account (%{id})", id: a.id)), a.id] }
-                .sort_by(&:first)
+              accounts = Account.root_accounts.
+                active.
+                map { |a| [(a.name || t("Unnamed Account (%{id})", id: a.id)), a.id] }.
+                sort_by(&:first)
             %>
             <%= f.select :account_id, accounts, {:selected => @domain_root_account.id}, :class => "account_id_select" %>
           </td>

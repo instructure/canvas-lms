@@ -30,10 +30,10 @@ module Lti
       private
 
       def users
-        @users ||= user_scope
-                     .preload(:communication_channels, :not_ended_enrollments)
-                     .offset(@page * @per_page)
-                     .limit(@per_page + 1)
+        @users ||= user_scope.
+          preload(:communication_channels, :not_ended_enrollments).
+          offset(@page * @per_page).
+          limit(@per_page + 1)
       end
 
       def user_scope

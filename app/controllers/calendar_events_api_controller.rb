@@ -349,8 +349,8 @@ class CalendarEventsApiController < ApplicationController
       mark_submitted_assignments(user, events)
       includes = Array(params[:include])
       if includes.include?("submission")
-        submissions = Submission.active.where(assignment_id: events, user_id: user)
-          .group_by(&:assignment_id)
+        submissions = Submission.active.where(assignment_id: events, user_id: user).
+          group_by(&:assignment_id)
       end
       # preload data used by assignment_json
       ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)

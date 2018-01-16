@@ -52,9 +52,9 @@ module Canvas
             request_context_id: @rci,
             request_method: @req.request_method_symbol,
             format: @req.format,
-          }.merge(self.class.useful_http_env_stuff_from_request(@req))
-                   .merge(self.class.useful_http_headers(@req))
-                   .merge(@canvas_error_info)
+          }.merge(self.class.useful_http_env_stuff_from_request(@req)).
+            merge(self.class.useful_http_headers(@req)).
+            merge(@canvas_error_info)
         }
       end
 

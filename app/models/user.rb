@@ -3009,14 +3009,15 @@ class User < ActiveRecord::Base
       if for_course
         parent_folder = self.submissions_folder
         Folder.unique_constraint_retry do
-          self.folders.where(parent_folder_id: parent_folder, submission_context_code: for_course.asset_string)
-            .first_or_create!(name: for_course.name)
+          self.folders.where(parent_folder_id: parent_folder, submission_context_code: for_course.asset_string).
+            first_or_create!(name: for_course.name)
         end
       else
         return @submissions_folder if @submissions_folder
         Folder.unique_constraint_retry do
-          @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
-            .first_or_create!(name: I18n.t('Submissions', locale: self.locale))
+          @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first,
+                                                   submission_context_code: 'root').
+            first_or_create!(name: I18n.t('Submissions', locale: self.locale))
         end
       end
     end

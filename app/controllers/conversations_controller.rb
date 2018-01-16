@@ -713,16 +713,15 @@ class ConversationsController < ApplicationController
     return render_error('conversation_id', 'required') unless params['conversation_id']
 
     Conversation.find(params['conversation_id']).shard.activate do
-      cmp = ConversationMessageParticipant
-              .where(:user_id => params['user_id'])
-              .where(:conversation_message_id => params['message_id'])
+      cmp = ConversationMessageParticipant.
+        where(:user_id => params['user_id']).
+        where(:conversation_message_id => params['message_id'])
 
       cmp.update_all(:workflow_state => 'active', :deleted_at => nil)
 
-      participant = ConversationParticipant
-                      .where(:conversation_id => params['conversation_id'])
-                      .where(:user_id => params['user_id'])
-                      .first()
+      participant = ConversationParticipant.
+        where(:conversation_id => params['conversation_id']).
+        where(:user_id => params['user_id']).first
       messages = participant.messages
 
       participant.message_count = messages.count(:id)

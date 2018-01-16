@@ -248,10 +248,10 @@ describe EnrollmentTerm do
     end
 
     def term_ids_for_scope(scope)
-      Array.wrap(@root_account
-                  .enrollment_terms
-                  .send(scope)
-                  .pluck(:id)).sort
+      Array.wrap(@root_account.
+        enrollment_terms.
+        send(scope).
+        pluck(:id)).sort
     end
 
     def validate_scope(scope, expected_scopes = nil, include_default: false)

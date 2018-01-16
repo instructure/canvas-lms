@@ -53,12 +53,12 @@ module Api
           @domain_root_account.default_enrollment_term
         when 'current'
           if !current_term
-            current_terms = @domain_root_account
-             .enrollment_terms
-             .active
-             .where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc)
-              .limit(2)
-              .to_a
+            current_terms = @domain_root_account.
+              enrollment_terms.
+              active.
+              where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc).
+              limit(2).
+              to_a
             current_term = current_terms.length == 1 ? current_terms.first : :nil
           end
           current_term == :nil ? nil : current_term

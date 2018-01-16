@@ -31,8 +31,7 @@ class CommunicationChannel
     end
 
     def matching_channels(for_report: false)
-      ccs = CommunicationChannel.unretired
-            .where(user_id: User.of_account(account))
+      ccs = CommunicationChannel.unretired.where(user_id: User.of_account(account))
 
       # Limit to self.class.bulk_limit, or REPORT_LIMIT if it's less and for_report is true
       ccs = ccs.limit([(REPORT_LIMIT if for_report), self.class.bulk_limit].compact.min)

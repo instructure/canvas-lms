@@ -42,10 +42,10 @@ module Lti
       end
 
       def groups
-        @groups ||= @context.groups.active
-                             .order(:id)
-                             .offset(@page * @per_page)
-                             .limit(@per_page + 1)
+        @groups ||= @context.groups.active.
+          order(:id).
+          offset(@page * @per_page).
+          limit(@per_page + 1)
       end
 
       def generate_member(group)

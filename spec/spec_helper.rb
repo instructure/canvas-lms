@@ -285,8 +285,8 @@ module Helpers
       assert_status(401)
     else
       # Certain responses require more privileges than the current user has (ie site admin)
-      expect(response).to redirect_to(login_url)
-                      .or redirect_to(root_url)
+      expect(response).to redirect_to(login_url).
+        or redirect_to(root_url)
     end
   end
 
