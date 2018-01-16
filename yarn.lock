@@ -7924,9 +7924,9 @@ parse-asn1@^5.0.0:
     evp_bytestokey "^1.0.0"
     pbkdf2 "^3.0.3"
 
-parse-decimal-number@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/parse-decimal-number/-/parse-decimal-number-0.1.1.tgz#9ae54cd091bdc8ae8405936ee8911f1c1e688cc1"
+parse-decimal-number@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/parse-decimal-number/-/parse-decimal-number-1.0.0.tgz#f9d48399ae98f207935fd13dcbbc87654d865a2f"
 
 parse-entities@^1.0.2:
   version "1.1.1"
