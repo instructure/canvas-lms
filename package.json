@@ -154,7 +154,7 @@
   },
   "repository": "instructure/canvas-lms",
   "scripts": {
-    "test": "concurrently --names \"jest,karma\" \"jest\" \"if [ \"$COVERAGE\" ]; then yarn test:karma; else yarn test:karma:concurrently; fi\"",
+    "test": "concurrently --names \"jest,karma\" \"jest\" \"yarn test:karma:headless\"",
     "test:watch": "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
     "test:jest": "echo 'this is here just so you know you can use jest, but just use the `jest` cli directly' && jest",
     "test:karma": "karma start --single-run",

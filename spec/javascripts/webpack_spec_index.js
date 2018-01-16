@@ -41,20 +41,11 @@ if (process.env.JSPEC_PATH) {
     requireAll(require.context(`../../${process.env.JSPEC_PATH}`))
   }
 } else {
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'coffee')) {
-    // run specs for ember screenreader gradebook
-    requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/))
+  // run specs for ember screenreader gradebook
+  requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/))
 
-    requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))
-  }
+  requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))
 
-  // Run the js tests in 2 different groups, half in each.
-  // In testing, the letter "q" was the midpoint. If one of these takes a lot
-  // longer than the other, we can adjust which letter of the alphabet we split on
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'js1')) {
-    requireAll(require.context('./jsx', !!'includeSubdirectories', /[a-q]Spec$/))
-  }
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'js2')) {
-    requireAll(require.context('./jsx', !!'includeSubdirectories', /[^a-q]Spec$/))
-  }
+  requireAll(require.context('./jsx', !!'includeSubdirectories', /Spec$/))
+
 }
