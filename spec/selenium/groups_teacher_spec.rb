@@ -153,6 +153,19 @@ describe "new groups" do
       check_element_has_focus f(".group-user-actions[data-user-id='user_#{@students.first.id}']")
     end
 
+    it "should allow teachers to message unassigned students" do
+      group_test_setup
+
+      get "/courses/#{@course.id}/groups"
+      f(".icon-more").click
+      wait_for_animations
+      f(".message-all-unassigned").click
+      replace_content(fj('textarea[name="body"]'), "blah blah blah students")
+      fj(".btn-primary[data-text-when-loaded='Sent!']").click
+
+      expect(@course).to eq Conversation.last.context
+    end
+
     it "should allow a teacher to set up a group set with member limits", priority: "1", test_id: 94160 do
       group_test_setup(3,0,0)
       get "/courses/#{@course.id}/groups"
