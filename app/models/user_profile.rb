@@ -28,33 +28,100 @@ class UserProfile < ActiveRecord::Base
   TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
     TAB_PROFILE_SETTINGS, TAB_OBSERVEES = *0..10
 
-  def tabs_available(user=nil, opts={})
-    unless @tabs
-      @tabs = [
-        { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('#user_profile.tabs.notifications', "Notifications"), :css_class => 'notifications', :href => :communication_profile_path, :no_args => true },
-        { :id => TAB_FILES, :label => I18n.t('#tabs.files', "Files"), :css_class => 'files', :href => :files_path, :no_args => true },
-        { :id => TAB_PROFILE_SETTINGS, :label => I18n.t('#user_profile.tabs.settings', 'Settings'), :css_class => 'profile_settings', :href => :settings_profile_path, :no_args => true },
-      ]
-      if user && opts[:root_account] && opts[:root_account].enable_profiles?
-        @tabs.insert 1, {:id => TAB_PROFILE, :label => I18n.t('#user_profile.tabs.profile', "Profile"), :css_class => 'profile', :href => :profile_path, :no_args => true}
-      end
+  BASE_TABS = [
+    {
+      id: TAB_COMMUNICATION_PREFERENCES,
+      label: I18n.t('#user_profile.tabs.notifications', "Notifications"),
+      css_class: 'notifications',
+      href: :communication_profile_path,
+      no_args: true
+    }.freeze,
+    {
+      id: TAB_FILES,
+      label: I18n.t('#tabs.files', "Files"),
+      css_class: 'files',
+      href: :files_path,
+      no_args: true
+    }.freeze,
+    {
+      id: TAB_PROFILE_SETTINGS,
+      label: I18n.t('#user_profile.tabs.settings', 'Settings'),
+      css_class: 'profile_settings',
+      href: :settings_profile_path,
+      no_args: true
+    }.freeze
+  ].freeze
 
-      @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if user.eportfolios_enabled?
-
-
-      if user && opts[:root_account]
-        tools = opts[:root_account].context_external_tools.active.having_setting('user_navigation')
-        @tabs += Lti::ExternalToolTab.new(user, :user_navigation, tools, opts[:language]).tabs
-      end
-      if user && user.fake_student?
-        @tabs = @tabs.slice(0,2)
-      end
-
-      if user && user.user_observees.active.exists?
-        @tabs << { :id => TAB_OBSERVEES, :label => I18n.t('#tabs.observees', 'Observing'), :css_class => 'observees', :href => :observees_profile_path, :no_args => true }
-      end
+  set_policy do
+    given do |user, account|
+      return unless user
+      user_roles = Lti::SubstitutionsHelper.new(account, account.root_account, user).all_roles
+      user_roles.include?('urn:lti:instrole:ims/lis/Administrator')
     end
-    @tabs
+    can :view_lti_tool
+  end
+
+  def tabs_available(user=nil, opts={})
+    @tabs ||= begin
+      tabs = BASE_TABS.dup
+      insert_profile_tab(tabs, user, opts)
+      insert_eportfolios_tab(tabs, user)
+      insert_lti_tool_tabs(tabs, user, opts) if user && opts[:root_account]
+      tabs = tabs.slice(0,2) if user&.fake_student?
+      insert_observer_tabs(tabs, user)
+      tabs
+    end
+  end
+
+  private
+
+  def insert_profile_tab(tabs, user, opts)
+    if user && opts[:root_account] && opts[:root_account].enable_profiles?
+      tabs.insert 1, {
+        id: TAB_PROFILE,
+        label: I18n.t('#user_profile.tabs.profile', "Profile"),
+        css_class: 'profile',
+        href: :profile_path,
+        no_args: true
+      }
+    end
+  end
+
+  def insert_eportfolios_tab(tabs, user)
+    if user.eportfolios_enabled?
+      tabs << {
+        id: TAB_EPORTFOLIOS,
+        label:I18n.t('#tabs.eportfolios', "ePortfolios"),
+        css_class: 'eportfolios',
+        href: :dashboard_eportfolios_path,
+        no_args: true
+      }
+    end
+  end
+
+  def insert_lti_tool_tabs(tabs, user, opts)
+    tools = opts[:root_account].context_external_tools.active.having_setting('user_navigation')
+    tabs.concat(
+      Lti::ExternalToolTab.new(user, :user_navigation, tools, opts[:language]).
+      tabs.
+      find_all { |tab| should_keep_tab?(tab, user, opts[:root_account]) }
+    )
+  end
+
+  def should_keep_tab?(tab, user, account)
+    tab[:visibility] != 'admins' || self.grants_right?(user, account, :view_lti_tool)
+  end
+
+  def insert_observer_tabs(tabs, user)
+    if user&.user_observees&.active&.exists?
+      tabs << {
+        id: TAB_OBSERVEES,
+        label: I18n.t('#tabs.observees', 'Observing'),
+        css_class: 'observees',
+        href: :observees_profile_path,
+        no_args: true
+      }
+    end
   end
 end
 
