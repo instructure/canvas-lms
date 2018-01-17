@@ -652,6 +652,19 @@ describe GroupCategory do
     gc = GroupCategory.create!(name: 'Test2', account: account, sis_batch: sis_batch)
     expect(gc.sis_batch_id).to eq(sis_batch.id)
   end
+
+  it 'should make sure sis_source_id is unique per root_account' do
+    GroupCategory.create!(name: 'Test', account: account, sis_source_id: '1')
+
+    expect {
+      GroupCategory.create!(name: 'Test2', account: account, sis_source_id: '1')
+    }.to raise_error(ActiveRecord::RecordInvalid)
+
+    new_account = Account.create
+    gc = GroupCategory.create!(name: 'Test3', account: new_account, sis_source_id: 1)
+    expect(gc.sis_source_id).to eq('1')
+  end
+
 end
 
 def assert_random_group_assignment(category, course, initial_spread, result_spread, opts={})

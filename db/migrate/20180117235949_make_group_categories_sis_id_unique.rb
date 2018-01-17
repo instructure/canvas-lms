@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,12 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AddSisIdToGroupCategories < ActiveRecord::Migration[5.0]
+class MakeGroupCategoriesSisIdUnique < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    add_column :group_categories, :sis_source_id, :string
-    add_reference :group_categories, :sis_batch, index: true, foreign_key: true
-    add_column :group_categories, :root_account_id, :integer, limit: 8
+    if index_exists?(:group_categories, [:root_account_id, :sis_source_id])
+      remove_index :group_categories, [:root_account_id, :sis_source_id]
+    end
+    add_index :group_categories, [:root_account_id, :sis_source_id], where: "sis_source_id IS NOT NULL", unique: true
   end
 end
