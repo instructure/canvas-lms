@@ -170,6 +170,7 @@ describe "accounts/settings.html.erb" do
 
         allow(@account).to receive(:feature_enabled?).with(:post_grades).and_return(true)
         allow(@account).to receive(:feature_enabled?).with(:google_docs_domain_restriction).and_return(true)
+        allow(@account).to receive(:feature_enabled?).with(:student_planner).and_return(false)
       end
 
       context "new_sis_integrations => false" do

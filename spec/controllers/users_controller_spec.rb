@@ -1511,36 +1511,12 @@ describe UsersController do
 
     it 'sets the proper user preference on PUT requests' do
       put :dashboard_view, params: {:dashboard_view => 'cards'}
-      expect(@user.preferences[:dashboard_view]).to eql('cards')
+      expect(@user.dashboard_view).to eql('cards')
     end
 
     it 'does not allow arbitrary values to be set' do
       put :dashboard_view, params: {:dashboard_view => 'a non-whitelisted value'}
       assert_status(400)
-    end
-  end
-
-  describe "show_planner?" do
-    before(:each) do
-      course_factory
-      user_factory(active_all: true)
-      user_session(@user)
-      subject.instance_variable_set(:@current_user, @user)
-    end
-
-    it "should be false if preferences[:dashboard_view] is not set" do
-      @user.preferences.delete(:dashboard_view)
-      expect(subject.show_planner?).to be_falsey
-    end
-
-    it "should be false if preferences[:dashboard_view] is not planner" do
-      @user.preferences[:dashboard_view] = 'something_that_isnt_planner'
-      expect(subject.show_planner?).to be_falsey
-    end
-
-    it "should be true if preferences[:dashboard_view] is planner" do
-      @user.preferences[:dashboard_view] = 'planner'
-      expect(subject.show_planner?).to be_truthy
     end
   end
 

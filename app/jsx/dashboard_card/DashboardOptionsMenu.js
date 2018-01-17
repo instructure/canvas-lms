@@ -91,7 +91,7 @@ export default class DashboardOptionsMenu extends React.Component {
   }
 
   render () {
-    const cardView = this.cardView
+    const { cardView } = this
 
     return (
       <PopoverMenu

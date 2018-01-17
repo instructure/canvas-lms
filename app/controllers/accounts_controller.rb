@@ -477,6 +477,9 @@ class AccountsController < ApplicationController
         end
       end
 
+      # Set default Dashboard View
+      set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
+
       # account settings (:manage_account_settings)
       account_settings = account_params.slice(:name, :default_time_zone, :settings)
       unless account_settings.empty?
@@ -703,6 +706,9 @@ class AccountsController < ApplicationController
 
         remove_ip_filters = params[:account].delete(:remove_ip_filters)
         params[:account][:ip_filters] = [] if remove_ip_filters
+
+        # Set default Dashboard view
+        set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
 
         if @account.update_attributes(strong_account_params)
           format.html { redirect_to account_settings_url(@account) }
@@ -1122,6 +1128,15 @@ class AccountsController < ApplicationController
     end
   end
 
+  def set_default_dashboard_view(new_view)
+    if new_view != @account.default_dashboard_view
+      if authorized_action(@account, @current_user, :manage_account_settings)
+        # NOTE: Only _sets_ the property. It's up to the caller to `save` it
+        @account.default_dashboard_view = new_view
+      end
+    end
+  end
+
   def format_avatar_count(count = 0)
     count > 99 ? "99+" : count
   end
@@ -1178,7 +1193,7 @@ class AccountsController < ApplicationController
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
-                                   :app_center_access_token].freeze
+                                   :app_center_access_token, :default_dashboard_view].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

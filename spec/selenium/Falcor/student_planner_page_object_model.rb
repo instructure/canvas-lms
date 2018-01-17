@@ -73,7 +73,7 @@ module PlannerPageObject
   end
 
   def go_to_list_view
-    @student1.preferences[:dashboard_view] = "planner"
+    @student1.dashboard_view = "planner"
     @student1.save!
     get '/'
     wait_for_planner_load

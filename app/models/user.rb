@@ -1381,6 +1381,17 @@ class User < ActiveRecord::Base
     preferences[:dashboard_positions] = new_positions
   end
 
+  # Use the user's preferences for the default view
+  # Otherwise, use the account's default (if set)
+  # Fallback to using cards (default option on the Account settings page)
+  def dashboard_view
+    preferences[:dashboard_view] || account.default_dashboard_view || 'cards'
+  end
+
+  def dashboard_view=(new_dashboard_view)
+    preferences[:dashboard_view] = new_dashboard_view
+  end
+
   def course_nicknames
     preferences[:course_nicknames] ||= {}
   end

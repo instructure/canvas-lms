@@ -19,7 +19,7 @@
 import React from 'react';
 import I18n from 'i18n!dashboard';
 import axios from 'axios';
-import { bool, func } from 'prop-types';
+import { bool, func, string } from 'prop-types';
 import { showFlashError } from '../shared/FlashAlert'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import loadCardDashboard from '../bundles/dashboard_card'
@@ -33,13 +33,14 @@ class DashboardHeader extends React.Component {
     super(props);
 
     let currentDashboard;
+    const enabledViews = ['cards', 'activity']
 
-    if (props.planner_selected && props.planner_enabled) {
-      currentDashboard = 'planner';
-    } else if (props.recent_activity_dashboard) {
-      currentDashboard = 'activity';
+    if (props.planner_enabled) enabledViews.push('planner')
+
+    if (enabledViews.includes(props.dashboard_view)) {
+      currentDashboard = props.dashboard_view
     } else {
-      currentDashboard = 'cards';
+      currentDashboard = 'cards'
     }
 
     this.state = { currentDashboard, loadedViews: ['activity'] }
@@ -49,16 +50,14 @@ class DashboardHeader extends React.Component {
     this.showDashboard(this.state.currentDashboard)
   }
 
+  getActiveApp = () => this.state.currentDashboard
+
   resetClasses (newDashboard) {
     if (newDashboard === 'planner') {
       document.body.classList.add('dashboard-is-planner')
     } else {
       document.body.classList.remove('dashboard-is-planner')
     }
-  }
-
-  getActiveApp = () => {
-    return this.state.currentDashboard
   }
 
   loadPlannerComponent () {
@@ -166,17 +165,16 @@ class DashboardHeader extends React.Component {
 }
 
 DashboardHeader.propTypes = {
-  recent_activity_dashboard: bool,
+  dashboard_view: string,
   hide_dashcard_color_overlays: bool,
   planner_enabled: bool.isRequired,
-  planner_selected: bool.isRequired,
   flashError: func,
   flashMessage: func,
   screenReaderFlashMessage: func,
 }
 
 DashboardHeader.defaultProps = {
-  recent_activity_dashboard: false,
+  dashboard_view: 'cards',
   hide_dashcard_color_overlays: false,
   flashError: () => {},
   flashMessage: () => {},

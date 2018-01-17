@@ -17,24 +17,11 @@
 #
 
 module DashboardHelper
-  def show_recent_activity?
-    if @current_user.preferences[:dashboard_view]
-      @current_user.preferences[:dashboard_view] == 'activity'
-    else
-      @current_user.preferences[:recent_activity_dashboard].present?
-    end
-  end
-
-  def show_dashboard_cards?
-    if @current_user.preferences[:dashboard_view]
-      @current_user.preferences[:dashboard_view] == 'cards'
-    else
-      @current_user.preferences[:recent_activity_dashboard].blank?
-    end
-  end
-
-  def show_planner?
-    @current_user&.preferences&.dig(:dashboard_view) == 'planner'
+  def user_dashboard_view
+    dashboard_view = @current_user&.dashboard_view
+    dashboard_view = 'activity' if @current_user&.preferences&.dig(:recent_activity_dashboard) && !@current_user.preferences[:dashboard_view]
+    dashboard_view = 'cards' if dashboard_view == 'planner' && !@current_user.account.feature_enabled?(:student_planner)
+    dashboard_view
   end
 
   def show_welcome_message?

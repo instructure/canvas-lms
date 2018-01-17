@@ -242,7 +242,7 @@ describe Account do
       expect(@a.service_enabled?(:twitter)).to be_truthy
     end
 
-    it "should use + and - by default when setting service availabilty" do
+    it "should use + and - by default when setting service availability" do
       @a.enable_service(:twitter)
       expect(@a.service_enabled?(:twitter)).to be_truthy
       expect(@a.allowed_services).to be_nil
@@ -1653,4 +1653,39 @@ describe Account do
   end
 
   it_behaves_like 'a learning outcome context'
+
+  describe "#default_dashboard_view" do
+    before(:once) do
+      @account = Account.create!
+    end
+
+    it "should be nil by default" do
+      expect(@account.default_dashboard_view).to be_nil
+    end
+
+    it "should update if view is valid" do
+      @account.default_dashboard_view = "activity"
+      @account.save!
+
+      expect(@account.default_dashboard_view).to eq "activity"
+    end
+
+    it "should not update if view is invalid" do
+      @account.default_dashboard_view = "junk"
+      expect { @account.save! }.not_to change { @account.default_dashboard_view }
+    end
+
+    it "should not contain planner if feature is disabled" do
+      @account.default_dashboard_view = "planner"
+      @account.save!
+      expect(@account.default_dashboard_view).not_to eq "planner"
+    end
+
+    it "should contain planner if feature is enabled" do
+      @account.enable_feature! :student_planner
+      @account.default_dashboard_view = "planner"
+      @account.save!
+      expect(@account.default_dashboard_view).to eq "planner"
+    end
+  end
 end

@@ -26,7 +26,7 @@ js_env({
 })
 %>
 
-<div id="DashboardCard_Container" style="display: <%= show_dashboard_cards? ? 'block' : 'none' %>">
+<div id="DashboardCard_Container" style="display: <%= user_dashboard_view == 'cards' ? 'block' : 'none' %>">
   <div class="ic-DashboardCard__box">
     <% for i in 0..dashboard_courses.length-1 do %>
       <div class="ic-DashboardCard">

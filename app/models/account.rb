@@ -78,8 +78,7 @@ class Account < ActiveRecord::Base
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
-    sql = []
-    conds = []
+    sql, conds = [], []
     contexts = additional_contexts + account_chain
     contexts.delete(self) unless include_self
     contexts.each { |c|
@@ -235,13 +234,16 @@ class Account < ActiveRecord::Base
 
   add_setting :enable_gravatar, :boolean => true, :root_only => true, :default => true
 
+  # For Student Planner/List View
+  add_setting :default_dashboard_view, :inheritable => true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
-        if account_settings_options && account_settings_options[key.to_sym]
-          opts = account_settings_options[key.to_sym]
+        key = key.to_sym
+        if account_settings_options && (opts = account_settings_options[key])
           if (opts[:root_only] && !self.root_account?) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
-            settings.delete key.to_sym
+            settings.delete key
           elsif opts[:hash]
             new_hash = {}
             if val.is_a?(Hash) || val.is_a?(ActionController::Parameters)
@@ -256,11 +258,11 @@ class Account < ActiveRecord::Base
                 end
               end
             end
-            settings[key.to_sym] = new_hash.empty? ? nil : new_hash
+            settings[key] = new_hash.empty? ? nil : new_hash
           elsif opts[:boolean]
-            settings[key.to_sym] = Canvas::Plugin.value_to_boolean(val)
+            settings[key] = Canvas::Plugin.value_to_boolean(val)
           else
-            settings[key.to_sym] = val.to_s
+            settings[key] = val.to_s
           end
         end
       end
@@ -916,7 +918,7 @@ class Account < ActiveRecord::Base
   end
 
   def get_role_by_name(role_name)
-    if role = Role.get_built_in_role(role_name)
+    if (role = Role.get_built_in_role(role_name))
       return role
     end
 
@@ -1019,8 +1021,7 @@ class Account < ActiveRecord::Base
   end
 
   set_policy do
-    enrollment_types = RoleOverride.enrollment_type_labels.map { |role| role[:name] }
-    RoleOverride.permissions.each do |permission, details|
+    RoleOverride.permissions.each do |permission, _details|
       given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
       can :create_courses if permission == :manage_courses
@@ -1148,7 +1149,7 @@ class Account < ActiveRecord::Base
     return if self.settings[:auth_discovery_url].blank?
 
     begin
-      value, uri = CanvasHttp.validate_url(self.settings[:auth_discovery_url])
+      value, _uri = CanvasHttp.validate_url(self.settings[:auth_discovery_url])
       self.auth_discovery_url = value
     rescue URI::Error, ArgumentError
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
@@ -1294,12 +1295,12 @@ class Account < ActiveRecord::Base
       scopes = if root_account?
                 [all_courses,
                  associated_courses.
-                     where("root_account_id<>?", self)]
-              else
-                [courses,
-                 associated_courses.
+                   where("root_account_id<>?", self)]
+               else
+                 [courses,
+                  associated_courses.
                     where("courses.account_id<>?", self)]
-              end
+               end
       # match the "batch" size in Course.update_account_associations
       scopes.each do |scope|
         scope.select([:id, :account_id]).find_in_batches(:batch_size => 500) do |courses|
@@ -1667,7 +1668,7 @@ class Account < ActiveRecord::Base
 
   def trusted_referer?(referer_url)
     return if !self.settings.has_key?(:trusted_referers) || self.settings[:trusted_referers].blank?
-    if referer_with_port = format_referer(referer_url)
+    if (referer_with_port = format_referer(referer_url))
       self.settings[:trusted_referers].split(',').include?(referer_with_port)
     end
   end
@@ -1719,5 +1720,20 @@ class Account < ActiveRecord::Base
         self.errors.add(:terms_of_service, t("Terms of Service attributes not valid"))
       end
     end
+  end
+
+  # Different views are available depending on feature flags
+  def dashboard_views
+    ['activity', 'cards'].tap {|views| views << 'planner' if feature_enabled?(:student_planner)}
+  end
+
+  # Getter/Setter for default_dashboard_view account setting
+  def default_dashboard_view=(default_dashboard_view)
+    return unless dashboard_views.include?(default_dashboard_view)
+    self.settings[:default_dashboard_view] = default_dashboard_view
+  end
+
+  def default_dashboard_view
+    self.settings[:default_dashboard_view]
   end
 end

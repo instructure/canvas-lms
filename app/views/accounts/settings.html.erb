@@ -171,6 +171,15 @@
                     </td>
                   </tr>
 
+                  <% if can_do(@context, @current_user, :manage_account_settings) %>
+                    <tr>
+                      <td><%= settings.blabel :default_dashboard_view, t("Default View for Dashboard") %></td>
+                      <td>
+                        <%= settings.select :default_dashboard_view, options_for_select(dashboard_view_options(@account), @account.default_dashboard_view) %>
+                      </td>
+                    </tr>
+                  <% end %>
+
                   <tr>
                     <td colspan="2"><%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
                     <%= settings.label :prevent_course_renaming_by_teachers, :en => "Don't let teachers rename their courses" %>

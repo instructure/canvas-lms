@@ -18,15 +18,15 @@
 
 import {View} from 'Backbone'
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications';
+import 'compiled/jquery.rails_flash_notifications'
+import 'jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!dashboard'
 import newCourseForm from 'compiled/util/newCourseForm'
-import DashboardHeader from '../dashboard/DashboardHeader'
 import showMoreTemplate from 'jst/dashboard/show_more_link'
+import DashboardHeader from '../dashboard/DashboardHeader'
 
-import 'jquery.disableWhileLoading'
 
 if (ENV.DASHBOARD_SIDEBAR_URL) {
   const rightSide = $('#right-side')
@@ -41,10 +41,9 @@ const dashboardHeaderContainer = document.getElementById('dashboard_header_conta
 if (dashboardHeaderContainer) {
   ReactDOM.render(
     <DashboardHeader
-      recent_activity_dashboard={ENV.PREFERENCES.recent_activity_dashboard}
+      dashboard_view={ENV.PREFERENCES.dashboard_view}
       hide_dashcard_color_overlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
       planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
-      planner_selected={ENV.PREFERENCES.show_planner}
       flashError={$.flashError}
       flashMessage={$.flashMessage}
       screenReaderFlashMessage={$.screenReaderFlashMessage}
@@ -95,7 +94,7 @@ class DashboardView extends View {
     const isExpanded = $category.find('.details_container').is(':visible')
     // go up to stream-category to build the text to display
     const categoryName = $category.data('category')
-    const count = parseInt($category.find('.count:first').text())
+    const count = parseInt($category.find('.count:first').text(), 10)
     const assistiveText = this.getCategoryText(categoryName, count, !isExpanded)
     const $link = $category.find('.toggle-details')
     $link.html(showMoreTemplate({expanded: isExpanded, assistiveText}))
@@ -156,9 +155,8 @@ class DashboardView extends View {
   }
 
   handleDetailsClick (event) {
-    let link
     const row = $(event.target).closest('tr')
-    return link = row.find('a')
+    return row.find('a')
   }
 
   // TODO: switch recent items to client rendering and skip all this

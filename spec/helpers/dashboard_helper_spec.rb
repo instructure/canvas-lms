@@ -35,66 +35,47 @@ describe DashboardHelper do
     end
   end
 
-  describe "show_recent_activity?" do
-    before(:once) do
+  context "user_dashboard_view" do
+    before :once do
       course_with_student(:active_all => true)
       @current_user = @student
     end
 
-    it "should be false if preferences[:dashboard_view] is not set" do
-      @current_user.preferences.delete(:dashboard_view)
-      @current_user.preferences.delete(:recent_activity_dashboard)
-      expect(show_recent_activity?).to be_falsey
+    it "should use the account's default dashboard view setting if the user has not selected one" do
+      @current_user.dashboard_view = nil
+      @current_user.save!
+      @course.account.default_dashboard_view = 'activity'
+      @course.account.save!
+      expect(user_dashboard_view).to eq 'activity'
     end
 
-    it "should be false if preferences[:dashboard_view] is not activity" do
-      @current_user.preferences[:dashboard_view] = 'something_that_isnt_activity'
-      @current_user.preferences.delete(:recent_activity_dashboard)
-      expect(show_recent_activity?).to be_falsey
+    it "should default to 'cards' if 'planner' was set but the feature flag is disabled" do
+      @current_user.dashboard_view = 'planner'
+      @current_user.save!
+      expect(user_dashboard_view).to eq 'cards'
     end
 
-    it "should be true if preferences[:dashboard_view] is activity" do
-      @current_user.preferences[:dashboard_view] = 'activity'
-      @current_user.preferences.delete(:recent_activity_dashboard)
-      expect(show_recent_activity?).to be_truthy
+    it "should return 'planner' if set and feature is enabled" do
+      @course.root_account.enable_feature!(:student_planner)
+      @current_user.dashboard_view = 'planner'
+      @current_user.save!
+      expect(user_dashboard_view).to eq 'planner'
     end
 
-    it "should be true if preferences[:recent_activity_dashboard] is true" do
-      @current_user.preferences.delete(:dashboard_view)
+    it "should be backwards compatible with the deprecated 'show_recent_activity' preference" do
       @current_user.preferences[:recent_activity_dashboard] = true
-      expect(show_recent_activity?).to be_truthy
+      @current_user.save!
+      expect(user_dashboard_view).to eq 'activity'
+    end
+
+    it "should return the correct value based on the user's setting" do
+      @current_user.dashboard_view = 'cards'
+      @current_user.save!
+      expect(user_dashboard_view).to eq 'cards'
+
+      @current_user.dashboard_view = 'activity'
+      @current_user.save!
+      expect(user_dashboard_view).to eq 'activity'
     end
   end
-
-  describe "show_dashboard_cards?" do
-    before(:once) do
-      course_with_student(:active_all => true)
-      @current_user = @student
-    end
-
-    it "should be true if preferences[:dashboard_view] is not set" do
-      @current_user.preferences.delete(:dashboard_view)
-      @current_user.preferences.delete(:recent_activity_dashboard)
-      expect(show_dashboard_cards?).to be_truthy
-    end
-
-    it "should be false if preferences[:dashboard_view] is not cards" do
-      @current_user.preferences[:dashboard_view] = 'something_that_isnt_cards'
-      @current_user.preferences.delete(:recent_activity_dashboard)
-      expect(show_dashboard_cards?).to be_falsey
-    end
-
-    it "should be true if preferences[:dashboard_view] is cards" do
-      @current_user.preferences[:dashboard_view] = 'cards'
-      @current_user.preferences.delete(:recent_activity_dashboard)
-      expect(show_dashboard_cards?).to be_truthy
-    end
-
-    it "should be true if preferences[:recent_activity_dashboard] is false" do
-      @current_user.preferences.delete(:dashboard_view)
-      @current_user.preferences[:recent_activity_dashboard] = false
-      expect(show_dashboard_cards?).to be_truthy
-    end
-  end
-
 end
