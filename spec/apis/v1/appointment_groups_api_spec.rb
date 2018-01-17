@@ -324,6 +324,27 @@ describe AppointmentGroupsController, type: :request do
     expect(json['workflow_state']).to eql 'pending'
   end
 
+  it 'should forbid creating an appointment group for a concluded course' do
+    course1 = course_factory(active_all: true)
+    course1.save!
+    course2 = course_factory(active_all: true)
+    course2.save!
+    course2.complete!
+    course2.save!
+    appointment_group_params = {
+      :appointment_group => {
+        :context_codes => [course1.asset_string, course2.asset_string],
+        :title => "bad appointment group",
+        :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] }
+      }
+    }
+    json = api_call(:post, "/api/v1/appointment_groups",
+      {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
+      appointment_group_params, {}, :expected_status => 400)
+    expect(json['error']).to eql "cannot create an appointment group for a concluded course"
+  end
+
+
   it 'should create a new appointment group with a sub_context' do
     json = api_call(:post, "/api/v1/appointment_groups",
                       {:controller => 'appointment_groups', :action => 'create', :format => 'json'},

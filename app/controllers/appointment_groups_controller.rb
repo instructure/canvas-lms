@@ -345,6 +345,15 @@ class AppointmentGroupsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def create
     contexts = get_contexts
+    # Don't let people create new appointment groups for concluded courses.  Ideally
+    # we would have a check on update as well but there may be existing ones and
+    # it would be very delicate to write one in a way that doesn't accidentally
+    # break the ability to edit those.
+    if contexts.any? { |c| c.concluded? }
+      return render json: { error: t('cannot create an appointment group for a concluded course') },
+        status: :bad_request
+    end
+
     raise ActiveRecord::RecordNotFound unless contexts.present?
 
     publish = value_to_boolean(params[:appointment_group].delete(:publish))

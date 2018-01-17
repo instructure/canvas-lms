@@ -62,8 +62,8 @@ define [
       @contextsHash[c.asset_string] = c for c in @contexts
 
       @form = $(selector).find("form")
-
-      @contextSelector = new ContextSelector('.ag-menu-container', @apptGroup, @contexts, @contextsChanged, @toggleContextsMenu)
+      editableContexts = @contexts.filter((c) => !c.concluded)
+      @contextSelector = new ContextSelector('.ag-menu-container', @apptGroup, editableContexts, @contextsChanged, @toggleContextsMenu)
 
       if @editing()
         @form.attr('action', @apptGroup.url)
