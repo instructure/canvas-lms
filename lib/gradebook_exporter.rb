@@ -20,6 +20,14 @@ class GradebookExporter
   include GradebookSettingsHelpers
   include LocaleSelection
 
+  # You may see a pattern in this file of things that look like `<< nil << nil`
+  # to create 'buffer' cells for columns. Let's try to stop using that pattern
+  # and instead define the number of 'buffer' columns here in the COLUMN_COUNTS hash.
+  # Please leave a comment for each entry in COLUMN_COUNTS.
+  COLUMN_COUNTS = {
+    grading_standard: 4 # 'Current Grade', 'Final Grade', 'Unposted Current Grade', 'Unposted Final Grade'
+  }.freeze
+
   def initialize(course, user, options = {})
     @course  = course
     @user    = user
@@ -45,6 +53,11 @@ class GradebookExporter
   end
 
   private
+
+  def buffer_columns(column_name, buffer_value=nil)
+    column_count = COLUMN_COUNTS.fetch(column_name)
+    Array.new(column_count, buffer_value)
+  end
 
   def determine_column_separator
     default_separator = I18n.t('number.format.separator', '.') == ',' ? ';' : ','
@@ -126,7 +139,11 @@ class GradebookExporter
       if assignments.any?(&:muted)
         # This is is not translated since we look for this exact string when we upload to gradebook.
         row = [nil, nil, nil, nil]
-        row << nil if include_sis_id
+        if include_sis_id
+          row << nil
+          row << nil if include_root_account
+        end
+
         row.concat(assignments.map { |a| 'Muted' if a.muted? })
 
         if should_show_totals
@@ -135,9 +152,7 @@ class GradebookExporter
           row << nil << nil << nil << nil
         end
 
-        if @course.grading_standard_enabled?
-          row << nil << nil << nil << nil
-        end
+        row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
         csv << row
       end
 
@@ -153,10 +168,7 @@ class GradebookExporter
         row.concat([read_only] * group_filler_length)
         row << read_only << read_only if include_points?
         row << read_only << read_only << read_only << read_only
-
-        if @course.grading_standard_enabled?
-          row << read_only << read_only << read_only << read_only
-        end
+        row.concat(buffer_columns(:grading_standard, read_only)) if @course.grading_standard_enabled?
       end
       csv << row
 

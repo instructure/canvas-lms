@@ -32,14 +32,17 @@ describe GradebookExporter do
     end
 
     describe "default output with blank course" do
-      subject(:csv)   { exporter.to_csv }
+      subject(:csv) { exporter.to_csv }
 
-      it "produces a String" do
-        expect(subject).to be_a String
-      end
+      it { is_expected.to be_a String }
 
       it "is a csv with two rows" do
-        expect(CSV.parse(subject).count).to be 2
+        expect(CSV.parse(csv).count).to be 2
+      end
+
+      it "is a csv with rows of equal length" do
+        rows = CSV.parse(csv)
+        expect(rows.first.length).to eq rows.second.length
       end
 
       it "has headers in a default order" do
@@ -48,9 +51,40 @@ describe GradebookExporter do
           "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score",
           "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"
         ]
-        actual_headers = CSV.parse(subject, headers: true).headers
+        actual_headers = CSV.parse(csv, headers: true).headers
 
         expect(actual_headers).to match_array(expected_headers)
+      end
+
+      context "when muted assignments are present" do
+        before(:each) do
+          @course.assignments.create!(muted: true, points_possible: 10)
+          @exporter_options = {}
+        end
+
+        let(:csv) do
+          unparsed_csv = GradebookExporter.new(@course, @teacher, @exporter_options).to_csv
+          CSV.parse(unparsed_csv)
+        end
+
+        let(:header_row_length) { csv.first.length }
+        let(:muted_row_length) { csv.second.length }
+
+        it "the length of the 'muted' row matches the length of the header row" do
+          expect(header_row_length).to eq muted_row_length
+        end
+
+        it "the length of the 'muted' row matches the length of the header row when include_sis_id is true" do
+          @exporter_options[:include_sis_id] = true
+          expect(header_row_length).to eq muted_row_length
+        end
+
+        it "the length of the 'muted' row matches the length of the header row when include_sis_id " \
+          "is true and the account is a trust account" do
+          expect(@course.root_account).to receive(:trust_exists?).and_return(true)
+          @exporter_options[:include_sis_id] = true
+          expect(header_row_length).to eq muted_row_length
+        end
       end
     end
 
