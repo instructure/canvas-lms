@@ -71,6 +71,7 @@ $(() => {
   const container = document.querySelector('#sections_autocomplete_root')
   const sectionSpecificAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
                                         && ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
+                                        && ENV.context_asset_string.startsWith("course")
   if (container && sectionSpecificAnnouncement) {
     ReactDOM.render(
       <SectionsAutocomplete

@@ -123,6 +123,12 @@ describe "new groups" do
       expect(f('.group-summary')).to include_text("0 students")
     end
 
+    it "should not allow teachers to see sections specific dropdown on announcement page" do
+      group_test_setup
+      get "/groups/#{@testgroup.first.id}/discussion_topics/new?is_announcement=true"
+      expect(f('#sections_autocomplete_root').text).to eq ""
+    end
+
     it "should allow teachers to make a student a group leader", priority: "1", test_id: 96021 do
       group_test_setup
       add_user_to_group(@students.first,@testgroup[0])
