@@ -252,7 +252,9 @@ module Lti
           tool_proxy_id: tool_proxy.id,
           context_id: @context.id,
           context_type: @context.class.name,
-          resource_link_id: resource_link_id
+          resource_link_id: resource_link_id,
+          product_code: tool_proxy.product_family.product_code,
+          vendor_code: tool_proxy.product_family.vendor_code
         ).first_or_create
 
         binding = ToolSetting.where(

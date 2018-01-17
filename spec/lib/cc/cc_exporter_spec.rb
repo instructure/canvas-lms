@@ -466,37 +466,6 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    describe "tool settings" do
-      include_context 'lti2_course_spec_helper'
-
-      before { tool_proxy.update_attributes!(context: @course) }
-
-      it 'should export tool settings that have a tool proxy' do
-        Lti::ToolSetting.create!(
-          tool_proxy: tool_proxy,
-          resource_link_id: SecureRandom.uuid,
-          context: @course
-        )
-        run_export
-
-        resource = @manifest_doc.at_css('resource[type="tool_setting"]')
-        expect(resource).not_to be_nil
-        file_path = resource.at_css('file').attribute('href')
-        expect(@zip_file.find_entry(file_path)).not_to be_nil
-      end
-
-      it 'should not export tool settings that have no tool proxy' do
-        Lti::ToolSetting.create!(
-          resource_link_id: SecureRandom.uuid,
-          context: @course
-        )
-        run_export
-
-        resource = @manifest_doc.at_css('resource[type="tool_setting"]')
-        expect(resource).to be_nil
-      end
-    end
-
     it "should use canvas_export.txt as flag" do
       run_export
 
@@ -611,6 +580,83 @@ describe "Common Cartridge exporting" do
 
         it 'exports the originality report visibility setting' do
           expect(similarity_tool_el.attr('visibility')).to eq 'immediate'
+        end
+      end
+    end
+
+    context 'tool settings' do
+      include_context "lti2_course_spec_helper"
+
+      let(:custom) do
+        {
+          'custom_var_1' => 'value one',
+          'custom_var_2' => 'value two'
+        }
+      end
+
+      let(:custom_parameters) do
+        {
+          'custom_parameter_1' => 'param value one',
+          'custom_parameter_2' => 'param value two'
+        }
+      end
+
+      let(:assignment_xml_doc) do
+        run_export
+        assignment_xml_file = @manifest_doc.at_css("resource[href*='test-assignment.html'] file[href*='.xml']").attr('href')
+        Nokogiri::XML(@zip_file.read(assignment_xml_file))
+      end
+
+      before(:each) do
+        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { SecureRandom.uuid }
+        allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
+
+        assignment = @course.assignments.create! name: 'test assignment', submission_types: 'online_upload'
+        assignment.tool_settings_tool = message_handler
+        assignment.save!
+
+        tool_proxy.context = @course
+        tool_proxy.save!
+        tool_proxy.tool_settings.create!(
+          context: course,
+          tool_proxy: tool_proxy,
+          resource_link_id: assignment.lti_context_id,
+          custom: custom,
+          custom_parameters: custom_parameters,
+          product_code: tool_proxy.product_family.product_code,
+          vendor_code: tool_proxy.product_family.vendor_code
+        )
+
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+      end
+
+      describe 'tool attributes' do
+        it 'exports the vendor code' do
+          expect(assignment_xml_doc.at_css('tool_setting tool_proxy').attribute('vendor_code').value).to eq product_family.vendor_code
+        end
+
+        it 'exports the product code' do
+          expect(assignment_xml_doc.at_css('tool_setting tool_proxy').attribute('product_code').value).to eq product_family.product_code
+        end
+      end
+
+      describe 'custom values' do
+        it 'exports the custom hash' do
+          exported_hash = assignment_xml_doc.css("tool_setting custom property").each_with_object({}) do |el, hash|
+            hash[el.attr('name')] = el.text
+          end
+
+          expect(exported_hash).to eq(custom)
+        end
+
+        it 'exports the custom parameters hash' do
+          exported_hash = assignment_xml_doc.css("tool_setting custom_parameters property").each_with_object({}) do |el, hash|
+            hash[el.attr('name')] = el.text
+          end
+
+          expect(exported_hash).to eq(custom_parameters)
         end
       end
     end
