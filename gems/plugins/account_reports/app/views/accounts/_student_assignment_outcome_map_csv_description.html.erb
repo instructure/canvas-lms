@@ -29,7 +29,16 @@ outcomes tied to question banks.}) %></p>
     <th><%= t('#account_reports.report_header_section_id', %{section id}) %></th>
     <th><%= t('#account_reports.report_header_section_sis_id', %{section sis id}) %></th>
     <th><%= t('#account_reports.report_header_assignment_url', %{assignment url}) %></th>
-  </tr>e
+    <th><%= t('learning outcome friendly name') %></th>
+    <th><%= t('learning outcome points possible') %></th>
+    <th><%= t('learning outcome mastery score') %></th>
+    <th><%= t('learning outcome mastered') %></th>
+    <th><%= t('learning outcome rating') %></th>
+    <th><%= t('learning outcome rating points') %></th>
+    <th><%= t('account id') %></th>
+    <th><%= t('account name') %></th>
+    <th><%= t('enrollment state') %></th>
+  </tr>
   </thead>
   <tbody>
   <tr>
@@ -51,6 +60,15 @@ outcomes tied to question banks.}) %></p>
     <td>678435</td>
     <td>s5001901</td>
     <td>https://example.com/courses/46489/assignments/3217</td>
+    <td>Ruby A1</td>
+    <td>5</td>
+    <td>3</td>
+    <td>1</td>
+    <td>Needs Improvement</td>
+    <td>1.0</td>
+    <td>399</td>
+    <td>Example Account</td>
+    <td>active</td>
   </tr>
   <tr>
     <td>smith, kacie</td>
@@ -71,6 +89,15 @@ outcomes tied to question banks.}) %></p>
     <td>678435</td>
     <td>s5001901</td>
     <td>https://example.com/courses/46489/assignments/3217</td>
+    <td>Ruby A1</td>
+    <td>5</td>
+    <td>3</td>
+    <td>1</td>
+    <td>Progressing</td>
+    <td>2.0</td>
+    <td>403</td>
+    <td>Example Subaccount</td>
+    <td>active</td>
   </tr>
   </tbody>
-</table>  
+</table>
