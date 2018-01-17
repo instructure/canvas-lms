@@ -20,13 +20,29 @@ require File.expand_path(File.dirname(__FILE__) + '/swagger_helper')
 require 'model_view'
 
 describe ModelView do
-  let(:text) { "Example\n{ \"properties\": [] }" }
+  let(:text) do
+    "Example\n{\n \"properties\": [],\n \"deprecated\": true,\n \"deprecation_description\": \"A description.\" }"
+  end
+
   let(:model) { double('Model', :text => text) }
 
-  it "is created from model" do
-    view = ModelView.new_from_model(model)
-    expect(view.name).to eq "Example"
-    expect(view.properties).to eq []
+  describe '.new_from_model' do
+    it "is created from model" do
+      view = ModelView.new_from_model(model)
+      expect(view.name).to eq "Example"
+      expect(view.properties).to eq []
+    end
+
+    it 'parses the deprecated attribute' do
+      view = ModelView.new_from_model(model)
+      expect(view).to be_deprecated
+    end
+
+    it 'parses the deprecation description' do
+      view = ModelView.new_from_model(model)
+      description = view.json_schema.dig('Example', 'deprecation_description')
+      expect(description).to eq 'A description.'
+    end
   end
 
   it "generates a schema" do
@@ -40,8 +56,32 @@ describe ModelView do
           }
         },
         "description" => "",
-        "required" => []
+        "required" => [],
+        "deprecated" => false,
+        "deprecation_description" => ""
       }
     })
+  end
+
+  describe '#deprecated?' do
+    let(:properties) do
+      {
+        "foo" => {
+          "description" => "A description of the property.",
+          "example" => "bar",
+          "type" => "string"
+        }
+      }
+    end
+
+    it 'returns true if the model is deprecated' do
+      view = ModelView.new('Foo', properties, deprecated: true, deprecation_description: 'A description.')
+      expect(view).to be_deprecated
+    end
+
+    it 'returns false if the model is not deprecated' do
+      view = ModelView.new('Foo', properties)
+      expect(view).not_to be_deprecated
+    end
   end
 end
