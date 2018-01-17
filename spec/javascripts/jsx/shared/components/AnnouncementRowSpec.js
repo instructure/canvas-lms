@@ -42,6 +42,7 @@ const makeProps = (props = {}) => _.merge({
     discussion_subentry_count: 5,
     locked: false,
     html_url: '',
+    user_count: 10,
   },
   canManage: false,
   masterCourseData: {},
@@ -137,4 +138,18 @@ test('does not render reply button icon if is locked', () => {
   const tree = mount(<AnnouncementRow {...makeProps({ announcement: { locked: true } })} />)
   const node = tree.find('IconReplyLine')
   notOk(node.exists())
+})
+
+test('removes non-text content from announcement message', () => {
+  const messageHtml = `
+    <p>Hello World!</p>
+    <img src="/images/stuff/things.png" />
+    <p>foo bar</p>
+  `
+  const tree = mount(<AnnouncementRow {...makeProps({ announcement: { message: messageHtml } })} />)
+  const node = tree.find('.ic-announcement-row__content').getDOMNode()
+  equal(node.childNodes.length, 1)
+  equal(node.childNodes[0].nodeType, 3) // nodeType === 3 is text node type
+  ok(node.textContent.includes('Hello World!'))
+  ok(node.textContent.includes('foo bar'))
 })

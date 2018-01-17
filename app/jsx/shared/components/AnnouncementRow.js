@@ -65,7 +65,9 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
     : null
 
   // necessary because announcements return html from RCE
-  const content = { dangerouslySetInnerHTML: { __html: announcement.message } }
+  const contentWrapper = document.createElement('span')
+  contentWrapper.innerHTML = announcement.message
+  const textContent = contentWrapper.textContent.trim()
   return (
     <CourseItemRow
       ref={rowRef}
@@ -103,7 +105,7 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
       <SectionsTooltip
         totalUserCount={announcement.user_count}
         sections={announcement.sections} />
-      <div className="ic-announcement-row__content" {...content} />
+      <div className="ic-announcement-row__content">{textContent}</div>
       {!announcement.locked &&
         <Container display="block" margin="x-small 0 0">
           <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
