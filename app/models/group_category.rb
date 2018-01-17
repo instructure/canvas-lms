@@ -27,7 +27,8 @@ class GroupCategory < ActiveRecord::Base
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'
 
-  before_save :set_root_account_id
+  before_validation :set_root_account_id
+  validates_uniqueness_of :sis_source_id, scope: [:root_account_id], conditions: -> { where.not(sis_source_id: nil) }
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership
@@ -139,7 +140,9 @@ class GroupCategory < ActiveRecord::Base
     def role_category_for_context(role, context)
       return unless context and protected_role_for_context?(role, context)
       category = context.group_categories.where(role: role).first ||
-                 context.group_categories.build(:name => name_for_role(role), :role => role)
+                 context.group_categories.build(name: name_for_role(role),
+                                                role: role,
+                                                root_account: context.root_account)
       category.save({:validate => false}) if category.new_record?
       category
     end
@@ -398,7 +401,8 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def set_root_account_id
-    if self.context.root_account
+    # context might be nil since this runs before validations.
+    if self.context&.root_account
       root_account_id = self.context.root_account.id
       self.root_account_id = root_account_id
     end
