@@ -121,7 +121,7 @@ export default class AddExternalFeed extends React.Component {
   renderTextInput(value, text, onTextChange) {
     return (
       <Container
-        margin="small 0 medium"
+        margin="small"
         display="block"
       >
         <TextInput
