@@ -530,15 +530,20 @@ RSpec.configure do |config|
     dir
   end
 
+  def generate_csv_file(lines)
+    tmp = Tempfile.new("sis_rspec")
+    path = "#{tmp.path}.csv"
+    tmp.close!
+    File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
+    path
+  end
+
   def process_csv_data(*lines)
     opts = lines.extract_options!
     opts.reverse_merge!(allow_printing: false)
     account = opts[:account] || @account || account_model
 
-    tmp = Tempfile.new("sis_rspec")
-    path = "#{tmp.path}.csv"
-    tmp.close!
-    File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
+    path = generate_csv_file(lines)
     opts[:files] = [path]
 
     importer = SIS::CSV::Import.process(account, opts)

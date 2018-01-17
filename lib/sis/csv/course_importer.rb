@@ -30,11 +30,11 @@ module SIS
 
       # expected columns
       # course_id,short_name,long_name,account_id,term_id,status
-      def process(csv)
+      def process(csv, index=nil, count=nil)
         course_ids = {}
         messages = []
         @sis.counts[:courses] += SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
-          csv_rows(csv) do |row|
+          csv_rows(csv, index, count) do |row|
             update_progress
 
             start_date = nil
