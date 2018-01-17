@@ -96,6 +96,8 @@ module CC::Importer::Standard
       assignment["workflow_state"] = get_node_val(meta_doc, "workflow_state") if meta_doc.at_css("workflow_state")
       assignment["external_tool_migration_id"] = get_node_val(meta_doc, "external_tool_identifierref") if meta_doc.at_css("external_tool_identifierref")
       assignment["external_tool_id"] = get_node_val(meta_doc, "external_tool_external_identifier") if meta_doc.at_css("external_tool_external_identifier")
+      assignment["tool_setting"] = get_tool_setting(meta_doc) if meta_doc.at_css('tool_setting').present?
+
       if meta_doc.at_css("saved_rubric_comments comment")
         assignment[:saved_rubric_comments] = {}
         meta_doc.css("saved_rubric_comments comment").each do |comment_node|
@@ -147,6 +149,18 @@ module CC::Importer::Standard
         end
       end
       assignment
+    end
+
+    private
+    def get_tool_setting(meta_doc)
+      tool_setting = {
+        product_code: meta_doc.at_css('tool_setting tool_proxy').attribute('product_code').value,
+        vendor_code: meta_doc.at_css('tool_setting tool_proxy').attribute('vendor_code').value,
+        custom: meta_doc.css("tool_setting custom property").each_with_object({}) { |el, hash| hash[el.attr('name')] = el.text },
+        custom_parameters: meta_doc.css("tool_setting custom_parameters property").each_with_object({}) { |el, hash| hash[el.attr('name')] = el.text }
+      }
+
+      tool_setting
     end
   end
 end
