@@ -402,6 +402,27 @@ describe AppointmentGroupsController, type: :request do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
                       {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
+    expect(response).to be_success
+    expect(json.keys.sort).to eql expected_fields
+    expect(json['workflow_state']).to eql 'deleted'
+    expect(ag.reload).to be_deleted
+  end
+
+  it 'should delete an appointment group with appointments' do
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00",
+                                                                                "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                                               ["#{Time.now.year + 1}-01-01 13:00:00",
+                                                                                "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
+    student_in_course(:course => @course, :active_all => true)
+    ag.appointments.first.reserve_for @student, @me
+    ag.appointments.last.reserve_for @student, @me
+
+    @user = @me
+
+    json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
+                      {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
+
+    expect(response).to be_success
     expect(json.keys.sort).to eql expected_fields
     expect(json['workflow_state']).to eql 'deleted'
     expect(ag.reload).to be_deleted

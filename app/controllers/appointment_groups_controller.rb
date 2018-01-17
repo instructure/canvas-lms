@@ -499,7 +499,7 @@ class AppointmentGroupsController < ApplicationController
   def destroy
     if authorized_action(@group, @current_user, :delete)
       @group.cancel_reason = params[:cancel_reason]
-      if @group.destroy
+      if @group.destroy(@current_user)
         render :json => appointment_group_json(@group, @current_user, session)
       else
         render :json => @group.errors, :status => :bad_request

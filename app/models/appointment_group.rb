@@ -463,11 +463,14 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
-  def destroy
+  def destroy(updating_user)
     transaction do
       self.workflow_state = 'deleted'
       save!
-      self.appointments.map{ |a| a.destroy(false) }
+      self.appointments.map do |a|
+        a.updating_user = updating_user
+        a.destroy(false)
+      end
     end
   end
 
