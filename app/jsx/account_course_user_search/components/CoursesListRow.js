@@ -164,17 +164,17 @@ export default class CoursesListRow extends React.Component {
         <td style={{whiteSpace: 'nowrap'}}>
           <Tooltip tip={I18n.t('Add Users to %{name}', {name})}>
             <Button variant="icon" size="small" onClick={this.openAddUsersToCourseDialog}>
-              <IconPlusLine />
+              <IconPlusLine title={I18n.t('Add Users to %{name}', {name})} />
             </Button>
           </Tooltip>
           <Tooltip tip={I18n.t('Statistics for %{name}', {name})}>
             <Button variant="icon" size="small" href={`${url}/statistics`}>
-              <IconStatsLine />
+              <IconStatsLine title={I18n.t('Statistics for %{name}', {name})} />
             </Button>
           </Tooltip>
           <Tooltip tip={I18n.t('Settings for %{name}', {name})}>
             <Button variant="icon" size="small" href={`${url}/settings`}>
-              <IconSettingsLine />
+              <IconSettingsLine title={I18n.t('Settings for %{name}', {name})} />
             </Button>
           </Tooltip>
         </td>
