@@ -16900,7 +16900,7 @@ es:
       domain_match_notice: "para usar esta herramienta, el dominio debe coincidir con %{domain}"
       external_tool_item: "Herramienta externa"
       external_tool_notice: "Seleccionar una herramienta de la siguiente lista, o ingrese una URL para una herramienta externa que ya sabe está configurada con Basic LTI para agregar un enlace entre él y este *módulo*."
-      external_url_item: externa
+      external_url_item: "URL externa"
       external_url_notice: "Ingrese una URL y un nombre de página para agregar un enlace a cualquier URL a este *módulo*."
       file_item: Archivo
       file_notice: "Seleccione el archivo que desea asociar con este *módulo*, o agregue un archivo seleccionando \"Archivo Nuevo\"."
