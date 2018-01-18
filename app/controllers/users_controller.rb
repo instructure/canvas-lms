@@ -539,7 +539,8 @@ class UsersController < ApplicationController
         :show_planner => show_planner?
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
-      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true)
+      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true),
+      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups.where(context_type: 'Account'))
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
