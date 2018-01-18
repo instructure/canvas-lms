@@ -5755,7 +5755,7 @@ zh-Hans:
     bottom: 
       student: 
         count: 落后学生人数
-    column_delimiter: ，
+    column_delimiter: ","
     comments: 评论
     correct: 
       bottom: 
