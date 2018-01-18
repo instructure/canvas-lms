@@ -608,6 +608,36 @@ describe "Group Categories API", type: :request do
         )
         expect(response.code).to eq '400'
       end
+
+      describe "sis permissions" do
+        let(:json) { api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
+                              @category_path_options.merge(action:'index',
+                                                           account_id: @account.to_param)) }
+        let(:admin) { Role.get_built_in_role("AccountAdmin") }
+
+        before :each do
+          @user = User.create!(name: 'billy')
+          @account.account_users.create(user: @user)
+        end
+
+        it "should show SIS fields if the user has permission", priority: 3, test_id: 3436530 do
+          expect(json[0]).to have_key("sis_group_category_id")
+          expect(json[0]).to have_key("sis_import_id")
+        end
+
+        it "should show only sis_group_category_id without manage_sis permission", priority: 3, test_id: 3436880 do
+          @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
+          expect(json[0]).to have_key("sis_group_category_id")
+          expect(json[0]).not_to have_key("sis_import_id")
+        end
+
+        it "should not show SIS fields if the user doesn't have permission", priority: 3, test_id: 3436531 do
+          @account.role_overrides.create(role: admin, enabled: false, permission: :read_sis)
+          @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
+          expect(json[0]).not_to have_key("sis_group_category_id")
+          expect(json[0]).not_to have_key("sis_import_id")
+        end
+      end
     end
 
     it "should not allow non-admins to list an account's group categories" do

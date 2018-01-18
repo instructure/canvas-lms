@@ -138,6 +138,32 @@ describe "Groups API", type: :request do
     expect(links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }).to be_truthy
   end
 
+  describe "show SIS fields based on manage_sis permissions" do
+    before :once do
+      course_with_student(:user => @member)
+      @group = @course.groups.create!(:name => "My Group")
+      @group.add_user(@member, 'accepted', true)
+      @group.reload
+      account = @course.account
+      @admin_user = User.create!()
+      account.account_users.create!(user: @admin_user, account: account)
+    end
+
+    it "should show if the user has permission", priority: 3, test_id: 3436528 do
+      @user = @admin_user
+      json = api_call(:get, "/api/v1/groups/#{@group.id}", @category_path_options.merge(action: "show", group_id: @group.id))
+      expect(json).to have_key("sis_group_id")
+      expect(json).to have_key("sis_import_id")
+    end
+
+    it "should not show if the user doesn't have permission", priority: 3, test_id: 3436529 do
+      @user = @member
+      json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(action: 'index'))
+      expect(json[0]).not_to have_key("sis_group_id")
+      expect(json[0]).not_to have_key("sis_import_id")
+    end
+ end
+
   it "should indicate if the context is deleted" do
     course_with_student(:user => @member)
     @group = @course.groups.create!(:name => "My Group")
