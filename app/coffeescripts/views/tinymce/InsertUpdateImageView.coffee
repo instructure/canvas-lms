@@ -45,6 +45,7 @@ define [
     dialogOptions:
       width: 625
       title: I18n.t 'titles.insert_edit_image', 'Insert / Edit Image'
+      destroy: true
 
     toJSON: () ->
       {show_quiz_warning: ENV.SHOW_QUIZ_ALT_TEXT_WARNING}
