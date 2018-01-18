@@ -5778,7 +5778,7 @@ zh-Hant:
     bottom: 
       student: 
         count: 最低分學生人數
-    column_delimiter: ，
+    column_delimiter: ","
     comments: 注解
     correct: 
       bottom: 
