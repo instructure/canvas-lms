@@ -91,7 +91,8 @@ module Lti
         'description' => assignment_instance.description,
         'due_at' => assignment_instance.due_at,
         'points_possible' => assignment_instance.points_possible,
-        'lti_id' => assignment_instance.lti_context_id
+        'lti_id' => assignment_instance.lti_context_id,
+        'lti_course_id' => Lti::Asset.opaque_identifier_for(assignment_instance.context)
       }
     end
 

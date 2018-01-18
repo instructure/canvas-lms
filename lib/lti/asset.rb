@@ -17,7 +17,6 @@
 
 module Lti
   class Asset
-
     def self.opaque_identifier_for(asset)
       shard = asset.shard
       shard.activate do
@@ -25,8 +24,6 @@ module Lti
         set_asset_context_id(asset, lti_context_id)
       end
     end
-
-    private
 
     def self.set_asset_context_id(asset, context_id)
       lti_context_id = context_id
@@ -58,6 +55,5 @@ module Lti
       raise "Empty value" if str.blank?
       Canvas::Security.hmac_sha1(str, asset.shard.settings[:encryption_key])
     end
-
   end
 end
