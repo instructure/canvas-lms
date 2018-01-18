@@ -223,6 +223,21 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.require_initial_post?).to be_falsey
     end
 
+    it 'will not create an announcement with sections if context is a group' do
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      @group_category = @course.group_categories.create(:name => 'gc')
+      @group = @course.groups.create!(:group_category => @group_category)
+      api_call(:post, "/api/v1/groups/#{@group.id}/discussion_topics",
+               {:controller => "discussion_topics", :action => "create", :format => "json", :group_id=> @group.to_param},
+               {:title => "test title", :message => "test <b>message</b>",
+                :is_announcement => true, :specific_sections => [section1.id, section2.id] })
+      expect(response).to have_http_status :bad_request
+    end
+
     it 'should process html content in message on create' do
       should_process_incoming_user_content(@course) do |content|
         api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",

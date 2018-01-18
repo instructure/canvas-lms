@@ -492,7 +492,8 @@ class DiscussionTopicsController < ApplicationController
       end
 
       if @context.account.feature_enabled?(:section_specific_announcements) &&
-          @topic.is_section_specific
+          @topic.is_section_specific && @context.is_a?(Course)
+
         selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
         js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
           {
@@ -689,9 +690,8 @@ class DiscussionTopicsController < ApplicationController
             end
 
             js_hash = {:DISCUSSION => env_hash}
-
-            if @context.account.feature_enabled?(:section_specific_announcements)
-              js_hash[:TOTAL_USER_COUNT] = Enrollment.where(course_id: @context).active.count
+            if @context.account.feature_enabled?(:section_specific_announcements) && @context.is_a?(Course)
+              js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.active.count
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
@@ -1012,10 +1012,14 @@ class DiscussionTopicsController < ApplicationController
                  else
                     :discussion_topics
                  end
+    if @context.is_a?(Group) && params[:specific_sections] && params[:specific_sections] != "all"
+      @errors[:specific_sections] = t("You cannot assign sections to a group discussion topic")
+    end
+
     if is_new
       @topic = @context.send(model_type).build
       prior_version = @topic.dup
-      if model_type == :announcements
+      if model_type == :announcements && @context.is_a?(Course)
         @topic.locked = true
         set_sections if @context.account.feature_enabled?(:section_specific_announcements) &&
           params[:specific_sections] != "all"
@@ -1026,9 +1030,10 @@ class DiscussionTopicsController < ApplicationController
       if model_type == :announcements &&
               @context.account.feature_enabled?(:section_specific_announcements) &&
               @topic.is_section_specific &&
-              params[:specific_sections] == "all"
+              params[:specific_sections] == "all" &&
+              @context.is_a?(Course)
         @topic.is_section_specific = false
-      elsif model_type == :announcements &&
+      elsif model_type == :announcements && @context.is_a?(Course)
               @context.account.feature_enabled?(:section_specific_announcements)
         set_sections
       end
