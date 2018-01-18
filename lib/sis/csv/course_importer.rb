@@ -45,10 +45,10 @@ module SIS
             rescue
               messages << "Bad date format for course #{row['course_id']}"
             end
-
+            course_format = row.has_key?('course_format') && (row['course_format'] || 'not_set')
             begin
               importer.add_course(row['course_id'], row['term_id'], row['account_id'], row['fallback_account_id'], row['status'], start_date, end_date,
-                row['abstract_course_id'], row['short_name'], row['long_name'], row['integration_id'], row['course_format'], row['blueprint_course_id'])
+                row['abstract_course_id'], row['short_name'], row['long_name'], row['integration_id'], course_format, row['blueprint_course_id'])
             rescue ImportError => e
               messages << "#{e}"
             end

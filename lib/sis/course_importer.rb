@@ -70,7 +70,7 @@ module SIS
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished)/i
-        raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended)/i
+        raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
 
         course = @root_account.all_courses.where(sis_source_id: course_id).take
         if course.nil?
@@ -168,9 +168,12 @@ module SIS
 
         update_enrollments = !course.new_record? && !(course.changes.keys & ['workflow_state', 'name', 'course_code']).empty?
 
-        if course_format != course.course_format
-          course.settings_will_change!
-          course.course_format = course_format
+        if course_format
+          course_format = nil if course_format == 'not_set'
+          if course_format != course.course_format
+            course.settings_will_change!
+            course.course_format = course_format
+          end
         end
 
         if course.changed?

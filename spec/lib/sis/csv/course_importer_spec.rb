@@ -594,6 +594,12 @@ describe SIS::CSV::CourseImporter do
     expect(Course.find_by_sis_source_id('test_1').course_format).not_to be_present
     expect(Course.find_by_sis_source_id('test_2').course_format).not_to be_present
     expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'blended'
+
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_3,TC 103,Test Course 103,,,active"
+    )
+    expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'blended'
   end
 
   it 'rejects invalid course_format' do
