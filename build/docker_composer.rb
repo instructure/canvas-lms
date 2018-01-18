@@ -17,6 +17,7 @@
 
 require "yaml"
 require "fileutils"
+require "open3"
 require "English"
 require_relative "./docker_utils"
 
@@ -236,12 +237,22 @@ class DockerComposer
     end
 
     def docker(args)
-      system "docker #{args}" or raise("`docker #{args}` failed")
+      out, err, status = Open3.capture3("docker #{args}")
+      puts out
+      if !status.success?
+        $stderr.puts err
+        raise("`docker #{args}` failed")
+      end
     end
 
     def docker_compose(args)
       file_args = COMPOSE_FILES.map { |f| "-f #{f}" }.join(" ")
-      system "docker-compose #{file_args} #{args}" or raise("`docker-compose #{args}` failed")
+      out, err, status = Open3.capture3("docker-compose #{file_args} #{args}")
+      puts out
+      if !status.success?
+        $stderr.puts err
+        raise("`docker-compose #{file_args} #{args}` failed")
+      end
     end
 
     def service_config(key)
