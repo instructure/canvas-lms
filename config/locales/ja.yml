@@ -5763,7 +5763,7 @@ ja:
     bottom: 
       student: 
         count: 下位の受講生数
-    column_delimiter: 、
+    column_delimiter: ","
     comments: コメント
     correct: 
       bottom: 
