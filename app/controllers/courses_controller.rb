@@ -383,9 +383,12 @@ class CoursesController < ApplicationController
   #   - "total_scores": Optional information to include with each Course.
   #     When total_scores is given, any student enrollments will also
   #     include the fields 'computed_current_score', 'computed_final_score',
-  #     'computed_current_grade', and 'computed_final_grade' (see Enrollment
-  #     documentation for more information on these fields). This argument
-  #     is ignored if the course is configured to hide final grades.
+  #     'computed_current_grade', and 'computed_final_grade', as well as (if
+  #     the user has permission) 'unposted_current_score',
+  #     'unposted_final_score', 'unposted_current_grade', and
+  #     'unposted_final_grade' (see Enrollment documentation for more
+  #     information on these fields). This argument is ignored if the course is
+  #     configured to hide final grades.
   #   - "current_grading_period_scores": Optional information to include with
   #     each Course. When current_grading_period_scores is given and total_scores
   #     is given, any student enrollments will also include the fields
@@ -394,7 +397,11 @@ class CoursesController < ApplicationController
   #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
-  #     'current_period_computed_final_grade' (see Enrollment documentation for
+  #     'current_period_computed_final_grade', as well as (if the user has permission)
+  #     'current_period_unposted_current_score',
+  #     'current_period_unposted_final_score',
+  #     'current_period_unposted_current_grade', and
+  #     'current_period_unposted_final_grade' (see Enrollment documentation for
   #     more information on these fields). In addition, when this argument is
   #     passed, the course will have a 'has_grading_periods' attribute
   #     on it. This argument is ignored if the course is configured to hide final
@@ -512,7 +519,11 @@ class CoursesController < ApplicationController
   #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
-  #     'current_period_computed_final_grade' (see Enrollment documentation for
+  #     'current_period_computed_final_grade', as well as (if the user has permission)
+  #     'current_period_unposted_current_score',
+  #     'current_period_unposted_final_score',
+  #     'current_period_unposted_current_grade', and
+  #     'current_period_unposted_final_grade' (see Enrollment documentation for
   #     more information on these fields). In addition, when this argument is
   #     passed, the course will have a 'has_grading_periods' attribute
   #     on it. This argument is ignored if the course is configured to hide final

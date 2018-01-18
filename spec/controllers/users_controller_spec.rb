@@ -691,6 +691,87 @@ describe UsersController do
       end
     end
 
+    context "with unposted assignments" do
+      before(:each) do
+        unposted_assignment = assignment_model(
+          course: test_course, due_at: Time.zone.now,
+          points_possible: 90, muted: true
+        )
+        unposted_assignment.grade_student(student, grade: '100%', grader: @teacher)
+
+        user_session(@teacher)
+      end
+
+      let(:response) do
+        get('grades_for_student', params: {enrollment_id: student_enrollment.id})
+      end
+
+      let(:parsed_response) do
+        json_parse(response.body)
+      end
+
+      context "when the requester can manage grades" do
+        before(:each) do
+          test_course.root_account.role_overrides.create!(
+            permission: 'view_all_grades', role: teacher_role, enabled: false
+          )
+          RoleOverride.create!(
+            permission: 'manage_grades', role: teacher_role, enabled: true
+          )
+        end
+
+        it "allows access" do
+          expect(response).to be_ok
+        end
+
+        it "returns the grade" do
+          expect(parsed_response['grade']).to eq 94.55
+        end
+
+        it "returns the unposted_grade" do
+          expect(parsed_response['unposted_grade']).to eq 97
+        end
+      end
+
+      context "when the requester can view all grades" do
+        before(:each) do
+          test_course.root_account.role_overrides.create!(
+            permission: 'view_all_grades', role: teacher_role, enabled: true
+          )
+          test_course.root_account.role_overrides.create!(
+            permission: 'manage_grades', role: teacher_role, enabled: false
+          )
+        end
+
+        it "allows access" do
+          expect(response).to be_ok
+        end
+
+        it "returns the grade" do
+          expect(parsed_response['grade']).to eq 94.55
+        end
+
+        it "returns the unposted_grade" do
+          expect(parsed_response['unposted_grade']).to eq 97
+        end
+      end
+
+      context "when the requester does not have permissions to see unposted grades" do
+        before(:each) do
+          test_course.root_account.role_overrides.create!(
+            permission: 'view_all_grades', role: teacher_role, enabled: false
+          )
+          test_course.root_account.role_overrides.create!(
+            permission: 'manage_grades', role: teacher_role, enabled: false
+          )
+        end
+
+        it "returns unauthorized" do
+          expect(response).to have_http_status(401)
+        end
+      end
+    end
+
     context "as an observer" do
       let(:observer) { user_with_pseudonym(active_all: true) }
 

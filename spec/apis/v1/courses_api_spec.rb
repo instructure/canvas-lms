@@ -142,17 +142,20 @@ describe Api::V1::Course do
       expect(json['original_name']).to eq @course1.name
     end
 
-    context "total_scores" do
-      before do
-        @enrollment.scores.create!(current_score: 95.0, final_score: 85.0)
+    describe "total_scores" do
+      before(:each) do
+        @enrollment.scores.create!(
+          current_score: 95.0, final_score: 85.0,
+          unposted_current_score: 94.0, unposted_final_score: 84.0
+        )
         @course.grading_standard_enabled = true
         @course.save!
       end
 
       let(:json) { @test_api.course_json(@course1, @me, {}, ['total_scores'], [@enrollment]) }
 
-      it "should include computed scores" do
-        expect(json['enrollments']).to eq [{
+      let(:expected_result_without_unposted) do
+        {
           "type" => "student",
           "role" => student_role.name,
           "role_id" => student_role.id,
@@ -162,7 +165,137 @@ describe Api::V1::Course do
           "computed_final_score" => 85.0,
           "computed_current_grade" => "A",
           "computed_final_grade" => "B"
-        }]
+        }
+      end
+
+      let(:expected_result_with_unposted) do
+        expected_result_without_unposted.merge({
+          "unposted_current_score" => 94.0,
+          "unposted_final_score" => 84.0,
+          "unposted_current_grade" => "A",
+          "unposted_final_grade" => "B"
+        })
+      end
+
+      it "should include computed scores" do
+        expect(json['enrollments']).to eq [expected_result_with_unposted]
+      end
+
+      it "should include unposted scores if user has :manage_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: true)
+
+        expect(json['enrollments']).to eq [expected_result_with_unposted]
+      end
+
+      it "should include unposted scores if user has :view_all_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: true)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: false)
+
+        expect(json['enrollments']).to eq [expected_result_with_unposted]
+      end
+
+      it "should not include unposted scores if user does not have permission" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: false)
+
+        expect(json['enrollments']).to eq [expected_result_without_unposted]
+      end
+    end
+
+    describe "current_grading_period_scores" do
+      before(:each) do
+        @course.grading_standard_enabled = true
+        create_grading_periods_for(@course, grading_periods: [:current, :future])
+
+        current_assignment = @course.assignments.create!(
+          title: "Current",
+          due_at: 2.days.ago,
+          points_possible: 10
+        )
+        current_assignment.grade_student(@student, grader: @teacher, score: 2)
+        unposted_current_assignment = @course.assignments.create!(
+          title: "Current",
+          due_at: 2.days.ago,
+          points_possible: 10,
+          muted: true
+        )
+        unposted_current_assignment.grade_student(@student, grader: @teacher, score: 9)
+
+        future_assignment = @course.assignments.create!(
+          title: "Future",
+          due_at: 4.months.from_now,
+          points_possible: 10,
+        )
+        future_assignment.grade_student(@student, grader: @teacher, score: 7)
+
+        @course.save!
+        @me = @teacher
+      end
+
+      let(:json) do
+        @test_api.course_json(@course, @me, {}, ['total_scores', 'current_grading_period_scores'], [@enrollment])
+      end
+
+      let(:student_enrollment) { json['enrollments'].first }
+
+      let(:expected_fields_without_unposted) do
+        {
+          "type" => "student",
+          "role" => student_role.name,
+          "role_id" => student_role.id,
+          "user_id" => @student.id,
+          "enrollment_state" => "active",
+          "computed_current_score" => 45.0,
+          "computed_final_score" => 30.0,
+          "computed_current_grade" => "F",
+          "computed_final_grade" => "F",
+          "current_period_computed_current_score" => 20.0,
+          "current_period_computed_final_score" => 10.0,
+          "current_period_computed_current_grade" => "F",
+          "current_period_computed_final_grade" => "F"
+        }
+      end
+
+      let(:unposted_fields) do
+        {
+          "unposted_current_score" => 60.0,
+          "unposted_final_score" => 60.0,
+          "unposted_current_grade" => "F",
+          "unposted_final_grade" => "F",
+          "current_period_unposted_current_score" => 55.0,
+          "current_period_unposted_final_score" => 55.0,
+          "current_period_unposted_current_grade" => "F",
+          "current_period_unposted_final_grade" => "F"
+        }
+      end
+
+      let(:expected_fields_with_unposted) { expected_fields_without_unposted.merge(unposted_fields) }
+
+      it "should always include computed scores" do
+        expect(student_enrollment).to include(expected_fields_without_unposted)
+      end
+
+      it "should include unposted scores if user has :manage_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: true)
+
+        expect(student_enrollment).to include(expected_fields_with_unposted)
+      end
+
+      it "should include unposted scores if user has :view_all_grades" do
+        @course.root_account.role_overrides.create!(permission: 'view_all_grades', role: teacher_role, enabled: true)
+        @course.root_account.role_overrides.create!(permission: 'manage_grades', role: teacher_role, enabled: false)
+
+        expect(student_enrollment).to include(expected_fields_with_unposted)
+      end
+
+      it "should not include unposted scores if user does not have permission" do
+        @me = @student
+
+        enrollment = student_enrollment
+        expect(enrollment).to include(expected_fields_without_unposted)
+        expect(enrollment).not_to include(unposted_fields)
       end
     end
 
@@ -1678,7 +1811,7 @@ describe CoursesController, type: :request do
     context "include total scores" do
       before(:once) do
         student_enrollment = @course2.all_student_enrollments.first
-        student_enrollment.scores.create!(current_score: 80, final_score: 70)
+        student_enrollment.scores.create!(current_score: 80, final_score: 70, unposted_current_score: 10)
       end
 
       it "includes scores in course list if requested" do
@@ -1688,6 +1821,16 @@ describe CoursesController, type: :request do
           'computed_current_score' => 80,
           'computed_final_score' => 70,
           'computed_final_grade' => @course2.score_to_grade(70)
+        )
+      end
+
+      it "does not include unposted scores for a self-viewing user" do
+        json_response = courses_api_index_call
+        expect(enrollment(json_response)).not_to include(
+          'unposted_current_score',
+          'unposted_current_grade',
+          'unposted_final_score',
+          'unposted_final_grade'
         )
       end
 
@@ -3621,8 +3764,10 @@ describe CoursesController, type: :request do
 
     before(:once) do
       student.scores.create!(grading_period_id: grading_period.id,
-                             current_score: 100, final_score: 50)
-      student.scores.create!(current_score: 80, final_score: 74)
+                             current_score: 100, final_score: 50,
+                             unposted_current_score: 70, unposted_final_score: 60)
+      student.scores.create!(current_score: 80, final_score: 74,
+                             unposted_current_score: 75, unposted_final_score: 86)
     end
 
     context "users endpoint with mgp" do
@@ -3644,6 +3789,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 80.0,
           "final_score" => 74.0,
+          "unposted_current_score" => 75.0,
+          "unposted_final_score" => 86.0
         })
       end
 
@@ -3657,6 +3804,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 100.0,
           "final_score" => 50.0,
+          "unposted_current_score" => 70.0,
+          "unposted_final_score" => 60.0,
           "grading_period_id" => grading_period.id
         })
       end
@@ -3684,6 +3833,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 80.0,
           "final_score" => 74.0,
+          "unposted_current_score" => 75.0,
+          "unposted_final_score" => 86.0
         })
       end
 
@@ -3697,6 +3848,8 @@ describe CoursesController, type: :request do
         expect(grades).to include({
           "current_score" => 100.0,
           "final_score" => 50.0,
+          "unposted_current_score" => 70.0,
+          "unposted_final_score" => 60.0,
           "grading_period_id" => grading_period.id
         })
       end

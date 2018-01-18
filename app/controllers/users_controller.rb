@@ -201,10 +201,17 @@ class UsersController < ApplicationController
 
     grading_period_id = generate_grading_period_id(params[:grading_period_id])
     opts = { grading_period_id: grading_period_id } if grading_period_id
-    render json: {
+
+    grade_data = {
       grade: enrollment.computed_current_score(opts),
       hide_final_grades: enrollment.course.hide_final_grades?
     }
+
+    if enrollment.course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+      grade_data[:unposted_grade] = enrollment.unposted_current_score(opts)
+    end
+
+    render json: grade_data
   end
 
   def oauth
