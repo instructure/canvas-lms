@@ -93,10 +93,16 @@ test('renders "Posted on" date label if announcement is not delayed', () => {
   ok(node.text().includes('Posted on'))
 })
 
-test('renders the SectionsTooltip component', () => {
+test('renders the SectionsTooltip component if canHaveSections: true', () => {
   const announcement = { user_count: 200 }
-  const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
+  const tree = mount(<AnnouncementRow {...makeProps({ announcement, canHaveSections: true })} />)
   equal(tree.find('SectionsTooltip Text').text(), 'All Sections')
+})
+
+test('does not render the SectionsTooltip component if canHaveSections: false', () => {
+  const announcement = { user_count: 200, canHaveSections: false }
+  const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
+  notOk(tree.find('SectionsTooltip').exists())
 })
 
 test('renders the SectionsTooltip component with sections', () => {
@@ -104,7 +110,7 @@ test('renders the SectionsTooltip component with sections', () => {
     { "id": 6, "course_id": 1, "name": "section 4", "user_count": 2 },
     { "id": 5, "course_id": 1, "name": "section 2", "user_count": 1 }
   ]}
-  const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
+  const tree = mount(<AnnouncementRow {...makeProps({ announcement, canHaveSections: true })} />)
   equal(tree.find('SectionsTooltip Text').text(), '2 Sectionssection 4section 2')
 })
 

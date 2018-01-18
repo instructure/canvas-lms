@@ -54,7 +54,8 @@ function makeTimestamp ({ delayed_post_at, posted_at }) {
   : { title: I18n.t('Posted on:'), date: posted_at }
 }
 
-export default function AnnouncementRow ({ announcement, canManage, masterCourseData, rowRef, onSelectedChanged, onManageMenuSelect }) {
+export default function AnnouncementRow (
+  { announcement, canManage, masterCourseData, rowRef, onSelectedChanged, onManageMenuSelect, canHaveSections }) {
   const timestamp = makeTimestamp(announcement)
   const readCount = announcement.discussion_subentry_count > 0
     ? (
@@ -129,9 +130,9 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
       ] || null}
     >
       <Heading level="h3">{announcement.title}</Heading>
-      <SectionsTooltip
+      {canHaveSections && <SectionsTooltip
         totalUserCount={announcement.user_count}
-        sections={announcement.sections} />
+        sections={announcement.sections} />}
       <div className="ic-announcement-row__content">{textContent}</div>
       {!announcement.locked &&
         <Container display="block" margin="x-small 0 0">
@@ -144,6 +145,7 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
 AnnouncementRow.propTypes = {
   announcement: announcementShape.isRequired,
   canManage: bool,
+  canHaveSections: bool,
   masterCourseData: masterCourseDataShape,
   rowRef: func,
   onSelectedChanged: func,
@@ -152,6 +154,7 @@ AnnouncementRow.propTypes = {
 
 AnnouncementRow.defaultProps = {
   canManage: false,
+  canHaveSections: false,
   masterCourseData: null,
   rowRef () {},
   onSelectedChanged () {},

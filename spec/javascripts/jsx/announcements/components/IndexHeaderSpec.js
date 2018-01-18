@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
+import { mount } from 'enzyme'
 import merge from 'lodash/merge'
 
 import IndexHeader, { SEARCH_TIME_DELAY } from 'jsx/announcements/components/IndexHeader'
 
 const makeProps = (props = {}) => merge({
-  courseId: '5',
+  contextType: 'course',
+  contextId: '1',
   permissions: {
     create: true,
     manage_content: true,

@@ -70,7 +70,8 @@ function reduceAnnouncements (announcements, action) {
 }
 
 export default combineReducers({
-  courseId: identity(null),
+  contextType: identity(null),
+  contextId: identity(null),
   feedId: identity(null),
   permissions: identity({}),
   masterCourseData: identity(null),

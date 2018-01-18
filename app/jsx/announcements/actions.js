@@ -84,7 +84,7 @@ actions.searchAnnouncements = function searchAnnouncements (searchOpts) {
 actions.getExternalFeeds = function () {
   return (dispatch, getState) => {
     dispatch(actions.loadingExternalFeedStart())
-    apiClient.getExternalFeeds({ courseId : getState().courseId })
+    apiClient.getExternalFeeds(getState())
       .then(resp => {
         dispatch(actions.loadingExternalFeedSuccess({ feeds: resp.data }))
       }).catch((err) => {
@@ -100,21 +100,21 @@ actions.deleteExternalFeed = function ({ feedId }) {
   return (dispatch, getState) => {
     if(!getState().externalRssFeed.isDeleting) {
       dispatch(actions.deleteExternalFeedStart())
-      apiClient.deleteExternalFeed({ courseId : getState().courseId, feedId })
-      .then(() => {
-        dispatch(actions.deleteExternalFeedSuccess({ feedId }))
-        const successMessage = I18n.t('External Feed deleted successfully')
-        $.screenReaderFlashMessage(successMessage)
-        dispatch(notificationActions.notifyInfo({ message: successMessage }))
-      })
-      .catch((err) => {
-        const failMessage = I18n.t('Failed to delete external feed')
-        $.screenReaderFlashMessage(failMessage)
-        dispatch(actions.deleteExternalFeedFail({
-          message: failMessage,
-          err
-        }))
-      })
+      apiClient.deleteExternalFeed(getState(), feedId)
+        .then(() => {
+          dispatch(actions.deleteExternalFeedSuccess({ feedId }))
+          const successMessage = I18n.t('External Feed deleted successfully')
+          $.screenReaderFlashMessage(successMessage)
+          dispatch(notificationActions.notifyInfo({ message: successMessage }))
+        })
+        .catch((err) => {
+          const failMessage = I18n.t('Failed to delete external feed')
+          $.screenReaderFlashMessage(failMessage)
+          dispatch(actions.deleteExternalFeedFail({
+            message: failMessage,
+            err
+          }))
+        })
     }
   }
 }
@@ -196,7 +196,7 @@ actions.deleteSelectedAnnouncements = () => (dispatch, getState) => {
 actions.addExternalFeed = function (payload) {
   return (dispatch, getState) => {
     dispatch(actions.addExternalFeedStart())
-    apiClient.addExternalFeed({ courseId : getState().courseId, ...payload })
+    apiClient.addExternalFeed(getState(), payload)
       .then(resp => {
         dispatch(actions.addExternalFeedSuccess({ feed: resp.data}))
         const successMessage = I18n.t('External feed successfully added')

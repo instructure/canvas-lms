@@ -50,7 +50,8 @@ const filters = {
 }
 export default class IndexHeader extends Component {
   static propTypes = {
-    courseId: string.isRequired,
+    contextType: string.isRequired,
+    contextId: string.isRequired,
     isBusy: bool,
     selectedCount: number,
     permissions: propTypes.permissions.isRequired,
@@ -148,7 +149,7 @@ export default class IndexHeader extends Component {
                   ><IconTrash /><ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent></Button>}
                 {this.props.permissions.create &&
                   <Button
-                    href={`/courses/${this.props.courseId}/discussion_topics/new?is_announcement=true`}
+                    href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
                     variant="primary"
                     id="add_announcement"
                   ><IconPlus />
@@ -169,7 +170,7 @@ export default class IndexHeader extends Component {
 const connectState = state => Object.assign({
   isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
   selectedCount: state.selectedAnnouncements.length,
-}, select(state, ['courseId', 'permissions', 'atomFeedUrl']))
+}, select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl']))
 const selectedActions = ['searchAnnouncements', 'toggleSelectedAnnouncementsLock', 'deleteSelectedAnnouncements']
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

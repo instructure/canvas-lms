@@ -48,6 +48,7 @@ export default class AnnouncementsIndex extends Component {
     announcementsLastPage: number.isRequired,
     isLoadingAnnouncements: bool.isRequired,
     hasLoadedAnnouncements: bool.isRequired,
+    isCourseContext: bool.isRequired,
     getAnnouncements: func.isRequired,
     setAnnouncementSelection: func.isRequired,
     permissions: propTypes.permissions.isRequired,
@@ -137,6 +138,7 @@ export default class AnnouncementsIndex extends Component {
               masterCourseData={this.props.masterCourseData}
               onSelectedChanged={this.props.setAnnouncementSelection}
               onManageMenuSelect={this.onManageAnnouncement}
+              canHaveSections={this.props.isCourseContext}
             />
           ))}
         </Container>
@@ -193,7 +195,7 @@ export default class AnnouncementsIndex extends Component {
 const connectState = state =>
   Object.assign(
     {
-      // props derived from state here
+      isCourseContext: state.contextType === 'course',
     },
     selectPaginationState(state, 'announcements'),
     select(state, ['permissions', 'masterCourseData'])
@@ -202,4 +204,5 @@ const connectActions = dispatch =>
   bindActionCreators(select(actions,
     ['getAnnouncements', 'setAnnouncementSelection', 'deleteAnnouncements', 'toggleAnnouncementsLock']
   ), dispatch)
+
 export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)

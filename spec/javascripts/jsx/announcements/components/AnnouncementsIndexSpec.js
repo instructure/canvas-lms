@@ -27,6 +27,7 @@ import sampleData from '../sampleData'
 const makeProps = (props = {}) => _.merge({
   announcements: [],
   announcementsPage: 1,
+  isCourseContext: true,
   isLoadingAnnouncements: false,
   hasLoadedAnnouncements: false,
   announcementsLastPage: 5,
@@ -45,7 +46,8 @@ const makeProps = (props = {}) => _.merge({
 // that need to pull their props from the store state
 const store = {
   getState: () => ({
-    courseId: '5',
+    contextType: 'course',
+    contextId: '1',
     permissions: {
       create: true,
       manage_content: true,
