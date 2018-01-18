@@ -252,6 +252,14 @@ class DiscussionTopicsController < ApplicationController
   # @argument include[] [String, "all_dates", "sections", "sections_user_count"]
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
+  #   if "sections" is passed, includes the course sections that are associated
+  #   with the topic, if the topic is specific to sertain sections of the course.
+  #   If "sections_user_count" is passed, then:
+  #     (a) If sections were asked for *and* the topic is specific to certain
+  #         course sections sections, includes the number of users in each
+  #         section. (as part of the section json asked for above)
+  #     (b) Else, includes at the root level the total number of users in the
+  #         topic's context (group or course) that the topic applies to.
   #
   # @argument order_by [String, "position"|"recent_activity"|"title"]
   #   Determines the order of the discussion topic list. Defaults to "position".
@@ -775,6 +783,13 @@ class DiscussionTopicsController < ApplicationController
   #   A multipart/form-data form-field-style attachment.
   #   Attachments larger than 1 kilobyte are subject to quota restrictions.
   #
+  # @argument specific_sections [String]
+  #   A comma-separated list of sections ids to which the discussion topic
+  #   should be made specific too.  If it is not desired to make the discussion
+  #   topic specific to sections, then this parameter may be omitted or set to
+  #   "all".  Can only be present only on announcements and only those that are
+  #   for a course (as opposed to a group).
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #         -F title='my topic' \
@@ -861,6 +876,13 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument sort_by_rating [Boolean]
   #   If true, entries will be sorted by rating.
+  #
+  # @argument specific_sections [String]
+  #   A comma-separated list of sections ids to which the discussion topic
+  #   should be made specific too.  If it is not desired to make the discussion
+  #   topic specific to sections, then this parameter may be omitted or set to
+  #   "all".  Can only be present only on announcements and only those that are
+  #   for a course (as opposed to a group).
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
