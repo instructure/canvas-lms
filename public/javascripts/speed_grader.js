@@ -1075,7 +1075,11 @@ EG = {
     });
 
     initRubricStuff();
-    initCommentBox();
+
+    if (ENV.can_comment_on_submission) {
+      initCommentBox()
+    }
+
     EG.initComments();
     header.init();
     initKeyCodes();
@@ -2795,7 +2799,7 @@ function setupSelectors() {
   // so that the jquery selector does not have to be run every time.
   $add_a_comment = $('#add_a_comment')
   $add_a_comment_submit_button = $add_a_comment.find('button:submit')
-  $add_a_comment_textarea = null
+  $add_a_comment_textarea = $(`#${SPEEDGRADER_COMMENT_TEXTAREA_MOUNT_POINT}`)
   $add_attachment = $('#add_attachment')
   $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url')
   $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url')

@@ -23,7 +23,7 @@
     <tr class="date{{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}}">
       <td scope="row" valign="top" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}">
         {{#if date}}
-          {{tDateToString date "medium_with_weekday"}}
+          {{tDateToString (unfudge date) "medium_with_weekday"}}
         {{/if}}
       </td>
       <td class="details">

@@ -1030,7 +1030,8 @@ class ExternalToolsController < ApplicationController
     else
       return unless find_tool(tool_id, launch_type)
     end
-    if @tool.blank? || @tool.url.blank?
+
+    if @tool&.url.blank? && @tool&.extension_setting(launch_type, :url).blank?
       flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
       return redirect_to named_context_url(@context, :context_url)
     end

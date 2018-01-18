@@ -7033,11 +7033,11 @@ fa:
   error_98e81528: خطا
   error_deleting_name_reason_11f9d399: "خطا در حذف %{name}: %{reason}"
   error_duplicating_module_4b023042: "خطا در تکرار ماژول"
-  error_exporting_gradebook_msg_6ea31e2f: "خطای صدور دفتر نمره: %{msg} "
-  error_in_mastery_paths_range_index_7d17ddac: "%{error} در محدوده مسیر اصلی %{index}"
-  error_loading_gradebook_history_try_again_19032437: "خطای بارگیری تاریخچه دفتر نمره. دوبار تلاش می‌کنید؟"
+  error_exporting_gradebook_msg_6ea31e2f: "خطا در صدور دفتر نمره: %{msg} "
+  error_in_mastery_paths_range_index_7d17ddac: "%{error} در محدوده مسیرهای تسلط %{index}"
+  error_loading_gradebook_history_try_again_19032437: "خطا در بارگذاری تاریخچه دفتر نمره. دوبار تلاش می‌کنید؟"
   error_message_2b9d12ee: "خطا: %{message}"
-  error_rendering_duplicated_module_db821097: "خطای تفسیر ماژول تکراری"
+  error_rendering_duplicated_module_db821097: "خطا در تفسیر ماژول تکراری"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "خطا در بازیابی ابزارهای تشخیص شباهت"
   error_running_quizzes_2_export_cfecedba: "خطا در اجرای صدور Quizzes 2."
   error_uploading_file_e2d31b56: "خطا در بارگذاری فایل."
@@ -7073,7 +7073,7 @@ fa:
       invalid: "معتبر نیست"
       less_than: "باید کوچکتر از %{count} باشد"
       less_than_or_equal_to: "باید کوچکتر از %{count} یا مساوی با آن باشد"
-      model_invalid: "اعتبارسنجی با شکست مواجه شد: %{errors}"
+      model_invalid: "اعتبارسنجی انجام نشد: %{errors}"
       not_a_number: "عدد نیست"
       not_an_integer: "باید عدد صحیح باشد"
       odd: "باید فرد باشد"
@@ -7083,13 +7083,13 @@ fa:
       taken: "قبلا انتخاب شده است"
       too_long: 
         one: "بیش از اندازه طولانی است (حداکثر %{count} کاراکتر)"
-        other: "بیش از اندازه طولانی است (حداکثر %{count} کاراکتر)"
+        other: "طولانی است (حداکثر %{count} نویسه)"
       too_short: 
         one: "بیش از اندازه کوتاه است (حداقل %{count} کاراکتر)"
-        other: "بیش از اندازه کوتاه است (حداقل %{count} کاراکتر)"
+        other: "کوتاه است (حداقل %{count} نویسه)"
       wrong_length: 
         one: "طول اشتباه است (باید %{count} کاراکتر باشد)"
-        other: "طول اشتباه است (باید %{count} کاراکتر باشد)"
+        other: "طول اشتباه است (باید %{count} نویسه باشد)"
     no_attached_file: "باید حداقل یک فایل را به این تکلیف پیوست کنید"
     notices: 
       error_reported: "از کمک شما سپاسگزاریم! مشکل را برطرف خواهیم کرد"
@@ -7127,7 +7127,7 @@ fa:
   excused_cf8792eb: "معاف شد"
   exit_d0c7b013: خروج
   expand_collapse_title_outcome_group_239f0a9d: "باز کردن/جمع کردن گروه نتیجه %{title}"
-  expand_collapse_title_outcome_group_student_meets__46ffef48: "باز کردن/ جمع کردن  گروه نتیجه %{title}، دانشجویان برتری  %{mastery_count} از  %{count} نتیجه را می‌بینند."
+  expand_collapse_title_outcome_group_student_meets__46ffef48: "باز کردن/ جمع کردن  گروه نتیجه %{title}، دانشجو تسلط %{mastery_count} از  %{count} نتیجه را دارد"
   expand_global_navigation_2c28d5d4: "بسط دادن پیمایش سراسری"
   expand_group_53765272: "باز کردن گروه"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "باز کردن فهرست اعضای گروه برای %{groupName}"

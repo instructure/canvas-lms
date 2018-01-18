@@ -263,8 +263,11 @@ describe Api::V1::User do
       before :once do
         @enrollment.scores.create!
         assignment_group = @course.assignment_groups.create!
-        @enrollment.find_score(course_score: true).update!(current_score: 95.0, final_score: 85.0)
-        @enrollment.find_score(assignment_group_id: assignment_group).update!(current_score: 50.0, final_score: 40.0)
+        @enrollment.find_score(course_score: true).
+          update!(current_score: 95.0, final_score: 85.0, unposted_current_score: 90.0, unposted_final_score: 87.0)
+        @enrollment.find_score(assignment_group_id: assignment_group).
+          update!(current_score: 50.0, final_score: 40.0, unposted_current_score: 55.0, unposted_final_score: 45.0)
+        @student1 = @student
         @student1_enrollment = @enrollment
         @student2 = course_with_student(:course => @course).user
       end
@@ -274,8 +277,23 @@ describe Api::V1::User do
         @course.save!
       end
 
-      it "should return course scores as admin" do
+      it "should return posted course scores as admin" do
         json = @test_api.user_json(@student, @admin, {}, [], @course, [@student1_enrollment])
+        expect(json['enrollments'].first['grades']).to eq({
+          "html_url" => "",
+          "current_score" => 95.0,
+          "final_score" => 85.0,
+          "current_grade" => "A",
+          "final_grade" => "B",
+          "unposted_current_grade" => "A-",
+          "unposted_current_score" => 90.0,
+          "unposted_final_grade" => "B+",
+          "unposted_final_score" => 87.0
+        })
+      end
+
+      it "should not return unposted course scores as a student" do
+        json = @test_api.user_json(@student1, @student1, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
           "html_url" => "",
           "current_score" => 95.0,
@@ -286,7 +304,7 @@ describe Api::V1::User do
       end
 
       it "should not return course scores as another student" do
-        json = @test_api.user_json(@student, @student2, {}, [], @course, [@student1_enrollment])
+        json = @test_api.user_json(@student1, @student2, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades'].keys).to eq ["html_url"]
       end
     end

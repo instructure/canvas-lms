@@ -795,12 +795,38 @@ describe AccountsController do
   describe "terms of service" do
     before do
       @account = Account.create!
+      course_with_teacher(:account => @account)
+      c1 = @course
+      course_with_teacher(:course => c1)
+      @student = User.create
+      c1.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+      c1.save
     end
 
     it "should return the terms of service content" do
       @account.update_terms_of_service(terms_type: "custom", content: "custom content")
 
       admin_logged_in(@account)
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"content\":\"custom content\"/)
+    end
+
+    it "should return the terms of service content as student" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+
+      user_session(@teacher)
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"content\":\"custom content\"/)
+    end
+
+    it "should return the terms of service content as teacher" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+
+      user_session(@student)
       get 'terms_of_service', params: {account_id: @account.id}
 
       expect(response).to be_success

@@ -49,6 +49,26 @@
 #           "description": "The user's final score for the class. Only included if user has permissions to view this score.",
 #           "example": "",
 #           "type": "string"
+#         },
+#         "unposted_current_grade": {
+#           "description": "The user's current grade in the class including muted/unposted assignments. Only included if user has permissions to view this grade, typically teachers, TAs, and admins.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "unposted_final_grade": {
+#           "description": "The user's final grade for the class including muted/unposted assignments. Only included if user has permissions to view this grade, typically teachers, TAs, and admins..",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "unposted_current_score": {
+#           "description": "The user's current score in the class including muted/unposted assignments. Only included if user has permissions to view this score, typically teachers, TAs, and admins..",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "unposted_final_score": {
+#           "description": "The user's final score for the class including muted/unposted assignments. Only included if user has permissions to view this score, typically teachers, TAs, and admins..",
+#           "example": "",
+#           "type": "string"
 #         }
 #       }
 #     }
