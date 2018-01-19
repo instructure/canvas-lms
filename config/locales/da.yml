@@ -60,6 +60,7 @@ da:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Et partner-id er påkrævet for at bruge Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "En partner-nøgle er påkrævet for at bruge Academic Benchmarks"
   a_problem_occurred_adding_reviewers_57b083d9: "Der opstod et problem under tilføjelse af bedømmere."
+  a_section_is_required_64103992: "En sektion er påkrævet"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "En SIS-integration er ikke konfigureret, og funktionen Aktiver nye SIS-integrationsindstillinger er ikke aktiveret"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabel indeholdende navene på bedømmelsessystemet og ikoner for redigering eller sletning af system."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "En tabel, som indeholder navnet på karakterordning og knapper til at redigere eller slette ordningen."
@@ -1538,6 +1539,7 @@ da:
   add_users_to_name_b8109bbb: "Føj brugere til  %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Tilføj dine opgaver. Du kan blot lave en lang liste, eller opdele dem i grupper; du kan endda specificere vægtning for hver opgavegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Føj dit Zendesk Instance kundefelt-id til hvert af de følgende (felter uden id logges ikke):"
+  additional_comments_9aed10bb: "Yderligere kommentarer"
   additional_occurrence_s_7b5b0173: "yderligere forekomst(er)"
   additional_outcomes_options_6df428f1: "Yderligere læringsudbytte-muligheder"
   additional_settings_for_sis_syncing_f926973e: "Yderligere indstillinger for SIS-synkronisering"
@@ -1614,6 +1616,7 @@ da:
   all_account_types_e83c1516: "Alle kontotyper"
   all_accounts_3bafc860: "Alle konti"
   all_assignment_groups_a65e9e46: "Alle opgavegrupper"
+  all_assignments_b79a4d6a: "Alle opgaver"
   all_changes_were_saved_f6f3ddcc: "Alle ændringer blev gemt"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Alle afslutningsdatoer skal være på eller efter slutdatoen"
   all_configured_apps_a14eef0a: "Alle konfigurerede app'er"
@@ -1629,6 +1632,7 @@ da:
   all_items_a49b66c7: "Alle elementer"
   all_modules_20c9a1c8: "Alle moduler"
   all_my_files_a0213441: "Alle mine filer"
+  all_my_sections_375248b3: "Alle mine sektioner"
   all_roles_f3bba14d: "Alle roller"
   all_sections_daf11554: "Alle sektioner"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoer skal ligge før slutdatoen"
@@ -1655,6 +1659,7 @@ da:
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Giv de studerende mulighed for at se, hvem har meldt sig til tidsrum."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Lad de studerende se, hvem der er tilmeldt tidsrum"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Gør det muligt at sende meddelelser gennem vores afsendelseskø"
+  allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Giv dette værktøj adgang til IMS Name and Role Provisioning Service"
   allowed_attempts_4e229caa: "Tilladte forsøg"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillader oprettelse af beskeder for en bestemt sektion"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Giver underviserne mulighed for at markere karakteroplysninger, som skal eksporteres i bulk til SIS-integrationer."
@@ -1787,6 +1792,7 @@ da:
     podcast_feed_description_group: "Alle mediefiler, som er linket fra eller integreret i denne gruppes \"%{group}\" beskeder, vises i dette feed."
     podcast_feed_name: "%{course} beskeder Podcast Feed"
   announcements_a4b8ed4a: Beskeder
+  announcements_list_c75fc413: Beskedliste
   announcements_loaded_e9335d5f: "Meddelelser indlæst!"
   announcements_tutorial_tray_994287d6: "Beskeder selvstudiumområde"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Anonymér alle anmærkninger foretaget af instruktører om indsendelser til denne opgave i SpeedGrader"
@@ -2047,6 +2053,7 @@ da:
       frozen_assignments_error: "Du kan ikke slette en gruppe med en låst opgave."
   assignment_groups_bc9cc3c9: Opgavegrupper
   assignment_groups_weight_2f1a5a7c: "Vægtning af opgavegruppe"
+  assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "Opgaven har en låst dato. Afleveringsdato kan ikke indstilles uden for låst datointerval."
   assignment_id_b040cee0: Opgave-id
   assignment_menu_91fe3716: Opgavemenu
   assignment_muted_4cb590a4: "Tilbageholdt opgave"
@@ -2593,6 +2600,29 @@ da:
       titles: 
         media_recordings_disabled: "Medieoptagelser er ikke aktiveret for denne Canvas-side"
       upload_or_choose_file: "Upload en fil, eller vælg en fil, som du allerede har uploadet."
+    submit_online_text_entry: 
+      additional_comments: "Yderligere kommentarer"
+      buttons: 
+        submit_assignment: "Aflever opgave"
+      comments_placeholder: "Kommentarer ..."
+      instructions: 
+        online_text_entry: "Kopiér og indsæt eller indtast din aflevering lige her."
+    submit_online_upload: 
+      additional_comments: "Yderligere kommentarer"
+      buttons: 
+        submit_assignment: "Aflever opgave"
+      comments_placeholder: "Kommentarer ..."
+      errors: 
+        unacceptable_file_type: "Denne filtype understøttes ikke. Accepterede filtyper: %{allowed_extensions_list}"
+      labels: 
+        uploaded_data: Fil
+      links: 
+        add_another_file: "Tilføj endnu en fil"
+        find_file: "Klik her for at finde en fil, som du allerede har uploadet"
+      messages: 
+        submitting: "Afleverer ..."
+      no_files: "Inge filer"
+      upload_or_choose_file: "Upload en fil, eller vælg en fil, som du allerede har uploadet."
     syllabus: 
       page_title: "Læseplan for %{course}"
     syllabus_content: 
@@ -2814,6 +2844,7 @@ da:
   blueprint_course_sync_in_progress_a1e2622b: "Synkronisering af blueprint-fag i gang"
   blueprint_courses_9dd321b8: Blueprint-fag
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blueprint-fag (opret / rediger / associer / slet)"
+  blueprint_information_95dcef55: Blueprint-information
   blueprint_settings_233e909a: Blueprint-indstillinger
   body_9f663faf: Brødtekst
   body_shadow_d36e8c2e: Skyggetekst
@@ -3376,6 +3407,7 @@ da:
   cancel_submitting_comment_2666e98b: "Annuller indsendelse af kommentar"
   cancel_updating_comment_6816d855: "Annuller opdatering af kommentar"
   cannot_access_group_in_concluded_course_90a8db52: "Kan ikke få adgang til gruppe i afsluttet fag"
+  cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Kan ikke tilføje sektion til en ikke-sektionsspecifik diskussion"
   cannot_autograde_at_this_time_a146ad9d: "Kan ikke give automatisk karakter i øjeblikket"
   cannot_be_associated_with_a_different_account_ac863be2: "kan ikke blive associeret med en anden konto"
   cannot_be_associated_with_different_accounts_f461814f: "kan ikke blive associetert med forskellig konti"
@@ -3502,6 +3534,7 @@ da:
   child_s_username_dde3aa9: "Barnets brugernavn"
   chile_56_88238b47: "Chile (+56)"
   chile_9081cde6: Chile
+  china_86_36913b7a: "Kina (+86)"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Vælg en farve eller alias til fag for %{course}"
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Vælg et farve- eller fag-kaldenavn eller flyt fagkort for %{course}"
   choose_a_course_home_page_8059c7b: "Vælg en startside til faget"
@@ -4810,6 +4843,7 @@ da:
     one: "1 test fundet"
     other: "%{count} test fundet"
     zero: "Der er ikke fundet matchende test"
+  count_replies_a685c742: "%{count} svar"
   count_results_9926447c: 
     one: "Et resultat"
     other: "%{count} resultater"
@@ -4836,8 +4870,10 @@ da:
     one: "1 opgave kræver karakter"
     other: "%{count} opgaver kræver karakter"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} ville blive slettet og overstiger den fastsatte tærskel på %{change_threshold}%"
+  count_unread_replies_86976ab: "%{count} ulæste svar"
   count_unsynced_changes_1fc147e5: "%{count} Usynkroniserede ændringer"
   count_unsynched_changes_3a1249ba: "%{count} Usynkroniserede ændringer"
+  count_users_374d6e47: "(%{count} brugere)"
   country_is_required_b0afbf52: "Land er påkrævet"
   course: 
     access_denied: "Adgang blev nægtet"
@@ -6039,6 +6075,7 @@ da:
   deactivate_this_key_3e79a2b5: "Deaktiver denne kode"
   deactivate_user_86c09036: "Deaktiver bruger"
   decaying_average_8bf6a0dd: "Dæmpet gennemsnit"
+  decorative_image_3c28aa7d: "Dekorativt billede"
   decrease_indent_d9cf469d: "Formindsk indrykning"
   decrease_indent_de6343ab: "Formindsk indrykning"
   deduct_104e8866: "Træk fra"
@@ -6061,6 +6098,7 @@ da:
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Definer indstillinger efter type for låste objekter i dette fag. "
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definer tekst, som skal stilles før og efter dropdown-menuen, og opret et sæt med mulige svar."
   delay_posting_this_topic_until_aa483eec: "Forsink offentliggørelse af dette emne indtil"
+  delayed_until_58b7af4b: "Forsinket indtil:"
   delete_a6efa79d: Slet
   delete_account_name_96aee330: "Slet %{account_name}"
   delete_alignment_f33c97d5: "Slet tilpasning"
@@ -6606,6 +6644,7 @@ da:
   do_nothing_9672b478: "Gør intet"
   domain_3b54c511: Domæne
   domain_is_required_1d4c8b25: "Domæne er påkrævet"
+  dominican_republic_1_3cef4021: "Dominikanske republik (+1)"
   don_t_add_this_user_for_now_32912974: "Tilføj ikke denne bruger nu."
   don_t_move_lti_query_params_to_post_body_21744487: "Flyt ikke LTI forspørgsel parametre til POST krop"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Flyt ikke LTI Query Params til POST Body"
@@ -6841,6 +6880,7 @@ da:
   either_the_url_or_domain_should_be_set_c29cf8c1: "Webadressen (url) eller domænet skal indstilles."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Enten er du en ny bruger eller *Betingelser for brug* har ændret sig, siden du sidst accepterede dem. Du skal acceptere *Betingelserne for brug* og **datapolitikken**, inden du fortsætter."
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Enten er du en ny bruger eller *Betingelser for brug* har ændret sig siden du sidst var enig i dem. Vær venlig at acceptere *Betingelser for brug*, før du fortsætter."
+  el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "`element` indstilling mangler fejl: Der skal specificeres et element til at vedhæfte TreeBrowserView, når gengivelsesindstillingen konfigureres til 'sand' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
@@ -7373,6 +7413,7 @@ da:
       phrase_to_look_for: "Sætning der skal søges efter"
       posts_added: "Tilføjede opslag"
       remove_feed: "Fjern %{display_name}"
+  external_feeds_77f57c7d: "Eksterne feeds"
   external_integration_keys_8b4f4548: "Eksterne integrationsnøgler"
   external_tool_c5a6410a: "Eksternt værktøj"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "URL til eksternt værktøj kan ikke efterlades tom"
@@ -7484,6 +7525,7 @@ da:
     user_navigation_configured: "Brugernavigation konfigureret"
     wiki_page_menu_configured: "Wikiside menu konfigureret"
   external_url_e9b87215: "Ekstern URL"
+  extract_error_error_file_names_a4989ed0: "Uddrag fejl, %{error} : %{file_names}"
   extreme_critical_emergency_80b3dbda: "EKSTREMT KRITISK NØDSTILFÆLDE!"
   faculty_journal_5634938e: Undervisernotater
   fail_62dbb06a: mislykket
@@ -7559,6 +7601,7 @@ da:
   feed_url_is_required_253fda4e: "Feed URL er nødvendig"
   field_name_31fff38e: Feltnavn
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Indsend besked for et personligt svar fra vores supportteam"
+  file_already_exists_bdc61895: "fil eksisterer allerede"
   file_attachment_8e7dbfd1: "Vedhæftet fil"
   file_c851020d: Fil
   file_content_a99b5c6b: Filindhold
@@ -7567,6 +7610,7 @@ da:
   file_list_updated_38e2a5ad: "Filliste opdateret"
   file_menu_cc0ca54: Filmenu
   file_name_2fe68ec1: Filnavn
+  file_name_too_long_ea535796: "filnavn for langt"
   file_not_available_1869c733: "fil ikke tilgængelig"
   file_not_found_9eec054c: "Fil ikke fundet"
   file_preview: 
@@ -8614,12 +8658,14 @@ da:
       update_category_success: "Kategori blev opdateret."
   group_category: 
     cant_restrict_self_signup: "Kan ikke begrænse selvtilmelding, mens en blandet sektionsgruppe eksisterer i kategorien"
+    empty_course_or_account_id: "Skal have et konto- eller fag-ID"
     greater_than_1: "Skal være større end 1"
     group_categories: 
       communities: Communities
       imported: "Importerede grupper"
       student_organized: Studiegrupper
       uncategorized: "Ikke kategoriseret"
+    group_category_must_have_context: "Skal tilhøre en konto eller et fag"
     invalid_auto_leader: "AutoLeader-type skal være en af de følgende værdier: %{values}"
     invalid_self_signup: "Selvtilmelding skal være en af de følgende værdier: %{values}"
     name_required: "Navn er påkrævet"
@@ -9010,6 +9056,7 @@ da:
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper skal være tomme for at tildele pr. sektion"
   groups_navigation_menu_76b5acc6: Gruppe-navigationsmenu
   groupweight_of_total_9579ae8c: "%{groupWeight}% af total"
+  guatemala_502_ae25c68f: "Guatemala (+502)"
   handlebars_helpers: 
     time: 
       event: "%{date} ved %{time}"
@@ -9145,6 +9192,7 @@ da:
       Som standard vil Canvas forsøge at benytte Flash først til at afspille videoer. Aktiver dette ved at bruge HTML5 først,
       derefter gå tilbage til Flash.
   html_editor_fb2ab713: HTML-editor
+  hungary_36_cd3e515b: "Ungarn (+36)"
   i_agree_to_the_34aa16ce: "Jeg er enig i"
   i_agree_to_the_terms_of_use_18e16f0c: "Jeg er enig i *Betingelserne for brug*."
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Jeg accepterer *Betingelser for brug* og **datapolitikken**."
@@ -9174,6 +9222,7 @@ da:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Hvis aktiveret skal indholdsdesignere oplyse copyright og licensoplysninger for filer, inden de udgives. Gælder kun, hvis Better File Browsing også er aktiveret."
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Hvis aktiveret, vil moduler have muligheden for at blive markeret som fuldført, når blot et af kravene er opfyldt."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Hvis aktiveret, sendes 'oauth2_access_token_url' i LTI2 registreringslancering"
+  if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Hvis aktiveret, kan OAuth 1.0a-signering bruges af LTI-værktøjer for at få adgang til medlemskabstjenestens API"
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Hvis aktiveret vil disse parametre ikke kopieres til POST-teksten under igangsætning af LTI."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Hvis aktiveret, bliver Sourcedids, der bruges af Canvas til grundlæggende læringsudbytte, krypteret."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Hvis aktiveret, brugere vil være i stand til at konfigurere LTI 2 værktøjer."
@@ -9290,9 +9339,11 @@ da:
   incremental_update_successfully_generated_against__db3f3f06: "Trinvis opdatering genereret mod en forudgående SIS-import."
   india_8d982994: Indien
   india_91_6c290107: "Indien (+91)"
+  indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Angiver, at billedet er kun til dekorative formål og bør ikke læses af skærmlæserne"
   indigo_2035fc55: Indigo
   individual_view_81c2f124: "Individuel visning"
   individual_view_d60b9132: "Individuel visning ..."
+  indonesia_62_4c35bd62: "Indonesien (+62)"
   info: 
     old_styleguide: 
       create_collection: "Opret en samling"
@@ -9324,6 +9375,7 @@ da:
     authorize_google_docs: "Før du kan samarbejde på dokumenter, skal du autorisere Canvas til at have adgang til din Google Docs konto:"
     authorize_google_drive: "Inden du kan samarbejde på dokumenter, skal du give Canvas tilladelse til at få adgang til din Google Drive-konto:"
   instructions_2f88ee72: Instruktioner
+  instructor_comments_205e0ec8: Instruktørkommentarer
   instructor_id_ed9c0d8b: Instruktør-id
   instructor_is_working_on_grades_135388d2: "Instruktøren arbejder på karakterer"
   instructor_messages_a4c28674: Instruktørbeskeder
@@ -9525,6 +9577,7 @@ da:
   k_2521301c: k
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Husk på, at denne aflevering gælder for alle i din %{groupType} gruppe."
   keep_submissions_anonymous_5cbaf419: "Hold afleveringer anonyme"
+  kenya_254_2945663a: "Kenya (+254)"
   key_api_key_68bf80ae: "Nøgle: *%{api_key}*"
   keyboard_instructions_e032939f: tastaturinstruktioner
   keyboard_nav_dialog: 
@@ -10008,6 +10061,7 @@ da:
   masquerade_as_name_8bb004c5: "Masker som %{name}"
   masquerade_fdbc9594: Masker
   master_courses_2aaa4841: Masterkurser
+  master_lock_590266b6: Hovedlås
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Opfyldelse af læringsmål: %{n_mastery_points_precision_2_str} point"
   mastery_path_processing_f4471152: "Behandling af læringsstier"
   mastery_paths_breakdown_6e0b5fce: "Opdeling af læringsstier"
@@ -10081,6 +10135,7 @@ da:
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmer ud af maksimum %{max_membership}"
   members_af25c21d: Medlemmer
   membership_by_invitation_only_9bc27199: "Medlemskab udelukkede efter invitation"
+  membership_service_configuration_d8ba5a74: "Konfiguration af medlemskabsservice"
   menu: 
     current_groups: "Aktuelle grupper"
     customize: Tilpas
@@ -12237,6 +12292,7 @@ da:
   name_3806192d: "Navn:"
   name_app_has_been_deleted_fb2d9426: "%{name} app er blevet slettet"
   name_badfe525: navn
+  name_count_users_ccc93c3d: "%{name} (%{count} brugere)"
   name_current_score_b3198dfa: "%{name} nuværende resultat"
   name_error_fee4236: "Fejl i navn"
   name_final_score_2dce3ff8: "%{name} endeligt resultat"
@@ -12318,6 +12374,7 @@ da:
   new_zealand_ef5d7b74: "New Zealand"
   newest_oldest_d768cf1a: "Nyeste - ældste"
   next_40e12421: Næste
+  next_announcements_page_3956eb11: "Næste besked-side"
   next_assignment_8ec51175: "Næste opgave"
   next_item_2d1ddc96: "Næste: *Element*"
   next_mastery_path_is_currently_locked_a9253711: "Næste læringssti er i øjeblikket låst"
@@ -12338,6 +12395,7 @@ da:
   no_associated_terms_13bacefc: "Ingen associated semestre"
   no_attributes_locked_611c5cc: "ingen attributter låst"
   no_broken_links_found_38d951e3: "Der er ikke fundet afbrudte links"
+  no_cancel_installation_db8d12d7: "Nej, annuller installation"
   no_collaboration_apps_3bbd30ce: "Ingen samarbejds-apps"
   no_content_has_been_added_f36bab43: "* Der er ikke blevet tilføjet indhold"
   no_courses_found_12d68a74: "Der er ikke fundet fag"
@@ -12731,6 +12789,7 @@ da:
       format: 
         format: "%n%"
   number_between_1_and_16_inclusive_31f5468d: "tal mellem 1 og 16 inklusive"
+  number_more_a46966: "%{number} Mere..."
   number_of_allowed_attempts_3d10b740: "Antal tilladte forsøg"
   number_of_respondents_e1e7e8b: "Antal respondenter"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Antal resultater, der skal ignoreres for hver studerende"
@@ -12784,6 +12843,7 @@ da:
   okay_1772bbeb: Okay
   okay_got_it_d686d4e8: "Okay, godt"
   oldest_newest_4de86803: "Ældste - nyeste"
+  oman_968_46f8d901: "Oman (+968)"
   on_paper_46d0ba36: "På papir"
   on_time_17ca5ad9: "Til tiden"
   on_time_percent_eebffe38: "Til tiden: %{percent}"
@@ -12802,6 +12862,7 @@ da:
   only_a_maximum_of_100_events_can_be_created_ad703982: "der kan kun oprettes maksimalt 100 begivenheder"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "Der kan kun oprettes maks. %{limit} begivenheder"
   only_after_their_last_attempt_3593d101: "Kun efter deres sidste forsøg"
+  only_announcements_can_be_section_specific_1ff992a: "Kun beskeder kan være sektionsspecifikke"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Kun tilgængelig for studerende med link. Ingen synlige i studerendes filer."
   only_once_after_each_attempt_cc842738: "Kun en gang efter hvert forsøg"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Kun undervisere kan se dette fag, indtil det offentliggøres"
@@ -12832,6 +12893,7 @@ da:
     ? "yes"
     : Ja
   options_3ab0ea65: Muligheder
+  options_for_title_label_17f821ff: "Valg til %{title_label}"
   or_a01eec62: ELLER
   orange_81386a62: Orange
   orbis_report_header_assignment_id: opgave-id
@@ -13070,6 +13132,7 @@ da:
     view_more_link: "Vis mere"
   paginated_view: 
     loading_more_results: "indlæser flere resultater"
+  pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
   panama_fa454c86: Panama
   paper_view_7405eeab: Papirvisning
@@ -13655,7 +13718,9 @@ da:
   post_grades_to_posttosisname_70430da4: "Læg karaktererne ud på %{postToSISName}"
   post_grades_to_sis_97ece878: "Offentliggør karakterer til SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "Afkrydsningsfeltet Post karakterer til SIS er aktiveret som standard til opgaver, diskussioner med karakterer og quizzer"
+  post_to_961f8937: "Opslå på"
   posted_at_4cfce2c3: "%{posted_at}"
+  posted_on_e1010e1e: "Opslået d.:"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: Øvelsestest
   pre_processing_92865c1d: Forbehandling
@@ -13672,6 +13737,7 @@ da:
   prev_month_34bd934c: "Forrige måned"
   preview_53003fd2: Eksempel
   preview_your_changes_373557d8: "Forhåndsvis ændringer"
+  previous_announcements_page_79c0ada1: "Forrige besked-side"
   previous_assignment_83d1f423: "Tidligere opgave"
   previous_bd2ac015: Forrige
   previous_csv_file_time_d7bfe7ef: "Forrige CSV-fil (%{time})"
@@ -15627,6 +15693,7 @@ da:
   remove_filename_87f3781e: "fjern %{filename}"
   remove_icon_a4646413: "fjern ikon"
   remove_image_341340b3: "Fjern billede"
+  remove_label_11d96b8f: "Fjern %{label}"
   remove_linked_student_name_52dc7fce: "Fjern linket elev %{name}"
   remove_name_as_an_admin_c296cf49: "Fjern %{name} som admin"
   remove_recipient_name_a6b83cef: "Fjern modtager %{name}"
@@ -15872,6 +15939,7 @@ da:
     observing_user: "Observerer: %{user_name}"
     unknown_error: "Noget gik galt med din søgning, prøv igen."
     updating: "Opdaterer ..."
+  rss_feed_cf6286b3: "RSS Feed"
   rubric: 
     context_name_rubric: "%{course_name} rubrik"
     no_description: "ingen beskrivelse"
@@ -15941,6 +16009,7 @@ da:
   save_grading_period_set_e029fa88: "Gem karakterperiodesæt"
   save_publish_36440725: "Gem og offentliggør"
   save_theme_f706116e: "Gem tema"
+  save_this_comment_for_reuse_5eda0b70: "Gem denne kommentar til genbrug"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Gem din %{type} for at begynde at specificere betinget indhold."
   saving_associations_989bd4da: "Gemmer associationer"
   saving_associations_complete_e4b9634d: "Det lykkedes at gemme associationer"
@@ -16120,6 +16189,7 @@ da:
   search_title_body_or_author_1d26711f: "Søg efter overskrift, brødtekst eller forfatter"
   search_users_48b1789e: "Søg brugere ..."
   searching_b0207e7f: Søger
+  searching_for_announcements_in_sections_must_span__80e4dfe4: "Søgning efter beskeder i sektioner skal spænde nøjagtigt et fag"
   second_reviewer_90046c68: "Anden bedømmer"
   secondary_button_36a86f03: "Sekundær knap"
   secondary_button_text_e92b3e52: "Tekst til sekundær knap"
@@ -16150,6 +16220,8 @@ da:
       removing_crosslisting_of_section: "Fjern krydslisten for sektionen ..."
   section_84b5391: sektion
   section_c7f66a0d: Sektion
+  section_count_sections_42196f3f: "%{section_count} Sektioner"
+  section_does_not_belong_to_course_for_this_discuss_39fd6808: "Sektion hører ikke til faget for dette diskussionsemne"
   section_ends_at_bb9df3c0: "Sektionen slutter"
   section_filter_cde54d0a: Sektionsfilter
   section_id_6f73f3d5: sektions-id
@@ -16159,6 +16231,8 @@ da:
   section_sis_2a80d2fa: "Sektion Sis"
   section_sis_94511bcd: sektion-SIS
   section_specific_announcements_e0d355d9: "Sektionspecifikke beskeder"
+  section_specific_discussions_are_disabled_9e3fd431: "Sektionsspecifikke diskussioner er deaktiveret"
+  section_specific_topics_must_have_sections_11868960: "Sektionsspecifikke emner skal have sektioner"
   section_starts_at_65eaed1: "Sektionen starter"
   sections: 
     section_created: "Sektionen blev oprettet!"
@@ -16223,6 +16297,7 @@ da:
   see_scoring_details_f7fd1f3b: "Se detaljer om resultat"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se nogle LTI-værktøjer*, som fungerer fint med Canvas."
   see_turnitin_results_cd9d4a6c: "Se Turninit-resultater"
+  select_1e849959: "[ Vælg ]"
   select_a_grading_period_5ea50f1: "Vælg en karakterperiode ..."
   select_a_grading_period_aab25483: "Vælg en karakterperiode"
   select_a_log_type_to_search_247fc6b4: "Vælg en logtype for at søge."
@@ -17283,6 +17358,7 @@ da:
   sorted_descending_84ec84c8: "sorteret i faldende rækkefølge"
   sorted_descending_d9aa3cf8: "Sorter faldende."
   source_code_2395ca74: Kildekode
+  south_africa_27_d5e0f1e1: "Sydafrika (+27)"
   south_korea_16d43049: Sydkorea
   south_korea_82_10618967: "Sydkorea (+82)"
   space_ec476863: Mellemrum
@@ -17664,7 +17740,7 @@ da:
       contact_support_sub_text: "Få hjælp med tidskritiske problemer"
       curriculum_assessment_errata: "Curriculum/bedømmelse fejlliste"
       curriculum_assessment_errata_description: "Vis allerede indberettede fejl i bedømmelse og curricula. Søg efter \"fejlliste\"."
-      global_support_desk: "Global support"
+      global_support_desk: "NetAcad Support"
       global_support_desk_description: "Vores ASC'er (centre til akademisk succes) er det første led til din support og kan sætte dig i forbindelse med vores globale support for problemer, der kræver yderligere assistance."
       networking_academy_description: "Vis Cisco-svar til de oftest stillede spørgsmål."
       networking_academy_faqs: "Networking Academy FAQ"
@@ -17745,6 +17821,7 @@ da:
     syllabus: Læseplan
     tab_location_error: "Denne faneplacering er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikke administreres"
+  taiwan_886_9a5b6bbf: "Taiwan (+886)"
   take_a_snapshot_now_5b622d85: "Tag et øjebliksbillede nu"
   take_the_quiz_87214d7e: "Tag testen"
   take_the_quiz_again_8ea51a6c: "Tag testen igen"
@@ -17834,6 +17911,7 @@ da:
   text_entry_submission_7b0ae0c5: "Indsendelse af tekstindtastning"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstaflevering kan ikke være tom"
   text_input_d3480b8c: Tekstindtastning
+  thailand_66_5b3ef324: "Thailand (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Den brugerkonto er blevet slettet. Kontakt din systemadministrator for at få din konto genaktiveret."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-id for den konto, som den rapporterende bruger tilhører"
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "Beskeden \"%{title}\" kunne ikke linkes til modulet \"%{mod_title}\""
@@ -17954,6 +18032,7 @@ da:
   there_was_a_problem_toggling_the_content_lock_2a5d678b: "Der opstod et problem, da indholdslåsen blev slået til eller fra."
   there_was_a_problem_updating_the_comment_5f3595b9: "Der opstod et problem ved opdatering af kommentaren"
   there_was_a_problem_updating_the_submission_6e5280a1: "Der opstod et problem ved opdatering af afleveringen."
+  there_was_an_error_fetching_outcome_results_45c57590: "Der opstod en fejl under hentning af læringsudbytteresultater"
   there_was_an_error_fetching_submission_comments_ce153077: "Der opstod en fejl under hentning af afleveringskommentarer"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Der opstod en fejl ved start af værktøj"
   there_was_an_error_in_processing_your_request_6513a49a: "Der opstod en fejl ved behandling af din anmodning"
@@ -17975,6 +18054,7 @@ da:
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Disse legitimationsoplysninger er for Academic Benchmark API v1, som vil blive udfaset i en fremtidig version."
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Disse bedømmelsesperioder blev oprettet for dig af en administrator."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Denne handling er blevet deaktiveret af din administrator."
+  this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Dette område bruges af bedømmeren til at efterlade kommentarer i forbindelse med dette kriterie."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Denne opgave tæller ikke mod den endelige karakter"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne opgave tæller ikke med i den endelige karakter."
   this_assignment_has_been_excused_87f1dc13: "Denne opgave er blevet fritaget."
@@ -18071,6 +18151,7 @@ da:
   this_submission_is_not_being_autograded_4fd68d32: "Denne aflevering bliver ikke givet automatisk karakter"
   this_submission_is_not_in_any_grading_period_cbbd2f8: "Denne aflevering er ikke i nogen karakterperiode"
   this_submission_is_not_in_any_grading_period_d4c728db: "Denne aflevering er ikke i nogen karakterperiode."
+  this_tool_has_already_been_installed_in_this_conte_b73ea29c: "Dette værktøj er allerede blevet installeret i denne kontekst. Vil du gerne installere det alligevel?"
   this_topic_is_closed_for_comments_3dd10c00: "Dette emne er lukket for kommentarer."
   this_topic_is_closed_for_comments_5bacad6: "Dette emne er lukket for kommentarer"
   this_topic_is_used_for_grading_efc6ca89: "Dette emne bruges til karaktergivning"
@@ -18297,11 +18378,13 @@ da:
   title_52b8638d: "Overskrift:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} aftalegruppe* Du kan **melde dig** til denne."
   title_ee03d132: Titel
+  title_is_locked_click_to_unlock_21548cfb: "%{title} er låst. Klik for at låse op"
   title_is_off_6c823e2d: "%{title} er slået fra"
   title_is_on_2b72a9b7: "%{title} er slået til"
   title_is_required_437f9993: "Titel er påkrævet"
   title_is_required_8bb13295: "Titel er påkrævet!"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Titel er for lang, skal være under %{length} tegn"
+  title_is_unlocked_click_to_lock_6a20cfcb: "%{title} er låst op. Klik for at låse."
   title_separator: ":"
   titles: 
     aligned_items: "Justerede elementer"
@@ -18384,6 +18467,7 @@ da:
   treat_ungraded_as_0_d38c2b41: "Tildel 0 til ikke bedømte"
   tree_browser: 
     folder_tree_instructions: "Brug op- og nedpilene for at navigere gennem træet. Tryk til højre for at udvide mapperne, venstre for at skjule og på Enter for at vælge det ønskede element."
+  trinidad_and_tobago_1_fc2d8d1c: "Trinidad og Tobago (+1)"
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: "Hvis du slukker for dette selvstudium, fjerner du selvstudiumområdet fra din skærm for alle dine fag. Du kan tænde det igen under funktionsindstillinger i dine brugerindstillinger."
   turnitin: 
     error_1007: "Den uploadede fil er for stor."
@@ -18455,6 +18539,7 @@ da:
   unknown_47a3b725: Ukendt
   unknown_account_74d30b82: "Ukendt konto"
   unknown_answers_9688a2bc: "Ukendte svar"
+  unknown_compression_method_b6a850b5: "ukendt komprimeringsmetode"
   unknown_content_type_ae6d08e8: "Ukendt indholdstype"
   unknown_question_bank: "Ukendt spørgsmålsbank"
   unknown_quiz: "Ukendt test"
@@ -18497,6 +18582,7 @@ da:
   unread_e9c1b19c: Ulæst
   unregister_service_985238e9: "Annuller tjenestens registrering"
   unreserved_e86b7425: "Ikke reserveret"
+  unsafe_file_link_8a18eceb: "usikkert fillink"
   unselected_all_courses_99a9d35c: "Fjernet markering for alle fag"
   unselected_course_course_89995a83: "Ikke valgt fag %{course}"
   unstar_conversation_45fc43d6: "Slet stjerne fra diskussion"
@@ -19037,6 +19123,7 @@ da:
   validate_links_in_content_b1630fba: "Godkend links i indhold"
   value_d842f16d: Værdi
   vanity_url_76f93382: "Vanity URL"
+  venezuela_58_959d01f7: "Venezuela (+58)"
   vericite: 
     no_score_after_retries: "VeriCite har ikke returneret et resultat efter %{max_tries} forsøg på at hente et."
   vericite_info: 
@@ -19045,6 +19132,7 @@ da:
   video_b9f27375: Video
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoindhold understøttes ikke af din enhed eller app."
   video_player_b371005: Videoafspiller
+  vietnam_84_e50a2a44: "Vietnam (+84)"
   view_analytics_91a3b7a: "Vis fag-statistik"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Se analysedata i tabeller i stedet for grafer"
   view_analytics_for_name_9b31594e: "Vis analyse for %{name}"
@@ -19062,6 +19150,7 @@ da:
   view_grades_for_name_45aeb2f2: "Vis karakterer for %{name}"
   view_grading_history_e64bb8fe: "Vis karakterhistorik"
   view_in_speedgrader_773b9d81: "Vis i SpeedGrader"
+  view_longer_description_6b762087: "vis længere beskrivelse"
   view_name_app_62a2ad8e: "Vis %{name} app"
   view_next_file_a8a4a885: "Vis næste fil"
   view_next_student_9fc72fef: "se næste studerende"
@@ -19339,6 +19428,7 @@ da:
   yellow_4cf93785: Gul
   yes_3593c135: Ja
   yes_dde87d5: Ja
+  yes_install_tool_f51b3278: "Ja, installer værktøj"
   yo_e4ee15a4: Yo
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Du er ved at miste eventuelle ændringer, som du endnu ikke har anvendt til din konto. 
