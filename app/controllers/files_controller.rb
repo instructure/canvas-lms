@@ -788,8 +788,17 @@ class FilesController < ApplicationController
       return
     end
 
-    @context = Context.find_polymorphic(params[:context_type], params[:context_id])
-    @attachment = @context.attachments.build
+    case params[:context_type]
+    when 'ContentMigration'
+      @context = ContentMigration.find(params[:context_id])
+      @attachment = Attachment.where(context: @context).build
+    when 'Quizzes::QuizSubmission'
+      @context = Quizzes::QuizSubmission.find(params[:context_id])
+      @attachment = @context.attachments.build
+    else
+      @context = Context.find_polymorphic(params[:context_type], params[:context_id])
+      @attachment = @context.attachments.build
+    end
 
     # service metadata
     @attachment.filename = params[:name]

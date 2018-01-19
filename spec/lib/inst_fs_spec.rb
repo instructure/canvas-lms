@@ -125,7 +125,7 @@ describe InstFS do
   end
 
   context "upload_preflight_json" do
-    let(:context) { instance_double("Course", id: 1, global_id: 101, account: Account.default) }
+    let(:context) { instance_double("Course", id: 1, global_id: 101, root_account: Account.default) }
     let(:user) { instance_double("User", id: 2, global_id: 102) }
     let(:folder) { instance_double("Folder", id: 3, global_id: 103) }
     let(:filename) { 'test.txt' }
@@ -197,7 +197,7 @@ describe InstFS do
         end
 
         it "include the root_account_id" do
-          expect(capture_params['root_account_id']).to eq context.account.root_account.global_id.to_s
+          expect(capture_params['root_account_id']).to eq context.root_account.global_id.to_s
         end
 
         it "include the quota_exempt flag" do

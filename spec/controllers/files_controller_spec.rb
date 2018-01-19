@@ -1236,6 +1236,53 @@ describe FilesController do
       assert_status(201)
       expect(folder.attachments.first).to_not be_nil
     end
+
+    it "works with a ContentMigration as the context" do
+      course = Course.create!
+      user = User.create!(:name => "me")
+      migration = course.content_migrations.create!
+      folder = course.folders.create!(name: "migrations")
+
+      params = {
+        id: 1,
+        user_id: user.id,
+        context_type: "ContentMigration",
+        context_id: migration.id,
+        token: @token,
+        name: "test.txt",
+        size: 42,
+        content_type: "text/plain",
+        instfs_uuid: 1,
+        folder_id: folder.id
+      }
+
+      post "api_capture", params: params
+      assert_status(201)
+    end
+
+    it "works with a Quizzes::QuizSubmission as the context" do
+      course = Course.create!
+      user = User.create!(name: "me")
+      quiz = course.quizzes.create!
+      submission = quiz.quiz_submissions.create!(user: user)
+      folder = course.folders.create!(name: "submissions")
+
+      params = {
+        id: 1,
+        user_id: user.id,
+        context_type: "Quizzes::QuizSubmission",
+        context_id: submission.id,
+        token: @token,
+        name: "test.txt",
+        size: 42,
+        content_type: "text/plain",
+        instfs_uuid: 1,
+        folder_id: folder.id
+      }
+
+      post "api_capture", params: params
+      assert_status(201)
+    end
   end
 
   describe "public_url" do
