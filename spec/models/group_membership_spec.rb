@@ -341,13 +341,19 @@ describe GroupMembership do
 
     it "triggers a batch when membership is created" do
       expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).with(@course.id, match_array(@assignments[0..1].map(&:id)))
+      expect(DueDateCacher).to receive(:recompute_course).with(
+        @course.id,
+        assignments: match_array(@assignments[0..1].map(&:id))
+      )
       @group.group_memberships.create(:user => user_factory)
     end
 
     it "triggers a batch when membership is deleted" do
       expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).with(@course.id, match_array(@assignments[0..1].map(&:id)))
+      expect(DueDateCacher).to receive(:recompute_course).with(
+        @course.id,
+        assignments: match_array(@assignments[0..1].map(&:id))
+      )
       @membership.destroy
     end
 

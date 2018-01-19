@@ -96,6 +96,25 @@ describe Course do
       expect(Enrollment).to receive(:recompute_final_score).with([], any_args)
       first_course.recompute_student_scores([enrollment.user_id])
     end
+
+    it "triggers a delayed job by default" do
+      expect(@course).to receive(:send_later_if_production_enqueue_args).
+        with(:recompute_student_scores_without_send_later, any_args)
+
+      @course.recompute_student_scores
+    end
+
+    it "does not trigger a delayed job when passed run_immediately: true" do
+      expect(@course).not_to receive(:send_later_if_production_enqueue_args).
+        with(:recompute_student_scores_without_send_later, any_args)
+
+      @course.recompute_student_scores(nil, run_immediately: true)
+    end
+
+    it "calls recompute_student_scores_without_send_later when passed run_immediately: true" do
+      expect(@course).to receive(:recompute_student_scores_without_send_later)
+      @course.recompute_student_scores(nil, run_immediately: true)
+    end
   end
 
   it "should properly determine if group weights are active" do

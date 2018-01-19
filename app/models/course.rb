@@ -1058,25 +1058,34 @@ class Course < ActiveRecord::Base
 
   def recompute_student_scores(student_ids = nil, grading_period_id: nil,
                                                   update_all_grading_period_scores: true,
-                                                  update_course_score: true)
-    inst_job_opts = {}
-    if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
-      # if we have all default args, let's queue this job in a singleton to avoid duplicates
-      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
-    elsif student_ids.blank? && grading_period_id.present?
-      # A migration that changes a lot of due dates in a grading period
-      # situation can kick off a job storm and redo work. Let's avoid
-      # that by putting it into a singleton.
-      inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
-    end
+                                                  update_course_score: true,
+                                                  run_immediately: false)
+    if run_immediately
+      recompute_student_scores_without_send_later(
+        student_ids,
+        grading_period_id: grading_period_id,
+        update_all_grading_period_scores: update_all_grading_period_scores
+      )
+    else
+      inst_job_opts = {}
+      if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
+        # if we have all default args, let's queue this job in a singleton to avoid duplicates
+        inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
+      elsif student_ids.blank? && grading_period_id.present?
+        # A migration that changes a lot of due dates in a grading period
+        # situation can kick off a job storm and redo work. Let's avoid
+        # that by putting it into a singleton.
+        inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
+      end
 
-    send_later_if_production_enqueue_args(
-      :recompute_student_scores_without_send_later,
-      inst_job_opts,
-      student_ids,
-      grading_period_id: grading_period_id,
-      update_all_grading_period_scores: update_all_grading_period_scores
-    )
+      send_later_if_production_enqueue_args(
+        :recompute_student_scores_without_send_later,
+        inst_job_opts,
+        student_ids,
+        grading_period_id: grading_period_id,
+        update_all_grading_period_scores: update_all_grading_period_scores
+      )
+    end
   end
 
   def recompute_student_scores_without_send_later(student_ids = nil, opts = {})

@@ -4464,7 +4464,7 @@ describe Assignment do
         it { is_expected.not_to be_in_closed_grading_period }
       end
 
-      context 'when there are at least one submission in a closed grading peiod' do
+      context 'when there are at least one submission in a closed grading period' do
         before { assignment.update!(due_at: 3.months.ago) }
 
         it { is_expected.to be_in_closed_grading_period }
