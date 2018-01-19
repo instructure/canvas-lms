@@ -606,23 +606,31 @@ $gradebook_cell_padding_top: 8px;
   // This nesting is required to ensure higher specificity than InstUI styles
   .Grid__AssignmentRowCell__PercentInput,
   .Grid__AssignmentRowCell__PointsInput {
-    label input[type="text"] {
-      text-align: center;
-    }
-
-    width: 78px; // wide enough to fit "Excused"
+    // wide enough to fit "Excused"
+    width: 78px;
   }
 
   .Grid__AssignmentRowCell__GradingSchemeInput,
   .Grid__AssignmentRowCell__PassFailInput {
-    // wide enough to fit "Excused" and the autocomplete arrow
+    // wide enough to fit "Excused" and the grading scheme menu button
     width: 78px + $cell-icon-width;
+  }
+
+  .HorizontalFlex {
+    align-content: space-between;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
   }
 
   .Grid__AssignmentRowCell__PercentInput,
   .Grid__AssignmentRowCell__PointsInput,
-  .Grid__AssignmentRowCell__GradingSchemeInput,
-  .Grid__AssignmentRowCell__PassFailInput {
+  .Grid__AssignmentRowCell__GradingSchemeInput {
+    label input[type="text"] {
+      text-align: center;
+    }
+
     // clip any input messages
     span > span {
       margin-bottom: 0;
@@ -648,6 +656,7 @@ $gradebook_cell_padding_top: 8px;
   white-space: nowrap;
 }
 
+.Grid__AssignmentRowCell__GradingSchemeMenu,
 .Grid__AssignmentRowCell__Options {
   align-items: center;
   box-sizing: border-box;
@@ -655,6 +664,12 @@ $gradebook_cell_padding_top: 8px;
   height: $cell-icon-height;
   justify-content: center;
   width: $cell-icon-width;
+}
+
+.Grid__AssignmentRowCell__GradingSchemeMenu {
+  flex-basis: auto;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 /* End Styles for Assignment Cells */

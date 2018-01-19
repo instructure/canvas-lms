@@ -26,6 +26,10 @@ QUnit.module('GradeInputHelper', () => {
       strictEqual(GradeInputHelper.isExcused('EX'), true)
     })
 
+    test('returns true when given "ex"', () => {
+      strictEqual(GradeInputHelper.isExcused('ex'), true)
+    })
+
     test('returns true when given "EX" with surrounding whitespace', () => {
       strictEqual(GradeInputHelper.isExcused('  EX  '), true)
     })
@@ -266,6 +270,10 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(parseTextValue('  ').grade, null)
       })
 
+      test('sets the grade to null when the value is null', () => {
+        strictEqual(parseTextValue(null).grade, null)
+      })
+
       test('sets the grade to the given non-numerical string when given no grading scheme', () => {
         options.gradingScheme = null
         strictEqual(parseTextValue('B').grade, 'B')
@@ -390,6 +398,10 @@ QUnit.module('GradeInputHelper', () => {
 
       test('sets the score to null when the value is blank', () => {
         strictEqual(parseTextValue('  ').score, null)
+      })
+
+      test('sets the score to null when the value is null', () => {
+        strictEqual(parseTextValue(null).score, null)
       })
 
       test('sets the grade to null when the value is "EX"', () => {

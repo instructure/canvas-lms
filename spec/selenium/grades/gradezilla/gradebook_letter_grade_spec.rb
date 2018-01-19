@@ -36,16 +36,14 @@ describe "Gradezilla" do
     end
 
     it 'is maintained in editable mode', priority: "1", test_id: 3438379 do
-      skip('This is skeleton code that acts as AC for GRADE-61 which is WIP')
-      Gradezilla::Cells.grading_cell(@students[0], @assignment).click
-      expect(Gradezilla::Cells.grade_cell_input(@students[0], @assignment)).to eq('B')
+      Gradezilla::Cells.select_scheme_grade(@students[0], @assignment, 'C')
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq('C')
     end
 
     it 'is maintained on page refresh post grade update', priority: "1", test_id: 3438380 do
-      skip('This is skeleton code that acts as AC for GRADE-61 which is WIP')
-      Gradezilla::Cells.edit_grade(@students[0], @assignment, 'A')
+      Gradezilla::Cells.select_scheme_grade(@students[0], @assignment, 'A-')
       refresh_page
-      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq('A')
+      expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq('A-')
     end
   end
 end

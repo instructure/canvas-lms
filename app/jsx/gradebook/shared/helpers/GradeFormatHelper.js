@@ -106,16 +106,16 @@ function formatCompleteIncompleteGrade (score, grade, options) {
   return passed ? I18n.t('Complete') : I18n.t('Incomplete');
 }
 
-function formatPendingGradeInfo(pendingGradeInfo, options = {}) {
-  if (pendingGradeInfo.excused) {
+function formatGradeInfo(gradeInfo, options = {}) {
+  if (gradeInfo.excused) {
     return excused()
   }
 
-  if (pendingGradeInfo.grade == null) {
+  if (gradeInfo.grade == null) {
     return options.defaultValue != null ? options.defaultValue : UNGRADED
   }
 
-  return pendingGradeInfo.grade
+  return gradeInfo.grade
 }
 
 const GradeFormatHelper = {
@@ -206,7 +206,7 @@ const GradeFormatHelper = {
 
   excused,
   isExcused,
-  formatPendingGradeInfo,
+  formatGradeInfo,
 
   formatSubmissionGrade (submission, options = { version: 'final' }) {
     if (submission.excused) {

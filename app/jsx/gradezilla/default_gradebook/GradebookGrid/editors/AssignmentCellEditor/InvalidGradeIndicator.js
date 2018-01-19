@@ -18,28 +18,33 @@
 
 import React from 'react'
 import {func} from 'prop-types'
+import Button from '@instructure/ui-core/lib/components/Button'
 import Text from '@instructure/ui-core/lib/components/Text'
 import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
 import IconWarningLine from 'instructure-icons/lib/Line/IconWarningLine'
 import I18n from 'i18n!gradebook'
-import CellButton from './CellButton'
 
-function Indicator(props) {
+function InvalidGradeIndicator(props) {
   return (
     <div className="Grid__AssignmentRowCell__InvalidGrade">
-      <Tooltip placement="bottom" size="medium" tip={I18n.t('This is not a valid grade')} variant="inverse">
-        <CellButton buttonRef={props.elementRef}>
+      <Tooltip
+        placement="bottom"
+        size="medium"
+        tip={I18n.t('This is not a valid grade')}
+        variant="inverse"
+      >
+        <Button buttonRef={props.elementRef} size="small" variant="icon">
           <Text color="error">
             <IconWarningLine />
           </Text>
-        </CellButton>
+        </Button>
       </Tooltip>
     </div>
   )
 }
 
-Indicator.propTypes = {
+InvalidGradeIndicator.propTypes = {
   elementRef: func.isRequired
 }
 
-export default Indicator
+export default InvalidGradeIndicator

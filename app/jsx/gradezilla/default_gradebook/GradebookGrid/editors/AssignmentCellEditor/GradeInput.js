@@ -20,9 +20,8 @@ import React, {Component} from 'react'
 import {bool, instanceOf, oneOf, number, shape, string} from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradebook'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import {hasGradeChanged, parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
-import CellTextInput from './CellTextInput'
+import GradingSchemeGradeInput from './GradingSchemeGradeInput'
+import TextGradeInput from './TextGradeInput'
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__AssignmentRowCell__GradingSchemeInput',
@@ -31,28 +30,15 @@ const CLASSNAME_FOR_ENTER_GRADES_AS = {
   points: 'Grid__AssignmentRowCell__PointsInput'
 }
 
-function formatGrade(submission, assignment, gradingScheme, enterGradesAs, pendingGradeInfo) {
-  if (pendingGradeInfo) {
-    return GradeFormatHelper.formatPendingGradeInfo(pendingGradeInfo, {defaultValue: ''})
+function inputComponentFor(enterGradesAs) {
+  switch(enterGradesAs) {
+    case 'gradingScheme': {
+      return GradingSchemeGradeInput
+    }
+    default: {
+      return TextGradeInput
+    }
   }
-
-  const formatOptions = {
-    defaultValue: '',
-    formatType: enterGradesAs,
-    gradingScheme,
-    pointsPossible: assignment.pointsPossible,
-    version: 'entered'
-  }
-
-  return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
-}
-
-function getGradeInfo(value, props) {
-  return parseTextValue(value, {
-    enterGradesAs: props.enterGradesAs,
-    gradingScheme: props.gradingScheme,
-    pointsPossible: props.assignment.pointsPossible
-  })
 }
 
 export default class GradeInput extends Component {
@@ -64,15 +50,14 @@ export default class GradeInput extends Component {
     enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
     gradingScheme: instanceOf(Array).isRequired,
     pendingGradeInfo: shape({
-      excused: bool,
+      excused: bool.isRequired,
       grade: string,
-      valid: bool
+      valid: bool.isRequired
     }),
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
-      excused: bool.isRequired,
-      id: string.isRequired
+      excused: bool.isRequired
     }).isRequired
   }
 
@@ -84,72 +69,27 @@ export default class GradeInput extends Component {
   constructor(props) {
     super(props)
 
-    this.bindTextInput = ref => {
-      this.textInput = ref
+    this.bindGradeInput = ref => {
+      this.gradeInput = ref
     }
 
-    this.handleTextChange = this.handleTextChange.bind(this)
-
-    const {assignment, enterGradesAs, gradingScheme, pendingGradeInfo, submission} = props
-
-    this.state = {
-      grade: formatGrade(submission, assignment, gradingScheme, enterGradesAs, pendingGradeInfo)
-    }
+    this.handleKeyDown = this.handleKeyDown.bind(this)
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.isFocused()) {
-      const {assignment, enterGradesAs, gradingScheme, pendingGradeInfo, submission} = nextProps
-
-      this.setState({
-        grade: formatGrade(submission, assignment, gradingScheme, enterGradesAs, pendingGradeInfo)
-      })
-    }
-  }
-
-  get gradingData() {
-    return getGradeInfo(this.state.grade, this.props)
+  get gradeInfo() {
+    return this.gradeInput.gradeInfo
   }
 
   focus() {
-    this.textInput.focus()
-    this.textInput.setSelectionRange(0, this.textInput.value.length)
+    this.gradeInput.focus()
+  }
+
+  handleKeyDown(event) {
+    return this.gradeInput.handleKeyDown(event)
   }
 
   hasGradeChanged() {
-    if (this.props.pendingGradeInfo) {
-      if (this.props.pendingGradeInfo.valid) {
-        // the pending grade is currently being submitted
-        // changes are not allowed
-        return false
-      }
-
-      // the pending grade is invalid
-      // return true only when the input value differs from the invalid grade
-      return this.state.grade.trim() !== this.props.pendingGradeInfo.grade
-    }
-
-    const {assignment, enterGradesAs, gradingScheme, submission} = this.props
-    const formattedGrade = formatGrade(submission, assignment, gradingScheme, enterGradesAs)
-
-    if (formattedGrade === this.state.grade.trim()) {
-      return false
-    }
-
-    const gradeInfo = getGradeInfo(this.state.grade, this.props)
-    return hasGradeChanged(this.props.submission, gradeInfo, {
-      enterGradesAs: this.props.enterGradesAs,
-      gradingScheme: this.props.gradingScheme,
-      pointsPossible: this.props.assignment.pointsPossible
-    })
-  }
-
-  handleTextChange(event) {
-    this.setState({grade: event.target.value})
-  }
-
-  isFocused() {
-    return this.textInput === document.activeElement
+    return this.gradeInput.hasGradeChanged()
   }
 
   render() {
@@ -160,16 +100,15 @@ export default class GradeInput extends Component {
       messages.push({type: 'error', text: I18n.t('This grade is invalid')})
     }
 
+    const InputComponent = inputComponentFor(this.props.enterGradesAs)
+
     return (
       <div className={className}>
-        <CellTextInput
-          value={this.state.grade}
-          disabled={this.props.disabled}
-          inputRef={this.bindTextInput}
+        <InputComponent
+          {...this.props}
           label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
           messages={messages}
-          onChange={this.handleTextChange}
-          size="small"
+          ref={this.bindGradeInput}
         />
       </div>
     )

@@ -39,10 +39,15 @@ class Gradezilla
         f("#{grading_cell_selector(student, assignment)} input[type='text']")
       end
 
+      def grading_cell_scheme_menu_button(student, assignment)
+        f("#{grading_cell_selector(student, assignment)} .Grid__AssignmentRowCell__GradingSchemeMenu button")
+      end
+
       def get_grade(student, assignment)
         grading_cell(student, assignment).text
       end
 
+      # TODO: remove with GRADE-76
       def grade_cell_input(student, assignment)
         cell_selector = grading_cell_selector(student, assignment)
         f(cell_selector).click
@@ -57,6 +62,20 @@ class Gradezilla
         set_value(grade_input, grade)
 
         grade_input.send_keys(:return)
+      end
+
+      def select_scheme_grade(student, assignment, grade)
+        f(grading_cell_selector(student, assignment)).click
+
+        button = grading_cell_scheme_menu_button(student, assignment)
+        button.click
+
+        grade_item = ff("ul[aria-labelledby='#{button.attribute('id')}'] li").detect do |element|
+          element.text.chomp == grade # find exact grade match "B+" != "B"
+        end
+        grade_item.click
+
+        grading_cell_input(student, assignment).send_keys(:return) # commit the grade change
       end
 
       def send_keyboard_shortcut(student, assignment, key)

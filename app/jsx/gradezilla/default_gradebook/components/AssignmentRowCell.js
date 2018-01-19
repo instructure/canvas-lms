@@ -18,13 +18,25 @@
 
 import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
+import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
+import Button from '@instructure/ui-core/lib/components/Button'
 import Text from '@instructure/ui-core/lib/components/Text'
+import TextInput from '@instructure/ui-core/lib/components/TextInput'
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell'
 import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine'
 import I18n from 'i18n!gradebook'
-import CellButton from '../GradebookGrid/editors/AssignmentCellEditor/CellButton'
 import InvalidGradeIndicator from '../GradebookGrid/editors/AssignmentCellEditor/InvalidGradeIndicator'
 import GradeInput from '../GradebookGrid/editors/AssignmentCellEditor/GradeInput'
+
+const themeOverrides = {
+  [Button.theme]: {
+    iconPadding: '0 3px',
+    smallHeight: '23px'
+  },
+  [TextInput.theme]: {
+    smallHeight: '27px'
+  }
+}
 
 export default class AssignmentRowCell extends Component {
   static propTypes = {
@@ -107,6 +119,8 @@ export default class AssignmentRowCell extends Component {
       submissionFinishedUpdating &&
       this.trayButton !== document.activeElement
     ) {
+      // the cell was reactivated while the grade was updating
+      // set the focus on the input by default
       this.gradeInput.focus()
     }
   }
@@ -121,6 +135,13 @@ export default class AssignmentRowCell extends Component {
     const indicatorHasFocus = this.invalidGradeIndicator === document.activeElement
     const inputHasFocus = this.contentContainer.contains(document.activeElement)
     const trayButtonHasFocus = this.trayButton === document.activeElement
+
+    if (this.gradeInput) {
+      const inputHandled = this.gradeInput.handleKeyDown(event)
+      if (inputHandled != null) {
+        return inputHandled
+      }
+    }
 
     const hasPreviousElement = trayButtonHasFocus || (inputHasFocus && this.invalidGradeIndicator)
     const hasNextElement = inputHasFocus || indicatorHasFocus
@@ -160,7 +181,7 @@ export default class AssignmentRowCell extends Component {
     if (this.props.enterGradesAs === 'passFail') {
       this.submissionCell.applyValue(item, state)
     } else {
-      this.props.onGradeSubmission(this.props.submission, this.gradeInput.gradingData)
+      this.props.onGradeSubmission(this.props.submission, this.gradeInput.gradeInfo)
     }
   }
 
@@ -193,44 +214,48 @@ export default class AssignmentRowCell extends Component {
     const gradeIsInvalid = this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid
 
     return (
-      <div className="Grid__AssignmentRowCell">
-        <div className="Grid__AssignmentRowCell__StartContainer">
-          {gradeIsInvalid && (
-            <InvalidGradeIndicator elementRef={this.bindInvalidGradeIndicatorRef} />
-          )}
-        </div>
+      <ApplyTheme theme={themeOverrides}>
+        <div className="Grid__AssignmentRowCell">
+          <div className="Grid__AssignmentRowCell__StartContainer">
+            {gradeIsInvalid && (
+              <InvalidGradeIndicator elementRef={this.bindInvalidGradeIndicatorRef} />
+            )}
+          </div>
 
-        <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef}>
-          {this.props.enterGradesAs !== 'passFail' && (
-            <GradeInput
-              assignment={this.props.assignment}
-              enterGradesAs={this.props.enterGradesAs}
-              disabled={this.props.submissionIsUpdating}
-              gradingScheme={this.props.gradingScheme}
-              pendingGradeInfo={this.props.pendingGradeInfo}
-              ref={this.bindGradeInput}
-              submission={this.props.submission}
-            />
-          )}
-        </div>
+          <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef}>
+            {this.props.enterGradesAs !== 'passFail' && (
+              <GradeInput
+                assignment={this.props.assignment}
+                enterGradesAs={this.props.enterGradesAs}
+                disabled={this.props.submissionIsUpdating}
+                gradingScheme={this.props.gradingScheme}
+                pendingGradeInfo={this.props.pendingGradeInfo}
+                ref={this.bindGradeInput}
+                submission={this.props.submission}
+              />
+            )}
+          </div>
 
-        <div className="Grid__AssignmentRowCell__EndContainer">
-          {showEndText && (
-            <span className="Grid__AssignmentRowCell__EndText">
-              {pointsPossible && <Text size="small">{pointsPossible}</Text>}
-            </span>
-          )}
+          <div className="Grid__AssignmentRowCell__EndContainer">
+            {showEndText && (
+              <span className="Grid__AssignmentRowCell__EndText">
+                {pointsPossible && <Text size="small">{pointsPossible}</Text>}
+              </span>
+            )}
 
-          <div className="Grid__AssignmentRowCell__Options">
-            <CellButton
-              buttonRef={this.bindToggleTrayButtonRef}
-              onClick={this.handleToggleTrayButtonClick}
-            >
-              <IconExpandLeftLine title={I18n.t('Open submission tray')} />
-            </CellButton>
+            <div className="Grid__AssignmentRowCell__Options">
+              <Button
+                buttonRef={this.bindToggleTrayButtonRef}
+                onClick={this.handleToggleTrayButtonClick}
+                size="small"
+                variant="icon"
+              >
+                <IconExpandLeftLine title={I18n.t('Open submission tray')} />
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </ApplyTheme>
     )
   }
 }

@@ -62,7 +62,7 @@ test('uses I18n#t to format pass_fail based grades: fail', function () {
 
 test('returns "Excused" when the grade is "EX"', function () {
   // this is for backwards compatibility for users who depend on this behavior
-  equal('Excused', GradeFormatHelper.formatGrade('EX'));
+  equal(GradeFormatHelper.formatGrade('EX'), 'Excused');
 });
 
 test('parses a stringified integer percentage grade when it is a valid number', function () {
@@ -310,41 +310,41 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
     });
   });
 
-  QUnit.module('.formatPendingGradeInfo()', hooks => {
+  QUnit.module('.formatGradeInfo()', hooks => {
     let options
-    let pendingGradeInfo
+    let gradeInfo
 
-    function formatPendingGradeInfo() {
-      return GradeFormatHelper.formatPendingGradeInfo(pendingGradeInfo, options)
+    function formatGradeInfo() {
+      return GradeFormatHelper.formatGradeInfo(gradeInfo, options)
     }
 
     hooks.beforeEach(() => {
-      pendingGradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+      gradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
     })
 
     test('returns the grade when the pending grade is valid', () => {
-      strictEqual(formatPendingGradeInfo(), 'A')
+      strictEqual(formatGradeInfo(), 'A')
     })
 
     test('returns the grade when the pending grade is invalid', () => {
-      pendingGradeInfo.valid = false
-      strictEqual(formatPendingGradeInfo(), 'A')
+      gradeInfo.valid = false
+      strictEqual(formatGradeInfo(), 'A')
     })
 
     test('returns "–" (en dash) when the pending grade is null', () => {
-      pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
-      strictEqual(formatPendingGradeInfo(), '–')
+      gradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      strictEqual(formatGradeInfo(), '–')
     })
 
     test('returns the given default value when the pending grade is null', () => {
       options = {defaultValue: 'default'}
-      pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
-      strictEqual(formatPendingGradeInfo(), 'default')
+      gradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      strictEqual(formatGradeInfo(), 'default')
     })
 
     test('returns "Excused" when the pending grade info includes excused', () => {
-      pendingGradeInfo = {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
-      strictEqual(formatPendingGradeInfo(), 'Excused')
+      gradeInfo = {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
+      strictEqual(formatGradeInfo(), 'Excused')
     })
   })
 

@@ -108,7 +108,8 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').node.isFocused(), true)
+        const node = wrapper.find('GradeInput input')
+        strictEqual(node.getDOMNode(), document.activeElement)
       })
 
       test('disables the GradeInput when the submission is updating', () => {
@@ -163,7 +164,8 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').node.isFocused(), true)
+        const node = wrapper.find('GradeInput input')
+        strictEqual(node.getDOMNode(), document.activeElement)
       })
 
       test('disables the GradeInput when the submission is updating', () => {
@@ -212,7 +214,8 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').node.isFocused(), true)
+        const node = wrapper.find('GradeInput input')
+        strictEqual(node.getDOMNode(), document.activeElement)
       })
 
       test('disables the GradeInput when the submission is updating', () => {
@@ -286,6 +289,14 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         wrapper.node.trayButton.focus()
         const continueHandling = simulateKeyDown(9, true) // shift+tab back to grade input
+        strictEqual(continueHandling, false)
+      })
+
+      test('skips SlickGrid default behavior when the input handles the event', () => {
+        wrapper = mountComponent()
+        wrapper.node.gradeInput.focus()
+        sinon.stub(wrapper.find('GradeInput').node, 'handleKeyDown').returns(false)
+        const continueHandling = simulateKeyDown(9) // tab within the grade input
         strictEqual(continueHandling, false)
       })
 
@@ -399,7 +410,8 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
       wrapper.node.focus()
-      strictEqual(wrapper.find('GradeInput').node.isFocused(), true)
+      const node = wrapper.find('GradeInput input')
+      strictEqual(node.getDOMNode(), document.activeElement)
     })
 
     test('sets focus on the button for a Complete/Incomplete SubmissionCell', () => {

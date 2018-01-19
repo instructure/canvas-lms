@@ -170,11 +170,11 @@ function parseForPassFail(value, options) {
 }
 
 export function isExcused(grade) {
-  return `${grade}`.trim() === 'EX'
+  return `${grade}`.trim().toLowerCase() === 'ex'
 }
 
 export function parseTextValue(value, options) {
-  const trimmedValue = `${value}`.trim()
+  const trimmedValue = value != null ? `${value}`.trim() : ''
 
   if (trimmedValue === '') {
     return {enteredAs: null, excused: false, grade: null, score: null, valid: true}

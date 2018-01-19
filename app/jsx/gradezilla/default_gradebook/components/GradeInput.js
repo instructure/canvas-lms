@@ -33,7 +33,7 @@ function normalizeSubmissionGrade (props) {
   if (props.pendingGradeInfo && props.pendingGradeInfo.excused) {
     return GradeFormatHelper.excused();
   } else if (props.pendingGradeInfo) {
-    return GradeFormatHelper.formatPendingGradeInfo(props.pendingGradeInfo, {defaultValue: ''})
+    return GradeFormatHelper.formatGradeInfo(props.pendingGradeInfo, {defaultValue: ''})
   }
 
   if (!gradeToNormalize) {

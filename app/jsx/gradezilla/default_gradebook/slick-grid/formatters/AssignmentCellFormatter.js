@@ -179,7 +179,7 @@ export default class AssignmentCellFormatter {
 
     let grade
     if (pendingGradeInfo) {
-      grade = GradeFormatHelper.formatPendingGradeInfo(pendingGradeInfo)
+      grade = GradeFormatHelper.formatGradeInfo(pendingGradeInfo)
     } else {
       grade = formatGrade(submissionData, assignment, this.options)
     }
