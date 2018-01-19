@@ -60,6 +60,7 @@ nl:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Er is een partner-ID nodig om Academic Benchmarks te kunnen gebruiken"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Er is een partnersleutel nodig om Academic Benchmarks te kunnen gebruiken"
   a_problem_occurred_adding_reviewers_57b083d9: "Er heeft zich een probleem voorgedaan bij het toevoegen van beoordelaars."
+  a_section_is_required_64103992: "Er is een sectie vereist"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Er is geen SIS-integratie geconfigureerd en de functie Nieuwe instellingen voor SIS-integratie inschakelen is niet ingeschakeld"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Een tabel met de naam van het beoordelingsschema en pictogrammen om het schema te bewerken of te verwijderen. "
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Een tabel met de naam van het beoordelingsschema en iconen om het schema te bewerken of te verwijderen."
@@ -1541,6 +1542,7 @@ nl:
   add_users_to_name_b8109bbb: "Gebruikers toevoegen aan %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Jouw opdrachten toevoegen. Je kunt gewoon een lange lijst maken, of ze in groepen verdelen - en zelfs waarden voor iedere groep opdrachten aangeven."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Voeg het aangepaste veld ID van je Zendesk Exemplaar toe aan elk van de volgende (velden die geen ID hebben zullen niet gelogd worden):"
+  additional_comments_9aed10bb: "Extra opmerkingen"
   additional_occurrence_s_7b5b0173: "extra voorval(len)"
   additional_outcomes_options_6df428f1: "Extra leerdoelopties"
   additional_settings_for_sis_syncing_f926973e: "Extra instellingen voor SIS-synchronisatie"
@@ -1617,6 +1619,7 @@ nl:
   all_account_types_e83c1516: "Alle account types"
   all_accounts_3bafc860: "Alle Accounts"
   all_assignment_groups_a65e9e46: "Alle opdrachtgroepen"
+  all_assignments_b79a4d6a: "Alle opdrachten"
   all_changes_were_saved_f6f3ddcc: "Alle wijzigingen opgeslagen"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Alle sluitingsdatums moeten op of na de einddatum vallen"
   all_configured_apps_a14eef0a: "Alle Geconfigureerde Apps"
@@ -1632,6 +1635,7 @@ nl:
   all_items_a49b66c7: "Alle items"
   all_modules_20c9a1c8: "Alle modules"
   all_my_files_a0213441: "Al mijn bestanden"
+  all_my_sections_375248b3: "Al mijn secties"
   all_roles_f3bba14d: "Alle functies"
   all_sections_daf11554: "Alle secties"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle begindata moeten voor de einddatum liggen"
@@ -1659,6 +1663,7 @@ nl:
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Cursisten kunnen zien wie zich voor welke tijdblokken heeft aangemeld"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "De mogelijkheid toestaan om meldingen te sturen via onze dispatch wachtrij"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Sta toe om meldingen te sturen door middel van een verzendwachtrij."
+  allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Geef deze tool toegang tot de IMS Names and Role Provisioning Service"
   allowed_attempts_4e229caa: "Toegestane aantal pogingen "
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Hiermee kun je aankondigingen voor een specifieke sectie maken"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Stelt instructeurs in staat cijfers te markeren om te exporteren naar SIS-integraties."
@@ -1791,6 +1796,7 @@ nl:
     podcast_feed_description_group: "Mediabestanden die gekoppeld zijn vanuit of ingesloten zijn in aankondigingen in de groep \"%{group}\" zullen in deze feed verschijnen."
     podcast_feed_name: "Podcast-feed voor %{course} aankondigingen"
   announcements_a4b8ed4a: Aankondigingen
+  announcements_list_c75fc413: "Lijst met aankondigingen"
   announcements_loaded_e9335d5f: "Aankondigingen zijn geladen!"
   announcements_tutorial_tray_994287d6: "Zelfstudiemenu Aankondigingen"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Maak alle aantekeningen van andere cursusleiders anoniem bij inzendingen voor deze opdracht in SpeedGrader"
@@ -2051,6 +2057,7 @@ nl:
       frozen_assignments_error: "Je kunt een groep met een vergrendelde opdracht niet verwijderen."
   assignment_groups_bc9cc3c9: Opdrachtgroepen
   assignment_groups_weight_2f1a5a7c: "Opdracht Groepswegingen"
+  assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "Opdracht heeft een vergrendelde datum. Inleverdatum kan niet buiten het vergrendelde datumbereik worden ingesteld."
   assignment_id_b040cee0: "ID voor opdracht"
   assignment_menu_91fe3716: Opdrachtmenu
   assignment_muted_4cb590a4: "Opdracht verborgen"
@@ -2597,6 +2604,29 @@ nl:
       titles: 
         media_recordings_disabled: "Mediaopnames zijn niet ingeschakeld voor deze Canvas-site"
       upload_or_choose_file: "Een bestand uploaden of een reeds geüploade bestand kiezen."
+    submit_online_text_entry: 
+      additional_comments: "Aanvullende opmerkingen"
+      buttons: 
+        submit_assignment: "Opdracht inleveren"
+      comments_placeholder: Opmerkingen...
+      instructions: 
+        online_text_entry: "Je inlevering hier kopiëren en plakken of typen."
+    submit_online_upload: 
+      additional_comments: "Aanvullende opmerkingen"
+      buttons: 
+        submit_assignment: "Opdracht inleveren"
+      comments_placeholder: Opmerkingen...
+      errors: 
+        unacceptable_file_type: "Dit bestandstype is niet toegestaan. Dit zijn de toegestane bestandstypen: %{allowed_extensions_list}"
+      labels: 
+        uploaded_data: Bestand
+      links: 
+        add_another_file: "Een ander bestand toevoegen"
+        find_file: "Hier klikken om een reeds geüpload bestand te zoeken"
+      messages: 
+        submitting: "Bezig met inleveren..."
+      no_files: "Geen bestanden"
+      upload_or_choose_file: "Een bestand uploaden of een reeds geüpload bestand kiezen."
     syllabus: 
       page_title: "Syllabus voor %{course}"
     syllabus_content: 
@@ -2819,6 +2849,7 @@ nl:
   blueprint_course_sync_in_progress_a1e2622b: "Synchroniseren van blauwdrukcursus wordt uitgevoerd"
   blueprint_courses_9dd321b8: Blauwdrukcursussen
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blauwdrukcursussen (maken/bewerken/koppelen/verwijderen)"
+  blueprint_information_95dcef55: Blauwdrukinformatie
   blueprint_settings_233e909a: Blauwdrukinstellingen
   body_9f663faf: Hoofdtekst
   body_shadow_d36e8c2e: "Schaduw lichaam"
@@ -3372,6 +3403,7 @@ nl:
   cancel_submitting_comment_2666e98b: "Indienen van opmerking annuleren"
   cancel_updating_comment_6816d855: "Bijwerken van opmerking annuleren"
   cannot_access_group_in_concluded_course_90a8db52: "Kan groep niet openen in een beëindigde cursus"
+  cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Kan sectie niet toevoegen aan een niet-sectiespecifieke discussie"
   cannot_autograde_at_this_time_a146ad9d: "Kan momenteel niet automatisch beoordelen"
   cannot_be_associated_with_a_different_account_ac863be2: "mag niet met een andere account geassocieerd worden"
   cannot_be_associated_with_different_accounts_f461814f: "mag niet met andere accounts geassocieerd worden"
@@ -3498,6 +3530,7 @@ nl:
   child_s_username_dde3aa9: "Gebruikersnaam van kind"
   chile_56_88238b47: "Chili (+56)"
   chile_9081cde6: Chili
+  china_86_36913b7a: "China (+86)"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Kies een bijnaam voor kleur of cursus voor %{course}"
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Kies een bijnaam voor kleur of cursus of verplaats cursuskaart voor %{course}"
   choose_a_course_home_page_8059c7b: "Een startpagina voor de cursus kiezen "
@@ -4800,6 +4833,7 @@ nl:
     one: "1 toets gevonden."
     other: "%{count} toetsen gevonden."
     zero: "Geen overeenkomende toetsen gevonden."
+  count_replies_a685c742: "%{count} antwoorden"
   count_results_9926447c: 
     one: "Eén resultaat"
     other: "%{count} resultaten"
@@ -4826,8 +4860,10 @@ nl:
     one: "1 inlevering nog te beoordelen"
     other: "%{count} inleveringen nog te beoordelen"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} zouden worden verwijderd en overschrijdt de ingestelde drempel van %{change_threshold}%"
+  count_unread_replies_86976ab: "%{count} ongelezen antwoorden."
   count_unsynced_changes_1fc147e5: "%{count} Niet-gesynchroniseerde wijzigingen"
   count_unsynched_changes_3a1249ba: "%{count} Niet-gesynchroniseerde wijzigingen"
+  count_users_374d6e47: "(%{count} gebruikers)"
   country_is_required_b0afbf52: "Land is verplicht"
   course: 
     access_denied: "Toegang is geweigerd"
@@ -6024,6 +6060,7 @@ nl:
   deactivate_this_key_3e79a2b5: "Deze toets activeren"
   deactivate_user_86c09036: "Gebruiker deactiveren"
   decaying_average_8bf6a0dd: "Achteruitgaand gemiddelde"
+  decorative_image_3c28aa7d: "Decoratieve afbeelding"
   decrease_indent_d9cf469d: "Inspringen verkleinen"
   decrease_indent_de6343ab: "Inspringen verkleinen"
   deduct_104e8866: Aftrekken
@@ -6046,6 +6083,7 @@ nl:
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Instellingen per soort bepalen voor vergrendelde artikelen in deze cursus. "
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definieer tekst voor en na de vervolgkeuzelijst en maak een set van mogelijke antwoorden."
   delay_posting_this_topic_until_aa483eec: "Stel publiceren van dit onderwerp uit tot"
+  delayed_until_58b7af4b: "Uitgesteld tot:"
   delete_a6efa79d: Verwijderen
   delete_account_name_96aee330: "Verwijderen %{account_name}"
   delete_alignment_f33c97d5: "Afstemming verwijderen"
@@ -6592,6 +6630,7 @@ nl:
   do_nothing_9672b478: "Niets doen"
   domain_3b54c511: Domein
   domain_is_required_1d4c8b25: "Domein is verplicht"
+  dominican_republic_1_3cef4021: "Dominicaanse Republiek (+1)"
   don_t_add_this_user_for_now_32912974: "Deze gebruiker voorlopig nog niet vragen."
   don_t_move_lti_query_params_to_post_body_21744487: "LTI query betalingen niet naar POST body verplaatsen"
   don_t_move_lti_query_params_to_post_body_5c80e037: "LTI query Params niet naar POST body verplaatsen"
@@ -6829,6 +6868,7 @@ nl:
       Of je bent een nieuwe gebruiker, of de *gebruiksvoorwaarden* zijn gewijzigd sinds de laatste keer dat je er akkoord mee ging.
       Ga akkoord met de *gebruiksvoorwaarden* en het **privacybeleid** alvorens verder te gaan.
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Je bent een nieuwe gebruiker of de *gebruiksvoorwaarden* zijn gewijzigd sinds je er de laatste keer mee akkoord bent gegaan. Ga akkoord met de *gebruiksvoorwaarden* voordat je verdergaat."
+  el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "ontbrekende fout in optie `element`: Een element aan de TreeBrowserView toevoegen moet bepaald worden wanneer de weergave-optie voor BBTreeBrowserView op 'true' (waar) wordt ingesteld"
   email: 
     default_from_name: "Instructure Canvas"
@@ -7360,6 +7400,7 @@ nl:
       phrase_to_look_for: "Zoeken naar woordgroep"
       posts_added: "Berichten gepost"
       remove_feed: "%{display_name} verwijderen"
+  external_feeds_77f57c7d: "Externe feeds"
   external_integration_keys_8b4f4548: "Sleutels voor externe integratie "
   external_tool_c5a6410a: "Externe tool"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "Externe TOOL URL mag niet leeg zijn"
@@ -7471,6 +7512,7 @@ nl:
     user_navigation_configured: "Gebruikersnavigatie geconfigureerd"
     wiki_page_menu_configured: "Menu van wikipagina geconfigureerd"
   external_url_e9b87215: "Externe URL's"
+  extract_error_error_file_names_a4989ed0: "Fout tijdens ophalen, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "EXTREEM NOODGEVAL!"
   faculty_journal_5634938e: Faculteitsnieuws
   fail_62dbb06a: mislukt
@@ -7546,6 +7588,7 @@ nl:
   feed_url_is_required_253fda4e: "FEED URL is vereist"
   field_name_31fff38e: Veldnaam
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Een ticket inleveren om een persoonlijk antwoord van onze helpdesk te krijgen."
+  file_already_exists_bdc61895: "bestand bestaat al"
   file_attachment_8e7dbfd1: Bestandsbijlage
   file_c851020d: Bestand
   file_content_a99b5c6b: Bestandinhoud
@@ -7554,6 +7597,7 @@ nl:
   file_list_updated_38e2a5ad: "List met bestanden bijgewerkt "
   file_menu_cc0ca54: Bestandsmenu
   file_name_2fe68ec1: Bestandsnaam
+  file_name_too_long_ea535796: "bestandsnaam te lang"
   file_not_available_1869c733: "bestand niet beschikbaar"
   file_not_found_9eec054c: "Functie niet gevonden"
   file_preview: 
@@ -8597,12 +8641,14 @@ nl:
       update_category_success: "Categorie is succesvol bijgewerkt."
   group_category: 
     cant_restrict_self_signup: "Kan zelf inschrijven niet beperken als de categorie een groep met gemengde secties bevat"
+    empty_course_or_account_id: "Moet een account- of cursus-ID hebben"
     greater_than_1: "Moet groter zijn dan 1"
     group_categories: 
       communities: Communitys
       imported: "Geïmporteerde groepen"
       student_organized: "Groepen cursisten"
       uncategorized: "Niet gecategoriseerd"
+    group_category_must_have_context: "Moet bij een account of cursus horen"
     invalid_auto_leader: "AutoLeader moet één van de volgende waarden hebben: %{values}"
     invalid_self_signup: "Zelf inschrijven moet één van de volgende waarden hebben: %{values}"
     name_required: "Naam is verplicht!"
@@ -8989,6 +9035,7 @@ nl:
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Groepen moeten leeg zijn om ze per sectie te kunnen toewijzen"
   groups_navigation_menu_76b5acc6: "Menu Groepsnavigatie"
   groupweight_of_total_9579ae8c: "%{groupWeight}% van totaal"
+  guatemala_502_ae25c68f: "Guatemala (+502)"
   handlebars_helpers: 
     time: 
       event: "%{date} om %{time}"
@@ -9124,6 +9171,7 @@ nl:
       Standaard zal Canvas eerst Flash proberen te gebruiken om video's af te spelen. Schakel die in om eerst HTML5
       te gebruiken om dan op Flash terug te vallen.
   html_editor_fb2ab713: "HTML Editor"
+  hungary_36_cd3e515b: "Hongarije (+36)"
   i_agree_to_the_34aa16ce: "Ik ga akkoord met"
   i_agree_to_the_terms_of_use_18e16f0c: "Ik ga akkoord met de *gebruiksvoorwaarden*."
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Ik ga akkoord met de *gebruiksvoorwaarden* en het **privacybeleid**."
@@ -9153,6 +9201,7 @@ nl:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Indien ingeschakeld, moeten content-ontwerpers auteursrechten en licentie-informatie verstrekken voor bestanden voordat deze worden gepubliceerd. Alleen van toepassing als Better File Browsing ook is ingeschakeld."
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Indien ingeschakeld, zullen modulen de optie hebben als voltooid gemarkeerd te worden als aan slechts een van de vereisten is voldaan."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Indien ingeschakeld, wordt 'oauth2_access_token_url' verzonden in de lancering van de LTI2-registratie"
+  if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Indien ingeschakeld, kan OAuth 1.0a door LTI-tools worden gebruikt voor toegang tot de Membership Service API "
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Indien ingeschakeld, worden query parameters niet gekopieerd naar de POST body tijdens een LTI-lancering."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Indien ingeschakeld, worden Sourcedids versleuteld die Canvas gebruikt voor basisleerdoelen."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Indien ingeschakeld, kunnen gebruikers LT1 2 tools configureren"
@@ -9269,9 +9318,11 @@ nl:
   incremental_update_successfully_generated_against__db3f3f06: "Tussentijdse update met succes gegenereerd tegen een eerdere SIS-import."
   india_8d982994: India
   india_91_6c290107: "India (+91)"
+  indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Geeft aan dat de afbeelding alleen bedoeld is ter decoratie en door schermlezers moet worden gelezen"
   indigo_2035fc55: Indigo
   individual_view_81c2f124: "Individuele weergave"
   individual_view_d60b9132: "Individuele weergave..."
+  indonesia_62_4c35bd62: "Indonesië (+62)"
   info: 
     old_styleguide: 
       create_collection: "Een verzameling maken"
@@ -9297,6 +9348,7 @@ nl:
     authorize_google_docs: "Voordat je kunt samenwerken aan documenten, moet je eerst aan Canvas eerst toegang verlenen tot jouw Google Docs-account:"
     authorize_google_drive: "Voordat je kan samenwerken op documenten, moet je Canvas autoriseren om toegang tot je Google Drive-account te krijgen:"
   instructions_2f88ee72: Instructies
+  instructor_comments_205e0ec8: "Opmerkingen van cursusleider"
   instructor_id_ed9c0d8b: "ID cursusleider"
   instructor_is_working_on_grades_135388d2: "Cursusleider werkt aan de cijfers"
   instructor_messages_a4c28674: "Berichten van cursusleider"
@@ -9498,6 +9550,7 @@ nl:
   k_2521301c: k
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Hou in gedachten: deze inzending zal voor iedereen van jouw %{groupType}-groep tellen."
   keep_submissions_anonymous_5cbaf419: "Inzendingen anoniem houden"
+  kenya_254_2945663a: "Kenia (+254)"
   key_api_key_68bf80ae: "Sleutel: *%{api_key}*"
   keyboard_instructions_e032939f: toetsenbordinstructies
   keyboard_nav_dialog: 
@@ -9980,6 +10033,7 @@ nl:
   masquerade_as_name_8bb004c5: "Maskeren als %{name}"
   masquerade_fdbc9594: "Masker toepassen"
   master_courses_2aaa4841: Hoofdcursussen
+  master_lock_590266b6: Hoofdvergrendeling
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Bekwaamheid: %{n_mastery_points_precision_2_str} Punten"
   mastery_path_processing_f4471152: "Leertraject wordt verwerkt"
   mastery_paths_breakdown_6e0b5fce: "Uitsplitsing Mastery Paths"
@@ -10053,6 +10107,7 @@ nl:
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} leden uit maximum van %{max_membership}"
   members_af25c21d: Leden
   membership_by_invitation_only_9bc27199: "Deelname alleen op uitnodiging"
+  membership_service_configuration_d8ba5a74: "Configuratie Membership Service"
   menu: 
     current_groups: "Huidige groepen"
     customize: Aanpassen
@@ -12231,6 +12286,7 @@ nl:
   name_3806192d: "Naam:"
   name_app_has_been_deleted_fb2d9426: "%{name} app is verwijderd"
   name_badfe525: naam
+  name_count_users_ccc93c3d: "%{name} (%{count} gebruikers)"
   name_current_score_b3198dfa: "%{name} huidige score"
   name_error_fee4236: "Naam van fout "
   name_final_score_2dce3ff8: "%{name} eindscore"
@@ -12309,6 +12365,7 @@ nl:
   new_zealand_ef5d7b74: "Nieuw Zeeland"
   newest_oldest_d768cf1a: "Nieuwste - Oudste"
   next_40e12421: Volgende
+  next_announcements_page_3956eb11: "Pagina Volgende aankondigingen"
   next_assignment_8ec51175: "Volgende opdracht"
   next_item_2d1ddc96: "Volgende: *item*"
   next_mastery_path_is_currently_locked_a9253711: "Volgend leertraject is momenteel geblokkeerd"
@@ -12329,6 +12386,7 @@ nl:
   no_associated_terms_13bacefc: "Geen bijbehorende termijnen"
   no_attributes_locked_611c5cc: "geen vergrendelde eigenschappen"
   no_broken_links_found_38d951e3: "Geen gebroken koppelingen gevonden"
+  no_cancel_installation_db8d12d7: "Nee, annuleer de installatie"
   no_collaboration_apps_3bbd30ce: "Geen samenwerkingsapps"
   no_content_has_been_added_f36bab43: "* Geen inhoud is toegevoegd"
   no_courses_found_12d68a74: "Geen cursussen gevonden"
@@ -12722,6 +12780,7 @@ nl:
       format: 
         format: "%n%"
   number_between_1_and_16_inclusive_31f5468d: "nummer tussen 1 en 16 inclusief"
+  number_more_a46966: "%{number} Meer..."
   number_of_allowed_attempts_3d10b740: "Aantal toegestane pogingen"
   number_of_respondents_e1e7e8b: "Aantal respondents"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Aantal te negeren scores voor iedere student"
@@ -12775,6 +12834,7 @@ nl:
   okay_1772bbeb: OK
   okay_got_it_d686d4e8: "Ok, ik snap het"
   oldest_newest_4de86803: "Oudste - Nieuwste"
+  oman_968_46f8d901: "Oman (+968)"
   on_paper_46d0ba36: "Op papier"
   on_time_17ca5ad9: "Op tijd"
   on_time_percent_eebffe38: "Op tijd: %{percent}"
@@ -12793,6 +12853,7 @@ nl:
   only_a_maximum_of_100_events_can_be_created_ad703982: "er kunnen slechts maximaal 100 gebeurtenissen worden aangemaakt"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "er kunnen slechts maximaal %{limit} evenementen worden gemaakt"
   only_after_their_last_attempt_3593d101: "Alleen na de laatste poging"
+  only_announcements_can_be_section_specific_1ff992a: "Alleen aankondigingen kunnen sectiespecifiek zijn"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Alleen beschikbaar voor cursisten met een link. Niet zichtbaar in bestanden voor cursisten."
   only_once_after_each_attempt_cc842738: "Alleen maar eenmaal na iedere poging"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Alleen docenten kunnen deze cursus zien totdat deze gepubliceerd is"
@@ -12823,6 +12884,7 @@ nl:
     ? "yes"
     : Ja
   options_3ab0ea65: Opties
+  options_for_title_label_17f821ff: "Opties voor %{title_label}"
   or_a01eec62: OF
   orange_81386a62: Oranje
   orbis_report_header_assignment_id: "id voor opdracht"
@@ -13057,6 +13119,7 @@ nl:
     view_more_link: "Meer weergeven"
   paginated_view: 
     loading_more_results: "Bezig met laden van meer resultaten"
+  pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
   panama_fa454c86: Panama
   paper_view_7405eeab: "Paper weergave"
@@ -13643,7 +13706,9 @@ nl:
   post_grades_to_posttosisname_70430da4: "Cijfers posten naar %{postToSISName}"
   post_grades_to_sis_97ece878: "Cijfers posten in SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "Vakje \"Cijfers op SIS posten\" is standaard ingeschakeld voor opdrachten, beoordeelde gesprekken en toetsen"
+  post_to_961f8937: "Plaatsen in"
   posted_at_4cfce2c3: "%{posted_at}"
+  posted_on_e1010e1e: "Geplaatst op:"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: Practicumtoets
   pre_processing_92865c1d: "Wordt voorverwerkt"
@@ -13660,6 +13725,7 @@ nl:
   prev_month_34bd934c: "Vorige maand"
   preview_53003fd2: Voorbeeld
   preview_your_changes_373557d8: "Voorbeeld van jouw wijzigingen"
+  previous_announcements_page_79c0ada1: "Pagina Vorige aankondigingen"
   previous_assignment_83d1f423: "Vorige opdracht"
   previous_bd2ac015: Vorige
   previous_csv_file_time_d7bfe7ef: "Vorig CSV-bestand (%{time})"
@@ -15617,6 +15683,7 @@ nl:
   remove_filename_87f3781e: "%{filename} verwijderen"
   remove_icon_a4646413: "pictogram verwijderen"
   remove_image_341340b3: "Afbeelding verwijderen"
+  remove_label_11d96b8f: "Verwijderen %{label}"
   remove_linked_student_name_52dc7fce: "Gekoppelde cursist verwijderen %{name}"
   remove_name_as_an_admin_c296cf49: "%{name} verwijderen als beheerder"
   remove_recipient_name_a6b83cef: "Verwijder geadresseerde %{name}"
@@ -15862,6 +15929,7 @@ nl:
     observing_user: "Bezig met waarnemen: %{user_name}"
     unknown_error: "Er is tijdens het zoeken iets misgegaan, probeer het opnieuw."
     updating: "Bezig met bijwerken..."
+  rss_feed_cf6286b3: RSS-feed
   rubric: 
     context_name_rubric: "Rubriek %{course_name}"
     no_description: "Geen beschrijving"
@@ -15931,6 +15999,7 @@ nl:
   save_grading_period_set_e029fa88: "Ingestelde beoordelingsperiode opslaan"
   save_publish_36440725: "Opslaan & publiceren"
   save_theme_f706116e: "Thema opslaan"
+  save_this_comment_for_reuse_5eda0b70: "Deze opmerking opslaan om nog eens te gebruiken"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Sla je  %{type} op om te beginnen met het specificeren van voorwaardelijke inhoud"
   saving_associations_989bd4da: "Koppelingen opslaan"
   saving_associations_complete_e4b9634d: "Koppelingen opslaan is voltooid"
@@ -16110,6 +16179,7 @@ nl:
   search_title_body_or_author_1d26711f: "Zoeken op titel, hoofdtekst of auteur "
   search_users_48b1789e: "Gebruikers zoeken..."
   searching_b0207e7f: "Bezig met zoeken..."
+  searching_for_announcements_in_sections_must_span__80e4dfe4: "Het zoeken naar aankondigingen in secties moet precies één cursus omvatten"
   second_reviewer_90046c68: "Tweede beoordelaar"
   secondary_button_36a86f03: "Tweede knop"
   secondary_button_text_e92b3e52: "Tweede knop tekst"
@@ -16140,6 +16210,8 @@ nl:
       removing_crosslisting_of_section: "Kruisverwijzing naar sectie ongedaan maken..."
   section_84b5391: sectie
   section_c7f66a0d: Sectie
+  section_count_sections_42196f3f: "%{section_count} Secties"
+  section_does_not_belong_to_course_for_this_discuss_39fd6808: "Sectie maakt geen deel uit van de cursus voor dit discussieonderwerp"
   section_ends_at_bb9df3c0: "Cursus eindigt op"
   section_filter_cde54d0a: Sectiefilter
   section_id_6f73f3d5: sectie-ID
@@ -16149,6 +16221,8 @@ nl:
   section_sis_2a80d2fa: Sectie-SIS
   section_sis_94511bcd: "SIS sectie"
   section_specific_announcements_e0d355d9: "Sectiespecifieke aankondigingen"
+  section_specific_discussions_are_disabled_9e3fd431: "Sectiespecifieke discussies worden uitgeschakeld"
+  section_specific_topics_must_have_sections_11868960: "Sectiespecifieke onderwerpen moeten secties hebben"
   section_starts_at_65eaed1: "Sectie begint op"
   sections: 
     section_created: "Sectie succesvol aangemaakt!"
@@ -16213,6 +16287,7 @@ nl:
   see_scoring_details_f7fd1f3b: "Details over score zien"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Bekijk een paar LTI-tools* die uitstekend met Canvas werken"
   see_turnitin_results_cd9d4a6c: "Turnitin resultaten zien"
+  select_1e849959: "[ Selecteren ]"
   select_a_grading_period_5ea50f1: "Een beoordelingsperiode selecteren..."
   select_a_grading_period_aab25483: "Een beoordelingsperiode selecteren..."
   select_a_log_type_to_search_247fc6b4: "Een type logbestand selecteren om te zoeken."
@@ -16601,7 +16676,7 @@ nl:
       close: Sluiten
     footer_links: 
       facebook: Facebook
-      privacy_policy: Privacy-beleid
+      privacy_policy: Privacybeleid
       terms_of_service: Gebruiksvoorwaarden
       twitter: Twitter
     global_dialogs: 
@@ -17276,6 +17351,7 @@ nl:
   sorted_descending_84ec84c8: "aflopend gesorteerd"
   sorted_descending_d9aa3cf8: "Aflopend sorteren."
   source_code_2395ca74: Broncode
+  south_africa_27_d5e0f1e1: "Zuid-Afrika (+27)"
   south_korea_16d43049: "Zuid Korea"
   south_korea_82_10618967: "Zuid Korea (+82)"
   space_ec476863: Spatie
@@ -17655,7 +17731,7 @@ nl:
       contact_support_sub_text: "Hulp krijgen bij urgente zaken."
       curriculum_assessment_errata: "Fouten in curriculums en opdrachten"
       curriculum_assessment_errata_description: "Reeds gerapporteerde beoordelings- en curriculumfouten weergeven. Zoeken op \"errata\"."
-      global_support_desk: "Algemene Helpdesk"
+      global_support_desk: "NetAcad Ondersteuning"
       global_support_desk_description: "Onze ASC's zijn je eerste lijn van ondersteuning en kunnen je in verbinding brengen met onze Algemene Helpdesk voor problemen die extra hulp vereisen."
       networking_academy_description: "Het weergeven van Cisco-antwoorden op de meest gestelde vragen."
       networking_academy_faqs: "Networking Academy-FAQ's"
@@ -17736,6 +17812,7 @@ nl:
     syllabus: Syllabus
     tab_location_error: "Die locatie van tabblad is ongeldig"
     tab_unmanagable_error: "%{css_class} kan niet worden beheerd"
+  taiwan_886_9a5b6bbf: "Taiwan (+886)"
   take_a_snapshot_now_5b622d85: "Maak nu een snapshot"
   take_the_quiz_87214d7e: "Toets afleggen"
   take_the_quiz_again_8ea51a6c: "De toets opnieuw afleggen"
@@ -17825,6 +17902,7 @@ nl:
   text_entry_submission_7b0ae0c5: "Tekstinvoer als inzending"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstinvoer inzending mag niet leeg zijn"
   text_input_d3480b8c: "Tekst input"
+  thailand_66_5b3ef324: "Thailand (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Dit gebruikersaccount is verwijderd. Neem contact op met je systeembeheerder om het account opnieuw te activeren."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Het account-ID van de account waar de rapporterende gebruiker bijhoort"
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "De aankondiging “” kon niet gekoppeld worden in de module “%{title}” kon niet gekoppeld worden in de module “%{mod_title}\""
@@ -17941,6 +18019,7 @@ nl:
   there_was_a_problem_toggling_the_content_lock_2a5d678b: "Er is een probleem met het in- en uitschakelen van de inhoudsvergrendeling."
   there_was_a_problem_updating_the_comment_5f3595b9: "Er is een probleem met het bijwerken van de opmerking"
   there_was_a_problem_updating_the_submission_6e5280a1: "Er is een probleem met het bijwerken van de inzending."
+  there_was_an_error_fetching_outcome_results_45c57590: "Er is een fout met het ophalen van leerdoelresultaten"
   there_was_an_error_fetching_submission_comments_ce153077: "Er is een fout met het ophalen van opmerkingen bij de inzending"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Er is een fout opgetreden bij het genereren van de lancering van de tool"
   there_was_an_error_in_processing_your_request_6513a49a: "Er is een fout opgetreden bij het verwerken van jouw verzoek "
@@ -17962,6 +18041,7 @@ nl:
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Deze referenties zijn voor Academic Benchmark API v1, dat in een toekomstige release zal worden afgeschaft."
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Deze beoordelingsperioden waren voor jou gemaakt door een beheerder."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Deze actie is uitgeschakeld door je beheerder."
+  this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Dit gebied wordt door de beoordelaar gebruikt om opmerkingen gerelateerd aan dit criterium achter te laten."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Deze opdracht telt niet mee voor het eindcijfer"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Deze opdracht zal niet meer voor je eindcijfer meetellen."
   this_assignment_has_been_excused_87f1dc13: "Deze opdracht is verwijderd."
@@ -18058,6 +18138,7 @@ nl:
   this_submission_is_not_being_autograded_4fd68d32: "Deze inlevering wordt niet automatisch beoordeeld"
   this_submission_is_not_in_any_grading_period_cbbd2f8: "Deze inlevering vindt in geen enkele beoordelingsperiode plaats"
   this_submission_is_not_in_any_grading_period_d4c728db: "Deze inlevering vindt in geen enkele beoordelingsperiode plaats."
+  this_tool_has_already_been_installed_in_this_conte_b73ea29c: "Deze tool is al in deze context geïnstalleerd. Wilt u de tool toch installeren?"
   this_topic_is_closed_for_comments_3dd10c00: "Dit onderwerp is voor opmerkingen gesloten."
   this_topic_is_closed_for_comments_5bacad6: "Dit onderwerp is  voor opmerkingen gesloten"
   this_topic_is_used_for_grading_efc6ca89: "Dit onderwerp wordt gebruikt voor beoordeling"
@@ -18284,11 +18365,13 @@ nl:
   title_52b8638d: "Titel:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} appointment group* Je kunt je hiervoor **aanmelden** ."
   title_ee03d132: Titel
+  title_is_locked_click_to_unlock_21548cfb: "%{title} is vergrendeld. Klik om te ontgrendelen"
   title_is_off_6c823e2d: "%{title} staat uit"
   title_is_on_2b72a9b7: "%{title} staat aan"
   title_is_required_437f9993: "Titel is verplicht"
   title_is_required_8bb13295: "Titel is verplicht!"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Titel is te lang, deze moet minder dan %{length} tekens zijn"
+  title_is_unlocked_click_to_lock_6a20cfcb: "%{title} is ontgrendeld. Klik om te vergrendelen."
   title_separator: ":"
   titles: 
     aligned_items: "Uitgelijnde items"
@@ -18369,6 +18452,7 @@ nl:
   treat_ungraded_as_0_d38c2b41: "Opdrachten die niet beoordeeld zijn behandelen als een 0"
   tree_browser: 
     folder_tree_instructions: "Gebruik het toetspijltje omhoog of het toetspijltje omlaag om door de boomstructuur te navigeren. Druk op het toetspijltje rechts om uit vouwen en druk op het toetspijltje links om in te vouwen."
+  trinidad_and_tobago_1_fc2d8d1c: "Trinidad en Tobago (+1)"
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: "Door deze zelfstudie uit te schakelen wordt het zelfstudiemenu uit de weergave van al je cursussen verwijderd. Het kan weer worden ingeschakeld met Functieopties in je Gebruikersinstellingen."
   turnitin: 
     error_1007: "Het geüploade bestand is te groot."
@@ -18438,6 +18522,7 @@ nl:
   unknown_47a3b725: Onbekend
   unknown_account_74d30b82: "Onbekende account"
   unknown_answers_9688a2bc: "Onbekende antwoorden"
+  unknown_compression_method_b6a850b5: "onbekende compressiemethode"
   unknown_content_type_ae6d08e8: "Onbekende inhoudstype"
   unknown_question_bank: "Onbekende toetsbank"
   unknown_quiz: "Onbekende toets"
@@ -18480,6 +18565,7 @@ nl:
   unread_e9c1b19c: Ongelezen
   unregister_service_985238e9: "Registratie van dienst ongedaan maken"
   unreserved_e86b7425: Niet-gereserveerd
+  unsafe_file_link_8a18eceb: "onveilige bestandslink"
   unselected_all_courses_99a9d35c: "Alle cursussen ongeselecteerd"
   unselected_course_course_89995a83: "Niet-geselecteerde cursus %{course}"
   unstar_conversation_45fc43d6: "Ster van gesprek verwijderen"
@@ -19008,6 +19094,7 @@ nl:
   validate_links_in_content_b1630fba: "Links in inhoud valideren"
   value_d842f16d: Waarde
   vanity_url_76f93382: "Vanity URL"
+  venezuela_58_959d01f7: "Venezuela (+58)"
   vericite: 
     no_score_after_retries: "VeriCite heeft geen score geretourneerd na %{max_tries} pogingen er een op te halen."
   vericite_info: 
@@ -19016,6 +19103,7 @@ nl:
   video_b9f27375: "Video "
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video-inhoud wordt niet ondersteund door je apparaat of app."
   video_player_b371005: Videospeler
+  vietnam_84_e50a2a44: "Vietnam (+84)"
   view_analytics_91a3b7a: "Zie analyse"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Analytics-gegevens weergeven in tabellen in plaats van grafieken"
   view_analytics_for_name_9b31594e: "Analyse bekijken voor %{name}"
@@ -19033,6 +19121,7 @@ nl:
   view_grades_for_name_45aeb2f2: "Cijfers bekijken voor %{name}"
   view_grading_history_e64bb8fe: "Beoordelingsgeschiedenis weergeven"
   view_in_speedgrader_773b9d81: "In SpeedGrader weergeven"
+  view_longer_description_6b762087: "langere beschrijving weergeven"
   view_name_app_62a2ad8e: "%{name} app weergeven "
   view_next_file_a8a4a885: "Volgende bestand weergeven"
   view_next_student_9fc72fef: "volgende cursist weergeven"
@@ -19310,6 +19399,7 @@ nl:
   yellow_4cf93785: Geel
   yes_3593c135: ja
   yes_dde87d5: Ja
+  yes_install_tool_f51b3278: "Ja, installeer de tool"
   yo_e4ee15a4: Yo
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
       Je staat op het punt onopgeslagen wijzigingen te verliezen.
