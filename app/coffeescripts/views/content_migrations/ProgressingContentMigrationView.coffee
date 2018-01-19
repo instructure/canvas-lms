@@ -96,6 +96,7 @@ define [
                          collection: @issues
                          itemView: ContentMigrationIssueView
                          template: progressingIssuesTemplate
+                         autoFetch: true
       @$migrationIssues.html issuesCollectionView.render().el
 
       progressStatus = new ProgressStatusView
