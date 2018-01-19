@@ -81,6 +81,7 @@ class User < ActiveRecord::Base
   has_many :access_tokens, -> { preload(:developer_key) }
   has_many :notification_endpoints, :through => :access_tokens
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :lti_results, inverse_of: :user, class_name: 'Lti::Result'
 
   has_many :student_enrollments
   has_many :ta_enrollments
