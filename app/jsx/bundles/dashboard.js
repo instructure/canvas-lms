@@ -18,6 +18,7 @@
 
 import {View} from 'Backbone'
 import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications';
 import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!dashboard'
@@ -44,6 +45,10 @@ if (dashboardHeaderContainer) {
       hide_dashcard_color_overlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
       planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
       planner_selected={ENV.PREFERENCES.show_planner}
+      flashError={$.flashError}
+      flashMessage={$.flashMessage}
+      screenReaderFlashMessage={$.screenReaderFlashMessage}
+      env={window.ENV}
     />,
     dashboardHeaderContainer
   )

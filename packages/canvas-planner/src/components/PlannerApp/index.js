@@ -57,6 +57,7 @@ export class PlannerApp extends Component {
     updateTodo: func,
     triggerDynamicUiUpdates: func,
     preTriggerDynamicUiUpdates: func,
+    plannerActive: func,
   };
 
   static defaultProps = {
@@ -64,6 +65,7 @@ export class PlannerApp extends Component {
     stickyOffset: 0,
     triggerDynamicUiUpdates: () => {},
     preTriggerDynamicUiUpdates: () => {},
+    plannerActive: () => {return false}
   };
 
   componentWillUpdate () {
@@ -127,7 +129,8 @@ export class PlannerApp extends Component {
       loadingFuture={this.props.loadingFuture}
       allFutureItemsLoaded={this.props.allFutureItemsLoaded}
       loadingError={this.props.loadingError}
-      onLoadMore={this.props.loadFutureItems} />;
+      onLoadMore={this.props.loadFutureItems}
+      plannerActive={this.props.plannerActive} />;
   }
 
   renderLoadPastButton () {

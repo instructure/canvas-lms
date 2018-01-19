@@ -58,6 +58,7 @@ exports[`renders base component using dayKeys 1`] = `
     allFutureItemsLoaded={false}
     loadingFuture={false}
     onLoadMore={[Function]}
+    plannerActive={[Function]}
   />
   <div
     id="planner-app-fixed-element"
@@ -150,6 +151,7 @@ exports[`shows new activity button when new activity is indicated 1`] = `
     allFutureItemsLoaded={false}
     loadingFuture={false}
     onLoadMore={[Function]}
+    plannerActive={[Function]}
   />
   <div
     id="planner-app-fixed-element"
@@ -250,6 +252,7 @@ exports[`shows the loading past indicator when loadingPast prop is true 1`] = `
     allFutureItemsLoaded={false}
     loadingFuture={false}
     onLoadMore={[Function]}
+    plannerActive={[Function]}
   />
   <div
     id="planner-app-fixed-element"

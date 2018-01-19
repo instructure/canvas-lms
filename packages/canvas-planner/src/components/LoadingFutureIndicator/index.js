@@ -31,6 +31,7 @@ export default class LoadingFutureIndicator extends Component {
     allFutureItemsLoaded: bool,
     onLoadMore: func,
     loadingError: string,
+    plannerActive: func,
   }
 
   static defaultProps = {
@@ -38,6 +39,7 @@ export default class LoadingFutureIndicator extends Component {
     allFutureItemsLoaded: false,
     onLoadMore: () => {},
     loadingError: undefined,
+    plannerActive: () => {return false;},
   }
 
   handleLoadMoreButton = () => {
@@ -45,7 +47,7 @@ export default class LoadingFutureIndicator extends Component {
   }
 
   handleWaypoint = () => {
-    if (!this.props.loadingError) {
+    if (!this.props.loadingError && this.props.plannerActive()) {
       this.props.onLoadMore();
     }
   }

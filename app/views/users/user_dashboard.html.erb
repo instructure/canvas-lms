@@ -41,7 +41,6 @@
     <h1 class="ic-Dashboard-header__title"><%= t "Dashboard" %></h1>
   </div>
   <% if planner_enabled? %>
-    <% js_bundle :student_planner %>
     <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
   <% end %>
   <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">

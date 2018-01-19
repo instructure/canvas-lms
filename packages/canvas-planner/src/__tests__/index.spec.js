@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import CanvasPlanner from '../index';
+import { render, renderHeader } from '../index';
 import moxios from 'moxios';
 
 describe('with mock api', () => {
@@ -30,7 +30,7 @@ describe('with mock api', () => {
 
   describe('render', () => {
     it('calls render with PlannerApp', () => {
-      CanvasPlanner.render(document.getElementById('container'), {
+      render(document.getElementById('container'), {
         flashAlertFunctions: {}
       });
       expect(document.querySelector('.PlannerApp')).toBeTruthy();
@@ -38,7 +38,7 @@ describe('with mock api', () => {
 
     it('throws an error if flashAlertFunctions are not provided', () => {
       expect(() => {
-        CanvasPlanner.render(document.getElementById('container'));
+        render(document.getElementById('container'));
       }).toThrow();
     });
   });
@@ -57,7 +57,7 @@ describe('with mock api', () => {
     });
 
     it('calls render with PlannerHeader', () => {
-      CanvasPlanner.renderHeader(document.getElementById('header_container'), options);
+      renderHeader(document.getElementById('header_container'), options);
       // This assertion is a bit odd, we need to get class names working with
       // CSS modules under test then we can be more clear here.
       expect(document.querySelector('#header_container div')).toBeTruthy();
