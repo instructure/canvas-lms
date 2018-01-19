@@ -66,7 +66,7 @@
             magic[:text] = "#{text} #{tag.title}"
             magic[:link] = link
             magic[:due_at] = due_at(obj, @current_user)
-            magic[:due_at_date] = overridden.due_at
+            magic[:sort_order] = overridden.due_at
             magic[:icon] = icon
 
             objs << magic
@@ -132,7 +132,9 @@
           magic[:text] = "#{text} #{disp_name}"
           magic[:link] = link
           magic[:due_at] = due_at(obj, @current_user)
-          magic[:due_at_date] = overridden.due_at
+          # onboarding should always be first, so we pretend it is always due right now to make it
+          # at the top of the todo list
+          magic[:sort_order] = (disp_name == "Onboard to Braven") ? DateTime.now : overridden.due_at
           magic[:icon] = icon
 
           objs << magic
@@ -140,7 +142,8 @@
 
       end
 
-      objs = objs.sort { |x, y| x[:due_at_date] <=> y[:due_at_date] }
+      # make sure onboard to braven is always first
+      objs = objs.sort { |x, y| x[:sort_order] <=> y[:sort_order] }
 
       if objs.any?
       objs.each do |obj|
