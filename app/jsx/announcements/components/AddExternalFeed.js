@@ -125,7 +125,7 @@ export default class AddExternalFeed extends React.Component {
   }
 
   toggleRef = (c) => {
-    this.toggleBtn = c.querySelector('button')
+    this.toggleBtn = c && c.querySelector('button')
   }
 
   renderTextInput(value, text, onTextChange, name) {
