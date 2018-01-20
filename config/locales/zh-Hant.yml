@@ -6900,6 +6900,7 @@ zh-Hant:
   email_is_required_736ac26b: 電郵地址為必填
   email_the_user_about_this_account_creation_e63f8759: 將有關此帳戶創建的資訊透過電子郵件發送給使用者
   embed_content_from_name_fb9e241a: "從 嵌入内容%{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "在 Ember 中重寫的模組。使用本機拖放 API，允許從外部位置拖曳。"
   empty_stub_for_testing_only_37aad38: 空存根（僅供測試）
   enable_6f5d1328: 啟用
