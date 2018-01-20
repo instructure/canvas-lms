@@ -7210,6 +7210,7 @@ ar:
   email_is_required_736ac26b: "البريد الإلكتروني مطلوب"
   email_the_user_about_this_account_creation_e63f8759: "إرسال بريد إلكتروني للمستخدم حول إنشاء هذا الحساب"
   embed_content_from_name_fb9e241a: "تضمين محتوى من %{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "تم كتابة الوحدات في Ember. استخدم واجهة برمجة التطبيقات الأصلية للسحب والإفلات للسماح بالسحب من المواقع الخارجية."
   empty_stub_for_testing_only_37aad38: "كعب فارغ (للاختبار فقط)"
   enable_6f5d1328: تمكين
