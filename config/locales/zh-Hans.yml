@@ -6879,6 +6879,7 @@ zh-Hans:
   email_is_required_736ac26b: 电子邮件是必需的
   email_the_user_about_this_account_creation_e63f8759: 电邮用户有关此帐户的创建
   embed_content_from_name_fb9e241a: "从此来源嵌入内容%{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
   empty_stub_for_testing_only_37aad38: "空存根 (只用于测试)"
   enable_6f5d1328: 启用
