@@ -18,19 +18,19 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {mount} from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import TermsOfServiceModal from 'jsx/shared/TermsOfServiceModal'
 
 QUnit.module('Terms of Service Modal Link', {
-  setup () {
+  beforeEach () {
     $('#fixtures').html('<div id="main">')
   },
-  teardown () {
+  afterEach () {
     $('#fixtures').empty()
   }
 });
 
-test('renders correct link when preview is provided', () => {
+test('renders correct link when preview is not provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = "Hello World"
   const wrapper = mount(<TermsOfServiceModal preview/>)
   const renderedLink = wrapper.find('Link')
@@ -41,32 +41,21 @@ test('renders correct link when preview is provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = "Hello World"
   const wrapper = mount(<TermsOfServiceModal/>)
   const renderedLink = wrapper.find('Link')
-  equal(renderedLink.text(), 'Terms of Service')
+  equal(renderedLink.text(), 'Acceptable Use Policy')
 })
 
+test('Opens the modal when link is preview', () => {
+  const wrapper = shallow(<TermsOfServiceModal preview/>)
+  const renderedLink = wrapper.find('Link')
+  renderedLink.simulate('click')
 
-// ---------------- THESE ARE BROKEN DUE TO IMAGE CROPPING FRAGILE SPEC -----------------------------
-// test('Opens the modal when link is preview', () => {
-  // const wrapper = shallow(<TermsOfServiceModal preview/>)
-  // const renderedLink = wrapper.find(Link)
-  // renderedLink.simulate('click')
+  ok(wrapper.state().open)
+});
 
-  // ok(wrapper.state().open)
-// });
+test('Opens the modal when link is Terms of Service', () => {
+  const wrapper = shallow(<TermsOfServiceModal />)
+  const renderedLink = wrapper.find('Link')
+  renderedLink.simulate('click')
 
-// test('Opens the modal when link is Terms of Service', () => {
-  // const wrapper = shallow(<TermsOfServiceModal />)
-  // const renderedLink = wrapper.find(Link)
-  // renderedLink.simulate('click')
-
-  // ok(wrapper.state().open)
-// });
-
-// test('Closes the modal when link is Terms of Service', () => {
-  // const wrapper = mount(<TermsOfServiceModal />)
-  // const link = wrapper.find(Link)
-  // const renderedLink = link.find('button')
-  // renderedLink.simulate('click')
-  // wrapper.component.getInstance().handleCloseModal()
-  // ok(!wrapper.component.getInstance().state.open)
-// });
+  ok(wrapper.state().open)
+});
