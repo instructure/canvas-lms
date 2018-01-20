@@ -6884,6 +6884,7 @@ nl:
   email_is_required_736ac26b: "E-mail is verplicht"
   email_the_user_about_this_account_creation_e63f8759: "De gebruiker per e-mail laten weten dat dit account is aangemaakt"
   embed_content_from_name_fb9e241a: "Inhoud insluiten van %{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "Modules opnieuw geschreven in Ember. Gebruik de eigen API slepen en neerzetten om het slepen van externe locaties toe te laten."
   empty_stub_for_testing_only_37aad38: "Lege stub (alleen voor testen)"
   enable_6f5d1328: Inschakelen
