@@ -6887,6 +6887,7 @@ ja:
   email_is_required_736ac26b: Eメールは必須項目です
   email_the_user_about_this_account_creation_e63f8759: このアカウント作成についてユーザに電子メールを送る
   embed_content_from_name_fb9e241a: "～からコンテンツをエンベッドする%{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "モジュールが Ember で書き直されています。外部の場所からのドラッグを許可するには、ネイティブのドラッグ アンド ドロップ API を使用します。"
   empty_stub_for_testing_only_37aad38: "空白の控え ( 試験用途のみ)"
   enable_6f5d1328: 有効
