@@ -6896,6 +6896,7 @@ da:
   email_is_required_736ac26b: "E-mail er påkrævet"
   email_the_user_about_this_account_creation_e63f8759: "Send en e-mail til brugeren om denne kontooprettelse"
   embed_content_from_name_fb9e241a: "Integrer indhold fra %{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "Moduler genskrivet i Ember. Bruger den medfødte træk og slip API for at tillade trækning fra eksterne placeringer."
   empty_stub_for_testing_only_37aad38: "Tom stub (kun for test)"
   enable_6f5d1328: Aktivér
