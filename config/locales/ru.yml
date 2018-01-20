@@ -7040,6 +7040,7 @@ ru:
   email_is_required_736ac26b: "Необходимо ввести email"
   email_the_user_about_this_account_creation_e63f8759: "Сообщить пользователю о создании данной учетной записи по электронной почте "
   embed_content_from_name_fb9e241a: "Внедрить контент из %{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "Модули переписаны в Ember. Используйте собственный API перетаскивания, чтобы позволить перетаскивание из внешних источников."
   empty_stub_for_testing_only_37aad38: "Пустая статья (только для тестирования)"
   enable_6f5d1328: Включить
