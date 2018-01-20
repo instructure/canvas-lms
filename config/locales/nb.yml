@@ -6887,6 +6887,7 @@ nb:
   email_is_required_736ac26b: "E-post er påkrevd"
   email_the_user_about_this_account_creation_e63f8759: "Send e-post til brukeren om at det er opprettet en brukerkonto"
   embed_content_from_name_fb9e241a: "Sitt inn innhold fra %{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "Moduler omskrevet i Ember. Bruker den innfødte dra og slipp API for å tillate å dra fra eksterne steder."
   empty_stub_for_testing_only_37aad38: "Tom stub (kun for testing)"
   enable_6f5d1328: "Slå på"
