@@ -6105,6 +6105,7 @@ is:
   email_is_invalid_e0d982eb: "Netfang er ógilt!"
   email_is_required_736ac26b: "Þarf netfang"
   email_the_user_about_this_account_creation_e63f8759: "Senda notanda tölvuskeyti um stofnun reiknings"
+  embedded_images_598ff8da: embedded_images
   empty_stub_for_testing_only_37aad38: "Auður stubbur (bara fyrir prófun)"
   enable_6f5d1328: Heimila
   enable_course_as_a_blueprint_course_8515ffd5: "Heimila námskeið sem grunnsnið"
