@@ -6912,6 +6912,7 @@ fr:
   email_is_required_736ac26b: "L'email est requis"
   email_the_user_about_this_account_creation_e63f8759: "Envoyer un courriel à l'utilisateur à propos de la création de ce compte "
   embed_content_from_name_fb9e241a: "Inclure du contenu de %{name}"
+  embedded_images_598ff8da: embedded_images
   ember_modules_description: "Modules réécrits dans Ember. L’API glisser-déposer native est utilisée, ce qui permet de faire glisser des éléments depuis des emplacements externes."
   empty_stub_for_testing_only_37aad38: "Vider le talon (uniquement pour les tests)"
   enable_6f5d1328: Activer
