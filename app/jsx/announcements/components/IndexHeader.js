@@ -30,6 +30,7 @@ import Select from '@instructure/ui-core/lib/components/Select'
 import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid'
 import Container from '@instructure/ui-core/lib/components/Container'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
 import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
@@ -121,7 +122,11 @@ export default class IndexHeader extends Component {
                     href={`/courses/${this.props.courseId}/discussion_topics/new?is_announcement=true`}
                     variant="primary"
                     id="add_announcement"
-                  ><IconPlus />{I18n.t('Announcement')}</Button>}
+                  ><IconPlus />
+                    <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
+                    <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
+                  </Button>
+                }
               </GridCol>
             </GridRow>
           </Grid>
