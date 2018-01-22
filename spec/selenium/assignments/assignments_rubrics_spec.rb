@@ -284,8 +284,8 @@ describe "assignment rubrics" do
 
       f(".toggle_full_rubric").click
       wait_for_ajaximations
-      expect(f('#criterion_1 .long_description')).
-        to include_text "<b>This text should not be bold</b>"
+      f(".criterion_description .long_description_link").click
+      expect(f(".ui-dialog div.long_description").text).to eq "<b>This text should not be bold</b>"
     end
 
     it "should follow learning outcome ignore_for_scoring", priority: "2", test_id: 220328 do

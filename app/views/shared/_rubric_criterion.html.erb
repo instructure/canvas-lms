@@ -47,10 +47,10 @@
         <span class="description criterion_description_value"><%= description %></span>
         <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
         <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
-        <% if !learning_outcome_criterion %>
+        <% if !learning_outcome_criterion && !assessing %>
           <div class="long_description small_description"><%= h((criterion.try(:long_description) || '')) %></div>
         <% end %>
-        <div style="<%= "display: none;" if !learning_outcome_criterion %>" class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
+        <div style="<%= "display: none;" if !learning_outcome_criterion && !assessing %>" class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
           <a href="#" class="long_description_link <%= "hidden" if !criterion || criterion.long_description.blank? %>"><%= t "view longer description" %></a>
           <textarea class="long_description" aria-label="<%= t "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
         </div>

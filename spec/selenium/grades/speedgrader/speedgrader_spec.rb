@@ -38,6 +38,7 @@ describe 'Speedgrader' do
     [
       {
         description: 'Awesomeness',
+        long_description: 'For real the most awesome thing',
         points: 10,
         id: 'crit1',
         ratings: [
@@ -173,7 +174,7 @@ describe 'Speedgrader' do
       end
     end
 
-    context 'Using a rubric saves grades' do
+    context 'Using a rubric' do
       before :once do
         init_course_with_students
         @teacher = @user
@@ -192,42 +193,51 @@ describe 'Speedgrader' do
         rubric.reload
       end
 
-      before :each do
+      it "properly shows the view longer description link" do
         user_session(@teacher)
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         f('button.toggle_full_rubric').click
-        [f('#rating_rat1'), f('#rating_rat5')].each(&:click)
-        f('button.save_rubric_button').click
-        wait_for_ajax_requests
+        expect(fj('#criterion_crit1 .long_description_link:visible')).to be_present
       end
 
-      it 'in speedgrader', priority: "1", test_id: 164016 do
-        expect(Speedgrader.grade_input).to have_value '15'
-        expect(f('#grading span.rubric_total')).to include_text '15'
-      end
+      describe 'saves grades in' do
+        before :each do
+          user_session(@teacher)
+          get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+          f('button.toggle_full_rubric').click
+          [f('#rating_rat1'), f('#rating_rat5')].each(&:click)
+          f('button.save_rubric_button').click
+          wait_for_ajax_requests
+        end
 
-      it 'in assignment page ', priority: "1", test_id: 217611 do
-        get "/courses/#{@course.id}/grades/#{@students[0].id}"
-        f("#submission_#{@assignment.id}  i.icon-rubric").click
+        it 'speedgrader', priority: "1", test_id: 164016 do
+          expect(Speedgrader.grade_input).to have_value '15'
+          expect(f('#grading span.rubric_total')).to include_text '15'
+        end
 
-        expect(f('#criterion_crit1 span.criterion_rating_points')).to include_text '10'
-        expect(f('#criterion_crit2 span.criterion_rating_points')).to include_text '5'
-      end
+        it 'assignment page ', priority: "1", test_id: 217611 do
+          get "/courses/#{@course.id}/grades/#{@students[0].id}"
+          f("#submission_#{@assignment.id}  i.icon-rubric").click
 
-      it 'in submissions page', priority: "1", test_id: 217612 do
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
-        f('a.assess_submission_link').click
-        wait_for_animations
+          expect(f('#criterion_crit1 span.criterion_rating_points')).to include_text '10'
+          expect(f('#criterion_crit2 span.criterion_rating_points')).to include_text '5'
+        end
 
-        expect(f('#criterion_crit1 input.criterion_points')).to have_value '10'
-        expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
+        it 'submissions page', priority: "1", test_id: 217612 do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
+          f('a.assess_submission_link').click
+          wait_for_animations
 
-        replace_content f('#criterion_crit1 input.criterion_points'), '5'
-        scroll_into_view('button.save_rubric_button')
-        f('button.save_rubric_button').click
+          expect(f('#criterion_crit1 input.criterion_points')).to have_value '10'
+          expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
 
-        el = f("#student_grading_#{@assignment.id}")
-        expect(el).to have_value '10'
+          replace_content f('#criterion_crit1 input.criterion_points'), '5'
+          scroll_into_view('button.save_rubric_button')
+          f('button.save_rubric_button').click
+
+          el = f("#student_grading_#{@assignment.id}")
+          expect(el).to have_value '10'
+        end
       end
     end
 
