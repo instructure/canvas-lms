@@ -21,12 +21,14 @@ require 'saml2'
 class AccountAuthorizationConfig::SAML::Federation < AccountAuthorizationConfig::SAML::MetadataRefresher
   class << self
     def metadata
-      if Canvas.redis_enabled?
-        deflated = Canvas.redis.get("#{class_name.downcase}_metadata")
-        existing_data = Zlib::Inflate.inflate(deflated) if deflated
+      Shard.default.activate do
+        if Canvas.redis_enabled?
+          deflated = Canvas.redis.get("#{class_name.downcase}_metadata")
+          existing_data = Zlib::Inflate.inflate(deflated) if deflated
+        end
+        new_data = refresh_if_necessary(class_name.downcase, endpoint, force_fetch: !existing_data)
+        validate_and_parse_metadata(new_data || existing_data)
       end
-      new_data = refresh_if_necessary(class_name.downcase, endpoint, force_fetch: !existing_data)
-      validate_and_parse_metadata(new_data || existing_data)
     end
 
     def refresh_providers(shard_scope: Shard.in_current_region, providers: nil)
@@ -38,7 +40,7 @@ class AccountAuthorizationConfig::SAML::Federation < AccountAuthorizationConfig:
       # to check them all, so just check the federation)
       return if Shard.count <= 1 && !providers.exists?
 
-      new_data = refresh_if_necessary(class_name.downcase, endpoint)
+      new_data = Shard.default.activate { refresh_if_necessary(class_name.downcase, endpoint) }
       # no changes; don't bother with the hard work
       return unless new_data
 
