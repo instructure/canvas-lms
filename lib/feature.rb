@@ -116,6 +116,14 @@ class Feature
       state: 'hidden',
       development: true,
     },
+    'section_specific_discussions' =>
+    {
+      display_name: -> { I18n.t('Section Specific Discussions') },
+      description: -> { I18n.t('Allows creating discussions for a specific section') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
+    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
