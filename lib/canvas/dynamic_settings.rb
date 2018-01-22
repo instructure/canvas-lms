@@ -69,7 +69,7 @@ module Canvas
       end
 
       def root_fallback_proxy
-        @root_fallback_proxy ||= DynamicSettings::FallbackProxy.new
+        @root_fallback_proxy ||= DynamicSettings::FallbackProxy.new(ConfigFile.load("dynamic_settings"))
       end
 
       # Build an object used to interacting with consul for the given
