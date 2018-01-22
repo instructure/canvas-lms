@@ -78,8 +78,8 @@ export default class RSSFeedList extends React.Component {
   renderFeedRow({ display_name, id, external_feed_entries_count = 0, url }, index) {
     return (
       <div key={id} className="announcements-tray-feed-row">
-        <Container margin="small 0" display="inline">
-          <Grid startAt="medium" vAlign="middle" colSpacing="none">
+        <Container margin="small 0" display="block">
+          <Grid startAt="medium" vAlign="middle" colSpacing="small" hAlign="space-around" rowSpacing="small">
             <GridRow>
               <GridCol>
                 <Link margin="0 small" href={url}>
