@@ -2045,6 +2045,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'lti/users_api') do
       get 'users/:id', action: :show
+      get 'groups/:group_id/users', action: :group_index, as: 'lti_user_group_index'
     end
 
     scope(controller: 'lti/assignments_api') do
