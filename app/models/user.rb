@@ -1044,8 +1044,7 @@ class User < ActiveRecord::Base
     can :view_statistics
 
     given {|user| self.check_accounts_right?(user, :manage_students) }
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and
-      can :view_statistics and can :read and can :read_reports and can :manage_feature_flags and can :read_grades
+    can :read_profile and can :view_statistics and can :read_reports and can :read_grades
 
     given {|user| self.check_accounts_right?(user, :manage_user_logins) }
     can :read and can :read_reports
@@ -1059,7 +1058,8 @@ class User < ActiveRecord::Base
     given do |user|
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
-    can :manage_user_details and can :rename and can :read_profile
+    can :manage_user_details and can :rename and can :read_profile and can :update_avatar and can :remove_avatar and
+      can :manage_feature_flags
 
     given{ |user| self.pseudonyms.shard(self).any?{ |p| p.grants_right?(user, :update) } }
     can :merge
