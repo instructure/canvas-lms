@@ -207,13 +207,13 @@ export default class AddExternalFeed extends React.Component {
           <Checkbox
             checked={this.state.phraseChecked}
             onChange={this.handleCheckboxPhraseChecked}
-            label={I18n.t('Only add posts with specific phrase in the title')}
+            label={I18n.t('Check this box to add posts with specific phrase in the title using text box below')}
             name="external-rss-feed__phrase-checkbox"
           />
           {this.state.phraseChecked &&
             this.renderTextInput(
               this.state.phrase,
-              I18n.t('Phrase'),
+              I18n.t('Enter specific phrase'),
               this.handleTextInputSetPhrase,
               'external-rss-feed__phrase-input'
             )}
