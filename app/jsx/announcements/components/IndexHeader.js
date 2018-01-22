@@ -92,7 +92,7 @@ export default class IndexHeader extends Component {
               <GridCol width={4}>
                 <TextInput
                   disabled={this.props.isBusy}
-                  label={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
+                  label={<ScreenReaderContent>{I18n.t('Search announcements by title')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search')}
                   icon={() => <IconSearchLine />}
                   ref={(c) => { this.searchInput = c }}
