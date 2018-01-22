@@ -20,6 +20,6 @@ class AddSisPsuedonymIdToEnrollments < ActiveRecord::Migration[5.0]
 
   def change
     add_column :enrollments, :sis_pseudonym_id, :integer, limit: 8
-    add_reference :enrollments, :pseudonym, column: :sis_pseudonym_id, index: true, foreign_key: true
+  # FK is added in later migration. 20180122184002_fix_sis_batch_id_on_group_categories.rb
   end
 end

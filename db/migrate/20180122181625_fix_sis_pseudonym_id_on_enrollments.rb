@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-class AddSisIdToGroupCategories < ActiveRecord::Migration[5.0]
+class FixSisPseudonymIdOnEnrollments < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    add_column :group_categories, :sis_source_id, :string
-    add_column :group_categories, :root_account_id, :integer, limit: 8
+    remove_column :enrollments, :pseudonym_id if column_exists?(:enrollments, :pseudonym_id)
+    add_foreign_key :enrollments, :pseudonyms, column: :sis_pseudonym_id
+    add_index :enrollments, :sis_pseudonym_id
   end
 end
