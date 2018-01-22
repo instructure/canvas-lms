@@ -101,7 +101,7 @@ export default class RSSFeedList extends React.Component {
                   size="small"
                   placement="end"
                 >
-                  <IconXLine title={I18n.t('Delete this feed')} />
+                  <IconXLine title={I18n.t('Delete %{feedName}', { feedName: display_name })} />
                 </Button>
               </GridCol>
             </GridRow>
