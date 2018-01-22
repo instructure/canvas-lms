@@ -59,6 +59,15 @@ const view = new EditView({
   lockedItems: model.id ? lockedItems : {}  // if no id, creating a new discussion
 })
 
+function sectionSpecificEnabled() {
+  if (!ENV.context_asset_string.startsWith("course")) {
+    return false
+  }
+
+  const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
+  return isAnnouncement ? ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED : ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
+}
+
 if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT) {
   const agc = new AssignmentGroupCollection();
   agc.options.params = {};
@@ -69,10 +78,8 @@ $(() => {
   view.render().$el.appendTo('#content')
   document.querySelector('#discussion-title').focus()
   const container = document.querySelector('#sections_autocomplete_root')
-  const sectionSpecificAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
-                                        && ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
-                                        && ENV.context_asset_string.startsWith("course")
-  if (container && sectionSpecificAnnouncement) {
+
+  if (container && sectionSpecificEnabled()) {
     ReactDOM.render(
       <SectionsAutocomplete
         selectedSections={ENV.SELECTED_SECTION_LIST}

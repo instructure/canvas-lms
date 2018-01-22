@@ -1970,15 +1970,6 @@ describe DiscussionTopic do
       expect(errors).to eq ["Section specific topics must have sections"]
     end
 
-    it "feature must be enabled" do
-      @course.root_account.disable_feature!(:section_specific_announcements)
-      @announcement.is_section_specific = true
-      add_section_to_topic(@announcement, @section)
-      expect(@announcement.valid?).to eq false
-      errors = @announcement.errors[:is_section_specific]
-      expect(errors).to eq ["Section-specific discussions are disabled"]
-    end
-
     it "group topics cannot be section specific" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       group_category = @course.group_categories.create(:name => "new category")
@@ -1992,18 +1983,43 @@ describe DiscussionTopic do
       errors = announcement.errors[:is_section_specific]
       # note that the feature flag validation will also fail here, but we still want this
       # validation to trigger too.
-      expect(errors.include?("Only course announcements can be section-specific")).to eq true
+      expect(errors.include?("Only course announcements and discussions can be section-specific")).to eq true
     end
 
-    it "only announcements can be section-specific" do
-      @course.root_account.enable_feature!(:section_specific_announcements)
+    it "does not allow discussions to be section-specific if the feature is disabled" do
+      @course.root_account.disable_feature!(:section_specific_discussions)
       topic = DiscussionTopic.create!(:title => "some title", :context => @course,
         :user => @teacher)
       topic.is_section_specific = true
       add_section_to_topic(topic, @section)
       expect(topic.valid?).to eq false
       errors = topic.errors[:is_section_specific]
-      expect(errors).to eq ["Only announcements can be section-specific"]
+      expect(errors).to eq ["Section-specific discussions are disabled"]
+    end
+
+    it "allows discussions to be section-specific if the feature is enabled" do
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      topic = DiscussionTopic.create!(:title => "some title", :context => @course,
+        :user => @teacher)
+      topic.is_section_specific = true
+      add_section_to_topic(topic, @section)
+      expect(topic.valid?).to eq true
+    end
+
+    it "does not allow announcements to be section-specific if the feature is disabled" do
+      @course.root_account.disable_feature!(:section_specific_announcements)
+      @announcement.is_section_specific = true
+      add_section_to_topic(@announcement, @section)
+      expect(@announcement.valid?).to eq false
+      errors = @announcement.errors[:is_section_specific]
+      expect(errors).to eq ["Section-specific announcements are disabled"]
+    end
+
+    it "allows announcements to be section-specific if the feature is enabled" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement.is_section_specific = true
+      add_section_to_topic(@announcement, @section)
+      expect(@announcement.valid?).to eq true
     end
 
     it "should not include deleted sections" do

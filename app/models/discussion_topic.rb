@@ -79,7 +79,6 @@ class DiscussionTopic < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
-  validate :only_announcements_can_be_section_specific
   validate :feature_must_be_enabled_for_section_specific
   validate :only_course_topics_can_be_section_specific
 
@@ -109,9 +108,13 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def only_announcements_can_be_section_specific
-    if self.is_section_specific && !self.is_announcement
-      self.errors.add(:is_section_specific, t("Only announcements can be section-specific"))
+  def feature_must_be_enabled_for_section_specific
+    return true unless self.is_section_specific
+
+    if self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_announcements)
+      self.errors.add(:is_section_specific, t("Section-specific announcements are disabled"))
+    elsif !self.is_announcement && !self.context.root_account.feature_enabled?(:section_specific_discussions)
+      self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
     else
       true
     end
@@ -119,20 +122,10 @@ class DiscussionTopic < ActiveRecord::Base
 
   def only_course_topics_can_be_section_specific
     if self.is_section_specific && !(self.context.is_a? Course)
-      self.errors.add(:is_section_specific, t("Only course announcements can be section-specific"))
+      self.errors.add(:is_section_specific, t("Only course announcements and discussions can be section-specific"))
     else
       true
     end
-  end
-
-  def feature_must_be_enabled_for_section_specific
-    return true unless self.is_section_specific
-    # We don't allow group discussions to be section-specific, so it's ok to require
-    # that context be a course here.
-    feature_enabled = (self.context.is_a? Course) &&
-      self.context.root_account&.feature_enabled?(:section_specific_announcements)
-    return true if feature_enabled
-    self.errors.add(:is_section_specific, t("Section-specific discussions are disabled"))
   end
 
   def threaded=(v)

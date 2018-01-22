@@ -298,11 +298,42 @@ describe DiscussionTopicsController do
         expect(response).to be_success
       end
 
-      it "should not be visible to students not in specific section" do
+      it "should not be visible to students not in specific section announcements" do
         user_session(@student2)
         get('show', params: {course_id: @course.id, id: @announcement.id})
         expect(response).to be_redirect
         expect(response.location).to eq course_announcements_url @course
+      end
+    end
+
+    context 'section specific discussions' do
+      before(:once) do
+        @course.root_account.enable_feature!(:section_specific_discussions)
+        course_with_teacher(active_course: true)
+        @section = @course.course_sections.create!(name: 'test section')
+
+        @discussion = @course.discussion_topics.create!(:user => @teacher, message: 'hello my favorite section!')
+        @discussion.is_section_specific = true
+        @discussion.course_sections = [@section]
+        @discussion.save!
+
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, :enrollment_state => 'active')
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        student_in_section(@section, user: @student1)
+      end
+
+      it "should be visible to students in specific section" do
+        user_session(@student1)
+        get 'show', params: {:course_id => @course.id, :id => @discussion.id}
+        expect(response).to be_success
+      end
+
+      it "should not be visible to students not in specific section discussions" do
+        user_session(@student2)
+        get('show', params: {course_id: @course.id, id: @discussion.id})
+        expect(response).to be_redirect
+        expect(response.location).to eq course_discussion_topics_url @course
       end
     end
 
@@ -935,8 +966,16 @@ describe DiscussionTopicsController do
         :lock_at => '',
         :message => 'Message',
         :delay_posting => false,
-        :threaded => false
+        :threaded => false,
+        :specific_sections => 'all'
       }.merge(opts)
+    end
+
+    def group_topic_params(group, opts={})
+      params = topic_params(group, opts)
+      params[:group_id] = group.id
+      params.delete(:course_id)
+      params
     end
 
     def assignment_params(course, opts={})
@@ -991,6 +1030,66 @@ describe DiscussionTopicsController do
       expect(response).to have_http_status :success
       expect(DiscussionTopic.last.course_sections.first).to eq section1
       expect(DiscussionTopicSectionVisibility.count).to eq 1
+    end
+
+    it 'does not create an announcement with sections if the feature is disabled' do
+      @course.root_account.disable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      post 'create',
+        params: topic_params(@course, {is_announcement: true, specific_sections: [section1.id]}),
+        :format => :json
+      expect(response).to have_http_status 400
+      expect(DiscussionTopic.count).to eq 0
+      expect(DiscussionTopicSectionVisibility.count).to eq 0
+    end
+
+    it 'creates a discussion with sections' do
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      post 'create',
+        params: topic_params(@course, {specific_sections: [section1.id]}), :format => :json
+      expect(response).to have_http_status :success
+      expect(DiscussionTopic.last.course_sections.first).to eq section1
+      expect(DiscussionTopicSectionVisibility.count).to eq 1
+    end
+
+    it 'does not create a discussion with sections if the feature is disabled' do
+      @course.root_account.disable_feature!(:section_specific_discussions)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      post 'create',
+        params: topic_params(@course, {specific_sections: [section1.id]}), :format => :json
+      expect(response).to have_http_status 400
+      expect(DiscussionTopic.count).to eq 0
+      expect(DiscussionTopicSectionVisibility.count).to eq 0
+    end
+
+    it 'does not allow creation of group discussions that are section specific' do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      @group_category = @course.group_categories.create(:name => 'gc')
+      @group = @course.groups.create!(:group_category => @group_category)
+      post 'create',
+        params: group_topic_params(@group, {specific_sections: [section1.id]}), :format => :json
+      expect(response).to have_http_status 400
+      expect(DiscussionTopic.count).to eq 0
+      expect(DiscussionTopicSectionVisibility.count).to eq 0
     end
 
     it 'creates an announcement that is locked by default' do
@@ -1105,6 +1204,30 @@ describe DiscussionTopicsController do
       user_session(@teacher)
     end
 
+    it 'does not allow setting specific sections for group discussions' do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+
+      group_category = @course.group_categories.create(:name => 'gc')
+      group = @course.groups.create!(:group_category => group_category)
+      topic = DiscussionTopic.create!(context: group, title: 'Test Topic',
+        delayed_post_at: '2013-01-01T00:00:00UTC', lock_at: '2013-01-02T00:00:00UTC')
+      put('update', params: {
+        id: topic.id,
+        group_id: group.id,
+        topic_id: topic.id,
+        specific_sections: section2.id,
+        title: 'Updated Topic',
+      })
+      expect(response).to have_http_status 422
+      expect(DiscussionTopic.count).to eq 2
+      expect(DiscussionTopicSectionVisibility.count).to eq 0
+    end
 
     it "should not clear lock_at if locked is not changed" do
       put('update', params: {course_id: @course.id, topic_id: @topic.id,
@@ -1217,6 +1340,25 @@ describe DiscussionTopicsController do
       visibilities = DiscussionTopicSectionVisibility.active.
         where(:discussion_topic_id => @announcement.id)
       expect(visibilities.empty?).to eq true
+    end
+
+    it 'does not remove specific sections if key is missing in PUT json' do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement = Announcement.create!(context: @course, title: 'Test Announcement',
+        message: 'Foo', delayed_post_at: '2013-01-01T00:00:00UTC',
+        lock_at: '2013-01-02T00:00:00UTC')
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @announcement.is_section_specific = true
+      @announcement.course_sections = [section1, section2]
+      @announcement.save!
+
+      put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
+        is_announcement: true})
+      expect(response).to be_success
+      visibilities = DiscussionTopicSectionVisibility.active.
+        where(:discussion_topic_id => @announcement.id)
+      expect(visibilities.count).to eq 2
     end
   end
 
