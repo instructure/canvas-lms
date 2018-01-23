@@ -35,6 +35,7 @@ export default {
 
   update: (elem, data) => {
     elem.style.color = data.color
+    elem.setAttribute("data-mce-style", `color: ${data.color};`)
     return elem
   },
 

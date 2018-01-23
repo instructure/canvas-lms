@@ -71,6 +71,11 @@ describe("update", () => {
     rule.update(el, { color: "#fff" })
     expect(el.style.color).toBe("rgb(255, 255, 255)") // Seems like this always comes back as rgb
   })
+
+  test("sets the mce-style data attribute with the updated color", () => {
+    rule.update(el, { color: "#fff" })
+    expect(el.getAttribute("data-mce-style")).toBe("color: #fff;")
+  })
 })
 
 describe("message", () => {
