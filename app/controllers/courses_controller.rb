@@ -1719,7 +1719,8 @@ class CoursesController < ApplicationController
       end
 
       if @context.show_announcements_on_home_page? && @context.grants_right?(@current_user, session, :read_announcements)
-        js_env(:SHOW_ANNOUNCEMENTS => true, :ANNOUNCEMENT_COURSE_ID => @context.id, :ANNOUNCEMENT_LIMIT => @context.home_page_announcement_limit)
+        js_env TOTAL_USER_COUNT: @context.enrollments.active.count
+        js_env(:SHOW_ANNOUNCEMENTS => true, :ANNOUNCEMENT_LIMIT => @context.home_page_announcement_limit)
       end
 
       @contexts = [@context]

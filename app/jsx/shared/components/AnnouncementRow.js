@@ -96,7 +96,7 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
           <span className="ic-item-row__meta-content-heading">
             <Text size="small" as="p">{timestamp.title}</Text>
           </span>
-          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'full'})}</Text>
+          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
         </div>
       }
       actionsContent={readCount}

@@ -17,6 +17,7 @@
  */
 
 @import "base/_environment.scss";
+@import "components/ic-content-rows";
 
 #edit_course_home_content_form div.form_group {
   padding-top: 2px;
@@ -40,37 +41,4 @@
 #course_status h3 {
   @include fontSize(17.5px);
   line-height: 20px;
-}
-
-#announcements_on_home_page {
-  padding: 20px 0;
-  text-align: center;
-}
-
-.AnnouncementList {
-  margin: 0 auto 40px;
-  text-align: left;
-
-  &__posted-at {
-    width: 20%;
-  }
-
-  &__message {
-    width: 80%;
-  }
-
-  &__message-content {
-    table {
-      margin: 8px;
-      border: 1px solid $ic-border-color;
-    }
-
-    tr {
-      height: 32px;
-    }
-
-    td {
-      border: 1px solid $ic-border-color;
-    }
-  }
 }
