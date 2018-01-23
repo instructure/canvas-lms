@@ -2385,7 +2385,7 @@ class UsersController < ApplicationController
     end
 
     @user ||= @pseudonym && @pseudonym.user
-    @user ||= User.new
+    @user ||= @context.shard.activate { User.new }
 
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
