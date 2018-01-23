@@ -240,13 +240,13 @@ define [
       else
         params['appointment_group[context_codes]'] = contextCodes
 
-      if @creating()
-        if data.use_group_signup == '1' && data.group_category_id
-          params['appointment_group[sub_context_codes]'] = [data.group_category_id]
-        else
-          sections = @contextSelector.selectedSections()
-          params['appointment_group[sub_context_codes]'] = sections if sections
+      if data.use_group_signup == '1' && data.group_category_id
+        params['appointment_group[sub_context_codes]'] = [data.group_category_id]
+      else
+        sections = @contextSelector.selectedSections()
+        params['appointment_group[sub_context_codes]'] = sections if sections
 
+      if @creating()
         # TODO: Provide UI for specifying this
         params['appointment_group[min_appointments_per_participant]'] = 1
 
