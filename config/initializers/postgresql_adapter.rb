@@ -21,7 +21,7 @@ end
 module PostgreSQLAdapterExtensions
   def readonly?(table = nil, column = nil)
     return @readonly unless @readonly.nil?
-    @readonly = (select_value("SELECT pg_is_in_recovery();") == "t")
+    @readonly = (select_value("SELECT pg_is_in_recovery();") == true)
   end
 
   def bulk_insert(table_name, records)

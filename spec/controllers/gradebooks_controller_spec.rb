@@ -1398,58 +1398,45 @@ describe GradebooksController do
   end
 
   describe "GET 'speed_grader'" do
-    it "redirects the user if course's large_roster? setting is true" do
-      user_session(@teacher)
-      assignment = @course.assignments.create!(:title => 'some assignment')
+    before :once do
+      @assignment = @course.assignments.create!(
+        title: 'A Title', submission_types: 'online_url', grading_type: 'percent'
+      )
+    end
 
+    before :each do
+      user_session(@teacher)
+    end
+
+    it "redirects the user if course's large_roster? setting is true" do
       allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 
-      get 'speed_grader', params: {:course_id => @course.id, :assignment_id => assignment.id}
+      get 'speed_grader', params: {:course_id => @course.id, :assignment_id => @assignment.id}
       expect(response).to be_redirect
       expect(flash[:notice]).to eq 'SpeedGrader is disabled for this course'
     end
 
-    context "assignment published status" do
-      before :once do
-        @assign = @course.assignments.create!(title: 'Totally')
-        @assign.unpublish
-      end
+    it "redirects if the assignment is unpublished" do
+      @assignment.unpublish
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(response).to be_redirect
+      expect(flash[:notice]).to eq I18n.t(
+        :speedgrader_enabled_only_for_published_content, 'SpeedGrader is enabled only for published content.'
+      )
+    end
 
-      before :each do
-        user_session(@teacher)
-      end
-
-      it "redirects if the assignment is unpublished" do
-        get 'speed_grader', params: {course_id: @course, assignment_id: @assign.id}
-        expect(response).to be_redirect
-        expect(flash[:notice]).to eq I18n.t(
-          :speedgrader_enabled_only_for_published_content,
-                           'SpeedGrader is enabled only for published content.')
-      end
-
-      it "does not redirect if the assignment is published" do
-        @assign.publish
-        get 'speed_grader', params: {course_id: @course, assignment_id: @assign.id}
-        expect(response).not_to be_redirect
-      end
+    it "does not redirect if the assignment is published" do
+      @assignment.publish
+      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+      expect(response).not_to be_redirect
     end
 
     it 'includes the lti_retrieve_url in the js_env' do
-      user_session(@teacher)
-      @assignment = @course.assignments.create!(title: "A Title", submission_types: 'online_url,online_file')
-
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
     end
 
     it 'includes the grading_type in the js_env' do
-      user_session(@teacher)
-      @assignment = @course.assignments.create!(
-        title: "A Title",
-        submission_types: 'online_url,online_file',
-        grading_type: 'percent'
-      )
-
       get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
       expect(assigns[:js_env][:grading_type]).to eq('percent')
     end
