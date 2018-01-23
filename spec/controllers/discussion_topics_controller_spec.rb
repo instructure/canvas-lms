@@ -1200,6 +1200,24 @@ describe DiscussionTopicsController do
         is_announcement: true, specific_sections: "all"})
       expect(response).to be_success
     end
+
+    it "editing section-specific topic to not-specific should clear out visibilities" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement = Announcement.create!(context: @course, title: 'Test Announcement',
+        message: 'Foo', delayed_post_at: '2013-01-01T00:00:00UTC',
+        lock_at: '2013-01-02T00:00:00UTC')
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @announcement.is_section_specific = true
+      @announcement.course_sections = [section1, section2]
+      @announcement.save!
+      put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
+        is_announcement: true, specific_sections: "all"})
+      expect(response).to be_success
+      visibilities = DiscussionTopicSectionVisibility.active.
+        where(:discussion_topic_id => @announcement.id)
+      expect(visibilities.empty?).to eq true
+    end
   end
 
   describe "POST 'reorder'" do

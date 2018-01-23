@@ -1083,6 +1083,9 @@ class DiscussionTopicsController < ApplicationController
     else
       @topic.skip_broadcasts = true
       DiscussionTopic.transaction do
+        if !@topic.is_section_specific
+          @topic.course_sections = []
+        end
         @topic.update_attributes(discussion_topic_hash)
         @topic.root_topic.try(:save)
       end

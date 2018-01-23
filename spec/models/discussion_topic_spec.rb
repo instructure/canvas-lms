@@ -1950,6 +1950,18 @@ describe DiscussionTopic do
         )
     end
 
+    it "only section specific topics can have sections" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      announcement = basic_announcement_model(course: @course)
+      announcement.is_section_specific = true
+      add_section_to_topic(announcement, @section)
+      expect(announcement.valid?).to eq true
+      announcement.is_section_specific = false
+      expect(announcement.valid?).to eq false
+      announcement.discussion_topic_section_visibilities.first.destroy
+      expect(announcement.valid?).to eq true
+    end
+
     it "section specific topics must have sections" do
       @course.root_account.enable_feature!(:section_specific_announcements)
       @announcement.is_section_specific = true

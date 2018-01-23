@@ -72,6 +72,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :course_sections, :through => :discussion_topic_section_visibilities, :dependent => :destroy
   belongs_to :user
 
+  validates_associated :discussion_topic_section_visibilities
   validates_presence_of :context_id, :context_type
   validates_inclusion_of :discussion_type, :in => DiscussionTypes::TYPES
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
