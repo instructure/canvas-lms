@@ -39,7 +39,7 @@ gem 'authlogic', '3.6.1'
   gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
-gem 'switchman', '1.11.4'
+gem 'switchman', '1.11.5'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
