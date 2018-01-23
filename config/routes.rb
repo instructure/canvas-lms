@@ -2121,6 +2121,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/ims/scores') do
       post "courses/:course_id/line_items/:line_item_id/scores", action: :create, as: :lti_result_create
     end
+
+    # Result Service
+    scope(controller: 'lti/ims/results') do
+      get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
+      get "courses/:course_id/line_items/:line_item_id/results", action: :index
+    end
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

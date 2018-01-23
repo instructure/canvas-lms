@@ -19,12 +19,11 @@ module Lti::Ims::Concerns
   module GradebookServices
     extend ActiveSupport::Concern
 
-    # rubocop:disable Metrics/BlockLength
     included do
       before_action :verify_tool_in_context, :verify_tool_permissions
 
       def line_item
-        @_line_item ||= Lti::LineItem.find(params.fetch(:id, params[:line_item_id]))
+        @_line_item ||= Lti::LineItem.find(params.fetch(:line_item_id, params[:id]))
       end
 
       def context
@@ -37,7 +36,8 @@ module Lti::Ims::Concerns
       end
 
       def user
-        @_user ||= User.where(lti_context_id: params[:userId]).or(User.where(id: params[:userId])).take
+        @_user ||= User.where(lti_context_id: params[:userId]).where.not(lti_context_id: nil).
+          or(User.where(id: params.fetch(:userId, params[:user_id]))).take
       end
 
       def pagination_args
@@ -80,5 +80,4 @@ module Lti::Ims::Concerns
       end
     end
   end
-  # rubocop:enable Metrics/BlockLength
 end

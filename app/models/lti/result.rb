@@ -25,7 +25,8 @@ class Lti::Result < ApplicationRecord
 
   validates :line_item, :user, presence: true
   validates :result_maximum, presence: true, unless: proc { |r| r.result_score.blank? }
-  validates :result_maximum, :result_score, numericality: true, allow_nil: true
+  validates :result_score, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :result_maximum, numericality: { greater_than: 0 }, allow_nil: true
   validates :activity_progress,
             inclusion: { in: ACTIVITY_PROGRESS_TYPES },
             allow_nil: true

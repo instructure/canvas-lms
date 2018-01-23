@@ -15,21 +15,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+module Lti::Ims
+  class ResultsSerializer
+    def initialize(result, url)
+      @result = result
+      @url = url
+    end
 
-module Factories
-  def line_item_model(overrides = {})
-    params = {
-      score_maximum: 10,
-      label: 'Test Line Item',
-      assignment: overrides[:assignment] ||
-        assignment_model(
-          course: overrides[:course] || course_factory(active_course: true)
-        ),
-      resource_link: overrides.fetch(
-        :resource_link,
-        overrides[:with_resource_link] ? resource_link_model : nil
-      )
-    }.merge(overrides.except(:assignment, :course, :resource_link, :with_resource_link))
-    Lti::LineItem.create!(params)
+    def as_json
+      {
+        id: "#{url}/#{result.id}",
+        scoreOf: url,
+        userId: result.user_id.to_s,
+        resultScore: result.result_score,
+        resultMaximum: result.result_maximum,
+        comment:result.comment
+      }.compact
+    end
+
+    private
+
+    attr_reader :result, :url
   end
 end
