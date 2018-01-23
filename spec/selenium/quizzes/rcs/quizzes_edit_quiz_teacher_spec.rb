@@ -45,6 +45,19 @@ describe 'editing a quiz' do
       stub_rcs_config
     end
 
+    it "should show the RCS sidebar when focusing back on the question description box" do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+
+      click_questions_tab
+      fj('a.add_question_link:visible').click
+
+      hover_and_click('.edit_html:first')
+      ffj('.ic-RichContentEditor:visible')[1].click # send focus to the answer editor
+      f('.edit_html_done').click
+      ffj('.ic-RichContentEditor:visible')[0].click # send focus back to the quiz description box
+      expect(f('#editor_tabs')).to be_displayed
+    end
+
     context 'when the quiz is published' do
       it 'indicates the quiz is published', priority: "1", test_id: 351924 do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"

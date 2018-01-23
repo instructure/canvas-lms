@@ -23,7 +23,5 @@ class AddSisIdToGroupCategories < ActiveRecord::Migration[5.0]
     add_column :group_categories, :sis_source_id, :string
     add_reference :group_categories, :sis_batch, index: true, foreign_key: true
     add_column :group_categories, :root_account_id, :integer, limit: 8
-
-    add_index :group_categories, [:root_account_id, :sis_source_id]
   end
 end

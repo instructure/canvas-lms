@@ -158,6 +158,32 @@ module CC
       end
     end
 
+    def self.create_tool_setting_node(tool_setting, node)
+      node.tool_setting do |ts_node|
+        ts_node.tool_proxy({
+          product_code: tool_setting.product_code,
+          vendor_code: tool_setting.vendor_code,
+          tool_proxy_guid: tool_setting.tool_proxy&.guid
+        })
+
+        if tool_setting.custom.present?
+          ts_node.custom do |custom_node|
+            tool_setting.custom.each do |k, v|
+              custom_node.property({name: k}, v)
+            end
+          end
+        end
+
+        if tool_setting.custom_parameters.present?
+          ts_node.custom_parameters do |custom_params_node|
+            tool_setting.custom_parameters.each do |k, v|
+              custom_params_node.property({name: k}, v)
+            end
+          end
+        end
+      end
+    end
+
     def self.create_canvas_assignment(node, assignment, manifest = nil)
       key_generator = manifest || CCHelper
       node.title assignment.title
@@ -240,6 +266,14 @@ module CC
           product_code: resource_codes[:product_code],
           visibility: assignment.turnitin_settings.with_indifferent_access[:originality_report_visibility]
         })
+
+        tool_setting = Lti::ToolSetting.find_by(
+          resource_link_id: assignment.lti_context_id
+        )
+
+        if tool_setting.present?
+          AssignmentResources.create_tool_setting_node(tool_setting, node)
+        end
       end
     end
 
