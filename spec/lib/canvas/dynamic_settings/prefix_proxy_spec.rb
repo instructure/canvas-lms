@@ -49,23 +49,24 @@ module Canvas
             )
           expect(proxy.fetch('baz')).to eq 'qux'
         end
-      end
 
-      describe 'fetch_object(key, ttl: @default_ttl)' do
         it 'must fetch the value from consul using the prefix and supplied key' do
-          expect(client).to receive(:get).with('foo/bar/baz', an_instance_of(Symbol)).and_return(double(status: 200))
-          proxy.fetch_object('baz')
+          expect(client).to receive(:get).with('', :recurse, :stale).ordered.and_return(double(status: 200, values: {}))
+          expect(client).to receive(:get).with('global/foo/bar/baz', :stale).ordered.and_return(double(status: 200, values: nil))
+          proxy.fetch('baz')
         end
 
         it 'must use the dynamic settings cache for previously fetched values' do
-          expect(Cache).to receive(:fetch).with('foo/bar/baz', ttl: 3.minutes)
-          proxy.fetch_object('baz')
+          expect(Cache).to receive(:fetch).with('/', ttl: 3.minutes).ordered
+          expect(Cache).to receive(:fetch).with('foo/bar/baz').ordered
+          expect(Cache).to receive(:fetch).with('global/foo/bar/baz', ttl: 3.minutes).ordered
+          proxy.fetch('baz')
         end
 
         it "must fall back to expired cached values when consul can't be contacted" do
           Cache.store['foo/bar/baz'] = Cache::Value.new('qux', 3.minutes.ago)
           expect(client).to receive(:get).and_raise(Imperium::TimeoutError)
-          val = proxy.fetch_object('baz')
+          val = proxy.fetch('baz')
           expect(val).to eq 'qux'
         end
 
@@ -74,24 +75,24 @@ module Canvas
           expect(Canvas::Errors).to receive(:capture_exception).
             with(:consul, an_instance_of(Imperium::TimeoutError))
           allow(client).to receive(:get).and_raise(Imperium::TimeoutError)
-          proxy.fetch_object('baz')
+          proxy.fetch('baz')
         end
 
         it "must raise an exception when consul can't be reached and no previous value is found" do
           expect(client).to receive(:get).and_raise(Imperium::TimeoutError)
-          expect { proxy.fetch_object('baz') }.to raise_error(Imperium::TimeoutError)
+          expect { proxy.fetch('baz') }.to raise_error(Imperium::TimeoutError)
         end
 
         it "falls back to global settings" do
-          expect(client).to receive(:get).with('foo/bar/baz', an_instance_of(Symbol)).and_return(nil).ordered
-          mock = double(status: 200)
-          expect(client).to receive(:get).with('global/foo/bar/baz', an_instance_of(Symbol)).and_return(mock).ordered
-          expect(proxy.fetch_object('baz')).to eq mock
+          expect(client).to receive(:get).with('', :recurse, :stale).and_return(nil).ordered
+          mock = double(status: 200, values: 42)
+          expect(client).to receive(:get).with('global/foo/bar/baz', :stale).and_return(mock).ordered
+          expect(proxy.fetch('baz')).to eq 42
         end
       end
 
       describe 'for_prefix(prefix_extension, default_ttl: @default_ttl)' do
-        it 'must instantiate a new proxy with the supplied prefix extnsion appended to the current prefix' do
+        it 'must instantiate a new proxy with the supplied prefix extension appended to the current prefix' do
           new_proxy = proxy.for_prefix('baz')
           expect(new_proxy).to be_a PrefixProxy
           expect(new_proxy.prefix).to eq 'foo/bar/baz'
