@@ -47,6 +47,15 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(GroupCategory.count).to eq before_count + 1
   end
 
+  it "should ensure group_category_id is unique" do
+    importer = process_csv_data(
+      "group_category_id,category_name,status",
+      "gc1,Some Category,active",
+      "gc1,Other Category,active",
+    )
+    expect(GroupCategory.all.length).to eq(1)
+  end
+
   it "should create group categories" do
     @sub = Account.where(sis_source_id: 'A001').take
     process_csv_data_cleanly(
