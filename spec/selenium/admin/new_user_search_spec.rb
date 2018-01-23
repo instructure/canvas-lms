@@ -56,10 +56,7 @@ describe "new account user search" do
 
       f('#section-tabs .courses').click
     end
-
   end
-
-
 
   it "should not show the people tab without permission" do
     @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
@@ -177,9 +174,8 @@ describe "new account user search" do
     get "/accounts/#{@account.id}/users"
 
     f('input[placeholder="Search people..."]').send_keys(bogus)
-    wait_for_loading_to_disappear
 
-    expect(f('#content')).to include_text('No users found')
+    expect(f('#content .alert')).to include_text('No users found')
     expect(f('#content')).not_to contain_css('[data-automation="users list"] tr')
   end
 
