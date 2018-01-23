@@ -2325,6 +2325,8 @@ en-CA:
       buttons: 
         submit_assignment: "Submit Assignment"
       comments_placeholder: Comments...
+      errors: 
+        unacceptable_file_type: "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}"
       labels: 
         uploaded_data: File
       links: 
@@ -4323,6 +4325,7 @@ en-CA:
     one: "1 quiz found."
     other: "%{count} quizzes found."
     zero: "No matching quizzes found."
+  count_replies_a685c742: "%{count}replies"
   count_results_9926447c: 
     one: "One result"
     other: "%{count} results"
@@ -4346,7 +4349,9 @@ en-CA:
     one: "1 submission needs grading"
     other: "%{count} submissions need grading"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%"
+  count_unread_replies_86976ab: "%{count} unread replies"
   count_unsynced_changes_1fc147e5: "%{count} Unsynced Changes"
+  count_users_374d6e47: "(%{count} Users)"
   country_is_required_b0afbf52: "Country is required"
   course: 
     access_denied: "Access was denied"
@@ -6575,6 +6580,7 @@ en-CA:
       load_success_message: "You are free to navigate away from this page."
       load_success_title: "Tool Use Finished"
   external_url_e9b87215: "External Url"
+  extract_error_error_file_names_a4989ed0: "Extract error, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "EXTREME CRITICAL EMERGENCY!"
   faculty_journal_5634938e: "Faculty Journal"
   fail_62dbb06a: fail
@@ -10344,6 +10350,7 @@ en-CA:
   name_3806192d: "Name:"
   name_app_has_been_deleted_fb2d9426: "%{name} app has been deleted"
   name_badfe525: name
+  name_count_users_ccc93c3d: "%{name} (%{count} Users)"
   name_current_score_b3198dfa: "%{name} current score"
   name_error_fee4236: "Name Error"
   name_final_score_2dce3ff8: "%{name} final score"
@@ -10795,6 +10802,7 @@ en-CA:
       format: 
         format: "%n%"
   number_between_1_and_16_inclusive_31f5468d: "number between 1 and 16 inclusive"
+  number_more_a46966: "%{number} More..."
   number_of_allowed_attempts_3d10b740: "Number of allowed attempts"
   number_of_respondents_e1e7e8b: "Number of Respondents"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Number of scores to ignore for each student"
@@ -10877,6 +10885,7 @@ en-CA:
     ? "yes"
     : "Yes"
   options_3ab0ea65: Options
+  options_for_title_label_17f821ff: "Options for %{title_label}"
   orange_81386a62: Orange
   orbis_report_header_assignment_id: "assignment id"
   orbis_report_header_assignment_title: "assignment title"
@@ -13317,6 +13326,7 @@ en-CA:
   remove_filename_87f3781e: "remove %{filename}"
   remove_icon_a4646413: "remove icon"
   remove_image_341340b3: "Remove image"
+  remove_label_11d96b8f: "Remove %{label}"
   remove_linked_student_name_52dc7fce: "Remove linked student %{name}"
   remove_name_as_an_admin_c296cf49: "Remove %{name} as an admin"
   remove_recipient_name_a6b83cef: "Remove recipient %{name}"
@@ -13788,6 +13798,7 @@ en-CA:
       removing_crosslisting_of_section: "De-Cross-Listing Section..."
   section_84b5391: section
   section_c7f66a0d: Section
+  section_count_sections_42196f3f: "%{section_count} Sections"
   section_does_not_belong_to_course_for_this_discuss_39fd6808: "Section does not belong to course for this discussion topic"
   section_ends_at_bb9df3c0: "Section ends at"
   section_filter_cde54d0a: "Section Filter"
@@ -15671,11 +15682,13 @@ en-CA:
   title_52b8638d: "Title:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} appointment group* You can **sign up** for this."
   title_ee03d132: Title
+  title_is_locked_click_to_unlock_21548cfb: "%{title} is locked. Click to unlock"
   title_is_off_6c823e2d: "%{title} is off"
   title_is_on_2b72a9b7: "%{title} is on"
   title_is_required_437f9993: "Title is required"
   title_is_required_8bb13295: "Title is required!"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Title is too long, must be under %{length} characters"
+  title_is_unlocked_click_to_lock_6a20cfcb: "%{title} is unlocked. Click to lock."
   title_separator: ": "
   titles: 
     aligned_items: "Aligned Items"
