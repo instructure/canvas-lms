@@ -15,11 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class FixSisPseudonymIdOnEnrollments < ActiveRecord::Migration[5.0]
+class RemoveForeignKeyFromEnrollmentsToPseudonym < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    remove_column :enrollments, :pseudonym_id if column_exists?(:enrollments, :pseudonym_id)
-    add_index :enrollments, :sis_pseudonym_id
+    remove_foreign_key_if_exists :enrollments, column: :sis_pseudonym_id
   end
 end
