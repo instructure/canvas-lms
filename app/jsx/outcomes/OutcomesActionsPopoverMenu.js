@@ -20,6 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!outcomes'
+import IconMoreLine from 'instructure-icons/lib/Line/IconMoreLine'
 import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
 import Button from '@instructure/ui-core/lib/components/Button'
 import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
@@ -63,7 +64,11 @@ export default React.createClass({
 
         return (
           <span>
-            <PopoverMenu ref="popovermenu" trigger={<Button><ScreenReaderContent>{I18n.t("Additional outcomes options")}</ScreenReaderContent>&hellip;</Button>}>
+            <PopoverMenu ref={(ref) => {this.popovermenu = ref}}
+              trigger={<Button variant="icon">
+                <IconMoreLine />
+                <ScreenReaderContent>{I18n.t("Additional outcomes options")}</ScreenReaderContent>
+              </Button>}>
               {renderedMenuItems}
             </PopoverMenu>
             <AddToCourseModal ref={this._saveModal} onClose={this._handleModalClose} onReady={this._handleModalReady} />
@@ -89,6 +94,6 @@ export default React.createClass({
     },
     _handleModalClose: function () {
       this._applicationContainer.removeAttribute('aria-hidden');
-      this.refs.popovermenu.focus();
+      this.popovermenu.focus();
     }
   });
