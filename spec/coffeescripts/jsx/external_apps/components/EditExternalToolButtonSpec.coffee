@@ -19,7 +19,8 @@ define [
   'react'
   'react-dom'
   'jsx/external_apps/components/EditExternalToolButton'
-], (React, ReactDOM, EditExternalToolButton) ->
+  'jsx/external_apps/lib/ExternalAppsStore.js'
+], (React, ReactDOM, EditExternalToolButton, Store) ->
 
   wrapper = document.getElementById('fixtures')
   prevEnvironment = ENV
@@ -45,4 +46,20 @@ define [
     form = JSON.stringify(component.form())
     notOk form.indexOf(disabledMessage) >= 0
 
+  test 'opens modal with expected tool state', ->
+    tool = {name: 'test tool', description: 'New tool description', app_type: 'ContextExternalTool'}
+    data = {name: 'test tool', description: 'Old tool description', privacy_level: 'public'}
+    component = renderComponent({ tool: tool, canAddEdit: true })
+    component.setContextExternalToolState(data)
+    ok component.state.tool.description, 'New tool description'
 
+  test 'sets new state from state store response', ->
+    stub = sinon.stub(Store, "fetch")
+    configurationType = "manual"
+    data = {name: 'New Name', description: 'Current State', privacy_level: 'public'}
+    tool = {name: 'Old Name', description: 'Old State', app_type: 'ContextExternalTool'}
+    component = renderComponent({ tool: tool, canAddEdit: true })
+    component.saveChanges(configurationType, data)
+    ok component.state.tool.name, 'New Name'
+    ok component.state.tool.description, 'Current State'
+    stub.restore()
