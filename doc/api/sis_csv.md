@@ -810,7 +810,8 @@ This identifier must not change for the group, and must be globally unique.</td>
 <td></td>
 <td></td>
 <td>The group category identifier from group_categories.csv, if none is
-specified the group will be put in the default group category for the account.
+specified the group will be put in the default group category for the account
+or course or root_account if there is no course_id or account_id.
 </td>
 </tr>
 <tr>
@@ -819,6 +820,14 @@ specified the group will be put in the default group category for the account.
 <td></td>
 <td></td>
 <td>The account identifier from accounts.csv, if none is specified the group will be attached to
+the root account.</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The course identifier from courses.csv, if none is specified the group will be attached to
 the root account.</td>
 </tr>
 <tr>
