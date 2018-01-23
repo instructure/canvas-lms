@@ -26,6 +26,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :errors_attachment, class_name: 'Attachment'
   has_many :sis_batch_error_files
+  has_many :parallel_importers, inverse_of: :sis_batch
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
