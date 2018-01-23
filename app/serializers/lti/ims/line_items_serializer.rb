@@ -14,15 +14,23 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Factories
-  def line_item_model(overrides: {assignment: assignment_model})
-    options = {
-      score_maximum: 1,
-      label: 'Test Line Item',
-      assignment: assignment_model
-    }
-    Lti::LineItem.create!(options.merge(overrides))
+module Lti::Ims
+  class LineItemsSerializer
+    def initialize(line_item, line_item_url)
+      @line_item = line_item
+      @line_item_url = line_item_url
+    end
+
+    def as_json
+      {
+        id: @line_item_url,
+        scoreMaximum: @line_item.score_maximum,
+        label: @line_item.label,
+        resourceId: @line_item.resource_id,
+        tag: @line_item.tag,
+        ltiLinkId: @line_item.resource_link&.resource_link_id
+      }.compact
+    end
   end
 end

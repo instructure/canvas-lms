@@ -17,12 +17,7 @@
 #
 
 module Factories
-  def line_item_model(overrides: {assignment: assignment_model})
-    options = {
-      score_maximum: 1,
-      label: 'Test Line Item',
-      assignment: assignment_model
-    }
-    Lti::LineItem.create!(options.merge(overrides))
+  def resource_link_model(overrides: {})
+    Lti::ResourceLink.create!(overrides)
   end
 end

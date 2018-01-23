@@ -43,4 +43,29 @@ RSpec.describe Lti::LineItem, type: :model do
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Assignment can't be blank")
     end
   end
+
+  describe '#assignment_line_item?' do
+    let(:resource_link) { resource_link_model }
+    let(:line_item) { line_item_model }
+
+    it 'returns true if there is no resource link' do
+      expect(line_item.assignment_line_item?).to eq true
+    end
+
+    it 'returns true if the line item was created before all others in the resource' do
+      line_item_one = line_item_model(overrides: {resource_link: resource_link})
+      line_item_two = line_item_model(overrides: {resource_link: resource_link})
+      line_item_two.update_attributes!(created_at: line_item_one.created_at + 5.seconds)
+
+      expect(line_item_one.assignment_line_item?).to eq true
+    end
+
+    it 'returns false if there is a link and the line item is not the first in the resource' do
+      line_item_one = line_item_model(overrides: {resource_link: resource_link, assignment: assignment_model})
+      line_item_two = line_item_model(overrides: {resource_link: resource_link, assignment: assignment_model})
+      line_item_two.update_attributes!(created_at: line_item_one.created_at + 5.seconds)
+
+      expect(line_item_two.assignment_line_item?).to eq false
+    end
+  end
 end
