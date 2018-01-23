@@ -958,8 +958,9 @@ function unexcuseSubmission (grade, submission, assignment) {
 function rubricAssessmentToPopulate () {
   const assessment = getSelectedAssessment();
   const userIsNotAssessor = !!assessment && assessment.assessor_id !== ENV.current_user_id;
+  const userCanAssess = isAssessmentEditableByMe(assessment);
 
-  if (userIsNotAssessor) {
+  if (userIsNotAssessor && !userCanAssess) {
     return { ...assessment, data: [] };
   }
 
