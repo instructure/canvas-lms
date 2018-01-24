@@ -105,7 +105,7 @@ test('renders the SectionsTooltip component with sections', () => {
     { "id": 5, "course_id": 1, "name": "section 2", "user_count": 1 }
   ]}
   const tree = mount(<AnnouncementRow {...makeProps({ announcement })} />)
-  equal(tree.find('SectionsTooltip Text').text(), '2 Sections')
+  equal(tree.find('SectionsTooltip Text').text(), '2 Sectionssection 4section 2')
 })
 
 test('does not render master course lock icon if masterCourseData is not provided', (assert) => {

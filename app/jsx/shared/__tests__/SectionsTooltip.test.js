@@ -35,7 +35,9 @@ test('renders the SectionTooltip component', () => {
 test('renders the correct section text', () => {
   const tree = mount(<SectionTooltip {...defaultProps()} />)
   const node = tree.find('Link Text')
-  expect(node.text()).toBe('1 Sections')
+  expect(node.text()).toBe('1 Sectionsections name')
+  const screenReaderNode = tree.find('ScreenReaderContent')
+  expect(screenReaderNode.text()).toBe('sections name')
 })
 
 test('renders all sections if no sections are given', () => {
