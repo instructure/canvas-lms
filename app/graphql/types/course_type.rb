@@ -41,9 +41,8 @@ module Types
       resolve ->(course, args, ctx) {
         if course.grants_any_right?(ctx[:current_user], ctx[:session],
             :read_roster, :view_all_grades, :manage_grades)
-          scope = UserSearch.scope_for(course, ctx[:current_user], {})
+          scope = UserSearch.scope_for(course, ctx[:current_user], include_inactive_enrollments: true)
           scope = scope.where(users: {id: args[:userIds]}) if args[:userIds].present?
-
           scope
         else
           nil

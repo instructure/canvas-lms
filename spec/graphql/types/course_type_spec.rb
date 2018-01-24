@@ -122,12 +122,15 @@ describe Types::CourseType do
     before(:once) do
       @student1 = @student
       @student2 = student_in_course(active_all: true).user
+      @inactive_user = student_in_course.tap { |enrollment|
+        enrollment.update_attribute :workflow_state, 'inactive'
+      }.user
     end
 
     it "returns all visible users" do
       expect(
         course_type.usersConnection(current_user: @teacher)
-      ).to eq [@teacher, @student1, @student2]
+      ).to eq [@teacher, @student1, @student2, @inactive_user]
     end
 
     it "returns only the specified users" do
