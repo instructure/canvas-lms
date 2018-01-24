@@ -104,6 +104,7 @@ class BrandConfigsController < ApplicationController
   # indicating the progress of generating the css and pushing it to the CDN
   # @returns {BrandConfig, Progress}
   def create
+    params[:brand_config] ||= {}
     opts = {
       parent_md5: @account.first_parent_brand_config.try(:md5),
       variables: process_variables(params[:brand_config][:variables])
@@ -188,6 +189,7 @@ class BrandConfigsController < ApplicationController
   end
 
   def process_variables(variables)
+    return unless variables
     variables.to_unsafe_h.each_with_object({}) do |(key, value), memo|
       next unless value.present? && (config = BrandableCSS.variables_map[key])
       value = process_file(value) if config['type'] == 'image'
