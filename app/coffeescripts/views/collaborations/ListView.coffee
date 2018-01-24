@@ -45,7 +45,14 @@ define [
     # Returns a UserCollection or GroupCollection.
     createCollection: (type = 'user') ->
       if type is 'user'
-        new UserCollection(comparator: (user) -> user.get('sortable_name'))
+        # For reasons I don't understand, if a comparator is passed into the
+        # collection, it immediately gets an element (which, due to some logic in
+        # PaginatedView, causes us to not listen for scrolling when deciding
+        # to get more users).  However, if I set a comparator later then that element
+        # isn't added and infinite scrolling works fine.
+        c = new UserCollection()
+        c.comparator = 'sortable_name'
+        c
       else
         collection = new GroupCollection()
         collection.forCourse = true
@@ -118,4 +125,3 @@ define [
     removeFromFilter: (model) ->
       @filteredMembers = reject @filteredMembers, (m) ->
         m.get('id') is model.get('id')
-
