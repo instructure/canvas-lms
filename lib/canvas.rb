@@ -34,6 +34,7 @@ module Canvas
 
   def self.redis
     raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
+    return Rails.cache.data if redis_config == 'cache_store'
     @redis ||= begin
       Bundler.require 'redis'
       Canvas::Redis.patch
@@ -42,15 +43,12 @@ module Canvas
     end
   end
 
-  # Builds a redis object using a config hash in the format used by a couple
-  # different config/*.yml files, like redis.yml, cache_store.yml and
-  # delayed_jobs.yml
-  def self.redis_from_config(redis_settings)
-    RedisConfig.from_settings(redis_settings).redis
+  def self.redis_config
+    @redis_config ||= ConfigFile.load('redis')
   end
 
   def self.redis_enabled?
-    @redis_enabled ||= ConfigFile.load('redis').present?
+    @redis_enabled ||= redis_config.present?
   end
 
   def self.reconnect_redis
@@ -94,7 +92,8 @@ module Canvas
         #
         # the only options currently supported in redis-cache are the list of
         # servers, not key prefix or database names.
-        config = (ConfigFile.load('redis', cluster) || {}).merge(config)
+        redis_config = (ConfigFile.load('redis', cluster) || {})
+        config = redis_config.merge(config) if redis_config.is_a?(Hash)
         config_options = config.symbolize_keys.except(:key, :servers, :database)
         servers = config.delete('servers')
         if servers

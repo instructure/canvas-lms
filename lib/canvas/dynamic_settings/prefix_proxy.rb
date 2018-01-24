@@ -19,9 +19,6 @@ module Canvas
     #
     # @attr prefix [String] The prefix to be prepended to keys for querying.
     class PrefixProxy
-      CONSUL_READ_OPTIONS = %i{stale}.freeze
-      private_constant :CONSUL_READ_OPTIONS
-
       DEFAULT_TTL = 5.minutes
       # The TTL for cached values if none is specified in the constructor
 
@@ -68,39 +65,39 @@ module Canvas
       # @return [String]
       # @return [nil] When no value was found
       def fetch(key, ttl: @default_ttl)
-        fetch_object(key, ttl: ttl)&.values
-      end
-      alias [] fetch
-
-      # Fetch the full object at the specified key including all metadata
-      #
-      # This method is intended to retreive a single key from the keyspace and
-      # will not work for getting multiple values in a hash from the store. If
-      # you need to access values nested deeper in the keyspace use #for_prefix
-      # to move deeper in the nesting.
-      #
-      # @param key [String, Symbol] The key to fetch
-      # @param ttl [ActiveSupport::Duration] The TTL for the value in the cache,
-      #   defaults to value supplied to the constructor.
-      # @return [Imperium::KVGETResponse]
-      def fetch_object(key, ttl: @default_ttl)
         keys = [
           [tree, service, environment, cluster, prefix, key].compact.join("/"),
           [tree, service, environment, prefix, key].compact.join("/"),
+        ].uniq
+
+        fallback_keys = [
           [tree, service, prefix, key].compact.join("/"), # for backcompat only
           ["global", tree, service, environment, prefix, key].compact.join("/"),
-          ].uniq
+        ] - keys
 
-        # cache with the most specific value
-        Cache.fetch(keys.first, ttl: ttl) do
-          result = nil
-          keys.each do |full_key|
-            result = @kv_client.get(full_key, *CONSUL_READ_OPTIONS)
-            result = nil unless result&.status == 200
-            break if result
-          end
-          result
+        # pre-cache an entire tree
+        tree_key = [tree, service, environment].compact.join("/")
+        subtree = Cache.fetch(tree_key + '/', ttl: ttl) do
+          result = @kv_client.get(tree_key, :recurse, :stale)
+          result.values if result&.status == 200
         end
+        populate_cache(tree_key, subtree, ttl)
+
+        keys.each do |full_key|
+          # these keys will have been populated (or not!) above; don't
+          # actually try to fetch them
+          result = Cache.fetch(full_key)
+          return result if result
+        end
+
+        fallback_keys.each do |full_key|
+          result = Cache.fetch(full_key, ttl: ttl) do
+            result = @kv_client.get(full_key, :stale)
+            result.values if result&.status == 200
+          end
+          return result if result
+        end
+        nil
       rescue Imperium::TimeoutError => exception
         Cache.fallback_fetch(keys.first).tap do |val|
           if val
@@ -111,6 +108,7 @@ module Canvas
           end
         end
       end
+      alias [] fetch
 
       # Extend the prefix from this instance returning a new one.
       #
@@ -129,6 +127,18 @@ module Canvas
           default_ttl: default_ttl,
           kv_client: @kv_client
         )
+      end
+
+      private
+
+      def populate_cache(prefix, subtree, ttl)
+        if subtree.is_a?(Hash)
+          subtree.each do |(k, v)|
+            populate_cache("#{prefix}/#{k}", v, ttl)
+          end
+        else
+          Cache.insert(prefix, subtree, ttl: ttl)
+        end
       end
     end
   end

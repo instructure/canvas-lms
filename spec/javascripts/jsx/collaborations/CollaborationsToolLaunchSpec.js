@@ -27,10 +27,12 @@ QUnit.module('CollaborationsToolLaunch screenreader functionality', {
   setup () {
     fixtures = $('#fixtures')
     fixtures.append('<div id="main" style="height: 700px; width: 700px" />')
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
   },
 
   teardown () {
     fixtures.empty()
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
   }
 })
 
@@ -84,4 +86,14 @@ test("doesn't show alerts or add border to iframe by default", () => {
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
   deepEqual(wrapper.state().iframeStyle, {})
+})
+
+test("sets the iframe allowances", () => {
+  const wrapper = mount(
+    <CollaborationsToolLaunch />
+  )
+  wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
+  equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
+  equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
+  ok(wrapper.find('.tool_launch').node.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
 })

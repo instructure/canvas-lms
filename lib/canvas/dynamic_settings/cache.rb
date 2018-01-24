@@ -50,6 +50,7 @@ module Canvas
           stored.expiration_time = ttl&.from_now if stored.expiration_time.nil?
           stored.value
         else
+          return nil unless block_given?
           yield.tap do |value|
             insert(key, value, ttl: ttl) unless value.respond_to?(:not_found?) && value.not_found?
           end
