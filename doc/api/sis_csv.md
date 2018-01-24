@@ -1120,7 +1120,7 @@ remove the integration_id from the object.</td>
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>account, term, course, section, group, user, user_integration_id</td>
+<td>account, term, course, section, group, user</td>
 </tr>
 </table>
 
