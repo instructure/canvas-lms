@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe "Default Account Reports" do
   include ReportSpecHelper
 
-  def create_some_users_with_pseudonyms()
+  def create_some_users_with_pseudonyms
     sis = @account.sis_batches.create
     @user1 = user_with_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
                                  :sortable_name => "St. Clair,John", :username => 'john@stclair.com')
@@ -57,7 +57,7 @@ describe "Default Account Reports" do
     @user8.destroy
   end
 
-  def create_an_account()
+  def create_an_account
     @sis = @account.sis_batches.create
     @sub_account = Account.create(:parent_account => @account, :name => 'English')
     @sub_account.sis_source_id = 'sub1'
@@ -65,8 +65,8 @@ describe "Default Account Reports" do
     @sub_account.save!
   end
 
-  def create_some_accounts()
-    create_an_account()
+  def create_some_accounts
+    create_an_account
     @sub_sub_account = Account.create(:parent_account => @sub_account, :name => 'sESL')
     @sub_sub_account.sis_source_id = 'subsub1'
     @sub_sub_account.sis_batch_id = @sis.id
@@ -85,7 +85,7 @@ describe "Default Account Reports" do
     @sub_account6.destroy
   end
 
-  def create_a_term()
+  def create_a_term
     @sis = @account.sis_batches.create
     @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago,
                                    :end_at => 1.year.from_now)
@@ -95,7 +95,7 @@ describe "Default Account Reports" do
     @term1.save!
   end
 
-  def create_some_group_categories()
+  def create_some_group_categories
     create_some_courses
     @group_category1 = GroupCategory.create(
       name: 'Test Group Category',
@@ -111,11 +111,11 @@ describe "Default Account Reports" do
     @group_category2.save!
     @group_category3 = GroupCategory.create(
       name: 'Test Group Category Deleted',
-      course: @course,
+      course: @course3,
     )
     @group_category4 = GroupCategory.create(
       name: 'Test Group Category Course',
-      course: @course,
+      course: @course3,
     )
     @account.group_categories << @group_category1
     @account.group_categories << @group_category2
@@ -125,7 +125,7 @@ describe "Default Account Reports" do
     @account.save!
   end
 
-  def create_some_terms()
+  def create_some_terms
     create_a_term
     @term2 = EnrollmentTerm.create(:name => 'Winter', :start_at => 3.weeks.ago,
                                    :end_at => 2.years.from_now)
@@ -140,9 +140,9 @@ describe "Default Account Reports" do
     @term3.save!
   end
 
-  def create_some_courses()
-    create_an_account()
-    create_a_term()
+  def create_some_courses
+    create_an_account
+    create_a_term
     start_at = 1.day.ago
     end_at = 3.months.from_now
     @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101',
@@ -192,8 +192,8 @@ describe "Default Account Reports" do
     @course6.save!
   end
 
-  def create_some_courses_and_sections()
-    create_some_courses()
+  def create_some_courses_and_sections
+    create_some_courses
 
     @section1 = CourseSection.new(:name => 'English_01', :course => @course1,
                                   :start_at => @course1.start_at, :end_at => @course1.conclude_at)
@@ -228,9 +228,9 @@ describe "Default Account Reports" do
     @section5.destroy
   end
 
-  def create_some_enrolled_users()
-    create_some_courses_and_sections()
-    create_some_users_with_pseudonyms()
+  def create_some_enrolled_users
+    create_some_courses_and_sections
+    create_some_users_with_pseudonyms
 
     @role = @account.roles.build :name => 'Pixel Engineer'
     @role.base_role_type = 'DesignerEnrollment'
@@ -255,7 +255,7 @@ describe "Default Account Reports" do
     @enrollment12 = create_enrollment(@course4, @user4, enrollment_state: 'creation_pending')
   end
 
-  def create_some_groups()
+  def create_some_groups
     create_some_group_categories
     @group1 = @account.groups.create(:name => 'group1name')
     @group1.group_category = @group_category1
@@ -280,9 +280,9 @@ describe "Default Account Reports" do
     @group5.save!
   end
 
-  def create_some_group_memberships_n_stuff()
-    create_some_users_with_pseudonyms()
-    create_some_groups()
+  def create_some_group_memberships_n_stuff
+    create_some_users_with_pseudonyms
+    create_some_groups
     batch = @group1.root_account.sis_batches.create!
     @gm1 = GroupMembership.create(:group => @group1, :user => @user1, :workflow_state => "accepted")
     @gm1.sis_batch_id = batch.id
@@ -309,7 +309,7 @@ describe "Default Account Reports" do
 
     describe "Users" do
       before(:once) do
-        create_some_users_with_pseudonyms()
+        create_some_users_with_pseudonyms
       end
 
       it "should run sis report with term parameter and include deleted users" do
@@ -367,7 +367,7 @@ describe "Default Account Reports" do
       end
 
       it "should run sis report on a sub_acocunt" do
-        create_an_account()
+        create_an_account
         @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101')
         @course1.account_id = @sub_account.id
         @course1.workflow_state = 'available'
@@ -453,7 +453,7 @@ describe "Default Account Reports" do
 
     describe "Accounts" do
       before(:once) do
-        create_some_accounts()
+        create_some_accounts
       end
 
       it "should run the SIS report" do
@@ -513,7 +513,7 @@ describe "Default Account Reports" do
 
     describe "Terms" do
       before(:once) do
-        create_some_terms()
+        create_some_terms
       end
 
       it "should run the SIS report" do
@@ -562,7 +562,7 @@ describe "Default Account Reports" do
 
     describe "Courses" do
       before(:once) do
-        create_some_courses()
+        create_some_courses
       end
 
       it "should run the SIS report" do
@@ -668,7 +668,7 @@ describe "Default Account Reports" do
 
     describe "Sections" do
       before(:once) do
-        create_some_courses_and_sections()
+        create_some_courses_and_sections
       end
 
       it "should run the SIS report for a term" do
@@ -781,7 +781,7 @@ describe "Default Account Reports" do
 
     describe "Enrollments" do
       before(:once) do
-        create_some_enrolled_users()
+        create_some_enrolled_users
       end
 
       it "should run the SIS report" do
@@ -967,7 +967,7 @@ describe "Default Account Reports" do
 
     describe "Groups" do
       before(:once) do
-        create_some_groups()
+        create_some_groups
       end
 
       it "should run the SIS report" do
@@ -1072,12 +1072,14 @@ describe "Default Account Reports" do
       it 'should run the sis report' do
         GroupCategory.where(id: @group_category1).update_all(sis_source_id: 'gc101', sis_batch_id: @sis.id)
         GroupCategory.where(id: @group_category2).update_all(sis_source_id: 'gc102', sis_batch_id: @sis.id)
+        GroupCategory.where(id: @group_category4).update_all(sis_source_id: 'gc104', sis_batch_id: @sis.id)
         parameters = {}
         parameters["group_categories"] = true
         parsed = read_report("sis_export_csv", {params: parameters, order: 4})
-        expect(parsed.length).to eq 2
-        expect(parsed).to match_array [[@group_category1.reload.sis_source_id, @account.sis_source_id, "Test Group Category", 'active'],
-                                       [@group_category2.reload.sis_source_id, @account.sis_source_id, "Test Group Category2", 'active']]
+        expect(parsed.length).to eq 3
+        expect(parsed).to match_array [['gc101', @account.sis_source_id, nil, "Test Group Category", 'active'],
+                                       ['gc102', @account.sis_source_id, nil, "Test Group Category2", 'active'],
+                                       ['gc104', nil, "SIS_COURSE_ID_3", "Test Group Category Course", 'active']]
       end
 
       it 'should run the provisioning report for a sub account' do
@@ -1104,7 +1106,7 @@ describe "Default Account Reports" do
 
     describe "Group Memberships" do
       before(:once) do
-        create_some_group_memberships_n_stuff()
+        create_some_group_memberships_n_stuff
       end
 
       it "should run the sis report" do
@@ -1159,7 +1161,7 @@ describe "Default Account Reports" do
 
     describe "Cross List" do
       before(:once) do
-        create_some_courses_and_sections()
+        create_some_courses_and_sections
         @section1.crosslist_to_course(@course2)
         @section3.crosslist_to_course(@course1)
         @section5.crosslist_to_course(@course6)

@@ -626,7 +626,7 @@ module AccountReports
     def group_categories
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_category_id', 'account_id', 'category_name', 'status']
+        headers = ['group_category_id', 'account_id', 'course_id', 'category_name', 'status']
       else
         headers = []
         headers << I18n.t('canvas_group_category_id')
@@ -639,7 +639,6 @@ module AccountReports
         headers << I18n.t('group_limit')
         headers << I18n.t('auto_leader')
         headers << I18n.t('status')
-
       end
 
       root_account.shard.activate do
@@ -655,12 +654,14 @@ module AccountReports
         else
           group_categories = root_account.all_group_categories.
             joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
-                   AND group_categories.context_type = 'Account'")
+                     AND group_categories.context_type = 'Account'
+                   LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
+                     AND group_categories.context_type = 'Course'")
         end
         group_categories.where!('group_categories.deleted_at IS NULL') unless @include_deleted
         if @sis_format
           group_categories = group_categories.
-            select("group_categories.*, a.sis_source_id AS account_sis_id").
+            select("group_categories.*, a.sis_source_id AS account_sis_id, c.sis_source_id AS course_sis_id").
             where.not(sis_batch_id: nil)
         end
 
@@ -669,7 +670,8 @@ module AccountReports
             row = []
             row << g.id unless @sis_format
             row << g.sis_source_id
-            row << g.account_sis_id if @sis_format
+            row << ((g.context_type == 'Account') ? g.account_sis_id : nil) if @sis_format
+            row << ((g.context_type == 'Course') ? g.course_sis_id : nil) if @sis_format
             row << g.context_id unless @sis_format
             row << g.context_type unless @sis_format
             row << g.name
