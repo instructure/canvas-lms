@@ -39,27 +39,35 @@ module SIS
         @accounts_cache = {}
       end
 
-      def add_group_category(sis_id, account_id, category_name, status)
+      def add_group_category(sis_id, account_id, course_id, category_name, status)
         raise ImportError, "No sis_id given for a group category" if sis_id.blank?
         raise ImportError, "No name given for group category #{sis_id}" if category_name.blank?
         raise ImportError, "No status given for group category #{sis_id}" if status.blank?
         raise ImportError, "Improper status \"#{status}\" for group category #{sis_id}, skipping" unless status =~ /\A(active|deleted)/i
-
-        @logger.debug("Processing Group Category #{[sis_id, account_id, category_name, status].inspect}")
-
-        account = nil
-        if account_id.present?
-          account = @accounts_cache[account_id]
-          account ||= @root_account.all_accounts.where(sis_source_id: account_id).take
-          raise ImportError, "Account with id \"#{account_id}\" didn't exist for group category #{sis_id}" unless account
-          @accounts_cache[account.sis_source_id] = account
+        if course_id && account_id
+          raise ImportError, "Only one context is allowed and both course_id and account_id where provided for group category #{sis_id}."
         end
-        account ||= @root_account
+
+        @logger.debug("Processing Group Category #{[sis_id, account_id, course_id, category_name, status].inspect}")
+
+        context = nil
+        if account_id
+          context = @accounts_cache[account_id]
+          context ||= @root_account.all_accounts.active.where(sis_source_id: account_id).take
+          raise ImportError, "Account with id \"#{account_id}\" didn't exist for group category #{sis_id}" unless context
+          @accounts_cache[context.sis_source_id] = context
+        end
+
+        if course_id
+          context = @root_account.all_courses.active.where(sis_source_id: course_id).take
+          raise ImportError, "Course with id \"#{course_id}\" didn't exist for group category #{sis_id}" unless context
+        end
+        context ||= @root_account
 
         gc = @root_account.all_group_categories.where(sis_source_id: sis_id).take
-        gc ||= account.group_categories.new
+        gc ||= context.group_categories.new
         gc.name = category_name
-        gc.context = account
+        gc.context = context
         gc.root_account_id = @root_account.id
         gc.sis_source_id = sis_id
         gc.sis_batch_id = @batch.id if @batch

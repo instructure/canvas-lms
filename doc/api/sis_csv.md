@@ -758,8 +758,16 @@ This identifier must not change for the group category, and must be globally uni
 <td>text</td>
 <td></td>
 <td></td>
-<td>The account identifier from accounts.csv, if none is specified the group
-will be attached to the root account.</td>
+<td>The account identifier from accounts.csv, if no account or course is
+specified the group will be attached to the root account.</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The course identifier from courses.csv, if no course or account is specified
+the group will be attached to the root account.</td>
 </tr>
 <tr>
 <td>category_name</td>
@@ -779,10 +787,10 @@ will be attached to the root account.</td>
 
 Sample:
 
-<pre>group_category_id,account_id,category_name,status
-GC08,A001,First Group Category,active
-GC07,,GC7,active
-GC10,,GC10,deleted
+<pre>group_category_id,account_id,course_id,category_name,status
+GC08,A001,,First Group Category,active
+GC07,,,GC7,active
+GC10,,,GC10,deleted
 </pre>
 
 groups.csv
