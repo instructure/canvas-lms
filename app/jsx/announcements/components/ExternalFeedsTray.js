@@ -61,7 +61,7 @@ export default class ExternalFeedsTray extends Component {
         as="div"
         textAlign="start"
       >
-        <Heading margin="small 0 0 small" level="h3" as="h1">{I18n.t('External feeds')}</Heading>
+        <Heading margin="small 0 0 small" level="h3" as="h2">{I18n.t('External feeds')}</Heading>
       </Container>
     )
   }
