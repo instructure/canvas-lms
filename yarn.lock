@@ -9557,6 +9557,10 @@ rev-path@^2.0.0:
   dependencies:
     modify-filename "^1.0.0"
 
+rgb-hex@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/rgb-hex/-/rgb-hex-2.1.0.tgz#c773c5fe2268a25578d92539a82a7a5ce53beda6"
+
 right-align@^0.1.1:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/right-align/-/right-align-0.1.3.tgz#61339b722fe6a3515689210d24e14c96148613ef"
@@ -10591,9 +10595,9 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
-tinymce-a11y-checker@1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.2.3.tgz#540bf165666fc6191dcffa36117e2536e45968a1"
+tinymce-a11y-checker@1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.2.5.tgz#782e3a316d2f9732c830bdcc17ceae64842d897f"
   dependencies:
     format-message "^5.2.0"
     format-message-generate-id "^5.2.1"
@@ -10603,6 +10607,7 @@ tinymce-a11y-checker@1.2.3:
     react-aria-live "^1.0.4"
     react-color "^2.13.4"
     react-dom "^0.14.8 || ^15.0.0"
+    rgb-hex "^2.1.0"
     wcag-element-contrast "^1.0.1"
 
 tinymce-light-skin@1.3.1, tinymce-light-skin@~1.3.0:
