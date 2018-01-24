@@ -106,6 +106,7 @@ describe "announcements index v2" do
     it 'an announcement can be deleted' do
       AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.click_delete
+      AnnouncementIndex.click_confirm_delete
       expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement1_title))
       expect(Announcement.where(title: announcement1_title).first.workflow_state).to eq 'deleted'
     end
@@ -114,6 +115,7 @@ describe "announcements index v2" do
       AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.check_announcement(announcement2_title)
       AnnouncementIndex.click_delete
+      AnnouncementIndex.click_confirm_delete
       expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement1_title))
       expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement2_title))
       expect(Announcement.where(title: announcement1_title).first.workflow_state).to eq 'deleted'

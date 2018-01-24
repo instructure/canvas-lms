@@ -58,6 +58,10 @@ class AnnouncementIndex
       f('#delete_announcements')
     end
 
+    def confirm_delete_button
+      f('#confirm_delete_announcements')
+    end
+
     def add_announcement_button
       f('#add_announcement')
     end
@@ -127,6 +131,10 @@ class AnnouncementIndex
 
     def click_delete
       delete_button.click
+    end
+
+    def click_confirm_delete
+      confirm_delete_button.click
     end
 
     def click_on_announcement(title)

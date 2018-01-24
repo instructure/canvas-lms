@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import _ from 'lodash'
 
 import IndexHeader, { SEARCH_TIME_DELAY } from 'jsx/announcements/components/IndexHeader'
@@ -30,10 +30,11 @@ const makeProps = (props = {}) => _.merge({
     moderate: true,
   },
   isBusy: false,
-  hasSelectedAnnouncements: false,
+  selectedCount: 0,
   searchAnnouncements () {},
   lockAnnouncements () {},
   deleteAnnouncements () {},
+  applicationElement: () => document.getElementById('fixtures'),
 }, props)
 
 QUnit.module('IndexHeader component')
@@ -58,14 +59,6 @@ test('does not render create announcement button if we do not have create permis
   )
   const node = tree.find('#add_announcement')
   notOk(node.exists())
-})
-
-test('search text box is disabled if isBusy', () => {
-  const tree = mount(
-    <IndexHeader {...makeProps({ isBusy: true })} />
-  )
-  const node = tree.find('input[name="announcements_search"]')
-  ok(node.is('[disabled]'))
 })
 
 test('onSearch calls searchAnnouncements with searchInput value after debounce timeout', (assert) => {
@@ -154,9 +147,9 @@ test('lock announcements button is disabled if isBusy', () => {
   ok(node.is('[disabled]'))
 })
 
-test('lock announcements button is disabled if hasSelectedAnnouncements is false', () => {
+test('lock announcements button is disabled if selectedCount is 0', () => {
   const tree = mount(
-    <IndexHeader {...makeProps({ hasSelectedAnnouncements: false })} />
+    <IndexHeader {...makeProps({ selectedCount: 0 })} />
   )
   const node = tree.find('#lock_announcements')
   ok(node.is('[disabled]'))
@@ -186,9 +179,9 @@ test('delete announcements button is disabled if isBusy', () => {
   ok(node.is('[disabled]'))
 })
 
-test('delete announcements button is disabled if hasSelectedAnnouncements is false', () => {
+test('delete announcements button is disabled if selectedCount is 0', () => {
   const tree = mount(
-    <IndexHeader {...makeProps({ hasSelectedAnnouncements: false })} />
+    <IndexHeader {...makeProps({ selectedCount: 0 })} />
   )
   const node = tree.find('#delete_announcements')
   ok(node.is('[disabled]'))
@@ -198,7 +191,7 @@ test('clicking lock announcements button should call lockAnnouncements prop', (a
   const done = assert.async()
   const lockSpy = sinon.spy()
   const tree = mount(
-    <IndexHeader {...makeProps({ lockAnnouncements: lockSpy, hasSelectedAnnouncements: true })} />
+    <IndexHeader {...makeProps({ lockAnnouncements: lockSpy, selectedCount: 1 })} />
   )
 
   tree.find('#lock_announcements').simulate('click')
@@ -208,16 +201,66 @@ test('clicking lock announcements button should call lockAnnouncements prop', (a
   })
 })
 
-test('clicking delete announcements button should call deleteAnnouncements prop', (assert) => {
+test('clicking delete announcements button should show a confirm modal', (assert) => {
   const done = assert.async()
-  const deleteSpy = sinon.spy()
   const tree = mount(
-    <IndexHeader {...makeProps({ deleteAnnouncements: deleteSpy, hasSelectedAnnouncements: true })} />
+    <IndexHeader {...makeProps({ selectedCount: 1 })} />
   )
+  const instance = tree.instance()
 
   tree.find('#delete_announcements').simulate('click')
   setTimeout(() => {
-    equal(deleteSpy.callCount, 1)
+    ok(instance.state.showConfirmDelete)
+    tree.unmount()
     done()
+  })
+})
+
+test('confirm delete modal should call deleteAnnouncements prop on confirming delete', (assert) => {
+  const done = assert.async()
+  const deleteSpy = sinon.spy()
+  const tree = mount(
+    <IndexHeader {...makeProps({ selectedCount: 1, deleteAnnouncements: deleteSpy })} />
+  )
+  const instance = tree.instance()
+
+  tree.find('#delete_announcements').simulate('click')
+  setTimeout(() => {
+    const confirmWrapper = new ReactWrapper(instance.confirmDeleteBtn, instance.confirmDeleteBtn)
+    confirmWrapper.simulate('click')
+
+    // the nested setTimeout is necessary because if we do unmount in the same tick as clicking on confirm
+    // then the focus unmount logic will run before the focus re-direction logic, which will blow up
+    // using an additional setTimeout pushes the unmount execution in the next tick, after the focus logic
+    setTimeout(() => {
+      equal(deleteSpy.callCount, 1)
+      tree.unmount()
+      done()
+    })
+  })
+})
+
+test('confirm delete modal should not call deleteAnnouncements prop on cancel delete, and it should close the modal', (assert) => {
+  const done = assert.async()
+  const deleteSpy = sinon.spy()
+  const tree = mount(
+    <IndexHeader {...makeProps({ selectedCount: 1, deleteAnnouncements: deleteSpy })} />
+  )
+  const instance = tree.instance()
+
+  tree.find('#delete_announcements').simulate('click')
+  setTimeout(() => {
+    const cancelWrapper = new ReactWrapper(instance.cancelDeleteBtn, instance.cancelDeleteBtn)
+    cancelWrapper.simulate('click')
+
+    // the nested setTimeout is necessary because if we do unmount in the same tick as clicking on confirm
+    // then the focus unmount logic will run before the focus re-direction logic, which will blow up
+    // using an additional setTimeout pushes the unmount execution in the next tick, after the focus logic
+    setTimeout(() => {
+      equal(deleteSpy.callCount, 0)
+      notOk(instance.state.showConfirmDelete)
+      tree.unmount()
+      done()
+    })
   })
 })
