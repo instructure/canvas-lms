@@ -554,7 +554,7 @@ module AccountReports
     def groups
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['group_id', 'group_category_id', 'account_id', 'name', 'status']
+        headers = ['group_id', 'group_category_id', 'account_id', 'course_id', 'name', 'status']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
@@ -563,8 +563,10 @@ module AccountReports
         headers << I18n.t('group_category_id')
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
-        headers << I18n.t('#account_reports.report_header_name', 'name')
-        headers << I18n.t('#account_reports.report_header_status', 'status')
+        headers << I18n.t('canvas_course_id')
+        headers << I18n.t('course_id')
+        headers << I18n.t('name')
+        headers << I18n.t('status')
         headers << I18n.t('created_by_sis')
         headers << I18n.t('context_id')
         headers << I18n.t('context_type')
@@ -573,8 +575,11 @@ module AccountReports
       end
 
       groups = root_account.all_groups.
-        select("groups.*, accounts.sis_source_id AS account_sis_id, group_categories.sis_source_id AS gc_sis_id").
+        select("groups.*, accounts.sis_source_id AS account_sis_id,
+                courses.sis_source_id AS course_sis_id,
+                group_categories.sis_source_id AS gc_sis_id").
         joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id
+               LEFT JOIN #{Course.quoted_table_name} ON courses.id = groups.context_id AND context_type='Course'
                LEFT JOIN #{GroupCategory.quoted_table_name} ON groups.group_category_id=group_categories.id")
 
       groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
@@ -587,7 +592,6 @@ module AccountReports
       end
 
       if account != root_account
-        groups = groups.joins("LEFT JOIN #{Course.quoted_table_name} ON groups.context_type = 'Course' AND groups.context_id = courses.id")
         groups.where!("(groups.context_type = 'Account'
                          AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
                            OR accounts.id = :account_id))
@@ -603,8 +607,10 @@ module AccountReports
           row << g.sis_source_id
           row << g.group_category_id unless @sis_format
           row << g.gc_sis_id
-          row << g.account_id unless @sis_format
-          row << g.account_sis_id
+          row << (g.context_type == 'Account' ? g.context_id : nil) unless @sis_format
+          row << (g.context_type == 'Account' ? g.account_sis_id : nil)
+          row << (g.context_type == 'Course' ? g.context_id : nil) unless @sis_format
+          row << (g.context_type == 'Course' ? g.course_sis_id : nil)
           row << g.name
           row << g.workflow_state
           row << g.sis_batch_id? unless @sis_format
