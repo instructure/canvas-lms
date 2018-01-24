@@ -4,7 +4,7 @@ Contributing
 There are two wonderful ways you can contribute to Canvas: filing issues and
 submitting pull requests.
 
-## Filing Issues
+## Filing Issues 
 
 Filing a GitHub issue should be reserved for reporting bugs and defects in end-user functionality.
 Feature requests and configuration issues do not belong here and will be closed.
