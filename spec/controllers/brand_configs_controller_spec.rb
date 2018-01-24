@@ -108,6 +108,12 @@ describe BrandConfigsController do
       expect(json['brand_config']['variables']['ic-brand-primary']).to eq "#000000"
     end
 
+    it "should not fail when a brand_config is not passed" do
+      user_session(admin)
+      post 'create', params: {account_id: @account.id}
+      assert_status(200)
+    end
+
     it 'should not allow non admin access' do
       user = user_with_pseudonym(active_all: true)
       user_session(user)
