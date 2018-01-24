@@ -20,7 +20,7 @@ import { mount } from 'enzyme';
 
 import SelectMenuGroup from 'jsx/grade_summary/SelectMenuGroup';
 
-QUnit.module('SelectMenuGroup', function (hooks) {
+QUnit.module('SelectMenuGroup', function (suiteHooks) {
   let props;
   let wrapper;
 
@@ -28,7 +28,7 @@ QUnit.module('SelectMenuGroup', function (hooks) {
     return mount(<SelectMenuGroup {...props} />);
   }
 
-  hooks.beforeEach(function () {
+  suiteHooks.beforeEach(function () {
     const assignmentSortOptions = [
       ['Assignment Group', 'assignment_group'],
       ['Due Date', 'due_date'],
@@ -36,8 +36,12 @@ QUnit.module('SelectMenuGroup', function (hooks) {
     ];
 
     const courses = [
-      { id: '2', nickname: 'Autos', url: '/courses/2/grades' },
-      { id: '14', nickname: 'Woodworking', url: '/courses/14/grades' }
+      { id: '2', nickname: 'Autos', url: '/courses/2/grades', gradingPeriodSetId: null },
+      { id: '14', nickname: 'Woodworking', url: '/courses/14/grades', gradingPeriodSetId: null },
+      { id: '21', nickname: 'Airbending', url: '/courses/21/grades', gradingPeriodSetId: '3' },
+      { id: '42', nickname: 'Waterbending', url: '/courses/42/grades', gradingPeriodSetId: '3' },
+      { id: '51', nickname: 'Earthbending', url: '/courses/51/grades', gradingPeriodSetId: null },
+      { id: '60', nickname: 'Firebending', url: '/courses/60/grades', gradingPeriodSetId: '4' },
     ];
 
     const gradingPeriods = [
@@ -66,7 +70,7 @@ QUnit.module('SelectMenuGroup', function (hooks) {
     };
   });
 
-  hooks.afterEach(function () {
+  suiteHooks.afterEach(function () {
     wrapper.unmount();
     document.getElementById('fixtures').innerHTML = '';
   });
@@ -201,12 +205,121 @@ QUnit.module('SelectMenuGroup', function (hooks) {
     strictEqual(props.saveAssignmentOrder.callCount, 0);
   });
 
-  test('reloads the page when the submit button is clicked', function () {
-    props.goToURL = sinon.stub();
-    wrapper = mountComponent();
-    wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } });
-    const submitButton = wrapper.find('#apply_select_menus');
-    submitButton.simulate('click');
-    strictEqual(props.goToURL.callCount, 1);
-  });
+  QUnit.module('clicking the submit button', (hooks) => {
+    let submitButton
+
+    hooks.beforeEach(() => {
+      props.goToURL = sinon.stub()
+    })
+
+    QUnit.module('when the student has changed', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        wrapper = mountComponent()
+        submitButton = wrapper.find('#apply_select_menus')
+        wrapper.find('#student_select_menu').simulate('change', { target: { value: '7' } })
+        submitButton.simulate('click')
+      })
+
+      test('reloads the page', () => {
+        strictEqual(props.goToURL.callCount, 1)
+      })
+
+      test('takes you to the grades page for that student', () => {
+        deepEqual(props.goToURL.firstCall.args, ['/courses/2/grades/7'])
+      })
+    })
+
+    QUnit.module('when the course changes from one without a grading period set to another without a grading period set',
+      (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.selectedCourseID = '2'
+        wrapper = mountComponent()
+        submitButton = wrapper.find('#apply_select_menus')
+        wrapper.find('#course_select_menu').simulate('change', { target: { value: '14' } })
+        submitButton.simulate('click')
+      })
+
+      test('reloads the page', () => {
+        strictEqual(props.goToURL.callCount, 1)
+      })
+
+      test('takes you to the grades page for that course', () => {
+        deepEqual(props.goToURL.firstCall.args, ['/courses/14/grades/11'])
+      })
+    })
+
+    QUnit.module('when the course changes from one without a grading period set to one with a grading period set', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.selectedCourseID = '2'
+        wrapper = mountComponent()
+        submitButton = wrapper.find('#apply_select_menus')
+        wrapper.find('#course_select_menu').simulate('change', { target: { value: '21' } })
+        submitButton.simulate('click')
+      })
+
+      test('reloads the page', () => {
+        strictEqual(props.goToURL.callCount, 1)
+      })
+
+      test('takes you to the grades page for that course', () => {
+        deepEqual(props.goToURL.firstCall.args, ['/courses/21/grades/11'])
+      })
+    })
+
+    QUnit.module('when the course changes from one with a grading period set to one without a grading period set', (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.selectedCourseID = '21'
+        wrapper = mountComponent()
+        submitButton = wrapper.find('#apply_select_menus')
+        wrapper.find('#course_select_menu').simulate('change', { target: { value: '2' } })
+        submitButton.simulate('click')
+      })
+
+      test('reloads the page', () => {
+        strictEqual(props.goToURL.callCount, 1)
+      })
+
+      test('takes you to the grades page for that course and does not pass along the selected grading period', () => {
+        deepEqual(props.goToURL.firstCall.args, ['/courses/2/grades/11'])
+      })
+    })
+
+    QUnit.module('when the course changes from one with a grading period set to another with the same grading period set',
+      (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.selectedCourseID = '21'
+        wrapper = mountComponent()
+        submitButton = wrapper.find('#apply_select_menus')
+        wrapper.find('#course_select_menu').simulate('change', { target: { value: '42' } })
+        submitButton.simulate('click')
+      })
+
+      test('reloads the page', () => {
+        strictEqual(props.goToURL.callCount, 1)
+      })
+
+      test('takes you to the grades page for that course and passes the currently selected grading period', () => {
+        deepEqual(props.goToURL.firstCall.args, ['/courses/42/grades/11?grading_period_id=9'])
+      })
+    })
+
+    QUnit.module('when the course changes from one with a grading period set to another with a different grading period set',
+      (contextHooks) => {
+      contextHooks.beforeEach(() => {
+        props.selectedCourseID = '21'
+        wrapper = mountComponent()
+        submitButton = wrapper.find('#apply_select_menus')
+        wrapper.find('#course_select_menu').simulate('change', { target: { value: '60' } })
+        submitButton.simulate('click')
+      })
+
+      test('reloads the page', () => {
+        strictEqual(props.goToURL.callCount, 1)
+      })
+
+      test('takes you to the grades page for that course and does not pass the currently selected grading period', () => {
+        deepEqual(props.goToURL.firstCall.args, ['/courses/60/grades/11'])
+      })
+    })
+  })
 });

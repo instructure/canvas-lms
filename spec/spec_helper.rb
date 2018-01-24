@@ -318,6 +318,7 @@ RSpec.configure do |config|
 
   config.include Helpers
   config.include Factories
+  config.include RequestHelper, type: :request
   config.include Onceler::BasicHelpers
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
