@@ -108,7 +108,7 @@ require 'securerandom'
 #     }
 #
 class FilesController < ApplicationController
-  # show_relative is exempted from protect_from_forgery in order to allow 
+  # show_relative is exempted from protect_from_forgery in order to allow
   # brand-config-uploaded JS to work
   # verify_authenticity_token is manually-invoked where @context is not
   # an Account in show_relative

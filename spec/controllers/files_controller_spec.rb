@@ -656,7 +656,7 @@ describe FilesController do
         assert_unauthorized
       end
     end
-  
+
     context "account-context files" do
       before :once do
         @account = account_model
@@ -675,7 +675,7 @@ describe FilesController do
         get 'show_relative', params: { :download => 1, :inline => 1, :sf_verifier => sf_verifier, :ts => ts, :user_id => @teacher.id, :verifier => verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path }
         expect(response).to be_success
       end
-      
+
       it "should enforce verification for contexts other than account" do
         course_file
         verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
