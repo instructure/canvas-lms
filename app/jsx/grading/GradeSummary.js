@@ -18,23 +18,27 @@
 
 import _ from 'underscore'
 import $ from 'jquery'
-import I18n from 'i18n!gradebook'
-import htmlEscape from 'str/htmlEscape'
-import numberHelper from '../shared/helpers/numberHelper'
-import round from 'compiled/util/round'
-import CourseGradeCalculator from '../gradebook/CourseGradeCalculator'
-import {scopeToUser} from '../gradebook/EffectiveDueDates'
-import {scoreToGrade} from '../gradebook/GradingSchemeHelper'
-import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
-import StatusPill from '../grading/StatusPill'
-import gradingPeriodSetsApi from 'compiled/api/gradingPeriodSetsApi'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_misc_helpers'  /* replaceTags */
 import 'jquery.instructure_misc_plugins' /* showIf */
 import 'jquery.templateData'
 import 'compiled/jquery/mediaCommentThumbnail'
 import 'media_comments' /* mediaComment */
-
+import axios from 'axios'
+import { camelize } from 'convert_case'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import gradingPeriodSetsApi from 'compiled/api/gradingPeriodSetsApi'
+import htmlEscape from 'str/htmlEscape'
+import I18n from 'i18n!gradebook'
+import round from 'compiled/util/round'
+import numberHelper from '../shared/helpers/numberHelper'
+import CourseGradeCalculator from '../gradebook/CourseGradeCalculator'
+import {scopeToUser} from '../gradebook/EffectiveDueDates'
+import {scoreToGrade} from '../gradebook/GradingSchemeHelper'
+import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
+import StatusPill from '../grading/StatusPill'
+import SelectMenuGroup from '../grade_summary/SelectMenuGroup'
 
 const GradeSummary = {
   getSelectedGradingPeriodId () {
@@ -457,6 +461,47 @@ function bindShowAllDetailsButton ($ariaAnnouncer) {
   })
 }
 
+function displayPageContent() {
+  document.getElementById('grade-summary-content').style.display = ''
+  document.getElementById('student-grades-right-content').style.display = ''
+}
+
+function goToURL(url) {
+  window.location.href = url
+}
+
+function saveAssignmentOrder(order) {
+  return axios.post(ENV.save_assignment_order_url, { assignment_order: order })
+}
+
+function coursesWithGrades() {
+  return ENV.courses_with_grades.map((course) => camelize(course))
+}
+
+function getSelectMenuGroupProps() {
+  return {
+    assignmentSortOptions: ENV.assignment_sort_options,
+    courses: coursesWithGrades(),
+    currentUserID: ENV.current_user.id,
+    displayPageContent,
+    goToURL,
+    gradingPeriods: ENV.grading_periods || [],
+    saveAssignmentOrder,
+    selectedAssignmentSortOrder: ENV.current_assignment_sort_order,
+    selectedCourseID: ENV.context_asset_string.match(/.*_(\d+)$/)[1],
+    selectedGradingPeriodID: ENV.current_grading_period_id,
+    selectedStudentID: ENV.student_id,
+    students: ENV.students
+  }
+}
+
+function renderSelectMenuGroup() {
+  ReactDOM.render(
+    React.createElement(SelectMenuGroup, GradeSummary.getSelectMenuGroupProps()),
+    document.getElementById('GradeSummarySelectMenuGroup')
+  )
+}
+
 function setup () {
   $(document).ready(function () {
     GradeSummary.updateStudentGrades()
@@ -615,6 +660,8 @@ export default _.extend(GradeSummary, {
   calculatePercentGrade,
   finalGradePointsPossibleText,
   formatPercentGrade,
+  getSelectMenuGroupProps,
+  renderSelectMenuGroup,
   updateScoreForAssignment,
   updateStudentGrades
 })

@@ -35,7 +35,8 @@ export default class SelectMenuGroup extends React.Component {
     courses: PropTypes.arrayOf(PropTypes.shape({
       id: PropTypes.string.isRequired,
       nickname: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired
+      url: PropTypes.string.isRequired,
+      gradingPeriodSetId: PropTypes.string
     })).isRequired,
     currentUserID: PropTypes.string.isRequired,
     displayPageContent: PropTypes.func.isRequired,
@@ -119,11 +120,21 @@ export default class SelectMenuGroup extends React.Component {
   }
 
   reloadPage = () => {
-    const baseURL = this.props.courses.find(course => course.id === this.state.courseID).url;
-    const studentURL = this.state.studentID === this.props.currentUserID ? '' : `/${this.state.studentID}`;
-    const params = this.state.gradingPeriodID ? `?grading_period_id=${this.state.gradingPeriodID}` : '';
-    const url = `${baseURL}${studentURL}${params}`;
-    this.props.goToURL(url);
+    const { state: { courseID: currentlySelectedCourseId }, props: { selectedCourseID: initialCourseId } } = this;
+    const initialCourse = this.props.courses.find(course => course.id === initialCourseId)
+    const selectedCourse = this.props.courses.find(course => course.id === currentlySelectedCourseId)
+
+    const baseURL = selectedCourse.url
+    const studentURL = this.state.studentID === this.props.currentUserID ? '' : `/${this.state.studentID}`
+    let params
+
+    if (selectedCourse.gradingPeriodSetId && initialCourse.gradingPeriodSetId === selectedCourse.gradingPeriodSetId) {
+      params = this.state.gradingPeriodID ? `?grading_period_id=${this.state.gradingPeriodID}` : ''
+    } else {
+      params = ''
+    }
+
+    this.props.goToURL(`${baseURL}${studentURL}${params}`)
   };
 
   render () {

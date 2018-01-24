@@ -32,6 +32,18 @@ describe GradeSummaryPresenter do
         course.offer
       end
 
+      it 'preloads the enrollment term for each course' do
+        enrollment_terms = presenter.courses_with_grades.map { |c| c.association(:enrollment_term) }
+
+        expect(enrollment_terms).to all be_loaded
+      end
+
+      it 'preloads the legacy grading period groups for each course' do
+        grading_period_groups = presenter.courses_with_grades.map { |c| c.association(:grading_period_groups) }
+
+        expect(grading_period_groups).to all be_loaded
+      end
+
       it 'includes courses where the user is enrolled' do
         expect(presenter.courses_with_grades).to include(course)
       end
@@ -92,20 +104,37 @@ describe GradeSummaryPresenter do
         expect(presenter.courses_with_grades).to include(course)
       end
 
-      it 'can find courses for an observer across shards' do
-        course_with_student(:active_all => true)
-        @observer = user_factory(:active_all => true)
-        @course.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+      describe 'courses for an observer across shards' do
+        before :each do
+          course_with_student(:active_all => true)
+          @observer = user_factory(:active_all => true)
+          @course.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
 
-        @shard1.activate do
-          account = Account.create!
-          @course2 = account.courses.create!(:workflow_state => "available")
-          enrollment = StudentEnrollment.create!(:course => @course2, :user => @student, :workflow_state => 'active')
-          @course2.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+          @shard1.activate do
+            account = Account.create!
+            @course2 = account.courses.create!(:workflow_state => "available")
+            StudentEnrollment.create!(:course => @course2, :user => @student, :workflow_state => 'active')
+            @course2.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+          end
+
+          @presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
         end
 
-        presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
-        expect(presenter.courses_with_grades).to match_array([@course, @course2])
+        it 'can find courses for an observer across shards' do
+          expect(@presenter.courses_with_grades).to match_array([@course, @course2])
+        end
+
+        it 'preloads the enrollment term for each course' do
+          enrollment_terms = @presenter.courses_with_grades.map { |c| c.association(:enrollment_term) }
+
+          expect(enrollment_terms).to all be_loaded
+        end
+
+        it 'preloads the legacy grading period groups for each course' do
+          grading_period_groups = @presenter.courses_with_grades.map { |c| c.association(:grading_period_groups) }
+
+          expect(grading_period_groups).to all be_loaded
+        end
       end
     end
   end
