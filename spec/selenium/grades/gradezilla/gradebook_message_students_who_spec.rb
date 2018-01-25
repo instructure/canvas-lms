@@ -91,6 +91,7 @@ describe "Gradezilla - message students who" do
   end
 
   it "should have a Have not been graded option" do
+    skip('This spec is flaky, a fix is incoming in GRADE-810')
     # student 2 has submitted assignment 3, but it hasn't been graded
     submission = @third_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 3')
     submission.save!
