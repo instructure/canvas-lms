@@ -32,11 +32,12 @@ describe "Student column header options" do
 
     before(:each) do
       Gradezilla.visit(@course)
+      @students = @course.students.sort_by{|x| x[:id]}
     end
 
     it "sorts student column in A-Z order", priority: "1", test_id: 3253316 do
       Gradezilla.click_student_menu_sort_by('A-Z')
-      expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
+      expect(Gradezilla.fetch_student_names[0]).to eq(@students[0].name)
     end
   end
 
