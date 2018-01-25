@@ -1227,6 +1227,11 @@ CanvasRails::Application.routes.draw do
       put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
     end
 
+    scope(controller: :sis_import_errors_api) do
+      get 'accounts/:account_id/sis_imports/:id/errors', action: :index, as: :sis_batch_import_errors
+      get 'accounts/:account_id/sis_import_errors', action: :index, as: :account_sis_import_errors
+    end
+
     scope(controller: :users) do
       get 'users/self/activity_stream', action: :activity_stream, as: 'user_activity_stream'
       get 'users/activity_stream', action: :activity_stream # deprecated

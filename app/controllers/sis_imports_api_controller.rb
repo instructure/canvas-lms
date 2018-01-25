@@ -178,6 +178,16 @@
 #           "description": "The user that initiated the sis_batch. See the Users API for details.",
 #           "$ref": "User"
 #         },
+#         "errors": {
+#           "description": "Only included for a single import. A list of the first 50 errors for the import. To get all errors use the SisImportErrorsAPI",
+#           "type": "array",
+#           "items": { "$ref": "SisImportError" }
+#         },
+#         "errors_count": {
+#           "description": "Only included for a single import. A count of the errors for the import.",
+#           "type": "integer",
+#           "example": "90"
+#         },
 #         "processing_errors": {
 #           "description": "An array of CSV_file/error_message pairs.",
 #           "example": [["students.csv","Error while importing CSV. Please contact support."]],
@@ -493,7 +503,7 @@ class SisImportsApiController < ApplicationController
   def show
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = @account.sis_batches.find(params[:id])
-      render json: sis_import_json(@batch, @current_user, session)
+      render json: sis_import_json(@batch, @current_user, session, includes: ['errors'])
     end
   end
 
@@ -512,7 +522,7 @@ class SisImportsApiController < ApplicationController
         @batch = @account.sis_batches.not_completed.lock.find(params[:id])
         @batch.abort_batch
       end
-      render json: sis_import_json(@batch.reload, @current_user, session)
+      render json: sis_import_json(@batch.reload, @current_user, session, includes: ['errors'])
     end
   end
 

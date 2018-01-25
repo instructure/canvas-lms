@@ -46,8 +46,7 @@ describe SIS::CSV::GroupImporter do
            "Account with sis id A004 didn't exist for group G004.",
            "No group_id given for a group.",
            "Group Category invalid didn't exist in account A001 for group G006."]
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map(&:last)).to eq(err)
+    expect(importer.errors.map(&:last)).to eq err
     expect(Group.count).to eq before_count + 1
   end
 

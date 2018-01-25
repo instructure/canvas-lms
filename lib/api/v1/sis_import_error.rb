@@ -16,8 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ParallelImporter < ActiveRecord::Base
-  belongs_to :sis_batch
-  has_many :sis_batch_errors, foreign_key: :parallel_importer_id, inverse_of: :parallel_importer
-end
+module Api::V1::SisImportError
+  include Api::V1::Json
 
+  def sis_import_errors_json(errors)
+    errors.map do |e|
+      sis_import_error_json(e)
+    end
+  end
+
+  def sis_import_error_json(error)
+    {
+      sis_import_id: error.sis_batch_id,
+      file: error.file,
+      message: error.message,
+      row: error.row
+    }
+  end
+end

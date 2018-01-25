@@ -45,9 +45,8 @@ describe SIS::CSV::AdminImporter do
     )
     expect(AccountUser.active.count).to eq before_count
 
-    expect(importer.errors).to eq []
-    warnings = importer.warnings.map(&:last)
-    expect(warnings).to eq ["No user_id given for admin",
+    errors = importer.errors.map(&:last)
+    expect(errors).to eq ["No user_id given for admin",
                             "Invalid or unknown user_id 'invalid' for admin",
                             "Invalid account_id given for admin",
                             "Invalid role 'invalid role' for admin",

@@ -38,13 +38,12 @@ describe SIS::CSV::GroupCategoryImporter do
       "Gc004,invalid,Group Cat 4,active",
       "Gc004,invalid,Group Cat 4,active,invalid",
       ",A001,G1,active")
-    expect(importer.errors).to eq []
     err = ["Improper status \"blerged\" for group category Gc002, skipping",
            "No name given for group category Gc003",
            "Account with id \"invalid\" didn't exist for group category Gc004",
            "Only one context is allowed and both course_id and account_id where provided for group category Gc004.",
            "No sis_id given for a group category"]
-    expect(importer.warnings.map(&:last)).to eq(err)
+    expect(importer.errors.map(&:last)).to eq(err)
     expect(GroupCategory.count).to eq before_count + 1
   end
 
@@ -96,8 +95,7 @@ describe SIS::CSV::GroupCategoryImporter do
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
       "Gc002,,Group Cat 1,active")
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map(&:last)).to eq(["A group category did not pass validation (group category: Gc002, error: Name Group Cat 1 is already in use.)"])
+    expect(importer.errors.map(&:last)).to eq(["A group category did not pass validation (group category: Gc002, error: Name Group Cat 1 is already in use.)"])
   end
 
   it "should create in a course." do

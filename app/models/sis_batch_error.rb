@@ -15,9 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+class SisBatchError < ActiveRecord::Base
+  belongs_to :sis_batch, inverse_of: :sis_batch_errors
+  belongs_to :parallel_importer, inverse_of: :sis_batch_errors
+  belongs_to :root_account, class_name: 'Account', inverse_of: :sis_batch_errors
 
-class ParallelImporter < ActiveRecord::Base
-  belongs_to :sis_batch
-  has_many :sis_batch_errors, foreign_key: :parallel_importer_id, inverse_of: :parallel_importer
+  scope :expired_errors, -> {where('created_at < ?', 30.days.ago)}
+  scope :failed, -> {where(failure: true)}
+
+  def self.cleanup_old_errors
+    return unless expired_errors.exists?
+    expired_errors.find_ids_in_ranges(batch_size: 10_000) do |min_id, max_id|
+      self.where(id: min_id..max_id).delete_all
+    end
+  end
+
+  def description
+    (self.file || "") + " - " + (self.message || "")
+  end
+
 end
-

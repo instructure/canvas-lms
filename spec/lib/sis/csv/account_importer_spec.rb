@@ -27,26 +27,17 @@ describe SIS::CSV::AccountImporter do
     importer = process_csv_data(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
-      ",,Humanities 3,active")
-
-    errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings).to eq ["No account_id given for an account"]
-    expect(errors).to eq []
-
-    importer = process_csv_data(
-      "account_id,parent_account_id,name,status",
+      ",,Humanities 3,active",
       "A002,A000,English,active",
       "A003,,English,inactive",
       "A004,,,active")
     expect(Account.count).to eq before_count + 1
 
     errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(errors).to eq []
-    expect(warnings).to eq ["Parent account didn't exist for A002",
-                        "Improper status \"inactive\" for account A003, skipping",
-                        "No name given for account A004, skipping"]
+    expect(errors).to match_array ["No account_id given for an account",
+                                   "Parent account didn't exist for A002",
+                                   "Improper status \"inactive\" for account A003, skipping",
+                                   "No name given for account A004, skipping"]
   end
 
   it 'should create accounts' do
@@ -192,9 +183,7 @@ describe SIS::CSV::AccountImporter do
       "A001,A002,Humanities,active"
     )
     errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(errors).to eq []
-    expect(warnings).to eq ["Setting account A001's parent to A002 would create a loop"]
+    expect(errors).to eq ["Setting account A001's parent to A002 would create a loop"]
   end
 
   it 'should update batch id on unchanging accounts' do

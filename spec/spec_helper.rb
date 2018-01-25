@@ -542,6 +542,7 @@ RSpec.configure do |config|
     opts = lines.extract_options!
     opts.reverse_merge!(allow_printing: false)
     account = opts[:account] || @account || account_model
+    opts[:batch] ||= account.sis_batches.create!
 
     path = generate_csv_file(lines)
     opts[:files] = [path]
@@ -556,7 +557,7 @@ RSpec.configure do |config|
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
     raise "csv errors: #{importer.errors.inspect}" if importer.errors.present?
-    raise "csv warning: #{importer.warnings.inspect}" if importer.warnings.present?
+    importer
   end
 
   def enable_cache(new_cache=:memory_store)

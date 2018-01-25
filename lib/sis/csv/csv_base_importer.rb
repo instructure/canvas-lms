@@ -44,7 +44,7 @@ module SIS
       end
 
       def add_error(csv, message)
-        @sis.add_error(csv, message)
+        @sis.add_error(csv, message, failure: true)
       end
 
       def add_warning(csv, message)

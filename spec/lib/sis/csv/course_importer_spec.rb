@@ -34,9 +34,8 @@ describe SIS::CSV::CourseImporter do
     )
     expect(Course.count).to eq before_count + 1
 
-    expect(importer.errors).to eq []
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings).to eq ["No course_id given for a course",
+    errors = importer.errors.map { |r| r.last }
+    expect(errors).to eq ["No course_id given for a course",
                         "Improper status \"inactive\" for course C003",
                         "No short_name given for course C004",
                         "No long_name given for course C005"]
@@ -607,7 +606,7 @@ describe SIS::CSV::CourseImporter do
         "course_id,short_name,long_name,account_id,term_id,status,course_format",
         "test_1,TC 101,Test Course 101,,,active,FAT32"
     )
-    expect(importer.warnings.map(&:last)).to include "Invalid course_format \"FAT32\" for course test_1"
+    expect(importer.errors.map(&:last)).to include "Invalid course_format \"FAT32\" for course test_1"
   end
 
   it 'should allow unpublished to be passed for active' do
@@ -632,7 +631,7 @@ describe SIS::CSV::CourseImporter do
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{mc2.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
       )
-      expect(importer.warnings.map(&:last)).to include("Cannot associate course \"#{mc2.sis_source_id}\" - is a blueprint course")
+      expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{mc2.sis_source_id}\" - is a blueprint course")
     end
 
     it "should give a warning when trying to associate an already associated course" do
@@ -644,16 +643,16 @@ describe SIS::CSV::CourseImporter do
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
       )
-      expect(importer.warnings.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is associated to another blueprint course")
+      expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is associated to another blueprint course")
     end
 
     it "shouldn't fail if a course is already associated to the target" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       @template.add_child_course!(ac)
-      process_csv_data_cleanly(
+      expect {process_csv_data_cleanly(
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{ac.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
-      )
+      )}.not_to raise_error
     end
 
     it "should allow destroying" do

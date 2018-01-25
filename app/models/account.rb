@@ -73,6 +73,7 @@ class Account < ActiveRecord::Base
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
+  has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
