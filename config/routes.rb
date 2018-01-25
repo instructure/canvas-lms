@@ -965,6 +965,10 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/tabs/:tab_id", action: :update
     end
 
+    scope(controller: :scopes_api) do
+      get "accounts/:account_id/scopes", action: :index
+    end
+
     scope(controller: :sections) do
       get 'courses/:course_id/sections', action: :index, as: 'course_sections'
       get 'courses/:course_id/sections/:id', action: :show, as: 'course_section'

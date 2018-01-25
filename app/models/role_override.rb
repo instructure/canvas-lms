@@ -423,7 +423,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :acts_as_access_token_scope => true
       },
       :view_group_pages => {
         :label => lambda { t('permissions.view_group_pages', "View the group pages of all student groups") },
@@ -460,7 +461,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :acts_as_access_token_scope => true
       },
       :manage_assignments => {
         :label => lambda { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
@@ -478,7 +480,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :acts_as_access_token_scope => true
       },
       :undelete_courses => {
         :label => lambda { t('permissions.undelete_courses', "Undelete courses") },
@@ -800,6 +803,8 @@ class RoleOverride < ActiveRecord::Base
       }
     })
 
+  ACCESS_TOKEN_SCOPE_PREFIX = 'https://api.instructure.com/auth/canvas'.freeze
+
   def self.permissions
     Permissions.retrieve
   end
@@ -818,6 +823,18 @@ class RoleOverride < ActiveRecord::Base
     permissions.reject!{ |k, p| p[:enabled_for_plugin] &&
       !((plugin = Canvas::Plugin.find(p[:enabled_for_plugin])) && plugin.enabled?)}
     permissions
+  end
+
+  def self.manageable_access_token_scopes(context)
+    permissions = manageable_permissions(context).dup
+    permissions.select! { |_, p| p[:acts_as_access_token_scope].present? }
+
+    permissions.map do |k, p|
+      {
+        name: "#{ACCESS_TOKEN_SCOPE_PREFIX}.#{k}",
+        label: p[:label].call
+      }
+    end
   end
 
   def self.css_class_for(context, permission, role, role_context=nil)
