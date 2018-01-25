@@ -20,8 +20,8 @@ require 'spec_helper'
 
 describe Score do
   before(:once) do
-    grading_periods
-    test_course.assignment_groups.create!(name: 'Assignments')
+    @grading_periods = grading_periods
+    @assignment_group = test_course.assignment_groups.create!(name: 'Assignments')
   end
 
   let(:test_course) { Course.create! }
@@ -36,34 +36,50 @@ describe Score do
   end
 
   let(:grading_period_score_params) do
-    params.merge(grading_period_id: GradingPeriod.first.id)
+    params.merge(grading_period_id: @grading_periods.first.id)
   end
   let(:assignment_group_score_params) do
-    params.merge(assignment_group_id: AssignmentGroup.first.id)
+    params.merge(assignment_group_id: @assignment_group.id)
   end
   let(:grading_period_score) { student.scores.create!(grading_period_score_params) }
   let(:assignment_group_score) { student.scores.create!(assignment_group_score_params) }
 
   subject_once(:score) { student.scores.create!(params) }
 
+  it { is_expected.to belong_to(:enrollment) }
+  # shoulda-matchers will have an `optional` method in version 4. As a workaround,
+  # I've used the validates_presence_of matcher on the line following the belong_to matcher
+  it { is_expected.to belong_to(:grading_period) }
+  it { is_expected.not_to validate_presence_of(:grading_period) }
+  it { is_expected.to belong_to(:assignment_group) }
+  it { is_expected.not_to validate_presence_of(:assignment_group) }
+  it { is_expected.to have_one(:score_metadata) }
+  it { is_expected.to have_one(:course).through(:enrollment) }
+
   it_behaves_like "soft deletion" do
     subject { student.scores }
 
     let(:creation_arguments) do
       [
-        params.merge(grading_period: GradingPeriod.first),
-        params.merge(grading_period: GradingPeriod.last)
+        params.merge(grading_period: @grading_periods.first),
+        params.merge(grading_period: @grading_periods.last)
       ]
     end
   end
 
   describe 'validations' do
     it { is_expected.to be_valid }
+    it { is_expected.to validate_numericality_of(:current_score).allow_nil }
+    it { is_expected.to validate_numericality_of(:unposted_current_score).allow_nil }
+    it { is_expected.to validate_numericality_of(:final_score).allow_nil }
+    it { is_expected.to validate_numericality_of(:unposted_final_score).allow_nil }
 
     it 'is invalid without an enrollment' do
       score.enrollment = nil
       expect(score).to be_invalid
     end
+
+    it { is_expected.to validate_presence_of(:enrollment) }
 
     it 'is invalid without unique enrollment for course' do
       student.scores.create!(params)
@@ -80,29 +96,7 @@ describe Score do
       expect { student.scores.create!(assignment_group_score_params) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
-    shared_examples "score attribute" do
-      it 'is valid as nil' do
-        score.write_attribute(attribute, nil)
-        expect(score).to be_valid
-      end
-
-      it 'is valid with a numeric value' do
-        score.write_attribute(attribute, 43.2)
-        expect(score).to be_valid
-      end
-
-      it 'is invalid with a non-numeric value' do
-        score.write_attribute(attribute, 'dora')
-        expect(score).to be_invalid
-      end
-    end
-
-    include_examples('score attribute') { let(:attribute) { :current_score } }
-    include_examples('score attribute') { let(:attribute) { :final_score } }
-
     context("scorable associations") do
-      before(:once) { grading_periods }
-
       it 'is valid with course_score true and no scorable associations' do
         expect(student.scores.create!(course_score: true, **params)).to be_valid
       end
@@ -130,16 +124,57 @@ describe Score do
 
       it 'is invalid with multiple scorable associations' do
         expect do
-          student.scores.create!(grading_period_id: GradingPeriod.first.id, **assignment_group_score_params)
+          student.scores.create!(grading_period_id: @grading_periods.first.id, **assignment_group_score_params)
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
 
   describe '#destroy' do
-    it 'destroys its metadata too' do
-      score.create_score_metadata!(calculation_details: '{}')
-      expect{score.destroy}.to change{ScoreMetadata.count}.by(-1)
+    context 'with score metadata' do
+      let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
+
+      describe 'score_metadata association' do
+        it 'also destroys score metadata' do
+          metadata.score.destroy
+          expect(metadata).to be_deleted
+        end
+      end
+    end
+  end
+
+  describe '#destroy_permanently' do
+    context 'with score metadata' do
+      let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
+
+      describe 'score_metadata association' do
+        it 'also permanently destroys score metadata' do
+          metadata.score.destroy_permanently!
+          expect(metadata).to be_destroyed
+        end
+      end
+    end
+  end
+
+  describe '#undestroy' do
+    context 'without score metadata' do
+      it 'is active' do
+        score.destroy
+        score.undestroy
+        expect(score).to be_active
+      end
+    end
+
+    context 'with score metadata' do
+      let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
+
+      describe 'score_metadata association' do
+        it 'is active' do
+          metadata.score.destroy
+          metadata.score.undestroy
+          expect(metadata).to be_active
+        end
+      end
     end
   end
 

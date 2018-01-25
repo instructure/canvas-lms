@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,13 +14,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class ScoreMetadata < ActiveRecord::Base
-  include Canvas::SoftDeletable
+class AddWorkflowStateToScoreMetadata < ActiveRecord::Migration[5.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  belongs_to :score
+  def change
+    add_column :score_metadata, :workflow_state, :string
 
-  validates :score, :calculation_details, presence: true
-  validates :score_id, uniqueness: true
+    reversible do |dir|
+      dir.up do
+        change_column_default :score_metadata, :workflow_state, :active
+        add_index :score_metadata, :workflow_state, algorithm: :concurrently
+      end
+    end
+  end
 end
