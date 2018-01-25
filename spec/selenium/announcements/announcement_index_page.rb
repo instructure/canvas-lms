@@ -105,6 +105,18 @@ class AnnouncementIndex
       announcement_unread_pill(title).text
     end
 
+    def announcement_menu(title)
+      f('.ic-item-row__manage-menu button', announcement(title))
+    end
+
+    def delete_menu
+      f('#delete-announcement-menu-option')
+    end
+
+    def lock_menu
+      f('#lock-announcement-menu-option')
+    end
+
     def announcement_locked_icon(title)
       # f('.lock', announcement(title))
     end
@@ -131,6 +143,16 @@ class AnnouncementIndex
 
     def click_delete
       delete_button.click
+    end
+
+    def click_delete_menu(title)
+      announcement_menu(title).click
+      delete_menu.click
+    end
+
+    def click_lock_menu(title)
+      announcement_menu(title).click
+      lock_menu.click
     end
 
     def click_confirm_delete

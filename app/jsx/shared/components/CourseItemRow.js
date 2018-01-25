@@ -18,13 +18,16 @@
 
 import I18n from 'i18n!shared_components'
 import React, { Component } from 'react'
-import { bool, node, string, func, shape } from 'prop-types'
+import { bool, node, string, func, shape, arrayOf } from 'prop-types'
 import cx from 'classnames'
 
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import Avatar from '@instructure/ui-core/lib/components/Avatar'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-core/lib/components/Text'
+import Button from '@instructure/ui-core/lib/components/Button'
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu'
+import IconMore from 'instructure-icons/lib/Line/IconMoreLine'
 
 import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
 import LockIconView from 'compiled/views/LockIconView'
@@ -52,6 +55,9 @@ export default class CourseItemRow extends Component {
     showAvatar: bool,
     onSelectedChanged: func,
     icon: node,
+    showManageMenu: bool,
+    manageMenuOptions: arrayOf(node),
+    onManageMenuSelect: func,
   }
 
   static defaultProps = {
@@ -59,7 +65,7 @@ export default class CourseItemRow extends Component {
     metaContent: null,
     masterCourse: null,
     author: {
-      id: '4',
+      id: null,
       display_name: '',
       html_url: '',
       avatar_image_url: null,
@@ -74,6 +80,9 @@ export default class CourseItemRow extends Component {
     icon: null,
     showAvatar: false,
     onSelectedChanged () {},
+    showManageMenu: false,
+    manageMenuOptions: [],
+    onManageMenuSelect () {},
   }
 
   state = {
@@ -159,6 +168,17 @@ export default class CourseItemRow extends Component {
           <div className="ic-item-row__meta-actions">
             {this.props.actionsContent}
             <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
+            {this.props.showManageMenu && this.props.manageMenuOptions.length > 0 &&
+              (<span className="ic-item-row__manage-menu">
+                <PopoverMenu
+                  onSelect={this.props.onManageMenuSelect}
+                  trigger={
+                    <Button variant="icon" size="small">
+                      <IconMore />
+                      <ScreenReaderContent>{I18n.t('Manage options for %{name}', { name: this.props.title })}</ScreenReaderContent>
+                    </Button>
+                  }>{this.props.manageMenuOptions}</PopoverMenu>
+              </span>)}
           </div>
           <div className="ic-item-row__meta-content">
             {this.props.metaContent}

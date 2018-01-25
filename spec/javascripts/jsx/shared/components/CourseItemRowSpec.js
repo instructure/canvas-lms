@@ -18,14 +18,14 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import _ from 'lodash'
+import merge from 'lodash/merge'
 import CourseItemRow from 'jsx/shared/components/CourseItemRow'
 import AnnouncementModel from 'compiled/models/Announcement'
 import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 
 QUnit.module('CourseItemRow component')
 
-const makeProps = (props = {}) => _.merge({
+const makeProps = (props = {}) => merge({
   children: <p>Hello World</p>,
   actionsContent: null,
   metaContent: null,
@@ -192,4 +192,22 @@ test('calls onSelectChanged when checkbox is toggled', () => {
   const instance = tree.instance()
   instance.onSelectChanged({ target: { checked: true } })
   ok(onSelectedChanged.calledWithMatch({ id: '5', selected: true }))
+})
+
+test('renders no manage menu when showManageMenu is false', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: false })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders no manage menu when showManageMenu is true but manageMenuOptions is empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders manage menu when showManageMenu is true and manageMenuOptions is not empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true, manageMenuOptions: ['one', 'two'] })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  ok(menu.exists())
 })

@@ -90,8 +90,7 @@ describe "announcements index v2" do
     end
 
     it "an announcement can be locked for commenting" do
-      AnnouncementIndex.check_announcement(announcement1_title)
-      AnnouncementIndex.toggle_lock
+      AnnouncementIndex.click_lock_menu(announcement1_title)
       expect(Announcement.where(title: announcement1_title).first.locked).to be true
     end
 
@@ -104,8 +103,7 @@ describe "announcements index v2" do
     end
 
     it 'an announcement can be deleted' do
-      AnnouncementIndex.check_announcement(announcement1_title)
-      AnnouncementIndex.click_delete
+      AnnouncementIndex.click_delete_menu(announcement1_title)
       AnnouncementIndex.click_confirm_delete
       expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement1_title))
       expect(Announcement.where(title: announcement1_title).first.workflow_state).to eq 'deleted'

@@ -18,12 +18,12 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import _ from 'lodash'
+import merge from 'lodash/merge'
 import AnnouncementRow from 'jsx/shared/components/AnnouncementRow'
 
 QUnit.module('AnnouncementRow component')
 
-const makeProps = (props = {}) => _.merge({
+const makeProps = (props = {}) => merge({
   announcement: {
     id: '1',
     position: 1,
@@ -152,4 +152,16 @@ test('removes non-text content from announcement message', () => {
   equal(node.childNodes[0].nodeType, 3) // nodeType === 3 is text node type
   ok(node.textContent.includes('Hello World!'))
   ok(node.textContent.includes('foo bar'))
+})
+
+test('does not render manage menu if canManage is false', () => {
+  const tree = mount(<AnnouncementRow {...makeProps({ canManage: false })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders manage menu if canManage is true', () => {
+  const tree = mount(<AnnouncementRow {...makeProps({ canManage: true })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  ok(menu.exists())
 })

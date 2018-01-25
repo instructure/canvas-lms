@@ -25,8 +25,11 @@ import 'jquery.instructure_date_and_time'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import { MenuItem } from '@instructure/ui-core/lib/components/Menu'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
+import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
 
 import AnnouncementModel from 'compiled/models/Announcement'
 import SectionsTooltip from '../SectionsTooltip'
@@ -51,7 +54,7 @@ function makeTimestamp ({ delayed_post_at, posted_at }) {
   : { title: I18n.t('Posted on:'), date: posted_at }
 }
 
-export default function AnnouncementRow ({ announcement, canManage, masterCourseData, rowRef, onSelectedChanged }) {
+export default function AnnouncementRow ({ announcement, canManage, masterCourseData, rowRef, onSelectedChanged, onManageMenuSelect }) {
   const timestamp = makeTimestamp(announcement)
   const readCount = announcement.discussion_subentry_count > 0
     ? (
@@ -100,6 +103,30 @@ export default function AnnouncementRow ({ announcement, canManage, masterCourse
         </div>
       }
       actionsContent={readCount}
+      showManageMenu={canManage}
+      onManageMenuSelect={onManageMenuSelect}
+      manageMenuOptions={canManage && [
+        <MenuItem
+          key="delete"
+          value={{ action: 'delete', id: announcement.id }}
+          id="delete-announcement-menu-option"
+        >
+          <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+          <ScreenReaderContent>{I18n.t('Delete announcement %{title}', { title: announcement.title })}</ScreenReaderContent>
+        </MenuItem>,
+        <MenuItem
+          key="lock"
+          value={{ action: 'lock', id: announcement.id, lock: !announcement.locked }}
+          id="lock-announcement-menu-option"
+        >
+          <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
+          <ScreenReaderContent>
+          { announcement.locked
+            ? I18n.t('Allow replies for %{title}', { title: announcement.title })
+            : I18n.t('Disallow replies for %{title}', { title: announcement.title })}
+          </ScreenReaderContent>
+        </MenuItem>,
+      ] || null}
     >
       <Heading level="h3">{announcement.title}</Heading>
       <SectionsTooltip
@@ -120,6 +147,7 @@ AnnouncementRow.propTypes = {
   masterCourseData: masterCourseDataShape,
   rowRef: func,
   onSelectedChanged: func,
+  onManageMenuSelect: func,
 }
 
 AnnouncementRow.defaultProps = {
@@ -127,4 +155,5 @@ AnnouncementRow.defaultProps = {
   masterCourseData: null,
   rowRef () {},
   onSelectedChanged () {},
+  onManageMenuSelect () {},
 }

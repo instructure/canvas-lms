@@ -21,10 +21,8 @@ import React, { Component } from 'react'
 import { string, func, bool, number } from 'prop-types'
 import { connect } from 'react-redux'
 import { debounce } from 'lodash'
-
 import { bindActionCreators } from 'redux'
 
-import Heading from '@instructure/ui-core/lib/components/Heading'
 import Button from '@instructure/ui-core/lib/components/Button'
 import TextInput from '@instructure/ui-core/lib/components/TextInput'
 import Select from '@instructure/ui-core/lib/components/Select'
@@ -32,16 +30,16 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid
 import Container from '@instructure/ui-core/lib/components/Container'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-core/lib/components/Modal'
 import IconPlus from 'instructure-icons/lib/Line/IconPlusLine'
 import IconSearchLine from 'instructure-icons/lib/Line/IconSearchLine'
 import IconTrash from 'instructure-icons/lib/Line/IconTrashLine'
 import IconReply from 'instructure-icons/lib/Line/IconReplyLine'
 
 import select from '../../shared/select'
-import ExternalFeedsTray from './ExternalFeedsTray'
 import propTypes from '../propTypes'
 import actions from '../actions'
+import ExternalFeedsTray from './ExternalFeedsTray'
+import {showConfirmDelete} from './ConfirmDeleteModal'
 
 // Delay the search so as not to overzealously read out the number
 // of search results to the user
@@ -58,9 +56,10 @@ export default class IndexHeader extends Component {
     permissions: propTypes.permissions.isRequired,
     atomFeedUrl: string,
     searchAnnouncements: func.isRequired,
-    lockAnnouncements: func.isRequired,
-    deleteAnnouncements: func.isRequired,
+    toggleSelectedAnnouncementsLock: func.isRequired,
+    deleteSelectedAnnouncements: func.isRequired,
     applicationElement: func,
+    searchInputRef: func,
   }
 
   static defaultProps = {
@@ -68,14 +67,7 @@ export default class IndexHeader extends Component {
     atomFeedUrl: null,
     selectedCount: 0,
     applicationElement: () => document.getElementById('application'),
-  }
-
-  state = {
-    showConfirmDelete: false,
-  }
-
-  componentWillUnmount () {
-    if (this.confirmDeleteModal) this.confirmDeleteModal.setState({ open: false })
+    searchInputRef: null,
   }
 
   onSearch = debounce(() => {
@@ -86,63 +78,26 @@ export default class IndexHeader extends Component {
     trailing: true,
   })
 
-  showDeleteConfirm = () => {
-    this.setState({ showConfirmDelete: true })
+  onDelete = () => {
+    showConfirmDelete({
+      modalRef: (modal) => { this.deleteModal = modal },
+      applicationElement: this.props.applicationElement,
+      selectedCount: this.props.selectedCount,
+      onConfirm: () => this.props.deleteSelectedAnnouncements(),
+      onHide: () => {
+        const { deleteBtn, searchInput } = this
+        if (deleteBtn && deleteBtn._button && !deleteBtn._button.disabled) {
+          deleteBtn.focus()
+        } else if (searchInput) {
+          searchInput.focus()
+        }
+      },
+    })
   }
 
-  hideDeleteConfirm = () => {
-    const { deleteBtn, searchInput } = this
-    this.setState({ showConfirmDelete: false },
-      () => {
-        setTimeout(() => {
-          if (deleteBtn && deleteBtn._button && !deleteBtn._button.disabled) {
-            deleteBtn.focus()
-          } else if (searchInput) {
-            searchInput.focus()
-          }
-        })
-      })
-  }
-
-  confirmDelete = () => {
-    this.props.deleteAnnouncements()
-    this.hideDeleteConfirm()
-  }
-
-  renderConfirmDelete () {
-    return (
-      <Modal
-        open={this.state.showConfirmDelete}
-        onDismiss={this.hideDeleteConfirm}
-        size="small"
-        label={I18n.t('Confirm Delete Announcements')}
-        shouldCloseOnOverlayClick
-        closeButtonLabel={I18n.t('Close')}
-        applicationElement={this.props.applicationElement}
-        ref={(c) => { this.confirmDeleteModal = c }}
-      >
-        <ModalHeader>
-          <Heading>{I18n.t('Confirm Delete')}</Heading>
-        </ModalHeader>
-        <ModalBody>
-          {I18n.t({
-            one: 'You are about to delete 1 announcement. Are you sure?',
-            other: 'You are about to delete %{count} announcements. Are you sure?',
-          }, { count: this.props.selectedCount })}
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            ref={(c) => {this.cancelDeleteBtn = c}}
-            onClick={this.hideDeleteConfirm}
-          >{I18n.t('Cancel')}</Button>&nbsp;
-          <Button
-            ref={(c) => {this.confirmDeleteBtn = c}}
-            id="confirm_delete_announcements"
-            onClick={this.confirmDelete}
-            variant="danger">{I18n.t('Delete')}</Button>
-        </ModalFooter>
-      </Modal>
-    )
+  searchInputRef = (input) => {
+    this.searchInput = input
+    if (this.props.searchInputRef) this.props.searchInputRef(input)
   }
 
   render () {
@@ -167,7 +122,7 @@ export default class IndexHeader extends Component {
                   label={<ScreenReaderContent>{I18n.t('Search announcements by title')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search')}
                   icon={() => <IconSearchLine />}
-                  ref={(c) => { this.searchInput = c }}
+                  ref={this.searchInputRef}
                   onChange={this.onSearch}
                   name="announcements_search"
                 />
@@ -179,15 +134,16 @@ export default class IndexHeader extends Component {
                     size="medium"
                     margin="0 small 0 0"
                     id="lock_announcements"
-                    onClick={this.props.lockAnnouncements}
-                  ><IconReply /><ScreenReaderContent>{I18n.t('Lock Selected Announcements')}</ScreenReaderContent></Button>}
+                    onClick={this.props.toggleSelectedAnnouncementsLock}
+                    ><IconReply /><ScreenReaderContent>{I18n.t('Lock Selected Announcements')}</ScreenReaderContent></Button>}
+
                 {this.props.permissions.manage_content &&
                   <Button
                     disabled={this.props.isBusy || this.props.selectedCount === 0}
                     size="medium"
                     margin="0 small 0 0"
                     id="delete_announcements"
-                    onClick={this.showDeleteConfirm}
+                    onClick={this.onDelete}
                     ref={(c) => { this.deleteBtn = c }}
                   ><IconTrash /><ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent></Button>}
                 {this.props.permissions.create &&
@@ -205,7 +161,6 @@ export default class IndexHeader extends Component {
           </Grid>
         </Container>
         <ExternalFeedsTray atomFeedUrl={this.props.atomFeedUrl} permissions={this.props.permissions} />
-        {this.renderConfirmDelete()}
       </Container>
     )
   }
@@ -215,6 +170,6 @@ const connectState = state => Object.assign({
   isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
   selectedCount: state.selectedAnnouncements.length,
 }, select(state, ['courseId', 'permissions', 'atomFeedUrl']))
-const selectedActions = ['searchAnnouncements', 'lockAnnouncements', 'deleteAnnouncements']
+const selectedActions = ['searchAnnouncements', 'toggleSelectedAnnouncementsLock', 'deleteSelectedAnnouncements']
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

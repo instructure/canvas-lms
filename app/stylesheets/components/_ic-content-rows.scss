@@ -98,7 +98,7 @@
   text-align: right;
 
   .ic-item-row__meta-actions {
-    height: 20px;
+    height: 23px;
   }
 
   .ic-item-row__meta-content {
@@ -120,10 +120,6 @@
   }
 
   .ic-item-row__meta-actions {
-    .ic-unread-badge {
-      transform: translateY(-2px);
-    }
-
     .ic-item-row__master-course-lock {
       vertical-align: text-bottom;
       margin-left: 10px;
@@ -136,4 +132,10 @@
       font-size: 1.2rem;
     }
   }
+}
+
+.ic-item-row__manage-menu {
+  display: inline-block;
+  margin: 0 -10px;
+  transform: translateY(-5px);
 }

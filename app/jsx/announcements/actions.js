@@ -119,25 +119,13 @@ actions.deleteExternalFeed = function ({ feedId }) {
   }
 }
 
-actions.lockAnnouncements = () => (dispatch, getState) => {
-  const state = getState()
-  const { announcements } = state
-  const { items } = announcements.pages[announcements.currentPage]
-
-  const selectedItems = items.filter(item =>
-    state.selectedAnnouncements.includes(item.id))
-
-  // if all the selected items are locked, we want to unlock
-  // if any of the selected items are unlocked, we lock everything
-  const hasUnlockedItems = selectedItems
-    .reduce((hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked, false)
-
+actions.toggleAnnouncementsLock = (announcements, isLocking = true) => (dispatch, getState) => {
   dispatch(actions.lockAnnouncementsStart())
-  apiClient.lockAnnouncements(state, state.selectedAnnouncements, hasUnlockedItems)
+  apiClient.lockAnnouncements(getState(), [].concat(announcements), isLocking)
     .then(res => {
       if (res.successes.length) {
-        dispatch(actions.lockAnnouncementsSuccess({ res, locked: hasUnlockedItems }))
-        if (hasUnlockedItems) {
+        dispatch(actions.lockAnnouncementsSuccess({ res, locked: isLocking }))
+        if (isLocking) {
           dispatch(notificationActions.notifyInfo({ message: I18n.t('Announcements locked successfully') }))
         } else {
           dispatch(notificationActions.notifyInfo({ message: I18n.t('Announcements unlocked successfully') }))
@@ -154,10 +142,25 @@ actions.lockAnnouncements = () => (dispatch, getState) => {
     })
 }
 
-actions.deleteAnnouncements = () => (dispatch, getState) => {
+actions.toggleSelectedAnnouncementsLock = () => (dispatch, getState) => {
   const state = getState()
+  const { announcements } = state
+  const { items } = announcements.pages[announcements.currentPage]
+
+  const selectedItems = items.filter(item =>
+    state.selectedAnnouncements.includes(item.id))
+
+  // if all the selected items are locked, we want to unlock
+  // if any of the selected items are unlocked, we lock everything
+  const hasUnlockedItems = selectedItems
+    .reduce((hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked, false)
+
+  actions.toggleAnnouncementsLock(state.selectedAnnouncements, hasUnlockedItems)(dispatch, getState)
+}
+
+actions.deleteAnnouncements = (announcements) => (dispatch, getState) => {
   dispatch(actions.deleteAnnouncementsStart())
-  apiClient.deleteAnnouncements(state, state.selectedAnnouncements)
+  apiClient.deleteAnnouncements(getState(), [].concat(announcements))
     .then(res => {
       if (res.successes.length) {
         const pageState = getState().announcements
@@ -183,6 +186,11 @@ actions.deleteAnnouncements = () => (dispatch, getState) => {
         message: I18n.t('An error occurred while deleting announcements.'),
       }))
     })
+}
+
+actions.deleteSelectedAnnouncements = () => (dispatch, getState) => {
+  const state = getState()
+  actions.deleteAnnouncements(state.selectedAnnouncements)(dispatch, getState)
 }
 
 actions.addExternalFeed = function (payload) {

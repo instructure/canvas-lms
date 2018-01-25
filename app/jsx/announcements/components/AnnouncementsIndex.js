@@ -32,6 +32,7 @@ import Pagination, {PaginationButton} from '@instructure/ui-core/lib/components/
 import AnnouncementRow from '../../shared/components/AnnouncementRow'
 import {ConnectedIndexHeader} from './IndexHeader'
 import AnnouncementEmptyState from './AnnouncementEmptyState'
+import {showConfirmDelete} from './ConfirmDeleteModal'
 
 import select from '../../shared/select'
 import {selectPaginationState} from '../../shared/reduxPagination'
@@ -50,16 +51,41 @@ export default class AnnouncementsIndex extends Component {
     getAnnouncements: func.isRequired,
     setAnnouncementSelection: func.isRequired,
     permissions: propTypes.permissions.isRequired,
-    masterCourseData: masterCourseDataShape
+    masterCourseData: masterCourseDataShape,
+    deleteAnnouncements: func.isRequired,
+    toggleAnnouncementsLock: func.isRequired,
+    applicationElement: func,
   }
 
   static defaultProps = {
-    masterCourseData: null
+    masterCourseData: null,
+    applicationElement: () => document.getElementById('application'),
   }
 
   componentDidMount() {
     if (!this.props.hasLoadedAnnouncements) {
       this.props.getAnnouncements()
+    }
+  }
+
+  onManageAnnouncement = (e, { action, id, lock }) => {
+    switch (action) {
+      case 'delete':
+        showConfirmDelete({
+          selectedCount: 1,
+          modalRef: (modal) => { this.deleteModal = modal },
+          applicationElement: this.props.applicationElement,
+          onConfirm: () => {
+            this.props.deleteAnnouncements(id)
+            if (this.searchInput) this.searchInput.focus()
+          },
+        })
+        break;
+      case 'lock':
+        this.props.toggleAnnouncementsLock(id, lock)
+        break;
+      default:
+        break;
     }
   }
 
@@ -110,6 +136,7 @@ export default class AnnouncementsIndex extends Component {
               canManage={this.props.permissions.manage_content}
               masterCourseData={this.props.masterCourseData}
               onSelectedChanged={this.props.setAnnouncementSelection}
+              onManageMenuSelect={this.onManageAnnouncement}
             />
           ))}
         </Container>
@@ -153,7 +180,7 @@ export default class AnnouncementsIndex extends Component {
         <ScreenReaderContent>
           <Heading level="h1">{I18n.t('Announcements')}</Heading>
         </ScreenReaderContent>
-        <ConnectedIndexHeader />
+        <ConnectedIndexHeader searchInputRef={(c) => { this.searchInput = c }} />
         {this.renderSpinner(this.props.isLoadingAnnouncements, I18n.t('Loading Announcements'))}
         {this.renderEmptyAnnouncements()}
         {this.renderAnnouncements()}
@@ -172,5 +199,7 @@ const connectState = state =>
     select(state, ['permissions', 'masterCourseData'])
   )
 const connectActions = dispatch =>
-  bindActionCreators(select(actions, ['getAnnouncements', 'setAnnouncementSelection']), dispatch)
+  bindActionCreators(select(actions,
+    ['getAnnouncements', 'setAnnouncementSelection', 'deleteAnnouncements', 'toggleAnnouncementsLock']
+  ), dispatch)
 export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)
