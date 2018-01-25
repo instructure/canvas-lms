@@ -178,7 +178,7 @@ export default class IndexHeader extends Component {
                     margin="0 small 0 0"
                     id="lock_announcements"
                     onClick={this.props.lockAnnouncements}
-                  ><IconReply title={I18n.t('Lock Selected Announcements')} /></Button>}
+                  ><IconReply /><ScreenReaderContent>{I18n.t('Lock Selected Announcements')}</ScreenReaderContent></Button>}
                 {this.props.permissions.manage_content &&
                   <Button
                     disabled={this.props.isBusy || this.props.selectedCount === 0}
@@ -187,7 +187,7 @@ export default class IndexHeader extends Component {
                     id="delete_announcements"
                     onClick={this.showDeleteConfirm}
                     ref={(c) => { this.deleteBtn = c }}
-                  ><IconTrash title={I18n.t('Delete Selected Announcements')} /></Button>}
+                  ><IconTrash /><ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent></Button>}
                 {this.props.permissions.create &&
                   <Button
                     href={`/courses/${this.props.courseId}/discussion_topics/new?is_announcement=true`}
