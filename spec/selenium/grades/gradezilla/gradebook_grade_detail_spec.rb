@@ -52,6 +52,12 @@ describe 'Grade Detail Tray:' do
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('none')).to be true
     end
 
+    it 'excused submission has excused-radiobutton selected', priority: "1", test_id: 3337204 do
+      Gradezilla::Cells.open_tray(@course.students.first, @a4)
+
+      expect(Gradezilla::GradeDetailTray.is_radio_button_selected('excused')).to be true
+    end
+
     it 'updates status when excused-option is selected', priority: "1", test_id: 3337207 do
       Gradezilla::Cells.open_tray(@course.students.first, @a2)
       Gradezilla::GradeDetailTray.change_status_to('excused')
