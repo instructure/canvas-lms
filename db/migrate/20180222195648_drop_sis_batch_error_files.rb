@@ -15,18 +15,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CleanupSisBatchErrorFileAttachments < ActiveRecord::Migration[5.0]
+class DropSisBatchErrorFiles < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
-  def up
-    remove_foreign_key_if_exists :sis_batch_error_files, column: :sis_batch_id
-    remove_foreign_key_if_exists :sis_batch_error_files, column: :attachment_id
-    DataFixup::RemoveSisBatchErrorFileAttachments.send_later_if_production_enqueue_args(
-      :run,
-      priority: Delayed::LOW_PRIORITY,
-      n_strand: 'long_datafixups'
-    )
+  def change
+    drop_table :sis_batch_error_files if table_exists? :sis_batch_error_files
   end
-
-  def down; end
 end
