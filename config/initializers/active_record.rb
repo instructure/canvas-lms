@@ -1259,11 +1259,8 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   end
 
   def remove_foreign_key_if_exists(table, options = {})
-    begin
-      remove_foreign_key(table, options)
-    rescue ActiveRecord::StatementInvalid => e
-      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist/
-    end
+    return unless foreign_key_exists?(table, options)
+    remove_foreign_key(table, options)
   end
 end
 

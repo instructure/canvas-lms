@@ -984,14 +984,8 @@ class CoursesController < ApplicationController
       }), [params[:id]])
 
       user_json_preloads(users, includes.include?('email'))
-      if includes.include?('enrollments')
-        # not_ended_enrollments for enrollment_json
-        # enrollments course for has_grade_permissions?
-        ActiveRecord::Associations::Preloader.new.preload(users, :not_ended_enrollments, Enrollment.where(:course_id => @context))
-        ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course})
-      end
       user = users.first or raise ActiveRecord::RecordNotFound
-      enrollments = user.not_ended_enrollments.preload(:root_account, :sis_pseudonym) if includes.include?('enrollments')
+      enrollments = user.not_ended_enrollments.where(:course_id => @context).preload(:course, :root_account, :sis_pseudonym) if includes.include?('enrollments')
       render :json => user_json(user, @current_user, session, includes, @context, enrollments)
     end
   end
