@@ -206,11 +206,8 @@ describe "Gradezilla" do
       # chrome fails to find the download submissions link because it does not fit normal screen
       make_full_screen
 
-      # And I click the dropdown menu on the assignment
-      Gradezilla.click_assignment_header_menu(@first_assignment.id)
-
       # And I click the download submissions button
-      Gradezilla.click_assignment_header_menu_element("download submissions")
+      Gradezilla.click_assignment_header_menu_element(@first_assignment.id,"download submissions")
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click

@@ -161,28 +161,25 @@ describe "Gradezilla editing grades" do
     curved_grade_text = "8"
 
     Gradezilla.visit(@course)
-
-    Gradezilla.click_assignment_header_menu(@first_assignment.id)
-    Gradezilla.click_assignment_header_menu_element("curve grades")
+    Gradezilla.click_assignment_header_menu_element(@first_assignment.id,"curve grades")
     curve_form = GradingCurvePage.new
     curve_form.edit_grade_curve(curved_grade_text)
     curve_form.curve_grade_submit
     accept_alert
+
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0]).to include_text curved_grade_text
   end
 
   it "assigns zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
     skip_if_safari(:alert)
+    @first_assignment.grade_student(@student_2, grade: '', grader: @teacher)
     Gradezilla.visit(@course)
-
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l1', '')
-
-    Gradezilla.click_assignment_header_menu(@first_assignment.id)
-    Gradezilla.click_assignment_header_menu_element("curve grades")
+    Gradezilla.click_assignment_header_menu_element(@first_assignment.id,"curve grades")
 
     f('#assign_blanks').click
     fj('.ui-dialog-buttonpane button:visible').click
     accept_alert
+
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0]).to include_text '0'
   end
 
