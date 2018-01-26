@@ -58,6 +58,7 @@
     "react-aria-live": "^1.0.4",
     "react-color": "^2.13.4",
     "react-dom": "^0.14.8 || ^15.0.0",
+    "rgb-hex": "^2.1.0",
     "wcag-element-contrast": "^1.0.1"
   },
   "jest": {
