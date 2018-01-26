@@ -1,0 +1,31 @@
+<h1>Cohort Info Upload</h1>
+
+<table>
+<caption>Example Spreadsheet</caption>
+<tr><th>Section Name</th><th>LC Name</th><th>LC Email</th><th>LC Phone</th><th>TA Name</th><th>TA Email</th><th>TA Phone</th><th>TA Office Hours/Location</th><th>LL Times</th><th>LL Location</th></tr>
+<% existing = CohortInfo.where(:course_id => params[:course_id])
+
+if existing.any?
+  existing.each do |row|
+%>
+<tr>
+  <td><%= row.section_name %></td><td><%= row.lc_name %></td><td><%= row.lc_phone %></td><td><%= row.lc_email %></td><td><%= row.ta_name %></td><td><%= row.ta_email %></td><td><%= row.ta_phone %></td><td><%= row.ta_office %></td><td><%= row.ll_times %></td><td><%= row.ll_location %></td></tr>
+</tr>
+<%
+  end
+else
+%>
+<tr>
+  <td>BZ John (Tu)</td><td>John Smith</td><td>john@example.com</td><td>000-555-1234</td><td>Frances Faculty</td><td>faculty@institution.edu</td><td>000-555-4321</td><td>Monday, Wednesday 3-5, Room 104 University Office Building</td><td>Tuesdays 6:00pm - 8:00pm</td><td>Room 309 Student Center</td></tr>
+</tr>
+<% end %>
+</table>
+
+<p>The spreadsheet should include information for all cohorts in this course on Canvas. The Section Name should match exactly what we already have in Canvas and Salesforce.</p>
+
+<%= form_for :import, :html => { :multipart => true } do |f| %>
+  <%= f.hidden_field :course_id, :value => @course_id %>
+  <%= f.file_field :csv %>
+  <%= submit_tag 'Upload CSV' %>
+<% end %>
+
