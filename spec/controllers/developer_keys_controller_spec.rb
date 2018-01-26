@@ -19,7 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DeveloperKeysController do
-
   context "Site admin" do
     before :once do
       account_admin_user(:account => Account.site_admin)
@@ -37,6 +36,25 @@ describe DeveloperKeysController do
         get 'index', params: {account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(assigns[:keys]).to be_include(dk)
+      end
+
+      describe "js bundles" do
+        render_views
+
+        it 'includes developer_keys_react' do
+          allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management_ui_rewrite).and_return(true)
+          user_session(@admin)
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(response).to render_template(:index_react)
+          expect(response).to be_success
+        end
+
+        it 'includes developer_keys' do
+          user_session(@admin)
+          get 'index', params: {account_id: Account.site_admin.id}
+          expect(response).to render_template(:index)
+          expect(response).to be_success
+        end
       end
 
       it 'should not include deleted keys' do

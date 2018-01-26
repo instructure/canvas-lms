@@ -625,6 +625,14 @@ END
         applies_to: 'RootAccount',
         state: 'hidden',
         development: true
+      },
+    'developer_key_management_ui_rewrite' =>
+      {
+        display_name: -> { I18n.t('Developer Key management UI Rewrite')},
+        description: -> { I18n.t('React UI rewrite Developer Key management') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        beta: true
       }
   )
 

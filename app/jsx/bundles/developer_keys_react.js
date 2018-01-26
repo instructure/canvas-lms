@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,5 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'compiled/developer_keys'
+import router from '../developer_keys/router'
 
+router.start()
