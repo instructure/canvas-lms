@@ -123,7 +123,9 @@ export default class CourseItemRow extends Component {
     if (this.props.itemUrl) {
       return (
         <a className="ic-item-row__content-link" href={this.props.itemUrl}>
-          {this.props.children}
+          <div className="ic-item-row__content-link-container">
+            {this.props.children}
+          </div>
         </a>
       )
     } else {

@@ -56,7 +56,6 @@
   min-width: 0;
   flex-grow: 1;
   margin: 0 22px;
-  overflow: hidden;
 
   &:first-child {
     margin-left: 0;
@@ -71,10 +70,15 @@
     }
   }
 
+  .ic-item-row__content-link-container {
+    width: auto;
+  }
+
   h3 {
     font-weight: 600;
     font-size: 1rem;
     margin-bottom: 4px;
+    overflow: hidden;
   }
 
   p {
