@@ -1,6 +1,7 @@
 import formatMessage from "../format-message"
 import contrast from "wcag-element-contrast"
 import { onlyContainsLink } from "../utils/dom"
+import rgbHex from "rgb-hex"
 
 export default {
   test: (elem, config = {}) => {
@@ -35,7 +36,12 @@ export default {
 
   update: (elem, data) => {
     elem.style.color = data.color
-    elem.setAttribute("data-mce-style", `color: ${data.color};`)
+    if (data && data.color && data.color.indexOf("#") < 0) {
+      elem.setAttribute("data-mce-style", `color: #${rgbHex(data.color)};`)
+    } else {
+      elem.setAttribute("data-mce-style", `color: ${data.color};`)
+    }
+
     return elem
   },
 

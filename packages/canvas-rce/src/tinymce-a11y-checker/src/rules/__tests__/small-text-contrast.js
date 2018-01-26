@@ -76,6 +76,11 @@ describe("update", () => {
     rule.update(el, { color: "#fff" })
     expect(el.getAttribute("data-mce-style")).toBe("color: #fff;")
   })
+
+  test("converts rgb to hex prior to setting it on the mce-style data attribute", () => {
+    rule.update(el, { color: "rgb(255, 255, 255)" })
+    expect(el.getAttribute("data-mce-style")).toBe("color: #ffffff;")
+  })
 })
 
 describe("message", () => {
