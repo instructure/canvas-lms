@@ -1,0 +1,55 @@
+<div class="my-cohort-info-page">
+<h1>My Cohort Info</h1>
+
+<% @current_user.enrollments.active.each do |enrollment| %>
+  <% next if !params[:course_id].nil? && params[:course_id].to_s != enrollment.course_id.to_s %>
+
+  <h2><%= Course.find(enrollment.course_id).name %></h2>
+
+  <h3><%= enrollment.course_section.name %></h3>
+
+  <% info = CohortInfo.where(:course_id => enrollment.course_id, :section_name => enrollment.course_section.name) %>
+  <% if info.any?
+       info = info.first
+  %>
+    <table class="lc individual_info">
+      <caption>Leadership Coach</caption>
+      <tr><th>Name:</th><td><%= info.lc_name %></td></tr>
+      <tr><th>Email:</th><td><%= info.lc_email %></td></tr>
+      <tr><th>Phone:</th><td><%= info.lc_phone %></td></tr>
+    </table>
+    <table class="ta individual_info">
+      <caption>TA</caption>
+      <tr><th>Name:</th><td><%= info.ta_name %></td></tr>
+      <tr><th>Email:</th><td><%= info.ta_email %></td></tr>
+      <tr><th>Phone:</th><td><%= info.ta_phone %></td></tr>
+      <tr><th>Office hours:</th><td><%= info.ta_office %></td></tr>
+    </table>
+    <table class="ll individual_info">
+      <caption>Learning Labs</caption>
+      <tr><th>Times:</th><td><%= info.ll_times %></td></tr>
+      <tr><th>Location:</th><td><%= info.ll_location %></td></tr>
+    </table>
+  <% else %>
+    no additional info
+  <% end %>
+
+  <table class="fellows_info">
+    <caption>Fellows</caption>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+    </tr>
+    <% enrollment.course_section.students.active.each do |student| %>
+      <tr>
+      <td>
+      <%= student.name %>
+      </td><td>
+      <%= student.email %>
+      </td>
+      </tr>
+    <% end %>
+  </table>
+
+<% end %>
+</div>
