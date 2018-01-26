@@ -10705,9 +10705,9 @@ timespan@2.3.x:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/timespan/-/timespan-2.3.0.tgz#4902ce040bd13d845c8f59b27e9d59bad6f39929"
 
-timezone@1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.6.tgz#d3b50bc35c63a09ed8876a8cc3642628685ccc33"
+timezone@1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.13.tgz#38d3c2e4ff7947b1f4bd6ac6e000c2461483f8b3"
 
 tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"
