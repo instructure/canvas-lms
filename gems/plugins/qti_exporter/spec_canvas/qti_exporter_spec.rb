@@ -354,7 +354,6 @@ describe Qti::Converter do
       "answers"=>
        [{"comments"=>"",
          "numerical_answer_type"=>"range_answer",
-         "exact"=>1.25,
          "weight"=>100,
          "end"=>1.3,
          "id"=>9082,
