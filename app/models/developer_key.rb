@@ -99,7 +99,8 @@ class DeveloperKey < ActiveRecord::Base
 
   def authorized_for_account?(target_account)
     return true unless account_id
-    target_account.id == account_id
+    return true if target_account.id == account_id
+    target_account.account_chain_ids.include?(account_id)
   end
 
   def account_name

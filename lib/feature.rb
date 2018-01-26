@@ -602,7 +602,15 @@ END
         end
         is_provisioned
       end
-    }
+    },
+    'developer_key_management' =>
+      {
+        display_name: -> { I18n.t('Developer Key management')},
+        description: -> { I18n.t('New Features for Developer Key management') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        development: true
+      }
   )
 
   def self.definitions

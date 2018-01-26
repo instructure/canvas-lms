@@ -644,7 +644,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_developer_keys => {
         :label => lambda { t('permissions.manage_developer_keys', "Manage developer keys") },
-        :account_only => :root,
+        :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },

@@ -126,6 +126,12 @@ describe DeveloperKey do
       it "shouldn't allow allow access to a foreign account" do
         expect(@key.authorized_for_account?(@not_sub_account)).to be false
       end
+
+      it "allows access if the account is in its account chain" do
+        sub_account = Account.create!(parent_account: @account)
+        expect(@key.authorized_for_account?(sub_account)).to be true
+      end
+      
     end
 
     context 'with sharding' do
