@@ -13,6 +13,55 @@ class BzController < ApplicationController
   before_filter :require_user, :except => [:magic_field_dump]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
+  def cohort_info_upload
+    @course_id = params[:course_id]
+    # view render
+  end
+
+  def my_cohort
+    # view render
+  end
+
+  def do_cohort_info_upload
+    if params[:import].nil?
+      flash[:message] = 'Please upload a csv file'
+      redirect_to cohort_info_upload_path(course_id: params[:course_id])
+      return
+    end
+
+    file = CSV.parse(params[:import][:csv].read)
+
+    file.each_with_index do |row, index|
+      next if index == 0 # skip the header row
+
+      existing = CohortInfo.where(:course_id => params[:import][:course_id], :section_name => row[0])
+      obj = nil
+      if existing.any?
+        obj = existing.first
+      else
+        obj = CohortInfo.new
+      end
+
+      obj.course_id = params[:import][:course_id]
+      obj.section_name = row[0].strip
+      obj.lc_name = row[1]
+      obj.lc_email = row[2]
+      obj.lc_phone = row[3]
+      obj.ta_name = row[4]
+      obj.ta_phone = row[5]
+      obj.ta_email = row[6]
+      obj.ta_office = row[7]
+      obj.ll_times = row[8]
+      obj.ll_location = row[9]
+
+      obj.save
+    end
+
+    flash[:message] = 'Data saved!'
+    redirect_to cohort_info_upload_path(course_id: params[:import][:course_id])
+  end
+
+
 
   def get_assignment_info(assignment_id)
     assignment = Assignment.find(assignment_id)
