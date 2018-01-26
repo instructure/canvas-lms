@@ -106,6 +106,16 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(GroupCategory.where(sis_source_id: 'Gc001').take.context).to eq course
   end
 
+  it "should not allow moving a group category with groups" do
+    gc = @account.group_categories.create(name: 'gc1', sis_source_id: 'Gc001')
+    gc.groups.create!(root_account: @account, context: @account)
+    course_factory(account: @account, sis_source_id: 'c01')
+    importer = process_csv_data(
+      "group_category_id,course_id,category_name,status",
+      "Gc001,c01,Group Cat 1,active")
+    expect(importer.errors.last.last).to eq("Cannot move group category Gc001 because it has groups in it.")
+  end
+
   it "should delete and restore group categories" do
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",

@@ -90,6 +90,13 @@ module SIS
         end
         # no account_id, course_id, or group_category, assign context to root_account
         context ||= @root_account
+
+        if group && group.group_memberships.exists?
+          unless context.id == group.context_id && context.class.base_class.name == group.context_type
+            raise ImportError, "Cannot move group #{group_id} because it has group_memberships." if group.context.is_a?(Course) || context.is_a?(Course)
+          end
+        end
+
         group ||= context.groups.new(name: name, sis_source_id: group_id)
         # only update the name on groups that haven't had their name changed since the last sis import
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)

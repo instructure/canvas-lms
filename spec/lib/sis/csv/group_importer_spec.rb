@@ -121,4 +121,16 @@ describe SIS::CSV::GroupImporter do
       "G001,c001,Group 1,available")
     expect(Group.where(sis_source_id: 'G001').take.context).to eq course
   end
+
+  it "should not allow changing course_id with group_memberships" do
+    course1 = course_factory(account: @account, sis_source_id: 'c001')
+    course_factory(account: @account, sis_source_id: 'c002')
+    group = group_model(context: course1, sis_source_id: "G001")
+    group.group_memberships.create!(user: user_model)
+
+    importer = process_csv_data(
+      "group_id,course_id,name,status",
+      "G001,c002,Group 1,available")
+    expect(importer.errors.last.last).to eq "Cannot move group G001 because it has group_memberships."
+  end
 end

@@ -51,7 +51,7 @@ module SIS
         user = pseudo.try(:user)
 
         group = @groups_cache[group_id]
-        group ||= @root_account.all_groups.where(sis_source_id: group_id).take
+        group ||= @root_account.all_groups.where(sis_source_id: group_id).preload(:context).take
         @groups_cache[group.sis_source_id] = group if group
 
         raise ImportError, "User #{user_id} didn't exist for group user" unless user
@@ -68,6 +68,10 @@ module SIS
           group_membership.workflow_state = 'accepted'
         when /deleted/i
           group_membership.workflow_state = 'deleted'
+        end
+
+        if group.context.is_a?(Course) && !group.context.all_real_users.where(id: user.id).exists?
+          raise ImportError, "User #{user_id} doesn't have an enrollment in the course of group #{group_id}."
         end
 
         if group_membership.valid?

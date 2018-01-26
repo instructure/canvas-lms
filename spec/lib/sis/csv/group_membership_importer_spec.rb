@@ -69,4 +69,13 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(ms.map(&:workflow_state)).to eq %w(deleted deleted)
   end
 
+  it "should add users to groups that the user cannot access" do
+    course = course_factory(account: @account, sis_source_id: 'c001')
+    group_model(context: course, sis_source_id: "G002")
+    importer = process_csv_data(
+      "group_id,user_id,status",
+      "G002,U001,accepted")
+    expect(importer.errors.last.last).to eq "User U001 doesn't have an enrollment in the course of group G002."
+  end
+
 end
