@@ -31,7 +31,12 @@ module ContentLibraryHelper
             local_assignment_id = "RESAVE_THIS_PAGE_IN_CONTENT_LIBRARY_TO_FIX"
           else
             local_assignment = Assignment.where(:clone_of_id => master_assignment_id, :context_id => local_course_id).first
-            local_assignment_id = local_assignment.id
+            if local_assignment.nil?
+              Rails.logger.warn("### replace_content_library_links_with_local_links: skipping link to #{url} b/c can't determine local assignment id. master_assignment_id = #{master_assignment_id}, local_course_id = #{local_course_id}")
+              local_assignment_id = "LINK_THE_PAGE_OR_ASSIGNMENT_FROM_CONTENT_LIBRARY_TO_FIX"
+            else
+              local_assignment_id = local_assignment.id
+            end
           end
           replaceUrl = url.gsub(/\/courses\/1\/assignments\/\d+/, "/courses/#{local_course_id}/assignments/#{local_assignment_id}")
         else
