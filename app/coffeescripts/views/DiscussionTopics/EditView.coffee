@@ -120,6 +120,9 @@ define [
 
       @lockedItems = options.lockedItems || {}
 
+    setRenderSectionsAutocomplete: (func) =>
+      @renderSectionsAutocomplete = func
+
     redirectAfterSave: ->
       window.location = @locationAfterSave(deparam())
 
@@ -247,6 +250,7 @@ define [
         fieldLabel: @messages.group_category_field_label
         lockedMessage: @messages.group_locked_message
         inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
+        renderSectionsAutocomplete: @renderSectionsAutocomplete
 
       @groupCategorySelector.render()
 
@@ -392,6 +396,15 @@ define [
       @disableWhileLoadingOpts = {}
       super(xhr)
 
+    sectionsAreRequired: ->
+      if !ENV.context_asset_string.startsWith("course")
+        return false
+
+      isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
+      announcementsFlag = ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED
+      discussionsFlag = ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
+      if isAnnouncement then announcementsFlag else discussionsFlag
+
     validateBeforeSave: (data, errors) =>
       if data.delay_posting == "0"
         data.delayed_post_at = null
@@ -412,9 +425,7 @@ define [
       if data.allow_todo_date == '1' && data.todo_date == null
         errors['todo_date'] = [{type: 'date_required_error', message: I18n.t('You must enter a date')}]
 
-      sectionsAreRequired = ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED && ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement &&
-        ENV.context_asset_string.startsWith("course")
-      if sectionsAreRequired && !data.specific_sections
+      if @sectionsAreRequired() && !data.specific_sections
         errors['specific_sections'] = [{type: 'specific_sections_required_error', message: I18n.t('You must input a section')}]
 
       if @isAnnouncement()
@@ -477,9 +488,21 @@ define [
       @toggleAvailabilityOptions()
       @toggleConditionalReleaseTab()
       @toggleTodoDateBox()
+      @renderSectionsAutocomplete() if @renderSectionsAutocomplete?
+
+    gradedChecked: ->
+      @$useForGrading.is(':checked')
+
+    # Graded discussions and section specific discussions are mutually exclusive
+    disableGradedCheckBox: =>
+      @$useForGrading.prop('disabled', true)
+
+    # Graded discussions and section specific discussions are mutually exclusive
+    enableGradedCheckBox: =>
+      @$useForGrading.prop('disabled', false)
 
     toggleAvailabilityOptions: ->
-      if @$useForGrading.is(':checked')
+      if @gradedChecked()
         @$availabilityOptions.hide()
       else
         @$availabilityOptions.show()
@@ -489,14 +512,14 @@ define [
 
     toggleConditionalReleaseTab: ->
       if @showConditionalRelease()
-        if @$useForGrading.is(':checked')
+        if @gradedChecked()
           @$discussionEditView.tabs("option", "disabled", false)
         else
           @$discussionEditView.tabs("option", "disabled", [1])
           @$discussionEditView.tabs("option", "active", 0)
 
     toggleTodoDateBox: ->
-      if @$useForGrading.is(':checked')
+      if @gradedChecked()
         @$todoOptions.hide()
       else
         @$todoOptions.show()

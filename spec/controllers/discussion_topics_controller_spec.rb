@@ -1009,87 +1009,96 @@ describe DiscussionTopicsController do
       specify { expect(topic.threaded).to be_falsey }
     end
 
+    describe 'section specific discussions' do
+      before(:each) do
+        @course.root_account.enable_feature!(:section_specific_announcements)
+        @course.root_account.enable_feature!(:section_specific_discussions)
+        user_session(@teacher)
+        @section1 = @course.course_sections.create!(name: "Section 1")
+        @section2 = @course.course_sections.create!(name: "Section 2")
+        @course.enroll_teacher(@teacher, section: @section1, allow_multiple_enrollments: true).accept(true)
+        @course.enroll_teacher(@teacher, section: @section2, allow_multiple_enrollments: true).accept(true)
+      end
+
+      it 'creates an announcement with sections' do
+        post 'create',
+          params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
+          :format => :json
+        expect(response).to have_http_status :success
+        expect(DiscussionTopic.last.course_sections.first).to eq @section1
+        expect(DiscussionTopicSectionVisibility.count).to eq 1
+      end
+
+      it 'does not create an announcement with sections if the feature is disabled' do
+        @course.root_account.disable_feature!(:section_specific_announcements)
+        post 'create',
+          params: topic_params(@course, {is_announcement: true, specific_sections: @section1.id.to_s}),
+          :format => :json
+        expect(response).to have_http_status 400
+        expect(DiscussionTopic.count).to eq 0
+        expect(DiscussionTopicSectionVisibility.count).to eq 0
+      end
+
+      it 'creates a discussion with sections' do
+        post 'create',
+          params: topic_params(@course, {specific_sections: @section1.id.to_s}), :format => :json
+        expect(response).to have_http_status :success
+        expect(DiscussionTopic.last.course_sections.first).to eq @section1
+        expect(DiscussionTopicSectionVisibility.count).to eq 1
+      end
+
+      it 'does not create a discussion with sections if the feature is disabled' do
+        @course.root_account.disable_feature!(:section_specific_discussions)
+        post 'create',
+          params: topic_params(@course, {specific_sections: @section1.id.to_s}), :format => :json
+        expect(response).to have_http_status 400
+        expect(DiscussionTopic.count).to eq 0
+        expect(DiscussionTopicSectionVisibility.count).to eq 0
+      end
+
+      it 'does not allow creation of group discussions that are section specific' do
+        @group_category = @course.group_categories.create(:name => 'gc')
+        @group = @course.groups.create!(:group_category => @group_category)
+        post 'create',
+          params: group_topic_params(@group, {specific_sections: @section1.id.to_s}), :format => :json
+        expect(response).to have_http_status 400
+        expect(DiscussionTopic.count).to eq 0
+        expect(DiscussionTopicSectionVisibility.count).to eq 0
+      end
+
+      # Note that this is different then group discussions. This is the
+      # "This is a Group Discussion" checkbox on a course discussion edit page,
+      # whereas that one is creating a discussion in a group page.
+      it 'does not allow creation of discussions with groups that are section specific' do
+        @group_category = @course.group_categories.create(:name => 'gc')
+        @group = @course.groups.create!(:group_category => @group_category)
+        param_overrides = {
+          specific_sections: "#{@section1.id},#{@section2.id}",
+          group_category_id: @group_category.id,
+        }
+        post('create', params: topic_params(@course, param_overrides), format: :json)
+        expect(response).to have_http_status 400
+        expect(DiscussionTopic.count).to eq 0
+        expect(DiscussionTopicSectionVisibility.count).to eq 0
+      end
+
+      it 'does not allow creation of graded discussions that are section specific' do
+        obj_params = topic_params(@course, {specific_sections: @section1.id.to_s})
+                       .merge(assignment_params(@course))
+        expect(DiscussionTopic.count).to eq 0
+        post('create', params: obj_params, format: :json)
+        expect(response).to have_http_status 422
+        expect(DiscussionTopic.count).to eq 0
+        expect(DiscussionTopicSectionVisibility.count).to eq 0
+      end
+    end
+
     it 'logs an asset access record for the discussion topic' do
       user_session(@student)
       post 'create', params: topic_params(@course), :format => :json
       accessed_asset = assigns[:accessed_asset]
       expect(accessed_asset[:category]).to eq 'topics'
       expect(accessed_asset[:level]).to eq 'participate'
-    end
-
-    it 'creates an announcement with sections' do
-      @course.root_account.enable_feature!(:section_specific_announcements)
-      user_session(@teacher)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
-      post 'create',
-        params: topic_params(@course, {is_announcement: true, specific_sections: [section1.id]}),
-        :format => :json
-      expect(response).to have_http_status :success
-      expect(DiscussionTopic.last.course_sections.first).to eq section1
-      expect(DiscussionTopicSectionVisibility.count).to eq 1
-    end
-
-    it 'does not create an announcement with sections if the feature is disabled' do
-      @course.root_account.disable_feature!(:section_specific_announcements)
-      user_session(@teacher)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
-      post 'create',
-        params: topic_params(@course, {is_announcement: true, specific_sections: [section1.id]}),
-        :format => :json
-      expect(response).to have_http_status 400
-      expect(DiscussionTopic.count).to eq 0
-      expect(DiscussionTopicSectionVisibility.count).to eq 0
-    end
-
-    it 'creates a discussion with sections' do
-      @course.root_account.enable_feature!(:section_specific_discussions)
-      user_session(@teacher)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
-      post 'create',
-        params: topic_params(@course, {specific_sections: [section1.id]}), :format => :json
-      expect(response).to have_http_status :success
-      expect(DiscussionTopic.last.course_sections.first).to eq section1
-      expect(DiscussionTopicSectionVisibility.count).to eq 1
-    end
-
-    it 'does not create a discussion with sections if the feature is disabled' do
-      @course.root_account.disable_feature!(:section_specific_discussions)
-      user_session(@teacher)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
-      post 'create',
-        params: topic_params(@course, {specific_sections: [section1.id]}), :format => :json
-      expect(response).to have_http_status 400
-      expect(DiscussionTopic.count).to eq 0
-      expect(DiscussionTopicSectionVisibility.count).to eq 0
-    end
-
-    it 'does not allow creation of group discussions that are section specific' do
-      @course.root_account.enable_feature!(:section_specific_announcements)
-      @course.root_account.enable_feature!(:section_specific_discussions)
-      user_session(@teacher)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
-      @group_category = @course.group_categories.create(:name => 'gc')
-      @group = @course.groups.create!(:group_category => @group_category)
-      post 'create',
-        params: group_topic_params(@group, {specific_sections: [section1.id]}), :format => :json
-      expect(response).to have_http_status 400
-      expect(DiscussionTopic.count).to eq 0
-      expect(DiscussionTopicSectionVisibility.count).to eq 0
     end
 
     it 'creates an announcement that is locked by default' do

@@ -2022,6 +2022,22 @@ describe DiscussionTopic do
       expect(@announcement.valid?).to eq true
     end
 
+    it "does not allow graded discussions to be section-specific" do
+      group_discussion_assignment
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      @topic.is_section_specific = true
+      add_section_to_topic(@topic, @section)
+      expect(@topic.valid?).to eq false
+    end
+
+    it "does not allow course grouped discussions to be section-specific" do
+      group_discussion_topic_model
+      @course.root_account.enable_feature!(:section_specific_discussions)
+      @group_topic.is_section_specific = true
+      add_section_to_topic(@group_topic, @section)
+      expect(@group_topic.valid?).to eq false
+    end
+
     it "should not include deleted sections" do
       course = course_with_two_sections
       announcement = basic_announcement_model(

@@ -81,6 +81,8 @@ class DiscussionTopic < ActiveRecord::Base
   validate :section_specific_topics_must_have_sections
   validate :feature_must_be_enabled_for_section_specific
   validate :only_course_topics_can_be_section_specific
+  validate :assignments_cannot_be_section_specific
+  validate :course_group_discussion_cannot_be_section_specific
 
   sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
@@ -98,8 +100,6 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_participant
   after_create :create_materialized_view
 
-  # TODO: Consider merging the following two validations into one to save a
-  # db query
   def section_specific_topics_must_have_sections
     if !self.deleted? && self.is_section_specific && self.discussion_topic_section_visibilities.none?(&:active?)
       self.errors.add(:is_section_specific, t("Section specific topics must have sections"))
@@ -123,6 +123,22 @@ class DiscussionTopic < ActiveRecord::Base
   def only_course_topics_can_be_section_specific
     if self.is_section_specific && !(self.context.is_a? Course)
       self.errors.add(:is_section_specific, t("Only course announcements and discussions can be section-specific"))
+    else
+      true
+    end
+  end
+
+  def assignments_cannot_be_section_specific
+    if self.is_section_specific && self.assignment
+      self.errors.add(:is_section_specific, t("Discussion assignments cannot be section-specific"))
+    else
+      true
+    end
+  end
+
+  def course_group_discussion_cannot_be_section_specific
+    if self.is_section_specific && self.has_group_category?
+      self.errors.add(:is_section_specific, t("Discussions with groups cannot be section-specific"))
     else
       true
     end
