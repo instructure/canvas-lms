@@ -125,12 +125,30 @@ define ['submit_assignment_helper','jquery'], ({submitContentItem, recordEulaAgr
     result = submitContentItem(undefined)
     equal result, false
 
-  test "Sets the input value to the current time if checked is true", ->
+  test "Sets the input value to the current time if checked is true for all eula inputs", ->
     now = new Date();
     clock = sinon.useFakeTimers(now.getTime());
-    inputHtml = "<input type='checkbox' name='test' id='checkbox-test'></input>"
+    inputHtml = """
+      <input type='checkbox' name='test' class='checkbox-test'></input>
+      <input type='checkbox' name='test two' class='checkbox-test'></input>
+    """
     $('#fixtures').append(inputHtml)
-    input = document.querySelector('#checkbox-test')
-    recordEulaAgreement(input, true)
-    equal document.querySelector('#checkbox-test').value, now.getTime()
+    recordEulaAgreement('.checkbox-test', true)
+    inputs = document.querySelectorAll('.checkbox-test')
+    for val in inputs
+      equal val.value, now.getTime()
+    clock.restore();
+
+  test "Clears the value if the input is not checked", ->
+    now = new Date();
+    clock = sinon.useFakeTimers(now.getTime());
+    inputHtml = """
+      <input type='checkbox' name='test' class='checkbox-test'></input>
+      <input type='checkbox' name='test two' class='checkbox-test'></input>
+    """
+    $('#fixtures').append(inputHtml)
+    recordEulaAgreement('.checkbox-test', false)
+    inputs = document.querySelectorAll('.checkbox-test')
+    for val in inputs
+      equal val.value, ''
     clock.restore();

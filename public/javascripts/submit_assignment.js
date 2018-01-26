@@ -252,7 +252,7 @@ import 'jqueryui/tabs'
     });
 
     $('input.turnitin_pledge').click((e) => {
-      recordEulaAgreement(document.querySelector('#eula_agreement_timestamp'),
+      recordEulaAgreement('#eula_agreement_timestamp',
                           e.target.checked);
     })
 
