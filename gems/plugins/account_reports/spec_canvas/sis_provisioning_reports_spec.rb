@@ -1075,9 +1075,10 @@ describe "Default Account Reports" do
         GroupCategory.where(id: @group_category4).update_all(sis_source_id: 'gc104', sis_batch_id: @sis.id)
         parameters = {}
         parameters["group_categories"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 4})
-        expect(parsed.length).to eq 3
-        expect(parsed).to match_array [['gc101', @account.sis_source_id, nil, "Test Group Category", 'active'],
+        parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 4})
+        expect(parsed.length).to eq 4
+        expect(parsed).to match_array [["group_category_id", "account_id", "course_id", "category_name", "status"],
+                                       ['gc101', @account.sis_source_id, nil, "Test Group Category", 'active'],
                                        ['gc102', @account.sis_source_id, nil, "Test Group Category2", 'active'],
                                        ['gc104', nil, "SIS_COURSE_ID_3", "Test Group Category Course", 'active']]
       end
@@ -1407,6 +1408,7 @@ describe "Default Account Reports" do
       parameters["sections"] = true
       parameters["enrollments"] = true
       parameters["groups"] = true
+      parameters["group_categories"] = true
       parameters["group_membership"] = true
       parameters["xlist"] = true
       parsed = read_report("sis_export_csv", {params: parameters, header: true})
@@ -1424,6 +1426,7 @@ describe "Default Account Reports" do
                                                 "status", "associated_user_id",
                                                 "limit_section_privileges"]]
       expect(parsed["groups.csv"]).to eq [["group_id", "group_category_id", "account_id", "course_id", "name", "status"]]
+      expect(parsed["group_categories.csv"]).to eq [["group_category_id", "account_id", "course_id", "category_name", "status"]]
       expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
       expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
     end
