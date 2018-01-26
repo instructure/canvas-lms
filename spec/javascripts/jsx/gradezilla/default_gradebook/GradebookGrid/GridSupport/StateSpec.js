@@ -278,6 +278,88 @@ QUnit.module('GridSupport State', (suiteHooks) => {
     });
   });
 
+  QUnit.module('#restorePreviousLocation', () => {
+    test('sets the active location to the first header cell when no previous location exists', () => {
+      gridSupport.state.restorePreviousLocation();
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'header');
+      strictEqual(activeLocation.cell, 0);
+      equal(typeof activeLocation.row, 'undefined');
+    });
+
+    test('sets the active location to the previously-selected cell when one is set', () => {
+      gridSupport.state.setActiveLocation('body', { cell: 1, row: 1 });
+      gridSupport.state.blur();
+      gridSupport.state.restorePreviousLocation();
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'body');
+      strictEqual(activeLocation.cell, 1);
+      strictEqual(activeLocation.row, 1);
+    });
+
+    test('sets the active location to the previously-selected body cell when the column has moved', () => {
+      gridSupport.state.setActiveLocation('body', { cell: 1, row: 1 });
+
+      grid.setColumns(createColumns().reverse());
+      gridSupport.state.restorePreviousLocation();
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'body');
+      strictEqual(activeLocation.cell, 2);
+      strictEqual(activeLocation.row, 1);
+    });
+
+    test('sets the active location to the previously-selected header cell when the column has moved', () => {
+      gridSupport.state.setActiveLocation('header', { cell: 1 });
+
+      grid.setColumns(createColumns().reverse());
+      gridSupport.state.restorePreviousLocation();
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'header');
+      strictEqual(activeLocation.cell, 2);
+      equal(typeof activeLocation.row, 'undefined');
+    });
+
+    test('sets the active location to the previously-selected body cell when the row has moved', () => {
+      gridSupport.state.setActiveLocation('body', { cell: 1, row: 1 });
+
+      grid.setData(createRows().reverse());
+      gridSupport.state.restorePreviousLocation();
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'body');
+      strictEqual(activeLocation.cell, 1);
+      strictEqual(activeLocation.row, 0);
+    });
+
+    test('sets the active location to the first header cell when the previously-selected column was removed', () => {
+      gridSupport.state.setActiveLocation('body', { cell: 1, row: 1 });
+
+      grid.setColumns(createColumns().slice(2));
+      gridSupport.state.restorePreviousLocation();
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'header');
+      strictEqual(activeLocation.cell, 0);
+      equal(typeof activeLocation.row, 'undefined');
+    });
+
+    test('sets the active location to the first header cell when the previously-selected row was removed', () => {
+      gridSupport.state.setActiveLocation('body', { cell: 1, row: 1 });
+
+      grid.setData(createRows().slice(0, 1));
+      gridSupport.state.restorePreviousLocation();
+
+      const activeLocation = gridSupport.state.getActiveLocation();
+      equal(activeLocation.region, 'header');
+      strictEqual(activeLocation.cell, 0);
+      equal(typeof activeLocation.row, 'undefined');
+    });
+  });
+
   QUnit.module('#getActiveNode', () => {
     test('returns the element for an active header cell', () => {
       gridSupport.state.setActiveLocation('header', { cell: 1 });

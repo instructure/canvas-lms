@@ -1611,7 +1611,7 @@ define [
 
       @gradebookGrid.gridSupport.events.onNavigatePrev.subscribe (event, location) =>
         if (location.region == 'header')
-          @getHeaderComponentRef(location.columnId)?.focusAtEnd()
+          @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
       @gradebookGrid.gridSupport.events.onNavigateNext.subscribe (event, location) =>
         if (location.region == 'header')
