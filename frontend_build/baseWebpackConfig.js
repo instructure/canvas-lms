@@ -26,7 +26,6 @@ const bundleEntries = require('./bundles')
 const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
 const ClientAppsPlugin = require('./clientAppPlugin')
 const CompiledReferencePlugin = require('./CompiledReferencePlugin')
-const HashOutput = require('webpack-plugin-hash-output')
 const I18nPlugin = require('./i18nPlugin')
 const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
@@ -84,8 +83,7 @@ module.exports = {
   }, bundleEntries, momentLocaleBundles),
 
   output: {
-    hashDigestLength: 10,
-
+    hashSalt: '2018-01-29',
     path: path.join(__dirname, '../public', webpackPublicPath),
 
     // Add /* filename */ comments to generated require()s in the output.
@@ -275,7 +273,9 @@ module.exports = {
     // be removed when that issue is fixed
     new webpack.IgnorePlugin(/\.flow$/),
 
-    new HashOutput()
+    new webpack.HashedModuleIdsPlugin({
+      hashDigestLength: 10
+    })
   ]
   .concat(process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE ? [
 
