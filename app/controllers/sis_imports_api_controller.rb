@@ -106,6 +106,14 @@
 #           "description": "the number of enrollments that were removed because they were not included in the batch for batch_mode imports. Only included if enrollments were deleted",
 #           "example": 150,
 #           "type": "integer"
+#         },
+#         "error_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "warning_count": {
+#           "example": 0,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -165,6 +173,10 @@
 #           "description": "The errors_attachment api object of the SIS import. Only available if there are errors or warning and import has completed.",
 #           "$ref": "File"
 #         },
+#         "user": {
+#           "description": "The user that initiated the sis_batch. See the Users API for details.",
+#           "$ref": "User"
+#         },
 #         "processing_warnings": {
 #           "description": "Only imports that are complete will get this data. An array of CSV_file/warning_message pairs.",
 #           "example": [["students.csv","user John Doe has already claimed john_doe's requested login information, skipping"]],
@@ -173,20 +185,6 @@
 #             "type": "array",
 #             "items": {"type": "string"}
 #           }
-#         },
-#         "user": {
-#           "description": "The user that initiated the sis_batch. See the Users API for details.",
-#           "$ref": "User"
-#         },
-#         "errors": {
-#           "description": "Only included for a single import. A list of the first 50 errors for the import. To get all errors use the SisImportErrorsAPI",
-#           "type": "array",
-#           "items": { "$ref": "SisImportError" }
-#         },
-#         "errors_count": {
-#           "description": "Only included for a single import. A count of the errors for the import.",
-#           "type": "integer",
-#           "example": "90"
 #         },
 #         "processing_errors": {
 #           "description": "An array of CSV_file/error_message pairs.",

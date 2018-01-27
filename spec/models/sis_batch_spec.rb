@@ -467,7 +467,18 @@ s2,test_1,section2,active},
     end
   end
 
-  context "csv diffing" do
+  it "should write all warnings/errors to a file" do
+    batch = @account.sis_batches.create!
+    3.times do |i|
+      batch.sis_batch_errors.create(root_account: @account, file: 'users.csv', message: "some error #{i}", row: i)
+    end
+    batch.finish(false)
+    error_file = batch.reload.errors_attachment
+    expect(error_file.display_name).to eq "sis_errors_attachment_#{batch.id}.csv"
+    expect(CSV.parse(error_file.open).map.to_a.size).to eq 4 # header and 3 errors
+  end
+
+  context "with csv diffing" do
     describe 'diffing_drop_status' do
       before :once do
         process_csv_data(

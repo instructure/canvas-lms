@@ -22,6 +22,7 @@ class SisBatchError < ActiveRecord::Base
 
   scope :expired_errors, -> {where('created_at < ?', 30.days.ago)}
   scope :failed, -> {where(failure: true)}
+  scope :warnings, -> {where(failure: false)}
 
   def self.cleanup_old_errors
     return unless expired_errors.exists?
