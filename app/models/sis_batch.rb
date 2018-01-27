@@ -112,10 +112,17 @@ class SisBatch < ActiveRecord::Base
   class Aborted < RuntimeError; end
 
   def add_errors(messages, failure: true)
-    messages.each do |message|
-      self.sis_batch_errors.create!(root_account: self.account,
-                                    failute: failure,
-                                    message: message)
+    messages.each_slice(1000) do |batch|
+      records = batch.map do |message|
+        {
+          root_account_id: self.account.id,
+          created_at: Time.zone.now,
+          sis_batch_id: self.id,
+          failute: failure,
+          message: message
+        }
+      end
+      SisBatchError.bulk_insert(records)
     end
   end
 
