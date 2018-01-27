@@ -18,20 +18,22 @@
 
 <% batch = sis_batch_messages %>
 <ul>
-  <% if batch.sis_batch_errors.failed.exists? %>
+  <% if batch.processing_errors && batch.processing_errors.length > 0 %>
+    <li><%= t("There were a total of %{count} errors.", count: batch.data[:error_count]) %>
     <li><%= t(:sis_batch_errors_title, "Errors that prevent importing") %>
       <ul>
-      <%batch.sis_batch_errors.failed.each do |error| %>
-        <li><%= error.description %></li>
-      <% end %>
+        <% batch.processing_errors.each do |message| %>
+          <li><%= message.first %> - <%= message.last %></li>
+        <% end %>
       </ul>
     </li>
   <% end %>
-  <% if batch.sis_batch_errors.where(failure: false).exists? %>
+  <% if batch.processing_warnings && batch.processing_warnings.length > 0 %>
+    <li><%= t("There were a total of %{count} warnings.", count: batch.data[:warning_count]) %>
     <li><%= t(:sis_batch_warnings_title, "Warnings")%>
       <ul>
-        <%batch.sis_batch_errors.where(failure: false).each do |error| %>
-          <li><%= error.description %></li>
+        <% batch.processing_warnings.each do |message| %>
+          <li><%= message.first %> - <%= message.last %></li>
         <% end %>
       </ul>
     </li>

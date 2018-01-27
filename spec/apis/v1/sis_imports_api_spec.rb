@@ -153,7 +153,9 @@ describe SisImportsApiController, type: :request do
                                     "group_categories" => 0,
                                     "groups" => 0,
                                     "group_memberships" => 0,
-                                    "terms" => 0, }},
+                                    "terms" => 0,
+                                    "error_count"=>0,
+                                    "warning_count"=>0 }},
           "progress" => 100,
           "id" => batch.id,
           "workflow_state"=>"imported",
@@ -166,9 +168,7 @@ describe SisImportsApiController, type: :request do
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
-          "change_threshold" => nil,
-          "errors"=>[],
-          "error_count"=>0,
+          "change_threshold" => nil
     })
   end
 
@@ -670,7 +670,9 @@ describe SisImportsApiController, type: :request do
                                                 "group_categories" => 0,
                                                 "groups" => 0,
                                                 "group_memberships" => 0,
-                                                "terms" => 0, }},
+                                                "terms" => 0,
+                                                "error_count"=>0,
+                                                "warning_count"=>0 }},
                       "progress" => 100,
                       "id" => batch.id,
                       "workflow_state"=>"imported",
@@ -760,5 +762,19 @@ describe SisImportsApiController, type: :request do
               attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv')},
              {},
              expected_status: 200)
+  end
+
+  it "should include the errors_attachment when there are errors" do
+    batch = @account.sis_batches.create!
+    3.times do |i|
+      batch.sis_batch_errors.create(root_account: @account, file: 'users.csv', message: "some error #{i}", row: i)
+    end
+    batch.finish(false)
+
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
+                    { controller: 'sis_imports_api', action: 'show', format: 'json',
+                      account_id: @account.id.to_s, id: batch.id.to_s })
+    expect(json.key?('errors_attachment')).to be_truthy
+    expect(json['errors_attachment']['id']).to eq batch.errors_attachment.id
   end
 end

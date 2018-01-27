@@ -41,8 +41,6 @@ module Api::V1::SisImport
         {submission_attachment: true}
       )
     end
-    json[:errors] = sis_import_errors_json(batch.sis_batch_errors.limit(50)) if includes.include?('errors')
-    json[:error_count] = batch.sis_batch_errors.count if includes.include?('errors')
     json[:user] = user_json(batch.user, user, session) if batch.user
     json
   end

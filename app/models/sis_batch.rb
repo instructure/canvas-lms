@@ -300,6 +300,8 @@ class SisBatch < ActiveRecord::Base
     remove_previous_imports if self.batch_mode? && import_finished
     import_finished = !self.sis_batch_errors.failed.exists? if import_finished
     finalize_workflow_state(import_finished)
+    write_errors_to_file
+    populate_old_warnings_and_errors
     self.progress = 100
     self.ended_at = Time.now.utc
     self.save!
@@ -478,12 +480,12 @@ class SisBatch < ActiveRecord::Base
   def as_json(options={})
     self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
+      "id" => self.id,
       "created_at" => self.created_at,
       "started_at" => self.started_at,
       "ended_at" => self.ended_at,
       "updated_at" => self.updated_at,
       "progress" => self.progress,
-      "id" => self.id,
       "workflow_state" => self.workflow_state,
       "data" => self.data,
       "batch_mode" => self.batch_mode,
@@ -500,5 +502,52 @@ class SisBatch < ActiveRecord::Base
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
     data
+  end
+
+  def populate_old_warnings_and_errors
+    fail_count = self.sis_batch_errors.failed.count
+    warning_count = self.sis_batch_errors.warnings.count
+    self.processing_errors = self.sis_batch_errors.failed.limit(24).pluck(:file, :message)
+    self.processing_warnings = self.sis_batch_errors.warnings.limit(24).pluck(:file, :message)
+    if fail_count > 24
+      self.processing_errors << ["and #{fail_count - 24} more errors that were not included",
+                                 "Download the error file to see all errors."]
+    end
+    if warning_count > 24
+      self.processing_warnings << ["and #{warning_count - 24} more warnings that were not included",
+                                   "Download the error file to see all warnings."]
+    end
+    self.data ||= {}
+    self.data[:counts] ||= {}
+    self.data[:counts][:error_count] = fail_count
+    self.data[:counts][:warning_count] = warning_count
+  end
+
+  def write_errors_to_file
+    return unless self.sis_batch_errors.exists?
+    file = temp_error_file_path
+    CSV.open(file, "w") do |csv|
+      csv << %w(sis_import_id file message row)
+      self.sis_batch_errors.find_each do |error|
+        row = []
+        row << error.sis_batch_id
+        row << error.file
+        row << error.message
+        row << error.row
+        csv << row
+      end
+    end
+    self.errors_attachment = SisBatch.create_data_attachment(
+      self,
+      Rack::Test::UploadedFile.new(file, 'csv', true),
+      "sis_errors_attachment_#{id}.csv"
+    )
+  end
+
+  def temp_error_file_path
+    temp = Tempfile.open([self.global_id.to_s + '_processing_warnings_and_errors' + Time.zone.now.to_s, '.csv'])
+    file = temp.path
+    temp.close!
+    file
   end
 end
