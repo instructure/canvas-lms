@@ -21,10 +21,9 @@ require_relative '../spec_helper'
 require 'csv'
 
 describe GradebookExporter do
-  before(:each) do
-    teacher_in_course active_all: true
-    @course.grading_standard_id = 0
-    @course.save
+  before(:once) do
+    @course = course_model(grading_standard_id: 0)
+    course_with_teacher(course: @course, active_all: true)
   end
 
   describe "#to_csv" do
@@ -286,29 +285,120 @@ describe GradebookExporter do
   end
 
   describe "#show_overall_totals" do
-    before(:each) do
-      course_with_teacher
+    let(:enrollment) { @student.enrollments.find_by(course: @course) }
+
+    before(:once) do
       student_in_course(course: @course, active_all: true)
     end
 
-    context "when a grading period is supplied" do
-      it "fetches scores from the Enrollment object using the grading period ID" do
-        @group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
-        grading_period = @group.grading_periods.create!(
+    # this test is needed to guarantee the stubbing in the following specs on
+    # enrollment reflects reality and isn't a false positive.
+    it 'includes the student enrollment in the course' do
+      exporter = GradebookExporter.new(@course, @teacher)
+
+      expect(exporter).to receive(:enrollments_for_csv).with([enrollment]).and_call_original
+      exporter.to_csv
+    end
+
+    context "when a grading period is present" do
+      let(:group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course) }
+      let(:grading_period) do
+        group.grading_periods.create!(
           start_date: 1.week.ago, end_date: 1.week.from_now, title: "test period"
         )
+      end
+      let(:exporter) { GradebookExporter.new(@course, @teacher, { grading_period_id: grading_period.id }) }
 
-        expect_any_instance_of(StudentEnrollment).to receive(:computed_current_score)
-          .with({ grading_period_id: grading_period.id })
+      before(:each) do
+        allow(exporter).to receive(:enrollments_for_csv).and_return([enrollment])
+      end
 
-        GradebookExporter.new(@course, @teacher, { grading_period_id: grading_period.id }).to_csv
+      it 'includes the computed current score for the grading period' do
+        expect(enrollment).to receive(:computed_current_score).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it 'includes the unposted current score for the grading period' do
+        expect(enrollment).to receive(:unposted_current_score).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it 'includes the computed final score for the grading period' do
+        expect(enrollment).to receive(:computed_final_score).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it 'includes the unposted final score for the grading period' do
+        expect(enrollment).to receive(:unposted_final_score).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it 'includes the computed current grade for the grading period' do
+        expect(enrollment).to receive(:computed_current_grade).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it 'includes the unposted current grade for the grading period' do
+        expect(enrollment).to receive(:unposted_current_grade).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it 'includes the computed final grade for the grading period' do
+        expect(enrollment).to receive(:computed_final_grade).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it 'includes the unposted final grade for the grading period' do
+        expect(enrollment).to receive(:unposted_final_grade).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
       end
     end
 
     context "when no grading period is supplied" do
-      it "fetches scores from the Enrollment object using the default Course parameters" do
-        expect_any_instance_of(StudentEnrollment).to receive(:computed_current_score).with(Score.params_for_course)
-        GradebookExporter.new(@course, @teacher, {}).to_csv
+      let(:exporter) { GradebookExporter.new(@course, @teacher) }
+
+      before(:each) do
+        allow(exporter).to receive(:enrollments_for_csv).and_return([enrollment])
+      end
+
+      it 'includes the computed current score for the course' do
+        expect(enrollment).to receive(:computed_current_score).with(Score.params_for_course)
+        exporter.to_csv
+      end
+
+      it 'includes the unposted current score for the course' do
+        expect(enrollment).to receive(:unposted_current_score).with(Score.params_for_course)
+        exporter.to_csv
+      end
+
+      it 'includes the computed final score for the course' do
+        expect(enrollment).to receive(:computed_final_score).with(Score.params_for_course)
+        exporter.to_csv
+      end
+
+      it 'includes the unposted final score for the course' do
+        expect(enrollment).to receive(:unposted_final_score).with(Score.params_for_course)
+        exporter.to_csv
+      end
+
+      it 'includes the computed current grade for the course' do
+        expect(enrollment).to receive(:computed_current_grade).with(Score.params_for_course)
+        exporter.to_csv
+      end
+
+      it 'includes the unposted current grade for the course' do
+        expect(enrollment).to receive(:unposted_current_grade).with(Score.params_for_course)
+        exporter.to_csv
+      end
+
+      it 'includes the computed final grade for the course' do
+        expect(enrollment).to receive(:computed_final_grade).with(Score.params_for_course)
+        exporter.to_csv
+      end
+
+      it 'includes the unposted final grade for the course' do
+        expect(enrollment).to receive(:unposted_final_grade).with(Score.params_for_course)
+        exporter.to_csv
       end
     end
   end
