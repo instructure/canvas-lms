@@ -64,6 +64,15 @@ describe SisBatch do
     create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}
   end
 
+  it 'should make file per zip file member' do
+    batch = process_csv_data([%{course_id,short_name,long_name,account_id,term_id,status},
+                              %{course_id,user_id,role,status,section_id}])
+    # 1 zip file and 2 csv files
+    atts = Attachment.where(context: batch)
+    expect(atts.count).to eq 3
+    expect(atts.pluck(:content_type)).to match_array %w(unknown/unknown text/csv text/csv)
+  end
+
   it "should keep the batch in initializing state during create_with_attachment" do
     batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user_factory) do |batch|
       expect(batch.attachment).not_to be_new_record
