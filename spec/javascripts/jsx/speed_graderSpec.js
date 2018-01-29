@@ -1176,55 +1176,80 @@ test('does not show an error when the gateway times out', function () {
   strictEqual($('#speed_grader_timeout_alert').text(), '');
 });
 
-QUnit.module('SpeedGrader#refreshFullRubric', function(hooks) {
-  let speedGraderCurrentStudent;
-  let jsonData;
-  const rubricHTML = `
+QUnit.module('SpeedGrader', function() {
+  QUnit.module('#refreshFullRubric', function(hooks) {
+    let speedGraderCurrentStudent;
+    let jsonData;
+    const rubricHTML = `
     <select id="rubric_assessments_select">
       <option value="3">an assessor</option>
     </select>
     <div id="rubric_full"><span>foo</span></div>
   `;
 
-  hooks.beforeEach(function () {
-    $('#fixtures').html(rubricHTML);
-    fakeENV.setup({ RUBRIC_ASSESSMENT: {} });
-    ({jsonData} = window);
-    speedGraderCurrentStudent = SpeedGrader.EG.currentStudent;
-    window.jsonData = { rubric_association: {} };
-    SpeedGrader.EG.currentStudent = {
-      rubric_assessments: [{ id: '3', assessor_id: '5', data: [{ points: 2, criterion_id: '9'}] }]
-    }
-    const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get');
-    getFromCache.withArgs('#rubric_full').returns($('#rubric_full'));
-    getFromCache.withArgs('#rubric_assessments_select').returns($('#rubric_assessments_select'));
-    sinon.stub(window.rubricAssessment, 'populateRubric');
+    hooks.beforeEach(function () {
+      $('#fixtures').html(rubricHTML);
+      fakeENV.setup({ RUBRIC_ASSESSMENT: { assessment_type: 'peer_review' }});
+      ({jsonData} = window);
+      speedGraderCurrentStudent = SpeedGrader.EG.currentStudent;
+      window.jsonData = { rubric_association: {} };
+      SpeedGrader.EG.currentStudent = {
+        rubric_assessments: [{ id: '3', assessor_id: '5', data: [{ points: 2, criterion_id: '9'}] }]
+      }
+      const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get');
+      getFromCache.withArgs('#rubric_full').returns($('#rubric_full'));
+      getFromCache.withArgs('#rubric_assessments_select').returns($('#rubric_assessments_select'));
+      sinon.stub(window.rubricAssessment, 'populateRubric');
+    });
+
+    hooks.afterEach(function() {
+      window.rubricAssessment.populateRubric.restore();
+      JQuerySelectorCache.prototype.get.restore();
+      SpeedGrader.EG.currentStudent = speedGraderCurrentStudent;
+      window.jsonData = jsonData;
+      fakeENV.teardown();
+      $('#fixtures').empty();
+    });
+
+    QUnit.module('when the assessment is a grading assessment and the user is a grader', function(contextHooks) {
+      contextHooks.beforeEach(function() {
+        SpeedGrader.EG.currentStudent.rubric_assessments[0].assessment_type = 'grading'
+        fakeENV.setup({ current_user_id: '7', RUBRIC_ASSESSMENT: { assessment_type: 'grading' }})
+      })
+
+      contextHooks.afterEach(function() {
+        delete SpeedGrader.EG.currentStudent.rubric_assessments[0].assessment_type
+      })
+
+      test('populates the rubric with data even if the user is not the selected assessor', function() {
+        SpeedGrader.EG.refreshFullRubric();
+        const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1];
+        propEqual(data, [{ points: 2, criterion_id: '9' }]);
+      })
+
+      test('populates the rubric with data if the user is the selected assessor', function() {
+        SpeedGrader.EG.refreshFullRubric()
+        const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1]
+        propEqual(data, [{ points: 2, criterion_id: '9' }])
+      })
+    })
+
+    QUnit.module('when the assessment is not a peer review assessment', function() {
+      test('populates the rubric without data if the user is not the selected assessor', function () {
+        SpeedGrader.EG.refreshFullRubric();
+        const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1];
+        propEqual(data, []);
+      });
+
+      test('populates the rubric with data if the user is the selected assessor', function () {
+        ENV.current_user_id = '5'
+        SpeedGrader.EG.refreshFullRubric();
+        const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1];
+        propEqual(data, [{ points: 2, criterion_id: '9' }]);
+      });
+    })
   });
 
-  hooks.afterEach(function() {
-    window.rubricAssessment.populateRubric.restore();
-    JQuerySelectorCache.prototype.get.restore();
-    SpeedGrader.EG.currentStudent = speedGraderCurrentStudent;
-    window.jsonData = jsonData;
-    fakeENV.teardown();
-    $('#fixtures').empty();
-  });
-
-  test('populates the rubric without data if the user is not the selected assessor', function () {
-    SpeedGrader.EG.refreshFullRubric();
-    const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1];
-    propEqual(data, []);
-  });
-
-  test('populates the rubric with data if the user is the selected assessor', function () {
-    fakeENV.setup({ current_user_id: '5' });
-    SpeedGrader.EG.refreshFullRubric();
-    const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1];
-    propEqual(data, [{ points: 2, criterion_id: '9' }]);
-  });
-});
-
-QUnit.module('SpeedGrader', function() {
   QUnit.module('#renderCommentTextArea', function(hooks) {
     hooks.beforeEach(function() {
       fakeENV.setup()
