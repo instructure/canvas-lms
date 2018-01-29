@@ -2,7 +2,7 @@ class CreateCohortInfos < ActiveRecord::Migration
   tag :predeploy
   def change
     create_table :cohort_infos do |t|
-      t.integer :course_id, limit => 8
+      t.integer :course_id, :limit => 8
       t.string :section_name
       t.string :lc_name
       t.string :lc_email
