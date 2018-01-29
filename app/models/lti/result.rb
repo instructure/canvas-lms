@@ -17,14 +17,20 @@
 #
 
 class Lti::Result < ApplicationRecord
+  GRADING_PROGRESS_TYPES = %w[FullyGraded Pending PendingManual Failed NotReady].freeze
+  ACCEPT_GIVEN_SCORE_TYPES = %w[FullyGraded PendingManual].freeze
+  ACTIVITY_PROGRESS_TYPES = %w[Initialized Started InProgress Submitted Completed].freeze
+
+  self.record_timestamps = false
+
   validates :line_item, :user, presence: true
   validates :result_maximum, presence: true, unless: proc { |r| r.result_score.blank? }
   validates :result_maximum, :result_score, numericality: true, allow_nil: true
   validates :activity_progress,
-            inclusion: { in: ['Initialized', 'Started', 'InProgress', 'Submitted', 'Completed'] },
+            inclusion: { in: ACTIVITY_PROGRESS_TYPES },
             allow_nil: true
   validates :grading_progress,
-            inclusion: { in: ['FullyGraded', 'Pending', 'PendingManual', 'Failed', 'NotReady'] },
+            inclusion: { in: GRADING_PROGRESS_TYPES },
             allow_nil: true
 
   belongs_to :submission, inverse_of: :lti_result

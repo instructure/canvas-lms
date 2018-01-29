@@ -21,13 +21,6 @@ require_dependency "lti/ims/line_items_controller"
 module Lti
   module Ims
     RSpec.describe LineItemsController, type: :request do
-      shared_examples "an lti 1.3 secured endpoint" do
-        it 'allows access if the tool is installed in the requested course'
-        it 'allows access if the tool is installed in the requested context chain'
-        it 'does not allow access if the tool is not installed in the context'
-        it 'checks that the tool has the proper capability'
-      end
-
       let(:course) { course_model }
       let(:resource_link) { resource_link_model(overrides: {resource_link_id: assignment.lti_context_id}) }
       let(:assignment) { assignment_model(course: course) }
@@ -43,6 +36,16 @@ module Lti
           course_id: course.id,
           id: line_item.id
         )
+      end
+
+      shared_examples 'lti_link tool check' do
+        context 'when owned by the tool' do
+          it 'is allowed to access'
+        end
+
+        context 'when not owned by the tool' do
+          it 'is not allowed to access'
+        end
       end
 
       describe '#create' do
@@ -65,6 +68,8 @@ module Lti
             assignment: assignment
           )
         end
+
+        it_behaves_like 'lti_link tool check'
 
         shared_examples 'the line item create endpoint' do
           let(:create_params) { raise 'set in example' }
@@ -204,12 +209,12 @@ module Lti
       describe '#update' do
         let(:line_item) do
           line_item_model(
-            overrides: {
-              assignment: assignment,
-              resource_link: resource_link
-            }
+            assignment: assignment,
+            resource_link: resource_link
           )
         end
+
+        it_behaves_like 'lti_link tool check'
 
         it 'updates the score maximum' do
           new_score_maximum = 88.2
@@ -229,8 +234,8 @@ module Lti
         end
 
         it 'does not update the assignment name if not the default line item' do
-          line_item_one = line_item_model(overrides: {resource_link: resource_link, assignment: assignment})
-          line_item_two = line_item_model(overrides: {resource_link: resource_link, assignment: assignment})
+          line_item_one = line_item_model(resource_link: resource_link, assignment: assignment)
+          line_item_two = line_item_model(resource_link: resource_link, assignment: assignment)
           line_item_two.update_attributes!(created_at: line_item_one.created_at + 5.seconds)
 
           second_url = Rails.application.routes.url_helpers.lti_line_item_edit_path(
@@ -281,7 +286,7 @@ module Lti
           expect(body['tag']).to eq new_tag
         end
 
-        it 'responds with precondition failed message if a non-mataching ltiLinkId is included' do
+        it 'responds with precondition failed message if a non-matching ltiLinkId is included' do
           new_assignment = assignment_model
           new_lti_link_id = new_assignment.lti_context_id
           resource_link_model(overrides: {resource_link_id: new_lti_link_id})
@@ -307,7 +312,7 @@ module Lti
 
           expected_response = {
             id: "http://www.example.com/api/lti/courses/#{course.id}/line_items/#{line_item.id}",
-            scoreMaximum: 1.0,
+            scoreMaximum: 10.0,
             label: 'Test Line Item',
             ltiLinkId: line_item.resource_link.resource_link_id
           }.with_indifferent_access
@@ -319,19 +324,19 @@ module Lti
       describe '#show' do
         let!(:line_item) do
           line_item_model(
-            overrides: {
-              assignment: assignment,
-              resource_link: resource_link,
-              tag: tag,
-            }
+            assignment: assignment,
+            resource_link: resource_link,
+            tag: tag,
           )
         end
+
+        it_behaves_like 'lti_link tool check'
 
         it 'correctly formats the requested line item' do
           get url, headers: request_headers
           expected_response = {
             id: "http://www.example.com/api/lti/courses/#{course.id}/line_items/#{line_item.id}",
-            scoreMaximum: 1.0,
+            scoreMaximum: 10.0,
             label: 'Test Line Item',
             tag: tag,
             ltiLinkId: line_item.resource_link.resource_link_id
@@ -352,10 +357,7 @@ module Lti
         end
 
         it 'responds with 404 if the line item does not exist' do
-          new_course = course_model
-          new_assignment = assignment_model(course: new_course)
-          new_line_item = line_item.dup
-          new_line_item.assignment = new_assignment
+          new_line_item = line_item_model
           new_line_item.save!
 
           new_url = Rails.application.routes.url_helpers.lti_line_item_edit_path(
@@ -394,36 +396,28 @@ module Lti
         # the specs that follow.
         let!(:line_item) do
           line_item_model(
-            overrides: {
-              assignment: assignment
-            }
+            assignment: assignment
           )
         end
 
         let!(:line_item_with_tag) do
           line_item_model(
-            overrides: {
-              assignment: assignment,
-              tag: tag
-            }
+            assignment: assignment,
+            tag: tag
           )
         end
 
         let!(:line_item_with_resource_id) do
           line_item_model(
-            overrides: {
-              assignment: assignment,
-              resource_id: resource_id
-            }
+            assignment: assignment,
+            resource_id: resource_id
           )
         end
 
         let!(:line_item_with_lti_link_id) do
           line_item_model(
-            overrides: {
-              assignment: assignment,
-              resource_link: resource_link
-            }
+            assignment: assignment,
+            resource_link: resource_link
           )
         end
 
@@ -473,11 +467,9 @@ module Lti
 
         it 'allows querying by multiple valid fields at the same time' do
           tag_and_resource = line_item_model(
-            overrides: {
-              assignment: assignment,
-              tag: tag,
-              resource_id: resource_id
-            }
+            assignment: assignment,
+            tag: tag,
+            resource_id: resource_id
           )
           get url, params: {tag: tag, resource_id: resource_id}, headers: request_headers
           expect(line_item_list).to match_array([
@@ -497,6 +489,8 @@ module Lti
       end
 
       describe 'destroy' do
+        it_behaves_like 'lti_link tool check'
+
         shared_examples 'the line item destroy endpoint' do
           let(:line_item) { raise 'override in spec' }
 
@@ -514,22 +508,20 @@ module Lti
         context 'when using the coupled model' do
           let(:coupled_line_item) do
             line_item_model(
-              overrides: {
-                assignment: assignment,
-                resource_link: resource_link,
-                tag: tag,
-                resource_id: resource_id
-              }
-            )
-          end
-
-          let!(:second_line_item) do
-            line_item_model(overrides: {
               assignment: assignment,
               resource_link: resource_link,
               tag: tag,
               resource_id: resource_id
-            })
+            )
+          end
+
+          let!(:second_line_item) do
+            line_item_model(
+              assignment: assignment,
+              resource_link: resource_link,
+              tag: tag,
+              resource_id: resource_id
+            )
           end
 
           it_behaves_like 'the line item destroy endpoint' do
@@ -552,11 +544,9 @@ module Lti
           it_behaves_like 'the line item destroy endpoint' do
             let(:line_item) do
               line_item_model(
-                overrides: {
-                  assignment: assignment,
-                  tag: tag,
-                  resource_id: resource_id
-                }
+                assignment: assignment,
+                tag: tag,
+                resource_id: resource_id
               )
             end
           end

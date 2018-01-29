@@ -63,7 +63,7 @@ module Lti
       include Concerns::GradebookServices
 
       skip_before_action :load_user
-      before_action :verify_tool_in_context, :verify_tool_permissions
+
       before_action :verify_line_item_in_context, only: %i(show update destroy)
       before_action :verify_valid_resource_link, only: :create
 
@@ -128,7 +128,6 @@ module Lti
         line_item.update_attributes!(line_item_params)
         update_assignment_title if line_item.assignment_line_item?
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
-               status: :ok,
                content_type: MIME_TYPE
       end
 
@@ -138,7 +137,6 @@ module Lti
       # @returns LineItem
       def show
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
-               status: :ok,
                content_type: MIME_TYPE
       end
 
@@ -233,6 +231,13 @@ module Lti
 
       def line_item_collection(line_items)
         line_items.map { |li| LineItemsSerializer.new(li, line_item_id(li)) }
+      end
+
+      def verify_valid_resource_link
+        return unless params[:ltiLinkId]
+        raise ActiveRecord::RecordNotFound if resource_link.blank?
+        head :precondition_failed if resource_link.line_items.blank?
+        # TODO: check that the Lti::ResouceLink is owned by the tool
       end
     end
   end

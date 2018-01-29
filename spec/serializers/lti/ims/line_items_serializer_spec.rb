@@ -28,14 +28,12 @@ RSpec.describe Lti::Ims::LineItemsSerializer do
   end
   let(:line_item) do
     line_item_model(
-      overrides:{
-        assignment: assignment,
-        resource_link: resource_link,
-        label: 'label',
-        tag: 'tag',
-        score_maximum: 60,
-        resource_id: 'resource_id'
-      }
+      assignment: assignment,
+      resource_link: resource_link,
+      label: 'label',
+      tag: 'tag',
+      score_maximum: 60,
+      resource_id: 'resource_id'
     )
   end
 

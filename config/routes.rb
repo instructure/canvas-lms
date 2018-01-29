@@ -2116,6 +2116,11 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/line_items/:id", action: :update, as: :lti_line_item_edit
       delete "courses/:course_id/line_items/:id", action: :destroy, as: :lti_line_item_delete
     end
+
+    # Scores Service
+    scope(controller: 'lti/ims/scores') do
+      post "courses/:course_id/line_items/:line_item_id/scores", action: :create, as: :lti_result_create
+    end
   end
 
   ApiRouteSet.draw(self, '/api/sis') do
