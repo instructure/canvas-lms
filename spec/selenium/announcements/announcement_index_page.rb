@@ -25,6 +25,11 @@ class AnnouncementIndex
       wait_for_ajaximations
     end
 
+    def visit_groups_index(group)
+      get("/groups/#{group.id}/announcements/")
+      wait_for_ajaximations
+    end
+
     def set_section_specific_announcements_flag(course, state)
       course.account.set_feature_flag! :section_specific_announcements, state
     end
@@ -165,6 +170,12 @@ class AnnouncementIndex
 
     def click_add_announcement
        add_announcement_button.click
+    end
+
+    def delete_announcement_manually(title)
+      check_announcement(title)
+      click_delete
+      click_confirm_delete
     end
   end
 end

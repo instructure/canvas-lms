@@ -22,8 +22,14 @@ class AnnouncementNewEdit
     include SeleniumDependencies
 
     # ---------------------- Page ----------------------
+    # TODO: Rename this to clarify that its group specific and takes you
+    # to the announcement creation page
     def visit(course)
       get("/courses/#{course.id}/discussion_topics/new?is_announcement=true")
+    end
+
+    def visit_group_create_announcement_page(group)
+      get("/groups/#{group.id}/discussion_topics/new?is_announcement=true")
     end
 
     def set_section_specific_announcements_flag(course, state)
@@ -38,6 +44,11 @@ class AnnouncementNewEdit
       "/discussion_topics/#{announcement.id}"
     end
 
+    def full_individual_announcement_url(context, announcement)
+      context_type = context.is_a?(Course) ? "courses" : "groups"
+      "/#{context_type}/#{context.id}/discussion_topics/#{announcement.id}"
+    end
+
     # ---------------------- Controls ----------------------
     def section_autocomplete_css
       "#sections_autocomplete_root input[type='text']"
@@ -47,6 +58,7 @@ class AnnouncementNewEdit
       submit_form('.form-actions')
     end
 
+    # Note: This *appends* to the existing content in the text area
     def add_message(message)
       type_in_tiny('textarea[name=message]', message)
     end
@@ -67,6 +79,23 @@ class AnnouncementNewEdit
       else
         driver.action.send_keys(:backspace).perform
       end
+      wait_for_ajax_requests
+    end
+
+    def create_group_announcement(group, title, text)
+      visit_group_create_announcement_page(group)
+      replace_content(f('input[name=title]'), title)
+      type_in_tiny('textarea[name=message]', text)
+      submit_announcement_form
+      wait_for_ajax_requests
+    end
+
+    def edit_group_announcement(group, announcement, message)
+      url_base = full_individual_announcement_url(group, announcement)
+      get "#{url_base}/edit"
+      # Note that add_message *appends* to existing
+      add_message(message)
+      submit_announcement_form
       wait_for_ajax_requests
     end
   end
