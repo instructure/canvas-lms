@@ -259,7 +259,7 @@ class GradeSummaryPresenter
   def courses_with_grades
     @courses_with_grades ||= begin
       student.shard.activate do
-        if student_is_user?
+        course_list = if student_is_user?
           Course.where(id: student.participating_student_current_and_concluded_course_ids).to_a
         elsif user_an_observer_of_student?
           observed_courses = []
@@ -275,6 +275,8 @@ class GradeSummaryPresenter
         else
           []
         end
+
+        course_list.select { |c| c.grants_right?(student, :read) }
       end
     end
   end

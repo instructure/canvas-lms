@@ -46,6 +46,14 @@ describe GradeSummaryPresenter do
         enrollment.conclude
         expect(presenter.courses_with_grades).to include(course)
       end
+
+      it "excludes soft-concluded courses where students are restricted after conclusion" do
+        course.soft_conclude!
+        course.settings = course.settings.merge(restrict_student_past_view: true)
+        course.save!
+
+        expect(presenter.courses_with_grades).not_to include(course)
+      end
     end
 
     describe 'across shards' do
