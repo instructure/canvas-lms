@@ -412,7 +412,7 @@ define [
       if data.allow_todo_date == '1' && data.todo_date == null
         errors['todo_date'] = [{type: 'date_required_error', message: I18n.t('You must enter a date')}]
 
-      if ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED && !data.specific_sections
+      if ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED && ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement && !data.specific_sections
         errors['specific_sections'] = [{type: 'specific_sections_required_error', message: I18n.t('You must input a section')}]
 
       if @isAnnouncement()
@@ -466,7 +466,7 @@ define [
         else
           @$discussionEditView.tabs("option", "active", 0)
 
-      if ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED && errors['specific_sections']
+      if ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED && ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement && errors['specific_sections']
         $.flashError(I18n.t("You must input a section"))
 
       super(errors)

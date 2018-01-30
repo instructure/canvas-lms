@@ -230,6 +230,45 @@ define [
     formData = view.getFormData()
     equal formData.todo_date, null
 
+  QUnit.module 'EditView - Sections Specific',
+    test "allows discussion to save when section specific has errors has no section", ->
+      ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
+      ENV.DISCUSSION_TOPIC = {
+        ATTRIBUTES: {
+          is_announcement: false
+        }
+      }
+      view = @editView({ withAssignment: true})
+      title = 'a'.repeat(10)
+      assignment = view.assignment
+      assignment.attributes.post_to_sis = '1'
+      errors = view.validateBeforeSave({
+        title: title,
+        set_assignment: '1',
+        assignment: assignment,
+        specific_sections: null
+      }, [])
+      equal errors.length, 0
+
+    test "allows announcement to save when section specific has a section", ->
+      ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
+      ENV.DISCUSSION_TOPIC = {
+        ATTRIBUTES: {
+          is_announcement: true
+        }
+      }
+      view = @editView({ withAssignment: true})
+      title = 'a'.repeat(10)
+      assignment = view.assignment
+      assignment.attributes.post_to_sis = '1'
+      errors = view.validateBeforeSave({
+        title: title,
+        set_assignment: '1',
+        assignment: assignment,
+        specific_sections: ["fake_section"]
+      }, [])
+      equal errors.length, 0
+
   QUnit.module 'EditView - ConditionalRelease',
     setup: ->
       fakeENV.setup()
