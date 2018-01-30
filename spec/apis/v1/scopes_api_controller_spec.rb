@@ -28,6 +28,9 @@ describe ScopesApiController, type: :request do
       end
 
       it "returns expected scopes" do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management).and_return(true)
+        allow_any_instance_of(Account).to receive(:feature_allowed?).and_return(false)
+        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management).and_return(true)
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", { controller: 'scopes_api', action: 'index', format: 'json', account_id: @account.id.to_s })
         [
           'manage_assignments',
@@ -36,6 +39,11 @@ describe ScopesApiController, type: :request do
         ].each do |scope|
           expect(json.one? { |s| s['name'] == "#{RoleOverride::ACCESS_TOKEN_SCOPE_PREFIX}.#{scope}" }).to eq true
         end
+      end
+
+      it "returns 403 when feature flag is disabled" do
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", { controller: 'scopes_api', action: 'index', format: 'json', account_id: @account.id.to_s })
+        expect(response.code).to eql '403'
       end
     end
 
@@ -46,6 +54,8 @@ describe ScopesApiController, type: :request do
       end
 
       it "returns a 401" do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management).and_return(true)
+        allow_any_instance_of(Account).to receive(:feature_allowed?).with(:developer_key_management).and_return(true)
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", { controller: 'scopes_api', action: 'index', format: 'json', account_id: @account.id.to_s })
         expect(response.code).to eql '401'
       end

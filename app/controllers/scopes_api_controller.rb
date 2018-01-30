@@ -39,6 +39,8 @@
 #
 class ScopesApiController < ApplicationController
   before_action :require_context
+  before_action :require_user
+  before_action :check_feature_flag
 
   # @API List scopes
   # A list of scopes that can be applied to developer keys and access tokens.
@@ -46,7 +48,19 @@ class ScopesApiController < ApplicationController
   # @returns [Scope]
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      render :json => RoleOverride.manageable_access_token_scopes(@context)
+      render json: RoleOverride.manageable_access_token_scopes(@context)
     end
+  end
+
+  private
+  def check_feature_flag
+    if @context.root_account.site_admin?
+      return if @context.root_account.feature_allowed?(:developer_key_management)
+    else
+      return if Account.site_admin.feature_allowed?(:developer_key_management) &&
+        @context.root_account.feature_enabled?(:developer_key_management)
+    end
+
+    render json: [], status: :forbidden
   end
 end
