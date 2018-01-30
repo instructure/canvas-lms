@@ -680,6 +680,7 @@ type User implements Node, Timestamped {
   _id: ID!
   avatarUrl: URL
   createdAt: Time
+  email: String
   enrollments(
     # only return enrollments for this course
     courseId: ID!

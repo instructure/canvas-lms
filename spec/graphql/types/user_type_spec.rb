@@ -46,4 +46,29 @@ describe Types::UserType do
       ).to be_nil
     end
   end
+
+  context "email" do
+    before(:once) do
+      user.email = "cooldude@example.com"
+      user.save!
+    end
+
+    it "returns email for teachers/admins" do
+      expect(user_type.email(current_user: @teacher)).to eq user.email
+
+      # this is for the cached branch
+      allow(user).to receive(:email_cached?) { true }
+      expect(user_type.email(current_user: @teacher)).to eq user.email
+    end
+
+    it "doesn't return email for others" do
+      _student = user
+      other_student = student_in_course(active_all: true).user
+      teacher_in_other_course = teacher_in_course(course: course_factory).user
+
+      expect(user_type.email(current_user: nil)).to be_nil
+      expect(user_type.email(current_user: other_student)).to be_nil
+      expect(user_type.email(current_user: teacher_in_other_course)).to be_nil
+    end
+  end
 end
