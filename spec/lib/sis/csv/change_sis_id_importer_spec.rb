@@ -139,4 +139,44 @@ describe SIS::CSV::ChangeSisIdImporter do
     expect(importer.errors).not_to be_nil
   end
 
+  describe 'group categories' do
+    let!(:gc) {group_category(context: @account, sis_source_id: 'GC1')}
+
+    it 'should change the sis id for a group category' do
+      importer = process_csv_data(
+        'old_id,new_id,type',
+        'GC1,GC2,group_category'
+      )
+      expect(importer.errors).to be_empty
+      gc.reload
+      expect(gc.sis_source_id).to eq('GC2')
+    end
+
+    it 'should not error if other rows have an integration_id' do
+      u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+      u1.pseudonym.integration_id = 'int1'
+      u1.pseudonym.save!
+
+      importer = process_csv_data(
+        'old_id,new_id,old_integration_id,new_integration_id,type',
+        ',,int1,int2,user',
+        'GC1,GC2,,,group_category'
+      )
+      gc.reload
+      expect(gc.sis_source_id).to eq('GC2')
+    end
+
+    it 'should cleanly handle error if integration_id is given' do
+      u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+
+      importer = process_csv_data(
+        'old_id,new_integration_id,new_id,type',
+        'GC1,INTID,group_category',
+        'U001,,U002,user'
+      )
+      expect(importer.errors).not_to be_empty
+      u1.reload
+      expect(u1.pseudonym.sis_user_id).to eq('U002')
+    end
+  end
 end

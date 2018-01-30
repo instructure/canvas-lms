@@ -1118,7 +1118,8 @@ object type and the root_account.</td>
 <td>text</td>
 <td>✓&#42;</td>
 <td></td>
-<td>The current integration_id of the object that should be changed.</td>
+<td>The current integration_id of the object that should be changed. This
+column is not supported for group categories.</td>
 </tr>
 <tr>
 <td>new_integration_id</td>
@@ -1126,15 +1127,16 @@ object type and the root_account.</td>
 <td>✓&#42;</td>
 <td></td>
 <td>The desired integration_id of the object. This id must be currently unique
-to the object type and the root_account. Can pass "&lt;delete>" to
-remove the integration_id from the object.</td>
+to the object type and the root_account. This column is not supported for group
+categories. Can pass "&lt;delete>" to remove the integration_id from the
+object.</td>
 </tr>
 <tr>
 <td>type</td>
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>account, term, course, section, group, user</td>
+<td>account, term, course, section, group, group_category, user</td>
 </tr>
 </table>
 
