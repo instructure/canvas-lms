@@ -320,7 +320,7 @@ class ApplicationController < ActionController::Base
     if is_master
       bc_data.merge!(
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        terms: @context.account.root_account.enrollment_terms.active.to_a.map{|term| {id: term.id, name: term.name}},
         canManageCourse: @context.account.grants_right?(@current_user, :manage_master_courses)
       )
     end
