@@ -2940,9 +2940,9 @@ class User < ActiveRecord::Base
     !!@all_active_pseudonyms
   end
 
-  def current_groups_in_region?
-    return true if self.current_groups.exists?
-    return true if self.current_groups.shard(self.in_region_associated_shards).exists?
+  def current_active_groups?
+    return true if self.current_groups.preload(:context).any?(&:context_available?)
+    return true if self.current_groups.shard(self.in_region_associated_shards).preload(:context).any?(&:context_available?)
     false
   end
 
