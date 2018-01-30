@@ -3976,7 +3976,7 @@ sv:
   configuration_location_ee0f6592: Konfigureringsplats
   configuration_type_25a084a4: Konfigureringstyp
   configure_ecb97e30: Konfigurera
-  configure_individual_learning_paths_for_students_b_e2fce294: "Konfigurera individuella lärovägar för studenter baserat på uppgiftsresultat."
+  configure_individual_learning_paths_for_students_b_e2fce294: "Konfigurera individuella måluppfyllnadsvägar för studenter baserat på uppgiftsresultat."
   configure_tool_app_3b1bb50b: "Konfigurera %{tool} app?"
   configure_toolname_app_651371be: "Konfigurera %{toolName} Appen"
   confirm_contact_method_29d6fe4b: "Bekräfta kontaktmetod"
@@ -5753,7 +5753,7 @@ sv:
   create_a_new_module_6f31b0fe: "Skapa en ny modul"
   create_a_new_user_for_address_7487e9c9: "Skapa en ny användare för \"%{address}\""
   create_account_263ec6: "Skapa konto"
-  create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Skapa och administrera online frågesporter och undersökningar, både graderade och ograderade."
+  create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Skapa och administrera online quizzes och undersökningar, både betygsatta och ej betygsatta."
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Skapa det antal diskussionsämnen som behövs, som uppgifter
       för betygsättning eller som forum för delning av idéer och information
@@ -9419,7 +9419,7 @@ sv:
       och bokstavsbetyg. Gruppuppgifter för betygsviktning.
   input_and_distribute_grades_for_students_display_g_9a2e46a0: |-
       Skriv in och distribuera betyg för studenter. Visa betyg som
-      poäng, procentandelar, fullständig eller ofullständig, godkänd eller ej godkänd,        		  GPA-skala, och bokstavsbetyg. Gruppuppgifter för betygsviktning.
+      poäng, procentandelar, färdig eller ofärdig, godkänd eller ej godkänd,        		  GPA-skala, och bokstavsbetyg. Gruppuppgifter för betygsviktning.
   insert_math_equation_57c6e767: "För in en matematisk ekvation"
   insert_row_below_25187f89: "Lägg till en rad under"
   installed_7b284a91: Installerad
@@ -9705,7 +9705,7 @@ sv:
       log_in_to_canvas: "Logga in på Canvas"
   learn_more_about_collaborations_2978f66d: "Lär dig mer om samarbeten"
   learning_mastery_5fc34276: Måluppfyllelse
-  learning_mastery_6ed4fd63: "Bemästring av lärande..."
+  learning_mastery_6ed4fd63: Måluppfyllelse...
   learning_mastery_gradebook_description: |-
       Överblick för måluppfyllelse ger läraren en överblick över student- och kursutvecklingen baserat på kursens lärandemål. Resultaten presenteras i ett betygsboksliknade format och studentutveckling visas både i siffror och
       definierade kategorier.
@@ -17873,7 +17873,7 @@ sv:
   sync_completed_successfully_8f68b542: "Synkroniseringen var framgångsrik"
   sync_grades_a16622ca: "Synkronisera betyg"
   sync_grades_to_sis_4e7fbc08: "Synkronisera betyg till SIS"
-  sync_grades_to_sis_checkbox_is_enabled_by_default__fad7a785: "”Synkronisa betyg till SIS” är aktiverat som standard för uppgifter, betygsdiskussioner och frågesporter"
+  sync_grades_to_sis_checkbox_is_enabled_by_default__fad7a785: "”Synkronisa betyg till SIS” är aktiverat som standard för uppgifter, betygsdiskussioner och quizzes"
   sync_grades_to_sis_fd01f7fd: "Synkronisera betyg till SIS"
   sync_history_3d46eb19: Synkroniseringshistorik
   sync_in_progress_12ff1d3c: "Synkronisering pågår"
@@ -19582,7 +19582,7 @@ sv:
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du kan du ställa in omgraderingsalternativ för elever som redan tagit Quiz."
   you_can_publish_your_course_from_the_home_page_whe_a36d49d6: |-
       Du kan publicera din kurs från hemsidan när du är redo
-      att dela den med dina studenter. Fram till din kurs publiceras kommer endast instruktörer att få tillgång till den.
+      att dela den med dina studenter. Fram till din kurs publiceras kommer endast lärare att få tillgång till den.
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "Du kan svara på denna kommentaren genom att svara på detta meddelandet, eller granska inlämningsdetaljerna via denna länken: %{link}."
   you_can_reply_to_this_comment_by_responding_to_thi_4fd1379e: "Du kan svara på den här kommentaren genom att svara på det här meddelandet eller granska inlämningsuppgifterna med den här länken: %{link}.När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på inlämningen"
   you_can_reply_to_this_message_in_canvas_by_clickin_f5f5f7a3: "Du kan svara på det här meddelandet i Canvas genom att klicka på den här länken: %{link}."
