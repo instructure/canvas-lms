@@ -947,6 +947,32 @@ module Lti
                        -> { @assignment.id },
                        ASSIGNMENT_GUARD
 
+    # Returns the Canvas id of the group the current user is in if launching
+    # from a group assignment.
+    #
+    # @example
+    #   ```
+    #   481
+    #   ```
+    register_expansion 'com.instructure.Group.id', [],
+                       -> { (@assignment.group_category&.groups & @current_user.groups).first&.id },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD,
+                       default_name: 'vnd_canvas_group_id'
+
+    # Returns the name of the group the current user is in if launching
+    # from a group assignment.
+    #
+    # @example
+    #   ```
+    #   Group One
+    #   ```
+    register_expansion 'com.instructure.Group.name', [],
+                       -> { (@assignment.group_category&.groups & @current_user.groups).first&.name },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD,
+                       default_name: 'vnd_canvas_group_name'
+
     # Returns the title of the assignment that was launched.
     #
     # @example

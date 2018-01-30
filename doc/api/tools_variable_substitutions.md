@@ -861,6 +861,26 @@ Returns the assignment_id of the assignment that was launched.
 ```
 1234
 ```
+## com.instructure.Group.id
+Returns the Canvas id of the group the current user is in if launching
+from a group assignment.
+
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *vnd_canvas_group_id*  
+
+```
+481
+```
+## com.instructure.Group.name
+Returns the name of the group the current user is in if launching
+from a group assignment.
+
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *vnd_canvas_group_name*  
+
+```
+Group One
+```
 ## Canvas.assignment.title
 Returns the title of the assignment that was launched.
 
