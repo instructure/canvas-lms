@@ -1,7 +1,7 @@
 import formatMessage from "../format-message"
 import contrast from "wcag-element-contrast"
 import { onlyContainsLink } from "../utils/dom"
-import rgbHex from "rgb-hex"
+import rgbHex from "../utils/rgb-hex"
 
 export default {
   test: (elem, config = {}) => {
