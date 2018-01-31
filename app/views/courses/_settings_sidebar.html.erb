@@ -45,7 +45,7 @@
       <% end %>
     <% elsif !@context.soft_concluded? %>
       <%= link_to context_url(@context, :context_confirm_action_url, :event => 'conclude'), :class => 'Button Button--link Button--link--has-divider Button--course-settings' do %>
-        <i class="icon-lock"></i><%= t('links.conclude', 'Conclude this Course') %>
+        <i class="icon-lock"></i><%= t('links.conclude', 'Grade Out All Students') %>
       <% end %>
     <% end %>
   <% end %>

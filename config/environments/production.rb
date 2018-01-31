@@ -48,6 +48,11 @@ environment_configuration(defined?(config) && config) do |config|
   config.public_file_server.enabled = true
 
   config.force_ssl = true
+  config.ssl_options = {
+    redirect: {
+      exclude: -> request { request.path =~ /health_check/ }
+    }
+  }
   # Enable serving of images, stylesheets, and javascripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
 

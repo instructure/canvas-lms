@@ -43,7 +43,7 @@ define [
     $(".conclude_enrollment_link").click (event) ->
       event.preventDefault()
       $(this).parents(".enrollment").confirmDelete
-        message: I18n.t("confirm.conclude_student", "Are you sure you want to conclude this student's enrollment?")
+        message: I18n.t("confirm.conclude_student", "Are you sure you would like to grade out this student from this course section?\n\nYou can undo this action by going to the People tab, clicking on View Prior Enrollments inside of the gear icon, and selecting the student you wish to restore.")
         url: $(this).attr("href")
         success: (data) ->
           $(this).undim()
