@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'parallel'
-require 'digest'
 
 module Canvas
   module Cdn
@@ -40,7 +39,7 @@ module Canvas
       end
 
       def upload!
-        opts = {in_threads: 32, progress: 'uploading to S3'}
+        opts = {in_threads: 16, progress: 'uploading to S3'}
         if block_given?
           opts[:finish] = -> (_, i, _) { yield (100.0 * i / local_files.count) }
         end
@@ -68,49 +67,13 @@ module Canvas
         options
       end
 
-      def ungzipped_body(s3_object)
-        if s3_object.content_encoding == "gzip"
-          ActiveSupport::Gzip.decompress(s3_object.get.body.string)
-        else
-          s3_object.get.body.string
-        end
-      end
-
-      def ignore?(local_path)
-        files_not_to_upload = [
-          /dist\/rev-manifest.json/,
-          /brandable_css\/brandable_css_bundles_with_deps.json/,
-          /brandable_css\/brandable_css_file_checksums.json/,
-          /webpack-manifest.json/
-        ]
-
-        (local_path.extname == '.gz') ||
-        local_path.directory? ||
-        files_not_to_upload.any? {|e| e.match? local_path.to_s}
-      end
-
       def upload_file(remote_path)
         local_path = Pathname.new("#{Rails.public_path}/#{remote_path}")
-        return if ignore?(local_path)
-        options = options_for(local_path)
-        body = handle_compression(local_path, options)
+        return if (local_path.extname == '.gz') || local_path.directory?
         s3_object = mutex.synchronize { bucket.object(remote_path) }
-        if s3_object.exists?
-          files_match = # quickest check
-                        %("#{Digest::MD5.hexdigest(body)}") == s3_object.etag ||
-                        # check actual contents in case it was just gzip encoded differently
-                        local_path.read == ungzipped_body(s3_object)
-
-          if files_match
-            return log("skipping already existing #{remote_path}")
-          else
-            raise "There is a already a file named #{s3_object.key} in the s3 bucket, \
-                  But its contents don't match what you are trying upload. \
-                  If a file's contents change, its name MUST change. \
-                  Otherwise, you'll run into all kinds of caching issues in production."
-          end
-        end
-        s3_object.put(options.merge(body: body))
+        return log("skipping already existing #{remote_path}") if s3_object.exists?
+        options = options_for(local_path)
+        s3_object.put(options.merge(body: handle_compression(local_path, options)))
       end
 
       def log(msg)
@@ -125,9 +88,11 @@ module Canvas
           # client makes it is not worth serving gzipped
           if compression > 5
             options[:content_encoding] = 'gzip'
+            log "uploading gzipped #{file}. was: #{file.size} now: #{gzipped.size} saved: #{compression}%"
             return gzipped
           end
         end
+        log "uploading ungzipped #{file}"
         file.read
       end
 
