@@ -117,7 +117,6 @@
     "istanbul-instrumenter-loader": "^3.0.0",
     "jest": "^22.0.6",
     "jest-junit": "^3.4.1",
-    "jest-localstorage-mock": "2.1.0",
     "json-loader": "^0.5.3",
     "jsx-loader": "0.11.2",
     "karma": "^2.0.0",
