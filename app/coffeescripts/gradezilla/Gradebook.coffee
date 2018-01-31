@@ -1679,6 +1679,8 @@ define [
 
     # The target cell will enter editing mode
     onBeforeEditCell: (event, obj) =>
+      if obj.column.type == 'custom_column' && @getCustomColumn(obj.column.customColumnId)?.read_only
+        return false
       return true if obj.column.type != 'assignment'
       return false unless student = @student(obj.item.id)
       return false if student.isConcluded

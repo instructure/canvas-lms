@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,19 +14,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Api::V1::CustomGradebookColumn
-  include Api::V1::Json
+class AddReadonlyToCustomGradebookColumn < ActiveRecord::Migration[5.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  def custom_gradebook_column_json(column, user, session)
-    json = api_json column, user, session, :only => %w(id title position
-                                                       teacher_notes read_only)
-    json[:hidden] = column.hidden?
-    json
+  def up
+    add_column :custom_gradebook_columns, :read_only, :boolean
+    change_column_default :custom_gradebook_columns, :read_only, false
+    DataFixup::BackfillNulls.run(CustomGradebookColumn, :read_only, default_value: false)
+    change_column_null :custom_gradebook_columns, :read_only, false
   end
 
-  def custom_gradebook_column_datum_json(datum, user, session)
-    api_json datum, user, session, :only => %w(user_id content)
+  def down
+    remove_column :custom_gradebook_columns, :read_only
   end
 end

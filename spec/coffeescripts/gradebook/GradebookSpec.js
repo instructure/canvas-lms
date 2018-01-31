@@ -399,6 +399,22 @@ test('It does not sort columns when gradebookColumnOrderSettings is undefined', 
   notOk(this.makeColumnSortFn.called)
 })
 
+QUnit.module('Gradebook#customColumnDefinitions', {
+  setup() {
+    this.gradebook = createGradebook()
+    this.gradebook.customColumns = [
+      { id: '1', teacher_notes: false, hidden: false, title: 'Read Only', read_only: true },
+      { id: '2', teacher_notes: false, hidden: false, title: 'Not Read Only', read_only: false }
+    ]
+  }
+})
+
+test('includes the cannot_edit class for read_only columns', function () {
+  columns = this.gradebook.customColumnDefinitions()
+  equal(columns[0].cssClass, "meta-cell custom_column cannot_edit")
+  equal(columns[1].cssClass, "meta-cell custom_column")
+})
+
 QUnit.module('Gradebook#fieldsToExcludeFromAssignments', {
   setup() {
     return (this.excludedFields = Gradebook.prototype.fieldsToExcludeFromAssignments)

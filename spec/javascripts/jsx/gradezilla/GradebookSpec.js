@@ -4414,6 +4414,10 @@ QUnit.module('Gradebook Grid Events', () => {
     hooks.beforeEach(() => {
       gradebook = createGradebook();
       gradebook.initSubmissionStateMap();
+      gradebook.gradebookContent.customColumns = [
+        { id: '1', teacher_notes: false, hidden: false, title: 'Read Only', read_only: true },
+        { id: '2', teacher_notes: false, hidden: false, title: 'Not Read Only', read_only: false }
+      ];
       gradebook.students = { 1101: { id: '1101', isConcluded: false } };
       eventObject = {
         column: { assignmentId: '2301', type: 'assignment' },
@@ -4451,6 +4455,11 @@ QUnit.module('Gradebook Grid Events', () => {
     test('returns true when the cell is not in an assignment column', () => {
       eventObject.column = { type: 'custom_column' };
       strictEqual(gradebook.onBeforeEditCell(null, eventObject), true);
+    });
+
+    test('returns false when the cell is read_only', () => {
+      eventObject.column = { type: 'custom_column', customColumnId: '1' };
+      strictEqual(gradebook.onBeforeEditCell(null, eventObject), false);
     });
   });
 

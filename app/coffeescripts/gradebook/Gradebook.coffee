@@ -1323,15 +1323,20 @@ define [
 
     customColumnDefinitions: ->
       @customColumns.map (c) ->
-        id: "custom_col_#{c.id}"
-        name: if c.teacher_notes then I18n.t('Notes') else htmlEscape c.title
-        field: "custom_col_#{c.id}"
-        width: 100
-        cssClass: "meta-cell custom_column"
-        resizable: true
-        editor: LongTextEditor
-        autoEdit: false
-        maxLength: 255
+        cssClasses = ["meta-cell", "custom_column"]
+        cssClasses.push("cannot_edit") if c.read_only
+
+        {
+          id: "custom_col_#{c.id}"
+          name: if c.teacher_notes then I18n.t('Notes') else htmlEscape c.title
+          field: "custom_col_#{c.id}"
+          width: 100
+          cssClass: cssClasses.join(" ")
+          resizable: true
+          editor: LongTextEditor
+          autoEdit: false
+          maxLength: 255
+        }
 
     initGrid: =>
       #this is used to figure out how wide to make each column
