@@ -14,7 +14,7 @@ CanvasSchema = GraphQL::Schema.define do
     GraphQLNodeLoader.load(type, id, ctx)
   }
 
-  resolve_type ->(obj, ctx) {
+  resolve_type ->(_type, obj, ctx) {
     case obj
     when Course then Types::CourseType
     when Assignment then Types::AssignmentType
