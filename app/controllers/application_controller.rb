@@ -2087,6 +2087,7 @@ class ApplicationController < ActionController::Base
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user
     data[:can_edit_name] = data[:can_edit] && profile.user.user_can_edit_name?
+    data[:can_edit_avatar] = data[:can_edit] && profile.user.avatar_state != :locked
     data[:known_user] = viewer.address_book.known_user(profile.user)
     if data[:known_user] && viewer != profile.user
       common_courses = viewer.address_book.common_courses(profile.user)
