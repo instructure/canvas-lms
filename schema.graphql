@@ -693,8 +693,8 @@ type User implements Node, Timestamped {
   email: String
   enrollments(
     # only return enrollments for this course
-    courseId: ID!
-  ): [Enrollment]
+    courseId: ID
+  ): [Enrollment]!
   id: ID!
   name: String
 
