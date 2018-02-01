@@ -1824,7 +1824,7 @@ class Course < ActiveRecord::Base
     enrollment_state = opts[:enrollment_state]
     enrollment_state ||= 'active' if type == 'ObserverEnrollment' && user.registered?
     section = opts[:section]
-    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
+    limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
 
     role = opts[:role] || Enrollment.get_built_in_role_for_type(type)
@@ -1860,7 +1860,7 @@ class Course < ActiveRecord::Base
         } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
       end
       # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
-      e.limit_privileges_to_course_section = limit_privileges_to_course_section if e unless limit_privileges_to_course_section.nil?
+      e.limit_privileges_to_course_section = limit_privileges_to_course_section if e
       # if we're creating a new enrollment, we want to return it as the correct
       # subclass, but without using associations, we need to manually activate
       # sharding. We should probably find a way to go back to using the

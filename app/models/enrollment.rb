@@ -64,7 +64,6 @@ class Enrollment < ActiveRecord::Base
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   before_validation :ensure_role_id
-  before_validation :infer_privileges
   after_create :create_linked_enrollments
   after_create :create_enrollment_state
   after_save :copy_scores_from_existing_enrollment, if: :need_to_copy_scores?
@@ -575,11 +574,6 @@ class Enrollment < ActiveRecord::Base
   def assert_section
     self.course_section = self.course.default_section if !self.course_section_id && self.course
     self.root_account_id ||= self.course.root_account_id rescue nil
-  end
-
-  def infer_privileges
-    self.limit_privileges_to_course_section = false if self.limit_privileges_to_course_section.nil?
-    true
   end
 
   def course_name(display_user = nil)
