@@ -379,6 +379,25 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@user, @account2)).to eq []
         expect(AccountNotification.for_user_and_account(@user, @shard2_account)).to eq []
       end
+
+      it "should find notifications on cross-sharded sub-accounts properly" do
+        # and perhaps more importantly, don't find notifications for accounts the user doesn't belong in
+        id = 1
+        while [Shard.default, @shard2].any?{|s| s.activate { Account.where(:id => id).exists? }} # make sure this id is free
+          id += 1 #
+        end
+
+        @tricky_sub_acc = @account1.sub_accounts.create!(:id => id) # create it with the id
+        # they don't belong to this sub-account so they shouldn't see this notification
+        @not_visible = account_notification(:account => @tricky_sub_acc)
+
+        @shard2.activate do
+          @shard2_subaccount = @shard2_account.sub_accounts.create!(:id => id) # create with same local id
+          @shard2_course2 = course_with_student(:account => @shard2_subaccount, :user => @user, :active_all => true)
+          @visible = account_notification(:account => @shard2_subaccount, :role_ids => [student_role.id])
+        end
+        expect(AccountNotification.for_user_and_account(@user, @account1)).to eq [@visible]
+      end
     end
   end
 end
