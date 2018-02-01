@@ -1761,11 +1761,6 @@ class UsersController < ApplicationController
       api_find(User, params[:id]) :
       params[:id] ? api_find(User, params[:id]) : @current_user
 
-    if params[:default_pseudonym_id] && authorized_action(@user, @current_user, :manage)
-      @default_pseudonym = @user.pseudonyms.find(params[:default_pseudonym_id])
-      @default_pseudonym.move_to_top
-    end
-
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
     managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)

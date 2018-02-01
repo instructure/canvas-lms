@@ -636,10 +636,6 @@ class User < ActiveRecord::Base
     self.name <=> other.name
   end
 
-  def default_pseudonym_id
-    self.pseudonyms.active.first.id
-  end
-
   def available?
     true
   end
