@@ -330,7 +330,7 @@ define [
     addRow: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
-      student.secondary_identifier = student.email || sis_login_id || student.login_id
+      student.secondary_identifier = student.email || student.sis_login_id || student.login_id
 
       student.isConcluded = _.all student.enrollments, (e) ->
         e.enrollment_state == 'completed'
