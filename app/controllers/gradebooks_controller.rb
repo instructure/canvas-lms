@@ -196,20 +196,25 @@ class GradebooksController < ApplicationController
             render :screenreader and return
           when '2'
             render :gradebook and return
+          when 'stmd'
+            render 'gradebooks/gradezilla/strongmind' and return
           when 'gradezilla-individual'
             render 'gradebooks/gradezilla/individual' and return
           when 'gradezilla-gradebook'
             render 'gradebooks/gradezilla/gradebook' and return
           else # fallback to the current user's preferences hash
             render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
+            render 'gradebooks/gradezilla/strongmind' and return if strongmind_view?(version)
             render 'gradebooks/gradezilla/gradebook' and return
           end
         else
           render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
+          render 'gradebooks/gradezilla/strongmind' and return if strongmind_view?(version)
           render 'gradebooks/gradezilla/gradebook' and return
         end
       else
         render :screenreader and return if individual_view?(version)
+        render :strongmind and return if strongmind_view?(version)
         render :gradebook and return
       end
     end
@@ -217,6 +222,10 @@ class GradebooksController < ApplicationController
 
   def individual_view?(version)
     %w(individual srgb).include?(version)
+  end
+
+  def strongmind_view?(version)
+    %w(strongmind stmd).include?(version)
   end
 
   def post_grades_ltis
