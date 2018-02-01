@@ -25,11 +25,15 @@
  * @return {function} The function that will warn once and then call `fn`
  * There are 3 ways you can use this:
  * @example
+ * // Most basic usage, just logs supplied deprecation message
  * $.somethingOld = deprecated("use 'instructure-ui/lib/somethingBetter' instead", () => { ...})
  * @example
- * deprecated("use 'instructure-ui/lib/somethingBetter' instead", $, 'somethingOld')
- * @example
+ * // Will log a more helpful deprecation method than the first example because
+ * // it will tell you the host object and name of the method that is deprecated.
  * deprecated("use 'instructure-ui/lib/somethingBetter' instead", $, 'somethingOld', () => { ...} )
+ * @example
+ * // if you want to mark a method defined somewhere else (like a lib you don't control) as deprecated
+ * deprecated("use 'instructure-ui/lib/somethingBetter' instead", $, 'somethingOld')
  */
 export default function deprecated(message, obj, method, fn) {
   const isBareFn = !method
