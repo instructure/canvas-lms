@@ -490,7 +490,7 @@ class UsersController < ApplicationController
           sortable_name: @user.sortable_name,
           email: @user.email,
           pseudonyms: @user.all_active_pseudonyms.map do |pseudonym|
-            { login_id: pseudonym.login,
+            { login_id: pseudonym.unique_id,
               sis_id: pseudonym.sis_user_id,
               integration_id: pseudonym.integration_id }
           end

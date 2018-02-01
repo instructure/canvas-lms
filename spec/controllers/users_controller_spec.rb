@@ -1253,7 +1253,7 @@ describe UsersController do
       user2 = user_with_pseudonym(name: "user2", short_name: "u2")
       user2.pseudonym.sis_user_id = "user2_sisid1"
       user2.pseudonym.integration_id = "user2_intid1"
-      user2.pseudonym.login = "user2_login1@foo.com"
+      user2.pseudonym.unique_id = "user2_login1@foo.com"
       user2.pseudonym.save!
       user2
     end
@@ -1274,7 +1274,7 @@ describe UsersController do
         sortable_name: user2.sortable_name,
         email: user2.email,
         pseudonyms: [
-          { login_id: user2.pseudonym.login,
+          { login_id: user2.pseudonym.unique_id,
             sis_id: user2.pseudonym.sis_user_id,
             integration_id: user2.pseudonym.integration_id }
         ]
