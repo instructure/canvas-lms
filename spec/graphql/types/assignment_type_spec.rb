@@ -84,4 +84,11 @@ describe Types::AssignmentType do
     assignment.update_attribute :submission_types, "none,foodfight"
     expect(assignment_type.submissionTypes).to eq ["none"]
   end
+
+  it "returns (valid) grading types" do
+    expect(assignment_type.gradingType).to eq assignment.grading_type
+
+    assignment.update_attribute :grading_type, "fakefakefake"
+    expect(assignment_type.gradingType).to be_nil
+  end
 end

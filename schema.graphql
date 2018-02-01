@@ -27,6 +27,7 @@ type Assignment implements Node, Timestamped {
 
   # when this assignment is due
   dueAt: String
+  gradingType: GradingType
   htmlUrl: URL
   id: ID!
   name: String
@@ -413,6 +414,15 @@ type GradingPeriodEdge {
 
   # The item at the end of the edge.
   node: GradingPeriod
+}
+
+enum GradingType {
+  gpa_scale
+  letter_grade
+  not_graded
+  pass_fail
+  percent
+  points
 }
 
 type Group implements Timestamped {
