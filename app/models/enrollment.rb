@@ -75,7 +75,6 @@ class Enrollment < ActiveRecord::Base
   after_save :set_update_cached_due_dates
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
-  after_save :update_assignment_overrides_if_needed
   after_save :dispatch_invitations_later
   after_save :add_to_favorites_later
   after_commit :update_cached_due_dates
