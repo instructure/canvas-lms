@@ -248,7 +248,7 @@ define [
         assignment: assignment,
         specific_sections: null
       }, [])
-      equal errors.length, 0
+      equal Object.keys(errors).length, 0
 
     test "allows announcement to save when section specific has a section", ->
       ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
@@ -257,17 +257,56 @@ define [
           is_announcement: true
         }
       }
-      view = @editView({ withAssignment: true})
+      view = @editView({ withAssignment: false })
       title = 'a'.repeat(10)
       assignment = view.assignment
       assignment.attributes.post_to_sis = '1'
       errors = view.validateBeforeSave({
         title: title,
-        set_assignment: '1',
-        assignment: assignment,
         specific_sections: ["fake_section"]
       }, [])
-      equal errors.length, 0
+      equal Object.keys(errors).length, 0
+
+    test "allows group announcements to be saved without a section", ->
+      ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
+      ENV.CONTEXT_ID = 1
+      ENV.context_asset_string = "group_1"
+      ENV.DISCUSSION_TOPIC = {
+        ATTRIBUTES: {
+          is_announcement: true
+        }
+      }
+
+      view = @editView({ withAssignment: false })
+      title = 'a'.repeat(10)
+      assignment = view.assignment
+      assignment.attributes.post_to_sis = '1'
+      errors = view.validateBeforeSave({
+        title: title,
+        specific_sections: null
+      }, [])
+      equal Object.keys(errors).length, 0
+
+    test "require section for course announcements if enabled", ->
+      ENV.should_log = true
+      ENV.SECTION_SPECIFIC_ANNOUNCEMENTS_ENABLED = true
+      ENV.CONTEXT_ID = 1
+      ENV.context_asset_string = "course_1"
+      ENV.DISCUSSION_TOPIC = {
+        ATTRIBUTES: {
+          is_announcement: true
+        }
+      }
+      view = @editView({ withAssignment: false })
+      title = 'a'.repeat(10)
+      assignment = view.assignment
+      assignment.attributes.post_to_sis = '1'
+      errors = view.validateBeforeSave({
+        title: title,
+        specific_sections: null
+      }, [])
+      equal Object.keys(errors).length, 1
+      equal Object.keys(errors)[0], 'specific_sections'
 
   QUnit.module 'EditView - ConditionalRelease',
     setup: ->
