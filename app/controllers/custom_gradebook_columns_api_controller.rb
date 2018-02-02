@@ -32,7 +32,7 @@
 #           "type": "integer"
 #         },
 #         "teacher_notes": {
-#           "description": "",
+#           "description": "When true, this column's visibility will be toggled in the Gradebook when a user selects to show or hide notes",
 #           "example": false,
 #           "type": "boolean"
 #         },
