@@ -80,12 +80,12 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@instructure/ui-core@^4.6.0":
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.6.0.tgz#1c53d8500125a55080a6856f4d3007f349e58676"
+"@instructure/ui-core@^4.6.0", "@instructure/ui-core@^4.7.1":
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.1.tgz#05f48e7f5eb469c97850bd517c266a13e2a9ec5b"
   dependencies:
-    "@instructure/ui-themeable" "^4.6.0"
-    "@instructure/ui-utils" "^4.6.0"
+    "@instructure/ui-themeable" "^4.7.1"
+    "@instructure/ui-utils" "^4.7.1"
     bowser "^1.7.0"
     classnames "^2.2.5"
     decimal.js "^7.2.1"
@@ -96,68 +96,24 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
-"@instructure/ui-core@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.0.tgz#533e9b0fefbc6218f6f717e57a041e048da6f965"
+"@instructure/ui-themeable@^4.7.0", "@instructure/ui-themeable@^4.7.1":
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.1.tgz#fe99079b8748391e939b98bf5e662d6e69d71206"
   dependencies:
-    "@instructure/ui-themeable" "^4.7.0"
-    "@instructure/ui-utils" "^4.7.0"
-    bowser "^1.7.0"
-    classnames "^2.2.5"
-    decimal.js "^7.2.1"
-    deep-equal "^1.0.1"
-    instructure-icons "^4.3.1"
-    keycode "^2.1.8"
-    no-scroll "^2.1.0"
-    numeral "^2.0.6"
-    prop-types "^15.5.10"
-
-"@instructure/ui-themeable@^4.6.0":
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.6.0.tgz#f15d7393912e3d12097d1ae986a81b3b9dd2c7bf"
-  dependencies:
-    "@instructure/ui-utils" "^4.6.0"
+    "@instructure/ui-utils" "^4.7.1"
     bowser "^1.7.0"
     deep-equal "^1.0.1"
     glamor "^2.20.37"
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
 
-"@instructure/ui-themeable@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.0.tgz#c06f0ba5f02de110af6c08b083cd6ae2094e604e"
-  dependencies:
-    "@instructure/ui-utils" "^4.7.0"
-    bowser "^1.7.0"
-    deep-equal "^1.0.1"
-    glamor "^2.20.37"
-    prop-types "^15.5.10"
-    tinycolor2 "^1.4.1"
+"@instructure/ui-themes@^4.7.1":
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.1.tgz#b4b51ddea50d94e83517297b46e470f5a2755e1a"
 
-"@instructure/ui-themes@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.0.tgz#b050ea6428e71c114d136dd14434d3386f46cb94"
-
-"@instructure/ui-utils@^4.6.0":
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.6.0.tgz#90a6418e7c066f1353c885b72a3819ee93e1baad"
-  dependencies:
-    bowser "^1.7.0"
-    decimal.js "^7.2.1"
-    deep-equal "^1.0.1"
-    keycode "^2.1.8"
-    moment "^2.10.6"
-    moment-timezone "^0.5.14"
-    no-scroll "^2.1.0"
-    numeral "^2.0.6"
-    object.omit "^3.0.0"
-    object.pick "^1.2.0"
-    prop-types "^15.5.10"
-    shortid "^2.2.8"
-
-"@instructure/ui-utils@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.0.tgz#21e776629b148e51fd956170c04f6008d3af610c"
+"@instructure/ui-utils@^4.7.0", "@instructure/ui-utils@^4.7.1":
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.1.tgz#93884d08cfecbc55c510a52dc71b70918ff14c4b"
   dependencies:
     bowser "^1.7.0"
     decimal.js "^7.2.1"
