@@ -26,6 +26,16 @@
 #       "id": "CustomColumn",
 #       "description": "",
 #       "properties": {
+#         "id": {
+#           "description": "The ID of the custom gradebook column",
+#           "example": "2",
+#           "type": "integer"
+#         },
+#         "teacher_notes": {
+#           "description": "",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "title": {
 #           "description": "header text",
 #           "example": "Stuff",
