@@ -16,22 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { combineReducers } from 'redux'
-// TODO: import { handleActions } from 'redux-actions'
-// TODO: import { actionTypes } from './actions'
-import { reduceNotifications } from '../shared/reduxNotifications'
-import { createPaginatedReducer } from '../shared/reduxPagination'
+@import "base/environment";
+@import "components/ic-content-rows";
 
-const identity = (defaultState = null) => (
-  state => (state === undefined ? defaultState : state)
-)
 
-export default combineReducers({
-  contextCodes: identity([]),
-  contextType: identity(null),
-  contextId: identity(null),
-  permissions: identity({}),
-  masterCourseData: identity(null),
-  discussions: createPaginatedReducer('discussions'),
-  notifications: reduceNotifications,
-})
+.ic-discussion-row {
+  box-shadow: -1px -1px $ic-border-color, inset -1px -1px $ic-border-color;
+  padding-right: 10px;
+  padding-left: 10px;
+  border-radius: 3px;
+}

@@ -15,23 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import { shape, arrayOf, string, number, bool, oneOf } from 'prop-types'
+import { author } from './user'
 
-import { combineReducers } from 'redux'
-// TODO: import { handleActions } from 'redux-actions'
-// TODO: import { actionTypes } from './actions'
-import { reduceNotifications } from '../shared/reduxNotifications'
-import { createPaginatedReducer } from '../shared/reduxPagination'
-
-const identity = (defaultState = null) => (
-  state => (state === undefined ? defaultState : state)
-)
-
-export default combineReducers({
-  contextCodes: identity([]),
-  contextType: identity(null),
-  contextId: identity(null),
-  permissions: identity({}),
-  masterCourseData: identity(null),
-  discussions: createPaginatedReducer('discussions'),
-  notifications: reduceNotifications,
+const discussion = shape({
+  id: string.isRequired,
+  position: number.isRequired,
+  published: bool.isRequired,
+  title: string.isRequired,
+  message: string.isRequired,
+  posted_at: string.isRequired,
+  author: author.isRequired,
+  read_state: oneOf(['read', 'unread']).isRequired,
+  unread_count: number.isRequired,
 })
+
+export const discussionList = arrayOf(discussion)
+
+export default discussion

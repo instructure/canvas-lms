@@ -16,29 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, arrayOf, string, number, bool, oneOf } from 'prop-types'
+import { shape, bool } from 'prop-types'
 
 const propTypes = {}
 
-propTypes.user = shape({
-  id: string.isRequired,
-  display_name: string.isRequired,
-  avatar_image_url: string,
-  html_url: string.isRequired,
+propTypes.permissions = shape({
+  create: bool.isRequired,
+  manage_content: bool.isRequired,
+  moderate: bool.isRequired,
 })
-
-propTypes.discussion = shape({
-  id: string.isRequired,
-  position: number.isRequired,
-  published: bool.isRequired,
-  title: string.isRequired,
-  message: string.isRequired,
-  posted_at: string.isRequired,
-  author: propTypes.user.isRequired,
-  read_state: oneOf(['read', 'unread']),
-  unread_count: number.isRequired,
-})
-
-propTypes.discussionList = arrayOf(propTypes.discussion)
 
 export default propTypes

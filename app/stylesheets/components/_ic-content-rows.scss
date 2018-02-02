@@ -22,6 +22,14 @@
   margin-left: 11px;
 }
 
+.ic-item-row__drag-col {
+  margin-right: 11px;
+}
+
+.ic-item-row__icon-col{
+  margin-right: -11px;
+}
+
 .ic-item-row {
   box-shadow: 0 -1px $ic-border-color, inset 0 -1px $ic-border-color;
   padding: 16px 0;

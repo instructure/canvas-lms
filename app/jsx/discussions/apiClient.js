@@ -19,6 +19,8 @@
 import axios from 'axios'
 import { encodeQueryString } from '../shared/queryString'
 
+// not using default because we will add more api calls in near future
+// eslint-disable-next-line
 export function getDiscussions ({ contextType, contextId, discussions }, { page }) {
   const params = [
     { per_page: 40 },

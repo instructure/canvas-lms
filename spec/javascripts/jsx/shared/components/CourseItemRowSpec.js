@@ -21,6 +21,7 @@ import { mount } from 'enzyme'
 import _ from 'lodash'
 import CourseItemRow from 'jsx/shared/components/CourseItemRow'
 import AnnouncementModel from 'compiled/models/Announcement'
+import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 
 QUnit.module('CourseItemRow component')
 
@@ -73,6 +74,18 @@ test('renders metaContent inside meta content wrapper', () => {
 test('renders a checkbox if selectable: true', () => {
   const tree = mount(<CourseItemRow {...makeProps({ selectable: true })} />)
   const node = tree.find('Checkbox')
+  ok(node.exists())
+})
+
+test('renders a drag handle if draggable: true', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ draggable: true })} />)
+  const node = tree.find('IconDragHandleLine')
+  ok(node.exists())
+})
+
+test('renders inputted icon', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ icon: <IconAssignmentLine /> })} />)
+  const node = tree.find('IconAssignmentLine')
   ok(node.exists())
 })
 

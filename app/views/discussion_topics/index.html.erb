@@ -26,6 +26,7 @@
 
   if @context.account.feature_enabled?(:section_specific_discussions)
     js_bundle :discussion_topics_index_v2
+    css_bundle :discussions_index
   else
     js_bundle :discussion_topics_index
     css_bundle :discussions_list

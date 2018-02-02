@@ -24,7 +24,9 @@ import cx from 'classnames'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import Avatar from '@instructure/ui-core/lib/components/Avatar'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-core/lib/components/Text'
 
+import IconDragHandleLine from 'instructure-icons/lib/Line/IconDragHandleLine'
 import LockIconView from 'compiled/views/LockIconView'
 import { author as authorShape } from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
@@ -44,10 +46,12 @@ export default class CourseItemRow extends Component {
     className: string,
     itemUrl: string,
     selectable: bool,
+    draggable: bool,
     defaultSelected: bool,
     isRead: bool,
     showAvatar: bool,
     onSelectedChanged: func,
+    icon: node,
   }
 
   static defaultProps = {
@@ -64,8 +68,10 @@ export default class CourseItemRow extends Component {
     className: '',
     itemUrl: null,
     selectable: false,
+    draggable: false,
     defaultSelected: false,
     isRead: true,
+    icon: null,
     showAvatar: false,
     onSelectedChanged () {},
   }
@@ -123,6 +129,14 @@ export default class CourseItemRow extends Component {
 
     return (
       <div className={`${classes} ${this.props.className}`}>
+        {(this.props.draggable && <div className="ic-item-row__drag-col">
+          <Text color="secondary" size="large">
+            <IconDragHandleLine />
+          </Text>
+        </div>)}
+        {(this.props.icon && <div className="ic-item-row__icon-col">
+          {this.props.icon}
+        </div>)}
         {(this.props.selectable && <div className="ic-item-row__select-col">
           <Checkbox
             defaultChecked={this.props.defaultSelected}
