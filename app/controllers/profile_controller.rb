@@ -169,6 +169,7 @@ class ProfileController < ApplicationController
     )
 
     if @user_data[:known_user] # if you can message them, you can see the profile
+      js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
       add_crumb(t('crumbs.settings_frd', "%{user}'s Profile", :user => @user.short_name), user_profile_path(@user))
       render
     else
@@ -203,6 +204,7 @@ class ProfileController < ApplicationController
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = @user.profile
     @active_tab = "profile_settings"
+    js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
     respond_to do |format|
       format.html do
         show_tutorial_ff_to_user = @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
