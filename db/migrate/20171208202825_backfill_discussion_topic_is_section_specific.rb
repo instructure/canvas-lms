@@ -18,6 +18,8 @@
 class BackfillDiscussionTopicIsSectionSpecific < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
+  disable_ddl_transaction!
+
   def up
      DataFixup::BackfillNulls.run(DiscussionTopic, :is_section_specific, default_value: false)
      change_column_null(:discussion_topics, :is_section_specific, false)
