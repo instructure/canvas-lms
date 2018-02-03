@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageEditView from 'compiled/views/wiki/WikiPageEditView'
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'wiki_page', page: 'edit' })

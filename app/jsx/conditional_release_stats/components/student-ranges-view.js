@@ -18,11 +18,11 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import TabList, { TabPanel, Tab } from 'instructure-ui/lib/components/TabList'
-import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
+import TabList, { TabPanel, Tab } from '@instructure/ui-core/lib/components/TabList'
+import ApplyTheme from '@instructure/ui-core/lib/components/ApplyTheme'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar'
-import {transformScore} from 'jsx/shared/conditional_release/score'
+import {transformScore} from '../../shared/conditional_release/score'
 import { assignmentShape, studentShape } from '../shapes/index'
 import StudentRange from './student-range'
 

@@ -19,7 +19,7 @@ import I18n from 'i18n!media_comments'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
 import $ from 'jquery'
-import deparam from 'compiled/util/deparam'
+import deparam from '../util/deparam'
 
 const MEDIA_COMMENT_THUMBNAIL_SIZES = {
   normal: { width: 140, height: 100},

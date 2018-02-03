@@ -19,7 +19,7 @@
 import I18n from 'i18n!gradebook';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import CustomColumnHeader from 'jsx/gradezilla/default_gradebook/components/CustomColumnHeader';
+import CustomColumnHeader from '../../../../gradezilla/default_gradebook/components/CustomColumnHeader';
 
 function getProps (column, gradebook, options) {
   const customColumn = gradebook.getCustomColumn(column.customColumnId);

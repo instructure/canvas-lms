@@ -23,7 +23,7 @@ define [
   'jst/calendar/missingDueDateDialog'
   'str/htmlEscape'
   'jqueryui/dialog'
-  'compiled/jquery/fixDialogButtons'
+  '../../jquery/fixDialogButtons'
 ], ($, _, {View}, I18n, template, htmlEscape) ->
 
   class MissingDateDialogView extends View

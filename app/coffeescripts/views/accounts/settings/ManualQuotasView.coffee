@@ -18,12 +18,12 @@
 define [
   'jquery'
   'i18n!accounts'
-  'compiled/models/Course'
-  'compiled/models/Group'
-  'compiled/views/ValidatedFormView'
+  '../../../models/Course'
+  '../../../models/Group'
+  '../../ValidatedFormView'
   'str/htmlEscape'
   'jst/accounts/settings/ManualQuotas'
-  'compiled/jquery.rails_flash_notifications'
+  '../../../jquery.rails_flash_notifications'
 ], ($, I18n, Course, Group, ValidatedFormView, htmlEscape, template) ->
 
   class ManualQuotasView extends ValidatedFormView

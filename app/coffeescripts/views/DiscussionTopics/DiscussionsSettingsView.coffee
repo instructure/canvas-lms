@@ -18,9 +18,9 @@
 define [
   'i18n!discussions'
   'jquery'
-  'compiled/views/DialogFormView'
-  'compiled/models/DiscussionsSettings'
-  'compiled/models/UserSettings'
+  '../DialogFormView'
+  '../../models/DiscussionsSettings'
+  '../../models/UserSettings'
   'jst/DiscussionTopics/DiscussionsSettingsView'
 ], (I18n, $, DialogFormView, DiscussionsSettings, UserSettings, template) ->
 

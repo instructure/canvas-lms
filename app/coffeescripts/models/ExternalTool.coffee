@@ -18,7 +18,7 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/backbone-ext/DefaultUrlMixin'
+  '../backbone-ext/DefaultUrlMixin'
 ], (_, {Model}, DefaultUrlMixin) ->
 
   class ExternalTool extends Model

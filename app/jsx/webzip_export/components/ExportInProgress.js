@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ApiProgressBar from 'jsx/shared/ApiProgressBar'
+import ApiProgressBar from '../../shared/ApiProgressBar'
 import I18n from 'i18n!webzip_exports'
   class ExportInProgress extends React.Component {
     static propTypes = {

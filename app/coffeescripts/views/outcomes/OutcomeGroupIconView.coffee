@@ -20,8 +20,8 @@ define [
   'jquery'
   'underscore'
   'str/htmlEscape'
-  'compiled/models/Outcome'
-  'compiled/views/outcomes/OutcomeIconBase'
+  '../../models/Outcome'
+  './OutcomeIconBase'
   #
   'jquery.disableWhileLoading'
 ], ($, _, h, Outcome, OutcomeIconBase) ->

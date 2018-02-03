@@ -21,10 +21,11 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/collaborations/CollaboratorPickerView'
+  './CollaboratorPickerView'
   'jst/collaborations/edit'
-  'jst/collaborations/EditIframe'
-], (I18n, $, {extend}, {View}, CollaboratorPickerView, editForm, editIframe) ->
+  'jst/collaborations/EditIframe',
+  'jsx/external_apps/lib/iframeAllowances'
+], (I18n, $, {extend}, {View}, CollaboratorPickerView, editForm, editIframe, iframeAllowances) ->
 
   class CollaborationView extends View
     events:
@@ -67,7 +68,11 @@ define [
           @onCloseForm(e)
 
     iframeTemplate: ({url}) ->
-      $iframe = $(editIframe({id: @id, url: url}))
+      $iframe = $(editIframe({
+        id: @id,
+        url: url,
+        allowances: iframeAllowances()
+      }))
       $iframe.on 'keydown', (e) =>
         if e.which == 27
           e.preventDefault()

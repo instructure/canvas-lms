@@ -21,8 +21,8 @@ define [
   'underscore'
   'Backbone'
   'jst/feature_flags/featureFlagAdminView'
-  'compiled/collections/FeatureFlagCollection'
-  'compiled/views/feature_flags/FeatureFlagListView'
+  '../../collections/FeatureFlagCollection'
+  '../feature_flags/FeatureFlagListView'
 ], (I18n, $, _, Backbone, template, FeatureFlagCollection, FeatureFlagListView) ->
 
   class FeatureFlagAdminView extends Backbone.View

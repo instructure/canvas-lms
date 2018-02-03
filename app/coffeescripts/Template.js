@@ -1,4 +1,4 @@
-import Handlebars from 'compiled/handlebars_helpers'
+import Handlebars from './handlebars_helpers'
 import jQuery from 'jquery'
 
 // A client-side templating wrapper.  Templates are compiled with the rake task

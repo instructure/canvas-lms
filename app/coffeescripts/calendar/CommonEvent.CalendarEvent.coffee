@@ -18,10 +18,10 @@
 define [
   'i18n!calendar'
   'jquery'
-  'compiled/util/fcUtil'
-  'compiled/util/semanticDateRange'
-  'compiled/calendar/CommonEvent'
-  'compiled/util/natcompare'
+  '../util/fcUtil'
+  '../util/semanticDateRange'
+  '../calendar/CommonEvent'
+  '../util/natcompare'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
 ], (I18n, $, fcUtil, semanticDateRange, CommonEvent, natcompare) ->

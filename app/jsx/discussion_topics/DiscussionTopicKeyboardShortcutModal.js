@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import KeyboardShortcutModal from 'jsx/shared/KeyboardShortcutModal'
+import KeyboardShortcutModal from '../shared/KeyboardShortcutModal'
 import I18n from 'i18n!react_files'
 
   var SHORTCUTS = [

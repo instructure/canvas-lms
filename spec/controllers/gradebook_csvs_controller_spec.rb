@@ -58,6 +58,17 @@ describe GradebookCsvsController do
       attachment = Attachment.find(json['attachment_id'])
       expect(@course.short_name).to eq(File.basename(attachment.filename.split("-").last, ".csv"))
     end
+
+    it "the CSV filename starts with YYYY-MM-DDTHHMM" do
+      user_session @teacher
+      now = Time.zone.now
+      Timecop.freeze(now) do
+        get :show, params: { course_id: @course.id }, format: :json
+      end
+
+      filename = Attachment.find(json_parse(response.body)['attachment_id']).filename
+      expect(/^#{now.strftime('%FT%H%M')}_Grades/).to match(filename)
+    end
   end
 end
 

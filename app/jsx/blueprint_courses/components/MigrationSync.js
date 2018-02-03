@@ -21,13 +21,13 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import select from 'jsx/shared/select'
+import select from '../../shared/select'
 import cx from 'classnames'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Progress from 'instructure-ui/lib/components/Progress'
-import Button from 'instructure-ui/lib/components/Button'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Progress from '@instructure/ui-core/lib/components/Progress'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Text from '@instructure/ui-core/lib/components/Text'
 import IconRefreshLine from 'instructure-icons/lib/Line/IconRefreshLine'
 
 import MigrationStates from '../migrationStates'
@@ -88,8 +88,8 @@ export default class MigrationSync extends Component {
       <div id={this.props.id} className="bcs__migration-sync">
         { this.props.showProgress && isSyncing && (
           <div className="bcs__migration-sync__loading">
-            <Typography as="p">{I18n.t('Processing')}</Typography>
-            <Typography as="p" size="small">{I18n.t('This may take a bit...')}</Typography>
+            <Text as="p">{I18n.t('Processing')}</Text>
+            <Text as="p" size="small">{I18n.t('This may take a bit...')}</Text>
             <Progress
               label={I18n.t('Sync in progress')}
               size="x-small"
@@ -97,9 +97,9 @@ export default class MigrationSync extends Component {
               valueMax={MigrationStates.maxLoadingValue}
             />
             {this.props.willSendNotification &&
-              <Typography as="p" size="small">
+              <Text as="p" size="small">
                 {I18n.t('You can leave the page and you will get a notification when the sync process is complete.')}
-              </Typography>}
+              </Text>}
           </div>
         )}
         <div className="bcs__migration-sync__button">
@@ -110,9 +110,9 @@ export default class MigrationSync extends Component {
             disabled={isSyncing}
           >
             <span className={iconClasses}>
-              <Typography size="large">
+              <Text size="large">
                 <IconRefreshLine />
-              </Typography>
+              </Text>
             </span>
             <span className="bcs__sync-btn-text">
               {isSyncing ? I18n.t('Syncing...') : I18n.t('Sync')}

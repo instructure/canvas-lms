@@ -35,28 +35,28 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
     it 'shows the due dates for Section A', priority: "2", test_id: 282168 do
       validate_vdd_quiz_tooltip_dates(
         '.date-due',
-        "Everyone else\n#{format_date_for_view(@due_at_a)}"
+        "Everyone else\n#{format_date_for_view(@due_at_a, :short)}"
       )
     end
 
     it 'shows the due dates for Section B', priority: "2", test_id: 315651 do
       validate_vdd_quiz_tooltip_dates(
         '.date-due',
-        "#{@section_b.name}\n#{format_date_for_view(@due_at_b)}"
+        "#{@section_b.name}\n#{format_date_for_view(@due_at_b, :short)}"
       )
     end
 
     it 'shows the availability dates for Section A', priority: "2", test_id: 282395 do
       validate_vdd_quiz_tooltip_dates(
         '.date-available',
-        "Everyone else\nAvailable until #{format_date_for_view(@lock_at_a)}"
+        "Everyone else\nAvailable until #{format_date_for_view(@lock_at_a, :short)}"
       )
     end
 
     it 'shows the availability dates for Section B', priority: "2", test_id: 315653 do
       validate_vdd_quiz_tooltip_dates(
         '.date-available',
-        "#{@section_b.name}\nNot available until #{format_date_for_view(@unlock_at_b)}"
+        "#{@section_b.name}\nNot available until #{format_date_for_view(@unlock_at_b, :short)}"
       )
     end
   end

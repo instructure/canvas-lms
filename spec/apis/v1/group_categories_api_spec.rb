@@ -249,8 +249,8 @@ describe "Group Categories API", type: :request do
 
       describe "teacher actions with a group" do
         before :once do
-          @study_group = group_model(:name => @name, :group_category => @category,
-                                     :context => @course)
+          @study_group = group_model(name: @name, group_category: @category,
+                                     context: @course, root_account_id: @account.id)
         end
 
         it "should allow listing all of a course's group categories for teachers" do

@@ -21,8 +21,8 @@ define [
   'Backbone'
   'i18n!discussion_topics'
   'jst/DiscussionTopics/IndexView'
-  'compiled/views/DiscussionTopics/DiscussionsSettingsView'
-  'compiled/views/DiscussionTopics/UserSettingsView'
+  './DiscussionsSettingsView'
+  './UserSettingsView'
 ], ($, _, {View}, I18n, template, DiscussionsSettingsView, UserSettingsView) ->
 
   class IndexView extends View

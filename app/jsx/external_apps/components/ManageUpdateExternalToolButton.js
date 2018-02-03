@@ -20,8 +20,8 @@ import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Lti2ReregistrationUpdateModal from 'jsx/external_apps/components/Lti2ReregistrationUpdateModal'
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
+import Lti2ReregistrationUpdateModal from '../../external_apps/components/Lti2ReregistrationUpdateModal'
+import store from '../../external_apps/lib/ExternalAppsStore'
 
 export default React.createClass({
     displayName: 'ManageUpdateExternalToolButton',

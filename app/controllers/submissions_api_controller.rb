@@ -426,7 +426,7 @@ class SubmissionsApiController < ApplicationController
 
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
-        preload(:user => :pseudonyms).
+        preload(:root_account, :sis_pseudonym, :user => :pseudonyms).
         where(:user_id => student_ids)
       student_enrollments = Api.paginate(scope, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
 
@@ -447,7 +447,7 @@ class SubmissionsApiController < ApplicationController
         seen_users << student.id
         hash = { :user_id => student.id, :section_id => enrollment.course_section_id, :submissions => [] }
 
-        pseudonym = SisPseudonym.for(student, context)
+        pseudonym = SisPseudonym.for(student, enrollment)
         if pseudonym && show_sis_info
           hash[:integration_id] = pseudonym.integration_id
           hash[:sis_user_id] = pseudonym.sis_user_id

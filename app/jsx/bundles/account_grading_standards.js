@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import AccountTabContainer from 'jsx/grading/AccountTabContainer'
+import AccountTabContainer from '../grading/AccountTabContainer'
 
 ReactDOM.render(
   <AccountTabContainer

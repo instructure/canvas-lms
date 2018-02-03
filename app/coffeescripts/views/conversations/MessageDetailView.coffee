@@ -20,8 +20,8 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/Message'
-  'compiled/views/conversations/MessageItemView'
+  '../../models/Message'
+  '../conversations/MessageItemView'
   'jst/conversations/messageDetail'
   'jst/conversations/noMessage'
 ], (I18n, $, _, {View}, Message, MessageItemView, template, noMessage) ->

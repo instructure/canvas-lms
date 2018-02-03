@@ -21,9 +21,13 @@ class GroupCategory < ActiveRecord::Base
   attr_accessor :assign_unassigned_members, :group_by_section
 
   belongs_to :context, polymorphic: [:course, :account]
+  belongs_to :sis_batch
   has_many :groups, :dependent => :destroy
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'
+
+  before_validation :set_root_account_id
+  validates_uniqueness_of :sis_source_id, scope: [:root_account_id], conditions: -> { where.not(sis_source_id: nil) }
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership
@@ -68,6 +72,14 @@ class GroupCategory < ActiveRecord::Base
     next if value.blank?
     unless ['first', 'random'].include?(value)
       record.errors.add attr, t(:invalid_auto_leader, "AutoLeader type needs to be one of the following values: %{values}", values: "null, 'first', 'random'")
+    end
+  end
+
+  validates :context_id, presence: { message: t(:empty_course_or_account_id, 'Must have an account or course ID') }
+
+  validates_each :context_type do |record, attr, value|
+    unless ['Account', 'Course'].include?(value)
+      record.errors.add attr, t(:group_category_must_have_context, 'Must belong to an account or course')
     end
   end
 
@@ -127,7 +139,9 @@ class GroupCategory < ActiveRecord::Base
     def role_category_for_context(role, context)
       return unless context and protected_role_for_context?(role, context)
       category = context.group_categories.where(role: role).first ||
-                 context.group_categories.build(:name => name_for_role(role), :role => role)
+                 context.group_categories.build(name: name_for_role(role),
+                                                role: role,
+                                                root_account: context.root_account)
       category.save({:validate => false}) if category.new_record?
       category
     end
@@ -383,6 +397,14 @@ class GroupCategory < ActiveRecord::Base
     @create_group_count = num && num > 0 ?
       [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
       nil
+  end
+
+  def set_root_account_id
+    # context might be nil since this runs before validations.
+    if self.context&.root_account
+      root_account_id = self.context.root_account.id
+      self.root_account_id = root_account_id
+    end
   end
 
   def auto_create_groups

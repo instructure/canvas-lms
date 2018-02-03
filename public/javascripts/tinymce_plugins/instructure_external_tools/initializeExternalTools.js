@@ -21,6 +21,7 @@ import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
 import ExternalToolsHelper from 'tinymce_plugins/instructure_external_tools/ExternalToolsHelper'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import '../../jquery.instructure_misc_helpers'
 import 'jqueryui/dialog'
@@ -85,7 +86,9 @@ import Links from 'tinymce_plugins/instructure_links/links'
       var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
       if(!$dialog.length) {
         // xsslint safeString.identifier frameHeight
+        // xsslint safeString.identifier iframeAllowancesString
         var dialogHTML = '<div id="external_tool_button_dialog" style="padding: 0; overflow-y: hidden;"/>'
+        var iframeAllowancesString = iframeAllowances()
         $dialog = $(dialogHTML)
           .hide()
           .html("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>" +
@@ -104,7 +107,7 @@ import Links from 'tinymce_plugins/instructure_links/links'
             '</form>' +
             "<iframe name='external_tool_launch' src='/images/ajax-loader-medium-444.gif' id='external_tool_button_frame' style='width: 800px; height: " +
             frameHeight +
-            "px; border: 0;' borderstyle='0' tabindex='0'/>" +
+            "px; border: 0;' allow='" + iframeAllowancesString + "' borderstyle='0' tabindex='0'/>" +
             '<div class="after_external_content_info_alert screenreader-only" tabindex="0">' +
               '<div class="ic-flash-info">' +
                 '<div class="ic-flash__icon" aria-hidden="true">' +

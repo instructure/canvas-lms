@@ -17,9 +17,9 @@
  */
 
 import I18n from 'i18n!gradebook'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
 import round from 'compiled/util/round'
-import { scoreToGrade } from 'jsx/gradebook/GradingSchemeHelper';
+import numberHelper from '../../../shared/helpers/numberHelper'
+import { scoreToGrade } from '../../../gradebook/GradingSchemeHelper';
 
 const POINTS = 'points';
 const PERCENT = 'percent';

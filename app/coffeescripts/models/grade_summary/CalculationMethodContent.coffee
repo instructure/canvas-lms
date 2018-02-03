@@ -19,7 +19,7 @@ define [
   'underscore'
   'i18n!outcomes'
   'jsx/shared/helpers/numberFormat'
-  'compiled/underscore-ext/sum'
+  '../../underscore-ext/sum'
 ], (_, I18n, numberFormat) ->
   class DecayingAverage
     constructor: (@weight, @range) ->

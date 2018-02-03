@@ -19,7 +19,7 @@ define [
   'i18n!context_modules'
   'Backbone'
   'jquery'
-  'compiled/collections/ModuleItemCollection'
+  '../collections/ModuleItemCollection'
 ], (I18n, Backbone, $, ModuleItemCollection) ->
 
   class Module extends Backbone.Model

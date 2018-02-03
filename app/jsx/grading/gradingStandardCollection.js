@@ -18,7 +18,7 @@
 
 import React from 'react'
 import update from 'immutability-helper'
-import GradingStandard from 'jsx/grading/gradingStandard'
+import GradingStandard from '../grading/gradingStandard'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'

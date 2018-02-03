@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Heading from 'instructure-ui/lib/components/Heading'
-import Image from 'instructure-ui/lib/components/Image'
-import SVGWrapper from 'jsx/shared/SVGWrapper'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Image from '@instructure/ui-core/lib/components/Image'
+import SVGWrapper from '../../shared/SVGWrapper'
 
 const TutorialTrayContent = props => (
   <div className={props.name}>

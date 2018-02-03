@@ -190,6 +190,7 @@ define [
       customFields: "a=1\nb=2\nc=3"
       url: 'http://google.com'
       description: 'This is a description'
+      verifyUniqueness: 'true'
     params = store._generateParams('manual', data)
     deepEqual params, {
       consumer_key: "KEY"
@@ -202,13 +203,15 @@ define [
       name: "My App"
       privacy_level: "email_only"
       shared_secret: "SECRET"
-      url: "http://google.com"
+      url: "http://google.com",
+      verify_uniqueness: 'true'
     }
 
   test '_generateParams url', ->
     data =
       name: 'My App'
       configUrl: 'http://example.com/config.xml'
+      verifyUniqueness: 'true'
     params = store._generateParams('url', data)
     deepEqual params, {
       config_type: "by_url"
@@ -216,13 +219,15 @@ define [
       consumer_key: "N/A"
       name: "My App"
       privacy_level: "anonymous"
-      shared_secret: "N/A"
+      shared_secret: "N/A",
+      verify_uniqueness: 'true'
     }
 
   test '_generateParams xml', ->
     data =
       name: 'My App'
       xml: '<foo>bar</foo>'
+      verifyUniqueness: 'true'
     params = store._generateParams('xml', data)
     deepEqual params, {
       config_type: "by_xml"
@@ -230,7 +235,8 @@ define [
       consumer_key: "N/A"
       name: "My App"
       privacy_level: "anonymous"
-      shared_secret: "N/A"
+      shared_secret: "N/A",
+      verify_uniqueness: 'true'
     }
 
   test 'delete ContextExternalTool', ->

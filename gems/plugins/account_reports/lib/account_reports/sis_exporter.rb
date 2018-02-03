@@ -412,7 +412,7 @@ module AccountReports
         # rather than a cursor for this iteration
         # because it often is big enough that the slave
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
-        enrol.find_in_batches(start: 0) do |batch|
+        enrol.preload(:root_account, :sis_pseudonym).find_in_batches(start: 0) do |batch|
           users = batch.map {|e| User.new(id: e.user_id)}.compact
           users += batch.map {|e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil?}.compact
           users.uniq!
@@ -422,7 +422,8 @@ module AccountReports
           batch.each do |e|
             p = loaded_pseudonym(pseudonyms,
                                  users_by_id[e.user_id],
-                                 include_deleted: @include_deleted)
+                                 include_deleted: @include_deleted,
+                                 enrollment: e)
             next unless p
             p2 = nil
             row = enrollment_row(e, include_other_roots, p, p2, pseudonyms, users_by_id)
@@ -528,10 +529,11 @@ module AccountReports
       headers
     end
 
-    def loaded_pseudonym(pseudonyms, u, include_deleted: false)
+    def loaded_pseudonym(pseudonyms, u, include_deleted: false, enrollment: nil)
+      context = enrollment || root_account
       user_pseudonyms = pseudonyms[u.id] || []
       u.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
-      SisPseudonym.for(u, root_account, {type: :trusted, require_sis: false, include_deleted: include_deleted})
+      SisPseudonym.for(u, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
     end
 
     def load_cross_shard_logins(users, include_deleted: false)

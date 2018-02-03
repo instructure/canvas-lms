@@ -17,11 +17,12 @@
 %>
 
 <% cache([
-  'submission_sidebar_render',
+  'submission_sidebar_render2',
+  @current_user.id,
   @current_user_submission,
   Time.zone.utc_offset,
-  @current_user_submission.assigned_assessments.count,
-  @current_user_submission.assigned_assessments.incomplete.count
+  @assigned_assessments.count,
+  @assigned_assessments.count(&:incomplete?)
 ].cache_key) do %>
 <div class="details">
   <h3><%= t 'titles.submission', "Submission" %></h3>
@@ -107,8 +108,8 @@
       <h4><%= t 'titles.assigned_peer_reviews', "Assigned Peer Reviews" %></h4>
 
       <ul class="unstyled_list Submission__List">
-        <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
-        <% @current_user_submission.assigned_assessments.each do |assessment| %>
+        <li style="<%= hidden unless @assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
+        <% @assigned_assessments.each do |assessment| %>
           <li><%= student_peer_review_link_for @context, @assignment, assessment %></li>
         <% end %>
       </ul>

@@ -22,9 +22,9 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
-import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
-import Lti2Edit from 'jsx/external_apps/components/Lti2Edit'
+import store from '../../external_apps/lib/ExternalAppsStore'
+import ConfigurationForm from '../../external_apps/components/ConfigurationForm'
+import Lti2Edit from '../../external_apps/components/Lti2Edit'
 import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {
@@ -136,7 +136,14 @@ export default React.createClass({
     form() {
       if (this.state.tool.app_type === 'ContextExternalTool') {
         return (
-          <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.saveChanges} showConfigurationSelector={false}>
+          <ConfigurationForm
+            ref="configurationForm"
+            tool={this.state.tool}
+            configurationType="manual"
+            handleSubmit={this.saveChanges}
+            showConfigurationSelector={false}
+            membershipServiceFeatureFlagEnabled={window.ENV.MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED}
+          >
             <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
           </ConfigurationForm>
         );

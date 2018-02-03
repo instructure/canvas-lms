@@ -20,9 +20,9 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/Group'
-  'compiled/models/User'
-  'compiled/collections/CollaboratorCollection'
+  '../../models/Group'
+  '../../models/User'
+  '../../collections/CollaboratorCollection'
   'jst/collaborations/collaborator'
 ], ($, {extend, filter, map}, {View}, Group, User, CollaboratorCollection, collaboratorTemplate) ->
 

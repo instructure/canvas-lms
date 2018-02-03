@@ -1371,6 +1371,22 @@ describe UsersController do
 
       expect(assigns[:courses][@course][0][:last_interaction]).not_to be_nil
     end
+
+    it "finds ungraded submissions but not if the assignment is deleted" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course(:active_all => true)
+
+      type = "online_text_entry"
+      a1 = @course.assignments.create!(:title => "a1", :submission_types => "online_text_entry")
+      s1 = a1.submit_homework(@student, :body => "blah1")
+      a2 = @course.assignments.create!(:title => "a2", :submission_types => "online_text_entry")
+      s2 = a2.submit_homework(@student, :body => "blah2")
+      a2.destroy!
+
+      get 'teacher_activity', params: {user_id: @teacher.id, course_id: @course.id}
+
+      expect(assigns[:courses][@course][0][:ungraded]).to eq [s1]
+    end
   end
 
   describe '#toggle_recent_activity_dashboard' do

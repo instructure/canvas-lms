@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/userSettings'
+  '../../../../userSettings'
   '../start_app'
   'ember'
   '../shared_ajax_fixtures'

@@ -18,8 +18,8 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import Container from 'instructure-ui/lib/components/Container';
-import Select from 'instructure-ui/lib/components/Select';
+import Container from '@instructure/ui-core/lib/components/Container';
+import Select from '@instructure/ui-core/lib/components/Select';
 
 export default function SelectMenu (props) {
   const options = props.options.map((option) => {

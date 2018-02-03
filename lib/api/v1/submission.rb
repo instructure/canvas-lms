@@ -144,7 +144,7 @@ module Api::V1::Submission
       hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
     end
 
-    if attempt.originality_reports.present?
+    if show_originality_reports?(attempt)
        hash['has_originality_report'] = true
     end
 
@@ -323,6 +323,10 @@ module Api::V1::Submission
   end
 
   private
+
+  def show_originality_reports?(submission)
+    submission.assignment_group_originality_reports.present?
+  end
 
   def speed_grader_url(submission, assignment, provisional_grade)
     speed_grader_course_gradebook_url(

@@ -19,8 +19,8 @@ define [
   'underscore'
   'i18n!react_files'
   'jquery'
-  'compiled/models/Progress'
-  'compiled/models/Folder'
+  '../../models/Progress'
+  '../../models/Folder'
 ], (_, I18n, $, Progress, Folder) ->
 
   downloadStuffAsAZip = (filesAndFolders, {contextType, contextId}) ->

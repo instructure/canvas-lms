@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import ReactDOM from 'react-dom'
-import router from 'jsx/external_apps/router'
+import router from '../external_apps/router'
 
 let alreadyRendered = false
 

@@ -17,7 +17,7 @@
 
 define [
   'ember'
-  'compiled/util/round'
+  '../../../util/round'
   'jsx/gradebook/GradingSchemeHelper'
   'i18n!sr_gradebook'
 ], (Ember, round, GradingSchemeHelper, I18n) ->

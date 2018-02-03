@@ -261,7 +261,6 @@ class ContextExternalTool < ActiveRecord::Base
 
     @config_errors = []
     error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'
-
     converter = CC::Importer::BLTIConverter.new
     tool_hash = if config_type == 'by_url'
                   uri = Addressable::URI.parse(config_url)
@@ -507,6 +506,15 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  def duplicated_in_context?
+    self.class.all_tools_for(context).where.not(id: id).any? do |other_tool|
+      settings_equal = other_tool.settings == settings
+      launch_urls_equal = other_tool.url == url && settings.values.all?(&:blank?)
+
+      other_tool.settings.values.any?(&:present?) ? settings_equal : launch_urls_equal
+    end
+  end
+
   def self.contexts_to_search(context)
     case context
     when Course
@@ -548,6 +556,10 @@ class ContextExternalTool < ActiveRecord::Base
       scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
       scope.order("#{ContextExternalTool.best_unicode_collation_key('context_external_tools.name')}, context_external_tools.id")
     end
+  end
+
+  def self.find_active_external_tool_by_consumer_key(consumer_key, context)
+    self.active.where(:consumer_key => consumer_key).polymorphic_where(:context => contexts_to_search(context)).first
   end
 
   def self.find_external_tool_by_id(id, context)

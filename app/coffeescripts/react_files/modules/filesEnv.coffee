@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/models/Folder'
-  'compiled/str/splitAssetString'
+  '../../models/Folder'
+  '../../str/splitAssetString'
 ], (Folder, splitAssetString) ->
 
   fileContexts = ENV.FILES_CONTEXTS or []

@@ -19,8 +19,8 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/grade_summary/Outcome'
-  'compiled/collections/WrappedCollection'
+  '../models/grade_summary/Outcome'
+  '../collections/WrappedCollection'
 ], ($, _, Backbone, Outcome, WrappedCollection) ->
   class OutcomeResultCollection extends WrappedCollection
     key: 'outcome_results'

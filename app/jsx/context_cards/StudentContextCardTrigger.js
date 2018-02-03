@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import GraphQLStudentContextTray from 'jsx/context_cards/GraphQLStudentContextTray'
-import RestStudentContextTray from 'jsx/context_cards/RestStudentContextTray'
+import GraphQLStudentContextTray from '../context_cards/GraphQLStudentContextTray'
+import RestStudentContextTray from '../context_cards/RestStudentContextTray'
 
 const StudentContextTray = ENV.GRAPHQL_ENABLED
   ? GraphQLStudentContextTray

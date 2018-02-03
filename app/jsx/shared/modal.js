@@ -83,6 +83,9 @@ import ModalButtons from './modal-buttons'
     },
     onAfterOpen() {
       this.closeBtn.focus()
+      if (this.props.onAfterOpen) {
+        this.props.onAfterOpen()
+      }
     },
     getAppElement () {
       // Need to wait for the dom to load before we can get the default #application dom element

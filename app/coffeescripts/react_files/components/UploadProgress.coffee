@@ -20,7 +20,7 @@ define [
   'react'
   'prop-types'
   'jquery'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (I18n, React, PropTypes, $) ->
 
 

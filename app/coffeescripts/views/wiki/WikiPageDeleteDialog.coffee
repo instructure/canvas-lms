@@ -20,7 +20,7 @@ define [
   'underscore'
   'i18n!pages'
   'str/htmlEscape'
-  'compiled/views/DialogFormView'
+  '../DialogFormView'
 ], ($, _, I18n, htmlEscape, DialogFormView) ->
 
   dialogDefaults =

@@ -19,8 +19,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import ToDoSidebar from 'jsx/dashboard/ToDoSidebar';
-import configureStore from 'jsx/dashboard/ToDoSidebar/store';
+import ToDoSidebar from '../dashboard/ToDoSidebar';
+import configureStore from '../dashboard/ToDoSidebar/store';
 
 const store = configureStore({});
 

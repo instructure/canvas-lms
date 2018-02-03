@@ -208,13 +208,6 @@ $gradebook_cell_padding_top: 8px;
     padding-top: 0;
   }
 
-  &.hovered-column, // an element in the column is being hovered
-  &.slick-header-column-active, // the column is being dragged or resized
-  .slick-column-name {
-    font-weight: bold;
-    color: #2f2a34;
-    text-shadow: white 0 0 1px;
-  }
   .assignment-name {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -222,57 +215,68 @@ $gradebook_cell_padding_top: 8px;
   }
 
   .Gradebook__ColumnHeaderContent {
+    align-items: center;
     display: flex;
-    width: 100%;
     height: 36px;
+    overflow: hidden;
+    width: 100%;
   }
 
-  .Gradebook__ColumnHeaderDetail,
+  .Gradebook__ColumnHeaderIndicators,
   .Gradebook__ColumnHeaderAction {
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    text-align: center;
+    width: $header-content-height - 2px;
+  }
+
+  .Gradebook__ColumnHeaderIndicators {
+    padding: 0 0 0 2px;
+  }
+
+  .Gradebook__ColumnHeaderAction {
+    padding: 0 2px 0 0;
   }
 
   .Gradebook__ColumnHeaderDetail {
-    flex-grow: 1;
-    flex-shrink: 1;
-    min-width: 0;
+    display: block;
+    height: $header-content-height;
+    line-height: $header-content-height;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .Gradebook__ColumnHeaderAction {
-    flex-shrink: 0;
-    flex-grow: 0;
-    height: $cell_height;
-    opacity: 0;
+  .Gradebook__ColumnHeaderDetailLine {
+    display: block;
+    height: $header-content-height / 2;
+    line-height: $header-content-height / 2;
+  }
 
-    &:focus, &:hover, &.menuShown {
-      opacity: 1;
+  .Gradebook__ColumnHeaderAction {
+    button {
+      opacity: 0;
+
+      &:focus, &:hover {
+        opacity: 1;
+      }
+    }
+
+    &.menuShown {
+      button {
+        opacity: 1;
+      }
     }
   }
 
-  &:hover .Gradebook__ColumnHeaderAction {
+  &:hover .Gradebook__ColumnHeaderAction button {
     opacity: 1;
   }
 }
 
 .odd .slick-cell {
   background-color: #f5f6f7;
-
-  &.minimized {
-    background-color: darken(#f5f6f7, 4%);
-  }
 }
 
 .even .slick-cell {
   background-color: #fcfcfc;
-
-  &.minimized {
-    background-color: darken(#fcfcfc, 4%);
-  }
 }
 
 .odd .meta-cell {
@@ -623,15 +627,6 @@ $gradebook_checkbox_size: 16px;
 
 #hide_warning {
   vertical-align: top;
-}
-
-.minimized {
-  background-color: darken($ic-bg-light-neutral, 4%);
-
-  .gradebook-cell,
-  .Gradebook__ColumnHeaderContent {
-    display: none;
-  }
 }
 
 // STUFF FOR HEADER

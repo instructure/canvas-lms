@@ -20,12 +20,12 @@ define [
   'Backbone'
   'jquery'
   'underscore'
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/ConversationSearchResult'
-  'compiled/views/PaginatedCollectionView'
+  '../../collections/PaginatedCollection'
+  '../../models/ConversationSearchResult'
+  '../PaginatedCollectionView'
   'jst/conversations/autocompleteToken'
   'jst/conversations/autocompleteResult',
-  'compiled/jquery/scrollIntoView'
+  '../../jquery/scrollIntoView'
 ], (I18n, Backbone, $, _, PaginatedCollection, ConversationSearchResult, PaginatedCollectionView, tokenTemplate, resultTemplate) ->
 
   # Public: Helper method for capitalizing a string

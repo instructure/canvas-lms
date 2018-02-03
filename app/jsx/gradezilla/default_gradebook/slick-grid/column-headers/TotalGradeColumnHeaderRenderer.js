@@ -18,7 +18,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TotalGradeColumnHeader from 'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader';
+import TotalGradeColumnHeader from '../../../../gradezilla/default_gradebook/components/TotalGradeColumnHeader';
 
 function getProps (column, gradebook, gridSupport, options) {
   const columnId = 'total_grade';

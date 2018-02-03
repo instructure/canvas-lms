@@ -17,8 +17,8 @@
 
 define [
   'i18n!grading_cell'
-  'compiled/gradebook/GradebookTranslations'
-  'compiled/gradebook/GradebookHelpers'
+  '../../../gradebook/GradebookTranslations'
+  '../../../gradebook/GradebookHelpers'
   'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/shared/helpers/numberHelper'

@@ -21,10 +21,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import Typography from 'instructure-ui/lib/components/Typography'
-import RadioInput from 'instructure-ui/lib/components/RadioInput'
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
-import Tooltip from 'instructure-ui/lib/components/Tooltip'
+import Text from '@instructure/ui-core/lib/components/Text'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
+import Tooltip from '@instructure/ui-core/lib/components/Tooltip'
 import propTypes from '../propTypes'
 import ExpandableLockOptions from './ExpandableLockOptions'
 import LockCheckList from './LockCheckList'
@@ -91,7 +91,7 @@ export default class BlueprintLockOptions extends React.Component {
     return (
       <div className={viewableClasses}>
         <div className="bcs_sub-menu-item">
-          <Typography size="x-small" lineHeight="condensed">{generalDescription + standardDescription}</Typography>
+          <Text size="x-small" lineHeight="condensed">{generalDescription + standardDescription}</Text>
         </div>
         <LockCheckList
           formName="[blueprint_restrictions]"
@@ -110,7 +110,7 @@ export default class BlueprintLockOptions extends React.Component {
     return (
       <div className={viewableClasses}>
         <div className="bcs_sub-menu-item">
-          <Typography size="x-small">{granularDescription + standardDescription}</Typography>
+          <Text size="x-small">{granularDescription + standardDescription}</Text>
           {keys.map(item =>
             <ExpandableLockOptions
               key={item.objectType}

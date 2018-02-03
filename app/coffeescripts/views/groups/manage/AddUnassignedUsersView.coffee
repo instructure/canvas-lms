@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'underscore'
-  'compiled/views/CollectionView'
+  '../../CollectionView'
   'jst/groups/manage/addUnassignedUsers'
   'jst/groups/manage/addUnassignedUser'
 ], ({View}, _, CollectionView, template, itemTemplate) ->

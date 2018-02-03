@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'jst/content_migrations/ZipFiles'
-  'compiled/views/content_migrations/MigrationView'
+  './MigrationView'
 ],(Backbone, template, MigrationView) -> 
   class ZipFiles extends MigrationView
     template: template

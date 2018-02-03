@@ -71,13 +71,12 @@ describe "Gradezilla" do
 
     it "handles muting correctly", priority: "1", test_id: 164227 do
       # TODO "change test ids when Gradezilla test cases are created"
-      expect(fj(Gradezilla.assignment_header_mute_icon_selector(@second_assignment.id))).to be_displayed
       expect(Gradezilla.total_cell_mute_icon_select).to be_displayed
       expect(@second_assignment.reload).to be_muted
 
       # reload the page and make sure it remembered the setting
       Gradezilla.visit(@course)
-      expect(fj(Gradezilla.assignment_header_mute_icon_selector(@second_assignment.id))).to be_displayed
+      expect(Gradezilla.total_cell_mute_icon_select).to be_displayed
     end
 
     it "handles un-muting correctly", priority: "1", test_id: 164227 do
@@ -85,7 +84,7 @@ describe "Gradezilla" do
       # make sure you can un-mute
       Gradezilla.toggle_assignment_muting(@second_assignment.id)
 
-      expect(Gradezilla.content_selector).not_to contain_jqcss(Gradezilla.assignment_header_mute_icon_selector(@second_assignment.id))
+      expect(Gradezilla.content_selector).not_to contain_css(".total-cell .icon-muted")
       expect(@second_assignment.reload).not_to be_muted
     end
   end
@@ -253,7 +252,7 @@ describe "Gradezilla" do
 
     Gradezilla.visit(@course)
 
-    f('.Gradebook__ColumnHeaderAction').click
+    f('.Gradebook__ColumnHeaderAction button').click
     expect(f('.gradebook-header-menu')).not_to include_text("SpeedGrader")
   end
 

@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import I18n from 'i18n!react_scheduler'
-import Actions from 'jsx/calendar/scheduler/actions'
+import Actions from '../../../calendar/scheduler/actions'
 
   class FindAppointment extends React.Component {
 

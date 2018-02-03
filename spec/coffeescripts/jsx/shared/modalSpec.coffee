@@ -115,6 +115,20 @@ define [
     @component.componentWillReceiveProps(isOpen: true)
     ok @component.state.modalIsOpen, "props change to true"
 
+  test "Sets the iframe allowances", ->
+    spy = sinon.spy()
+    @component = TestUtils.renderIntoDocument(React.createElement(Modal, {
+      isOpen: true,
+      onRequestClose: ->
+      title: "Hello"
+      closeWithX: ->
+      onAfterOpen: spy
+    }, React.createElement(ModalButtons, {className: 'buttonContent'},
+      "buttons here"
+    )))
+
+    ok spy.called
+
   test "closeModal() set modal open state to false and calls onRequestClose", ->
     calledOnRequestClose = false
     oRC = ->

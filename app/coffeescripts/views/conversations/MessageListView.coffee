@@ -17,8 +17,8 @@
 
 define [
   'i18n!messages'
-  'compiled/views/PaginatedCollectionView'
-  'compiled/views/conversations/MessageView'
+  '../PaginatedCollectionView'
+  '../conversations/MessageView'
   'jst/conversations/messageList'
 ], (I18n, PaginatedCollectionView, MessageView, template) ->
 

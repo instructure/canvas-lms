@@ -18,11 +18,11 @@
 define [
   'i18n!groups'
   'underscore'
-  'compiled/views/DialogFormView'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
+  '../../DialogFormView'
+  './GroupCategoryCloneView'
   'jst/groups/manage/randomlyAssignMembers'
   'jst/EmptyDialogFormWrapper'
-  'compiled/util/groupHasSubmissions'
+  '../../../util/groupHasSubmissions'
 ], (I18n, _, DialogFormView, GroupCategoryCloneView, template, wrapper, groupHasSubmissions) ->
 
   class RandomlyAssignMembersView extends DialogFormView

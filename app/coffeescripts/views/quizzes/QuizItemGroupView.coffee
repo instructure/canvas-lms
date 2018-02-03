@@ -18,9 +18,9 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/CollectionView'
+  '../CollectionView'
   'jst/quizzes/QuizItemGroupView'
-  'compiled/views/quizzes/QuizItemView'
+  './QuizItemView'
 ], ($, _, CollectionView, template, QuizItemView) ->
 
   class ItemGroupView extends CollectionView

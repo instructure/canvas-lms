@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/ModuleItem'
+  '../collections/PaginatedCollection'
+  '../models/ModuleItem'
 ], (PaginatedCollection, ModuleItem) ->
 
   class ModuleItemCollection extends PaginatedCollection

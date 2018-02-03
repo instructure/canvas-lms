@@ -16,117 +16,117 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/shared/upload_file'
-], (uploadFile) => {
+import uploadFile from 'jsx/shared/upload_file'
 
-  QUnit.module('Upload File');
+QUnit.module('Upload File');
 
-  asyncTest('uploadFile threads through in direct to S3 case', () => {
-    const successUrl = 'http://successUrl';
-    const preflightResponse = new Promise((resolve) => {
-      setTimeout(() => resolve({
-        data: {
-          upload_params: { fakeKey: 'fakeValue', success_url: successUrl },
-          upload_url: 'http://uploadUrl'
-        }
-      }));
-    });
-
-    const postStub = sinon.stub();
-    const getStub = sinon.stub();
-    postStub.onCall(0).returns(preflightResponse);
-    postStub.onCall(1).returns(Promise.resolve());
-    getStub.returns(Promise.resolve());
-
-    const fakeAjaxLib = {
-      post: postStub,
-      get: getStub
-    };
-
-    const url = `/api/v1/courses/1/files`;
-    const data = { name: 'fake' };
-    const file = sinon.stub();
-
-    uploadFile(url, data, file, fakeAjaxLib).then(() => {
-      ok(getStub.calledWith(successUrl), 'made request to success url');
-    });
-    start();
+test('uploadFile threads through in direct to S3 case', assert => {
+  const done = assert.async()
+  const successUrl = 'http://successUrl';
+  const preflightResponse = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      data: {
+        upload_params: { fakeKey: 'fakeValue', success_url: successUrl },
+        upload_url: 'http://uploadUrl'
+      }
+    }));
   });
 
-  asyncTest('uploadFile threads through in inst-fs case', () => {
-    const successUrl = 'http://successUrl';
-    const preflightResponse = new Promise((resolve) => {
-      setTimeout(() => resolve({
-        data: {
-          upload_params: { fakeKey: 'fakeValue' },
-          upload_url: 'http://uploadUrl'
-        }
-      }));
-    });
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.onCall(0).returns(preflightResponse);
+  postStub.onCall(1).returns(Promise.resolve());
+  getStub.returns(Promise.resolve());
 
-    const postResponse = new Promise((resolve) => {
-      setTimeout(() => resolve({
-        status: 201,
-        data: { location: successUrl }
-      }));
-    });
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
 
-    const postStub = sinon.stub();
-    const getStub = sinon.stub();
-    postStub.onCall(0).returns(preflightResponse);
-    postStub.onCall(1).returns(postResponse);
-    getStub.returns(Promise.resolve());
+  const url = `/api/v1/courses/1/files`;
+  const data = { name: 'fake' };
+  const file = sinon.stub();
 
-    const fakeAjaxLib = {
-      post: postStub,
-      get: getStub
-    };
+  uploadFile(url, data, file, fakeAjaxLib).then(() => {
+    ok(getStub.calledWith(successUrl), 'made request to success url');
+    done()
+  });
+});
 
-    const url = `/api/v1/courses/1/files`;
-    const data = { name: 'fake' };
-    const file = sinon.stub();
-
-    uploadFile(url, data, file, fakeAjaxLib).then(() => {
-      ok(getStub.calledWith(successUrl), 'made request to success url');
-    });
-    start();
+test('uploadFile threads through in inst-fs case', assert => {
+  const done = assert.async()
+  const successUrl = 'http://successUrl';
+  const preflightResponse = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      data: {
+        upload_params: { fakeKey: 'fakeValue' },
+        upload_url: 'http://uploadUrl'
+      }
+    }));
   });
 
-  asyncTest('uploadFile threads through in local-storage case', () => {
-    const preflightResponse = new Promise((resolve) => {
-      setTimeout(() => resolve({
-        data: {
-          upload_params: { fakeKey: 'fakeValue' },
-          upload_url: 'http://uploadUrl'
-        }
-      }));
-    });
+  const postResponse = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      status: 201,
+      data: { location: successUrl }
+    }));
+  });
 
-    const postResponse = new Promise((resolve) => {
-      setTimeout(() => resolve({
-        data: { id: 1 }
-      }));
-    });
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.onCall(0).returns(preflightResponse);
+  postStub.onCall(1).returns(postResponse);
+  getStub.returns(Promise.resolve());
 
-    const postStub = sinon.stub();
-    const getStub = sinon.stub();
-    postStub.onCall(0).returns(preflightResponse);
-    postStub.onCall(1).returns(postResponse);
-    getStub.returns(Promise.resolve());
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
 
-    const fakeAjaxLib = {
-      post: postStub,
-      get: getStub
-    };
+  const url = `/api/v1/courses/1/files`;
+  const data = { name: 'fake' };
+  const file = sinon.stub();
 
-    const url = `/api/v1/courses/1/files`;
-    const data = { name: 'fake' };
-    const file = sinon.stub();
+  uploadFile(url, data, file, fakeAjaxLib).then(() => {
+    ok(getStub.calledWith(successUrl), 'made request to success url');
+    done()
+  });
+});
 
-    uploadFile(url, data, file, fakeAjaxLib).then((response) => {
-      equal(response.data.id, 1, 'passed response through');
-    });
-    start();
+test('uploadFile threads through in local-storage case', assert => {
+  const done = assert.async()
+  const preflightResponse = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      data: {
+        upload_params: { fakeKey: 'fakeValue' },
+        upload_url: 'http://uploadUrl'
+      }
+    }));
+  });
+
+  const postResponse = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      data: { id: 1 }
+    }));
+  });
+
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.onCall(0).returns(preflightResponse);
+  postStub.onCall(1).returns(postResponse);
+  getStub.returns(Promise.resolve());
+
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
+
+  const url = `/api/v1/courses/1/files`;
+  const data = { name: 'fake' };
+  const file = sinon.stub();
+
+  uploadFile(url, data, file, fakeAjaxLib).then((response) => {
+    equal(response.data.id, 1, 'passed response through');
+    done()
   });
 });

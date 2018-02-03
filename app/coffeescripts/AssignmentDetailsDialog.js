@@ -1,9 +1,9 @@
 import I18n from 'i18n!assignment_details'
 import $ from 'jquery'
 import assignmentDetailsDialogTemplate from 'jst/AssignmentDetailsDialog'
-import round from 'compiled/util/round'
+import round from './util/round'
 import 'jqueryui/dialog'
-import 'compiled/jquery/fixDialogButtons'
+import './jquery/fixDialogButtons'
 
 export default class AssignmentDetailsDialog {
   static show (opts) {

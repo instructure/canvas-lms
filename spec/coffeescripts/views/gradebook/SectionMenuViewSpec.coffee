@@ -55,8 +55,9 @@ define [
     $('input[value=2]').parent().click()
     ok @view.currentSection == '2', 'updates its section'
 
-  asyncTest 'it publishes changes', ->
-    expect(1)
+  test 'it publishes changes', (assert) ->
+    start = assert.async()
+    assert.expect(1)
     $.subscribe 'currentSection/change', (section) ->
       ok section == '2', 'publish fires'
       start()

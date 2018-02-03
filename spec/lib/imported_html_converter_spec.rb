@@ -205,6 +205,16 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq test_string
     end
 
+    it "should convert base64 images to file links" do
+      base64 = "R0lGODlhCQAJAIAAAICAgP///yH5BAEAAAEALAAAAAAJAAkAAAIQTGCZgGrc\nFIxvSuhwpsuFAgA7\n"
+      test_string = "<p><img src=\"data:image/gif;base64,#{base64}\"></p>"
+      new_string = convert_and_replace(test_string)
+      attachment = Attachment.last
+      expect(attachment.content_type).to eq 'image/gif'
+      expect(attachment.name).to eq "1d1fde3d669ed5c4fc68a49d643f140d.gif"
+      expect(new_string).to eq "<p><img src=\"/courses/#{@course.id}/files/#{attachment.id}/preview\"></p>"
+    end
+
   end
 
   context ".relative_url?" do

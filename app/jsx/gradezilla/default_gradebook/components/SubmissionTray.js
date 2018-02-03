@@ -17,25 +17,25 @@
  */
 
 import React from 'react';
-import { arrayOf, bool, func, number, shape, string } from 'prop-types';
+import { arrayOf, bool, func, number, oneOf, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
-import Avatar from 'instructure-ui/lib/components/Avatar';
-import Button from 'instructure-ui/lib/components/Button';
-import Container from 'instructure-ui/lib/components/Container';
-import Heading from 'instructure-ui/lib/components/Heading';
-import Link from 'instructure-ui/lib/components/Link';
-import Spinner from 'instructure-ui/lib/components/Spinner';
-import Tray from 'instructure-ui/lib/components/Tray';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Avatar from '@instructure/ui-core/lib/components/Avatar';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Container from '@instructure/ui-core/lib/components/Container';
+import Heading from '@instructure/ui-core/lib/components/Heading';
+import Link from '@instructure/ui-core/lib/components/Link';
+import Spinner from '@instructure/ui-core/lib/components/Spinner';
+import Tray from '@instructure/ui-core/lib/components/Tray';
+import Text from '@instructure/ui-core/lib/components/Text';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
-import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
-import GradeInput from 'jsx/gradezilla/default_gradebook/components/GradeInput';
-import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
-import CommentPropTypes from 'jsx/gradezilla/default_gradebook/propTypes/CommentPropTypes';
-import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem';
-import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
-import SubmissionStatus from 'jsx/gradezilla/default_gradebook/components/SubmissionStatus';
-import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
+import Carousel from '../../../gradezilla/default_gradebook/components/Carousel';
+import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput';
+import LatePolicyGrade from '../../../gradezilla/default_gradebook/components/LatePolicyGrade';
+import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes';
+import SubmissionCommentListItem from '../../../gradezilla/default_gradebook/components/SubmissionCommentListItem';
+import SubmissionCommentCreateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
+import SubmissionStatus from '../../../gradezilla/default_gradebook/components/SubmissionStatus';
+import SubmissionTrayRadioInputGroup from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 
 function renderAvatar (name, avatarUrl) {
   return (
@@ -59,9 +59,9 @@ function renderSpeedGraderLink (speedGraderUrl) {
 function renderTraySubHeading (headingText) {
   return (
     <Heading level="h4" as="h2" margin="auto auto small">
-      <Typography weight="bold">
+      <Text weight="bold">
         {headingText}
-      </Typography>
+      </Text>
     </Heading>
   );
 }
@@ -85,6 +85,8 @@ export default class SubmissionTray extends React.Component {
     currentUserId: string.isRequired,
     editedCommentId: string,
     editSubmissionComment: func.isRequired,
+    enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
+    gradingScheme: arrayOf(Array).isRequired,
     gradingDisabled: bool,
     isOpen: bool.isRequired,
     colors: shape({
@@ -286,6 +288,8 @@ export default class SubmissionTray extends React.Component {
               <GradeInput
                 assignment={this.props.assignment}
                 disabled={this.props.gradingDisabled}
+                enterGradesAs={this.props.enterGradesAs}
+                gradingScheme={this.props.gradingScheme}
                 onSubmissionUpdate={this.props.onGradeSubmission}
                 submission={this.props.submission}
                 submissionUpdating={this.props.submissionUpdating}
@@ -293,7 +297,12 @@ export default class SubmissionTray extends React.Component {
 
               {!!this.props.submission.pointsDeducted &&
                 <Container as="div" margin="small 0 0 0">
-                  <LatePolicyGrade submission={this.props.submission} />
+                  <LatePolicyGrade
+                    assignment={this.props.assignment}
+                    enterGradesAs={this.props.enterGradesAs}
+                    gradingScheme={this.props.gradingScheme}
+                    submission={this.props.submission}
+                  />
                 </Container>
               }
 

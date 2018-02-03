@@ -20,12 +20,12 @@ import I18n from 'i18n!roster'
 import React  from 'react'
 import PropTypes from 'prop-types'
 import shapes from './shapes'
-import Table from 'instructure-ui/lib/components/Table'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import TextInput from 'instructure-ui/lib/components/TextInput'
-import RadioInput from 'instructure-ui/lib/components/RadioInput'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Link from 'instructure-ui/lib/components/Link'
+import Table from '@instructure/ui-core/lib/components/Table'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import TextInput from '@instructure/ui-core/lib/components/TextInput'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Link from '@instructure/ui-core/lib/components/Link'
 
   const CREATE_NEW = '__CREATE_NEW__';
   const SKIP = '__SKIP';
@@ -216,10 +216,10 @@ import Link from 'instructure-ui/lib/components/Link'
         <div className="addpeople__duplicates namelist" key={`dupe_${this.props.duplicates.address}`}>
           <Table
             caption={
-              <Typography>
+              <Text>
                 {I18n.t('Possible matches for "%{address}". Select the correct one below or create a new user.',
                       {address: this.props.duplicates.address})}
-              </Typography>
+              </Text>
             }
           >
             <thead>

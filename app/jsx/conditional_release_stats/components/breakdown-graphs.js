@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
-import {transformScore} from 'jsx/shared/conditional_release/score'
+import {transformScore} from '../../shared/conditional_release/score'
 import BarGraph from './breakdown-graph-bar'
   const { object, array, func, number, bool } = PropTypes
 

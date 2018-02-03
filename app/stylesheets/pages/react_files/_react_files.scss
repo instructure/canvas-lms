@@ -64,6 +64,9 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   .ui-buttonset {
     margin: 0;
   }
+  & .ui-button {
+    margin-right: -1px; // this is to override jquery negative margin that doesn't allow for full keyboard focus ring
+  }
   & .ui-button:first-child {
     border-top-left-radius: $borderRadius;
     border-bottom-left-radius: $borderRadius;

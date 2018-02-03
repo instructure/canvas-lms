@@ -21,6 +21,7 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import { shape } from 'prop-types'
 import Modal from 'react-modal'
+import iframeAllowances from '../lib/iframeAllowances'
 
 const modalOverrides = {
   overlay: {
@@ -97,49 +98,51 @@ export default React.createClass({
   },
 
   renderIframe () {
-    if (this.state.modalIsOpen) {
-      const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-      const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
 
-      return (
-        <div>
-          <div
-            onFocus={this.handleAlertFocus}
-            onBlur={this.handleAlertBlur}
-            className={beforeAlertStyles}
-            tabIndex="0"
-          >
-            <div className="ic-flash-info">
-              <div className="ic-flash__icon" aria-hidden="true">
-                <i className="icon-info" />
-              </div>
-              {I18n.t('The following content is partner provided')}
+    return (
+      <div>
+        <div
+          onFocus={this.handleAlertFocus}
+          onBlur={this.handleAlertBlur}
+          className={beforeAlertStyles}
+          tabIndex="0"
+        >
+          <div className="ic-flash-info">
+            <div className="ic-flash__icon" aria-hidden="true">
+              <i className="icon-info" />
             </div>
-          </div>
-          <iframe
-            src={this.getLaunchUrl()}
-            title={I18n.t('Tool Configuration')}
-            className="tool_launch"
-            style={this.state.iframeStyle}
-            ref={(e) => { this.iframe = e; }}
-          />
-          <div
-            onFocus={this.handleAlertFocus}
-            onBlur={this.handleAlertBlur}
-            className={afterAlertStyles}
-            tabIndex="0"
-          >
-            <div className="ic-flash-info">
-              <div className="ic-flash__icon" aria-hidden="true">
-                <i className="icon-info" />
-              </div>
-              {I18n.t('The preceding content is partner provided')}
-            </div>
+            {I18n.t('The following content is partner provided')}
           </div>
         </div>
-      );
-    } else {
-      return null;
+        <iframe
+          src={this.getLaunchUrl()}
+          title={I18n.t('Tool Configuration')}
+          className="tool_launch"
+          style={this.state.iframeStyle}
+          ref={(e) => { this.iframe = e; }}
+        />
+        <div
+          onFocus={this.handleAlertFocus}
+          onBlur={this.handleAlertBlur}
+          className={afterAlertStyles}
+          tabIndex="0"
+        >
+          <div className="ic-flash-info">
+            <div className="ic-flash__icon" aria-hidden="true">
+              <i className="icon-info" />
+            </div>
+            {I18n.t('The preceding content is partner provided')}
+          </div>
+        </div>
+      </div>
+    );
+  },
+
+  onAfterOpen () {
+    if (this.iframe) {
+      this.iframe.setAttribute('allow', iframeAllowances());
     }
   },
 
@@ -163,6 +166,7 @@ export default React.createClass({
           style={modalOverrides}
           isOpen={this.state.modalIsOpen}
           onRequestClose={this.closeModal}
+          onAfterOpen={this.onAfterOpen}
         >
           <div className="ReactModal__Layout">
             <div className="ReactModal__Header">

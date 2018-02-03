@@ -1,0 +1,35 @@
+<%
+# Copyright (C) 2018 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% if @assignment.tool_settings_tool.present? ||
+      @assignment.vericite_enabled? ||
+      @assignment.turnitin_enabled? %>
+    <tr>
+      <td colspan="2">
+        <label class='checkbox'>
+          <input type="checkbox" class='turnitin_pledge' name="turnitin_pledge" value="1"/>
+          <% if eula_url.present? %>
+            <%= t "I agree to the tool's" %>
+            <%= raw("<a href='#{eula_url}'>#{t 'End-User License Agreement.'}</a>") %>
+          <% else %>
+            <%= @similarity_pledge %>
+          <% end %>
+        </label>
+      </td>
+    </tr>
+<% end %>

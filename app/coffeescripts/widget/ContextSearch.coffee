@@ -20,8 +20,8 @@ define [
   'i18n!recipient_input'
   'jquery'
   'underscore'
-  'compiled/util/contextList'
-  'compiled/widget/TokenInput'
+  '../util/contextList'
+  '../widget/TokenInput'
   'str/htmlEscape'
   'jst/_avatar'
 ], (I18n, $, _, contextList, TokenInput, h, avatarTemplate) ->

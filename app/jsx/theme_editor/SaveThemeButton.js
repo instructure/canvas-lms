@@ -21,9 +21,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import customTypes from './PropTypes'
-import Modal from 'jsx/shared/modal'
-import ModalContent from 'jsx/shared/modal-content'
-import ModalButtons from 'jsx/shared/modal-buttons'
+import Modal from '../shared/modal'
+import ModalContent from '../shared/modal-content'
+import ModalButtons from '../shared/modal-buttons'
 
 export default React.createClass({
 

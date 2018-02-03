@@ -18,9 +18,9 @@
 
 import { Grid } from 'vendor/slickgrid';
 import 'jqueryui/sortable';
-import CellEditorFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory';
-import CellFormatterFactory from 'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory';
-import ColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer';
+import CellEditorFactory from '../../../gradezilla/default_gradebook/slick-grid/CellEditorFactory';
+import CellFormatterFactory from '../../../gradezilla/default_gradebook/slick-grid/CellFormatterFactory';
+import ColumnHeaderRenderer from '../../../gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer';
 import Columns from './Columns';
 import Events from './Events';
 import GridSupport from './GridSupport';
@@ -54,7 +54,6 @@ export default class GradebookGrid {
     ));
 
     this.grid = new Grid(this.options.$container, this.gridData.rows, columns, options);
-    this.grid.setSortColumn('student');
 
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,

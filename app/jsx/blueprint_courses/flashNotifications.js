@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { showFlashAlert } from 'jsx/shared/FlashAlert'
+import { showFlashAlert } from '../shared/FlashAlert'
 import actions from './actions'
 
 export default class FlashNotifications {

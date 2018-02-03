@@ -18,8 +18,8 @@
 define [
   'ember'
   'underscore'
-  'compiled/gradebook/GradebookHeaderMenu'
-  'compiled/SubmissionDetailsDialog'
+  '../../../gradebook/GradebookHeaderMenu'
+  '../../../SubmissionDetailsDialog'
 ], (Ember, _, GradebookHeaderMenu, SubmissionDetailsDialog) ->
 
   AssignmentsView = Ember.View.extend

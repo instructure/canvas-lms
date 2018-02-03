@@ -18,7 +18,7 @@
 define [
   'i18n!gradebook'
   'Backbone'
-  'compiled/gradebook/OutcomeGradebookGrid'
+  '../../gradebook/OutcomeGradebookGrid'
   'jst/gradebook/header_filter'
 ], (I18n, {View}, Grid, template) ->
 

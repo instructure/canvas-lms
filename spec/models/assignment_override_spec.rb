@@ -30,14 +30,16 @@ describe AssignmentOverride do
     @override_student.save!
 
     @override.destroy
+    @override_student.reload
     expect(AssignmentOverride.where(id: @override).first).not_to be_nil
-    expect(@override.workflow_state).to eq 'deleted'
-    expect(AssignmentOverrideStudent.where(:id => @override_student).first).to be_nil
+    expect(@override).to be_deleted
+    expect(AssignmentOverrideStudent.where(:id => @override_student).first).not_to be_nil
+    expect(@override_student).to be_deleted
   end
 
   it 'should allow deletes to invalid objects' do
     override = assignment_override_model(course: @course)
-    # make it invalide
+    # make it invalid
     AssignmentOverride.where(id: override).update_all(assignment_id: nil, quiz_id: nil)
     expect(override.reload).to be_invalid
     override.destroy
@@ -94,6 +96,8 @@ describe AssignmentOverride do
     @override_student.save!
 
     @override.destroy
+    expect(@override_student.reload).to be_deleted
+
     @override2 = assignment_override_model(:assignment => @assignment)
     @override_student2 = @override2.assignment_override_students.build
     @override_student2.user = @student
@@ -188,8 +192,8 @@ describe AssignmentOverride do
 
     it "should propagate student errors" do
       student = student_in_course(course: @override.assignment.context, name: 'Johnny Manziel').user
-      @override.assignment_override_students.create(user: student)
-      @override.assignment_override_students.build(user: student)
+      @override.assignment_override_students.create(user: student, workflow_state: 'active')
+      @override.assignment_override_students.build(user: student, workflow_state: 'active')
       expect(@override).not_to be_valid
       expect(@override.errors[:assignment_override_students].first.type).to eq :taken
     end

@@ -17,8 +17,8 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/CourseEvent'
+  '../collections/PaginatedCollection'
+  '../models/CourseEvent'
 ], (PaginatedCollection, CourseEvent) ->
 
   class CourseLoggingCollection extends PaginatedCollection

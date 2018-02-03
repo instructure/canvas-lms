@@ -17,6 +17,7 @@
 
 require_relative '../common'
 require_relative '../helpers/announcements_common'
+require_relative './announcement_new_edit_page'
 
 describe "announcements" do
   include_context "in-process server selenium tests"
@@ -30,6 +31,54 @@ describe "announcements" do
 
     before :each do
       user_session(@teacher)
+    end
+
+    it "should allow saving of section announcement" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @course.course_sections.create!(name: "Section 1")
+      @course.course_sections.create!(name: "Section 2")
+      AnnouncementNewEdit.visit(@course)
+      AnnouncementNewEdit.select_a_section("Section")
+      AnnouncementNewEdit.add_message("Announcement Body")
+      AnnouncementNewEdit.add_title("Announcement Title")
+      expect_new_page_load {AnnouncementNewEdit.submit_announcement_form}
+      expect(driver.current_url).to include(AnnouncementNewEdit.
+                                            individual_announcement_url(Announcement.last))
+    end
+
+    it "should not allow empty sections" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @course.course_sections.create!(name: "Section 1")
+      @course.course_sections.create!(name: "Section 2")
+      AnnouncementNewEdit.visit(@course)
+      AnnouncementNewEdit.select_a_section("")
+      AnnouncementNewEdit.add_message("Announcement Body")
+      AnnouncementNewEdit.add_title("Announcement Title")
+      expect(AnnouncementNewEdit.section_error).to include("A section is required")
+    end
+
+    context "section specific announcements" do
+      before (:once) do
+        course_with_teacher(active_course: true)
+        @course.account.set_feature_flag! :section_specific_announcements, 'on'
+        @section = @course.course_sections.create!(name: 'test section')
+
+        @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+        @announcement.is_section_specific = true
+        @announcement.course_sections = [@section]
+        @announcement.save!
+
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, :enrollment_state => 'active')
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        student_in_section(@section, user: @student1)
+      end
+
+      it "should be visible to teacher in course" do
+        user_session(@teacher)
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+        expect(f(".discussion-title")).to include_text(@announcement.title)
+      end
     end
 
     describe "shared bulk topics specs" do

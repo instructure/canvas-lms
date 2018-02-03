@@ -968,8 +968,7 @@ describe DiscussionTopic do
       @topic = @course.discussion_topics.build(:title => "topic")
       @assignment = @course.assignments.build title: @topic.title,
         submission_types: 'discussion_topic',
-        only_visible_to_overrides: true,
-        title: @topic.title
+        only_visible_to_overrides: true
       @assignment.assignment_overrides.build set: @empty_section
       @assignment.saved_by = :discussion_topic
       @topic.assignment = @assignment
@@ -1895,6 +1894,164 @@ describe DiscussionTopic do
       ids = new_order.map {|x| topics[x-1].id}
       topics[0].update_order(ids)
       expect(topics.first.list_scope.map(&:id)).to eq ids
+    end
+  end
+
+  describe "section specific announcements" do
+    before :once do
+      @course = course_factory({ :course_name => "Course 1", :active_all => true })
+      @section = @course.course_sections.create!
+      @course.save!
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement = Announcement.create!(
+        :title => "some topic",
+        :message => "I announce that i am lying",
+        :user => @teacher,
+        :context => @course,
+        :workflow_state => "published"
+      )
+    end
+
+    def course_with_two_sections
+      course = course_factory({ :course_name => "Course 1", :active_all => true })
+      course.course_sections.create!
+      course.course_sections.create!
+      course.root_account.enable_feature!(:section_specific_announcements)
+      course.save!
+      course
+    end
+
+    def basic_announcement_model(opts = {})
+      opts.reverse_merge!({
+        :title => "Default title",
+        :message => "Default message",
+        :is_section_specific => false
+      })
+      announcement = Announcement.create!(
+        :title => opts[:title],
+        :message => opts[:message],
+        :user => @teacher,
+        :context => opts[:course],
+        :workflow_state => "published",
+      )
+      announcement.is_section_specific = opts[:is_section_specific]
+      announcement
+    end
+
+    def add_section_to_topic(topic, section, opts = {})
+      opts.reverse_merge!({
+        :workflow_state => "active"
+      })
+      topic.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          :discussion_topic => topic,
+          :course_section => section,
+          :workflow_state => opts[:workflow_state]
+        )
+    end
+
+    it "section specific topics must have sections" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement.is_section_specific = true
+      expect(@announcement.valid?).to eq false
+      errors = @announcement.errors[:is_section_specific]
+      expect(errors).to eq ["Section specific topics must have sections"]
+    end
+
+    it "feature must be enabled" do
+      @course.root_account.disable_feature!(:section_specific_announcements)
+      @announcement.is_section_specific = true
+      add_section_to_topic(@announcement, @section)
+      expect(@announcement.valid?).to eq false
+      errors = @announcement.errors[:is_section_specific]
+      expect(errors).to eq ["Section-specific discussions are disabled"]
+    end
+
+    it "only announcements can be section-specific" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      topic = DiscussionTopic.create!(:title => "some title", :context => @course,
+        :user => @teacher)
+      topic.is_section_specific = true
+      add_section_to_topic(topic, @section)
+      expect(topic.valid?).to eq false
+      errors = topic.errors[:is_section_specific]
+      expect(errors).to eq ["Only announcements can be section-specific"]
+    end
+
+    it "should not include deleted sections" do
+      course = course_with_two_sections
+      announcement = basic_announcement_model(
+        :course => course,
+        :is_section_specific => true
+      )
+      add_section_to_topic(announcement, course.course_sections.first)
+      add_section_to_topic(announcement, course.course_sections.second)
+      announcement.save!
+      expect(announcement.course_sections.length).to eq 2
+      course.course_sections.second.reload
+      course.course_sections.second.destroy
+      announcement.reload
+      expect(announcement.course_sections.length).to eq 1
+      expect(announcement.course_sections.first.id).to eq course.course_sections.first.id
+    end
+
+    it "scope allows non-section-specific announcements" do
+      course = course_with_two_sections
+      announcement = basic_announcement_model(
+        :course => course,
+        :is_section_specific => false
+      )
+      announcement.save!
+      topics = DiscussionTopic.in_sections(course.course_sections)
+      expect(topics.length).to eq 1
+    end
+
+    it "scope allows section-specific announcements if in right section" do
+      course = course_with_two_sections
+      announcement = basic_announcement_model(
+        :course => course,
+        :is_section_specific => true
+      )
+      add_section_to_topic(announcement, course.course_sections.first)
+      announcement.save!
+      topics = DiscussionTopic.in_sections(course.course_sections)
+      expect(topics.length).to eq 1
+    end
+
+    it "scope forbids section-specific announcements if in wrong section" do
+      course = course_with_two_sections
+      announcement = basic_announcement_model(
+        :course => course,
+        :is_section_specific => true
+      )
+      add_section_to_topic(announcement, course.course_sections.second)
+      announcement.save!
+      topics = DiscussionTopic.in_sections([course.course_sections.first])
+      expect(topics.length).to eq 0
+    end
+
+    it "scope forbids sections from multiple courses" do
+      course1 = course_with_two_sections
+      course2 = course_with_two_sections
+      sections = [ course1.course_sections.first, course2.course_sections.first ]
+      expect { DiscussionTopic.in_sections(sections) }.
+        to raise_error(DiscussionTopic::QueryError,
+          "Searching for announcements in sections must span exactly one course")
+    end
+
+    it "don't return duplicates if matched multiple sections" do
+      course = course_with_two_sections
+      announcement = basic_announcement_model(
+        :course => course,
+        :is_section_specific => true
+      )
+      add_section_to_topic(announcement, course.course_sections.first)
+      add_section_to_topic(announcement, course.course_sections.second)
+      announcement.save!
+      topics = DiscussionTopic.in_sections(
+        [course.course_sections.first, course.course_sections.second]
+      )
+      expect(topics.length).to eq 1
     end
   end
 

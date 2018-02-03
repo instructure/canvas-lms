@@ -19,9 +19,9 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/grade_summary/ProgressBarView'
-  'compiled/views/grade_summary/OutcomePopoverView'
-  'compiled/views/grade_summary/OutcomeDialogView'
+  './ProgressBarView'
+  './OutcomePopoverView'
+  './OutcomeDialogView'
   'jst/grade_summary/outcome'
 ], ($, _, Backbone, ProgressBarView, OutcomePopoverView, OutcomeDialogView, template) ->
 

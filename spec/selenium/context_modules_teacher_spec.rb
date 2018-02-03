@@ -431,10 +431,10 @@ describe "context modules" do
     it "should always show module contents on empty module", priority: "1", test_id: 126732 do
       get "/courses/#{@course.id}/modules"
       add_module 'Test module'
-      ff(".icon-mini-arrow-down")[1].click
+      ff(".icon-mini-arrow-down")[0].click
       wait_for_ajaximations
       expect(f('.context_module .content')).to be_displayed
-      expect(ff(".icon-mini-arrow-down")[1]).to be_displayed
+      expect(ff(".icon-mini-arrow-down")[0]).to be_displayed
     end
 
     it "should allow adding an item twice" do

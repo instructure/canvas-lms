@@ -20,11 +20,11 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/views/DialogFormView'
+  '../DialogFormView'
   'jst/roles/newRole'
   'jst/EmptyDialogFormWrapper'
-  'compiled/models/Role'
-  'compiled/models/Account'
+  '../../models/Role'
+  '../../models/Account'
 ], (I18n, $, _, Backbone, DialogFormView, template, wrapper, Role, Account) ->
   class NewRoleView extends DialogFormView
     defaults:

@@ -242,7 +242,7 @@ describe "conversations new" do
 
         selector = "#bulk_message"
         bulk_cb = f(selector)
-        bulk_cb.click # check the box
+        move_to_click(selector)
 
         f("#recipient-search-btn").click
         wait_for_ajaximations

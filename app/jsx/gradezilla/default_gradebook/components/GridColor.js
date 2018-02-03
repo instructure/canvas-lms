@@ -18,8 +18,8 @@
 
 import React from 'react';
 import { arrayOf, shape, string } from 'prop-types';
-import { statuses } from 'jsx/gradezilla/default_gradebook/constants/statuses';
-import { darken } from 'jsx/gradezilla/default_gradebook/constants/colors';
+import { statuses } from '../../../gradezilla/default_gradebook/constants/statuses';
+import { darken } from '../../../gradezilla/default_gradebook/constants/colors';
 
 function GridColor (props) {
   const styleRules = props.statuses.map(status =>

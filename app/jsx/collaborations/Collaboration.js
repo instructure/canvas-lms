@@ -19,11 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import DatetimeDisplay from 'jsx/shared/DatetimeDisplay'
+import DatetimeDisplay from '../shared/DatetimeDisplay'
 import DeleteConfirmation from './DeleteConfirmation'
 import i18n from 'i18n!react_collaborations'
 import splitAssetString from 'compiled/str/splitAssetString'
-import store from 'jsx/collaborations/store/store'
+import store from '../collaborations/store/store'
   class Collaboration extends React.Component {
     constructor (props) {
       super(props);

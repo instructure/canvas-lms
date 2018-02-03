@@ -18,8 +18,9 @@
 define [
   'jquery',
   'Backbone',
-  'jst/ExternalTools/ExternalContentReturnView'
-], ($, Backbone, template) ->
+  'jst/ExternalTools/ExternalContentReturnView',
+  'jsx/external_apps/lib/iframeAllowances'
+], ($, Backbone, template, iframeAllowances) ->
 
   class ExternalContentReturnView extends Backbone.View
     template: template
@@ -52,6 +53,7 @@ define [
 
     toJSON: ->
       json = super
+      json.allowances = iframeAllowances()
       json.launch_url = @model.launchUrl(@launchType, @launchParams)
       json
 

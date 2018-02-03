@@ -18,8 +18,8 @@
 define [
   'Backbone'
   'underscore'
-  'compiled/views/CollectionView'
-  'compiled/views/grade_summary/GroupView'
+  '../CollectionView'
+  './GroupView'
   'jst/grade_summary/section'
 ], ({View, Collection}, _, CollectionView, GroupView, template) ->
 

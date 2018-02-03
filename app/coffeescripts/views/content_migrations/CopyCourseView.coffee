@@ -19,7 +19,7 @@ define [
   'Backbone'
   'underscore'
   'jst/content_migrations/CopyCourse'
-  'compiled/views/content_migrations/MigrationView'
+  './MigrationView'
 ],(Backbone, _, template, MigrationView) -> 
   class CopyCourseView extends MigrationView
     template: template

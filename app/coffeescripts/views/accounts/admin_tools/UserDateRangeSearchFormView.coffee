@@ -20,11 +20,11 @@ define [
   'jquery'
   'i18n!user_date_range_search'
   'jst/accounts/admin_tools/userDateRangeSearchForm'
-  'compiled/views/ValidatedMixin'
+  '../../ValidatedMixin'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
-  'compiled/jquery.rails_flash_notifications'
+  '../../../jquery.rails_flash_notifications'
 ], (Backbone, $, I18n, template, ValidatedMixin) ->
   class UserDateRangeSearchFormView extends Backbone.View
     @mixin ValidatedMixin

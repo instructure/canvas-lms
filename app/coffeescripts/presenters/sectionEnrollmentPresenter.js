@@ -24,7 +24,7 @@
 
 import I18n from 'i18n!section'
 import _ from 'underscore'
-import toUnderscore from 'compiled/str/underscore'
+import toUnderscore from '../str/underscore'
 
 // declare all used i18n keys here to cluttering up the logic
 const keys = {

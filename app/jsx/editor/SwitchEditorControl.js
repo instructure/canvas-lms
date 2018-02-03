@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!editor'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import RichContentEditor from '../shared/rce/RichContentEditor'
 
   var SwitchEditorControl = React.createClass({
     displayName: 'SwitchEditor',

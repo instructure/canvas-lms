@@ -17,8 +17,8 @@
  */
 
 import { combineReducers } from 'redux';
-import history from 'jsx/gradebook-history/reducers/HistoryReducer';
-import searchForm from 'jsx/gradebook-history/reducers/SearchFormReducer';
+import history from '../../gradebook-history/reducers/HistoryReducer';
+import searchForm from '../../gradebook-history/reducers/SearchFormReducer';
 
 const allReducers = () => (
   { history, searchForm }

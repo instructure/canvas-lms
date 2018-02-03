@@ -20,9 +20,9 @@ import I18n from 'i18n!student_groups'
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
-import BackboneState from 'jsx/groups/mixins/BackboneState'
-import PaginatedUserCheckList from 'jsx/groups/components/PaginatedUserCheckList'
-import InfiniteScroll from 'jsx/groups/mixins/InfiniteScroll'
+import BackboneState from '../../groups/mixins/BackboneState'
+import PaginatedUserCheckList from '../../groups/components/PaginatedUserCheckList'
+import InfiniteScroll from '../../groups/mixins/InfiniteScroll'
 import 'jquery.instructure_forms'
   var ManageGroupDialog = React.createClass({
     mixins: [BackboneState, InfiniteScroll],

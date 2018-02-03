@@ -20,8 +20,8 @@ import I18n from 'i18n!blueprint_settings'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Heading from 'instructure-ui/lib/components/Heading'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Text from '@instructure/ui-core/lib/components/Text'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import SyncChange from './SyncChange'
 
@@ -37,9 +37,9 @@ const SyncHistoryItem = ({ migration, heading, ChangeComponent }) => {
         <Heading level="h3">
           <FriendlyDatetime dateTime={date} format={I18n.t('#date.formats.full_with_weekday')} />
         </Heading>
-        <Typography color="secondary" size="small">{I18n.t('%{count} pushed changes', { count: changes.length })}</Typography>
+        <Text color="secondary" size="small">{I18n.t('%{count} pushed changes', { count: changes.length })}</Text>
       </header>
-      {comment && <Typography as="p" color="secondary" size="small">{`"${comment}"`}</Typography>}
+      {comment && <Text as="p" color="secondary" size="small">{`"${comment}"`}</Text>}
       <div role="grid">
         {changes.length ? heading : null}
         {changes.length ? changes.map(change => <ChangeComponent key={`${change.asset_type}_${change.asset_id}`} change={change} />) : null}

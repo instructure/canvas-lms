@@ -22,6 +22,9 @@ else
 end
 
 gem 'rack', '2.0.3'
+
+# oauth2-1.4.0 caused issues with google oauth login flow, which needs to be
+# investigated as part of a future gem bump.
 gem 'oauth2', '1.2.0', require: false
 
 gem 'rails-observers', '0.1.5'
@@ -36,7 +39,6 @@ gem 'authlogic', '3.6.1'
   gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
-gem 'rails-patch-json-encode', '0.0.1'
 gem 'switchman', '1.11.4'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
@@ -45,8 +47,8 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 
 gem 'addressable', '2.5.2', require: false
 gem "after_transaction_commit", '2.0.0'
-gem "aws-sdk-kinesis", '1.0.0', require: false
-gem "aws-sdk-s3", '1.5.0', require: false
+gem "aws-sdk-kinesis", '1.1.0', require: false
+gem "aws-sdk-s3", '1.8.0', require: false
 gem "aws-sdk-sns", '1.1.0', require: false
 gem "aws-sdk-sqs", '1.3.0', require: false
 gem 'barby', '0.6.5', require: false
@@ -60,35 +62,36 @@ gem 'inst-jobs', '0.14.2'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
 gem 'inst-jobs-autoscaling', '1.0.2'
-  gem 'aws-sdk-autoscaling', '1.3.0', require: false
+  gem 'aws-sdk-autoscaling', '1.4.0', require: false
 gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
-gem 'highline', '1.7.8', require: false
+gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.15.6'
-gem 'i18n', '0.9.0'
+gem 'i18n', '0.9.1'
 gem 'i18nliner', '0.0.14'
   gem 'ruby2ruby', '2.4.0', require: false
   gem 'ruby_parser', '3.10.1', require: false
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.2.2', require: 'ims'
+gem 'ims-lti', '2.2.3', require: 'ims'
+gem 'simple_oauth', '0.3.1', require: false
 gem 'json', '2.1.0'
 gem 'oj', '3.3.9'
 gem 'jwt', '1.5.6', require: false
 gem 'json-jwt', '1.7.2', require: false
-gem 'twilio-ruby', '4.2.1'
+gem 'twilio-ruby', '5.6.0'
 
 gem 'mail', '2.6.6', require: false
-gem 'marginalia', '1.4.0', require: false
+gem 'marginalia', '1.5.0', require: false
 gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.8.0'
 gem 'multi_json', '1.12.2'
 gem 'netaddr', '1.5.1', require: false
 gem 'nokogiri', '1.8.1', require: false
-gem 'oauth', '0.5.3', require: false
-gem 'parallel', '1.12.0', require: false
+gem 'oauth', '0.5.4', require: false
+gem 'parallel', '1.12.1', require: false
   gem 'ruby-progressbar', '1.9.0', require: false # used to show progress of S3Uploader
 gem 'retriable', '1.4.1'
-gem 'rake', '12.2.1'
+gem 'rake', '12.3.0'
 gem 'ratom-nokogiri', '0.10.6', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
@@ -97,7 +100,7 @@ gem 'rotp', '3.3.0', require: false
 gem 'net-ldap', '0.16.0', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.7'
-gem 'saml2', '1.1.3', require: false
+gem 'saml2', '1.1.5', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.0', require: 'zip'
@@ -109,7 +112,7 @@ gem 'useragent', '0.16.8', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.1', require: false
-gem 'sentry-raven', '0.15.6', require: false
+gem 'sentry-raven', '2.7.1', require: false
 gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.5', require: false

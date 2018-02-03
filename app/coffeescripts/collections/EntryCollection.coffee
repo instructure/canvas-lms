@@ -17,8 +17,8 @@
 
 define [
   'Backbone'
-  'compiled/models/Entry'
-  'compiled/arr/walk'
+  '../models/Entry'
+  '../arr/walk'
 ], (Backbone, Entry, walk) ->
 
   ##

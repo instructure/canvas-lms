@@ -18,7 +18,7 @@
 define [
   'jquery'
   'Backbone'
-  'compiled/jquery/outerclick'
+  '../../../jquery/outerclick'
 ], ($, {View}) ->
 
   class PopoverMenuView extends View

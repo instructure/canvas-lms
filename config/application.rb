@@ -163,16 +163,6 @@ module CanvasRails
     end
     SafeYAML.singleton_class.prepend(SafeYAMLWithFlag)
 
-    # safe_yaml can't whitelist specific instances of scalar values, so just override the loading
-    # here, and do a weird check
-    YAML.add_ruby_type("object:Class") do |_type, val|
-      if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
-        raise "Cannot load class #{val} from YAML"
-      end
-      val.constantize
-    end
-
-    # TODO: Use this instead of the above block when we switch to Psych
     Psych.add_domain_type("ruby/object", "Class") do |_type, val|
       if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
         raise "Cannot load class #{val} from YAML"

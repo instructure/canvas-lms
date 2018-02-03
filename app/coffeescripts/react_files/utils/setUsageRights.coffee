@@ -17,7 +17,7 @@
 
 define [
   'jquery'
-  'compiled/models/Folder'
+  '../../models/Folder'
   '../modules/filesEnv'
 ], ($, Folder, filesEnv) ->
 

@@ -20,13 +20,13 @@ define [
   'jquery'
   'Backbone'
   'underscore'
-  'compiled/models/DiscussionTopic'
-  'compiled/views/DiscussionTopic/EntriesView'
-  'compiled/views/DiscussionTopic/EntryView'
-  'compiled/views/PublishButtonView',
+  '../../models/DiscussionTopic'
+  '../DiscussionTopic/EntriesView'
+  '../DiscussionTopic/EntryView'
+  '../PublishButtonView',
   'jst/discussions/_reply_form'
-  'compiled/discussions/Reply'
-  'compiled/widget/assignmentRubricDialog'
+  '../../discussions/Reply'
+  '../../widget/assignmentRubricDialog'
   'jsx/shared/rce/RceCommandShim'
   'str/htmlEscape'
 ], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, PublishButtonView,

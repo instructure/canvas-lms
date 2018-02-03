@@ -19,12 +19,12 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/models/grade_summary/Outcome'
-  'compiled/collections/OutcomeResultCollection'
-  'compiled/views/DialogBaseView'
-  'compiled/views/CollectionView'
-  'compiled/views/grade_summary/AlignmentView'
-  'compiled/views/grade_summary/ProgressBarView'
+  '../../models/grade_summary/Outcome'
+  '../../collections/OutcomeResultCollection'
+  '../DialogBaseView'
+  '../CollectionView'
+  './AlignmentView'
+  './ProgressBarView'
   'jst/grade_summary/outcome_detail'
 ], ($, _, Backbone, Outcome, OutcomeResultCollection, DialogBaseView, CollectionView, AlignmentView, ProgressBarView, template) ->
   class OutcomeDetailView extends DialogBaseView

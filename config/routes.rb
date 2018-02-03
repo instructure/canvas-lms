@@ -924,7 +924,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/users/:id', action: :user, as: 'course_user'
       get 'courses/:course_id/activity_stream', action: :activity_stream, as: 'course_activity_stream'
       get 'courses/:course_id/activity_stream/summary', action: :activity_stream_summary, as: 'course_activity_stream_summary'
-      get 'courses/:course_id/todo', action: :todo_items
+      get 'courses/:course_id/todo', action: :todo_items, as: 'course_todo_list_items'
       post 'courses/:course_id/preview_html', action: :preview_html
       post 'courses/:course_id/course_copy', controller: :content_imports, action: :copy_course_content
       get 'courses/:course_id/course_copy/:id', controller: :content_imports, action: :copy_course_status, as: :course_copy_status
@@ -984,6 +984,8 @@ CanvasRails::Application.routes.draw do
 
       post 'courses/:course_id/enrollments', action: :create
       post 'sections/:section_id/enrollments', action: :create
+      post 'courses/:course_id/enrollments/:id/accept', action: :accept
+      post 'courses/:course_id/enrollments/:id/reject', action: :reject
 
       put 'courses/:course_id/enrollments/:id/reactivate', :action => :reactivate, :as => 'reactivate_enrollment'
 
@@ -1234,7 +1236,8 @@ CanvasRails::Application.routes.draw do
       put "users/:user_id/followers/self", action: :follow
       delete "users/:user_id/followers/self", action: :unfollow
 
-      get 'users/self/todo', action: :todo_items
+      get 'users/self/todo', action: :todo_items, as: 'user_todo_list_items'
+      get 'users/self/todo_item_count', action: :todo_item_count
       get 'users/self/upcoming_events', action: :upcoming_events
       get 'users/:user_id/missing_submissions', action: :missing_submissions, as: 'user_missing_submissions'
 

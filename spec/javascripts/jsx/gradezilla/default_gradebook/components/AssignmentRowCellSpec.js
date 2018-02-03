@@ -21,222 +21,234 @@ import { mount } from 'enzyme';
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCell';
 
-const $fixtures = document.getElementById('fixtures');
+QUnit.module('AssignmentRowCell', (suiteHooks) => {
+  let $container;
+  let props;
+  let wrapper;
 
-function createExampleProps () {
-  return {
-    editorOptions: {
-      column: {
-        assignmentId: '2301',
-        field: 'assignment_2301',
-        object: {
-          grading_type: 'points',
-          id: '2301',
-          points_possible: 10
-        }
-      },
-      grid: {},
-      item: { // student row object
-        id: '1101',
-        assignment_2301: { // submission
-          user_id: '1101'
-        }
-      }
-    },
-    isSubmissionTrayOpen: false,
-    onToggleSubmissionTrayOpen () {},
-  };
-}
+  function mountComponent () {
+    return mount(<AssignmentRowCell {...props} />, { attachTo: $container });
+  }
 
-function mountComponent (defaultProps, props = {}) {
-  const allProps = { ...defaultProps, ...props };
-  return mount(<AssignmentRowCell {...allProps} />, { attachTo: $fixtures });
-}
-
-QUnit.module('AssignmentRowCell', {
-  setup () {
-    this.props = createExampleProps();
-  },
-
-  simulateKeyDown (keyCode, shiftKey = false) {
+  function simulateKeyDown (keyCode, shiftKey = false) {
     const event = new Event('keydown');
     event.which = keyCode
     event.shiftKey = shiftKey;
-    return this.wrapper.node.handleKeyDown(event);
-  },
-
-  teardown () {
-    this.wrapper.unmount();
-    $fixtures.innerHTML = '';
+    return wrapper.node.handleKeyDown(event);
   }
-});
 
-test('assigns a reference to its child SubmissionCell container', function () {
-  this.wrapper = mountComponent(this.props);
-  ok(this.wrapper.contains(this.wrapper.node.container), 'component node contains the referenced container node');
-});
+  suiteHooks.beforeEach(() => {
+    $container = document.createElement('div');
+    document.body.appendChild($container);
 
-test('renders an "out_of" SubmissionCell when the assignment grading type is "points"', function () {
-  this.wrapper = mountComponent(this.props);
-  equal(this.wrapper.node.submissionCell.constructor.name, 'out_of');
-  ok(this.wrapper.node.submissionCell instanceof SubmissionCell.out_of);
-});
+    props = {
+      editorOptions: {
+        column: {
+          assignmentId: '2301',
+          field: 'assignment_2301',
+          object: {
+            grading_type: 'points',
+            id: '2301',
+            points_possible: 10
+          }
+        },
+        grid: {},
+        item: { // student row object
+          id: '1101',
+          assignment_2301: { // submission
+            user_id: '1101'
+          }
+        }
+      },
+      isSubmissionTrayOpen: false,
+      onToggleSubmissionTrayOpen () {},
+    };
+  });
 
-test('renders the SubmissionCell within the AssignmentRowCell', function () {
-  this.wrapper = mountComponent(this.props);
-  ok(this.wrapper.node.container.querySelector('.gradebook-cell'), 'container includes a gradebook cell');
-});
+  suiteHooks.afterEach(() => {
+    wrapper.unmount();
+    $container.remove();
+  });
 
-test('includes editor options when rendering the SubmissionCell', function () {
-  this.wrapper = mountComponent(this.props);
-  equal(this.wrapper.node.submissionCell.opts.item, this.props.editorOptions.item);
-});
+  QUnit.module('#render', () => {
+    test('assigns a reference to its child SubmissionCell container', () => {
+      wrapper = mountComponent();
+      ok(wrapper.contains(wrapper.node.container), 'component node contains the referenced container node');
+    });
 
-test('renders an "out_of" SubmissionCell when a "points" assignment has zero points possible', function () {
-  this.props.editorOptions.column.object.points_possible = 0;
-  this.wrapper = mountComponent(this.props);
-  equal(this.wrapper.node.submissionCell.constructor.name, 'out_of');
-  ok(this.wrapper.node.submissionCell instanceof SubmissionCell.out_of);
-});
+    test('renders an "out_of" SubmissionCell when the assignment grading type is "points"', () => {
+      wrapper = mountComponent();
+      equal(wrapper.node.submissionCell.constructor.name, 'out_of');
+      ok(wrapper.node.submissionCell instanceof SubmissionCell.out_of);
+    });
 
-test('renders a "points" SubmissionCell when a "points" assignment grading type has null points possible', function () {
-  this.props.editorOptions.column.object.points_possible = null;
-  this.wrapper = mountComponent(this.props);
-  equal(this.wrapper.node.submissionCell.constructor.name, 'points');
-  ok(this.wrapper.node.submissionCell instanceof SubmissionCell.points);
-});
+    test('renders the SubmissionCell within the AssignmentRowCell', () => {
+      wrapper = mountComponent();
+      ok(wrapper.node.container.querySelector('.gradebook-cell'), 'container includes a gradebook cell');
+    });
 
-test('renders an "pass_fail" SubmissionCell when the assignment grading type is "pass_fail"', function () {
-  this.props.editorOptions.column.object.grading_type = 'pass_fail';
-  this.wrapper = mountComponent(this.props);
-  equal(this.wrapper.node.submissionCell.constructor.name, 'pass_fail');
-  ok(this.wrapper.node.submissionCell instanceof SubmissionCell.pass_fail);
-});
+    test('includes editor options when rendering the SubmissionCell', () => {
+      wrapper = mountComponent();
+      equal(wrapper.node.submissionCell.opts.item, props.editorOptions.item);
+    });
 
-test('renders a SubmissionCell when the assignment grading type is "percent"', function () {
-  this.props.editorOptions.column.object.grading_type = 'percent';
-  this.wrapper = mountComponent(this.props);
-  equal(this.wrapper.node.submissionCell.constructor.name, 'SubmissionCell');
-  ok(this.wrapper.node.submissionCell instanceof SubmissionCell);
-});
+    test('renders an "out_of" SubmissionCell when a "points" assignment has zero points possible', () => {
+      props.editorOptions.column.object.points_possible = 0;
+      wrapper = mountComponent();
+      equal(wrapper.node.submissionCell.constructor.name, 'out_of');
+      ok(wrapper.node.submissionCell instanceof SubmissionCell.out_of);
+    });
 
-test('#handleKeyDown skips SlickGrid default behavior when tabbing from grade input', function () {
-  this.wrapper = mountComponent(this.props);
-  this.wrapper.node.submissionCell.focus();
-  const continueHandling = this.simulateKeyDown(9, false); // tab to tray button trigger
-  strictEqual(continueHandling, false);
-});
+    test('renders a "points" SubmissionCell when a "points" assignment grading type has null points possible', () => {
+      props.editorOptions.column.object.points_possible = null;
+      wrapper = mountComponent();
+      equal(wrapper.node.submissionCell.constructor.name, 'points');
+      ok(wrapper.node.submissionCell instanceof SubmissionCell.points);
+    });
 
-test('#handleKeyDown skips SlickGrid default behavior when shift-tabbing from tray button', function () {
-  this.wrapper = mountComponent(this.props);
-  this.wrapper.node.trayButton.focus();
-  const continueHandling = this.simulateKeyDown(9, true); // shift+tab back to grade input
-  strictEqual(continueHandling, false);
-});
+    test('renders an "pass_fail" SubmissionCell when the assignment grading type is "pass_fail"', () => {
+      props.editorOptions.column.object.grading_type = 'pass_fail';
+      wrapper = mountComponent();
+      equal(wrapper.node.submissionCell.constructor.name, 'pass_fail');
+      ok(wrapper.node.submissionCell instanceof SubmissionCell.pass_fail);
+    });
 
-test('#handleKeyDown does not skip SlickGrid default behavior when tabbing from tray button', function () {
-  this.wrapper = mountComponent(this.props);
-  this.wrapper.node.trayButton.focus();
-  const continueHandling = this.simulateKeyDown(9, false); // tab into next cell
-  equal(typeof continueHandling, 'undefined');
-});
+    test('renders a SubmissionCell when the assignment grading type is "percent"', () => {
+      props.editorOptions.column.object.grading_type = 'percent';
+      wrapper = mountComponent();
+      equal(wrapper.node.submissionCell.constructor.name, 'SubmissionCell');
+      ok(wrapper.node.submissionCell instanceof SubmissionCell);
+    });
+  });
 
-test('#handleKeyDown does not skip SlickGrid default behavior when shift-tabbing from grade input', function () {
-  this.wrapper = mountComponent(this.props);
-  this.wrapper.node.submissionCell.focus();
-  const continueHandling = this.simulateKeyDown(9, true); // shift+tab back to previous cell
-  equal(typeof continueHandling, 'undefined');
-});
+  QUnit.module('#handleKeyDown', () => {
+    test('skips SlickGrid default behavior when tabbing from grade input', () => {
+      wrapper = mountComponent();
+      wrapper.node.submissionCell.focus();
+      const continueHandling = simulateKeyDown(9, false); // tab to tray button trigger
+      strictEqual(continueHandling, false);
+    });
 
-test('#handleKeyDown skips SlickGrid default behavior when entering into tray button', function () {
-  this.wrapper = mountComponent(this.props);
-  this.wrapper.node.trayButton.focus();
-  const continueHandling = this.simulateKeyDown(13); // enter into tray button
-  strictEqual(continueHandling, false);
-});
+    test('skips SlickGrid default behavior when shift-tabbing from tray button', () => {
+      wrapper = mountComponent();
+      wrapper.node.trayButton.focus();
+      const continueHandling = simulateKeyDown(9, true); // shift+tab back to grade input
+      strictEqual(continueHandling, false);
+    });
 
-test('#handleKeyDown does not skip SlickGrid default behavior when pressing enter on grade input', function () {
-  this.wrapper = mountComponent(this.props);
-  this.wrapper.node.submissionCell.focus();
-  const continueHandling = this.simulateKeyDown(13); // enter on grade input (commit editor)
-  equal(typeof continueHandling, 'undefined');
-});
+    test('does not skip SlickGrid default behavior when tabbing from tray button', () => {
+      wrapper = mountComponent();
+      wrapper.node.trayButton.focus();
+      const continueHandling = simulateKeyDown(9, false); // tab into next cell
+      equal(typeof continueHandling, 'undefined');
+    });
 
-test('#focus delegates to the SubmissionCell', function () {
-  this.wrapper = mountComponent(this.props);
-  this.spy(this.wrapper.node.submissionCell, 'focus');
-  this.wrapper.node.focus();
-  strictEqual(this.wrapper.node.submissionCell.focus.callCount, 1);
-});
+    test('does not skip SlickGrid default behavior when shift-tabbing from grade input', () => {
+      wrapper = mountComponent();
+      wrapper.node.submissionCell.focus();
+      const continueHandling = simulateKeyDown(9, true); // shift+tab back to previous cell
+      equal(typeof continueHandling, 'undefined');
+    });
 
-test('#isValueChanged delegates to the SubmissionCell', function () {
-  this.wrapper = mountComponent(this.props);
-  this.stub(this.wrapper.node.submissionCell, 'isValueChanged').returns(true);
-  const changed = this.wrapper.node.isValueChanged();
-  strictEqual(this.wrapper.node.submissionCell.isValueChanged.callCount, 1);
-  strictEqual(changed, true);
-});
+    test('skips SlickGrid default behavior when entering into tray button', () => {
+      wrapper = mountComponent();
+      wrapper.node.trayButton.focus();
+      const continueHandling = simulateKeyDown(13); // enter into tray button
+      strictEqual(continueHandling, false);
+    });
 
-test('#serializeValue delegates to the SubmissionCell', function () {
-  this.wrapper = mountComponent(this.props);
-  this.stub(this.wrapper.node.submissionCell, 'serializeValue').returns('9.7');
-  const value = this.wrapper.node.serializeValue();
-  strictEqual(this.wrapper.node.submissionCell.serializeValue.callCount, 1);
-  strictEqual(value, '9.7');
-});
+    test('does not skip SlickGrid default behavior when pressing enter on grade input', () => {
+      wrapper = mountComponent();
+      wrapper.node.submissionCell.focus();
+      const continueHandling = simulateKeyDown(13); // enter on grade input (commit editor)
+      equal(typeof continueHandling, 'undefined');
+    });
+  });
 
-test('#loadValue delegates to the SubmissionCell', function () {
-  this.wrapper = mountComponent(this.props);
-  this.spy(this.wrapper.node.submissionCell, 'loadValue');
-  this.wrapper.node.loadValue('9.7');
-  strictEqual(this.wrapper.node.submissionCell.loadValue.callCount, 1);
-  const [value] = this.wrapper.node.submissionCell.loadValue.lastCall.args;
-  strictEqual(value, '9.7');
-});
+  QUnit.module('#focus', () => {
+    test('delegates to the SubmissionCell "focus" method', () => {
+      wrapper = mountComponent();
+      sinon.spy(wrapper.node.submissionCell, 'focus');
+      wrapper.node.focus();
+      strictEqual(wrapper.node.submissionCell.focus.callCount, 1);
+    });
+  });
 
-test('#applyValue delegates to the SubmissionCell', function () {
-  this.wrapper = mountComponent(this.props);
-  this.stub(this.wrapper.node.submissionCell, 'applyValue');
-  this.wrapper.node.applyValue({ id: '1101' }, '9.7');
-  strictEqual(this.wrapper.node.submissionCell.applyValue.callCount, 1);
-  const [item, value] = this.wrapper.node.submissionCell.applyValue.lastCall.args;
-  deepEqual(item, { id: '1101' });
-  strictEqual(value, '9.7');
-});
+  QUnit.module('#isValueChanged', () => {
+    test('delegates to the SubmissionCell "isValueChanged" method', () => {
+      wrapper = mountComponent();
+      sinon.stub(wrapper.node.submissionCell, 'isValueChanged').returns(true);
+      const changed = wrapper.node.isValueChanged();
+      strictEqual(wrapper.node.submissionCell.isValueChanged.callCount, 1);
+      strictEqual(changed, true);
+    });
+  });
 
-test('#validate delegates to the SubmissionCell', function () {
-  this.wrapper = mountComponent(this.props);
-  this.stub(this.wrapper.node.submissionCell, 'validate').returns({ valid: true });
-  const validation = this.wrapper.node.validate();
-  strictEqual(this.wrapper.node.submissionCell.validate.callCount, 1);
-  deepEqual(validation, { valid: true });
-});
+  QUnit.module('#serializeValue', () => {
+    test('delegates to the SubmissionCell "serializeValue" method', () => {
+      wrapper = mountComponent();
+      sinon.stub(wrapper.node.submissionCell, 'serializeValue').returns('9.7');
+      const value = wrapper.node.serializeValue();
+      strictEqual(wrapper.node.submissionCell.serializeValue.callCount, 1);
+      strictEqual(value, '9.7');
+    });
+  });
 
-test('destroys the SubmissionCell when unmounting', function () {
-  this.wrapper = mountComponent(this.props);
-  this.spy(this.wrapper.node.submissionCell, 'destroy');
-  this.wrapper.unmount();
-  strictEqual(this.wrapper.node.submissionCell.destroy.callCount, 1);
-});
+  QUnit.module('#loadValue', () => {
+    test('delegates to the SubmissionCell "loadValue" method', () => {
+      wrapper = mountComponent();
+      sinon.spy(wrapper.node.submissionCell, 'loadValue');
+      wrapper.node.loadValue('9.7');
+      strictEqual(wrapper.node.submissionCell.loadValue.callCount, 1);
+      const [value] = wrapper.node.submissionCell.loadValue.lastCall.args;
+      strictEqual(value, '9.7');
+    });
+  });
 
-QUnit.module('AssignmentRowCell "Toggle Tray" Button', {
-  setup () {
-    this.props = createExampleProps();
-  },
+  QUnit.module('#applyValue', () => {
+    test('delegates to the SubmissionCell "applyValue" method', () => {
+      wrapper = mountComponent();
+      sinon.stub(wrapper.node.submissionCell, 'applyValue');
+      wrapper.node.applyValue({ id: '1101' }, '9.7');
+      strictEqual(wrapper.node.submissionCell.applyValue.callCount, 1);
+      const [item, value] = wrapper.node.submissionCell.applyValue.lastCall.args;
+      deepEqual(item, { id: '1101' });
+      strictEqual(value, '9.7');
+    });
+  });
 
-  teardown () {
-    this.wrapper.unmount();
-    $fixtures.innerHTML = '';
-  }
-});
+  QUnit.module('#validate', () => {
+    test('delegates to the SubmissionCell "validate" method', () => {
+      wrapper = mountComponent();
+      sinon.stub(wrapper.node.submissionCell, 'validate').returns({ valid: true });
+      const validation = wrapper.node.validate();
+      strictEqual(wrapper.node.submissionCell.validate.callCount, 1);
+      deepEqual(validation, { valid: true });
+    });
+  });
 
-test('calls onToggleSubmissionTrayOpen with the student id and assignment id when clicked', function () {
-  const onToggleSubmissionTrayOpen = this.stub();
-  this.wrapper = mountComponent(this.props, { onToggleSubmissionTrayOpen });
-  this.wrapper.find('.Grid__AssignmentRowCell__Options button').simulate('click');
-  strictEqual(onToggleSubmissionTrayOpen.callCount, 1);
-  deepEqual(
-    onToggleSubmissionTrayOpen.getCall(0).args,
-    ['1101', '2301']
-  );
+  QUnit.module('#componentWillUnmount', () => {
+    test('destroys the SubmissionCell', () => {
+      wrapper = mountComponent();
+      sinon.spy(wrapper.node.submissionCell, 'destroy');
+      wrapper.unmount();
+      strictEqual(wrapper.node.submissionCell.destroy.callCount, 1);
+    });
+  });
+
+  QUnit.module('"Toggle Tray" Button', () => {
+    test('calls onToggleSubmissionTrayOpen when clicked', () => {
+      props.onToggleSubmissionTrayOpen = sinon.stub();
+      wrapper = mountComponent();
+      wrapper.find('.Grid__AssignmentRowCell__Options button').simulate('click');
+      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1);
+    });
+
+    test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
+      props.onToggleSubmissionTrayOpen = sinon.stub();
+      wrapper = mountComponent();
+      wrapper.find('.Grid__AssignmentRowCell__Options button').simulate('click');
+      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301']);
+    });
+  });
 });

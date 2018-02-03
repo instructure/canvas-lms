@@ -54,6 +54,23 @@ describe StreamItem do
     expect(de.reload.discussion_topic_id).not_to be_nil
   end
 
+  it "uses new context short name" do
+    user_factory
+    context = Course.create!(:course_code => "some name")
+    enable_cache do
+      dt1 = DiscussionTopic.create!(:context => context)
+      dt1.generate_stream_items([@user])
+      si1 = StreamItem.where(:asset_id => dt1.id).first
+      expect(si1.data.context_short_name).to eq "some name"
+
+      context.update_attribute(:course_code, "some other name")
+      dt2 = DiscussionTopic.create!(:context => context)
+      dt2.generate_stream_items([@user])
+      si2 = StreamItem.where(:asset_id => dt2.id).first
+      expect(si2.data.context_short_name).to eq "some other name"
+    end
+  end
+
   describe "destroy_stream_items_using_setting" do
     it "should have a default ttl" do
       si1 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }

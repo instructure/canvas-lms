@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import walk from 'compiled/arr/walk'
+import walk from '../arr/walk'
 
 // #
 // Counts the number of items in a nested object tree

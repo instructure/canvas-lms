@@ -17,7 +17,7 @@
 
 define [
   'i18n!feature_flags'
-  'compiled/views/DialogBaseView'
+  '../DialogBaseView'
   'jst/feature_flags/featureFlagDialog'
 ], (I18n, DialogBaseView, template) ->
 

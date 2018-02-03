@@ -247,62 +247,73 @@ describe "Importing assignments" do
         migration_id: migration.id
       )
     end
-    let(:tool_settings) do
-      [{
-        "tool_setting" => {
-          "tool_proxy" => {
-            "guid" => "3e6520e7-471e-46f3-b578-990766e9e4e6",
-            "product_code" => tool_proxy.product_family.product_code,
-            "vendor_code" => tool_proxy.product_family.vendor_code
-          },
-          "custom" => {
-            "setting_one" => "setting one value"
-          },
-          "custom_params" => {
-            "param_one" => "param one value"
-          }
-        },
-        "resource_href" => "i234fd8107ac2c2e75e9a142971693934.json",
-        "migration_id" => "i234fd8107ac2c2e75e9a142971693934"
-      }]
+
+    let(:custom) do
+      {
+        'custom_var_1' => 'value one',
+        'custom_var_2' => 'value two',
+      }
+    end
+
+    let(:custom_parameters) do
+      {
+        'custom_parameter_1' => 'param value one',
+        'custom_parameter_2' => 'param value two',
+      }
+    end
+
+    let(:tool_setting) do
+      {
+        "product_code" => tool_proxy.product_family.product_code,
+        "vendor_code" => tool_proxy.product_family.vendor_code,
+        "custom" => custom,
+        "custom_parameters" => custom_parameters
+      }
     end
 
     it 'does nothing if the tool settings is blank' do
-      Importers::AssignmentImporter.create_tool_settings([], tool_proxy, assignment)
+      Importers::AssignmentImporter.create_tool_settings({}, tool_proxy, assignment)
       expect(tool_proxy.tool_settings.length).to eq 0
     end
 
     it 'creates the tool setting if codes match' do
-      Importers::AssignmentImporter.create_tool_settings(tool_settings, tool_proxy, assignment)
+      Importers::AssignmentImporter.create_tool_settings(tool_setting, tool_proxy, assignment)
       expect(tool_proxy.reload.tool_settings.length).to eq 1
     end
 
     it 'uses the new assignment "lti_context_id" as the resource link id' do
-      Importers::AssignmentImporter.create_tool_settings(tool_settings, tool_proxy, assignment)
+      Importers::AssignmentImporter.create_tool_settings(tool_setting, tool_proxy, assignment)
       expect(tool_proxy.tool_settings.first.resource_link_id).to eq assignment.lti_context_id
     end
 
     it 'sets the context to the course of the assignment' do
-      Importers::AssignmentImporter.create_tool_settings(tool_settings, tool_proxy, assignment)
+      Importers::AssignmentImporter.create_tool_settings(tool_setting, tool_proxy, assignment)
       expect(tool_proxy.tool_settings.first.context).to eq course
     end
 
     it 'sets the custom data' do
-      Importers::AssignmentImporter.create_tool_settings(tool_settings, tool_proxy, assignment)
-      expect(tool_proxy.tool_settings.first.custom).to eq(
-        {
-          "setting_one" => "setting one value"
-        }
-      )
+      Importers::AssignmentImporter.create_tool_settings(tool_setting, tool_proxy, assignment)
+      expect(tool_proxy.tool_settings.first.custom).to eq(custom)
     end
 
     it 'sets the custom data parameters' do
-      Importers::AssignmentImporter.create_tool_settings(tool_settings, tool_proxy, assignment)
-      expect(tool_proxy.tool_settings.first.custom_parameters).to eq(
-        {
-          "param_one" => "param one value"
-        }
+      Importers::AssignmentImporter.create_tool_settings(tool_setting, tool_proxy, assignment)
+      expect(tool_proxy.tool_settings.first.custom_parameters).to eq(custom_parameters)
+    end
+
+    it 'does not attempt to recreate tool settings if they already exist' do
+      tool_proxy.tool_settings.create!(
+        context: course,
+        tool_proxy: tool_proxy,
+        resource_link_id: assignment.lti_context_id
       )
+      expect do
+        Importers::AssignmentImporter.create_tool_settings(
+          tool_setting,
+          tool_proxy,
+          assignment
+        )
+      end.not_to raise_exception
     end
   end
 

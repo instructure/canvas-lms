@@ -112,7 +112,7 @@ describe Enrollment do
       @override.assignment_override_students.create!(user: @enrollment.user)
     end
 
-    let(:override_student) { @override.assignment_override_students.find_by(user_id: @enrollment.user) }
+    let(:override_student) { @override.assignment_override_students.unscope(:where).find_by(user_id: @enrollment.user) }
 
     it 'does not destroy assignment override students on the user if other enrollments' \
     'for the user exist in the course' do
@@ -124,11 +124,11 @@ describe Enrollment do
       )
       @enrollment.destroy
       expect(override_student).to be_present
+      expect(override_student).to be_active
     end
-
     it 'destroys assignment override students on the user if no other enrollments for the user exist in the course' do
       @enrollment.destroy
-      expect(override_student).not_to be_present
+      expect(override_student).to be_deleted
     end
   end
 
@@ -151,6 +151,25 @@ describe Enrollment do
       new_score.workflow_state = :deleted
       new_score.save!
       expect { @enrollment.restore }.not_to change { new_score.reload.workflow_state }
+    end
+
+    it 'should restore assignment overrides for reactivated users' do
+      assignment = assignment_model(:course => @course)
+      ao = AssignmentOverride.new()
+      ao.assignment = assignment
+      ao.title = "ADHOC OVERRIDE"
+      ao.workflow_state = "active"
+      ao.set_type = "ADHOC"
+      ao.save!
+      assignment.reload
+      override_student = ao.assignment_override_students.build
+      override_student.user = @user
+      override_student.save!
+      override_student.destroy
+
+      expect(override_student.reload.workflow_state).to eq("deleted")
+      @enrollment.restore
+      expect(override_student.reload.workflow_state).to eq("active")
     end
   end
 
@@ -2353,6 +2372,26 @@ describe Enrollment do
         @enrollment.unconclude
         expect(@student.cached_current_enrollments).to eq [@enrollment]
       end
+    end
+
+    it 'should restore assignment overrides for unconcluded user' do
+      course_with_student active_course: true, enrollment_state: 'completed'
+      assignment = assignment_model(:course => @course)
+      ao = AssignmentOverride.new()
+      ao.assignment = assignment
+      ao.title = "ADHOC OVERRIDE"
+      ao.workflow_state = "active"
+      ao.set_type = "ADHOC"
+      ao.save!
+      assignment.reload
+      override_student = ao.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+      override_student.destroy
+
+      expect(override_student.reload.workflow_state).to eq("deleted")
+      @enrollment.unconclude
+      expect(override_student.reload.workflow_state).to eq("active")
     end
   end
 

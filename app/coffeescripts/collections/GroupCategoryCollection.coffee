@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/GroupCategory'
+  '../collections/PaginatedCollection'
+  '../models/GroupCategory'
 ], (PaginatedCollection, GroupCategory) ->
 
   class GroupCategoryCollection extends PaginatedCollection

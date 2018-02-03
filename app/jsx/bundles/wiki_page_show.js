@@ -20,7 +20,7 @@ import $ from 'jquery'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageView from 'compiled/views/wiki/WikiPageView'
 import MarkAsDone from 'compiled/util/markAsDone'
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import LockManager from '../blueprint_courses/apps/LockManager'
 import 'compiled/jquery/ModuleSequenceFooter'
 
 const lockManager = new LockManager()

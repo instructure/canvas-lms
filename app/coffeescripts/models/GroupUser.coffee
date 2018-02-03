@@ -17,7 +17,7 @@
 
 define [
   'jquery'
-  'compiled/models/User'
+  '../models/User'
   'jquery.ajaxJSON'
 ], ($, User) ->
 

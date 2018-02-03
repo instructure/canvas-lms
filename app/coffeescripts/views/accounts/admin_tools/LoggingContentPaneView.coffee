@@ -18,9 +18,9 @@
 define [
   'Backbone'
   'jquery'
-  'compiled/views/accounts/admin_tools/AuthLoggingContentPaneView'
-  'compiled/views/accounts/admin_tools/GradeChangeLoggingContentView'
-  'compiled/views/accounts/admin_tools/CourseLoggingContentView'
+  './AuthLoggingContentPaneView'
+  './GradeChangeLoggingContentView'
+  './CourseLoggingContentView'
   'jst/accounts/admin_tools/loggingContentPane'
 ], (
   Backbone,

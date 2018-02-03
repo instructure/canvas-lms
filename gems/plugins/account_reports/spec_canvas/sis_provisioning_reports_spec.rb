@@ -98,20 +98,24 @@ describe "Default Account Reports" do
   def create_some_group_categories()
     create_some_courses
     @group_category1 = GroupCategory.create(
-      :name => 'Test Group Category'
+      name: 'Test Group Category',
+      account: @account,
     )
     @group_category2 = GroupCategory.create(
-      :name => 'Test Group Category2'
+      name: 'Test Group Category2',
+      account: @account,
     )
     @group_category1.save!
     @group_category2.auto_leader = 'first'
     @group_category2.group_limit = 2
     @group_category2.save!
     @group_category3 = GroupCategory.create(
-      :name => 'Test Group Category Deleted'
+      name: 'Test Group Category Deleted',
+      course: @course,
     )
     @group_category4 = GroupCategory.create(
-      :name => 'Test Group Category Course'
+      name: 'Test Group Category Course',
+      course: @course,
     )
     @account.group_categories << @group_category1
     @account.group_categories << @group_category2
@@ -942,8 +946,8 @@ describe "Default Account Reports" do
             @user2 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'James John',
                                                  username: 'other_shar2d@example.com', sis_user_id: 'other_shard2')
           end
-          allow(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
-          allow(@account).to receive(:trust_exists?).and_return(true)
+          allow_any_instantiation_of(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
+          allow_any_instantiation_of(@account).to receive(:trust_exists?).and_return(true)
           @e1 = @course1.enroll_user(@user1)
           @course1.enroll_user(@user2)
 

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/views/SelectView',
+  '../../SelectView',
   'jst/courses/roster/roleSelect'
 ], (SelectView, template) ->
 

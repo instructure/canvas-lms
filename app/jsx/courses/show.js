@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CourseHomeDialog from 'jsx/courses/CourseHomeDialog'
-import HomePagePromptContainer from 'jsx/courses/HomePagePromptContainer'
-import createStore from 'jsx/shared/helpers/createStore'
+import CourseHomeDialog from '../courses/CourseHomeDialog'
+import HomePagePromptContainer from '../courses/HomePagePromptContainer'
+import createStore from '../shared/helpers/createStore'
 import $ from 'jquery'
 import I18n from 'i18n!courses_show'
 import axios from 'axios'

@@ -63,7 +63,9 @@ describe "new account course search" do
 
   it "should paginate" do
     16.times { |i| @account.courses.create!(:name => "course #{i + 1}") }
-    get "/accounts/#{@account.id}"
+
+    # slowness has been identified, remove timeout exception after CORE-712 is merged.
+    with_timeouts(script: 10) { get "/accounts/#{@account.id}" }
 
     expect(get_rows.count).to eq 15
     expect(get_rows.first).to include_text("course 1")

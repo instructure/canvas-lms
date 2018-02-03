@@ -47,7 +47,8 @@ define([
     equal(input.name, props.name, 'renders with name from props')
   })
 
-  asyncTest('renders formatted output', () => {
+  test('renders formatted output', assert => {
+    const start = assert.async()
     const component = ReactDOM.render(<RangeInput {...props} />, elem)
     const expected = 47
     const expectedFormatted = '47%'

@@ -62,7 +62,7 @@ module AttachmentHelper
   end
 
   def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)
-    set_cache_header(attachment)
+    set_cache_header(attachment, inline)
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, verifier, !inline)
     elsif attachment.stored_locally?
@@ -87,12 +87,13 @@ module AttachmentHelper
     !!@safer_domain_host
   end
 
-  def set_cache_header(attachment)
+  def set_cache_header(attachment, inline)
     unless attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
       cancel_cache_buster
-      #set cache to expoire in 1 day, max-age take seconds, and Expires takes a date
-      response.headers["Cache-Control"] = "private, max-age=86400"
-      response.headers["Expires"] = 1.day.from_now.httpdate
+      #set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
+      ttl = attachment.stored_locally? || (inline && attachment.can_be_proxied?) ? attachment.url_ttl : 1.day
+      response.headers["Cache-Control"] = "private, max-age=#{ttl.seconds.to_s}"
+      response.headers["Expires"] = ttl.from_now.httpdate
     end
   end
 

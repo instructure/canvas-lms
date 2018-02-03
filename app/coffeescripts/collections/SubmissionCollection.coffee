@@ -17,8 +17,8 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/Submission'
+  '../collections/PaginatedCollection'
+  '../models/Submission'
 ], (PaginatedCollection, Submission) ->
 
   class SubmissionCollection extends PaginatedCollection

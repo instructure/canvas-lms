@@ -22,7 +22,7 @@ import pubsub from 'vendor/jquery.ba-tinypubsub'
 import mejs from 'vendor/mediaelement-and-player'
 import MediaElementKeyActionHandler from 'jsx/mediaelement/MediaElementKeyActionHandler'
 import $ from 'jquery'
-import kalturaAnalytics from 'compiled/util/kalturaAnalytics'
+import kalturaAnalytics from '../util/kalturaAnalytics'
 import htmlEscape from 'str/htmlEscape'
 
 // #

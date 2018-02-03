@@ -18,8 +18,8 @@
 define [
   'react'
   'prop-types'
-  'compiled/models/Folder'
-  'compiled/models/FilesystemObject'
+  '../../models/Folder'
+  '../../models/FilesystemObject'
 ], (React, PropTypes, Folder, FilesystemObject) ->
 
   customPropTypes =

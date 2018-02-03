@@ -233,7 +233,7 @@ module AccountReports::ReportHelper
     ExtendedCSV.open(file, "w") do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
-      Shackles.activate(:slave) { yield csv }
+      Shackles.activate(:slave) { yield csv } if block_given?
       @account_report.update_attribute(:current_line, csv.lineno)
     end
     file

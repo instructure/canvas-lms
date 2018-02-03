@@ -18,10 +18,10 @@
 define [
   'jquery'
   'i18n!assignments'
-  'compiled/util/round'
+  '../../util/round'
   'jsx/shared/helpers/numberHelper'
   'underscore'
-  'compiled/views/DialogFormView'
+  '../DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSettings'
 ], ($, I18n, round, numberHelper, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->

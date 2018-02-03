@@ -18,7 +18,7 @@
 define [
   'jquery'
   'Backbone'
-  'compiled/collections/PaginatedCollection'
+  '../collections/PaginatedCollection'
 ], ($, Backbone, PaginatedCollection) ->
   class WrappedCollection extends PaginatedCollection
     @optionProperty 'key'

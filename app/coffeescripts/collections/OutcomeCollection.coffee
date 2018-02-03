@@ -17,8 +17,8 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/Outcome'
+  '../collections/PaginatedCollection'
+  '../models/Outcome'
 ], (PaginatedCollection, Outcome) ->
 
   class OutcomeCollection extends PaginatedCollection

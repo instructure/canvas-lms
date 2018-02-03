@@ -57,9 +57,6 @@ define [
 
               height: "auto"
 
-              open: ->
-                $(".navigation_list:first", @).focus()
-
               close: ->
                 $("li", @).attr("tabindex", "") # prevents chrome bsod
                 if(activeElement)

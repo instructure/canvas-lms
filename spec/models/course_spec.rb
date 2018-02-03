@@ -1800,6 +1800,31 @@ describe Course, "gradebook_to_csv" do
   end
 end
 
+describe Course, "gradebook_to_csv_in_background" do
+  context "sharding" do
+    specs_require_sharding
+
+    it "works for cross-shard users for courses on birth shard" do
+      s3_storage!
+
+      @shard1.activate do
+        @shard1_user = user_factory(active_all: true)
+      end
+
+      Shard.default.activate do
+        student_in_course(active_all: true)
+        @attachment_id = @course.gradebook_to_csv_in_background("asdf", @shard1_user)[:attachment_id]
+      end
+
+      @shard1.activate do
+        expect {
+          Attachment.find(@attachment_id).download_url
+        }.not_to raise_error
+      end
+    end
+  end
+end
+
 describe Course, "update_account_associations" do
   it "should update account associations correctly" do
     account1 = Account.create!(:name => 'first')

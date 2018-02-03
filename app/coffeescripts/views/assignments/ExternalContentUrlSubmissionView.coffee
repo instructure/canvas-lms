@@ -18,7 +18,7 @@
 define [
   'jquery'
   'jst/assignments/ExternalContentHomeworkUrlSubmissionView'
-  'compiled/views/assignments/ExternalContentHomeworkSubmissionView'
+  './ExternalContentHomeworkSubmissionView'
 ], ($, template, ExternalContentHomeworkSubmissionView) ->
 
   class ExternalContentUrlSubmissionView extends ExternalContentHomeworkSubmissionView

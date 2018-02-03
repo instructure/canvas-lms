@@ -25,10 +25,10 @@ class OriginalityReport < ActiveRecord::Base
   has_one :lti_link, class_name: Lti::Link, as: :linkable, inverse_of: :linkable, dependent: :destroy
   accepts_nested_attributes_for :lti_link, allow_destroy: true
 
-  validates :attachment, :submission, presence: true
+  validates :submission, presence: true
   validates :workflow_state, inclusion: { in: ['scored', 'error', 'pending'] }
   validates :originality_score, inclusion: { in: 0..100, message: 'score must be between 0 and 100' }, allow_nil: true
-  validates :attachment, uniqueness: true
+  validates :attachment, uniqueness: true, unless: proc { |o| o.attachment.blank? }
 
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id
@@ -63,6 +63,11 @@ class OriginalityReport < ActiveRecord::Base
     else
       originality_report_url
     end
+  end
+
+  def asset_key
+    return Attachment.asset_string(attachment_id) if attachment_id.present?
+    Submission.asset_string(submission_id)
   end
 
   private

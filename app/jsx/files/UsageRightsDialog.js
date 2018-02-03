@@ -19,9 +19,9 @@
 import React from 'react'
 import UsageRightsDialog from 'compiled/react_files/components/UsageRightsDialog'
 import I18n from 'i18n!usage_rights_modal'
-import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox'
-import RestrictedRadioButtons from 'jsx/files/RestrictedRadioButtons'
-import DialogPreview from 'jsx/files/DialogPreview'
+import UsageRightsSelectBox from '../files/UsageRightsSelectBox'
+import RestrictedRadioButtons from '../files/RestrictedRadioButtons'
+import DialogPreview from '../files/DialogPreview'
 import Folder from 'compiled/models/Folder'
 import htmlEscape from 'str/htmlEscape'
 

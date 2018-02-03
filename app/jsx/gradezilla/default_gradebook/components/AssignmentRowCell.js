@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { bool, func, shape, string } from 'prop-types';
-import Button from 'instructure-ui/lib/components/Button';
+import Button from '@instructure/ui-core/lib/components/Button';
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine';
 import I18n from 'i18n!gradebook';

@@ -18,7 +18,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Pill from 'instructure-ui/lib/components/Pill';
+import Pill from '@instructure/ui-core/lib/components/Pill';
 import I18n from 'i18n!gradebook';
 
 function forEachNode (nodeList, fn) {

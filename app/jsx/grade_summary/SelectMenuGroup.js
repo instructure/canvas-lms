@@ -19,15 +19,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Button from 'instructure-ui/lib/components/Button';
-import Container from 'instructure-ui/lib/components/Container';
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import Typography from 'instructure-ui/lib/components/Typography';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Container from '@instructure/ui-core/lib/components/Container';
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import Text from '@instructure/ui-core/lib/components/Text';
 
-import {showFlashError} from 'jsx/shared/FlashAlert';
+import {showFlashError} from '../shared/FlashAlert';
 import I18n from 'i18n!grade_summary';
-import SelectMenu from 'jsx/grade_summary/SelectMenu';
+import SelectMenu from '../grade_summary/SelectMenu';
 
 export default class SelectMenuGroup extends React.Component {
   static propTypes = {
@@ -192,7 +192,7 @@ export default class SelectMenuGroup extends React.Component {
               size="medium"
               variant="primary"
             >
-              <PresentationContent><Typography>{I18n.t('Apply')}</Typography></PresentationContent>
+              <PresentationContent><Text>{I18n.t('Apply')}</Text></PresentationContent>
               <ScreenReaderContent>
                 {I18n.t('Apply filters. Note: clicking this button will cause the page to reload.')}
               </ScreenReaderContent>

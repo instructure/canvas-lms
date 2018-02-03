@@ -606,7 +606,7 @@ describe ContentMigration do
       include_context 'lti2_spec_helper'
 
       let(:assignment) { @copy_from.assignments.create!(name: 'test assignment') }
-      let(:resource_link_id) { SecureRandom.uuid }
+      let(:resource_link_id) { assignment.lti_context_id }
       let(:custom_data) { {'setting_one' => 'value one'} }
       let(:custom_parameters) { {'param_one' => 'param value one'} }
       let(:tool_settings) do
@@ -615,7 +615,9 @@ describe ContentMigration do
           resource_link_id: resource_link_id,
           context: assignment.course,
           custom: custom_data,
-          custom_parameters: custom_parameters
+          custom_parameters: custom_parameters,
+          product_code: tool_proxy.product_family.product_code,
+          vendor_code: tool_proxy.product_family.vendor_code
         )
       end
 

@@ -19,24 +19,66 @@
 import React from 'react';
 import { arrayOf, bool, func, instanceOf, number, shape, string } from 'prop-types';
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
-import IconMutedSolid from 'instructure-icons/lib/Solid/IconMutedSolid';
-import IconWarningSolid from 'instructure-icons/lib/Solid/IconWarningSolid';
-import Link from 'instructure-ui/lib/components/Link';
+import Button from '@instructure/ui-core/lib/components/Button';
+import Grid, { GridCol, GridRow } from '@instructure/ui-core/lib/components/Grid';
+import Link from '@instructure/ui-core/lib/components/Link';
 import {
   MenuItem,
   MenuItemFlyout,
   MenuItemGroup,
   MenuItemSeparator
-} from 'instructure-ui/lib/components/Menu';
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
-import Typography from 'instructure-ui/lib/components/Typography';
+} from '@instructure/ui-core/lib/components/Menu';
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
+import Text from '@instructure/ui-core/lib/components/Text';
 import 'message_students';
-import MessageStudentsWhoHelper from 'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper';
+import MessageStudentsWhoHelper from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper';
 import I18n from 'i18n!gradebook';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import ColumnHeader from '../../../gradezilla/default_gradebook/components/ColumnHeader';
 
-class AssignmentColumnHeader extends ColumnHeader {
+function SecondaryDetailLine (props) {
+  if (!props.assignment.published) {
+    return (
+      <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
+        <Text color="error" size="x-small" transform="uppercase" weight="bold">
+          { I18n.t('Unpublished') }
+        </Text>
+      </span>
+    );
+  }
+
+  const pointsPossible = I18n.n(props.assignment.pointsPossible || 0);
+  return (
+    <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
+      <span className="assignment-points-possible">
+        <Text weight="normal" fontStyle="normal" size="x-small">
+          { I18n.t('Out of %{pointsPossible}', { pointsPossible }) }
+        </Text>
+      </span>
+
+      {
+        props.assignment.muted && (
+          <span>
+            &nbsp;
+            <Text size="x-small" transform="uppercase" weight="bold">
+              { I18n.t('Muted') }
+            </Text>
+          </span>
+        )
+      }
+    </span>
+  );
+}
+
+SecondaryDetailLine.propTypes = {
+  assignment: shape({
+    muted: bool.isRequired,
+    pointsPossible: number,
+    published: bool.isRequired
+  }).isRequired
+};
+
+export default class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
     ...ColumnHeader.propTypes,
     assignment: shape({
@@ -45,7 +87,6 @@ class AssignmentColumnHeader extends ColumnHeader {
       id: string.isRequired,
       muted: bool.isRequired,
       name: string.isRequired,
-      omitFromFinalGrade: bool.isRequired,
       pointsPossible: number,
       published: bool.isRequired,
       submissionTypes: arrayOf(string).isRequired
@@ -101,22 +142,6 @@ class AssignmentColumnHeader extends ColumnHeader {
     ...ColumnHeader.defaultProps
   };
 
-  static renderMutedIcon (screenreaderText) {
-    return (
-      <Typography weight="bold" fontStyle="normal" size="small" color="error">
-        <IconMutedSolid title={screenreaderText} />
-      </Typography>
-    );
-  }
-
-  static renderWarningIcon (screenreaderText) {
-    return (
-      <Typography weight="bold" fontStyle="normal" size="small" color="brand">
-        <IconWarningSolid title={screenreaderText} />
-      </Typography>
-    );
-  }
-
   bindAssignmentLink = (ref) => { this.assignmentLink = ref };
   bindEnterGradesAsMenuContent = (ref) => { this.enterGradesAsMenuContent = ref };
 
@@ -165,7 +190,7 @@ class AssignmentColumnHeader extends ColumnHeader {
   activeStudentDetails () {
     const activeStudents = this.props.students.filter(student => !student.isInactive);
     return activeStudents.map((student) => {
-      const { excused, score, latePolicyStatus, submittedAt } = student.submission;
+      const { excused, latePolicyStatus, score, submittedAt } = student.submission;
       return {
         excused,
         id: student.id,
@@ -179,51 +204,23 @@ class AssignmentColumnHeader extends ColumnHeader {
 
   renderAssignmentLink () {
     const assignment = this.props.assignment;
-    let assignmentTitle;
-    let assignmentIcon;
-
-    if (assignment.muted) {
-      assignmentTitle = I18n.t('This assignment is muted');
-      assignmentIcon = AssignmentColumnHeader.renderMutedIcon(assignmentTitle);
-    } else if (assignment.omitFromFinalGrade) {
-      assignmentTitle = I18n.t('This assignment does not count toward the final grade');
-      assignmentIcon = AssignmentColumnHeader.renderWarningIcon(assignmentTitle);
-    } else if (assignment.pointsPossible == null || assignment.pointsPossible === 0) {
-      assignmentTitle = I18n.t('This assignment has no points possible and cannot be included in grade calculation');
-      assignmentIcon = AssignmentColumnHeader.renderWarningIcon(assignmentTitle);
-    }
 
     return (
       <span className="assignment-name">
-        <Link ref={this.bindAssignmentLink} title={assignmentTitle} href={assignment.htmlUrl}>
-          {assignmentIcon}
+        <Link ref={this.bindAssignmentLink} href={assignment.htmlUrl}>
           {assignment.name}
         </Link>
       </span>
     );
   }
 
-  renderPointsPossible () {
-    const pointsPossible = I18n.n(this.props.assignment.pointsPossible || 0);
-
-    return (
-      <div className="assignment-points-possible">
-        { I18n.t('Out of %{pointsPossible}', { pointsPossible }) }
-      </div>
-    );
-  }
-
   renderTrigger () {
     const optionsTitle = I18n.t('%{name} Options', { name: this.props.assignment.name });
-    const menuShown = this.state.menuShown;
-    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
 
     return (
-      <span ref={this.bindOptionsMenuTrigger} className={classes}>
-        <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-          <IconMoreSolid className="rotated" title={optionsTitle} />
-        </Typography>
-      </span>
+      <Button buttonRef={this.bindOptionsMenuTrigger} size="small" variant="icon">
+        <IconMoreSolid className="Gradebook__ColumnHeaderActionIcon" title={optionsTitle} />
+      </Button>
     );
   }
 
@@ -373,19 +370,36 @@ class AssignmentColumnHeader extends ColumnHeader {
   }
 
   render () {
+    const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`;
+
     return (
       <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail">
-          {this.renderAssignmentLink()}
-          <Typography weight="normal" fontStyle="normal" size="x-small">
-            {this.renderPointsPossible()}
-          </Typography>
-        </span>
+        <div style={{ flex: 1, minWidth: '1px' }}>
+          <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
+            <GridRow>
+              <GridCol textAlign="center" width="auto">
+                <div className="Gradebook__ColumnHeaderIndicators" />
+              </GridCol>
 
-        {this.renderMenu()}
+              <GridCol textAlign="center">
+                <span className="Gradebook__ColumnHeaderDetail">
+                  <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--primary">
+                    { this.renderAssignmentLink() }
+                  </span>
+
+                  <SecondaryDetailLine assignment={this.props.assignment} />
+                </span>
+              </GridCol>
+
+              <GridCol textAlign="center" width="auto">
+                <div className={classes}>
+                  {this.renderMenu()}
+                </div>
+              </GridCol>
+            </GridRow>
+          </Grid>
+        </div>
       </div>
     );
   }
 }
-
-export default AssignmentColumnHeader;

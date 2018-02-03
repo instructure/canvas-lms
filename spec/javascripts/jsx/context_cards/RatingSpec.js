@@ -16,44 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/context_cards/Rating',
-  'instructure-ui/lib/components/Rating'
-], (React, TestUtils, Rating, { default: InstUIRating }) => {
+import React from 'react'
+import TestUtils from 'react-addons-test-utils'
+import Rating from 'jsx/context_cards/Rating'
+import InstUIRating from '@instructure/ui-core/lib/components/Rating'
 
-  QUnit.module('StudentContextTray/Rating', () => {
-    let subject
-    const participationsLevel = 2
+QUnit.module('StudentContextTray/Rating', () => {
+  let subject
+  const participationsLevel = 2
 
-    QUnit.module('formatValueText', () => {
-      subject = TestUtils.renderIntoDocument(
-        <Rating metric={{level: 1}} />
-      )
-      const valueText = [
-        'None', 'Low', 'Moderate', 'High'
-      ]
-      valueText.forEach((v, i) => {
-        test(`returns value ${v} for rating ${i}`, () => {
-          equal(subject.formatValueText(i, 3), v)
-        })
+  QUnit.module('formatValueText', () => {
+    subject = TestUtils.renderIntoDocument(
+      <Rating metric={{level: 1}} />
+    )
+    const valueText = [
+      'None', 'Low', 'Moderate', 'High'
+    ]
+    valueText.forEach((v, i) => {
+      test(`returns value ${v} for rating ${i}`, () => {
+        equal(subject.formatValueText(i, 3), v)
       })
     })
+  })
 
-    QUnit.module('render', () => {
-      test('delegates to InstUIRating', () => {
-        subject = TestUtils.renderIntoDocument(
-          <Rating
-            label='Participation'
-            metric={{
-              level: participationsLevel
-            }}
-          />
-        )
-        const instUIRating = TestUtils.findRenderedComponentWithType(subject, InstUIRating)
-        equal(instUIRating.props.label, subject.props.label)
-      })
+  QUnit.module('render', () => {
+    test('delegates to InstUIRating', () => {
+      subject = TestUtils.renderIntoDocument(
+        <Rating
+          label='Participation'
+          metric={{
+            level: participationsLevel
+          }}
+        />
+      )
+      const instUIRating = TestUtils.findRenderedComponentWithType(subject, InstUIRating)
+      equal(instUIRating.props.label, subject.props.label)
     })
   })
 })

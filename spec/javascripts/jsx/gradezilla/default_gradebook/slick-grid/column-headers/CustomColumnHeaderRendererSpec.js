@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!gradebook';
 import ReactDOM from 'react-dom';
-import { createGradebook, setFixtureHtml } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook, setFixtureHtml } from '../../GradebookSpecHelper';
 import CustomColumnHeaderRenderer
 from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/CustomColumnHeaderRenderer';
 

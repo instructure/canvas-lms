@@ -276,6 +276,16 @@ describe BasicLTI::BasicOutcomes do
       expect(request.body).to eq '<replaceResultResponse />'
     end
 
+    it "sets submitted_at to now if resultData is not present" do
+      xml.css('resultData').remove
+      now = Time.now.utc
+      Timecop.freeze(now) do
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        submission = assignment.submissions.where(user_id: @user.id).first
+        expect(submission.submitted_at).to eq now
+      end
+    end
+
     it 'accepts LTI launch URLs as a data format with a specific submission type' do
       xml.css('resultScore').remove
       xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')

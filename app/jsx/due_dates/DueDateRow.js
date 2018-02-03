@@ -19,9 +19,9 @@
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import DueDateTokenWrapper from 'jsx/due_dates/DueDateTokenWrapper'
-import DueDateCalendars from 'jsx/due_dates/DueDateCalendars'
-import DueDateRemoveRowLink from 'jsx/due_dates/DueDateRemoveRowLink'
+import DueDateTokenWrapper from '../due_dates/DueDateTokenWrapper'
+import DueDateCalendars from '../due_dates/DueDateCalendars'
+import DueDateRemoveRowLink from '../due_dates/DueDateRemoveRowLink'
 import I18n from 'i18n!assignments'
 import $ from 'jquery'
 

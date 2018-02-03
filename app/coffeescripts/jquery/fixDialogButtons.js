@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import preventDefault from 'compiled/fn/preventDefault'
+import preventDefault from '../fn/preventDefault'
 import 'jqueryui/dialog'
 
 $.fn.fixDialogButtons = function () {

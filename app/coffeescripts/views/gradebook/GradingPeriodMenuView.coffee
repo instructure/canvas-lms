@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/userSettings'
+  '../../userSettings'
   'i18n!gradebook'
   'jquery'
   'underscore'
   'Backbone'
   'jst/gradebook/grading_period_to_show_menu'
-   'compiled/jquery.kylemenu'
+   '../../jquery.kylemenu'
   'vendor/jquery.ba-tinypubsub'
 ], (userSettings, I18n, $, _, {View}, template) ->
 

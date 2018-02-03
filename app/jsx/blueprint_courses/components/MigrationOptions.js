@@ -21,14 +21,14 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!blueprint_settings'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import select from 'jsx/shared/select'
+import select from '../../shared/select'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
-import TextArea from 'instructure-ui/lib/components/TextArea'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
+import TextArea from '@instructure/ui-core/lib/components/TextArea'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
@@ -115,7 +115,7 @@ export default class MigrationOptions extends React.Component {
               size="small"
               disabled={isDisabled}
             />
-            <Typography
+            <Text
               aria-label={
                 I18n.t('%{chars} written, max character length %{len}',
                   {
@@ -126,7 +126,7 @@ export default class MigrationOptions extends React.Component {
               as="span" color="secondary" size="small" role="presentation"
             >
               ({I18n.t('%{len}/%{maxLen}', {len: this.props.notificationMessage.length, maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH})})
-            </Typography>
+            </Text>
           </div> : null
         }
         {this.props.willSendNotification && this.props.willIncludeCustomNotificationMessage ?

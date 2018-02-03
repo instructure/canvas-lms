@@ -24,12 +24,13 @@ define [
   'react-dom'
   'Backbone'
   'vendor/slickgrid'
-  'compiled/gradezilla/OutcomeGradebookGrid'
-  'compiled/views/gradezilla/CheckboxView'
-  'compiled/views/gradebook/SectionMenuView'
+  '../../gradezilla/OutcomeGradebookGrid'
+  '../gradezilla/CheckboxView'
+  '../gradebook/SectionMenuView'
   'jsx/gradezilla/default_gradebook/components/SectionFilter'
   'jst/gradezilla/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
+  '../../jquery.rails_flash_notifications'
   'jquery.instructure_misc_plugins'
 ], (I18n, $, _, React, ReactDOM, {View}, Slick, Grid, CheckboxView, SectionMenuView, SectionFilter, template, cellTemplate) ->
 
@@ -223,7 +224,9 @@ define [
     #
     # Returns nothing.
     _loadPage: (url, outcomes) ->
-      dfd  = $.getJSON(url)
+      dfd  = $.getJSON(url).fail((e) ->
+        $.flashError(I18n.t('There was an error fetching outcome results'))
+      )
       dfd.then (response, status, xhr) =>
         outcomes = @_mergeResponses(outcomes, response)
         if response.meta.pagination.next

@@ -16,44 +16,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/external_apps/components/ConfigurationFormManual'
-], (React, TestUtils, ConfigurationFormManual) => {
+import React from 'react'
+import TestUtils from 'react-addons-test-utils'
+import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
 
-  QUnit.module('External Apps Manual Configuration Form');
+QUnit.module('External Apps Manual Configuration Form');
 
-  const fakeStore = {
-    findAppByShortName () {
-      return {
-        short_name: 'someApp',
-        config_options: []
-      };
-    }
-  };
+const fakeStore = {
+  findAppByShortName () {
+    return {
+      short_name: 'someApp',
+      config_options: []
+    };
+  }
+};
 
-  const component = TestUtils.renderIntoDocument (
-    <ConfigurationFormManual
-      domain=''
-      description=''
-      shortName="someApp"
-      store={fakeStore}
-    />
-  );
+const component = TestUtils.renderIntoDocument (
+  <ConfigurationFormManual
+    domain=''
+    description=''
+    shortName="someApp"
+    store={fakeStore}
+    allowMembershipServiceAccess={true}
+    membershipServiceFeatureFlagEnabled={true}
+  />
+);
 
-    test('domain field should not be null', () => {
+test('domain field should not be null', () => {
 
-      const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
 
-      equal(app.props.domain, '');
-    });
-
-    test('description field should not be null', () => {
-
-      const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
-
-      equal(app.props.description, '');
-    });
-
+  equal(app.props.domain, '');
 });
+
+test('description field should not be null', () => {
+
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
+
+  equal(app.props.description, '');
+});
+
+QUnit.module('ConfigurationFormManual#getFormData()');
+
+test('returns expected output with membership service feature flag enabled', () => {
+
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
+  app.refs.allow_membership_service_access.setState({value: true})
+  equal(app.getFormData().allow_membership_service_access, true);
+});
+

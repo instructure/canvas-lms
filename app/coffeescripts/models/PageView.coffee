@@ -21,7 +21,7 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'compiled/str/TextHelper'
+  '../str/TextHelper'
   'jquery.instructure_misc_helpers' # $.parseUserAgentString
 ], (I18n, $, _, Backbone, {truncateText}) ->
 

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define ['compiled/collections/PaginatedCollection'], (PaginatedCollection) ->
+define ['../collections/PaginatedCollection'], (PaginatedCollection) ->
 
   class AppCenterAppCollection extends PaginatedCollection
     resourceName: 'app_center/apps'

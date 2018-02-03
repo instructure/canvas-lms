@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'i18n!discussions'
-  'compiled/views/DiscussionTopic/EntryView'
+  '../DiscussionTopic/EntryView'
   'jst/discussions/results_entry'
 ], ({View}, I18n, EntryView, template) ->
 

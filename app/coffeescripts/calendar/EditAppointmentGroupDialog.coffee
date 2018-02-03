@@ -18,7 +18,7 @@
 define [
   'jquery'
   'i18n!calendar'
-  'compiled/calendar/EditAppointmentGroupDetails'
+  '../calendar/EditAppointmentGroupDetails'
   'jst/calendar/editAppointmentGroup'
   'jqueryui/dialog'
 ], ($, I18n, EditAppointmentGroupDetails, editAppointmentGroupTemplate) ->

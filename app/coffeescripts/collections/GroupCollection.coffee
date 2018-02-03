@@ -17,10 +17,10 @@
 #
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/collections/GroupUserCollection'
-  'compiled/models/Group'
-  'compiled/util/natcompare'
+  '../collections/PaginatedCollection'
+  '../collections/GroupUserCollection'
+  '../models/Group'
+  '../util/natcompare'
 ], (PaginatedCollection, GroupUserCollection, Group, natcompare) ->
 
   class GroupCollection extends PaginatedCollection

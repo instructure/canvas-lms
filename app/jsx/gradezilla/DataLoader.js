@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery';
-import cheaterDepaginate, { consumePagesInOrder } from 'jsx/shared/CheatDepaginator';
+import cheaterDepaginate, { consumePagesInOrder } from '../shared/CheatDepaginator';
 import _ from 'lodash';
 
 const submissionsParams = {

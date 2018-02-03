@@ -20,10 +20,10 @@ import I18n from 'i18n!blueprint_courses'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
-import shortId from 'jsx/shared/shortid'
+import shortId from '../../shared/shortid'
 
-import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid'
+import Text from '@instructure/ui-core/lib/components/Text'
 import { IconLock, IconUnlock } from './BlueprintLocks'
 
 import propTypes from '../propTypes'
@@ -46,7 +46,7 @@ export default class ChangeLogRow extends Component {
 
   colIds = [shortId(), shortId(), shortId(), shortId()]
 
-  renderText = text => <Typography size="small" weight={this.props.isHeading ? 'bold' : 'normal'}>{text}</Typography>
+  renderText = text => <Text size="small" weight={this.props.isHeading ? 'bold' : 'normal'}>{text}</Text>
 
   renderRow () {
     const { col1, col2, col3, col4, isHeading } = this.props
@@ -91,7 +91,7 @@ export const ChangeRow = ({ change }) => (
     col4={change.exceptions && change.exceptions.length ? I18n.t('No') : I18n.t('Yes')}
   >
     <div className="bcs__history-item__lock-icon">
-      <Typography size="large" color="secondary">{change.locked ? <IconLock /> : <IconUnlock />}</Typography>
+      <Text size="large" color="secondary">{change.locked ? <IconLock /> : <IconUnlock />}</Text>
     </div>
   </ChangeLogRow>
 )

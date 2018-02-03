@@ -71,17 +71,6 @@ describe "announcements" do
       expect(f("#content")).not_to contain_css(".announcements active")
     end
 
-    it "should not show JSON when loading more announcements via pageless", priority: "2", test_id: 220375 do
-      50.times { @course.announcements.create!(:title => 'Hi there!', :message => 'Announcement time!') }
-      get "/courses/#{@course.id}/announcements"
-
-      start = ff(".discussionTopicIndexList .discussion-topic").length
-      scroll_page_to_bottom
-      expect(ff(".discussionTopicIndexList .discussion-topic")).not_to have_size(start)
-
-      expect(f(".discussionTopicIndexList")).not_to include_text('discussion_topic')
-    end
-
     it "should validate that a student can not see an announcement with a delayed posting date", priority: "1", test_id: 220376 do
       announcement_title = 'Hi there!'
       announcement = @course.announcements.create!(:title => announcement_title, :message => 'Announcement time!', :delayed_post_at => Time.now + 1.day)
@@ -170,6 +159,37 @@ describe "announcements" do
       wait_for_ajaximations
 
       expect(f("#content")).not_to contain_css('.discussion-rate-action')
+    end
+
+    context "section specific announcements" do
+      before (:once) do
+        course_with_teacher(active_course: true)
+        @course.account.set_feature_flag! :section_specific_announcements, 'on'
+        @section = @course.course_sections.create!(name: 'test section')
+
+        @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+        @announcement.is_section_specific = true
+        @announcement.course_sections = [@section]
+        @announcement.save!
+
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, :enrollment_state => 'active')
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        student_in_section(@section, user: @student1)
+      end
+
+      it "should be visible to students in the specific section" do
+        user_session(@student1)
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+        expect(f(".discussion-title")).to include_text(@announcement.title)
+      end
+
+      it "should not be visible to students not in the specific section" do
+        user_session(@student2)
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+        expect(driver.current_url).to eq course_announcements_url @course
+        expect_flash_message :error, 'You do not have access to the requested announcement.'
+      end
     end
   end
 end

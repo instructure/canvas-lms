@@ -184,7 +184,7 @@ define [
     view = @editView {}, {todo_date: '2017-01-03'}
 
     equal view.$el.find('#allow_todo_date').prop('checked'), true
-    equal view.$el.find('#todo_date').val(), 'Jan 3 at 12am'
+    equal view.$el.find('#todo_date').val(), 'Jan 3, 2017 at 12am'
 
   test 'does not show todo checkbox without permission', ->
     ENV.STUDENT_PLANNER_ENABLED = false

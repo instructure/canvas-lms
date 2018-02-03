@@ -17,8 +17,8 @@
 
 define [
   'i18n!discussions'
-  'compiled/views/DialogFormView'
-  'compiled/models/UserSettings'
+  '../DialogFormView'
+  '../../models/UserSettings'
   'jst/DiscussionTopics/UserSettingsView'
 ], (I18n, DialogFormView, UserSettings, template) ->
 

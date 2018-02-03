@@ -20,13 +20,13 @@ define [
   'i18n!outcomes'
   'jquery'
   'underscore'
-  'compiled/models/OutcomeGroup'
-  'compiled/views/DialogBaseView'
-  'compiled/views/outcomes/SidebarView'
-  'compiled/views/outcomes/ContentView'
+  '../../models/OutcomeGroup'
+  '../DialogBaseView'
+  './SidebarView'
+  './ContentView'
   'jst/outcomes/browser'
   'jst/outcomes/findInstructions'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, OutcomeGroup, DialogBaseView, SidebarView, ContentView, browserTemplate, instructionsTemplate) ->
 

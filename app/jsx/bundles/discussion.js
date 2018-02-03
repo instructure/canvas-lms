@@ -26,19 +26,20 @@ import $ from 'jquery'
 import Backbone from 'Backbone'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DiscussionTopicKeyboardShortcutModal from 'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
 import MaterializedDiscussionTopic from 'compiled/models/Topic'
 import SideCommentDiscussionTopic from 'compiled/models/SideCommentDiscussionTopic'
 import EntryCollection from 'compiled/collections/EntryCollection'
 import DiscussionTopicToolbarView from 'compiled/views/DiscussionTopic/DiscussionTopicToolbarView'
 import TopicView from 'compiled/views/DiscussionTopic/TopicView'
 import EntriesView from 'compiled/views/DiscussionTopic/EntriesView'
-import CyoeStats from 'jsx/conditional_release_stats/index'
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import SectionsTooltip from 'jsx/shared/SectionsTooltip'
 import 'rubricEditBinding'
 import 'compiled/jquery/sticky'
 import 'compiled/jquery/ModuleSequenceFooter'
-import 'jsx/context_cards/StudentContextCardTrigger'
+import CyoeStats from '../conditional_release_stats/index'
+import LockManager from '../blueprint_courses/apps/LockManager'
+import DiscussionTopicKeyboardShortcutModal from '../discussion_topics/DiscussionTopicKeyboardShortcutModal'
+import '../context_cards/StudentContextCardTrigger'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'discussion_topic', page: 'show' })
@@ -63,6 +64,19 @@ ReactDOM.render(
   <DiscussionTopicKeyboardShortcutModal />,
   document.getElementById('keyboard-shortcut-modal')
 )
+
+// Rendering of the section tooltip
+const container = document.querySelector('#section_tooltip_root')
+const sectionSpecificAnnouncement = ENV.DISCUSSION.TOPIC.IS_ANNOUNCEMENT
+                                    && (ENV.TOTAL_USER_COUNT || ENV.DISCUSSION.TOPIC.COURSE_SECTIONS)
+if (container && sectionSpecificAnnouncement) {
+  ReactDOM.render(
+    <SectionsTooltip
+      totalUserCount={ENV.TOTAL_USER_COUNT}
+      sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS}/>,
+    container
+  )
+}
 
 const topicView = new TopicView({
   el: '#main',

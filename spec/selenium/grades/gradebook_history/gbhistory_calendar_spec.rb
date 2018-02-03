@@ -43,7 +43,7 @@ describe "Gradebook History Page" do
     end
 
     xit "on entering invalid dates", test_id: 3308867, priority: "1" do
-      skip('Blocked due to Grade-319')
+      skip('Blocked due to Grade-743')
       GradeBookHistory.enter_start_date('bad date')
       GradeBookHistory.enter_end_date('invalid date')
       GradeBookHistory.enter_end_date(:tab)

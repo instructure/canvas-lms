@@ -19,7 +19,7 @@ define [
   'jquery'
   'Backbone'
   'jst/searchView'
-  'compiled/views/SearchMixin'
+  './SearchMixin'
 ], ($, Backbone, template, SearchMixin) ->
 
   ##

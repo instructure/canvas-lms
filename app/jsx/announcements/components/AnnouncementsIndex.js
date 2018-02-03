@@ -22,22 +22,37 @@ import { func, bool, number } from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import Spinner from 'instructure-ui/lib/components/Spinner'
-import Heading from 'instructure-ui/lib/components/Heading'
-import Typography from 'instructure-ui/lib/components/Typography'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
+import Container from '@instructure/ui-core/lib/components/Container'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Heading from '@instructure/ui-core/lib/components/Heading'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Pagination, { PaginationButton } from '@instructure/ui-core/lib/components/Pagination'
+
+import AnnouncementRow from '../../shared/components/AnnouncementRow'
+import { ConnectedIndexHeader } from './IndexHeader'
 
 import select from '../../shared/select'
 import { selectPaginationState } from '../../shared/reduxPagination'
-import propTypes from '../propTypes'
+import { announcementList } from '../../shared/proptypes/announcement'
+import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import actions from '../actions'
+import propTypes from '../propTypes'
 
 export default class AnnouncementsIndex extends Component {
   static propTypes = {
-    announcements: propTypes.announcementList.isRequired,
+    announcements: announcementList.isRequired,
     announcementsPage: number.isRequired,
+    announcementsLastPage: number.isRequired,
     isLoadingAnnouncements: bool.isRequired,
     hasLoadedAnnouncements: bool.isRequired,
     getAnnouncements: func.isRequired,
+    permissions: propTypes.permissions.isRequired,
+    masterCourseData: masterCourseDataShape,
+  }
+
+  static defaultProps = {
+    masterCourseData: null,
   }
 
   componentDidMount () {
@@ -46,12 +61,16 @@ export default class AnnouncementsIndex extends Component {
     }
   }
 
+  selectPage (page) {
+    return () => this.props.getAnnouncements({ page, select: true })
+  }
+
   renderSpinner (condition, title) {
     if (condition) {
       return (
         <div style={{textAlign: 'center'}}>
           <Spinner size="small" title={title} />
-          <Typography size="small" as="p">{title}</Typography>
+          <Text size="small" as="p">{title}</Text>
         </div>
       )
     } else {
@@ -61,32 +80,67 @@ export default class AnnouncementsIndex extends Component {
 
   renderAnnouncements () {
     if (this.props.hasLoadedAnnouncements) {
-      return (
-        <Typography as="p">
-          {I18n.t('%{count} items on page %{page}', {
-            count: this.props.announcements.length,
-            page: this.props.announcementsPage,
-          })}
-        </Typography>
-      )
+      return this.props.announcements.map(announcement => (
+        <AnnouncementRow
+          key={announcement.id}
+          announcement={announcement}
+          canManage={this.props.permissions.manage_content}
+          masterCourseData={this.props.masterCourseData}
+        />
+      ))
     } else {
       return null
     }
   }
 
+  renderPageButton (page) {
+    return (
+      <PaginationButton
+        key={page}
+        onClick={this.selectPage(page)}
+        current={page === this.props.announcementsPage}>
+          {page}
+      </PaginationButton>
+    )
+  }
+
+  renderPagination () {
+    const pages = Array.from(Array(this.props.announcementsLastPage))
+      .map((_, i) => this.renderPageButton(i + 1))
+
+    return (
+      <Pagination
+        variant="compact"
+        labelNext={I18n.t('Next Announcements Page')}
+        labelPrev={I18n.t('Previous Announcements Page')}
+      >
+        {pages}
+      </Pagination>
+    )
+  }
+
   render () {
     return (
       <div className="announcements-v2__wrapper">
-        <Heading>{I18n.t('Announcements')}</Heading>
+        <ScreenReaderContent>
+          <Heading level="h1">{I18n.t('Announcements')}</Heading>
+        </ScreenReaderContent>
+        {this.props.permissions.manage_content && <ConnectedIndexHeader />}
         {this.renderSpinner(this.props.isLoadingAnnouncements, I18n.t('Loading Announcements'))}
-        {this.renderAnnouncements()}
+        <Container margin="medium">
+          <ScreenReaderContent>
+            <Heading level="h2">{I18n.t('Announcements List')}</Heading>
+          </ScreenReaderContent>
+          {this.renderAnnouncements()}
+        </Container>
+        {this.renderPagination()}
       </div>
     )
   }
 }
 
 const connectState = state => Object.assign({
-  // other props here
-}, selectPaginationState(state, 'announcements'))
+  // props derived from state here
+}, selectPaginationState(state, 'announcements'), select(state, ['permissions', 'masterCourseData']))
 const connectActions = dispatch => bindActionCreators(select(actions, ['getAnnouncements']), dispatch)
 export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)

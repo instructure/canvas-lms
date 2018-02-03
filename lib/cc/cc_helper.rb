@@ -178,7 +178,7 @@ module CCHelper
       @media_object_flavor = opts[:media_object_flavor]
       @used_media_objects = Set.new
       @media_object_infos = {}
-      @rewriter = UserContent::HtmlRewriter.new(course, user)
+      @rewriter = UserContent::HtmlRewriter.new(course, user, contextless_types: ['files'])
       @course = course
       @user = user
       @track_referenced_files = opts[:track_referenced_files]

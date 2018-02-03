@@ -21,7 +21,8 @@ define [
   'compiled/views/outcomes/ContentView'
   'helpers/fakeENV'
   'jst/outcomes/mainInstructions'
-], ($, Backbone, ContentView, fakeENV, instructionsTemplate) ->
+  'helpers/assertions'
+], ($, Backbone, ContentView, fakeENV, instructionsTemplate, assertions) ->
 
   QUnit.module 'CollectionView',
     setup: ->
@@ -37,6 +38,10 @@ define [
     teardown: ->
       fakeENV.teardown()
       @contentView.remove()
+
+  test 'should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @contentView, done, {'a11yReport': true}
 
   test 'collectionView replaces text with warning and link on renderNoOutcomeWarning event', ->
     ok @contentView.$el?.text().match(/original_text/)

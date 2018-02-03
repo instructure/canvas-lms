@@ -19,7 +19,7 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import PropTypes from 'prop-types'
-import SVGWrapper from 'jsx/shared/SVGWrapper'
+import SVGWrapper from '../../shared/SVGWrapper'
 import PreventDefault from 'compiled/fn/preventDefault'
 
 function readCookie(key) {

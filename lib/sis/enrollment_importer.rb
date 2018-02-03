@@ -283,6 +283,7 @@ module SIS
                 @update_account_association_user_ids.add(user.id)
               end
             end
+            enrollment.sis_pseudonym_id = pseudo.id
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
               courses_to_recache_due_dates << enrollment.course_id if enrollment.workflow_state_changed?

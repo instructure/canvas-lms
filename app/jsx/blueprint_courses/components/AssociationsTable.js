@@ -22,12 +22,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Typography from 'instructure-ui/lib/components/Typography'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
-import Table from 'instructure-ui/lib/components/Table'
-import Button from 'instructure-ui/lib/components/Button'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import Table from '@instructure/ui-core/lib/components/Table'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import RemoveIcon from 'instructure-icons/lib/Solid/IconXSolid'
 
 import propTypes from '../propTypes'
@@ -148,7 +148,7 @@ export default class AssociationsTable extends React.Component {
   }
 
   renderCellText (text) {
-    return <Typography color="secondary" size="small">{text}</Typography>
+    return <Text color="secondary" size="small">{text}</Text>
   }
 
   renderRows (associations) {
@@ -230,7 +230,7 @@ export default class AssociationsTable extends React.Component {
     if (this.state.visibleExisting.length) {
       return [(
         <tr key="existing-heading">
-          <th scsope="rowgroup" colSpan={6}><Typography weight="bold" size="small">{I18n.t('Current')}</Typography></th>
+          <th scsope="rowgroup" colSpan={6}><Text weight="bold" size="small">{I18n.t('Current')}</Text></th>
         </tr>
       )].concat(this.renderRows(this.state.visibleExisting))
     }
@@ -242,7 +242,7 @@ export default class AssociationsTable extends React.Component {
     if (this.props.addedAssociations.length) {
       return [(
         <tr key="added-heading">
-          <th scsope="rowgroup" colSpan={6}><Typography weight="bold" size="small">{I18n.t('To be Added')}</Typography></th>
+          <th scsope="rowgroup" colSpan={6}><Text weight="bold" size="small">{I18n.t('To be Added')}</Text></th>
         </tr>
       )].concat(this.renderRows(this.props.addedAssociations))
     }
@@ -254,7 +254,7 @@ export default class AssociationsTable extends React.Component {
     if (this.props.removedAssociations.length) {
       return [(
         <tr key="removed-heading">
-          <th scsope="rowgroup" colSpan={6}><Typography weight="bold" size="small">{I18n.t('To be Removed')}</Typography></th>
+          <th scsope="rowgroup" colSpan={6}><Text weight="bold" size="small">{I18n.t('To be Removed')}</Text></th>
         </tr>
       )].concat(this.renderToBeRemovedRows(this.props.removedAssociations))
     }
@@ -289,7 +289,7 @@ export default class AssociationsTable extends React.Component {
       return (
         <div className="bca__overlay">
           <Spinner title={title} />
-          <Typography as="p">{title}</Typography>
+          <Text as="p">{title}</Text>
         </div>
       )
     }
@@ -308,7 +308,7 @@ export default class AssociationsTable extends React.Component {
         {this.renderLoadingOverlay()}
         { this.state.visibleExisting.length || addedAssociations.length || removedAssociations.length
           ? this.renderTable()
-          : <Typography color="secondary" as="p">{I18n.t('There are currently no associated courses.')}</Typography>
+          : <Text color="secondary" as="p">{I18n.t('There are currently no associated courses.')}</Text>
         }
       </div>
     )

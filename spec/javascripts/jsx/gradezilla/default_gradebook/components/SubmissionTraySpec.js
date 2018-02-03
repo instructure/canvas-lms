@@ -21,6 +21,8 @@ import { mount, ReactWrapper } from 'enzyme';
 import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm';
 import SubmissionTray from 'jsx/gradezilla/default_gradebook/components/SubmissionTray';
 
+/* eslint qunit/no-identical-names: 0 */
+
 QUnit.module('SubmissionTray', function (hooks) {
   let clock;
   let content;
@@ -51,7 +53,9 @@ QUnit.module('SubmissionTray', function (hooks) {
       },
       editedCommentId: null,
       editSubmissionComment () {},
+      enterGradesAs: 'points',
       gradingDisabled: false,
+      gradingScheme: [['A', 0.90], ['B+', 0.85], ['B', 0.80], ['B-', 0.75]],
       locale: 'en',
       onGradeSubmission () {},
       onRequestClose () {},
@@ -260,34 +264,47 @@ QUnit.module('SubmissionTray', function (hooks) {
     strictEqual(studentNameDiv().innerHTML, 'Sara');
   });
 
-  test('shows the late policy grade when points have been deducted', function () {
-    mountComponent();
-    strictEqual(wrapContent().find('LatePolicyGrade').length, 1);
-  });
-
-  test('uses the submission to show the late policy grade', function () {
-    mountComponent();
-    const latePolicyGrade = wrapContent().find('LatePolicyGrade').at(0);
-    equal(latePolicyGrade.prop('submission').grade, '100%');
-    strictEqual(latePolicyGrade.prop('submission').pointsDeducted, 3);
-  });
-
-  test('does not show the late policy grade when zero points have been deducted', function () {
-    mountComponent({
-      submission: {
-        excused: false, id: '2501', late: true, missing: false, pointsDeducted: 0, secondsLate: 0, assignmentId: '30'
-      }
+  QUnit.module('LatePolicyGrade', function () {
+    test('shows the late policy grade when points have been deducted', function () {
+      mountComponent();
+      strictEqual(wrapContent().find('LatePolicyGrade').length, 1);
     });
-    strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
-  });
 
-  test('does not show the late policy grade when points deducted is null', function () {
-    mountComponent({
-      submission: {
-        excused: false, id: '2501', late: true, missing: false, pointsDeducted: null, secondsLate: 0, assignmentId: '30'
-      }
+    test('uses the submission to show the late policy grade', function () {
+      mountComponent();
+      const latePolicyGrade = wrapContent().find('LatePolicyGrade').at(0);
+      equal(latePolicyGrade.prop('submission').grade, '100%');
+      strictEqual(latePolicyGrade.prop('submission').pointsDeducted, 3);
     });
-    strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
+
+    test('does not show the late policy grade when zero points have been deducted', function () {
+      mountComponent({
+        submission: {
+          excused: false, id: '2501', late: true, missing: false, pointsDeducted: 0, secondsLate: 0, assignmentId: '30'
+        }
+      });
+      strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
+    });
+
+    test('does not show the late policy grade when points deducted is null', function () {
+      mountComponent({
+        submission: {
+          excused: false, id: '2501', late: true, missing: false, pointsDeducted: null, secondsLate: 0, assignmentId: '30'
+        }
+      });
+      strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
+    });
+
+    test('receives the "enterGradesAs" given to the Tray', function () {
+      mountComponent({ enterGradesAs: 'percent' });
+      strictEqual(wrapContent().find('LatePolicyGrade').prop('enterGradesAs'), 'percent');
+    });
+
+    test('receives the "gradingScheme" given to the Tray', function () {
+      const gradingScheme = [['A', 0.90], ['B+', 0.85], ['B', 0.80], ['B-', 0.75], ['C+', 0.70]];
+      mountComponent({ gradingScheme });
+      deepEqual(wrapContent().find('LatePolicyGrade').prop('gradingScheme'), gradingScheme);
+    });
   });
 
   test('shows a radio input group', function () {
@@ -524,6 +541,17 @@ QUnit.module('SubmissionTray', function (hooks) {
     test('receives the "submissionUpdating" given to the Tray', function () {
       mountComponent({ submissionUpdating: true });
       strictEqual(wrapContent().find('GradeInput').prop('submissionUpdating'), true);
+    });
+
+    test('receives the "enterGradesAs" given to the Tray', function () {
+      mountComponent({ enterGradesAs: 'percent' });
+      strictEqual(wrapContent().find('GradeInput').prop('enterGradesAs'), 'percent');
+    });
+
+    test('receives the "gradingScheme" given to the Tray', function () {
+      const gradingScheme = [['A', 0.90], ['B+', 0.85], ['B', 0.80], ['B-', 0.75], ['C+', 0.70]];
+      mountComponent({ gradingScheme });
+      deepEqual(wrapContent().find('GradeInput').prop('gradingScheme'), gradingScheme);
     });
   });
 

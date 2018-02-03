@@ -19,10 +19,10 @@
 define [
   'jquery'
   'underscore'
-  'compiled/widget/TokenSelectorList'
-  'compiled/collections/RecipientCollection'
+  '../widget/TokenSelectorList'
+  '../collections/RecipientCollection'
   'jquery.instructure_misc_helpers'
-  'compiled/jquery/scrollIntoView'
+  '../jquery/scrollIntoView'
 ], ($, _, TokenSelectorList, RecipientCollection) ->
 
   class

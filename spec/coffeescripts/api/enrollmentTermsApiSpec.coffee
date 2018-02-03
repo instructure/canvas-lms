@@ -88,7 +88,8 @@ define [
     api.list()
     ok $.ajaxJSON.calledWith('api/enrollment_terms')
 
-  asyncTest "deserializes returned enrollment terms", ->
+  test "deserializes returned enrollment terms", (assert) ->
+    start = assert.async()
     @server.respondWith "GET", /enrollment_terms/, [200, {"Content-Type":"application/json", "Link": @fakeHeaders}, JSON.stringify serializedTerms]
     api.list()
        .then (terms) =>
@@ -96,9 +97,10 @@ define [
           start()
     @server.respond()
 
-  asyncTest "rejects the promise upon errors", ->
-     @server.respondWith "GET", /enrollment_terms/, [404, {"Content-Type":"application/json"}, "FAIL"]
-     api.list().catch (error) =>
-       ok "we got here"
-       start()
-     @server.respond()
+  test "rejects the promise upon errors", (assert) ->
+    start = assert.async()
+    @server.respondWith "GET", /enrollment_terms/, [404, {"Content-Type":"application/json"}, "FAIL"]
+    api.list().catch (error) =>
+      ok "we got here"
+      start()
+    @server.respond()

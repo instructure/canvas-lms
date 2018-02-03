@@ -22,13 +22,13 @@ define [
   'react-dom'
   'prop-types'
   'i18n!usage_rights_modal'
-  'compiled/fn/preventDefault'
+  '../../fn/preventDefault'
   '../modules/customPropTypes'
-  'compiled/models/Folder'
+  '../../models/Folder'
   '../modules/filesEnv'
   '../utils/setUsageRights'
   '../utils/updateModelsUsageRights'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
   'jquery.instructure_forms'
 ], ($, _, React, ReactDOM, PropTypes, I18n, preventDefault, customPropTypes, Folder, filesEnv, setUsageRights, updateModelsUsageRights) ->
 

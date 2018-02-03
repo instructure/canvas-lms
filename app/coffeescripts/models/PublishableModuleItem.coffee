@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/backbone-ext/DefaultUrlMixin'
+  '../backbone-ext/DefaultUrlMixin'
   'Backbone'
   'i18n!publishableModuleItem'
 ], (DefaultUrlMixin, {Model}, I18n) ->

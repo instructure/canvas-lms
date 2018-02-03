@@ -18,7 +18,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCell';
+import AssignmentRowCell from '../../../../gradezilla/default_gradebook/components/AssignmentRowCell';
 
 class AssignmentCellEditor {
   constructor (options) {

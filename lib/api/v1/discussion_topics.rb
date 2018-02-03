@@ -22,6 +22,7 @@ module Api::V1::DiscussionTopics
   include Api::V1::Attachment
   include Api::V1::Locked
   include Api::V1::Assignment
+  include Api::V1::Section
 
   include HtmlTextHelper
 
@@ -30,6 +31,7 @@ module Api::V1::DiscussionTopics
     id title assignment_id delayed_post_at lock_at
     last_reply_at posted_at root_topic_id podcast_has_student_posts
     discussion_type position allow_rating only_graders_can_rate sort_by_rating
+    is_section_specific
   }.freeze
 
   # Public: DiscussionTopic methods to serialize.
@@ -57,14 +59,14 @@ module Api::V1::DiscussionTopics
   # opts - see discussion_topic_api_json in this file for what the options are
   # Returns an array of hashes
   def discussion_topics_api_json(topics, context, user, session, opts={})
-    DiscussionTopic.preload_can_unpublish(context, topics)
+    DiscussionTopic.preload_can_unpublish(context, topics) if context
     root_topics = {}
     if opts[:root_topic_fields]&.length
       root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
     end
     topics.inject([]) do |result, topic|
       if topic.visible_for?(user)
-        result << discussion_topic_api_json(topic, context, user, session, opts, root_topics)
+        result << discussion_topic_api_json(topic, context || topic.context, user, session, opts, root_topics)
       end
 
       result
@@ -110,6 +112,12 @@ module Api::V1::DiscussionTopics
         include_discussion_topic: false, override_dates: opts[:override_dates],
         include_all_dates: opts[:include_all_dates],
         exclude_response_fields: excludes)
+    end
+
+    if opts[:include_sections] && topic.is_section_specific
+      section_includes = []
+      section_includes.push('user_count') if opts[:include_sections_user_count]
+      json[:sections] = sections_json(topic.course_sections, user, session, section_includes)
     end
 
     if topic.context.root_account.feature_enabled?(:student_planner)

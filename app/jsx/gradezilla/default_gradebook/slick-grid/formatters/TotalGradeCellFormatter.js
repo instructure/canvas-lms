@@ -19,7 +19,7 @@
 import $ from 'jquery';
 import round from 'compiled/util/round';
 import I18n from 'i18n!gradebook';
-import GradingSchemeHelper from 'jsx/gradebook/GradingSchemeHelper';
+import GradingSchemeHelper from '../../../../gradebook/GradingSchemeHelper';
 import 'jquery.instructure_misc_helpers'; // $.toSentence
 
 function getGradePercentage (score, pointsPossible) {

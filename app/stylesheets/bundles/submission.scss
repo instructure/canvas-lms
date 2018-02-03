@@ -29,16 +29,44 @@
 .submission-details-header {
   margin-bottom: $ic-sp;
 }
-.submission-details-header__grade-summary {
-  float: right;
-}
-.SubmissionDetails__Text {
-  padding-right: $ic-sp/2;
-  @include fontSize(12px);
+.submission-details-header__heading-and-grades {
+  border-bottom: 0.0625rem solid $ic-border-light;
+  padding-bottom: $ic-sp;
+  margin-bottom: $ic-sp;
 
+  @include breakpoint(tablet) {
+    display: flex;
+    align-items: center;
+  }
+}
+.submission-details-header__heading {
+  margin: 0 0 $ic-sp / 2;
+  line-height: $ic-label-line-height;
+
+  @include breakpoint(tablet) {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 1px;
+    padding-right: $ic-sp;
+  }
+}
+.submission-details-header__rubric {
+  @include breakpoint(tablet) {
+    text-align: right;
+  }
+
+  &.submission-details-header__rubric--can-grade {
+    margin-top: -($ic-sp * 0.75);
+  }
+}
+.submission-details-header__info {
+  margin-top: $ic-sp / 3;
+}
+.submission-details-header__time {
+  margin-right: $ic-sp / 4;
   &.late {
-  color: $ic-color-danger;
-  font-weight: bold;
+    color: $ic-color-danger;
+    font-weight: bold;
   }
 }
 .submission-details-container {

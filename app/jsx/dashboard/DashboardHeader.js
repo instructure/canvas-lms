@@ -18,7 +18,7 @@
 
 import React from 'react';
 import I18n from 'i18n!dashboard'
-import DashboardOptionsMenu from 'jsx/dashboard_card/DashboardOptionsMenu';
+import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import { bool } from 'prop-types';
 
 /**

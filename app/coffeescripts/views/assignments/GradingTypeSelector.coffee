@@ -21,8 +21,8 @@ define [
   'underscore'
   'jquery'
   'jst/assignments/GradingTypeSelector'
-  'compiled/jquery/toggleAccessibly',
-  'compiled/jquery/fixDialogButtons'
+  '../../jquery/toggleAccessibly',
+  '../../jquery/fixDialogButtons'
 ], (I18n, Backbone, _, $, template) ->
 
   class GradingTypeSelector extends Backbone.View

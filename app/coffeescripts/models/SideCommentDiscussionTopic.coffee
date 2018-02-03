@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/arr/walk'
-  'compiled/models/Topic'
+  '../arr/walk'
+  '../models/Topic'
 ], (walk, MaterializedDiscussionTopic) ->
 
   class SideCommentDiscussionTopic extends MaterializedDiscussionTopic

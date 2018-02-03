@@ -18,7 +18,7 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/models/DaySubstitution'
+  '../models/DaySubstitution'
 ], (_, Backbone, DaySubstitution) ->
 
   class DaySubstitutionCollection extends Backbone.Collection

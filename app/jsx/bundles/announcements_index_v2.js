@@ -16,10 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createAnnIndex from 'jsx/announcements'
+import createAnnouncementsIndex from '../announcements'
 
 const root = document.querySelector('#content')
-const app = createAnnIndex(root, {
-  contextCodes: [ENV.context_asset_string],
+const app = createAnnouncementsIndex(root, {
+  atomFeedUrl: ENV.atom_feed_url,
+  courseId: ENV.COURSE_ID,
+  masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
+  permissions: ENV.permissions,
 })
+
 app.render()

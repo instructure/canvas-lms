@@ -18,9 +18,9 @@
 
 define [
   'jquery'
-  'compiled/views/outcomes/OutcomesDirectoryView'
-  'compiled/collections/OutcomeCollection'
-  'compiled/collections/OutcomeGroupCollection'
+  './OutcomesDirectoryView'
+  '../../collections/OutcomeCollection'
+  '../../collections/OutcomeGroupCollection'
 ], ($, OutcomesDirectoryView, OutcomeCollection, OutcomeGroupCollection) ->
 
   # for working with Account Standards in the import dialog

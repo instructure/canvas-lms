@@ -17,8 +17,8 @@
 #
 
 define [
-  'compiled/views/outcomes/OutcomesDirectoryView'
-  'compiled/collections/OutcomeCollection'
+  './OutcomesDirectoryView'
+  '../../collections/OutcomeCollection'
 ], (OutcomesDirectoryView, OutcomeCollection) ->
 
   # for working with State Standards in the import dialog

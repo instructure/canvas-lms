@@ -24,10 +24,10 @@ import PublishButtonView from 'compiled/views/PublishButtonView'
 import SpeedgraderLinkView from 'compiled/views/assignments/SpeedgraderLinkView'
 import vddTooltip from 'compiled/util/vddTooltip'
 import MarkAsDone from 'compiled/util/markAsDone'
-import CyoeStats from 'jsx/conditional_release_stats/index'
+import CyoeStats from '../conditional_release_stats/index'
 import 'compiled/jquery/ModuleSequenceFooter'
 import 'jquery.instructure_forms'
-import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'assignment', page: 'show' })

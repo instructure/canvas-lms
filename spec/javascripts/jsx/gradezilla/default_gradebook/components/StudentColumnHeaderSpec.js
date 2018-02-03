@@ -33,7 +33,7 @@ function mountComponent (props, mountOptions = {}) {
 
 function mountAndOpenOptions (props) {
   const wrapper = mountComponent(props);
-  wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
   return wrapper;
 }
 
@@ -93,16 +93,15 @@ test('renders a PopoverMenu', function () {
 });
 
 test('renders a PopoverMenu with a trigger', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
+  const optionsMenuTrigger = this.wrapper.find('.Gradebook__ColumnHeaderAction button');
 
   strictEqual(optionsMenuTrigger.length, 1);
 });
 
-test('adds a class to the trigger when the PopoverMenu is opened', function () {
-  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
-  optionsMenuTrigger.simulate('click');
-
-  ok(optionsMenuTrigger.hasClass('menuShown'));
+test('adds a class to the action container when the PopoverMenu is opened', function () {
+  const actionContainer = this.wrapper.find('.Gradebook__ColumnHeaderAction');
+  actionContainer.find('button').simulate('click');
+  ok(actionContainer.hasClass('menuShown'));
 });
 
 test('renders a title for the More icon', function () {
@@ -114,7 +113,7 @@ test('renders a title for the More icon', function () {
 test('calls addGradebookElement prop on open', function () {
   notOk(this.props.addGradebookElement.called);
 
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   ok(this.props.addGradebookElement.called);
 });
@@ -122,15 +121,15 @@ test('calls addGradebookElement prop on open', function () {
 test('calls removeGradebookElement prop on close', function () {
   notOk(this.props.removeGradebookElement.called);
 
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   ok(this.props.removeGradebookElement.called);
 });
 
 test('calls onMenuClose prop on close', function () {
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
-  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction button').simulate('click');
 
   strictEqual(this.props.onMenuClose.callCount, 1);
 });

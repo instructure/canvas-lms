@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ModulesHomePage from 'jsx/courses/ModulesHomePage'
+import ModulesHomePage from '../courses/ModulesHomePage'
 import modules from 'context_modules'
 
 

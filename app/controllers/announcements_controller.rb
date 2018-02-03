@@ -44,8 +44,10 @@ class AnnouncementsController < ApplicationController
 
         if @context.account.feature_enabled?(:section_specific_announcements)
           js_bundle :announcements_index_v2
+          css_bundle :announcements_index
         else
           js_bundle :announcements_index
+          css_bundle :discussions_list
         end
 
         set_tutorial_js_env

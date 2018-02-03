@@ -21,7 +21,7 @@ define [
   'jquery'
   'jsx/shared/helpers/numberHelper'
   'jst/assignments/PeerReviewsSelector'
-  'compiled/jquery/toggleAccessibly'
+  '../../jquery/toggleAccessibly'
 ], (Backbone, _, $, numberHelper, template, toggleAccessibly) ->
 
   class PeerReviewsSelector extends Backbone.View

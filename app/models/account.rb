@@ -108,6 +108,8 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
   after_update :clear_special_account_cache_if_special
 
+  after_update :clear_cached_short_name, :if => :name_changed?
+
   after_create :create_default_objects
 
   serialize :settings, Hash
@@ -457,13 +459,18 @@ class Account < ActiveRecord::Base
     @cached_users_name_like[query] ||= self.fast_all_users.name_like(query)
   end
 
-  def associated_courses
+  def associated_courses(opts = {})
     if root_account?
       all_courses
     else
       shard.activate do
-        Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self, course_section_id: nil)
-              .where("course_id=courses.id"))
+        if opts[:include_crosslisted_courses]
+          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self)
+                .where("course_id=courses.id"))
+        else
+          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self, course_section_id: nil)
+                .where("course_id=courses.id"))
+        end
       end
     end
   end
@@ -475,7 +482,10 @@ class Account < ActiveRecord::Base
   def fast_course_base(opts = {})
     opts[:order] ||= "#{Course.best_unicode_collation_key("courses.name")} ASC"
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
-    associated_courses = self.associated_courses.active.order(opts[:order])
+    associated_courses = self.associated_courses(
+      :include_crosslisted_courses => opts[:include_crosslisted_courses]
+    )
+    associated_courses = associated_courses.active.order(opts[:order])
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.master_courses if opts[:only_master_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
@@ -520,7 +530,11 @@ class Account < ActiveRecord::Base
   end
 
   def file_namespace
-    Shard.birth.activate { "account_#{self.root_account.id}" }
+    if Shard.current == Shard.birth
+      "account_#{root_account.local_id}"
+    else
+      root_account.global_asset_string
+    end
   end
 
   def self.account_lookup_cache_key(id)

@@ -18,7 +18,7 @@
 define [
   'underscore'
   'Backbone'
-  'compiled/views/conversations/AutocompleteView'
+  '../conversations/AutocompleteView'
 ], (_, {View}, AutocompleteView) ->
 
   class SearchView extends View

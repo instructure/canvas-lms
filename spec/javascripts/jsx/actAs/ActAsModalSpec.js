@@ -21,11 +21,11 @@ import { shallow } from 'enzyme'
 import ActAsModal from 'jsx/actAs/ActAsModal'
 import ActAsMask from 'jsx/actAs/ActAsMask'
 import ActAsPanda from 'jsx/actAs/ActAsPanda'
-import Button from 'instructure-ui/lib/components/Button'
-import Avatar from 'instructure-ui/lib/components/Avatar'
-import Table from 'instructure-ui/lib/components/Table'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Avatar from '@instructure/ui-core/lib/components/Avatar'
+import Table from '@instructure/ui-core/lib/components/Table'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 
 QUnit.module('ActAsModal', {
   setup () {
@@ -78,7 +78,7 @@ test('it renders the table with correct user information', function () {
 
   const textContent = []
   tables.find('tr').forEach((row) => {
-    row.find(Typography).forEach((rowContent) => {
+    row.find(Text).forEach((rowContent) => {
       textContent.push(rowContent.props().children)
     })
   })

@@ -19,25 +19,25 @@
 import React from 'react';
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
-import Button from 'instructure-ui/lib/components/Button';
+import Button from '@instructure/ui-core/lib/components/Button';
 import {
   MenuItem,
   MenuItemGroup,
   MenuItemFlyout,
   MenuItemSeparator
-} from 'instructure-ui/lib/components/Menu';
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
-import Typography from 'instructure-ui/lib/components/Typography';
+} from '@instructure/ui-core/lib/components/Menu';
+import PopoverMenu from '@instructure/ui-core/lib/components/PopoverMenu';
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
+import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
-import { filterLabels } from 'jsx/gradezilla/default_gradebook/constants/ViewOptions';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import { filterLabels } from '../../../gradezilla/default_gradebook/constants/ViewOptions';
 
 function renderTriggerButton (bindButton) {
   return (
     <Button ref={bindButton} variant="link">
-      <Typography color="primary">
+      <Text color="primary">
         {I18n.t('View')} <IconMiniArrowDownSolid />
-      </Typography>
+      </Text>
     </Button>
   );
 }

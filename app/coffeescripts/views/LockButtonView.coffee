@@ -18,7 +18,7 @@
 define [
   'i18n!lock_btn_module'
   'jquery'
-  'compiled/fn/preventDefault'
+  '../fn/preventDefault'
   'Backbone'
   'str/htmlEscape'
   'jquery.instructure_forms'
@@ -214,8 +214,6 @@ define [
         hint:        I18n.t 'Locking...'
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
         iconClass:   'icon-blueprint'
-
-
 
     renderState: (options) ->
       @reset()

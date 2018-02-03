@@ -21,7 +21,7 @@ define [
   'i18n!context_sector'
   'jst/calendar/contextSelector'
   'jst/calendar/contextSelectorItem'
-  'compiled/fn/preventDefault'
+  '../fn/preventDefault'
 ], ($, _, I18n, contextSelectorTemplate, contextSelectorItemTemplate, preventDefault) ->
 
   class ContextSelectorItem

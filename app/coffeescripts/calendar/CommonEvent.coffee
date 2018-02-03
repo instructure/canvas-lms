@@ -18,7 +18,7 @@
 define [
   'i18n!calendar'
   'jquery'
-  'compiled/util/fcUtil'
+  '../util/fcUtil'
   'jquery.ajaxJSON'
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, fcUtil) ->

@@ -21,10 +21,10 @@ import React, { Component } from 'react'
 import cx from 'classnames'
 
 import get from 'lodash/get'
-import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
+import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid'
+import Text from '@instructure/ui-core/lib/components/Text'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
 import { IconLock, IconUnlock } from './BlueprintLocks'
 
 import propTypes from '../propTypes'
@@ -47,7 +47,7 @@ class SyncChange extends Component {
     this.setState({ isExpanded: !this.state.isExpanded })
   }
 
-  renderText = text => <Typography size="small" weight="bold">{text}</Typography>
+  renderText = text => <Text size="small" weight="bold">{text}</Text>
   renderSpace = () => <span style={{display: 'inline-block', width: '20px'}} />
 
   renderExceptionGroup (exType, items) {
@@ -101,7 +101,7 @@ class SyncChange extends Component {
               {this.renderExceptions()}
             </ToggleDetails>}
           <div className="bcs__history-item__lock-icon">
-            <Typography size="large" color="secondary">{locked ? <IconLock /> : <IconUnlock />}</Typography>
+            <Text size="large" color="secondary">{locked ? <IconLock /> : <IconUnlock />}</Text>
           </div>
           <div className="bcs__history-item__content-grid">
             <Grid colSpacing="none">
@@ -112,11 +112,11 @@ class SyncChange extends Component {
                 <GridCol width={2}>
                   <div style={{textAlign: 'right'}}>
                     {hasExceptions ? (
-                      <Typography size="x-small" color="secondary">
+                      <Text size="x-small" color="secondary">
                         <span className="pill">
                           {I18n.t({ one: '%{count} exception', other: '%{count} exceptions' }, { count: exceptions.length })}
                         </span>
-                      </Typography>
+                      </Text>
                     ) : this.renderText(I18n.t('Applied'))}
                   </div>
                 </GridCol>

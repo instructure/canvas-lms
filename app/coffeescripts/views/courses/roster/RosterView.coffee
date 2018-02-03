@@ -20,8 +20,8 @@ define [
   'jquery'
   'Backbone'
   'jst/courses/roster/index'
-  'compiled/views/ValidatedMixin'
-  'compiled/models/GroupCategory'
+  '../../ValidatedMixin'
+  '../../../models/GroupCategory'
   'jsx/add_people/add_people_app'
 ], (I18n, $, Backbone, template, ValidatedMixin, GroupCategory, AddPeopleApp) ->
 

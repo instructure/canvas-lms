@@ -30,10 +30,11 @@ class Enrollment < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :course, :touch => true, :inverse_of => :enrollments
-  belongs_to :course_section
-  belongs_to :root_account, :class_name => 'Account'
-  belongs_to :user
+  belongs_to :course, touch: true, inverse_of: :enrollments
+  belongs_to :course_section, inverse_of: :enrollments
+  belongs_to :root_account, class_name: 'Account', inverse_of: :enrollments
+  belongs_to :user, inverse_of: :enrollments
+  belongs_to :sis_pseudonym, class_name: 'Pseudonym', inverse_of: :sis_enrollments
   belongs_to :associated_user, :class_name => 'User'
 
   belongs_to :role
@@ -59,6 +60,7 @@ class Enrollment < ActiveRecord::Base
 
   before_save :assign_uuid
   before_validation :assert_section
+  after_save :recalculate_enrollment_state
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   before_validation :ensure_role_id
@@ -75,10 +77,9 @@ class Enrollment < ActiveRecord::Base
   after_save :reset_notifications_cache
   after_save :update_assignment_overrides_if_needed
   after_save :dispatch_invitations_later
-  after_save :recalculate_enrollment_state
   after_save :add_to_favorites_later
   after_commit :update_cached_due_dates
-  after_destroy :update_assignment_overrides_if_needed
+  after_save :update_assignment_overrides_if_needed
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -741,7 +742,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
+    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state, self.changed?) do
       if %w{invited active completed}.include?(self.workflow_state)
         self.enrollment_state.get_effective_state
       else
@@ -1336,14 +1337,23 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_assignment_overrides_if_needed
-    being_deleted = self.workflow_state == 'deleted' && self.workflow_state_was != 'deleted'
-    if being_deleted && !enrollments_exist_for_user_in_course?
-      assignment_ids = Assignment.where(context_id: self.course_id, context_type: 'Course').pluck(:id)
-      return unless assignment_ids
+    assignment_scope = Assignment
+                        .where(context_id: self.course_id, context_type: 'Course')
+    override_scope = AssignmentOverrideStudent
+                      .where(user_id: self.user_id)
 
-      AssignmentOverrideStudent
-        .where(user_id: self.user_id, assignment_id: assignment_ids)
+    if being_deleted? && !enrollments_exist_for_user_in_course?
+      return unless (assignment_ids = assignment_scope.pluck(:id)).any?
+
+      override_scope
+        .where(assignment_id: assignment_ids)
         .find_each(&:destroy)
+    elsif being_restored? || being_reactivated? || being_uncompleted?
+      return unless (assignment_ids = assignment_scope.pluck(:id)).any?
+
+      override_scope
+        .where(assignment_id: assignment_ids)
+        .find_each(&:undestroy)
     end
   end
 
@@ -1428,5 +1438,17 @@ class Enrollment < ActiveRecord::Base
 
   def being_restored?(to_state: workflow_state)
     workflow_state_changed? && workflow_state_was == 'deleted' && workflow_state == to_state
+  end
+
+  def being_reactivated?
+    workflow_state_changed? && workflow_state != 'deleted' && workflow_state_was == 'inactive'
+  end
+
+  def being_uncompleted?
+    workflow_state_changed? && workflow_state != 'deleted' && workflow_state_was == 'completed'
+  end
+
+  def being_deleted?
+    workflow_state == 'deleted' && workflow_state_was != 'deleted'
   end
 end

@@ -447,6 +447,56 @@ describe AssignmentGroup do
       expect(@ag.any_assignment_in_closed_grading_period?).to eq(true)
     end
   end
+
+  describe "#destroy" do
+    before(:once) do
+      @student_enrollment = @student.enrollments.find_by(course_id: @course)
+      @group = @course.assignment_groups.create!(@valid_attributes)
+    end
+
+    let(:student_score) do
+      Score.find_by(enrollment_id: @student_enrollment, assignment_group_id: @group)
+    end
+
+    it "destroys scores belonging to active students" do
+      expect { @group.destroy }.to change { student_score.reload.state }.from(:active).to(:deleted)
+    end
+
+    it "does not destroy scores belonging to concluded students" do
+      @student_enrollment.conclude
+      expect { @group.destroy }.not_to change { student_score.reload.state }
+    end
+  end
+
+  describe "#restore" do
+    before(:once) do
+      @student_enrollment = @student.enrollments.find_by(course_id: @course)
+      @group = @course.assignment_groups.create!(@valid_attributes)
+      @group.destroy
+    end
+
+    let(:student_score) do
+      Score.find_by(enrollment_id: @student_enrollment, assignment_group_id: @group)
+    end
+
+    it "restores the assignment group back to an 'available' state" do
+      expect { @group.restore }.to change { @group.state }.from(:deleted).to(:available)
+    end
+
+    it "restores scores belonging to active students" do
+      expect { @group.restore }.to change { student_score.reload.state }.from(:deleted).to(:active)
+    end
+
+    it "does not restore scores belonging to concluded students" do
+      @student_enrollment.conclude
+      expect { @group.restore }.not_to change { student_score.reload.state }
+    end
+
+    it "does not restore scores belonging to deleted students" do
+      @student_enrollment.destroy
+      expect { @group.restore }.not_to change { student_score.reload.state }
+    end
+  end
 end
 
 def assignment_group_model(opts={})

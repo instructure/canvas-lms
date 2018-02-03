@@ -1,0 +1,131 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+ @import "components/ic-unread-badge";
+
+.ic-item-row__select-col + .ic-item-row__author-col {
+  margin-left: 11px;
+}
+
+.ic-item-row {
+  box-shadow: 0 -1px $ic-border-color, inset 0 -1px $ic-border-color;
+  padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+
+  &.ic-item-row__unread:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: -25px;
+    width: 12px;
+    height: 12px;
+    background: $electric;
+    border-radius: 50%;
+  }
+}
+
+.ic-item-row__content-col {
+  // necessary because min-width: auto by default
+  // without this, the text force-expands the width of the container instead of being truncated
+  min-width: 0;
+  flex-grow: 1;
+  margin: 0 22px;
+  overflow: hidden;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  & > .ic-item-row__content-link {
+    &, &:link {
+      color: inherit;
+    }
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  h3 {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  p, h4, .ic-announcement-row__content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.ic-item-row__meta-col {
+  // prevent flex from resizing this box, necessary because it has a sibling with flex-grow: 1
+  // that would otherwise steal width from this element, not the same as width: 200px
+  min-width: 230px;
+  max-width: 230px;
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+
+  .ic-item-row__meta-actions {
+    height: 20px;
+  }
+
+  .ic-item-row__meta-content {
+    p {
+      margin: 3px 0 0;
+    }
+
+    .ic-item-row__meta-content-heading {
+      font-weight: 600;
+    }
+  }
+}
+
+.ic-announcement-row {
+  .ic-announcement-row__content {
+    p:not(:first-of-type) {
+      display: none;
+    }
+  }
+
+  .ic-item-row__meta-actions {
+    .ic-unread-badge {
+      transform: translateY(-2px);
+    }
+
+    .ic-item-row__master-course-lock {
+      vertical-align: text-bottom;
+      margin-left: 10px;
+    }
+  }
+
+  .ic-item-row__meta-content {
+    svg {
+      transform: translateY(3px);
+      font-size: 1.2rem;
+    }
+  }
+}

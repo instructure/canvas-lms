@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['jquery', 'moment', 'compiled/util/fcUtil'], ($, moment, fcUtil) ->
+define ['jquery', 'moment', '../util/fcUtil'], ($, moment, fcUtil) ->
 
   class TimeBlockListManager
     # takes an optional array of Date pairs

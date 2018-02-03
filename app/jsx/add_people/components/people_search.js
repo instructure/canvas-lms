@@ -18,13 +18,13 @@
 
 import I18n from 'i18n!roster'
 import React from 'react'
-import Typography from 'instructure-ui/lib/components/Typography'
-import RadioInputGroup from 'instructure-ui/lib/components/RadioInputGroup'
-import RadioInput from 'instructure-ui/lib/components/RadioInput'
-import Select from 'instructure-ui/lib/components/Select'
-import TextArea from 'instructure-ui/lib/components/TextArea'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
+import Text from '@instructure/ui-core/lib/components/Text'
+import RadioInputGroup from '@instructure/ui-core/lib/components/RadioInputGroup'
+import RadioInput from '@instructure/ui-core/lib/components/RadioInput'
+import Select from '@instructure/ui-core/lib/components/Select'
+import TextArea from '@instructure/ui-core/lib/components/TextArea'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import IconUserSolid from 'instructure-icons/lib/Solid/IconUserSolid'
 import {courseParamsShape, inputParamsShape} from './shapes'
 import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
@@ -194,9 +194,9 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
             <div className="usericon" aria-hidden>
               <IconUserSolid />
             </div>
-            <Typography size="medium">
+            <Text size="medium">
               {I18n.t('When adding multiple users, use a comma or line break to separate users.')}
-            </Typography>
+            </Text>
           </div>
         </div>
       );

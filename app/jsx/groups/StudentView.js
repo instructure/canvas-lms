@@ -24,11 +24,11 @@ import natcompare from 'compiled/util/natcompare'
 import Group from 'compiled/models/Group'
 import UserCollection from 'compiled/collections/UserCollection'
 import ContextGroupCollection from 'compiled/collections/ContextGroupCollection'
-import BackboneState from 'jsx/groups/mixins/BackboneState'
-import PaginatedGroupList from 'jsx/groups/components/PaginatedGroupList'
-import Filter from 'jsx/groups/components/Filter'
-import NewGroupDialog from 'jsx/groups/components/NewGroupDialog'
-import ManageGroupDialog from 'jsx/groups/components/ManageGroupDialog'
+import BackboneState from '../groups/mixins/BackboneState'
+import PaginatedGroupList from '../groups/components/PaginatedGroupList'
+import Filter from '../groups/components/Filter'
+import NewGroupDialog from '../groups/components/NewGroupDialog'
+import ManageGroupDialog from '../groups/components/ManageGroupDialog'
   const StudentView = React.createClass({
     mixins: [BackboneState],
 

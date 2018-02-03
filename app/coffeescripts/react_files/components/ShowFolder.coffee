@@ -24,7 +24,7 @@ define [
   '../modules/filesEnv'
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
-  'compiled/models/Folder'
+  '../../models/Folder'
 ], ($, React, page, _, I18n, filesEnv, getAllPages, updateAPIQuerySortParams, Folder) ->
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/

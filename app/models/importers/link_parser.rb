@@ -130,6 +130,8 @@ module Importers
       elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
         # Course copy media reference, leave it alone
         resolved
+      elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w\+\.]+)?;base64,(?<image>.*)/m))
+        link_embedded_image(info_match)
       elsif attr == 'src' && node['class'] && node['class'] =~ /equation_image/
         # Equation image, leave it alone
         resolved
@@ -151,6 +153,24 @@ module Importers
       else
         resolved
       end
+    end
+
+    def link_embedded_image(info_match)
+      extension = MIME::Types[info_match[:mime_type]]&.first&.extensions&.first
+      image_data = Base64.decode64(info_match[:image])
+      md5 = Digest::MD5.hexdigest image_data
+      folder_name = I18n.t('embedded_images')
+      @folder ||= Folder.root_folders(context).first.sub_folders.
+        where(name: folder_name, workflow_state: 'hidden', context: context).first_or_create!
+      filename = "#{md5}.#{extension}"
+      file = Tempfile.new([md5, ".#{extension}"])
+      file.binmode
+      file.write(image_data)
+      file.close
+      attachment = FileInContext.attach(context, file.path, filename, @folder, filename, false, md5)
+      resolved("#{context_path}/files/#{attachment.id}/preview")
+    rescue
+      unresolved(:file, rel_path: "#{folder_name}/#{filename}")
     end
   end
 end

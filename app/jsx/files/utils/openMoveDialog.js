@@ -19,7 +19,7 @@
 import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import MoveDialog from 'jsx/files/MoveDialog'
+import MoveDialog from '../../files/MoveDialog'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import $ from 'jquery'
 

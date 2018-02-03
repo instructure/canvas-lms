@@ -19,10 +19,10 @@ define [
   'jquery'
   'Backbone'
   'jst/groups/manage/group'
-  'compiled/views/groups/manage/GroupUsersView'
-  'compiled/views/groups/manage/GroupDetailView'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
-  'compiled/util/groupHasSubmissions'
+  './GroupUsersView'
+  './GroupDetailView'
+  './GroupCategoryCloneView'
+  '../../../util/groupHasSubmissions'
 ], ($, {View}, template, GroupUsersView, GroupDetailView, GroupCategoryCloneView, groupHasSubmissions) ->
 
   class GroupView extends View

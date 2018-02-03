@@ -20,8 +20,8 @@ define [
   'jquery'
   'jst/DiscussionTopics/pageNav'
   'Backbone'
-  'compiled/views/DiscussionTopic/EntryCollectionView'
-  'compiled/jquery/scrollIntoView'
+  '../DiscussionTopic/EntryCollectionView'
+  '../../jquery/scrollIntoView'
   'underscore.flattenObjects'
 ], (_, $, pageNavTemplate, Backbone, EntryCollectionView) ->
 

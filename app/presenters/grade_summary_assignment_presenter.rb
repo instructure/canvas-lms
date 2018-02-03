@@ -24,7 +24,7 @@ class GradeSummaryAssignmentPresenter
     @current_user = current_user
     @assignment = assignment
     @submission = submission
-    @originality_reports = OriginalityReport.where(attachment_id: @submission.attachment_ids) if @submission
+    @originality_reports = @submission.originality_reports_for_display if @submission
   end
 
   def originality_report?
@@ -209,7 +209,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_plagiarism_attachment?(a)
-    @originality_reports.find_by(attachment: a) ||
+    @originality_reports.select { |o| o.attachment == a } ||
     (submission.turnitin_data && submission.turnitin_data[a.asset_string]) ||
     (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string])
   end

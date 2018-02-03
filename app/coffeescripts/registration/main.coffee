@@ -17,10 +17,10 @@
 
 define [
   'jquery'
-  'compiled/fn/preventDefault'
-  'compiled/registration/signupDialog'
+  '../fn/preventDefault'
+  '../registration/signupDialog'
   'jst/registration/login'
-  'compiled/behaviors/authenticity_token'
+  '../behaviors/authenticity_token'
   'str/htmlEscape'
   'i18n!registration'
 ], ($, preventDefault, signupDialog, loginForm, authenticity_token, htmlEscape, I18n) ->

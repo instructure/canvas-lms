@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'underscore'
-import createStore from 'jsx/shared/helpers/createStore'
+import createStore from '../shared/helpers/createStore'
 import $ from 'jquery'
 import splitAssetString from 'compiled/str/splitAssetString'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'

@@ -20,11 +20,11 @@ define [
   'jquery'
   'underscore'
   'timezone'
-  'compiled/views/DialogBaseView'
-  'compiled/util/deparam'
+  '../DialogBaseView'
+  '../../util/deparam'
   'jst/conferences/editConferenceForm'
   'jst/conferences/userSettingOptions'
-  'compiled/behaviors/authenticity_token',
+  '../../behaviors/authenticity_token',
   'jsx/shared/helpers/numberHelper'
 ], (I18n, $, _, tz, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token, numberHelper) ->
 

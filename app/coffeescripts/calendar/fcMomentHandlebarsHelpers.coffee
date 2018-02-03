@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This file is to add the methods that depend on 'compiled/util/fcUtil'
+# This file is to add the methods that depend on '../util/fcUtil'
 # as registered handelbars helpers. These are not in app/coffeescripts/handlebars_helpers.coffee
 # because otherwise everypage would load fullcalendar.js (which fcUtil depends on).
 # So anything that depends on these helpers in their handlbars needs to make sure
@@ -23,7 +23,7 @@
 
 define [
   'timezone'
-  'compiled/util/fcUtil'
+  '../util/fcUtil'
   'handlebars/runtime'
 ], (tz, fcUtil, {default: Handlebars}) ->
 

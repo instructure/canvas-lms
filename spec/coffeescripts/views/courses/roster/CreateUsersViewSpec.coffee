@@ -22,7 +22,7 @@ define [
   'compiled/models/Role'
   'compiled/models/CreateUserList'
   'helpers/assertions'
-], ($, CreateUsersView, RolesCollection, Role, CreateUserList, assert) ->
+], ($, CreateUsersView, RolesCollection, Role, CreateUserList, assertions) ->
 
   view = null
   server = null
@@ -86,7 +86,7 @@ define [
     ok $('#create-users-results').html().match('joe@joe.com'), 'enrolled users matched'
 
   assertStepVisible = (step) ->
-    assert.isVisible $("#create-users-step-#{step}")
+    assertions.isVisible $("#create-users-step-#{step}")
 
   startOver = ->
     view.$('.createUsersStartOver').click()
@@ -96,6 +96,10 @@ define [
 
   assertTextareaValue = (text) ->
     equal view.$textarea.val(), text, 'textarea matches text'
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'moves through the steps', ->
     assertStepVisible 1

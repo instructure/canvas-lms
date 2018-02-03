@@ -20,9 +20,9 @@ import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Spinner from 'instructure-ui/lib/components/Spinner'
+import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Spinner from '@instructure/ui-core/lib/components/Spinner'
 import 'compiled/jquery.rails_flash_notifications'
 import propTypes from '../propTypes'
 import CourseFilter from './CourseFilter'
@@ -104,6 +104,11 @@ export default class CoursePicker extends React.Component {
     })
   }
 
+  // when user clicks "Courses" button to toggle visibliity
+  onToggleCoursePicker = (event, isExpanded) => {
+    this.setState({isExpanded})
+  }
+
   // in IE, instui icons are in the tab order and get focus, even if hidden
   // this fixes them up so that doesn't happen.
   // Eventually this should get folded into instui via INSTUI-572
@@ -134,7 +139,14 @@ export default class CoursePicker extends React.Component {
           <ToggleDetails
             ref={(c) => { this.coursesToggle = c }}
             expanded={this.state.isExpanded}
-            summary={<span ref={(c) => { if (c) this.props.detailsRef(c.parentElement.parentElement) }}><Typography>{I18n.t('Courses')}</Typography></span>}
+            summary={
+              <span ref={(c) => {
+                if (c) this.props.detailsRef(c.parentElement.parentElement)
+              }}>
+                <Text>{I18n.t('Courses')}</Text>
+              </span>
+            }
+            onToggle={this.onToggleCoursePicker}
           >
             {this.props.isLoadingCourses && (<div className="bca-course-picker__loading">
               <Spinner title={I18n.t('Loading Courses')} />

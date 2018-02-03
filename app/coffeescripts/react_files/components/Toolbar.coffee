@@ -26,12 +26,12 @@ define [
   '../utils/deleteStuff'
   '../modules/customPropTypes'
   'jsx/files/RestrictedDialogForm'
-  'compiled/fn/preventDefault'
+  '../../fn/preventDefault'
   '../modules/FocusStore'
-  'compiled/models/Folder'
+  '../../models/Folder'
   'classnames'
   'jquery'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (_, I18n, React, ReactDOM, page, UsageRightsDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, Folder, classnames, $) ->
 
   Toolbar =

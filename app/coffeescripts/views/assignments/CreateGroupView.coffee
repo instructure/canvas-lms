@@ -16,18 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/util/round'
+  '../../util/round'
   'i18n!assignments'
   'jquery'
   'underscore'
   'jsx/shared/helpers/numberHelper'
-  'compiled/models/AssignmentGroup'
-  'compiled/collections/NeverDropCollection'
-  'compiled/views/assignments/NeverDropCollectionView'
-  'compiled/views/DialogFormView'
+  '../../models/AssignmentGroup'
+  '../../collections/NeverDropCollection'
+  './NeverDropCollectionView'
+  '../DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (round, I18n, $, _, numberHelper, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   SHORT_HEIGHT = 250

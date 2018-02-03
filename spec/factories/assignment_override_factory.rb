@@ -33,13 +33,22 @@ module Factories
   end
 
   def create_section_override_for_assignment(assignment_or_quiz, opts={})
+    opts_with_default = opts.reverse_merge({
+      due_at: 2.days.from_now,
+      due_at_overridden: true,
+      set_type: "CourseSection",
+      course_section: assignment_or_quiz.context.default_section,
+      title: "test override",
+      workflow_state: "active"
+    })
+
     ao = assignment_or_quiz.assignment_overrides.build
-    ao.due_at = opts[:due_at] || 2.days.from_now
-    ao.set_type = "CourseSection"
-    #make sure the default due date is overridden with our override due date
-    ao.due_at_overridden = true
-    ao.set = opts[:course_section] || assignment_or_quiz.context.default_section
-    ao.title = "test override"
+    ao.due_at = opts_with_default[:due_at]
+    ao.due_at_overridden = opts_with_default[:due_at_overridden]
+    ao.set_type = opts_with_default[:set_type]
+    ao.set = opts_with_default[:course_section]
+    ao.title = opts_with_default[:title]
+    ao.workflow_state = opts_with_default[:workflow_state]
     ao.save!
     ao
   end

@@ -748,7 +748,7 @@ class Assignment < ActiveRecord::Base
       mod.completion_requirements && mod.completion_requirements.any?{|req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id])}
     end
     return unless modules.any?
-    student_ids = self.submissions.having_submission.distinct.pluck(:user_id)
+    student_ids = self.submissions.having_submission.or(self.submissions.graded).distinct.pluck(:user_id)
     return unless student_ids.any?
 
     modules.each do |mod|
@@ -2587,9 +2587,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def assignment_overrides_due_date_ok?(overrides={})
+    return true if @skip_due_date_validation
+
     if AssignmentUtil.due_date_required?(self)
       overrides = gather_override_data(overrides)
-      if overrides.select{|o| o['due_at'].nil?}.length > 0
+      if overrides.select{|o| o[:due_at].nil? && o[:workflow_state] != 'deleted'}.length > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end
@@ -2598,9 +2600,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def gather_override_data(overrides)
-    return self.assignment_overrides unless self.assignment_overrides.empty?
-    return overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
-    overrides
+    overrides = overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
+    override_ids = overrides.map{|ele| ele[:id]}.to_set
+    self.assignment_overrides.reject{|o| override_ids.include? o[:id]} + overrides
   end
 
   def active_assignment_overrides?

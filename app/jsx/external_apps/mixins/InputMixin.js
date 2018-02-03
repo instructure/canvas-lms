@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
-import classMunger from 'jsx/external_apps/lib/classMunger'
+import classMunger from '../../external_apps/lib/classMunger'
 
 export default {
     getInitialState() {
@@ -30,6 +30,10 @@ export default {
     handleChange(e) {
       e.preventDefault();
       this.setState({ value: e.target.value });
+    },
+
+    handleCheckChange(e) {
+      this.setState({ value: !!e.target.checked })
     },
 
     renderHint() {

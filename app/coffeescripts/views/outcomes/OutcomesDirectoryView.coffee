@@ -20,16 +20,16 @@ define [
   'i18n!outcomes'
   'jquery'
   'underscore'
-  'compiled/views/PaginatedView'
-  'compiled/models/OutcomeGroup'
-  'compiled/collections/OutcomeCollection'
-  'compiled/collections/OutcomeGroupCollection'
-  'compiled/views/outcomes/OutcomeGroupIconView'
-  'compiled/views/outcomes/OutcomeIconView'
+  '../PaginatedView'
+  '../../models/OutcomeGroup'
+  '../../collections/OutcomeCollection'
+  '../../collections/OutcomeGroupCollection'
+  './OutcomeGroupIconView'
+  './OutcomeIconView'
   'str/htmlEscape'
   'jquery.disableWhileLoading'
   'jqueryui/droppable'
-  'compiled/jquery.rails_flash_notifications'
+  '../../jquery.rails_flash_notifications'
 ], (I18n, $, _, PaginatedView, OutcomeGroup, OutcomeCollection, OutcomeGroupCollection, OutcomeGroupIconView, OutcomeIconView, htmlEscape) ->
 
   # The outcome group "directory" browser.

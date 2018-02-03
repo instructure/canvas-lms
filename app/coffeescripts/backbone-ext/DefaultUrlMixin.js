@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import splitAssetString from 'compiled/str/splitAssetString'
+import splitAssetString from '../str/splitAssetString'
 // #
 // In the spirit of convention over configuration, if the base API route of
 // your model follows canvas's default routing pattern of:

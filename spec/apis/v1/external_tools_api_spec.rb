@@ -32,6 +32,15 @@ describe ExternalToolsController, type: :request do
       show_call(@course)
     end
 
+    it "should include allow_membership_service_access if feature flag enabled" do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
+      et = tool_with_everything(@course, allow_membership_service_access: true)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
+                    {:controller => 'external_tools', :action => 'show', :format => 'json',
+                     :course_id => @course.id.to_s, :external_tool_id => et.id.to_s})
+      expect(json['allow_membership_service_access']).to eq true
+    end
+
     it "should return 404 for not found tool" do
       not_found_call(@course)
     end
@@ -177,7 +186,20 @@ describe ExternalToolsController, type: :request do
             # request/verify the lti launch page
             get json['url']
             expect(response.code).to eq '200'
+          end
 
+          it "returns sessionless launch URL when default URL is not set and placement URL is" do
+            tool.update_attributes!(url: nil)
+            params = { id: tool.id.to_s, launch_type: 'course_navigation' }
+            json = get_sessionless_launch_url(@course, 'course', params)
+            expect(json).to include('url')
+
+            # remove the user session (it's supposed to be sessionless, after all), and make the request
+            remove_user_session
+
+            # request/verify the lti launch page
+            get json['url']
+            expect(response.code).to eq '200'
           end
 
         end
@@ -517,6 +539,7 @@ describe ExternalToolsController, type: :request do
       et.course_assignments_menu = { url: 'http://www.example.com/ims/lti/resource', text: 'course assignments menu' }
     end
     et.context_external_tool_placements.new(:placement_type => opts[:placement]) if opts[:placement]
+    et.allow_membership_service_access = opts[:allow_membership_service_access] if opts[:allow_membership_service_access]
     et.save!
     et
   end

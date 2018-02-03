@@ -19,7 +19,7 @@ define [
   'react'
   'underscore'
   'i18n!react_files'
-  'compiled/str/splitAssetString'
+  '../../str/splitAssetString'
   'jsx/files/Toolbar'
   'jsx/files/FolderTree'
   'jsx/files/FilesUsage'

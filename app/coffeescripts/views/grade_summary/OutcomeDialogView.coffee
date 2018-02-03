@@ -19,8 +19,8 @@ define [
   'i18n!outcomes'
   'jquery'
   'underscore'
-  'compiled/views/DialogBaseView'
-  'compiled/views/grade_summary/OutcomeLineGraphView'
+  '../DialogBaseView'
+  './OutcomeLineGraphView'
   'jst/outcomes/outcomePopover'
 ], (I18n, $, _, DialogBaseView, OutcomeLineGraphView, template) ->
   class OutcomeResultsDialogView extends DialogBaseView

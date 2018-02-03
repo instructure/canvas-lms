@@ -19,9 +19,9 @@
 import I18n from 'i18n!student_context_tray'
 import React from 'react'
 import PropTypes from 'prop-types'
-import InstUIAvatar from 'instructure-ui/lib/components/Avatar'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Link from 'instructure-ui/lib/components/Link'
+import InstUIAvatar from '@instructure/ui-core/lib/components/Avatar'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Link from '@instructure/ui-core/lib/components/Link'
 
 class Avatar extends React.Component {
   static propTypes = {
@@ -54,14 +54,14 @@ class Avatar extends React.Component {
           </Link>
           {
             canMasquerade && (
-              <Typography size="x-small" weight="bold" as="div">
+              <Text size="x-small" weight="bold" as="div">
                 <a
                   href={`/courses/${courseId}?become_user_id=${user._id}`}
                   aria-label={I18n.t('Act as %{name}', { name: user.short_name })}
                 >
                   {I18n.t('Act as User')}
                 </a>
-              </Typography>
+              </Text>
             )
           }
         </div>

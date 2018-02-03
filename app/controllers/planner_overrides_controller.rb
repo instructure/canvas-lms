@@ -292,7 +292,7 @@ class PlannerOverridesController < ApplicationController
 
   def unread_items
     collections = [unread_discussion_topic_collection,
-                   unread_submission_collection]
+                   unread_assignment_collection]
 
     BookmarkedCollection.merge(*collections)
   end
@@ -325,21 +325,27 @@ class PlannerOverridesController < ApplicationController
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
                     @current_user.discussion_topics_needing_viewing(scope_only: true, include_ignored: true,
-                      due_before: end_date, due_after: start_date, new_activity: true).
+                      due_before: end_date, due_after: start_date).
                       unread_for(@current_user),
-                    DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at], :id)
+                    DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
   end
 
-  def unread_submission_collection
-    course_ids = @current_user.enrollments.shard(Shard.current).where(:type => %w{StudentEnrollment StudentViewEnrollment}).current.active_by_date.distinct.pluck(:course_id)
+  def unread_assignment_collection
+    course_ids = @current_user.enrollments.shard(Shard.current).current.active_by_date.
+      where(:type => %w{StudentEnrollment StudentViewEnrollment}).distinct.pluck(:course_id)
+    assign_scope = Assignment.active.where(:context_type => "Course", :context_id => course_ids).
+      due_between_with_overrides(start_date, end_date)
+    disc_assign_ids = DiscussionTopic.active.where(context_type: 'Course', context_id: course_ids).
+      where.not(assignment_id: nil).unread_for(@current_user).pluck(:assignment_id)
     item_collection('unread_assignment_submissions',
-                    Assignment.active.where(:context_type => "Course", :context_id => course_ids).
-                      where("assignments.muted IS NULL OR NOT assignments.muted").
-                      joins(:submissions => :content_participations). # we can assume content participations because they're automatically created when comments are made - see SubmissionComment#update_participation
-                      where(:submissions => {:user_id => @current_user}).
-                      where(:content_participations => {:user_id => @current_user, :workflow_state => 'unread'}).
-                      due_between_with_overrides(start_date, end_date),
-                    Assignment, [:due_at, :created_at], :id)
+                    assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted").
+                    # we can assume content participations because they're automatically created when comments
+                    # are made - see SubmissionComment#update_participation
+                    joins(submissions: :content_participations).
+                    where(submissions: {user_id: @current_user}).
+                    where(content_participations: {user_id: @current_user, workflow_state: 'unread'}).union(
+                      assign_scope.where(id: disc_assign_ids)
+                    ), Assignment, [:due_at, :created_at], :id)
   end
 
   def planner_note_collection

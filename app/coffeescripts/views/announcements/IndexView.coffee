@@ -17,14 +17,14 @@
 
 define [
   'jquery'
-  'compiled/views/DiscussionTopics/DiscussionsSettingsView'
-  'compiled/views/DiscussionTopics/UserSettingsView'
+  '../DiscussionTopics/DiscussionsSettingsView'
+  '../DiscussionTopics/UserSettingsView'
   'i18n!discussion_topics'
   'underscore'
   'jst/announcements/IndexView'
-  'compiled/views/PaginatedView'
-  'compiled/views/DiscussionTopics/SummaryView'
-  'compiled/collections/AnnouncementsCollection'
+  '../PaginatedView'
+  '../DiscussionTopics/SummaryView'
+  '../../collections/AnnouncementsCollection'
 ], ($, DiscussionsSettingsView, UserSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
 
   class IndexView extends PaginatedView

@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/AccountUser'
+  '../collections/PaginatedCollection'
+  '../models/AccountUser'
 ], (PaginatedCollection, AccountUser) ->
 
   class AccountUserCollection extends PaginatedCollection

@@ -21,13 +21,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-core/lib/components/PresentationContent'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 import IconArrowOpenRightSolid from 'instructure-icons/lib/Solid/IconArrowOpenRightSolid'
 import IconArrowOpenDownSolid from 'instructure-icons/lib/Solid/IconArrowOpenDownSolid'
-import Button from 'instructure-ui/lib/components/Button'
-import Typography from 'instructure-ui/lib/components/Typography'
-import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
+import Button from '@instructure/ui-core/lib/components/Button'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid'
 
 import { IconLock, IconUnlock } from './BlueprintLocks'
 import LockCheckList from './LockCheckList'
@@ -95,7 +95,7 @@ export default class ExpandableLockOptions extends React.Component {
     return (
       <div className="bcs_tab_indicator-icon" onKeyDown={this.onKeyDown}>
         <Button variant="icon" onClick={this.toggle} >
-          <Typography size="medium" ><Icon /></Typography>
+          <Text size="medium" ><Icon /></Text>
           <ScreenReaderContent>
             {`${itemTypeLabelPlurals[this.props.objectType]},
             ${this.state.open ? I18n.t('Expanded') : I18n.t('Collapsed')},
@@ -120,7 +120,7 @@ export default class ExpandableLockOptions extends React.Component {
           <GridCol width={8}>
             <PresentationContent>
               <div className="bcs_tab-text" >
-                <Typography size="small" weight="normal">{itemTypeLabelPlurals[this.props.objectType]}</Typography>
+                <Text size="small" weight="normal">{itemTypeLabelPlurals[this.props.objectType]}</Text>
               </div>
             </PresentationContent>
           </GridCol>
@@ -175,7 +175,7 @@ export default class ExpandableLockOptions extends React.Component {
               <GridCol width={7}>
                 <PresentationContent>
                   <div className="bcs_tab-text" >
-                    <Typography size="small" weight="normal" >{formatLockObject(this.state.locks)}</Typography>
+                    <Text size="small" weight="normal" >{formatLockObject(this.state.locks)}</Text>
                   </div>
                 </PresentationContent>
               </GridCol>

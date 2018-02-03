@@ -21,8 +21,8 @@ define [
   'underscore'
   'Backbone'
   'jst/roles/manageRoles'
-  'compiled/views/roles/PermissionButtonView'
-  'compiled/views/roles/RoleHeaderView'
+  './PermissionButtonView'
+  './RoleHeaderView'
   'str/htmlEscape'
 ], (I18n, $, _, Backbone, template, PermissionButtonView, RoleHeaderView, htmlEscape) ->
   class ManageRolesView extends Backbone.View

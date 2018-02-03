@@ -19,7 +19,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import SubmissionTrayRadioInput from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
-import NumberInput from 'instructure-ui/lib/components/NumberInput';
+import NumberInput from '@instructure/ui-core/lib/components/NumberInput';
 
 QUnit.module('SubmissionTrayRadioInput', {
   mountComponent (customProps) {

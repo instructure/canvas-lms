@@ -19,9 +19,9 @@
 define [
   'jquery'
   'underscore'
-  'compiled/views/PaginatedView'
-  'compiled/collections/UserCollection'
-  'compiled/collections/GroupCollection'
+  '../PaginatedView'
+  '../../collections/UserCollection'
+  '../../collections/GroupCollection'
   'jst/collaborations/collaborator'
 ], ($, {each, extend, flatten, reject}, PaginatedView, UserCollection, GroupCollection, collaboratorTemplate) ->
 

@@ -94,7 +94,8 @@ test('addError', () => {
   deepEqual(message.error, {errorKey: 'error'}, 'it returns the proper error')
 })
 
-asyncTest('apiUpdateUser', () => {
+test('apiUpdateUser', assert => {
+  const start = assert.async()
   const server = sinon.fakeServer.create()
 
   // This is a POST rather than a PUT because of the way our $.getJSON converts
@@ -154,7 +155,8 @@ test('loadingUsers', () => {
   equal(message.type, 'LOADING_USERS', 'it returns the proper type')
 })
 
-asyncTest('applySearchFilter', () => {
+test('applySearchFilter', assert => {
+  const start = assert.async()
   let count = 3
   const done = () => {
     --count || start()

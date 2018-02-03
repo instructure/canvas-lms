@@ -19,11 +19,11 @@
 import I18n from 'i18n!edit_timezone'
 import React from 'react'
 import {func, shape, string, object} from 'prop-types'
-import Modal from 'jsx/shared/modal'
-import ModalContent from 'jsx/shared/modal-content'
-import ModalButtons from 'jsx/shared/modal-buttons'
-import TimeZoneSelect from 'jsx/shared/TimeZoneSelect'
-import IcInput from 'jsx/account_course_user_search/IcInput'
+import Modal from './modal'
+import ModalContent from './modal-content'
+import ModalButtons from './modal-buttons'
+import TimeZoneSelect from './TimeZoneSelect'
+import IcInput from '../account_course_user_search/IcInput'
 import {screenReaderFlashMessage} from 'compiled/jquery.rails_flash_notifications'
 
 export default class EditUserDetailsDialog extends React.Component {

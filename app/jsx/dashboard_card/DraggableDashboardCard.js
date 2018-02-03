@@ -17,7 +17,7 @@
  */
 
 import { DropTarget, DragSource } from 'react-dnd'
-import compose from 'jsx/shared/helpers/compose'
+import compose from '../shared/helpers/compose'
 import ItemTypes from './Types'
 import DashboardCard from './DashboardCard'
   const cardSource = {

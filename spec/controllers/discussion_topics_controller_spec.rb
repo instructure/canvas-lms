@@ -238,6 +238,27 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    it "js_env TOTAL_USER_COUNT and IS_ANNOUNCEMENT are set correctly for section specific announcements" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
+      ann.save!
+      get 'show', params: {:course_id => @course.id, :id => ann}
+      expect(assigns[:js_env][:TOTAL_USER_COUNT]).to eq(4)
+    end
+
+    it "js_env COURSE_SECTIONS is set correctly for section specific announcements" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
+      ann.save!
+      get 'show', params: {:course_id => @course.id, :id => ann}
+      expect(assigns[:js_env][:DISCUSSION][:TOPIC][:COURSE_SECTIONS].first["name"]).to eq(section1.name)
+    end
+
     it "should not work for announcements in a public course" do
       @course.update_attribute(:is_public, true)
       @announcement = @course.announcements.create!(
@@ -252,6 +273,37 @@ describe DiscussionTopicsController do
       announcement = @course.announcements.create!(title: 'Test announcement', message: 'Message')
       get('show', params: {course_id: @course.id, id: announcement.id})
       assert_unauthorized
+    end
+
+    context 'section specific announcements' do
+      before(:once) do
+        course_with_teacher(active_course: true)
+        @course.account.set_feature_flag! :section_specific_announcements, 'on'
+        @section = @course.course_sections.create!(name: 'test section')
+
+        @announcement = @course.announcements.create!(:user => @teacher, message: 'hello my favorite section!')
+        @announcement.is_section_specific = true
+        @announcement.course_sections = [@section]
+        @announcement.save!
+
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, :enrollment_state => 'active')
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        student_in_section(@section, user: @student1)
+      end
+
+      it "should be visible to students in specific section" do
+        user_session(@student1)
+        get 'show', params: {:course_id => @course.id, :id => @announcement.id}
+        expect(response).to be_success
+      end
+
+      it "should not be visible to students not in specific section" do
+        user_session(@student2)
+        get('show', params: {course_id: @course.id, id: @announcement.id})
+        expect(response).to be_redirect
+        expect(response.location).to eq course_announcements_url @course
+      end
     end
 
     context "discussion topic with assignment with overrides" do
@@ -665,6 +717,19 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env]).to have_key(:active_grading_periods)
     end
 
+    it "js_env SELECTED_SECTION_LIST is set correctly for section specific announcements" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = course.course_sections.create!(name: "Section 1")
+      section2 = course.course_sections.create!(name: "Section 2")
+      course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
+      ann.save!
+      get :edit, params: {course_id: @course.id, id: ann.id}
+      expect(assigns[:js_env]["SELECTED_SECTION_LIST"]).to eq([{:id=>section1.id, :name=>section1.name}])
+    end
+
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
@@ -911,6 +976,21 @@ describe DiscussionTopicsController do
       accessed_asset = assigns[:accessed_asset]
       expect(accessed_asset[:category]).to eq 'topics'
       expect(accessed_asset[:level]).to eq 'participate'
+    end
+
+    it 'creates an announcement with sections' do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      post 'create',
+        params: topic_params(@course, {is_announcement: true, specific_sections: [section1.id]}),
+        :format => :json
+      expect(response).to have_http_status :success
+      expect(DiscussionTopic.last.course_sections.first).to eq section1
+      expect(DiscussionTopicSectionVisibility.count).to eq 1
     end
 
     it 'registers a page view' do

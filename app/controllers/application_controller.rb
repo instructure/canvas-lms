@@ -144,6 +144,7 @@ class ApplicationController < ActionController::Base
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
+        LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch::FRAME_ALLOWANCES,
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
           eportfolios_enabled: (@domain_root_account && @domain_root_account.settings[:enable_eportfolios] != false), # checking all user root accounts is slow
@@ -1582,8 +1583,8 @@ class ApplicationController < ActionController::Base
           return unless require_user
           add_crumb(@resource_title)
           @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
-          @prepend_template = 'assignments/lti_header'
-          @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))
+          @prepend_template = 'assignments/lti_header' unless external_tool_redirect_display_type == 'full_width'
+          @lti_launch.params = lti_launch_params(adapter)
         else
           @lti_launch.params = adapter.generate_post_payload
         end
@@ -1593,13 +1594,23 @@ class ApplicationController < ActionController::Base
         @lti_launch.analytics_id = @tool.tool_id
 
         @append_template = 'context_modules/tool_sequence_footer'
-        render Lti::AppUtil.display_template(params['display'])
+        render Lti::AppUtil.display_template(external_tool_redirect_display_type)
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
     end
   end
+
+  def lti_launch_params(adapter)
+    adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))
+  end
+  private :lti_launch_params
+
+  def external_tool_redirect_display_type
+    params['display'] || @tool&.extension_setting(:assignment_selection)&.dig('display_type')
+  end
+  private :external_tool_redirect_display_type
 
   # pass it a context or an array of contexts and it will give you a link to the
   # person's calendar with only those things checked.

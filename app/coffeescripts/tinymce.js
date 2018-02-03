@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import tinymce from 'compiled/editor/stocktiny'
+import tinymce from './editor/stocktiny'
 import 'tinymce_plugins/instructure_image/plugin'
 import 'tinymce_plugins/instructure_links/plugin'
 import 'tinymce_plugins/instructure_embed/plugin'

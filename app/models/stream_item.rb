@@ -195,7 +195,7 @@ class StreamItem < ActiveRecord::Base
       raise "Unexpected stream item type: #{object.class}"
     end
     if self.context_type
-      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', self.context_type, self.context_id].cache_key) do
+      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', "#{self.context_type.underscore}_#{self.context_id}"].cache_key) do
         self.context.short_name rescue ''
       end
     end

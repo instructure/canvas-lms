@@ -20,10 +20,10 @@ import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import store from 'jsx/external_apps/lib/ExternalAppsStore'
-import ExternalToolsTableRow from 'jsx/external_apps/components/ExternalToolsTableRow'
-import InfiniteScroll from 'jsx/external_apps/components/InfiniteScroll'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import store from '../../external_apps/lib/ExternalAppsStore'
+import ExternalToolsTableRow from '../../external_apps/components/ExternalToolsTableRow'
+import InfiniteScroll from '../../external_apps/components/InfiniteScroll'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
 export default React.createClass({
     displayName: 'ExternalToolsTable',

@@ -17,15 +17,15 @@
  */
 
 import AssignmentColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/AssignmentColumnHeaderRenderer';
+from '../../../gradezilla/default_gradebook/slick-grid/column-headers/AssignmentColumnHeaderRenderer';
 import AssignmentGroupColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/AssignmentGroupColumnHeaderRenderer';
+from '../../../gradezilla/default_gradebook/slick-grid/column-headers/AssignmentGroupColumnHeaderRenderer';
 import CustomColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/CustomColumnHeaderRenderer';
+from '../../../gradezilla/default_gradebook/slick-grid/column-headers/CustomColumnHeaderRenderer';
 import StudentColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/StudentColumnHeaderRenderer';
+from '../../../gradezilla/default_gradebook/slick-grid/column-headers/StudentColumnHeaderRenderer';
 import TotalGradeColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/TotalGradeColumnHeaderRenderer';
+from '../../../gradezilla/default_gradebook/slick-grid/column-headers/TotalGradeColumnHeaderRenderer';
 
 export default class ColumnHeaderRenderer {
   constructor (gradebook) {

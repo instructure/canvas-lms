@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'compiled/models/User'
-  'compiled/models/Pseudonym'
-  'compiled/object/flatten'
+  '../models/User'
+  '../models/Pseudonym'
+  '../object/flatten'
 ], (User, Pseudonym, flatten) ->
 
   # normalize errors we get from POST /user (user creation API)

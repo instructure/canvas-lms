@@ -175,6 +175,27 @@ define [
         addToolButton.createTool('lti2', {'registrationUrl': registrationUrl}, {'currentTarget': launchButton})
         ok iframeDouble.submit.called
 
+      test 'renders the duplicate confirmation form when "duplicateTool" is true', ->
+        addToolButton = renderComponent({'canAddEdit': true})
+        addToolButton.setState({modalIsOpen: true, duplicateTool: true})
+        ok document.querySelector('#duplicate-confirmation-form')
+
+      test 'renders the duplicate confirmation form when duplicate tool response is received', ->
+        addToolButton = renderComponent()
+        addToolButton.setState({configurationType: 'xml'})
+        xhr = {}
+        xhr.responseText = JSON.stringify({
+         "errors":{
+            "tool_currently_installed":[
+               {
+                  "type":"The tool is already installed in this context.",
+                  "message":"The tool is already installed in this context."
+               }
+            ]
+          }
+        })
+        addToolButton._errorHandler(xhr)
+        ok document.querySelector('#duplicate-confirmation-form')
 
 
 

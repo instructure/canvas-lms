@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!epub_exports'
 import classnames from 'classnames'
 import _ from 'underscore'
-import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
+import CourseEpubExportStore from '../epub_exports/CourseStore'
 
   var GenerateLink = React.createClass({
     displayName: 'GenerateLink',

@@ -20,7 +20,7 @@ import I18n from 'i18n!question_bank'
 import $ from 'jquery'
 import moveQuestionTemplate from 'jst/quiz/move_question'
 import htmlEscape from 'str/htmlEscape'
-import loadBanks from 'jsx/quizzes/question_bank/loadBanks'
+import loadBanks from '../../quizzes/question_bank/loadBanks'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'

@@ -44,7 +44,7 @@
 // </form>
 
 import $ from 'jquery'
-import 'compiled/jquery/fixDialogButtons'
+import '../jquery/fixDialogButtons'
 
 function updateTextToState (newStateOfRegion) {
   return function () {

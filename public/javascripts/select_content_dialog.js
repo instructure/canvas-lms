@@ -25,6 +25,7 @@ import FileSelectBox from 'jsx/context_modules/FileSelectBox'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
 import uploadFile from 'jsx/shared/upload_file'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import './jquery.instructure_date_and_time' /* datetime_field */
 import './jquery.ajaxJSON'
 import './jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
@@ -86,7 +87,8 @@ import './jquery.templateData'
             style: 'width: 800px; height: ' + frameHeight + 'px; border: 0;',
             src: '/images/ajax-loader-medium-444.gif',
             borderstyle: '0',
-            tabindex: '0'
+            tabindex: '0',
+            allow: iframeAllowances()
           }));
           $dialog.append(`<div class="after_external_content_info_alert screenreader-only" tabindex="0">
             <div class="ic-flash-info">

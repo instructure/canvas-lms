@@ -26,7 +26,7 @@ define [
   'jquery.instructure_forms'
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
-  'compiled/jquery/fixDialogButtons'
+  '../jquery/fixDialogButtons'
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, numberHelper, $, curveGradesDialogTemplate, htmlEscape) ->
   class CurveGradesDialog

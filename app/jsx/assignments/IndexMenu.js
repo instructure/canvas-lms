@@ -21,7 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!assignment_index_menu'
-import ExternalToolModalLauncher from 'jsx/shared/ExternalToolModalLauncher'
+import ExternalToolModalLauncher from '../shared/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
 
 export default React.createClass({
@@ -142,8 +142,8 @@ export default React.createClass({
           title={I18n.t('Assignments Settings')}
           aria-label={I18n.t('Assignments Settings')}
         >
-          <span className="screenreader-only">{I18n.t('Assignments Settings')}</span>
-          <i className="icon-settings" /><i className="icon-mini-arrow-down" />
+          <i className="icon-more" aria-hidden="true"/>
+          <span className="screenreader-only">{I18n.t('Assignment Options')}</span>
         </a>
         <ul
           className="al-options"

@@ -21,9 +21,9 @@ import React from 'react'
 import I18n from 'i18n!restrict_student_access'
 import $ from 'jquery'
 import classNames from 'classnames'
-import UsageRightsSelectBox from 'jsx/files/UsageRightsSelectBox'
-import RestrictedRadioButtons from 'jsx/files/RestrictedRadioButtons'
-import DialogPreview from 'jsx/files/DialogPreview'
+import UsageRightsSelectBox from '../files/UsageRightsSelectBox'
+import RestrictedRadioButtons from '../files/RestrictedRadioButtons'
+import DialogPreview from '../files/DialogPreview'
 import RestrictedDialogForm from 'compiled/react_files/components/RestrictedDialogForm'
 
   RestrictedDialogForm.renderUsageRightsWarning = function () {

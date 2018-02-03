@@ -2865,6 +2865,16 @@ describe CoursesController, type: :request do
         { controller: 'courses', action: 'user', course_id: @course1.id.to_s, id: "sis_user_id:#{pseudonym.sis_user_id}", :format => 'json' })
       expect(response.code).to eq '200'
     end
+
+    it "shouldn't show other course enrollments to other students" do
+      @me = @student
+      student2 = student_in_course(course: @course1, name: "student").user
+      @course2.enroll_student(student2)
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users/#{student2.id}.json?include[]=enrollments",
+        { controller: 'courses', action: 'user', course_id: @course1.id.to_s, id: student2.id.to_s, include: ['enrollments'], :format => 'json' })
+      course_ids = json["enrollments"].map{|e| e["course_id"]}
+      expect(course_ids).to eq [@course1.id]
+    end
   end
 
   it "should return the needs_grading_count for all assignments" do

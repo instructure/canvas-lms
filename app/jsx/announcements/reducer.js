@@ -27,7 +27,10 @@ const identity = (defaultState = null) => (
 )
 
 export default combineReducers({
-  contextCodes: identity([]),
+  courseId: identity(null),
+  permissions: identity({}),
+  masterCourseData: identity(null),
+  atomFeedUrl: identity(null),
   announcements: createPaginatedReducer('announcements'),
   notifications: reduceNotifications,
 })

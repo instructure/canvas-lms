@@ -19,6 +19,7 @@ require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/groups_common'
 require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla_cells_page'
+require_relative '../pages/gradezilla_grade_detail_tray_page'
 
 describe "Gradezilla - Assignment Column Options" do
   include_context "in-process server selenium tests"
@@ -78,23 +79,37 @@ describe "Gradezilla - Assignment Column Options" do
       Gradezilla.visit(@course)
     end
 
-    it "Can switch from grading-scheme to points", priority: "1", test_id: 3415925 do
-      # Initial grade is letter-grade
+    it "can switch from letter grade to points", priority: "1", test_id: 3415925 do
+      # Initial grade is letter grade
       expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq 'A'
 
       # Change grade type to points
-      Gradezilla.click_assignment_header_menu(@assignment.id)
-      Gradezilla.click_assignment_popover_enter_grade_as('Points')
+      Gradezilla.click_assignment_popover_enter_grade_as(@assignment.id, 'Points')
       wait_for_ajaximations
 
       expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq '10'
     end
 
-    it "Active grade-type displays a check", priority: "2", test_id: 3415924 do
-      # Initial grade is letter-grade
+    it "active grading scheme displays a check", priority: "2", test_id: 3415924 do
+      # Initial grade is letter grade
       Gradezilla.click_assignment_header_menu(@assignment.id)
 
       expect(Gradezilla.enter_grade_as_popover_menu_item_checked?('Grading Scheme')).to eq 'true'
+    end
+
+    it "grade detail tray has the new grading scheme", priority: "2", test_id: 3416270 do
+      # Initial grade is letter grade
+      Gradezilla.click_assignment_popover_enter_grade_as(@assignment.id, 'Percentage')
+
+      Gradezilla::Cells.open_tray(@course.students[2], @assignment)
+      expect(Gradezilla::GradeDetailTray.grade_input.attribute('value')).to eq '100%'
+    end
+
+    it "replace EX with Excused in Gradebook Cells", priority: "2", test_id: 3424906 do
+      # excuse the student by entering 'EX' in the cell
+      Gradezilla::Cells.edit_grade(@course.students[2],@assignment, 'EX')
+
+      expect(Gradezilla::Cells.get_grade(@course.students[2], @assignment)).to eq 'Excused'
     end
   end
 end

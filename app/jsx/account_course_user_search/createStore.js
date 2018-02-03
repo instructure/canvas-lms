@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import createStore from 'jsx/shared/helpers/createStore'
+import createStore from '../shared/helpers/createStore'
 import parseLinkHeader from 'parse-link-header'
 import _ from 'underscore'
 import 'jquery.ajaxJSON'

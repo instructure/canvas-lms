@@ -21,9 +21,10 @@ import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from 'jsx/external_apps/components/TextInput'
-import TextAreaInput from 'jsx/external_apps/components/TextAreaInput'
-import SelectInput from 'jsx/external_apps/components/SelectInput'
+import TextInput from '../../external_apps/components/TextInput'
+import TextAreaInput from '../../external_apps/components/TextAreaInput'
+import SelectInput from '../../external_apps/components/SelectInput'
+import CheckboxInput from '../../external_apps/components/CheckboxInput'
 import 'compiled/jquery.rails_flash_notifications'
 
   var PRIVACY_OPTIONS = {
@@ -37,14 +38,16 @@ export default React.createClass({
     displayName: 'ConfigurationFormManual',
 
     propTypes: {
-      name         : PropTypes.string,
-      consumerKey  : PropTypes.string,
-      sharedSecret : PropTypes.string,
-      url          : PropTypes.string,
-      domain       : PropTypes.string,
-      privacyLevel : PropTypes.string,
-      customFields : PropTypes.object,
-      description  : PropTypes.string
+      name                                : PropTypes.string,
+      consumerKey                         : PropTypes.string,
+      sharedSecret                        : PropTypes.string,
+      url                                 : PropTypes.string,
+      domain                              : PropTypes.string,
+      privacyLevel                        : PropTypes.string,
+      customFields                        : PropTypes.object,
+      description                         : PropTypes.string,
+      allowMembershipServiceAccess        : PropTypes.bool,
+      membershipServiceFeatureFlagEnabled : PropTypes.bool
     },
 
     getInitialState() {
@@ -82,16 +85,23 @@ export default React.createClass({
     },
 
     getFormData() {
-      return {
-        name         : this.refs.name.state.value,
-        consumerKey  : this.refs.consumerKey.state.value,
-        sharedSecret : this.refs.sharedSecret.state.value,
-        url          : this.refs.url.state.value,
-        domain       : this.refs.domain.state.value,
-        privacyLevel : this.refs.privacyLevel.state.value,
-        customFields : this.refs.customFields.state.value,
-        description  : this.refs.description.state.value
+      var data = {
+        name:             this.refs.name.state.value,
+        consumerKey:      this.refs.consumerKey.state.value,
+        sharedSecret:     this.refs.sharedSecret.state.value,
+        url:              this.refs.url.state.value,
+        domain:           this.refs.domain.state.value,
+        privacyLevel:     this.refs.privacyLevel.state.value,
+        customFields:     this.refs.customFields.state.value,
+        description:      this.refs.description.state.value,
+        verifyUniqueness: 'true'
       };
+
+      if (this.props.membershipServiceFeatureFlagEnabled) {
+        data.allow_membership_service_access = this.refs.allow_membership_service_access.state.value
+      }
+
+      return data
     },
 
     customFieldsToMultiLine() {
@@ -101,6 +111,16 @@ export default React.createClass({
       return _.map(this.props.customFields, function(v, k) {
         return k+'='+v;
       }.bind(this)).join("\n")
+    },
+
+    renderMembershipServiceOption() {
+      if (this.props.membershipServiceFeatureFlagEnabled) {
+        return <CheckboxInput id="allow_membership_service_access"
+                              ref="allow_membership_service_access"
+                              label={I18n.t('Allow this tool to access the IMS Names and Role Provisioning Service')}
+                              checked={this.props.allowMembershipServiceAccess}
+                              errors={this.state.errors} />
+      }
     },
 
     render() {
@@ -133,6 +153,8 @@ export default React.createClass({
                 errors={this.state.errors} />
             </div>
           </div>
+
+          {this.renderMembershipServiceOption()}
 
           <TextInput
             ref="url"

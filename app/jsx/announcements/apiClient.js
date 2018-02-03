@@ -19,11 +19,14 @@
 import axios from 'axios'
 import { encodeQueryString } from '../shared/queryString'
 
-export function getAnnouncements ({ contextCodes, announcements }, { page }) {
+// not using default because we will add more api calls in near future
+// eslint-disable-next-line
+export function getAnnouncements ({ courseId, announcements }, { page }) {
   const params = encodeQueryString([
-    { 'context_codes[]': contextCodes },
+    { only_announcements: true },
+    { per_page: 40 },
     { page: page || announcements.currentPage },
   ])
 
-  return axios.get(`/api/v1/announcements?${params}`)
+  return axios.get(`/api/v1/courses/${courseId}/discussion_topics?${params}`)
 }

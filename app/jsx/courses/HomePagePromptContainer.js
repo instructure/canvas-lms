@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import CourseHomeDialog from 'jsx/courses/CourseHomeDialog'
+import CourseHomeDialog from '../courses/CourseHomeDialog'
 import I18n from 'i18n!home_page_prompt'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'

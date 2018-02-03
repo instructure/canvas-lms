@@ -19,7 +19,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import CurrentUploads from 'compiled/react_files/components/CurrentUploads'
-import UploadProgress from 'jsx/files/UploadProgress'
+import UploadProgress from '../files/UploadProgress'
 
     CurrentUploads.renderUploadProgress = function () {
       if (this.state.currentUploads.length) {

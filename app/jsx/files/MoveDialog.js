@@ -19,10 +19,10 @@
 import I18n from 'i18n!react_files'
 import React from 'react'
 import MoveDialog from 'compiled/react_files/components/MoveDialog'
-import Modal from 'jsx/shared/modal'
-import ModalContent from 'jsx/shared/modal-content'
-import ModalButtons from 'jsx/shared/modal-buttons'
-import BBTreeBrowser from 'jsx/files/BBTreeBrowser'
+import Modal from '../shared/modal'
+import ModalContent from '../shared/modal-content'
+import ModalButtons from '../shared/modal-buttons'
+import BBTreeBrowser from '../files/BBTreeBrowser'
 import classnames from 'classnames'
 
   MoveDialog.renderMoveButton = function () {

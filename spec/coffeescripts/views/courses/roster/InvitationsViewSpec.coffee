@@ -20,7 +20,7 @@ define [
   'compiled/views/courses/roster/InvitationsView'
   'compiled/models/RosterUser'
   'helpers/assertions'
-], ($, InvitationsView, RosterUser, assert) ->
+], ($, InvitationsView, RosterUser, assertions) ->
 
   QUnit.module 'InvitationsView',
     setup: ->
@@ -32,6 +32,12 @@ define [
     model = new RosterUser( enrollments: [enrollment] )
     model.currentRole = 'student'
     new InvitationsView(model: model)
+
+  test 'it should be accessible', (assert) ->
+    enrollment = {id: 1, role: 'student', enrollment_state: 'invited'}
+    view = buildView enrollment
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'knows when invitation is pending', ->
     enrollment = {id: 1, role: 'student', enrollment_state: 'invited'}

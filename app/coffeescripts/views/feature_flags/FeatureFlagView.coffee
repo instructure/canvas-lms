@@ -18,7 +18,7 @@
 define [
   'jquery'
   'Backbone'
-  'compiled/views/feature_flags/FeatureFlagDialog'
+  '../feature_flags/FeatureFlagDialog'
   'jst/feature_flags/featureFlag'
 ], ($, Backbone, FeatureFlagDialog, template) ->
 

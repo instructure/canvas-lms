@@ -17,8 +17,8 @@
 
 define [
   'Backbone'
-  'compiled/models/ContentMigrationProgress'
-  'compiled/collections/ContentMigrationIssueCollection'
+  '../models/ContentMigrationProgress'
+  '../collections/ContentMigrationIssueCollection'
 ], (Backbone, ProgressModel, IssuesCollection) ->
 
   # Summary

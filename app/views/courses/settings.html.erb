@@ -32,10 +32,12 @@
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 
   is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
+  blueprint_subscription = @context.master_course_subscriptions.active.first
+  master_course = blueprint_subscription&.master_template&.course
 %>
 
 <% content_for :right_side do %>
-  <%= render :partial => 'settings_sidebar' %>
+  <%= render :partial => 'settings_sidebar', :locals => { :blueprint_subscription => blueprint_subscription } %>
 <% end %>
 
 <h1 class="screenreader-only"><%= t 'course_settings_title', "Course Settings" %></h1>
@@ -122,10 +124,19 @@
       <tr>
         <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
         <td class="nobr">
-          <% if can_manage_master_courses %>
-            <div id="blueprint_menu"></div>
+          <% if master_course %>
+            <% if master_course.grants_right? @current_user, session, :read %>
+              <a href="<%= course_url(master_course) %>"><%= master_course.nickname_for(@current_user) %></a>
+            <% else %>
+              <%= master_course.nickname_for(@current_user) %>
+            <% end %>
+            (courses/<%= master_course.id %>)
           <% else %>
-            <span id="course_blueprint"><%= is_master_course ? t("Yes") : t("No") %></span>
+            <% if can_manage_master_courses %>
+              <div id="blueprint_menu"></div>
+            <% else %>
+              <span id="course_blueprint"><%= is_master_course ? t("Yes") : t("No") %></span>
+            <% end %>
           <% end %>
         </td>
       </tr>
@@ -169,7 +180,7 @@
             <% account_chain = @context.account.account_chain.reverse %>
             <% account_chain.each do |account| %>
               <% if can_do(account, @current_user, :manage_courses) %>
-                <% if account.root_account? && account.all_accounts.count > Setting.get('course_settings_sub_account_dropdown_limit', '500').to_i %>
+                <% if account.root_account? && account.all_accounts.active.count > Setting.get('course_settings_sub_account_dropdown_limit', '500').to_i %>
                   <a href="<%= context_url(account, :context_sub_accounts_url, :format => :json, :include_self => "1") %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
                   <input type="hidden" name="course[account_id]" id="course_account_id" value="<%= @context.account_id %>"/>
                   <input type="text" name="account[name]" id="course_account_id_lookup" value="<%= @context.account.name %>" style="width: 150px;"/>
@@ -609,12 +620,9 @@
             <%= tab[:label] %>
             <div class="admin-links">
               <a class="al-trigger al-trigger-gray" role="button" href="#">
-                <i class="icon-settings"></i>
-                <i class="icon-mini-arrow-down"></i>
+                <i class="icon-more" aria-hidden="true"></i>
                 <span class="screenreader-only">
-                  <span class="screenreader-only">
-                    <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
-                  </span>
+                  <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
                 </span>
               </a>
 
@@ -650,9 +658,9 @@
             <%= tab[:label] %>
             <div class="admin-links">
                 <a class="al-trigger al-trigger-gray" role="button" href="#">
-                  <i class="icon-settings"></i>
-                  <i class="icon-mini-arrow-down"></i>
-                  <span class="screenreader-only"><%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %></span>
+                  <i class="icon-more" aria-hidden="true"></i>
+                  <span class="screenreader-only"><%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
+                  </span>
                 </a>
 
                 <ul id="content-2" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-3">

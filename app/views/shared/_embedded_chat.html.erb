@@ -30,15 +30,27 @@
 
     var data = JSON.parse(event.data)
 
-    if (data.request_launch_url) {
-      event.source.postMessage(JSON.stringify({launch_url: iframe.getAttribute('data-launch-url')}), '*');
+    if(data.subject === 'betterchat.is_mini_chat') {
+      event.source.postMessage(
+        JSON.stringify({is_mini_chat: <%= embedded_chat_visible.to_json.html_safe %>}
+      ), '*');
       return;
     }
 
-      if (data.quicklaunch) {
-        event.source.postMessage(JSON.stringify({quicklaunch: <%= embedded_chat_quicklaunch_params.to_json.html_safe %>}), '*');
-        return;
-      }
+    if (data.request_launch_url) {
+      event.source.postMessage(
+        JSON.stringify({launch_url: iframe.getAttribute('data-launch-url')}
+      ), '*');
+      return;
+    }
+
+    if (data.quicklaunch) {
+      event.source.postMessage(
+        JSON.stringify({quicklaunch: <%= embedded_chat_quicklaunch_params.to_json.html_safe %>}
+      ), '*');
+      return;
+    }
+
     if (!data.width && data.width !== 0) {return;}
     if (data.width > document.documentElement.clientWidth / 2) {return;}
     iframe.style.width = data.width+'px';

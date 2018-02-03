@@ -132,14 +132,13 @@
                 </span>
               </a>
             </span>
-
           <% elsif can_do(@submission, @current_user, :view_turnitin_report) &&
             (turnitin_score = @submission.originality_data[attachment.asset_string]) &&
             (@submission.originality_data[:provider] == nil || @submission.originality_reports.present?) &&
             turnitin_score[:similarity_score] %>
             <span class="turnitin_score_container">
               <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
-              <% if @submission.originality_reports.blank? %>
+              <% if !@submission.has_originality_report? %>
                 <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" title="Similarity score -- more information" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
               <% else %>
                 <a href="<%= polymorphic_url([@context, @assignment, @submission, :originality_report], asset_string: attachment.asset_string) %>" target="_blank" title="Similarity score -- more information" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>

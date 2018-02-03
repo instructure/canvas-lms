@@ -23,6 +23,7 @@
 # is switched to Psych. Otherwise we
 # won't have access to (safe|unsafe)_load.
 require 'yaml'
+require 'date' if RUBY_VERSION >= "2.5.0"
 require 'safe_yaml'
 
 module FixSafeYAMLNullMerge
@@ -74,13 +75,6 @@ SafeYAML::OPTIONS.merge!(
 
 module Syckness
   TAG = "#GETDOWNWITHTHESYCKNESS\n"
-end
-
-[Object, Hash, Struct, Array, Exception, String, Symbol, Range, Regexp, Time,
-  Date, Integer, Float, Rational, Complex, TrueClass, FalseClass, NilClass].each do |klass|
-  klass.class_eval do
-    alias :to_yaml :psych_to_yaml
-  end
 end
 
 SafeYAML::PsychResolver.class_eval do

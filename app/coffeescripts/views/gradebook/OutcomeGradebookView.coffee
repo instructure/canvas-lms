@@ -21,11 +21,12 @@ define [
   'underscore'
   'Backbone'
   'vendor/slickgrid'
-  'compiled/gradebook/OutcomeGradebookGrid'
-  'compiled/views/gradebook/CheckboxView'
-  'compiled/views/gradebook/SectionMenuView'
+  '../../gradebook/OutcomeGradebookGrid'
+  '../gradebook/CheckboxView'
+  '../gradebook/SectionMenuView'
   'jst/gradebook/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
+  '../../jquery.rails_flash_notifications'
   'jquery.instructure_misc_plugins'
 ], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 
@@ -197,7 +198,9 @@ define [
     #
     # Returns nothing.
     _loadPage: (url, outcomes) ->
-      dfd  = $.getJSON(url)
+      dfd  = $.getJSON(url).fail((e) ->
+        $.flashError(I18n.t('There was an error fetching outcome results'))
+      )
       dfd.then (response, status, xhr) =>
         outcomes = @_mergeResponses(outcomes, response)
         if response.meta.pagination.next

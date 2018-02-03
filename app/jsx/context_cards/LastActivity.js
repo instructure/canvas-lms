@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
-import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
+import FriendlyDatetime from '../shared/FriendlyDatetime'
 
   class LastActivity extends React.Component {
     static propTypes = {

@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!load_bank'
 import $ from 'jquery'
-import addBank from 'jsx/quizzes/question_bank/addBank'
+import addBank from '../../quizzes/question_bank/addBank'
 import 'jquery.ajaxJSON' /* ajaxJSON */
 import 'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'

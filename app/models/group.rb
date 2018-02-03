@@ -71,6 +71,8 @@ class Group < ActiveRecord::Base
 
   after_create :refresh_group_discussion_topics
 
+  after_update :clear_cached_short_name, :if => :name_changed?
+
   delegate :time_zone, :to => :context
 
   include StickySisFields

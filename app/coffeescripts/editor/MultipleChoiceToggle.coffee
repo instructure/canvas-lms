@@ -18,7 +18,7 @@
 define [
   'jquery',
   'str/htmlEscape',
-  'compiled/editor/EditorToggle',
+  '../editor/EditorToggle',
   'jsx/shared/rce/RceCommandShim'
   ], ($, htmlEscape, EditorToggle, RceCommandShim) ->
 

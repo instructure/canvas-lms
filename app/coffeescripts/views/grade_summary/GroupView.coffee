@@ -19,8 +19,8 @@ define [
   'i18n!outcomes'
   'Backbone'
   'underscore'
-  'compiled/views/CollectionView'
-  'compiled/views/grade_summary/OutcomeView'
+  '../CollectionView'
+  './OutcomeView'
   'jst/grade_summary/group'
 ], (I18n, {View, Collection}, _, CollectionView, OutcomeView, template) ->
 

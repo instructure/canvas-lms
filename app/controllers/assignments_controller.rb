@@ -111,6 +111,7 @@ class AssignmentsController < ApplicationController
           !@current_user_submission.graded? &&
           !@current_user_submission.submission_type
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
+        @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
       end
 
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)

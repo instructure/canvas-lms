@@ -153,15 +153,6 @@ function handleYoutubeLink () {
           .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
           .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
       }).end()
-        .find("a.instructure_file_link").each(function() {
-            var $link = $(this),
-                $span = $("<span class='instructure_file_link_holder link_holder'/>");
-            $link.removeClass('instructure_file_link').before($span).appendTo($span);
-            if($link.attr('target') != '_blank') {
-          $span.append("<a href='" + htmlEscape($link.attr('href')) + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
-              "' style='padding-left: 5px;'><img src='/images/popout.png' alt='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) + "'/></a>");
-        }
-      });
     if ($.filePreviewsEnabled()) {
       $("a.instructure_scribd_file").not(".inline_disabled").each(function() {
         var $link = $(this);

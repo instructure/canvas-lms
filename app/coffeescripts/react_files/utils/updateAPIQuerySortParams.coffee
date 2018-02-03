@@ -18,7 +18,7 @@
 define [
   'underscore'
   'jquery'
-  'compiled/util/deparam'
+  '../../util/deparam'
 ], (_, {param}, deparam) ->
 
   # if you change which column to order by or wheather to to sort asc or desc,

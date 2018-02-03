@@ -160,13 +160,13 @@ describe GroupCategory do
 
   context 'destroy' do
     it "should not remove the database row" do
-      category = GroupCategory.create(name: "foo")
+      category = GroupCategory.create(name: "foo", course: @course)
       category.destroy
       expect{ GroupCategory.find(category.id) }.not_to raise_error
     end
 
     it "should set deleted_at upon destroy" do
-      category = GroupCategory.create(name: "foo")
+      category = GroupCategory.create(name: "foo", course: @course)
       category.destroy
       category.reload
       expect(category.deleted_at?).to eq true
@@ -624,6 +624,47 @@ describe GroupCategory do
       expect(group.leader).to eq @student
     end
   end
+
+  it 'should set root_account_id when created' do
+    group_category = GroupCategory.create!(name: 'Test', account: account)
+    group_category_course = GroupCategory.create!(name: 'Test', course: @course)
+
+    expect(group_category.root_account_id).to eq(account.id)
+    expect(group_category_course.root_account_id).to eq(account.id)
+  end
+
+  it 'should require a group category to belong to an account or course' do
+    expect {
+      GroupCategory.create!(name: 'Test') # don't provide an account or course; should fail
+    }.to raise_error(ActiveRecord::RecordInvalid)
+
+    gc = GroupCategory.create(name: 'Test')
+    expect(gc.errors.full_messages).to include('Context Must have an account or course ID')
+    expect(gc.errors.full_messages).to include('Context type Must belong to an account or course')
+  end
+
+  it 'should make sure sis_batch_id is valid' do
+    expect {
+      GroupCategory.create!(name: 'Test', account: account, sis_batch_id: 1)
+    }.to raise_error(ActiveRecord::InvalidForeignKey)
+
+    sis_batch = SisBatch.create!(account: account)
+    gc = GroupCategory.create!(name: 'Test2', account: account, sis_batch: sis_batch)
+    expect(gc.sis_batch_id).to eq(sis_batch.id)
+  end
+
+  it 'should make sure sis_source_id is unique per root_account' do
+    GroupCategory.create!(name: 'Test', account: account, sis_source_id: '1')
+
+    expect {
+      GroupCategory.create!(name: 'Test2', account: account, sis_source_id: '1')
+    }.to raise_error(ActiveRecord::RecordInvalid)
+
+    new_account = Account.create
+    gc = GroupCategory.create!(name: 'Test3', account: new_account, sis_source_id: 1)
+    expect(gc.sis_source_id).to eq('1')
+  end
+
 end
 
 def assert_random_group_assignment(category, course, initial_spread, result_spread, opts={})

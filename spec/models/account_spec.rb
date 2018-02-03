@@ -141,9 +141,9 @@ describe Account do
         expect(@account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T003").first}).map(&:sis_source_id).sort).to eq ["C005", "C006", "C007", "C008", "C009", "C005S", "C006S", "C007S", "C008S", "C009S"].sort
       end
 
-      it "don't double-count cross-listed courses" do
-        def check_account(account, expected_length, expected_course_names)
-          actual_courses = account.fast_all_courses
+      it "counting cross-listed courses only if requested" do
+        def check_account(account, include_crosslisted_courses, expected_length, expected_course_names)
+          actual_courses = account.fast_all_courses({ :include_crosslisted_courses => include_crosslisted_courses })
           expect(actual_courses.length).to eq expected_length
           actual_course_names = actual_courses.pluck("name").sort!
           expect(actual_course_names).to eq(expected_course_names.sort!)
@@ -156,8 +156,10 @@ describe Account do
         course_b = course_factory({ :account => account_b, :course_name => "course_b" })
         course_b.course_sections.create!({ :name => "section_b" })
         course_b.course_sections.first.crosslist_to_course(course_a)
-        check_account(account_a, 1, ["course_a"])
-        check_account(account_b, 1, ["course_b"])
+        check_account(account_a, false, 1, ["course_a"])
+        check_account(account_a, true, 1, ["course_a"])
+        check_account(account_b, false, 1, ["course_b"])
+        check_account(account_b, true, 2, ["course_a", "course_b"])
       end
 
       it "should list associated nonenrollmentless courses" do

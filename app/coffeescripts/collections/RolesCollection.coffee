@@ -18,7 +18,7 @@
 define [
   'Backbone'
   'underscore'
-  'compiled/models/Role'
+  '../models/Role'
 ], (Backbone, _, Role) ->
   class RolesCollection extends Backbone.Collection
     model: Role

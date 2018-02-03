@@ -18,8 +18,8 @@
 define [
   'i18n!GroupUserCollection'
   'jquery'
-  'compiled/collections/PaginatedCollection'
-  'compiled/models/GroupUser'
+  '../collections/PaginatedCollection'
+  '../models/GroupUser'
   'str/htmlEscape'
 ], (I18n, $, PaginatedCollection, GroupUser, h) ->
 

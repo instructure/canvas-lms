@@ -18,8 +18,8 @@
 define [
   'i18n!outcomes'
   'jquery'
-  'compiled/models/OutcomeGroup'
-  'compiled/views/outcomes/FindDialog'
+  '../../models/OutcomeGroup'
+  '../outcomes/FindDialog'
   'edit_rubric'
 ], (I18n, $, OutcomeGroup, FindDialog, rubricEditing) ->
 
