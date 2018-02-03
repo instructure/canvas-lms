@@ -3670,10 +3670,11 @@ describe Assignment do
     end
     it "should include assignments where unlock_at is in the past and lock_at is future" do
       @quiz.unlock_at = 1.day.ago
+      @quiz.due_at = 1.hour.ago
       @quiz.lock_at = 1.day.from_now
       @quiz.save!
       list = Assignment.not_locked.to_a
-      expect(list.size).to eql 1
+      expect(list.size).to be 1
       expect(list.first.title).to eql 'Test Assignment'
     end
     it "should not include assignments where unlock_at is in future" do

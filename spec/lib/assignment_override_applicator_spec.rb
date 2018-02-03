@@ -883,14 +883,14 @@ describe AssignmentOverrideApplicator do
 
     it "should use raw UTC time for datetime fields" do
       Time.zone = 'Alaska'
-      @assignment = create_assignment(
-        :due_at => 5.days.from_now,
-        :unlock_at => 6.days.from_now,
-        :lock_at => 7.days.from_now)
+      @assignment = create_assignment(due_at: 5.days.from_now, unlock_at: 4.days.from_now, lock_at: 7.days.from_now)
       collapsed = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [])
-      expect(collapsed[:due_at].class).to eq Time; expect(collapsed[:due_at]).to eq @assignment.due_at.utc
-      expect(collapsed[:unlock_at].class).to eq Time; expect(collapsed[:unlock_at]).to eq @assignment.unlock_at.utc
-      expect(collapsed[:lock_at].class).to eq Time; expect(collapsed[:lock_at]).to eq @assignment.lock_at.utc
+      expect(collapsed[:due_at].class).to eq Time
+      expect(collapsed[:due_at]).to eq @assignment.due_at.utc
+      expect(collapsed[:unlock_at].class).to eq Time
+      expect(collapsed[:unlock_at]).to eq @assignment.unlock_at.utc
+      expect(collapsed[:lock_at].class).to eq Time
+      expect(collapsed[:lock_at]).to eq @assignment.lock_at.utc
     end
 
     it "should not use raw UTC time for date fields" do

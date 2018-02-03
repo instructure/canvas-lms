@@ -656,6 +656,106 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    describe "updating an assignment with locked ranges" do
+      before :once do
+        course_with_teacher(:active_all => true)
+      end
+
+      it 'should not allow updating due date to invalid lock range' do
+        json = api_create_assignment_in_course(@course, {name: 'aaron assignment'})
+        @assignment = Assignment.find(json['id'])
+        @assignment.unlock_at = 1.week.ago
+        @assignment.lock_at = 3.days.ago
+        @assignment.save!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {controller: 'assignments_api', action: 'update', format: 'json',
+                  course_id: @course.id.to_s, id: @assignment.to_param},
+                 {assignment: {due_at: 2.days.ago.iso8601}}, {}, {expected_status: 400})
+      end
+
+      it 'should allow updating due date to invalid lock range if lock range is also updated' do
+        json = api_create_assignment_in_course(@course, {name: 'aaron assignment'})
+        @assignment = Assignment.find(json['id'])
+        @assignment.unlock_at = 1.week.ago
+        @assignment.lock_at = 3.days.ago
+        @assignment.save!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {controller: 'assignments_api', action: 'update', format: 'json',
+                  course_id: @course.id.to_s, id: @assignment.to_param},
+                 {assignment: {unlock_at: 4.days.ago.iso8601, lock_at: 1.day.ago.iso8601,
+                               due_at: 2.days.ago.iso8601}}, {}, {expected_status: 200})
+      end
+
+      it "should allow assignment update due_date within locked range" do
+        json = api_create_assignment_in_course(@course, {name: 'aaron assignment'})
+        @assignment = Assignment.find(json['id'])
+        @assignment.unlock_at = Time.zone.parse("2011-01-02T00:00:00Z")
+        @assignment.lock_at = Time.zone.parse("2011-01-10T00:00:00Z")
+        @assignment.save!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {controller: 'assignments_api', action: 'update', format: 'json',
+                  course_id: @course.id.to_s, id: @assignment.to_param},
+                 {assignment: {due_at: "2011-01-05T00:00:00Z"}}, {},
+                 {expected_status: 200})
+      end
+
+      it "should not allow assignment update due_date before locked range" do
+        json = api_create_assignment_in_course(@course, {'name' => 'my assignment'})
+        @assignment = Assignment.find(json['id'])
+        @assignment.unlock_at = Time.zone.parse("2011-01-02T00:00:00Z")
+        @assignment.lock_at = Time.zone.parse("2011-01-10T00:00:00Z")
+        @assignment.save!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {controller: 'assignments_api', action: 'update', format: 'json',
+                  course_id: @course.id.to_s, id: @assignment.to_param},
+                 {assignment: {due_at: "2011-01-01T00:00:00Z"}}, {},
+                 {expected_status: 400})
+      end
+
+      it "should allow assignment update due_date with no locked ranges" do
+        json = api_create_assignment_in_course(@course, {'name' => 'blerp assignment'})
+        @assignment = Assignment.find(json['id'])
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {controller: 'assignments_api', action: 'update', format: 'json',
+                  course_id: @course.id.to_s, id: @assignment.to_param},
+                 {assignment: {due_at: "2011-01-01T00:00:00Z"}}, {},
+                 {expected_status: 200})
+      end
+
+      it "should not allow assignment update due_date after locked range" do
+        json = api_create_assignment_in_course(@course, {'name' => 'wow assignment'})
+        @assignment = Assignment.find(json['id'])
+        @assignment.unlock_at = Time.zone.parse("2011-01-02T00:00:00Z")
+        @assignment.lock_at = Time.zone.parse("2011-01-10T00:00:00Z")
+        @assignment.save!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {controller: 'assignments_api', action: 'update', format: 'json',
+                  course_id: @course.id.to_s, id: @assignment.to_param},
+                 {assignment: {due_at: "2012-01-01T00:00:00Z"}}, {},
+                 {expected_status: 400})
+      end
+
+      it "should allow assignment update due_date on locked range" do
+        json = api_create_assignment_in_course(@course, {'name' => 'cool assignment'})
+        @assignment = Assignment.find(json['id'])
+        @assignment.unlock_at = Time.zone.parse("2011-01-01T00:00:00Z")
+        @assignment.lock_at = Time.zone.parse("2011-01-10T00:00:00Z")
+        @assignment.save!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                 {controller: 'assignments_api', action: 'update', format: 'json',
+                  course_id: @course.id.to_s, id: @assignment.to_param},
+                 {assignment: {due_at: "2011-01-01T00:00:00Z"}}, {},
+                 {expected_status: 200})
+      end
+    end
+
     describe "differentiated assignments" do
       def setup_DA
         @course_section = @course.course_sections.create
@@ -947,9 +1047,6 @@ describe AssignmentsApiController, type: :request do
   end
 
   describe "GET /users/:user_id/courses/:course_id/assignments (#user_index)" do
-    before :once do
-      course_with_teacher(:active_all => true)
-    end
 
     it "returns data for user calling on self" do
       course_with_student_submissions(:active_all => true)
@@ -972,19 +1069,10 @@ describe AssignmentsApiController, type: :request do
       # unpublished course with invited student
       course_with_student
       expect(@course.grants_right?(@student, :read)).to be_falsey
-      api_call(:get,
-               "/api/v1/users/#{@student.id}/courses/#{@course.id}/assignments",
-               {
-                   :controller => 'assignments_api',
-                   :action => 'user_index',
-                   :format => 'json',
-                   :course_id=> @course.id,
-                   :user_id=> @student.id.to_s
-               },
-               {},
-               {},
-               {:expected_status => 401}
-              )
+      api_call(:get, "/api/v1/users/#{@student.id}/courses/#{@course.id}/assignments",
+               {controller: 'assignments_api', action: 'user_index',
+                format: 'json', course_id: @course.id, user_id: @student.id.to_s},
+               {}, {}, {expected_status: 401})
     end
 
     it "returns data for for teacher who can read target student data" do
@@ -1000,7 +1088,7 @@ describe AssignmentsApiController, type: :request do
       student = student_in_section(section)
       ta = ta_in_section(section)
 
-      json = api_get_assignments_user_index(student, @course, ta)
+      api_get_assignments_user_index(student, @course, ta)
       expect(response).to be_success
     end
 
@@ -1011,19 +1099,10 @@ describe AssignmentsApiController, type: :request do
       student = student_in_section(s1)
       ta = ta_in_section(s2)
 
-      api_call_as_user(ta, :get,
-               "/api/v1/users/#{student.id}/courses/#{@course.id}/assignments",
-               {
-                   :controller => 'assignments_api',
-                   :action => 'user_index',
-                   :format => 'json',
-                   :course_id=> @course.id,
-                   :user_id=> student.id.to_s
-               },
-               {},
-               {},
-               {:expected_status => 401}
-              )
+      api_call_as_user(ta, :get, "/api/v1/users/#{student.id}/courses/#{@course.id}/assignments",
+                       {controller: 'assignments_api', action: 'user_index', format: 'json',
+                        course_id: @course.id, user_id: student.id.to_s}, {}, {},
+                       {expected_status: 401})
     end
   end
 
@@ -1177,7 +1256,7 @@ describe AssignmentsApiController, type: :request do
         'points_possible' => '12',
         'due_at' => '2011-01-01T00:00:00Z',
         'lock_at' => '2011-01-03T00:00:00Z',
-        'unlock_at' => '2011-12-31T00:00:00Z',
+        'unlock_at' => '2010-12-31T00:00:00Z',
         'description' => 'assignment description',
         'assignment_group_id' => group.id,
         'submission_types' => [
@@ -1983,39 +2062,40 @@ describe AssignmentsApiController, type: :request do
 
         it "allows setting the due date in an open grading period" do
           due_date = 3.days.from_now.iso8601
-          call_create({ due_at: due_date }, 201)
+          call_create({due_at: due_date, lock_at: nil, unlock_at: nil}, 201)
           expect(@course.assignments.last.due_at).to eq due_date
         end
 
         it "does not allow setting the due date in a closed grading period" do
-          call_create({ due_at: 3.days.ago.iso8601 }, 403)
+          call_create({ due_at: 3.days.ago.iso8601, lock_at: nil, unlock_at: nil}, 403)
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "due_at"
         end
 
         it "allows setting the due date in a closed grading period when only visible to overrides" do
           due_date = 3.days.ago.iso8601
-          call_create({ due_at: due_date, only_visible_to_overrides: true }, 201)
+          call_create({due_at: due_date, lock_at: nil, unlock_at: nil, only_visible_to_overrides: true}, 201)
           expect(@course.assignments.last.due_at).to eq due_date
         end
 
         it "does not allow a nil due date when the last grading period is closed" do
-          call_create({ due_at: nil }, 403)
+          call_create({due_at: nil}, 403)
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "due_at"
         end
 
         it "does not allow setting an override due date in a closed grading period" do
-          override_params = [{ student_ids: [@student.id], due_at: 3.days.ago.iso8601 }]
-          params = { due_at: 3.days.from_now.iso8601, assignment_overrides: override_params }
+          override_params = [{student_ids: [@student.id], due_at: 3.days.ago.iso8601, lock_at: nil, unlock_at: nil}]
+          params = {due_at: 3.days.from_now.iso8601, assignment_overrides: override_params}
           call_create(params, 403)
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "due_at"
         end
 
         it "does not allow a nil override due date when the last grading period is closed" do
-          override_params = [{ student_ids: [@student.id], due_at: nil }]
-          params = { due_at: 3.days.from_now.iso8601, assignment_overrides: override_params }
+          override_params = [{student_ids: [@student.id], due_at: nil}]
+          params = {due_at: 3.days.from_now.iso8601, assignment_overrides: override_params,
+                    lock_at: nil, unlock_at: nil}
           call_create(params, 403)
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "due_at"
@@ -2023,12 +2103,12 @@ describe AssignmentsApiController, type: :request do
 
         it "allows a due date in a closed grading period when the assignment is not graded" do
           due_date = 3.days.ago.iso8601
-          call_create({ due_at: due_date, submission_types: "not_graded" }, 201)
+          call_create({due_at: due_date, lock_at: nil, unlock_at: nil, submission_types: "not_graded"}, 201)
           expect(@course.assignments.last.due_at).to eq due_date
         end
 
         it "allows a nil due date when not graded and the last grading period is closed" do
-          call_create({ due_at: nil, submission_types: "not_graded" }, 201)
+          call_create({due_at: nil, submission_types: "not_graded"}, 201)
           expect(@course.assignments.last.due_at).to be_nil
         end
       end
@@ -2040,7 +2120,7 @@ describe AssignmentsApiController, type: :request do
 
         it "allows setting the due date in a closed grading period" do
           due_date = 3.days.ago.iso8601
-          call_create({ due_at: due_date }, 201)
+          call_create({ due_at: due_date, lock_at: nil, unlock_at: nil }, 201)
           json = JSON.parse response.body
           expect(json["due_at"]).to eq due_date
         end

@@ -23,19 +23,19 @@ describe ContentMigration do
 
     describe "date shifting" do
       before :once do
-        @old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
-        @new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
+        @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
+        @new_start = Time.zone.parse("05 Aug 2012 06:00:00 UTC +00:00")
 
         @copy_from.require_assignment_group
-        @copy_from.assignments.create!(:due_at => @old_start + 1.day,
-                                       :unlock_at => @old_start + 2.days,
-                                       :lock_at => @old_start + 3.days,
-                                       :peer_reviews_due_at => @old_start + 4.days
-        )
+        @copy_from.assignments.create!(due_at: @old_start + 1.day,
+                                       unlock_at: @old_start - 2.days,
+                                       lock_at: @old_start + 3.days,
+                                       peer_reviews_due_at: @old_start + 4.days)
 
-        att = Attachment.create!(:context => @copy_from, :filename => 'hi.txt',
-          :uploaded_data => StringIO.new("stuff"), :folder => Folder.unfiled_folder(@copy_from))
-        att.unlock_at = @old_start + 2.days
+        att = Attachment.create!(context: @copy_from, filename: 'hi.txt',
+                                 uploaded_data: StringIO.new("stuff"),
+                                 folder: Folder.unfiled_folder(@copy_from))
+        att.unlock_at = @old_start - 2.days
         att.lock_at = @old_start + 3.days
         att.save!
 
@@ -65,12 +65,12 @@ describe ContentMigration do
       it "should shift dates" do
         skip unless Qti.qti_enabled?
         options = {
-                :everything => true,
-                :shift_dates => true,
-                :old_start_date => 'Jul 1, 2012',
-                :old_end_date => 'Jul 11, 2012',
-                :new_start_date => 'Aug 5, 2012',
-                :new_end_date => 'Aug 15, 2012'
+          everything: true,
+          shift_dates: true,
+          old_start_date: 'Jul 1, 2012',
+          old_end_date: 'Jul 11, 2012',
+          new_start_date: 'Aug 5, 2012',
+          new_end_date: 'Aug 15, 2012'
         }
         @cm.copy_options = options
         @cm.save!
@@ -79,12 +79,12 @@ describe ContentMigration do
 
         new_asmnt = @copy_to.assignments.first
         expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
 
         new_att = @copy_to.attachments.first
-        expect(new_att.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_att.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_att.lock_at.to_i).to eq (@new_start + 3.day).to_i
 
         new_quiz = @copy_to.quizzes.first
@@ -115,12 +115,12 @@ describe ContentMigration do
       it "infers a sensible end date if not provided" do
         skip unless Qti.qti_enabled?
         options = {
-                :everything => true,
-                :shift_dates => true,
-                :old_start_date => 'Jul 1, 2012',
-                :old_end_date => nil,
-                :new_start_date => 'Aug 5, 2012',
-                :new_end_date => nil
+          everything: true,
+          shift_dates: true,
+          old_start_date: 'Jul 1, 2012',
+          old_end_date: nil,
+          new_start_date: 'Aug 5, 2012',
+          new_end_date: nil
         }
         @cm.copy_options = options
         @cm.save!
@@ -129,7 +129,7 @@ describe ContentMigration do
 
         new_asmnt = @copy_to.assignments.first
         expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
       end
@@ -137,12 +137,12 @@ describe ContentMigration do
       it "ignores a bad end date" do
         skip unless Qti.qti_enabled?
         options = {
-                :everything => true,
-                :shift_dates => true,
-                :old_start_date => 'Jul 1, 2012',
-                :old_end_date => nil,
-                :new_start_date => 'Aug 5, 2012',
-                :new_end_date => 'Jul 4, 2012'
+          everything: true,
+          shift_dates: true,
+          old_start_date: 'Jul 1, 2012',
+          old_end_date: nil,
+          new_start_date: 'Aug 5, 2012',
+          new_end_date: 'Jul 4, 2012'
         }
         @cm.copy_options = options
         @cm.save!
@@ -151,7 +151,7 @@ describe ContentMigration do
 
         new_asmnt = @copy_to.assignments.first
         expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
       end
@@ -159,8 +159,8 @@ describe ContentMigration do
       it "should remove dates" do
         skip unless Qti.qti_enabled?
         options = {
-            :everything => true,
-            :remove_dates => true,
+          everything: true,
+          remove_dates: true,
         }
         @cm.copy_options = options
         @cm.save!
@@ -205,8 +205,8 @@ describe ContentMigration do
 
       it "should not create broken assignments from unpublished quizzes" do
         options = {
-            :everything => true,
-            :remove_dates => true,
+          everything: true,
+          remove_dates: true,
         }
         @cm.copy_options = options
         @cm.save!
@@ -217,8 +217,8 @@ describe ContentMigration do
       end
     end
 
-    context "should copy time correctly across daylight saving shift" do
-      let(:local_time_zone) { ActiveSupport::TimeZone.new 'America/Denver' }
+    context "when crossing daylight saving shift" do
+      let(:local_time_zone) {ActiveSupport::TimeZone.new 'America/Denver'}
 
       def copy_assignment(options = {})
         account = @copy_to.account
@@ -232,12 +232,12 @@ describe ContentMigration do
           assignment.save!
 
           opts = {
-                  :everything => true,
-                  :shift_dates => true,
-                  :old_start_date => old_start_date,
-                  :old_end_date => old_end_date,
-                  :new_start_date => new_start_date,
-                  :new_end_date => new_end_date
+            everything: true,
+            shift_dates: true,
+            old_start_date: old_start_date,
+            old_end_date: old_end_date,
+            new_start_date: new_start_date,
+            new_end_date: new_end_date
           }
           opts[:time_zone] = options[:time_zone].name if options.include?(:time_zone)
           @cm.copy_options = @cm.copy_options.merge(opts)
@@ -253,109 +253,109 @@ describe ContentMigration do
         account.save!
       end
 
-      context "from MST to MDT" do
-        let(:old_date)       { local_time_zone.local(2012, 1, 6, 12, 0) } # 6 Jan 2012 12:00
-        let(:new_date)       { local_time_zone.local(2012, 4, 6, 12, 0) } # 6 Apr 2012 12:00
-        let(:old_start_date) { 'Jan 1, 2012' }
-        let(:old_end_date)   { 'Jan 15, 2012' }
-        let(:new_start_date) { 'Apr 1, 2012' }
-        let(:new_end_date)   { 'Apr 15, 2012' }
+      context "when MST to MDT" do
+        let(:old_date) {local_time_zone.local(2012, 1, 6, 12, 0)} # 6 Jan 2012 12:00
+        let(:new_date) {local_time_zone.local(2012, 4, 6, 12, 0)} # 6 Apr 2012 12:00
+        let(:old_start_date) {'Jan 1, 2012'}
+        let(:old_end_date) {'Jan 15, 2012'}
+        let(:new_start_date) {'Apr 1, 2012'}
+        let(:new_end_date) {'Apr 15, 2012'}
 
         it "using an explicit time zone" do
           expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
-          expect(@copy_to.start_at.utc).to eq Time.parse('2012-04-01 06:00:00 UTC')
-          expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-04-15 06:00:00 UTC')
+          expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 06:00:00 UTC')
+          expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 06:00:00 UTC')
         end
 
         it "using the account time zone" do
           expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
-          expect(@copy_to.start_at.utc).to eq Time.parse('2012-04-01 06:00:00 UTC')
-          expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-04-15 06:00:00 UTC')
+          expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 06:00:00 UTC')
+          expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 06:00:00 UTC')
         end
       end
 
-      context "from MDT to MST" do
-        let(:old_date)       { local_time_zone.local(2012, 9, 6, 12, 0) }  # 6 Sep 2012 12:00
-        let(:new_date)       { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
-        let(:old_start_date) { 'Sep 1, 2012' }
-        let(:old_end_date)   { 'Sep 15, 2012' }
-        let(:new_start_date) { 'Dec 1, 2012' }
-        let(:new_end_date)   { 'Dec 15, 2012' }
+      context "when MDT to MST" do
+        let(:old_date) {local_time_zone.local(2012, 9, 6, 12, 0)} # 6 Sep 2012 12:00
+        let(:new_date) {local_time_zone.local(2012, 12, 6, 12, 0)} # 6 Dec 2012 12:00
+        let(:old_start_date) {'Sep 1, 2012'}
+        let(:old_end_date) {'Sep 15, 2012'}
+        let(:new_start_date) {'Dec 1, 2012'}
+        let(:new_end_date) {'Dec 15, 2012'}
 
         it "using an explicit time zone" do
           expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
-          expect(@copy_to.start_at.utc).to eq Time.parse('2012-12-01 07:00:00 UTC')
-          expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-12-15 07:00:00 UTC')
+          expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 07:00:00 UTC')
+          expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 07:00:00 UTC')
         end
 
         it "using the account time zone" do
           expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
-          expect(@copy_to.start_at.utc).to eq Time.parse('2012-12-01 07:00:00 UTC')
-          expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-12-15 07:00:00 UTC')
+          expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 07:00:00 UTC')
+          expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 07:00:00 UTC')
         end
       end
 
-      context "parsing dates with times" do
+      context "when parsing dates with times" do
         context "from MST to MDT" do
-          let(:old_date)       { local_time_zone.local(2012, 1, 6, 12, 0) } # 6 Jan 2012 12:00
-          let(:new_date)       { local_time_zone.local(2012, 4, 6, 12, 0) } # 6 Apr 2012 12:00
-          let(:old_start_date) { '2012-01-01T01:00:00' }
-          let(:old_end_date)   { '2012-01-15T01:00:00' }
-          let(:new_start_date) { '2012-04-01T01:00:00' }
-          let(:new_end_date)   { '2012-04-15T01:00:00' }
+          let(:old_date) {local_time_zone.local(2012, 1, 6, 12, 0)} # 6 Jan 2012 12:00
+          let(:new_date) {local_time_zone.local(2012, 4, 6, 12, 0)} # 6 Apr 2012 12:00
+          let(:old_start_date) {'2012-01-01T01:00:00'}
+          let(:old_end_date) {'2012-01-15T01:00:00'}
+          let(:new_start_date) {'2012-04-01T01:00:00'}
+          let(:new_end_date) {'2012-04-15T01:00:00'}
 
           it "using an explicit time zone" do
             expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
-            expect(@copy_to.start_at.utc).to eq Time.parse('2012-04-01 07:00:00 UTC')
-            expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-04-15 07:00:00 UTC')
+            expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 07:00:00 UTC')
+            expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 07:00:00 UTC')
           end
 
           it "using the account time zone" do
             expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
-            expect(@copy_to.start_at.utc).to eq Time.parse('2012-04-01 07:00:00 UTC')
-            expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-04-15 07:00:00 UTC')
+            expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-04-01 07:00:00 UTC')
+            expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-04-15 07:00:00 UTC')
           end
         end
 
-        context "from MDT to MST" do
-          let(:old_date)       { local_time_zone.local(2012, 9, 6, 12, 0) }  # 6 Sep 2012 12:00
-          let(:new_date)       { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
-          let(:old_start_date) { '2012-09-01T01:00:00' }
-          let(:old_end_date)   { '2012-09-15T01:00:00' }
-          let(:new_start_date) { '2012-12-01T01:00:00' }
-          let(:new_end_date)   { '2012-12-15T01:00:00' }
+        context "when MDT to MST" do
+          let(:old_date) {local_time_zone.local(2012, 9, 6, 12, 0)} # 6 Sep 2012 12:00
+          let(:new_date) {local_time_zone.local(2012, 12, 6, 12, 0)} # 6 Dec 2012 12:00
+          let(:old_start_date) {'2012-09-01T01:00:00'}
+          let(:old_end_date) {'2012-09-15T01:00:00'}
+          let(:new_start_date) {'2012-12-01T01:00:00'}
+          let(:new_end_date) {'2012-12-15T01:00:00'}
 
           it "using an explicit time zone" do
             expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
-            expect(@copy_to.start_at.utc).to eq Time.parse('2012-12-01 08:00:00 UTC')
-            expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-12-15 08:00:00 UTC')
+            expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
+            expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
 
           it "using the account time zone" do
             expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
-            expect(@copy_to.start_at.utc).to eq Time.parse('2012-12-01 08:00:00 UTC')
-            expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-12-15 08:00:00 UTC')
+            expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
+            expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
         end
 
         context "with UTC date_shift parameters" do
-          let(:old_date)       { local_time_zone.local(2012, 9, 6, 12, 0) }  # 6 Sep 2012 12:00
-          let(:new_date)       { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
-          let(:old_start_date) { '2012-09-01T08:00:00Z' }
-          let(:old_end_date)   { '2012-09-15T08:00:00Z' }
-          let(:new_start_date) { '2012-12-01T08:00:00Z' }
-          let(:new_end_date)   { '2012-12-15T08:00:00Z' }
+          let(:old_date) {local_time_zone.local(2012, 9, 6, 12, 0)} # 6 Sep 2012 12:00
+          let(:new_date) {local_time_zone.local(2012, 12, 6, 12, 0)} # 6 Dec 2012 12:00
+          let(:old_start_date) {'2012-09-01T08:00:00Z'}
+          let(:old_end_date) {'2012-09-15T08:00:00Z'}
+          let(:new_start_date) {'2012-12-01T08:00:00Z'}
+          let(:new_end_date) {'2012-12-15T08:00:00Z'}
 
           it "using an explicit time zone" do
             expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
-            expect(@copy_to.start_at.utc).to eq Time.parse('2012-12-01 08:00:00 UTC')
-            expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-12-15 08:00:00 UTC')
+            expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
+            expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
 
           it "using the account time zone" do
             expect(new_date).to eq copy_assignment(:account_time_zone => local_time_zone)
-            expect(@copy_to.start_at.utc).to eq Time.parse('2012-12-01 08:00:00 UTC')
-            expect(@copy_to.conclude_at.utc).to eq Time.parse('2012-12-15 08:00:00 UTC')
+            expect(@copy_to.start_at.utc).to eq Time.zone.parse('2012-12-01 08:00:00 UTC')
+            expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
         end
       end
@@ -372,8 +372,8 @@ describe ContentMigration do
       @copy_from.reload
 
       @cm.copy_options = @cm.copy_options.merge(
-              :shift_dates => true,
-              :day_substitutions => {today.wday.to_s => (today.wday + 1).to_s}
+        :shift_dates => true,
+        :day_substitutions => {today.wday.to_s => (today.wday + 1).to_s}
       )
       @cm.save!
 
@@ -435,83 +435,86 @@ describe ContentMigration do
     it "should not break link resolution in quiz_data" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
-      topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<p>some text</p>")
+      topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<p>some text</p>")
 
       html = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"
 
-      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      data = {'question_name' => 'test question', 'question_type' => 'essay_question', 'question_text' => html}
-      aq = bank.assessment_questions.create!(:question_data => data)
+      bank = @copy_from.assessment_question_banks.create!(title: 'bank')
+      data = {question_name: 'test question', question_type: 'essay_question', question_text: html}
+      bank.assessment_questions.create!(question_data: data)
 
-      quiz = @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00")
-      qq = quiz.quiz_questions.create!(:question_data => data)
+      quiz = @copy_from.quizzes.create!(due_at: "05 Jul 2012 06:00:00 UTC +00:00")
+      quiz.quiz_questions.create!(question_data: data)
       quiz.generate_quiz_data
-      quiz.published_at = Time.now
+      quiz.published_at = Time.zone.now
       quiz.workflow_state = 'available'
       quiz.save!
 
       options = {
-        :everything => true,
-        :shift_dates => true,
-        :old_start_date => 'Jul 1, 2012',
-        :old_end_date => 'Jul 11, 2012',
-        :new_start_date => 'Aug 5, 2012',
-        :new_end_date => 'Aug 15, 2012'
+        everything: true,
+        shift_dates: true,
+        old_start_date: 'Jul 1, 2012',
+        old_end_date: 'Jul 11, 2012',
+        new_start_date: 'Aug 5, 2012',
+        new_end_date: 'Aug 15, 2012'
       }
       @cm.copy_options = options
       @cm.save!
 
       run_course_copy
 
-      topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
-      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
       data = quiz_to.quiz_data.to_yaml
-      expect(data).to_not include("LINK.PLACEHOLDER")
+      expect(data).not_to include("LINK.PLACEHOLDER")
       expect(data).to include("courses/#{@copy_to.id}/discussion_topics/#{topic_to.id}")
     end
 
     it "should work on all_day calendar events" do
-      @old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
-      @new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
+      @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
+      @new_start = Time.zone.parse("05 Aug 2012 06:00:00 UTC +00:00")
 
-      all_day_event = @copy_from.calendar_events.create!(:title => "an event",
-        :start_at => @old_start + 4.days, :all_day => true)
+      all_day_event = @copy_from.calendar_events.create!(title: "an event",
+                                                         start_at: @old_start + 4.days, all_day: true)
 
       options = {
-        :everything => true,
-        :shift_dates => true,
-        :old_start_date => 'Jul 1, 2012',
-        :old_end_date => 'Jul 11, 2012',
-        :new_start_date => 'Aug 5, 2012',
-        :new_end_date => 'Aug 15, 2012'
+        everything: true,
+        shift_dates: true,
+        old_start_date: 'Jul 1, 2012',
+        old_end_date: 'Jul 11, 2012',
+        new_start_date: 'Aug 5, 2012',
+        new_end_date: 'Aug 15, 2012'
       }
       @cm.copy_options = options
       @cm.save!
 
-      Account.default.tap{|a| a.default_time_zone = "America/Denver"; a.save!}
+      Account.default.tap do |a|
+        a.default_time_zone = "America/Denver"
+        a.save!
+      end
       run_course_copy
 
-      new_event = @copy_to.calendar_events.where(:migration_id => mig_id(all_day_event)).first
+      new_event = @copy_to.calendar_events.where(migration_id: mig_id(all_day_event)).first
       expect(new_event.all_day?).to be_truthy
       expect(new_event.all_day_date).to eq (@new_start + 4.days).to_date
     end
 
     it "should remove dates for all-day events" do
-      @old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
+      @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
 
-      all_day_event = @copy_from.calendar_events.create!(:title => "an event",
-        :start_at => @old_start + 4.days, :all_day => true)
+      all_day_event = @copy_from.calendar_events.create!(title: "an event",
+                                                         start_at: @old_start + 4.days, all_day: true)
 
       options = {
-        :everything => true,
-        :remove_dates => true
+        everything: true,
+        remove_dates: true
       }
       @cm.copy_options = options
       @cm.save!
 
       run_course_copy
 
-      new_event = @copy_to.calendar_events.where(:migration_id => mig_id(all_day_event)).first
+      new_event = @copy_to.calendar_events.where(migration_id: mig_id(all_day_event)).first
       expect(new_event.all_day?).to be_truthy
       expect(new_event.all_day_date).to be_nil
     end

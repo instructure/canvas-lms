@@ -42,7 +42,7 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def unlock_at
-    Time.zone.now.advance(days: -2)
+    Time.zone.now.advance(days: -7)
   end
 
   def lock_at
