@@ -490,7 +490,7 @@ class BzController < ApplicationController
     field_type = params[:type]
     answer = params[:answer]
     weight = params[:weight].blank? ? 1 : params[:weight].to_i
-    partial_credit_params = params[:partial_credit]
+    partial_credit_mode = params[:partial_credit]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
@@ -629,8 +629,22 @@ class BzController < ApplicationController
               step = 0 # don't award double credit
               response_object["points_reason"] = "already_awarded"
             elsif !answer.nil? && params[:value] != answer
+              total_potential_value = step
               step = 0 # wrong answer = no points
               response_object["points_reason"] = "wrong"
+
+              case partial_credit_mode
+              when 'per_char'
+                user_chars = params[:value].split("")
+                answer_chars = answer.split("")
+                each_char_value = total_potential_value.to_f / answer_chars.count
+                answer_chars.each_with_index do |item, index|
+                  if item == user_chars[index]
+                    step += each_char_value
+                    response_object["points_reason"] = "partial_credit"
+                  end
+                end
+              end
             end
 
             if step > 0
