@@ -1082,15 +1082,6 @@ class AssignmentsApiController < ApplicationController
   def update
     @assignment = @context.active_assignments.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :update)
-      if @assignment.unlock_at && @assignment.lock_at && params[:assignment][:due_at]
-        due_date = Time.zone.parse(params[:assignment][:due_at])
-        if !in_date_range?(due_date, @assignment.unlock_at, @assignment.lock_at)
-          err_msg = t('Assignment has a locked date. Due date cannot be set outside of locked date range.')
-          return render json: { error: err_msg },
-                        status: :bad_request
-        end
-      end
-
       @assignment.content_being_saved_by(@current_user)
       @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
@@ -1135,10 +1126,5 @@ class AssignmentsApiController < ApplicationController
     end
     # self, observer
     authorized_action(@user, @current_user, [:read_as_parent, :read])
-  end
-
-  # Inputs using ActiveSupport::TimeWithZone objects
-  def in_date_range?(date, startDate, endDate)
-    date >= startDate && date <= endDate
   end
 end
