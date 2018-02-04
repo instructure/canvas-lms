@@ -54,12 +54,12 @@
 #           "type": "string"
 #         },
 #         "unlock_at": {
-#           "description": "(Optional) Time at which this was/will be unlocked.",
+#           "description": "(Optional) Time at which this was/will be unlocked. Must be before the due date.",
 #           "example": "2013-01-01T00:00:00-06:00",
 #           "type": "datetime"
 #         },
 #         "lock_at": {
-#           "description": "(Optional) Time at which this was/will be locked.",
+#           "description": "(Optional) Time at which this was/will be locked. Must be after the due date.",
 #           "example": "2013-02-01T00:00:00-06:00",
 #           "type": "datetime"
 #         },
@@ -162,14 +162,17 @@
 #           "type": "string"
 #         },
 #         "due_at": {
+#          "description": "The due date for the assignment. Must be between the unlock date and the lock date if there are lock dates",
 #           "example": "2013-08-28T23:59:00-06:00",
 #           "type": "datetime"
 #         },
 #         "unlock_at": {
+#           "description": "The unlock date for the assignment. Must be before the due date if there is a due date.",
 #           "example": "2013-08-01T00:00:00-06:00",
 #           "type": "datetime"
 #         },
 #         "lock_at": {
+#           "description": "The lock date for the assignment. Must be after the due date if there is a due date.",
 #           "example": "2013-08-31T23:59:00-06:00",
 #           "type": "datetime"
 #         }
@@ -872,15 +875,15 @@ class AssignmentsApiController < ApplicationController
   #  Note: the "gpa_scale" grading_type is deprecated and will be removed on 2018-06-02.
   #
   # @argument assignment[due_at] [DateTime]
-  #   The day/time the assignment is due.
+  #   The day/time the assignment is due. Must be between the lock dates if there are lock dates.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[lock_at] [DateTime]
-  #   The day/time the assignment is locked after.
+  #   The day/time the assignment is locked after. Must be after the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[unlock_at] [DateTime]
-  #   The day/time the assignment is unlocked.
+  #   The day/time the assignment is unlocked. Must be before the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[description] [String]
@@ -1031,11 +1034,11 @@ class AssignmentsApiController < ApplicationController
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[lock_at] [DateTime]
-  #   The day/time the assignment is locked after.
+  #   The day/time the assignment is locked after. Must be after the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[unlock_at] [DateTime]
-  #   The day/time the assignment is unlocked.
+  #   The day/time the assignment is unlocked. Must be before the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[description] [String]
