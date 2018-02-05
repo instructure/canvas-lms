@@ -1733,6 +1733,13 @@ describe CoursesController, type: :request do
         expect(enrollment_json['current_grading_period_title']).to eq(current_grading_period_title)
       end
 
+      it "ignores soft-deleted grading periods when determining the current grading period" do
+        GradingPeriod.current_period_for(@course2).destroy
+        json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
+        current_period_id = enrollment(json_response)['current_grading_period_id']
+        expect(current_period_id).to be_nil
+      end
+
       it "does not include current grading period scores if 'total_scores' are " \
       "not requested, even if 'current_grading_period_scores' are requested" do
         json_response = courses_api_index_call(includes: ['current_grading_period_scores'])
