@@ -694,28 +694,6 @@ define([
     equal($('#show_all_details_button').text(), 'Show All Details');
   });
 
-  QUnit.module('GradeSummary.getSelectedGradingPeriodId', {
-    setup () {
-      setPageHtmlFixture();
-      this.$select = document.querySelector('.grading_periods_selector');
-    }
-  });
-
-  test('returns the value of the selected grading period', function () {
-    this.$select.value = '701';
-    equal(GradeSummary.getSelectedGradingPeriodId(), '701');
-  });
-
-  test('returns null when "All Grading Periods" is selected', function () {
-    this.$select.value = '0';
-    deepEqual(GradeSummary.getSelectedGradingPeriodId(), null);
-  });
-
-  test('returns null when the grading periods selector is not present in the DOM', function () {
-    this.$select.parentNode.removeChild(this.$select);
-    deepEqual(GradeSummary.getSelectedGradingPeriodId(), null);
-  });
-
   QUnit.module('GradeSummary.onEditWhatIfScore', {
     setup () {
       fullPageSetup();
@@ -1097,27 +1075,25 @@ define([
   });
 
   test('returns an empty string if grading periods are weighted and "All Grading Periods" is selected', function () {
-    sinon.stub(GradeSummary, 'getSelectedGradingPeriodId').returns(null);
     ENV.grading_period_set = {
       id: '1501',
       grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
       weighted: true
-    };
-    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
-    strictEqual(text, '');
-    GradeSummary.getSelectedGradingPeriodId.restore();
+    }
+    ENV.current_grading_period_id = '0'
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
+    strictEqual(text, '')
   });
 
   test('returns the score with points possible if grading periods are weighted and a period is selected', function () {
-    sinon.stub(GradeSummary, 'getSelectedGradingPeriodId').returns('701');
     ENV.grading_period_set = {
       id: '1501',
       grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }],
       weighted: true
-    };
-    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
-    strictEqual(text, '50.00 / 100.00');
-    GradeSummary.getSelectedGradingPeriodId.restore();
+    }
+    ENV.current_grading_period_id = '701'
+    const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
+    strictEqual(text, '50.00 / 100.00')
   });
 
   test('returns the score with points possible if grading periods are not weighted', function () {
@@ -1129,5 +1105,33 @@ define([
 
     const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00');
     strictEqual(text, '50.00 / 100.00');
+  });
+
+  QUnit.module('GradeSummary', () => {
+    QUnit.module('.getSelectedGradingPeriodId', (hooks) => {
+      hooks.beforeEach(() => {
+        fakeENV.setup()
+      })
+
+      hooks.afterEach(() => {
+        fakeENV.teardown()
+      })
+
+      test('returns the id of the current grading period', () => {
+        ENV.current_grading_period_id = '701'
+
+        strictEqual(GradeSummary.getSelectedGradingPeriodId(), '701')
+      })
+
+      test('returns null when the current grading period is "All Grading Periods"', () => {
+        ENV.current_grading_period_id = '0'
+
+        strictEqual(GradeSummary.getSelectedGradingPeriodId(), null)
+      })
+
+      test('returns null when there is no current grading period', () => {
+        strictEqual(GradeSummary.getSelectedGradingPeriodId(), null)
+      })
+    });
   });
 });
