@@ -43,6 +43,50 @@ module ContextModulesCommon
     wait_for_ajaximations
   end
 
+  def module_setup
+    @module = @course.context_modules.create!(:name => "module")
+
+    #create module items
+    #add first and last module items to get previous and next displayed
+    @assignment1 = @course.assignments.create!(:title => 'first item in module')
+    @assignment2 = @course.assignments.create!(:title => 'assignment')
+    @assignment3 = @course.assignments.create!(:title => 'last item in module')
+    @quiz = @course.quizzes.create!(:title => 'quiz assignment')
+    @quiz.publish!
+    @wiki = @course.wiki_pages.create!(:title => "wiki", :body => 'hi')
+    @discussion = @course.discussion_topics.create!(:title => 'discussion')
+
+    #add items to module
+    @module.add_item :type => 'assignment', :id => @assignment1.id
+    @module.add_item :type => 'assignment', :id => @assignment2.id
+    @module.add_item :type => 'quiz', :id => @quiz.id
+    @module.add_item :type => 'wiki_page', :id => @wiki.id
+    @module.add_item :type => 'discussion_topic', :id => @discussion.id
+    @module.add_item :type => 'assignment', :id => @assignment3.id
+
+    #add external tool
+    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", 
+                                                   :shared_secret => "secret", :domain => 'example.com', 
+                                                   :custom_fields => {'a' => '1', 'b' => '2'})
+    @external_tool_tag = @module.add_item({
+                                            :type => 'context_external_tool',
+                                            :title => 'Example',
+                                            :url => 'http://www.example.com',
+                                            :new_tab => '0'
+                                          })
+    @external_tool_tag.publish!
+    #add external url
+    @external_url_tag = @module.add_item({
+                                           :type => 'external_url',
+                                           :title => 'pls view',
+                                           :url => 'http://example.com/lolcats'
+                                         })
+    @external_url_tag.publish!
+
+    #add another assignment at the end to create a bookend, provides next and previous for external url
+    @module.add_item :type => 'assignment', :id => @assignment3.id
+  end
+
   def test_relock
     wait_for_ajaximations
     expect(f('#relock_modules_dialog')).to be_displayed
@@ -70,6 +114,12 @@ module ContextModulesCommon
     end
   end
 
+  def verify_next_and_previous_buttons_display
+    wait_for_ajaximations
+    expect(f('.module-sequence-footer-button--previous')).to be_displayed
+    expect(f('.module-sequence-footer-button--next')).to be_displayed
+  end
+
   def validate_context_module_item_icon(module_item_id, icon_expected)
     if icon_expected == 'no-icon'
       expect(f("#context_module_item_#{module_item_id}")).not_to contain_jqcss(".module-item-status-icon i:visible")
@@ -89,6 +139,34 @@ module ContextModulesCommon
     context_modules = ff('.context_module')
     expect_new_page_load { context_modules[module_num].find_element(:link, link_text).click }
     go_to_modules
+  end
+
+  def mark_as_done_setup
+    @mark_done_module = create_context_module('Mark Done Module')
+    page = @course.wiki_pages.create!(:title => "The page", :body => 'hi')
+    @tag = @mark_done_module.add_item({:id => page.id, :type => 'wiki_page'})
+    @mark_done_module.completion_requirements = {@tag.id => {:type => 'must_mark_done'}}
+    @mark_done_module.save!
+  end
+
+  def navigate_to_wikipage(title)
+    els = ff('.context_module_item')
+    el = els.find {|e| e.text =~ /#{title}/}
+    el.find_element(:css, 'a.title').click
+    wait_for_ajaximations
+  end
+
+  def create_additional_assignment_for_module_1
+    @assignment_4 = @course.assignments.create!(:title => "assignment 4")
+    @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
+    @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
+                                         @tag_4.id => {:type => 'must_view'}}
+    @module_1.save!
+  end
+
+  def make_module_1_complete_one
+    @module_1.requirement_count = 1
+    @module_1.save!
   end
 
   def assert_page_loads
@@ -179,6 +257,31 @@ module ContextModulesCommon
     @module3 = @course.context_modules.create!(:name => "Third module")
     @module3.prerequisites = "module_#{@module1.id},module_#{@module2.id}"
     @module3.save!
+  end
+
+  def add_non_requirement
+    @assignment_4 = @course.assignments.create!(:title => "assignment 4")
+    @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
+    @module_1.save!
+  end
+
+  def add_min_score_assignment
+    @assignment_4 = @course.assignments.create!(:title => "assignment 4")
+    @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
+    @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
+                                         @tag_4.id => {:type => 'min_score', :min_score => 90}}
+    @module_1.require_sequential_progress = false
+    @module_1.save!
+  end
+
+  def make_past_due
+    @assignment_4.submission_types = 'online_text_entry'
+    @assignment_4.due_at = '2015-01-01'
+    @assignment_4.save!
+  end
+
+  def grade_assignment(score)
+    @assignment_4.grade_student(@user, grade: score, grader: @teacher)
   end
 
   def edit_module_item(module_item)
