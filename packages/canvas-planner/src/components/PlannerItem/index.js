@@ -105,7 +105,7 @@ export class PlannerItem extends Component {
   }
 
   getFocusable (which) {
-    return which === 'update' ? this.itemLink : this.checkboxRef;
+    return (which === 'update' || which === 'delete') ? this.itemLink : this.checkboxRef;
   }
 
   getScrollable () {

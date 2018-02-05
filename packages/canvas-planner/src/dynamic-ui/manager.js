@@ -25,6 +25,10 @@ import {daysToItems} from '../utilities/daysUtils';
 import {srAlert} from '../utilities/alertUtils';
 import formatMessage from '../format-message';
 
+export function specialFallbackFocusId (type) {
+  return `~~~${type}-fallback-focus~~~`;
+}
+
 export class DynamicUiManager {
   constructor (opts = {animator: new Animator(), document: document}) {
     this.animator = opts.animator;
@@ -38,12 +42,16 @@ export class DynamicUiManager {
     this.stickyOffset = offset;
   }
 
-  registerAnimatable = (type, component, index, itemIds) => {
-    this.animatableRegistry.register(type, component, index, itemIds);
+  // If you want to register a fallback focus component when all the things in a list are deleted,
+  // register that component with a -1 index and a special unique componentId that looks like
+  // this: `~~~${registryName}-fallback-focus~~~` where registryName is one of the
+  // AnimatableRegistry collections.
+  registerAnimatable = (type, component, index, componentIds) => {
+    this.animatableRegistry.register(type, component, index, componentIds);
   }
 
-  deregisterAnimatable = (type, component, itemIds) => {
-    this.animatableRegistry.deregister(type, component, itemIds);
+  deregisterAnimatable = (type, component, componentIds) => {
+    this.animatableRegistry.deregister(type, component, componentIds);
   }
 
   clearAnimationPlan () {
@@ -88,7 +96,9 @@ export class DynamicUiManager {
     } else if (this.animationPlan.focusFirstNewItem) {
       this.triggerFocusFirstNewItem();
     } else if (this.animationPlan.focusItem) {
-      this.triggerFocusItem();
+      this.triggerFocusItemComponent();
+    } else if (this.animationPlan.focusOpportunity) {
+      this.triggerFocusOpportunity();
     } else if (this.animationPlan.focusPreOpenTrayElement && this.animationPlan.preOpenTrayElement) {
       this.triggerFocusPreOpenTrayElement();
     }
@@ -97,14 +107,14 @@ export class DynamicUiManager {
   }
 
   triggerFocusFirstNewItem () {
-    const {itemIds: newDayItemIds} =
-      this.animatableRegistry.getFirstComponent('day', this.animationPlan.newItemIds);
-    const {component: firstNewGroup, itemIds: firstGroupItemIds} =
-      this.animatableRegistry.getFirstComponent('group', newDayItemIds);
+    const {componentIds: newDayComponentIds} =
+      this.animatableRegistry.getFirstComponent('day', this.animationPlan.newComponentIds);
+    const {component: firstNewGroupComponent, componentIds: firstGroupComponentIds} =
+      this.animatableRegistry.getFirstComponent('group', newDayComponentIds);
 
-    let focusable = firstNewGroup.getFocusable();
+    let focusable = firstNewGroupComponent.getFocusable();
     if (focusable == null) {
-      const {component: firstNewGroupItem} = this.animatableRegistry.getFirstComponent('item', firstGroupItemIds);
+      const {component: firstNewGroupItem} = this.animatableRegistry.getFirstComponent('item', firstGroupComponentIds);
       focusable = firstNewGroupItem.getFocusable();
     }
 
@@ -112,12 +122,12 @@ export class DynamicUiManager {
   }
 
   triggerFocusLastNewItem () {
-    const {itemIds: newDayItemIds} =
-      this.animatableRegistry.getLastComponent('day', this.animationPlan.newItemIds);
-    const {component: lastNewGroup, itemIds: newGroupItemIds} =
-      this.animatableRegistry.getLastComponent('group', newDayItemIds);
+    const {componentIds: newDayComponentIds} =
+      this.animatableRegistry.getLastComponent('day', this.animationPlan.newComponentIds);
+    const {component: lastNewGroup, componentIds: newGroupComponentIds} =
+      this.animatableRegistry.getLastComponent('group', newDayComponentIds);
     const {component: lastNewItem} =
-      this.animatableRegistry.getLastComponent('item', newGroupItemIds);
+      this.animatableRegistry.getLastComponent('item', newGroupComponentIds);
     this.animator.focusElement(lastNewItem.getFocusable());
     this.animator.scrollTo(lastNewGroup.getScrollable(), this.stickyOffset);
   }
@@ -128,25 +138,32 @@ export class DynamicUiManager {
     const newActivityItemIds = newActivityItems.map(item => item.uniqueId);
     if (newActivityItemIds.length === 0) return;
 
-    let {itemIds: newActivityDayItemIds} =
+    let {componentIds: newActivityDayComponentIds} =
       this.animatableRegistry.getLastComponent('day', newActivityItemIds);
     // only want groups in the day that have new activity items
-    newActivityDayItemIds = _.intersection(newActivityDayItemIds, newActivityItemIds);
+    newActivityDayComponentIds = _.intersection(newActivityDayComponentIds, newActivityItemIds);
 
-    const {component: newActivityGroup, itemIds: newActivityGroupItemIds} =
-      this.animatableRegistry.getLastComponent('group', newActivityDayItemIds);
+    const {component: newActivityGroup, componentIds: newActivityGroupComponentIds} =
+      this.animatableRegistry.getLastComponent('group', newActivityDayComponentIds);
 
-    const {component: newActivityItem} =
-      this.animatableRegistry.getLastComponent('item', newActivityGroupItemIds);
+    const {component: newActivityComponent} =
+      this.animatableRegistry.getLastComponent('item', newActivityGroupComponentIds);
 
-    this.animator.focusElement(newActivityItem.getFocusable());
+    this.animator.focusElement(newActivityComponent.getFocusable());
     this.animator.scrollTo(newActivityGroup.getScrollable(), this.stickyOffset);
   }
 
-  triggerFocusItem () {
-    const itemToFocus = this.animatableRegistry.getComponent('item', this.animationPlan.focusItem);
-    this.animator.focusElement(itemToFocus.component.getFocusable(this.animationPlan.trigger));
-    this.animator.scrollTo(itemToFocus.component.getScrollable(), this.stickyOffset);
+  triggerFocusItemComponent () {
+    const itemComponentToFocus = this.animatableRegistry.getComponent('item', this.animationPlan.focusItem);
+    if (itemComponentToFocus == null) return;
+    this.animator.focusElement(itemComponentToFocus.component.getFocusable(this.animationPlan.trigger));
+    this.animator.scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset);
+  }
+
+  triggerFocusOpportunity () {
+    const oppToFocus = this.animatableRegistry.getComponent('opportunity', this.animationPlan.focusOpportunity);
+    if (oppToFocus == null) return;
+    this.animator.focusElement(oppToFocus.component.getFocusable(this.animationPlan.trigger));
   }
 
   triggerFocusPreOpenTrayElement () {
@@ -196,11 +213,14 @@ export class DynamicUiManager {
       }`, { count: newItems.length})
     );
 
-    if (!newItems.length) return;
+    if (!newItems.length) {
+      this.clearAnimationPlan();
+      return;
+    }
     this.animationPlan.ready = true;
 
     this.animationPlan.newItems = newItems;
-    this.animationPlan.newItemIds = newItems.map(item => item.uniqueId);
+    this.animationPlan.newComponentIds = newItems.map(item => item.uniqueId);
 
     const sortedItems = _.sortBy(newItems, item => item.date);
     this.animationPlan.firstNewItem = sortedItems[0];
@@ -225,13 +245,45 @@ export class DynamicUiManager {
   }
 
   handleDeletedPlannerItem = (action) => {
-    const sortedItems = this.animatableRegistry.getAllItemsSorted();
-    if (sortedItems.length === 1) return; // give up, no items to receive focus
-    const doomedItem = action.payload;
-    const doomedIndex = sortedItems.findIndex(item => item.itemIds[0] === doomedItem.uniqueId);
-    let newItemIndex = doomedIndex + 1;
-    if (newItemIndex === sortedItems.length) newItemIndex = doomedIndex - 1;
-    this.animationPlan.focusItem = sortedItems[newItemIndex].itemIds[0];
+    const doomedItemId = action.payload.uniqueId;
+    this.planDeletedComponent('item', doomedItemId);
+  }
+
+  handleDismissedOpportunity = (action) => {
+    const doomedComponentId = action.payload.plannable_id;
+    this.planDeletedComponent('opportunity', doomedComponentId);
+  }
+
+  // Note that this is actually called before reducers and therefore before the doomed item has
+  // actually been removed from the state.
+  planDeletedComponent (doomedComponentType, doomedComponentId) {
+    const sortedComponents = this.sortedComponentsFor(doomedComponentType);
+    const doomedComponentIndex = sortedComponents.findIndex(c => c.componentIds[0] === doomedComponentId);
+    const newComponentIndex = this.findFocusIndexAfterDelete(sortedComponents, doomedComponentIndex);
+    const animationPlanFocusField = changeCase.camelCase(`focus-${doomedComponentType}`);
+    if (newComponentIndex != null) {
+      this.animationPlan[animationPlanFocusField] = sortedComponents[newComponentIndex].componentIds[0];
+    } else {
+      this.animationPlan[animationPlanFocusField] = specialFallbackFocusId(doomedComponentType);
+    }
+    this.animationPlan.trigger = 'delete';
     this.animationPlan.ready = true;
+  }
+
+  sortedComponentsFor (componentType) {
+    switch (componentType) {
+      case 'item': return this.animatableRegistry.getAllItemsSorted();
+      case 'opportunity': return this.animatableRegistry.getAllOpportunitiesSorted();
+      default: throw new Error(`unrecognized deleted component type: ${componentType}`);
+    }
+  }
+
+  // Note that this finds the new focusable index at its current position, not at its new position
+  // after the doomed item is removed. This allows retrieval of the new focusable before the doomed
+  // item is removed.
+  findFocusIndexAfterDelete (sortedFocusables, doomedFocusableIndex) {
+    const newFocusableIndex = doomedFocusableIndex - 1;
+    if (newFocusableIndex < 0) return null;
+    return newFocusableIndex;
   }
 }

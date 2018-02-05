@@ -37,18 +37,18 @@ export function animatable(WrappedComponent) {
       }),
     }
 
-    registerAnimatable = (type, component, index, itemIds) => {
+    registerAnimatable = (type, component, index, componentIds) => {
       // This should be required, but I don't want tests to have to muck with wrapping their stuff
       // in a DynamicUiProvider
       if (!this.context.dynamicUiManager) return;
-      this.context.dynamicUiManager.registerAnimatable(type, component, index, itemIds);
+      this.context.dynamicUiManager.registerAnimatable(type, component, index, componentIds);
     }
 
-    deregisterAnimatable = (type, component, itemIds) => {
+    deregisterAnimatable = (type, component, componentIds) => {
       // This should be required, but I don't want tests to have to muck with wrapping their stuff
       // in a DynamicUiProvider
       if (!this.context.dynamicUiManager) return;
-      this.context.dynamicUiManager.deregisterAnimatable(type, component, itemIds);
+      this.context.dynamicUiManager.deregisterAnimatable(type, component, componentIds);
     }
 
     render () {

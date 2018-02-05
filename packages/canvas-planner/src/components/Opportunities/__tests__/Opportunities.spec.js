@@ -17,7 +17,7 @@
  */
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import { Opportunities } from '../index';
+import { Opportunities, OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID } from '../index';
 
 function defaultProps (option) {
   return {
@@ -83,4 +83,21 @@ it('calls setTimeout when component is mounted', () => {
   expect(setTimeout.mock.calls.length).toBe(1);
   expect(setTimeout.mock.calls[0][1]).toBe(200);
   jest.runAllTimers();
+});
+
+it('registers itself as animatable', () => {
+  const fakeRegister = jest.fn();
+  const fakeDeregister = jest.fn();
+  const wrapper = mount(
+    <Opportunities
+      {...defaultProps()}
+      registerAnimatable={fakeRegister}
+      deregisterAnimatable={fakeDeregister}
+    />
+  );
+  const instance = wrapper.instance();
+  expect(fakeRegister).toHaveBeenCalledWith('opportunity', instance, -1, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID]);
+  wrapper.unmount();
+  expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID]);
+
 });

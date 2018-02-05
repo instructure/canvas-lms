@@ -80,7 +80,7 @@ exports[`renders the base component correctly with two buttons and a tray 1`] = 
       </Button>
     </PopoverTrigger>
     <PopoverContent>
-      <Opportunities
+      <Animatable(Opportunities)
         courses={
           Array [
             Object {

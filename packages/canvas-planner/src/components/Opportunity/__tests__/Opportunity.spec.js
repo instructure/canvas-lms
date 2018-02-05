@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import { Opportunity } from '../index';
 import Pill from '@instructure/ui-core/lib/components/Pill';
 
@@ -31,6 +31,9 @@ function defaultProps (options) {
     url: "http://www.non_default_url.com",
     timeZone: 'America/Denver',
     dismiss: () => {},
+    registerAnimatable: () => {},
+    deregisterAnimatable: () => {},
+    animatableIndex: 1,
   };
 }
 
@@ -71,4 +74,27 @@ it('does not render a Pill if passed showPill: false', () => {
   props.showPill = false;
   const wrapper = shallow(<Opportunity {...props} />);
   expect(wrapper.find(Pill).length).toEqual(0);
+});
+
+it('registers itself as animatable', () => {
+  const fakeRegister = jest.fn();
+  const fakeDeregister = jest.fn();
+  const wrapper = mount(
+    <Opportunity
+      {...defaultProps()}
+      id='1'
+      registerAnimatable={fakeRegister}
+      deregisterAnimatable={fakeDeregister}
+      animatableIndex={42}
+    />
+  );
+  const instance = wrapper.instance();
+  expect(fakeRegister).toHaveBeenCalledWith('opportunity', instance, 42, ['1']);
+
+  wrapper.setProps({id: '2', animatableIndex: 43});
+  expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, ['1']);
+  expect(fakeRegister).toHaveBeenCalledWith('opportunity', instance, 43, ['2']);
+
+  wrapper.unmount();
+  expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, ['2']);
 });

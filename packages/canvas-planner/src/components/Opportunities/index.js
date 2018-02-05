@@ -17,6 +17,8 @@
  */
 import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
+import {animatable} from '../../dynamic-ui';
+import {specialFallbackFocusId} from '../../dynamic-ui/manager';
 import scopeTab from '@instructure/ui-utils/lib/dom/scopeTab';
 import keycode from 'keycode';
 
@@ -31,6 +33,8 @@ import IconXLine from 'instructure-icons/lib/Line/IconXLine';
 import styles from './styles.css';
 import theme from './theme.js';
 
+export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opportunity');
+
 export class Opportunities extends Component {
   static propTypes = {
     opportunities: array.isRequired,
@@ -38,18 +42,32 @@ export class Opportunities extends Component {
     courses: array.isRequired,
     dismiss: func.isRequired,
     togglePopover: func.isRequired,
-    maxHeight: oneOfType([number, string])
-  }
-  static defaultProps = {
-    maxHeight: 'none'
+    maxHeight: oneOfType([number, string]),
+    registerAnimatable: func,
+    deregisterAnimatable: func,
   }
 
-  componentDidMount() {
+  static defaultProps = {
+    maxHeight: 'none',
+    registerAnimatable: () => {},
+    deregisterAnimatable: () => {},
+  }
+
+  componentDidMount () {
+    this.props.registerAnimatable('opportunity', this, -1, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID]);
     setTimeout(() =>{
       // eslint-disable-next-line react/no-find-dom-node
       let closeButtonRef = findDOMNode(this.closeButton);
       closeButtonRef.focus();
     }, 200);
+  }
+
+  componentWillUnmount () {
+    this.props.deregisterAnimatable('opportunity', this, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID]);
+  }
+
+  getFocusable () {
+    return this.closeButton;
   }
 
   handleKeyDown = (event) => {
@@ -70,7 +88,7 @@ export class Opportunities extends Component {
 
   renderOpportunity = () => {
     return (
-      this.props.opportunities.map(opportunity =>
+      this.props.opportunities.map((opportunity, oppIndex) =>
         <li key={opportunity.id} className={styles.item}>
           <Opportunity
             id={opportunity.id}
@@ -83,6 +101,7 @@ export class Opportunities extends Component {
             dismiss={this.props.dismiss}
             plannerOverride={opportunity.planner_override}
             url={opportunity.html_url}
+            animatableIndex={oppIndex}
           />
         </li>
       )
@@ -119,4 +138,4 @@ export class Opportunities extends Component {
   }
 }
 
-export default themeable(theme, styles)(Opportunities);
+export default animatable(themeable(theme, styles)(Opportunities));

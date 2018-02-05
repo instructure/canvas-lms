@@ -17,6 +17,7 @@
  */
 import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
+import {animatable} from '../../dynamic-ui';
 import formatMessage from '../../format-message';
 import moment from 'moment-timezone';
 import { getFullDateAndTime } from '../../utilities/dateUtils';
@@ -42,6 +43,9 @@ export class Opportunity extends Component {
     url: string.isRequired,
     dismiss: func.isRequired,
     plannerOverride: object,
+    registerAnimatable: func,
+    deregisterAnimatable: func,
+    animatableIndex: number,
   }
 
   constructor (props) {
@@ -49,6 +53,33 @@ export class Opportunity extends Component {
 
     const tzMomentizedDate = moment.tz(props.dueAt, props.timeZone);
     this.fullDate = getFullDateAndTime(tzMomentizedDate);
+  }
+
+  static defaultProps = {
+    registerAnimatable: () => {},
+    deregisterAnimatable: () => {},
+  }
+
+  componentDidMount () {
+    this.props.registerAnimatable('opportunity', this, this.props.animatableIndex, [this.props.id]);
+  }
+
+  componentWillReceiveProps (newProps) {
+    this.props.deregisterAnimatable('opportunity', this, [this.props.id]);
+    this.props.registerAnimatable('opportunity', this, newProps.animatableIndex, [newProps.id]);
+  }
+
+  componentWillUnmount () {
+    this.props.deregisterAnimatable('opportunity', this, [this.props.id]);
+  }
+
+
+  linkRef = (ref) => {
+    this.link = ref;
+  }
+
+  getFocusable () {
+    return this.link;
   }
 
   render () {
@@ -59,7 +90,7 @@ export class Opportunity extends Component {
             {this.props.courseName}
           </div>
           <div className={styles.title}>
-            <Link href={this.props.url}>{this.props.opportunityTitle}</Link>
+            <Link href={this.props.url} ref={this.linkRef}>{this.props.opportunityTitle}</Link>
           </div>
         </div>
         <div className={styles.footer}>
@@ -99,4 +130,4 @@ export class Opportunity extends Component {
   }
 }
 
-export default themeable(theme, styles)(Opportunity);
+export default animatable(themeable(theme, styles)(Opportunity));

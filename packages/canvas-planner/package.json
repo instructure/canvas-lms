@@ -25,6 +25,7 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "test:update": "jest --updateSnapshot",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "generate-themeable": "./scripts/generate-themeable",
     "clean": "rm -rf .babel-cache && rm -rf es && rm -rf lib && rm -rf coverage"
   },

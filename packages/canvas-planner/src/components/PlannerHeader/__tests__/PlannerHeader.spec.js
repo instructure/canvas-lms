@@ -334,5 +334,5 @@ it('sets the maxHeight on the Opportunities', () => {
   };
   // triggers a re-render
   wrapper.setState({opportunitiesOpen: true});
-  expect(wrapper.find('Opportunities').prop('maxHeight')).toEqual(640);
+  expect(wrapper.find('Animatable(Opportunities)').prop('maxHeight')).toEqual(640);
 });

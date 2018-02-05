@@ -17,6 +17,7 @@
  */
 
 import {DynamicUiManager as Manager} from '../manager';
+import {dismissedOpportunity} from '../../actions';
 import {gotItemsSuccess} from '../../actions/loading-actions';
 import { initialize as alertInitialize } from '../../utilities/alertUtils';
 
@@ -290,39 +291,72 @@ describe('manipulating items', () => {
   });
 
   describe('deleting an item', () => {
-    it('sets focus to to the next item if there is one', () => {
+    it('sets focus to the previous item if there is one', () => {
       const {manager, animator} = createManagerWithMocks();
       // when deleting, we need to assume the item has already been registered.
       registerStandardDays(manager);
       manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-1-group-1-item-1'}});
+      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-1-group-1-item-2'}});
       manager.preTriggerUpdates('fixed-element');
       manager.triggerUpdates();
-      expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-1-group-1-item-2');
+      expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-1-group-1-item-1');
     });
 
-    it('sets focus to the previous item if there is no next item', () => {
+    it('sets focus to the fallback if there is no previous item', () => {
       const {manager, animator} = createManagerWithMocks();
-      // when deleting, we need to assume the item has already been registered.
+      registerStandardDays(manager);
+      const fakeFallback = {getFocusable: () => 'fallback', getScrollable: () => 'scroll'};
+      manager.registerAnimatable('item', fakeFallback, -1, ['~~~item-fallback-focus~~~']);
+      manager.handleOpenEditingPlannerItem();
+      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-0-group-0-item-0'}});
+      manager.preTriggerUpdates('fixed-element');
+      manager.triggerUpdates();
+      expect(animator.focusElement).toHaveBeenCalledWith('fallback');
+    });
+
+    it('gives up setting item focus if deleting the first item and there is no fallback', () => {
+      const {manager, animator} = createManagerWithMocks();
       registerStandardDays(manager);
       manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-2-group-2-item-2'}});
-      manager.preTriggerUpdates('fixed-element');
-      manager.triggerUpdates();
-      expect(animator.focusElement).toHaveBeenCalledWith('focusable-day-2-group-2-item-1');
-    });
-
-    it('gives up setting focus if deleting the only item', () => {
-      const {manager, animator} = createManagerWithMocks();
-      manager.registerAnimatable('item', {uniqueId: 'some-item'}, 0, ['some-item']);
-      manager.registerAnimatable('group', {}, 0, ['some-item']);
-      manager.registerAnimatable('day', {}, 0, ['some-item']);
-      manager.handleOpenEditingPlannerItem();
-      manager.handleDeletedPlannerItem({payload: {uniqueId: 'some-item'}});
+      manager.handleDeletedPlannerItem({payload: {uniqueId: 'day-0-group-0-item-0'}});
       manager.preTriggerUpdates('fixed-element');
       manager.triggerUpdates();
       expect(animator.focusElement).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('deleting an opportunity', () => {
+  it('sets focus to an opportunity', () => {
+    const {manager, animator} = createManagerWithMocks();
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-1'}, 0, ['1']);
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-2'}, 1, ['2']);
+    manager.handleDismissedOpportunity(dismissedOpportunity({plannable_id: '2'}));
+    manager.preTriggerUpdates('fixed-element');
+    manager.triggerUpdates();
+    expect(animator.focusElement).toHaveBeenCalledWith('opp-1');
+  });
+
+  it('uses the opportunity fallback if one is given', () => {
+    const {manager, animator} = createManagerWithMocks();
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-1'}, 0, ['1']);
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-2'}, 1, ['2']);
+    const fakeFallback = {getFocusable: () => 'fallback', getScrollable: () => 'scroll'};
+    manager.registerAnimatable('opportunity', fakeFallback, -1, ['~~~opportunity-fallback-focus~~~']);
+    manager.handleDismissedOpportunity(dismissedOpportunity({plannable_id: '1'}));
+    manager.preTriggerUpdates('fixed-element');
+    manager.triggerUpdates();
+    expect(animator.focusElement).toHaveBeenCalledWith('fallback');
+  });
+
+  it('gives up setting opportunity focus there is no fallback', () => {
+    const {manager, animator} = createManagerWithMocks();
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-1'}, 0, ['1']);
+    manager.registerAnimatable('opportunity', {getFocusable: () => 'opp-2'}, 1, ['2']);
+    manager.handleDismissedOpportunity(dismissedOpportunity({plannable_id: '1'}));
+    manager.preTriggerUpdates('fixed-element');
+    manager.triggerUpdates();
+    expect(animator.focusElement).not.toHaveBeenCalled();
   });
 });
 

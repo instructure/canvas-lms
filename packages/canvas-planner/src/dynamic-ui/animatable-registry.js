@@ -24,60 +24,84 @@ export class AnimatableRegistry {
       day: {},
       group: {},
       item: {},
+      opportunity: {},
     };
   }
 
   validateType (type) {
-    if (!['day', 'group', 'item'].find((t) => t === type)) {
+    if (!['day', 'group', 'item', 'opportunity'].find((t) => t === type)) {
       throw new Error(`invalid registry type ${type}`);
     }
   }
 
-  register (type, component, index, itemIds) {
+  register (type, component, index, componentIds) {
     this.validateType(type);
     const registry = this.registries[type];
-    itemIds.forEach(itemId => registry[itemId] = {component, index, itemIds});
+    componentIds.forEach(componentId => registry[componentId] = {component, index, componentIds});
   }
 
-  deregister (type, component, itemIds) {
+  deregister (type, component, componentIds) {
     this.validateType(type);
     const registry = this.registries[type];
-    itemIds.forEach(itemId => {
-      if (registry[itemId].component === component) {
-        delete registry[itemId];
+    componentIds.forEach(componentId => {
+      if (registry[componentId].component === component) {
+        delete registry[componentId];
       }
     });
   }
 
-  getComponent (type, itemId) {
+  getComponent (type, componentId) {
     this.validateType(type);
-    return this.registries[type][itemId];
+    return this.registries[type][componentId];
   }
 
-  getFirstComponent (type, itemIds) {
+  getFirstComponent (type, componentIds) {
     this.validateType(type);
     const registry = this.registries[type];
-    const minItemId = _.minBy(itemIds, itemId => registry[itemId].index);
+    const minItemId = _.minBy(componentIds, componentId => registry[componentId].index);
     return registry[minItemId];
   }
 
-  getLastComponent (type, itemIds) {
+  getLastComponent (type, componentIds) {
     this.validateType(type);
     const registry = this.registries[type];
-    const maxItemId = _.maxBy(itemIds, itemId => registry[itemId].index);
+    const maxItemId = _.maxBy(componentIds, componentId => registry[componentId].index);
     return registry[maxItemId];
   }
 
-  getUniqSortedComponents (type, itemIds) {
+  getUniqSortedComponents (type, componentIds) {
     this.validateType(type);
-    let components = itemIds.map(itemId => this.registries[type][itemId]);
+    let components = componentIds.map(componentId => this.registries[type][componentId]);
     return _.chain(components).sortBy('index').sortedUniqBy('index').value();
   }
 
+  // Gets all non-negative indexed components from the given registry in indexed order. Negative
+  // indexed components are special and are not returned by this method. This method only makes
+  // sense for days and opportunities since groups and items are nested components and will have
+  // duplicate indexes registered (with different ids).
+  getSortedComponents (type, componentIds) {
+    this.validateType(type);
+    return _.chain(this.registries[type])
+      .values()
+      .sortBy('index')
+      .sortedUniqBy('index')
+      .filter(entryValue => entryValue.index >= 0)
+      .value();
+  }
+
+  // gets all items that are displayed in the interface in interface sorted order.
   getAllItemsSorted () {
-    const sortedDays = _.chain(this.registries.day).values().sortBy('index').sortedUniqBy('index').value();
-    const sortedGroups = _.flatMap(sortedDays, day => this.getUniqSortedComponents('group', day.itemIds));
-    const sortedItems = _.flatMap(sortedGroups, group => this.getUniqSortedComponents('item', group.itemIds));
+    // get list of days sorted as they appear in the interface.
+    const sortedDays = this.getSortedComponents('day');
+    // get sorted groups for each sorted day, then flatten into one list of interface sorted groups.
+    const sortedGroups = _.flatMap(sortedDays, day => this.getUniqSortedComponents('group', day.componentIds));
+    // get sorted items for each group, then flatten into one list of interface sorted items
+    const sortedItems = _.flatMap(sortedGroups, group => this.getUniqSortedComponents('item', group.componentIds));
     return sortedItems;
+  }
+
+  // gets indexed opportunities in interface order.
+  getAllOpportunitiesSorted () {
+    return this.getSortedComponents('opportunity');
   }
 }
