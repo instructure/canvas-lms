@@ -17,6 +17,7 @@ exports[`renders the base component correctly with two buttons and a tray 1`] = 
     />
   </Button>
   <Popover
+    alignArrow={false}
     applicationElement={null}
     closeButtonLabel={null}
     closeButtonRef={[Function]}
