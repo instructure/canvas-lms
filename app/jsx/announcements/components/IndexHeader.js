@@ -43,7 +43,9 @@ import ExternalFeedsTray from './ExternalFeedsTray'
 import propTypes from '../propTypes'
 import actions from '../actions'
 
-export const SEARCH_TIME_DELAY = 300
+// Delay the search so as not to overzealously read out the number
+// of search results to the user
+export const SEARCH_TIME_DELAY = 750
 const filters = {
   all: I18n.t('All'),
   unread: I18n.t('Unread')

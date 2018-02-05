@@ -31,7 +31,7 @@ function fetchAnnouncements(dispatch, getState, payload) {
   return (resolve, reject) => {
     apiClient.getAnnouncements(getState(), payload)
       .then(res => {
-        $.screenReaderFlashMessage(I18n.t('%{count} announcements found.', { count: res.data.length }))
+        $.screenReaderFlashMessageExclusive(I18n.t('%{count} announcements found.', { count: res.data.length }))
         resolve(res)
       })
       .catch(err => reject({ err, message: I18n.t('An error ocurred while loading announcements') }))
