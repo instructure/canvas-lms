@@ -43,9 +43,22 @@ class DueDateCacher
     new(course, assignments).send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
   end
 
-  def initialize(course, assignments)
+  def self.recompute_users_for_course(user_ids, course, assignments = nil, inst_jobs_opts = {})
+    user_ids = Array(user_ids)
+    course = Course.find(course) unless course.is_a?(Course)
+    if assignments.nil?
+      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{user_ids.join(':')}"
+    end
+    assignments ||= Assignment.active.where(context: course).pluck(:id)
+    return if assignments.empty?
+
+    new(course, assignments, user_ids).send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+  end
+
+  def initialize(course, assignments, user_ids = [])
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
+    @user_ids = Array(user_ids)
   end
 
   def recompute
@@ -65,7 +78,7 @@ class DueDateCacher
         assigned_student_ids = effective_due_dates.find_effective_due_dates_for_assignment(assignment_id).keys
         submission_scope = Submission.active.where(assignment_id: assignment_id)
 
-        if assigned_student_ids.blank? && enrollment_counts.prior_student_ids.blank?
+        if @user_ids.blank? && assigned_student_ids.blank? && enrollment_counts.prior_student_ids.blank?
           submission_scope.in_batches.update_all(workflow_state: :deleted)
         else
           # Delete the users we KNOW we need to delete in batches (it makes the database happier this way)
@@ -152,23 +165,26 @@ class DueDateCacher
 
       Shackles.activate(:slave) do
         # The various workflow states below try to mimic similarly named scopes off of course
-        Enrollment.select(
+        scope = Enrollment.select(
           :user_id,
           "count(nullif(workflow_state not in ('rejected', 'deleted', 'completed'), false)) as accepted_count",
           "count(nullif(workflow_state in ('completed'), false)) as prior_count",
           "count(nullif(workflow_state in ('rejected', 'deleted'), false)) as deleted_count"
         ).
-          where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment']).
-          group(:user_id).find_each do |record|
-            if record.accepted_count == 0 && record.deleted_count > 0
-              counts.deleted_student_ids << record.user_id
-            elsif record.accepted_count == 0 && record.prior_count > 0
-              counts.prior_student_ids << record.user_id
-            elsif record.accepted_count > 0
-              counts.accepted_student_ids << record.user_id
-            else
-              raise "Unknown enrollment state: #{record.accepted_count}, #{record.prior_count}, #{record.deleted_count}"
-            end
+          where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'])
+
+        scope = scope.where(user_id: @user_ids) if @user_ids.present?
+
+        scope.group(:user_id).find_each do |record|
+          if record.accepted_count == 0 && record.deleted_count > 0
+            counts.deleted_student_ids << record.user_id
+          elsif record.accepted_count == 0 && record.prior_count > 0
+            counts.prior_student_ids << record.user_id
+          elsif record.accepted_count > 0
+            counts.accepted_student_ids << record.user_id
+          else
+            raise "Unknown enrollment state: #{record.accepted_count}, #{record.prior_count}, #{record.deleted_count}"
+          end
         end
       end
       counts
@@ -176,6 +192,10 @@ class DueDateCacher
   end
 
   def effective_due_dates
-    @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignment_ids)
+    @effective_due_dates ||= begin
+      edd = EffectiveDueDates.for_course(@course, @assignment_ids)
+      edd.filter_students_to(@user_ids) if @user_ids.present?
+      edd
+    end
   end
 end
