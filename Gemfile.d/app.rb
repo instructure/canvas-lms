@@ -53,7 +53,7 @@ gem "aws-sdk-sns", '1.1.0', require: false
 gem "aws-sdk-sqs", '1.3.0', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
-  gem 'chunky_png', '1.3.8', require: false
+  gem 'chunky_png', '1.3.10', require: false
 gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.6', require: false
