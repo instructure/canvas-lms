@@ -2078,7 +2078,7 @@ caniuse-lite@^1.0.30000784:
   version "1.0.30000784"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000784.tgz#129ced74e9a1280a441880b6cd2bce30ef59e6c0"
 
-"canvas-planner@file:./packages/canvas-planner":
+"canvas-planner@file:./packages/canvas-planner/copy-of-what-gets-published-to-npm-registry":
   version "1.0.16"
   dependencies:
     "@instructure/ui-core" "^4.6.0"
