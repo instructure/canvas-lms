@@ -67,7 +67,7 @@ gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.15.6'
-gem 'i18n', '0.9.1'
+gem 'i18n', '0.9.3'
 gem 'i18nliner', '0.0.14'
   gem 'ruby2ruby', '2.4.0', require: false
   gem 'ruby_parser', '3.10.1', require: false
