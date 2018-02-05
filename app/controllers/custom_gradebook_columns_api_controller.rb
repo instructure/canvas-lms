@@ -28,7 +28,7 @@
 #       "properties": {
 #         "id": {
 #           "description": "The ID of the custom gradebook column",
-#           "example": "2",
+#           "example": 2,
 #           "type": "integer"
 #         },
 #         "teacher_notes": {
