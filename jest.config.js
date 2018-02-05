@@ -6,9 +6,8 @@ module.exports = {
   "roots": [
     "app/jsx"
   ],
-  "moduleDirectories": [
-    "node_modules",
-    "public/javascripts"
+  setupFiles: [
+    '<rootDir>/jest/jest-setup.js'
   ],
   "transform": {
     "^i18n": "<rootDir>/jest/i18nTransformer.js",

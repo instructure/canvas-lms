@@ -8710,6 +8710,10 @@ nn:
       Tilfør og fordel karakterar for studentar. Presenter karakterane som
       poeng, prosent, fullført eller ikkje fullført, godkjent eller ikkje godkjent, GPA-skala
       og bokstavkarakterar. Gruppeoppgåver for karaktervekting.
+  input_and_distribute_grades_for_students_display_g_9a2e46a0: |-
+      Tilfør og fordel karakterar for studentar. Presenter karakterane som
+      poeng, prosent, fullført eller ikkje fullført, godkjent eller ikkje godkjent, GPA-skala
+      og bokstavkarakterar. Grupper oppgåver for karaktervekting.
   insert_math_equation_57c6e767: "Set inn mattelikning"
   insert_row_below_25187f89: "Set inn rad nedanfor"
   installed_7b284a91: Installert
@@ -9372,6 +9376,7 @@ nn:
   masquerade_fdbc9594: Forkledning
   master_lock_590266b6: Masterlås
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Meistringsnivå: %{n_mastery_points_precision_2_str} poeng"
+  mastery_path_processing_f4471152: "Behandlar meistringssti"
   mastery_paths_breakdown_6e0b5fce: "Sjå meistringssti-detaljar"
   mastery_paths_cc4096c2: Meistringsstiar
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultatet reflekterer høgaste resultat i ei karaktersett oppgåve eller quiz."
@@ -9387,6 +9392,8 @@ nn:
       miscellaneous: Diverse
       operators: Operatør
       relationships: Relasjon
+  max_dd02d615: maks
+  max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Talet (maks)på brukarar/grupper per avtale"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Talet (maks) på avtalar ein deltakar kan delta i"
   media_comment_e494a952: Mediekommentar
@@ -9458,13 +9465,14 @@ nn:
     recipients: "Mottakarar:"
   message_students_who_369b8488: "Send melding til studentar som..."
   message_students_who_57f07a41: "Send melding til studentar som"
+  message_text_5f692459: Meldingstekst
   message_this_student_6d14043d: "Send melding til denne studenten"
   message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Sender melding til alle faglærarane og undervisingsassistentane på emnet."
   messageableuser_library_767eed20: "Liste over brukarar du kan senda melding til"
   messages: 
     account_suspended: 
       email: 
-        body: "%{institution} er deaktivert. Ta kontakt med områdeadministrator for å finne ut kvifor."
+        body: "%{institution}er suspendert. Ta kontakt med Canvas-kontakten din for å finne ut kvifor."
         subject: "Institusjonen er suspendert"
     account_user_notification: 
       email: 
@@ -9582,7 +9590,7 @@ nn:
         body: "%{user} posta ein ny kommentar til kunngjeringa: %{discussion_topic} for %{course}:"
         html: 
           body: "%{user} posta ein ny kommentar til kunngjeringa: %{discussion_topic} for %{course}:"
-          discussion_entry_reply_message: "Delta i samtalen ved å bruke lenka nedanfor, eller kommenter ved å svare på denne meldinga."
+          discussion_entry_reply_message: "Delta i samtalen ved å bruke lenka nedanfor, eller kommenter ved å svare på denne meldinga. Dersom du vil sende med eit vedlegg, må du logge inn i Canvas og svare på kunngjeringa der. "
           link: "Klikk her for å delta i Vis kunngjeringa"
           subject: "Ny kommentar til kunngjeringa %{discussion_topic}: %{course}"
         subject: "Ny kommentar til kunngjeringa %{discussion_topic}: %{course}"
@@ -9974,6 +9982,26 @@ nn:
       summary: 
         subject: "Karakterar og kommentarar kunngjort for: %{title}, %{course}"
     assignment_unpublished_module: "Oppgåva er del av ein upublisert modul og er ikkje tilgjengeleg enno."
+    blueprint_content_added: 
+      email: 
+        body: "Endringar i blåkopi-emna er synkronsert til %{name}."
+        details_link: "Sjå endringar: %{link}"
+        html: 
+          body: "Endringar i blåkopi-emna er synkronsert til %{name}."
+          details_link: "Sjå endringar"
+          subject: "Synkronisering av blåkopiemne: %{name}"
+        subject: "Synkronisering av blåkopiemne: %{name}"
+      sms: 
+        body: "Endringar i blåkopi-emna er synkronsert til %{name}."
+        link_message: "Meir info på %{url}"
+      summary: 
+        body: "Synkronsering av blåkopiemne: endringar er synkronsert til %{name}."
+        subject: "Synkronisering av blåkopiemne: %{name}"
+      twitter: 
+        tweet: "Canvas-varsel - endringar i blåkopiemne er synkronisert til %{name}"
+    blueprint_sync_complete: 
+      sms: 
+        link_message: "Meir info på %{url}"
     collaboration_invitation: 
       email: 
         body: |-
