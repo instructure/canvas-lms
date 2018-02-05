@@ -950,9 +950,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: :account_notifications) do
       post 'accounts/:account_id/account_notifications', action: :create, as: 'account_notification'
       put 'accounts/:account_id/account_notifications/:id', action: :update, as: 'account_notification_update'
-      get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
-      get 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :show, as: 'user_account_notification_show'
-      delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
+      get 'accounts/:account_id/account_notifications', action: :user_index, as: 'user_account_notifications' # to change the api docs
+      get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index_deprecated # for back compat
+      get 'accounts/:account_id/account_notifications/:id', action: :show, as: 'user_account_notification_show'
+      get 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :show_deprecated
+      delete 'accounts/:account_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
+      delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification_deprecated
     end
 
     scope(controller: :brand_configs_api) do
