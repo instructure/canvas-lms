@@ -38,8 +38,13 @@ import 'media_comments' /* mediaComment */
 
 const GradeSummary = {
   getSelectedGradingPeriodId () {
-    const $select = document.querySelector('.grading_periods_selector')
-    return ($select && $select.value !== '0') ? $select.value : null
+    const currentGradingPeriodId = ENV.current_grading_period_id
+
+    if (!currentGradingPeriodId || currentGradingPeriodId === '0') {
+      return null;
+    }
+
+    return currentGradingPeriodId
   },
 
   getAssignmentId ($assignment) {
