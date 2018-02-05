@@ -79,7 +79,7 @@
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/postcss-themeable-styles/-/postcss-themeable-styles-4.7.1.tgz#61e3f6c7d162039cb3c19b77a5c1a8f6c8ef685c"
 
-"@instructure/ui-core@^4.6.0":
+"@instructure/ui-core@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.1.tgz#05f48e7f5eb469c97850bd517c266a13e2a9ec5b"
   dependencies:
@@ -9743,9 +9743,9 @@ webpack-dev-middleware@1.12.2, webpack-dev-middleware@^1.12.0:
     range-parser "^1.0.3"
     time-stamp "^2.0.0"
 
-webpack-dev-server@^2, webpack-dev-server@^2.9.4:
-  version "2.11.1"
-  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-2.11.1.tgz#6f9358a002db8403f016e336816f4485384e5ec0"
+webpack-dev-server@^2.9.4:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-2.10.0.tgz#6db9c77c8cf2e2d7ff85c89fb5e4de6f7227be19"
   dependencies:
     ansi-html "0.0.7"
     array-includes "^3.0.3"

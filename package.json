@@ -162,7 +162,7 @@
     "test:karma:headless": "karma start --single-run --browsers ChromeHeadlessNoSandbox",
     "test:karma:watch": "karma start",
     "test:karma:watch:headless": "karma start --browsers ChromeHeadlessNoSandbox",
-    "test:packages": "(cd packages/canvas-planner; yarn test)",
+    "test:packages": "script/local-yarn test",
     "preinstall": "script/local-yarn install",
     "build": "yarn run build:css && yarn run build:js",
     "build:watch": "concurrently \"yarn build:css:watch\" \"yarn build:js:watch\"",
