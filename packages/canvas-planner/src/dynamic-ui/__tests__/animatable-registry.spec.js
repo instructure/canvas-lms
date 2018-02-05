@@ -26,6 +26,7 @@ function createAr () {
     {item: 'zero'}, {item: 'one'}, {item: 'two'}, {item: 'three'},
     {item: 'four'}, {item: 'five'}, {item: 'six'}, {item: 'seven'},
   ];
+  const nais = [{nai: 'zero'}, {nai: 'one'}];
   ar.register('day', days[0], 0, ['1', '3', '5', '7']);
   ar.register('day', days[1], 1, ['0', '2', '4', '6']);
   ar.register('group', groups[0], 0, ['1', '3']);
@@ -40,7 +41,9 @@ function createAr () {
   ar.register('item', items[5], 0, ['5']);
   ar.register('item', items[6], 1, ['6']);
   ar.register('item', items[7], 1, ['7']);
-  return {ar, days, groups, items};
+  ar.register('new-activity-indicator', nais[0], 1, ['5', '7']);
+  ar.register('new-activity-indicator', nais[1], 1, ['4', '6']);
+  return {ar, days, groups, items, nais};
 }
 
 it('borks on invalid types', () => {
@@ -78,4 +81,10 @@ it('only deregisters if component matches', () => {
   ar.deregister('group', groups[1], ['1', '5']);
   expect(ar.getComponent('group', '1').component).toBe(groups[0]);
   expect(ar.getComponent('group', '5')).not.toBeDefined();
+});
+
+it('returns compacted list of new activity indicators', () => {
+  const {ar, nais} = createAr();
+  const result = ar.getAllNewActivityIndicatorsSorted();
+  expect(result.map(r => r.component)).toEqual(nais);
 });

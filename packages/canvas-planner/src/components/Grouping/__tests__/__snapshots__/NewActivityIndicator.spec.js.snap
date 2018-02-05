@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`passes props to Indicator 1`] = `
+<Indicator
+  indicatorRef={[Function]}
+  title="New activity for some title"
+  variant="primary"
+/>
+`;

@@ -19,14 +19,14 @@ import React, { Component } from 'react';
 import themeable from '@instructure/ui-themeable/lib';
 import classnames from 'classnames';
 import containerQuery from '@instructure/ui-utils/lib/react/containerQuery';
-import Badge from '@instructure/ui-core/lib/components/Badge';
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent';
 import { partition } from 'lodash';
 import { arrayOf, string, number, shape, bool, func } from 'prop-types';
 import styles from './styles.css';
 import theme from './theme.js';
 import PlannerItem from '../PlannerItem';
 import CompletedItemsFacade from '../CompletedItemsFacade';
+import NewActivityIndicator from './NewActivityIndicator';
+import MissingIndicator from './MissingIndicator';
 import moment from 'moment-timezone';
 import formatMessage from '../../format-message';
 import { getBadgesForItem, getBadgesForItems, showPillForOverdueStatus } from '../../utilities/statusUtils';
@@ -175,16 +175,12 @@ export class Grouping extends Component {
       return item.newActivity;
     });
     if (newItem || missing) {
-      let badgeMessage = newItem ? formatMessage('New activity for ') : formatMessage('Missing items for ');
-      badgeMessage += this.props.title ? this.props.title : this.renderToDoText();
-      return (
-        <div>
-          <Badge standalone type="notification" variant={newItem ? 'primary' : 'danger'} />
-          <ScreenReaderContent>
-            {badgeMessage}
-          </ScreenReaderContent>
-        </div>
-      );
+      const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
+      const badgeMessage = this.props.title ? this.props.title : this.renderToDoText();
+      return <IndicatorComponent
+        title={badgeMessage}
+        itemIds={this.itemUniqueIds()}
+        animatableIndex={this.props.animatableIndex} />;
     } else {
       return null;
     }

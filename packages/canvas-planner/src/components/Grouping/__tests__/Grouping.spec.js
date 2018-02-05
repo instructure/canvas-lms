@@ -151,11 +151,9 @@ it('renders an activity notification when there is new activity', () => {
   const wrapper = shallow(
     <Grouping {...props} />
   );
-
-  expect(wrapper.find('Badge')).toHaveLength(1);
-  expect(wrapper.find('Badge')).toHaveProperty('node.props.variant', 'primary');
-  expect(wrapper.find('ScreenReaderContent')).toHaveLength(1);
-  expect(wrapper.find('ScreenReaderContent')).toHaveProperty('node.props.children', 'New activity for ' + props.title);
+  const nai = wrapper.find('Animatable(NewActivityIndicator)');
+  expect(nai).toHaveLength(1);
+  expect(nai.prop('title')).toBe(props.title);
 });
 
 it('renders a danger activity notification when there is a missing item', () => {
@@ -164,11 +162,7 @@ it('renders a danger activity notification when there is a missing item', () => 
   const wrapper = shallow(
     <Grouping {...props} />
   );
-
-  expect(wrapper.find('Badge')).toHaveLength(1);
-  expect(wrapper.find('Badge')).toHaveProperty('node.props.variant', 'danger');
-  expect(wrapper.find('ScreenReaderContent')).toHaveLength(1);
-  expect(wrapper.find('ScreenReaderContent')).toHaveProperty('node.props.children', 'Missing items for ' + props.title);
+  expect(wrapper.find('MissingIndicator')).toHaveLength(1);
 });
 
 it(`does not render a danger activity notification when there is a missing item
@@ -193,16 +187,14 @@ it(`does not render a danger activity notification when there is a missing item
   expect(wrapper.find('ScreenReaderContent')).toHaveLength(0);
 });
 
-it('renders the to do screenreader text when there is no course', () => {
+it('renders the to do title when there is no course', () => {
   let props = getDefaultProps();
   props.title = null;
   props.items[1].newActivity = true;
   const wrapper = shallow(
     <Grouping {...props} />
   );
-
-  expect(wrapper.find('ScreenReaderContent')).toHaveLength(1);
-  expect(wrapper.find('ScreenReaderContent')).toHaveProperty('node.props.children', 'New activity for To Do');
+  expect(wrapper.find('Animatable(NewActivityIndicator)').prop('title')).toBe('To Do');
 });
 
 it('does not render an activity badge when things have no new activity', () => {

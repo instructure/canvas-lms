@@ -25,11 +25,13 @@ export class AnimatableRegistry {
       group: {},
       item: {},
       opportunity: {},
+      'new-activity-indicator': {},
     };
   }
 
   validateType (type) {
-    if (!['day', 'group', 'item', 'opportunity'].find((t) => t === type)) {
+    const registryTypes = Object.keys(this.registries);
+    if (!registryTypes.find((t) => t === type)) {
       throw new Error(`invalid registry type ${type}`);
     }
   }
@@ -79,7 +81,7 @@ export class AnimatableRegistry {
   // indexed components are special and are not returned by this method. This method only makes
   // sense for days and opportunities since groups and items are nested components and will have
   // duplicate indexes registered (with different ids).
-  getSortedComponents (type, componentIds) {
+  getSortedComponents (type) {
     this.validateType(type);
     return _.chain(this.registries[type])
       .values()
@@ -89,12 +91,17 @@ export class AnimatableRegistry {
       .value();
   }
 
-  // gets all items that are displayed in the interface in interface sorted order.
-  getAllItemsSorted () {
+  getAllGroupsSorted () {
     // get list of days sorted as they appear in the interface.
     const sortedDays = this.getSortedComponents('day');
     // get sorted groups for each sorted day, then flatten into one list of interface sorted groups.
     const sortedGroups = _.flatMap(sortedDays, day => this.getUniqSortedComponents('group', day.componentIds));
+    return sortedGroups;
+  }
+
+  // gets all items that are displayed in the interface in interface sorted order.
+  getAllItemsSorted () {
+    const sortedGroups = this.getAllGroupsSorted();
     // get sorted items for each group, then flatten into one list of interface sorted items
     const sortedItems = _.flatMap(sortedGroups, group => this.getUniqSortedComponents('item', group.componentIds));
     return sortedItems;
@@ -103,5 +110,15 @@ export class AnimatableRegistry {
   // gets indexed opportunities in interface order.
   getAllOpportunitiesSorted () {
     return this.getSortedComponents('opportunity');
+  }
+
+  getAllNewActivityIndicatorsSorted () {
+    const sortedGroups = this.getAllGroupsSorted();
+    const sortedNewActivityIndicators = _.chain(sortedGroups)
+      .flatMap(group => this.getUniqSortedComponents('new-activity-indicator', group.componentIds))
+      // not every group has a new activity indicator, so remove the undefined components
+      .filter(nai => nai != null)
+      .value();
+    return sortedNewActivityIndicators;
   }
 }
