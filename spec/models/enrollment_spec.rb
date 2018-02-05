@@ -2618,32 +2618,28 @@ describe Enrollment do
     end
 
     it "triggers a batch when enrollment is created" do
-      expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).with(@course)
-      @course.enroll_student(user_factory)
+      added_user = user_factory
+      expect(DueDateCacher).to receive(:recompute_users_for_course).with(added_user.id, @course)
+      @course.enroll_student(added_user)
     end
 
     it "does not trigger a batch when enrollment is not student" do
-      expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).never
+      expect(DueDateCacher).to receive(:recompute_users_for_course).never
       @course.enroll_teacher(user_factory)
     end
 
     it "triggers a batch when enrollment is deleted" do
-      expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).with(@course)
+      expect(DueDateCacher).to receive(:recompute_users_for_course).with(@enrollment.user_id, @course)
       @enrollment.destroy
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).never
+      expect(DueDateCacher).to receive(:recompute_users_for_course).never
       @enrollment.save
     end
 
     it "does not trigger when set_update_cached_due_dates callback is suspended" do
-      expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).never
+      expect(DueDateCacher).to receive(:recompute_users_for_course).never
       Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
         @course.enroll_student(user_factory)
       end
