@@ -19,7 +19,7 @@ class ValidateAssignmentOverrides < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def self.up
-    Assignment.find_ids_in_ranges(:batch_size => 100_000) do |start_at, end_at|
+    Assignment.find_ids_in_ranges(:batch_size => 10_000) do |start_at, end_at|
       DataFixup::ValidateAssignmentOverrides.send_later_if_production_enqueue_args(:run, {
           priority: Delayed::LOW_PRIORITY,
           max_attempts: 1,

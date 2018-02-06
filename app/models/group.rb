@@ -580,7 +580,6 @@ class Group < ActiveRecord::Base
     end
     return false
   end
-  private :can_participate?
 
   def can_join?(user)
     if self.context.is_a?(Course)

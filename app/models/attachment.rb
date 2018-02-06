@@ -772,11 +772,43 @@ class Attachment < ActiveRecord::Base
       InstFS.authenticated_url(self, options)
     else
       # attachment_fu doesn't like the extra option when building s3 urls
+      options.delete(:user)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
       self.authenticated_s3_url(**options)
     end
+  end
+
+  def authenticated_url_for_user(user, **options)
+    authenticated_url(options.merge(user: user))
+  end
+
+  def download_url_for_user(user, ttl = url_ttl)
+    authenticated_url_for_user(user, expires_in: ttl, download: true)
+  end
+
+  def inline_url_for_user(user, ttl = url_ttl)
+    authenticated_url_for_user(user, expires_in: ttl, download: false)
+  end
+
+  def public_url(**options)
+    authenticated_url_for_user(nil, options)
+  end
+
+  def public_inline_url(ttl = url_ttl)
+    inline_url_for_user(nil, ttl)
+  end
+
+  def public_download_url(ttl = url_ttl)
+    download_url_for_user(nil, ttl)
+  end
+
+  def url_ttl
+    settings = root_account_id && Account.find_cached(root_account_id)&.settings
+    setting = settings && settings[:s3_url_ttl_seconds]
+    setting ||= Setting.get('attachment_url_ttl', 1.hour.to_s)
+    setting.to_i.seconds
   end
 
   def stored_locally?
@@ -965,19 +997,6 @@ class Attachment < ActiveRecord::Base
     h = ActionView::Base.new
     h.extend ActionView::Helpers::NumberHelper
     h.number_to_human_size(self.size) rescue "size unknown"
-  end
-
-  def download_url(ttl = url_ttl)
-    authenticated_url(expires_in: ttl, download: true)
-  end
-
-  def inline_url(ttl = url_ttl)
-    authenticated_url(expires_in: ttl, download: false)
-  end
-
-  def url_ttl
-    default = Setting.get('attachment_url_ttl', 1.hour.to_s).to_i.seconds
-    (root_account_id && Account.find_cached(root_account_id)&.settings[:s3_url_ttl_seconds]&.to_i&.seconds) || default
   end
 
   def disposition_filename

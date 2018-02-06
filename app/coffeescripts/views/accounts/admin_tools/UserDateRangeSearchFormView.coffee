@@ -106,9 +106,15 @@ define [
             {
               text: I18n.t('Find')
               'class': 'btn btn-primary userDateRangeSearchBtn'
+              'id': "#{self.formName}-find-button"
               click: ->
-                self.$hiddenDateStart.val(if self.$dateStartSearchField.attr('aria-invalid') == 'true' then '' else self.$dateStartSearchField.val())
-                self.$hiddenDateEnd.val(if self.$dateEndSearchField.attr('aria-invalid') == 'true' then '' else self.$dateEndSearchField.val())
+                errors = self.datesValidation()
+                if Object.keys(errors).length != 0
+                  self.showErrors(errors, true)
+                  return
+
+                self.$hiddenDateStart.val(self.$dateStartSearchField.val())
+                self.$hiddenDateEnd.val(self.$dateEndSearchField.val())
                 self.$el.submit()
                 $(this).dialog('close')
             }
@@ -116,30 +122,37 @@ define [
       else
         @$userIdField.val('')
 
-    validityCheck: ->
-      json = @$el.toJSON()
+    dateIsValid: (dateField) ->
+      if dateField.val() == ''
+        return true
+      date = dateField.data('unfudged-date')
+      return (date instanceof Date && !isNaN(date.valueOf()))
 
-      valid = true
+    datesValidation: ->
       errors = {}
-      # If have both start and end, check for values to make sense together.
-      if json.start_time && json.end_time && (json.start_time > json.end_time)
-        valid = false
-        errors['end_time'] =
-          [
-            {
-            type: 'invalid'
-            message: I18n.t('"To Date" can\'t come before "From Date"')
-            }
-          ]
-      # Show any errors
-      @showErrors errors
-      # Return false if there are any errors
-      valid
+      startDateField = @$dateStartSearchField
+      endDateField = @$dateEndSearchField
+      startDate = startDateField.data('unfudged-date')
+      endDate = endDateField.data('unfudged-date')
+
+      if startDate && endDate && (startDate > endDate)
+        errors["#{@formName}_end_time"] = [{
+          message: I18n.t('To Date cannot come before From Date')
+        }]
+      else
+        if !@dateIsValid(startDateField)
+          errors["#{@formName}_start_time"] = [{
+            message: I18n.t('Not a valid date')
+          }]
+        if !@dateIsValid(endDateField)
+          errors["#{@formName}_end_time"] = [{
+            message: I18n.t('Not a valid date')
+          }]
+      return errors
 
     submit: (event) ->
       event.preventDefault()
-      if @validityCheck()
-        @updateCollection()
+      @updateCollection()
 
     updateCollection: ->
       # Update the params (which fetches the collection)

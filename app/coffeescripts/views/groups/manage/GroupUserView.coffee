@@ -54,6 +54,7 @@ define [
       result = Object.assign {groupId: @model.get('group')?.id}, this, super
       result.shouldMarkInactive =
         @options.markInactiveStudents && @model.attributes.is_inactive
+      result.isLeader = @isLeader()
       result
 
     isLeader: ->

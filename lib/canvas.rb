@@ -98,7 +98,7 @@ module Canvas
         servers = config.delete('servers')
         if servers
           servers = servers.map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
-          ActiveSupport::Cache.lookup_store(:redis_store, servers, config)
+          ActiveSupport::Cache.lookup_store(:redis_store, servers, config.symbolize_keys)
         end
       end
     when 'memory_store'

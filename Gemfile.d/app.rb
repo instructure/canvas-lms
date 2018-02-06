@@ -39,7 +39,7 @@ gem 'authlogic', '3.6.1'
   gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
-gem 'switchman', '1.11.4'
+gem 'switchman', '1.11.5'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -100,7 +100,7 @@ gem 'rotp', '3.3.0', require: false
 gem 'net-ldap', '0.16.0', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.7'
-gem 'saml2', '1.1.5', require: false
+gem 'saml2', '2.0.0'
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.0', require: 'zip'
@@ -117,7 +117,7 @@ gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.5', require: false
 gem 'gepub', '0.7.0beta4'
-gem 'imperium', '0.2.2', require: false
+gem 'imperium', '0.2.4', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
 gem 'graphql', '1.6.7'

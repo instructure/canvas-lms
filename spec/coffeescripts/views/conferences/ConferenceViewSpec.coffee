@@ -22,8 +22,9 @@ define [
   'jquery',
   'helpers/I18nStubber',
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], (Backbone, Conference, ConferenceView, $, I18nStubber, fakeENV) ->
+], (Backbone, Conference, ConferenceView, $, I18nStubber, fakeENV, assertions) ->
   fixtures = $('#fixtures')
   conferenceView = (conferenceOpts = {}) ->
     conference = new Conference
@@ -42,6 +43,10 @@ define [
       fakeENV.setup()
     teardown: ->
       fakeENV.teardown()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible conferenceView(), done, {'a11yReport': true}
 
   test 'renders', ->
     view = conferenceView()

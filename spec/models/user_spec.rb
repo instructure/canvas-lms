@@ -139,6 +139,25 @@ describe User do
     expect(@user.associated_accounts.first).to eql(account)
   end
 
+  it "should exclude deleted enrollments from all courses list" do
+    account1 = account_model
+
+    enrollment1 = course_with_student(:account => account1)
+    enrollment2 = course_with_student(:account => account1)
+    enrollment1.user = @user
+    enrollment2.user = @user
+    enrollment1.save!
+    enrollment2.save!
+    @user.reload
+
+    expect(@user.all_courses_for_active_enrollments.length).to be(2)
+
+    expect { enrollment1.destroy! }.
+      to change {
+        @user.reload.all_courses_for_active_enrollments.size
+      }.from(2).to(1)
+  end
+
   it "should populate dashboard_messages" do
     Notification.create(:name => "Assignment Created")
     course_with_teacher(:active_all => true)
@@ -2154,7 +2173,14 @@ describe User do
     before(:each) do
       @reviewer = course_with_student(active_all: true).user
       @reviewee = course_with_student(course: @course, active_all: true).user
-      assignment_model(course: @course, peer_reviews: true)
+
+      add_section("section1")
+      @course.enroll_user(@reviewer, 'StudentEnrollment',
+                    :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(@reviewee, 'StudentEnrollment',
+                    :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+
+      assignment_model(course: @course, peer_reviews: true, only_visible_to_overrides: true)
 
       @reviewer_submission = submission_model(assignment: @assignment, user: @reviewer)
       @reviewee_submission = submission_model(assignment: @assignment, user: @reviewee)
@@ -2173,6 +2199,21 @@ describe User do
     it "should not include assessment requests the user does not have permission to perform" do
       @assignment.peer_reviews = false
       @assignment.save!
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 0
+    end
+
+    it "should not include assessment requests for users not assigned the assignment" do
+      # create a new section with only the reviewer student
+      # since the reviewee is no longer assigned @assignment, the reviewer should
+      # have nothing to do.
+      add_section("section2")
+      @course.enroll_user(@reviewer, 'StudentEnrollment',
+                      :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      override = @assignment.assignment_overrides.build
+      override.set = @course_section
+      override.save!
+      AssignmentOverrideApplicator.assignment_with_overrides(@assignment, [@override])
+
       expect(@reviewer.submissions_needing_peer_review.length).to eq 0
     end
   end

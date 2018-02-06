@@ -202,6 +202,9 @@ module AccountReports
             :groups => {
               :description => 'Get the SIS file for groups'
             },
+            :group_categories => {
+              :description => 'Get the SIS file for group_categories'
+            },
             :group_membership => {
               :description => 'Get the SIS file for group_membership'
             },

@@ -780,21 +780,21 @@ class ApplicationController < ActionController::Base
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
         unless course_ids.empty?
-          courses = Course
-            .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
-            .joins(enrollments: :enrollment_state)
-            .merge(enrollment_scope)
-            .where(id: course_ids)
+          courses = Course.
+            shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
+            joins(enrollments: :enrollment_state).
+            merge(enrollment_scope).
+            where(id: course_ids)
         end
         if include_groups
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
           include_groups = !group_ids.empty?
         end
       else
-        courses = Course
-          .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
-          .joins(enrollments: :enrollment_state)
-          .merge(enrollment_scope)
+        courses = Course.
+          shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
+          joins(enrollments: :enrollment_state).
+          merge(enrollment_scope)
       end
 
       groups = []
@@ -1121,6 +1121,7 @@ class ApplicationController < ActionController::Base
   end
 
   def update_enrollment_last_activity_at
+    return unless @context_enrollment.is_a?(Enrollment)
     activity = Enrollment::RecentActivity.new(@context_enrollment, @context)
     activity.record_for_access(response)
   end
@@ -1254,8 +1255,6 @@ class ApplicationController < ActionController::Base
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)
-    raise if Rails.env.development? && ENV['BETTER_ERRORS_DISABLE'] != 'true'
-
     ActiveSupport::Deprecation.silence do
       message = "\n#{exception.class} (#{exception.message}):\n"
       message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
@@ -1583,7 +1582,7 @@ class ApplicationController < ActionController::Base
           return unless require_user
           add_crumb(@resource_title)
           @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
-          @prepend_template = 'assignments/lti_header' unless external_tool_redirect_display_type == 'full_width'
+          @prepend_template = 'assignments/lti_header' unless render_external_tool_full_width?
           @lti_launch.params = lti_launch_params(adapter)
         else
           @lti_launch.params = adapter.generate_post_payload
@@ -1593,7 +1592,7 @@ class ApplicationController < ActionController::Base
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
 
-        @append_template = 'context_modules/tool_sequence_footer'
+        @append_template = 'context_modules/tool_sequence_footer' unless render_external_tool_full_width?
         render Lti::AppUtil.display_template(external_tool_redirect_display_type)
       end
     else
@@ -1611,6 +1610,11 @@ class ApplicationController < ActionController::Base
     params['display'] || @tool&.extension_setting(:assignment_selection)&.dig('display_type')
   end
   private :external_tool_redirect_display_type
+
+  def render_external_tool_full_width?
+    external_tool_redirect_display_type == 'full_width'
+  end
+  private :render_external_tool_full_width?
 
   # pass it a context or an array of contexts and it will give you a link to the
   # person's calendar with only those things checked.
@@ -2327,25 +2331,20 @@ class ApplicationController < ActionController::Base
       return render_unauthorized_action
     end
 
-    def localized_timezones(zones)
-      zones.map { |tz| {name: tz.name, localized_name: tz.to_s} }
-    end
-
     js_env({
-      TIMEZONES: {
-        priority_zones: localized_timezones(I18nTimeZone.us_zones),
-        timezones: localized_timezones(I18nTimeZone.all)
-      },
       COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user)
     })
     js_bundle :account_course_user_search
-    css_bundle :account_course_user_search, :addpeople
+    css_bundle :addpeople
     @page_title = @account.name
     add_crumb '', '?' # the text for this will be set by javascript
     js_env({
-      ROOT_ACCOUNT_NAME: @domain_root_account.name, # used in AddPeopleApp modal
+      ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
       ACCOUNT_ID: @account.id,
       ROOT_ACCOUNT_ID: @account.root_account.id,
+      customized_login_handle_name: @account.root_account.customized_login_handle_name,
+      delegated_authentication: @account.root_account.delegated_authentication?,
+      SHOW_SIS_ID_IN_NEW_USER_FORM: @account.root_account.allow_sis_import && @account.root_account.grants_right?(@current_user, session, :manage_sis),
       PERMISSIONS: {
         can_read_course_list: can_read_course_list,
         can_read_roster: can_read_roster,

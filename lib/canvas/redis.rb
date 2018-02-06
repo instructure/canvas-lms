@@ -275,8 +275,20 @@ module Canvas::Redis
     ].freeze
   end
 
+  module DistributedStore
+    def initialize(addresses, options = { })
+      _extend_namespace options
+      @ring = options[:ring] || Canvas::HashRing.new([], options[:replicas], options[:digest])
+
+      addresses.each do |address|
+        @ring.add_node(::Redis::Store.new _merge_options(address, options))
+      end
+    end
+  end
+
   def self.patch
     Redis::Client.prepend(Client)
+    Redis::DistributedStore.prepend(DistributedStore)
     Redis.send(:remove_const, :BoolifySet)
     Redis.const_set(:BoolifySet, BoolifySet)
   end

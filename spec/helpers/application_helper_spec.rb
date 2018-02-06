@@ -722,6 +722,30 @@ describe ApplicationHelper do
     end
   end
 
+  describe "map_groups_for_planner" do
+    context "with planner enabled" do
+      before(:each) do
+        @account = Account.default
+        @account.enable_feature! :student_planner
+      end
+
+      it "returns the list of account-level groups the user belongs to" do
+        user = user_model
+        group1 = @account.groups.create! :name => 'Account group'
+        course1 = @account.courses.create!
+        group2 = course1.groups.create! :name => 'Course group'
+        group3 = @account.groups.create! :name => 'Another account group'
+        groups = [group1, group2, group3]
+
+        @current_user = user
+        course1.enroll_student(@current_user)
+        groups.each {|g| g.add_user(user, 'accepted', true)}
+        user_account_groups = map_groups_for_planner(groups)
+        expect(user_account_groups.map {|g| g[:id]}).to eq [group1.id, group3.id]
+      end
+    end
+  end
+
   describe "tutorials_enabled?" do
     before(:each) do
       @domain_root_account = Account.default

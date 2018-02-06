@@ -17,9 +17,10 @@
 
 define [
   'compiled/react_files/modules/FileUploader'
+  'jsx/shared/upload_file'
   'jquery'
   'jquery.ajaxJSON'
-], (FileUploader, $) ->
+], (FileUploader, uploader, $) ->
 
   mockFileOptions =  (name, type, size) ->
     fileOptions =
@@ -63,7 +64,8 @@ define [
 
     server.restore()
 
-  test 'pings success_url after upload if set (S3)', ->
+  test 'completes upload after preflight', (assert) ->
+    done = assert.async()
     server = sinon.fakeServer.create()
     server.respondWith('POST',
                        '/api/v1/folders/1/files',
@@ -72,81 +74,14 @@ define [
                          '{"upload_url": "/s3/upload/url", "upload_params": {"success_url": "/success/url"}}'
                        ]
     )
-    server.respondWith('POST',
-                       '/s3/upload/url',
-                       [ 201,
-                         {"Content-Type": "application/xml"},
-                         '<s3metadata />'
-                       ]
-    )
-    server.respondWith('GET',
-                       '/success/url',
-                       [ 200,
-                         {"Content-Type": "application/json"},
-                         '{ "id": "s3-id" }'
-                       ]
-    )
     @stub(@uploader, 'addFileToCollection')
+    @stub(uploader, 'completeUpload').returns Promise.resolve(id: "s3-id")
     promise = @uploader.upload()
     server.respond() # preflight
-    server.respond() # upload to s3
-    server.respond() # success_url
-    ok(@uploader.addFileToCollection.calledWith(id: "s3-id"), "got metadata from success_url")
-    server.restore()
-
-  test 'reads location after upload if 201 but no success_url (inst-fs)', ->
-    server = sinon.fakeServer.create()
-    server.respondWith('POST',
-                       '/api/v1/folders/1/files',
-                       [ 200,
-                         {"Content-Type": "application/json"},
-                         '{"upload_url": "/inst-fs/upload/url", "upload_params": {}}'
-                       ]
-    )
-    server.respondWith('POST',
-                       '/inst-fs/upload/url',
-                       [ 201,
-                         {"Content-Type": "application/json"},
-                         '{ "location": "/attachment/url" }'
-                       ]
-    )
-    server.respondWith('GET',
-                       '/attachment/url',
-                       [ 200,
-                         {"Content-Type": "application/json"},
-                         '{ "id": "inst-fs-id" }'
-                       ]
-    )
-    @stub(@uploader, 'addFileToCollection')
-    promise = @uploader.upload()
-    server.respond() # preflight
-    server.respond() # upload to inst-fs
-    server.respond() # location
-    ok(@uploader.addFileToCollection.calledWith(id: "inst-fs-id"), "got metadata from location")
-    server.restore()
-
-  test 'takes response body directly if 200 instead of 201 (local storage)', ->
-    server = sinon.fakeServer.create()
-    server.respondWith('POST',
-                       '/api/v1/folders/1/files',
-                       [ 200,
-                         {"Content-Type": "application/json"},
-                         '{"upload_url": "/inst-fs/upload/url", "upload_params": {}}'
-                       ]
-    )
-    server.respondWith('POST',
-                       '/inst-fs/upload/url',
-                       [ 200,
-                         {"Content-Type": "application/json"},
-                         '{ "id": "local-storage-id" }'
-                       ]
-    )
-    @stub(@uploader, 'addFileToCollection')
-    promise = @uploader.upload()
-    server.respond() # preflight
-    server.respond() # upload to local storage
-    ok(@uploader.addFileToCollection.calledWith(id: "local-storage-id"), "got metadata from response")
-    server.restore()
+    promise.then =>
+      ok(@uploader.addFileToCollection.calledWith(id: "s3-id"), "got metadata from success_url")
+      server.restore()
+      done()
 
   test 'roundProgress returns back rounded values', ->
     @stub(@uploader, 'getProgress').returns(0.18) # progress is [0 .. 1]

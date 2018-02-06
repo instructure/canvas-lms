@@ -22,7 +22,8 @@ define [
   'compiled/models/Group'
   'compiled/models/GroupUser'
   'compiled/models/GroupCategory'
-], ($, AssignToGroupMenu, GroupCollection, Group, GroupUser, GroupCategory) ->
+  'helpers/assertions'
+], ($, AssignToGroupMenu, GroupCollection, Group, GroupUser, GroupCategory, assertions) ->
 
   view = null
   user = null
@@ -43,6 +44,10 @@ define [
     teardown: ->
       view.remove()
       document.getElementById("fixtures").innerHTML = ""
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test "updates the user's group", ->
     equal user.get('group'), null

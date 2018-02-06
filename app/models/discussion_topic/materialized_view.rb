@@ -77,7 +77,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   # that have been created or updated since the view was generated.
   def materialized_view_json(opts = {})
     if !up_to_date?
-      update_materialized_view
+      update_materialized_view(xlog_location: self.class.current_xlog_location)
     end
 
     if json_structure.present?
@@ -101,7 +101,8 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     end
   end
 
-  def update_materialized_view
+  def update_materialized_view(xlog_location: nil)
+    self.class.wait_for_replication(start: xlog_location)
     self.generation_started_at = Time.zone.now
     view_json, user_ids, entry_lookup =
       self.build_materialized_view
@@ -112,8 +113,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   end
 
   handle_asynchronously :update_materialized_view,
-    :singleton => proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" },
-    :run_at => proc { 10.seconds.from_now } # delay for replication to slave
+    :singleton => proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" }
 
   def build_materialized_view
     entry_lookup = {}

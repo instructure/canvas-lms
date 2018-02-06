@@ -1185,6 +1185,30 @@ describe MasterCourses::MasterMigration do
       expect(sub.quiz_data.first["question_text"]).to eq new_text
     end
 
+    it "syncs quiz_groups with points locked" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!(:title => 'quiz')
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      group = quiz.quiz_groups.create!(:name => "group", :pick_count => 1, :question_points => 2.0)
+      group.assessment_question_bank = bank
+      group.save
+      tag = @template.create_content_tag_for!(quiz, restrictions: {content: false, points: true})
+
+      mm = run_master_migration
+      expect(mm.migration_results.first.content_migration.warnings).to be_empty
+
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).take
+      qg_to = quiz_to.quiz_groups.first # note: it's migration_id isn't mig_id(group) because qti_generator is an oddball. oh well.
+
+      expect(qg_to.question_points).to eq 2.0
+      qg_to.question_points = 3.0
+      expect(qg_to.save).to be false
+      expect(qg_to.errors.first.second).to eq "cannot change column(s): question_points - locked by Master Course"
+    end
+
     it "copies tab configurations for account-level external tools" do
       @tool_from = @copy_from.account.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
       @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}

@@ -993,6 +993,22 @@ describe DiscussionTopicsController do
       expect(DiscussionTopicSectionVisibility.count).to eq 1
     end
 
+    it 'creates an announcement that is locked by default' do
+      user_session(@teacher)
+      post 'create',
+        params: topic_params(@course, {is_announcement: true}), :format => :json
+      expect(response).to have_http_status :success
+      expect(DiscussionTopic.last.locked).to be_truthy
+    end
+
+    it 'creates a discussion topic that is not locked by default' do
+      user_session(@teacher)
+      post 'create',
+        params: topic_params(@course, {is_announcement: false}), :format => :json
+      expect(response).to have_http_status :success
+      expect(DiscussionTopic.last.locked).to be_falsy
+    end
+
     it 'registers a page view' do
       user_session(@student)
       post 'create', params: topic_params(@course), :format => :json
@@ -1089,6 +1105,7 @@ describe DiscussionTopicsController do
       user_session(@teacher)
     end
 
+
     it "should not clear lock_at if locked is not changed" do
       put('update', params: {course_id: @course.id, topic_id: @topic.id,
           title: 'Updated Topic',
@@ -1172,6 +1189,16 @@ describe DiscussionTopicsController do
 
       expect(@topic.reload.attachment).to be_nil
       expect(attachment.reload).to be_deleted
+    end
+
+    it "can edit topics with section specific flag on" do
+      @course.root_account.enable_feature!(:section_specific_announcements)
+      @announcement = Announcement.create!(context: @course, title: 'Test Announcement',
+        message: 'Foo', delayed_post_at: '2013-01-01T00:00:00UTC',
+        lock_at: '2013-01-02T00:00:00UTC')
+      put('update', params: {course_id: @course.id, topic_id: @announcement.id, message: 'Foobar',
+        is_announcement: true, specific_sections: "all"})
+      expect(response).to be_success
     end
   end
 

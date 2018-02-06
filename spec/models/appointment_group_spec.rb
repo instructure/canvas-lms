@@ -397,13 +397,13 @@ describe AppointmentGroup do
     it "should notify all participants when deleting", priority: "1", test_id: 193137 do
       @ag.publish!
       @ag.cancel_reason = "just because"
-      @ag.destroy
+      @ag.destroy(@teacher)
       expect(@ag.messages_sent).to be_include("Appointment Group Deleted")
       expect(@ag.messages_sent["Appointment Group Deleted"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
 
     it "should not notify participants when unpublished" do
-      @ag.destroy
+      @ag.destroy(@teacher)
       expect(@ag.messages_sent).to be_empty
     end
 
@@ -419,7 +419,7 @@ describe AppointmentGroup do
       @ag.publish!
       expect(@ag.messages_sent).to be_empty
 
-      @ag.destroy
+      @ag.destroy(@teacher)
       expect(@ag.messages_sent).to be_empty
     end
   end
@@ -437,7 +437,7 @@ describe AppointmentGroup do
       participant
     }
 
-    ag.destroy
+    ag.destroy(@teacher)
     expect(appt.reload).to be_deleted
     participants.each do |participant|
       expect(participant.reload).to be_deleted

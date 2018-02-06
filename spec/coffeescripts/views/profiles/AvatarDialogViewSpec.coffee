@@ -18,7 +18,8 @@
 define [
   'jquery'
   'compiled/views/profiles/AvatarDialogView'
-], ($, AvatarDialogView) ->
+  'helpers/assertions'
+], ($, AvatarDialogView, assertions) ->
 
   QUnit.module 'AvatarDialogView#onPreflight',
     setup: ->
@@ -29,32 +30,14 @@ define [
       @avatarDialogView = null
       $(".ui-dialog").remove()
 
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @avatarDialogView, done, {'a11yReport': true}
+
   test 'calls flashError with base error message when errors are present', ->
     errorMessage = "User storage quota exceeded"
     @stub(@avatarDialogView, 'enableSelectButton')
     mock = @mock($).expects('flashError').withArgs(errorMessage)
     @avatarDialogView.preflightRequest()
     @server.respond 'POST', '/files/pending', [400, {'Content-Type': 'application/json'}, "{\"errors\":{\"base\":\"#{errorMessage}\"}}"]
-    ok(mock.verify())
-
-  QUnit.module 'AvatarDialogView#postAvatar',
-    setup: ->
-      @avatarDialogView = new AvatarDialogView()
-    teardown: ->
-      @avatarDialogView = null
-      $(".ui-dialog").remove()
-
-  test 'calls flashError with base error message when errors are present', ->
-    errorMessage = "User storage quota exceeded"
-    preflightResponse = {
-      upload_url: 'http://some_url',
-      upload_params: {},
-      file_param: ''
-    }
-    fakeXhr = {
-      responseText: '{"errors":{"base":[{"message":"User storage quota exceeded"}]}}'
-    }
-    @stub($, 'ajax').yieldsTo('error', fakeXhr)
-    mock = @mock($).expects('flashError').withArgs(errorMessage)
-    @avatarDialogView.postAvatar(preflightResponse)
     ok(mock.verify())

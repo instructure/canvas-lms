@@ -67,6 +67,19 @@ describe FeatureFlags do
       expect(t_course.lookup_feature_flag('user_feature')).to be_nil
     end
 
+    it "should return nil if the visible_on returns false" do
+      feature = double(
+        "Feature double",
+        feature: 'some_feature',
+        visible_on: ->(_) { return false },
+        state: 'allowed'
+      )
+      expect(feature).to receive(:applies_to_object).and_return(true)
+      allow(Feature.definitions).to receive(:[]).and_call_original
+      expect(Feature.definitions).to receive(:[]).with('some_feature').and_return(feature)
+      expect(t_course.lookup_feature_flag('some_feature')).to be_nil
+    end
+
     it "should return defaults when no flags exist" do
       expect(t_user.lookup_feature_flag('user_feature')).to be_default
     end

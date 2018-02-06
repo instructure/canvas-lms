@@ -16,23 +16,56 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class AssignmentRowCellPropFactory {
-  constructor (assignment, gradebook) {
-    this.assignment = assignment;
-    this.gradebook = gradebook;
-  }
-
-  isTrayOpenForThisCell = (student) => {
-    const { open, studentId, assignmentId } = this.gradebook.getSubmissionTrayState();
-    return open && studentId === student.id && assignmentId === this.assignment.id;
-  }
-
-  getProps (student) {
-    return {
-      isSubmissionTrayOpen: this.isTrayOpenForThisCell(student),
-      onToggleSubmissionTrayOpen: this.gradebook.toggleSubmissionTrayOpen
-    };
-  }
+function isTrayOpen(gradebook, student, assignment) {
+  const {open, studentId, assignmentId} = gradebook.getSubmissionTrayState()
+  return open && studentId === student.id && assignmentId === assignment.id
 }
 
-export default AssignmentRowCellPropFactory;
+export default class AssignmentRowCellPropFactory {
+  constructor(gradebook) {
+    this.gradebook = gradebook
+  }
+
+  getProps(editorOptions) {
+    const student = editorOptions.item
+    const assignment = this.gradebook.getAssignment(editorOptions.column.assignmentId)
+    const submission = this.gradebook.getSubmission(student.id, assignment.id)
+
+    const cleanSubmission = {
+      assignmentId: assignment.id,
+      enteredGrade: submission.entered_grade,
+      enteredScore: submission.entered_score,
+      excused: !!submission.excused,
+      id: submission.id,
+      userId: student.id
+    }
+
+    const updatingSubmission = this.gradebook.getUpdatingSubmission(cleanSubmission)
+    if (updatingSubmission) {
+      cleanSubmission.enteredGrade = updatingSubmission.enteredGrade
+      cleanSubmission.enteredScore = updatingSubmission.enteredScore
+      cleanSubmission.excused = updatingSubmission.excused
+    }
+
+    return {
+      assignment: {
+        id: assignment.id,
+        pointsPossible: assignment.points_possible
+      },
+
+      enterGradesAs: this.gradebook.getEnterGradesAsSetting(assignment.id),
+      gradingScheme: this.gradebook.getAssignmentGradingScheme(assignment.id).data,
+      isSubmissionTrayOpen: isTrayOpen(this.gradebook, student, assignment),
+
+      onToggleSubmissionTrayOpen: () => {
+        this.gradebook.toggleSubmissionTrayOpen(student.id, assignment.id)
+      },
+
+      onGradeSubmission: this.gradebook.gradeSubmission,
+
+      submission: cleanSubmission,
+
+      submissionIsUpdating: !!updatingSubmission
+    }
+  }
+}

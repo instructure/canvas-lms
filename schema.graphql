@@ -1,6 +1,25 @@
+# A list of students that an `AssignmentOverride` applies to
+type AdhocStudents {
+  students: [User]
+}
+
 type Assignment implements Node, Timestamped {
   # legacy canvas id
   _id: ID!
+  assignmentGroup: AssignmentGroup
+  assignmentOverrides(
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): AssignmentOverrideConnection
   course: Course
   createdAt: Time
   description: String
@@ -13,6 +32,10 @@ type Assignment implements Node, Timestamped {
   name: String
   needsGradingCount: Int
 
+  # specifies that this assignment is only assigned to students for whom an
+  #        `AssignmentOverride` applies.
+  onlyVisibleToOverrides: Boolean
+
   # the assignment is out of this many points
   pointsPossible: Float
 
@@ -20,6 +43,7 @@ type Assignment implements Node, Timestamped {
   position: Int
   quiz: Quiz
   state: AssignmentState!
+  submissionTypes: [SubmissionType!]
 
   # submissions for this assignment
   submissionsConnection(
@@ -120,6 +144,43 @@ input AssignmentInput {
   name: String!
 }
 
+type AssignmentOverride implements Timestamped {
+  # legacy canvas id
+  _id: ID!
+  allDay: Boolean
+  assignment: Assignment
+  createdAt: Time
+  dueAt: Time
+  lockAt: Time
+
+  # This object specifies what students this override applies to
+  set: AssignmentOverrideSet
+  title: String
+  unlockAt: Time
+  updatedAt: Time
+}
+
+# The connection type for AssignmentOverride.
+type AssignmentOverrideConnection {
+  # A list of edges.
+  edges: [AssignmentOverrideEdge]
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+}
+
+# An edge in a connection.
+type AssignmentOverrideEdge {
+  # A cursor for use in pagination.
+  cursor: String!
+
+  # The item at the end of the edge.
+  node: AssignmentOverride
+}
+
+# Objects that can be assigned overridden dates
+union AssignmentOverrideSet = AdhocStudents | Group | Section
+
 # States that an Assignment can be in
 enum AssignmentState {
   deleted
@@ -173,6 +234,19 @@ type Course implements Node, Timestamped {
     # Returns the last _n_ elements from the list.
     last: Int
   ): GradingPeriodConnection
+  groupsConnection(
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): GroupConnection
   id: ID!
   name: String!
 
@@ -224,6 +298,9 @@ type Course implements Node, Timestamped {
 
     # Returns the last _n_ elements from the list.
     last: Int
+
+    # only include users with the given ids
+    userIds: [ID!]
   ): UserConnection
 }
 
@@ -336,6 +413,80 @@ type GradingPeriodEdge {
 
   # The item at the end of the edge.
   node: GradingPeriod
+}
+
+type Group implements Timestamped {
+  # legacy canvas id
+  _id: ID!
+  createdAt: Time
+  membersConnection(
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+  ): GroupMembershipConnection
+  name: String
+  updatedAt: Time
+}
+
+# The connection type for Group.
+type GroupConnection {
+  # A list of edges.
+  edges: [GroupEdge]
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+}
+
+# An edge in a connection.
+type GroupEdge {
+  # A cursor for use in pagination.
+  cursor: String!
+
+  # The item at the end of the edge.
+  node: Group
+}
+
+type GroupMembership implements Timestamped {
+  # legacy canvas id
+  _id: ID!
+  createdAt: Time
+  state: GroupMembershipState!
+  updatedAt: Time
+  user: User
+}
+
+# The connection type for GroupMembership.
+type GroupMembershipConnection {
+  # A list of edges.
+  edges: [GroupMembershipEdge]
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+}
+
+# An edge in a connection.
+type GroupMembershipEdge {
+  # A cursor for use in pagination.
+  cursor: String!
+
+  # The item at the end of the edge.
+  node: GroupMembership
+}
+
+enum GroupMembershipState {
+  accepted
+  deleted
+  invited
+  rejected
+  requested
 }
 
 type Mutation {
@@ -487,6 +638,22 @@ input SubmissionOrderCriteria {
 enum SubmissionOrderField {
   _id
   gradedAt
+}
+
+# Types of submissions an assignment accepts
+enum SubmissionType {
+  attendance
+  discussion_topic
+  external_tool
+  media_recording
+  none
+  not_graded
+  on_paper
+  online_quiz
+  online_text_entry
+  online_upload
+  online_url
+  wiki_page
 }
 
 # statistics based on timeliness of student submissions

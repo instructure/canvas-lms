@@ -20,191 +20,141 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Rubric do
 
-  context "outcomes" do
+  context "with outcomes" do
+    before do
+      outcome_with_rubric({mastery_points: 3})
+    end
+
     before :once do
       assignment_model
-      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
     end
 
-    def create_rubric(data)
-      @rubric = Rubric.new(:context => @course)
-      @rubric.data = data
-      @rubric.save!
-    end
-
-    def rubric_data_hash(outcome=@outcome)
-      hash = {
-        :points => 3,
-        :description => "Outcome row",
-        :id => 1,
-        :ratings => [
-          {
-            :points => 3,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 2
-          },
-          {
-            :points => 0,
-            :description => "Lame",
-            :criterion_id => 1,
-            :id => 3
+    def assessment_data(opts={})
+      crit_id = "criterion_#{@rubric.data[0][:id]}"
+      {
+        user: @user,
+        assessor: @user,
+        artifact: @submission,
+        assessment: {
+          assessment_type: 'grading',
+          "#{crit_id}": {
+            points: opts[:points],
+            comments: "cool, yo"
           }
-        ]
+        }
       }
-      hash[:learning_outcome_id] = outcome.id if outcome
-      hash
     end
 
     it "should allow learning outcome rows in the rubric" do
-      create_rubric([rubric_data_hash])
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
     end
 
     it "should delete learning outcome tags when they no longer exist" do
-      create_rubric([rubric_data_hash])
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
-      @rubric.data = [rubric_data_hash(nil)]
+      @rubric.data[0][:learning_outcome_id] = nil
       @rubric.save!
       expect(@rubric.learning_outcome_alignments.active).to be_empty
     end
 
     it "should create learning outcome associations for multiple outcome rows" do
-      @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
-      create_rubric([rubric_data_hash, rubric_data_hash(@outcome2)])
-      expect(@rubric).not_to be_new_record
-      expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
-      expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, @outcome2.id].sort)
-    end
-
-    it "should create outcome results when outcome-aligned rubrics are assessed" do
-      create_rubric([rubric_data_hash])
+      outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
+      @rubric.data[1][:learning_outcome_id] = outcome2.id
       @rubric.save!
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
-      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
-      @user = user_factory(active_all: true)
-      @e = @course.enroll_student(@user)
-      @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-      @assignment.reload
-      expect(@assignment.learning_outcome_alignments).not_to be_empty
-      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
-      @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 2,
-            :comments => "cool, yo"
-          }
-        }
-      })
-      expect(@outcome.learning_outcome_results).not_to be_empty
-      @result = @outcome.learning_outcome_results.first
-      expect(@result.user_id).to eql(@user.id)
-      expect(@result.score).to eql(2.0)
-      expect(@result.possible).to eql(3.0)
-      expect(@result.original_score).to eql(2.0)
-      expect(@result.original_possible).to eql(3.0)
-      expect(@result.mastery).to be_falsey
-      n = @result.version_number
-      @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 3,
-            :comments => "cool, yo"
-          }
-        }
-      })
-      @result.reload
-      expect(@result.version_number).to be > n
-      expect(@result.score).to eql(3.0)
-      expect(@result.possible).to eql(3.0)
-      expect(@result.original_score).to eql(2.0)
-      expect(@result.mastery).to be_truthy
+      expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, outcome2.id].sort)
     end
 
-    it "should be able to destroy an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
-      @outcome2 = @course.account.created_learning_outcomes.create!(:title => 'outcome')
-      @link = @course.root_outcome_group.add_outcome(@outcome2)
+    it "should create outcome results when outcome-aligned rubrics are assessed" do
+      expect(@rubric).not_to be_new_record
+      expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
+      expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
+      user = user_factory(active_all: true)
+      @course.enroll_student(user)
+      a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      @assignment.reload
+      expect(@assignment.learning_outcome_alignments).not_to be_empty
+      @submission = @assignment.grade_student(user, grade: "10", grader: @teacher).first
+      a.assess(assessment_data({points: 2}))
+      expect(@outcome.learning_outcome_results).not_to be_empty
+      result = @outcome.learning_outcome_results.first
+      expect(result.user_id).to be(user.id)
+      expect(result.score).to be(2.0)
+      expect(result.possible).to be(3.0)
+      expect(result.original_score).to be(2.0)
+      expect(result.original_possible).to be(3.0)
+      expect(result.mastery).to be_falsey
+      n = result.version_number
+      a.assess(assessment_data({points: 3}))
+      result.reload
+      expect(result.version_number).to be > n
+      expect(result.score).to be(3.0)
+      expect(result.possible).to be(3.0)
+      expect(result.original_score).to be(2.0)
+      expect(result.mastery).to be_truthy
+    end
 
-      create_rubric([rubric_data_hash(@outcome2)])
-      @assignment2 = @course.assignments.create!(assignment_valid_attributes)
-      @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-      @a2 = @rubric.associate_with(@assignment2, @course, :purpose => 'grading')
+    it "should destroy an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
+      outcome2 = @course.account.created_learning_outcomes.create!(:title => 'outcome')
+      link = @course.root_outcome_group.add_outcome(outcome2)
+      rubric = rubric_model
+      rubric.data[0][:learning_outcome_id] = outcome2.id
+      rubric.save!
+      assignment2 = @course.assignments.create!(assignment_valid_attributes)
+      rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      a2 = rubric.associate_with(assignment2, @course, :purpose => 'grading')
 
-      @assignment2.destroy
-      expect(RubricAssociation.where(:id => @a2).first).to be_nil # association should be destroyed
+      assignment2.destroy
+      expect(RubricAssociation.where(:id => a2).first).to be_nil # association should be destroyed
 
-      @rubric.reload
-      expect(@rubric).to be_active
+      rubric.reload
+      expect(rubric).to be_active
 
       @assignment.destroy
-      @rubric.reload
-      expect(@rubric).to be_deleted
+      rubric.reload
+      expect(rubric).to be_deleted
 
-      @link.reload
-      expect(@link.destroy).to be_truthy
+      link.reload
+      expect(link.destroy).to be_truthy
     end
   end
 
-  context "fractional_points" do
+  context "with fractional_points" do
     it "should allow fractional points" do
       course_factory
-      @rubric = Rubric.new(:context => @course)
-      @rubric.data = [
+      data = [
         {
           :points => 0.5,
           :description => "Fraction row",
           :id => 1,
           :ratings => [
-            {
-              :points => 0.5,
-              :description => "Rockin'",
-              :criterion_id => 1,
-              :id => 2
-            },
-            {
-              :points => 0,
-              :description => "Lame",
-              :criterion_id => 1,
-              :id => 3
-            }
+            { points: 0.5, description: "Rockin'", criterion_id: 1, id: 2 },
+            { points: 0, description: "Lame", criterion_id: 1, id: 3 }
           ]
         }
       ]
-      @rubric.save!
-
-      @rubric2 = Rubric.find(@rubric.id)
-      expect(@rubric2.data.first[:points]).to eql(0.5)
-      expect(@rubric2.data.first[:ratings].first[:points]).to eql(0.5)
+      rubric = rubric_model({context: @course, data: data})
+      expect(rubric.data.first[:points]).to be(0.5)
+      expect(rubric.data.first[:ratings].first[:points]).to be(0.5)
     end
   end
 
   it "should be cool about duplicate titles" do
     course_with_teacher
 
-    r1 = Rubric.new :title => "rubric", :context => @course
-    r1.save!
+    r1 = rubric_model({context: @course, title: "rubric"})
     expect(r1.title).to eql "rubric"
 
-    r2 = Rubric.new :title => "rubric", :context => @course
-    r2.save!
+    r2 = rubric_model({context: @course, title: "rubric"})
     expect(r2.title).to eql "rubric (1)"
 
     r1.destroy
 
-    r3 = Rubric.create! :title => "rubric", :context => @course
+    r3 = rubric_model({context: @course, title: "rubric"})
     expect(r3.title).to eql "rubric"
 
     r3.title = "rubric"
@@ -215,8 +165,7 @@ describe Rubric do
   context "#update_with_association" do
     before :once do
       course_with_teacher
-      @assignment = @course.assignments.create! title: "aaaaah",
-                                                points_possible: 20
+      assignment_model(points_possible: 20)
       @rubric = Rubric.new title: "r", context: @course
     end
 
@@ -258,6 +207,36 @@ describe Rubric do
         expect(@assignment.reload.points_possible).to eq 15
       end
     end
+  end
+
+  describe "#destroy_for" do
+
+    before do
+      course_factory
+      assignment_model
+      rubric_model
+    end
+
+    it "does not destroy associations when deleted from an account" do
+      @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      @rubric.destroy_for(@course.account)
+      expect(@rubric.rubric_associations).to be_present
+    end
+
+    it "destroys rubric associations within context when deleted from a course" do
+      course_factory
+      course1 = Course.first
+      course2 = Course.last
+      assignment2 = course2.assignments.create! title: "Assignment 2: Electric Boogaloo",
+                                                points_possible: 20
+      @rubric.associate_with(@assignment, course1, :purpose => 'grading')
+      @rubric.associate_with(assignment2, course2, :purpose => 'grading')
+      expect(@rubric.rubric_associations.length).to eq 2
+      @rubric.destroy_for(course1)
+      @rubric.reload
+      expect(@rubric.rubric_associations.length).to eq 1
+    end
+
   end
 
   it "normalizes criteria for comparison" do

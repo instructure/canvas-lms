@@ -29,13 +29,6 @@ module ConsulInitializer
       end
     end
   end
-
-  def self.fallback_to(settings_hash)
-    if settings_hash.present?
-      Canvas::DynamicSettings.fallback_data = settings_hash.with_indifferent_access
-    end
-  end
-
 end
 
 settings = ConfigFile.load("consul")
@@ -43,8 +36,6 @@ ConsulInitializer.configure_with(settings)
 
 handle_fallbacks = -> do
   Canvas::DynamicSettings.reset_cache!
-  fallback_settings = ConfigFile.load("dynamic_settings")
-  ConsulInitializer.fallback_to(fallback_settings)
 end
 handle_fallbacks.call
 Canvas::Reloader.on_reload(&handle_fallbacks)

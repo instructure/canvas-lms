@@ -28,7 +28,7 @@
   <% if @current_groups.empty? %>
     <%= t(:no_groups, "No Groups") %>
   <% else %>
-    <table id="my_groups_table" class="ic-Table ic-Table--bordered">
+    <table id="current_groups_table" class="ic-Table ic-Table--bordered">
       <thead>
         <tr>
           <th scope="col" class="course-list-group-column"><%= t ('Group') %></th>
@@ -60,7 +60,7 @@
   <% if @previous_groups.empty? %>
     <%= t(:no_groups, "No Groups") %>
   <% else %>
-    <table id="my_groups_table" class="ic-Table ic-Table--bordered">
+    <table id="previous_groups_table" class="ic-Table ic-Table--bordered">
       <thead>
         <tr>
           <th scope="col" class="course-list-group-column"><%= t ('Group') %></th>
@@ -71,9 +71,8 @@
       <% @previous_groups.each do |group| %>
         <tr>
           <td>
-            <%# Only show a link if the user can read the group - they'll get a permissions error page if they try to %>
-            <%# hit the link otherwise %>
-            <% if group.grants_right?(@current_user, session, :read) %>
+            <%# Don't show the link if the user no longer has access to this concluded course %>
+            <% if group.context.grants_right?(@current_user, session, :read_roster) %>
               <%= link_to group.name, group_path(group) %>
             <% else %>
               <%= group.name %>

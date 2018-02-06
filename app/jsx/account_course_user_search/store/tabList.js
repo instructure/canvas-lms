@@ -17,8 +17,8 @@
  */
 
 import I18n from 'i18n!account_course_user_search'
-import CoursesPane from '../CoursesPane'
-import UsersPane from '../UsersPane'
+import CoursesPane from '../components/CoursesPane'
+import UsersPane from '../components/UsersPane'
 
 export default [
   {

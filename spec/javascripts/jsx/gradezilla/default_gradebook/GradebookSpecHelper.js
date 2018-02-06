@@ -54,6 +54,13 @@ export function createGradebook (options = {}) {
     addGradebookElement () {},
     removeGradebookElement () {}
   };
+  gradebook.gradebookGrid.gridSupport = {
+    columns: {
+      updateColumnHeaders () {},
+      scrollToStart () {},
+      scrollToEnd () {}
+    }
+  }
 
   return gradebook;
 }

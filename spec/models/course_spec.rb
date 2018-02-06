@@ -937,8 +937,9 @@ describe Course do
       sub = @course.root_account.sub_accounts.create
       @course.sis_source_id = 'sis_id'
       @course.course_code = "cid"
-      @course.save!
       @course.stuck_sis_fields = [].to_set
+      @course.save!
+      @course.reload
       @course.name = "course_name"
       expect(@course.stuck_sis_fields).to eq [:name].to_set
       profile = @course.profile
@@ -1818,7 +1819,7 @@ describe Course, "gradebook_to_csv_in_background" do
 
       @shard1.activate do
         expect {
-          Attachment.find(@attachment_id).download_url
+          Attachment.find(@attachment_id).public_download_url
         }.not_to raise_error
       end
     end
@@ -4889,7 +4890,7 @@ describe Course, "#image" do
   it "returns the download_url for a course file if image_id is set" do
     @course.image_id = @attachment.id
     @course.save!
-    expect(@course.image).to eq @attachment.download_url
+    expect(@course.image).to eq @attachment.public_download_url
   end
 
   it "returns nil if image_id and image_url are not set" do

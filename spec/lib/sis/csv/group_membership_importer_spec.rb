@@ -42,12 +42,11 @@ describe SIS::CSV::GroupMembershipImporter do
       "G001,,accepted",
       "G001,U001,bogus")
     expect(GroupMembership.count).to eq 0
-    expect(importer.warnings.map(&:last)).to eq(
+    expect(importer.errors.map(&:last)).to eq(
       ["No group_id given for a group user",
        "No user_id given for a group user",
        "Improper status \"bogus\" for a group user"]
     )
-    expect(importer.errors).to eq []
   end
 
   it "should add users to groups" do
@@ -68,6 +67,15 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
     expect(ms.map(&:workflow_state)).to eq %w(deleted deleted)
+  end
+
+  it "should add users to groups that the user cannot access" do
+    course = course_factory(account: @account, sis_source_id: 'c001')
+    group_model(context: course, sis_source_id: "G002")
+    importer = process_csv_data(
+      "group_id,user_id,status",
+      "G002,U001,accepted")
+    expect(importer.errors.last.last).to eq "User U001 doesn't have an enrollment in the course of group G002."
   end
 
 end

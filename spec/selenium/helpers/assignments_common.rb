@@ -129,8 +129,7 @@ module AssignmentsCommon
   end
 
   def manually_create_assignment(assignment_title = 'new assignment')
-    get "/courses/#{@course.id}/assignments"
-    expect_new_page_load { f('.new_assignment').click }
+    get "/courses/#{@course.id}/assignments/new"
     replace_content(f('#assignment_name'), assignment_title)
   end
 

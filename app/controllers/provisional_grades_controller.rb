@@ -217,15 +217,15 @@ class ProvisionalGradesController < ApplicationController
     grades_to_publish = graded_submissions.map do |submission|
       if (selection = selections[submission.user_id])
         # student in moderation: choose the selected provisional grade
-        selected_provisional_grade = submission.provisional_grades
-          .detect { |pg| pg.id == selection.selected_provisional_grade_id }
+        selected_provisional_grade = submission.provisional_grades.
+          detect { |pg| pg.id == selection.selected_provisional_grade_id }
       end
 
       # either the student is not in moderation, or not all provisional grades were entered
       # choose the first one with a grade (there should only be one)
       unless selected_provisional_grade
-        provisional_grades = submission.provisional_grades
-          .select { |pg| pg.graded_at.present? }
+        provisional_grades = submission.provisional_grades.
+          select { |pg| pg.graded_at.present? }
         selected_provisional_grade = provisional_grades.first if provisional_grades.count == 1
       end
 

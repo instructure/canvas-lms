@@ -393,6 +393,18 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         options.version = 'entered';
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
       });
+
+      test('returns the given default value for "final" when the final score is null', () => {
+        submission.score = null
+        options = {...options, version: 'final', defaultValue: 'default'}
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'default')
+      })
+
+      test('returns the given default value for "entered" when the entered score is null', () => {
+        submission.enteredScore = null
+        options = {...options, version: 'entered', defaultValue: 'default'}
+        equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'default')
+      })
     });
 
     QUnit.module('when formatting as "percentage"', (contextHooks) => {

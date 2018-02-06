@@ -68,9 +68,8 @@ describe SIS::CSV::ChangeSisIdImporter do
       'c002,c001,course',
       'c001,new_id,invalid'
     )
-    expect(importer.errors).to eq []
-    warnings = importer.warnings.map(&:last)
-    expect(warnings).to eq ["An old_id, 'invalid', referenced a non-existent term and was not changed.",
+    errors = importer.errors.map(&:last)
+    expect(errors).to eq ["An old_id, 'invalid', referenced a non-existent term and was not changed.",
                             "No old_id or old_integration_id given for change_sis_id",
                             "No new_id or new_integration_id given for change_sis_id",
                             "No type given for change_sis_id",
@@ -89,4 +88,55 @@ describe SIS::CSV::ChangeSisIdImporter do
     )
     expect(p1.reload.integration_id).to be_nil
   end
+
+  it 'should allow changing integration_ids' do
+    u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    p1 = u1.pseudonym
+    p1.integration_id = 'int1'
+    p1.save!
+    process_csv_data_cleanly(
+      'old_integration_id,new_integration_id,type',
+      'int1,int2,user'
+    )
+    expect(p1.reload.integration_id).to eq('int2')
+  end
+
+  it 'should change both SIS ID and integration ID' do
+    u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    p1 = u1.pseudonym
+    p1.integration_id = 'int1'
+    p1.save!
+    process_csv_data_cleanly(
+      'old_id,new_id,old_integration_id,new_integration_id,type',
+      'U001,sis2,int1,int2,user'
+    )
+    expect(p1.reload.integration_id).to eq('int2')
+    expect(p1.sis_user_id).to eq('sis2')
+  end
+
+  it 'should change both SIS ID and integration ID if only one is passed in' do
+    u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    p1 = u1.pseudonym
+    p1.integration_id = 'int1'
+    p1.save!
+    process_csv_data_cleanly(
+      'new_id,old_integration_id,new_integration_id,type',
+      'sis2,int1,int2,user'
+    )
+    expect(p1.reload.integration_id).to eq('int2')
+    expect(p1.sis_user_id).to eq('sis2')
+  end
+
+  it 'should throw an error when you pass in mismatched SIS ID and integration ID' do
+    u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    u2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+    u1.pseudonym.update!(integration_id: 'int1')
+    u2.pseudonym.update!(integration_id: 'int2')
+    importer = process_csv_data(
+      'old_id,new_id,old_integration_id,new_integration_id,type',
+      'U001,int2,new_integration_id,user'
+    )
+    expect(importer.errors).not_to be_nil
+  end
+
 end

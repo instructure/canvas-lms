@@ -122,7 +122,6 @@ module SIS
             pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
             pseudo ||= pseudo_by_login
-            pseudo ||= @root_account.pseudonyms.active.by_unique_id(user_row.email).take if user_row.email.present?
 
             status_is_active = !(user_row.status =~ /\Adeleted/i)
             if pseudo

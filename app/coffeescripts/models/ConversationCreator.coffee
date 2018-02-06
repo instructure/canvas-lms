@@ -26,6 +26,7 @@ define [
       @chunkSize = opts.chunkSize || 100
 
     save: (data, saveOpts) ->
+      data.context_code = ENV.context_asset_string
       xhrs = _.chunk(data.recipients, @chunkSize).map (chunk) ->
         chunkData = Object.assign({}, data, { recipients: chunk })
         (new Conversation).save(chunkData, saveOpts)

@@ -149,11 +149,27 @@ describe Types::CourseType do
   end
 
   describe "AssignmentGroupConnection" do
-    it "returns groups" do
+    it "returns assignment groups" do
       c = Course.find(course.id)
       c.assignment_groups.create!(name: 'a group')
       expect(c.assignment_groups.size).to be 1
       expect(course_type.assignmentGroupsConnection.length).to be 1
+    end
+  end
+
+  describe "GroupsConnection" do
+    before(:once) do
+      course.groups.create! name: "A Group"
+    end
+
+    it "returns student groups" do
+      expect(course_type.groupsConnection(current_user: @teacher)).to eq course.groups
+    end
+
+    it "returns nil for users with no permission" do
+      other_course = course_with_teacher(active_all: true)
+      other_teacher = @teacher
+      expect(course_type.groupsConnection(current_user: other_teacher)).to be_nil
     end
   end
 end

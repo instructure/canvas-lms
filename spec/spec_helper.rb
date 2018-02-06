@@ -285,8 +285,8 @@ module Helpers
       assert_status(401)
     else
       # Certain responses require more privileges than the current user has (ie site admin)
-      expect(response).to redirect_to(login_url)
-                      .or redirect_to(root_url)
+      expect(response).to redirect_to(login_url).
+        or redirect_to(root_url)
     end
   end
 
@@ -530,15 +530,21 @@ RSpec.configure do |config|
     dir
   end
 
-  def process_csv_data(*lines)
-    opts = lines.extract_options!
-    opts.reverse_merge!(allow_printing: false)
-    account = opts[:account] || @account || account_model
-
+  def generate_csv_file(lines)
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
     tmp.close!
     File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
+    path
+  end
+
+  def process_csv_data(*lines)
+    opts = lines.extract_options!
+    opts.reverse_merge!(allow_printing: false)
+    account = opts[:account] || @account || account_model
+    opts[:batch] ||= account.sis_batches.create!
+
+    path = generate_csv_file(lines)
     opts[:files] = [path]
 
     importer = SIS::CSV::Import.process(account, opts)
@@ -551,7 +557,7 @@ RSpec.configure do |config|
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
     raise "csv errors: #{importer.errors.inspect}" if importer.errors.present?
-    raise "csv warning: #{importer.warnings.inspect}" if importer.warnings.present?
+    importer
   end
 
   def enable_cache(new_cache=:memory_store)

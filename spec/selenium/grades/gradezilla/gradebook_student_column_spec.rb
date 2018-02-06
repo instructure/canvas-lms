@@ -32,28 +32,30 @@ describe "Student column header options" do
 
     before(:each) do
       Gradezilla.visit(@course)
+      @students = @course.students.sort_by{|x| x[:id]}
     end
 
     it "sorts student column in A-Z order", priority: "1", test_id: 3253316 do
       Gradezilla.click_student_menu_sort_by('A-Z')
-      expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
+      expect(Gradezilla.fetch_student_names[0]).to eq(@students[0].name)
     end
   end
 
   context "Display as" do
     before(:each) do
       Gradezilla.visit(@course)
+      @students = @course.students.sort_by{|x| x[:id]}
     end
 
     it "displays student names as First Last", priority: "1", test_id: 3253319 do
       Gradezilla.click_student_menu_display_as('First,Last')
-      expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
+      expect(Gradezilla.fetch_student_names[0]).to eq(@students[0].name)
     end
 
     it "displays student names as Last,First", priority: "2", test_id: 3253320 do
       Gradezilla.click_student_menu_display_as('Last,First')
 
-      student_name = @course.students[0].last_name + ", " + @course.students[0].first_name
+      student_name = @students[0].last_name + ", " + @students[0].first_name
       expect(Gradezilla.fetch_student_names[0]).to eq(student_name)
     end
 
@@ -61,7 +63,7 @@ describe "Student column header options" do
       Gradezilla.click_student_menu_display_as('Last,First')
       Gradezilla.visit(@course)
 
-      student_name = @course.students[0].last_name + ", " + @course.students[0].first_name
+      student_name = @students[0].last_name + ", " + @students[0].first_name
       expect(Gradezilla.fetch_student_names[0]).to eq(student_name)
     end
   end

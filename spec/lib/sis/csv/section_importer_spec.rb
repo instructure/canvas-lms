@@ -39,9 +39,8 @@ describe SIS::CSV::SectionImporter do
     )
     expect(CourseSection.count).to eq before_count + 1
 
-    expect(importer.errors).to eq []
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings).to eq ["No course_id given for a section S002",
+    errors = importer.errors.map { |r| r.last }
+    expect(errors).to eq ["No course_id given for a section S002",
                       "No section_id given for a section in course C001",
                       "Improper status \"inactive\" for section S003 in course C002",
                       "No name given for section S004 in course C002",
@@ -73,7 +72,6 @@ describe SIS::CSV::SectionImporter do
       "section_id,course_id,name,start_date,end_date,status",
       "1B,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
     )
-    expect(importer.warnings).to eq []
     expect(importer.errors).to eq []
   end
 
@@ -145,9 +143,8 @@ describe SIS::CSV::SectionImporter do
     expect(s2.start_at).to be_nil
     expect(s2.end_at).to be_nil
 
-    expect(importer.warnings.map{|r|r.last}).to eq ["Bad date format for section S002",
+    expect(importer.errors.map{|r|r.last}).to eq ["Bad date format for section S002",
                                                 "Section S003 references course C002 which doesn't exist"]
-    expect(importer.errors).to eq []
   end
 
   it 'should override term dates if the start or end dates are set' do
@@ -203,28 +200,15 @@ describe SIS::CSV::SectionImporter do
   it 'should verify xlist files' do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
-      ",S001,active"
-    )
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map{|r|r.last}).to eq ["No xlist_course_id given for a cross-listing"]
-    importer = process_csv_data(
-      "xlist_course_id,section_id,status",
-      "X001,,active"
-    )
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map{|r|r.last}).to eq ["No section_id given for a cross-listing"]
-    importer = process_csv_data(
-      "xlist_course_id,section_id,status",
-      "X001,S001,"
-    )
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map{|r|r.last}).to eq ['Improper status "" for a cross-listing']
-    importer = process_csv_data(
-      "xlist_course_id,section_id,status",
+      ",S001,active",
+      "X001,,active",
+      "X001,S001,",
       "X001,S001,baleeted"
     )
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map{|r|r.last}).to eq ['Improper status "baleeted" for a cross-listing']
+    expect(importer.errors.map{|r|r.last}).to eq ["No xlist_course_id given for a cross-listing",
+                                                  "No section_id given for a cross-listing",
+                                                  'Improper status "" for a cross-listing',
+                                                  'Improper status "baleeted" for a cross-listing']
     expect(@account.courses.size).to eq 0
   end
 

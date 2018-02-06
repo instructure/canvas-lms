@@ -791,6 +791,10 @@ class Enrollment < ActiveRecord::Base
     state_based_on_date == :inactive
   end
 
+  def hard_inactive?
+    workflow_state == 'inactive'
+  end
+
   def invited?
     state_based_on_date == :invited
   end
@@ -1337,10 +1341,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_assignment_overrides_if_needed
-    assignment_scope = Assignment
-                        .where(context_id: self.course_id, context_type: 'Course')
-    override_scope = AssignmentOverrideStudent
-                      .where(user_id: self.user_id)
+    assignment_scope = Assignment.where(context_id: self.course_id, context_type: 'Course')
+    override_scope = AssignmentOverrideStudent.where(user_id: self.user_id)
 
     if being_deleted? && !enrollments_exist_for_user_in_course?
       return unless (assignment_ids = assignment_scope.pluck(:id)).any?

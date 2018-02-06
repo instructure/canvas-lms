@@ -26,6 +26,10 @@
     roles_stuff = %Q|role="region" aria-label="#{t('Question Group')}"|
     question_count = question_bank ? question_bank.assessment_question_count : hash_get(group, :questions, []).count
   end
+  object_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
+                     !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course")
+  content_is_locked = object_is_locked && js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :content)
+  points_are_locked = object_is_locked && js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :points)
 %>
 <div <%= roles_stuff ? roles_stuff : nil %> class="quiz_sortable group_top <%= 'question_bank_top' if question_bank %>" style="<%= "display: none;" unless group %>" id="group_top_<%= hash_get(group, :id, 'template') %>"
   <% if question_bank %>data-bank_question_count="<%= question_count %>"<% end %>
@@ -53,8 +57,8 @@
             :num_questions => hash_get(group, :pick_count, 1),
             :num_points => hash_get(group, :question_points, 1),
             :wrapper => {
-              '*' => "<input name='quiz_group[pick_count]' aria-label='#{h(t('labels.number_of_questions', "Number of Questions"))}' type='text' style='width: 20px;' value='\1'/>",
-              '#' => "<input name='quiz_group[question_points]' class='float_value' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1'/>"
+              '*' => "<input name='quiz_group[pick_count]' aria-label='#{h(t('labels.number_of_questions', "Number of Questions"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/>",
+              '#' => "<input name='quiz_group[question_points]' class='float_value' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/>"
             }) %>
     </span>
     <% if !group && @context.grants_right?(@current_user, :read_question_banks) %>
@@ -63,20 +67,24 @@
       </div>
     <% end %>
   </div>
-  <div style="float: right;" class="links">
-    <span class="local_group_links">
-      <% collapse_title = t('titles.collapse_group', "Collapse Group") %>
-      <% expand_title = t('titles.expand_group', "Expand Group") %>
-      <% add_question_title = t('titles.add_question_to_group', "Add Question to this Group") %>
-      <a href="#" class="collapse_link group_display no-hover" title="<%= collapse_title %>"><i class="icon-arrow-up standalone-icon"><span class="screenreader-only"><%= collapse_title %></span></i></a>
-      <a href="#" class="expand_link group_display hidden no-hover" title="<%= expand_title %>"><i class="icon-arrow-down standalone-icon"><span class="screenreader-only"><%= expand_title %></span></i></a>
-      <a href="#" class="add_question_link group_display no-hover" title="<%= add_question_title %>"><i class="icon-add standalone-icon"><span class="screenreader-only"><%= add_question_title %></span></i></a>
-    </span>
-    <% edit_group_title = t('titles.edit_group_details', "Edit Group Details") %>
-    <% delete_group_title = t('titles.delete_group', "Delete Group") %>
-    <a href="#" class="edit_group_link group_display no-hover" title="<%= edit_group_title %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_group_title %></span></i></a>
-    <a href="#" class="delete_group_link group_display no-hover" title="<%= delete_group_title %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= delete_group_title %></span></i></a>
-  </div>
+  <% unless content_is_locked %>
+    <div style="float: right;" class="links">
+      <span class="local_group_links">
+        <% collapse_title = t('titles.collapse_group', "Collapse Group") %>
+        <% expand_title = t('titles.expand_group', "Expand Group") %>
+        <% add_question_title = t('titles.add_question_to_group', "Add Question to this Group") %>
+        <a href="#" class="collapse_link group_display no-hover" title="<%= collapse_title %>"><i class="icon-arrow-up standalone-icon"><span class="screenreader-only"><%= collapse_title %></span></i></a>
+        <a href="#" class="expand_link group_display hidden no-hover" title="<%= expand_title %>"><i class="icon-arrow-down standalone-icon"><span class="screenreader-only"><%= expand_title %></span></i></a>
+        <a href="#" class="add_question_link group_display no-hover" title="<%= add_question_title %>"><i class="icon-add standalone-icon"><span class="screenreader-only"><%= add_question_title %></span></i></a>
+      </span>
+      <% edit_group_title = t('titles.edit_group_details', "Edit Group Details") %>
+      <a href="#" class="edit_group_link group_display no-hover" title="<%= edit_group_title %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_group_title %></span></i></a>
+      <% unless points_are_locked %>
+        <% delete_group_title = t('titles.delete_group', "Delete Group") %>
+        <a href="#" class="delete_group_link group_display no-hover" title="<%= delete_group_title %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= delete_group_title %></span></i></a>
+      <% end %>
+    </div>
+  <% end %>
   <div class="clear"></div>
   <div class="button-container">
     <button type="button" class="group_edit cancel_button btn btn-small"/><%= t('#buttons.cancel', "Cancel") %></button>

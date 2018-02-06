@@ -17,13 +17,17 @@
 #
 
 module Factories
-  def external_tool_model(context: nil)
+  BASE_ATTRS = {
+    :name => "a",
+    :url => "http://google.com",
+    :consumer_key => '12345',
+    :shared_secret => 'secret'
+  }.freeze
+
+  def external_tool_model(context: nil, opts: {})
     context ||= course_model
     context.context_external_tools.create(
-      :name => "a",
-      :url => "http://google.com",
-      :consumer_key => '12345',
-      :shared_secret => 'secret'
+      BASE_ATTRS.merge(opts)
     )
   end
 end

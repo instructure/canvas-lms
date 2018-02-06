@@ -67,7 +67,8 @@ class CalendarsController < ApplicationController
         :can_create_calendar_events => context.respond_to?("calendar_events") && CalendarEvent.new.tap{|e| e.context = context}.grants_right?(@current_user, session, :create),
         :can_create_assignments => context.respond_to?("assignments") && Assignment.new.tap{|a| a.context = context}.grants_right?(@current_user, session, :create),
         :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.pluck(:id, :name).map {|id, name| { :id => id, :name => name } } : [],
-        :can_create_appointment_groups => ag_permission
+        :can_create_appointment_groups => ag_permission,
+        :concluded => (context.is_a? Course) ? context.concluded? : false
       }
       if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|

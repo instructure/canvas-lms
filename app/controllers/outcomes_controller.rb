@@ -209,11 +209,10 @@ class OutcomesController < ApplicationController
       if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == 'AssessmentQuestionBank'
         # anchor to first question in aligned bank
         question_bank_id = @result.alignment.content_id
-        first_aligned_question = Quizzes::QuizQuestion.where(quiz_id: @asset.id)
-          .joins(:assessment_question)
-          .where(assessment_questions: { assessment_question_bank_id: question_bank_id })
-          .order(:position)
-          .first
+        first_aligned_question = Quizzes::QuizQuestion.where(quiz_id: @asset.id).
+          joins(:assessment_question).
+          where(assessment_questions: { assessment_question_bank_id: question_bank_id }).
+          order(:position).first
         anchor = first_aligned_question ? "question_#{first_aligned_question.id}" : nil
       elsif @asset.is_a? AssessmentQuestion
         question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @asset.data[:id] }

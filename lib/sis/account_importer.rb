@@ -72,7 +72,9 @@ module SIS
         account ||= @root_account.sub_accounts.new
 
         account.root_account = @root_account
-        account.parent_account = parent ? parent : @root_account
+        if account.new_record? || !account.stuck_sis_fields.include?(:parent_account_id) || Account.sis_stickiness_options[:add_sis_stickiness]
+          account.parent_account = parent ? parent : @root_account
+        end
 
         # only update the name on new records, and ones that haven't been changed since the last sis import
         account.name = name if name.present? && (account.new_record? || (!account.stuck_sis_fields.include?(:name)))

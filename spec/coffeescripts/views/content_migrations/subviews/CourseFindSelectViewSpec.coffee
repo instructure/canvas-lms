@@ -20,7 +20,8 @@ define [
   'compiled/views/content_migrations/subviews/CourseFindSelectView'
   'helpers/fakeENV'
   'underscore'
-], (Backbone, CourseFindSelectView, fakeENV, _) ->
+  'helpers/assertions'
+], (Backbone, CourseFindSelectView, fakeENV, _, assertions) ->
   QUnit.module 'CourseFindSelectView: #setSourceCourseId',
     setup: ->
       fakeENV.setup()
@@ -63,6 +64,12 @@ define [
     teardown: ->
       fakeENV.teardown()
       @server.restore()
+
+  test 'it should be accessible', (assert) ->
+    courseFindSelectView = new CourseFindSelectView
+      model: new Backbone.Model
+    done = assert.async()
+    assertions.isAccessible courseFindSelectView, done, {'a11yReport': true}
 
   test 'Triggers "course_changed" when course is found by its id', ->
     courseFindSelectView = new CourseFindSelectView

@@ -3,10 +3,14 @@ process.env.NODE_ENV = 'test'
 const path = require('path')
 const webpack = require('webpack')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
-const jspecEnv = require('./spec/jspec_env')
 
 testWebpackConfig.entry = undefined
-testWebpackConfig.plugins.push(new webpack.DefinePlugin(jspecEnv))
+
+testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
+  JSPEC_PATH: null,
+  JSPEC_GROUP: null,
+  A11Y_REPORT: false
+}))
 
 // These externals are necessary for Enzyme
 // See http://airbnb.io/enzyme/docs/guides/webpack.html

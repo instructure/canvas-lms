@@ -61,7 +61,7 @@ class AssignmentsController < ApplicationController
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         MAX_NAME_LENGTH: max_name_length,
         HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
-        QUIZ_LTI_ENABLED: @context.quiz_lti_tool.present?,
+        QUIZ_LTI_ENABLED: @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
       }
       js_env(hash)

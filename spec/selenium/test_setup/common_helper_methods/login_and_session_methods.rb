@@ -71,6 +71,11 @@ module LoginAndSessionMethods
     course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
   end
 
+  def provision_quizzes_next(account)
+    account.root_account.settings[:provision] = { 'lti' => 'lti url'}
+    account.root_account.save!
+  end
+
   def admin_logged_in(opts={})
     account_admin_user({:active_user => true}.merge(opts))
     user_logged_in({:user => @user}.merge(opts))

@@ -604,7 +604,7 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin',
           'AccountMembership'
         ],
-        :account_only => true,
+        :account_only => :root,
         :true_for => [
           'AccountAdmin'
         ]

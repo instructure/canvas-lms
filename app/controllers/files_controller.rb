@@ -108,6 +108,12 @@ require 'securerandom'
 #     }
 #
 class FilesController < ApplicationController
+  # show_relative is exempted from protect_from_forgery in order to allow
+  # brand-config-uploaded JS to work
+  # verify_authenticity_token is manually-invoked where @context is not
+  # an Account in show_relative
+  protect_from_forgery :except => [:api_capture, :show_relative], with: :exception
+
   before_action :require_user, only: :create_pending
   before_action :require_context, except: [
     :assessment_question_show, :image_thumbnail, :show_thumbnail,
@@ -398,7 +404,7 @@ class FilesController < ApplicationController
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
     if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-      render :json  => { :public_url => @attachment.authenticated_url(:secure => request.ssl?) }
+      render :json  => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
   end
 
@@ -537,11 +543,11 @@ class FilesController < ApplicationController
           # some form.
           if @current_user &&
              (attachment.canvadocable? ||
-              (service_enabled?(:google_docs_previews) && attachment.authenticated_url))
+              GoogleDocsPreview.previewable?(@domain_root_account, attachment))
             attachment.context_module_action(@current_user, :read)
           end
-          if url = service_enabled?(:google_docs_previews) && attachment.authenticated_url
-            json[:attachment][:authenticated_url] = url
+          if GoogleDocsPreview.previewable?(@domain_root_account, attachment)
+            json[:attachment][:public_url] = GoogleDocsPreview.url_for(attachment)
           end
 
           json_include = if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)
@@ -566,6 +572,10 @@ class FilesController < ApplicationController
     path = params[:file_path]
     file_id = params[:file_id]
     file_id = nil unless file_id.to_s =~ Api::ID_REGEX
+
+    # Manually-invoke verify_authenticity_token for non-Account contexts
+    # This is to allow Account-level file downloads to skip request forgery protection
+    verify_authenticity_token unless @context.is_a?(Account)
 
     #if the relative path matches the given file id use that file
     if file_id && @attachment = @context.attachments.where(id: file_id).first
@@ -786,8 +796,17 @@ class FilesController < ApplicationController
       return
     end
 
-    @context = Context.find_polymorphic(params[:context_type], params[:context_id])
-    @attachment = @context.attachments.build
+    case params[:context_type]
+    when 'ContentMigration'
+      @context = ContentMigration.find(params[:context_id])
+      @attachment = Attachment.where(context: @context).build
+    when 'Quizzes::QuizSubmission'
+      @context = Quizzes::QuizSubmission.find(params[:context_id])
+      @attachment = @context.attachments.build
+    else
+      @context = Context.find_polymorphic(params[:context_type], params[:context_id])
+      @attachment = @context.attachments.build
+    end
 
     # service metadata
     @attachment.filename = params[:name]

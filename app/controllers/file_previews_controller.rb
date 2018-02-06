@@ -20,32 +20,6 @@ class FilePreviewsController < ApplicationController
 
   before_action :get_context
 
-  GOOGLE_PREVIEWABLE_TYPES = %w{
-   application/vnd.openxmlformats-officedocument.wordprocessingml.template
-   application/vnd.oasis.opendocument.spreadsheet
-   application/vnd.sun.xml.writer
-   application/excel
-   application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-   text/rtf
-   text/plain
-   application/vnd.openxmlformats-officedocument.spreadsheetml.template
-   application/vnd.sun.xml.impress
-   application/vnd.sun.xml.calc
-   application/vnd.ms-excel
-   application/msword
-   application/mspowerpoint
-   application/rtf
-   application/vnd.oasis.opendocument.presentation
-   application/vnd.oasis.opendocument.text
-   application/vnd.openxmlformats-officedocument.presentationml.template
-   application/vnd.openxmlformats-officedocument.presentationml.slideshow
-   application/vnd.openxmlformats-officedocument.presentationml.presentation
-   application/vnd.openxmlformats-officedocument.wordprocessingml.document
-   application/postscript
-   application/pdf
-   application/vnd.ms-powerpoint
-  }.freeze
-
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.
   def show
@@ -74,8 +48,9 @@ class FilePreviewsController < ApplicationController
       elsif url = @file.canvadoc_url(@current_user)
         redirect_to url and return
       # google docs
-      elsif service_enabled?(:google_docs_previews) && GOOGLE_PREVIEWABLE_TYPES.include?(@file.content_type)
-        redirect_to('//docs.google.com/viewer?' + { embedded: true, url: @file.authenticated_url }.to_query) and return
+      elsif GoogleDocsPreview.previewable?(@domain_root_account, @file)
+        url = GoogleDocsPreview.url_for(@file)
+        redirect_to('//docs.google.com/viewer?' + { embedded: true, url: url }.to_query) and return
       # images
       elsif @file.content_type =~ %r{\Aimage/}
         return render template: 'file_previews/img_preview', layout: false

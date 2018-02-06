@@ -959,6 +959,14 @@ acknowledge that you have read and agreed to the
             </p>
           <% end %>
         </div>
+
+        <% if @account.root_account.trust_exists? %>
+          <div class="ic-Form-control">
+            <%= f.check_box :domain_specific, :checked => !!@account.root_account.settings[:default_announcement_domain_specific] %>
+            <%= f.label :domain_specific, t("Only show announcement on current account domain") %>
+          </div>
+        <% end %>
+
         <% if @account.site_admin? %>
           <div class="ic-Checkbox-group">
             <div class="ic-Form-control ic-Form-control--checkbox">

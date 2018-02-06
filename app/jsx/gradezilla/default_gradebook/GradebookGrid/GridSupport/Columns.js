@@ -83,4 +83,14 @@ export default class Columns {
       });
     }
   }
+
+  scrollToStart () {
+    const { top } = this.grid.getViewport()
+    this.grid.scrollCellIntoView(top, 0)
+  }
+
+  scrollToEnd () {
+    const { top } = this.grid.getViewport()
+    this.grid.scrollCellIntoView(top, this.grid.getColumns().length - 1)
+  }
 }

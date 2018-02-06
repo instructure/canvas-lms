@@ -377,5 +377,31 @@ describe "Outcome Reports" do
       report = run_report(@type, {params: param})
       expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
     end
+
+    context 'with multiple subaccounts' do
+      before(:once) do
+        @parent_account = @account
+        @subaccount1 = Account.create! parent_account: @parent_account
+        @subaccount2 = Account.create! parent_account: @parent_account
+        @enrollment1 = course_with_student(account: @subaccount1, user: @user1, active_all: true)
+        @enrollment2 = course_with_student(account: @subaccount2, user: @user2, active_all: true)
+        @rubric1 = outcome_with_rubric(outcome: @outcome, course: @enrollment1.course, outcome_context: @subaccount1)
+        @rubric2 = outcome_with_rubric(outcome: @outcome, course: @enrollment2.course, outcome_context: @subaccount2)
+        rubric_assessment_model(context: @enrollment1.course, rubric: @rubric1, user: @user1)
+        rubric_assessment_model(context: @enrollment2.course, rubric: @rubric2, user: @user2)
+      end
+
+      it 'includes results for all subaccounts when run from the root account' do
+        rows = read_report(@type, order: [0])
+        expect(rows.length).to eq 3
+      end
+
+      it 'includes only results from subaccount' do
+        rows = read_report(@type, account: @subaccount1, parse_header: true)
+        expect(rows.length).to eq 1
+        expect(rows[0]['student name']).to eq @user1.sortable_name
+        expect(rows[0]['course id']).to eq @enrollment1.course_id.to_s
+      end
+    end
   end
 end

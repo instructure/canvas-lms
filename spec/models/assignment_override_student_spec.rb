@@ -125,7 +125,7 @@ describe AssignmentOverrideStudent do
   end
 
   def adhoc_override_with_student
-    student_in_course
+    student_in_course(:active_all => true)
     @assignment = assignment_model(:course => @course)
     @ao = AssignmentOverride.new()
     @ao.assignment = @assignment
@@ -177,6 +177,22 @@ describe AssignmentOverrideStudent do
       expect(@override_student).to be_active
       AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
       expect(@override_student.reload).to be_deleted
+    end
+
+    it "should not broadcast notifications when processing a cleanup" do
+      Timecop.freeze(1.day.ago) do
+        adhoc_override_with_student
+      end
+      Enrollment.where(:id => @enrollment).update_all(:workflow_state => "deleted") # skip callbacks
+
+      notification_name = "Assignment Due Date Override Changed"
+      @notification = Notification.create! :name => notification_name, :category => "TestImmediately"
+      teacher_in_course(active_all: true)
+      notification_policy_model
+
+      expect(DelayedNotification).to_not receive(:process)
+      AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
+      expect(@ao.reload).to be_deleted
     end
 
     it "trying to update an orphaned override student (one without an enrollment) removes it" do

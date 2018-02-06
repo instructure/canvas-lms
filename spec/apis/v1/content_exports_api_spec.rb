@@ -534,7 +534,7 @@ describe ContentExportsApiController, type: :request do
 
   describe "quizzes2 exports" do
     before do
-      t_course.account.enable_feature!(:quizzes2_exporter)
+      t_course.enable_feature!(:quizzes_next)
     end
 
     context "quiz_id param" do

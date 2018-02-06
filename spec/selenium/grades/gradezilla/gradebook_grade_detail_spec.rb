@@ -52,12 +52,6 @@ describe 'Grade Detail Tray:' do
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('none')).to be true
     end
 
-    it 'excused submission has excused-radiobutton selected', priority: "1", test_id: 3337204 do
-      Gradezilla::Cells.open_tray(@course.students.first, @a4)
-
-      expect(Gradezilla::GradeDetailTray.is_radio_button_selected('excused')).to be true
-    end
-
     it 'updates status when excused-option is selected', priority: "1", test_id: 3337207 do
       Gradezilla::Cells.open_tray(@course.students.first, @a2)
       Gradezilla::GradeDetailTray.change_status_to('excused')
@@ -97,7 +91,7 @@ describe 'Grade Detail Tray:' do
 
     it 'late submission has late-by days/hours', test_id: 3337209, priority: '1' do
       late_by_days_value = (@course.students.first.submissions.find_by(assignment_id:@a1.id).
-                              seconds_late/86400.to_f).round(2)
+        seconds_late/86400.to_f).round(2)
 
       expect(Gradezilla::GradeDetailTray.fetch_late_by_value.to_f).to eq late_by_days_value
     end

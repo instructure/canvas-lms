@@ -734,6 +734,65 @@ E411208,13834,student,2A,active
 E411208,13aa3,teacher,2A,active
 </pre>
 
+group_categories.csv
+------------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>group_category_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference a group category.
+This identifier must not change for the group category, and must be globally unique.</td>
+</tr>
+<tr>
+<td>account_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The account identifier from accounts.csv, if no account or course is
+specified the group will be attached to the root account.</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The course identifier from courses.csv, if no course or account is specified
+the group will be attached to the root account.</td>
+</tr>
+<tr>
+<td>category_name</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The name of the group category.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
+</tr>
+</table>
+
+Sample:
+
+<pre>group_category_id,account_id,course_id,category_name,status
+GC08,A001,,First Group Category,active
+GC07,,,GC7,active
+GC10,,,GC10,deleted
+</pre>
+
 groups.csv
 ------------
 
@@ -754,11 +813,29 @@ groups.csv
 This identifier must not change for the group, and must be globally unique.</td>
 </tr>
 <tr>
+<td>group_category_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The group category identifier from group_categories.csv, if none is
+specified the group will be put in the default group category for the account
+or course or root_account if there is no course_id or account_id.
+</td>
+</tr>
+<tr>
 <td>account_id</td>
 <td>text</td>
 <td></td>
 <td></td>
 <td>The account identifier from accounts.csv, if none is specified the group will be attached to
+the root account.</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The course identifier from courses.csv, if none is specified the group will be attached to
 the root account.</td>
 </tr>
 <tr>
@@ -1043,7 +1120,7 @@ remove the integration_id from the object.</td>
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>account, term, course, section, group, user, user_integration_id</td>
+<td>account, term, course, section, group, user</td>
 </tr>
 </table>
 

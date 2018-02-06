@@ -447,7 +447,7 @@
 #           "type": "boolean"
 #         },
 #         "grading_type": {
-#           "description": "The type of grading the assignment receives; one of 'pass_fail', 'percent', 'letter_grade', 'gpa_scale', 'points'",
+#           "description": "The type of grading the assignment receives; one of 'pass_fail', 'percent', 'letter_grade', 'gpa_scale', 'points'. Note: the 'gpa_scale' grading_type is deprecated and will be removed on 2018-06-02.",
 #           "example": "points",
 #           "type": "string",
 #           "allowableValues": {
@@ -618,8 +618,8 @@ class AssignmentsApiController < ApplicationController
 
     new_assignment.insert_at(old_assignment.position + 1)
     new_assignment.save!
-    positions_in_group = Assignment.active.where(assignment_group_id: old_assignment.assignment_group_id)
-                                   .pluck("id", "position")
+    positions_in_group = Assignment.active.where(assignment_group_id: old_assignment.assignment_group_id).
+      pluck("id", "position")
     positions_hash = {}
     positions_in_group.each do |id_pos_pair|
       positions_hash[id_pos_pair[0]] = id_pos_pair[1]
@@ -742,8 +742,8 @@ class AssignmentsApiController < ApplicationController
   #   All dates associated with the assignment, if applicable
   # @returns Assignment
   def show
-    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric)
-                    .api_id(params[:id])
+    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric).
+      api_id(params[:id])
     if authorized_action(@assignment, @current_user, :read)
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 
@@ -869,6 +869,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
   #  The assignment defaults to "points" if this field is omitted.
+  #  Note: the "gpa_scale" grading_type is deprecated and will be removed on 2018-06-02.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
@@ -1023,6 +1024,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
   #  The assignment defaults to "points" if this field is omitted.
+  #  Note: the "gpa_scale" grading_type is deprecated and will be removed on 2018-06-02.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.

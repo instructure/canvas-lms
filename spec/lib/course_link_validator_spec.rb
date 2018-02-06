@@ -104,6 +104,23 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
+  it "should not run on deleted quiz questions" do
+    allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
+    html = %{<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>}
+
+    course_factory
+    quiz = @course.quizzes.create!(:title => 'quiz1', :description => "desc")
+    qq = quiz.quiz_questions.create!(:question_data => {'name' => 'test question',
+      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+    qq.destroy!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues.count).to eq 0
+  end
+
   it "should not care if it can reach it" do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(true)
 

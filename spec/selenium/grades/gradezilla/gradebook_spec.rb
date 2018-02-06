@@ -96,10 +96,10 @@ describe "Gradezilla" do
     end
 
     it "allows editing grades", priority: "1", test_id: 210026 do
-      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1')
+      cell = Gradezilla::Cells.grading_cell(@student_1, @first_assignment)
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
-      expect(ff('.grade', cell)).not_to be_blank
+      expect(Gradezilla::Cells.grading_cell_input(@student_1, @first_assignment)).not_to be_blank
     end
   end
 
@@ -206,11 +206,8 @@ describe "Gradezilla" do
       # chrome fails to find the download submissions link because it does not fit normal screen
       make_full_screen
 
-      # And I click the dropdown menu on the assignment
-      Gradezilla.click_assignment_header_menu(@first_assignment.id)
-
       # And I click the download submissions button
-      Gradezilla.click_assignment_header_menu_element("download submissions")
+      Gradezilla.click_assignment_header_menu_element(@first_assignment.id,"download submissions")
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
@@ -329,12 +326,11 @@ describe "Gradezilla" do
 
       Gradezilla.visit(test_course)
       # in order to get into edit mode with an icon in the way, a total of 3 clicks are needed
-      f('#gradebook_grid .icon-not-graded').click
-      double_click('.online_quiz')
+      grading_cell = Gradezilla::Cells.grading_cell(student, essay_quiz.assignment)
+      grading_cell.click
 
-      replace_value('#gradebook_grid input.grade', '10')
-      f('#gradebook_grid input.grade').send_keys(:enter)
-      expect(f('#gradebook_grid')).not_to contain_css('.icon-not-graded')
+      Gradezilla::Cells.edit_grade(student, essay_quiz.assignment, 10)
+      expect(grading_cell).not_to contain_css('.icon-not-graded')
     end
   end
 end

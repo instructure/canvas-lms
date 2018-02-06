@@ -17,8 +17,9 @@
 
 define [
   'jquery'
+  'jsx/shared/upload_file'
   'jquery.ajaxJSON'
-], ($) ->
+], ($, uploader) ->
 
   # Base uploader with common api between File and Zip uploads
   # (where zip is expanded)
@@ -32,14 +33,6 @@ define [
 
     onProgress: (percentComplete, file) ->
       #noop will be set up a level
-
-    createFormData: () ->
-      data = @uploadData.upload_params
-      formData = new FormData()
-      Object.keys(data).forEach (key) ->
-        formData.append(key, data[key])
-      formData.append('file', @file)
-      formData
 
     createPreFlightParams: ->
       params =
@@ -69,17 +62,10 @@ define [
 
     #actual upload based on kickoff / preflight
     _actualUpload: () ->
-      @_xhr = new XMLHttpRequest
-      @_xhr.upload.addEventListener('progress', @trackProgress, false)
-      @_xhr.onload = @onUploadPosted
-      @_xhr.onerror = @deferred.reject
-      @_xhr.onabort = @deferred.reject
-      @_xhr.open 'POST', @uploadData.upload_url, true
-      @_xhr.send @createFormData()
+      uploader.completeUpload(@uploadData, @file, onProgress: @trackProgress)
+        .then(@onUploadPosted)
+        .catch(@deferred.reject)
 
-    # when using s3 uploads you now need to manually hit the success_url
-    # when using local uploads you have already been auto-redirected (even
-    # though we requested no_redirect) to the succes_url at this point
     onUploadPosted: (event) =>
       # should be implemented in extensions
 

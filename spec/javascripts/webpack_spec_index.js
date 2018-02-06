@@ -28,20 +28,24 @@ if (!window.ENV) window.ENV = {}
 // setup the inst-ui default theme
 canvas.use()
 
-function requireAll (requireContext) {
-  return requireContext.keys().map(requireContext);
-}
+const requireAll = context => context.keys().map(context)
 
-if (__SPEC_FILE) {
-  require(__SPEC_FILE)
-} else if (__SPEC_DIR) {
-  requireAll(require.context(__SPEC_DIR, true, /Spec$/))
+if (process.env.JSPEC_PATH) {
+  let isFile = false
+  try {
+    isFile = __webpack_modules__[require.resolveWeak(`../../${process.env.JSPEC_PATH}`)]
+  } catch (e) {}
+  if (isFile) {
+    require(`../../${process.env.JSPEC_PATH}`)
+  } else {
+    requireAll(require.context(`../../${process.env.JSPEC_PATH}`))
+  }
 } else {
-
   // run specs for ember screenreader gradebook
-  requireAll(require.context('../../app/coffeescripts', true, /\.spec.coffee$/))
+  requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/))
 
-  // run all the specs for the rest of canvas
-  requireAll(require.context('../coffeescripts', true, /Spec.coffee$/))
-  requireAll(require.context('./jsx', true, /Spec$/))
+  requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))
+
+  requireAll(require.context('./jsx', !!'includeSubdirectories', /Spec$/))
+
 }

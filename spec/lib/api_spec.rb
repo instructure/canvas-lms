@@ -113,6 +113,12 @@ describe Api do
       expect(Account.site_admin).to eq TestApiInstance.new(account, nil).api_find(Account, 'site_admin')
     end
 
+    it 'should find group_category with sis_id' do
+      account = Account.create!
+      gc = GroupCategory.create(sis_source_id: 'gc_sis', account: account, name: 'gc')
+      expect(gc).to eq TestApiInstance.new(account, nil).api_find(GroupCategory, 'sis_group_category_id:gc_sis')
+    end
+
     it 'should find term id "default"' do
       account = Account.create!
       expect(TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'default')).to eq account.default_enrollment_term
@@ -601,6 +607,18 @@ describe Api do
     it 'should correctly capture course_section lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(CourseSection)[:lookups]
       expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq ["sis_source_id", "1"]
+      expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
+    end
+
+    it 'should correctly capture group_categories lookups' do
+      lookups = Api.sis_find_sis_mapping_for_collection(GroupCategory)[:lookups]
+      expect(Api.sis_parse_id("sis_group_category_id:1", lookups)).to eq ["sis_source_id", "1"]
+      expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq [nil, nil]

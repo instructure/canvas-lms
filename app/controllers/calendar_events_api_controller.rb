@@ -349,8 +349,8 @@ class CalendarEventsApiController < ApplicationController
       mark_submitted_assignments(user, events)
       includes = Array(params[:include])
       if includes.include?("submission")
-        submissions = Submission.active.where(assignment_id: events, user_id: user)
-          .group_by(&:assignment_id)
+        submissions = Submission.active.where(assignment_id: events, user_id: user).
+          group_by(&:assignment_id)
       end
       # preload data used by assignment_json
       ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
@@ -647,7 +647,7 @@ class CalendarEventsApiController < ApplicationController
       @event.cancel_reason = params[:cancel_reason]
       if @event.destroy
         if @event.appointment_group && @event.appointment_group.appointments.count == 0 && @event.appointment_group.context.root_account.feature_enabled?(:better_scheduler)
-          @event.appointment_group.destroy
+          @event.appointment_group.destroy(@current_user)
         end
         render :json => event_json(@event, @current_user, session)
       else

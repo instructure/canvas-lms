@@ -21,8 +21,9 @@ define [
   'compiled/views/content_migrations/SelectContentView'
   'compiled/models/ProgressingContentMigration'
   'helpers/fakeENV'
+  'helpers/assertions'
   'helpers/jquery.simulate'
-], ($, Backbone, SelectContentView, ProgressingMigration, fakeENV) -> 
+], ($, Backbone, SelectContentView, ProgressingMigration, fakeENV, assertions) ->
 
   class SelectContentHelper
     @url = '/api/v1/courses/42/content_migrations/5/selective_data'
@@ -81,7 +82,7 @@ define [
                                           ])]
 
   QUnit.module 'SelectContentView: Integration Tests',
-    setup: -> 
+    setup: ->
       @server = sinon.fakeServer.create()
       fakeENV.setup()
       @$fixtures = $('#fixtures')
@@ -89,7 +90,7 @@ define [
                   id: 5
                   course_id: 42
 
-      @selectContentView = new SelectContentView 
+      @selectContentView = new SelectContentView
                               model: @model
                               title: 'Select Content'
                               width: 600
@@ -103,12 +104,16 @@ define [
       @server.respond()
       @tree = @selectContentView.$el.find('ul[role=tree]')
 
-    teardown: -> 
+    teardown: ->
       fakeENV.teardown()
       @server.restore()
       @selectContentView.remove()
 
-  test 'render top level checkboxes when opened', -> 
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @selectContentView, done, {'a11yReport': true}
+
+  test 'render top level checkboxes when opened', ->
     $checkboxes = @selectContentView.$el.find('[type=checkbox]')
     equal $checkboxes.length, 3, "Renders all checkboxes"
 
@@ -120,9 +125,9 @@ define [
     @selectContentView.$el.find("[data-state='closed']").show()
     @selectContentView.$el.find($subCheckboxes[2]).simulate 'click'
     indeterminate = @selectContentView.$el.find("input[name='copy[all_assignments]']").first().prop('indeterminate')
-    
+
     ok (indeterminate || indeterminate == 'true'), "Parent changed to intermediate"
-    
+
   test "clicking the caret shows and hides checkboxes", ->
     $caret = @selectContentView.$el.find("[data-type=assignments] .checkbox-caret").first()
     $sublevelCheckboxes = $caret.closest('div').siblings('ul').first()
@@ -158,16 +163,16 @@ define [
     @server.respond()
 
     clock.tick 1
-    @selectContentView.$el.find('[data-type=assignments] input[type=checkbox]').each -> 
+    @selectContentView.$el.find('[data-type=assignments] input[type=checkbox]').each ->
       ok $(this).is(':checked'), 'checkbox is checked'
 
     clock.restore()
 
-  test "pressing the cancel button closes the dialog view", -> 
+  test "pressing the cancel button closes the dialog view", ->
     @selectContentView.$el.find('#cancelSelect').simulate 'click'
     ok !@selectContentView.dialog.isOpen(), "Dialog is closed"
 
-  test "select content button is disabled unless content is selected", -> 
+  test "select content button is disabled unless content is selected", ->
     ok @selectContentView.$el.find('#selectContentBtn').prop('disabled'), 'Disabled by default'
     @selectContentView.$el.find('input[type=checkbox]').first().simulate('click')
     ok !@selectContentView.$el.find('#selectContentBtn').prop('disabled'), 'Enabled after checking item'

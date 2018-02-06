@@ -263,6 +263,9 @@ class ContextController < ApplicationController
         @membership = scope.first
         if @membership
           @enrollments = scope.to_a
+          js_env(COURSE_ID: @context.id,
+                 USER_ID: user_id,
+                 LAST_ATTENDED_DATE: @enrollments.first.last_attended_at)
           log_asset_access(@membership, "roster", "roster")
         end
       elsif @context.is_a?(Group)

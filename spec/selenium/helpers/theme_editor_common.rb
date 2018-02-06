@@ -58,19 +58,19 @@ module ThemeEditorCommon
   end
 
   def click_global_branding
-    f('.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:first-child').click
+    fj('h3:contains("Global Branding")').click
   end
 
   def click_global_navigation
-    f('.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:nth-of-type(2)').click
+    fj('h3:contains("Global Navigation")').click
   end
 
   def click_watermarks_and_other_images
-    f('.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:nth-of-type(3)').click
+    fj('h3:contains("Watermarks & Other Images")').click
   end
-  
+
   def primary_color
-    f('#brand_config\\[variables\\]\\[ic-brand-primary\\]') 
+    f('#brand_config\\[variables\\]\\[ic-brand-primary\\]')
   end
 
   def primary_button
@@ -134,13 +134,13 @@ module ThemeEditorCommon
   end
 
   def all_global_navigation
-    [nav_background, 
-     nav_icon, 
-     nav_icon_active, 
-     nav_text, 
-     nav_text_active, 
-     nav_avatar_border, 
-     nav_badge, 
+    [nav_background,
+     nav_icon,
+     nav_icon_active,
+     nav_text,
+     nav_text_active,
+     nav_avatar_border,
+     nav_badge,
      logo_background]
   end
 

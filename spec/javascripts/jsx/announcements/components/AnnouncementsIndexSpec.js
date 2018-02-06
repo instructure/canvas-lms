@@ -22,6 +22,7 @@ import { Provider } from 'react-redux'
 import _ from 'lodash'
 
 import AnnouncementsIndex from 'jsx/announcements/components/AnnouncementsIndex'
+import sampleData from '../sampleData'
 
 const makeProps = (props = {}) => _.merge({
   announcements: [],
@@ -34,7 +35,8 @@ const makeProps = (props = {}) => _.merge({
     manage_content: true,
     moderate: true,
   },
-  getAnnouncements: () => {},
+  getAnnouncements () {},
+  setAnnouncementSelection () {},
 }, props)
 
 // necessary to mock this because we have a child Container/"Smart" component
@@ -47,6 +49,7 @@ const store = {
       manage_content: true,
       moderate: true,
     },
+    selectedAnnouncements: [],
   }),
   // we only need to define these functions so that we match the react-redux contextTypes
   // shape for a store otherwise react-redux thinks our store is invalid
@@ -82,7 +85,7 @@ test('calls getAnnouncements if hasLoadedAnnouncements is false', () => {
   equal(getAnnouncements.callCount, 1)
 })
 
-test('renders IndexHeader if we have manage_content permissions', () => {
+test('should render IndexHeader if we have manage_content permissions', () => {
   const tree = mount(
     <Provider store={store}>
       <AnnouncementsIndex {...makeProps({ permissions: { manage_content: true } })} />
@@ -92,12 +95,37 @@ test('renders IndexHeader if we have manage_content permissions', () => {
   ok(node.exists())
 })
 
-test('does not render IndexHeader if we do not have manage_content permissions', () => {
+test('should render IndexHeader even if we do not have manage_content permissions', () => {
   const tree = mount(
     <Provider store={store}>
       <AnnouncementsIndex {...makeProps({ permissions: { manage_content: false } })} />
     </Provider>
   )
   const node = tree.find('IndexHeader')
-  notOk(node.exists())
+  ok(node.exists())
+})
+
+test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', (assert) => {
+  const done = assert.async()
+  const selectSpy = sinon.spy()
+  const props = {
+    announcements: sampleData.announcements,
+    setAnnouncementSelection: selectSpy,
+    hasLoadedAnnouncements: true,
+    permissions: {
+      moderate: true,
+    },
+  }
+  const tree = mount(
+    <Provider store={store}>
+      <AnnouncementsIndex {...makeProps(props)} />
+    </Provider>
+  )
+
+  tree.find('input[type="checkbox"]').simulate('change', { target: { checked: true } })
+  setTimeout(() => {
+    equal(selectSpy.callCount, 1)
+    deepEqual(selectSpy.firstCall.args, [{ selected: true, id: sampleData.announcements[0].id }])
+    done()
+  })
 })

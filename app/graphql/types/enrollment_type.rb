@@ -54,8 +54,8 @@ module Types
             nil
         end
 
-        Loaders::AssociationLoader.for(Enrollment, [:scores, :user, :course])
-          .load(enrollment).then do
+        Loaders::AssociationLoader.for(Enrollment, [:scores, :user, :course]).
+          load(enrollment).then do
             if grading_period_id = args[:gradingPeriodId]
               grades_resolver.call(grading_period_id)
             else

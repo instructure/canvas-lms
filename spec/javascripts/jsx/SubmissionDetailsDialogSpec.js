@@ -64,7 +64,6 @@ define([
     callback({ score: 15, excused: false });
     this.clock.tick(510);
     ok(flashWarningStub.calledOnce);
-    submissionsDetailsDialog.dialog.dialog('destroy');
   });
 
   test("display name by default", function () {
@@ -83,7 +82,6 @@ define([
     submissionDetailsDialog.update(submissionData);
 
     strictEqual(document.querySelector('address').innerText.includes('Some Author'), true);
-    submissionDetailsDialog.dialog.dialog('destroy');
   });
 
   test("when anonymous hides student's name from address section", function () {

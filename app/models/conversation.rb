@@ -121,7 +121,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def can_add_participants?(users)
-    (users.map(&:id) + conversation_participants.pluck(:user_id)).uniq.count <= self.class.max_group_conversation_size
+    (users.map(&:id) + conversation_participants.pluck(:user_id)).uniq.count <= self.class.max_group_conversation_size + 1
   end
 
   def add_participants(current_user, users, options={})

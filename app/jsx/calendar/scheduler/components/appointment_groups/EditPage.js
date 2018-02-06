@@ -236,7 +236,7 @@ import TimeBlockSelector from './TimeBlockSelector'
             </h1>
           </ScreenReaderContent>
           <div className="EditPage__Header">
-            <Grid>
+            <Grid vAlign="middle">
               <GridRow hAlign="end">
                 <GridCol width="auto">
                   <Button onClick={this.deleteGroup} disabled={this.state.isDeleting}>{I18n.t('Delete Group')}</Button>
@@ -254,6 +254,7 @@ import TimeBlockSelector from './TimeBlockSelector'
             <FormFieldGroup
               description={I18n.t('Calendars')}
               layout="inline"
+              vAlign="top"
             >
               <ContextSelector
                 ref={(c) => { this.contextSelector = c; }}
@@ -268,10 +269,12 @@ import TimeBlockSelector from './TimeBlockSelector'
               value={this.state.formValues.title}
               onChange={this.handleChange}
               layout="inline"
+              vAlign="top"
               />
             <FormFieldGroup
               description={I18n.t('Time Block')}
               layout="inline"
+              vAlign="top"
               >
               <TimeBlockSelector
                 timeData={parseTimeData(this.state.appointmentGroup)}
@@ -284,6 +287,7 @@ import TimeBlockSelector from './TimeBlockSelector'
               value={this.state.formValues.location}
               onChange={this.handleChange}
               layout="inline"
+              vAlign="top"
               />
             <TextArea
               resize="vertical"
@@ -298,7 +302,7 @@ import TimeBlockSelector from './TimeBlockSelector'
                 description={I18n.t('Options')}
                 rowSpacing="small"
                 layout="inline"
-                vAlign="middle"
+                vAlign="top"
               >
                 <Checkbox
                   checked={this.state.appointmentGroup.participant_type === 'Group'}
@@ -353,8 +357,14 @@ import TimeBlockSelector from './TimeBlockSelector'
             <FormFieldGroup
               description={I18n.t('Appointments')}
               layout="inline"
+              rowSpacing="small"
+              vAlign="top"
             >
-              <Button ref={(c) => { this.messageStudentsButton = c }} onClick={this.messageStudents} disabled={this.state.appointmentGroup.appointments_count === 0}>{I18n.t('Message Students')}</Button>
+            <Button ref={(c) => { this.messageStudentsButton = c }}
+              onClick={this.messageStudents}
+              disabled={this.state.appointmentGroup.appointments_count === 0}>
+                {I18n.t('Message Students')}
+              </Button>
               <AppointmentGroupList appointmentGroup={this.state.appointmentGroup} />
             </FormFieldGroup>
           </FormFieldGroup>

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "components/ic-badge";
-
 .EditPage__Header {
   border-bottom: 1px solid $ic-border-light;
   padding-bottom: 15px;
@@ -57,32 +55,12 @@
   margin-left: 30px;
 }
 
-.AppointmentGroupList__Appointment-timeLabel {
-  display: inline-block;
-  width: 180px;
-}
-
-.AppointmentGroupList__Badge--unreserved {
-  @include ic-badge-maker(20px, $ic-color-medium-light, $ic-color-dark);
-  border: 1px solid $ic-border-light;
-}
-
-.AppointmentGroupList__Badge--reserved {
-  @include ic-badge-maker(20px, $ic-color-success, $ic-color-light);
-  border: 1px solid $ic-border-light;
-}
-
 .AppointmentGroupList__Icon--reserved {
   color: $ic-color-success;
 }
 
 .AppointmentGroupList__Icon--unreserved {
   color: $ic-color-medium;
-}
-
-.AppointmentGroupList__Badge {
-  min-width: 70px;
-  margin-right: 10px;
 }
 
 .ContextSelector__Dropdown {
@@ -101,11 +79,18 @@
   width: 135px;
 }
 
-.TimeBlockSelector__DivideSection-Input {
-  width: 40px;
+.TimeBlockSelectorRow {  // until container supports flex this is a wrapping div for alignment
+  font-family: $ic-font-family;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $ic-sp;
 }
 
-.TimeBlockSelectorRow__Date,
+.TimeBlockSelectorColumn {
+  margin-right: $ic-sp;
+}
+
+.TimeBlockSelectorRow__Date,  // will remove once inputs are switched over to use instui
 .TimeBlockSelectorRow__StartTime,
 .TimeBlockSelectorRow__EndTime {
   width: 130px;

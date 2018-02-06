@@ -320,6 +320,7 @@ describe "announcements" do
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       replace_content(f('input[name=title]'), 'title')
       type_in_tiny('textarea[name=message]', 'hi')
+      f('#allow_user_comments').click
       f('#require_initial_post').click
       expect_new_page_load { submit_form('.form-actions') }
       announcement = Announcement.where(title: 'title').first

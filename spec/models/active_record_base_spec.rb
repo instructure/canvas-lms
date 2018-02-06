@@ -162,6 +162,61 @@ describe ActiveRecord::Base do
       }.to raise_error(ArgumentError)
     end
 
+    describe "#find_in_batches_with_copy" do
+      it "works" do
+        expected = [Account.default, Account.site_admin]
+        got = []
+        conn = Account.connection
+        Account.where(id: expected).find_in_batches_with_copy(batch_size: 1) do |batch|
+          got.concat(batch)
+        end
+        # verify we're still using the same connection
+        expect(Account.connection).to eq conn
+        expect(got.sort).to eq expected.sort
+
+        # test the loop-and-a-half
+        got = []
+        Account.where(id: expected).find_in_batches_with_copy(batch_size: 5) do |batch|
+          expect(Account.connection).to eq conn
+          got.concat(batch)
+        end
+        expect(Account.connection).to eq conn
+        expect(got.sort).to eq expected.sort
+      end
+
+      context "non-transactional" do
+        self.use_transactional_tests = false
+        def using_transactions_properly?
+          true
+        end
+
+        it "gives you a fresh connection inside the block" do
+          expected = [Account.default, Account.site_admin]
+          got = []
+          conn = Account.connection
+          other_conn = nil
+          Account.where(id: expected).find_in_batches_with_copy(batch_size: 1) do |batch|
+            expect(Account.connection).not_to eq conn
+            other_conn = Account.connection
+            got.concat(batch)
+          end
+          # verify we're still using the other connection
+          expect(Account.connection).to eq other_conn
+          expect(got.sort).to eq expected.sort
+
+          # a second loop forces the connection to swap back
+          got = []
+          Account.where(id: expected).find_in_batches_with_copy(batch_size: 1) do |batch|
+            expect(Account.connection).to eq conn
+            got.concat(batch)
+          end
+          expect(Account.connection).to eq conn
+          # this connection couldn't see the transaction
+          expect(got).to eq []
+        end
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

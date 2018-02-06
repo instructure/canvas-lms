@@ -987,6 +987,7 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/enrollments/:id/accept', action: :accept
       post 'courses/:course_id/enrollments/:id/reject', action: :reject
 
+      put 'courses/:course_id/users/:user_id/last_attended', :action => :last_attended
       put 'courses/:course_id/enrollments/:id/reactivate', :action => :reactivate, :as => 'reactivate_enrollment'
 
       delete 'courses/:course_id/enrollments/:id', action: :destroy, :as => "destroy_enrollment"
@@ -1224,6 +1225,11 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
       put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
+    end
+
+    scope(controller: :sis_import_errors_api) do
+      get 'accounts/:account_id/sis_imports/:id/errors', action: :index, as: :sis_batch_import_errors
+      get 'accounts/:account_id/sis_import_errors', action: :index, as: :account_sis_import_errors
     end
 
     scope(controller: :users) do
@@ -2044,6 +2050,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'lti/users_api') do
       get 'users/:id', action: :show
+      get 'groups/:group_id/users', action: :group_index, as: 'lti_user_group_index'
     end
 
     scope(controller: 'lti/assignments_api') do

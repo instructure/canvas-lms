@@ -40,11 +40,14 @@ describe "announcements" do
     wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
     replace_content(f('input[name=title]'), topic_title)
     type_in_tiny('textarea[name=message]', 'hi, first announcement')
+    f('#allow_user_comments').click
     f('#require_initial_post').click
     wait_for_ajaximations
     expect_new_page_load { submit_form('.form-actions') }
     announcement = Announcement.where(title: topic_title).first
     expect(announcement[:require_initial_post]).to eq true
+    announcement.locked = false
+    announcement.save!
     student_2 = student_in_course.user
     announcement.discussion_entries.create!(:user => student_2, :message => student_2_entry)
 

@@ -540,6 +540,7 @@ describe "admin settings tab" do
 
   it "should show all the feature flags" do
     course_with_admin_logged_in(:account => Account.site_admin)
+    provision_quizzes_next(Account.site_admin)
     get "/accounts/#{Account.site_admin.id}/settings"
     f("#tab-features-link").click
     wait_for_ajaximations

@@ -30,9 +30,9 @@ module SIS
 
       # possible columns:
       # xlist_course_id, section_id, status
-      def process(csv)
+      def process(csv, index=nil, count=nil)
         @sis.counts[:xlists] += SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
-          csv_rows(csv) do |row|
+          csv_rows(csv, index, count) do |row|
             update_progress
 
             begin

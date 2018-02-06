@@ -99,6 +99,8 @@ module FeatureFlags
     feature_def = Feature.definitions[feature]
     return nil unless feature_def
     return nil unless feature_def.applies_to_object(self)
+
+    return nil if feature_def.visible_on.is_a?(Proc) && !feature_def.visible_on.call(self)
     return feature_def unless feature_def.allowed? || feature_def.hidden?
 
     is_root_account = self.is_a?(Account) && self.root_account?

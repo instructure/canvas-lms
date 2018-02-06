@@ -406,8 +406,8 @@ module Lti
     #   http://example.url/path.css
     #   ```
     register_expansion 'Canvas.css.common', [],
-                       -> { URI.parse(@request.url)
-                               .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s },
+                       -> { URI.parse(@request.url).
+                         merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s },
                        CONTROLLER_GUARD
 
     # returns the shard id for the current context.

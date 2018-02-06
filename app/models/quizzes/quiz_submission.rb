@@ -636,6 +636,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def update_scores(params)
+    original_score = self.score
     params = (params || {}).with_indifferent_access
     self.manually_scored = false
     self.grader_id = params[:grader_id]
@@ -721,6 +722,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       self.without_versioning(&:save)
     end
     self.reload
+    grader = Quizzes::SubmissionGrader.new(self)
+    if grader.outcomes_require_update(self, original_score)
+      grader.track_outcomes(version.model.attempt)
+    end
     true
   end
 

@@ -101,6 +101,64 @@ describe GradebookUserIds do
     expect(gradebook_user_ids.user_ids).to eq([@student1.id])
   end
 
+  context "with viewing user's privileges limited" do
+    let!(:viewable_section) { @course.course_sections.create! }
+
+    before(:each) do
+      teacher_in_section(
+        viewable_section,
+        # we omit allow_multiple_enrollments here to clear this user's existing enrollments
+        limit_privileges_to_course_section: true,
+        user: @teacher
+      )
+
+      student_in_section(
+        viewable_section,
+        user: @student1
+      )
+    end
+
+    it "only returns users in the teacher's sections" do
+      another_viewable_section = @course.course_sections.create!
+      teacher_in_section(
+        another_viewable_section,
+        allow_multiple_enrollments: true,
+        limit_privileges_to_course_section: true,
+        user: @teacher
+      )
+      student_in_section(
+        another_viewable_section,
+        user: @student2
+      )
+
+      unviewable_section = @course.course_sections.create!
+      student_in_section(
+        unviewable_section,
+        user: @student3
+      )
+
+      expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id, @student2.id)
+    end
+
+    it "returns visible inactive/concluded users" do
+      @student1.enrollments.find_by(course_section: viewable_section).deactivate
+
+      student_in_section(
+        viewable_section,
+        user: @student2
+      )
+      @student2.enrollments.find_by(course_section: viewable_section).conclude
+
+      @teacher.preferences[:gradebook_settings] = {
+        @course.id => {
+          show_inactive_enrollments: "true",
+          show_concluded_enrollments: "true"
+        }
+      }
+      expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id, @student2.id)
+    end
+  end
+
   context 'with pg_collkey installed' do
     before do
       skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
@@ -603,11 +661,14 @@ describe GradebookUserIds do
     end
   end
 
-  describe "total grade sorting" do
+  describe "score sorting" do
     before(:once) do
       @now = Time.zone.now
       @assignment1 = @course.assignments.create!(points_possible: 10, due_at: 1.month.from_now(@now))
-      @assignment2 = @course.assignments.create!(points_possible: 100, due_at: 3.months.from_now(@now))
+      @second_assignment_group = @course.assignment_groups.create(name: 'second group')
+      @assignment2 = @course.assignments.create!(
+        points_possible: 100, due_at: 3.months.from_now(@now), assignment_group: @second_assignment_group
+      )
 
       @assignment1.grade_student(@student1, grade: 1, grader: @teacher)
       @assignment1.grade_student(@student2, grade: 10, grader: @teacher)
@@ -628,21 +689,49 @@ describe GradebookUserIds do
         skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
       end
 
-      it "sorts by total grade ascending" do
-        expected_user_ids = [@student1.id, @student2.id, @student4.id, @student3.id, @fake_student.id]
-        expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+      context "with total grade" do
+        it "sorts by total grade ascending" do
+          expected_user_ids = [@student1.id, @student2.id, @student4.id, @student3.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "sorts by total grade descending" do
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+          expected_user_ids = [@student3.id, @student4.id, @student2.id, @student1.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "includes concluded students ids if the course is concluded" do
+          @course.complete!
+          all_students = [@student1.id, @student2.id, @student4.id, @student3.id,
+                          @concluded_student.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(all_students)
+        end
       end
 
-      it "sorts by total grade descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
-        expected_user_ids = [@student3.id, @student4.id, @student2.id, @student1.id, @fake_student.id]
-        expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
-      end
+      context "with assignment group" do
+        before(:once) do
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] =
+            "assignment_group_#{@second_assignment_group.id}"
+        end
 
-      it "includes concluded students ids if the course is concluded" do
-        @course.complete!
-        all_students = [@student1.id, @student2.id, @student4.id, @student3.id, @concluded_student.id, @fake_student.id]
-        expect(gradebook_user_ids.user_ids).to eq(all_students)
+        it "sorts by assignment group grade ascending" do
+          expected_user_ids = [@student2.id, @student1.id, @student4.id, @student3.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "sorts by assignment group grade descending" do
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+          expected_user_ids = [@student3.id, @student4.id, @student1.id, @student2.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "includes concluded students ids if the course is concluded" do
+          @course.complete!
+          all_students = [@student2.id, @student1.id, @student4.id, @student3.id,
+                          @concluded_student.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(all_students)
+        end
       end
     end
 
@@ -651,21 +740,49 @@ describe GradebookUserIds do
         skip 'requires no pg_collkey installed SD-2747' if has_pg_collkey
       end
 
-      it "sorts by total grade ascending" do
-        expected_user_ids = [@student1.id, @student2.id, @student3.id, @student4.id, @fake_student.id]
-        expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+      context "with total grade" do
+        it "sorts by total grade ascending" do
+          expected_user_ids = [@student1.id, @student2.id, @student3.id, @student4.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "sorts by total grade descending" do
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+          expected_user_ids = [@student4.id, @student3.id, @student2.id, @student1.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "includes concluded students ids if the course is concluded" do
+          @course.complete!
+          all_students = [@student1.id, @student2.id, @student3.id, @student4.id,
+                          @concluded_student.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(all_students)
+        end
       end
 
-      it "sorts by total grade descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
-        expected_user_ids = [@student4.id, @student3.id, @student2.id, @student1.id, @fake_student.id]
-        expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
-      end
+      context "with assignment groups" do
+        before(:once) do
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] =
+            "assignment_group_#{@second_assignment_group.id}"
+        end
 
-      it "includes concluded students ids if the course is concluded" do
-        @course.complete!
-        all_students = [@student1.id, @student2.id, @student3.id, @student4.id, @concluded_student.id, @fake_student.id]
-        expect(gradebook_user_ids.user_ids).to eq(all_students)
+        it "sorts by assignment group grade ascending" do
+          expected_user_ids = [@student2.id, @student1.id, @student4.id, @student3.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "sorts by assignment group grade descending" do
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+          expected_user_ids = [@student3.id, @student4.id, @student1.id, @student2.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
+        it "includes concluded students ids if the course is concluded" do
+          @course.complete!
+          all_students = [@student2.id, @student1.id, @student4.id, @student3.id,
+                          @concluded_student.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(all_students)
+        end
       end
     end
 

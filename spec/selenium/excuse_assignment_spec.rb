@@ -345,13 +345,13 @@ describe 'Excuse an Assignment' do
 
       get "/courses/#{@course.id}/gradebook/"
 
-      ['EX', 'ex', 'Ex', 'eX'].each_with_index do |ex, i|
+      ['EX', 'ex', 'Ex', 'eX'].each do |ex|
         driver.action.move_to(f('.canvas_1 .slick-cell')).perform
         f('a.gradebook-cell-comment').click
         wait_for_ajaximations
 
-        arr = ff("#student_grading_#{assignment.id}")
-        replace_content arr[i], "#{ex}\n"
+        arr = f("#student_grading_#{assignment.id}")
+        replace_content arr, "#{ex}\n"
         wait_for_ajaximations
 
         f('.canvas_1 .slick-row .slick-cell:first-child .grade-and-outof-wrapper input').send_keys "\n"

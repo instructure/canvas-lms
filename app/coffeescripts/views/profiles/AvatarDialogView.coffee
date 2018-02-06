@@ -24,9 +24,10 @@ define [
   './UploadFileView'
   './TakePictureView'
   './GravatarView'
+  'jsx/shared/upload_file'
   'jst/profiles/avatarDialog'
   'jst/profiles/avatar'
-], (I18n, $, _, DialogBaseView, UploadFileView, TakePictureView, GravatarView, template, avatarTemplate) ->
+], (I18n, $, _, DialogBaseView, UploadFileView, TakePictureView, GravatarView, uploader, template, avatarTemplate) ->
 
   class AvatarDialogView extends DialogBaseView
 
@@ -145,53 +146,10 @@ define [
       }).fail((xhr) => @handleErrorUpdating(xhr.responseText))
 
     onPreflight: (image, response) =>
-      @image = image
-      preflightResponse = response[0]
-      @postAvatar(preflightResponse).then(_.partial(@onPostAvatar, preflightResponse))
-
-    postAvatar: (preflightResponse) =>
-      image = @image
-      req   = new FormData
-
-      delete @image
-
-      ###
-      xsslint xssable.receiver.whitelist req
-      ###
-      req.append(k, v) for k, v of preflightResponse.upload_params
-      req.append(preflightResponse.file_param, image, 'profile.jpg')
-      dataType = if preflightResponse.success_url then 'xml' else 'json'
-      $.ajax(preflightResponse.upload_url, {
-        contentType: false
-        data: req
-        dataType: dataType
-        processData: false
-        type: 'POST'
-        error: (xhr) => @handleErrorUpdating(xhr.responseText)
-      })
-
-    onPostAvatar: (preflightResponse, postAvatarResponse) =>
-      if preflightResponse.success_url
-        # s3 upload, need to ping success_url to finalize and get back
-        # attachment information
-        @s3Success(preflightResponse, postAvatarResponse).then(@onUploadSuccess)
-      else if postAvatarResponse.location
-        # inst-fs upload, need to request attachment information from location
-        @getCanvasJSON(postAvatarResponse.location).then(@onUploadSuccess)
-      else
-        # local-storage upload, this _is_ the attachment information
-        @onUploadSuccess(postAvatarResponse)
-
-    getCanvasJSON: (location) =>
-      $.getJSON("#{location}?include=avatar")
-
-    s3Success: (preflightResponse, s3Response) =>
-      $s3 = $(s3Response)
-      $.getJSON(preflightResponse.success_url, {
-        bucket: $s3.find('Bucket').text()
-        key:    $s3.find('Key').text()
-        etag:   $s3.find('ETag').text()
-      })
+      preflight = response[0]
+      uploader.completeUpload(preflight, image, filename: 'profile.jpg', includeAvatar: true)
+        .then(@onUploadSuccess)
+        .catch((xhr) => @handleErrorUpdating(xhr.responseText))
 
     onUploadSuccess: (response) =>
       @waitAndSaveUserAvatar(response.avatar.token, response.avatar.url)

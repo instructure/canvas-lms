@@ -78,55 +78,48 @@ describe "announcements index v2" do
     end
 
     it "announcements can be filtered" do
-      skip('Add in with COMMS-560')
-      AnnouncementIndex.select_filter("Delayed")
+      AnnouncementIndex.select_filter("Unread")
       expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
-      expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
+      expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement2_title))
     end
 
     it "search by title works correctly" do
-      skip('Add in with COMMS-556')
       AnnouncementIndex.enter_search("Free food!")
       expect(AnnouncementIndex.announcement(announcement1_title)).to be_displayed
-      expect(AnnouncementIndex.announcement(announcement2_title)).not_to be_displayed
+      expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement2_title))
     end
 
     it "an announcement can be locked for commenting" do
-      skip('Add in with COMMS-561')
       AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.toggle_lock
-      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).to be_displayed
       expect(Announcement.where(title: announcement1_title).first.locked).to be true
     end
 
     it 'multiple announcements can be locked for commenting' do
-      skip('Add in with COMMS-561')
       AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.check_announcement(announcement2_title)
       AnnouncementIndex.toggle_lock
-      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).to be_displayed
-      expect(AnnouncementIndex.announcement_locked_icon(announcement2_title)).to be_displayed
       expect(Announcement.where(title: announcement1_title).first.locked).to be true
       expect(Announcement.where(title: announcement2_title).first.locked).to be true
     end
 
     it 'an announcement can be deleted' do
-      skip('Add in with COMMS-561')
       AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.click_delete
-      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).not_to be_displayed
-      expect(Announcement.where(title: announcement1_title).first.workflow_state).to be 'deleted'
+      AnnouncementIndex.click_confirm_delete
+      expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement1_title))
+      expect(Announcement.where(title: announcement1_title).first.workflow_state).to eq 'deleted'
     end
 
     it 'multiple announcements can be deleted' do
-      skip('Add in with COMMS-561')
       AnnouncementIndex.check_announcement(announcement1_title)
       AnnouncementIndex.check_announcement(announcement2_title)
       AnnouncementIndex.click_delete
-      expect(AnnouncementIndex.announcement_locked_icon(announcement1_title)).not_to be_displayed
-      expect(AnnouncementIndex.announcement_locked_icon(announcement2_title)).not_to be_displayed
-      expect(Announcement.where(title: announcement1_title).first.workflow_state).to be 'deleted'
-      expect(Announcement.where(title: announcement2_title).first.workflow_state).to be 'deleted'
+      AnnouncementIndex.click_confirm_delete
+      expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement1_title))
+      expect(f('#content')).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(announcement2_title))
+      expect(Announcement.where(title: announcement1_title).first.workflow_state).to eq 'deleted'
+      expect(Announcement.where(title: announcement2_title).first.workflow_state).to eq 'deleted'
     end
 
     it 'clicking the Add Announcement button redirects to new announcement page' do
@@ -150,10 +143,18 @@ describe "announcements index v2" do
     end
 
     it 'an external feed can be added' do
-      skip('Add with COMMS-589')
       AnnouncementIndex.open_external_feeds
-      ExternalFeedPage.add_external_feed('/someurl', 'Truncated')
-      expect(ExternalFeed.feed_name).to be_displayed
+      ExternalFeedPage.add_external_feed('http://someurl', 'full')
+      ExternalFeedPage.add_external_feed('http://otherurl', 'full')
+      expect(ExternalFeed.all.length).to eq 2
+    end
+
+    it 'an external feed can be deleted' do
+      AnnouncementIndex.open_external_feeds
+      ExternalFeedPage.add_external_feed('http://someurl', 'full')
+      ExternalFeedPage.add_external_feed('http://otherurl', 'full')
+      ExternalFeedPage.delete_first_feed
+      expect(ExternalFeed.all.length).to eq 1
     end
   end
 end

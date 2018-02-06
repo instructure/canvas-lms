@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import TimeZoneSelect from 'jsx/shared/TimeZoneSelect'
+import TimeZoneSelect from 'jsx/shared/components/TimeZoneSelect'
 
 QUnit.module('TimeZoneSelect')
 

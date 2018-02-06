@@ -19,7 +19,8 @@ define [
   'jquery'
   'Backbone'
   'compiled/views/content_migrations/subviews/ExternalToolLaunchView'
-], ($, Backbone, ExternalToolLaunchView) ->
+  'helpers/assertions'
+], ($, Backbone, ExternalToolLaunchView, assertions) ->
 
   QUnit.module 'ExternalToolLaunchView',
     setup: ->
@@ -34,6 +35,10 @@ define [
 
     teardown: ->
       @launchView.remove()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @launchView, done, {'a11yReport': true}
 
   test 'calls render on return view when launch button clicked', ->
     @stub(@mockReturnView, 'render').returns(this)

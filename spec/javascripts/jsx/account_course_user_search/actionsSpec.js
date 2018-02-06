@@ -17,7 +17,6 @@
  */
 
 import actions from 'jsx/account_course_user_search/actions/UserActions'
-import UserStore from 'jsx/account_course_user_search/UsersStore'
 
 const STUDENTS = [
   {
@@ -65,74 +64,6 @@ const STUDENTS = [
 ]
 
 QUnit.module('Account Course User Search Actions')
-
-test('apiCreateUser', function(assert) {
-  assert.expect(3)
-  const server = sinon.fakeServer.create()
-  UserStore.reset({accountId: 1})
-
-  server.respondWith('POST', '/api/v1/accounts/1/users', [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(STUDENTS[0])
-  ])
-
-  equal(typeof actions.apiCreateUser(1, {}), 'function', 'it initally returns a callback function')
-
-  actions.apiCreateUser(1, {})(response => {
-    equal(response.type, 'ADD_TO_USERS', 'it dispatches the proper action')
-    equal(Array.isArray(response.payload.users), true, 'it returns a users array')
-  })
-
-  server.respond()
-  server.restore()
-})
-
-test('addError', () => {
-  const message = actions.addError({errorKey: 'error'})
-  equal(message.type, 'ADD_ERROR', 'it returns the proper action type')
-  deepEqual(message.error, {errorKey: 'error'}, 'it returns the proper error')
-})
-
-test('apiUpdateUser', assert => {
-  const start = assert.async()
-  const server = sinon.fakeServer.create()
-
-  // This is a POST rather than a PUT because of the way our $.getJSON converts
-  // non-GET requests to posts anyways.
-  server.respondWith('POST', /api\/v1\/users\/1/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(STUDENTS[0])
-  ])
-
-  equal(
-    typeof actions.apiUpdateUser({name: 'Test'}, 1),
-    'function',
-    'it initally returns a callback function'
-  )
-
-  actions.apiUpdateUser({name: 'Test'}, 1)(response => {
-    equal(response.type, 'GOT_USER_UPDATE', 'it returns the proper action type')
-    deepEqual(response.payload, STUDENTS[0], 'it returns the user in the payload')
-    start()
-  })
-
-  server.respond()
-  server.restore()
-})
-
-test('openEditUserDialog', () => {
-  const message = actions.openEditUserDialog(STUDENTS[0])
-  equal(message.type, 'OPEN_EDIT_USER_DIALOG', 'it returns the proper type')
-  deepEqual(message.payload, STUDENTS[0], 'the payload contains the user')
-})
-
-test('closeEditUserDialog', () => {
-  const message = actions.closeEditUserDialog(STUDENTS[0])
-  equal(message.type, 'CLOSE_EDIT_USER_DIALOG', 'it returns the proper type')
-  deepEqual(message.payload, STUDENTS[0], 'the payload contains the user')
-})
 
 test('updateSearchFilter', () => {
   const message = actions.updateSearchFilter('myFilter')

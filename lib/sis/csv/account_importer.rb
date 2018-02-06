@@ -30,7 +30,10 @@ module SIS
 
       # expected columns
       # account_id,parent_account_id
-      def process(csv)
+      #
+      # index and count are not passed to csv_rows for the account importer
+      # because the order matters.
+      def process(csv, _index=nil, _count=nil)
         @sis.counts[:accounts] += SIS::AccountImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv) do |row|
             update_progress

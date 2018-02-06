@@ -143,8 +143,8 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
     idp = idps.first
     self.idp_entity_id = entity.entity_id
-    self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Endpoint::Bindings::HTTP_REDIRECT }.try(:location)
-    self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Endpoint::Bindings::HTTP_REDIRECT }.try(:location)
+    self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
+    self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.certificate_fingerprint = (idp.signing_keys.first || idp.keys.first).try(:fingerprint)
     self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
     self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
@@ -282,7 +282,22 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def self.sp_metadata_for_account(account, current_host = nil)
-    sp_metadata(saml_default_entity_id_for_account(account),HostUrl.context_hosts(account, current_host))
+    entity = sp_metadata(saml_default_entity_id_for_account(account),HostUrl.context_hosts(account, current_host))
+    prior_configs = Set.new
+    account.authentication_providers.active.where(auth_type: 'saml').each do |ap|
+      federated_attributes = ap.federated_attributes
+      next if federated_attributes.empty?
+      next if prior_configs.include?(federated_attributes)
+      prior_configs << federated_attributes
+
+      acs = SAML2::AttributeConsumingService.new(en: 'Canvas')
+      acs.index = ap.id
+      federated_attributes.each do |(_canvas_attribute_name, provider_attribute_config)|
+        acs.requested_attributes << SAML2::RequestedAttribute.create(provider_attribute_config['attribute'])
+      end
+      entity.roles.last.attribute_consuming_services << acs
+    end
+    entity
   end
 
   def self.config

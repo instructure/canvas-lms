@@ -16,7 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% question_bank_id ||= "" %>
+<% question_bank_id ||= ""
+  object_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
+                     !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course")
+  points_are_locked = object_is_locked && js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :points)
+%>
 
 <form id="question_form_template" class="question_form" style="display: none;">
 <div class="question">
@@ -40,7 +44,7 @@
     </select>
     <span class="question_points_holder">
       <span style="padding-left: 20px;"><%= before_label :points, 'pts' %></span>
-      <input class="float_value" type="text" style="width: 25px; min-width: 0;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>"/>
+      <input class="float_value" type="text" style="width: 25px; min-width: 0;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>" <%= 'readonly' if points_are_locked %>/>
     </span>
   </div>
   <div class="links">

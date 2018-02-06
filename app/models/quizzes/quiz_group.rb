@@ -34,6 +34,11 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   before_destroy :update_quiz
   after_save :update_quiz
 
+  include MasterCourses::CollectionRestrictor
+  self.collection_owner_association = :quiz
+  restrict_columns :points, [:pick_count, :question_points]
+  restrict_columns :content, [:name, :pick_count]
+
   def actual_pick_count
     count = if self.assessment_question_bank
               # don't do a valid question check because we don't want to instantiate all the bank's questions

@@ -80,6 +80,7 @@ class DiscussionTopic < ActiveRecord::Base
   validate :section_specific_topics_must_have_sections
   validate :only_announcements_can_be_section_specific
   validate :feature_must_be_enabled_for_section_specific
+  validate :only_course_topics_can_be_section_specific
 
   sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
@@ -100,7 +101,7 @@ class DiscussionTopic < ActiveRecord::Base
   # TODO: Consider merging the following two validations into one to save a
   # db query
   def section_specific_topics_must_have_sections
-    if self.is_section_specific && self.discussion_topic_section_visibilities.none?(&:active?)
+    if !self.deleted? && self.is_section_specific && self.discussion_topic_section_visibilities.none?(&:active?)
       self.errors.add(:is_section_specific, t("Section specific topics must have sections"))
     else
       true
@@ -110,6 +111,14 @@ class DiscussionTopic < ActiveRecord::Base
   def only_announcements_can_be_section_specific
     if self.is_section_specific && !self.is_announcement
       self.errors.add(:is_section_specific, t("Only announcements can be section-specific"))
+    else
+      true
+    end
+  end
+
+  def only_course_topics_can_be_section_specific
+    if self.is_section_specific && !(self.context.is_a? Course)
+      self.errors.add(:is_section_specific, t("Only course announcements can be section-specific"))
     else
       true
     end
@@ -312,7 +321,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def update_materialized_view
     # kick off building of the view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view(xlog_location: self.class.current_xlog_location)
   end
 
   def group_category_deleted_with_entries?
@@ -1415,6 +1424,6 @@ class DiscussionTopic < ActiveRecord::Base
 
   # synchronously create/update the materialized view
   def create_materialized_view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(xlog_location: self.class.current_xlog_location)
   end
 end

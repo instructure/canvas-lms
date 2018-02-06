@@ -63,6 +63,13 @@
     <% end %>
   </div>
 
+  <% if @account.root_account.trust_exists? %>
+    <div class="ic-Form-control">
+      <%= f.check_box :domain_specific, :checked => announcement.domain_specific %>
+      <%= f.label :domain_specific, t("Only show announcement on current account domain") %>
+    </div>
+  <% end %>
+
   <div class="ic-Form-control">
     <div class="ic-Label" id="aria-announcements-send-to-group">
       <%= t "Send to" %>

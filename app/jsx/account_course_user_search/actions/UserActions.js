@@ -16,34 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import UsersStore from '../../account_course_user_search/UsersStore'
 import I18n from 'i18n!user_actions'
+import UsersStore from '../store/UsersStore'
 
 export default {
-  apiCreateUser(accountId, attributes) {
-    return (dispatch, _getState) => {
-      UsersStore.create(attributes).then((response, _, xhr) => {
-        dispatch(this.addToUsers([response], xhr))
-      })
-    }
-  },
-
-  addError(error) {
-    return {
-      type: 'ADD_ERROR',
-      error
-    }
-  },
-
-  apiUpdateUser(attributes, userId) {
-    return (dispatch, _getState) => {
-      const url = `/api/v1/users/${userId}`
-      $.ajaxJSON(url, 'PUT', {user: attributes}).then(response => {
-        dispatch(this.gotUserUpdate(response))
-      })
-    }
-  },
 
   gotUserList(users, xhr) {
     return {
@@ -58,20 +34,6 @@ export default {
   gotUserUpdate(user) {
     return {
       type: 'GOT_USER_UPDATE',
-      payload: user
-    }
-  },
-
-  openEditUserDialog(user) {
-    return {
-      type: 'OPEN_EDIT_USER_DIALOG',
-      payload: user
-    }
-  },
-
-  closeEditUserDialog(user) {
-    return {
-      type: 'CLOSE_EDIT_USER_DIALOG',
       payload: user
     }
   },
@@ -97,16 +59,6 @@ export default {
   loadingUsers() {
     return {
       type: 'LOADING_USERS'
-    }
-  },
-
-  addToUsers(users, xhr) {
-    return {
-      type: 'ADD_TO_USERS',
-      payload: {
-        users,
-        xhr
-      }
     }
   },
 

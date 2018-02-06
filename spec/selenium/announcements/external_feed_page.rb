@@ -26,27 +26,35 @@ class ExternalFeedPage
     end
 
     def add_external_feed_expander
-      # f('.feed_expander')
+      f("#external-rss-feed__toggle-button")
     end
 
     def feed_url_textbox
-      # f('.feed_url')
+      f('input[name="external-rss-feed__url-input"]')
     end
 
-    def display_length_option(option)
-      find_radio_button_by_value(option)
+    def display_length_option(type)
+      fj("label[data-reactid*='#{type}']")
+    end
+
+    def phrase_textbox
+      f('input[name="external-rss-feed__phrase-input"]')
     end
 
     def add_feed_button
-      # f('.add_feed_button')
+      f('#external-rss-feed__submit-button')
     end
 
     def feed_list
-      # f('.feed_list')
+      # f('#external-rss-feed__rss-list')
+    end
+
+    def external_feeds
+      ff('.announcements-tray-feed-row')
     end
 
     def feed_name(name)
-      # f('.feed_name', feed_list)
+      # TODO: Implement feed_name to grab specific feed
     end
 
     # ---------------------- Actions ----------------------
@@ -54,11 +62,21 @@ class ExternalFeedPage
       rss_feed_link.click
     end
 
+    def type_in_box(box, text)
+      set_value(box, text)
+      driver.action.send_keys(:enter).perform
+      wait_for_ajaximations
+    end
+
     def add_external_feed(url, article_length)
       add_external_feed_expander.click
-      type_in_tiny(feed_url_textbox, url)
+      type_in_box(feed_url_textbox, url)
       display_length_option(article_length).click
       add_feed_button.click
+    end
+
+    def delete_first_feed
+      f('button', external_feeds[0]).click
     end
   end
 end

@@ -1425,6 +1425,16 @@ describe Assignment do
         expect(@assignment.interpret_grade("75.2%")).to eq 7.52
       end
     end
+
+    context "with gpa_scale" do
+      before(:once) do
+        @assignment.update!(grading_type: 'gpa_scale', points_possible: 10.0)
+      end
+
+      it "accepts numbers" do
+        expect(@assignment.interpret_grade("9.5")).to eq 9.5
+      end
+    end
   end
 
   describe '#submit_homework' do
@@ -4438,36 +4448,44 @@ describe Assignment do
   end
 
   describe '#in_closed_grading_period?' do
-    it 'returns true if any submissions are in a closed grading period' do
-      create_grading_periods_for(@course, grading_periods: [:old, :current])
-      assignment_model(course: @course, due_at: 3.months.ago)
-      expect(@assignment.in_closed_grading_period?).to be true
+    subject(:assignment) { @course.assignments.create! }
+
+    context 'when there are no grading periods' do
+      it { is_expected.not_to be_in_closed_grading_period }
     end
 
-    it 'returns false if no submissions are in a closed grading period' do
-      create_grading_periods_for(@course, grading_periods: [:old, :current])
-      assignment_model(course: @course)
-      expect(@assignment.in_closed_grading_period?).to be false
-    end
+    context 'when there is a past and current grading period' do
+      before(:once) do
+        @old, @current = create_grading_periods_for(@course, grading_periods: [:old, :current])
+      end
 
-    it 'returns false if there are no grading periods' do
-      assignment_model(course: @course, due_at: 3.months.ago)
-      expect(@assignment.in_closed_grading_period?).to be false
-    end
+      context 'when there are no submissions in a closed grading period' do
+        it { is_expected.not_to be_in_closed_grading_period }
+      end
 
-    it 'returns true if a single submission is in a closed grading period' do
-      create_grading_periods_for(@course, grading_periods: [:old, :current])
-      assignment_model(course: @course)
-      @u2 = student_in_course(active_all: true, user_name: 'another student').user
-      create_adhoc_override_for_assignment(@assignment, @u2, due_at: 3.months.ago)
-      expect(@assignment.in_closed_grading_period?).to be true
+      context 'when there are at least one submission in a closed grading peiod' do
+        before { assignment.update!(due_at: 3.months.ago) }
+
+        it { is_expected.to be_in_closed_grading_period }
+
+        context 'when a grading period is deleted for a submission' do
+          before { @old.grading_period_group.destroy }
+          it { is_expected.not_to be_in_closed_grading_period }
+        end
+      end
+
+      context 'when a single submission is in a closed grading period via overrides' do
+        let(:user) { student_in_course(active_all: true, user_name: 'another student').user }
+
+        before { create_adhoc_override_for_assignment(assignment, user, due_at: 3.months.ago) }
+
+        it { is_expected.to be_in_closed_grading_period }
+      end
     end
   end
 
   describe "basic validation" do
-
     describe "possible points" do
-
       it "does not allow a negative value" do
         assignment = Assignment.new(points_possible: -1)
         assignment.valid?

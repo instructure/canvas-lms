@@ -283,8 +283,10 @@ define [
       })
 
     init: () ->
-      @$wrapper = $(@cellWrapper())
+      classes = 'Grid__AssignmentRowCell__PassFailInput'
+      @$wrapper = $(@cellWrapper(undefined, { classes }))
       @$wrapper = $(@htmlFromSubmission({
+        classes,
         submission: @opts.item[@opts.column.field],
         assignment: @opts.column.object,
         editable: true})

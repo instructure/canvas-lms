@@ -417,7 +417,7 @@ class Course < ActiveRecord::Base
   def image
     if self.image_id.present?
       self.shard.activate do
-        self.attachments.active.where(id: self.image_id).first.download_url rescue nil
+        self.attachments.active.where(id: self.image_id).take&.public_download_url
       end
     elsif self.image_url
       self.image_url

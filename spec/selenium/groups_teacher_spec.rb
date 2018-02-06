@@ -123,6 +123,12 @@ describe "new groups" do
       expect(f('.group-summary')).to include_text("0 students")
     end
 
+    it "should not allow teachers to see sections specific dropdown on announcement page" do
+      group_test_setup
+      get "/groups/#{@testgroup.first.id}/discussion_topics/new?is_announcement=true"
+      expect(f('#sections_autocomplete_root').text).to eq ""
+    end
+
     it "should allow teachers to make a student a group leader", priority: "1", test_id: 96021 do
       group_test_setup
       add_user_to_group(@students.first,@testgroup[0])
@@ -145,6 +151,19 @@ describe "new groups" do
       expect(f('.span3.ellipsis.group-leader')).to include_text(@students.first.name)
 
       check_element_has_focus f(".group-user-actions[data-user-id='user_#{@students.first.id}']")
+    end
+
+    it "should allow teachers to message unassigned students" do
+      group_test_setup
+
+      get "/courses/#{@course.id}/groups"
+      f(".icon-more").click
+      wait_for_animations
+      f(".message-all-unassigned").click
+      replace_content(fj('textarea[name="body"]'), "blah blah blah students")
+      fj(".btn-primary[data-text-when-loaded='Sent!']").click
+
+      expect(@course).to eq Conversation.last.context
     end
 
     it "should allow a teacher to set up a group set with member limits", priority: "1", test_id: 94160 do

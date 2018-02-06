@@ -19,7 +19,7 @@
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state,
            :root_opt_in, :enable_at, :beta, :development,
-           :release_notes_url, :custom_transition_proc,
+           :release_notes_url, :custom_transition_proc, :visible_on,
            :after_state_change_proc, :autoexpand, :touch_context].freeze
   attr_reader *ATTRS
 
@@ -112,6 +112,14 @@ class Feature
     {
       display_name: -> { I18n.t('Section Specific Announcements') },
       description: -> { I18n.t('Allows creating announcements for a specific section') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
+    },
+    'section_specific_discussions' =>
+    {
+      display_name: -> { I18n.t('Section Specific Discussions') },
+      description: -> { I18n.t('Allows creating discussions for a specific section') },
       applies_to: 'Account',
       state: 'hidden',
       development: true,
@@ -554,14 +562,6 @@ END
       beta: true,
       development: false
     },
-    'quizzes2_exporter' =>
-    {
-      display_name: -> { I18n.t('Export to Quizzes 2 format') },
-      description: -> { I18n.t('Export an existing quiz to new Quizzes 2 format') },
-      applies_to: "RootAccount",
-      state: "hidden",
-      root_opt_in: true
-    },
     'graphql' =>
     {
       display_name: -> { I18n.t("GraphQL API") },
@@ -583,6 +583,25 @@ END
       description: -> { I18n.t('If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.') },
       applies_to: 'RootAccount',
       state: 'allowed'
+    },
+    'quizzes_next' =>
+    {
+      display_name: -> { I18n.t('Quizzes') + '.' + I18n.t('Next') },
+      description: -> { I18n.t('Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.') },
+      applies_to: 'Course',
+      state: 'allowed',
+      visible_on: ->(context) do
+        root_account = context.root_account
+        is_provisioned = Rails.env.development? || root_account.settings&.dig(:provision, 'lti').present?
+
+        if is_provisioned
+          FeatureFlag.where(
+            feature: 'quizzes_next',
+            context: root_account
+          ).first_or_create!(state: 'on') # if it's local or previously provisioned, FF is on
+        end
+        is_provisioned
+      end
     }
   )
 
