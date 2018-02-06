@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
-import {isEqual} from 'lodash'
+import {isEqual, groupBy, map} from 'lodash'
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
@@ -31,6 +31,18 @@ import preventDefault from 'compiled/fn/preventDefault'
 import {propType as termsPropType} from '../store/TermsStore'
 import NewCourseModal from './NewCourseModal'
 
+function termGroup(term){
+  if (term.start_at && new Date(term.start_at) > new Date()) return 'future'
+  if (term.end_at && new Date(term.end_at) < new Date()) return 'past'
+  return 'active'
+}
+
+const termGroups = {
+  active: I18n.t('Active Terms'),
+  future: I18n.t('Future Terms'),
+  past: I18n.t('Past Terms')
+}
+
 export default function CoursesToolbar({
   can_create_courses,
   terms,
@@ -40,6 +52,7 @@ export default function CoursesToolbar({
   errors,
   draftFilters
 }) {
+  const groupedTerms = groupBy(terms.data, termGroup)
   const searchLabel =
     draftFilters.search_by === 'teacher'
       ? I18n.t('Search courses by teacher...')
@@ -63,15 +76,20 @@ export default function CoursesToolbar({
                         <option key="all" value="">
                           {I18n.t('All Terms')}
                         </option>
-                        {(terms.data || []).map(term => (
-                          <option key={term.id} value={term.id}>
-                            {term.name}
-                          </option>
-                        ))}
-                        {terms.loading && (
-                          <option disabled>{I18n.t('Loading more terms...')}</option>
-                        )}
                       </optgroup>
+                      {map(termGroups, (label, key) =>
+                        groupedTerms[key] && (
+                          <optgroup key={key} label={label}>
+                            {groupedTerms[key].map(term => (
+                              <option key={term.id} value={term.id}>
+                                {term.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                      ))}
+                      {terms.loading && (
+                        <option disabled>{I18n.t('Loading more terms...')}</option>
+                      )}
                     </Select>
                   </GridCol>
                   <GridCol width="2">
