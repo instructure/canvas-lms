@@ -59,7 +59,7 @@ module Lti
         }.freeze,
         {
           id: LTI_LINK_SETTINGS,
-          endpoint: 'api/lti/tool_settings/links/{tool_proxy_id}',
+          endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}/courses/{course_id}/resource_link_id/{resource_link_id}/tool_setting',
           format: %w(
             application/vnd.ims.lti.v2.toolsettings+json
             application/vnd.ims.lti.v2.toolsettings.simple+json
