@@ -40,6 +40,7 @@ module CyoeHelper
     assignment_id = content_tag.assignment.try(:id)
     path_data = conditional_release_assignment_set(rules, assignment_id) if rules.present? && assignment_id.present?
     if path_data.present? && opts[:is_student]
+      path_data[:is_student] = true
       build_path_data(path_data, content_tag.id.to_s)
       check_if_processing(path_data)
     end
