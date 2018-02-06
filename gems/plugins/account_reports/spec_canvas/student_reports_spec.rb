@@ -58,10 +58,11 @@ describe 'Student reports' do
       :active_all => true, :account => @account, :name => 'Rick Astley',
       :sortable_name => 'Astley, Rick', :username => 'rick@roll.com',
       :sis_user_id => 'user_sis_id_03')
-    @e1 = @course1.enroll_user(@user1, 'StudentEnrollment', {enrollment_state: 'active'})
-    @e2 = @course2.enroll_user(@user2, 'StudentEnrollment', {enrollment_state: 'active'})
-    @e3 = @course2.enroll_user(@user1, 'StudentEnrollment', {enrollment_state: 'active'})
-    @e4 = @course1.enroll_user(@user2, 'StudentEnrollment', {enrollment_state: 'active'})
+
+    enrollment_params = {enrollment_state: 'active', type: 'StudentEnrollment'}
+    @e1, @e4 = Enrollment.find(create_enrollments(@course1, [@user1, @user2], enrollment_params))
+    @e2, @e3 = Enrollment.find(create_enrollments(@course2, [@user2, @user1], enrollment_params))
+
     @section1 = @course1.course_sections.first
     @section2 = @course2.course_sections.first
     @section3 = @course3.course_sections.first
@@ -267,12 +268,26 @@ describe 'Student reports' do
     before(:once) do
       @type = 'zero_activity_csv'
 
-      @course1.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
+      @course1.enroll_user(@user3, 'StudentEnrollment', {enrollment_state: 'active'})
       @course3.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
 
-      [[@user1, @course1], [@user2, @course2], [@user3, @course3]].each do |user, course|
-        user.enrollments.where(:course_id => course).update_all(:last_activity_at => Time.now.utc)
+      @user4 = user_with_managed_pseudonym(name: 'User 4', account: @account, sis_user_id: 'user_sis_id_04')
+      @user5 = user_with_managed_pseudonym(name: 'User 5', account: @account, sis_user_id: 'user_sis_id_05')
+      @course4 = course_factory(:course_name => 'Course 4', :account => @account,
+                                :active_course => true)
+      create_enrollments(@course4, [@user4, @user5], {enrollment_state: 'active', type: 'StudentEnrollment'})
+
+      [[@user1, @course1], [@user2, @course2], [@user3, @course3], [@user5, @course4]].each do |user, course|
+        user.enrollments.where(course_id: course).update_all(last_activity_at: Time.now.utc)
       end
+
+      @term1 = EnrollmentTerm.create(:name => 'Fall')
+      @term1.root_account = @account
+      @term1.sis_source_id = 'fall12'
+      @term1.save!
+
+      @course4.enrollment_term = @term1
+      @course4.save
     end
 
     it 'should run the zero activity report for course' do
@@ -291,16 +306,12 @@ describe 'Student reports' do
     end
 
     it 'should run the zero activity report for term' do
-      @term1 = EnrollmentTerm.create(:name => 'Fall')
-      @term1.root_account = @account
-      @term1.sis_source_id = 'fall12'
-      @term1.save!
       @course1.enrollment_term = @term1
       @course1.save
       param = {}
       param['enrollment_term'] = 'sis_term_id:fall12'
       parsed = read_report(@type, {params: param, order: 1})
-      expect(parsed.length).to eq 2
+      expect(parsed.length).to eq 3
       expect(parsed[0]).to eq [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
@@ -309,6 +320,10 @@ describe 'Student reports' do
                            @user3.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      expect(parsed[2]).to eq [@user4.id.to_s, 'user_sis_id_04',
+                                 '4, User', @course4.default_section.id.to_s,
+                                 nil, @course4.default_section.name,
+                                 @course4.id.to_s, nil, 'Course 4']
     end
 
     it 'should run the zero activity report with no params' do
@@ -316,7 +331,7 @@ describe 'Student reports' do
       expect(report.parameters["extra_text"]).to eq  "Term: All Terms;"
       parsed = parse_report(report, {order: 1})
 
-      expect(parsed.length).to eq 3
+      expect(parsed.length).to eq 4
 
       expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
@@ -330,6 +345,10 @@ describe 'Student reports' do
                            @user3.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      expect(parsed[3]).to eq [@user4.id.to_s, 'user_sis_id_04',
+                                '4, User', @course4.default_section.id.to_s,
+                                nil, @course4.default_section.name,
+                                @course4.id.to_s, nil, 'Course 4']
     end
 
     it 'should run zero activity report on a sub account' do
@@ -352,7 +371,7 @@ describe 'Student reports' do
       report = run_report(@type, {params: parameter})
       expect(report.parameters["extra_text"].include? "Start At:").to eq true
       parsed = parse_report(report, {order: [1,5]})
-      expect(parsed.length).to eq 4
+      expect(parsed.length).to eq 5
       expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
@@ -369,6 +388,9 @@ describe 'Student reports' do
                            @user3.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
                            @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+      expect(parsed[4]).to eq [@user4.id.to_s, 'user_sis_id_04',
+                              '4, User', @course4.default_section.id.to_s,
+                              nil, 'Course 4', @course4.id.to_s, nil, 'Course 4']
     end
   end
 
