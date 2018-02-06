@@ -64,9 +64,9 @@ module ContextModulesCommon
     @module.add_item :type => 'discussion_topic', :id => @discussion.id
     @module.add_item :type => 'assignment', :id => @assignment3.id
 
-    #add external tool
-    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", 
-                                                   :shared_secret => "secret", :domain => 'example.com', 
+    # add external tool
+    @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
+                                                   :shared_secret => "secret", :domain => 'example.com',
                                                    :custom_fields => {'a' => '1', 'b' => '2'})
     @external_tool_tag = @module.add_item({
                                             :type => 'context_external_tool',
@@ -209,7 +209,6 @@ module ContextModulesCommon
   end
 
   def add_new_module_item(item_select_selector, module_name, new_item_text, item_title_text)
-    add_module(module_name + 'Module')
     f('.ig-header-admin .al-trigger').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', module_name)
@@ -225,14 +224,10 @@ module ContextModulesCommon
     expect(module_item).to include_text(item_title_text)
   end
 
-  def add_new_external_item(module_name, url_text, page_name_text)
-    add_module(module_name + 'Module')
+  def add_new_external_item(module_item, url_text, page_name_text)
     f('.ig-header-admin .al-trigger').click
-    wait_for_ajaximations
     f('.add_module_item_link').click
-    wait_for_ajaximations
-    select_module_item('#add_module_item_select', module_name)
-    wait_for_ajaximations
+    select_module_item('#add_module_item_select', module_item)
     url_input = fj('input[name="url"]:visible')
     title_input = fj('input[name="title"]:visible')
     replace_content(url_input, url_text)

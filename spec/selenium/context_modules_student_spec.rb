@@ -461,14 +461,14 @@ describe "context modules" do
         vaildate_correct_pill_message(@module_1.id, 'Complete One Item')
       end
 
-      it "should show a completed icon when module is complete for 'Complete All Items' requirement" do
+      it "shows a completed icon and unlocks next when module is complete for 'Complete All Items' requirement", priority: "1", test_id: 248902 do
         create_additional_assignment_for_module_1
+        # navigate to module items to satisfy must_view_requirement
+        get "/courses/#{@course.id}/assignments/#{@assignment_1.id}?module_item_id=#{@tag_1.id}"
+        get "/courses/#{@course.id}/assignments/#{@assignment_4.id}?module_item_id=#{@tag_4.id}"
         go_to_modules
-
-        navigate_to_module_item(0, @assignment_1.title)
-        navigate_to_module_item(0, @assignment_4.title)
-        vaildate_correct_pill_message(@module_1.id, 'Complete All Items')
         validate_context_module_status_icon(@module_1.id, @completed_icon)
+        validate_context_module_status_icon(@module_2.id, @no_icon)
       end
 
       it "should show a completed icon when module is complete for 'Complete One Item' requirement", priority: "1", test_id: 250542 do
@@ -479,6 +479,14 @@ describe "context modules" do
         navigate_to_module_item(0, @assignment_1.title)
         vaildate_correct_pill_message(@module_1.id, 'Complete One Item')
         validate_context_module_status_icon(@module_1.id, @completed_icon)
+      end
+
+      it "unlocks the next module when module is complete with 'Complete 1 requirement'", priority: "1", test_id: 255037 do
+        create_additional_assignment_for_module_1
+        make_module_1_complete_one
+        go_to_modules
+        navigate_to_module_item(0, @assignment_1.title)
+        validate_context_module_status_icon(@module_2.id, @no_icon)
       end
 
       it "should show a locked icon when module is locked", priority:"1", test_id: 250541 do
