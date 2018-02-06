@@ -33,7 +33,6 @@ const stores = [CoursesStore, TermsStore, AccountsTreeStore]
 const defaultFilters = {
   enrollment_term_id: '',
   search_term: '',
-  with_students: false,
   sort: 'sis_course_id',
   order: 'asc',
   search_by: 'course',

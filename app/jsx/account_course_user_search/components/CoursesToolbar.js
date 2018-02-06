@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {string, bool, func, shape, oneOf} from 'prop-types'
+import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
+import {isEqual} from 'lodash'
 import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine'
 import Button from '@instructure/ui-core/lib/components/Button'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
@@ -103,15 +104,15 @@ export default function CoursesToolbar({
                 <GridRow>
                   <GridCol>
                     <Checkbox
-                      checked={draftFilters.with_students}
-                      onChange={e => onUpdateFilters({with_students: e.target.checked})}
-                      label={I18n.t('Hide courses without enrollments')}
+                      checked={isEqual(draftFilters.enrollment_type, ['student'])}
+                      onChange={e => onUpdateFilters({enrollment_type: e.target.checked ? ['student'] : null})}
+                      label={I18n.t('Hide courses without students')}
                     />
                   </GridCol>
                 </GridRow>
               </Grid>
             </GridCol>
-            { can_create_courses && (
+            {can_create_courses && (
               <GridCol width="auto">
                 <NewCourseModal terms={terms}>
                   <Button>
@@ -134,7 +135,9 @@ CoursesToolbar.propTypes = {
   onApplyFilters: func.isRequired,
   isLoading: bool.isRequired,
   draftFilters: shape({
-    with_students: bool.isRequired,
+    enrollment_type: arrayOf(
+      oneOf(['teacher', 'student', 'ta', 'observer', 'designer']).isRequired
+    ),
     search_by: oneOf(['course', 'teacher']).isRequired,
     search_term: string.isRequired,
     enrollment_term_id: string.isRequired
