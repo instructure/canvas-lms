@@ -82,7 +82,8 @@ module Api::V1::User
       # adr edit: the above line is the original, the following is mine
       # i make it always include email, even if not specifically requested,
       # because it helps us sync up user info. keeping the permission check tho
-      if context.grants_right?(current_user, session, :read_roster)
+      # the respond to btw is so it works on user settings page too as well as on course
+      if context.respond_to?(:grants_right?) && context.grants_right?(current_user, session, :read_roster)
         json[:email] = user.email
       end
 
