@@ -334,7 +334,16 @@ class ExternalToolsController < ApplicationController
   #        "migration_selection": null,
   #        "resource_selection": null,
   #        "tool_configuration": null,
-  #        "user_navigation": null,
+  #        "user_navigation": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "text": "...",
+  #             "url": "...",
+  #             "default": "disabled",
+  #             "enabled": "true",
+  #             "visibility": "public",
+  #             "windowTarget": "_blank"
+  #        },
   #        "selection_width": 500,
   #        "selection_height": 500,
   #        "icon_url": "...",
@@ -633,6 +642,10 @@ class ExternalToolsController < ApplicationController
   #
   # @argument user_navigation[text] [String]
   #   The text that will show on the left-tab in the user navigation
+  #
+  # @argument user_navigation[visibility] [String, "admins"|"members"|"public"]
+  #   Who will see the navigation tab. "admins" for admins, "public" or
+  #   "members" for everyone
   #
   # @argument course_home_sub_navigation[url] [String]
   #   The url of the external tool for right-side course home navigation menu
