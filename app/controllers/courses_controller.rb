@@ -896,72 +896,78 @@ class CoursesController < ApplicationController
       search_params[:include_inactive_enrollments] = true if include_inactive
       search_term = search_params[:search_term].presence
 
-      if search_term
-        users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, search_params)
-      else
-        users = UserSearch.scope_for(@context, @current_user, search_params)
-      end
-      # If a user_id is passed in, modify the page parameter so that the page
-      # that contains that user is returned.
-      # We delete it from params so that it is not maintained in pagination links.
-      user_id = params[:user_id]
-      if user_id.present? && user = users.where(:users => { :id => user_id }).first
-        position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
-        position = position_scope.distinct.count(:all)
-        per_page = Api.per_page_for(self)
-        params[:page] = (position.to_f / per_page.to_f).ceil
-      end
+      Shackles.activate(:slave) do
+        users = if search_term
+                  UserSearch.for_user_in_context(search_term, @context, @current_user, session, search_params)
+                else
+                  UserSearch.scope_for(@context, @current_user, search_params)
+                end
 
-      user_ids = params[:user_ids]
-      if user_ids.present?
-        user_ids = user_ids.split(",") if user_ids.is_a?(String)
-        users = users.where(id: user_ids)
-      end
-
-      users = Api.paginate(users, self, api_v1_course_users_url)
-      includes = Array(params[:include])
-
-      # user_json_preloads loads both active/accepted and deleted
-      # group_memberships when passed "group_memberships: true." In a
-      # known case in the wild, each student had thousands of deleted
-      # group memberships. Since we only care about active group
-      # memberships for this course, load the data in a more targeted way.
-      user_json_preloads(users, includes.include?('email'))
-      include_group_ids = includes.delete('group_ids').present?
-
-      unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
-        users.reject! do |u|
-          u.preferences[:fake_student]
+        # If a user_id is passed in, modify the page parameter so that the page
+        # that contains that user is returned.
+        # We delete it from params so that it is not maintained in pagination links.
+        user_id = params[:user_id]
+        if user_id.present? && (user = users.where(:users => { :id => user_id }).first)
+          position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}",
+            user.sortable_name)
+          position = position_scope.distinct.count(:all)
+          per_page = Api.per_page_for(self)
+          params[:page] = (position.to_f / per_page.to_f).ceil
         end
-      end
-      if includes.include?('enrollments')
-        enrollment_scope = @context.enrollments.
-          where(user_id: users).
-          preload(:course, :scores)
 
-        if search_params[:enrollment_state]
-          enrollment_scope = enrollment_scope.where(:workflow_state => search_params[:enrollment_state])
+        user_ids = params[:user_ids]
+        if user_ids.present?
+          user_ids = user_ids.split(",") if user_ids.is_a?(String)
+          users = users.where(id: user_ids)
+        end
+
+        users = Api.paginate(users, self, api_v1_course_users_url)
+        includes = Array(params[:include])
+
+        # user_json_preloads loads both active/accepted and deleted
+        # group_memberships when passed "group_memberships: true." In a
+        # known case in the wild, each student had thousands of deleted
+        # group memberships. Since we only care about active group
+        # memberships for this course, load the data in a more targeted way.
+        user_json_preloads(users, includes.include?('email'))
+        include_group_ids = includes.delete('group_ids').present?
+
+        unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
+          users.reject! do |u|
+            u.preferences[:fake_student]
+          end
+        end
+        if includes.include?('enrollments')
+          enrollment_scope = @context.enrollments.
+            where(user_id: users).
+            preload(:course, :scores)
+
+          enrollment_scope = if search_params[:enrollment_state]
+                               enrollment_scope.where(:workflow_state => search_params[:enrollment_state])
+                             elsif include_inactive
+                               enrollment_scope.all_active_or_pending
+                             else
+                               enrollment_scope.active_or_pending
+                             end
+          enrollments_by_user = enrollment_scope.group_by(&:user_id)
         else
-          enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+          confirmed_user_ids = @context.enrollments.where.not(:workflow_state => %w{invited creation_pending rejected}).
+            where(:user_id => users).distinct.pluck(:user_id)
         end
-        enrollments_by_user = enrollment_scope.group_by(&:user_id)
-      else
-        confirmed_user_ids = @context.enrollments.where.not(:workflow_state => %w{invited creation_pending rejected}).
-          where(:user_id => users).distinct.pluck(:user_id)
-      end
 
-      render :json => users.map { |u|
-        enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
-        user_unconfirmed = if enrollments
-          enrollments.all?{|e| %w{invited creation_pending rejected}.include?(e.workflow_state)}
-        else
-          !confirmed_user_ids.include?(u.id)
-        end
-        excludes = user_unconfirmed ? %w{pseudonym personal_info} : []
-        user_json(u, @current_user, session, includes, @context, enrollments, excludes).tap do |json|
-          json[:group_ids] = active_group_memberships(users)[u.id]&.map(&:group_id) || [] if include_group_ids
-        end
-      }
+        render :json => users.map { |u|
+          enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
+          user_unconfirmed = if enrollments
+                               enrollments.all?{|e| %w{invited creation_pending rejected}.include?(e.workflow_state)}
+                             else
+                               !confirmed_user_ids.include?(u.id)
+                             end
+          excludes = user_unconfirmed ? %w{pseudonym personal_info} : []
+          user_json(u, @current_user, session, includes, @context, enrollments, excludes).tap do |json|
+            json[:group_ids] = active_group_memberships(users)[u.id]&.map(&:group_id) || [] if include_group_ids
+          end
+        }
+      end
     end
   end
 
