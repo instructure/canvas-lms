@@ -50,6 +50,7 @@ export class PlannerItem extends Component {
     details: string,
     courseName: string,
     completed: bool,
+    overrideId: string,
     associated_item: string,
     context: object,
     html_url: string,

@@ -329,6 +329,30 @@ describe('api actions', () => {
         expect(fakeAlert).toHaveBeenCalled();
       });
     });
+
+    it('saves and restores the override data', () => {
+      const mockDispatch = jest.fn();
+      // a planner item with override data
+      const plannerItem = {some: 'data', id: '42', overrideId: '17', completed: true};
+      const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState);
+      return moxiosRespond(
+        {some: 'data', id: '42'}, // notice the response has no override data
+        savePromise,
+        {status: 200}
+      ).then(result => {
+        expect(result).toMatchObject({  // yet the resolved item does have override data
+          item: {
+            some: 'data',
+            id: '42',
+            overrideId: '17',
+            completed: true,
+            show: true,
+            transformedToInternal: true
+          },
+          isNewItem: false,
+        });
+      });
+    });
   });
 
   describe('deletePlannerItem', () => {

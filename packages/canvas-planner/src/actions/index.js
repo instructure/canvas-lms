@@ -146,6 +146,7 @@ export const savePlannerItem = (plannerItem) => {
 
   return (dispatch, getState) => {
     const isNewItem = !plannerItem.id;
+    const overrideData = getOverrideDataOnItem(plannerItem);
     dispatch(savingPlannerItem({item: plannerItem, isNewItem}));
     const apiItem = transformInternalToApiItem(plannerItem);
     let promise = isNewItem ?
@@ -154,7 +155,10 @@ export const savePlannerItem = (plannerItem) => {
     promise = promise
       .then(response => {
         const apiItem = transformPlannerNoteApiToInternalItem(response.data, getState().courses, getState().timeZone);
-        return {item: apiItem, isNewItem};
+        return {
+          item: updateOverrideDataOnItem(apiItem, overrideData),
+          isNewItem
+        };
       })
       .catch(() => alert(formatMessage('Failed to save to do'), true));
     dispatch(savedPlannerItem(promise));
@@ -221,4 +225,11 @@ function updateOverrideDataOnItem (plannerItem, apiOverride) {
   updatedItem.completed = apiOverride.marked_complete;
   updatedItem.show = true;
   return updatedItem;
+}
+
+function getOverrideDataOnItem (plannerItem) {
+  return {
+    id: plannerItem.overrideId,
+    marked_complete: plannerItem.completed
+  };
 }

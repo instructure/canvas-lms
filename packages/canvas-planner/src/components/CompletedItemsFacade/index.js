@@ -65,6 +65,8 @@ export class CompletedItemsFacade extends Component {
 
   getFocusable () { return this.mainButton; }
 
+  getScrollable () { return this.rootDiv; }
+
   renderBadges () {
     if (this.props.badges.length) {
       return (
@@ -85,7 +87,7 @@ export class CompletedItemsFacade extends Component {
 
   render () {
     return (
-      <div className={styles.root}>
+      <div className={styles.root} ref={elt => this.rootDiv = elt}>
         <div className={styles.contentPrimary}>
           <Checkbox
             defaultChecked
@@ -98,6 +100,7 @@ export class CompletedItemsFacade extends Component {
               }`, { count: this.props.itemCount })
             }
             onClick={this.props.onClick}
+            ref={elt => this.mainButton = elt}
          />
         </div>
         <div className={styles.contentSecondary}>

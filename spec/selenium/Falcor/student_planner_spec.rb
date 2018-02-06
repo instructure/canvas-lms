@@ -68,7 +68,7 @@ describe "student planner" do
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
-      @assignment.submit_homework(@student1, submission_type: "online_text_entry", 
+      @assignment.submit_homework(@student1, submission_type: "online_text_entry",
                                   body: "Assignment submitted")
       go_to_list_view
       expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
@@ -151,7 +151,7 @@ describe "student planner" do
       expect(f('.PlannerApp')).to contain_link(past_discussion.title.to_s)
     end
   end
-  
+
   it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
     discussion = @course.discussion_topics.create!(user: @teacher, title: 'somebody topic title',
                                                    message: 'somebody topic message',
@@ -279,8 +279,7 @@ describe "student planner" do
       # gives the To Do a new name and saves it
       modal = todo_sidebar_modal("Title Text")
       element = f('input', modal)
-      element.send_keys(8.chr * 10)
-      element.send_keys("New Text")
+      replace_content(element, "New Text")
       todo_save_button.click
 
       # verifies that the edited To Do is showing up
@@ -288,6 +287,35 @@ describe "student planner" do
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("New Text")
       expect(todo_item).not_to include_text("Title Text")
+    end
+
+    it "edits a completed To Do", priority: "1" do
+      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+      go_to_list_view
+
+      # complete it
+      f('label[for*=Checkbox]').click
+      expect(f('input[type=checkbox]:checked')).to be_displayed
+
+      # Opens the To Do edit sidebar
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("Title Text")
+      fj("a:contains('Title Text')", todo_item).click
+
+      # gives the To Do a new name and saves it
+      modal = todo_sidebar_modal("Title Text")
+      element = f('input', modal)
+      replace_content(element, "New Text")
+      todo_save_button.click
+
+      # verifies that the edited To Do is showing up
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("New Text")
+
+      # and that it is still complete
+      expect(f('input[type=checkbox]:checked')).to be_displayed
     end
 
     it "deletes a To Do", priority: "1", test_id: 3281715 do

@@ -35,7 +35,7 @@ export class Day extends Component {
     day: string.isRequired,
     itemsForDay: arrayOf(shape({
       context: shape({
-        inform_students_of_overdue_submissions: bool.isRequired
+        inform_students_of_overdue_submissions: bool
       })
     })),
     animatableIndex: number,

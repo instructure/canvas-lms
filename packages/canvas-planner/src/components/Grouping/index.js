@@ -36,7 +36,7 @@ export class Grouping extends Component {
   static propTypes = {
     items: arrayOf(shape({
       context: shape({
-        inform_students_of_overdue_submissions: bool.isRequired
+        inform_students_of_overdue_submissions: bool
       })
     })).isRequired,
     animatableIndex: number,
@@ -121,6 +121,7 @@ export class Grouping extends Component {
           }}
           color={this.props.color}
           completed={item.completed}
+          overrideId={item.overrideId}
           id={item.id}
           uniqueId={item.uniqueId}
           animatableIndex={itemIndex}
