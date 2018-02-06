@@ -270,22 +270,9 @@ describe 'Student reports' do
       @course1.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
       @course3.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
 
-      @asset1 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user1, :context => @course1,
-        :asset_code => @assignment1.asset_string
-      )
-      @asset2 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user2, :context => @course2,
-        :asset_code => @assignment2.asset_string
-      )
-      @asset3 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user3, :context => @course3,
-        :asset_code => @assignment3.asset_string
-      )
-      @asset4 = factory_with_protected_attributes(
-        AssetUserAccess, :user => @user3, :context => @course3,
-        :asset_code => @assignment4.asset_string
-      )
+      [[@user1, @course1], [@user2, @course2], [@user3, @course3]].each do |user, course|
+        user.enrollments.where(:course_id => course).update_all(:last_activity_at => Time.now.utc)
+      end
     end
 
     it 'should run the zero activity report for course' do
@@ -359,8 +346,7 @@ describe 'Student reports' do
     end
 
     it 'should ignore everything before the start date' do
-      AssetUserAccess.where(:id => @asset1).
-        update_all(:updated_at => 6.days.ago)
+      @user1.enrollments.where(:course_id => @course1).update_all(:last_activity_at => 6.days.ago)
       parameter = {}
       parameter['start_at'] = 3.days.ago
       report = run_report(@type, {params: parameter})
