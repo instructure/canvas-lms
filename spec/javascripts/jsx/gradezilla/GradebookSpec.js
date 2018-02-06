@@ -3181,15 +3181,22 @@ test('removes the section select when filter is deselected', function () {
 
 QUnit.module('Gradebook#updateCurrentSection', {
   setup () {
-    this.gradebook = createGradebook();
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    this.gradebook = createGradebook({ settings_update_url: '/settingUrl' })
     this.gradebook.postGradesStore = {
       setSelectedSection: this.stub()
     };
     this.stub(this.gradebook, 'reloadStudentData');
-    this.stub(this.gradebook, 'saveSettings');
+    this.spy(this.gradebook, 'saveSettings')
     this.stub(this.gradebook, 'updateSectionFilterVisibility');
+  },
+
+  teardown () {
+    this.server.restore()
   }
-});
+})
 
 test('updates the filter setting with the given section id', function () {
   this.gradebook.updateCurrentSection('2001');
@@ -3225,10 +3232,8 @@ test('saves settings', function () {
 });
 
 test('saves settings after updating the filter setting', function () {
-  this.gradebook.saveSettings.callsFake(() => {
-    strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001', 'section was already updated');
-  });
-  this.gradebook.updateCurrentSection('2001');
+  this.gradebook.updateCurrentSection('2001')
+  strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001', 'section was already updated');
 });
 
 test('has no effect when the section has not changed', function () {
@@ -3240,8 +3245,7 @@ test('has no effect when the section has not changed', function () {
 });
 
 test('reloads student data after saving settings', function () {
-  this.gradebook.saveSettings.callsFake((_data, callback) => { callback() });
-  this.gradebook.updateCurrentSection('2001');
+  this.gradebook.updateCurrentSection('2001')
   strictEqual(this.gradebook.reloadStudentData.callCount, 1);
 });
 
@@ -5844,6 +5848,12 @@ test('renders the view options menu', function () {
 
 QUnit.module('Gradebook#updateCurrentGradingPeriod', {
   setup () {
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    const fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="grading-periods-filter-container"></div>'
+
     this.gradebook = createGradebook({
       grading_period_set: {
         id: '1501',
@@ -5852,14 +5862,19 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
       settings: {
         filter_columns_by: {
           grading_period_id: '1402'
-        }
+        },
+        selected_view_options_filters: ['gradingPeriods']
       }
     });
-    this.stub(this.gradebook, 'saveSettings');
+    this.spy(this.gradebook, 'saveSettings');
     this.stub(this.gradebook, 'resetGrading');
     this.stub(this.gradebook, 'sortGridRows');
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  },
+
+  teardown () {
+    this.server.restore()
   }
 });
 
@@ -5869,17 +5884,13 @@ test('updates the filter setting with the given grading period id', function () 
 });
 
 test('saves settings after updating the filter setting', function () {
-  this.gradebook.saveSettings.callsFake(() => {
-    strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated');
-  });
   this.gradebook.updateCurrentGradingPeriod('1401');
+  strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated')
 });
 
 test('resets grading after updating the filter setting', function () {
-  this.gradebook.resetGrading.callsFake(() => {
-    strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated');
-  });
   this.gradebook.updateCurrentGradingPeriod('1401');
+  strictEqual(this.gradebook.resetGrading.callCount, 1)
 });
 
 test('sorts grid grows after resetting grading', function () {
@@ -5914,17 +5925,33 @@ test('has no effect when the grading period has not changed', function () {
 
 QUnit.module('Gradebook#updateCurrentModule', {
   setup () {
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    const fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="modules-filter-container"></div>'
+
     this.gradebook = createGradebook({
       settings: {
         filter_columns_by: {
           context_module_id: '2'
-        }
+        },
+        selected_view_options_filters: ['modules']
       }
     });
+    this.gradebook.setContextModules([
+      { id: '1', name: 'Module 1', position: 1 },
+      { id: '2', name: 'Another Module', position: 2 },
+      { id: '3', name: 'Module 2', position: 3 },
+    ]);
     this.spy(this.gradebook, 'setFilterColumnsBySetting');
-    this.stub($, 'ajaxJSON');
+    this.spy($, 'ajaxJSON')
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  },
+
+  teardown () {
+    this.server.restore()
   }
 });
 
@@ -5976,17 +6003,32 @@ test('has no effect when the module has not changed', function () {
 
 QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
   setup () {
+    this.server = sinon.createFakeServer({ respondImmediately: true })
+    this.server.respondWith([200, {}, ''])
+
+    const fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="assignment-group-filter-container"></div>'
+
     this.gradebook = createGradebook({
       settings: {
         filter_columns_by: {
           assignment_group_id: '2'
-        }
+        },
+        selected_view_options_filters: ['assignmentGroups']
       }
     });
+    this.gradebook.setAssignmentGroups({
+      '1': { id: '1' },
+      '2': { id: '2' }
+    })
     this.spy(this.gradebook, 'setFilterColumnsBySetting');
-    this.stub($, 'ajaxJSON');
+    this.spy($, 'ajaxJSON')
     this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  },
+
+  teardown () {
+    this.server.restore()
   }
 });
 
@@ -6144,7 +6186,102 @@ QUnit.module('Gradebook', () => {
       strictEqual(props.publishGradesToSis.isEnabled, false);
     });
   });
-});
+
+  QUnit.module('#updateFilterSettings', (hooks) => {
+    let gradebook
+    let currentFilters
+
+    hooks.beforeEach(() => {
+      $fixtures.innerHTML = `
+        <div id="assignment-group-filter-container"></div>
+        <div id="grading-periods-filter-container"></div>
+        <div id="modules-filter-container"></div>
+        <div id="sections-filter-container"></div>
+        <div id="search-filter-container">
+          <input type="text" />
+        </div>
+      `
+      currentFilters = ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
+      gradebook = createGradebook({
+        grading_period_set: {
+          id: '1501',
+          grading_periods: [{ id: '1401', name: 'Grading Period #1' }, { id: '1402', name: 'Grading Period #2' }]
+        },
+        sections: [{ id: '2001', name: 'Freshmen' }, { id: '2002', name: 'Sophomores' }],
+        sections_enabled: true,
+        settings: {
+          filter_columns_by: {
+            assignment_group_id: '2',
+            grading_period_id: '1402',
+            context_module_id: '2'
+          },
+          filter_rows_by: {
+            section_id: '2001'
+          },
+          selected_view_options_filters: currentFilters
+        }
+      })
+      gradebook.setAssignmentGroups({
+        '1': { id: '1', name: 'Assignment Group #1' },
+        '2': { id: '2', name: 'Assignment Group #2' }
+      })
+      gradebook.setContextModules([
+        { id: '1', name: 'Module 1', position: 1 },
+        { id: '2', name: 'Another Module', position: 2 },
+        { id: '3', name: 'Module 2', position: 3 }
+      ])
+
+      sinon.spy(gradebook, 'setFilterColumnsBySetting')
+      sinon.stub(gradebook, 'saveSettings')
+      sinon.stub(gradebook, 'resetGrading')
+      sinon.stub(gradebook, 'sortGridRows')
+      sinon.stub(gradebook, 'updateFilteredContentInfo')
+      sinon.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+      sinon.stub(gradebook, 'renderViewOptionsMenu')
+    })
+
+    hooks.afterEach(() => {
+      gradebook = null
+      $fixtures.innerHTML = ''
+    })
+
+    test('getFilterColumnsBySetting returns the assignment group filter setting', () => {
+      strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2')
+    })
+
+    test('deletes the assignment group filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'assignmentGroups'))
+      strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), null)
+    })
+
+    test('getFilterColumnsBySetting returns the grading period filter setting', () => {
+      strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1402')
+    })
+
+    test('deletes the grading period filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'gradingPeriods'))
+      strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), null)
+    })
+
+    test('getFilterColumnsBySetting returns the modules filter setting', () => {
+      strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
+    })
+
+    test('deletes the modules filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
+      strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null)
+    })
+
+    test('getFilterColumnsBySetting returns the sections filter setting', () => {
+      strictEqual(gradebook.getFilterRowsBySetting('sectionId'), '2001')
+    })
+
+    test('deletes the sections filter setting when the filter is hidden', () => {
+      gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'sections'))
+      strictEqual(gradebook.getFilterRowsBySetting('sectionId'), null)
+    })
+  })
+})
 
 QUnit.module('Gradebook#getInitialGridDisplaySettings');
 

@@ -124,7 +124,8 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     fakeENV.setup({
       current_user_id: '1101'
     });
-    server = sinon.fakeServer.create();
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    server.respondWith([200, {}, '{}'])
 
     dataLoader = {
       gotAssignmentGroups: $.Deferred(),
@@ -472,11 +473,13 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
             { id: '1401', title: 'Grading Period 1' },
             { id: '1402', title: 'Grading Period 2' }
           ]
+        },
+        settings: {
+          selected_view_options_filters: ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
         }
       });
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid);
       gradebook.getAssignment('2302').published = false;
-      sinon.stub(gradebook, 'saveSettings');
     });
 
     test('removes unpublished assignment columns when filtered', function () {

@@ -1061,9 +1061,11 @@ define [
           disabled: !@contentLoadStates.studentsLoaded
 
         @sectionFilterMenu = renderComponent(SectionFilter, mountPoint, props)
-      else if @sectionFilterMenu
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @sectionFilterMenu = null
+      else
+        @updateCurrentSection(null)
+        if @sectionFilterMenu
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @sectionFilterMenu = null
 
     updateCurrentSection: (sectionId) =>
       sectionId = if sectionId == '0' then null else sectionId
@@ -1071,8 +1073,8 @@ define [
       if currentSection != sectionId
         @setFilterRowsBySetting('sectionId', sectionId)
         @postGradesStore.setSelectedSection(sectionId)
-        @updateSectionFilterVisibility()
         @saveSettings({}, =>
+          @updateSectionFilterVisibility()
           @reloadStudentData()
         )
 
@@ -1094,9 +1096,11 @@ define [
           selectedItemId: @getAssignmentGroupToShow()
 
         @assignmentGroupFilterMenu = renderComponent(AssignmentGroupFilter, mountPoint, props)
-      else if @assignmentGroupFilterMenu?
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @assignmentGroupFilterMenu = null
+      else
+        @updateCurrentAssignmentGroup(null)
+        if @assignmentGroupFilterMenu?
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @assignmentGroupFilterMenu = null
 
     updateCurrentAssignmentGroup: (group) =>
       if @getFilterColumnsBySetting('assignmentGroupId') != group
@@ -1120,9 +1124,11 @@ define [
           selectedItemId: @getGradingPeriodToShow()
 
         @gradingPeriodFilterMenu = renderComponent(GradingPeriodFilter, mountPoint, props)
-      else if @gradingPeriodFilterMenu?
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @gradingPeriodFilterMenu = null
+      else
+        @updateCurrentGradingPeriod(null)
+        if @gradingPeriodFilterMenu?
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @gradingPeriodFilterMenu = null
 
     updateCurrentGradingPeriod: (period) =>
       if @getFilterColumnsBySetting('gradingPeriodId') != period
@@ -1155,9 +1161,11 @@ define [
           selectedItemId: @getFilterColumnsBySetting('contextModuleId') || '0'
 
         @moduleFilterMenu = renderComponent(ModuleFilter, mountPoint, props)
-      else if @moduleFilterMenu?
-        ReactDOM.unmountComponentAtNode(mountPoint)
-        @moduleFilterMenu = null
+      else
+        @updateCurrentModule(null)
+        if @moduleFilterMenu?
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @moduleFilterMenu = null
 
     initSubmissionStateMap: =>
       @submissionStateMap = new SubmissionStateMap
@@ -1273,12 +1281,14 @@ define [
 
     getFilterSettingsViewOptionsMenuProps: =>
       available: @listAvailableViewOptionsFilters()
-      onSelect: (filters) =>
-        @setSelectedViewOptionsFilters(filters)
-        @renderViewOptionsMenu()
-        @renderFilters()
-        @saveSettings()
+      onSelect: @updateFilterSettings
       selected: @listSelectedViewOptionsFilters()
+
+    updateFilterSettings: (filters) =>
+      @setSelectedViewOptionsFilters(filters)
+      @renderViewOptionsMenu()
+      @renderFilters()
+      @saveSettings()
 
     getViewOptionsMenuProps: ->
       teacherNotes: @getTeacherNotesViewOptionsMenuProps()

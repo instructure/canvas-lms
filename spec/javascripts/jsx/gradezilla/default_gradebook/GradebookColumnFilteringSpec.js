@@ -37,6 +37,15 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
   let contextModules;
   let customColumns;
 
+  function createGradebookWithAllFilters (options = {}) {
+    return createGradebook({
+      settings: {
+        selected_view_options_filters: ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
+      },
+      ...options
+    })
+  }
+
   function createContextModules () {
     contextModules = [
       { id: '2601', position: 3, name: 'Final Module' },
@@ -173,7 +182,8 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
     fakeENV.setup({
       current_user_id: '1101'
     });
-    server = sinon.fakeServer.create();
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    server.respondWith([200, {}, ''])
 
     dataLoader = {
       gotAssignmentGroups: $.Deferred(),
@@ -214,6 +224,10 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
       gradebook = createGradebook();
       sinon.stub(gradebook, 'saveSettings');
     });
+
+    hooks.afterEach(() => {
+      gradebook.saveSettings.restore()
+    })
 
     test('optionally shows all unpublished assignment columns at initial render', function () {
       setShowUnpublishedAssignments(true);
@@ -329,12 +343,12 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
 
   QUnit.module('with multiple assignment groups', function (hooks) {
     hooks.beforeEach(function () {
-      gradebook = createGradebook();
+      gradebook = createGradebookWithAllFilters()
     });
 
     test('optionally shows assignment columns for all assignment groups at initial render', function () {
-      gradebook.setFilterColumnsBySetting('assignmentGroupId', '0');
       addDataAndInitialize();
+      gradebook.updateCurrentAssignmentGroup('0')
       const expectedColumns = [
         'assignment_2301', 'assignment_2302', 'assignment_2303', 'assignment_2304',
         'assignment_group_2201', 'assignment_group_2202', 'total_grade'
@@ -343,8 +357,8 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
     });
 
     test('optionally shows only assignment columns for the selected assignment group at initial render', function () {
-      gradebook.setFilterColumnsBySetting('assignmentGroupId', '2201');
       addDataAndInitialize();
+      gradebook.updateCurrentAssignmentGroup('2201')
       const expectedColumns = [
         'assignment_2301', 'assignment_2303', 'assignment_group_2201', 'assignment_group_2202', 'total_grade'
       ];
@@ -400,7 +414,7 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
 
   QUnit.module('with grading periods', function (hooks) {
     hooks.beforeEach(function () {
-      gradebook = createGradebook({
+      gradebook = createGradebookWithAllFilters({
         grading_period_set: {
           id: '1501',
           display_totals_for_all_grading_periods: true,
@@ -497,7 +511,7 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
 
   QUnit.module('with multiple context modules', function (hooks) {
     hooks.beforeEach(function () {
-      gradebook = createGradebook();
+      gradebook = createGradebookWithAllFilters()
     });
 
     test('optionally shows assignment columns for all context modules at initial render', function () {
