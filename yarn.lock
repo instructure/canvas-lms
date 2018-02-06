@@ -6029,6 +6029,10 @@ jest-leak-detector@^22.0.6:
   dependencies:
     pretty-format "^22.0.6"
 
+jest-localstorage-mock@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/jest-localstorage-mock/-/jest-localstorage-mock-2.1.0.tgz#6626a570d6b47c155762dc05523616f7bcedeca2"
+
 jest-matcher-utils@^22.0.6:
   version "22.0.6"
   resolved "https://registry.yarnpkg.com/jest-matcher-utils/-/jest-matcher-utils-22.0.6.tgz#55675242b2af1de913f44e00aa4d68a38d349b07"
