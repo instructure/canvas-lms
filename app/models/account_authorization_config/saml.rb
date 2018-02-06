@@ -208,7 +208,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def self.sp_metadata(entity_id, hosts)
-    app_config = ConfigFile.load('saml') || {}
+    app_config = config
 
     entity = SAML2::Entity.new
     entity.entity_id = entity_id
@@ -269,7 +269,9 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
         authn_request.requested_authn_context.comparison = :exact
       end
       authn_request.force_authn = true if parent_registration
-      forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request)
+      private_key = self.class.private_key
+      private_key = nil if account.settings[:dont_sign_saml_authn_requests]
+      forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request, private_key: private_key)
 
       if debugging? && !debug_get(:request_id)
         debug_set(:request_id, authn_request.id)
@@ -304,6 +306,14 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     ConfigFile.load('saml') || {}
   end
 
+  def self.private_key
+    unless instance_variable_defined?(:@key)
+      private_key_data = private_keys.first&.last
+      @key = OpenSSL::PKey::RSA.new(private_key_data) if private_key_data
+    end
+    @key
+  end
+
   def self.private_keys
     return [] unless (encryption = config[:encryption])
     ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).map do |key|
@@ -311,6 +321,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
       next unless path
       [path, File.read(path)]
     end.compact.to_h
+  end
+
+  ::Canvas::Reloader.on_reload do
+    remove_instance_variable(:@key)
   end
 
   def self.onelogin_saml_settings_for_account(account, current_host=nil)
@@ -407,9 +421,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     )
 
     # sign the response
-    private_key_data = AccountAuthorizationConfig::SAML.private_keys.first&.last
-    private_key = OpenSSL::PKey::RSA.new(private_key_data) if private_key_data
-    result = SAML2::Bindings::HTTPRedirect.encode(logout_request, private_key: private_key)
+    result = SAML2::Bindings::HTTPRedirect.encode(logout_request, private_key: AccountAuthorizationConfig::SAML.private_key)
 
     if debugging? && debug_get(:logged_in_user_id) == current_user.id
       debug_set(:logout_request_id, logout_request.id)

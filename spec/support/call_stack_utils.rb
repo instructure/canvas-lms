@@ -17,9 +17,9 @@
 
 module CallStackUtils
   def self.best_line_for(call_stack)
-    line = CallStackUtils.prune_backtrace!(call_stack).first
+    lines = CallStackUtils.prune_backtrace!(call_stack)
     root = Rails.root.to_s + "/"
-    line.sub(root, '').sub(/:in .*/, '')
+    lines.map { |line| line.sub(root, '').sub(/:in .*/, '') }
   end
 
   # (re-)raise the exception while preserving its backtrace
