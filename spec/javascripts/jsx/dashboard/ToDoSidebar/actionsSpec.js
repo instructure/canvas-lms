@@ -87,6 +87,29 @@ test('dispatches ITEMS_LOADED with the proper url on success', (assert) => {
   });
 });
 
+test('dispatches ITEMS_LOADED when initial load gets them all', (assert) => {
+  const done = assert.async();
+  const thunk = Actions.loadInitialItems(moment().startOf('day'));
+  const fakeDispatch = sinon.spy();
+  thunk(fakeDispatch);
+  moxios.wait(() => {
+    const request = moxios.requests.mostRecent();
+    request.respondWith({
+      status: 200,
+      headers: {
+      },
+      response: [{ id: 1 }, { id: 2 }]
+    }).then(() => {
+      const expected = {
+        type: 'ITEMS_LOADED',
+        payload: { items: [{ id: 1 }, { id: 2 }], nextUrl: null }
+      };
+      deepEqual(fakeDispatch.secondCall.args[0], expected);
+      done();
+    })
+  });
+});
+
 
 test('dispatches ITEMS_LOADING_FAILED on failure', (assert) => {
   const done = assert.async();
