@@ -37,30 +37,8 @@ export default class LoadingPastIndicator extends Component {
     loadingError: undefined
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    const should = this.props.allPastItemsLoaded !== nextProps.allPastItemsLoaded ||
-           this.props.loadingPast !== nextProps.loadingPast ||
-           this.props.loadingError !== nextProps.loadingError;
-    return should;
-  }
-
-  componentDidUpdate (prevProps) {
-    // only animate on the transition to loading error,
-    // regardless of the other property state
-    if (this.props.loadingError) {
-      if (!prevProps.loadingError) {
-        animateSlideDown(this.rootDiv);
-      }
-      return;
-    }
-    // if we just transitioned from not loadingPast to loadingPast or
-    // from not allPastItemsLoaded to allItemsLoaded, then run the transition
-    // that slides the component in
-    if((this.props.allPastItemsLoaded && this.props.allPastItemsLoaded !== prevProps.allPastItemsLoaded) ||
-        (this.props.loadingPast && this.props.loadingPast !== prevProps.loadingPast)) {
-      animateSlideDown(this.rootDiv);
-    }
-  }
+  // Don't try to animate this component here. If we want this to animate, it should be coordinated
+  // with other animations in the dynamic ui manager.
 
   renderError () {
     if (this.props.loadingError) {
@@ -76,23 +54,8 @@ export default class LoadingPastIndicator extends Component {
     }
   }
 
-  renderLoading () {
-    if (this.props.loadingPast) {
-      return (
-        <Container as="div" padding="small" textAlign="center">
-          <Container display="inline">
-            <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading past items')}/>
-          </Container>
-          <Text size="small" color="secondary">
-            {formatMessage('Loading past items')}
-          </Text>
-        </Container>
-      );
-    }
-  }
-
   renderNoMore () {
-    if (!this.props.loadingPast && this.props.allPastItemsLoaded) {
+    if (this.props.allPastItemsLoaded) {
       return (
         <Container as="div" padding="small" textAlign="center">
           <Container display="block" margin="small">
@@ -109,12 +72,27 @@ export default class LoadingPastIndicator extends Component {
     }
   }
 
+  renderLoading () {
+    if (this.props.loadingPast && !this.props.allPastItemsLoaded) {
+      return (
+        <Container as="div" padding="small" textAlign="center">
+          <Container display="inline">
+            <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading past items')}/>
+          </Container>
+          <Text size="small" color="secondary">
+            {formatMessage('Loading past items')}
+          </Text>
+        </Container>
+      );
+    }
+  }
+
   render () {
     return (
       <div ref={(elt) => { this.rootDiv = elt; }}>
         {this.renderError()}
-        {this.renderLoading()}
         {this.renderNoMore()}
+        {this.renderLoading()}
       </div>
     );
   }

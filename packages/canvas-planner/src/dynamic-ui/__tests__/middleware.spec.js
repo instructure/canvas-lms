@@ -20,9 +20,16 @@ import {createDynamicUiMiddleware as createMiddleware} from '../middleware';
 
 function createManager () {
   return {
+    setStore: jest.fn(),
     handleAction: jest.fn(),
   };
 }
+
+it('registers the store with the manager', () => {
+  const mockManager = createManager();
+  createMiddleware(mockManager)('the store');
+  expect(mockManager.setStore).toHaveBeenCalledWith('the store');
+});
 
 it('notifies manager of actions', () => {
   const mockManager = createManager();

@@ -46,6 +46,7 @@ export const {
   clearUpdateTodo,
   openEditingPlannerItem,
   cancelEditingPlannerItem,
+  scrollToNewActivity
 } = createActions(
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
@@ -61,6 +62,7 @@ export const {
   'CLEAR_UPDATE_TODO',
   'OPEN_EDITING_PLANNER_ITEM',
   'CANCEL_EDITING_PLANNER_ITEM',
+  'SCROLL_TO_NEW_ACTIVITY',
 );
 
 export * from './loading-actions';

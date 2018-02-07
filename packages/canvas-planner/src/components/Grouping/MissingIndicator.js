@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react';
+import React from 'react';
 import { string } from 'prop-types';
 import formatMessage from '../../format-message';
 

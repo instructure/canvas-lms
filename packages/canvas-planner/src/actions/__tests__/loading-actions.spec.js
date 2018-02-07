@@ -39,7 +39,6 @@ const getBasicState = () => ({
     ['2017-05-24', [{id: '42', dateBucketMoment: moment.tz('2017-05-24', 'UTC')}]],
   ],
   loading: {
-    somePastItemsLoaded: false,
     futureNextUrl: null,
     pastNextUrl: null,
   },
@@ -208,7 +207,6 @@ describe('api actions', () => {
       Actions.loadPastUntilNewActivity()(mockDispatch, (getBasicState));
       expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingPastItems({
         seekingNewActivity: true,
-        somePastItemsLoaded: false,
       }));
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingPastUntilNewActivitySaga());
     });

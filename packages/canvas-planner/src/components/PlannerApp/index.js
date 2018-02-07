@@ -28,7 +28,7 @@ import LoadingFutureIndicator from '../LoadingFutureIndicator';
 import LoadingPastIndicator from '../LoadingPastIndicator';
 import PlannerEmptyState from '../PlannerEmptyState';
 import formatMessage from '../../format-message';
-import {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, togglePlannerItemCompletion, updateTodo} from '../../actions';
+import {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo} from '../../actions';
 import {getFirstLoadedMoment} from '../../utilities/dateUtils';
 import {notifier} from '../../dynamic-ui';
 
@@ -49,6 +49,7 @@ export class PlannerApp extends Component {
     firstNewActivityDate: momentObj,
     scrollIntoPast: func,
     loadPastUntilNewActivity: func,
+    scrollToNewActivity: func,
     loadFutureItems: func,
     stickyOffset: number, // in pixels
     stickyZIndex: number,
@@ -69,7 +70,7 @@ export class PlannerApp extends Component {
   };
 
   componentWillUpdate () {
-    this.props.preTriggerDynamicUiUpdates(this.fixedElement);
+    this.props.preTriggerDynamicUiUpdates(this.fixedElement, 'app');
   }
 
   componentDidUpdate () {
@@ -81,7 +82,9 @@ export class PlannerApp extends Component {
   }
 
   handleNewActivityClick = () => {
-    this.props.loadPastUntilNewActivity();
+    let additionalOffset = 0;
+    if (this.newActivityButtonRef) additionalOffset = this.newActivityButtonRef.getBoundingClientRect().height;
+    this.props.scrollToNewActivity({additionalOffset});
   }
 
   renderLoading () {
@@ -110,6 +113,7 @@ export class PlannerApp extends Component {
         onClick={this.handleNewActivityClick}
         offset={this.props.stickyOffset + 'px'}
         zIndex={this.props.stickyZIndex}
+        buttonRef={ref => this.newActivityButtonRef = ref}
       >
         {formatMessage("New Activity")}
       </StickyButton>
@@ -208,5 +212,5 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, togglePlannerItemCompletion, updateTodo};
+const mapDispatchToProps = {loadFutureItems, scrollIntoPast, loadPastUntilNewActivity, scrollToNewActivity, togglePlannerItemCompletion, updateTodo};
 export default notifier(connect(mapStateToProps, mapDispatchToProps)(PlannerApp));

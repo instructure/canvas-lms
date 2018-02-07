@@ -24,6 +24,7 @@ import {isNewActivityItem} from '../utilities/statusUtils';
 import {daysToItems} from '../utilities/daysUtils';
 import {srAlert} from '../utilities/alertUtils';
 import formatMessage from '../format-message';
+import {loadPastUntilNewActivity} from '../actions/loading-actions';
 
 export function specialFallbackFocusId (type) {
   return `~~~${type}-fallback-focus~~~`;
@@ -42,6 +43,10 @@ export class DynamicUiManager {
     this.stickyOffset = offset;
   }
 
+  setStore (store) {
+    this.store = store;
+  }
+
   // If you want to register a fallback focus component when all the things in a list are deleted,
   // register that component with a -1 index and a special unique componentId that looks like
   // this: `~~~${registryName}-fallback-focus~~~` where registryName is one of the
@@ -55,12 +60,12 @@ export class DynamicUiManager {
   }
 
   clearAnimationPlan () {
-    this.animationPlan = {};
+    this.animationPlan = this.animationPlan.nextAnimationPlan || {};
   }
 
   animationWillScroll () {
-    return this.animationPlan.scrollToLastNewActivity ||
-      this.animationPlan.focusLastNewItem ||
+    return this.animationPlan.scrollToTop ||
+      this.animationPlan.scrollToLastNewActivity ||
       this.animationPlan.focusItem ||
       // This works around a chrome bug where focusing something in the sticky header jumps the
       // scroll position to the top of the document, so we need to maintain the scroll position.
@@ -68,7 +73,7 @@ export class DynamicUiManager {
     ;
   }
 
-  shouldMaintainCurrentSrcollingPosition () {
+  shouldMaintainCurrentScrollingPosition () {
     // We need to maintain our scrolling postion in the viewport if:
     // 1. we will not animate and do not want to scroll from the current position at all,
     //    which is the case when the user is scrolling into the past and we load more items, or
@@ -76,11 +81,14 @@ export class DynamicUiManager {
     return !!(this.animationPlan.noScroll || this.animationWillScroll());
   }
 
-  preTriggerUpdates = (fixedElement) => {
+  preTriggerUpdates = (fixedElement, triggerer) => {
     const animationPlan = this.animationPlan;
     if (!animationPlan.ready) return;
 
-    if (fixedElement && this.shouldMaintainCurrentSrcollingPosition()) {
+    // only the app should be allowed to muck with the scroll position (the header should not).
+    if (triggerer !== 'app') return;
+
+    if (fixedElement && this.shouldMaintainCurrentScrollingPosition()) {
       this.animator.maintainViewportPosition(fixedElement);
     }
   }
@@ -89,12 +97,10 @@ export class DynamicUiManager {
     const animationPlan = this.animationPlan;
     if (!animationPlan.ready) return;
 
-    if (this.animationPlan.scrollToLastNewActivity) {
+    if (this.animationPlan.scrollToTop) {
+      this.triggerScrollToTop();
+    } else if (this.animationPlan.scrollToLastNewActivity) {
       this.triggerNewActivityAnimations();
-    } else if (this.animationPlan.focusLastNewItem) {
-      this.triggerFocusLastNewItem();
-    } else if (this.animationPlan.focusFirstNewItem) {
-      this.triggerFocusFirstNewItem();
     } else if (this.animationPlan.focusItem) {
       this.triggerFocusItemComponent();
     } else if (this.animationPlan.focusOpportunity) {
@@ -106,30 +112,8 @@ export class DynamicUiManager {
     this.clearAnimationPlan();
   }
 
-  triggerFocusFirstNewItem () {
-    const {componentIds: newDayComponentIds} =
-      this.animatableRegistry.getFirstComponent('day', this.animationPlan.newComponentIds);
-    const {component: firstNewGroupComponent, componentIds: firstGroupComponentIds} =
-      this.animatableRegistry.getFirstComponent('group', newDayComponentIds);
-
-    let focusable = firstNewGroupComponent.getFocusable();
-    if (focusable == null) {
-      const {component: firstNewGroupItem} = this.animatableRegistry.getFirstComponent('item', firstGroupComponentIds);
-      focusable = firstNewGroupItem.getFocusable();
-    }
-
-    this.animator.focusElement(focusable);
-  }
-
-  triggerFocusLastNewItem () {
-    const {componentIds: newDayComponentIds} =
-      this.animatableRegistry.getLastComponent('day', this.animationPlan.newComponentIds);
-    const {component: lastNewGroup, componentIds: newGroupComponentIds} =
-      this.animatableRegistry.getLastComponent('group', newDayComponentIds);
-    const {component: lastNewItem} =
-      this.animatableRegistry.getLastComponent('item', newGroupComponentIds);
-    this.animator.focusElement(lastNewItem.getFocusable());
-    this.animator.scrollTo(lastNewGroup.getScrollable(), this.stickyOffset);
+  triggerScrollToTop () {
+    this.animator.scrollToTop();
   }
 
   triggerNewActivityAnimations () {
@@ -143,14 +127,16 @@ export class DynamicUiManager {
     // only want groups in the day that have new activity items
     newActivityDayComponentIds = _.intersection(newActivityDayComponentIds, newActivityItemIds);
 
-    const {component: newActivityGroup, componentIds: newActivityGroupComponentIds} =
-      this.animatableRegistry.getLastComponent('group', newActivityDayComponentIds);
+    const {component: newActivityIndicator, componentIds: newActivityGroupComponentIds} =
+      this.animatableRegistry.getLastComponent('new-activity-indicator', newActivityDayComponentIds);
 
+    // focus the group because it's right beside the new activity indicator. If we put the focus on
+    // an item, the focus might be off the screen when we scroll to the new activity indicator.
     const {component: newActivityComponent} =
-      this.animatableRegistry.getLastComponent('item', newActivityGroupComponentIds);
+      this.animatableRegistry.getLastComponent('group', newActivityGroupComponentIds);
 
     this.animator.focusElement(newActivityComponent.getFocusable());
-    this.animator.scrollTo(newActivityGroup.getScrollable(), this.stickyOffset);
+    this.animator.scrollTo(newActivityIndicator.getScrollable(), this.stickyOffset + this.animationPlan.additionalOffset);
   }
 
   triggerFocusItemComponent () {
@@ -182,23 +168,12 @@ export class DynamicUiManager {
     if (handler) handler(action);
   }
 
-  handleStartLoadingItems = (action) => {
-    this.animationPlan.focusFirstNewItem = true;
-  }
-
-  handleGettingFutureItems = (action) => {
-    this.animationPlan.focusFirstNewItem = true;
-  }
-
   handleGettingPastItems = (action) => {
     if (action.payload.seekingNewActivity) {
       this.animationPlan.scrollToLastNewActivity = true;
     } else {
-      // if there are no past items yet, focus on the last one
-      // otherwise leave scrolling position where it is and let
-      // the user simply scroll into the newly loaded ones as they choose to
-      this.animationPlan.focusLastNewItem = !action.payload.somePastItemsLoaded;
-      this.animationPlan.noScroll = !!action.payload.somePastItemsLoaded;
+      // otherwise just don't let the window scroll when past items are loaded.
+      this.animationPlan.noScroll = true;
     }
   }
 
@@ -221,10 +196,6 @@ export class DynamicUiManager {
 
     this.animationPlan.newItems = newItems;
     this.animationPlan.newComponentIds = newItems.map(item => item.uniqueId);
-
-    const sortedItems = _.sortBy(newItems, item => item.date);
-    this.animationPlan.firstNewItem = sortedItems[0];
-    this.animationPlan.lastNewItem = sortedItems[sortedItems.length - 1];
   }
 
   handleOpenEditingPlannerItem = (action) => {
@@ -232,7 +203,32 @@ export class DynamicUiManager {
   }
 
   handleCancelEditingPlannerItem = (action) => {
-    Object.assign(this.animationPlan, {focusPreOpenTrayElement: true, ready: true, ...action.payload});
+    Object.assign(this.animationPlan, {
+      focusPreOpenTrayElement: true,
+      ready: true,
+      noScroll: action.payload.noScroll,
+    });
+  }
+
+  handleScrollToNewActivity = (action) => {
+    const totalOffset = this.stickyOffset + action.payload.additionalOffset;
+    const newActivityIndicators = this.animatableRegistry.getAllNewActivityIndicatorsSorted();
+    const lastOffscreenIndicator = newActivityIndicators.reverse().find(indicator => {
+      return this.animator.isAboveScreen(indicator.component.getScrollable(), totalOffset);
+    });
+    if (lastOffscreenIndicator) {
+      // there's no state update, so we can just do it now and not muck with the animationPlan
+      this.animator.scrollTo(lastOffscreenIndicator.component.getScrollable(), totalOffset);
+    } else {
+      this.animationPlan.additionalOffset = action.payload.additionalOffset;
+      // if there's more we could load, then we should do that.
+      // we're assuming there is more to load if this action happens.
+      this.store.dispatch(loadPastUntilNewActivity());
+      // scroll to the top first so they can see the loading indicator.
+      this.animationPlan = {nextAnimationPlan: this.animationPlan};
+      this.animationPlan.scrollToTop = true;
+      this.animationPlan.ready = true;
+    }
   }
 
   handleSavedPlannerItem = (action) => {
