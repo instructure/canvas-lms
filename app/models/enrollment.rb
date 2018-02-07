@@ -682,7 +682,6 @@ class Enrollment < ActiveRecord::Base
     state :invited do
       event :reject, :transitions_to => :rejected do self.user.touch; end
       event :complete, :transitions_to => :completed
-      event :pend, :transitions_to => :pending
     end
 
     state :creation_pending do
@@ -692,8 +691,6 @@ class Enrollment < ActiveRecord::Base
     state :active do
       event :reject, :transitions_to => :rejected do self.user.touch; end
       event :complete, :transitions_to => :completed
-      # TODO: remove pend, there's no `state :pending`
-      event :pend, :transitions_to => :pending
     end
 
     state :deleted
