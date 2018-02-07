@@ -60,8 +60,10 @@ export class UpdateItemTray extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const updates = this.getNoteUpdates(nextProps);
-    this.setState({updates}, this.updateMessages);
+    if (nextProps.noteItem) {
+      const updates = this.getNoteUpdates(nextProps);
+      this.setState({updates}, this.updateMessages);
+    }
   }
 
   getNoteUpdates (props) {

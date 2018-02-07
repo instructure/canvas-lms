@@ -43,6 +43,13 @@ it('renders the item to update if provided', () => {
   expect(wrapper).toMatchSnapshot();
 });
 
+it("doesn't re-render unless new item is provided", () => {
+  const wrapper = shallow(<UpdateItemTray {...defaultProps} />)
+  const newProps = {...defaultProps, locale: 'fr'}
+  wrapper.setProps(newProps)
+  expect(wrapper.find('DateInput').props()['messages'].length).toBe(0)
+})
+
 it('renders Add To Do header when creating a new to do', () => {
   const wrapper = mount(
     <UpdateItemTray {...defaultProps} />
