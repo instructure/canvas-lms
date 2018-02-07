@@ -15,17 +15,5 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import { createStore, applyMiddleware } from 'redux'
-import ReduxThunk from 'redux-thunk'
-import rootReducer from './rootReducer'
-
-export default function configStore (initialState) {
-  const middleware = [
-    ReduxThunk,
-
-    // this is so redux-logger is not included in the production webpack bundle
-    (process.env.NODE_ENV !== 'production') && require('redux-logger')() // eslint-disable-line global-require
-  ].filter(Boolean)
-  return applyMiddleware(...middleware)(createStore)(rootReducer, initialState)
-}
+const DRAG_AND_DROP_ROLES = ['teacher', 'ta', 'admin']
+export default DRAG_AND_DROP_ROLES

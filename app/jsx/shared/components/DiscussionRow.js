@@ -18,10 +18,11 @@
 
 import I18n from 'i18n!discussion_row'
 import React from 'react'
-import { func } from 'prop-types'
+import { func, bool } from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
+import { DragSource } from 'react-dnd';
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
@@ -49,8 +50,13 @@ function makeTimestamp ({ delayed_post_at, posted_at }) {
   }
   : { title: I18n.t('Posted on:'), date: posted_at }
 }
+const discussionTarget = {
+  beginDrag (props) {
+    return props.discussion
+  },
+}
 
-export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged }) {
+export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged, connectDragSource, connectDragPreview, draggable }) {
   const timestamp = makeTimestamp(discussion)
   const readCount = discussion.discussion_subentry_count > 0
     ? (
@@ -67,50 +73,53 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
   const contentWrapper = document.createElement('span')
   contentWrapper.innerHTML = discussion.message
   const textContent = contentWrapper.textContent.trim()
-  return (
-    <CourseItemRow
-      ref={rowRef}
-      className="ic-discussion-row"
-      id={discussion.id}
-      draggable
-      icon={
-        <Text color="success" size="large">
-          <IconAssignmentLine />
-        </Text>
-      }
-      isRead={discussion.read_state === 'read'}
-      author={discussion.author}
-      title={discussion.title}
-      body={<div className="ic-discussion-row__content">{textContent}</div>}
-      sectionToolTip={
-        <SectionsTooltip
-          totalUserCount={discussion.user_count}
-          sections={discussion.sections}
-        />
-      }
-      itemUrl={discussion.html_url}
-      onSelectedChanged={onSelectedChanged}
-      masterCourse={{
-        courseData: masterCourseData || {},
-        getLockOptions: () => ({
-          model: new DiscussionModel(discussion),
-          unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: discussion.title}),
-          lockedText: I18n.t('%{title} is locked. Click to unlock', {title: discussion.title}),
-          course_id: masterCourseData.masterCourse.id,
-          content_id: discussion.id,
-          content_type: 'discussion_topic',
-        }),
-      }}
-      metaContent={
-        <div>
-          <span className="ic-item-row__meta-content-heading">
-            <Text size="small" as="p">{timestamp.title}</Text>
-          </span>
-          <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
-        </div>
-      }
-      actionsContent={readCount}
-    />
+  return connectDragPreview (
+    <span>
+      <CourseItemRow
+        ref={rowRef}
+        className="ic-discussion-row"
+        id={discussion.id}
+        draggable={draggable}
+        connectDragSource={connectDragSource}
+        icon={
+          <Text color={draggable ? "success" : "secondary"} size="large">
+            <IconAssignmentLine />
+          </Text>
+        }
+        isRead={discussion.read_state === 'read'}
+        author={discussion.author}
+        title={discussion.title}
+        body={<div className="ic-discussion-row__content">{textContent}</div>}
+        sectionToolTip={
+          <SectionsTooltip
+            totalUserCount={discussion.user_count}
+            sections={discussion.sections}
+          />
+        }
+        itemUrl={discussion.html_url}
+        onSelectedChanged={onSelectedChanged}
+        masterCourse={{
+          courseData: masterCourseData || {},
+          getLockOptions: () => ({
+            model: new DiscussionModel(discussion),
+            unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: discussion.title}),
+            lockedText: I18n.t('%{title} is locked. Click to unlock', {title: discussion.title}),
+            course_id: masterCourseData.masterCourse.id,
+            content_id: discussion.id,
+            content_type: 'discussion_topic',
+          }),
+        }}
+        metaContent={
+          <div>
+            <span className="ic-item-row__meta-content-heading">
+              <Text size="small" as="p">{timestamp.title}</Text>
+            </span>
+            <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
+          </div>
+        }
+        actionsContent={readCount}
+      />
+    </span>
   )
 }
 
@@ -119,10 +128,20 @@ DiscussionRow.propTypes = {
   masterCourseData: masterCourseDataShape,
   rowRef: func,
   onSelectedChanged: func,
+  connectDragSource: func,
+  connectDragPreview: func,
+  draggable: bool,
 }
 
 DiscussionRow.defaultProps = {
+  connectDragSource (component) {return component},
   masterCourseData: null,
   rowRef () {},
   onSelectedChanged () {},
+  connectDragPreview (component) {return component},
 }
+export const DraggableDiscussionRow = DragSource('Discussion', discussionTarget, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging(),
+  connectDragPreview: connect.dragPreview(),
+}))(DiscussionRow)

@@ -104,7 +104,7 @@ test('renders a checkbox if selectable: true', () => {
 })
 
 test('renders a drag handle if draggable: true', () => {
-  const tree = mount(<CourseItemRow {...makeProps({ draggable: true })} />)
+  const tree = mount(<CourseItemRow {...makeProps({ draggable: true, connectDragSource: (component) => component})} />)
   const node = tree.find('IconDragHandleLine')
   ok(node.exists())
 })

@@ -23,6 +23,7 @@ const [contextType, contextId] = ENV.context_asset_string.split('_')
 const root = document.querySelector('#content')
 const app = createDiscussionsIndex(root, {
   permissions: ENV.permissions,
+  roles: ENV.current_user_roles,
   masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
   contextCodes: [ENV.context_asset_string],
   contextType,

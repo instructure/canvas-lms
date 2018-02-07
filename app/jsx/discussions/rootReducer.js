@@ -17,20 +17,26 @@
  */
 
 import { combineReducers } from 'redux'
-// TODO: import { handleActions } from 'redux-actions'
-// TODO: import { actionTypes } from './actions'
 import { reduceNotifications } from '../shared/reduxNotifications'
 import { createPaginatedReducer } from '../shared/reduxPagination'
+import pinnedDiscussionReducer from './reducers/pinnedDiscussionReducer'
+import unpinnedDiscussionReducer from './reducers/unpinnedDiscussionReducer'
+import closedForCommentsDiscussionReducer from './reducers/closedForCommentsDiscussionReducer'
 
 const identity = (defaultState = null) => (
   state => (state === undefined ? defaultState : state)
 )
 
+
 export default combineReducers({
+  pinnedDiscussions: pinnedDiscussionReducer,
+  closedForCommentsDiscussions: closedForCommentsDiscussionReducer,
+  unpinnedDiscussions: unpinnedDiscussionReducer,
   contextCodes: identity([]),
   contextType: identity(null),
   contextId: identity(null),
   permissions: identity({}),
+  roles: identity({}),
   masterCourseData: identity(null),
   discussions: createPaginatedReducer('discussions'),
   notifications: reduceNotifications,

@@ -38,3 +38,8 @@ export function getDiscussions ({ contextType, contextId, discussions }, { page 
   const queryString = encodeQueryString(params)
   return axios.get(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
 }
+
+export function updateDiscussion ({ contextType, contextId }, discussion, pinnedState, closedState) {
+  const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussion.id}`
+  return axios.put(url, { pinned: pinnedState, locked: closedState })
+}
