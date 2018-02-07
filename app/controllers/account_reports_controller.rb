@@ -77,12 +77,12 @@
 #           "type": "integer"
 #         },
 #         "include_deleted": {
-#           "description": "Include deleted objects",
+#           "description": "If true, deleted objects will be included. If false, deleted objects will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "course_id": {
-#           "description": "The course to report on",
+#           "description": "The id of the course to report on",
 #           "example": 2,
 #           "type": "integer"
 #         },
@@ -99,42 +99,42 @@
 #           }
 #         },
 #         "users": {
-#           "description": "Get the data for users",
+#           "description": "If true, user data will be included. If false, user data will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "accounts": {
-#           "description": "Get the data for accounts",
+#           "description": "If true, account data will be included. If false, account data will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "terms": {
-#           "description": "Get the data for terms",
+#           "description": "If true, term data will be included. If false, term data will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "courses": {
-#           "description": "Get the data for courses",
+#           "description": "If true, course data will be included. If false, course data will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "sections": {
-#           "description": "Get the data for sections",
+#           "description": "If true, section data will be included. If false, section data will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "enrollments": {
-#           "description": "Get the data for enrollments",
+#           "description": "If true, enrollment data will be included. If false, enrollment data will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "groups": {
-#           "description": "Get the data for groups",
+#           "description": "If true, group data will be included. If false, group data will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "xlist": {
-#           "description": "Get the data for cross-listed courses",
+#           "description": "If true, data for crosslisted courses will be included. If false, data for crosslisted courses will be omitted.",
 #           "example": false,
 #           "type": "boolean"
 #         },
@@ -147,7 +147,7 @@
 #           "type": "integer"
 #         },
 #         "include_enrollment_state": {
-#           "description": "Include enrollment state. Defaults to false",
+#           "description": "If true, enrollment state will be included. If false, enrollment state will be omitted. Defaults to false.",
 #           "example": false,
 #           "type": "boolean"
 #         },
@@ -240,13 +240,37 @@ class AccountReportsController < ApplicationController
     end
   end
 
-# @API Start a Report
-# Generates a report instance for the account.
-#
-# @argument [parameters] The parameters will vary for each report
-#
-# @returns Report
-#
+  # @API Start a Report
+  # Generates a report instance for the account. Note that "report" in the
+  # request must match one of the available report names. To fetch a list of
+  # available report names and parameters for each report (including whether or
+  # not those parameters are required), see
+  # {api:AccountReportsController#available_reports List Available Reports}.
+  #
+  # @argument parameters The parameters will vary for each report. To fetch a list
+  #   of available parameters for each report, see {api:AccountReportsController#available_reports List Available Reports}.
+  #   A few example parameters have been provided below. Note that the example
+  #   parameters provided below may not be valid for every report.
+  #
+  # @argument parameters[course_id] [Integer] The id of the course to report on.
+  #   Note: this parameter has been listed to serve as an example and may not be
+  #   valid for every report.
+  #
+  # @argument parameters[users] [Boolean] If true, user data will be included. If
+  #   false, user data will be omitted. Note: this parameter has been listed to
+  #   serve as an example and may not be valid for every report.
+  #
+  # @example_request
+  #   curl -X POST \
+  #        https://<canvas>/api/v1/accounts/1/reports/provisioning_csv \
+  #        -H 'Authorization: Bearer <token>' \
+  #        -H 'Content-Type: multipart/form-data' \
+  #        -F 'parameters[users]=true' \
+  #        -F 'parameters[courses]=true' \
+  #        -F 'parameters[enrollments]=true'
+  #
+  # @returns Report
+  #
   def create
     if authorized_action(@context, @current_user, :read_reports)
       available_reports = AccountReport.available_reports.keys
