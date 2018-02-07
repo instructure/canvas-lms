@@ -16,15 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CreateLtiResourceLinks < ActiveRecord::Migration[5.0]
+class CreateLtiLineItems < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    create_table :lti_resource_links do |t|
-      t.string :resource_link_id, null: false
+    return if connection.table_exists? :lti_line_items
+
+    create_table :lti_line_items do |t|
+      t.float :score_maximum, null: false
+      t.string :label, null: false
+      t.string :resource_id, null: true
+      t.string :tag, null: true
+      t.references :lti_resource_link, foreign_key: true, null: true, limit: 8
+      t.references :assignment, foreign_key: true, null: false, limit: 8
       t.timestamps
     end
 
-    add_index :lti_resource_links, :resource_link_id, unique: true
+    add_index :lti_line_items, :tag
+    add_index :lti_line_items, :resource_id
   end
 end
