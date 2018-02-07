@@ -64,33 +64,62 @@ const props = {
   }
 }
 
-QUnit.module('CoursesToolbar')
+QUnit.module('CoursesToolbar', () => {
+  test('groups terms properly', () => {
+    const wrapper = shallow(<CoursesToolbar {...props} />)
+    deepEqual(wrapper.find('optgroup[label="Active Terms"] option').map(n => n.text()), [
+      'Active Term 1',
+      'Term With No Start Or End 1'
+    ])
 
-test('groups terms properly', () => {
-  const wrapper = shallow(<CoursesToolbar {...props} />)
-  deepEqual(wrapper.find('optgroup[label="Active Terms"] option').map(n => n.text()), [
-    'Active Term 1',
-    'Term With No Start Or End 1'
-  ])
+    deepEqual(wrapper.find('optgroup[label="Future Terms"] option').map(n => n.text()), [
+      'Future Term 1',
+      'Future Term 2'
+    ])
 
-  deepEqual(wrapper.find('optgroup[label="Future Terms"] option').map(n => n.text()), [
-    'Future Term 1',
-    'Future Term 2'
-  ])
+    deepEqual(wrapper.find('optgroup[label="Past Terms"] option').map(n => n.text()), [
+      'Past Term 1'
+    ])
+  })
 
-  deepEqual(wrapper.find('optgroup[label="Past Terms"] option').map(n => n.text()), [
-    'Past Term 1'
-  ])
-})
-
-test('shows "loading" until terms are loaded', () => {
-  const propsWithNoTerms = {
-    ...props,
-    terms: {
-      loading: true
+  test('shows "loading" until terms are loaded', () => {
+    const propsWithNoTerms = {
+      ...props,
+      terms: {
+        loading: true
+      }
     }
-  }
-  const wrapper = shallow(<CoursesToolbar {...propsWithNoTerms} />)
-  equal(wrapper.find('option[disabled]').text(), 'Loading more terms...')
-  notOk(wrapper.find('optgroup[label="Active Terms"]').exists())
+    const wrapper = shallow(<CoursesToolbar {...propsWithNoTerms} />)
+    equal(wrapper.find('option[disabled]').text(), 'Loading more terms...')
+    notOk(wrapper.find('optgroup[label="Active Terms"]').exists())
+  })
+
+  QUnit.module('blueprint_courses checkbox', () => {
+    test('does not show "blueprint courses checkbox" unless feature is enabled', () => {
+      let wrapper = shallow(<CoursesToolbar {...props} />)
+      notOk(wrapper.find('Checkbox[label="Show only blueprint courses"]').exists())
+
+      wrapper = shallow(<CoursesToolbar {...props} show_blueprint_courses_checkbox />)
+      ok(wrapper.find('Checkbox[label="Show only blueprint courses"]').exists())
+    })
+
+    test('clicking it causes "onUpdateFilters" to be called', () => {
+      const onUpdateFilters = sinon.stub()
+      const checkbox = shallow(
+        <CoursesToolbar
+          {...props}
+          onUpdateFilters={onUpdateFilters}
+          show_blueprint_courses_checkbox
+        />
+      ).find('Checkbox[label="Show only blueprint courses"]')
+
+      checkbox.simulate('change', {target: {checked: true}})
+      ok(onUpdateFilters.calledWith({"blueprint": true}))
+
+      checkbox.simulate('change', {target: {checked: false}})
+      ok(onUpdateFilters.calledWith({blueprint: null}))
+    })
+  })
+
 })
+

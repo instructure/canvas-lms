@@ -2342,6 +2342,7 @@ class ApplicationController < ActionController::Base
     js_env({
       ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
       ACCOUNT_ID: @account.id,
+      'master_courses?' => master_courses?,
       ROOT_ACCOUNT_ID: @account.root_account.id,
       customized_login_handle_name: @account.root_account.customized_login_handle_name,
       delegated_authentication: @account.root_account.delegated_authentication?,
