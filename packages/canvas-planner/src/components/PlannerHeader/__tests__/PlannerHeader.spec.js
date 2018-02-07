@@ -336,3 +336,12 @@ it('sets the maxHeight on the Opportunities', () => {
   wrapper.setState({opportunitiesOpen: true});
   expect(wrapper.find('Animatable(Opportunities)').prop('maxHeight')).toEqual(640);
 });
+
+it('leaves the tray in current open state when receiving new empty todo props', () => {
+  const wrapper = shallow(
+    <PlannerHeader {...defaultProps()} />
+  );
+  wrapper.instance().toggleUpdateItemTray();
+  wrapper.setProps({...defaultProps({todo: {}})});
+  expect(wrapper.find('Tray').prop('open')).toBe(true);
+});

@@ -105,7 +105,7 @@ export class PlannerHeader extends Component {
     }
 
     opportunities = opportunities.slice(0, 10);
-    this.setUpdateItemTray(!!nextProps.todo.updateTodoItem);
+    this.setUpdateItemTray(!!nextProps.todo.updateTodoItem || this.state.trayOpen);
     this.setState({opportunities});
   }
 
