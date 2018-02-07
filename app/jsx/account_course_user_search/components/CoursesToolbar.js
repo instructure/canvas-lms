@@ -31,7 +31,7 @@ import preventDefault from 'compiled/fn/preventDefault'
 import {propType as termsPropType} from '../store/TermsStore'
 import NewCourseModal from './NewCourseModal'
 
-function termGroup(term){
+function termGroup(term) {
   if (term.start_at && new Date(term.start_at) > new Date()) return 'future'
   if (term.end_at && new Date(term.end_at) < new Date()) return 'past'
   return 'active'
@@ -50,7 +50,8 @@ export default function CoursesToolbar({
   onUpdateFilters,
   isLoading,
   errors,
-  draftFilters
+  draftFilters,
+  show_blueprint_courses_checkbox
 }) {
   const groupedTerms = groupBy(terms.data, termGroup)
   const searchLabel =
@@ -120,13 +121,22 @@ export default function CoursesToolbar({
                   </GridCol>
                 </GridRow>
                 <GridRow>
-                  <GridCol>
+                  <GridCol width="auto">
                     <Checkbox
                       checked={isEqual(draftFilters.enrollment_type, ['student'])}
                       onChange={e => onUpdateFilters({enrollment_type: e.target.checked ? ['student'] : null})}
                       label={I18n.t('Hide courses without students')}
                     />
                   </GridCol>
+                  {show_blueprint_courses_checkbox &&
+                    <GridCol>
+                      <Checkbox
+                        checked={draftFilters.blueprint}
+                        onChange={e => onUpdateFilters({blueprint: e.target.checked ? true : null})}
+                        label={I18n.t('Show only blueprint courses')}
+                      />
+                    </GridCol>
+                  }
                 </GridRow>
               </Grid>
             </GridCol>
@@ -149,6 +159,7 @@ export default function CoursesToolbar({
 
 CoursesToolbar.propTypes = {
   can_create_courses: bool,
+  show_blueprint_courses_checkbox: bool,
   onUpdateFilters: func.isRequired,
   onApplyFilters: func.isRequired,
   isLoading: bool.isRequired,
@@ -169,6 +180,10 @@ CoursesToolbar.defaultProps = {
     window.ENV &&
     window.ENV.PERMISSIONS &&
     window.ENV.PERMISSIONS.can_create_courses
+  ),
+  show_blueprint_courses_checkbox: (
+    window.ENV &&
+    window.ENV['master_courses?']
   ),
   terms: {
     data: [],
