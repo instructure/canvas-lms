@@ -598,7 +598,7 @@ class BzController < ApplicationController
         end
         Rails.logger.debug("### set_user_retained_data - magic_field_counts(total, supposed_to_be_blank) = #{magic_field_counts}")
 
-        magic_field_weight = magic_field_counts[0]
+        magic_field_total_weight = magic_field_counts[0]
         graded_checkboxes_that_are_supposed_to_be_empty_weight = magic_field_counts[1]
 
         # This is hacky, but we tie modules to participation tracking assignments using the name.
@@ -616,7 +616,7 @@ class BzController < ApplicationController
           effective_due_at = participation_assignment.due_at if overridden.due_at.nil?
           if effective_due_at.nil? || effective_due_at >= DateTime.now
 
-            step = participation_assignment.points_possible.to_f / magic_field_weight
+            step = weight * participation_assignment.points_possible.to_f / magic_field_total_weight
             original_step = step
             if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
               step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
@@ -649,6 +649,7 @@ class BzController < ApplicationController
 
             if step > 0
               response_object["points_given"] = true
+              response_object["points_amount"] = step
               response_object["points_reason"] = answer.nil? ? "participation" : "mastery"
             end
 
