@@ -34,4 +34,12 @@ module OutcomeImporter
       ["vendor_guid = ? OR (vendor_guid IS NULL AND vendor_guid_2 = ?)", value, value]
     end
   end
+
+  def plural_vendor_clause(values)
+    if AcademicBenchmark.use_new_guid_columns?
+      ["vendor_guid_2 IN (?) OR (vendor_guid_2 IS NULL AND vendor_guid IN (?))", values, values]
+    else
+      ["vendor_guid IN (?) OR (vendor_guid IS NULL AND vendor_guid_2 IN (?))", values, values]
+    end
+  end
 end
