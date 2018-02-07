@@ -489,6 +489,8 @@ class BzController < ApplicationController
     was_optional = params[:optional]
     field_type = params[:type]
     answer = params[:answer]
+    weight = params[:weight].blank? ? 1 : params[:weight].to_i
+    partial_credit_mode = params[:partial_credit]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
@@ -549,8 +551,8 @@ class BzController < ApplicationController
         # shouldn't be a real problem.
         # old one was magic_field_count, now it is magic_field_counts -- new cache returns an array for more detail
         magic_field_counts = Rails.cache.fetch("magic_field_counts_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.day) do
-          total_count = 0
-          graded_checkboxes_that_are_supposed_to_be_empty_count = 0
+          total_weight = 0
+          graded_checkboxes_that_are_supposed_to_be_empty_weight = 0
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
           # NOTE: Now that we have separate Course Participation assignments to track engagement on a per module basis, 
@@ -583,20 +585,21 @@ class BzController < ApplicationController
                 next if names[n]
                 next if o.attr('type') == 'checkbox' && o.attr('data-bz-answer').nil?
                 names[n] = true
-                total_count += 1
+                item_weight = o.attr('data-bz-weight').nil? ? 1 : o.attr('data-bz-weight').to_i
+                total_weight += item_weight
                 if o.attr('type') == 'checkbox' && o.attr('data-bz-answer') == ''
-                  graded_checkboxes_that_are_supposed_to_be_empty_count += 1
+                  graded_checkboxes_that_are_supposed_to_be_empty_weight += item_weight
                 end
-                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, total_count = #{total_count}, graded_checkboxes_that_are_supposed_to_be_empty_count = #{graded_checkboxes_that_are_supposed_to_be_empty_count}")
+                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, total_weight = #{total_weight}, graded_checkboxes_that_are_supposed_to_be_empty_weight = #{graded_checkboxes_that_are_supposed_to_be_empty_weight}")
               end
             end
           end
-          [total_count == 0 ? 1 : total_count, graded_checkboxes_that_are_supposed_to_be_empty_count]
+          [total_weight == 0 ? 1 : total_weight, graded_checkboxes_that_are_supposed_to_be_empty_weight]
         end
         Rails.logger.debug("### set_user_retained_data - magic_field_counts(total, supposed_to_be_blank) = #{magic_field_counts}")
 
-        magic_field_count = magic_field_counts[0]
-        graded_checkboxes_that_are_supposed_to_be_empty_count = magic_field_counts[1]
+        magic_field_weight = magic_field_counts[0]
+        graded_checkboxes_that_are_supposed_to_be_empty_weight = magic_field_counts[1]
 
         # This is hacky, but we tie modules to participation tracking assignments using the name.
         # E.g. #Course Participation - Onboarding" would track the Onboarding Module.
@@ -613,7 +616,7 @@ class BzController < ApplicationController
           effective_due_at = participation_assignment.due_at if overridden.due_at.nil?
           if effective_due_at.nil? || effective_due_at >= DateTime.now
 
-            step = participation_assignment.points_possible.to_f / magic_field_count
+            step = participation_assignment.points_possible.to_f / magic_field_weight
             original_step = step
             if !answer.nil? && answer != 'yes' && params[:value] == 'yes' && field_type == 'checkbox'
               step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
@@ -626,8 +629,22 @@ class BzController < ApplicationController
               step = 0 # don't award double credit
               response_object["points_reason"] = "already_awarded"
             elsif !answer.nil? && params[:value] != answer
+              total_potential_value = step
               step = 0 # wrong answer = no points
               response_object["points_reason"] = "wrong"
+
+              case partial_credit_mode
+              when 'per_char'
+                user_chars = params[:value].split("")
+                answer_chars = answer.split("")
+                each_char_value = total_potential_value.to_f / answer_chars.count
+                answer_chars.each_with_index do |item, index|
+                  if item == user_chars[index]
+                    step += each_char_value
+                    response_object["points_reason"] = "partial_credit"
+                  end
+                end
+              end
             end
 
             if step > 0
@@ -637,7 +654,7 @@ class BzController < ApplicationController
 
             submission = participation_assignment.find_or_create_submission(@current_user)
             submission.with_lock do
-              existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_count * original_step) : submission.grade.to_f
+              existing_grade = submission.grade.nil? ? (graded_checkboxes_that_are_supposed_to_be_empty_weight * original_step) : submission.grade.to_f
               new_grade = existing_grade + step 
               response_object["score_set_to"] = new_grade
               if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
