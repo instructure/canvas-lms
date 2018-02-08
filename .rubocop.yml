@@ -163,6 +163,9 @@ Rails/HasManyOrHasOneDependent:
 # Lint changes
 Lint/AmbiguousRegexpLiteral:
   Severity: convention
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*"
 Lint/UselessAssignment:
   Severity: convention
 Lint/Debugger:
