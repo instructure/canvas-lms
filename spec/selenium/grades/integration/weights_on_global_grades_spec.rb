@@ -31,6 +31,7 @@ describe 'gradezilla' do
 
     if @grading_period_index
       GlobalGrades.select_grading_period(@course, grading_period_titles[@grading_period_index])
+      wait_for_ajax_requests
     end
     GlobalGrades.get_score_for_course(@course)
   end
