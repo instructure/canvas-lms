@@ -203,4 +203,24 @@ describe "new account user search" do
     expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
   end
 
+  it "should open the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
+    conv_user = user_with_pseudonym(:account => @account, :name => "Conversation User")
+
+    get "/accounts/#{@account.id}/users"
+
+    fj("[data-automation='users list'] tr:contains('#{conv_user.name}') [role=button]:has([name='IconMessageLine'])")
+      .click
+    expect(f('.message-header-input .ac-token')).to include_text conv_user.name
+  end
+
+  it "should open the edit user modal when clicking the edit user button", priority: "1", test_id: 3453436 do
+    edit_user = user_with_pseudonym(:account => @account, :name => "Edit User")
+
+    get "/accounts/#{@account.id}/users"
+
+    fj("[data-automation='users list'] tr:contains('#{edit_user.name}') [role=button]:has([name='IconEditLine'])").click
+
+    expect(fj('label:contains("Full Name") input').attribute('value')).to eq("Edit User")
+  end
+
 end
