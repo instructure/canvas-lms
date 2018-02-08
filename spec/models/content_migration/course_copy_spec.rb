@@ -750,5 +750,15 @@ describe ContentMigration do
       expect(new_tag1).to be_published
       expect(new_tag2).to be_unpublished
     end
+
+    it "shouldn't try to translate links to similarishly looking urls" do
+      body = %{<p>link to external thing <a href="https://someotherexampledomain.com/users/what">sad</a></p>}
+      page = @copy_from.wiki_pages.create!(:title => "some page", :body => body)
+
+      run_course_copy
+
+      page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
+      expect(page_to.body).to eq body
+    end
   end
 end
