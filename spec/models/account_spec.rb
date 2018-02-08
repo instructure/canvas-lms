@@ -1645,4 +1645,6 @@ describe Account do
 
     expect(Account.default.settings[:blah]).to eq true
   end
+
+  it_behaves_like 'a learning outcome context'
 end

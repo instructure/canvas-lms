@@ -35,6 +35,8 @@ describe Course do
       expect(course.tool_proxies.size).to eq 1
     end
   end
+
+  it_behaves_like 'a learning outcome context'
 end
 
 describe Course do
