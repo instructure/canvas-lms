@@ -1877,7 +1877,7 @@ import 'compiled/jquery.rails_flash_notifications'
       $icon.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
     } else if ($icon.hasClass('icon-arrow-open-down')) {
       $icon.removeClass('icon-arrow-open-down').addClass('icon-arrow-open-right');
-    }   
+    }
   };
   function init_icon_status(button){
     button.removeClass('icon-arrow-open-right').addClass('icon-arrow-open-down');
@@ -2181,7 +2181,9 @@ import 'compiled/jquery.rails_flash_notifications'
       var new_module = workflow_modules.find(function (flow) {
         return flow[1] != "completed" ;
       });
-      currentModules.push(new_module[0]);
+      if (new_module) {
+        currentModules.push(new_module[0]);
+      }
     }
     for(var idx in currentModules) {
       let $cm = $("#context_module_" + currentModules[idx])
