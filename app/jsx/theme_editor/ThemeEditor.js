@@ -20,7 +20,7 @@ import I18n from 'i18n!theme_editor'
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from 'underscore'
+import _ from 'lodash'
 import preventDefault from 'compiled/fn/preventDefault'
 import Progress from 'compiled/models/Progress'
 import customTypes from './PropTypes'
@@ -84,13 +84,31 @@ export default class ThemeEditor extends React.Component {
     refactorEnabled: false
   }
 
-  state = {
-    changedValues: {},
-    showProgressModal: false,
-    progress: 0,
-    sharedBrandConfigBeingEdited: readSharedBrandConfigBeingEditedFromStorage(),
-    showSubAccountProgress: false,
-    activeSubAccountProgresses: []
+  state = {}
+
+  constructor(props) {
+    super()
+    const {variableSchema, brandConfig} = props
+    const theme = _.flatMap(variableSchema, s => s.variables).reduce(
+      (acc, next) => ({
+        ...acc,
+        ...{[next.variable_name]: next.default}
+      }),
+      {}
+    )
+
+    this.state = {
+      themeStore: {
+        properties: {...theme, ...brandConfig.variables},
+        files: []
+      },
+      changedValues: {},
+      showProgressModal: false,
+      progress: 0,
+      sharedBrandConfigBeingEdited: readSharedBrandConfigBeingEditedFromStorage(),
+      showSubAccountProgress: false,
+      activeSubAccountProgresses: []
+    }
   }
 
   onProgress = data => {
@@ -145,8 +163,20 @@ export default class ThemeEditor extends React.Component {
     return val
   }
 
+  handleThemeStateChange = (key, value) => {
+    this.setState({
+      themeStore: {
+        properties: {
+          ...this.state.themeStore.properties,
+          ...{[key]: value}
+        },
+        files: this.state.themeStore.files
+      }
+    })
+  }
+
   somethingHasChanged = () =>
-    _.any(
+    _.some(
       this.state.changedValues,
       (change, key) =>
         // null means revert an unsaved change (should revert to saved brand config or fallback to default and not flag as a change)
