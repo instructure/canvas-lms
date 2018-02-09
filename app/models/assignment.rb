@@ -112,6 +112,27 @@ class Assignment < ActiveRecord::Base
     @content_library_sync = false
   end
 
+  def self.zero_overdue_participation
+    Course.active.all.each do |course|
+      course.assignments.published.where("title LIKE 'Course Participation%'").each do |participation_assignment|
+        course.students.each do |student|
+          overridden = participation_assignment.overridden_for(student)
+          effective_due_at = overridden.due_at
+          effective_due_at = participation_assignment.due_at if overridden.due_at.nil?
+
+          if !effective_due_at.nil? && effective_due_at < DateTime.now
+            submission = participation_assignment.find_or_create_submission(student)
+            if submission.grade.nil?
+              Rails.logger.debug("zero applied to #{student.email} on #{participation_assignment.title} because overdue with no attempt to start")
+
+              participation_assignment.grade_student(student, {:grade => 0, :suppress_notification => true })
+            end
+          end
+        end
+      end
+    end
+  end
+
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
   ).freeze
