@@ -469,6 +469,7 @@ class GroupsController < ApplicationController
     @group = @context.groups.temp_record(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
+      @group.set_default_account
       if (sis_id = params.delete :sis_group_id)
         if @group.root_account.grants_right?(@current_user, :manage_sis)
           @group.sis_source_id = sis_id
