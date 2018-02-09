@@ -290,9 +290,10 @@ class PlannerOverridesController < ApplicationController
 
   def planner_items
     collections = [*assignment_collections,
-                    planner_note_collection,
-                    page_collection,
-                    ungraded_discussion_collection]
+                   ungraded_quiz_collection,
+                   planner_note_collection,
+                   page_collection,
+                   ungraded_discussion_collection]
     BookmarkedCollection.merge(*collections)
   end
 
@@ -310,28 +311,30 @@ class PlannerOverridesController < ApplicationController
     #
     # grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     # moderation = @current_user.assignments_needing_moderation(default_opts)
-    submitting = @current_user.assignments_needing_submitting(default_opts).
-      preload(:quiz, :discussion_topic)
-    ungraded_quiz = @current_user.ungraded_quizzes(default_opts)
-    submitted = @current_user.submitted_assignments(default_opts).preload(:quiz, :discussion_topic)
-    scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
-              submitting: submitting}
+    viewing = @current_user.assignments_for_student('viewing', default_opts).preload(:quiz, :discussion_topic)
+    scopes = {viewing: viewing}
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading
     # scopes[:moderation] = moderation if moderation
     collections = []
     scopes.each do |scope_name, scope|
       next unless scope
-      base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
-      collections << item_collection(scope_name.to_s, scope, base_model, [:due_at, :created_at], :id)
+      collections << item_collection(scope_name.to_s,
+        scope,
+        Assignment, [:due_at, :created_at], :id)
     end
     collections
   end
 
+  def ungraded_quiz_collection
+    item_collection('ungraded_quizzes',
+                    @current_user.ungraded_quizzes(default_opts),
+                    Quizzes::Quiz, [:due_at, :created_at], :id)
+  end
+
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
-                    @current_user.discussion_topics_needing_viewing(scope_only: true, include_ignored: true,
-                      due_before: end_date, due_after: start_date).
+                    @current_user.discussion_topics_needing_viewing(default_opts).
                       unread_for(@current_user),
                     DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
   end

@@ -2097,7 +2097,7 @@ class Assignment < ActiveRecord::Base
   scope :with_submissions, -> { preload(:submissions) }
 
   scope :with_submissions_for_user, lambda { |user|
-    eager_load(:submissions).where(submissions: {user_id: user})
+    joins(:submissions).where(submissions: {user_id: user})
   }
 
   scope :starting_with_title, lambda { |title|

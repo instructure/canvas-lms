@@ -55,7 +55,7 @@ module UserLearningObjectScopes
       end
 
       if opts[:only_favorites]
-        course_ids = course_ids & favorite_context_ids("Course")
+        course_ids &= favorite_context_ids("Course")
       end
 
       if opts[:contexts]
@@ -65,52 +65,26 @@ module UserLearningObjectScopes
     end
   end
 
-  def assignments_needing(purpose, participation_type, expires_in, opts={})
+  def objects_needing(object_type, purpose, participation_type, expires_in, opts={})
     original_shard = Shard.current
     shard.activate do
       course_ids = course_ids_for_todo_lists(participation_type, opts)
       opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored,
-        :include_locked, :include_concluded, :scope_only, :only_favorites, :needing_submitting))
-
-      if opts[:scope_only]
-        Shard.partition_by_shard(course_ids) do |shard_course_ids|
-          next unless Shard.current == original_shard
-          return yield(*arguments_for_assignments_needing(purpose, shard_course_ids, opts))
-        end
-        return Assignment.none # fallback
-      else
-        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
-        Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
-          result = Shackles.activate(:slave) do
-            Shard.partition_by_shard(course_ids) do |shard_course_ids|
-              yield(*arguments_for_assignments_needing(purpose, shard_course_ids, opts))
-            end
-          end
-          result = result[0...opts[:limit]] if opts[:limit]
-          result
-        end
-      end
-    end
-  end
-
-  def needing_viewing(object_type, participation_type, expires_in, opts={})
-    original_shard = Shard.current
-    shard.activate do
-      course_ids = course_ids_for_todo_lists(participation_type, opts)
+        :include_locked, :include_concluded, :scope_only, :only_favorites, :needing_submitting, :role))
 
       if opts[:scope_only]
         Shard.partition_by_shard(course_ids) do |shard_course_ids|
           next unless Shard.current == original_shard # only provide scope on current shard
-          return yield(*arguments_for_needing_viewing(object_type, shard_course_ids, opts))
+          return yield(*arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts))
         end
-        return object_type.constantize.none
+        return object_type.constantize.none # fallback
       else
-        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join(','))
-        cache_key = [self, "#{object_type.underscore}_needing_viewing", course_ids_cache_key, opts].cache_key
-        Rails.cache.fetch(cache_key, :expires_in => expires_in) do
+        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
+        cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, opts].cache_key
+        Rails.cache.fetch(cache_key, expires_in: expires_in) do
           result = Shackles.activate(:slave) do
             Shard.partition_by_shard(course_ids) do |shard_course_ids|
-              yield(*arguments_for_needing_viewing(object_type, shard_course_ids, opts))
+              yield(*arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts))
             end
           end
           result = result[0...opts[:limit]] if opts[:limit]
@@ -120,69 +94,54 @@ module UserLearningObjectScopes
     end
   end
 
-  def arguments_for_assignments_needing(purpose, shard_course_ids, opts)
-    scope = nil
-    if opts[:ungraded_quizzes]
-      scope = Quizzes::Quiz.where(context_type: 'Course', context_id: shard_course_ids).
-        not_for_assignment
-      scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
-    else
-      scope = Assignment.for_course(shard_course_ids)
-      scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
+  def arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts)
+    scope = object_type.constantize
+    scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
+    scope = scope.for_course(shard_course_ids) if ['Assignment', 'Quizzes::Quiz'].include?(object_type)
+    if object_type == 'Assignment'
+      scope = participation_type == :student ? scope.published : scope.active
+      scope = scope.expecting_submission unless opts[:include_ungraded]
     end
-    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
+    [scope, opts.merge(shard_course_ids: shard_course_ids)]
   end
 
-  def arguments_for_needing_viewing(object_type, shard_course_ids, opts)
-    scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
-    scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
-    scope = scope.todo_date_between(opts[:due_after], opts[:due_before])
-    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
+  def assignments_for_student(purpose, opts={})
+    opts[:due_after] ||= 2.weeks.ago
+    opts[:due_before] ||= 2.weeks.from_now
+    cache_timeout = opts[:cache_timeout] || 120.minutes
+    objects_needing('Assignment', purpose, :student, cache_timeout, opts) do |assignment_scope, options|
+      assignments = assignment_scope.due_between_with_overrides(options[:due_after], options[:due_before])
+      assignments = assignments.filter_by_visibilities_in_given_courses(id, options[:shard_course_ids])
+      assignments = assignments.need_submitting_info(id, options[:limit]) if purpose == 'submitting'
+      assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
+      assignments = assignments.not_locked unless options[:include_locked]
+      assignments
+    end
   end
 
   def assignments_needing_submitting(opts={})
-    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, options|
-      due_after = options[:due_after] || 4.weeks.ago
-      due_before = options[:due_before] || 1.week.from_now
-
-      assignments = assignment_scope.
-        filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
-        published.
-        due_between_with_overrides(due_after, due_before).
-        need_submitting_info(id, options[:limit])
-      assignments = assignments.expecting_submission unless options[:include_ungraded]
-      assignments = assignments.not_locked unless options[:include_locked]
-      if options[:scope_only]
-        assignments.for_course(options[:shard_course_ids])
-      else
-        select_available_assignments(assignments, options).reject { |a| a.due_at && a.due_at < Time.now && !a.expects_submission? }
-      end
+    opts[:due_after] ||= 4.weeks.ago
+    opts[:due_before] ||= 1.week.from_now
+    opts[:cache_timeout] = 15.minutes
+    assignments = assignments_for_student('submitting', opts)
+    return assignments if opts[:scope_only]
+    select_available_assignments(assignments, opts).reject do |a|
+      a.due_at && a.due_at < Time.zone.now && !a.expects_submission?
     end
   end
 
   def submitted_assignments(opts={})
-    assignments_needing('submitted', :student, 120.minutes, opts) do |assignment_scope, options|
-      due_after = options[:due_after] || 2.weeks.ago
-      due_before = options[:due_before] || 2.weeks.from_now
-
-      as = assignment_scope.active
-      as = as.expecting_submission unless options[:include_ungraded]
-      as = as.not_locked unless options[:include_locked]
-      as = as.filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
-        published.
-        due_between_with_overrides(due_after, due_before).
-        having_submissions_for_user(id).
-        group('submissions.id')
-      options[:scope_only] ? as : select_available_assignments(as, options)
-    end
+    assignments = assignments_for_student('submitted', opts)
+    return assignments if opts[:scope_only]
+    select_available_assignments(assignments, opts)
   end
 
   def ungraded_quizzes(opts={})
-    assignments_needing('submitting', :student, 15.minutes, opts.merge(:ungraded_quizzes => true)) do |quiz_scope, options|
-      due_after = options[:due_after] || Time.now
+    objects_needing('Quizzes::Quiz', 'viewing', :student, 15.minutes, opts.merge(:ungraded_quizzes => true)) do |quiz_scope, options|
+      due_after = options[:due_after] || Time.zone.now
       due_before = options[:due_before] || 1.week.from_now
 
-      quizzes = quiz_scope.
+      quizzes = quiz_scope.not_for_assignment.
         visible_to_students_in_course_with_da(self.id, options[:shard_course_ids])
       quizzes = quizzes.not_locked unless opts[:include_locked]
       quizzes = quizzes.
@@ -191,7 +150,7 @@ module UserLearningObjectScopes
         preload(:context)
       quizzes = quizzes.need_submitting_info(id, options[:limit]) if options[:needing_submitting]
       if options[:scope_only]
-        quizzes.for_course(options[:shard_course_ids])
+        quizzes
       else
         select_available_assignments(quizzes, options)
       end
@@ -241,21 +200,21 @@ module UserLearningObjectScopes
 
   def assignments_needing_grading(opts={})
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    assignments_needing('grading', :instructor, 120.minutes, opts) do |assignment_scope, opts|
+    objects_needing('Assignment', 'grading', :instructor, 120.minutes, opts) do |assignment_scope, options|
       as = assignment_scope.active.
         expecting_submission.
         need_grading_info
       ActiveRecord::Associations::Preloader.new.preload(as, :context)
-      if opts[:scope_only]
+      if options[:scope_only]
         as # This needs the below `select` somehow to work
       else
-        as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
+        as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(options[:limit]).to_a
       end
     end
   end
 
   def assignments_needing_moderation(opts={})
-    assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, options|
+    objects_needing('Assignment', 'moderation', :instructor, 120.minutes, opts) do |assignment_scope, options|
       scope = assignment_scope.active.
         expecting_submission.
         where(:moderated_grading => true).
@@ -272,14 +231,22 @@ module UserLearningObjectScopes
   end
 
   def discussion_topics_needing_viewing(opts={})
-    needing_viewing('DiscussionTopic', :student, 120.minutes, opts) do |topics_context, options|
-      topics_context.active.published
+    objects_needing('DiscussionTopic', 'viewing', :student, 120.minutes, opts) do |topics_context, options|
+      topics_context.
+        active.
+        published.
+        for_courses_and_groups(options[:shard_course_ids], cached_current_group_memberships.pluck(:group_id)).
+        todo_date_between(opts[:due_after], opts[:due_before])
     end
   end
 
   def wiki_pages_needing_viewing(opts={})
-    needing_viewing('WikiPage', :student, 120.minutes, opts) do |wiki_pages_context, options|
-      wiki_pages_context.available_to_planner.visible_to_user(self)
+    objects_needing('WikiPage', 'viewing', :student, 120.minutes, opts) do |wiki_pages_context, options|
+      wiki_pages_context.
+        available_to_planner.
+        visible_to_user(self).
+        for_courses_and_groups(options[:shard_course_ids], cached_current_group_memberships.pluck(:group_id)).
+        todo_date_between(opts[:due_after], opts[:due_before])
     end
   end
 
@@ -290,13 +257,17 @@ module UserLearningObjectScopes
       {
         submitted: Set.new(submitted_assignments(opts).pluck(:id)),
         excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
-        graded: Set.new(Submission.active.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
+        graded: Set.new(Submission.active.with_assignment.where(user_id: self).
+          where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").
+          pluck(:assignment_id)),
         late: Set.new(Submission.active.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
         missing: Set.new(Submission.active.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
         needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
-        # distinguishes between assignment being graded and having feedback comments, but cannot discern new feedback and new grades if there is already feedback.
-        # that's OK for now, since the "New" was removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there is _any_ feedback or grade.
-        has_feedback: Set.new((self.recent_feedback(start_at: opts[:due_after]).select { |feedback| feedback[:submission_comments_count].to_i > 0 }).pluck(:assignment_id)),
+        # distinguishes between assignment being graded and having feedback comments, but cannot discern
+        # new feedback and new grades if there is already feedback. that's OK for now, since the "New" was
+        # removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there is _any_ feedback or grade.
+        has_feedback: Set.new((self.recent_feedback(start_at: opts[:due_after]).
+          select { |feedback| feedback[:submission_comments_count].to_i > 0 }).pluck(:assignment_id)),
         new_activity: Set.new(Submission.active.with_assignment.unread_for(self).pluck(:assignment_id))
       }.with_indifferent_access
     end
