@@ -185,7 +185,7 @@ export class UpdateItemTray extends Component {
         nextLabel={formatMessage("Next Month")}
         previousLabel={formatMessage("Previous Month")}
         locale={this.props.locale}
-        timeZone={this.props.timeZone}
+        timezone={this.props.timeZone}
         placement="start"
         dateValue={this.state.updates.date}
         onDateChange={this.handleDateChange}

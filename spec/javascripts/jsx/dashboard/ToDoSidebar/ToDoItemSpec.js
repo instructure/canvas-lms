@@ -109,7 +109,11 @@ test('renders out the due date in the proper format', () => {
     <ToDoItem {...getDefaultProps()} />
   );
   const info = wrapper.find('.ToDoSidebarItem__Info');
-  ok(info.text().match(/Jul 15 at {2}8:00pm/));
+  // The due date in was '2017-07-15T20:00:00-0600'
+  // since this test is not running in canvas,
+  // the user's profile TZ will default to UTC
+  // and the output will be 6 hours later
+  ok(info.text().indexOf('Jul 16 at  2:00am') > 0);
 });
 
 test('renders the title as a Link when given an href prop', () => {

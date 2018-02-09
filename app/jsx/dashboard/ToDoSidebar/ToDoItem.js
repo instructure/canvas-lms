@@ -32,6 +32,7 @@ import PageIcon from 'instructure-icons/lib/Line/IconMsWordLine';
 import XIcon from 'instructure-icons/lib/Line/IconDiscussionXLine';
 import I18n from 'i18n!todo_sidebar';
 import { func, object, arrayOf, number, string } from 'prop-types';
+import tz from 'timezone_core';
 
 const getIconComponent = (itemType) => {
   switch (itemType) {
@@ -66,13 +67,15 @@ const getInformationRow = (dueAt, points) => {
       </ListItem>
     );
   }
+
+  const dueAtObj = new Date(dueAt);
+  const date = tz.format(dueAtObj, I18n.lookup('date.formats.short'), ENV.TIMEZONE);
+  const time = tz.format(dueAtObj, I18n.lookup('time.formats.tiny'), ENV.TIMEZONE);
+
   toDisplay.push(
     <ListItem key="date">
       {
-        I18n.t('%{date} at %{time}', {
-          date: I18n.l('#date.formats.short', dueAt),
-          time: I18n.l('#time.formats.tiny', dueAt)
-        })
+        I18n.t('%{date} at %{time}', {date, time})
       }
     </ListItem>
   );

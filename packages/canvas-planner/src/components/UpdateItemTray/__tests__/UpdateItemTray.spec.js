@@ -167,6 +167,13 @@ xit('clears the error message when a date is typed in', () => {
   expect(dateInput.props().messages).toEqual([]);
 });
 
+it('respects the provided timezone', () => {
+  const item = { title: '', date: '2017-04-25 12:00:00-0300' };
+  const wrapper = mount(<UpdateItemTray {...defaultProps} noteItem={item} />);
+  const d = wrapper.find('DateInput').find('TextInput').props().value;
+  expect(d).toEqual('April 26, 2017');  // timezone shift from -3 to +9 pushes it to the next day
+});
+
 it('changes state when new date is typed in', () => {
   const noteItem = {
     title: 'Planner Item',
