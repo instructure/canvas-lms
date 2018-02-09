@@ -382,6 +382,120 @@ module Lti
         end
       end
 
+      describe '#index' do
+        let(:url) do
+          Rails.application.routes.url_helpers.lti_line_item_index_path(
+            course_id: course.id,
+          )
+        end
+
+        # The following "let!" declarations are used to provide a
+        # diverse pool of line items when testing the queries in
+        # the specs that follow.
+        let!(:line_item) do
+          line_item_model(
+            overrides: {
+              assignment: assignment
+            }
+          )
+        end
+
+        let!(:line_item_with_tag) do
+          line_item_model(
+            overrides: {
+              assignment: assignment,
+              tag: tag
+            }
+          )
+        end
+
+        let!(:line_item_with_resource_id) do
+          line_item_model(
+            overrides: {
+              assignment: assignment,
+              resource_id: resource_id
+            }
+          )
+        end
+
+        let!(:line_item_with_lti_link_id) do
+          line_item_model(
+            overrides: {
+              assignment: assignment,
+              resource_link: resource_link
+            }
+          )
+        end
+
+        let(:line_item_list) do
+          parsed_response_body.map { |li| LineItem.find(li['id'].split('/').last) }
+        end
+
+        it 'does not include line items not owned by the tool'
+        it 'responds with 404 if context does not exist' do
+          bad_url = Rails.application.routes.url_helpers.lti_line_item_index_path(
+            course_id: course.id + 50,
+          )
+          get bad_url, headers: request_headers
+          expect(response).to be_not_found
+        end
+
+        it 'includes all associated line items in the course' do
+          get url, headers: request_headers
+          expect(line_item_list).to match_array([
+            line_item,
+            line_item_with_tag,
+            line_item_with_resource_id,
+            line_item_with_lti_link_id
+          ])
+        end
+
+        it 'correctly queries by tag' do
+          get url, params: {tag: tag}, headers: request_headers
+          expect(line_item_list).to match_array([
+            line_item_with_tag
+          ])
+        end
+
+        it 'correctly queries by resource_id' do
+          get url, params: {resource_id: resource_id}, headers: request_headers
+          expect(line_item_list).to match_array([
+            line_item_with_resource_id
+          ])
+        end
+
+        it 'correctly queries by lti_link_id' do
+          get url, params: {lti_link_id: resource_link.resource_link_id}, headers: request_headers
+          expect(line_item_list).to match_array([
+            line_item_with_lti_link_id
+          ])
+        end
+
+        it 'allows querying by multiple valid fields at the same time' do
+          tag_and_resource = line_item_model(
+            overrides: {
+              assignment: assignment,
+              tag: tag,
+              resource_id: resource_id
+            }
+          )
+          get url, params: {tag: tag, resource_id: resource_id}, headers: request_headers
+          expect(line_item_list).to match_array([
+            tag_and_resource
+          ])
+        end
+
+        it 'responds with the correct mime type' do
+          get url, headers: request_headers
+          expect(response.headers['Content-Type']).to include described_class::CONTAINER_MIME_TYPE
+        end
+
+        it 'includes pagination headers' do
+          get url, headers: request_headers
+          expect(response.headers.key?('Link')).to eq true
+        end
+      end
+
       describe 'destroy' do
         shared_examples 'the line item destroy endpoint' do
           let(:line_item) { raise 'override in spec' }

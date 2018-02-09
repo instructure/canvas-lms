@@ -58,6 +58,10 @@ module Lti::Ims::Concerns
         render json: error_response, status: :precondition_failed
       end
 
+      def pagination_args
+        params[:limit] ? { per_page: params[:limit] } : {}
+      end
+
       def verify_line_item_in_context
         line_item_context_id = Assignment.where(id: line_item.assignment_id).pluck(:context_id).first
         raise ActiveRecord::RecordNotFound if line_item_context_id != params[:course_id].to_i || context.blank?

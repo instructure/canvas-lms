@@ -142,6 +142,32 @@ module Lti
                content_type: MIME_TYPE
       end
 
+      # @API List line Items
+      #
+      # @argument tag [String]
+      #   If specified only Line Items with this tag will be included.
+      #
+      # @argument resouce_id [String]
+      #   If specified only Line Items with this resource_id will be included.
+      #
+      # @argument lti_link_id [String]
+      #   If specified only Line Items attached to the specified lti_link_id will be included.
+      #
+      # @argument limit [String]
+      #   May be used to limit the number of Line Items returned in a page
+      #
+      # @returns LineItem
+      def index
+        line_items = Api.paginate(
+          Lti::LineItem.where(index_query),
+          self,
+          lti_line_item_index_url(course_id: context.id),
+          pagination_args
+        )
+        render json: line_item_collection(line_items),
+               content_type: CONTAINER_MIME_TYPE
+      end
+
       # @API Delete a Line Item
       # Delete an existing Line Item
       #
@@ -192,6 +218,21 @@ module Lti
       def resource_link
         # TODO: Create an Lti::ResourceLink when a 1.3 tool is associated with an assignment
         @_resource_link ||= ResourceLink.find_by(resource_link_id: params[:ltiLinkId])
+      end
+
+      def index_query
+        assignments = Assignment.where(context: context)
+        # TODO: only show line items that belong to the current tool.
+        {
+          assignment: assignments,
+          tag: params[:tag],
+          resource_id: params[:resource_id],
+          lti_resource_link_id: Lti::ResourceLink.find_by(resource_link_id: params[:lti_link_id])
+        }.compact
+      end
+
+      def line_item_collection(line_items)
+        line_items.map { |li| LineItemsSerializer.new(li, line_item_id(li)) }
       end
     end
   end
