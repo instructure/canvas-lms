@@ -30,6 +30,14 @@
 <% end %>
 <% js_bundle 'legacy/rubrics_show' %>
 <h2><%= @actual_rubric.title %></h2>
+<script>
+  // this is to disable a really annoying scroll to top on an interval
+  // that i can't find the source of to disable.
+  Object.defineProperty(document.documentElement, "scrollTop", {
+    get: function() { return 0; },
+    set: function() { console.log("set scrollTop suppressed"); }
+  });
+</script>
 <div id="rubrics" class="raw_listing">
   <% [@actual_rubric].each do |rubric| %>
     <%= render :partial => "shared/rubric", :object => rubric, :locals => {:association => @account, :editable => can_do(rubric, @current_user, :update), :edit_view => true, :for_context => true} %>
