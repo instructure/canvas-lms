@@ -211,7 +211,7 @@ describe "master courses sidebar" do
       inmsg = '1234567890123456789012345678901234567890'
       open_blueprint_sidebar
       # if the default ever changes in MigrationOptions, make sure our spec still works
-      driver.execute_script('ENV.MIGRATION_OPTIONS_SR_ALERT_TIMEOUT = 10')
+      driver.execute_script('ENV.MIGRATION_OPTIONS_SR_ALERT_TIMEOUT = 15')
       send_notification_checkbox.click
       add_message_checkbox.click
       # we don't start adding the message until 90% full
