@@ -388,6 +388,16 @@ describe "Groups API", type: :request do
     expect(project_groups.groups.active.count).to eq 1
   end
 
+  it "should allow using group category sis id" do
+    @account = Account.default
+    account_admin_user(account: @account)
+    project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
+    api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
+             @category_path_options.merge(action: :create,
+                                          group_category_id: 'sis_group_category_id:gcsis1'))
+    expect(project_groups.groups.active.count).to eq 1
+  end
+
   it "should not allow a non-admin to create a group in a account" do
     @account = Account.default
     project_groups = @account.group_categories.build

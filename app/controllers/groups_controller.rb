@@ -445,7 +445,7 @@ class GroupsController < ApplicationController
 
     if api_request?
       if params[:group_category_id]
-        group_category = GroupCategory.active.find(params[:group_category_id])
+        group_category = api_find(GroupCategory.active, params[:group_category_id])
         return render :json => {}, :status => bad_request unless group_category
         @context = group_category.context
         attrs[:group_category] = group_category
