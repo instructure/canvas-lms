@@ -33,7 +33,7 @@ describe ContentMigration do
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
                                                    :pinned => true, :discussion_type => "threaded",
-                                                   :require_initial_post => true)
+                                                   :require_initial_post => true, :locked => true)
       todo_date = 1.day.from_now
       topic.todo_date = todo_date
       topic.posted_at = 2.days.ago
@@ -45,8 +45,8 @@ describe ContentMigration do
       expect(@copy_to.discussion_topics.count).to eq 1
       new_topic = @copy_to.discussion_topics.first
 
-      attrs = ["title", "message", "discussion_type", "type", "pinned", "position", "require_initial_post"]
-      expect(topic.attributes.slice(*attrs)).to eq new_topic.attributes.slice(*attrs)
+      attrs = ["title", "message", "discussion_type", "type", "pinned", "position", "require_initial_post", "locked"]
+      expect(new_topic.attributes.slice(*attrs)).to eq topic.attributes.slice(*attrs)
 
       expect(new_topic.last_reply_at).to be_nil
       expect(new_topic.allow_rating).to eq false
