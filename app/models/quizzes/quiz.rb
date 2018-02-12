@@ -1270,7 +1270,11 @@ class Quizzes::Quiz < ActiveRecord::Base
         version_number: self.version_number
       }
       if current_quiz_question_regrades.present?
-        Quizzes::QuizRegrader::Regrader.send_later(:regrade!, options)
+        Quizzes::QuizRegrader::Regrader.send_later_enqueue_args(
+          :regrade!,
+          { strand: "quiz:#{self.global_id}:regrading"},
+          options
+        )
       end
     end
     true
