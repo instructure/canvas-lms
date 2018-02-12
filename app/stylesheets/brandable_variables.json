@@ -153,6 +153,12 @@
     "default": "/images/login/canvas-logo.svg"
   },
   {
+    "variable_name": "ic-brand-Login-logo@2x",
+    "type": "image",
+    "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
+    "default": "/images/login/canvas-logo@2x.png"
+  },
+  {
     "variable_name": "ic-brand-Login-Content-bgd-color",
     "type": "color",
     "default": "none"
