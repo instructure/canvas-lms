@@ -24,6 +24,8 @@ module Types
     field :submittedAt, TimeType, property: :submitted_at
     field :gradedAt, TimeType, property: :graded_at
 
+    field :state, SubmissionStateType, property: :workflow_state
+
     field :submissionStatus, types.String, resolve: ->(submission, _, _) {
       if submission.submission_type == "online_quiz"
         Loaders::AssociationLoader.for(Submission, :quiz_submission).

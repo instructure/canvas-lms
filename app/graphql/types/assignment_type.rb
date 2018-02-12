@@ -105,17 +105,22 @@ module Types
 
     connection :submissionsConnection, SubmissionType.connection_type do
       description "submissions for this assignment"
-      resolve ->(assignment, _, ctx) {
+      argument :filter, SubmissionFilterInputType
+
+      resolve ->(assignment, args, ctx) {
         current_user = ctx[:current_user]
         session = ctx[:session]
         course = assignment.course
 
+        submissions = assignment.submissions.where(
+          workflow_state: (args[:filter] || {})[:states] || DEFAULT_SUBMISSION_STATES
+        )
+
         if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-          # a user can see all submissions
-          assignment.submissions.where.not(workflow_state: "unsubmitted")
+          submissions
         elsif course.grants_right?(current_user, session, :read_grades)
           # a user can see their own submission
-          assignment.submissions.where(user_id: current_user.id).where.not(workflow_state: "unsubmitted")
+          submissions.where(user_id: current_user.id)
         end
       }
     end

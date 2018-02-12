@@ -53,6 +53,7 @@ type Assignment implements Node, Timestamped {
 
     # Returns the elements in the list that come before the specified global ID.
     before: String
+    filter: SubmissionFilter
 
     # Returns the first _n_ elements from the list.
     first: Int
@@ -275,6 +276,7 @@ type Course implements Node, Timestamped {
 
     # Returns the elements in the list that come before the specified global ID.
     before: String
+    filter: SubmissionFilter
 
     # Returns the first _n_ elements from the list.
     first: Int
@@ -616,6 +618,7 @@ type Submission implements Node, Timestamped {
   gradingStatus: String
   id: ID!
   score: Float
+  state: SubmissionState
   submissionStatus: String
   submittedAt: Time
   updatedAt: Time
@@ -640,6 +643,10 @@ type SubmissionEdge {
   node: Submission
 }
 
+input SubmissionFilter {
+  states: [SubmissionState!] = [submitted, pending_review, graded]
+}
+
 input SubmissionOrderCriteria {
   direction: OrderDirection
   field: SubmissionOrderField!
@@ -648,6 +655,14 @@ input SubmissionOrderCriteria {
 enum SubmissionOrderField {
   _id
   gradedAt
+}
+
+enum SubmissionState {
+  deleted
+  graded
+  pending_review
+  submitted
+  unsubmitted
 }
 
 # Types of submissions an assignment accepts

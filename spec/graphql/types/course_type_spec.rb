@@ -116,6 +116,20 @@ describe Types::CourseType do
         ]
       end
     end
+
+    context "filtering" do
+      it "allows filtering submissions by their state" do
+        expect(
+          course_type.submissionsConnection(
+            current_user: @teacher,
+            args: {
+              studentIds: [@student1.id.to_s],
+              filter: {states: %[unsubmitted]}
+            }
+          )
+        ).to eq [ ]
+      end
+    end
   end
 
   describe "usersConnection" do
