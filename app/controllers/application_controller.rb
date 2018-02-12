@@ -114,7 +114,7 @@ class ApplicationController < ActionController::Base
   #     require ['ENV'], (ENV) ->
   #       ENV.FOO_BAR #> [1,2,3]
   #
-  def js_env(hash = {})
+  def js_env(hash = {}, overwrite = false)
     return {} unless request.format.html? || @include_js_env
     # set some defaults
     unless @js_env
@@ -171,7 +171,7 @@ class ApplicationController < ActionController::Base
     end
 
     hash.each do |k,v|
-      if @js_env[k]
+      if @js_env[k] && !overwrite
         raise "js_env key #{k} is already taken"
       else
         @js_env[k] = v
