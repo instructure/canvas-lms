@@ -19,6 +19,11 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
+  def explain(arel, binds = [], analyze: false)
+    sql = "EXPLAIN #{"ANALYZE " if analyze}#{to_sql(arel, binds)}"
+    ActiveRecord::ConnectionAdapters::PostgreSQL::ExplainPrettyPrinter.new.pp(exec_query(sql, "EXPLAIN", binds))
+  end
+
   def readonly?(table = nil, column = nil)
     return @readonly unless @readonly.nil?
     @readonly = (select_value("SELECT pg_is_in_recovery();") == true)

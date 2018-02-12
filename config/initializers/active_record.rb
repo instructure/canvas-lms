@@ -23,7 +23,7 @@ class ActiveRecord::Base
   public :write_attribute
 
   class << self
-    delegate :distinct_on, :find_ids_in_batches, to: :all
+    delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
     def find_ids_in_ranges(opts={}, &block)
       opts.reverse_merge!(:loose => true)
@@ -1460,3 +1460,37 @@ Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
                 singleton: true,
                 method: :prepend,
                 optional: true)
+
+module ExplainAnalyze
+  def exec_explain(queries, analyze: false) # :nodoc:
+    str = queries.map do |sql, binds|
+      msg = "EXPLAIN #{"ANALYZE " if analyze}for: #{sql}"
+      unless binds.empty?
+        msg << " "
+        msg << binds.map { |attr| render_bind(attr) }.inspect
+      end
+      msg << "\n"
+      msg << connection.explain(sql, binds, analyze: analyze)
+    end.join("\n")
+
+    # Overriding inspect to be more human readable, especially in the console.
+    def str.inspect
+      self
+    end
+
+    str
+  end
+
+  def explain(analyze: false)
+    #TODO: Fix for binds.
+    exec_explain(collecting_queries_for_explain do
+      if block_given?
+        yield
+      else
+        # fold in switchman's override
+        self.activate { |relation| relation.exec_queries }
+      end
+    end, analyze: analyze)
+  end
+end
+ActiveRecord::Relation.prepend(ExplainAnalyze)
