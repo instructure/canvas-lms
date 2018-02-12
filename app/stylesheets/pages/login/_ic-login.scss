@@ -357,7 +357,7 @@ body.ic-Login-Body #footer.ic-Login-footer {
 // Styles specific to the confirmation box, using new UI variables
 ////
 body.body--login-confirmation {
-  background: darken(var(--ic-brand-Login-confirmation-bgd), 3%);
+  background: var(--ic-brand-Login-confirmation-bgd);
 }
 
 .ic-Login-confirmation {
@@ -371,7 +371,7 @@ body.body--login-confirmation {
 }
 
 .ic-Login-confirmation__header {
-  background: var(--ic-brand-Login-confirmation-bgd);
+  background: var(--ic-brand-Login-confirmation-header-bgd);
   border-top-left-radius: $baseBorderRadius;
   border-top-right-radius: $baseBorderRadius;
   padding: $ic-sp*1.5;

@@ -30,7 +30,7 @@
 
 <%= form_tag("/api/v1/users/self", method: "put", class: "reaccept_terms ic-Login-confirmation", id: "modal-box") do %>
   <header class="ic-Login-confirmation__header">
-    <%= image_tag(brand_variable("ic-brand-Login-logo@2x"), :class => "ic-Login-confirmation__logo", :alt => "Canvas by Instructure") %>
+    <%= image_tag(brand_variable("ic-brand-Login-confirmation-logo"), :class => "ic-Login-confirmation__logo", :alt => "Canvas by Instructure") %>
   </header>
   <div class="ic-Login-confirmation__content">
     <h2 class="ic-Login-confirmation__headline"><%= t('Updated Terms of Service') %></h2>

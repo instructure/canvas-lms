@@ -149,19 +149,24 @@
   {
     "variable_name": "ic-brand-Login-confirmation-bgd",
     "type": "color",
+    "default": "#2E3C46"
+  },   
+  {
+    "variable_name": "ic-brand-Login-confirmation-header-bgd",
+    "type": "color",
     "default": "#34444F"
   },  
+  {
+    "variable_name": "ic-brand-Login-confirmation-logo",
+    "type": "image",
+    "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
+    "default": "/images/login/canvas-logo@2x.png"
+  },
   {
     "variable_name": "ic-brand-Login-logo",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
     "default": "/images/login/canvas-logo.svg"
-  },
-  {
-    "variable_name": "ic-brand-Login-logo@2x",
-    "type": "image",
-    "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
-    "default": "/images/login/canvas-logo@2x.png"
   },
   {
     "variable_name": "ic-brand-Login-Content-bgd-color",
