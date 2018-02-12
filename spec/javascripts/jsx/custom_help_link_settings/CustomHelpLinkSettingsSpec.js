@@ -92,4 +92,27 @@ define([
     link.url = 'mailto:test@test.com'
     ok(subject.validate(link))
   })
+
+  test('assigns unique link ids', function() {
+    const subject = this.render({
+      links: [
+        {
+          id: 'link1',
+          available_to: ['student'],
+          text: 'Blah',
+          url: '#blah',
+          type: 'custom'
+        },
+        {
+          id: 'link3',
+          available_to: ['student'],
+          text: 'Bleh',
+          url: '#bleh',
+          type: 'custom'
+        }
+      ]
+    })
+    subject.add({text: 'eh', url: 'ftp://eh', available_to: ['student']})
+    equal(subject.state.links.find(link => link.text === 'eh').id, 'link4')
+  })
 })
