@@ -22,23 +22,39 @@ module Outcomes
     class ParseError < RuntimeError
     end
 
+    OBJECT_ONLY_FIELDS = %i[calculation_method calculation_int ratings].freeze
+    VALID_WORKFLOWS = ['', 'active', 'deleted'].freeze
+
+    def check_object(object)
+      raise ParseError, Messages.field_required('vendor_guid') if object[:vendor_guid].blank?
+      raise ParseError, Messages.vendor_guid_no_spaces if object[:vendor_guid].include? ' '
+      raise ParseError, Messages.field_required('title') if object[:title].blank?
+
+      valid_workflow = VALID_WORKFLOWS.include? object[:workflow_state]
+      raise ParseError, Messages.workflow_state_invalid unless valid_workflow
+    end
+
     def import_object(object)
+      check_object(object)
+
       type = object[:object_type]
       if type == 'outcome'
         import_outcome(object)
       elsif type == 'group'
         import_group(object)
       else
-        raise ParseError, "Invalid object type: #{type}"
+        raise ParseError, Messages.invalid_object_type(type)
       end
     end
 
     def import_group(group)
+      invalid = group.keys.select do |k|
+        group[k].present? && OBJECT_ONLY_FIELDS.include?(k)
+      end
+      raise ParseError, Messages.invalid_group_fields(invalid) if invalid.present?
       parents = find_parents(group)
-      raise ParseError, "An outcome group can only have one parent" if parents.length > 1
+      raise ParseError, Messages.group_single_parent if parents.length > 1
       parent = parents.first
-
-      # OUT-1885 : require title / vendor_guid fields
 
       LearningOutcomeGroup.create!(
         context: @context,
@@ -52,8 +68,6 @@ module Outcomes
 
     def import_outcome(outcome)
       parents = find_parents(outcome)
-
-      # OUT-1885 : require title / vendor_guid fields
 
       imported = LearningOutcome.new(
         context: @context,
@@ -87,10 +101,46 @@ module Outcomes
       return [root_parent] if object[:parent_guids].nil? || object[:parent_guids].blank?
 
       guids = object[:parent_guids].strip.split
-      # OUT-1885 : throw error on missing parents
-      LearningOutcomeGroup.where(plural_vendor_clause(guids))
+      parents = LearningOutcomeGroup.where(plural_vendor_clause(guids)).to_a
+      missing = guids - parents.map(&:vendor_guid)
+      raise ParseError, Messages.missing_parents(missing) if missing.present?
+
+      parents
+    end
+
+    module Messages
+      def self.workflow_state_invalid
+        I18n.t(
+          '"%{field}" must be either "%{active}" or "%{deleted}"',
+          field: 'workflow_state',
+          active: 'active',
+          deleted: 'deleted'
+        )
+      end
+
+      def self.field_required(field)
+        I18n.t('The "%{field}" field is required', field: field)
+      end
+
+      def self.vendor_guid_no_spaces
+        I18n.t('The "%{field}" field must have no spaces', field: 'vendor_guid')
+      end
+
+      def self.invalid_object_type(type)
+        I18n.t('Invalid %{field}: "%{type}"', field: 'object_type', type: type)
+      end
+
+      def self.invalid_group_fields(invalid)
+        I18n.t('Invalid fields for a group: %{invalid}', invalid: invalid.map(&:to_s).inspect)
+      end
+
+      def self.group_single_parent
+        I18n.t('An outcome group can only have one parent')
+      end
+
+      def self.missing_parents(missing)
+        I18n.t('Missing parent groups: %{missing}', missing: missing.inspect)
+      end
     end
   end
-
-  # OUT-1885 : need lots of tests to verify that errors are thrown properly
 end
