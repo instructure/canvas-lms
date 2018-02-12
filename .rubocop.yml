@@ -10,6 +10,8 @@ AllCops:
 # our style changes: disabling style rules we aren't interested in
 Layout/AlignParameters:
   Enabled: false
+Layout/ElseAlignment:
+  Enabled: false
 Layout/EmptyLines:
   Enabled: false
 Layout/EmptyLinesAroundAccessModifier:
