@@ -21,7 +21,7 @@ describe "new account user search" do
   include_context "in-process server selenium tests"
 
   before :once do
-    account_model
+    @account = Account.default
     @account.enable_feature!(:course_user_search)
     account_admin_user(:account => @account, :active_all => true)
   end
@@ -201,6 +201,16 @@ describe "new account user search" do
     fj('[role="menuitem"]:contains("View user groups")').click
 
     expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
+  end
+
+  it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
+    mask_user = user_with_pseudonym(:account => @account, :name => "Mask User", :active_user => true)
+
+    get "/accounts/#{@account.id}/users"
+
+    fj("[data-automation='users list'] tr:contains('#{mask_user.name}') [role=button]:has([name='IconMasqueradeLine'])")
+      .click
+    expect(f('.ActAs__text')).to include_text mask_user.name
   end
 
   it "should open the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
