@@ -148,9 +148,11 @@ class GradebookExporter
             end
           end
           pseudonym = SisPseudonym.for(student, @course, include_root_account)
-          row = [student_name(student), student.id, student.email.blank? ? pseudonym.try(:sis_user_id) : student.email]
-          row << pseudonym.try(:sis_user_id) if include_sis_id
+          sis_user_id = nil
+          sis_user_id = pseudonym.try(:sis_user_id) if include_sis_id
           pseudonym ||= student.find_pseudonym_for_account(@course.root_account, include_root_account)
+          row = [student_name(student), student.id, student.email.blank? ? pseudonym.try(:unique_id) : student.email]
+          row << sis_user_id
           row << pseudonym.try(:unique_id)
           row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_sis_id && include_root_account
           row << student_sections
