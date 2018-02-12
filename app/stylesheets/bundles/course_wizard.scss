@@ -38,7 +38,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: url("/images/wizard-bg.jpg") no-repeat center center;
   background-size: cover;
   transform: translate3d(250%,0,0);
   opacity: 0;
@@ -177,7 +176,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box__headline {
   line-height: 0.85;
-  @include fontSize(36px);
+  @include fontSize(30px);
   text-align: center;
   color: $ic-color-light;
   font-weight: 500;
