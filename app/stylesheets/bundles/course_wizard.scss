@@ -30,7 +30,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box {
   transition: all 1s $ic-transition;
-  width: 100%;
+  width: 30%;
   height: 100%;
   background: $ic-wizard-color-dark-neutral;
   position: fixed;
@@ -40,12 +40,12 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   flex-direction: column;
   background: url("/images/wizard-bg.jpg") no-repeat center center;
   background-size: cover;
-  transform: translate3d(0,100%,0);
+  transform: translate3d(250%,0,0);
   opacity: 0;
-  @include breakpoint(desktop) { flex-direction: row; }
+  @include breakpoint(desktop) { flex-direction: row-reverse; }
 
   .ReactModal__Overlay.ReactModal__Overlay--after-open & {
-    transform: translate3d(0,0,0);
+    transform: translate3d(234%,0,0);
     opacity: 1;
   }
 
