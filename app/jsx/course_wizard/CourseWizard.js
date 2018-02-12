@@ -106,15 +106,6 @@ import 'compiled/jquery.rails_flash_notifications'
           >
             <main role='main'>
               <div ref='wizardBox' className='ic-wizard-box'>
-                <div className='ic-wizard-box__header'>
-                  <a href='/' className='ic-wizard-box__logo-link'>
-                    <span className='screenreader-only'>{I18n.t('My dashboard')}</span>
-                  </a>
-                  <Checklist className='ic-wizard-box__nav'
-                             selectedItem={this.state.selectedItem}
-                             clickHandler={this.checklistClickHandler}
-                  />
-                </div>
                 <div className='ic-wizard-box__main'>
                   <div className='ic-wizard-box__close'>
                     <div className='ic-Expand-link ic-Expand-link--from-right'>
@@ -127,6 +118,12 @@ import 'compiled/jquery.rails_flash_notifications'
                     </div>
                   </div>
                   <InfoFrame className='ic-wizard-box__content' itemToShow={this.state.selectedItem} closeModal={this.closeModal} />
+                </div>
+                <div className='ic-wizard-box__header'>
+                  <Checklist className='ic-wizard-box__nav'
+                             selectedItem={this.state.selectedItem}
+                             clickHandler={this.checklistClickHandler}
+                  />
                 </div>
               </div>
             </main>
