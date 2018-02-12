@@ -92,6 +92,7 @@ class PlannerOverridesController < ApplicationController
   attr_reader :start_date, :end_date, :page, :per_page,
               :include_concluded, :only_favorites
   # @API List planner items
+  # @beta
   #
   # Retrieve the paginated list of objects to be shown on the planner for the
   # current user with the associated planner override to override an item's
@@ -183,6 +184,7 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API List planner overrides
+  # @beta
   #
   # Retrieve a planner override for the current user
   #
@@ -193,6 +195,7 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Show a planner override
+  # @beta
   #
   # Retrieve a planner override for the current user
   #
@@ -208,6 +211,7 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Update a planner override
+  # @beta
   #
   # Update a planner override's visibilty for the current user
   #
@@ -231,6 +235,7 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Create a planner override
+  # @beta
   #
   # Create a planner override for the current user
   #
@@ -266,6 +271,7 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Delete a planner override
+  # @beta
   #
   # Delete a planner override for the current user
   #

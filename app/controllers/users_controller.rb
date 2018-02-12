@@ -1635,7 +1635,9 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API Get dashboard postions
+  # @API Get dashboard positions
+  # @beta
+  #
   # Returns all dashboard positions that have been saved for a user.
   #
   # @example_request
@@ -1659,6 +1661,8 @@ class UsersController < ApplicationController
   end
 
   # @API Update dashboard positions
+  # @beta
+  #
   # Updates the dashboard positions for a user for a given context.  This allows
   # positions for the dashboard cards and elsewhere to be customized on a per
   # user basis.
