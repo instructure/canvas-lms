@@ -65,7 +65,7 @@ class GradebookExporter
     include_sis_id = @options[:include_sis_id]
     CSV.generate do |csv|
       # First row
-      row = ["Student", "ID"]
+      row = ["Student", "ID", "Email"]
       row << "SIS User ID" if include_sis_id
       row << "SIS Login ID"
       row << "Root Account" if include_sis_id && include_root_account
@@ -93,7 +93,7 @@ class GradebookExporter
       # Possible muted row
       if assignments.any?(&:muted)
         # This is is not translated since we look for this exact string when we upload to gradebook.
-        row = [nil, nil, nil, nil]
+        row = [nil, nil, nil, nil, nil]
         row << nil if include_sis_id
         row.concat(assignments.map { |a| 'Muted' if a.muted? })
 
@@ -108,7 +108,7 @@ class GradebookExporter
       end
 
       # Second Row
-      row = ["    Points Possible", nil, nil, nil]
+      row = ["    Points Possible", nil, nil, nil, nil]
       if include_sis_id
         row << nil
         row << nil if include_root_account
@@ -147,7 +147,7 @@ class GradebookExporter
               end
             end
           end
-          row = [student_name(student), student.id]
+          row = [student_name(student), student.id, student.email]
           pseudonym = SisPseudonym.for(student, @course, include_root_account)
           row << pseudonym.try(:sis_user_id) if include_sis_id
           pseudonym ||= student.find_pseudonym_for_account(@course.root_account, include_root_account)
