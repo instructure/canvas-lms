@@ -118,12 +118,12 @@ import 'compiled/jquery.rails_flash_notifications'
                     </div>
                   </div>
                   <InfoFrame className='ic-wizard-box__content' itemToShow={this.state.selectedItem} closeModal={this.closeModal} />
-                </div>
-                <div className='ic-wizard-box__header'>
-                  <Checklist className='ic-wizard-box__nav'
-                             selectedItem={this.state.selectedItem}
-                             clickHandler={this.checklistClickHandler}
-                  />
+                  <div className='ic-wizard-box__header'>
+                    <Checklist className='ic-wizard-box__nav'
+                               selectedItem={this.state.selectedItem}
+                               clickHandler={this.checklistClickHandler}
+                    />
+                  </div>
                 </div>
               </div>
             </main>
