@@ -478,6 +478,7 @@ TEXT
                 <%= settings.check_box :author_email_in_notifications, :checked => @account.author_email_in_notifications? %>
                 <%= settings.label     :author_email_in_notifications, :en => "Show the email address of sender for user interaction Notifications" %>
               </div>
+
             <% end %>
             <% unless @account.site_admin? %>
               <div>
@@ -492,12 +493,20 @@ TEXT
               </div>
             <% end %>
           <% end %>
+
           <%= f.fields_for :services do |services| %>
             <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
               <div>
                 <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                 <%= services.label key, service[:name] + " " %>
               </div>
+              <% if key == :avatars %>
+                <div id="account_settings_gravatar_checkbox">
+                  <%= hidden_field_tag "account[settings][enable_gravatar]", "0", id: "hidden_account_settings_enable_gravatar" %>
+                  <%= check_box_tag "account[settings][enable_gravatar]", "1", @account.enable_gravatar? %>
+                  <%= label_tag "account[settings][enable_gravatar]", t("Enable Gravatar") %>
+                </div>
+              <% end %>
             <% end %>
           <% end %>
         </fieldset>

@@ -24,6 +24,19 @@ describe "root account basic settings" do
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
   include_examples "settings basic tests", :root_account
 
+  it "should be able to disable enable_gravatar" do
+    account_admin_user(:active_all => true)
+    user_session(@admin)
+    get account_settings_url
+
+    f("#account_services_avatars").click
+    f("#account_settings_enable_gravatar").click
+
+    submit_form("#account_settings")
+    wait_for_ajax_requests
+    expect(Account.default.reload.settings[:enable_gravatar]).to eq false
+  end
+
   it "downloads reports" do
     course_with_admin_logged_in
     account.account_reports.create!(
