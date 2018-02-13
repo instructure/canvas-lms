@@ -556,7 +556,8 @@ module Lti
     #   ```
     register_expansion 'Canvas.membership.roles', [],
                        -> { lti_helper.current_canvas_roles },
-                       ROLES_GUARD
+                       ROLES_GUARD,
+                       default_name: 'canvas_membership_roles'
 
     # This is a list of IMS LIS roles should have a different key
     # @example
@@ -745,6 +746,8 @@ module Lti
                        default_name: 'roles'
 
     # Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
+    # Note that this will include all roles the user has across the entire root account. Roles will not
+    # be scoped to the context of the LTI launch.
     # @duplicates ext_roles which is sent by default
     # @example
     #   ```

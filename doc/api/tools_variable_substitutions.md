@@ -512,7 +512,7 @@ active
 returns the current course membership roles.
 
 **Availability**: *when launched from a course or an account*  
-
+**Launch Parameter**: *canvas_membership_roles*  
 
 ```
 StudentEnrollment
@@ -681,6 +681,8 @@ http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
 ```
 ## Canvas.xuser.allRoles [duplicates ext_roles which is sent by default]
 Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
+Note that this will include all roles the user has across the entire root account. Roles will not
+be scoped to the context of the LTI launch.
 
 **Availability**: *always*  
 
