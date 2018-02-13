@@ -8,13 +8,17 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 CanvasRails::Application.routes.draw do
   resources :submission_comments, only: :destroy
 
-  # BZ custom sesction
+  # BZ custom section
   post 'bz/last_user_url' => 'bz#last_user_url'
   post 'bz/video_link' => 'bz#video_link'
   get 'bz/event_rsvps' => 'bz#event_rsvps'
   get 'bz/load_wiki_pages' => 'bz#load_wiki_pages'
   get 'bz/user_retained_data' => 'bz#user_retained_data'
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
+
+  get 'bz/cohort_info_upload' => 'bz#cohort_info_upload', as: :cohort_info_upload
+  get 'bz/my_cohort' => 'bz#my_cohort'
+  post 'bz/cohort_info_upload' => 'bz#do_cohort_info_upload'
 
   # both get and post work in batch mode for longer lists
   get 'bz/user_retained_data_batch' => 'bz#user_retained_data_batch'

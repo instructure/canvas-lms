@@ -106,6 +106,11 @@ Rails.configuration.after_initialize do
     end
   end
 
+  # run at 4:12 am each day (arbitrary time for daily update)
+  Delayed::Periodic.cron 'Assignment.zero_overdue_participation', '12 4 * * *', :priority => Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(Assignment, :zero_overdue_participation)
+  end
+
   Delayed::Periodic.cron 'Alerts::DelayedAlertSender.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Alerts::DelayedAlertSender, :process)
   end

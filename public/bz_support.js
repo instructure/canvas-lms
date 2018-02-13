@@ -131,7 +131,7 @@ function bzRetainedInfoSetup() {
           optional = true;
 
         var actualSave = function() {
-          BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"));
+          BZ_SaveMagicField(name, value, optional, el.getAttribute("type"), el.getAttribute("data-bz-answer"), el.getAttribute("data-bz-weight"), el.getAttribute("data-bz-partial-credit"));
 
           // we also need to update other views on the same page
           var magicElementsDOM = document.querySelectorAll("[data-bz-retained]");
@@ -530,11 +530,13 @@ function BZ_GoToMasterPage(master_page_id) {
 
 var BZ_MagicFieldSaveTimeouts = {};
 
-function BZ_SaveMagicField(field_name, field_value, optional, type, answer) {
+function BZ_SaveMagicField(field_name, field_value, optional, type, answer, weight, partialCredit) {
   if(optional == null)
     optional = true; // the default is to skip grading; assume api updates are optional fields
   if(type == null)
     type = "api";
+  if(weight == null)
+    weight = 1;
 
   // if there's an existing retry, cancel it so it doesn't
   // race condition overwrite a subsequent write; we only
@@ -549,6 +551,11 @@ function BZ_SaveMagicField(field_name, field_value, optional, type, answer) {
     data += "&optional=true";
   if (answer !== null)
     data += "&answer=" + encodeURIComponent(answer);
+  if (weight !== null)
+    data += "&weight=" + encodeURIComponent(weight);
+  if (partialCredit !== null)
+    data += "&partial_credit=" + encodeURIComponent(partialCredit);
+
   http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   http.onreadystatechange = function() {
     if(http.readyState == 4) {

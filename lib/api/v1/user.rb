@@ -77,7 +77,13 @@ module Api::V1::User
       end
       # include a permissions check here to only allow teachers and admins
       # to see user email addresses.
-      if includes.include?('email') && context.grants_right?(current_user, session, :read_roster)
+      # if includes.include?('email') && context.grants_right?(current_user, session, :read_roster)
+      #
+      # adr edit: the above line is the original, the following is mine
+      # i make it always include email, even if not specifically requested,
+      # because it helps us sync up user info. keeping the permission check tho
+      # the respond to btw is so it works on user settings page too as well as on course
+      if context.respond_to?(:grants_right?) && context.grants_right?(current_user, session, :read_roster)
         json[:email] = user.email
       end
 
