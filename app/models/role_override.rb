@@ -1016,12 +1016,6 @@ class RoleOverride < ActiveRecord::Base
   # settings is a hash with recognized keys :override and :locked. each key
   # differentiates nil, false, and truthy as possible values
   def self.manage_role_override(context, role, permission, settings)
-    if role.is_a?(String)
-      # for plugin spec compatibility
-      # TODO: update the plugins and remove this
-      Rails.logger.warn("Old use of RoleOverride.manage_role_override, plz to fix")
-      role = context.get_role_by_name(role)
-    end
     context.shard.activate do
       role_override = context.role_overrides.where(:permission => permission, :role_id => role.id).first
       if !settings[:override].nil? || settings[:locked]
