@@ -158,7 +158,8 @@ describe "new account course search" do
 
     get "/accounts/#{@account.id}"
 
-    get_rows.first.find('[name="IconPlusLine"]').click
+    el = get_rows.first.find('[name="IconPlusLine"]')
+    move_to_click_element(el)
 
     dialog = fj('#add_people_modal:visible')
     expect(dialog).to be_displayed
@@ -174,7 +175,8 @@ describe "new account course search" do
     # when the "+ users" is clicked and not as part of the page load
     sections = ('A'..'Z').map { |i| course.course_sections.create!(:name => "Test Section #{i}") }
 
-    get_rows.first.find('[name="IconPlusLine"]').click
+    el = get_rows.first.find('[name="IconPlusLine"]')
+    move_to_click_element(el)
     section_options = ffj('#add_people_modal:visible #peoplesearch_select_section option')
     expect(section_options.map(&:text)).to eq(sections.map(&:name))
   end
@@ -210,7 +212,8 @@ describe "new account course search" do
     named_course = course_factory(:account => @account, :course_name => "course factory with name")
 
     get "/accounts/#{@account.id}"
-    get_rows.first.find('[name="IconPlusLine"]').click
+    el = get_rows.first.find('[name="IconPlusLine"]')
+    move_to_click_element(el)
     expect(f('#add_people_modal h2')).to include_text(named_course.name)
   end
 end
