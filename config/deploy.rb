@@ -254,7 +254,7 @@ namespace :deploy do
       within release_path do
         execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru", "tmp/"
         execute :sudo, 'chmod 440', "config/*.yml"
-        execute :sudo, 'chmod 660', "config/google_calendar_auth.json" # this file is special b/c the google/api_client needs to write to it when it refreshes the token
+        execute :sudo, 'chmod 660', "config/google_calendar_auth.json", raise_on_non_zero_exit: false # this file is special b/c the google/api_client needs to write to it when it refreshes the token
       end
     end
   end
