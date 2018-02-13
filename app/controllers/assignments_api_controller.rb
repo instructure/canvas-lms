@@ -450,7 +450,7 @@
 #           "type": "boolean"
 #         },
 #         "grading_type": {
-#           "description": "The type of grading the assignment receives; one of 'pass_fail', 'percent', 'letter_grade', 'gpa_scale', 'points'. Note: the 'gpa_scale' grading_type is deprecated and will be removed on 2018-06-02.",
+#           "description": "The type of grading the assignment receives; one of 'pass_fail', 'percent', 'letter_grade', 'gpa_scale', 'points'",
 #           "example": "points",
 #           "type": "string",
 #           "allowableValues": {
@@ -872,7 +872,6 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
   #  The assignment defaults to "points" if this field is omitted.
-  #  Note: the "gpa_scale" grading_type is deprecated and will be removed on 2018-06-02.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due. Must be between the lock dates if there are lock dates.
@@ -1027,7 +1026,6 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
   #  The assignment defaults to "points" if this field is omitted.
-  #  Note: the "gpa_scale" grading_type is deprecated and will be removed on 2018-06-02.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
