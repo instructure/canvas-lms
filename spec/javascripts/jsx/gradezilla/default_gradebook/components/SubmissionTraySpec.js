@@ -106,7 +106,8 @@ QUnit.module('SubmissionTray', function (hooks) {
       submissionComments: [],
       isInOtherGradingPeriod: false,
       isInClosedGradingPeriod: false,
-      isInNoGradingPeriod: false
+      isInNoGradingPeriod: false,
+      isNotCountedForScore: false
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
     clock.tick(50); // wait for Tray to transition open
@@ -552,6 +553,12 @@ QUnit.module('SubmissionTray', function (hooks) {
       const gradingScheme = [['A', 0.90], ['B+', 0.85], ['B', 0.80], ['B-', 0.75], ['C+', 0.70]];
       mountComponent({ gradingScheme });
       deepEqual(wrapContent().find('GradeInput').prop('gradingScheme'), gradingScheme);
+    });
+
+    test('passes along isNotCountedForScore prop to SubmissionStatus', function () {
+      mountComponent()
+      const isNotCountedForScore = wrapContent().find('SubmissionStatus').at(0).prop('isNotCountedForScore')
+      deepEqual(isNotCountedForScore, wrapper.prop('isNotCountedForScore'))
     });
   });
 

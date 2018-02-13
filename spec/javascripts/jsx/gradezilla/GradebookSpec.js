@@ -3722,7 +3722,7 @@ test('sort gradebook rows by id when setting key and sortable name are the same'
   strictEqual(secondRow.id, '4');
 });
 
-test('descending sort gradebook rows by id when when setting key and sortable name are the same and direction is descending', function () {
+test('descending sort gradebook rows by id when setting key and sortable name are the same and direction is descending', function () {
   this.gradebook.gridData.rows = [
     { id: '3', sortable_name: 'Same Name', custom_col_501: '42' },
     { id: '4', sortable_name: 'Same Name', custom_col_501: '42' }
@@ -4710,6 +4710,13 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
       }],
       user_id: '1102'
     }];
+    this.gradebook.setAssignmentGroups({
+      9000: { group_weight: 100 }
+    })
+    this.gradebook.setAssignments({
+      201: { id: '201', assignment_group_id: '9000', name: 'Math Assignment', published: true },
+      202: { id: '202', assignment_group_id: '9000', name: 'English Assignment', published: false }
+    })
   });
 
   hooks.afterEach(function () {
@@ -4725,20 +4732,12 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
   });
 
   test('updates effectiveDueDates on related assignments', function () {
-    this.gradebook.setAssignments({
-      201: { id: '201', name: 'Math Assignment', published: true },
-      202: { id: '202', name: 'English Assignment', published: false }
-    });
     this.gradebook.gotSubmissionsChunk(studentSubmissions);
     deepEqual(Object.keys(this.gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102']);
     deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101']);
   });
 
   test('updates inClosedGradingPeriod on related assignments', function () {
-    this.gradebook.setAssignments({
-      201: { id: '201', name: 'Math Assignment', published: true },
-      202: { id: '202', name: 'English Assignment', published: false }
-    });
     this.gradebook.gotSubmissionsChunk(studentSubmissions);
     strictEqual(this.gradebook.getAssignment('201').inClosedGradingPeriod, false);
     strictEqual(this.gradebook.getAssignment('202').inClosedGradingPeriod, false);
@@ -6420,12 +6419,15 @@ QUnit.module('Gradebook#onGridBlur', {
       name: 'Adam Jones',
       assignment_2301: {
         assignment_id: '2301', id: '2501', late: false, missing: false, excused: false, seconds_late: 0
-      }
+      },
+      enrollment_state: ['active']
     }]
     this.gradebook.gotChunkOfStudents(students);
+    this.gradebook.initGrid();
     this.gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6437,8 +6439,8 @@ QUnit.module('Gradebook#onGridBlur', {
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
-    this.gradebook.initGrid();
+    })
+    this.gradebook.assignmentGroups = {9000: {group_weight: 100}}
     this.gradebook.gradebookGrid.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
     this.spy(this.gradebook.gradebookGrid.gridSupport.state, 'blur');
   },
@@ -6624,9 +6626,12 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     gradebook = createGradebook({
       default_grading_standard: defaultGradingScheme
     });
+    gradebook.setAssignmentGroups({9000: {group_weight: 100}})
     gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
+        points_posible: 10,
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6638,7 +6643,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
+    })
     gradebook.students = {
       1101: {
         id: '1101',
@@ -6857,6 +6862,36 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     strictEqual(gradebook.getEnterGradesAsSetting.withArgs('2301').callCount, 1);
     strictEqual(props.enterGradesAs, 'points');
   });
+
+  test('sets isNotCountedForScore to false when the assignment is not counted toward final grade', () => {
+    gradebook.assignments[2301].omit_from_final_grade = false
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
+  })
+
+  test('sets isNotCountedForScore to false when the assignment is counted toward final grade', () => {
+    gradebook.assignments[2301].omit_from_final_grade = true
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, true)
+  })
+
+  test('sets isNotCountedForScore to false when the assignment group weight is not zero', () => {
+    gradebook.assignmentGroups[9000].group_weight = 100
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, false)
+  })
+
+  test('sets isNotCountedForScore to true when the assignmentgroup weight is zero', () => {
+    gradebook.assignmentGroups[9000].group_weight = 0
+
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.isNotCountedForScore, true)
+  })
 });
 
 QUnit.module('Gradebook#renderSubmissionTray', {
@@ -6870,6 +6905,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     this.gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6881,7 +6917,8 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
+    })
+    this.gradebook.setAssignmentGroups({9000: {group_weight: 100}})
     this.gradebook.students = {
       1101: {
         id: '1101',
@@ -6971,6 +7008,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
     gradebook.setAssignments({
       2301: {
         id: '2301',
+        assignment_group_id: '9000',
         course_id: '1',
         grading_type: 'points',
         name: 'Assignment 1',
@@ -6982,7 +7020,8 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', function (hook
         published: true,
         submission_types: ['online_text_entry']
       }
-    });
+    })
+    gradebook.setAssignmentGroups({9000: {group_weight: 100}})
 
     gradebook.students = {
       1100: {

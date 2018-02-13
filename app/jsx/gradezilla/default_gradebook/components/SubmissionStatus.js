@@ -21,25 +21,7 @@ import { bool, shape } from 'prop-types';
 import I18n from 'i18n!gradebook';
 import Container from '@instructure/ui-core/lib/components/Container';
 import Pill from '@instructure/ui-core/lib/components/Pill';
-import Text from '@instructure/ui-core/lib/components/Text';
-import IconWarningLine from 'instructure-icons/lib/Line/IconWarningLine';
-
-function renderWarning (message) {
-  return (
-    <div style={{display: 'flex', alignItems: 'flex-start'}}>
-      <Container as="span" padding="xx-small 0 0 0">
-        <Text color="error">
-          <IconWarningLine title={message} />
-        </Text>
-      </Container>
-      <Container as="span" padding="0 0 0 x-small">
-        <Text size="small">
-          {message}
-        </Text>
-      </Container>
-    </div>
-  );
-}
+import Message from './SubmissionStatus/Message'
 
 export default class SubmissionStatus extends React.Component {
   static defaultProps = {
@@ -57,6 +39,7 @@ export default class SubmissionStatus extends React.Component {
     isInClosedGradingPeriod: bool.isRequired,
     isInNoGradingPeriod: bool.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
+    isNotCountedForScore: bool.isRequired,
     submission: shape({
       drop: bool,
       excused: bool
@@ -101,11 +84,11 @@ export default class SubmissionStatus extends React.Component {
     };
 
     if (this.props.isConcluded) {
-      const concludedEnrollmentStatusMessage = I18n.t("This student's enrollment has been concluded.")
+      const concludedEnrollmentStatusMessage = I18n.t("This student's enrollment has been concluded")
 
       statusNotificationComponents.push(
         <div key="concluded-enrollment-status" style={statusNotificationContainerStyle}>
-          {renderWarning(concludedEnrollmentStatusMessage)}
+          <Message variant="warning" message={concludedEnrollmentStatusMessage} />
         </div>
       );
     }
@@ -114,7 +97,17 @@ export default class SubmissionStatus extends React.Component {
     if (gradingPeriodStatusMessage) {
       statusNotificationComponents.push(
         <div key="grading-period-status" style={statusNotificationContainerStyle}>
-          {renderWarning(gradingPeriodStatusMessage)}
+          <Message variant="warning" message={gradingPeriodStatusMessage} />
+        </div>
+      );
+    }
+
+    if (this.props.isNotCountedForScore) {
+      const isNotCountedForScoreMessage = I18n.t('Will not factor in final grade')
+
+      statusNotificationComponents.push(
+        <div key="is-not-counted-for-score-status" style={statusNotificationContainerStyle}>
+          <Message variant="info" message={isNotCountedForScoreMessage} />
         </div>
       );
     }
@@ -127,11 +120,11 @@ export default class SubmissionStatus extends React.Component {
     let message;
 
     if (isInOtherGradingPeriod) {
-      message = I18n.t('This submission is in another grading period.');
+      message = I18n.t('This submission is in another grading period')
     } else if (isInClosedGradingPeriod) {
-      message = I18n.t('This submission is in a closed grading period.');
+      message = I18n.t('This submission is in a closed grading period')
     } else if (isInNoGradingPeriod) {
-      message = I18n.t('This submission is not in any grading period.');
+      message = I18n.t('This submission is not in any grading period')
     }
 
     return message;

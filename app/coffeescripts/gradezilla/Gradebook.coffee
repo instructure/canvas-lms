@@ -2122,6 +2122,7 @@ define [
       isLastStudent = activeLocation.row == (@listRows().length - 1)
 
       submissionState = @submissionStateMap.getSubmissionState({ user_id: studentId, assignment_id: assignmentId })
+      isGroupWeightZero = @assignmentGroups[assignment.assignment_group_id].group_weight == 0
 
       assignment: ConvertCase.camelize(assignment)
       colors: @getGridColors()
@@ -2138,6 +2139,7 @@ define [
       isLastAssignment: isLastAssignment
       isFirstStudent: isFirstStudent
       isLastStudent: isLastStudent
+      isNotCountedForScore: assignment.omit_from_final_grade or isGroupWeightZero
       isOpen: open
       key: "grade_details_tray"
       latePolicy: @courseContent.latePolicy

@@ -139,7 +139,8 @@ export default class SubmissionTray extends React.Component {
     setProcessing: func.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
     isInClosedGradingPeriod: bool.isRequired,
-    isInNoGradingPeriod: bool.isRequired
+    isInNoGradingPeriod: bool.isRequired,
+    isNotCountedForScore: bool.isRequired
   };
 
   cancelCommenting = () => {
@@ -282,6 +283,7 @@ export default class SubmissionTray extends React.Component {
                 isInOtherGradingPeriod={this.props.isInOtherGradingPeriod}
                 isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
                 isInNoGradingPeriod={this.props.isInNoGradingPeriod}
+                isNotCountedForScore={this.props.isNotCountedForScore}
                 submission={this.props.submission}
               />
 
