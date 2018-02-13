@@ -60,8 +60,8 @@ describe 'Student reports' do
       :sis_user_id => 'user_sis_id_03')
 
     enrollment_params = {enrollment_state: 'active', type: 'StudentEnrollment'}
-    @e1, @e4 = Enrollment.find(create_enrollments(@course1, [@user1, @user2], enrollment_params))
-    @e2, @e3 = Enrollment.find(create_enrollments(@course2, [@user2, @user1], enrollment_params))
+    @e_u1_c1, @e_u2_c1 = Enrollment.find(create_enrollments(@course1, [@user1, @user2], enrollment_params))
+    @e_u1_c2, @e_u2_c2 = Enrollment.find(create_enrollments(@course2, [@user1, @user2], enrollment_params))
 
     @section1 = @course1.course_sections.first
     @section2 = @course2.course_sections.first
@@ -94,10 +94,10 @@ describe 'Student reports' do
     end
 
     it 'should find users that with no submissions after a date in all states' do
-      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
-      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
-      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
-      Enrollment.where(id: @e4).update_all(workflow_state: 'rejected')
+      Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
+      Enrollment.where(id: @e_u2_c1).update_all(workflow_state: 'rejected')
       parameters = {}
       parameters['start_at'] = @start_at2
       parameters['include_enrollment_state'] = true
@@ -126,9 +126,9 @@ describe 'Student reports' do
     end
 
     it 'should filter on enrollment states' do
-      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
-      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
-      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
+      Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
       parameters = {}
       parameters['start_at'] = @start_at2
       parameters['include_enrollment_state'] = true
@@ -148,9 +148,9 @@ describe 'Student reports' do
     end
 
     it 'should filter on enrollment state' do
-      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
-      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
-      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
+      Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
       parameters = {}
       parameters['start_at'] = @start_at2
       parameters['include_enrollment_state'] = true
@@ -497,12 +497,12 @@ describe 'Student reports' do
       @later_activity = 1.week.ago
       @earlier_activity = 8.days.ago
       # user 1
-      @e1.last_activity_at = @later_activity
-      @e3.last_activity_at = @earlier_activity
+      @e_u1_c1.last_activity_at = @later_activity
+      @e_u1_c2.last_activity_at = @earlier_activity
       # user 2
-      @e2.last_activity_at = @later_activity
-      @e4.last_activity_at = @earlier_activity
-      [@e1,@e2,@e3,@e4].each(&:save!)
+      @e_u2_c2.last_activity_at = @later_activity
+      @e_u2_c1.last_activity_at = @earlier_activity
+      [@e_u1_c1, @e_u2_c2, @e_u1_c2, @e_u2_c1].each(&:save!)
     end
 
     it 'should show the lastest activity for each user' do
@@ -516,10 +516,10 @@ describe 'Student reports' do
     end
 
     it 'does not include a user who has no enrollment activity' do
-      @e1.last_activity_at = nil
-      @e3.last_activity_at = nil
-      @e1.save!
-      @e3.save!
+      @e_u1_c1.last_activity_at = nil
+      @e_u1_c2.last_activity_at = nil
+      @e_u1_c1.save!
+      @e_u1_c2.save!
 
       report = run_report(@type)
       parsed = parse_report(report, { order: 1 })
@@ -528,7 +528,6 @@ describe 'Student reports' do
     end
 
     it 'should scope by course if param given' do
-      # course1 is e1 and e4
       parameters = {}
       parameters['course'] = @course1.id
       report = run_report(@type, {params: parameters})
