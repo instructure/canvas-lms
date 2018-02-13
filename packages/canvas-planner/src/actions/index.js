@@ -46,6 +46,7 @@ export const {
   clearUpdateTodo,
   openEditingPlannerItem,
   cancelEditingPlannerItem,
+  setNaiAboveScreen,
   scrollToNewActivity
 } = createActions(
   'INITIAL_OPTIONS',
@@ -62,6 +63,7 @@ export const {
   'CLEAR_UPDATE_TODO',
   'OPEN_EDITING_PLANNER_ITEM',
   'CANCEL_EDITING_PLANNER_ITEM',
+  'SET_NAI_ABOVE_SCREEN',
   'SCROLL_TO_NEW_ACTIVITY',
 );
 

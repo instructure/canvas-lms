@@ -17,7 +17,7 @@
  */
 
 import {DynamicUiManager as Manager} from '../manager';
-import {dismissedOpportunity, cancelEditingPlannerItem, scrollToNewActivity} from '../../actions';
+import {dismissedOpportunity, cancelEditingPlannerItem, setNaiAboveScreen, scrollToNewActivity} from '../../actions';
 import {gettingPastItems, gotItemsSuccess} from '../../actions/loading-actions';
 import { initialize as alertInitialize } from '../../utilities/alertUtils';
 
@@ -365,5 +365,57 @@ describe('update handling', () => {
     manager.preTriggerUpdates('fixed-element', 'app');
     manager.triggerUpdates();
     expect(animator.focusElement).not.toHaveBeenCalled();
+  });
+});
+
+describe('managing nai scroll position', () => {
+  function naiFixture (naiAboveScreen) {
+    const {manager, store} = createManagerWithMocks();
+    store.getState.mockReturnValue({ui: {naiAboveScreen}})
+    const gbcr = jest.fn();
+    const nai = {
+      getScrollable () {
+        return { getBoundingClientRect: gbcr };
+      }
+    };
+    manager.registerAnimatable('day', {}, 0, ['nai-unique-id']);
+    manager.registerAnimatable('group', {}, 0, ['nai-unique-id']);
+    manager.registerAnimatable('new-activity-indicator', nai, 0, ['nai-unique-id']);
+    return {manager, store, gbcr};
+  }
+
+  it('set to above when nai goes above the screen', () => {
+    const {manager, store, gbcr} = naiFixture(false);
+    gbcr.mockReturnValueOnce({top: -1});
+    manager.handleScrollPositionChange();
+    expect(store.dispatch).toHaveBeenLastCalledWith(setNaiAboveScreen(true));
+  });
+
+  it('set to below when nai goes below sticky offset', () => {
+    const {manager, store, gbcr} = naiFixture(true);
+    gbcr.mockReturnValueOnce({top: 84});
+    manager.handleScrollPositionChange();
+    expect(store.dispatch).toHaveBeenLastCalledWith(setNaiAboveScreen(false));
+  });
+
+  it('does not set nai to below when nai is positive but less than the sticky offset', () => {
+    const {manager, store, gbcr} = naiFixture(false);
+    gbcr.mockReturnValueOnce({top: 41});
+    manager.handleScrollPositionChange();
+    expect(store.dispatch).not.toHaveBeenCalled();
+  });
+
+  it('does not send redundant nai above actions', () => {
+    const {manager, store, gbcr} = naiFixture(false);
+    gbcr.mockReturnValueOnce({top: 84});
+    manager.handleScrollPositionChange();
+    expect(store.dispatch).not.toHaveBeenCalled();
+  });
+
+  it('does not send redundant nai below actions', () => {
+    const {manager, store, gbcr} = naiFixture(true);
+    gbcr.mockReturnValueOnce({top: 8});
+    manager.handleScrollPositionChange();
+    expect(store.dispatch).not.toHaveBeenCalled();
   });
 });

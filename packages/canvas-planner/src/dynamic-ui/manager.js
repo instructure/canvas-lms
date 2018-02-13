@@ -24,6 +24,7 @@ import {isNewActivityItem} from '../utilities/statusUtils';
 import {daysToItems} from '../utilities/daysUtils';
 import {srAlert} from '../utilities/alertUtils';
 import formatMessage from '../format-message';
+import {setNaiAboveScreen} from '../actions';
 import {loadPastUntilNewActivity} from '../actions/loading-actions';
 
 export function specialFallbackFocusId (type) {
@@ -158,6 +159,30 @@ export class DynamicUiManager {
     // make sure the focused item is in view in case they scrolled away from it while the tray was open
     if (!this.animationPlan.noScroll) {
       this.animator.scrollTo(this.animationPlan.preOpenTrayElement, this.stickyOffset);
+    }
+  }
+
+  handleScrollPositionChange () {
+    // if the button is not being shown, don't show it until an nai is
+    // actually above the window, not just under the header. This prevents
+    // bouncing of the button visibility that happens as we scroll to new
+    // activity because showing and hiding the button changes the document
+    // height, which changes the scroll position.
+    let naiThreshold = this.stickyOffset;
+    if (!this.store.getState().ui.naiAboveScreen) {
+      naiThreshold = 0;
+    }
+
+    const newActivityIndicators = this.animatableRegistry.getAllNewActivityIndicatorsSorted();
+    let naiAboveScreen = false;
+    if (newActivityIndicators.length > 0) {
+      const naiScrollable = newActivityIndicators[0].component.getScrollable();
+      naiAboveScreen = naiScrollable.getBoundingClientRect().top < naiThreshold;
+    }
+
+    // just to make sure we avoid dispatching on every scroll position change
+    if (this.store.getState().ui.naiAboveScreen !== naiAboveScreen) {
+      this.store.dispatch(setNaiAboveScreen(naiAboveScreen));
     }
   }
 

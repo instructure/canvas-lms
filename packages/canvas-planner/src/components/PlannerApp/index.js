@@ -19,7 +19,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Container from '@instructure/ui-core/lib/components/Container';
 import Spinner from '@instructure/ui-core/lib/components/Spinner';
-import { arrayOf, oneOfType, bool, object, string, number, func } from 'prop-types';
+import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
 import { momentObj } from 'react-moment-proptypes';
 import Day from '../Day';
 import ShowOnFocusButton from '../ShowOnFocusButton';
@@ -59,6 +59,9 @@ export class PlannerApp extends Component {
     triggerDynamicUiUpdates: func,
     preTriggerDynamicUiUpdates: func,
     plannerActive: func,
+    ui: shape({
+      naiAboveScreen: bool,
+    }),
   };
 
   static defaultProps = {
@@ -66,7 +69,7 @@ export class PlannerApp extends Component {
     stickyOffset: 0,
     triggerDynamicUiUpdates: () => {},
     preTriggerDynamicUiUpdates: () => {},
-    plannerActive: () => {return false}
+    plannerActive: () => {return false;}
   };
 
   componentWillUpdate () {
@@ -105,7 +108,8 @@ export class PlannerApp extends Component {
     if (!this.props.firstNewActivityDate) return;
 
     const firstLoadedMoment = getFirstLoadedMoment(this.props.days, this.props.timeZone);
-    if (firstLoadedMoment.isSame(this.props.firstNewActivityDate) || firstLoadedMoment.isBefore(this.props.firstNewActivityDate)) return;
+    const firstNewActivityLoaded = firstLoadedMoment.isSame(this.props.firstNewActivityDate) || firstLoadedMoment.isBefore(this.props.firstNewActivityDate);
+    if (firstNewActivityLoaded && !this.props.ui.naiAboveScreen) return;
 
     return (
       <StickyButton
@@ -209,6 +213,7 @@ const mapStateToProps = (state) => {
     loadingError: state.loading.loadingError,
     firstNewActivityDate: state.firstNewActivityDate,
     timeZone: state.timeZone,
+    ui: state.ui,
   };
 };
 
