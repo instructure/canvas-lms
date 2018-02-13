@@ -62,7 +62,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @else { background: rgba($ic-wizard-color-dark-neutral, 0.9); }
 
   @include breakpoint(mini-tablet) {
-    flex-direction: row;
+    flex-direction: row-reverse;
   }
   @include breakpoint(desktop) {
     flex: 1;
@@ -184,7 +184,21 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   font-weight: 100;
   margin: 0;
   margin-bottom: 20px;
-  padding: 12px 0;
+  @include breakpoint(mini-tablet) {
+    font-size: 20px;
+    font-size: 2.5rem;
+    padding: 12px 0;
+  }
+  @include breakpoint(tablet) {
+    font-size: 20px;
+    font-size: 2.5rem;
+    padding: 12px 0;
+  }
+  @include breakpoint(desktop) {
+    font-size: 20px;
+    font-size: 2.5rem;
+    padding: 12px 0;
+  }
 }
 
 .ic-wizard-box__message {
@@ -296,6 +310,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
   @include breakpoint(desktop) {
     @include fontSize(15px);
+    font-size: 0.9375rem;
     line-height: 1.5;
   }
 }
