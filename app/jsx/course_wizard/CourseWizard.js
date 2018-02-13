@@ -112,7 +112,6 @@ import 'compiled/jquery.rails_flash_notifications'
                       <a ref='closeLink' href='#' className='ic-Expand-link__trigger' onClick={this.closeModal}>
                         <div className='ic-Expand-link__layout'>
                           <i className='icon-x ic-Expand-link__icon'></i>
-                          <span className='ic-Expand-link__text'>{I18n.t('Close and return to Canvas')}</span>
                         </div>
                       </a>
                     </div>

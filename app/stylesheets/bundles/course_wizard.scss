@@ -30,21 +30,24 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box {
   transition: all 1s $ic-transition;
-  width: 30%;
+  width: 380px;
+  min-width: 380px;
   height: 100%;
   background: #B4B6B9;
-  position: fixed;
-  bottom: 0; left: 0;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  right: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   background-size: cover;
-  transform: translate3d(250%,0,0);
+  transform: translate3d(300%,0,0);
   opacity: 0;
   @include breakpoint(desktop) { flex-direction: row-reverse; }
 
   .ReactModal__Overlay.ReactModal__Overlay--after-open & {
-    transform: translate3d(234%,0,0);
+    transform: translate3d(300%,0,0);
     opacity: 1;
   }
 
@@ -176,21 +179,22 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box__headline {
   line-height: 0.85;
-  font-size: 4rem;
+  font-size: 2.5rem;
   text-align: center;
   color: $ic-color-light;
   font-weight: 100;
   margin: 0;
+  margin-bottom: 20px;
   @include breakpoint(mini-tablet) {
-    @include fontSize(48px);
-    padding: $ic-sp 0;
+    @include fontSize(20px);
+    padding: 12px 0;
   }
   @include breakpoint(tablet) {
-    @include fontSize(60px);
+    @include fontSize(20px);
   }
   @include breakpoint(desktop) {
-    @include fontSize(72px);
-    padding: $ic-sp*2 0;
+    @include fontSize(20px);
+    padding: 10px 0;
   }
 }
 
