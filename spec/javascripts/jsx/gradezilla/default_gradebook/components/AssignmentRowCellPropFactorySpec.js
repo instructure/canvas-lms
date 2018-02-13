@@ -135,6 +135,26 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
       strictEqual(gradebook.getSubmissionTrayState().assignmentId, '2301')
     })
 
+    test('.pendingGradeInfo is included when a valid pending grade exists', () => {
+      const pendingGradeInfo = {
+        enteredAs: 'points',
+        excused: false,
+        grade: 'A',
+        score: 10,
+        valid: true
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      deepEqual(getProps().pendingGradeInfo, {
+        ...pendingGradeInfo,
+        assignmentId: '2301',
+        userId: '1101'
+      })
+    })
+
+    test('.pendingGradeInfo is null when no pending grade exists', () => {
+      strictEqual(getProps().pendingGradeInfo, null)
+    })
+
     test('.submission.assignmentId is the assignment id', () => {
       strictEqual(getProps().submission.assignmentId, '2301')
     })
@@ -157,35 +177,6 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
       strictEqual(getProps().submission.excused, false)
     })
 
-    QUnit.module('when the submission is updating', contextHooks => {
-      let submission
-
-      contextHooks.beforeEach(() => {
-        submission = {
-          assignmentId: '2301',
-          enteredGrade: 'B',
-          enteredScore: 8.9,
-          excused: false,
-          userId: '1101'
-        }
-      })
-
-      test('.submission.enteredGrade is the entered grade on the submission', () => {
-        gradebook.setSubmissionUpdating(submission, true)
-        strictEqual(getProps().submission.enteredGrade, 'B')
-      })
-
-      test('.submission.enteredScore is the entered score on the submission', () => {
-        gradebook.setSubmissionUpdating(submission, true)
-        strictEqual(getProps().submission.enteredScore, 8.9)
-      })
-
-      test('.submission.excused is true when the submission is excused', () => {
-        gradebook.setSubmissionUpdating({...submission, excused: true}, true)
-        strictEqual(getProps().submission.excused, true)
-      })
-    })
-
     test('.submission.id is the submission id', () => {
       strictEqual(getProps().submission.id, '2501')
     })
@@ -194,13 +185,23 @@ QUnit.module('AssignmentRowCellPropFactory', () => {
       strictEqual(getProps().submission.userId, '1101')
     })
 
-    test('.submissionIsUpdating is true when the submission is updating', () => {
-      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, true)
+    test('.submissionIsUpdating is true when a valid pending grade exists', () => {
+      gradebook.addPendingGradeInfo(
+        {assignmentId: '2301', userId: '1101'},
+        {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+      )
       strictEqual(getProps().submissionIsUpdating, true)
     })
 
-    test('.submissionIsUpdating is false when the submission is not updating', () => {
-      gradebook.setSubmissionUpdating({assignmentId: '2301', userId: '1101'}, false)
+    test('.submissionIsUpdating is false when an invalid pending grade exists', () => {
+      gradebook.addPendingGradeInfo(
+        {assignmentId: '2301', userId: '1101'},
+        {enteredAs: null, excused: false, grade: null, score: null, valid: false}
+      )
+      strictEqual(getProps().submissionIsUpdating, false)
+    })
+
+    test('.submissionIsUpdating is false when no pending grade exists', () => {
       strictEqual(getProps().submissionIsUpdating, false)
     })
   })

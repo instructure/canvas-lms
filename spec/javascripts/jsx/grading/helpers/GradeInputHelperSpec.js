@@ -55,6 +55,101 @@ QUnit.module('GradeInputHelper', () => {
     })
   })
 
+  QUnit.module('.hasGradeChanged()', hooks => {
+    let options
+    let pendingGradeInfo
+    let submission
+
+    function hasGradeChanged() {
+      return GradeInputHelper.hasGradeChanged(submission, pendingGradeInfo, options)
+    }
+
+    hooks.beforeEach(() => {
+      options = {
+        enterGradesAs: 'points',
+        gradingScheme: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]],
+        pointsPossible: 10
+      }
+      // cleared grade info
+      pendingGradeInfo = {
+        enteredAs: null,
+        excused: false,
+        grade: null,
+        score: null,
+        valid: true
+      }
+      submission = {enteredGrade: 'A', enteredScore: 10, excused: false, grade: 'B'}
+    })
+
+    test('returns true when the pending grade is invalid', () => {
+      Object.assign(pendingGradeInfo, {grade: 'invalid', valid: false})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns true when the submission is becoming excused', () => {
+      Object.assign(pendingGradeInfo, {enteredAs: 'excused', excused: true})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns true when the submission is becoming unexcused', () => {
+      submission = {enteredGrade: null, enteredScore: null, excused: true, grade: null}
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    QUnit.module('when the pending grade is entered as "points"', contextHooks => {
+      contextHooks.beforeEach(() => {
+        options.enterGradesAs = 'points'
+        Object.assign(pendingGradeInfo, {enteredAs: 'points', grade: 'A', score: 10})
+      })
+
+      test('returns false when the pending score matches the entered score', () => {
+        strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when the pending score does not match the entered score', () => {
+        pendingGradeInfo.score = 9.9
+        strictEqual(hasGradeChanged(), true)
+      })
+    })
+
+    QUnit.module('when the pending grade is entered as "percent"', contextHooks => {
+      contextHooks.beforeEach(() => {
+        options.enterGradesAs = 'percent'
+        Object.assign(pendingGradeInfo, {enteredAs: 'percent', grade: 'A', score: 10})
+      })
+
+      test('returns false when the pending score matches the entered score', () => {
+        strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when the pending score does not match the entered score', () => {
+        pendingGradeInfo.score = 9.9
+        strictEqual(hasGradeChanged(), true)
+      })
+    })
+
+    QUnit.module('when the pending grade is entered as "gradingScheme"', contextHooks => {
+      contextHooks.beforeEach(() => {
+        options.enterGradesAs = 'gradingScheme'
+        Object.assign(pendingGradeInfo, {enteredAs: 'gradingScheme', grade: 'A', score: 10})
+      })
+
+      test('returns false when the pending grade matches the submission grade', () => {
+        strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns false when the pending grade matches only the submission grade', () => {
+        pendingGradeInfo.score = 9.1
+        strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when the pending grade does not match the submission grade', () => {
+        Object.assign(pendingGradeInfo, {grade: 'B', score: 8.9})
+        strictEqual(hasGradeChanged(), true)
+      })
+    })
+  })
+
   QUnit.module('.parseTextValue()', () => {
     let options
 
@@ -163,17 +258,17 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(parseTextValue(' B ').grade, '8.9')
       })
 
-      test('sets the grade to null when given a non-numerical string not in the grading scheme', () => {
-        strictEqual(parseTextValue('B-').grade, null)
+      test('sets the grade to the given non-numerical string not in the grading scheme', () => {
+        strictEqual(parseTextValue('B-').grade, 'B-')
       })
 
       test('sets the grade to null when the value is blank', () => {
         strictEqual(parseTextValue('  ').grade, null)
       })
 
-      test('sets the grade to null when given no grading scheme for a non-numerical string', () => {
+      test('sets the grade to the given non-numerical string when given no grading scheme', () => {
         options.gradingScheme = null
-        strictEqual(parseTextValue('B').grade, null)
+        strictEqual(parseTextValue('B').grade, 'B')
       })
 
       test('sets the score to the value when given an integer', () => {
@@ -352,6 +447,30 @@ QUnit.module('GradeInputHelper', () => {
       test('sets "enteredAs" to null when the grade is cleared', () => {
         strictEqual(parseTextValue('').enteredAs, null)
       })
+
+      test('sets "valid" to true when the grade is a valid point value', () => {
+        strictEqual(parseTextValue('8.34').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is a valid percentage', () => {
+        strictEqual(parseTextValue('83.4%').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is a valid grading scheme key', () => {
+        strictEqual(parseTextValue('B').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is cleared', () => {
+        strictEqual(parseTextValue('').valid, true)
+      })
+
+      test('sets "valid" to true when the value is "EX"', () => {
+        strictEqual(parseTextValue('EX').valid, true)
+      })
+
+      test('sets "valid" to false when given non-numerical string not in the grading scheme', () => {
+        strictEqual(parseTextValue('B-').valid, false)
+      })
     })
 
     QUnit.module('when the "enter grades as" setting is "percent"', hooks => {
@@ -455,17 +574,17 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(parseTextValue(' B ').grade, '89%')
       })
 
-      test('sets the grade to null when given a non-numerical string not in the grading scheme', () => {
-        strictEqual(parseTextValue('B-').grade, null)
+      test('sets the grade to the given non-numerical string not in the grading scheme', () => {
+        strictEqual(parseTextValue('B-').grade, 'B-')
       })
 
       test('sets the grade to null when the value is blank', () => {
         strictEqual(parseTextValue('  ').grade, null)
       })
 
-      test('sets the grade to null when given no grading scheme for a non-numerical string', () => {
+      test('sets the grade to the given non-numerical string when given no grading scheme', () => {
         options.gradingScheme = null
-        strictEqual(parseTextValue('B').grade, null)
+        strictEqual(parseTextValue('B').grade, 'B')
       })
 
       test('sets the score to the result of the value divided by points possible when given an integer', () => {
@@ -645,6 +764,30 @@ QUnit.module('GradeInputHelper', () => {
       test('sets "enteredAs" to null when the grade is cleared', () => {
         strictEqual(parseTextValue('').enteredAs, null)
       })
+
+      test('sets "valid" to true when the grade is a valid point value', () => {
+        strictEqual(parseTextValue('8.34').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is a valid percentage', () => {
+        strictEqual(parseTextValue('83.4%').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is a valid grading scheme key', () => {
+        strictEqual(parseTextValue('B').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is cleared', () => {
+        strictEqual(parseTextValue('').valid, true)
+      })
+
+      test('sets "valid" to true when the value is "EX"', () => {
+        strictEqual(parseTextValue('EX').valid, true)
+      })
+
+      test('sets "valid" to false when given non-numerical string not in the grading scheme', () => {
+        strictEqual(parseTextValue('B-').valid, false)
+      })
     })
 
     QUnit.module('when the "enter grades as" setting is "gradingScheme"', hooks => {
@@ -741,17 +884,17 @@ QUnit.module('GradeInputHelper', () => {
         strictEqual(parseTextValue(' B ').grade, 'B')
       })
 
-      test('sets the grade to null when given a non-numerical string not in the grading scheme', () => {
-        strictEqual(parseTextValue('B-').grade, null)
+      test('sets the grade to the given non-numerical string not in the grading scheme', () => {
+        strictEqual(parseTextValue('B-').grade, 'B-')
       })
 
       test('sets the grade to null when the value is blank', () => {
         strictEqual(parseTextValue('  ').grade, null)
       })
 
-      test('sets the grade to null when given no grading scheme for a non-numerical string', () => {
+      test('sets the grade to the given non-numerical string when given no grading scheme', () => {
         options.gradingScheme = null
-        strictEqual(parseTextValue('B').grade, null)
+        strictEqual(parseTextValue('B').grade, 'B')
       })
 
       test('sets the score to the matching scheme value when given a scheme key', () => {
@@ -931,6 +1074,30 @@ QUnit.module('GradeInputHelper', () => {
       test('sets "enteredAs" to null when the grade is cleared', () => {
         strictEqual(parseTextValue('').enteredAs, null)
       })
+
+      test('sets "valid" to true when the grade is a valid point value', () => {
+        strictEqual(parseTextValue('8.34').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is a valid percentage', () => {
+        strictEqual(parseTextValue('83.4%').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is a valid grading scheme key', () => {
+        strictEqual(parseTextValue('B').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is cleared', () => {
+        strictEqual(parseTextValue('').valid, true)
+      })
+
+      test('sets "valid" to true when the value is "EX"', () => {
+        strictEqual(parseTextValue('EX').valid, true)
+      })
+
+      test('sets "valid" to false when given non-numerical string not in the grading scheme', () => {
+        strictEqual(parseTextValue('B-').valid, false)
+      })
     })
 
     QUnit.module('when the "enter grades as" setting is "passFail"', hooks => {
@@ -1029,6 +1196,26 @@ QUnit.module('GradeInputHelper', () => {
 
       test('sets "enteredAs" to null when given any other value', () => {
         strictEqual(parseTextValue('unknown').enteredAs, null)
+      })
+
+      test('sets "valid" to true when given "complete"', () => {
+        strictEqual(parseTextValue('complete').valid, true)
+      })
+
+      test('sets "valid" to true when given "incomplete"', () => {
+        strictEqual(parseTextValue('incomplete').valid, true)
+      })
+
+      test('sets "valid" to true when the grade is cleared', () => {
+        strictEqual(parseTextValue('').valid, true)
+      })
+
+      test('sets "valid" to true when given "EX"', () => {
+        strictEqual(parseTextValue('EX').valid, true)
+      })
+
+      test('sets "valid" to false when given any other value', () => {
+        strictEqual(parseTextValue('unknown').valid, false)
       })
     })
   })

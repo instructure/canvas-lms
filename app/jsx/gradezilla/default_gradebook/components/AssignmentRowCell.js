@@ -19,10 +19,11 @@
 import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
 import Text from '@instructure/ui-core/lib/components/Text'
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
-import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine';
-import I18n from 'i18n!gradebook';
+import SubmissionCell from 'compiled/gradezilla/SubmissionCell'
+import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine'
+import I18n from 'i18n!gradebook'
 import CellButton from '../GradebookGrid/editors/AssignmentCellEditor/CellButton'
+import InvalidGradeIndicator from '../GradebookGrid/editors/AssignmentCellEditor/InvalidGradeIndicator'
 import GradeInput from '../GradebookGrid/editors/AssignmentCellEditor/GradeInput'
 
 export default class AssignmentRowCell extends Component {
@@ -44,6 +45,13 @@ export default class AssignmentRowCell extends Component {
     gradingScheme: instanceOf(Array).isRequired,
     onGradeSubmission: func.isRequired,
     onToggleSubmissionTrayOpen: func.isRequired,
+    pendingGradeInfo: shape({
+      enteredAs: string,
+      excused: bool.isRequired,
+      grade: string,
+      score: number,
+      valid: bool.isRequired
+    }),
     submission: shape({
       assignmentId: string.isRequired,
       enteredGrade: string,
@@ -53,13 +61,20 @@ export default class AssignmentRowCell extends Component {
       userId: string.isRequired
     }).isRequired,
     submissionIsUpdating: bool.isRequired
-  };
+  }
 
-  constructor (props) {
-    super(props);
+  static defaultProps = {
+    pendingGradeInfo: null
+  }
+
+  constructor(props) {
+    super(props)
 
     this.bindContainerRef = ref => {
       this.contentContainer = ref
+    }
+    this.bindInvalidGradeIndicatorRef = ref => {
+      this.invalidGradeIndicator = ref
     }
     this.bindGradeInput = ref => {
       this.gradeInput = ref
@@ -71,7 +86,7 @@ export default class AssignmentRowCell extends Component {
     this.gradeSubmission = this.gradeSubmission.bind(this)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.props.enterGradesAs === 'passFail') {
       // eslint-disable-next-line new-cap
       this.submissionCell = new SubmissionCell.pass_fail({
@@ -96,38 +111,41 @@ export default class AssignmentRowCell extends Component {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.submissionCell) {
       this.submissionCell.destroy()
     }
   }
 
-  handleKeyDown = (event) => {
+  handleKeyDown = event => {
+    const indicatorHasFocus = this.invalidGradeIndicator === document.activeElement
     const inputHasFocus = this.contentContainer.contains(document.activeElement)
     const trayButtonHasFocus = this.trayButton === document.activeElement
 
-    if (event.which === 9) { // Tab
-      if (!event.shiftKey && inputHasFocus) {
-        // browser will set focus on the tray button
-        return false; // prevent Grid behavior
-      } else if (event.shiftKey && trayButtonHasFocus) {
-        // browser will set focus on the submission cell
-        return false; // prevent Grid behavior
+    const hasPreviousElement = trayButtonHasFocus || (inputHasFocus && this.invalidGradeIndicator)
+    const hasNextElement = inputHasFocus || indicatorHasFocus
+
+    // Tab
+    if (event.which === 9) {
+      if (!event.shiftKey && hasNextElement) {
+        return false // prevent Grid behavior
+      } else if (event.shiftKey && hasPreviousElement) {
+        return false // prevent Grid behavior
       }
     }
 
     // Enter
     if (event.which === 13 && trayButtonHasFocus) {
       // browser will activate the tray button
-      return false; // prevent Grid behavior
+      return false // prevent Grid behavior
     }
 
-    return undefined;
+    return undefined
   }
 
   handleToggleTrayButtonClick = () => {
-    const options = this.props.editorOptions;
-    this.props.onToggleSubmissionTrayOpen(options.item.id, options.column.assignmentId);
+    const options = this.props.editorOptions
+    this.props.onToggleSubmissionTrayOpen(options.item.id, options.column.assignmentId)
   }
 
   focus() {
@@ -146,7 +164,7 @@ export default class AssignmentRowCell extends Component {
     }
   }
 
-  isValueChanged () {
+  isValueChanged() {
     if (this.props.enterGradesAs === 'passFail') {
       return this.submissionCell.isValueChanged()
     }
@@ -163,7 +181,7 @@ export default class AssignmentRowCell extends Component {
     return this.submissionCell ? this.submissionCell.serializeValue() : null
   }
 
-  render () {
+  render() {
     let pointsPossible = null
     if (this.props.enterGradesAs === 'points' && this.props.assignment.pointsPossible) {
       pointsPossible = `/${I18n.n(this.props.assignment.pointsPossible)}`
@@ -172,9 +190,15 @@ export default class AssignmentRowCell extends Component {
     const showEndText =
       this.props.enterGradesAs === 'percent' || this.props.enterGradesAs === 'points'
 
+    const gradeIsInvalid = this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid
+
     return (
       <div className="Grid__AssignmentRowCell">
-        <div className="Grid__AssignmentRowCell__StartContainer" />
+        <div className="Grid__AssignmentRowCell__StartContainer">
+          {gradeIsInvalid && (
+            <InvalidGradeIndicator elementRef={this.bindInvalidGradeIndicatorRef} />
+          )}
+        </div>
 
         <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef}>
           {this.props.enterGradesAs !== 'passFail' && (
@@ -183,6 +207,7 @@ export default class AssignmentRowCell extends Component {
               enterGradesAs={this.props.enterGradesAs}
               disabled={this.props.submissionIsUpdating}
               gradingScheme={this.props.gradingScheme}
+              pendingGradeInfo={this.props.pendingGradeInfo}
               ref={this.bindGradeInput}
               submission={this.props.submission}
             />
@@ -206,6 +231,6 @@ export default class AssignmentRowCell extends Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 }

@@ -54,9 +54,18 @@ function formatGrade (submissionData, assignment, options) {
   return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions);
 }
 
-function renderTemplate (grade, options = {}) {
-  let classNames = ['gradebook-cell'];
-  let content = grade;
+function renderStartContainer(options) {
+  let content = ''
+  if (options.invalid) {
+    content +=
+      '<div class="Grid__AssignmentRowCell__InvalidGrade"><i class="icon-warning"></i></div>'
+  }
+  return `<div class="Grid__AssignmentRowCell__StartContainer">${content}</div>`
+}
+
+function renderTemplate(grade, options = {}) {
+  let classNames = ['Grid__AssignmentRowCell', 'gradebook-cell']
+  let content = grade
 
   if (options.classNames) {
     classNames = [...classNames, ...options.classNames];
@@ -72,10 +81,14 @@ function renderTemplate (grade, options = {}) {
 
   if (options.turnitinState) {
     classNames.push('turnitin');
-    content += `<span class='gradebook-cell-turnitin ${options.turnitinState}-score' />`;
+    content += `<span class="gradebook-cell-turnitin ${options.turnitinState}-score" />`;
   }
 
-  return `<div class="${htmlEscape(classNames.join(' '))}">${content}</div>`;
+  return `<div class="${htmlEscape(classNames.join(' '))}">
+    ${renderStartContainer(options)}
+    <div class="Grid__AssignmentRowCell__Content">${content}</div>
+    <div class="Grid__AssignmentRowCell__EndContainer"></div>
+  </div>`
 }
 
 export default class AssignmentCellFormatter {
@@ -90,14 +103,14 @@ export default class AssignmentCellFormatter {
       getGradingSchemeData (assignmentId) {
         return gradebook.getAssignmentGradingScheme(assignmentId).data;
       },
+      getPendingGradeInfo(submission) {
+        return gradebook.getPendingGradeInfo(submission)
+      },
       getStudent (studentId) {
         return gradebook.student(studentId);
       },
       getSubmissionState (submission) {
         return gradebook.submissionStateMap.getSubmissionState(submission);
-      },
-      getUpdatingSubmission(submission) {
-        return gradebook.getUpdatingSubmission(submission)
       }
     };
   }
@@ -143,14 +156,12 @@ export default class AssignmentCellFormatter {
       score: submission.score
     };
 
-    const updatingSubmission = this.options.getUpdatingSubmission({
+    const pendingGradeInfo = this.options.getPendingGradeInfo({
       assignmentId: assignment.id,
       userId: student.id
     })
-    if (updatingSubmission) {
-      submissionData.excused = updatingSubmission.excused
-      submissionData.grade = updatingSubmission.enteredGrade
-      submissionData.score = updatingSubmission.enteredScore
+    if (pendingGradeInfo) {
+      submissionData.excused = pendingGradeInfo.excused
     }
 
     const options = {
@@ -158,6 +169,7 @@ export default class AssignmentCellFormatter {
       dimmed: student.isInactive || student.isConcluded || submissionState.locked,
       disabled: student.isConcluded || submissionState.locked,
       hidden: submissionState.hideGrade,
+      invalid: !!pendingGradeInfo && !pendingGradeInfo.valid,
       turnitinState: getTurnitinState(submission)
     };
 
@@ -165,7 +177,12 @@ export default class AssignmentCellFormatter {
       return renderTemplate('<i class="icon-not-graded"></i>', options);
     }
 
-    const grade = formatGrade(submissionData, assignment, this.options);
+    let grade
+    if (pendingGradeInfo) {
+      grade = GradeFormatHelper.formatPendingGradeInfo(pendingGradeInfo)
+    } else {
+      grade = formatGrade(submissionData, assignment, this.options)
+    }
 
     return renderTemplate(grade, options);
   };

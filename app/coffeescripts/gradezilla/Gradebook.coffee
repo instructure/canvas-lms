@@ -76,6 +76,7 @@ define [
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
   'jsx/gradezilla/shared/helpers/TextMeasure'
+  'jsx/grading/helpers/GradeInputHelper'
   'jsx/grading/helpers/OutlierScoreHelper'
   'jsx/grading/LatePolicyApplicator'
   '@instructure/ui-core/lib/components/Button'
@@ -103,8 +104,8 @@ define [
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, OutlierScoreHelper, LatePolicyApplicator, { default: Button },
-  { default: IconSettingsSolid }, FlashAlert) ->
+  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, OutlierScoreHelper,
+  LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -224,7 +225,7 @@ define [
 
   getInitialActionStates = () ->
     {
-      submissionsUpdating: []
+      pendingGradeInfo: []
     }
 
   class Gradebook
@@ -2309,23 +2310,24 @@ define [
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
 
-    setSubmissionUpdating: (submission, updating) =>
-      if updating
-        @actionStates.submissionsUpdating.push(submission)
-      else
-        @actionStates.submissionsUpdating = _.reject(@actionStates.submissionsUpdating, (sub) ->
-          sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
-        )
+    addPendingGradeInfo: (submission, gradeInfo) =>
+      { userId, assignmentId } = submission
+      pendingGradeInfo = Object.assign({ assignmentId, userId }, gradeInfo)
+      @removePendingGradeInfo(submission)
+      @actionStates.pendingGradeInfo.push(pendingGradeInfo)
 
-    submissionIsUpdating: (submission) ->
-      @actionStates.submissionsUpdating.some((sub) ->
-        sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
+    removePendingGradeInfo: (submission) =>
+      @actionStates.pendingGradeInfo = _.reject(@actionStates.pendingGradeInfo, (info) ->
+        info.userId == submission.userId and info.assignmentId == submission.assignmentId
       )
 
-    getUpdatingSubmission: (submission) ->
-      @actionStates.submissionsUpdating.find((sub) ->
-        sub.userId == submission.userId and sub.assignmentId == submission.assignmentId
+    getPendingGradeInfo: (submission) =>
+      @actionStates.pendingGradeInfo.find((info) ->
+        info.userId == submission.userId and info.assignmentId == submission.assignmentId
       ) or null
+
+    submissionIsUpdating: (submission) ->
+      Boolean(@getPendingGradeInfo(submission)?.valid)
 
     setTeacherNotesColumnUpdating: (updating) =>
       @contentLoadStates.teacherNotesColumnUpdating = updating
@@ -2669,54 +2671,60 @@ define [
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
 
-    apiUpdateSubmission: (submission, updatingSubmission) =>
+    apiUpdateSubmission: (submission, gradeInfo) =>
       { userId, assignmentId } = submission
       student = @student(userId)
-      @setSubmissionUpdating(updatingSubmission, true)
+      @addPendingGradeInfo(submission, gradeInfo)
       @renderSubmissionTray(student) if @getSubmissionTrayState().open
       GradebookApi.updateSubmission(@options.context_id, assignmentId, userId, submission)
         .then((response) =>
-          @setSubmissionUpdating(updatingSubmission, false)
+          @removePendingGradeInfo(submission)
           @updateSubmissionsFromExternal(response.data.all_submissions)
           @renderSubmissionTray(student) if @getSubmissionTrayState().open
           response
         ).catch((response) =>
-          @setSubmissionUpdating(updatingSubmission, false)
+          @removePendingGradeInfo(submission)
           @updateRowCellsForStudentIds([userId])
           $.flashError I18n.t('There was a problem updating the submission.')
           @renderSubmissionTray(student) if @getSubmissionTrayState().open
           Promise.reject(response)
         )
 
-    gradeSubmission: (submission, gradingData) =>
-      submissionData =
-        assignmentId: submission.assignmentId
-        userId: submission.userId
+    gradeSubmission: (submission, gradeInfo) =>
+      if gradeInfo.valid
+        gradeChangeOptions =
+          enterGradesAs: @getEnterGradesAsSetting(submission.assignmentId)
+          gradingScheme: @getAssignmentGradingScheme(submission.assignmentId).data
+          pointsPossible: @getAssignment(submission.assignmentId).points_possible
 
-      if gradingData.excused
-        submissionData.excuse = true
-      else if gradingData.enteredAs == null
-        submissionData.posted_grade = ''
-      else if ['passFail', 'gradingScheme'].includes(gradingData.enteredAs)
-        submissionData.posted_grade = gradingData.grade
+        if GradeInputHelper.hasGradeChanged(submission, gradeInfo, gradeChangeOptions)
+          submissionData =
+            assignmentId: submission.assignmentId
+            userId: submission.userId
+
+          if gradeInfo.excused
+            submissionData.excuse = true
+          else if gradeInfo.enteredAs == null
+            submissionData.posted_grade = ''
+          else if ['passFail', 'gradingScheme'].includes(gradeInfo.enteredAs)
+            submissionData.posted_grade = gradeInfo.grade
+          else
+            submissionData.posted_grade = gradeInfo.score
+
+          @apiUpdateSubmission(submissionData, gradeInfo)
+            .then((response) =>
+              assignment = @getAssignment(submission.assignmentId)
+              outlierScoreHelper = new OutlierScoreHelper(response.data.score, assignment.points_possible)
+              $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
+            )
+        else
+          @removePendingGradeInfo(submission)
       else
-        submissionData.posted_grade = gradingData.score
-
-      updatingSubmission =
-        assignmentId: submission.assignmentId
-        enteredGrade: gradingData.grade
-        enteredScore: gradingData.score
-        excused: gradingData.excused
-        grade: gradingData.grade
-        score: gradingData.score
-        userId: submission.userId
-
-      @apiUpdateSubmission(submissionData, updatingSubmission)
-        .then((response) =>
-          assignment = @getAssignment(submission.assignmentId)
-          outlierScoreHelper = new OutlierScoreHelper(response.data.score, assignment.points_possible)
-          $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
-        )
+        FlashAlert.showFlashAlert({
+          message: I18n.t('You have entered an invalid grade for this student. Check the value and the grading type and try again.'),
+          type: 'error'
+        })
+        @addPendingGradeInfo(submission, gradeInfo)
 
     updateSubmissionAndRenderSubmissionTray: (data) =>
       { studentId, assignmentId } = @getSubmissionTrayState()
@@ -2725,9 +2733,15 @@ define [
         userId: studentId
       }, data)
 
-      updatingSubmission = ConvertCase.camelize(@getSubmission(studentId, assignmentId))
+      submission = @getSubmission(studentId, assignmentId)
 
-      @apiUpdateSubmission(submissionData, updatingSubmission)
+      gradeInfo =
+        excused: submission.excused
+        grade: submission.entered_grade
+        score: submission.entered_score
+        valid: true
+
+      @apiUpdateSubmission(submissionData, gradeInfo)
 
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')

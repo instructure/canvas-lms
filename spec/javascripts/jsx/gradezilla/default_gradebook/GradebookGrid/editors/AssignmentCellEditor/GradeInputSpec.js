@@ -69,6 +69,24 @@ QUnit.module('GradeInput', suiteHooks => {
     equal(label.text(), 'Grade')
   })
 
+  test('sets the input value to the grade of the pending grade info, when present', () => {
+    props.pendingGradeInfo = {excused: false, grade: 'invalid', valid: false}
+    mountComponent()
+    strictEqual(getTextInputValue(), 'invalid')
+  })
+
+  test('clears the grade input when the pending grade is cleared', () => {
+    props.pendingGradeInfo = {excused: false, grade: null, valid: true}
+    mountComponent()
+    strictEqual(getTextInputValue(), '')
+  })
+
+  test('displays "Excused" when the pending grade is "Excused"', () => {
+    props.pendingGradeInfo = {excused: true, grade: null, valid: true}
+    mountComponent()
+    strictEqual(getTextInputValue(), 'Excused')
+  })
+
   QUnit.module('when the "enter grades as" setting is "points"', contextHooks => {
     contextHooks.beforeEach(() => {
       props.enterGradesAs = 'points'
@@ -479,6 +497,53 @@ QUnit.module('GradeInput', suiteHooks => {
       strictEqual(hasGradeChanged(), false)
     })
 
+    test('returns true when an invalid grade is entered', () => {
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: 'invalid'}})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns false when an invalid grade is entered without change', () => {
+      props.pendingGradeInfo = {grade: 'invalid', valid: false}
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: 'invalid'}})
+      strictEqual(hasGradeChanged(), false)
+    })
+
+    test('ignores whitespace when comparing an invalid grade', () => {
+      props.pendingGradeInfo = {grade: 'invalid', valid: false}
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: '  invalid  '}})
+      strictEqual(hasGradeChanged(), false)
+    })
+
+    test('returns true when an invalid grade is changed to a different invalid grade', () => {
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: 'also invalid'}})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns true when an invalid grade is cleared', () => {
+      props.pendingGradeInfo = {grade: 'invalid', valid: false}
+      mountComponent()
+      wrapper.find('input').simulate('change', {target: {value: ''}})
+      strictEqual(hasGradeChanged(), true)
+    })
+
+    test('returns false when a valid grade is pending', () => {
+      props.pendingGradeInfo = {grade: '8.9', valid: true}
+      mountComponent()
+      // with valid pending grades, the input is disabled
+      // changing grades is not allowed at this time
+      wrapper.find('input').simulate('change', {target: {value: 'invalid'}})
+      strictEqual(hasGradeChanged(), false)
+    })
+
+    test('returns false when a null grade is unchanged', () => {
+      mountComponent()
+      strictEqual(hasGradeChanged(), false)
+    })
+
     QUnit.module('when the "enter grades as" setting is "points"', () => {
       test('returns true when the grade has changed', () => {
         props.submission = {...props.submission, enteredGrade: '7.6', enteredScore: 7.6}
@@ -539,6 +604,13 @@ QUnit.module('GradeInput', suiteHooks => {
         mountComponent()
         wrapper.find('input').simulate('change', {target: {value: '7.6'}})
         strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when an invalid grade is corrected', () => {
+        props.pendingGradeInfo = {grade: 'invalid', valid: false}
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '8.9'}})
+        strictEqual(hasGradeChanged(), true)
       })
     })
 
@@ -606,6 +678,13 @@ QUnit.module('GradeInput', suiteHooks => {
         mountComponent()
         wrapper.find('input').simulate('change', {target: {value: '76%'}})
         strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when an invalid grade is corrected', () => {
+        props.pendingGradeInfo = {grade: 'invalid', valid: false}
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: '89%'}})
+        strictEqual(hasGradeChanged(), true)
       })
     })
 
@@ -680,6 +759,13 @@ QUnit.module('GradeInput', suiteHooks => {
         mountComponent()
         wrapper.find('input').simulate('change', {target: {value: 'C'}})
         strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns true when an invalid grade is corrected', () => {
+        props.pendingGradeInfo = {grade: 'invalid', valid: false}
+        mountComponent()
+        wrapper.find('input').simulate('change', {target: {value: 'B'}})
+        strictEqual(hasGradeChanged(), true)
       })
     })
 

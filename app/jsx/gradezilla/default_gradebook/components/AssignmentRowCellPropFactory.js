@@ -40,12 +40,7 @@ export default class AssignmentRowCellPropFactory {
       userId: student.id
     }
 
-    const updatingSubmission = this.gradebook.getUpdatingSubmission(cleanSubmission)
-    if (updatingSubmission) {
-      cleanSubmission.enteredGrade = updatingSubmission.enteredGrade
-      cleanSubmission.enteredScore = updatingSubmission.enteredScore
-      cleanSubmission.excused = updatingSubmission.excused
-    }
+    const pendingGradeInfo = this.gradebook.getPendingGradeInfo(cleanSubmission)
 
     return {
       assignment: {
@@ -62,10 +57,9 @@ export default class AssignmentRowCellPropFactory {
       },
 
       onGradeSubmission: this.gradebook.gradeSubmission,
-
+      pendingGradeInfo,
       submission: cleanSubmission,
-
-      submissionIsUpdating: !!updatingSubmission
+      submissionIsUpdating: !!pendingGradeInfo && pendingGradeInfo.valid
     }
   }
 }

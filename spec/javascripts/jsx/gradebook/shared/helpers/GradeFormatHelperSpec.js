@@ -310,6 +310,44 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
     });
   });
 
+  QUnit.module('.formatPendingGradeInfo()', hooks => {
+    let options
+    let pendingGradeInfo
+
+    function formatPendingGradeInfo() {
+      return GradeFormatHelper.formatPendingGradeInfo(pendingGradeInfo, options)
+    }
+
+    hooks.beforeEach(() => {
+      pendingGradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+    })
+
+    test('returns the grade when the pending grade is valid', () => {
+      strictEqual(formatPendingGradeInfo(), 'A')
+    })
+
+    test('returns the grade when the pending grade is invalid', () => {
+      pendingGradeInfo.valid = false
+      strictEqual(formatPendingGradeInfo(), 'A')
+    })
+
+    test('returns "–" (en dash) when the pending grade is null', () => {
+      pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      strictEqual(formatPendingGradeInfo(), '–')
+    })
+
+    test('returns the given default value when the pending grade is null', () => {
+      options = {defaultValue: 'default'}
+      pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      strictEqual(formatPendingGradeInfo(), 'default')
+    })
+
+    test('returns "Excused" when the pending grade info includes excused', () => {
+      pendingGradeInfo = {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
+      strictEqual(formatPendingGradeInfo(), 'Excused')
+    })
+  })
+
   QUnit.module('.formatSubmissionGrade', (hooks) => {
     let options;
     let submission;
@@ -383,12 +421,12 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         strictEqual(GradeFormatHelper.formatSubmissionGrade(submission, options), '7.33');
       });
 
-      test('returns "–" (emdash) when the score is null', () => {
+      test('returns "–" (en dash) when the score is null', () => {
         submission.score = null;
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
       });
 
-      test('returns "–" (emdash) for the "entered" version when the entered score is null', () => {
+      test('returns "–" (en dash) for the "entered" version when the entered score is null', () => {
         submission.enteredScore = null;
         options.version = 'entered';
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
@@ -441,12 +479,12 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '78.84%');
       });
 
-      test('returns "–" (emdash) when the score is null', () => {
+      test('returns "–" (en dash) when the score is null', () => {
         submission.score = null;
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
       });
 
-      test('returns "–" (emdash) for the "entered" version when the entered score is null', () => {
+      test('returns "–" (en dash) for the "entered" version when the entered score is null', () => {
         submission.enteredScore = null;
         options.version = 'entered';
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
@@ -495,12 +533,12 @@ QUnit.module('GradeFormatHelper', (suiteHooks) => {
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), 'D');
       });
 
-      test('returns "–" (emdash) when the score is null', () => {
+      test('returns "–" (en dash) when the score is null', () => {
         submission.score = null;
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');
       });
 
-      test('returns "–" (emdash) for the "entered" version when the entered score is null', () => {
+      test('returns "–" (en dash) for the "entered" version when the entered score is null', () => {
         submission.enteredScore = null;
         options.version = 'entered';
         equal(GradeFormatHelper.formatSubmissionGrade(submission, options), '–');

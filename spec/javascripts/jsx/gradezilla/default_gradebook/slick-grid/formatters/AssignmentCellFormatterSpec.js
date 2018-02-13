@@ -73,6 +73,10 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
     return $fixture.querySelector('.gradebook-cell')
   }
 
+  function getRenderedGrade() {
+    return $fixture.querySelector('.Grid__AssignmentRowCell__Content')
+  }
+
   function excuseSubmission() {
     submission.grade = null
     submission.score = null
@@ -149,27 +153,32 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
     test('renders an empty cell when the student is not loaded', () => {
       student.loaded = false
-      strictEqual(renderCell().innerHTML, '')
+      renderCell()
+      strictEqual(getRenderedGrade().innerHTML, '')
     })
 
     test('renders an empty cell when the student is not initialized', () => {
       student.initialized = false
-      strictEqual(renderCell().innerHTML, '')
+      renderCell()
+      strictEqual(getRenderedGrade().innerHTML, '')
     })
 
     test('renders an empty cell when the submission is not defined', () => {
       submission = undefined
-      strictEqual(renderCell().innerHTML, '')
+      renderCell()
+      strictEqual(getRenderedGrade().innerHTML, '')
     })
 
     test('renders an empty cell when the submission state is not defined', () => {
       gradebook.submissionStateMap.getSubmissionState.withArgs(submission).returns(undefined)
-      strictEqual(renderCell().innerHTML, '')
+      renderCell()
+      strictEqual(getRenderedGrade().innerHTML, '')
     })
 
     test('renders an empty cell when the submission has a hidden grade', () => {
       submissionState.hideGrade = true
-      strictEqual(renderCell().innerHTML, '')
+      renderCell()
+      strictEqual(getRenderedGrade().innerHTML, '')
     })
 
     test('renders a grayed-out cell when the student enrollment is inactive', () => {
@@ -232,13 +241,93 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       ok(renderCell().classList.contains('muted'))
     })
 
+    test('displays the pending grade when present', () => {
+      const pendingGradeInfo = {
+        enteredAs: 'points',
+        excused: false,
+        grade: 'A',
+        score: 9.1,
+        valid: true
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      renderCell()
+      equal(getRenderedGrade().innerHTML.trim(), 'A')
+    })
+
+    test('displays the grade as "Excused" when the submission is being excused', () => {
+      const pendingGradeInfo = {
+        enteredAs: 'excused',
+        excused: true,
+        grade: null,
+        score: null,
+        valid: true
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      renderCell()
+      equal(getRenderedGrade().innerHTML.trim(), 'Excused')
+    })
+
+    test('includes the "excused" style when the submission is being excused', () => {
+      const pendingGradeInfo = {
+        enteredAs: 'excused',
+        excused: true,
+        grade: null,
+        score: null,
+        valid: true
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      ok(renderCell().classList.contains('excused'))
+    })
+
+    test('displays the grade as "–" (en dash) when the grade is being cleared', () => {
+      const pendingGradeInfo = {
+        enteredAs: null,
+        excused: false,
+        grade: null,
+        score: null,
+        valid: true
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      renderCell()
+      equal(getRenderedGrade().innerHTML.trim(), '–')
+    })
+
+    test('displays an invalid grade indicator when the pending grade is invalid', () => {
+      const pendingGradeInfo = {
+        enteredAs: null,
+        excused: false,
+        grade: 'invalid',
+        score: null,
+        valid: false
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+    })
+
+    test('does not display an invalid grade indicator when the pending grade is valid', () => {
+      const pendingGradeInfo = {
+        enteredAs: null,
+        excused: false,
+        grade: null,
+        score: null,
+        valid: true
+      }
+      gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
+      strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+    })
+
+    test('does not display an invalid grade indicator when no grade is pending', () => {
+      strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+    })
+
     QUnit.module('with a "points" assignment submission', contextHooks => {
       contextHooks.beforeEach(() => {
         gradebook.getAssignment('2301').grading_type = 'points'
       })
 
       test('renders the score converted to a points string', () => {
-        strictEqual(renderCell().innerHTML.trim(), '8')
+        renderCell()
+        strictEqual(getRenderedGrade().innerHTML.trim(), '8')
       })
 
       test('renders the "needs grading" icon when the submission was graded and cleared', () => {
@@ -263,31 +352,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
       test('renders "Excused" when the submission is excused', () => {
         excuseSubmission()
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
-      })
-
-      test('uses the updating grade data when the submission is updating', () => {
-        const updatingSubmission = {
-          assignmentId: '2301',
-          enteredGrade: 'B',
-          enteredScore: 8.9,
-          excused: false,
-          userId: '1101'
-        }
-        gradebook.setSubmissionUpdating(updatingSubmission, true)
-        strictEqual(renderCell().innerHTML.trim(), '8.9')
-      })
-
-      test('renders "Excused" when the submission is being excused', () => {
-        const updatingSubmission = {
-          assignmentId: '2301',
-          enteredGrade: null,
-          enteredScore: null,
-          excused: true,
-          userId: '1101'
-        }
-        gradebook.setSubmissionUpdating(updatingSubmission, true)
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'Excused')
       })
     })
 
@@ -297,7 +363,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       })
 
       test('renders the score converted to a percentage', () => {
-        strictEqual(renderCell().innerHTML.trim(), '80%')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), '80%')
       })
 
       test('renders the "needs grading" icon when the submission was graded and cleared', () => {
@@ -322,31 +389,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
       test('renders "Excused" when the submission is excused', () => {
         excuseSubmission()
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
-      })
-
-      test('uses the updating grade data when the submission is updating', () => {
-        const updatingSubmission = {
-          assignmentId: '2301',
-          enteredGrade: 'B',
-          enteredScore: 8.9,
-          excused: false,
-          userId: '1101'
-        }
-        gradebook.setSubmissionUpdating(updatingSubmission, true)
-        strictEqual(renderCell().innerHTML.trim(), '89%')
-      })
-
-      test('renders "Excused" when the submission is being excused', () => {
-        const updatingSubmission = {
-          assignmentId: '2301',
-          enteredGrade: null,
-          enteredScore: null,
-          excused: true,
-          userId: '1101'
-        }
-        gradebook.setSubmissionUpdating(updatingSubmission, true)
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'Excused')
       })
     })
 
@@ -357,14 +401,16 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       })
 
       test('renders the score converted to a letter grade', () => {
-        strictEqual(renderCell().firstChild.wholeText.trim(), 'A')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'A')
       })
 
       test('renders the grade when the assignment has no points possible', () => {
         gradebook.getAssignment('2301').points_possible = 0
         submission.grade = 'A'
         submission.score = 0
-        strictEqual(renderCell().firstChild.wholeText.trim(), 'A')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'A')
       })
 
       test('renders the "needs grading" icon when the submission was graded and cleared', () => {
@@ -389,31 +435,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
       test('renders "Excused" when the submission is excused', () => {
         excuseSubmission()
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
-      })
-
-      test('uses the updating grade data when the submission is updating', () => {
-        const updatingSubmission = {
-          assignmentId: '2301',
-          enteredGrade: 'A',
-          enteredScore: 9.1,
-          excused: false,
-          userId: '1101'
-        }
-        gradebook.setSubmissionUpdating(updatingSubmission, true)
-        strictEqual(renderCell().innerHTML.trim(), 'A')
-      })
-
-      test('renders "Excused" when the submission is being excused', () => {
-        const updatingSubmission = {
-          assignmentId: '2301',
-          enteredGrade: null,
-          enteredScore: null,
-          excused: true,
-          userId: '1101'
-        }
-        gradebook.setSubmissionUpdating(updatingSubmission, true)
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'Excused')
       })
     })
 
@@ -436,7 +459,7 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
         strictEqual(renderCell().querySelectorAll('button i.icon-x').length, 1)
       })
 
-      test('renders an emdash "–" when the submission is unsubmitted', () => {
+      test('renders "–" (en dash) when the submission is unsubmitted', () => {
         submission.grade = null
         submission.rawGrade = null
         submission.score = null
@@ -478,7 +501,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       })
 
       test('renders the score converted to a letter grade', () => {
-        strictEqual(renderCell().innerHTML.trim(), 'A')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'A')
       })
 
       test('renders the "needs grading" icon when the submission was graded and cleared', () => {
@@ -503,7 +527,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
       test('renders "Excused" when the submission is excused', () => {
         excuseSubmission()
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'Excused')
       })
     })
 
@@ -514,7 +539,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
       })
 
       test('renders the score converted to a points string', () => {
-        strictEqual(renderCell().innerHTML.trim(), '8')
+        renderCell()
+        strictEqual(getRenderedGrade().innerHTML.trim(), '8')
       })
 
       test('renders the "needs grading" icon when the submission was graded and cleared', () => {
@@ -544,7 +570,8 @@ QUnit.module('AssignmentCellFormatter', suiteHooks => {
 
       test('renders "Excused" when the submission is excused', () => {
         excuseSubmission()
-        strictEqual(renderCell().innerHTML.trim(), 'Excused')
+        renderCell()
+        equal(getRenderedGrade().innerHTML.trim(), 'Excused')
       })
     })
   })

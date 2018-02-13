@@ -132,6 +132,23 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '')
       })
+
+      test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: false}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+      })
+
+      test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: true}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+      })
+
+      test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+      })
     })
 
     QUnit.module('when the "enter grades as setting" is "percent"', hooks => {
@@ -164,6 +181,23 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '')
       })
+
+      test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: false}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+      })
+
+      test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: true}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+      })
+
+      test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+      })
     })
 
     QUnit.module('when the "enter grades as setting" is "gradingScheme"', hooks => {
@@ -190,6 +224,23 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       test('does not render end text', () => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 0)
+      })
+
+      test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: false}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+      })
+
+      test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: true}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+      })
+
+      test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
       })
     })
 
@@ -241,21 +292,21 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       test('does not skip SlickGrid default behavior when tabbing from tray button', () => {
         wrapper = mountComponent()
         wrapper.node.trayButton.focus()
-        const continueHandling = simulateKeyDown(9, false) // tab into next cell
+        const continueHandling = simulateKeyDown(9, false) // tab out of grid
         equal(typeof continueHandling, 'undefined')
       })
 
       test('does not skip SlickGrid default behavior when shift-tabbing from grade input', () => {
         wrapper = mountComponent()
         wrapper.node.gradeInput.focus()
-        const continueHandling = simulateKeyDown(9, true) // shift+tab back to previous cell
+        const continueHandling = simulateKeyDown(9, true) // shift+tab out of grid
         equal(typeof continueHandling, 'undefined')
       })
 
-      test('skips SlickGrid default behavior when entering into tray button', () => {
+      test('skips SlickGrid default behavior when pressing enter on tray button', () => {
         wrapper = mountComponent()
         wrapper.node.trayButton.focus()
-        const continueHandling = simulateKeyDown(13) // enter into tray button
+        const continueHandling = simulateKeyDown(13) // enter on tray button (open tray)
         strictEqual(continueHandling, false)
       })
 
@@ -264,6 +315,33 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper.node.gradeInput.focus()
         const continueHandling = simulateKeyDown(13) // enter on grade input (commit editor)
         equal(typeof continueHandling, 'undefined')
+      })
+
+      QUnit.module('when the grade is invalid', contextHooks => {
+        contextHooks.beforeEach(() => {
+          props.pendingGradeInfo = {excused: false, grade: null, valid: false}
+        })
+
+        test('Tab on the invalid grade indicator skips SlickGrid default behavior', () => {
+          wrapper = mountComponent()
+          wrapper.node.invalidGradeIndicator.focus()
+          const continueHandling = simulateKeyDown(9, false) // tab to tray button trigger
+          strictEqual(continueHandling, false)
+        })
+
+        test('Shift+Tab on the grade input skips SlickGrid default behavior', () => {
+          wrapper = mountComponent()
+          wrapper.node.gradeInput.focus()
+          const continueHandling = simulateKeyDown(9, true) // shift+tab back to indicator
+          strictEqual(continueHandling, false)
+        })
+
+        test('Shift+Tab on the invalid grade indicator does not skip SlickGrid default behavior', () => {
+          wrapper = mountComponent()
+          wrapper.node.invalidGradeIndicator.focus()
+          const continueHandling = simulateKeyDown(9, true) // shift+tab out of grid
+          equal(typeof continueHandling, 'undefined')
+        })
       })
     })
 
@@ -296,7 +374,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       test('does not skip SlickGrid default behavior when shift-tabbing from grade input', () => {
         wrapper = mountComponent();
         wrapper.node.submissionCell.focus();
-        const continueHandling = simulateKeyDown(9, true); // shift+tab back to previous cell
+        const continueHandling = simulateKeyDown(9, true); // shift+tab out of grid
         equal(typeof continueHandling, 'undefined');
       });
 
