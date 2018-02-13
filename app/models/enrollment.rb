@@ -457,7 +457,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    DueDateCacher.recompute_course(course) if @update_cached_due_dates
+    DueDateCacher.recompute_users_for_course(user_id, course) if @update_cached_due_dates
   end
 
   def update_from(other, skip_broadcasts=false)

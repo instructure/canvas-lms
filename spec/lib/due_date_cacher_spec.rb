@@ -89,8 +89,57 @@ describe DueDateCacher do
     end
   end
 
+  describe ".recompute_users_for_course" do
+    let!(:assignment_1) { @assignment }
+    let(:assignment_2) { assignment_model(course: @course) }
+    let(:assignments) { [assignment_1, assignment_2] }
+
+    let!(:student_1) { @student }
+    let(:student_2) { student_in_course(course: @course) }
+    let(:student_ids) { [student_1.id, student_2.id] }
+    let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+
+    it "delegates to an instance" do
+      expect(DueDateCacher).to receive(:new).and_return(instance)
+      expect(instance).to receive(:recompute)
+      DueDateCacher.recompute_users_for_course(student_1.id, @course)
+    end
+
+    it "passes along the whole user array" do
+      expect(DueDateCacher).to receive(:new).and_return(instance).
+        with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids)
+      DueDateCacher.recompute_users_for_course(student_ids, @course)
+    end
+
+    it "passes assignments if it has any specified" do
+      expect(DueDateCacher).to receive(:new).and_return(instance).
+        with(@course, assignments, student_ids)
+      DueDateCacher.recompute_users_for_course(student_ids, @course, assignments)
+    end
+
+    it "handles being called with a course id" do
+      expect(DueDateCacher).to receive(:new).and_return(instance).
+        with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids)
+      DueDateCacher.recompute_users_for_course(student_ids, @course.id)
+    end
+
+    it "queues a delayed job in a singleton if given no assignments and no singleton option" do
+      expect(DueDateCacher).to receive(:new).and_return(instance)
+      expect(instance).to receive(:send_later_if_production_enqueue_args).
+        with(:recompute, singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{student_1.id}")
+      DueDateCacher.recompute_users_for_course(student_1.id, @course)
+    end
+
+    it "queues a delayed job in a singleton if given no assignments and a singleton option" do
+      expect(DueDateCacher).to receive(:new).and_return(instance)
+      expect(instance).to receive(:send_later_if_production_enqueue_args).
+        with(:recompute, singleton: "what:up:dog")
+      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog")
+    end
+  end
+
   describe "#recompute" do
-    before do
+    before(:once) do
       @cacher = DueDateCacher.new(@course, [@assignment])
       submission_model(:assignment => @assignment, :user => @student)
       Submission.update_all(:cached_due_date => nil)
@@ -536,6 +585,42 @@ describe DueDateCacher do
       expect(LatePolicyApplicator).not_to receive(:for_assignment)
 
       DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
+    end
+
+    context "when called for specific users" do
+      before(:once) do
+        @student_1 = @student
+        @student_2, @student_3, @student_4 = n_students_in_course(3, course: @course)
+        # The n_students_in_course helper creates the enrollments in a
+        # way that appear to skip callbacks
+        @cacher.recompute
+      end
+
+      it "leaves other users submissions alone on enrollment destroy" do
+        @student_3.enrollments.each(&:destroy)
+
+        sub_ids = Submission.active.where(assignment: @assignment).order(:user_id).pluck(:user_id)
+        expect(sub_ids).to contain_exactly(@student_1.id, @student_2.id, @student_4.id)
+      end
+
+      it "adds submissions for a single user added to a course" do
+        new_student = user_model
+        @course.enroll_user(new_student)
+
+        submission = Submission.active.where(assignment: @assignment, user_id: new_student.id)
+        expect(submission).to exist
+      end
+
+      it "adds submissions for multiple users" do
+        new_students = n_students_in_course(2, course: @course)
+        new_student_ids = new_students.map(&:id)
+
+        ddc = DueDateCacher.new(@course, @assignment, new_student_ids)
+        ddc.recompute
+
+        submission_count = Submission.active.where(assignment: @assignment, user_id: new_student_ids).count
+        expect(submission_count).to eq 2
+      end
     end
   end
 end
