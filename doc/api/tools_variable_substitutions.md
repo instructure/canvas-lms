@@ -661,6 +661,15 @@ Returns the users preference for high contrast colors (an accessibility feature)
 ```
 false
 ```
+## com.instructure.Course.groupIds
+returns the Canvas ids of all active groups in the current course.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_course_groupids*  
+
+```
+23,24,...
+```
 ## Canvas.group.contextIds
 returns the context ids for the groups the user belongs to in the course.
 

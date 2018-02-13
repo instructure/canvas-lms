@@ -104,7 +104,8 @@ module Lti
          com.instructure.Editor.selection
          com.instructure.Group.id
          com.instructure.Group.name
-         Canvas.membership.roles)
+         Canvas.membership.roles
+         com.instructure.Course.groupIds)
     }
 
     describe '#supported_capabilities' do

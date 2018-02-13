@@ -723,6 +723,17 @@ module Lti
                        -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
                        USER_GUARD
 
+    # returns the Canvas ids of all active groups in the current course.
+    # @example
+    #   ```
+    #   23,24,...
+    #   ```
+    register_expansion 'com.instructure.Course.groupIds', [],
+                       -> { @context.groups.active.pluck(:id).join(',') },
+                       COURSE_GUARD,
+                       default_name: 'com_instructure_course_groupids'
+
+
     # returns the context ids for the groups the user belongs to in the course.
     # @example
     #   ```
