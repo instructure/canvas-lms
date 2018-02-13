@@ -29,7 +29,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # raw
 ], ($, _, I18n, numberHelper, GradeFormatHelper, GRADEBOOK_TRANSLATIONS,
-  OutlierScoreHelper, htmlEscape, {extractDataTurnitin}, round) ->
+  { default: OutlierScoreHelper }, htmlEscape, {extractDataTurnitin}, round) ->
 
   class SubmissionCell
 

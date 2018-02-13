@@ -6901,6 +6901,31 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.isNotCountedForScore, true)
   })
+
+  test('sets pendingGradeInfo when a pending grade exists for the current student/assignment', () => {
+    const pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+    const submission = {assignmentId: '2301', userId: '1101'}
+
+    gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    deepEqual(
+      props.pendingGradeInfo,
+      { ...pendingGradeInfo, assignmentId: '2301', userId: '1101' }
+    )
+  })
+
+  test('sets pendingGradeInfo to null when no pending grade exists for the current student/assignment', () => {
+    const pendingGradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+    const submission = {assignmentId: '2302', userId: '1101'}
+
+    gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    notOk(props.pendingGradeInfo)
+  })
 });
 
 QUnit.module('Gradebook#renderSubmissionTray', {
@@ -7799,6 +7824,7 @@ QUnit.module('Gradebook', () => {
     let submission
     let gradeInfo
     let response
+    let renderSubmissionTrayStub
 
     hooks.beforeEach(() => {
       const defaultGradingScheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]]
@@ -7836,10 +7862,12 @@ QUnit.module('Gradebook', () => {
         return apiPromise
       })
       sinon.stub($, 'flashWarning')
+      renderSubmissionTrayStub = sinon.stub(gradebook, 'renderSubmissionTray')
     })
 
     hooks.afterEach(() => {
       $.flashWarning.restore()
+      renderSubmissionTrayStub.restore()
     })
 
     test('updates the submission via Gradebook.apiUpdateSubmission', () => {
@@ -7987,6 +8015,20 @@ QUnit.module('Gradebook', () => {
       test('does not update the grade via the api', () => {
         strictEqual(gradebook.apiUpdateSubmission.callCount, 0)
       })
+
+      test('re-renders the submission tray if it is open', function () {
+        sinon.stub(gradebook, 'getSubmissionTrayState').callsFake(() => ({ open: true }))
+
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 1)
+
+        gradebook.getSubmissionTrayState.restore()
+      })
+
+      test('does not attempt to re-render the submission tray if it is not open', function () {
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 0)
+      })
     })
 
     QUnit.module('when the grade info is invalid', contextHooks => {
@@ -8031,6 +8073,18 @@ QUnit.module('Gradebook', () => {
       test('mentions the invalid grade in the flash alert', function () {
         const [{message}] = FlashAlert.showFlashAlert.lastCall.args
         ok(message.includes('invalid grade'))
+      })
+
+      test('re-renders the submission tray if it is open', function () {
+        sinon.stub(gradebook, 'getSubmissionTrayState').callsFake(() => ({ open: true }))
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 1)
+        gradebook.getSubmissionTrayState.restore()
+      })
+
+      test('does not attempt to re-render the submission tray if it is not open', function () {
+        gradebook.gradeSubmission(submission, gradeInfo)
+        strictEqual(gradebook.renderSubmissionTray.callCount, 0)
       })
     })
   })

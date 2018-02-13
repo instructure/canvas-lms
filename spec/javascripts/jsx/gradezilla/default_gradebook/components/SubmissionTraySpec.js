@@ -560,6 +560,16 @@ QUnit.module('SubmissionTray', function (hooks) {
       const isNotCountedForScore = wrapContent().find('SubmissionStatus').at(0).prop('isNotCountedForScore')
       deepEqual(isNotCountedForScore, wrapper.prop('isNotCountedForScore'))
     });
+
+    test('receives the "pendingGradeInfo" given to the Tray', function() {
+      const pendingGradeInfo = {
+        excused: false,
+        grade: '10',
+        valid: true
+      };
+      mountComponent({ pendingGradeInfo });
+      equal(wrapContent().find('GradeInput').prop('pendingGradeInfo'), pendingGradeInfo);
+    });
   });
 
   test('renders the new comment form if the editedCommentId is null', function () {

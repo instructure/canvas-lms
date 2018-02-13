@@ -104,7 +104,7 @@ define [
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, OutlierScoreHelper,
+  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, { default: OutlierScoreHelper },
   LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
 
   isAdmin = =>
@@ -2149,6 +2149,7 @@ define [
       onClose: => @gradebookGrid.gridSupport.helper.focus()
       onGradeSubmission: @gradeSubmission
       onRequestClose: @closeSubmissionTray
+      pendingGradeInfo: @getPendingGradeInfo({ assignmentId, userId: studentId })
       selectNextAssignment: => @loadTrayAssignment('next')
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
@@ -2723,12 +2724,14 @@ define [
             )
         else
           @removePendingGradeInfo(submission)
+          @renderSubmissionTray() if @getSubmissionTrayState().open
       else
         FlashAlert.showFlashAlert({
           message: I18n.t('You have entered an invalid grade for this student. Check the value and the grading type and try again.'),
           type: 'error'
         })
         @addPendingGradeInfo(submission, gradeInfo)
+        @renderSubmissionTray() if @getSubmissionTrayState().open
 
     updateSubmissionAndRenderSubmissionTray: (data) =>
       { studentId, assignmentId } = @getSubmissionTrayState()
