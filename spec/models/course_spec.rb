@@ -65,6 +65,22 @@ describe Course do
     @course.save!
   end
 
+  it "should correctly identify course as active" do
+    @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
+    expect(@course.inactive?).to eq false
+  end
+
+  it "should correctly identify destroyed course as not active" do
+    @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
+    @course.destroy!
+    expect(@course.inactive?).to eq true
+  end
+
+  it "should correctly identify concluded course as not active" do
+    @course.complete!
+    expect(@course.inactive?).to eq true
+  end
+
   describe "#recompute_student_scores" do
     it "should use all student ids except concluded and deleted if none are passed" do
       @course.save!

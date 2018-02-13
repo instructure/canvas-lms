@@ -195,6 +195,10 @@ class Group < ActiveRecord::Base
     raise "DONT USE THIS, use .short_name instead" unless Rails.env.production?
   end
 
+  def inactive?
+    self.context.deleted? || (self.context.is_a?(Course) && self.context.inactive?)
+  end
+
   def context_available?
     return false unless self.context
     case self.context

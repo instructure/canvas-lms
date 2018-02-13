@@ -1473,6 +1473,12 @@ class Course < ActiveRecord::Base
     conclude_at && conclude_at < Time.now.utc && conclude_at > 1.month.ago
   end
 
+  # People may conclude courses and then unclude them. This is a good alias_method
+  # to check for in situations where we are dependent on those cases
+  def inactive?
+    self.deleted? || self.completed?
+  end
+
   # Public: Return true if the end date for a course (or its term, if the course doesn't have one) has passed.
   #
   # Returns boolean or nil.

@@ -61,6 +61,46 @@ describe Group do
     expect(@group.time_zone.to_s).to match /Mountain Time/
   end
 
+  it "should correctly identify group as active" do
+    course_with_student(:active_all => true)
+    group_model(:group_category => @communities, :is_public => true)
+    group.add_user(@student)
+    expect(@group.inactive?).to eq false
+  end
+
+  it "should correctly identify destroyed course as not active" do
+    course_with_student(:active_all => true)
+    group_model(:group_category => @communities, :is_public => true)
+    group.add_user(@student)
+    @group.context = @course
+    @course.destroy!
+    expect(@group.inactive?).to eq true
+  end
+
+  it "should correctly identify concluded course as not active" do
+    course_with_student(:active_all => true)
+    group_model(:group_category => @communities, :is_public => true)
+    group.add_user(@student)
+    @group.context = @course
+    @course.complete!
+    expect(@group.inactive?).to eq true
+  end
+
+  it "should correctly identify account group as not active" do
+    @account = account_model
+    group_model(:group_category => @communities, :is_public => true, :context => @account)
+    group.add_user(@student)
+    @group.context.destroy
+    expect(@group.inactive?).to eq true
+  end
+
+  it "should correctly identify account group as active" do
+    @account = account_model
+    group_model(:group_category => @communities, :is_public => true, :context => @account)
+    group.add_user(@student)
+    expect(@group.inactive?).to eq false
+  end
+
   context "#peer_groups" do
     it "should find all peer groups" do
       context = course_model
