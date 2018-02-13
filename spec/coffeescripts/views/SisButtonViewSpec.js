@@ -1,318 +1,390 @@
-#
-# Copyright (C) 2016 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'jquery'
-  'compiled/views/SisButtonView'
-  'Backbone'
-], ($, SisButtonView, Backbone) ->
+import $ from 'jquery'
+import SisButtonView from 'compiled/views/SisButtonView'
+import Backbone from 'Backbone'
 
-  class AssignmentStub extends Backbone.Model
-    url: '/fake'
-    postToSIS: (postToSisBoolean) =>
-      return @get 'post_to_sis' unless arguments.length > 0
-      @set 'post_to_sis', postToSisBoolean
 
-    name: (newName) =>
-      return @get 'name' unless arguments.length > 0
-      @set 'name', newName
+class AssignmentStub extends Backbone.Model {
+  constructor() {
+    super(...arguments)
+    this.postToSIS = this.postToSIS.bind(this)
+    this.name = this.name.bind(this)
+    this.dueAt = this.dueAt.bind(this)
+    this.allDates = this.allDates.bind(this)
+  }
 
-    maxNameLength: =>
-      return ENV.MAX_NAME_LENGTH
+  postToSIS(postToSisBoolean) {
+    if (!(arguments.length > 0)) {
+      return this.get('post_to_sis')
+    }
+    return this.set('post_to_sis', postToSisBoolean)
+  }
 
-    dueAt: (date) =>
-      return @get 'due_at' unless arguments.length > 0
-      @set 'due_at', date
+  name(newName) {
+    if (!(arguments.length > 0)) {
+      return this.get('name')
+    }
+    return this.set('name', newName)
+  }
 
-    allDates: (alldate) =>
-      return @get 'all_dates' unless arguments.length > 0
-      @set 'all_dates', alldate
+  maxNameLength() {
+    return ENV.MAX_NAME_LENGTH
+  }
 
-    sisIntegrationSettingsEnabled: =>
-      return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
+  dueAt(date) {
+    if (!(arguments.length > 0)) {
+      return this.get('due_at')
+    }
+    return this.set('due_at', date)
+  }
 
-  class QuizStub extends Backbone.Model
-    url: '/fake'
-    postToSIS: (postToSisBoolean) =>
-      return @get 'post_to_sis' unless arguments.length > 0
-      @set 'post_to_sis', postToSisBoolean
+  allDates(alldate) {
+    if (!(arguments.length > 0)) {
+      return this.get('all_dates')
+    }
+    return this.set('all_dates', alldate)
+  }
 
-    name: (newName) =>
-      return @get 'title' unless arguments.length > 0
-      @set 'title', newName
+  sisIntegrationSettingsEnabled() {
+    return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
+  }
+}
+AssignmentStub.prototype.url = '/fake'
 
-    maxNameLength: =>
-      return ENV.MAX_NAME_LENGTH
+class QuizStub extends Backbone.Model {
+  constructor() {
+    super(...arguments)
+    this.postToSIS = this.postToSIS.bind(this)
+    this.name = this.name.bind(this)
+    this.dueAt = this.dueAt.bind(this)
+    this.allDates = this.allDates.bind(this)
+  }
 
-    dueAt: (date) =>
-      return @get 'due_at' unless arguments.length > 0
-      @set 'due_at', date
+  postToSIS(postToSisBoolean) {
+    if (!(arguments.length > 0)) {
+      return this.get('post_to_sis')
+    }
+    return this.set('post_to_sis', postToSisBoolean)
+  }
 
-    allDates: (alldate) =>
-      return @get 'all_dates' unless arguments.length > 0
-      @set 'all_dates', alldate
+  name(newName) {
+    if (!(arguments.length > 0)) {
+      return this.get('title')
+    }
+    return this.set('title', newName)
+  }
 
-    sisIntegrationSettingsEnabled: =>
-      return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
+  maxNameLength() {
+    return ENV.MAX_NAME_LENGTH
+  }
 
-  QUnit.module 'SisButtonView',
-    setup: ->
-      @assignment = new AssignmentStub()
-      @quiz = new QuizStub()
-      @quiz.set('toggle_post_to_sis_url', '/some_other_url')
+  dueAt(date) {
+    if (!(arguments.length > 0)) {
+      return this.get('due_at')
+    }
+    return this.set('due_at', date)
+  }
 
-  test 'properly populates initial settings', ->
-    @assignment.set('post_to_sis', true)
-    @quiz.set('post_to_sis', false)
-    @view1 = new SisButtonView(model: @assignment, sisName: 'SIS')
-    @view2 = new SisButtonView(model: @quiz, sisName: 'SIS')
-    @view1.render()
-    @view2.render()
-    equal @view1.$input.attr('title'), 'Sync to SIS enabled. Click to toggle.'
-    equal @view2.$input.attr('title'), 'Sync to SIS disabled. Click to toggle.'
+  allDates(alldate) {
+    if (!(arguments.length > 0)) {
+      return this.get('all_dates')
+    }
+    return this.set('all_dates', alldate)
+  }
 
-  test 'properly populates initial settings with custom SIS name', ->
-    @assignment.set('post_to_sis', true)
-    @quiz.set('post_to_sis', false)
-    @view1 = new SisButtonView(model: @assignment, sisName: 'PowerSchool')
-    @view2 = new SisButtonView(model: @quiz, sisName: 'PowerSchool')
-    @view1.render()
-    @view2.render()
-    equal @view1.$input.attr('title'), 'Sync to PowerSchool enabled. Click to toggle.'
-    equal @view2.$input.attr('title'), 'Sync to PowerSchool disabled. Click to toggle.'
+  sisIntegrationSettingsEnabled() {
+    return ENV.SIS_INTEGRATION_SETTINGS_ENABLED
+  }
+}
+QuizStub.prototype.url = '/fake'
 
-  test 'properly toggles model sis status when clicked', ->
-    ENV.MAX_NAME_LENGTH = 256
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment)
-    @view.render()
-    @view.$el.click()
-    ok @assignment.postToSIS()
-    @view.$el.click()
-    ok !@assignment.postToSIS()
+QUnit.module('SisButtonView', {
+  setup() {
+    this.assignment = new AssignmentStub()
+    this.quiz = new QuizStub()
+    this.quiz.set('toggle_post_to_sis_url', '/some_other_url')
+  }
+})
 
-  test 'model does not save if there are name length errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment, maxNameLengthRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@assignment.postToSIS()
+test('properly populates initial settings', function() {
+  this.assignment.set('post_to_sis', true)
+  this.quiz.set('post_to_sis', false)
+  this.view1 = new SisButtonView({model: this.assignment, sisName: 'SIS'})
+  this.view2 = new SisButtonView({model: this.quiz, sisName: 'SIS'})
+  this.view1.render()
+  this.view2.render()
+  equal(this.view1.$input.attr('title'), 'Sync to SIS enabled. Click to toggle.')
+  equal(this.view2.$input.attr('title'), 'Sync to SIS disabled. Click to toggle.')
+})
 
-  test 'model saves if there are name length errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment, maxNameLengthRequired: false)
-    @view.render()
-    @view.$el.click()
-    ok @assignment.postToSIS()
+test('properly populates initial settings with custom SIS name', function() {
+  this.assignment.set('post_to_sis', true)
+  this.quiz.set('post_to_sis', false)
+  this.view1 = new SisButtonView({model: this.assignment, sisName: 'PowerSchool'})
+  this.view2 = new SisButtonView({model: this.quiz, sisName: 'PowerSchool'})
+  this.view1.render()
+  this.view2.render()
+  equal(this.view1.$input.attr('title'), 'Sync to PowerSchool enabled. Click to toggle.')
+  equal(this.view2.$input.attr('title'), 'Sync to PowerSchool disabled. Click to toggle.')
+})
 
-  test 'model does not save if there are name length errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz, maxNameLengthRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@quiz.postToSIS()
+test('properly toggles model sis status when clicked', function() {
+  ENV.MAX_NAME_LENGTH = 256
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.assignment})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.assignment.postToSIS())
+  this.view.$el.click()
+  ok(!this.assignment.postToSIS())
+})
 
-  test 'model saves if there are name length errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz, maxNameLengthRequired: false)
-    @view.render()
-    @view.$el.click()
-    ok @quiz.postToSIS()
+test('model does not save if there are name length errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.assignment, maxNameLengthRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.assignment.postToSIS())
+})
 
-  test 'model does not save if there are due date errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@assignment.postToSIS()
+test('model saves if there are name length errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is false', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.assignment, maxNameLengthRequired: false})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.assignment.postToSIS())
+})
 
-  test 'model saves if there are overrides but not base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @assignment.set('all_dates', [{dueAt: 'Test'}, {dueAt: 'Test2'}])
-    @assignment.set('due_at', null)
-    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok @assignment.postToSIS()
+test('model does not save if there are name length errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.quiz, maxNameLengthRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.quiz.postToSIS())
+})
 
-  test 'model does not save if there are no due date overrides and no base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @assignment.set('all_dates', [])
-    @assignment.set('due_at', null)
-    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@assignment.postToSIS()
+test('model saves if there are name length errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is false', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.quiz, maxNameLengthRequired: false})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.quiz.postToSIS())
+})
 
-  test 'model does not save if there is only one due date override and no base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @assignment.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
-    @assignment.set('due_at', null)
-    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@assignment.postToSIS()
+test('model does not save if there are due date errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.assignment, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.assignment.postToSIS())
+})
 
-  test 'model does not save if there are no due dates on overrides assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @assignment.set('all_dates', [{dueAt: null}, {dueAt: null}])
-    @assignment.set('due_at', "I am a date")
-    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@assignment.postToSIS()
+test('model saves if there are overrides but not base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.assignment.set('all_dates', [{dueAt: 'Test'}, {dueAt: 'Test2'}])
+  this.assignment.set('due_at', null)
+  this.view = new SisButtonView({model: this.assignment, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.assignment.postToSIS())
+})
 
-  test 'model saves if there are overrides but not base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @quiz.set('all_dates', [{dueAt: 'Test'}, {dueAt: 'Test2'}])
-    @quiz.set('due_at', null)
-    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok @quiz.postToSIS()
+test('model does not save if there are no due date overrides and no base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.assignment.set('all_dates', [])
+  this.assignment.set('due_at', null)
+  this.view = new SisButtonView({model: this.assignment, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.assignment.postToSIS())
+})
 
-  test 'model does not save if there are no due date overrides and no base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @quiz.set('all_dates', [])
-    @quiz.set('due_at', null)
-    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@quiz.postToSIS()
+test('model does not save if there is only one due date override and no base due date for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.assignment.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
+  this.assignment.set('due_at', null)
+  this.view = new SisButtonView({model: this.assignment, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.assignment.postToSIS())
+})
 
-  test 'model does not save if there is only one due date override and no base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @quiz.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
-    @quiz.set('due_at', null)
-    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@quiz.postToSIS()
+test('model does not save if there are no due dates on overrides assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.assignment.set('all_dates', [{dueAt: null}, {dueAt: null}])
+  this.assignment.set('due_at', 'I am a date')
+  this.view = new SisButtonView({model: this.assignment, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.assignment.postToSIS())
+})
 
-  test 'model saves if there are no due date overrides and base for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @quiz.set('all_dates', [{dueAt: null}, {dueAt: null}])
-    @quiz.set('due_at', "I am a date")
-    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@quiz.postToSIS()
+test('model saves if there are overrides but not base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.quiz.set('all_dates', [{dueAt: 'Test'}, {dueAt: 'Test2'}])
+  this.quiz.set('due_at', null)
+  this.view = new SisButtonView({model: this.quiz, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.quiz.postToSIS())
+})
 
-  test 'model saves if there are due date errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
-    @assignment.set('post_to_sis', false)
-    @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok @assignment.postToSIS()
+test('model does not save if there are no due date overrides and no base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.quiz.set('all_dates', [])
+  this.quiz.set('due_at', null)
+  this.view = new SisButtonView({model: this.quiz, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.quiz.postToSIS())
+})
 
-  test 'model does not save if there are due date errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok !@quiz.postToSIS()
+test('model does not save if there is only one due date override and no base due date for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.quiz.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
+  this.quiz.set('due_at', null)
+  this.view = new SisButtonView({model: this.quiz, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.quiz.postToSIS())
+})
 
-  test 'model saves if there are due date errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is false', ->
-    ENV.MAX_NAME_LENGTH = 5
-    ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
-    @quiz.set('post_to_sis', false)
-    @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz, dueDateRequired: true)
-    @view.render()
-    @view.$el.click()
-    ok @quiz.postToSIS()
+test('model saves if there are no due date overrides and base for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.quiz.set('all_dates', [{dueAt: null}, {dueAt: null}])
+  this.quiz.set('due_at', 'I am a date')
+  this.view = new SisButtonView({model: this.quiz, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.quiz.postToSIS())
+})
 
-  test 'does not override dates', ->
-    ENV.MAX_NAME_LENGTH = 256
-    @assignment.set('name', 'Gil Faizon')
-    saveStub = @stub(@assignment, 'save').callsFake(() ->)
-    @view = new SisButtonView(model: @assignment)
-    @view.render()
-    @view.$el.click()
-    ok saveStub.calledWith(override_dates: false)
+test('model saves if there are due date errors for assignment AND SIS_INTEGRATION_SETTINGS_ENABLED is false', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+  this.assignment.set('post_to_sis', false)
+  this.assignment.set('name', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.assignment, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.assignment.postToSIS())
+})
 
-  test 'properly saves model with a custom url if present', ->
-    ENV.MAX_NAME_LENGTH = 256
-    @quiz.set('title', 'George St. Geegland')
-    @stub(@quiz, 'save').callsFake (attributes, options) ->
-      ok options['url'], '/some_other_url'
-    @quiz.set('post_to_sis', false)
-    @view = new SisButtonView(model: @quiz)
-    @view.render()
-    @view.$el.click()
-    ok @quiz.postToSIS()
+test('model does not save if there are due date errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is true', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.quiz, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(!this.quiz.postToSIS())
+})
 
-  test 'properly associates button label via aria-describedby', ->
-    @assignment.set('id', '1')
-    @view = new SisButtonView(model: @assignment)
-    @view.render()
-    equal @view.$input.attr('aria-describedby'), 'sis-status-label-1'
-    equal @view.$label.attr('id'), 'sis-status-label-1'
+test('model saves if there are due date errors for quiz AND SIS_INTEGRATION_SETTINGS_ENABLED is false', function() {
+  ENV.MAX_NAME_LENGTH = 5
+  ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
+  this.quiz.set('post_to_sis', false)
+  this.quiz.set('title', 'Too Much Tuna')
+  this.view = new SisButtonView({model: this.quiz, dueDateRequired: true})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.quiz.postToSIS())
+})
 
-  test 'properly toggles aria-pressed value based on post_to_sis', ->
-    @assignment.set('post_to_sis', true)
-    @view = new SisButtonView(model: @assignment)
-    @view.render()
-    equal @view.$label.attr('aria-pressed'), 'true'
-    @view.$el.click()
-    equal @view.$label.attr('aria-pressed'), 'false'
+test('does not override dates', function() {
+  ENV.MAX_NAME_LENGTH = 256
+  this.assignment.set('name', 'Gil Faizon')
+  const saveStub = this.stub(this.assignment, 'save').callsFake(() => {})
+  this.view = new SisButtonView({model: this.assignment})
+  this.view.render()
+  this.view.$el.click()
+  ok(saveStub.calledWith({override_dates: false}))
+})
+
+test('properly saves model with a custom url if present', function() {
+  ENV.MAX_NAME_LENGTH = 256
+  this.quiz.set('title', 'George St. Geegland')
+  this.stub(this.quiz, 'save').callsFake(function(attributes, options) {
+    ok(options.url, '/some_other_url')
+  })
+  this.quiz.set('post_to_sis', false)
+  this.view = new SisButtonView({model: this.quiz})
+  this.view.render()
+  this.view.$el.click()
+  ok(this.quiz.postToSIS())
+})
+
+test('properly associates button label via aria-describedby', function() {
+  this.assignment.set('id', '1')
+  this.view = new SisButtonView({model: this.assignment})
+  this.view.render()
+  equal(this.view.$input.attr('aria-describedby'), 'sis-status-label-1')
+  equal(this.view.$label.attr('id'), 'sis-status-label-1')
+})
+
+test('properly toggles aria-pressed value based on post_to_sis', function() {
+  this.assignment.set('post_to_sis', true)
+  this.view = new SisButtonView({model: this.assignment})
+  this.view.render()
+  equal(this.view.$label.attr('aria-pressed'), 'true')
+  this.view.$el.click()
+  equal(this.view.$label.attr('aria-pressed'), 'false')
+})

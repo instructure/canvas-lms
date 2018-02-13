@@ -1,112 +1,110 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2013 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'underscore'
-  'Backbone'
-  'compiled/collections/AssignmentGroupCollection'
-  'compiled/collections/AssignmentCollection'
-  'compiled/models/AssignmentGroup'
-  'compiled/models/Assignment'
-  'compiled/views/assignments/DeleteGroupView'
-  'jquery'
-  'helpers/assertions'
-  'helpers/jquery.simulate'
-], (_, Backbone, AssignmentGroupCollection, AssignmentCollection, AssignmentGroup, Assignment, DeleteGroupView, $, assertions) ->
+import Backbone from 'Backbone'
+import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
+import AssignmentCollection from 'compiled/collections/AssignmentCollection'
+import AssignmentGroup from 'compiled/models/AssignmentGroup'
+import Assignment from 'compiled/models/Assignment'
+import DeleteGroupView from 'compiled/views/assignments/DeleteGroupView'
+import $ from 'jquery'
+import assertions from 'helpers/assertions'
+import 'helpers/jquery.simulate'
 
-  group = (assignments=true, id) ->
-    new AssignmentGroup
-      id: id
-      name: "something cool #{id}"
-      assignments: if assignments then [new Assignment, new Assignment] else []
+const group = (assignments = true, id) =>
+  new AssignmentGroup({
+    id,
+    name: `something cool ${id}`,
+    assignments: assignments ? [new Assignment(), new Assignment()] : []
+  })
+const assignmentGroups = function(assignments = true, multiple = true) {
+  const groups = multiple ? [group(assignments, 1), group(assignments, 2)] : [group(assignments, 1)]
+  return new AssignmentGroupCollection(groups)
+}
+const createView = function(assignments = true, multiple = true) {
+  const ags = assignmentGroups(assignments, multiple)
+  const ag_group = ags.first()
+  return new DeleteGroupView({model: ag_group})
+}
 
-  assignmentGroups = (assignments=true, multiple=true) ->
-    groups = if multiple then [group(assignments, 1), group(assignments, 2)] else [group(assignments, 1)]
-    new AssignmentGroupCollection(groups)
+QUnit.module('DeleteGroupView', {
+  setup() {},
+  teardown() {
+    $('#fixtures').empty()
+    return $('form.dialogFormView').remove()
+  }
+})
 
-  createView = (assignments=true, multiple=true) ->
-    ags = assignmentGroups(assignments, multiple)
-    ag_group = ags.first()
+test('should be accessible', assert => {
+  const view = createView(false, true)
+  const done = assert.async()
+  assertions.isAccessible(view, done, {a11yReport: true})
+})
 
-    new DeleteGroupView
-      model: ag_group
+test('it should delete a group without assignments', function() {
+  this.stub(window, 'confirm').returns(true)
+  const view = createView(false, true)
+  this.stub(view, 'destroyModel')
+  view.render()
+  view.open()
+  ok(window.confirm.called)
+  ok(view.destroyModel.called)
+})
 
-  QUnit.module 'DeleteGroupView',
-    setup: ->
-    teardown: ->
-      $("#fixtures").empty()
-      $("form.dialogFormView").remove()
+test('assignment and ag counts should be correct', () => {
+  const view = createView(true, true)
+  view.render()
+  view.open()
+  equal(view.$('.assignment_count:visible').text(), '2')
+  equal(view.$('.group_select option').length, 2)
+  return view.close()
+})
 
-  test 'should be accessible', (assert) ->
-    view = createView(false, true)
-    done = assert.async()
-    assertions.isAccessible view, done, {'a11yReport': true}
+test('assignment and ag counts should update', () => {
+  const view = createView(true, true)
+  view.render()
+  view.open()
+  view.close()
+  view.model.get('assignments').add(new Assignment())
+  view.model.collection.add(new AssignmentGroup())
+  view.open()
+  equal(view.$('.assignment_count:visible').text(), '3')
+  equal(view.$('.group_select:visible option').length, 3)
+  return view.close()
+})
 
-  test 'it should delete a group without assignments', ->
-    @stub(window, "confirm").returns(true)
-    view = createView(false, true)
-    @stub(view, "destroyModel")
-    view.render()
-    view.open()
+test('it should delete a group with assignments', function() {
+  const destroy_stub = this.stub(DeleteGroupView.prototype, 'destroy')
+  const view = createView(true, true)
+  view.render()
+  view.open()
+  view.$('.delete_group').click()
+  ok(destroy_stub.called)
+  return view.close()
+})
 
-    ok window.confirm.called
-    ok view.destroyModel.called
-
-  test 'assignment and ag counts should be correct', ->
-    view = createView(true, true)
-    view.render()
-    view.open()
-
-    equal view.$('.assignment_count:visible').text(), "2"
-    equal view.$('.group_select option').length, 2
-    view.close()
-
-  test 'assignment and ag counts should update', ->
-    view = createView(true, true)
-    view.render()
-    view.open()
-    view.close()
-
-    view.model.get('assignments').add(new Assignment)
-    view.model.collection.add(new AssignmentGroup)
-
-    view.open()
-    equal view.$('.assignment_count:visible').text(), "3"
-    equal view.$('.group_select:visible option').length, 3
-    view.close()
-
-  test 'it should delete a group with assignments', ->
-    destroy_stub = @stub(DeleteGroupView.prototype, "destroy")
-    view = createView(true, true)
-    view.render()
-    view.open()
-
-    view.$(".delete_group").click()
-
-    ok destroy_stub.called
-    view.close()
-
-  test 'it should not delete the last assignment group', ->
-    alert_stub = @stub(window, "alert").returns(true)
-    view = createView(true, false)
-    destroy_spy = @spy(view, "destroyModel")
-    view.render()
-    view.open()
-
-    ok alert_stub.called
-    ok !destroy_spy.called
-    view.close()
+test('it should not delete the last assignment group', function() {
+  const alert_stub = this.stub(window, 'alert').returns(true)
+  const view = createView(true, false)
+  const destroy_spy = this.spy(view, 'destroyModel')
+  view.render()
+  view.open()
+  ok(alert_stub.called)
+  ok(!destroy_spy.called)
+  return view.close()
+})

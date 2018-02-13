@@ -25,7 +25,6 @@ import InputFilterView from 'compiled/views/InputFilterView'
 import PaginatedCollectionView from 'compiled/views/PaginatedCollectionView'
 import UserView from 'compiled/views/accounts/UserView'
 
-
 QUnit.module('UserDateRangeSearchFormView', {
   setup() {
     const messages = new CommMessageCollection(null, {params: {perPage: 10}})
@@ -41,7 +40,7 @@ QUnit.module('UserDateRangeSearchFormView', {
       }),
       collection: messages
     })
-    $("#fixtures").append(this.searchForm.render().el)
+    $('#fixtures').append(this.searchForm.render().el)
   },
 
   teardown() {
@@ -51,45 +50,45 @@ QUnit.module('UserDateRangeSearchFormView', {
   changeDate(startDate, endDate) {
     this.searchForm.$dateStartSearchField.val(startDate)
     this.searchForm.$dateEndSearchField.val(endDate)
-    this.searchForm.$dateStartSearchField.trigger("change")
-    this.searchForm.$dateEndSearchField.trigger("change")
+    this.searchForm.$dateStartSearchField.trigger('change')
+    this.searchForm.$dateEndSearchField.trigger('change')
   }
 })
 
 test('find with no dates is valid', function() {
-  this.changeDate("", "")
+  this.changeDate('', '')
   const errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 0)
 })
 
 test('find with one date selected is valid', function() {
-  this.changeDate("Jan 16, 2018", "")
+  this.changeDate('Jan 16, 2018', '')
   let errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 0)
 
-  this.changeDate("", "Jan 16, 2018")
+  this.changeDate('', 'Jan 16, 2018')
   errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 0)
 })
 
 test('find with start date before end date is valid', function() {
-  this.changeDate("Jan 04, 2018", "Jan 12, 2018")
+  this.changeDate('Jan 04, 2018', 'Jan 12, 2018')
   const errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 0)
 })
 
 test('find with invalid dates is invalid', function() {
-  this.changeDate("", "banana")
+  this.changeDate('', 'banana')
   let errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 1)
   strictEqual(errors.messages_end_time[0].message, 'Not a valid date')
 
-  this.changeDate("banana", "Jan 16, 2018")
+  this.changeDate('banana', 'Jan 16, 2018')
   errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 1)
   strictEqual(errors.messages_start_time[0].message, 'Not a valid date')
 
-  this.changeDate("banana", "banana")
+  this.changeDate('banana', 'banana')
   errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 2)
   strictEqual(errors.messages_start_time[0].message, 'Not a valid date')
@@ -97,7 +96,7 @@ test('find with invalid dates is invalid', function() {
 })
 
 test('find with start date after end date is invalid', function() {
-  this.changeDate("Jan 12, 2018", "Jan 1, 2018")
+  this.changeDate('Jan 12, 2018', 'Jan 1, 2018')
   const errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 1)
   strictEqual(errors.messages_end_time[0].message, 'To Date cannot come before From Date')

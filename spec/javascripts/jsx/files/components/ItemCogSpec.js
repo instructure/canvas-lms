@@ -17,7 +17,7 @@
  */
 
 define([
-  '../../../../coffeescripts/react_files/mockFilesENV.coffee',
+  '../../../../coffeescripts/react_files/mockFilesENV',
   'react',
   'react-dom',
   'react-addons-test-utils',

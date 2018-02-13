@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import * as enzyme from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import ChangeLogRow, { ChangeRow } from 'jsx/blueprint_courses/components/ChangeLogRow'
 import sampleData from '../sampleData'
 
@@ -32,7 +32,7 @@ const defaultProps = () => ({
 })
 
 test('renders the ChangeLogRow component', () => {
-  const tree = enzyme.shallow(<ChangeLogRow {...defaultProps()} />)
+  const tree = shallow(<ChangeLogRow {...defaultProps()} />)
   const node = tree.find('.bcs__history-item__change-log-row')
   ok(node.exists())
 })
@@ -40,26 +40,26 @@ test('renders the ChangeLogRow component', () => {
 test('renders the ChangeLogRow component as a heading', () => {
   const props = defaultProps()
   props.isHeading = true
-  const tree = enzyme.shallow(<ChangeLogRow {...props} />)
+  const tree = shallow(<ChangeLogRow {...props} />)
   const node = tree.find('.bcs__history-item__change-log-row__heading')
   ok(node.exists())
 })
 
 test('renders children inside content', () => {
   const children = <div className="test-children" />
-  const tree = enzyme.shallow(<ChangeLogRow {...defaultProps()}>{children}</ChangeLogRow>)
+  const tree = shallow(<ChangeLogRow {...defaultProps()}>{children}</ChangeLogRow>)
   const node = tree.find('.bcs__history-item__content .test-children')
   ok(node.exists())
 })
 
 test('renders the ChangeRow component', () => {
-  const tree = enzyme.mount(<ChangeRow change={sampleData.history[0].changes[0]} />)
+  const tree = mount(<ChangeRow change={sampleData.history[0].changes[0]} />)
   const node = tree.find('.bcs__history-item__change-log-row')
   ok(node.exists())
 })
 
 test('renders lock icon when its a ChangeRow component', () => {
-  const tree = enzyme.mount(<ChangeRow change={sampleData.history[0].changes[0]} />)
+  const tree = mount(<ChangeRow change={sampleData.history[0].changes[0]} />)
   const node = tree.find('.bcs__history-item__content .bcs__history-item__lock-icon')
   ok(node.exists())
 })

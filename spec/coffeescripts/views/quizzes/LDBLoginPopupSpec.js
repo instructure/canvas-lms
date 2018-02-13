@@ -1,144 +1,170 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  "underscore"
-  "jquery"
-  "compiled/views/quizzes/LDBLoginPopup"
-], (_, $, LDBLoginPopup, FormMarkup) ->
-  whnd = undefined
-  popup = undefined
-  server = undefined
-  root = this
-  QUnit.module "LDBLoginPopup",
-    setup: ->
-      popup = new LDBLoginPopup(sticky: false)
+import {defer} from 'lodash'
+import $ from 'jquery'
+import LDBLoginPopup from 'compiled/views/quizzes/LDBLoginPopup'
 
-    teardown: ->
-      if whnd and not whnd.closed
-        whnd.close()
-        whnd = null
+let whnd
+let popup
+let server
+const root = this
 
-      server.restore() if server
+QUnit.module('LDBLoginPopup', {
+  setup() {
+    popup = new LDBLoginPopup({sticky: false})
+  },
 
-  test "it should exec", 1, ->
-    whnd = popup.exec()
+  teardown() {
+    if (whnd && !whnd.closed) {
+      whnd.close()
+      whnd = null
+    }
 
-    ok whnd, "popup window is created"
+    if (server) server.restore()
+  }
+})
 
-  test "it should inject styleSheets", 1, ->
-    whnd = popup.exec()
-    strictEqual $(whnd.document).find("link[href]").length,$("link").length
+test('it should exec', 1, function() {
+  whnd = popup.exec()
 
-  test "it should trigger the @open and @close events", ->
-    onOpen = @spy()
-    onClose = @spy()
+  ok(whnd, 'popup window is created')
+})
 
-    popup.on "open", onOpen
-    popup.on "close", onClose
+test('it should inject styleSheets', 1, function() {
+  whnd = popup.exec()
+  strictEqual($(whnd.document).find('link[href]').length, $('link').length)
+})
 
-    whnd = popup.exec()
-    ok onOpen.called, "@open handler gets called"
+test('it should trigger the @open and @close events', function() {
+  const onOpen = this.spy()
+  const onClose = this.spy()
 
-    whnd.close()
-    ok onClose.called, "@close handler gets called"
+  popup.on('open', onOpen)
+  popup.on('close', onClose)
 
-  test "it should close after a successful login", 1, ->
-    onClose = @spy()
+  whnd = popup.exec()
+  ok(onOpen.called, '@open handler gets called')
 
-    server = sinon.fakeServer.create()
-    server.respondWith "POST", /login/, [ 200, {}, "OK" ]
+  whnd.close()
+  ok(onClose.called, '@close handler gets called')
+})
 
-    popup.on "close", onClose
-    popup.on "open", (e, document) ->
-      $(document).find(".btn-primary").click()
-      server.respond()
-      ok onClose.called, "popup should be closed"
+test('it should close after a successful login', 1, function() {
+  const onClose = this.spy()
 
-    whnd = popup.exec()
+  server = sinon.fakeServer.create()
+  server.respondWith('POST', /login/, [200, {}, 'OK'])
 
-  test "it should trigger the @login_success event", 1, ->
-    onSuccess = @spy()
+  popup.on('close', onClose)
+  popup.on('open', function(e, document) {
+    $(document)
+      .find('.btn-primary')
+      .click()
+    server.respond()
+    ok(onClose.called, 'popup should be closed')
+  })
 
-    server = sinon.fakeServer.create()
-    server.respondWith "POST", /login/, [ 200, {}, "OK" ]
+  whnd = popup.exec()
+})
 
-    popup.on "login_success", onSuccess
-    popup.on "open", (e, document) ->
-      $(document).find(".btn-primary").click()
-      server.respond()
-      ok onSuccess.called, "@login_success handler gets called"
+test('it should trigger the @login_success event', 1, function() {
+  const onSuccess = this.spy()
 
-    whnd = popup.exec()
+  server = sinon.fakeServer.create()
+  server.respondWith('POST', /login/, [200, {}, 'OK'])
 
-  test "it should trigger the @login_failure event", 1, ->
-    onFailure = @spy()
+  popup.on('login_success', onSuccess)
+  popup.on('open', function(e, document) {
+    $(document)
+      .find('.btn-primary')
+      .click()
+    server.respond()
+    ok(onSuccess.called, '@login_success handler gets called')
+  })
 
-    server = sinon.fakeServer.create()
-    server.respondWith "POST", /login/, [ 401, {}, "Bad Request" ]
+  whnd = popup.exec()
+})
 
-    popup.on "login_failure", onFailure
-    popup.on "open", (e, document) ->
-      $(document).find(".btn-primary").click()
-      server.respond()
-      ok onFailure.called, "@login_failure handler gets called"
+test('it should trigger the @login_failure event', 1, function() {
+  const onFailure = this.spy()
 
-    whnd = popup.exec()
+  server = sinon.fakeServer.create()
+  server.respondWith('POST', /login/, [401, {}, 'Bad Request'])
 
-  test "it should pop back in if student closes it", (assert) ->
-    assert.expect(5)
-    done = assert.async()
-    latestWindow = undefined
-    onFailure = @spy()
-    onOpen = @spy()
-    onClose = @spy()
-    originalOpen = window.open
+  popup.on('login_failure', onFailure)
+  popup.on('open', function(e, document) {
+    $(document)
+      .find('.btn-primary')
+      .click()
+    server.respond()
+    ok(onFailure.called, '@login_failure handler gets called')
+  })
 
-    # needed for proper cleanup of windows
-    openStub = @stub(window, "open").callsFake ->
-      latestWindow = originalOpen.apply(this, arguments)
+  whnd = popup.exec()
+})
 
-    server = sinon.fakeServer.create()
-    server.respondWith "POST", /login/, [ 401, {}, "Bad Request" ]
+test('it should pop back in if student closes it', function(assert) {
+  assert.expect(5)
+  const done = assert.async()
+  let latestWindow
+  const onFailure = this.spy()
+  const onOpen = this.spy()
+  const onClose = this.spy()
+  const originalOpen = window.open
 
-    # a sticky version
-    popup = new LDBLoginPopup(sticky: true)
-    popup.on "login_failure", onFailure
-    popup.on "open", onOpen
-    popup.on "close", onClose
-    popup.one "open", (e, document) ->
-      $(document).find(".btn-primary").click()
-      server.respond()
-      ok onFailure.calledOnce, "logged out by passing in bad credentials"
+  // needed for proper cleanup of windows
+  const openStub = this.stub(window, 'open').callsFake(function() {
+    return (latestWindow = originalOpen.apply(this, arguments))
+  })
 
-      _.defer ->
-        whnd.close()
+  server = sinon.fakeServer.create()
+  server.respondWith('POST', /login/, [401, {}, 'Bad Request'])
 
-      popup.one "close", ->
-        # we need to defer because #open will not be called in the close handler
-        _.defer ->
-          ok onOpen.calledTwice, "popup popped back in"
-          ok onClose.calledOnce, "popup closed"
+  // a sticky version
+  popup = new LDBLoginPopup({sticky: true})
+  popup.on('login_failure', onFailure)
+  popup.on('open', onOpen)
+  popup.on('close', onClose)
+  popup.one('open', function(e, document) {
+    $(document)
+      .find('.btn-primary')
+      .click()
+    server.respond()
+    ok(onFailure.calledOnce, 'logged out by passing in bad credentials')
 
-          # clean up the dangling window which we don't have a handle to
-          popup.off "close.sticky"
-          latestWindow.close()
-          ok onClose.calledTwice, "popup closed for good"
-          done()
+    defer(() => whnd.close())
 
-    whnd = popup.exec()
-    ok onOpen.called, "popup opened"
+    popup.one('close', () =>
+      // we need to defer because #open will not be called in the close handler
+      defer(function() {
+        ok(onOpen.calledTwice, 'popup popped back in')
+        ok(onClose.calledOnce, 'popup closed')
+
+        // clean up the dangling window which we don't have a handle to
+        popup.off('close.sticky')
+        latestWindow.close()
+        ok(onClose.calledTwice, 'popup closed for good')
+        done()
+      })
+    )
+  })
+
+  whnd = popup.exec()
+  ok(onOpen.called, 'popup opened')
+})

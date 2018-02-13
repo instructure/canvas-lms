@@ -1,117 +1,106 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'compiled/react_files/modules/UploadQueue'
-  'jquery'
-], (UploadQueue, $) ->
+import UploadQueue from 'compiled/react_files/modules/UploadQueue'
+import $ from 'jquery'
 
-  mockFileOptions = (name='foo', type='bar') ->
-      file:
-        size: 1
-        name: name
-        type: type
+const mockFileOptions = (name = 'foo', type = 'bar') => ({
+  file: {
+    size: 1,
+    name,
+    type
+  }
+})
+const mockFileUploader = file => ({
+  upload() {
+    const promise = $.Deferred()
+    window.setTimeout(() => promise.resolve(), 2)
+    return promise
+  },
+  file
+})
+const mockAttemptNext = function() {}
 
+QUnit.module('UploadQueue', {
+  setup() {
+    this.queue = UploadQueue
+  },
+  teardown() {
+    this.queue.flush()
+    return delete this.queue
+  }
+})
 
-  mockFileUploader = (file) ->
-    {
-      upload: ->
-        promise = $.Deferred()
-        window.setTimeout ->
-          promise.resolve()
-        , 2
-        promise
-      file: file
-    }
+test('Enqueues uploads, flush clears', function() {
+  const original = this.queue.attemptNextUpload
+  this.queue.attemptNextUpload = mockAttemptNext
+  this.queue.enqueue(mockFileOptions())
+  equal(this.queue.length(), 1)
+  this.queue.enqueue(mockFileOptions())
+  equal(this.queue.length(), 2)
+  this.queue.flush()
+  equal(this.queue.length(), 0)
+  this.queue.attemptNextUpload = original
+})
 
-  mockAttemptNext = ->
-    #noop
+test('processes one upload at a time', function() {
+  expect(2)
+  const original = this.queue.createUploader
+  this.queue.createUploader = mockFileUploader
+  this.queue.enqueue('foo')
+  this.queue.enqueue('bar')
+  this.queue.enqueue('baz')
+  equal(this.queue.length(), 2) // first item starts, remainder are waiting
+  stop()
+  window.setTimeout(() => {
+    start()
+    equal(this.queue.length(), 1) // after two more ticks there is only one remaining
+  }, 2)
+  this.queue.createUploader = original
+})
 
-  QUnit.module 'UploadQueue',
-    setup: ->
-      @queue = UploadQueue
+test('dequeue removes top of the queue', function() {
+  const original = this.queue.attemptNextUpload
+  this.queue.attemptNextUpload = mockAttemptNext
+  const foo = mockFileOptions('foo')
+  this.queue.enqueue(foo)
+  equal(this.queue.length(), 1)
+  this.queue.enqueue(mockFileOptions('zoo'))
+  equal(this.queue.length(), 2)
+  equal(this.queue.dequeue().options, foo)
+  this.queue.attemptNextUpload = original
+})
 
-    teardown: ->
-      @queue.flush()
-      delete @queue
-
-
-  test 'Enqueues uploads, flush clears', ->
-    original = @queue.attemptNextUpload
-    @queue.attemptNextUpload = mockAttemptNext
-
-    @queue.enqueue mockFileOptions()
-    equal(@queue.length(), 1)
-    @queue.enqueue mockFileOptions()
-    equal(@queue.length(), 2)
-    @queue.flush()
-    equal(@queue.length(), 0)
-
-    @queue.attemptNextUpload = original
-
-
-  test 'processes one upload at a time', ->
-    expect(2)
-    original = @queue.createUploader
-    @queue.createUploader = mockFileUploader
-
-    @queue.enqueue 'foo'
-    @queue.enqueue 'bar'
-    @queue.enqueue 'baz'
-    equal(@queue.length(), 2) # first item starts, remainder are waitingj
-    stop()
-    window.setTimeout =>
-      start()
-      equal(@queue.length(), 1) #after two more ticks there is only one remaining
-    , 2
-
-    @queue.createUploader = original
-
-  test 'dequeue removes top of the queue', ->
-    original = @queue.attemptNextUpload
-    @queue.attemptNextUpload = mockAttemptNext
-
-    foo = mockFileOptions('foo')
-    @queue.enqueue foo
-    equal(@queue.length(), 1)
-    @queue.enqueue mockFileOptions('zoo')
-    equal(@queue.length(), 2)
-    equal(@queue.dequeue().options, foo)
-
-    @queue.attemptNextUpload = original
-
-  test 'getAllUploaders includes the current uploader', ->
-    original = @queue.attemptNextUpload
-    @queue.attemptNextUpload = mockAttemptNext
-    @queue.flush()
-
-    foo = mockFileOptions('foo')
-    @queue.enqueue foo
-    equal(@queue.length(), 1)
-    @queue.enqueue mockFileOptions('zoo')
-    equal(@queue.length(), 2)
-
-    equal @queue.length(), 2
-    sentinel = mockFileOptions('sentinel')
-    @queue.currentUploader = sentinel
-
-    all = @queue.getAllUploaders()
-    equal all.length, 3
-    equal all.indexOf(sentinel), 0
-
-    @queue.currentUploader = undefined
-    @queue.attemptNextUpload = original
+test('getAllUploaders includes the current uploader', function() {
+  const original = this.queue.attemptNextUpload
+  this.queue.attemptNextUpload = mockAttemptNext
+  this.queue.flush()
+  const foo = mockFileOptions('foo')
+  this.queue.enqueue(foo)
+  equal(this.queue.length(), 1)
+  this.queue.enqueue(mockFileOptions('zoo'))
+  equal(this.queue.length(), 2)
+  equal(this.queue.length(), 2)
+  const sentinel = mockFileOptions('sentinel')
+  this.queue.currentUploader = sentinel
+  const all = this.queue.getAllUploaders()
+  equal(all.length, 3)
+  equal(all.indexOf(sentinel), 0)
+  this.queue.currentUploader = undefined
+  this.queue.attemptNextUpload = original
+})

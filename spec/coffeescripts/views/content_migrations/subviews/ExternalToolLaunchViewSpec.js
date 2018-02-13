@@ -1,54 +1,72 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'jquery'
-  'Backbone'
-  'compiled/views/content_migrations/subviews/ExternalToolLaunchView'
-  'helpers/assertions'
-], ($, Backbone, ExternalToolLaunchView, assertions) ->
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import ExternalToolLaunchView from 'compiled/views/content_migrations/subviews/ExternalToolLaunchView'
+import assertions from 'helpers/assertions'
 
-  QUnit.module 'ExternalToolLaunchView',
-    setup: ->
-      @mockMigration = new Backbone.Model
-      @mockReturnView = new Backbone.View
+QUnit.module('ExternalToolLaunchView', {
+  setup() {
+    this.mockMigration = new Backbone.Model()
+    this.mockReturnView = new Backbone.View()
+    this.launchView = new ExternalToolLaunchView({
+      contentReturnView: this.mockReturnView,
+      model: this.mockMigration
+    })
+    return $('#fixtures').html(this.launchView.render().el)
+  },
+  teardown() {
+    return this.launchView.remove()
+  }
+})
 
-      @launchView = new ExternalToolLaunchView
-        contentReturnView: @mockReturnView
-        model: @mockMigration
+test('it should be accessible', function(assert) {
+  const done = assert.async()
+  assertions.isAccessible(this.launchView, done, {a11yReport: true})
+})
 
-      $('#fixtures').html @launchView.render().el
+test('calls render on return view when launch button clicked', function() {
+  this.stub(this.mockReturnView, 'render').returns(this)
+  this.launchView.$el.find('#externalToolLaunch').click()
+  ok(this.mockReturnView.render.calledOnce, 'render not called on return view')
+})
 
-    teardown: ->
-      @launchView.remove()
+test("displays file name on 'ready'", function() {
+  this.mockReturnView.trigger('ready', {
+    contentItems: [
+      {
+        text: 'data text',
+        url: 'data url'
+      }
+    ]
+  })
+  strictEqual(this.launchView.$fileName.text(), 'data text')
+})
 
-  test 'it should be accessible', (assert) ->
-    done = assert.async()
-    assertions.isAccessible @launchView, done, {'a11yReport': true}
-
-  test 'calls render on return view when launch button clicked', ->
-    @stub(@mockReturnView, 'render').returns(this)
-    @launchView.$el.find('#externalToolLaunch').click()
-    ok @mockReturnView.render.calledOnce, 'render not called on return view'
-
-  test "displays file name on 'ready'", ->
-    @mockReturnView.trigger('ready', {contentItems: [{text: 'data text', url: 'data url'}]})
-    strictEqual @launchView.$fileName.text(), 'data text'
-
-  test "sets settings.data_url on migration on 'ready'", ->
-    @mockReturnView.trigger('ready', {contentItems: [{text: 'data text', url: 'data url'}]})
-    deepEqual @mockMigration.get('settings'), {file_url: 'data url'}
+test("sets settings.data_url on migration on 'ready'", function() {
+  this.mockReturnView.trigger('ready', {
+    contentItems: [
+      {
+        text: 'data text',
+        url: 'data url'
+      }
+    ]
+  })
+  deepEqual(this.mockMigration.get('settings'), {file_url: 'data url'})
+})

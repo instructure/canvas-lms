@@ -1,169 +1,188 @@
-#
-# Copyright (C) 2015 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-define [
-  'react'
-  'react-dom'
-  'react-addons-test-utils'
-  'jquery'
-  'jsx/grading/dataRow'
-], (React, ReactDOM, {Simulate, SimulateNative}, $, DataRow) ->
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Simulate} from 'react-addons-test-utils'
+import $ from 'jquery'
+import DataRow from 'jsx/grading/dataRow'
 
-  QUnit.module 'DataRow not being edited, without a sibling',
-    setup: ->
-      props =
-        key: 0
-        uniqueId: 0
-        row: ['A', 92.346]
-        editing: false
-        round: (number)-> Math.round(number * 100)/100
+QUnit.module('DataRow not being edited, without a sibling', {
+  setup() {
+    const props = {
+      key: 0,
+      uniqueId: 0,
+      row: ['A', 92.346],
+      editing: false,
+      round: number => Math.round(number * 100) / 100
+    }
+    const DataRowElement = <DataRow {...props} />
+    this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  },
+  teardown() {
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dataRow).parentNode)
+    $('#fixtures').empty()
+  }
+})
 
-      DataRowElement = React.createElement(DataRow, props)
-      @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+test('renders in "view" mode (as opposed to "edit" mode)', function() {
+  ok(this.dataRow.refs.viewContainer)
+})
 
-    teardown: ->
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dataRow).parentNode)
-      $("#fixtures").empty()
+test('getRowData() returns the correct name', function() {
+  deepEqual(this.dataRow.getRowData().name, 'A')
+})
 
-  test 'renders in "view" mode (as opposed to "edit" mode)', ->
-    ok @dataRow.refs.viewContainer
+test('getRowData() sets max score to 100 if there is no sibling row', function() {
+  deepEqual(this.dataRow.getRowData().maxScore, 100)
+})
 
-  test 'getRowData() returns the correct name', ->
-    deepEqual @dataRow.getRowData().name, 'A'
+test('renderMinScore() rounds the score if not in editing mode', function() {
+  deepEqual(this.dataRow.renderMinScore(), '92.35')
+})
 
-  test 'getRowData() sets max score to 100 if there is no sibling row', ->
-    deepEqual @dataRow.getRowData().maxScore, 100
+test("renderMaxScore() returns a max score of 100 without a '<' sign", function() {
+  deepEqual(this.dataRow.renderMaxScore(), '100')
+})
 
-  test 'renderMinScore() rounds the score if not in editing mode', ->
-    deepEqual @dataRow.renderMinScore(), '92.35'
+QUnit.module('DataRow being edited', {
+  setup() {
+    this.props = {
+      key: 0,
+      uniqueId: 0,
+      row: ['A', 92.346],
+      editing: true,
+      round: number => Math.round(number * 100) / 100,
+      onRowMinScoreChange() {},
+      onRowNameChange() {},
+      onDeleteRow() {}
+    }
+    const DataRowElement = <DataRow {...this.props} />
+    this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  },
+  teardown() {
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dataRow).parentNode)
+    $('#fixtures').empty()
+  }
+})
 
-  test "renderMaxScore() returns a max score of 100 without a '<' sign", ->
-    deepEqual @dataRow.renderMaxScore(), '100'
+test('renders in "edit" mode (as opposed to "view" mode)', function() {
+  ok(this.dataRow.refs.editContainer)
+})
 
-  QUnit.module 'DataRow being edited',
-    setup: ->
-      @props =
-        key: 0
-        uniqueId: 0
-        row: ['A', 92.346]
-        editing: true
-        round: (number)-> Math.round(number * 100)/100
-        onRowMinScoreChange: ->
-        onRowNameChange: ->
-        onDeleteRow: ->
+test('on change, accepts arbitrary input and saves to state', function() {
+  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const DataRowElement = <DataRow {...this.props} />
+  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: 'A'}})
+  deepEqual(this.dataRow.renderMinScore(), 'A')
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '*&@%!'}})
+  deepEqual(this.dataRow.renderMinScore(), '*&@%!')
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '3B'}})
+  deepEqual(this.dataRow.renderMinScore(), '3B')
+  ok(changeMinScore.notCalled)
+  changeMinScore.restore()
+})
 
-      DataRowElement = React.createElement(DataRow, @props)
-      @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+test('on blur, does not call onRowMinScoreChange if the input parsed value is less than 0', function() {
+  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const DataRowElement = <DataRow {...this.props} />
+  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '-1'}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  ok(changeMinScore.notCalled)
+  changeMinScore.restore()
+})
 
-    teardown: ->
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dataRow).parentNode)
-      $("#fixtures").empty()
+test('on blur, does not call onRowMinScoreChange if the input parsed value is greater than 100', function() {
+  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const DataRowElement = <DataRow {...this.props} />
+  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '101'}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  ok(changeMinScore.notCalled)
+  changeMinScore.restore()
+})
 
-  test 'renders in "edit" mode (as opposed to "view" mode)', ->
-    ok @dataRow.refs.editContainer
+test('on blur, calls onRowMinScoreChange when input parsed value is between 0 and 100', function() {
+  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const DataRowElement = <DataRow {...this.props} />
+  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '88.'}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: ''}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '100'}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '0'}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: 'A'}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  Simulate.change(this.dataRow.minScoreInput, {target: {value: '%*@#($'}})
+  Simulate.blur(this.dataRow.minScoreInput)
+  deepEqual(changeMinScore.callCount, 3)
+  changeMinScore.restore()
+})
 
-  test 'on change, accepts arbitrary input and saves to state', ->
-    changeMinScore = @spy(@props, 'onRowMinScoreChange')
-    DataRowElement = React.createElement(DataRow, @props)
-    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-    Simulate.change(@dataRow.minScoreInput, {target: {value: 'A'}})
-    deepEqual @dataRow.renderMinScore(), 'A'
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '*&@%!'}})
-    deepEqual @dataRow.renderMinScore(), '*&@%!'
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '3B'}})
-    deepEqual @dataRow.renderMinScore(), '3B'
-    ok changeMinScore.notCalled
-    changeMinScore.restore()
+test('on blur, does not call onRowMinScoreChange when input has not changed', function() {
+  const changeMinScore = this.spy(this.props, 'onRowMinScoreChange')
+  const DataRowElement = <DataRow {...this.props} />
+  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  Simulate.blur(this.dataRow.minScoreInput)
+  ok(changeMinScore.notCalled)
+  changeMinScore.restore()
+})
 
-  test 'on blur, does not call onRowMinScoreChange if the input parsed value is less than 0', ->
-    changeMinScore = @spy(@props, 'onRowMinScoreChange')
-    DataRowElement = React.createElement(DataRow, @props)
-    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '-1'}})
-    Simulate.blur(@dataRow.minScoreInput)
-    ok changeMinScore.notCalled
-    changeMinScore.restore()
+test('calls onRowNameChange when input changes', function() {
+  const changeMinScore = this.spy(this.props, 'onRowNameChange')
+  const DataRowElement = <DataRow {...this.props} />
+  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  Simulate.change(this.dataRow.refs.nameInput, {target: {value: 'F'}})
+  ok(changeMinScore.calledOnce)
+  changeMinScore.restore()
+})
 
-  test 'on blur, does not call onRowMinScoreChange if the input parsed value is greater than 100', ->
-    changeMinScore = @spy(@props, 'onRowMinScoreChange')
-    DataRowElement = React.createElement(DataRow, @props)
-    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '101'}})
-    Simulate.blur(@dataRow.minScoreInput)
-    ok changeMinScore.notCalled
-    changeMinScore.restore()
+test('calls onDeleteRow when the delete button is clicked', function() {
+  const deleteRow = this.spy(this.props, 'onDeleteRow')
+  const DataRowElement = <DataRow {...this.props} />
+  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  Simulate.click(this.dataRow.refs.deleteButton.getDOMNode())
+  ok(deleteRow.calledOnce)
+})
 
-  test 'on blur, calls onRowMinScoreChange when input parsed value is between 0 and 100', ->
-    changeMinScore = @spy(@props, 'onRowMinScoreChange')
-    DataRowElement = React.createElement(DataRow, @props)
-    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '88.'}})
-    Simulate.blur(@dataRow.minScoreInput)
-    Simulate.change(@dataRow.minScoreInput, {target: {value: ''}})
-    Simulate.blur(@dataRow.minScoreInput)
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '100'}})
-    Simulate.blur(@dataRow.minScoreInput)
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '0'}})
-    Simulate.blur(@dataRow.minScoreInput)
-    Simulate.change(@dataRow.minScoreInput, {target: {value: 'A'}})
-    Simulate.blur(@dataRow.minScoreInput)
-    Simulate.change(@dataRow.minScoreInput, {target: {value: '%*@#($'}})
-    Simulate.blur(@dataRow.minScoreInput)
-    deepEqual changeMinScore.callCount, 3
-    changeMinScore.restore()
+QUnit.module('DataRow with a sibling', {
+  setup() {
+    const props = {
+      key: 1,
+      row: ['A-', 90],
+      siblingRow: ['A', 92.346],
+      editing: false,
+      round: number => Math.round(number * 100) / 100
+    }
+    const DataRowElement = <DataRow {...props} />
+    this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  },
+  teardown() {
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dataRow).parentNode)
+    $('#fixtures').empty()
+  }
+})
 
-  test 'on blur, does not call onRowMinScoreChange when input has not changed', ->
-    changeMinScore = @spy(@props, 'onRowMinScoreChange')
-    DataRowElement = React.createElement(DataRow, @props)
-    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-    Simulate.blur(@dataRow.minScoreInput)
-    ok changeMinScore.notCalled
-    changeMinScore.restore()
-
-  test 'calls onRowNameChange when input changes', ->
-    changeMinScore = @spy(@props, 'onRowNameChange')
-    DataRowElement = React.createElement(DataRow, @props)
-    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-    Simulate.change(@dataRow.refs.nameInput, {target: {value: 'F'}})
-    ok changeMinScore.calledOnce
-    changeMinScore.restore()
-
-  test 'calls onDeleteRow when the delete button is clicked', ->
-    deleteRow = @spy(@props, 'onDeleteRow')
-    DataRowElement = React.createElement(DataRow, @props)
-    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-    Simulate.click(@dataRow.refs.deleteButton.getDOMNode())
-    ok deleteRow.calledOnce
-
-  QUnit.module 'DataRow with a sibling',
-    setup: ->
-      props =
-        key: 1
-        row: ['A-', 90.0]
-        siblingRow: ['A', 92.346]
-        editing: false
-        round: (number)-> Math.round(number * 100)/100
-
-      DataRowElement = React.createElement(DataRow, props)
-      @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-
-    teardown: ->
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dataRow).parentNode)
-      $("#fixtures").empty()
-
-  test "shows the max score as the sibling's min score", ->
-    deepEqual @dataRow.renderMaxScore(), '< 92.35'
+test("shows the max score as the sibling's min score", function() {
+  deepEqual(this.dataRow.renderMaxScore(), '< 92.35')
+})
