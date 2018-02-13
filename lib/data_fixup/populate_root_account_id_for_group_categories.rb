@@ -22,12 +22,9 @@ module DataFixup::PopulateRootAccountIdForGroupCategories
     # be some GroupCategory records that don't have a context_type. This only
     # looks for ones that do have a context_type, since we use that to find what
     # account it belongs to.
-    scope = GroupCategory.where(root_account_id: nil).where.not(context_type: nil)
-    scope.find_in_batches(batch_size: 10000) do |group|
-      group.each do |group_category|
-        root_account_id = group_category.context.root_account.id
-        group_category.update!(root_account_id: root_account_id)
-      end
+    GroupCategory.where(root_account_id: nil).where.not(context_type: nil).find_each do |group_category|
+      root_account_id = group_category.context&.root_account&.id
+      group_category.update!(root_account_id: root_account_id) if root_account_id
     end
   end
 end
