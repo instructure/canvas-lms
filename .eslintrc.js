@@ -28,6 +28,7 @@ module.exports = {
   plugins: [
     "promise",
     "import",
+    "notice",
     "jest"
   ],
   // 0 - off, 1 - warning, 2 - error
@@ -70,6 +71,12 @@ module.exports = {
     "jest/prefer-to-be-undefined": "error",
     "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
     "import/extensions": [1, { "js": "never", "jsx": "never", "json": "always" }],
+    'notice/notice': ['error', {
+      templateFile: 'config/copyright-template.js',
+      // purposely lenient so we don't automatically put our copyright notice on
+      // top of something already copyrighted by someone else.
+      mustMatch: 'Copyright '
+    }],
     "promise/avoid-new": [0],
   }
 }

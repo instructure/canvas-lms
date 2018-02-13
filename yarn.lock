@@ -3615,6 +3615,13 @@ eslint-plugin-jsx-a11y@^6.0.2:
     emoji-regex "^6.1.0"
     jsx-ast-utils "^2.0.0"
 
+eslint-plugin-notice@^0.5.6:
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-notice/-/eslint-plugin-notice-0.5.6.tgz#f34bf59230d9cfe73f10810e390e439719e0e5cb"
+  dependencies:
+    lodash ">=2.4.0"
+    metric-lcs "^0.1.2"
+
 eslint-plugin-promise@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-3.6.0.tgz#54b7658c8f454813dc2a870aff8152ec4969ba75"
@@ -6858,6 +6865,10 @@ lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
+lodash@>=2.4.0:
+  version "4.17.5"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
+
 "lodash@>=3.5 <5", lodash@>=4.0.0, lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.4, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@^4.5.1, lodash@~4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
@@ -7155,6 +7166,10 @@ merge-stream@^1.0.1:
 merge@^1.1.3:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/merge/-/merge-1.2.0.tgz#7531e39d4949c281a66b8c5a6e0265e8b05894da"
+
+metric-lcs@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/metric-lcs/-/metric-lcs-0.1.2.tgz#87913f149410e39c7c5a19037512814eaf155e11"
 
 micromatch@^2.1.5, micromatch@^2.3.11, micromatch@^2.3.7, micromatch@^2.3.8:
   version "2.3.11"
