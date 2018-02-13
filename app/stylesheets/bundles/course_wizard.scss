@@ -32,7 +32,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   transition: all 1s $ic-transition;
   width: 30%;
   height: 100%;
-  background: $ic-wizard-color-dark-neutral;
+  background: #B4B6B9;
   position: fixed;
   bottom: 0; left: 0;
   box-sizing: border-box;
@@ -176,7 +176,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box__headline {
   line-height: 0.85;
-  @include fontSize(30px);
+  font-size: 4rem;
   text-align: center;
   color: $ic-color-light;
   font-weight: 100;
@@ -277,7 +277,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   transform: translate3d(0,50%,0);
   background: rgba($ic-color-light, 0.9);
   padding: $ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2;
-  box-shadow: 0 1px 4px 1px rgba(black, 0.3);
   text-align: center;
 
   &.ic-wizard-box__message-inner--is-fired {
