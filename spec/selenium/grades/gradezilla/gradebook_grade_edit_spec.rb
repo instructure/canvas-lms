@@ -206,6 +206,29 @@ describe "Gradezilla editing grades" do
     end
   end
 
+  context 'with an invalid grade' do
+    before :once do
+      init_course_with_students 1
+      @assignment = @course.assignments.create!(grading_type: 'points', points_possible: 10)
+      @assignment.grade_student(@students[0], grade: 10, grader: @teacher)
+    end
+
+    before :each do
+      user_session(@teacher)
+      Gradezilla.visit(@course)
+    end
+
+    it 'indicates an error without posting the grade', priority: "1", test_id: 3455458 do
+      skip('This is skeleton code that acts as AC for GRADE-684 which is WIP')
+      Gradezilla::Cells.edit_grade(@students[0], @assignment, 'A')
+      current_cell = Gradezilla::Cells.grading_cell(@students[0], @assignment)
+      expect(current_cell).to have_css(".Grid__AssignmentRowCell__Indicator .invalid-grade")
+      refresh_page
+      current_score = Gradezilla::Cells.get_grade(@students[0], @assignment)
+      expect(current_score).to eq(10)
+    end
+  end
+
   context 'with grading periods' do
     before(:once) do
       root_account = @course.root_account = Account.default
