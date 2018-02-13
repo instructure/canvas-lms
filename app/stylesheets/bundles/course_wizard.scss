@@ -31,7 +31,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 .ic-wizard-box {
   transition: all 1s $ic-transition;
   width: 380px;
-  min-width: 380px;
   height: 100%;
   background: #B4B6B9;
   position: absolute;
@@ -185,17 +184,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   font-weight: 100;
   margin: 0;
   margin-bottom: 20px;
-  @include breakpoint(mini-tablet) {
-    @include fontSize(20px);
-    padding: 12px 0;
-  }
-  @include breakpoint(tablet) {
-    @include fontSize(20px);
-  }
-  @include breakpoint(desktop) {
-    @include fontSize(20px);
-    padding: 10px 0;
-  }
+  padding: 12px 0;
 }
 
 .ic-wizard-box__message {
@@ -294,12 +283,12 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(mini-tablet) {
     border-radius: $baseBorderRadius;
   }
-  @include breakpoint(desktop) { padding: $ic-sp*7 $ic-sp*2 $ic-sp*2 $ic-sp*2; }
+  @include breakpoint(desktop) { padding: $ic-sp*5 $ic-sp*2 $ic-sp*2 $ic-sp*2; }
 
 }
 
 .ic-wizard-box__message-button {
-  margin-top: $ic-sp*2;
+  margin-top: 15px;
 }
 
 .ic-wizard-box__message-text {
@@ -307,7 +296,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
   @include breakpoint(desktop) {
     @include fontSize(15px);
-    line-height: 1.6;
+    line-height: 1.5;
   }
 }
 
