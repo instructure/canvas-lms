@@ -46,7 +46,19 @@ module.exports = {
     "no-unused-vars": [2, { "argsIgnorePattern": "^_"}],
     "one-var": ["error", { initialized: "never" }], // allow `let foo, bar` but not `let foo=1, bar=2`
     "object-curly-spacing": [0],
-    "prefer-destructuring": ["error", {"object": true, "array": false}],
+    "prefer-destructuring": [
+      "error",
+      {
+        VariableDeclarator: {
+          array: true, // allow `let [bar] = foo`; reject `let bar = foo[0]`
+          object: true // allow `let { bar: foo } = object`; reject `let foo = object.bar`
+        },
+        AssignmentExpression: {
+          array: false, // allow `let bar; bar = foo[0]`; this matters for conditional assignment
+          object: false // allow `let bar; bar = foo.bar`; this matters for conditional assignment
+        }
+      }
+    ],
     "padded-blocks": [0], // so we can have space between the define([... and the callback
     "semi": [0],
     "import/no-extraneous-dependencies": [0], // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
