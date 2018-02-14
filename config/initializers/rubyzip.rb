@@ -23,6 +23,7 @@
 require 'zip'
 
 Zip.write_zip64_support = true
+Zip.unicode_names = true
 
 module ZipEncodingFix
   def fix_name_encoding
