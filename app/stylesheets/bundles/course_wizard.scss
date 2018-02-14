@@ -305,6 +305,9 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box__message-button {
   margin-top: 15px;
+  .sm-colorfix {
+    color: $ic-color-light;
+  }
 }
 
 .ic-wizard-box__message-text {

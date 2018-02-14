@@ -130,7 +130,7 @@ import ListItems from './ListItems'
         }
         if (this.state.itemShown.hasOwnProperty('title')) {
           return (
-            <a ref="callToAction" href={this.getHref()} className="Button Button--primary" aria-label={"Start task: "+this.state.itemShown.title} aria-describedby="ic-wizard-box__message-text">
+            <a ref="callToAction" href={this.getHref()} className="Button Button--primary sm-colorfix" aria-label={"Start task: "+this.state.itemShown.title} aria-describedby="ic-wizard-box__message-text">
               {this.state.itemShown.title}
             </a>
           );
