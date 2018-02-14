@@ -4002,6 +4002,7 @@ ko:
       show_more: "자세히 표시"
   dashboard_7f1dbf71: 대시보드
   dashboard_options_b240ed5a: "대시보드 옵션"
+  dashboard_view_d7d85969: "대시보드 보기"
   date: 
     abbr_day_names: 
       - 일
@@ -8331,6 +8332,7 @@ ko:
       other: 기타
       parent: "부모 이메일"
       scheduling: 일정
+  notifications_cbfa7704: 알림
   number: 
     currency: 
       format: 
