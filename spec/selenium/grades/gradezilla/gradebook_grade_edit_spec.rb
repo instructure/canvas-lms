@@ -117,7 +117,7 @@ describe "Gradezilla editing grades" do
     expect(first_cell).to have_class('editable')
   end
 
-  it "'tab' navigates forward out of the grid when focused on the options menu trigger", priority: "1" do
+  it "'tabs' forward out of the grid when focused on the options menu", priority: "1", test_id: 3455461 do
     Gradezilla.visit(@course)
 
     first_cell = Gradezilla::Cells.grading_cell(@student_1, @second_assignment)
@@ -131,7 +131,7 @@ describe "Gradezilla editing grades" do
     expect(next_cell).not_to have_class('editable')
   end
 
-  it "'shift-tab' within the grid navigates backward out of the grid", priority: "1" do
+  it "'shift-tab' within the grid navigates backward out of the grid", priority: "1", test_id: 3455462 do
     Gradezilla.visit(@course)
 
     second_cell = Gradezilla::Cells.grading_cell(@student_1, @second_assignment)
@@ -143,7 +143,7 @@ describe "Gradezilla editing grades" do
     expect(first_cell).not_to have_class('editable')
   end
 
-  it "'tab' into the grid activates the first header cell by default", priority: "1" do
+  it "'tab' into the grid activates the first header cell by default", priority: "1", test_id: 3455459 do
     Gradezilla.visit(@course)
 
     # Select the search field (the closest element we can "click" that won't
@@ -156,7 +156,7 @@ describe "Gradezilla editing grades" do
     expect(first_header_cell).to contain_css(':focus')
   end
 
-  it "'tab' into the grid re-activates the previously-active cell if set", priority: "1" do
+  it "'tab' into the grid re-activates the previously-active cell if set", priority: "1", test_id: 3455460 do
     Gradezilla.visit(@course)
 
     selected_cell = Gradezilla::Cells.grading_cell(@student_1, @second_assignment)
