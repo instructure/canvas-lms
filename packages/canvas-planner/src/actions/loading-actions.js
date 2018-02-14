@@ -71,7 +71,7 @@ export function getFirstNewActivityDate (fromMoment) {
   return (dispatch, getState) => {
     fromMoment = fromMoment.clone().subtract(6, 'months');
     return axios.get('api/v1/planner/items', { params: {
-      start_date: fromMoment.format(),
+      start_date: fromMoment.toISOString(),
       filter: 'new_activity',
       order: 'asc'
     }}).then(response => {
@@ -137,7 +137,7 @@ function fetchParams (loadingOptions) {
     return [nextPageUrl, {}];
   } else {
     const params = {
-      [timeParam]: loadingOptions.fromMoment.format()
+      [timeParam]: loadingOptions.fromMoment.toISOString()
     };
     if (loadingOptions.intoThePast) {
       params.order = 'desc';

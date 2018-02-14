@@ -50,7 +50,7 @@ export class UpdateItemTray extends Component {
     super(props);
     const updates = this.getNoteUpdates(props);
     if (!updates.date) {
-      updates.date = props.noteItem && props.noteItem.date ? props.noteItem.date : moment.tz(props.timeZone).format();
+      updates.date = props.noteItem && props.noteItem.date ? props.noteItem.date : moment.tz(props.timeZone).toISOString();
     }
     this.state = {
       updates,
@@ -122,7 +122,7 @@ export class UpdateItemTray extends Component {
   }
 
   handleDateChange = (e, date) => {
-    const value = date ? moment(date).format() : '';  // works if date is a moment obj (instui 3) or iso string (instui 4)
+    const value = date ? moment(date).toISOString() : '';  // works if date is a moment obj (instui 3) or iso string (instui 4)
       this.handleChange('date', value);
   }
 

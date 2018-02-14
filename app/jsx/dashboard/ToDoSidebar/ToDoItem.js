@@ -104,7 +104,7 @@ export default function ToDoItem (props) {
         <Text color="secondary" size="small" weight="bold" lineHeight="fit">
           {getContextShortName(props.courses, props.courseId)}
         </Text>
-        <List variant="inline" delimeter="pipe">
+        <List variant="inline" delimiter="pipe" size="small">
           {getInformationRow(props.dueAt, props.points)}
         </List>
       </div>
