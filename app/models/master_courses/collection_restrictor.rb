@@ -20,6 +20,9 @@ module MasterCourses::CollectionRestrictor
   # e.g. this is a quiz question locked by a quiz
   # even though they do a lot of the same things, i couldn't figure out a way to keep them together that didn't make things super convoluted
 
+  # FYI you'll have to directly hook code that replicates the behavior of
+  # `check_before_overwriting_child_content_on_import` into the respective importers if you add this to new objects
+
   def self.included(klass)
     klass.include MasterCourses::Restrictor::CommonMethods
     klass.extend ClassMethods
@@ -27,11 +30,6 @@ module MasterCourses::CollectionRestrictor
     klass.cattr_accessor :collection_owner_association # this is the association to find the quiz
 
     klass.after_update :mark_downstream_changes
-
-    # quiz questions don't even get instantiated normally on import so
-    # we'll have to directly hook this code into the importer
-    # this callback is silly but i'm adding it just in case
-    klass.before_update :check_before_overwriting_child_content_on_import
   end
 
   module ClassMethods
@@ -80,10 +78,5 @@ module MasterCourses::CollectionRestrictor
       end
     end
     self.owner_for_restrictions.mark_downstream_changes(changed_types) if changed_types.any? # store changes on owner
-  end
-
-  def check_before_overwriting_child_content_on_import
-    return unless @importing_migration && is_child_content?
-    raise "was too lazy to implement this because i didn't think we needed it, sorry not sorry"
   end
 end

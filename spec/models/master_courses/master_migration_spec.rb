@@ -321,6 +321,102 @@ describe MasterCourses::MasterMigration do
       expect(qq3_to.reload).to_not be_deleted
     end
 
+    it "should sync deleted quiz groups (unless changed downstream)" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!
+      qgroup1 = quiz.quiz_groups.create!(:name => "group", :pick_count => 1)
+      qq1 = qgroup1.quiz_questions.create!(:quiz => quiz, :question_data => {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      qgroup2 = quiz.quiz_groups.create!(:name => "group2", :pick_count => 1)
+      qq2 = qgroup2.quiz_questions.create!(:quiz => quiz, :question_data => {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      qgroup1_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup1)).first
+      qgroup2_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup2)).first
+      qq2_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq2)).first
+
+      qq2_to.update_attribute(:question_data, qq2_to.question_data.merge('question_text' => 'something')) # trigger a downstream change on the quiz
+      Timecop.freeze(2.minutes.from_now) do
+        qgroup1.destroy
+      end
+      run_master_migration
+
+      expect(quiz_to.reload.quiz_groups.to_a).to match_array([qgroup1_to, qgroup2_to]) # should not have overwritten because downstream changes
+
+      Timecop.freeze(4.minutes.from_now) do
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true})
+      end
+      run_master_migration
+      expect(quiz_to.reload.quiz_groups.to_a).to eq [qgroup2_to]
+    end
+
+    it "should sync deleted assessment bank questions (unless changed downstream)" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      aq1 = bank1.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      aq2 = bank1.assessment_questions.create!(:question_data => {'question_name' => 'test question2', 'question_type' => 'essay_question'})
+      bank2 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      aq3 = bank2.assessment_questions.create!(:question_data => {'question_name' => 'test question3', 'question_type' => 'essay_question'})
+      aq4 = bank2.assessment_questions.create!(:question_data => {'question_name' => 'test question4', 'question_type' => 'essay_question'})
+
+      run_master_migration
+
+      bank1_to = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank1)).first
+      aq1_to = bank1_to.assessment_questions.where(:migration_id => mig_id(aq1)).first
+      aq2_to = bank1_to.assessment_questions.where(:migration_id => mig_id(aq2)).first
+      bank2_to = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank2)).first
+      aq3_to = bank2_to.assessment_questions.where(:migration_id => mig_id(aq3)).first
+      aq4_to = bank2_to.assessment_questions.where(:migration_id => mig_id(aq4)).first
+
+      aq1_to.update_attribute(:question_data, aq1_to.question_data.merge('question_text' => 'something')) # trigger a downstream change on the bank
+      Timecop.freeze(2.minutes.from_now) do
+        aq2.destroy
+        aq3.destroy
+      end
+
+      run_master_migration
+
+      expect(aq2_to.reload).to_not be_deleted  # should not have overwritten because downstream changes
+      expect(aq3_to.reload).to be_deleted # should be because no downstream changes
+      expect(aq4_to.reload).to_not be_deleted # should have been left alone
+    end
+
+    it "should sync quiz group attributes (unless changed downstream)" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!
+      qgroup = quiz.quiz_groups.create!(:name => "group", :pick_count => 1)
+      qq = qgroup.quiz_questions.create!(:quiz => quiz, :question_data => {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      qgroup_to = quiz_to.quiz_groups.where(:migration_id => mig_id(qgroup)).first
+
+      qgroup_to.update_attribute(:name, "downstream") # should mark it as a downstream change
+      Timecop.freeze(2.minutes.from_now) do
+        qgroup.update_attribute(:name, "upstream")
+        @new_qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      end
+      run_master_migration
+
+      expect(qgroup_to.reload.name).to eq "downstream"
+      expect(quiz_to.reload.quiz_questions.where(:migration_id => mig_id(@new_qq)).first).to be_nil
+
+      Timecop.freeze(4.minutes.from_now) do
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true})
+      end
+      run_master_migration
+
+      expect(qgroup_to.reload.name).to eq "upstream"
+      # adding new questions was borking because a method i didn't think would ever get called was getting called >.<
+      expect(quiz_to.reload.quiz_questions.where(:migration_id => mig_id(@new_qq)).first).to_not be_nil
+    end
+
     it "should sync unpublished quiz points possible" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
