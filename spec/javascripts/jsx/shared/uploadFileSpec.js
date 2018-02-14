@@ -47,10 +47,40 @@ test('uploadFile posts form data instead of json if necessary', assert => {
   const file = sinon.stub();
 
   uploadFile(url, data, file, fakeAjaxLib).then(() => {
-    ok(postStub.calledWith(url, 'name=fake&attachment%5Bcontext_code%5D=course_1'),
+    ok(postStub.calledWith(url, 'name=fake&attachment%5Bcontext_code%5D=course_1&no_redirect=true'),
        'posted url encoded form data');
     done()
+  }).catch(done);
+});
+
+test('uploadFile requests no_redirect in preflight even if not specified', assert => {
+  const done = assert.async()
+  const preflightResponse = new Promise((resolve) => {
+    setTimeout(() => resolve({
+      data: {
+        upload_url: 'http://uploadUrl'
+      }
+    }));
   });
+
+  const postStub = sinon.stub();
+  const getStub = sinon.stub();
+  postStub.onCall(0).returns(preflightResponse);
+  postStub.onCall(1).returns(Promise.resolve({ data: {} }));
+  const fakeAjaxLib = {
+    post: postStub,
+    get: getStub
+  };
+
+  const url = `/api/v1/courses/1/files`;
+  const data = { name: 'fake' };
+  const file = sinon.stub();
+
+  uploadFile(url, data, file, fakeAjaxLib).then(() => {
+    ok(postStub.calledWith(url, { name: "fake", no_redirect: true }),
+       'posted with no_redirect: true');
+    done()
+  }).catch(done);
 });
 
 test('uploadFile threads through in direct to S3 case', assert => {
@@ -83,7 +113,7 @@ test('uploadFile threads through in direct to S3 case', assert => {
   uploadFile(url, data, file, fakeAjaxLib).then(() => {
     ok(getStub.calledWith(successUrl), 'made request to success url');
     done()
-  });
+  }).catch(done);
 });
 
 test('uploadFile threads through in inst-fs case', assert => {
@@ -123,7 +153,7 @@ test('uploadFile threads through in inst-fs case', assert => {
   uploadFile(url, data, file, fakeAjaxLib).then(() => {
     ok(getStub.calledWith(successUrl), 'made request to success url');
     done()
-  });
+  }).catch(done);
 });
 
 test('uploadFile threads through in local-storage case', assert => {
@@ -161,7 +191,7 @@ test('uploadFile threads through in local-storage case', assert => {
   uploadFile(url, data, file, fakeAjaxLib).then((response) => {
     equal(response.id, 1, 'passed response through');
     done()
-  });
+  }).catch(done);
 });
 
 test('completeUpload upacks embedded "attachments" wrapper if any', assert => {
@@ -181,7 +211,7 @@ test('completeUpload upacks embedded "attachments" wrapper if any', assert => {
     ok(postStub.calledWith(upload_url, sinon.match.any, sinon.match.any),
        'posted correct upload_url');
     done()
-  });
+  }).catch(done);
 });
 
 test('completeUpload wires up progress callback if any', assert => {
@@ -203,7 +233,7 @@ test('completeUpload wires up progress callback if any', assert => {
       onUploadProgress: options.onProgress
     })), 'posted correct config');
     done()
-  });
+  }).catch(done);
 })
 
 test('completeUpload skips GET after inst-fs upload if options.ignoreResult', assert => {
@@ -237,7 +267,7 @@ test('completeUpload skips GET after inst-fs upload if options.ignoreResult', as
   completeUpload(preflightResponse, file, options).then(() => {
     ok(getStub.neverCalledWith(successUrl), 'skipped request to success url');
     done()
-  });
+  }).catch(done);
 })
 
 test('completeUpload appends avatar include in GET after inst-fs upload if options.includeAvatar', assert => {
@@ -271,7 +301,7 @@ test('completeUpload appends avatar include in GET after inst-fs upload if optio
   completeUpload(preflightResponse, file, options).then(() => {
     ok(getStub.calledWith(`${successUrl}?include=avatar`), 'skipped request to success url');
     done();
-  });
+  }).catch(done);
 })
 
 test('completeUpload to S3 posts withCredentials false', assert => {
@@ -300,7 +330,7 @@ test('completeUpload to S3 posts withCredentials false', assert => {
       withCredentials: false
     })), 'withCredentials is false');
     done();
-  });
+  }).catch(done);
 })
 
 test('completeUpload to non-S3 posts withCredentials true', assert => {
@@ -325,5 +355,5 @@ test('completeUpload to non-S3 posts withCredentials true', assert => {
       withCredentials: true
     })), 'withCredentials is true');
     done();
-  });
+  }).catch(done);
 })
