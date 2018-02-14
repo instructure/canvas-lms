@@ -249,6 +249,16 @@ describe SIS::CSV::UserImporter do
     expect(user.sortable_name).to eql("Two, User")
   end
 
+  it "should not override the sortable name if full name is provided" do
+    process_csv_data_cleanly(
+      "user_id,login_id,full_name,sortable_name,status",
+      "user_1,user1,User One Two,\"One Two, User\",active"
+    )
+    user = Pseudonym.where(:sis_user_id => "user_1").first.user
+    expect(user.name).to eql("User One Two")
+    expect(user.sortable_name).to eql("One Two, User")
+  end
+
   it "should set passwords and not overwrite current passwords" do
     process_csv_data_cleanly(
       "user_id,login_id,password,first_name,last_name,email,status,ssha_password",

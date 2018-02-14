@@ -3624,6 +3624,35 @@ describe User do
         expect(alice).not_to be_grants_right(sally, :merge)
       end
     end
+
+    describe ":manage_user_details" do
+      before :once do
+        @root_account = Account.default
+        @root_admin = account_admin_user(account: @root_account)
+        @sub_account = Account.create! root_account: @root_account
+        @sub_admin = account_admin_user(account: @sub_account)
+        @student = course_with_student(account: @sub_account, active_all: true).user
+      end
+
+      it "is granted to root account admins" do
+        expect(@student.grants_right?(@root_admin, :manage_user_details)).to eq true
+      end
+
+      it "is not granted to root account admins w/o :manage_user_logins" do
+        @root_account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_user_logins)
+        expect(@student.grants_right?(@root_admin, :manage_user_details)).to eq false
+      end
+
+      it "is not granted to sub-account admins" do
+        expect(@student.grants_right?(@sub_admin, :manage_user_details)).to eq false
+      end
+
+      it "is not granted to root account admins on other root account admins who are invited as students" do
+        other_admin = account_admin_user account: Account.create!
+        course_with_student account: @root_account, user: other_admin, enrollment_state: 'invited'
+        expect(@root_admin.grants_right?(other_admin, :manage_user_details)).to eq false
+      end
+    end
   end
 
   describe "check_accounts_right?" do

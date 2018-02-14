@@ -445,7 +445,7 @@ class GroupsController < ApplicationController
 
     if api_request?
       if params[:group_category_id]
-        group_category = GroupCategory.active.find(params[:group_category_id])
+        group_category = api_find(GroupCategory.active, params[:group_category_id])
         return render :json => {}, :status => bad_request unless group_category
         @context = group_category.context
         attrs[:group_category] = group_category
@@ -469,6 +469,7 @@ class GroupsController < ApplicationController
     @group = @context.groups.temp_record(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
+      @group.set_default_account
       if (sis_id = params.delete :sis_group_id)
         if @group.root_account.grants_right?(@current_user, :manage_sis)
           @group.sis_source_id = sis_id

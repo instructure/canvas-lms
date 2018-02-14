@@ -20,7 +20,7 @@ require 'spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../../lib/data_fixup/populate_root_account_id_for_group_categories')
 
 describe DataFixup::PopulateRootAccountIdForGroupCategories do
-  before :each do
+  before :once do
     account_model
     @other_acct = Account.create!
 
@@ -29,6 +29,9 @@ describe DataFixup::PopulateRootAccountIdForGroupCategories do
 
     @category_for_acct = GroupCategory.create!(account: @account, name: 'Account')
     @category_for_course = GroupCategory.create!(course: course, name: 'Course')
+    # we have invalid contexts because they have been scrubbed, but they should
+    # allow the rest to enjoy a root_account_id even though they don't get one.
+    @cat_for_invalid_course = GroupCategory.create!(context_id: -42, context_type: 'Course', name: 'Other Course')
 
     @other_cat_for_acct = GroupCategory.create!(account: @other_acct, name: 'Other Account')
     @other_cat_for_course = GroupCategory.create!(course: other_course, name: 'Other Course')

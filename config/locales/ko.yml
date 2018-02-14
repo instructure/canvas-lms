@@ -1025,6 +1025,8 @@ ko:
   all_4321c3a1: 전부
   all_students_have_taken_the_quiz_b558f8b4: "모든 학생이 이 퀴즈를 치름"
   all_students_have_taken_the_survey_494f9f42: "모든 학생이 이 설문을 치름"
+  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "사용자가 개별적으로 대시보드 카드 순서 변경을 할 수 있도록 허용함"
+  allow_reorder_dashboard_cards_78215947: "대시보드 카드 순서 변경을 허용함"
   always_3a59e701: 항상
   analytics: 
     course: 
@@ -3998,6 +4000,9 @@ ko:
     show_more_link: 
       show_less: "간단히 표시"
       show_more: "자세히 표시"
+  dashboard_7f1dbf71: 대시보드
+  dashboard_options_b240ed5a: "대시보드 옵션"
+  dashboard_view_d7d85969: "대시보드 보기"
   date: 
     abbr_day_names: 
       - 일
@@ -8115,6 +8120,7 @@ ko:
     students_will_see: "학생이 이 과제가 평점 비공개라는 것을 볼 수 있습니다."
     submission_comments: "제출물 의견"
     sure_you_want_to_mute: "이 과제의 평점을 비공개하시겠습니까? 과제가 평점 비공개 상태인 동안에는 학생이 다음 경우에 대한 알림을 받거나 볼 수 없습니다:"
+  my_dashboard_b724020: "내 대시보드"
   n_a_d6f6c42f: "해당 없음"
   name: "Academic Benchmark 가져오기 도구"
   name_1aed4a1b: 이름
@@ -8326,6 +8332,7 @@ ko:
       other: 기타
       parent: "부모 이메일"
       scheduling: 일정
+  notifications_cbfa7704: 알림
   number: 
     currency: 
       format: 
