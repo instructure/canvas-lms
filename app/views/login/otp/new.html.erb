@@ -30,7 +30,7 @@
 
 <div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">
-    <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
+    <%= image_tag(brand_variable("ic-brand-Login-confirmation-logo"), :class => "ic-Login-confirmation__logo", :alt => "Canvas by Instructure") %>
   </header>
   <div class="ic-Login-confirmation__content">
   <h2 class="ic-Login-confirmation__headline"><%= t 'titles.mfa', "Multi-factor Authentication" %></h2>

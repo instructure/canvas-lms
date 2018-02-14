@@ -35,7 +35,7 @@
 >
   <% if !@current_user && !@embedded_view %>
     <header class="ic-Login-confirmation__header">
-      <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
+      <%= image_tag(brand_variable("ic-brand-Login-confirmation-logo"), :class => "ic-Login-confirmation__logo", :alt => "Canvas by Instructure") %>
     </header>
     <div class="ic-Login-confirmation__content">
   <% end %>
