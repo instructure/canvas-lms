@@ -80,7 +80,7 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@instructure/ui-core@^4.6.0", "@instructure/ui-core@^4.7.1":
+"@instructure/ui-core@^4.1.0", "@instructure/ui-core@^4.6.0", "@instructure/ui-core@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.1.tgz#05f48e7f5eb469c97850bd517c266a13e2a9ec5b"
   dependencies:
@@ -107,7 +107,7 @@
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
 
-"@instructure/ui-themes@^4.7.1":
+"@instructure/ui-themes@^4.1.0", "@instructure/ui-themes@^4.7.1":
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.1.tgz#b4b51ddea50d94e83517297b46e470f5a2755e1a"
 
@@ -2110,17 +2110,18 @@ caniuse-lite@^1.0.30000784:
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
-canvas-rce@2.6.3:
-  version "2.6.3"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.6.3.tgz#45aadd6bbeba49776b7dc915c2a6f699ce5732a6"
+canvas-rce@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-3.0.2.tgz#bd91030c0100588c07fe5b29aa5e1f1325bd5185"
   dependencies:
+    "@instructure/ui-core" "^4.1.0"
+    "@instructure/ui-themes" "^4.1.0"
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
     escape-html "1.0.3"
     format-message "^5.1.0"
     format-message-generate-id "^5.1.0"
     instructure-icons "3 || 4"
-    instructure-ui "^2.1.0 || 3"
     isomorphic-fetch "2.2.1"
     load-css "0.1.0"
     react "^0.14.8 || ^15.0.0"
@@ -5390,7 +5391,7 @@ install@~0.1.7:
     shortid "^2.2.8"
     svg-to-jsx "^0.0.20"
 
-instructure-ui@3.3.4, instructure-ui@3.x, "instructure-ui@^2.1.0 || 3":
+instructure-ui@3.3.4, instructure-ui@3.x:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-3.3.4.tgz#6a5640f60d5cd5c0c4462c021350407a8975f556"
   dependencies:
