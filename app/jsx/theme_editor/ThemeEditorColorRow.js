@@ -28,11 +28,17 @@ export default class ThemeEditorColorRow extends Component {
     varDef: customTypes.color,
     onChange: PropTypes.func.isRequired,
     userInput: customTypes.userVariableInput,
-    placeholder: PropTypes.string.isRequired
+    placeholder: PropTypes.string.isRequired,
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func,
+    refactorEnabled: PropTypes.bool
   }
 
   static defaultProps = {
-    userInput: {}
+    userInput: {},
+    themeState: {},
+    handleThemeStateChange() {},
+    refactorEnabled: false
   }
 
   state = {}
@@ -91,10 +97,12 @@ export default class ThemeEditorColorRow extends Component {
   inputChange = value => {
     const invalidColor = !!value && (!this.changedColor(value) || this.invalidHexString(value))
     this.props.onChange(value, invalidColor)
+    if (!invalidColor) {
+      this.props.handleThemeStateChange(this.props.varDef.variable_name, value)
+    }
   }
 
-  inputNotFocused = () =>
-    this.refs.textInput && this.refs.textInput.getDOMNode() != document.activeElement
+  inputNotFocused = () => this.textInput && this.textInput !== document.activeElement
 
   updateIfMounted = () => {
     this.forceUpdate()
@@ -110,23 +118,24 @@ export default class ThemeEditorColorRow extends Component {
     const colorVal =
       this.props.userInput.val != null ? this.props.userInput.val : this.props.currentValue
 
-    // 1st input is hidden and posts a valid hex value
     // 2nd input handles display, input events, and validation
     const hexValue = this.hexVal(colorVal)
     return (
       <span>
+        {!this.props.refactorEnabled && (
+          <input
+            type="hidden"
+            name={`brand_config[variables][${this.props.varDef.variable_name}]`}
+            value={hexValue}
+          />
+        )}
         <input
-          type="hidden"
-          name={`brand_config[variables][${this.props.varDef.variable_name}]`}
-          value={hexValue}
-        />
-        <input
-          ref="textInput"
+          ref={c => (this.textInput = c)}
           type="text"
           id={`brand_config[variables][${this.props.varDef.variable_name}]`}
           className={inputClasses}
           placeholder={this.props.placeholder}
-          value={colorVal}
+          value={this.props.themeState[this.props.varDef.variable_name]}
           aria-invalid={this.showWarning()}
           onChange={event => this.inputChange(event.target.value)}
           onBlur={this.updateIfMounted}

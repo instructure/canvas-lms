@@ -164,13 +164,22 @@ export default class ThemeEditor extends React.Component {
   }
 
   handleThemeStateChange = (key, value) => {
+    let {files, properties} = this.state.themeStore
+    if (value instanceof File) {
+      files.push({
+        variable_name: key,
+        value
+      })
+    } else {
+      properties = {
+        ...properties,
+        ...{[key]: value}
+      }
+    }
     this.setState({
       themeStore: {
-        properties: {
-          ...this.state.themeStore.properties,
-          ...{[key]: value}
-        },
-        files: this.state.themeStore.files
+        properties,
+        files
       }
     })
   }
@@ -436,6 +445,8 @@ export default class ThemeEditor extends React.Component {
             <div className="Theme__editor">
               {this.props.refactorEnabled ? (
                 <ThemeEditorSidebar
+                  themeStore={this.state.themeStore}
+                  handleThemeStateChange={this.handleThemeStateChange}
                   refactorEnabled={this.props.refactorEnabled}
                   allowGlobalIncludes={this.props.allowGlobalIncludes}
                   brandConfig={this.props.brandConfig}

@@ -137,3 +137,24 @@ test('handleThemeStateChange updates theme store', () => {
     files: []
   })
 })
+
+test('handleThemeStateChange updates when there is a file', () => {
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  const key = 'ic-brand-favicon'
+  const value = new File(['foo'], 'foo.png')
+  wrapper.instance().handleThemeStateChange(key, value)
+  deepEqual(wrapper.state('themeStore'), {
+    properties: {
+      'ic-brand-primary': 'green',
+      'ic-brand-font-color-dark': '#2D3B45',
+      'ic-brand-global-nav-bgd': '#394B58',
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef'
+    },
+    files: [
+      {
+        value,
+        variable_name: key
+      }
+    ]
+  })
+})

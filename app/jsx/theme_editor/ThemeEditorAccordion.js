@@ -38,7 +38,9 @@ export default class ThemeEditorAccordion extends React.Component {
     changeSomething: PropTypes.func.isRequired,
     getDisplayValue: PropTypes.func.isRequired,
     refactorEnabled: PropTypes.bool,
-    accordionContextOverride: PropTypes.object // Temporary prop that should be removed after removing the refactorEnabled stuff
+    accordionContextOverride: PropTypes.object, // Temporary prop that should be removed after removing the refactorEnabled stuff
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func
   }
 
   static defaultProps = {
@@ -121,6 +123,9 @@ export default class ThemeEditorAccordion extends React.Component {
       userInput: this.props.changedValues[varDef.variable_name],
       onChange: this.props.changeSomething.bind(null, varDef.variable_name),
       placeholder: this.props.getDisplayValue(varDef.variable_name),
+      themeState: this.props.themeState,
+      handleThemeStateChange: this.props.handleThemeStateChange,
+      refactorEnabled: this.props.refactorEnabled,
       varDef
     }
 

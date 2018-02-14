@@ -38,6 +38,8 @@ export default function ThemeEditorSidebar(props) {
             getDisplayValue={props.getDisplayValue}
             changedValues={props.changedValues}
             changeSomething={props.changeSomething}
+            themeState={props.themeState}
+            handleThemeStateChange={props.handleThemeStateChange}
           />
         </TabPanel>
         <TabPanel title={I18n.t('Upload')} padding="0">
@@ -141,7 +143,9 @@ ThemeEditorSidebar.propTypes = {
   variableSchema: types.variableSchema.isRequired,
   getDisplayValue: func.isRequired,
   changeSomething: func.isRequired,
-  changedValues: object
+  changedValues: object,
+  themeState: object.isRequired,
+  handleThemeStateChange: func.isRequired
 }
 
 ThemeEditorSidebar.defaultProps = {
