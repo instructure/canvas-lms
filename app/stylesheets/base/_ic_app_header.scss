@@ -327,13 +327,31 @@ button.ic-app-header__menu-list-link {
   background-repeat: no-repeat;
   background-size: contain;
   transition: transform 0.3s;
-  height: 70px;
+  /*height: 70px;*/
 
   body.primary-nav-expanded & {
-    height: 70px;
+    /*height: 70px;*/
   }
 }
-// set to block to avoid any exta inline spacing at bottom
+
+.ic-wizard-box  .ic-app-header__logomark {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  margin: 15px auto 15px auto;
+  background-image: $ic-brand-header-image;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  transition: transform 0.3s;
+  height: 50px;
+
+  body.primary-nav-expanded & {
+    /*height: 70px;*/
+  }
+}
+
+// set to block to avoid any extra inline spacing at bottom
 .ic-app-header__uploaded-logo { display: block; }
 
 // stuff that changes when the nav is expanded
