@@ -246,40 +246,28 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def generate_authn_request_redirect(host: nil, parent_registration: false)
-    if account.settings[:use_legacy_saml_authn_request]
-      settings = saml_settings(host)
-      request = Onelogin::Saml::AuthRequest.new(settings)
-      forward_url = request.generate_request
-      if debugging? && !debug_get(:request_id)
-        debug_set(:request_id, request.id)
-        debug_set(:to_idp_url, forward_url)
-        debug_set(:to_idp_xml, request.request_xml)
-        debug_set(:debugging, "Forwarding user to IdP for authentication")
-      end
-      forward_url << '&ForceAuthn=true' if parent_registration
-    else
-      sp_metadata = self.class.sp_metadata_for_account(account, host).service_providers.first
-      authn_request = SAML2::AuthnRequest.initiate(SAML2::NameID.new(entity_id),
-                                                   idp_metadata.identity_providers.first,
-                                                   service_provider: sp_metadata)
-      authn_request.name_id_policy.format = identifier_format if identifier_format.present?
-      if requested_authn_context.present?
-        authn_request.requested_authn_context = SAML2::RequestedAuthnContext.new
-        authn_request.requested_authn_context.class_ref = requested_authn_context
-        authn_request.requested_authn_context.comparison = :exact
-      end
-      authn_request.force_authn = true if parent_registration
-      private_key = self.class.private_key
-      private_key = nil if account.settings[:dont_sign_saml_authn_requests]
-      forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request, private_key: private_key)
-
-      if debugging? && !debug_get(:request_id)
-        debug_set(:request_id, authn_request.id)
-        debug_set(:to_idp_url, forward_url)
-        debug_set(:to_idp_xml, authn_request.to_s)
-        debug_set(:debugging, "Forwarding user to IdP for authentication")
-      end
+    sp_metadata = self.class.sp_metadata_for_account(account, host).service_providers.first
+    authn_request = SAML2::AuthnRequest.initiate(SAML2::NameID.new(entity_id),
+                                                 idp_metadata.identity_providers.first,
+                                                 service_provider: sp_metadata)
+    authn_request.name_id_policy.format = identifier_format if identifier_format.present?
+    if requested_authn_context.present?
+      authn_request.requested_authn_context = SAML2::RequestedAuthnContext.new
+      authn_request.requested_authn_context.class_ref = requested_authn_context
+      authn_request.requested_authn_context.comparison = :exact
     end
+    authn_request.force_authn = true if parent_registration
+    private_key = self.class.private_key
+    private_key = nil if account.settings[:dont_sign_saml_authn_requests]
+    forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request, private_key: private_key)
+
+    if debugging? && !debug_get(:request_id)
+      debug_set(:request_id, authn_request.id)
+      debug_set(:to_idp_url, forward_url)
+      debug_set(:to_idp_xml, authn_request.to_s)
+      debug_set(:debugging, "Forwarding user to IdP for authentication")
+    end
+
     forward_url
   end
 
