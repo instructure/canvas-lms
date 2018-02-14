@@ -88,7 +88,7 @@ $(document).ready(function(event) {
     output += "<li>" + htmlEscape(I18n.t('import_counts.groups', "Groups: %{group_count}", {group_count: batch.data.counts.groups})) + "</li>";
     output += "<li>" + htmlEscape(I18n.t('import_counts.group_enrollments', "Group Enrollments: %{group_enrollments_count}", {group_enrollments_count: batch.data.counts.group_memberships})) + "</li>";
     output += "<li>" + htmlEscape(I18n.t('import_counts.user_observers', "User Observers: %{user_observers_count}", {user_observers_count: batch.data.counts.user_observers})) + "</li>";
-    output += "<li>" + htmlEscape(I18n.t('import_counts.change_sis_ids', "Change SIS IDs: %{change_sis_ids_count}", {change_sis_ids_count: batch.data.counts.change_sis_id})) + "</li>";
+    output += "<li>" + htmlEscape(I18n.t('import_counts.change_sis_ids', "Change SIS IDs: %{change_sis_ids_count}", {change_sis_ids_count: batch.data.counts.change_sis_ids})) + "</li>";
     output += "</ul></li></ul>";
 
     return output
