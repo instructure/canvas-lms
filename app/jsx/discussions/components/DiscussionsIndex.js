@@ -51,6 +51,7 @@ export default class DiscussionsIndex extends Component {
     pinnedDiscussions: discussionList,
     roles: arrayOf(string).isRequired,
     togglePin: func.isRequired,
+    toggleSubscriptionState: func.isRequired,
     unpinnedDiscussions: discussionList,
   }
 
@@ -93,6 +94,7 @@ export default class DiscussionsIndex extends Component {
             discussions={this.props.pinnedDiscussions}
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
+            toggleSubscribe={this.props.toggleSubscriptionState}
             roles={this.props.roles}
           />
         </div>
@@ -102,6 +104,7 @@ export default class DiscussionsIndex extends Component {
             discussions={this.props.closedForCommentsDiscussions}
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
+            toggleSubscribe={this.props.toggleSubscriptionState}
             roles={this.props.roles}
           />
         </div>
@@ -119,6 +122,7 @@ export default class DiscussionsIndex extends Component {
           permissions={this.props.permissions}
           masterCourseData={this.props.masterCourseData}
           togglePin={this.props.togglePin}
+          toggleSubscribe={this.props.toggleSubscriptionState}
           roles={this.props.roles}
           closedState={false}
           pinned
@@ -131,6 +135,7 @@ export default class DiscussionsIndex extends Component {
           permissions={this.props.permissions}
           masterCourseData={this.props.masterCourseData}
           togglePin={this.props.togglePin}
+          toggleSubscribe={this.props.toggleSubscriptionState}
           pinned={false}
           closedState={false}
           roles={this.props.roles}
@@ -142,6 +147,7 @@ export default class DiscussionsIndex extends Component {
             discussions={this.props.closedForCommentsDiscussions}
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
+            toggleSubscribe={this.props.toggleSubscriptionState}
             closeForComments={this.props.closeForComments}
             roles={this.props.roles}
             pinned={false}
@@ -175,5 +181,9 @@ const connectState = state => Object.assign({
     'closedForCommentsDiscussions',
     'unpinnedDiscussions']
 ))
-const connectActions = dispatch => bindActionCreators(select(actions, ['getDiscussions', 'closeForComments', 'togglePin']), dispatch)
+const connectActions = dispatch => bindActionCreators(
+  select(actions, ['getDiscussions',
+                   'closeForComments',
+                   'togglePin',
+                   'toggleSubscriptionState']), dispatch)
 export const ConnectedDiscussionsIndex = DragDropContext(HTML5Backend)(connect(connectState, connectActions)(DiscussionsIndex))

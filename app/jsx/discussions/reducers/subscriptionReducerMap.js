@@ -15,22 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { shape, arrayOf, string, number, bool, oneOf } from 'prop-types'
-import { author } from './user'
+import { actionTypes } from '../actions'
 
-const discussion = shape({
-  id: string.isRequired,
-  position: number.isRequired,
-  published: bool.isRequired,
-  title: string.isRequired,
-  message: string.isRequired,
-  posted_at: string.isRequired,
-  author: author.isRequired,
-  read_state: oneOf(['read', 'unread']).isRequired,
-  unread_count: number.isRequired,
-  subscribed: bool.isRequired,
-})
+const subscriptionReducerMap = {
+  [actionTypes.TOGGLE_SUBSCRIBE_SUCCESS]: (state, action) => (
+    state.map(discussion => (discussion.id === action.payload.id)
+      ? {...discussion, subscribed: action.payload.subscribed}
+      : discussion
+    )
+  )
+}
 
-export const discussionList = arrayOf(discussion)
-
-export default discussion
+export default subscriptionReducerMap

@@ -67,6 +67,14 @@ test('renders UnreadBadge if discussion has replies == 0', () => {
   notOk(node.exists())
 })
 
+test('renders the subscription ToggleIcon', () => {
+  const discussion = { discussion_subentry_count: 5 }
+  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const node = tree.find('ToggleIcon')
+  ok(node.exists())
+  strictEqual(node.length, 1)
+})
+
 test('renders "Delayed until" date label if discussion is delayed', () => {
   const discussion = { delayed_post_at: (new Date).toString() }
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)

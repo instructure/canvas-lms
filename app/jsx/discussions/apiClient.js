@@ -19,15 +19,13 @@
 import axios from 'axios'
 import { encodeQueryString } from '../shared/queryString'
 
-// not using default because we will add more api calls in near future
-// eslint-disable-next-line
 export function getDiscussions ({ contextType, contextId, discussions }, { page }) {
   const params = [
     { per_page: 40 },
     { plain_messages: true },
     { exclude_assignment_descriptions: true },
     { exclude_context_module_locked_topics: true },
-    { page: page || discussions.currentPage },
+    { page: page || discussions.currentPage }, // TODO get all discussions. See COMMS-851
   ]
 
   if (contextType === 'course') {
@@ -42,4 +40,12 @@ export function getDiscussions ({ contextType, contextId, discussions }, { page 
 export function updateDiscussion ({ contextType, contextId }, discussion, pinnedState, closedState) {
   const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussion.id}`
   return axios.put(url, { pinned: pinnedState, locked: closedState })
+}
+
+export function subscribeToTopic ({ contextType, contextId }, { id }) {
+  return axios.put(`/api/v1/${contextType}s/${contextId}/discussion_topics/${id}/subscribed`)
+}
+
+export function unsubscribeFromTopic ({ contextType, contextId }, { id }) {
+  return axios.delete(`/api/v1/${contextType}s/${contextId}/discussion_topics/${id}/subscribed`)
 }

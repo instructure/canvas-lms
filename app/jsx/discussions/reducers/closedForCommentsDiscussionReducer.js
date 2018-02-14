@@ -17,30 +17,34 @@
  */
 import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
+import subscriptionReducerMap from './subscriptionReducerMap'
 
-const closedForCommentsDiscussionReducer = handleActions({
-    [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
-      let closedDiscussions = []
-      if(action.payload.data) {
-        closedDiscussions = action.payload.data.filter((disc) => disc.locked)
-      }
-      return closedDiscussions
-    },
-    [actionTypes.CLOSE_FOR_COMMENTS_START]: (state, action) => {
-      const newState = state.slice()
+const reducerMap = {
+  [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
+    let closedDiscussions = []
+    if(action.payload.data) {
+      closedDiscussions = action.payload.data.filter((disc) => disc.locked)
+    }
+    return closedDiscussions
+  },
+  [actionTypes.CLOSE_FOR_COMMENTS_START]: (state, action) => {
+    const newState = state.slice()
+    newState.push(action.payload.discussion)
+    return newState
+  },
+  [actionTypes.CLOSE_FOR_COMMENTS_FAIL]: (state, action) => state.filter((disc) => disc.id !== action.payload.discussion.id),
+  [actionTypes.TOGGLE_PIN_START]: (state, action) => state.filter((disc) => disc.id !== action.payload.discussion.id),
+  [actionTypes.TOGGLE_PIN_FAIL]: (state, action) => {
+    let newState = state.slice()
+    if(action.payload.discussion.locked) {
       newState.push(action.payload.discussion)
-      return newState
-    },
-    [actionTypes.CLOSE_FOR_COMMENTS_FAIL]: (state, action) => state.filter((disc) => disc.id !== action.payload.discussion.id),
-    [actionTypes.TOGGLE_PIN_START]: (state, action) => state.filter((disc) => disc.id !== action.payload.discussion.id),
-    [actionTypes.TOGGLE_PIN_FAIL]: (state, action) => {
-      let newState = state.slice()
-      if(action.payload.discussion.locked) {
-        newState.push(action.payload.discussion)
-      } else {
-        newState = state.filter((disc) => disc.id !== action.payload.discussion.id)
-      }
-      return newState
-    },
-}, [])
+    } else {
+      newState = state.filter((disc) => disc.id !== action.payload.discussion.id)
+    }
+    return newState
+  },
+}
+
+Object.assign(reducerMap, subscriptionReducerMap)
+const closedForCommentsDiscussionReducer = handleActions(reducerMap, [])
 export default closedForCommentsDiscussionReducer

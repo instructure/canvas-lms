@@ -49,6 +49,7 @@ export default class DiscussionsContainer extends Component {
     masterCourseData: masterCourseDataShape,
     title: string.isRequired,
     togglePin: func,
+    toggleSubscribe: func.isRequired,
     closeForComments: func,
     pinned: bool,
     closedState: bool,
@@ -74,6 +75,7 @@ export default class DiscussionsContainer extends Component {
           discussion={discussion}
           canManage={this.props.permissions.manage_content}
           masterCourseData={this.props.masterCourseData}
+          onToggleSubscribe={this.props.toggleSubscribe}
           draggable
         />)
       } else {
@@ -83,6 +85,7 @@ export default class DiscussionsContainer extends Component {
             discussion={discussion}
             canManage={this.props.permissions.manage_content}
             masterCourseData={this.props.masterCourseData}
+            onToggleSubscribe={this.props.toggleSubscribe}
             draggable={false}
           />
         )

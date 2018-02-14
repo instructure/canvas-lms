@@ -20,12 +20,12 @@ import I18n from 'i18n!discussions_v2'
 import { createActions } from 'redux-actions'
 import $ from 'jquery'
 
-import { getDiscussions, updateDiscussion } from './apiClient'
+import * as apiClient from './apiClient'
 import { createPaginationActions } from '../shared/reduxPagination'
 
 function fetchDiscussions(dispatch, getState, payload) {
   return (resolve, reject) => {
-    getDiscussions(getState(), payload)
+    apiClient.getDiscussions(getState(), payload)
       .then(resolve)
       .catch(err => reject({ err, message: I18n.t('An error ocurred while loading discussions') }))
   }
@@ -40,6 +40,9 @@ const types = [
   'CLOSE_FOR_COMMENTS_START',
   'CLOSE_FOR_COMMENTS_SUCCESS',
   'CLOSE_FOR_COMMENTS_FAIL',
+  'TOGGLE_SUBSCRIBE_START',
+  'TOGGLE_SUBSCRIBE_SUCCESS',
+  'TOGGLE_SUBSCRIBE_FAIL'
 ]
 const actions = Object.assign(
   createActions(...types),
@@ -53,7 +56,7 @@ actions.togglePin = function ({pinnedState, discussion, closedState}) {
       discussionCopy.pinned = pinnedState
       discussionCopy.locked = false
       dispatch(actions.togglePinStart({discussion: discussionCopy, pinnedState, closedState}))
-      updateDiscussion(getState(), discussion, pinnedState, closedState)
+      apiClient.updateDiscussion(getState(), discussion, pinnedState, closedState)
         .then(_ => {
           dispatch(actions.togglePinSuccess())
             const successMessage = pinnedState ? I18n.t('Discussion pinned successfully') : I18n.t('Discussion unpinned successfully')
@@ -81,7 +84,7 @@ actions.closeForComments = function ({closedState, discussion, pinnedState}) {
       discussionCopy.pinned = pinnedState
       discussionCopy.locked = closedState
       dispatch(actions.closeForCommentsStart({discussion: discussionCopy, closedState, pinnedState}))
-      updateDiscussion(getState(), discussion, pinnedState, closedState)
+      apiClient.updateDiscussion(getState(), discussion, pinnedState, closedState)
         .then(_ => {
           dispatch(actions.closeForCommentsSuccess())
           const successMessage = I18n.t('Discussion closed for comments successfully')
@@ -94,6 +97,29 @@ actions.closeForComments = function ({closedState, discussion, pinnedState}) {
             discussion,
             closedState,
             pinnedState,
+            message: failMessage,
+            err
+          }))
+        })
+    }
+  }
+}
+
+actions.toggleSubscriptionState = function(discussion) {
+  return (dispatch, getState) => {
+    if (discussion.subscription_hold === undefined) {
+      dispatch(actions.toggleSubscribeStart())
+      const toggleFunc = discussion.subscribed ? apiClient.unsubscribeFromTopic : apiClient.subscribeToTopic
+
+      toggleFunc(getState(), discussion)
+        .then(_ => {
+          const params = { id: discussion.id, subscribed: !discussion.subscribed }
+          dispatch(actions.toggleSubscribeSuccess(params))
+        })
+        .catch(err => {
+          const failMessage = discussion.subscribed ? I18n.t('Unsubscribed failed') : I18n.t('Subscribe failed')
+          $.screenReaderFlashMessageExclusive(failMessage)
+          dispatch(actions.toggleSubscribeFail({
             message: failMessage,
             err
           }))

@@ -27,11 +27,14 @@ import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
 import IconTimer from 'instructure-icons/lib/Line/IconTimerLine'
 import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
+import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
+import IconRssSolid from 'instructure-icons/lib/Solid/IconRssSolid'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import SectionsTooltip from '../SectionsTooltip'
 import CourseItemRow from './CourseItemRow'
 import UnreadBadge from './UnreadBadge'
+import ToggleIcon from './ToggleIcon'
 import discussionShape from '../proptypes/discussion'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 
@@ -56,7 +59,9 @@ const discussionTarget = {
   },
 }
 
-export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged, connectDragSource, connectDragPreview, draggable }) {
+export default function DiscussionRow ({ discussion, masterCourseData, rowRef, onSelectedChanged,
+                                         connectDragSource, connectDragPreview, draggable,
+                                         onToggleSubscribe }) {
   const timestamp = makeTimestamp(discussion)
   const readCount = discussion.discussion_subentry_count > 0
     ? (
@@ -68,6 +73,16 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
       />
     )
     : null
+  const subscribeButton = (
+    <ToggleIcon
+      toggled={discussion.subscribed}
+      OnIcon={<IconRssSolid title={I18n.t('Unsubscribe from %{title}', { title: discussion.title })} />}
+      OffIcon={<IconRssLine title={I18n.t('Subscribe to %{title}', { title: discussion.title })} />}
+      onToggleOn={() => onToggleSubscribe(discussion)}
+      onToggleOff={() => onToggleSubscribe(discussion)}
+      disabled={discussion.subscription_hold !== undefined}
+    />
+  )
 
   // necessary because discussions return html from RCE
   const contentWrapper = document.createElement('span')
@@ -117,7 +132,7 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
             <Text color="secondary" size="small" as="p">{$.datetimeString(timestamp.date, {format: 'medium'})}</Text>
           </div>
         }
-        actionsContent={readCount}
+        actionsContent={[readCount, subscribeButton]}
       />
     </span>
   )
@@ -131,6 +146,7 @@ DiscussionRow.propTypes = {
   connectDragSource: func,
   connectDragPreview: func,
   draggable: bool,
+  onToggleSubscribe: func.isRequired,
 }
 
 DiscussionRow.defaultProps = {

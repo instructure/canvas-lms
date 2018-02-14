@@ -17,43 +17,47 @@
  */
 import { handleActions } from 'redux-actions'
 import { actionTypes } from '../actions'
+import subscriptionReducerMap from './subscriptionReducerMap'
 
-const unpinnedDiscussionReducer = handleActions({
-    [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
-      let unpinnedDiscussions = []
-      if(action.payload.data) {
-        unpinnedDiscussions = action.payload.data.filter((disc) => !disc.pinned && !disc.locked)
-      }
-      return unpinnedDiscussions
-    },
-    [actionTypes.CLOSE_FOR_COMMENTS_START]: (state, action) => {
-      const newState = state.slice()
-      return newState.filter((disc) => disc.id !== action.payload.discussion.id)
-    },
-    [actionTypes.CLOSE_FOR_COMMENTS_FAIL]: (state, action) => {
-      const newState = state.slice()
-      if(!action.payload.discussion.pinned) {
-        newState.push(action.payload.discussion)
-      }
-      return newState
-    },
-    [actionTypes.TOGGLE_PIN_START]: (state, action) => {
-      let newState = state.slice()
-      if(!action.payload.pinnedState && !action.payload.discussion.locked) {
-        newState.push(action.payload.discussion)
-      } else {
-        newState = state.filter((disc) => disc.id !== action.payload.discussion.id)
-      }
-      return newState
-    },
-    [actionTypes.TOGGLE_PIN_FAIL]: (state, action) => {
-      let newState = state.slice()
-      if(!action.payload.pinnedState || action.payload.discussion.locked) {
-        newState = state.filter((disc) => disc.id !== action.payload.discussion.id)
-      } else {
-        newState.push(action.payload.discussion)
-      }
-      return newState
-    },
-}, [])
+const reducerMap = {
+  [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
+    let unpinnedDiscussions = []
+    if(action.payload.data) {
+      unpinnedDiscussions = action.payload.data.filter((disc) => !disc.pinned && !disc.locked)
+    }
+    return unpinnedDiscussions
+  },
+  [actionTypes.CLOSE_FOR_COMMENTS_START]: (state, action) => {
+    const newState = state.slice()
+    return newState.filter((disc) => disc.id !== action.payload.discussion.id)
+  },
+  [actionTypes.CLOSE_FOR_COMMENTS_FAIL]: (state, action) => {
+    const newState = state.slice()
+    if(!action.payload.discussion.pinned) {
+      newState.push(action.payload.discussion)
+    }
+    return newState
+  },
+  [actionTypes.TOGGLE_PIN_START]: (state, action) => {
+    let newState = state.slice()
+    if(!action.payload.pinnedState && !action.payload.discussion.locked) {
+      newState.push(action.payload.discussion)
+    } else {
+      newState = state.filter((disc) => disc.id !== action.payload.discussion.id)
+    }
+    return newState
+  },
+  [actionTypes.TOGGLE_PIN_FAIL]: (state, action) => {
+    let newState = state.slice()
+    if(!action.payload.pinnedState || action.payload.discussion.locked) {
+      newState = state.filter((disc) => disc.id !== action.payload.discussion.id)
+    } else {
+      newState.push(action.payload.discussion)
+    }
+    return newState
+  },
+}
+
+Object.assign(reducerMap, subscriptionReducerMap)
+const unpinnedDiscussionReducer = handleActions(reducerMap, [])
 export default unpinnedDiscussionReducer
