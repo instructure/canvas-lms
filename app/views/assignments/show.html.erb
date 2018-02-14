@@ -176,6 +176,15 @@
     </table>
 
     <% if can_do(@assignment, @current_user, :update) %>
+      <script>
+        // this is to disable a really annoying scroll to top on an interval
+        // that i can't find the source of to disable.
+        Object.defineProperty(document.documentElement, "scrollTop", {
+          get: function() { return 0; },
+          set: function() { console.log("set scrollTop suppressed"); }
+        });
+      </script>
+
       <div class="content-box">
         <a
           href="<%= context_url(@context, :context_rubrics_url) %>"
