@@ -30,7 +30,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box {
   transition: all 1s $ic-transition;
-  width: 380px;
+  width: 540px;
   height: 100%;
   background: #B4B6B9;
   position: absolute;
@@ -234,10 +234,10 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
     display: block;
     background: $ic-wizard-color-dark-neutral;
-    width: 72px; height: 72px;
+    width: 90px; height: 90px;
     border-radius: 100%;
     position: absolute;
-    left: 50%; top: -36px;
+    left: 50%; top: -45px;
     z-index: 1;
     margin-left: -36px;
     display: flex;
@@ -268,9 +268,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   }
 
   @include breakpoint(desktop) {
-    width: 120px; height: 120px;
-    top: -60px; left: 50%;
-    margin-left: -60px;
     i[class*=icon-], i[class^=icon-] {
       &:before { font-size: $ic-sp*5; }
     }
@@ -283,12 +280,17 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   opacity: 0;
   transform: translate3d(0,50%,0);
   background: rgba($ic-color-light, 0.9);
-  padding: $ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2;
   text-align: center;
 
   &.ic-wizard-box__message-inner--is-fired {
     opacity: 1;
     transform: translate3d(0,0,0);
+    padding: 50px 25px 15px 25px;
+    height: 227px;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    box-sizing: border-box;
   }
 
   @if $use_high_contrast { background: $ic-color-light; }
@@ -297,7 +299,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(mini-tablet) {
     border-radius: $baseBorderRadius;
   }
-  @include breakpoint(desktop) { padding: $ic-sp*5 $ic-sp*2 $ic-sp*2 $ic-sp*2; }
+  @include breakpoint(desktop) { /*padding: $ic-sp*5 $ic-sp*2 $ic-sp*2 $ic-sp*2;*/ }
 
 }
 

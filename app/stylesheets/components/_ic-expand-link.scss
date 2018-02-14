@@ -200,8 +200,8 @@ $ic-Expand-link-size: $ic-sp*4;
     top: 0; right: 0;
     text-align: center;
     &:before {
-      top: $ic-sp/2;
-      font-size: $ic-Expand-link-size - $ic-sp;
+      font-size: 25px;
+      margin-top: 12px;
     }
   }
 
@@ -228,6 +228,7 @@ $ic-Expand-link-size: $ic-sp*4;
 
     .ic-Expand-link__layout { padding: 0 0 0 $ic-Expand-link-size; }
     .ic-Expand-link__icon { right: auto; left: 0; }
+    .icon-x .ic-Expand-link__icon { margin-top: 12px; left: 7px; }
 
     &.ic-Expand-link--active {
       .ic-Expand-link__trigger { @include ic-Expand-link-active-state; }
