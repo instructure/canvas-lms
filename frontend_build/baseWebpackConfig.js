@@ -172,6 +172,7 @@ module.exports = {
           path.resolve(__dirname, '../app/jsx'),
           path.resolve(__dirname, '../app/coffeescripts'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
+          path.resolve(__dirname, '../spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/jsx\//
         ],
         exclude: [
