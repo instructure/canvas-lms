@@ -30,22 +30,23 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box {
   transition: all 1s $ic-transition;
-  width: 100%;
+  width: 540px;
   height: 100%;
-  background: $ic-wizard-color-dark-neutral;
-  position: fixed;
-  bottom: 0; left: 0;
+  background: #B4B6B9;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  right: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: url("/images/wizard-bg.jpg") no-repeat center center;
   background-size: cover;
-  transform: translate3d(0,100%,0);
+  transform: translate3d(300%,0,0);
   opacity: 0;
-  @include breakpoint(desktop) { flex-direction: row; }
+  @include breakpoint(desktop) { flex-direction: row-reverse; }
 
   .ReactModal__Overlay.ReactModal__Overlay--after-open & {
-    transform: translate3d(0,0,0);
+    transform: translate3d(300%,0,0);
     opacity: 1;
   }
 
@@ -61,7 +62,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @else { background: rgba($ic-wizard-color-dark-neutral, 0.9); }
 
   @include breakpoint(mini-tablet) {
-    flex-direction: row;
+    flex-direction: row-reverse;
   }
   @include breakpoint(desktop) {
     flex: 1;
@@ -177,21 +178,26 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box__headline {
   line-height: 0.85;
-  @include fontSize(36px);
+  font-size: 2.5rem;
   text-align: center;
   color: $ic-color-light;
-  font-weight: 500;
+  font-weight: 100;
   margin: 0;
+  margin-bottom: 20px;
   @include breakpoint(mini-tablet) {
-    @include fontSize(48px);
-    padding: $ic-sp 0;
+    font-size: 20px;
+    font-size: 2.5rem;
+    padding: 12px 0;
   }
   @include breakpoint(tablet) {
-    @include fontSize(60px);
+    font-size: 20px;
+    font-size: 2.5rem;
+    padding: 12px 0;
   }
   @include breakpoint(desktop) {
-    @include fontSize(72px);
-    padding: $ic-sp*2 0;
+    font-size: 20px;
+    font-size: 2.5rem;
+    padding: 12px 0;
   }
 }
 
@@ -228,10 +234,10 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
     display: block;
     background: $ic-wizard-color-dark-neutral;
-    width: 72px; height: 72px;
+    width: 90px; height: 90px;
     border-radius: 100%;
     position: absolute;
-    left: 50%; top: -36px;
+    left: 50%; top: -45px;
     z-index: 1;
     margin-left: -36px;
     display: flex;
@@ -262,9 +268,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   }
 
   @include breakpoint(desktop) {
-    width: 120px; height: 120px;
-    top: -60px; left: 50%;
-    margin-left: -60px;
     i[class*=icon-], i[class^=icon-] {
       &:before { font-size: $ic-sp*5; }
     }
@@ -277,13 +280,17 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   opacity: 0;
   transform: translate3d(0,50%,0);
   background: rgba($ic-color-light, 0.9);
-  padding: $ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2;
-  box-shadow: 0 1px 4px 1px rgba(black, 0.3);
   text-align: center;
 
   &.ic-wizard-box__message-inner--is-fired {
     opacity: 1;
     transform: translate3d(0,0,0);
+    padding: 50px 25px 15px 25px;
+    height: 227px;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    box-sizing: border-box;
   }
 
   @if $use_high_contrast { background: $ic-color-light; }
@@ -292,12 +299,15 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(mini-tablet) {
     border-radius: $baseBorderRadius;
   }
-  @include breakpoint(desktop) { padding: $ic-sp*7 $ic-sp*2 $ic-sp*2 $ic-sp*2; }
+  @include breakpoint(desktop) { /*padding: $ic-sp*5 $ic-sp*2 $ic-sp*2 $ic-sp*2;*/ }
 
 }
 
 .ic-wizard-box__message-button {
-  margin-top: $ic-sp*2;
+  margin-top: 15px;
+  .sm-colorfix {
+    color: $ic-color-light;
+  }
 }
 
 .ic-wizard-box__message-text {
@@ -305,7 +315,8 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
   @include breakpoint(desktop) {
     @include fontSize(15px);
-    line-height: 1.6;
+    font-size: 0.9375rem;
+    line-height: 1.5;
   }
 }
 
