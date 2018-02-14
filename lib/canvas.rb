@@ -34,7 +34,15 @@ module Canvas
 
   def self.redis
     raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
-    return Rails.cache.data if redis_config == 'cache_store'
+    if redis_config == 'cache_store'
+      raw_redis = Rails.cache.data
+      wrapped_redis = raw_redis.instance_variable_get(:@wrapped_redis)
+      unless wrapped_redis
+        wrapped_redis = RedisWrapper.new(raw_redis)
+        raw_redis.instance_variable_set(:@wrapped_redis, wrapped_redis)
+      end
+      return wrapped_redis
+    end
     @redis ||= begin
       Bundler.require 'redis'
       Canvas::Redis.patch
