@@ -192,7 +192,7 @@ module Api::V1::Assignment
       hash['external_tool_tag_attributes'] = {
         'url' => external_tool_tag.url,
         'new_tab' => external_tool_tag.new_tab,
-        'resource_link_id' => ContextExternalTool.opaque_identifier_for(external_tool_tag, assignment.shard)
+        'resource_link_id' => assignment.lti_resource_link_id
       }
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',

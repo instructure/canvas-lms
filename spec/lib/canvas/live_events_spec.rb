@@ -502,7 +502,9 @@ describe Canvas::LiveEvents do
           unlock_at: assignment.unlock_at,
           lock_at: assignment.lock_at,
           points_possible: assignment.points_possible,
-          lti_assignment_id: assignment.lti_context_id
+          lti_assignment_id: assignment.lti_context_id,
+          lti_resource_link_id: assignment.lti_resource_link_id,
+          lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id
         })).once
 
       Canvas::LiveEvents.assignment_created(assignment)
@@ -526,7 +528,9 @@ describe Canvas::LiveEvents do
           unlock_at: assignment.unlock_at,
           lock_at: assignment.lock_at,
           points_possible: assignment.points_possible,
-          lti_assignment_id: assignment.lti_context_id
+          lti_assignment_id: assignment.lti_context_id,
+          lti_resource_link_id: assignment.lti_resource_link_id,
+          lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id
         })).once
 
       Canvas::LiveEvents.assignment_updated(assignment)

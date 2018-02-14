@@ -72,6 +72,9 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
 
+  belongs_to :duplicate_of, class_name: 'Assignment', optional: true, inverse_of: :duplicates
+  has_many :duplicates, class_name: 'Assignment', inverse_of: :duplicate_of, foreign_key: 'duplicate_of_id'
+
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
   has_many :line_items, inverse_of: :assignment, class_name: 'Lti::LineItem', dependent: :destroy
@@ -199,6 +202,13 @@ class Assignment < ActiveRecord::Base
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric
     result.rubric_association = self.rubric_association.clone
+
+    # Link the duplicated assignment to this assignment
+    result.duplicate_of = self
+
+    # If this assignment uses an external tool, duplicate that too
+    result.external_tool_tag = self.external_tool_tag&.dup
+
     result
   end
 
@@ -2578,6 +2588,11 @@ class Assignment < ActiveRecord::Base
     end
     raise ActiveRecord::RecordInvalid unless assignment_overrides_due_date_ok?(overrides)
     @skip_due_date_validation = true
+  end
+
+  def lti_resource_link_id
+    return nil if external_tool_tag.blank?
+    ContextExternalTool.opaque_identifier_for(external_tool_tag, shard)
   end
 
   private

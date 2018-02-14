@@ -405,14 +405,27 @@ describe Assignment do
     expect(new_assignment.rubric_association).not_to be_nil
     expect(new_assignment.title).to eq "Wiki Assignment Copy"
     expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
+    expect(new_assignment.duplicate_of).to eq assignment
     new_assignment.save!
     new_assignment2 = assignment.duplicate
     expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
     new_assignment2.save!
+    expect(assignment.duplicates).to match_array [new_assignment, new_assignment2]
     # Go back to the first new assignment to test something just ending in
     # "Copy"
     new_assignment3 = new_assignment.duplicate
     expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
+  end
+
+  it "duplicates an assignment's external_tool_tag" do
+    assignment = @course.assignments.create!(
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: { url: 'http://example.com/launch' },
+      **assignment_valid_attributes
+    )
+    new_assignment = assignment.duplicate
+    expect(new_assignment.external_tool_tag).to be_present
+    expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
   end
 
   describe "#representatives" do
@@ -4877,6 +4890,35 @@ describe Assignment do
         sql = @course.assignments.with_student_submission_count.to_sql
         expect(sql).to be_include(Shard.default.name)
         expect(sql).not_to be_include(@shard1.name)
+      end
+    end
+  end
+
+  describe '#lti_resource_link_id' do
+    subject { assignment.lti_resource_link_id }
+
+    context 'without external tool tag' do
+      let(:assignment) do
+        @course.assignments.create!(assignment_valid_attributes)
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'with external tool tag' do
+      let(:assignment) do
+        @course.assignments.create!(submission_types: 'external_tool',
+                                    external_tool_tag_attributes: { url: 'http://example.com/launch' },
+                                    **assignment_valid_attributes)
+      end
+
+      it 'calls ContextExternalTool.opaque_identifier_for with the external tool tag and assignment shard' do
+        lti_resource_link_id = SecureRandom.hex
+        expect(ContextExternalTool).to receive(:opaque_identifier_for).with(
+          assignment.external_tool_tag,
+          assignment.shard
+        ).and_return(lti_resource_link_id)
+        expect(assignment.lti_resource_link_id).to eq(lti_resource_link_id)
       end
     end
   end
