@@ -3994,24 +3994,24 @@ describe Assignment do
 
     it "triggers when assignment is created" do
       new_assignment = @course.assignments.build
-      expect(DueDateCacher).to receive(:recompute).with(new_assignment)
+      expect(DueDateCacher).to receive(:recompute).with(new_assignment, hash_including(update_grades: true))
       new_assignment.save
     end
 
     it "triggers when due_at changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = 1.week.from_now
       @assignment.save
     end
 
     it "triggers when due_at changes to nil" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = nil
       @assignment.save
     end
 
     it "triggers when assignment deleted" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.destroy
     end
 
