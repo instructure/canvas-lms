@@ -20,6 +20,8 @@ class GradeCalculator
   attr_accessor :assignments, :groups
 
   def initialize(user_ids, course, opts = {})
+    Rails.logger.info "GRADE CALCULATOR STARTS (initialize): #{Time.zone.now.to_i}"
+    Rails.logger.info "GRADE CALCULATOR - caller: #{caller(1..1).first}"
     opts = opts.reverse_merge(
       ignore_muted: true,
       update_all_grading_period_scores: true,
@@ -62,6 +64,8 @@ class GradeCalculator
 
   # recomputes the scores and saves them to each user's Enrollment
   def self.recompute_final_score(user_ids, course_id, compute_score_opts = {})
+    Rails.logger.info "GRADE CALCULATOR STARTS (recompute_final_score): #{Time.zone.now.to_i}"
+    Rails.logger.info "GRADE CALCULATOR - caller: #{caller(1..1).first}"
     user_ids = Array(user_ids).uniq.map(&:to_i)
     return if user_ids.empty?
     course = course_id.is_a?(Course) ? course_id : Course.active.where(id: course_id).take
@@ -84,11 +88,16 @@ class GradeCalculator
   end
 
   def submissions
-    @submissions ||= @course.submissions.
-      except(:order, :select).
-      for_user(@user_ids).
-      where(assignment_id: @assignments).
-      select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
+    @submissions ||= begin
+      submissions = @course.submissions.
+        except(:order, :select).
+        for_user(@user_ids).
+        where(assignment_id: @assignments).
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
+
+      Rails.logger.info "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
+      submissions
+    end
   end
 
   def compute_scores

@@ -29,18 +29,28 @@ class DueDateCacher
     END
   SQL_FRAGMENT
 
-  def self.recompute(assignment)
+  def self.recompute(assignment, update_grades: false)
+    Rails.logger.info "DDC.recompute(#{assignment&.id}) - #{caller(1..1).first}"
     return unless assignment.active?
     recompute_course(assignment.context, [assignment.id],
-      singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}")
+      singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}",
+      update_grades: update_grades,
+      original_caller: caller(1..1).first
+    )
   end
 
   def self.recompute_course(course, assignments = nil, inst_jobs_opts = {})
+    update_grades = inst_jobs_opts.delete(:update_grades) || false
+    original_caller = inst_jobs_opts.delete(:original_caller)
+
+    Rails.logger.info "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{caller(1..1).first}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil?
     assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
-    new(course, assignments).send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+
+    due_date_cacher = new(course, assignments, update_grades: update_grades, original_caller: original_caller)
+    due_date_cacher.send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
   end
 
   def self.recompute_users_for_course(user_ids, course, assignments = nil, inst_jobs_opts = {})
@@ -52,16 +62,24 @@ class DueDateCacher
     assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
 
-    new(course, assignments, user_ids).send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+    current_caller = caller(1..1).first
+    update_grades = inst_jobs_opts.delete(:update_grades) || false
+    new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller).
+      send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
   end
 
-  def initialize(course, assignments, user_ids = [])
+  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: nil)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
     @user_ids = Array(user_ids)
+    @update_grades = update_grades
+    @original_caller = original_caller
   end
 
   def recompute
+    Rails.logger.info "DUE DATE CACHER STARTS: #{Time.zone.now.to_i}"
+    Rails.logger.info "DDC#recompute() - original caller: #{@original_caller}"
+    Rails.logger.info "DDC#recompute() - current caller: #{caller(1..1).first}"
     # in a transaction on the correct shard:
     @course.shard.activate do
       values = []
@@ -143,6 +161,10 @@ class DueDateCacher
 
         Assignment.connection.execute(query)
       end
+    end
+
+    if @update_grades
+      @course.recompute_student_scores_without_send_later(@user_ids)
     end
 
     if @assignment_ids.size == 1
