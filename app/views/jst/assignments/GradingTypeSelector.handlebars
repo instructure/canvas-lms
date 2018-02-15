@@ -25,11 +25,9 @@
     <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
       {{#t "grading_type_options.letter_grade"}}Letter Grade{{/t}}
     </option>
-    {{#if isGpaScaled}}
-      <option value="gpa_scale" {{selectedIf gradingType "gpa_scale"}}>
-        {{#t "grading_type_options.gpa_scale"}}GPA Scale{{/t}}
-      </option>
-    {{/if}}
+    <option value="gpa_scale" {{selectedIf gradingType "gpa_scale"}}>
+      {{#t "grading_type_options.gpa_scale"}}GPA Scale{{/t}}
+    </option>
     {{#unless preventNotGraded}}
       <option value="not_graded" {{selectedIf isNotGraded}}>
         {{#t "grading_type_options.not_graded"}}Not Graded{{/t}}
