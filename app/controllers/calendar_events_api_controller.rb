@@ -406,6 +406,8 @@ class CalendarEventsApiController < ApplicationController
   #   Time zone of the user editing the event. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument calendar_event[all_day] [Boolean]
+  #   When true event is considered to span the whole day and times are ignored.
   # @argument calendar_event[child_event_data][X][start_at] [DateTime]
   #   Section-level start time(s) if this is a course event. X can be any
   #   identifier, provided that it is consistent across the start_at, end_at
@@ -575,6 +577,8 @@ class CalendarEventsApiController < ApplicationController
   #   Time zone of the user editing the event. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  # @argument calendar_event[all_day] [Boolean]
+  #   When true event is considered to span the whole day and times are ignored.
   # @argument calendar_event[child_event_data][X][start_at] [DateTime]
   #   Section-level start time(s) if this is a course event. X can be any
   #   identifier, provided that it is consistent across the start_at, end_at
