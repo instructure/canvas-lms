@@ -99,6 +99,10 @@ describe "new account user search" do
     expect(get_rows.count).to eq 2 # the first user is the admin
     new_row = get_rows.detect{|r| r.text.include?(name)}
     expect(new_row).to include_text(email)
+
+    # should clear out the inputs
+    fj('button:has([name="IconPlusLine"]):contains("People")').click
+    expect(fj('[aria-label="Add a new user"] label:contains("Full Name") input').attribute('value')).to eq('')
   end
 
   it "should be able to create users with confirmation disabled", priority: "1", test_id: 3399311 do
