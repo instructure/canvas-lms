@@ -51,7 +51,7 @@ gulp.task('rev', () => {
     .pipe(gulpPlugins.rename('lato-fontfaceobserver.js'))
     .pipe(gulpPlugins.insert.append(`
       new FontFaceObserver('LatoWeb').load().then(function () {
-        document.documentElement.classList.add('lato-font-loaded');
+        document.documentElement.classList.remove('lato-font-not-loaded-yet');
       }, console.log.bind(console, 'Failed to load Lato font'));
     `))
 
