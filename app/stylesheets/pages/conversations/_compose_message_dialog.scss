@@ -278,14 +278,16 @@ $subtleBorderColor: #e5e5e5;
       display: table-cell;
       vertical-align: middle;
 
+      #bulk_message:focus {
+        outline: 0;
+        outline-width: 2px !important;
+        @include ic-focus-base;
+        @include ic-focus-variant;
+      }
+
       input {
         box-sizing: border-box;
         height: auto;
-
-        &:focus {
-          outline: none;
-          box-shadow: 0 0 0 1px var(--ic-link-color);
-        }
       }
       input[type="text"] {
         margin: 0;
@@ -326,15 +328,15 @@ $subtleBorderColor: #e5e5e5;
 
 }
 
-::-webkit-input-placeholder { 
+::-webkit-input-placeholder {
     color: #666;
     opacity: 1;
 }
-::-moz-placeholder { 
+::-moz-placeholder {
     color: #666;
     opacity: 1;
 }
-:-ms-input-placeholder { 
+:-ms-input-placeholder {
     color: #666;
     opacity: 1;
 }
