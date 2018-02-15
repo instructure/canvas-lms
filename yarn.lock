@@ -96,7 +96,7 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
-"@instructure/ui-themeable@^4.7.1", "@instructure/ui-themeable@^4.7.2":
+"@instructure/ui-themeable@^4.7.2":
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.2.tgz#2c4365d1a035f3064fde74e4fbab339a8492f59f"
   dependencies:
@@ -111,7 +111,7 @@
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.2.tgz#0e5f70af92da4d9376ea0ec9cea4ac649d882698"
 
-"@instructure/ui-utils@^4.7.1", "@instructure/ui-utils@^4.7.2":
+"@instructure/ui-utils@^4.7.2":
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.2.tgz#79ae4671989d11ac15ab228e388ec10bf702c7fc"
   dependencies:
