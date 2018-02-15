@@ -76,7 +76,6 @@ export default class CoursesGroupsAutocomplete extends React.Component {
         this.setState({selectedOption: ""})
       }
     } else {
-      // FELIX: WHY DOES THIS NOT CLEAR OUT THE COURSE GROUP FILTER LABEL?
       this.setState({selectedOption: ""})
     }
   }
@@ -101,6 +100,7 @@ export default class CoursesGroupsAutocomplete extends React.Component {
     const params = {
       state: ['unpublished', 'available', 'completed'],
       include: ['term'],
+      enrollment_state: 'active',
       per_page: this.props.maxCoursesToFetch
     }
     return `${courseUrlBase}${$.param(params)}`
