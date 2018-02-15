@@ -14,8 +14,18 @@ module Types
     field :user, UserType, resolve: ->(s, _, _) { Loaders::IDLoader.for(User).load(s.user_id) }
 
     field :score, types.Float, resolve: SubmissionHelper.protect_submission_grades(:score)
-
     field :grade, types.String, resolve: SubmissionHelper.protect_submission_grades(:grade)
+
+    field :enteredScore, types.Float,
+      "the submission score *before* late policy deductions were applied",
+      resolve: SubmissionHelper.protect_submission_grades(:entered_score)
+    field :enteredGrade, types.String,
+      "the submission grade *before* late policy deductions were applied",
+      resolve: SubmissionHelper.protect_submission_grades(:entered_grade)
+
+    field :deductedPoints, types.Float,
+      "how many points are being deducted due to late policy",
+      resolve: SubmissionHelper.protect_submission_grades(:points_deducted)
 
     field :excused, types.Boolean,
       "excused assignments are ignored when calculating grades",
