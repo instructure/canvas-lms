@@ -26,7 +26,8 @@ import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 QUnit.module('CourseItemRow component')
 
 const makeProps = (props = {}) => merge({
-  children: <p>Hello World</p>,
+  clickableChildren: [<p>Hello World</p>],
+  unclickableChildren: [],
   actionsContent: null,
   metaContent: null,
   author: {
@@ -52,9 +53,34 @@ test('renders the CourseItemRow component', () => {
 })
 
 test('renders children inside content column', () => {
-  const tree = mount(<CourseItemRow {...makeProps()}><span className="find-me" /></CourseItemRow>)
-  const node = tree.find('.ic-item-row__content-col .find-me')
-  ok(node.exists())
+  // Not sure why, maybe something about it being a list, but if I pass these
+  // into makeProps it doesn't actually update the [un]clickableChildren entries.
+  const props = makeProps()
+  props.clickableChildren = [<span className="find-me" />]
+  props.unclickableChildren = [<span className="find-me2" />]
+  const tree = mount(<CourseItemRow { ...props } />)
+
+  const node1 = tree.find('.ic-item-row__content-col .find-me')
+  const node2 = tree.find('.ic-item-row__content-col .find-me2')
+  ok(node1.exists())
+  ok(node2.exists())
+})
+
+test('renders clickable children inside content link', () => {
+  // Not sure why, maybe something about it being a list, but if I pass these
+  // into makeProps it doesn't actually update the [un]clickableChildren entries.
+  const itemUrl = "/foo"
+  const props = makeProps(makeProps({ itemUrl }))
+  props.clickableChildren = [<span className="find-me" />]
+  props.unclickableChildren = [<span className="find-me2" />]
+  const tree = mount(<CourseItemRow { ...props } />)
+
+  const node1 = tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me')
+  const node2 = tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me2')
+  const node3 = tree.find('.ic-item-row__content-col .find-me2')
+  ok(node1.exists())
+  ok(!node2.exists())
+  ok(node3.exists())
 })
 
 test('renders actions inside actions wrapper', () => {

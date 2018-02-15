@@ -36,7 +36,8 @@ import masterCourseDataShape from '../proptypes/masterCourseData'
 
 export default class CourseItemRow extends Component {
   static propTypes = {
-    children: node.isRequired,
+    clickableChildren: arrayOf(node),
+    unclickableChildren: arrayOf(node),
     actionsContent: node,
     metaContent: node,
     masterCourse: shape({
@@ -62,6 +63,8 @@ export default class CourseItemRow extends Component {
 
   static defaultProps = {
     actionsContent: null,
+    clickableChildren: [],
+    unclickableChildren: [],
     metaContent: null,
     masterCourse: null,
     author: {
@@ -122,14 +125,24 @@ export default class CourseItemRow extends Component {
   renderChildren () {
     if (this.props.itemUrl) {
       return (
-        <a className="ic-item-row__content-link" href={this.props.itemUrl}>
-          <div className="ic-item-row__content-link-container">
-            {this.props.children}
-          </div>
-        </a>
+        <div className="ic-item-row__content-col">
+          {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
+          <a className="ic-item-row__content-link" href={this.props.itemUrl}>
+            <div className="ic-item-row__content-link-container">
+              {this.props.clickableChildren}
+            </div>
+          </a>
+          {this.props.unclickableChildren}
+        </div>
       )
     } else {
-      return this.props.children
+      return (
+        <div className="ic-item-row__content-col">
+          {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
+          {this.props.clickableChildren}
+          {this.props.unclickableChildren}
+        </div>
+      )
     }
   }
 
@@ -162,10 +175,7 @@ export default class CourseItemRow extends Component {
             src={this.props.author.avatar_image_url}
           />
         </div>)}
-        <div className="ic-item-row__content-col">
-          {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-          {this.renderChildren()}
-        </div>
+        {this.renderChildren()}
         <div className="ic-item-row__meta-col">
           <div className="ic-item-row__meta-actions">
             {this.props.actionsContent}

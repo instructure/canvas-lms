@@ -72,6 +72,32 @@ export default function AnnouncementRow (
   const contentWrapper = document.createElement('span')
   contentWrapper.innerHTML = announcement.message
   const textContent = contentWrapper.textContent.trim()
+
+  // The clickable children get thrown in a clickable div that renders
+  // above the unclickable children
+  const clickableChildren = [
+    <Heading level="h3">{announcement.title}</Heading>,
+    <div className="ic-announcement-row__content">{textContent}</div>,
+  ]
+  const unclickableChildren = []
+  if (canHaveSections) {
+    unclickableChildren.push((
+      <SectionsTooltip
+        totalUserCount={announcement.user_count}
+        sections={announcement.sections}
+      />
+    ))
+  }
+  if (!announcement.locked) {
+    unclickableChildren.push((
+      <a href={announcement.html_url}>
+        <Container display="block" margin="x-small 0 0">
+          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
+        </Container>
+      </a>
+    ))
+  }
+
   return (
     <CourseItemRow
       ref={rowRef}
@@ -128,17 +154,9 @@ export default function AnnouncementRow (
           </ScreenReaderContent>
         </MenuItem>,
       ] || null}
-    >
-      <Heading level="h3">{announcement.title}</Heading>
-      {canHaveSections && <SectionsTooltip
-        totalUserCount={announcement.user_count}
-        sections={announcement.sections} />}
-      <div className="ic-announcement-row__content">{textContent}</div>
-      {!announcement.locked &&
-        <Container display="block" margin="x-small 0 0">
-          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
-        </Container>}
-    </CourseItemRow>
+      clickableChildren={clickableChildren}
+      unclickableChildren={unclickableChildren}
+    />
   )
 }
 

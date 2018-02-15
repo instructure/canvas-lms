@@ -104,13 +104,17 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
         </div>
       }
       actionsContent={readCount}
-    >
-      <Heading level="h3">{discussion.title}</Heading>
-      <SectionsTooltip
-        totalUserCount={discussion.user_count}
-        sections={discussion.sections} />
-      <div className="ic-discussion-row__content">{textContent}</div>
-    </CourseItemRow>
+      clickableChildren={[
+        <Heading level="h3">{discussion.title}</Heading>,
+        <div className="ic-discussion-row__content">{textContent}</div>,
+      ]}
+      unclickableChildren={[
+        <SectionsTooltip
+          totalUserCount={discussion.user_count}
+          sections={discussion.sections}
+        />,
+      ]}
+    />
   )
 }
 
