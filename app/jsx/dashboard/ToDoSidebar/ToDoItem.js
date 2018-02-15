@@ -82,43 +82,51 @@ const getInformationRow = (dueAt, points) => {
   return toDisplay;
 }
 
-export default function ToDoItem (props) {
-  const title = <Text size="small" lineHeight="fit">{props.title}</Text>
-  const titleComponent = props.href ? (
-    <Link href={props.href}>{title}</Link>
-  ) : (
-    <Text>{title}</Text>
-  );
-
-  const handleClick = () => {
-    props.handleDismissClick(props.itemType, props.itemId);
+export default class ToDoItem extends React.Component {
+  focus () {
+    const focusable = this.linkRef || this.buttonRef;
+    if (focusable) focusable.focus();
   }
 
-  return (
-    <div className="ToDoSidebarItem">
-      {getIconComponent(props.itemType)}
-      <div className="ToDoSidebarItem__Info">
-        <div className="ToDoSidebarItem__Title">
-          {titleComponent}
+  handleClick = () => {
+    this.props.handleDismissClick(this.props.itemType, this.props.itemId);
+  }
+
+  render () {
+    const title = <Text size="small" lineHeight="fit">{this.props.title}</Text>
+    const titleComponent = this.props.href ? (
+      <Link linkRef={(elt) => {this.linkRef = elt}} href={this.props.href}>{title}</Link>
+    ) : (
+      <Text>{title}</Text>
+    );
+
+    return (
+      <div className="ToDoSidebarItem">
+        {getIconComponent(this.props.itemType)}
+        <div className="ToDoSidebarItem__Info">
+          <div className="ToDoSidebarItem__Title">
+            {titleComponent}
+          </div>
+          <Text color="secondary" size="small" weight="bold" lineHeight="fit">
+            {getContextShortName(this.props.courses, this.props.courseId)}
+          </Text>
+          <List variant="inline" delimeter="pipe" size="small">
+            {getInformationRow(this.props.dueAt, this.props.points)}
+          </List>
         </div>
-        <Text color="secondary" size="small" weight="bold" lineHeight="fit">
-          {getContextShortName(props.courses, props.courseId)}
-        </Text>
-        <List variant="inline" delimiter="pipe" size="small">
-          {getInformationRow(props.dueAt, props.points)}
-        </List>
+        <div className="ToDoSidebarItem__Close">
+          <Button
+            variant="icon"
+            size="small"
+            onClick={this.handleClick}
+            buttonRef={(elt) => {this.buttonRef = elt}}
+          >
+            <XIcon title={I18n.t('Dismiss This')} className="ToDoSidebarItem__CloseIcon" />
+          </Button>
+        </div>
       </div>
-      <div className="ToDoSidebarItem__Close">
-        <Button
-          variant="icon"
-          size="small"
-          onClick={handleClick}
-        >
-          <XIcon title={I18n.t('Dismiss This')} className="ToDoSidebarItem__CloseIcon" />
-        </Button>
-      </div>
-    </div>
-  )
+    )
+  }
 }
 
 ToDoItem.propTypes = {
