@@ -21,15 +21,10 @@ class AnnouncementNewEdit
   class << self
     include SeleniumDependencies
 
-    # ---------------------- Page ----------------------
-    # TODO: Rename this to clarify that its group specific and takes you
-    # to the announcement creation page
-    def visit(course)
-      get("/courses/#{course.id}/discussion_topics/new?is_announcement=true")
-    end
-
-    def visit_group_create_announcement_page(group)
-      get("/groups/#{group.id}/discussion_topics/new?is_announcement=true")
+    def visit_new(context)
+      context_type = context.is_a?(Course) ? "courses" : "groups"
+      get("/#{context_type}/#{context.id}/discussion_topics/new?is_announcement=true")
+      wait_for_tiny(f('textarea[name=message]'))
     end
 
     def set_section_specific_announcements_flag(course, state)
@@ -83,7 +78,7 @@ class AnnouncementNewEdit
     end
 
     def create_group_announcement(group, title, text)
-      visit_group_create_announcement_page(group)
+      visit_new(group)
       replace_content(f('input[name=title]'), title)
       type_in_tiny('textarea[name=message]', text)
       submit_announcement_form
@@ -93,6 +88,7 @@ class AnnouncementNewEdit
     def edit_group_announcement(group, announcement, message)
       url_base = full_individual_announcement_url(group, announcement)
       get "#{url_base}/edit"
+      wait_for_tiny(f('textarea[name=message]'))
       # Note that add_message *appends* to existing
       add_message(message)
       submit_announcement_form

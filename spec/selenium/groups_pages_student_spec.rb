@@ -212,7 +212,7 @@ describe "groups" do
         )
         # Log in as a new student to see if we can make an announcement
         user_session(@students.first)
-        AnnouncementNewEdit.visit_group_create_announcement_page(@testgroup.first)
+        AnnouncementNewEdit.visit_new(@testgroup.first)
         expect(f('#content-wrapper')).not_to contain_css('#sections_autocomplete_root')
         AnnouncementNewEdit.add_message("New Announcement")
         AnnouncementNewEdit.add_title("New Title")
