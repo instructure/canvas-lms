@@ -26,8 +26,8 @@ import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 QUnit.module('CourseItemRow component')
 
 const makeProps = (props = {}) => merge({
-  clickableChildren: [<p>Hello World</p>],
-  unclickableChildren: [],
+  title: <p>Hello World</p>,
+  body: <p>Hello World</p>,
   actionsContent: null,
   metaContent: null,
   author: {
@@ -53,34 +53,34 @@ test('renders the CourseItemRow component', () => {
 })
 
 test('renders children inside content column', () => {
-  // Not sure why, maybe something about it being a list, but if I pass these
-  // into makeProps it doesn't actually update the [un]clickableChildren entries.
-  const props = makeProps()
-  props.clickableChildren = [<span className="find-me" />]
-  props.unclickableChildren = [<span className="find-me2" />]
-  const tree = mount(<CourseItemRow { ...props } />)
+  // lodash merge is broken, have to do it this way for whatever reason
+  const props = makeProps({})
+  props.title = <span className="find-me" />
+  props.body = <span className="find-me2" />
+  props.sectionToolTip = <span className="find-me3" />
+  props.replyButton = <span className="find-me4" />
 
-  const node1 = tree.find('.ic-item-row__content-col .find-me')
-  const node2 = tree.find('.ic-item-row__content-col .find-me2')
-  ok(node1.exists())
-  ok(node2.exists())
+  const tree = mount(<CourseItemRow { ...props } />)
+  ok(tree.find('.ic-item-row__content-col .find-me').exists())
+  ok(tree.find('.ic-item-row__content-col .find-me2').exists())
+  ok(tree.find('.ic-item-row__content-col .find-me3').exists())
+  ok(tree.find('.ic-item-row__content-col .find-me4').exists())
 })
 
 test('renders clickable children inside content link', () => {
-  // Not sure why, maybe something about it being a list, but if I pass these
-  // into makeProps it doesn't actually update the [un]clickableChildren entries.
+  // lodash merge is broken, have to do it this way for whatever reason
   const itemUrl = "/foo"
   const props = makeProps(makeProps({ itemUrl }))
-  props.clickableChildren = [<span className="find-me" />]
-  props.unclickableChildren = [<span className="find-me2" />]
-  const tree = mount(<CourseItemRow { ...props } />)
+  props.title = <span className="find-me" />
+  props.body = <span className="find-me2" />
+  props.sectionToolTip = <span className="find-me3" />
+  props.replyButton = <span className="find-me4" />
 
-  const node1 = tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me')
-  const node2 = tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me2')
-  const node3 = tree.find('.ic-item-row__content-col .find-me2')
-  ok(node1.exists())
-  ok(!node2.exists())
-  ok(node3.exists())
+  const tree = mount(<CourseItemRow { ...props } />)
+  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me').exists())
+  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me2').exists())
+  ok(!tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me3').exists())
+  ok(tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me4').exists())
 })
 
 test('renders actions inside actions wrapper', () => {
