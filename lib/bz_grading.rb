@@ -1,0 +1,160 @@
+# This does our special grading stuff that relates to magic fields
+# like course participation, mastery, etc. It can be used from the
+# bz_controller and also from various grade audit helper scripts.
+#
+# For now though it isn't used from bz_controller and duplicates a
+# bunch of code from there. That's just because the cleanup is hard to
+# test so trying to do it in smaller chunks
+class BZGrading
+
+  def initialize
+
+  end
+
+  def find_module_item_id(course_id, wiki_page_name)
+    page = WikiPage.where(:url => wiki_page_name)
+    tag = nil
+    pages.each do |page| # Don't know which WikiPage is from this course, need to lookup the ContentTag for each to find the association
+      tag = ContentTag.where(:content_id => page.id, :context_id => course_id, :context_type => 'Course', :content_type => 'WikiPage').first
+      if !tag.nil?
+        return tag.id
+      end
+    end
+    return nil
+  end
+
+  def module_unique_magic_fields(module_item_id)
+    context_module = get_context_module(module_item_id)
+
+    names = {}
+    selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
+
+    # Loop over the Wiki Pages in this module
+    items_in_module = context_module.content_tags.active
+    items_in_module.each do |item|
+      next if !item.published?
+      if item.content_type == "WikiPage"
+        wiki_page = WikiPage.find(item.content_id)
+        page_html = wiki_page.body
+        doc = Nokogiri::HTML(page_html)
+        doc.css(selector).each do |o|
+          n = o.attr('data-bz-retained')
+          next if names[n]
+          next if o.attr('type') == 'checkbox' && o.attr('data-bz-answer').nil?
+          names[n] = true
+
+          yield(o)
+        end
+      end
+    end
+
+    return nil
+  end
+
+  def get_magic_field_weight_count(module_item_id)
+    context_module = get_context_module(module_item_id)
+
+    total_weight = 0
+    graded_checkboxes_that_are_supposed_to_be_empty_weight = 0
+
+    module_unique_magic_fields(module_item_id) do |o|
+      n = o.attr('data-bz-retained')
+      item_weight = o.attr('data-bz-weight').nil? ? 1 : o.attr('data-bz-weight').to_i
+      total_weight += item_weight
+      if o.attr('type') == 'checkbox' && o.attr('data-bz-answer') == ''
+        graded_checkboxes_that_are_supposed_to_be_empty_weight += item_weight
+      end
+      Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, total_weight = #{total_weight}, graded_checkboxes_that_are_supposed_to_be_empty_weight = #{graded_checkboxes_that_are_supposed_to_be_empty_weight}")
+    end
+    [total_weight == 0 ? 1 : total_weight, graded_checkboxes_that_are_supposed_to_be_empty_weight]
+  end
+
+  def get_context_module(module_item_id)
+    tag = ContentTag.find(module_item_id)
+    context_module = tag.context_module
+    return context_module
+  end
+
+  def get_participation_assignment(course, context_module)
+        # This is hacky, but we tie modules to participation tracking assignments using the name.
+        # E.g. #Course Participation - Onboarding" would track the Onboarding Module.
+        # Note: this is case sensitve based on the module name in the database, not the CSS styled upper case names.
+        res = course.assignments.active.where(:title => "Course Participation - #{context_module.name}")
+        if !res.empty?
+          return res.first
+        end
+
+        return nil
+  end
+
+  def get_value_of_user_answer_from_nokogiri(magic_field_counts, current_user, participation_assignment, time_answer_given, value, nokogiri_element)
+    o = nokogiri_element
+    return get_value_of_user_answer(magic_field_counts, current_user, participation_assignment, value, time_answer_given,
+      o.attr('data-bz-weight'), o.attr('data-bz-answer'), o.attr('type'), o.attr('data-bz-partial-credit'))
+  end
+
+  def get_value_of_user_answer(magic_field_counts, current_user, participation_assignment, value, time_answer_given, weight, answer, field_type, partial_credit_mode)
+    response_object = {}
+
+    response_object["points_given"] = false
+    response_object["points_amount"] = 0
+    response_object["points_possible"] = 0
+    response_object["points_reason"] = "N/A"
+
+    magic_field_total_weight = magic_field_counts[0]
+    graded_checkboxes_that_are_supposed_to_be_empty_weight = magic_field_counts[1]
+
+    step = weight * participation_assignment.points_possible.to_f / magic_field_total_weight
+    original_step = step
+    if !answer.nil? && answer != 'yes' && value == 'yes' && field_type == 'checkbox'
+      step = -step # checked the wrong checkbox, deduct points instead (note the exisitng_grade below assumes all are right when it starts so this totals to 100% if they do it all right)
+      response_object["points_reason"] = "wrong"
+    elsif !answer.nil? && answer == '' && value == '' && field_type == 'checkbox'
+      # they checked then unchecked a box, triggering an explicit save. We assume there is no
+      # explicit save so the points are already there... but here, there is one, so the points
+      # are already there! Thus, despite them putting in the correct answer, since it is a checkbox
+      # we want to give them zero points here so they don't get double credit.
+      step = 0 # don't award double credit
+      response_object["points_reason"] = "already_awarded"
+    elsif !answer.nil? && value != answer
+      total_potential_value = step
+      step = 0 # wrong answer = no points
+      response_object["points_reason"] = "wrong"
+
+      case partial_credit_mode
+      when 'per_char'
+        user_chars = value.split("")
+        answer_chars = answer.split("")
+        each_char_value = total_potential_value.to_f / answer_chars.count
+        answer_chars.each_with_index do |item, index|
+          if item == user_chars[index]
+            step += each_char_value
+            response_object["points_reason"] = "partial_credit"
+          end
+        end
+      end
+    end
+
+    response_object["points_possible"] = original_step
+
+    if step > 0
+      response_object["points_given"] = true
+      response_object["points_amount"] = step
+      response_object["points_reason"] = answer.nil? ? "participation" : "mastery"
+    end
+
+    # only update score if we are not yet at the due date or there is no due date
+    # participation doesn't count if it is done late.
+    # this accounts for a due date being set the same for everyone on the assignment or set differently per section
+    overridden = participation_assignment.overridden_for(current_user)
+    effective_due_at = overridden.due_at
+    effective_due_at = participation_assignment.due_at if overridden.due_at.nil?
+    if !effective_due_at.nil? && effective_due_at < time_answer_given
+      response_object["points_reason"] = "past_due"
+      response_object["points_amount"] = 0
+      response_object["points_given"] = false
+    end
+
+    return response_object
+  end
+end
