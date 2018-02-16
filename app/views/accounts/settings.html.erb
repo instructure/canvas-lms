@@ -300,7 +300,10 @@ TEXT
             <legend><%= t("Acceptable Use Policy") %></legend>
             <%= f.fields_for :terms_of_service do |tos| %>
               <%= tos.label :terms_type, t("License Type") %>
-              <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options, @account.terms_of_service.terms_type) %>
+              <% if TermsOfService.type_dropdown_options_for_account(@account)[0][1] == "built_in:default" %>
+                <label> (<%= t("Old Policy") %>)</label>
+              <% end %>
+              <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options_for_account(@account), @account.terms_of_service.terms_type) %>
               <br>
               <%= tos.check_box :passive, :checked => @account.terms_of_service.passive %>
               <%= tos.label :passive, t("Allow passive acceptance of Terms of Service")%>
