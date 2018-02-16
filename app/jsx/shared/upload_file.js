@@ -24,12 +24,17 @@ import qs from 'qs'
  *   `/api/v1/courses/:course_id/files` or
  *   `/api/v1/folders/:folder_id/files`
  * preflightData: see api, but something like
- *   `{ name, size, parent_folder_path, type, on_duplicate, no_redirect }`
+ *   `{ name, size, parent_folder_path, type, on_duplicate }`
+ *   note that `no_redirect: true` will be forced
  * file: the file object to upload.
  *   To get this off of an input element: `input.files[0]`
  *   To get this off of a drop event: `e.dataTransfer.files[0]`
  */
 export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
+  // force "no redirect" behavior. redirecting from the S3 POST breaks under
+  // CORS in this pathway
+  preflightData.no_redirect = true;
+
   // when preflightData is flat, won't parse right on server as JSON, so force
   // into a query string
   if (preflightData['attachment[context_code]']) {

@@ -42,6 +42,7 @@ QUnit.module('Course Group Filter', function(hooks) {
     const params = {
       state: ['unpublished', 'available', 'completed'],
       include: ['term'],
+      enrollment_state: 'active',
       per_page: numToFetch
     }
     return `${courseUrlBase}${$.param(params)}`

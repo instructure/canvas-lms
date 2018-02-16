@@ -22,7 +22,7 @@ module InstFS
     end
 
     def login_pixel(user, session)
-      if !session[:shown_instfs_pixel] && user && app_host
+      if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user))
         %Q(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe

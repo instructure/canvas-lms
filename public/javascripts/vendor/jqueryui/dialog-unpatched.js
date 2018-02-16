@@ -337,7 +337,7 @@ $.widget("ui.dialog", {
 				// Safari was shift-tabbing from a control in the
 				// middle of the new conversations compose dialog
 				// to a background control, killing focus
-				var tabbables = $( ":tabbable", this.uiDialog );
+				var tabbables = $( ":tabbable, input[role='combobox']",  this.uiDialog );
 				var index = $.inArray( event.target, tabbables );
 				if ( index == -1 ) {return;}
 				var targetIndex = index + (event.shiftKey ? -1 : 1);

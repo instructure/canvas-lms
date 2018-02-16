@@ -35,7 +35,12 @@ define [
       filename = event.target.value.replace(/^.*\\/, '')
       fileElement = @$migrationFileUpload[0]
 
-      @model.set('pre_attachment', {file_size: @fileSize(fileElement), name: filename, fileElement: fileElement})
+      @model.set('pre_attachment', {
+        file_size: @fileSize(fileElement),
+        name: filename,
+        fileElement: fileElement,
+        no_redirect: true
+      })
     
     # TODO 
     #   Handle cases for file size from IE browsers
