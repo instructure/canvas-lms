@@ -23,7 +23,7 @@ en-GB:
     bad_max_appts: "You must allow at least one appointment per participant"
     bad_per_slot: "You must allow at least one appointment per time slot"
     context_required: "You need to select a calendar"
-    select_calendars: "Select calendars"
+    select_calendars: "Select Calendars"
   EditGroupAssignmentView: 
     move_to: "Move To"
   GroupDetailView: 
@@ -1494,7 +1494,7 @@ en-GB:
   add_content_to_module_name_589a8d54: "Add Content to %{module_name}"
   add_course_406cb773: "Add course"
   add_course_assignments_628ed6d0: "Add course assignments"
-  add_course_calendar_events_146154a5: "Add course calendar events"
+  add_course_calendar_events_146154a5: "Add Course Calendar Events"
   add_criterion_eb9587ef: "Add criterion"
   add_custom_link_22059c0: "Add custom link"
   add_email_address_aef3b61: "Add email address"
@@ -3214,13 +3214,13 @@ en-GB:
       date: Date
       delete: Delete
       different_date_for_each_section: "Use a different date for each section"
-      edit_calendar_event_header: "Edit calendar event"
+      edit_calendar_event_header: "Edit Calendar Event"
       end_time: "End time"
       event_description: "Event description"
       event_title: "Event title"
       location_address: "Address:"
       location_name: "Location:"
-      new_calendar_event_header: "New calendar event"
+      new_calendar_event_header: "New Calendar Event"
       repeat: Repeat
       start_time: "Start time"
     edit_event: 
@@ -3330,30 +3330,30 @@ en-GB:
       duplicate_child_event_contexts: "Duplicate child event contexts"
       invalid_child_event_context: "Invalid child event context"
       no_updating_user: "Can't update child events unless an updating_user is set"
-    feed_item_title: "Calendar event: %{event_title}"
-    feed_item_title_with_context: "Calendar event, %{course_or_account_name}: %{event_title}"
+    feed_item_title: "Calendar Event: %{event_title}"
+    feed_item_title_with_context: "Calendar Event, %{course_or_account_name}: %{event_title}"
     see_assignment: "See %{assignment_name}"
     see_discussion_topic: "See %{discussion_topic_name}"
     see_file: "See %{file_name}"
     see_quiz: "See %{quiz_name}"
     see_related_link: "See related link"
-  calendar_event_89aadc1c: "Calendar event"
+  calendar_event_89aadc1c: "Calendar Event"
   calendar_events: 
     crumbs: 
-      new: "New calendar event"
+      new: "New Calendar Event"
     full_calendar_event: 
       no_content: "No content"
     new: 
-      page_title: "New calendar event"
+      page_title: "New Calendar Event"
     notices: 
       created: "Event was successfully created."
       deleted: "This event has been deleted"
       updated: "Event was successfully updated."
     show: 
       links: 
-        back_to_calendar: "Back to calendar"
+        back_to_calendar: "Back to Calendar"
         delete: "Delete the event"
-        edit: "Edit calendar event"
+        edit: "Edit Calendar Event"
   calendar_events_api: 
     feed_title: "%{course_or_group_name} Calendar feed"
     ics_description: "Calendar events for %{context_name}"
@@ -3367,11 +3367,11 @@ en-GB:
       due: due
       event_title: "due: %{event_title}"
     show2: 
-      calendar_feed: "Calendar feed"
+      calendar_feed: "Calendar Feed"
       calendar_feed_instructions: "Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)"
       calendars: Calendars
-      feed_dialog_title: "Calendar feed"
-      feed_title: "Course calendar Atom feed"
+      feed_dialog_title: "Calendar Feed"
+      feed_title: "Course Calendar Atom Feed"
       links: 
         feed: "click here to view the feed"
       page_title_header: Calendar
@@ -4961,14 +4961,14 @@ en-GB:
   course_assignments_833b8cf1: "Course assignments"
   course_assignments_menu_fa6aeb23: "Course assignments menu"
   course_atom_feed_9d95214e: "Course Atom Feed"
-  course_calendar_7d3cba7b: "Course calendar"
+  course_calendar_7d3cba7b: "Course Calendar"
   course_canvas_id_9e36b24c: "Course Canvas ID"
   course_card_color_region_for_course_c356a69c: "Course card colour region for %{course}"
   course_cards_6029a05c: "Course cards"
   course_catalog_4cc7c8ce: "Course Catalog"
   course_collaborations_dadb327e: "Course collaborations"
   course_conferences_3d914c96: "Course conferences"
-  course_content_a92eca20: "Course content"
+  course_content_a92eca20: "Course Content"
   course_content_download_from_3c8c6c01: "Course content download from"
   course_content_downloads_6cb31802: "Course content downloads"
   course_copy_argument_error: "A course copy requires a source course."
@@ -5180,7 +5180,7 @@ en-GB:
     titles: 
       link_to_students: "Link to students"
       move_course: "Move course"
-      reset_course_content_dialog_help: "Reset course content"
+      reset_course_content_dialog_help: "Reset Course Content"
       section_enrollments: "Section enrolments"
   course_settings_sub_navigation_b95deae: "Course settings sub navigation"
   course_setup_wizard_is_showing_a7c087c1: "Course Setup Wizard is showing."
@@ -5587,22 +5587,22 @@ en-GB:
       wiki_editing_roles_change_existing: "Change pages currently editable by \"%{current_setting}\" to \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
-        reset: "Reset course content"
+        reset: "Reset Course Content"
         unconclude: "Unconclude course"
       headings: 
         current_users: "Current users"
       help: 
         reset_course_content: "Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content. This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?"
       links: 
-        calendar: "Course calendar"
+        calendar: "Course Calendar"
         conclude: "End this Course"
         copy: "Copy this course"
         delete: "Delete this Course"
-        export_content: "Export course content"
+        export_content: "Export Course Content"
         import: "Import Course Content"
         new_badge: New
-        reset: "Reset course content"
-        stats: "Course statistics"
+        reset: "Reset Course Content"
+        stats: "Course Statistics"
         student_view: "Student view"
       role: 
         inactive: inactive
@@ -5688,7 +5688,7 @@ en-GB:
       new_discussions: "New discussions"
       number_of_assignments: "# Assignments"
       number_of_submissions: "# Submissions"
-      page_title: "Course statistics"
+      page_title: "Course Statistics"
       quiz: Quiz
       quiz_questions: "Quiz questions"
       quiz_submissions: "Quiz submissions"
@@ -5787,7 +5787,7 @@ en-GB:
     access_report: "Access report"
     announcements: Announcements
     assignments: Assignments
-    calendar_events: "Calendar events"
+    calendar_events: "Calendar Events"
     collaborations: Collaborations
     conferences: Conferences
     confirmation: Confirmation
@@ -6679,7 +6679,7 @@ en-GB:
   download_assignment_submissions_41e50ee7: "Download assignment submissions"
   download_associated_files_f35dcb5e: "Download associated files"
   download_c7ffdfb9: Download
-  download_course_content_7f66edc9: "Download course content"
+  download_course_content_7f66edc9: "Download Course Content"
   download_epub_757cf0af: "Download ePub"
   download_errors_attchment_82ffea3f: "Download errors_attchment"
   download_item_analysis_report_statuslabel_8c9387ec: "Download item analysis report %{statusLabel}"
@@ -7388,7 +7388,7 @@ en-GB:
   expanded_f4493860: Expanded
   experimental_graphql_api_75c5eb8f: "EXPERIMENTAL GraphQL API."
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Export an existing quiz to new Quizzes 2 format"
-  export_course_content_f4774b74: "Export course content"
+  export_course_content_f4774b74: "Export Course Content"
   export_de71cd8e: Export
   export_failed_5d615d6d: "Export failed"
   export_in_progress_70db262a: "Export in progress"
@@ -8711,7 +8711,7 @@ en-GB:
       not_in_group_section: "%{student} does not share a section with the other members of %{group}."
   group_name_b69c144: "Group name"
   group_name_group_announcements_5ce81c6d: "%{group_name} - Group announcements"
-  group_name_group_calendar_7f10e0ed: "%{group_name} - Group calendar"
+  group_name_group_calendar_7f10e0ed: "%{group_name} - Group Calendar"
   group_name_group_collaborations_49b5dcd7: "%{group_name} - Group collaborations"
   group_name_group_conferences_8b01695f: "%{group_name} - Group conferences"
   group_name_group_discussions_8e509286: "%{group_name} - Group discussions"
@@ -9733,7 +9733,7 @@ en-GB:
         assessment_question_banks: "Question banks"
         assignments: Assignments
         attachments: Files
-        calendar_events: "Calendar events"
+        calendar_events: "Calendar Events"
         context_modules: Modules
         course_settings: "Course settings"
         discussion_topics: "Discussion topics"
@@ -11952,7 +11952,7 @@ en-GB:
     announcement_type: Announcement
     assignment_group_type: "Assignment group"
     assignment_type: Assignment
-    calendar_event_type: "Calendar event"
+    calendar_event_type: "Calendar Event"
     discussion_topic_type: "Discussion topic"
     ecollege: 
       course_not_found: "The ECollege course wasn't found."
@@ -12560,7 +12560,7 @@ en-GB:
       appointment_signups: "Appointment signups"
       blueprint: Blueprint
       calendar: Calendar
-      course_content: "Course content"
+      course_content: "Course Content"
       discussion: Discussion
       discussion_entry: "Discussion entry"
       due_date: "Due date"
@@ -14522,7 +14522,7 @@ en-GB:
         other: "%{count} students have scored between %{start} and %{end}%."
         zero: "No students have scored between %{start} and %{end}%."
       table_description: "Summary statistics for all turned in submissions"
-    title: "Quiz statistics"
+    title: "Quiz Statistics"
     unknown_answer: "Something else"
     user_names: "User Names"
   quiz_submission_dca0c013: "Quiz submission"
@@ -15353,12 +15353,12 @@ en-GB:
           moderate_this_quiz: "Moderate this quiz"
           moderate_this_survey: "Moderate this survey"
           preview: Preview
-          quiz_statistics: "Quiz statistics"
+          quiz_statistics: "Quiz Statistics"
           see_full_quiz: "See full quiz"
           show_assignment_rubric: "Show rubric"
           show_student_quiz_results: "Show student quiz results"
           show_student_survey_results: "Show student survey results"
-          survey_statistics: "Survey statistics"
+          survey_statistics: "Survey Statistics"
         manage: Manage
         only_registered_users: "Only registered, enrolled users can take graded quizzes"
         quiz_regraded_your_score_affected: 
@@ -16346,7 +16346,7 @@ en-GB:
     other: "Select all (%{count}) courses"
   select_all_students_7c2c34b3: "Select all students"
   select_audio_file_7d905cce: "Select Audio File"
-  select_calendars_d5fa50b6: "Select calendars"
+  select_calendars_d5fa50b6: "Select Calendars"
   select_content: "Select content"
   select_content_checkbox: 
     select_content_error: "You must choose a content option"
@@ -17768,7 +17768,7 @@ en-GB:
   successfully_resubmitted_to_vericite_dab924b6: "Successfully resubmitted to VeriCite."
   successfully_updated_the_comment_946360d5: "Successfully updated the comment"
   sum_of_all_files_in_mb_2b705055: "sum of all files in MB"
-  summary_statistics_f74852a5: "Summary statistics"
+  summary_statistics_f74852a5: "Summary Statistics"
   support: 
     array: 
       last_word_connector: ", and "
@@ -19156,7 +19156,7 @@ en-GB:
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Uses the new scheduler and its functionality"
   validate: 
     is_required: "This field is required"
-  validate_links_in_content_b1630fba: "Validate Links in content"
+  validate_links_in_content_b1630fba: "Validate Links in Content"
   value_d842f16d: Value
   vanity_url_76f93382: "Vanity URL"
   venezuela_58_959d01f7: "Venezuela (+58)"
@@ -19458,7 +19458,7 @@ en-GB:
   would_you_like_to_enable_this_app_ccdf735d: "Would you like to enable this app?"
   would_you_like_to_go_back_to_include_1d279044: "Would you like to go back to include:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?"
-  wrap_event_titles_in_calendar_month_view_cbb29fd8: "Wrap event titles in calendar month view"
+  wrap_event_titles_in_calendar_month_view_cbb29fd8: "Wrap event titles in Calendar month view"
   x_y_4a86b3ab: "%{x}/%{y}"
   xml_configuration_5ea1b942: "XML Configuration"
   yellow_4cf93785: Yellow
