@@ -17,7 +17,6 @@
  */
 
 import parseLinkHeader from 'parse-link-header'
-import _ from 'underscore'
 import ajaxJSON from 'jquery.ajaxJSON'
 import createStore from '../../shared/helpers/createStore'
 
@@ -35,7 +34,7 @@ const getNextUrl = obj =>
  * normalizeParams and jsonKey
  */
 export default function factory(spec) {
-  return _.extend(createStore(), {
+  return Object.assign(createStore(), {
     /**
      * Get a blank state in the store; useful when mounting the top-
      * level component that uses the store
