@@ -833,6 +833,14 @@ class FilesController < ApplicationController
       @context.file_upload_success_callback(@attachment)
     end
 
+    if params[:progress_id]
+      progress = Progress.find(params[:progress_id])
+
+      json = attachment_json(@attachment, @current_user)
+      progress.set_results(json)
+      progress.complete!
+    end
+
     url_params = {}
     url_params[:include] = 'enhanced_preview_url' if @context.is_a?(User) || @context.is_a?(Course)
     render json: {}, status: :created, location: api_v1_attachment_url(@attachment, url_params)

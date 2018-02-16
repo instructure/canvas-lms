@@ -1258,6 +1258,35 @@ describe FilesController do
       post "api_capture", params: params
       assert_status(201)
     end
+
+    it "completes the Progress object given in params[:progress_id], if any" do
+      user = User.create!(:name => "me")
+
+      progress = ::Progress.new(context: user, tag: :upload_via_url)
+      progress.start
+      progress.save!
+
+      course = Course.create
+      folder = Folder.create!(:name => "test", :context => course)
+      params = {
+        id: 1,
+        user_id: user.id,
+        context_type: "Course",
+        context_id: course.id,
+        token: @token,
+        name: "test.txt",
+        size: 42,
+        content_type: "text/plain",
+        instfs_uuid: 1,
+        folder_id: folder.id,
+        progress_id: progress.id,
+      }
+      post "api_capture", params: params
+      assert_status(201)
+
+      progress.reload
+      expect(progress).to be_completed
+    end
   end
 
   describe "public_url" do

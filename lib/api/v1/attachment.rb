@@ -19,6 +19,7 @@
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
+  include Api::V1::Progress
   include Api::V1::User
   include Api::V1::UsageRights
 
@@ -213,33 +214,30 @@ module Api::V1::Attachment
     return if folder && !authorized_action(folder, @current_user, :manage_contents)
 
     # no permission check required to use the preferred folder
-    folder ||= opts[:folder]
 
+    folder ||= opts[:folder]
     if InstFS.enabled?
-      if params[:url]
-        # TODO: CNVS-39171
-        # * asynchronously tell inst-fs to fetch and store the file, then
-        #   ping api_v1_files_capture_url on success or failure
-        # * return a Progress from this method
-        # * update client and docs to recognize the Progress
-        # * augment api_capture to update the appropriate progress when it creates the file
-        # * allow api_capture to receive an error and fail the appropriate
-        #   Progress instead of creating a file
-        raise NotImplementedError
-      else
-        json = InstFS.upload_preflight_json(
-          context: context,
-          user: logged_in_user,
-          acting_as: @current_user,
-          domain_root_account: @domain_root_account,
-          folder: folder,
-          filename: infer_upload_filename(params),
-          content_type: infer_upload_content_type(params),
-          on_duplicate: infer_on_duplicate(params),
-          quota_exempt: !opts[:check_quota],
-          capture_url: api_v1_files_capture_url
-        )
+      progress_json = if params[:url]
+        progress = ::Progress.new(context: @current_user, tag: :upload_via_url)
+        progress.start
+        progress.save!
+        progress_json(progress, @current_user, session)
       end
+
+      json = InstFS.upload_preflight_json(
+        context: context,
+        user: logged_in_user,
+        acting_as: @current_user,
+        domain_root_account: @domain_root_account,
+        folder: folder,
+        filename: infer_upload_filename(params),
+        content_type: infer_upload_content_type(params),
+        on_duplicate: infer_on_duplicate(params),
+        quota_exempt: !opts[:check_quota],
+        capture_url: api_v1_files_capture_url,
+        target_url: params[:url],
+        progress_json: progress_json
+      )
     else
       @attachment = Attachment.new
       @attachment.shard = context.shard

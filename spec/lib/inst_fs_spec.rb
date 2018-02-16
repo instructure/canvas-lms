@@ -147,8 +147,8 @@ describe InstFS do
     let(:on_duplicate) { 'rename' }
     let(:capture_url) { 'http://canvas.host/api/v1/files/capture' }
 
-    let(:preflight_json) do
-      InstFS.upload_preflight_json(
+    let(:default_args) do
+      {
         context: context,
         user: user,
         acting_as: acting_as,
@@ -159,7 +159,11 @@ describe InstFS do
         on_duplicate: on_duplicate,
         capture_url: capture_url,
         domain_root_account: Account.default
-      )
+      }
+    end
+
+    let(:preflight_json) do
+      InstFS.upload_preflight_json(default_args)
     end
 
     it "includes a static 'file' file_param" do
@@ -243,6 +247,27 @@ describe InstFS do
 
       it "include the content_type" do
         expect(upload_params[:content_type]).to eq content_type
+      end
+    end
+
+    context "upload via url" do
+      it "throw ArgumentError when appropriate" do
+        expect { InstFS.upload_preflight_json(default_args.merge({target_url: "foo"})) }.to raise_error(ArgumentError)
+        expect { InstFS.upload_preflight_json(default_args.merge({progress_json: {"foo": 1}})) }.to raise_error(ArgumentError)
+      end
+
+      it "responds properly when passed target_url and progress_json" do
+        progress_json = { id: 1 }
+        target_url = "http://www.example.com/"
+        preflight_json = InstFS.upload_preflight_json(default_args.merge({target_url: target_url, progress_json: progress_json}))
+
+        token = preflight_json[:upload_url].split('token=').last
+        jwt = Canvas::Security.decode_jwt(token, [ @secret ])
+
+        expect(jwt[:capture_params][:progress_id]).to eq(progress_json[:id])
+        expect(preflight_json[:file_paran]).to be_nil
+        expect(preflight_json[:upload_params][:target_url]).to eq(target_url)
+        expect(preflight_json[:progress]).to eq(progress_json)
       end
     end
   end

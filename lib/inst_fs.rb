@@ -66,7 +66,9 @@ module InstFS
       Base64.decode64(setting("secret"))
     end
 
-    def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, domain_root_account:)
+    def upload_preflight_json(context:, user:, acting_as:, folder:, filename:, content_type:, quota_exempt:, on_duplicate:, capture_url:, domain_root_account:, target_url: nil, progress_json: nil)
+      raise ArgumentError unless !!target_url == !!progress_json # these params must both be present or both absent
+
       token = upload_jwt(user, acting_as, capture_url, domain_root_account.domain,
         context_type: context.class.to_s,
         context_id: context.global_id.to_s,
@@ -74,15 +76,22 @@ module InstFS
         folder_id: folder&.global_id.to_s,
         root_account_id: context.respond_to?(:root_account) && context.root_account.global_id.to_s,
         quota_exempt: !!quota_exempt,
-        on_duplicate: on_duplicate)
+        on_duplicate: on_duplicate,
+        progress_id: progress_json && progress_json[:id])
+
+      upload_params = {
+        filename: filename,
+        content_type: content_type
+      }
+      if target_url
+        upload_params[:target_url] = target_url
+      end
 
       {
-        file_param: 'file',
+        file_param: target_url ? nil : 'file',
+        progress: progress_json,
         upload_url: upload_url(token),
-        upload_params: {
-          filename: filename,
-          content_type: content_type,
-        }
+        upload_params: upload_params
       }
     end
 
