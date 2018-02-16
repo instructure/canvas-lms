@@ -23,7 +23,7 @@ const userMetaTypes = {
   students: ['student', 'student_view']
 };
 
-function getUsersByName (courseId, userType, searchTerm) {
+function getUsersByName (courseId, userType, searchTerm, enrollmentStates = []) {
   if (searchTerm.length < 3) {
     // the endpoint doesn't allow searching by 2 letters or less
     return Promise.resolve({ response: {data: []} });
@@ -32,9 +32,11 @@ function getUsersByName (courseId, userType, searchTerm) {
   const params = {
     params: {
       search_term: searchTerm,
-      enrollment_type: userMetaTypes[userType]
+      enrollment_type: userMetaTypes[userType],
+      enrollment_state: enrollmentStates
     }
   }
+
   const url = encodeURI(`/api/v1/courses/${courseId}/users`);
 
   return axios.get(url, params);

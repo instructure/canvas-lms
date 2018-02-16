@@ -414,14 +414,16 @@ class GradebooksController < ApplicationController
   end
 
   def history
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, %i[manage_grades view_all_grades])
       crumbs.delete_if { |crumb| crumb[0] == "Grades" }
       add_crumb(t("Gradebook History"),
                 context_url(@context, controller: :gradebooks, action: :history))
       @page_title = t("Gradebook History")
       @body_classes << "full-width padless-content"
       js_bundle :gradebook_history
-      js_env({})
+      js_env(
+        COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?
+      )
 
       render html: "", layout: true
     end

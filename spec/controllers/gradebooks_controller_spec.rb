@@ -1135,6 +1135,30 @@ describe GradebooksController do
     end
   end
 
+  describe "GET 'history'" do
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+
+      get 'history', params: { course_id: @course.id }
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+
+      get 'history', params: { course_id: @course.id }
+      expect(response).to be_ok
+    end
+
+    it "returns unauthorized for students" do
+      user_session(@student)
+
+      get 'history', params: { course_id: @course.id }
+      assert_unauthorized
+    end
+  end
+
   describe "POST 'submissions_zip_upload'" do
     it "requires authentication" do
       course_factory

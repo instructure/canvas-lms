@@ -107,9 +107,10 @@ const SearchFormActions = {
     return function (dispatch) {
       dispatch(SearchFormActions.fetchRecordsStart(recordType));
 
+      const enrollmentStates = environment.courseIsConcluded() ? ['completed'] : [];
       const request = recordType === 'assignments' ?
         AssignmentApi.getAssignmentsByName(courseId, searchTerm) :
-        UserApi.getUsersByName(courseId, recordType, searchTerm);
+        UserApi.getUsersByName(courseId, recordType, searchTerm, enrollmentStates);
 
       return request
         .then((response) => {
