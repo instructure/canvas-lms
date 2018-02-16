@@ -9366,6 +9366,7 @@ nn:
   manage_profile_pictures_40c958ce: "Administrer profilbilete"
   manage_rubrics_5d274f6a: "Administrer vurderingsskjema"
   manage_snapshots_1dc4b79d: "Administrer "
+  manage_snapshots_modal_b0517bb6: "Administrer Snapshots Modal"
   manage_update_23de23a1: "Rediger oppdatering"
   manage_update_for_toolname_f8e3b2fb: "Rediger oppdatering for %{toolName}"
   manage_usage_rights_c5a8c216: "Administrere bruksrettar"
@@ -12203,8 +12204,12 @@ nn:
   pink_68ad45cb: Rosa
   place_b128fa94: Plassering
   place_section_before_5b45714e: "Plasser \"%{section}\" før:"
+  place_title_2c183274: "Plassering \"%{title}\""
   placements_5b5e056b: Plasseringar
   plagiarism_detection_platform_6ce67e66: "Plattform for plagiatkontroll"
+  plagiarism_review_tool_error_513f47ff: "Feil med plagiatkontrollverktøy"
+  plagiarism_review_tool_is_missing_submission_event_75273069: "Plagiatkontrollverktøy manglar innleveringsaktivitetsteneste"
+  plagiarism_review_tool_submission_event_service_is_b023b4c7: "Plagiatkontrollverktøyet sitt innleveringsaktivitetsteneste manglar sluttpunkt"
   plain_text_e3ab33aa: "Rein tekst"
   plain_text_view_7640af4c: "Rein tekst-vising"
   please_add_a_due_date_1d433d2: "Legg til frist"
@@ -12297,6 +12302,7 @@ nn:
       description: "Dette programtillegget integrerer med Crocodoc og gir ei HTML5-basert førehandsvising av dokument som gjer at studentar og faglærarar kan skrive merknader i dokumenta."
       labels: 
         api_key: "Crocodoc API-nøkkel"
+        disable_polling: "Slår av spørjing om dokumentstatus"
     custom_ticketing_email_settings: 
       labels: 
         email_address: "e-postadresse for å sende feilrapportar til (something@example.com)"
@@ -12436,6 +12442,9 @@ nn:
       tag: Merke
       version: Versjon
       website: Nettstad
+    inst_fs: 
+      description: "Filteneste som er proxy for S3."
+      name: Inst-FS
     kaltura: 
       description: "Kaltura video- og lydinnspeling med avspeling"
       name: Kaltura
@@ -12503,6 +12512,7 @@ nn:
         aws_region: AWS-region
         aws_secret_access_key: "AWS nøkkel for hemmeleg tilgang"
         kinesis_stream_name: "Namn på Kinesis-straum"
+        use_consul: "Konfigurer ved å bruke Consul istadenfor denne sida"
     lockdown_browser: 
       labels: 
         download_url: "URL for nedlasting av LockDown Browser"
@@ -12585,6 +12595,9 @@ nn:
       labels: 
         consumer_key: Forbrukarnøkkel
         consumer_secret: Forbrukarhemmelegheit
+    uuid_provisioner: 
+      description: "Dette slår på eksport av UUID-er til Quiz.Next-tenester."
+      name: UUID-leverandør
     vericite: 
       description: Plagiatkontrolltenesta.
       name: VeriCite
@@ -12592,7 +12605,7 @@ nn:
       default_assignment_settings: "**Standard oppgåveinnstillingar**"
       default_comments_settings: "*Tekst som er lagt inn her vil bli vist til studentar når dei leverer ei oppgåve.*"
       labels: 
-        account_id: VeriCite-konto-ID
+        account_id: "VeriCite forbrukarnøkkel"
         comments: "Kommentarar til innlevering"
         exclude_quotes: "Ekskluder sitat"
         exclude_self_plag: "Ekskluder sjølvplagiat"
@@ -12651,10 +12664,14 @@ nn:
         username: Brukarnamn
   points_bb475533: Poeng
   points_bceb5005: poeng
+  points_changed_exceptions_b0c771f7: "Unntak: poeng endra:"
+  points_highest_to_lowest_87f1b143: "Poeng - høgast til lågast"
+  points_lowest_to_highest_45089e82: "Poeng - lågast til høgast"
   points_n_e0b20623: "Poeng %{n}"
   points_out_of_total_24f61148: "*%{points}* av **%{total}**"
   points_points_b6b422e2: "Poeng: %{points}"
   points_possible_1c0b3445: "Moglege poeng"
+  points_possible_44cb4190: "/ %{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Moglege poeng må vere 0 eller meir for valde typar karaktersetjing"
   points_possible_points_fda3b111: "%{points_possible} poeng"
   points_pts_e5596bf7: "%{points} poeng"
@@ -12682,6 +12699,7 @@ nn:
   poor_score_715306e2: "Lite godt resultat"
   port_75f69d1: Port
   position_f9c9b93c: Plassering
+  position_select_c2dd3980: "Vel plassering"
   possible_combination_count_db651ca4: "Mogleg kombinasjonstal"
   possible_matches_for_address_select_the_correct_on_e206f972: "Moglege samsvar for \"%{address}\". Vel den korrekte nedanfor eller opprett ein ny brukar."
   possible_score_5e0a328e: "Mogleg: %{score}"
@@ -12695,9 +12713,12 @@ nn:
       GradingAssignment og GradingAssignmentScore.
   post_grades_to_sis_97ece878: "Post karakterar i SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "\"Send karakterar til SIS\" er slått på som standard for oppgåver, karaktergivande diskusjonar, og quizar"
+  post_to_961f8937: "Post til"
   posted_at_4cfce2c3: "%{posted_at}"
+  posted_on_e1010e1e: "Posta den:"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: Øvingsquiz
+  pre_processing_92865c1d: "Førebur behandling"
   prerequisites_49659f16: "Føresetnader:"
   prerequisites_lookup: 
     headers: 
@@ -12711,6 +12732,8 @@ nn:
   prev_month_34bd934c: "Førre månad"
   preview_53003fd2: Førehandsvising
   preview_your_changes_373557d8: "Førehandsvis endringane"
+  previous_announcements_page_79c0ada1: "Førre side med kunngjeringar"
+  previous_assignment_83d1f423: "Førre oppgåve"
   previous_bd2ac015: Førre
   previous_csv_file_time_d7bfe7ef: "Førre CSV-fil (%{time})"
   previous_csv_timestamp_6673c69c: "Førre CSV (%{timestamp})"
@@ -12718,8 +12741,13 @@ nn:
   previous_message_8804f87e: "Førre melding"
   previous_module_item_2bb5e499: "Førre modul/element"
   previous_month_7adf1380: "Førre månad"
+  previous_month_bb1e3c84: "Førre månad"
+  previous_page_928fc112: "Førre side"
+  previous_snapshots_d8cd4820: "Førre Snapshots"
+  previous_student_46275eae: "Førre student"
   previous_time_cc96b361: "Førre (%{time})"
   previous_timestamp_19343a58: "Førre (%{timestamp})"
+  primary_brand_color_db79b428: "Primær merkefarge"
   primary_button_3a98f4bc: Primærknapp
   primary_button_text_1f55d27b: "Tekst på primærknapp"
   primary_color_630fc6f3: Primærfarge
@@ -12885,6 +12913,7 @@ nn:
         google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "fleire alternativ"
+        otp_backup_codes: "Backup-kodar for fleirfaktorautentisering"
         reconfigure_mfa: "Konfigurer godkjenning med fleire faktorar på nytt"
         skype: Skype
         twitter: Twitter
@@ -13028,10 +13057,17 @@ nn:
   progress_for_account_name_ef203250: "Framdrift for %{account_name}"
   progress_loading_bar_a26b8861: Framdriftsfelt
   project_groups_1fa0320b: Prosjektgrupper
+  provide_a_space_for_users_to_work_on_a_single_goog_8edec82b: |-
+      Legg til eit område der brukarar kan arbeide samtidig
+      i eit Google-dokument direkte frå Canvas-emnet ditt.
+  provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "Legg til ein URI i IdP-en sine metadata slik at resten av felta kan fyllast ut automatisk. Dersom skolen din er med i InCommon eller i UK Access Management Federation, må du spesifisere urn:mace:incommon eller http://ukfederation.org.uk i URI-en saman med entitet-ID-en til skolen.  "
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "Legg til ein URI i IdP-en sine metadata slik at resten av felta kan fyllast ut automatisk. Dersom skolen din er med i InCommon må du spesifisere urn:mace:incommon i URI-en saman med entitet-ID-en til skolen.  "
+  provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Legg til opplæringsinformasjon for nye brukarar i ein undermeny"
   provider_attribute_b1cad655: Tilbyderattributt
   provider_icon_5064fa6e: Leverandørikon
+  provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Gi brukarane å gjere-liste som dashbordval."
   provision_a_catalog_account_8cea67f6: "Klargjer ein Canvas Catalog-konto"
+  provision_a_quiz_next_service_c7c6bd87: "Sett opp Quiz.Next-teneste"
   provisioned_catalog_account_26339afd: "Klargjord Canvas Catalog-konto"
   provisioning_only_7c0e5911: "Kun for klargjering"
   provisioning_title: Klargjering
@@ -13077,6 +13113,7 @@ nn:
       email_sent: "E-post med stadfesting er send til %{email}, hugs å sjekke Søppelpost"
       link_invalid: "Lenka du brukte er ikkje lenger gyldig.  Om du ikkje kan logge på, klikkar du på \"Hugsar du ikkje passordet?\" for å tilbakestille passordet."
       password_changed: "Passord er endra"
+  pts_699bd9aa: poeng
   public_a749f507: Offentleg
   public_course_index_59270e80: "Offentleg emneliste"
   public_courses_title: "Offentlege emne"
@@ -13106,10 +13143,12 @@ nn:
   published_4bb5209e: Publisert
   published_c944a23d: publisert
   published_click_to_modify_233c0d4: "Publisert – klikk for å endre"
+  published_click_to_unpublish_db016671: "Publisert. Klikk for å oppheve publisering."
   published_click_to_unpublish_ec4495b5: "Publisert. Klikk for å oppheve publisering."
   published_click_to_unpublish_item_name_aaa804b0: "Publisert. Klikk for å oppheve publisering %{item_name}."
   published_click_to_unpublish_module_name_eddd07bb: "Publisert. Klikk for å oppheve publisering %{module_name}."
   published_click_to_unpublish_name_9bdd66cf: "Publisert. Klikk for å avpublisere %{name}"
+  published_click_to_unpublish_title_358122a: "Publisert. Klikk for å oppheve publisering av %{title}."
   publishing_is_disabled_for_this_item_efa7803f: "Publisering er slått av for dette elementet"
   publishing_item_name_is_disabled_8207a9e7: "Publisering %{item_name} deaktivert"
   purchases: 
@@ -13162,6 +13201,7 @@ nn:
       move_copy_questions: "Flytt/kopier spørsmål"
     update_outcomes_fail: "Oppdatering av læringsmål mislukkast"
     updating_outcomes: "Oppdaterer læringsmål..."
+  question_bank_f6c44d62: Spørsmålsbank
   question_banks: 
     bank_fail: "Kan ikkje opprette spørsmålsbank."
     bank_success: "Spørsmålsbank er oppretta."
@@ -13173,7 +13213,7 @@ nn:
       labels: 
         title: "Namn på banken"
       page_title: Spørsmålsbankar
-      see_bookmarked_banks: "Sjå bankane som er bokmerka"
+      see_bookmarked_banks: "Sjå bankar som er bokmerka"
       user_question_banks: "Spørsmålsbankar for brukar"
     question_bank: 
       bookmark_bank: "Bokmerk denne spørsmålsbanken"
@@ -13224,6 +13264,7 @@ nn:
   question_mark_icon_d2bbd204: Spørsmålsteiknikon
   question_unanswered: "Har ikkje svart enno"
   questions_a955145c: Spørsmål
+  queued_d0e45c4b: "Lagt i kø"
   quiz: 
     regrade: 
       give_everyone_full_credit: "Gi alle fullt utbytte for dette spørsmålet."
@@ -13234,6 +13275,7 @@ nn:
   quiz_40ee61b1: quiz
   quiz_e0dcce8f: Quiz
   quiz_failed_to_update_2b66fa4d: "Kan ikkje oppdatere quizen"
+  quiz_ip_address_filters_49a75ec8: "IP-adressefilter for quizar"
   quiz_log_auditing: 
     buttons: 
       reload_events: "Laste inn på nytt"
