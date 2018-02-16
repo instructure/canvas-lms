@@ -22,7 +22,6 @@ import { bool, func } from 'prop-types'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import Text from '@instructure/ui-core/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
@@ -68,38 +67,34 @@ export default function AnnouncementRow (
     )
     : null
 
+  const sectionsToolTip = canHaveSections
+    ? (
+      <SectionsTooltip
+        totalUserCount={announcement.user_count}
+        sections={announcement.sections}
+      />
+    )
+    : null
+
+  const replyButton = announcement.locked
+      ? null
+      : (
+        <Container display="block" margin="x-small 0 0">
+          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
+        </Container>
+      )
+
   // necessary because announcements return html from RCE
   const contentWrapper = document.createElement('span')
   contentWrapper.innerHTML = announcement.message
   const textContent = contentWrapper.textContent.trim()
 
-  // The clickable children get thrown in a clickable div that renders
-  // above the unclickable children
-  const clickableChildren = [
-    <Heading level="h3">{announcement.title}</Heading>,
-    <div className="ic-announcement-row__content">{textContent}</div>,
-  ]
-  const unclickableChildren = []
-  if (canHaveSections) {
-    unclickableChildren.push((
-      <SectionsTooltip
-        totalUserCount={announcement.user_count}
-        sections={announcement.sections}
-      />
-    ))
-  }
-  if (!announcement.locked) {
-    unclickableChildren.push((
-      <a href={announcement.html_url}>
-        <Container display="block" margin="x-small 0 0">
-          <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
-        </Container>
-      </a>
-    ))
-  }
-
   return (
     <CourseItemRow
+      title={announcement.title}
+      body={<div className="ic-announcement-row__content">{textContent}</div>}
+      sectionToolTip={sectionsToolTip}
+      replyButton={replyButton}
       ref={rowRef}
       className="ic-announcement-row"
       selectable={canManage}
@@ -107,7 +102,6 @@ export default function AnnouncementRow (
       id={announcement.id}
       isRead={announcement.read_state === 'read'}
       author={announcement.author}
-      title={announcement.title}
       itemUrl={announcement.html_url}
       onSelectedChanged={onSelectedChanged}
       masterCourse={{
@@ -154,8 +148,6 @@ export default function AnnouncementRow (
           </ScreenReaderContent>
         </MenuItem>,
       ] || null}
-      clickableChildren={clickableChildren}
-      unclickableChildren={unclickableChildren}
     />
   )
 }

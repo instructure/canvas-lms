@@ -21,6 +21,7 @@ import React, { Component } from 'react'
 import { bool, node, string, func, shape, arrayOf } from 'prop-types'
 import cx from 'classnames'
 
+import Heading from '@instructure/ui-core/lib/components/Heading'
 import Checkbox from '@instructure/ui-core/lib/components/Checkbox'
 import Avatar from '@instructure/ui-core/lib/components/Avatar'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
@@ -36,8 +37,6 @@ import masterCourseDataShape from '../proptypes/masterCourseData'
 
 export default class CourseItemRow extends Component {
   static propTypes = {
-    clickableChildren: arrayOf(node),
-    unclickableChildren: arrayOf(node),
     actionsContent: node,
     metaContent: node,
     masterCourse: shape({
@@ -46,6 +45,7 @@ export default class CourseItemRow extends Component {
     }),
     author: authorShape,
     title: string.isRequired,
+    body: node.isRequired,
     id: string,
     className: string,
     itemUrl: string,
@@ -59,12 +59,12 @@ export default class CourseItemRow extends Component {
     showManageMenu: bool,
     manageMenuOptions: arrayOf(node),
     onManageMenuSelect: func,
+    sectionToolTip: node,
+    replyButton: node,
   }
 
   static defaultProps = {
     actionsContent: null,
-    clickableChildren: [],
-    unclickableChildren: [],
     metaContent: null,
     masterCourse: null,
     author: {
@@ -86,6 +86,8 @@ export default class CourseItemRow extends Component {
     showManageMenu: false,
     manageMenuOptions: [],
     onManageMenuSelect () {},
+    sectionToolTip: null,
+    replyButton: null,
   }
 
   state = {
@@ -122,28 +124,14 @@ export default class CourseItemRow extends Component {
     }
   }
 
-  renderChildren () {
-    if (this.props.itemUrl) {
-      return (
-        <div className="ic-item-row__content-col">
-          {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-          <a className="ic-item-row__content-link" href={this.props.itemUrl}>
-            <div className="ic-item-row__content-link-container">
-              {this.props.clickableChildren}
-            </div>
-          </a>
-          {this.props.unclickableChildren}
+  renderClickableDiv (component) {
+    return (
+      <a className="ic-item-row__content-link" href={this.props.itemUrl}>
+        <div className="ic-item-row__content-link-container">
+          {component}
         </div>
-      )
-    } else {
-      return (
-        <div className="ic-item-row__content-col">
-          {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-          {this.props.clickableChildren}
-          {this.props.unclickableChildren}
-        </div>
-      )
-    }
+      </a>
+    )
   }
 
   render () {
@@ -175,7 +163,13 @@ export default class CourseItemRow extends Component {
             src={this.props.author.avatar_image_url}
           />
         </div>)}
-        {this.renderChildren()}
+        <div className="ic-item-row__content-col">
+          {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
+          {this.renderClickableDiv(<Heading level="h3">{this.props.title}</Heading>)}
+          {this.props.sectionToolTip}
+          {this.renderClickableDiv(this.props.body)}
+          {this.props.replyButton ? this.renderClickableDiv(this.props.replyButton) : null}
+        </div>
         <div className="ic-item-row__meta-col">
           <div className="ic-item-row__meta-actions">
             {this.props.actionsContent}
