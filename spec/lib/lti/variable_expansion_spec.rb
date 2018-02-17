@@ -32,45 +32,27 @@ module Lti
       end
     end
 
-    subject { expander.expand(TestExpander.new) }
+    it 'must accept multiple guards and combine their results with a logical AND' do
+      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { true }, -> { true } )
+      expect(var_exp.expand(TestExpander.new)).to eq 6
 
-    let(:setup_data) { ['test', [], -> { @one + @two + @three }] }
-    let(:expander) { described_class.new(*setup_data) }
-
-    it { is_expected.to eq 6 }
-
-    context 'with multiple guards' do
-      context 'with result true' do
-        let(:setup_data) { ['test', [], -> { @one + @two + @three }, -> { true }, -> { true }] }
-
-        it { is_expected.to eq 6 }
-      end
-
-      context 'with result false' do
-        let(:setup_data) { ['test', [], -> { @one + @two + @three }, -> { false }, -> { true }] }
-
-        it { is_expected.to be_nil }
-      end
+      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { false }, -> { true } )
+      expect(var_exp.expand(TestExpander.new)).to eq '$test'
     end
 
-    context 'with empty result' do
-      let(:setup_data) { ['test', [], -> { nil }] }
-
-      it { is_expected.to eq '' }
+    it 'accepts and sets default_name' do
+      var_exp = described_class.new('test', [], -> { 'test' }, -> { true }, default_name: 'test_name' )
+      expect(var_exp.default_name).to eq 'test_name'
     end
 
-    context 'with default_name' do
-      let(:setup_data) { ['test', [], -> { 'test' }, -> { true }, default_name: 'test_name'] }
-
-      it 'accepts and sets default_name' do
-        expect(expander.default_name).to eq 'test_name'
-      end
+    it 'expands variables' do
+      var_exp = described_class.new('test', [], -> { @one + @two + @three } )
+      expect(var_exp.expand(TestExpander.new)).to eq 6
     end
 
-    context 'with single guard' do
-      let(:setup_data) { ['test', [], -> { @one + @two + @three }, -> {false}] }
-
-      it { is_expected.to be_nil }
+    it 'does not expand if the guard evals false' do
+      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> {false} )
+      expect(var_exp.expand(TestExpander.new)).to eq '$test'
     end
   end
 end

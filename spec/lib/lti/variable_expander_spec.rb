@@ -182,7 +182,6 @@ module Lti
            Message.locale
            Context.id)
       }
-      let(:user) { user_model :email => 'test@test.com' }
 
       it 'does not use expansions that do not have default names' do
         VariableExpander.register_expansion('TestCapability.Foo', ['a'], -> {'test'})
@@ -295,12 +294,6 @@ module Lti
     end
 
     describe "#variable expansions" do
-      it 'returns the variable substitution string when expansion not registered' do
-        exp_hash = {test: '$unset.expansion'}
-        variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq '$unset.expansion'
-      end
-
       it 'has a substitution for com.instructure.Assignment.lti.id' do
         exp_hash = {test: '$com.instructure.Assignment.lti.id'}
         variable_expander.expand_variables!(exp_hash)
@@ -439,7 +432,7 @@ module Lti
         variable_expander.instance_variable_set(:@request, nil)
         exp_hash = {test: '$Canvas.api.domain'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to be_nil
+        expect(exp_hash[:test]).to eq '$Canvas.api.domain'
       end
 
       it 'has substitution for $com.instructure.brandConfigJSON.url' do
@@ -453,7 +446,7 @@ module Lti
         variable_expander.instance_variable_set(:@request, nil)
         exp_hash = {test: '$com.instructure.brandConfigJSON.url'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to be_nil
+        expect(exp_hash[:test]).to eq '$com.instructure.brandConfigJSON.url'
       end
 
       it 'has substitution for $com.instructure.brandConfigJSON' do
@@ -467,7 +460,7 @@ module Lti
         variable_expander.instance_variable_set(:@request, nil)
         exp_hash = {test: '$com.instructure.brandConfigJSON'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to be_nil
+        expect(exp_hash[:test]).to eq '$com.instructure.brandConfigJSON'
       end
 
       it 'has substitution for $com.instructure.brandConfigJS.url' do
@@ -481,7 +474,7 @@ module Lti
         variable_expander.instance_variable_set(:@request, nil)
         exp_hash = {test: '$com.instructure.brandConfigJS.url'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to be_nil
+        expect(exp_hash[:test]).to eq '$com.instructure.brandConfigJS.url'
       end
 
       it 'has substitution for $Canvas.css.common' do
@@ -495,7 +488,7 @@ module Lti
         variable_expander.instance_variable_set(:@request, nil)
         exp_hash = {test: '$Canvas.css.common'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to be_nil
+        expect(exp_hash[:test]).to eq '$Canvas.css.common'
       end
 
       it 'has substitution for $Canvas.api.baseUrl' do
@@ -510,7 +503,7 @@ module Lti
         variable_expander.instance_variable_set(:@request, nil)
         exp_hash = {test: '$Canvas.api.baseUrl'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to be_nil
+        expect(exp_hash[:test]).to eq '$Canvas.api.baseUrl'
       end
 
       it 'has substitution for $Canvas.account.id' do
@@ -599,7 +592,7 @@ module Lti
           variable_expander.instance_variable_set(:@request, nil)
           exp_hash = { test: '$ToolProxyBinding.memberships.url' }
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be_nil
+          expect(exp_hash[:test]).to eq '$ToolProxyBinding.memberships.url'
         end
       end
 
@@ -759,7 +752,7 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
 
           unless term && term.start_at
-            expect(exp_hash[:test]).to be_nil
+            expect(exp_hash[:test]).to eq '$Canvas.term.startAt'
           end
         end
 
@@ -780,7 +773,7 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
 
           unless term && term.name
-            expect(exp_hash[:test]).to be_nil
+            expect(exp_hash[:test]).to eq '$Canvas.term.name'
           end
         end
 
@@ -807,11 +800,12 @@ module Lti
         end
 
         it 'does not substitute $Canvas.externalTool.url when the controller is unset' do
+
           variable_expander.instance_variable_set(:@controller, nil)
           variable_expander.instance_variable_set(:@request, nil)
           exp_hash = {test: '$Canvas.externalTool.url'}
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be_nil
+          expect(exp_hash[:test]).to eq '$Canvas.externalTool.url'
         end
 
         it 'returns the opaque identifiers for the active groups the user is a part of' do
@@ -946,21 +940,21 @@ module Lti
             allow(assignment).to receive(:unlock_at).and_return(nil)
             exp_hash = {test: '$Canvas.assignment.unlockAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to be_nil
+            expect(exp_hash[:test]).to eq "$Canvas.assignment.unlockAt.iso8601"
           end
 
           it 'handles a nil lock_at' do
             allow(assignment).to receive(:lock_at).and_return(nil)
             exp_hash = {test: '$Canvas.assignment.lockAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to be_nil
+            expect(exp_hash[:test]).to eq "$Canvas.assignment.lockAt.iso8601"
           end
 
           it 'handles a nil due_at' do
             allow(assignment).to receive(:lock_at).and_return(nil)
             exp_hash = {test: '$Canvas.assignment.dueAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to be_nil
+            expect(exp_hash[:test]).to eq "$Canvas.assignment.dueAt.iso8601"
           end
 
         end
@@ -973,7 +967,7 @@ module Lti
         it 'has substitution for $vnd.Canvas.Person.email.sis when user is not logged in' do
           exp_hash = {test: '$vnd.Canvas.Person.email.sis'}
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be_nil
+          expect(exp_hash[:test]).to eq '$vnd.Canvas.Person.email.sis'
         end
       end
 
@@ -1037,7 +1031,7 @@ module Lti
 
           exp_hash = {test: '$vnd.Canvas.Person.email.sis'}
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be_nil
+          expect(exp_hash[:test]).to eq '$vnd.Canvas.Person.email.sis'
         end
 
         it 'has substitution for $Person.address.timezone' do
@@ -1260,7 +1254,7 @@ module Lti
           variable_expander.instance_variable_set(:@request, nil)
           exp_hash = {test: '$Canvas.masqueradingUser.id'}
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be_nil
+          expect(exp_hash[:test]).to eq '$Canvas.masqueradingUser.id'
         end
 
         it 'has substitution for $Canvas.masqueradingUser.userId' do
