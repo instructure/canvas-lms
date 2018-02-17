@@ -841,6 +841,67 @@ module Lti
         end
       end
 
+      context 'when group assignment' do
+        let!(:original_assignment) { @assignment }
+        let(:user_one) { submission_one.user }
+        let(:user_two) { submission_two.user }
+        let(:course) { submission_one.assignment.course }
+        let(:submission_one) { submission_model({course: original_assignment.course, assignment: original_assignment}) }
+        let(:submission_two) { submission_model({course: original_assignment.course, assignment: original_assignment}) }
+        let(:submission_three) { submission_model({course: original_assignment.course, assignment: original_assignment}) }
+        let!(:group) do
+          group = course.groups.create!(name: 'group one')
+          group.add_user(user_one)
+          group.add_user(user_two)
+          submission_one.update!(group: group)
+          submission_two.update!(group: group)
+          group
+        end
+        let(:create_endpoint) do
+          "/api/lti/assignments/#{submission_one.assignment.id}/submissions/#{submission_one.id}/originality_report"
+        end
+        let(:originality_score) { 33 }
+
+        before do
+          submission_one.assignment.update!(submission_types: 'online_text_entry')
+          submission_two.update!(
+            assignment_id: submission_one.assignment_id,
+            group_id: submission_one.group_id
+          )
+        end
+
+        it 'copies the report to all other submissions in the group' do
+
+          post create_endpoint,
+               params: {
+                  originality_report: {
+                    originality_score: originality_score,
+                  },
+                  submission_id: submission_one.id
+               },
+               headers: request_headers
+
+          run_jobs
+
+          expect(submission_two.originality_reports.first.originality_score).to eq originality_score
+        end
+
+        it 'does not copy the report to submissions outside the group' do
+          post create_endpoint,
+               params: {
+                  originality_report: {
+                    originality_score: originality_score,
+                  },
+                  submission_id: submission_one.id
+               },
+               headers: request_headers
+
+          run_jobs
+
+          expect(submission_three.originality_reports).to be_blank
+        end
+      end
+
       def api_create_originality_report(file_id, score)
         api_call(
           :post,
