@@ -28,7 +28,6 @@ class OriginalityReport < ActiveRecord::Base
   validates :submission, presence: true
   validates :workflow_state, inclusion: { in: ['scored', 'error', 'pending'] }
   validates :originality_score, inclusion: { in: 0..100, message: 'score must be between 0 and 100' }, allow_nil: true
-  validates :attachment, uniqueness: true, unless: proc { |o| o.attachment.blank? }
 
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id
@@ -68,6 +67,27 @@ class OriginalityReport < ActiveRecord::Base
   def asset_key
     return Attachment.asset_string(attachment_id) if attachment_id.present?
     Submission.asset_string(submission_id)
+  end
+
+  def copy_to_group_submissions!
+    return if submission.group_id.blank?
+    group_submissions = assignment.submissions.where.not(id: submission.id).where(group: submission.group)
+    group_submissions.find_each do |s|
+      copy_of_report = self.dup
+
+      # We don't want a single submission to have
+      # multiple originality reports with the same
+      # attachment/submission combo hanging around.
+      s.originality_reports.where(
+        attachment_id: attachment_id
+      ).destroy_all
+
+      copy_of_report.update!(submission: s)
+      lti_link&.dup&.update!(
+        linkable: copy_of_report,
+        resource_link_id: nil
+      )
+    end
   end
 
   private

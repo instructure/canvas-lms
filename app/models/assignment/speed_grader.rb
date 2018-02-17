@@ -132,6 +132,7 @@ class Assignment
       Submission.bulk_load_versioned_attachments(submission_histories,
                                                  preloads: attachment_includes)
       Submission.bulk_load_versioned_originality_reports(submission_histories)
+      Submission.bulk_load_text_entry_originality_reports(submission_histories)
 
       preloaded_prov_grades =
         case @grading_role
@@ -210,7 +211,8 @@ class Assignment
                             methods: %i[versioned_attachments late missing external_tool_url]).tap do |version_json|
               version_json['submission']['has_originality_report'] = version.has_originality_report?
               version_json['submission']['has_plagiarism_tool'] = version.assignment.assignment_configuration_tool_lookup_ids.present?
-              version_json['submission']['has_originality_score'] = version.originality_reports.any? { |o| o.originality_score.present? }
+              version_json['submission']['has_originality_score'] = version.originality_reports_for_display.any? { |o| o.originality_score.present? }
+              version_json["submission"]['turnitin_data'] = version.originality_data
 
               if version_json['submission'][:submission_type] == 'discussion_topic'
                 url_opts[:enable_annotations] = false

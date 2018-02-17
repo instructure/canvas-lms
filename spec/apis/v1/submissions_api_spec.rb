@@ -1649,6 +1649,7 @@ describe 'Submissions API', type: :request do
                 { :controller => 'submissions_api', :action => 'for_students',
                   :format => 'json', :course_id => @course.to_param },
                 { :student_ids => [@student.to_param] })
+
         expect(json.first).to have_key 'has_originality_report'
       end
 
