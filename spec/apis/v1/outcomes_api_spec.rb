@@ -725,7 +725,7 @@ describe "Outcomes API", type: :request do
             }
           end
 
-          it "should not allow updating calculation method after being used for assessing" do
+          it "should allow updating calculation method after being used for assessing" do
             expect(@outcome).to be_assessed
             expect(@outcome.calculation_method).to eq('decaying_average')
 
@@ -737,16 +737,16 @@ describe "Outcomes API", type: :request do
                      { :title => "New Title",
                        :description => "New Description",
                        :vendor_guid => "vendorguid9000",
-                       :calculation_method => "n_mastery" },
+                       :calculation_method => "highest" },
                      {},
-                     { :expected_status => 400 })
+                     { :expected_status => 200 })
 
             @outcome.reload
-            expect(json).not_to eq(outcome_json) # it should be filled with an error
-            expect(@outcome.calculation_method).to eq('decaying_average')
+            expect(json).to eq(outcome_json)
+            expect(@outcome.calculation_method).to eq('highest')
           end
 
-          it "should not allow updating calculation int after being used for assessing" do
+          it "should allow updating calculation int after being used for assessing" do
             expect(@outcome).to be_assessed
             expect(@outcome.calculation_method).to eq('decaying_average')
             expect(@outcome.calculation_int).to eq(62)
@@ -761,12 +761,12 @@ describe "Outcomes API", type: :request do
                        :vendor_guid => "vendorguid9000",
                        :calculation_int => "59" },
                      {},
-                     { :expected_status => 400 })
+                     { :expected_status => 200 })
 
             @outcome.reload
-            expect(json).not_to eq(outcome_json) # it should be filled with an error
+            expect(json).to eq(outcome_json)
             expect(@outcome.calculation_method).to eq('decaying_average')
-            expect(@outcome.calculation_int).to eq(62)
+            expect(@outcome.calculation_int).to eq(59)
           end
 
           it "should allow updating text-only fields even when assessed" do
@@ -808,26 +808,26 @@ describe "Outcomes API", type: :request do
               expect(@outcome2.rubric_criterion[:ratings]).to eq new_ratings
             end
 
-            it "should not allow updating rating points" do
+            it "should allow updating rating points" do
               new_ratings = [{ description: "some new desc1", points: 5 },
                 { description: "some new desc2", points: 3 }]
               json = api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
                 { :controller => 'outcomes_api', :action => 'update',
                   :id => @outcome2.id.to_s, :format => 'json' },
                 { :ratings => new_ratings },
-                {}, { :expected_status => 400 })
+                {}, { :expected_status => 200 })
               @outcome2.reload
-              expect(@outcome2.rubric_criterion[:ratings]).to_not eq new_ratings
+              expect(@outcome2.rubric_criterion[:ratings]).to eq new_ratings
             end
 
-            it "should not allow updating mastery points" do
+            it "should allow updating mastery points" do
               json = api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
                 { :controller => 'outcomes_api', :action => 'update',
                   :id => @outcome2.id.to_s, :format => 'json' },
                 { :mastery_points => 7 },
-                {}, { :expected_status => 400 })
+                {}, { :expected_status => 200 })
               @outcome2.reload
-              expect(@outcome2.rubric_criterion[:mastery_points]).to_not eq 7
+              expect(@outcome2.rubric_criterion[:mastery_points]).to eq 7
             end
           end
         end

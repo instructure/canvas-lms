@@ -49,6 +49,10 @@ define [
     handleAdd: (model) =>
       alignment_id = model.get('links').alignment
       model.set('alignment_name', @alignments.get(alignment_id)?.get('name'))
+      if model.get('points_possible') > 0
+        model.set('score', model.get('points_possible') * model.get('percent'))
+      else
+        model.set('score', model.get('mastery_points') * model.get('percent'))
 
     parse: (response) ->
       @alignments ?= new Backbone.Collection([])

@@ -31,7 +31,12 @@ QUnit.module('OutcomeResultCollectionSpec', {
       mastery_points: 8,
       points_possible: 10
     })
+    this.outcome2 = new Outcome({
+      mastery_points: 8,
+      points_possible: 0
+    })
     this.outcomeResultCollection = new OutcomeResultCollection([], {outcome: this.outcome})
+    this.outcomeResultCollection2 = new OutcomeResultCollection([], {outcome: this.outcome2})
     this.alignmentName = 'First Alignment Name'
     this.alignmentName2 = 'Second Alignment Name'
     this.alignmentName3 = 'Third Alignment Name'
@@ -39,7 +44,8 @@ QUnit.module('OutcomeResultCollectionSpec', {
       outcome_results: [
         {
           submitted_or_assessed_at: tz.parse('2015-04-24T19:27:54Z'),
-          links: {alignment: 'alignment_1'}
+          links: {alignment: 'alignment_1'},
+          percent: 0.4
         }
       ],
       linked: {
@@ -108,6 +114,15 @@ test('#handleAdd', function() {
   ok(this.outcomeResultCollection.add(this.response.outcome_results[0]))
   ok(this.outcomeResultCollection.length, 1)
   equal(this.alignmentName, this.outcomeResultCollection.first().get('alignment_name'))
+  equal(this.outcomeResultCollection.first().get('score'), 4.0)
+})
+
+test('#handleAdd 0 points_possible', function() {
+  equal(this.outcomeResultCollection2.length, 0, 'precondition')
+  this.outcomeResultCollection2.alignments = new Backbone.Collection(this.response.linked.alignments)
+  ok(this.outcomeResultCollection2.add(this.response.outcome_results[0]))
+  ok(this.outcomeResultCollection2.length, 1)
+  equal(this.outcomeResultCollection2.first().get('score'), 3.2)
 })
 
 test('#handleSort', function() {

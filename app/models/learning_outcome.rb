@@ -57,7 +57,6 @@ class LearningOutcome < ActiveRecord::Base
   validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
   validate :validate_calculation_int
-  validate :validate_text_only_changes_when_assessed
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -105,33 +104,6 @@ class LearningOutcome < ActiveRecord::Base
         ))
       end
     end
-  end
-
-  def validate_text_only_changes_when_assessed
-    if persisted? && assessed?
-      if criterion_non_text_fields_changed? || (self.changes.keys - %w{data description short_description display_name}).any?
-        self.errors.add(:base, t("This outcome has been used to assess a student. Only text fields can be updated"))
-      end
-    end
-  end
-
-  def criterion_non_text_fields_changed?
-    return false unless self.data_changed?
-    old_criterion = (self.data_was && self.data_was[:rubric_criterion]) || {}
-    return true if self.rubric_criterion.symbolize_keys.except(:description, :ratings) != old_criterion.symbolize_keys.except(:description, :ratings)
-
-    new_ratings = self.rubric_criterion[:ratings] || []
-    old_ratings = old_criterion[:ratings] || []
-    return true if new_ratings.count != old_ratings.count
-
-    non_description_changed = false
-    new_ratings.each_with_index do |new_rating, idx|
-      if new_rating.symbolize_keys.except(:description) != old_ratings[idx].symbolize_keys.except(:description)
-        non_description_changed = true
-        break
-      end
-    end
-    return non_description_changed
   end
 
   def self.valid_calculation_method?(method)

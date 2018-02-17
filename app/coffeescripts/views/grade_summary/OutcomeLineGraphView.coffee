@@ -144,10 +144,16 @@ define [
         ).value()
 
     masteryPercentage: ->
-      (@model.get('mastery_points') / @model.get('points_possible')) * 100
+      if @model.get('points_possible') > 0
+        (@model.get('mastery_points') / @model.get('points_possible')) * 100
+      else
+        100
 
     percentageFor: (score) ->
-      ((score / @model.get('points_possible')) * 100)
+      if @model.get('points_possible') > 0
+        ((score / @model.get('points_possible')) * 100)
+      else
+        ((score / @model.get('mastery_points')) * 100)
 
     xValue: (point) =>
       @x(point.x)
