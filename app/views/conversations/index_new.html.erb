@@ -26,9 +26,13 @@
   <header class="panel">
     <div class="panel__primary">
       <div class="filters">
-        <div class="course-group-filter" id="course-group-filter" aria-labelled-by="course-group-filter-description"
-          style="display: inline-block; vertical-align: middle;"></div>
-        <div id="conversation-filter" style="display:inline-block; vertical-align: middle;"></div>
+        <span aria-hidden="true" class="screenreader-only" id="course-filter-description">
+          <%= t(:filter_messages_by_course, "Filter messages by course") %>
+          &nbsp;
+          <span class="current-selection-label"></span>
+        </span>
+        <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
+        <div id="conversation_filter" style="display:inline-block; vertical-align: middle;"></div>
       </div>
       </div>
       <div class="panel__secondary">
