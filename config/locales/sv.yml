@@ -5801,12 +5801,8 @@ sv:
   create_a_new_module_6f31b0fe: "Skapa en ny modul"
   create_a_new_user_for_address_7487e9c9: "Skapa en ny användare för \"%{address}\""
   create_account_263ec6: "Skapa konto"
-<<<<<<< HEAD
-  create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Skapa och administrera online frågesporter och undersökningar, både graderade och ograderade."
-=======
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Skapa och administrera online quizzes och undersökningar, både betygsatta och ej betygsatta."
   create_announcements_above_1c36202b: "Skapa aviseringar ovan"
->>>>>>> 2f2f069018... update sv translation
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Skapa det antal diskussionsämnen som behövs, som uppgifter
       för betygsättning eller som forum för delning av idéer och information
