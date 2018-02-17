@@ -26,7 +26,7 @@ import I18n from 'i18n!terms_of_service_modal'
 import RichContentEditor from './rce/RichContentEditor'
 
 const { bool } = PropTypes
-const termsOfServiceText = I18n.t('Terms of Service')
+const termsOfServiceText = I18n.t('Acceptable Use Policy')
 
 export default class TermsOfServiceModal extends React.Component {
   static propTypes = {

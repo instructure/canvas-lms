@@ -27,6 +27,7 @@ module Factories
     @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
     @announcement.user = opts[:user]
     @announcement.account_notification_roles.build(role_ids.map { |r_id| {account_notification_id: @announcement.id, role: Role.get_role_by_id(r_id)} }) unless role_ids.empty?
+    @announcement.domain_specific = !!opts[:domain_specific]
     @announcement.save!
     @announcement
   end

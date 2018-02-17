@@ -34,8 +34,7 @@ describe SIS::CSV::AbstractCourseImporter do
     )
     expect(AbstractCourse.count).to eq before_count + 1
 
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map(&:last)).to eq [
+    expect(importer.errors.map(&:last)).to eq [
         "No abstract_course_id given for an abstract course",
         "Improper status \"inactive\" for abstract course C003",
         "No short_name given for abstract course C004",
@@ -158,10 +157,10 @@ describe SIS::CSV::AbstractCourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
       "C001,shortname,longname,,,active,AC001"
     ).tap do |i|
-      expect(i.errors).to eq []
-      expect(i.warnings.map(&:last)).to eq [
+      expect(i.errors.map(&:last)).to eq [
           "unknown abstract course id AC001, ignoring abstract course reference"]
     end
+    SisBatchError.where(root_account: @account).delete_all
     Course.last.tap{|c|
       expect(c.sis_source_id).to eq "C001"
       expect(c.abstract_course).to be_nil

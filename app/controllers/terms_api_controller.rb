@@ -72,7 +72,7 @@
 #     }
 #
 class TermsApiController < ApplicationController
-  before_action :require_context, :require_account_management
+  before_action :require_context, :require_account_access
 
   include Api::V1::EnrollmentTerm
 
@@ -134,5 +134,11 @@ class TermsApiController < ApplicationController
 
     terms = Api.paginate(terms, self, api_v1_enrollment_terms_url)
     render json: { enrollment_terms: enrollment_terms_json(terms, @current_user, session, nil, Array(params[:include])) }
+  end
+
+  protected
+
+  def require_account_access
+    return false unless authorized_action(@context, @current_user, :read_as_admin)
   end
 end

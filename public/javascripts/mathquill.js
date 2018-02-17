@@ -638,7 +638,7 @@ import htmlEscape from './str/htmlEscape'
       $('#mathquill-view .mathquill-tab-pane').removeClass('mathquill-tab-pane-selected');
       $(this).attr('tabindex', '0').attr('aria-selected', 'true').focus()
         .parent().addClass('mathquill-tab-selected');
-      $(this.href.replace(/.*#/, '#')).addClass('mathquill-tab-pane-selected');
+      $(this.getAttribute('href')).addClass('mathquill-tab-pane-selected');
     }).keydown(function (e) {
       var direction, listIndex, $tabLinks;
       switch (e.keyCode) {

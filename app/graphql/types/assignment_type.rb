@@ -64,6 +64,13 @@ module Types
       end
     end
 
+    field :submissionTypes, types[!AssignmentSubmissionType],
+      resolve: ->(assignment, _, _) {
+        # there's some weird data in the db so we'll just ignore anything that
+        # doesn't match a value that is expected
+        (SUBMISSION_TYPES & assignment.submission_types_array).to_a
+      }
+
     field :course, Types::CourseType, resolve: -> (assignment, _, _) {
       # course is polymorphicly associated with assignment through :context
       # it could also be queried by assignment.assignment_group.course
@@ -82,6 +89,15 @@ module Types
       "specifies that this assignment is only assigned to students for whom an
        `AssignmentOverride` applies.",
       property: :only_visible_to_overrides
+
+    connection :assignmentOverrides, AssignmentOverrideType.connection_type, resolve:
+      ->(assignment, _, ctx) {
+        # this is the assignment overrides index method of loading
+        # overrides... there's also the totally different method found in
+        # assignment_overrides_json. they may not return the same results?
+        # ¯\_(ツ)_/¯
+        AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, ctx[:current_user])
+      }
 
     connection :submissionsConnection, SubmissionType.connection_type do
       description "submissions for this assignment"
@@ -107,5 +123,28 @@ module Types
     value "unpublished"
     value "published"
     value "deleted"
+  end
+
+  SUBMISSION_TYPES = %w[
+    attendance
+    discussion_topic
+    external_tool
+    media_recording
+    none
+    not_graded
+    on_paper
+    online_quiz
+    online_text_entry
+    online_upload
+    online_url
+    wiki_page
+  ].to_set
+
+  AssignmentSubmissionType = GraphQL::EnumType.define do
+    name "SubmissionType"
+    description "Types of submissions an assignment accepts"
+    SUBMISSION_TYPES.each { |submission_type|
+      value(submission_type)
+    }
   end
 end

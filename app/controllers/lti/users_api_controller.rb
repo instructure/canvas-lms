@@ -24,17 +24,28 @@ module Lti
     include Api::V1::User
 
     skip_before_action :load_user
-    before_action :authorized_lti2_tool, :user_in_context
+    before_action :authorized_lti2_tool
+    before_action :user_in_context, only: :show
+    before_action :tool_in_context, only: :group_index
 
     USER_SERVICE = 'vnd.Canvas.User'.freeze
+    GROUP_INDEX_SERVICE = 'vnd.Canvas.GroupIndex'.freeze
     SERVICE_DEFINITIONS = [
       {
         id: USER_SERVICE,
         endpoint: 'api/lti/users/{user_id}',
         format: ['application/json'].freeze,
         action: ['GET'].freeze
+      }.freeze,
+      {
+        id: GROUP_INDEX_SERVICE,
+        endpoint: 'api/lti/group/{group_id}/users',
+        format: ['application/json'].freeze,
+        action: ['GET'].freeze
       }.freeze
     ].freeze
+
+    USER_INCLUDES = %w(email lti_id).freeze
 
     def lti2_service_name
       USER_SERVICE
@@ -47,13 +58,36 @@ module Lti
     #
     # @returns User
     def show
-      render json: user_json(user, user, nil, %w(email lti_id), tool_proxy.context)
+      render json: user_json(user, user, nil, USER_INCLUDES, tool_proxy.context)
+    end
+
+    # @API Get all users in a group (lti)
+    #
+    # Get all Canvas users in a group. Tool providers may only access
+    # groups that belong to the context the tool is installed in.
+    #
+    # @returns [User]
+    def group_index
+      users = Api.paginate(group.participating_users, self, lti_user_group_index_url)
+      user_json_preloads(users)
+      render json: users.map { |user| user_json(user, user, nil, USER_INCLUDES, group.context) }
     end
 
     private
 
     def user
       @_user ||= User.find_by(lti_context_id: params[:id]) || User.find(params[:id])
+    end
+
+    def group
+      @_group ||= Group.find(params[:group_id])
+    end
+
+    def tool_in_context
+      render_unauthorized_action unless PermissionChecker.authorized_lti2_action?(
+        tool: tool_proxy,
+        context: group.course
+      ) && group.active?
     end
 
     def user_in_context

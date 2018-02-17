@@ -18,8 +18,8 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import CoursesPane from 'jsx/account_course_user_search/CoursesPane';
-import CoursesStore from 'jsx/account_course_user_search/CoursesStore';
+import CoursesPane from 'jsx/account_course_user_search/components/CoursesPane';
+import CoursesStore from 'jsx/account_course_user_search/store/CoursesStore';
 
 QUnit.module('Account Course User Search CoursesPane View', {
   setup () {

@@ -115,9 +115,7 @@ module StickySisFields
     def process_as_sis(opts={})
       self.sis_stickiness_options ||= {}
       old_options = self.sis_stickiness_options.clone
-      [:override_sis_stickiness, :clear_sis_stickiness].each do |option|
-        self.sis_stickiness_options[option] = opts[option]
-      end
+      self.sis_stickiness_options = opts
       begin
         if opts[:add_sis_stickiness] || opts[:clear_sis_stickiness]
           yield
@@ -139,7 +137,7 @@ module StickySisFields
       klass.prepend(InstanceMethods)
       klass.cattr_accessor :sticky_sis_fields
       klass.cattr_accessor :sis_stickiness_options
-      klass.before_update :set_sis_stickiness
+      klass.before_save :set_sis_stickiness
     end
   end
 

@@ -77,7 +77,7 @@ describe "assignments" do
       expect(details).not_to include_text('comment after muting')
     end
 
-    it "should have group comment checkboxes for group assignments" do
+    it "should have group comment radio buttons for individually graded group assignments" do
       u1 = @user
       student_in_course(:course => @course)
       u2 = @user
@@ -90,7 +90,31 @@ describe "assignments" do
 
       acceptable_tabs = ffj('#submit_online_upload_form,#submit_online_text_entry_form,#submit_online_url_form')
       expect(acceptable_tabs.size).to be 3
-      acceptable_tabs.each { |tabby| expect(ffj('.formtable input[name="submission[group_comment]"]', tabby).size).to be 1 }
+      acceptable_tabs.each do |tabby|
+        expect(ffj('.formtable input[type="radio"][name="submission[group_comment]"]', tabby).size).to be 2
+      end
+    end
+
+    it "should have hidden group comment input for group graded group assignments" do
+      u1 = @user
+      student_in_course(:course => @course)
+      u2 = @user
+      assignment = @course.assignments.create!(
+        :title => "some assignment",
+        :submission_types => "online_url,online_upload,online_text_entry",
+        :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+        :grade_group_students_individually => false)
+      group = assignment.group_category.groups.create!(:name => 'g1', :context => @course)
+      group.users << u1
+      group.users << @user
+
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+
+      acceptable_tabs = ffj('#submit_online_upload_form,#submit_online_text_entry_form,#submit_online_url_form')
+      expect(acceptable_tabs.size).to be 3
+      acceptable_tabs.each do |tabby|
+        expect(ffj('.formtable input[type="hidden"][name="submission[group_comment]"]', tabby).size).to be 1
+      end
     end
 
     it "should not show assignments in an unpublished course" do

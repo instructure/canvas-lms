@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe "Group Categories API", type: :request do
-  def category_json(category)
-    {
+  def category_json(category, user=@user)
+    json = {
       'id' => category.id,
       'name' => category.name,
       'role' => category.role,
@@ -36,6 +36,9 @@ describe "Group Categories API", type: :request do
       'auto_leader' => category.auto_leader,
       'is_member' => false
     }
+    json['sis_group_category_id'] = category.sis_source_id if category.root_account.grants_any_right?(user, :read_sis, :manage_sis)
+    json['sis_import_id'] = category.sis_batch_id if category.root_account.grants_right?(user, :manage_sis)
+    json
   end
 
   before :once do
@@ -563,23 +566,26 @@ describe "Group Categories API", type: :request do
       it "should allow an admin to create an account group category" do
         json = api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
+                                                     :sis_group_category_id => 'gc101',
                                                      :account_id => @account.to_param),
                         {'name' => 'name'})
         category = GroupCategory.find(json["id"])
         expect(json["context_type"]).to eq "Account"
         expect(category.name).to eq 'name'
+        expect(category.sis_source_id).to eq 'gc101'
         expect(json).to eq category_json(category)
       end
 
       it "should allow an admin to update a category for an account" do
         api_call :put, "/api/v1/group_categories/#{@communities.id}",
                  @category_path_options.merge(:action => 'update',
+                                              :sis_group_category_id => 'gc101',
                                               :group_category_id => @communities.to_param),
                  {:name => 'name'}
         category = GroupCategory.find(@communities.id)
         expect(category.name).to eq 'name'
+        expect(category.sis_source_id).to eq 'gc101'
       end
-
 
       it "should allow an admin to delete a category for an account" do
         account_category = GroupCategory.create(:name => 'Groups', :context => @account)
@@ -601,6 +607,36 @@ describe "Group Categories API", type: :request do
                      }
         )
         expect(response.code).to eq '400'
+      end
+
+      describe "sis permissions" do
+        let(:json) { api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
+                              @category_path_options.merge(action:'index',
+                                                           account_id: @account.to_param)) }
+        let(:admin) { Role.get_built_in_role("AccountAdmin") }
+
+        before :each do
+          @user = User.create!(name: 'billy')
+          @account.account_users.create(user: @user)
+        end
+
+        it "should show SIS fields if the user has permission", priority: 3, test_id: 3436530 do
+          expect(json[0]).to have_key("sis_group_category_id")
+          expect(json[0]).to have_key("sis_import_id")
+        end
+
+        it "should show only sis_group_category_id without manage_sis permission", priority: 3, test_id: 3436880 do
+          @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
+          expect(json[0]).to have_key("sis_group_category_id")
+          expect(json[0]).not_to have_key("sis_import_id")
+        end
+
+        it "should not show SIS fields if the user doesn't have permission", priority: 3, test_id: 3436531 do
+          @account.role_overrides.create(role: admin, enabled: false, permission: :read_sis)
+          @account.role_overrides.create(role: admin, enabled: false, permission: :manage_sis)
+          expect(json[0]).not_to have_key("sis_group_category_id")
+          expect(json[0]).not_to have_key("sis_import_id")
+        end
       end
     end
 

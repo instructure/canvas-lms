@@ -21,7 +21,8 @@ define [
   'compiled/models/Group'
   'compiled/views/groups/manage/GroupCreateView'
   'helpers/fakeENV'
-], ($, GroupCategory, Group, GroupCreateView, fakeENV) ->
+  'helpers/assertions'
+], ($, GroupCategory, Group, GroupCreateView, fakeENV, assertions) ->
 
   view = null
   groupCategory = null
@@ -43,6 +44,10 @@ define [
       fakeENV.teardown()
       view.remove()
       document.getElementById("fixtures").innerHTML = ""
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   test 'renders join level in add group dialog for student organized group categories', ->
     view.groupCategory.set('role': 'student_organized')

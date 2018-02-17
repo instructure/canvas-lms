@@ -30,10 +30,10 @@ module SIS
 
       # possible columns:
       # user_id, account_id, role_id, role
-      def process(csv)
+      def process(csv, index=nil, count=nil)
         messages = []
         @sis.counts[:admins] += SIS::AdminImporter.new(@root_account, importer_opts).process(messages) do |i|
-          csv_rows(csv) do |row|
+          csv_rows(csv, index, count) do |row|
             update_progress
 
             begin

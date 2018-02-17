@@ -23,7 +23,7 @@ There are three steps to uploading a file directly via POST:
 
 ### Step 1: Telling Canvas about the file upload and getting a token
 
-The first step is to POST to the relevant API endpoint, depending one where
+The first step is to POST to the relevant API endpoint, depending on where
 you want to create the file. For example, to <a href="courses.html">add a file to a course</a>, you'd
 POST to `/api/v1/courses/:course_id/files`. Or to <a href="submissions.html">upload a file as part of a student homework submission</a>, as the student you'd POST to
 `/api/v1/courses/:course_id/assignments/:assignment_id/submissions/self/files`.

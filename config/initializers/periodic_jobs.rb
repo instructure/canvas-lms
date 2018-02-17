@@ -188,6 +188,10 @@ Rails.configuration.after_initialize do
     end
   end
 
+  Delayed::Periodic.cron 'SisBatchErrors.cleanup_old_errors', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(SisBatchError, :cleanup_old_errors)
+  end
+
   Delayed::Periodic.cron 'EnrollmentState.recalculate_expired_states', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(EnrollmentState, :recalculate_expired_states)
   end

@@ -557,6 +557,21 @@ module ApplicationHelper
     mapped
   end
 
+  # return enough group data for the planner to display items associated with
+  # account-level groups
+  def map_groups_for_planner(groups)
+    mapped = groups.select {|g| g.context_type == "Account"}.map do |g|
+      {
+        id: g.id,
+        assetString: "group_#{g.id}",
+        name: g.name,
+        url: "/groups/#{g.id}"
+      }
+    end
+
+    mapped
+  end
+
   def show_feedback_link?
     Setting.get("show_feedback_link", "false") == "true"
   end

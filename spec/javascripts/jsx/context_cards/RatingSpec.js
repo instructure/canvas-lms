@@ -25,10 +25,13 @@ QUnit.module('StudentContextTray/Rating', () => {
   let subject
   const participationsLevel = 2
 
-  QUnit.module('formatValueText', () => {
-    subject = TestUtils.renderIntoDocument(
-      <Rating metric={{level: 1}} />
-    )
+  QUnit.module('formatValueText', hooks => {
+    hooks.beforeEach(() => {
+      subject = TestUtils.renderIntoDocument(
+        <Rating metric={{level: 1}} />
+      )
+    })
+
     const valueText = [
       'None', 'Low', 'Moderate', 'High'
     ]

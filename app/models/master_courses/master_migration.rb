@@ -64,9 +64,20 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     Setting.get('master_course_export_job_expiration_hours', '24').to_i
   end
 
+  def in_running_state?
+    %w{created queued exporting imports_queued}.include?(self.workflow_state)
+  end
+
   def still_running?
     # if something catastrophic happens, just give up after 24 hours
-    %w{created queued exporting imports_queued}.include?(self.workflow_state) && self.created_at > self.hours_until_expire.hours.ago
+    in_running_state? && self.created_at > self.hours_until_expire.hours.ago
+  end
+
+  def expire_if_necessary!
+    if in_running_state? && self.created_at < self.hours_until_expire.hours.ago
+      self.workflow_state = (self.workflow_state == 'imports_queued') ? 'imports_failed' : 'exports_failed'
+      self.save!
+    end
   end
 
   def queue_export_job

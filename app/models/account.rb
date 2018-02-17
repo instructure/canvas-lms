@@ -33,9 +33,9 @@ class Account < ActiveRecord::Base
   has_one :terms_of_service, :dependent => :destroy
   has_one :terms_of_service_content, :dependent => :destroy
   has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
-  has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context, :inverse_of => :context
+  has_many :all_group_categories, :class_name => 'GroupCategory', foreign_key: 'root_account_id', inverse_of: :root_account
   has_many :groups, :as => :context, :inverse_of => :context
-  has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
+  has_many :all_groups, class_name: 'Group', foreign_key: 'root_account_id', inverse_of: :root_account
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: 'EnrollmentTerm', foreign_key: 'root_account_id'
@@ -73,6 +73,7 @@ class Account < ActiveRecord::Base
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
+  has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
@@ -134,7 +135,7 @@ class Account < ActiveRecord::Base
   validate :no_active_sub_accounts, if: lambda { |a| a.workflow_state_changed? && !a.active? }
 
   include StickySisFields
-  are_sis_sticky :name
+  are_sis_sticky :name, :parent_account_id
 
   include FeatureFlags
   def feature_flag_cache
@@ -465,11 +466,11 @@ class Account < ActiveRecord::Base
     else
       shard.activate do
         if opts[:include_crosslisted_courses]
-          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self)
-                .where("course_id=courses.id"))
+          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self).
+            where("course_id=courses.id"))
         else
-          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self, course_section_id: nil)
-                .where("course_id=courses.id"))
+          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self, course_section_id: nil).
+            where("course_id=courses.id"))
         end
       end
     end
@@ -948,14 +949,16 @@ class Account < ActiveRecord::Base
     self.login_handle_name.present?
   end
 
-  def login_handle_name_with_inference
+  def customized_login_handle_name
     if login_handle_name_is_customized?
       self.login_handle_name
     elsif self.delegated_authentication?
       AccountAuthorizationConfig.default_delegated_login_handle_name
-    else
-      AccountAuthorizationConfig.default_login_handle_name
     end
+  end
+
+  def login_handle_name_with_inference
+    customized_login_handle_name || AccountAuthorizationConfig.default_login_handle_name
   end
 
   def self_and_all_sub_accounts

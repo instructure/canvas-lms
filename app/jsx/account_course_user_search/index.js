@@ -20,10 +20,10 @@ import React from 'react'
 import {string, bool, shape} from 'prop-types'
 import {stringify} from 'qs'
 import permissionFilter from '../shared/helpers/permissionFilter'
-import CoursesStore from './CoursesStore'
-import TermsStore from './TermsStore'
-import AccountsTreeStore from './AccountsTreeStore'
-import UsersStore from './UsersStore'
+import CoursesStore from './store/CoursesStore'
+import TermsStore from './store/TermsStore'
+import AccountsTreeStore from './store/AccountsTreeStore'
+import UsersStore from './store/UsersStore'
 
 const stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore]
 

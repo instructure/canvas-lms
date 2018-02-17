@@ -20,8 +20,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import I18n from 'i18n!appointment_groups'
-import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 import natcompare from 'compiled/util/natcompare'
+import Grid, { GridRow, GridCol } from '@instructure/ui-core/lib/components/Grid'
+import Text from '@instructure/ui-core/lib/components/Text'
+import Pill from '@instructure/ui-core/lib/components/Pill'
 import IconCalendarAddLine from 'instructure-icons/lib/Line/IconCalendarAddLine'
 import IconCalendarReservedLine from 'instructure-icons/lib/Line/IconCalendarReservedLine'
 import $ from 'jquery'
@@ -55,21 +57,52 @@ import 'jquery.instructure_date_and_time'
     })
 
     const statusText = (isReserved) ?
-                       I18n.t('Reserved') :
-                       I18n.t('Available')
+      <Pill
+        variant="success"
+        text={I18n.t('Reserved')} /> :
+      <Pill
+        text={I18n.t('Available')} />
 
     return (
       <div key={appointment.id} className={rowClasses}>
-        <div>
-          <span className={iconClasses}>
-            {
-              (isReserved) ? <IconCalendarReservedLine /> : <IconCalendarAddLine />
-            }
-          </span>
-          <span className="pad-box-micro AppointmentGroupList__Appointment-timeLabel">{timeLabel}</span>
-          <span className={badgeClasses}>{statusText}</span>
-          <span className="pad-box-micro AppointmentGroupList__Appointment-label">{participantList}</span>
-        </div>
+        <Grid
+          hAlign="start"
+          vAlign="middle"
+        >
+          <GridRow>
+            <GridCol
+              width="auto">
+              <span className={iconClasses}>
+                {
+                  (isReserved) ? <IconCalendarReservedLine /> : <IconCalendarAddLine />
+                }
+              </span>
+            </GridCol>
+            <GridCol
+              colSpacing="small"
+              width={4}>
+              <span className="AppointmentGroupList__Appointment-timeLabel">
+                <Text>
+                  {timeLabel}
+                </Text>
+              </span>
+            </GridCol>
+            <GridCol
+              width="auto">
+              <span className={badgeClasses}>
+                {statusText}
+              </span>
+            </GridCol>
+            <GridCol
+              colSpacing="small">
+              <span className="AppointmentGroupList__Appointment-label">
+                <Text>
+                  {participantList}
+                </Text>
+              </span>
+            </GridCol>
+          </GridRow>
+        </Grid>
       </div>
     )
   }

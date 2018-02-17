@@ -539,7 +539,8 @@ class UsersController < ApplicationController
         :show_planner => show_planner?
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
-      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true)
+      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true),
+      :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups.where(context_type: 'Account'))
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -2385,7 +2386,7 @@ class UsersController < ApplicationController
     end
 
     @user ||= @pseudonym && @pseudonym.user
-    @user ||= User.new
+    @user ||= @context.shard.activate { User.new }
 
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)

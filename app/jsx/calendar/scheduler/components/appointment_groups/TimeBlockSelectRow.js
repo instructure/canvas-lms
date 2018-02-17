@@ -21,7 +21,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Button from '@instructure/ui-core/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-core/lib/components/Text'
+import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
 import coupleTimeFields from 'compiled/util/coupleTimeFields'
 import 'jquery.instructure_date_and_time'
 
@@ -96,8 +97,8 @@ import 'jquery.instructure_date_and_time'
 
     render () {
       return (
-        <div className="TimeBlockSelectorRow grid-row start-xs">
-          <div className="col-xs">
+        <div className="TimeBlockSelectorRow">
+          <div className="TimeBlockSelectorColumn">
             <input
               type="text"
               disabled={this.props.readOnly}
@@ -110,7 +111,7 @@ import 'jquery.instructure_date_and_time'
               defaultValue={dateToString(this.props.timeData.date, 'medium')}
             />
           </div>
-          <div className="col-xs">
+          <div className="TimeBlockSelectorColumn">
             <input
               type="text"
               disabled={this.props.readOnly}
@@ -123,10 +124,12 @@ import 'jquery.instructure_date_and_time'
               defaultValue={timeToString(this.props.timeData.startTime, 'tiny')}
             />
           </div>
-          <div className="col-xs">
-            <span className="TimeBlockSelectorRow__TimeSeparator">{I18n.t('to')}</span>
+          <div className="TimeBlockSelectorColumn" >
+            <Text>
+              {I18n.t('to')}
+            </Text>
           </div>
-          <div className="col-xs">
+          <div className="TimeBlockSelectorColumn">
             <input
               type="text"
               disabled={this.props.readOnly}
@@ -139,14 +142,12 @@ import 'jquery.instructure_date_and_time'
               defaultValue={timeToString(this.props.timeData.endTime, 'tiny')}
             />
           </div>
-          <div className="col-xs">
+          <div className="TimeBlockSelectorColumn">
             {
               !this.props.readOnly && (
-                <Button ref={(c) => { this.deleteBtn = c; }} variant="icon" onClick={this.handleDelete}>
-                  <i className="icon-end">
-                    <ScreenReaderContent>{I18n.t('Delete Time Range')}</ScreenReaderContent>
-                  </i>
-                </Button>
+                  <Button ref={(c) => { this.deleteBtn = c; }} variant="icon" onClick={this.handleDelete}>
+                    <IconXSolid title="{I18n.t('Delete Time Range')}" />
+                  </Button>
               )
             }
           </div>

@@ -18,12 +18,13 @@
 
 module Factories
   def rubric_association_model(opts={})
-    course_model(:reusable => true) unless @course || opts[:context]
-    @rubric = opts[:rubric] || rubric_model(:context => opts[:context] || @course)
+    course = (opts[:context] if opts[:context].is_a? Course) || @course || course_model(reusable: true)
+    context = opts[:context] || course
+    @rubric = opts[:rubric] || rubric_model(context: context)
     @rubric_association_object = opts[:association_object] ||
-      @course.assignments.first ||
-      @course.assignments.create!(assignment_valid_attributes)
-    @rubric_association = @rubric.rubric_associations.create!(valid_rubric_assessment_attributes.merge(:association_object =>  @rubric_association_object, :context => opts[:context] || @course, :purpose => opts[:purpose] || "none"))
+      course.assignments.first ||
+      course.assignments.create!(assignment_valid_attributes)
+    @rubric_association = @rubric.rubric_associations.create!(valid_rubric_assessment_attributes.merge(:association_object =>  @rubric_association_object, context: context, :purpose => opts[:purpose] || "none"))
   end
 
   def valid_rubric_assessment_attributes

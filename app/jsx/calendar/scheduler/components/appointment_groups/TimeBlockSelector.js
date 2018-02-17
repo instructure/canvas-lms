@@ -21,11 +21,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
-import Text from '@instructure/ui-core/lib/components/Text'
-import Button from '@instructure/ui-core/lib/components/Button'
-import TimeBlockSelectRow from './TimeBlockSelectRow'
 import TimeBlockListManager from 'compiled/calendar/TimeBlockListManager'
 import 'jquery.instructure_date_and_time'
+import FormFieldGroup from '@instructure/ui-core/lib/components/FormFieldGroup'
+import NumberInput from '@instructure/ui-core/lib/components/NumberInput'
+import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
+import Button from '@instructure/ui-core/lib/components/Button'
+import TimeBlockSelectRow from './TimeBlockSelectRow'
 
 const uniqueId = (() => {
   let count = 0
@@ -109,7 +111,7 @@ export default class TimeBlockSelector extends React.Component {
 
   handleSlotDivision = () => {
     const node = ReactDOM.findDOMNode(this)
-    const minuteValue = $('.TimeBlockSelector__DivideSection-Input', node).val()
+    const minuteValue = $('#TimeBlockSelector__DivideSection-Input', node).val()
     const timeManager = new TimeBlockListManager(this.getNewSlotData())
     timeManager.split(minuteValue)
     const newBlocks = timeManager.blocks.map(block => ({
@@ -131,7 +133,7 @@ export default class TimeBlockSelector extends React.Component {
 
   render() {
     return (
-      <div className={`TimeBlockSelector ${this.props.className}`}>
+      <div className="TimeBlockSelector">
         <div className="TimeBlockSelector__Rows">
           {this.props.timeData.map(timeBlock => (
             <TimeBlockSelectRow {...timeBlock} key={timeBlock.slotEventId} readOnly />
@@ -146,21 +148,20 @@ export default class TimeBlockSelector extends React.Component {
             />
           ))}
         </div>
-        <div className="TimeBlockSelector__DivideSection">
-          <Text>
-            <label
-              dangerouslySetInnerHTML={{
-                __html: I18n.t('Divide into equal slots of %{input_value} minutes. ', {
-                  input_value:
-                    '<input class="TimeBlockSelector__DivideSection-Input" value="30" type="number"/>'
-                })
-              }}
-            />
-            <Button size="small" onClick={this.handleSlotDivision}>
-              {I18n.t('Create Slots')}
-            </Button>
-          </Text>
-        </div>
+        <FormFieldGroup
+          layout="columns"
+          vAlign="bottom"
+          description={<ScreenReaderContent>{I18n.t('Divide into equal time slots (in minutes')}</ScreenReaderContent>}
+        >
+          <NumberInput
+            label={I18n.t('Divide into equal slots (value is in minutes)')}
+            defaultValue="30"
+            id="TimeBlockSelector__DivideSection-Input"
+          />
+          <Button onClick={this.handleSlotDivision}>
+            {I18n.t('Create Slots')}
+          </Button>
+        </FormFieldGroup>
       </div>
     )
   }

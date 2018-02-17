@@ -33,16 +33,31 @@ function isPositive (val) {
   return val > 0;
 }
 
-function changeSubmission (submission, score, grade, pointsDeducted) {
+function getEnteredScore (score, pointsDeducted) {
+  if (score == null) {
+    return score;
+  }
+
+  return score + (pointsDeducted || 0);
+}
+
+function changeSubmission (submission, score, grade, pointsDeducted, assignment, gradingScheme) {
   const changed = !(
     equivalent(score, submission.score) &&
     equivalent(grade, submission.grade) &&
     equivalent(pointsDeducted, submission.points_deducted)
   );
 
-  submission.points_deducted = pointsDeducted; // eslint-disable-line no-param-reassign
-  submission.score = score; // eslint-disable-line no-param-reassign
-  submission.grade = grade; // eslint-disable-line no-param-reassign
+  const enteredScore = getEnteredScore(score, pointsDeducted);
+  const enteredGrade = ScoreToGradeHelper.scoreToGrade(enteredScore, assignment, gradingScheme);
+
+  /* eslint-disable no-param-reassign */
+  submission.points_deducted = pointsDeducted;
+  submission.score = score;
+  submission.grade = grade;
+  submission.entered_score = enteredScore;
+  submission.entered_grade = enteredGrade;
+  /* eslint-enable no-param-reassign */
 
   return changed;
 }
@@ -106,14 +121,14 @@ function processLateSubmission (submission, assignment, gradingScheme, latePolic
   const score = submission.entered_score != null ? submission.entered_score - (pointsDeducted || 0) : null;
   const grade = ScoreToGradeHelper.scoreToGrade(score, assignment, gradingScheme);
 
-  return changeSubmission(submission, score, grade, pointsDeducted);
+  return changeSubmission(submission, score, grade, pointsDeducted, assignment, gradingScheme);
 }
 
 function processMissingSubmission (submission, assignment, gradingScheme, latePolicy) {
   const score = missingScore(submission, assignment, latePolicy);
   const grade = ScoreToGradeHelper.scoreToGrade(score, assignment, gradingScheme);
 
-  return changeSubmission(submission, score, grade, 0);
+  return changeSubmission(submission, score, grade, 0, assignment, gradingScheme);
 }
 
 const LatePolicyApplicator = {

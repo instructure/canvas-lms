@@ -502,6 +502,13 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
       ];
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder);
     });
+
+    test('does not duplicate the total column when filtering by grading period', function () {
+      gradebook.freezeTotalGradeColumn();
+      gradebook.updateCurrentGradingPeriod('1401');
+      const totalGradeColumns = gridSpecHelper.listFrozenColumnIds().filter(id => id === 'total_grade');
+      strictEqual(totalGradeColumns.length, 1);
+    });
   });
 
   QUnit.module('when teacher notes are hidden', function (hooks) {

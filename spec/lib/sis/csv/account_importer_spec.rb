@@ -27,26 +27,17 @@ describe SIS::CSV::AccountImporter do
     importer = process_csv_data(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
-      ",,Humanities 3,active")
-
-    errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings).to eq ["No account_id given for an account"]
-    expect(errors).to eq []
-
-    importer = process_csv_data(
-      "account_id,parent_account_id,name,status",
+      ",,Humanities 3,active",
       "A002,A000,English,active",
       "A003,,English,inactive",
       "A004,,,active")
     expect(Account.count).to eq before_count + 1
 
     errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(errors).to eq []
-    expect(warnings).to eq ["Parent account didn't exist for A002",
-                        "Improper status \"inactive\" for account A003, skipping",
-                        "No name given for account A004, skipping"]
+    expect(errors).to match_array ["No account_id given for an account",
+                                   "Parent account didn't exist for A002",
+                                   "Improper status \"inactive\" for account A003, skipping",
+                                   "No name given for account A004, skipping"]
   end
 
   it 'should create accounts' do
@@ -140,6 +131,32 @@ describe SIS::CSV::AccountImporter do
     expect(Account.where(sis_source_id: 'A001').first.name).to eq "Science"
   end
 
+  it 'should treat parent_account_id as stickyish' do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Math,active",
+      "A002,,Humanities,active",
+      "S001,A001,Submath,active",
+      {:add_sis_stickiness => true}
+    )
+    sub = Account.where(sis_source_id: 'S001').first
+    expect(sub.reload.parent_account.sis_source_id).to eq "A001"
+    expect(sub.stuck_sis_fields).to include(:parent_account_id)
+
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "S001,A002,Submath,active"
+    )
+    expect(sub.reload.parent_account.sis_source_id).to eq "A001" # should not update
+
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "S001,A002,Submath,active",
+      {:add_sis_stickiness => true}
+    )
+    expect(sub.reload.parent_account.sis_source_id).to eq "A002" # should override
+  end
+
   it 'should match headers case-insensitively' do
     before_count = Account.count
     process_csv_data_cleanly(
@@ -166,9 +183,7 @@ describe SIS::CSV::AccountImporter do
       "A001,A002,Humanities,active"
     )
     errors = importer.errors.map { |r| r.last }
-    warnings = importer.warnings.map { |r| r.last }
-    expect(errors).to eq []
-    expect(warnings).to eq ["Setting account A001's parent to A002 would create a loop"]
+    expect(errors).to eq ["Setting account A001's parent to A002 would create a loop"]
   end
 
   it 'should update batch id on unchanging accounts' do

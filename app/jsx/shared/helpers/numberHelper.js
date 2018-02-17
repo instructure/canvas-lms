@@ -29,13 +29,7 @@ import I18n from 'i18nObj'
         return input
       }
 
-      let inputStr = input.toString()
-
-      // this hack can be removed once this gets merged:
-      // https://github.com/AndreasPizsa/parse-decimal-number/pull/5
-      inputStr = inputStr.replace(/^\+/, '')
-
-      let num = helper._parseNumber(inputStr, {
+      let num = helper._parseNumber(input.toString(), {
         thousands: I18n.lookup('number.format.delimiter'),
         decimal: I18n.lookup('number.format.separator')
       })

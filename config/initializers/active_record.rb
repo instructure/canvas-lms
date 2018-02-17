@@ -23,7 +23,7 @@ class ActiveRecord::Base
   public :write_attribute
 
   class << self
-    delegate :distinct_on, :find_ids_in_batches, to: :all
+    delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
     def find_ids_in_ranges(opts={}, &block)
       opts.reverse_merge!(:loose => true)
@@ -643,8 +643,12 @@ end
 
 module UsefulFindInBatches
   def find_in_batches(options = {}, &block)
-    # already in a transaction (or transactions don't matter); cursor is fine
-    if can_use_cursor? && !options[:start]
+    # prefer copy unless we're in a transaction (which would be bad,
+    # because we might open a separate connection in the block, and not
+    # see the contents of our current transaction)
+    if connection.open_transactions == 0
+      self.activate { |r| r.find_in_batches_with_copy(options, &block) }
+    elsif should_use_cursor? && !options[:start]
       self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
     elsif find_in_batches_needs_temp_table?
       raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
@@ -701,12 +705,8 @@ ActiveRecord::Relation.class_eval do
   end
   private :find_in_batches_needs_temp_table?
 
-  def can_use_cursor?
-    (connection.adapter_name == 'PostgreSQL' &&
-      (Shackles.environment == :slave ||
-        connection.readonly? ||
-        (!Rails.env.test? && connection.open_transactions > 0) ||
-        in_transaction_in_test?))
+  def should_use_cursor?
+    (Shackles.environment == :slave || connection.readonly?)
   end
 
   def find_in_batches_with_cursor(options = {})
@@ -730,6 +730,77 @@ ActiveRecord::Relation.class_eval do
         unless $!.is_a?(ActiveRecord::StatementInvalid)
           connection.execute("CLOSE #{cursor}")
         end
+      end
+    end
+  end
+
+  def find_in_batches_with_copy(options = {})
+    # implement the start option as an offset
+    return offset(options[:start]).find_in_batches_with_copy(options.merge(start: 0)) if options[:start].to_i != 0
+
+    limited_query = limit(0).to_sql
+    full_query = "COPY (#{to_sql}) TO STDOUT"
+    conn = connection
+    pool = conn.pool
+    # remove the connection from the pool so that any queries executed
+    # while we're running this will get a new connection
+    pool.remove(conn)
+
+
+    # make sure to log _something_, even if the dbtime is totally off
+    conn.send(:log, full_query, "#{klass.name} Load") do
+      # set up all our metadata based on a dummy query (COPY doesn't return any metadata)
+      result = conn.raw_connection.exec(limited_query)
+      type_map = conn.raw_connection.type_map_for_results.build_column_map(result)
+      deco = PG::TextDecoder::CopyRow.new(type_map: type_map)
+      # see PostgreSQLAdapter#exec_query
+      types = {}
+      fields = result.fields
+      fields.each_with_index do |fname, i|
+        ftype = result.ftype i
+        fmod  = result.fmod i
+        types[fname] = conn.send(:get_oid_type, ftype, fmod, fname)
+      end
+
+      column_types = types.dup
+      columns_hash.each_key { |k| column_types.delete k }
+
+      includes = includes_values + preload_values
+
+      rows = []
+      batch_size = options[:batch_size] || 1000
+
+      conn.raw_connection.copy_data(full_query, deco) do
+        while (row = conn.raw_connection.get_copy_data)
+          rows << row
+          if rows.size == batch_size
+            batch = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
+            ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
+            yield batch
+            rows = []
+          end
+        end
+      end
+      # return the connection now, in case there was only 1 batch, we can avoid a separate connection if the block needs it
+      pool.synchronize do
+        pool.send(:adopt_connection, conn)
+        pool.checkin(conn)
+      end
+      pool = nil
+
+      unless rows.empty?
+        batch = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
+        ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
+        yield batch
+      end
+    end
+    nil
+  ensure
+    if pool
+      # put the connection back in the pool for reuse
+      pool.synchronize do
+        pool.send(:adopt_connection, conn)
+        pool.checkin(conn)
       end
     end
   end
@@ -1389,3 +1460,37 @@ Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
                 singleton: true,
                 method: :prepend,
                 optional: true)
+
+module ExplainAnalyze
+  def exec_explain(queries, analyze: false) # :nodoc:
+    str = queries.map do |sql, binds|
+      msg = "EXPLAIN #{"ANALYZE " if analyze}for: #{sql}"
+      unless binds.empty?
+        msg << " "
+        msg << binds.map { |attr| render_bind(attr) }.inspect
+      end
+      msg << "\n"
+      msg << connection.explain(sql, binds, analyze: analyze)
+    end.join("\n")
+
+    # Overriding inspect to be more human readable, especially in the console.
+    def str.inspect
+      self
+    end
+
+    str
+  end
+
+  def explain(analyze: false)
+    #TODO: Fix for binds.
+    exec_explain(collecting_queries_for_explain do
+      if block_given?
+        yield
+      else
+        # fold in switchman's override
+        self.activate { |relation| relation.exec_queries }
+      end
+    end, analyze: analyze)
+  end
+end
+ActiveRecord::Relation.prepend(ExplainAnalyze)

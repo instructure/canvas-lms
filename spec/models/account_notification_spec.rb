@@ -335,5 +335,50 @@ describe AccountNotification do
         end
       end
     end
+
+    context "announcements across multiple root accounts" do
+      before :once do
+        @account1 = Account.create!
+        @subaccount1 = @account1.sub_accounts.create!
+        @course1 = course_with_teacher(:account => @subaccount1, :active_all => true)
+        @account2 = Account.create!
+        @course2 = course_with_ta(:account => @account2, :user => @user, :active_all => true)
+        @shard2.activate do
+          @shard2_account = Account.create!
+          @shard2_course = course_with_student(:account => @shard2_account, :user => @user, :active_all => true)
+        end
+      end
+
+      it "should use the correct roles for the respective root accounts" do
+        # visible notifications
+        @visible1 = account_notification(:account => @subaccount1, :role_ids => [teacher_role.id])
+        @visible2 = account_notification(:account => @account2, :role_ids => [ta_role.id])
+        @shard2.activate do
+          @visible3 = account_notification(:account => @shard2_account, :role_ids => [student_role.id])
+        end
+
+        # notifications for roles that the user doesn't have in their root accounts
+        @not_visible1 = account_notification(:account => @subaccount1, :role_ids => [student_role.id])
+        @not_visible2 = account_notification(:account => @account2, :role_ids => [teacher_role.id])
+        @shard2.activate do
+          @not_visible3 = account_notification(:account => @shard2_account, :role_ids => [ta_role.id])
+        end
+
+        expected = [@visible1, @visible2, @visible3]
+        expect(AccountNotification.for_user_and_account(@user, @account1)).to match_array(expected)
+        expect(AccountNotification.for_user_and_account(@user, @account2)).to match_array(expected)
+        expect(AccountNotification.for_user_and_account(@user, @shard2_account)).to match_array(expected)
+      end
+
+      it "should be able to set notifications to be restricted to own domain" do
+        expected = []
+        expected << account_notification(:account => @account1, :domain_specific => true)
+        expected << account_notification(:account => @subaccount1, :domain_specific => true)
+
+        expect(AccountNotification.for_user_and_account(@user, @account1)).to match_array(expected)
+        expect(AccountNotification.for_user_and_account(@user, @account2)).to eq []
+        expect(AccountNotification.for_user_and_account(@user, @shard2_account)).to eq []
+      end
+    end
   end
 end

@@ -31,9 +31,9 @@ module SIS
 
       # expected columns
       # section_id,course_id,name,status,start_date,end_date
-      def process(csv)
+      def process(csv, index=nil, count=nil)
         @sis.counts[:sections] += SIS::SectionImporter.new(@root_account, importer_opts).process do |importer|
-          csv_rows(csv) do |row|
+          csv_rows(csv, index, count) do |row|
             update_progress
 
             start_date = nil

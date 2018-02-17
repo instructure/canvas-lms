@@ -36,7 +36,7 @@ define [
 
     iconClasses:
       'ModuleItem'          : "icon-module"
-      'File'                : "icon-download"
+      'File'                : "icon-paperclip"
       'Page'                : "icon-document"
       'Discussion'          : "icon-discussion"
       'Assignment'          : "icon-assignment"

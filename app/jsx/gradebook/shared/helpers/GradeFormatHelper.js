@@ -202,7 +202,10 @@ const GradeFormatHelper = {
     const grade = options.version === 'entered' ? submission.enteredGrade : submission.grade;
 
     if (score == null) {
-      return options.formatType === 'passFail' ? I18n.t('ungraded') : '–';
+      if (options.formatType === 'passFail') {
+        return I18n.t('ungraded')
+      }
+      return options.defaultValue != null ? options.defaultValue : '–'
     }
 
     switch (options.formatType) {
@@ -215,7 +218,6 @@ const GradeFormatHelper = {
       default:
         return formatPointsGrade(score);
     }
-
   }
 };
 

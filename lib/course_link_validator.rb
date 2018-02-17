@@ -117,7 +117,7 @@ class CourseLinkValidator
         self.issues << {:name => quiz.title, :type => :quiz,
                    :content_url => "/courses/#{self.course.id}/quizzes/#{quiz.id}"}.merge(:invalid_links => links)
       end
-      quiz.quiz_questions.each do |qq|
+      quiz.quiz_questions.active.each do |qq|
         check_question(qq)
       end
     end

@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
-import UsersList from 'jsx/account_course_user_search/UsersList'
-import UsersListRow from 'jsx/account_course_user_search/UsersListRow'
+import {shallow, mount} from 'enzyme'
+import UsersList from 'jsx/account_course_user_search/components/UsersList'
+import UsersListRow from 'jsx/account_course_user_search/components/UsersListRow'
 
 QUnit.module('Account Course User Search UsersList View');
 
@@ -49,10 +49,6 @@ const usersProps = {
     can_masquerade: true,
     can_message_users: true,
     can_edit_users: true
-  },
-  timezones: {
-    timezones: ['123123123'],
-    priority_zones: ['alsdkfjasldkfjs']
   },
   userList: {
     searchFilter: {
@@ -105,22 +101,22 @@ Object.entries({
     }
 
     test(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
-      const wrapper = shallow(<UsersList {...props} />)
+      const wrapper = mount(<UsersList {...props} />)
       equal(wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length, 0, `no columns have an ${unexpectedArrow} arrow`)
       const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
-      const header = icons.first().parents('Tooltip')
-      ok(header.prop('tip').match(RegExp(expectedTip, 'i')), 'has right tooltip')
-      ok(header.contains(label), `${label} is the one that has the ${expectedArrow} arrow`)
+      const header = icons.closest('UserListHeader')
+      ok(header.find('ScreenReaderContent').text().match(RegExp(expectedTip, 'i')), 'has right tooltip')
+      ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
     })
 
     test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, function() {
       const sortSpy = this.spy()
-      const wrapper = shallow(<UsersList {...{
+      const wrapper = mount(<UsersList {...{
         ...props,
         onUpdateFilters: sortSpy
       }} />)
-      const header = wrapper.findWhere(n => n.text() === label).first().parents('Tooltip')
+      const header = wrapper.find('UserListHeader').filterWhere(n => n.text().includes(label)).find('button')
       header.simulate('click')
       ok(sortSpy.calledOnce)
       ok(sortSpy.calledWith({

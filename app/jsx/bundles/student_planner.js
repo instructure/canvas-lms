@@ -29,6 +29,12 @@ const courses = window.ENV.STUDENT_PLANNER_COURSES.map(dc => ({
   color: window.ENV.PREFERENCES.custom_colors[dc.assetString]
 }));
 
+const groups = window.ENV.STUDENT_PLANNER_GROUPS ?
+  window.ENV.STUDENT_PLANNER_GROUPS.map(dg => ({
+    ...dg,
+    color: window.ENV.PREFERENCES.custom_colors[dg.assetString] || '#666666'
+  })) : [];
+
 const stickyElementRect = stickyElement.getBoundingClientRect()
 const stickyOffset = stickyElementRect.bottom - stickyElementRect.top
 
@@ -52,6 +58,7 @@ const options = {
   stickyZIndex: 3,
   stickyOffset,
   courses,
+  groups,
   changeToDashboardCardView
 };
 

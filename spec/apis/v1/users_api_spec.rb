@@ -834,6 +834,20 @@ describe "Users API", type: :request do
         create_user_skip_cc_confirm(@site_admin)
       end
 
+      context "sharding" do
+        specs_require_sharding
+        it "should allow creating users on cross-shard accounts" do
+          @other_account = @shard1.activate { Account.create! }
+          json = api_call(:post, "/api/v1/accounts/#{@other_account.id}/users",
+            { :controller => 'users', :action => 'create', :format => 'json', :account_id => @other_account.id.to_s },
+            { :user => { :name => "Test User" }, :pseudonym => { :unique_id => "test@example.com", :password => "password123"} }
+          )
+          new_user = User.find(json['id'])
+          expect(new_user.shard).to eq @shard1
+          expect(new_user.pseudonym.account).to eq @other_account
+        end
+      end
+
       it "respects authentication_provider_id" do
         ap = Account.site_admin.authentication_providers.create!(auth_type: 'facebook')
         api_call(:post, "/api/v1/accounts/#{Account.site_admin.id}/users",

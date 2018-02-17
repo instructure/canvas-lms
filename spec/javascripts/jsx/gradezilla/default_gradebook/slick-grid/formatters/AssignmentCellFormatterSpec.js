@@ -260,6 +260,30 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
 
+  test('uses the updating grade data when the submission is updating', () => {
+    const updatingSubmission = {
+      assignmentId: '2301',
+      enteredGrade: 'B',
+      enteredScore: 8.9,
+      excused: false,
+      userId: '1101'
+    }
+    gradebook.setSubmissionUpdating(updatingSubmission, true)
+    strictEqual(renderCell().innerHTML.trim(), '8.9')
+  })
+
+  test('renders "Excused" when the submission is being excused', () => {
+    const updatingSubmission = {
+      assignmentId: '2301',
+      enteredGrade: null,
+      enteredScore: null,
+      excused: true,
+      userId: '1101'
+    }
+    gradebook.setSubmissionUpdating(updatingSubmission, true)
+    strictEqual(renderCell().innerHTML.trim(), 'Excused')
+  })
+
   QUnit.module('#render with a "percent" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'percent';
@@ -294,6 +318,30 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     excuseSubmission();
     strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
+
+  test('uses the updating grade data when the submission is updating', () => {
+    const updatingSubmission = {
+      assignmentId: '2301',
+      enteredGrade: 'B',
+      enteredScore: 8.9,
+      excused: false,
+      userId: '1101'
+    }
+    gradebook.setSubmissionUpdating(updatingSubmission, true)
+    strictEqual(renderCell().innerHTML.trim(), '89%')
+  })
+
+  test('renders "Excused" when the submission is being excused', () => {
+    const updatingSubmission = {
+      assignmentId: '2301',
+      enteredGrade: null,
+      enteredScore: null,
+      excused: true,
+      userId: '1101'
+    }
+    gradebook.setSubmissionUpdating(updatingSubmission, true)
+    strictEqual(renderCell().innerHTML.trim(), 'Excused')
+  })
 
   QUnit.module('#render with a "letter grade" assignment submission', {
     setup () {
@@ -337,6 +385,30 @@ QUnit.module('AssignmentCellFormatter', function (hooks) {
     excuseSubmission();
     strictEqual(renderCell().innerHTML.trim(), 'Excused');
   });
+
+  test('uses the updating grade data when the submission is updating', () => {
+    const updatingSubmission = {
+      assignmentId: '2301',
+      enteredGrade: 'A',
+      enteredScore: 9.1,
+      excused: false,
+      userId: '1101'
+    }
+    gradebook.setSubmissionUpdating(updatingSubmission, true)
+    strictEqual(renderCell().innerHTML.trim(), 'A')
+  })
+
+  test('renders "Excused" when the submission is being excused', () => {
+    const updatingSubmission = {
+      assignmentId: '2301',
+      enteredGrade: null,
+      enteredScore: null,
+      excused: true,
+      userId: '1101'
+    }
+    gradebook.setSubmissionUpdating(updatingSubmission, true)
+    strictEqual(renderCell().innerHTML.trim(), 'Excused')
+  })
 
   QUnit.module('#render with a "complete/incomplete" assignment submission', {
     setup () {

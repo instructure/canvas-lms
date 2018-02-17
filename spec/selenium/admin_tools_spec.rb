@@ -171,7 +171,7 @@ describe "admin_tools" do
           expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
 
-        it "should display search params used when given invalid input data" do
+        it "should display an error when given invalid input data" do
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
@@ -180,7 +180,8 @@ describe "admin_tools" do
           set_value f('.userDateRangeSearchModal .dateEndSearchField'), 'pillow'
           f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from the beginning to now.")
+          assert_error_box("[name='messages_start_time']")
+          assert_error_box("[name='messages_end_time']")
         end
 
         it "should hide tab if account setting disabled" do

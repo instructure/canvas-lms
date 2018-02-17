@@ -20,14 +20,56 @@ import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
 import { mount, shallow } from 'enzyme'
 import ExternalFeedsTray from '../ExternalFeedsTray'
+import { ConnectedRSSFeedList } from '../RSSFeedList'
 
 const defaultProps = () => ({
   atomFeedUrl: "www.test.com",
+  permissions: {
+    create: false,
+    manage_content: false,
+    moderate: false
+  }
 })
 
 test('renders the ExternalFeedsTray component', () => {
   const tree = mount(<ExternalFeedsTray {...defaultProps()} />)
   expect(tree.exists()).toBe(true)
+})
+
+test('renders the AddExternalFeed component when user has permissions', () => {
+  const props = defaultProps();
+  props.permissions = {
+    create: true,
+    manage_content: false,
+    moderate: false
+  }
+  const tree = shallow(<ExternalFeedsTray {...props} />)
+  const node = tree.find('.announcements-tray__add-rss-root')
+  expect(node).toHaveLength(1)
+})
+
+test('does not render the AddExternalFeed component when user is student', () => {
+  const props = defaultProps();
+  props.permissions = {
+    create: false,
+    manage_content: false,
+    moderate: false
+  }
+  const tree = shallow(<ExternalFeedsTray {...props} />)
+  const node = tree.find('.announcements-tray__add-rss-root')
+  expect(node).toHaveLength(0)
+})
+
+test('does not render the RSSFeedList component when user is student', () => {
+  const props = defaultProps();
+  props.permissions = {
+    create: false,
+    manage_content: false,
+    moderate: false
+  }
+  const tree = shallow(<ExternalFeedsTray {...props} />)
+  const node = tree.find(ConnectedRSSFeedList)
+  expect(node).toHaveLength(0)
 })
 
 test('renders the external feeds link', () => {

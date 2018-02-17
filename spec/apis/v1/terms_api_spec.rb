@@ -169,6 +169,13 @@ describe TermsApiController, type: :request do
                         { expected_status: 400 })
         expect(json['message']).to eq 'Terms only belong to root_accounts.'
       end
+
+      it "should allow account admins without manage_account_settings to view" do
+        role = custom_account_role("custom")
+        account_admin_user_with_role_changes(account: @account, role: role)
+        res = get_terms.map{ |t| t['name'] }
+        expect(res).to match_array([@term1.name, @term2.name])
+      end
     end
   end
 end

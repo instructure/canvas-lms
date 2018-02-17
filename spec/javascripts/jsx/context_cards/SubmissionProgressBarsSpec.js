@@ -287,5 +287,20 @@ QUnit.module('StudentContextTray/Progress', (hooks) => {
       const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
       equal(tray.find('Progress').length, 1)
     })
+
+    test('links to submission urls', () => {
+      const submissions = [
+        {
+          id: '1',
+          score: 5,
+          grade: '5',
+          assignment: {html_url: 'grades', points_possible: 1},
+          user: {short_name: 'bob', _id: '99'}
+        },
+      ]
+
+      const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
+      ok(tray.find("Tooltip").node.props.href.match(/submissions\/99/));
+    })
   })
 })

@@ -23,6 +23,7 @@ import TextInput from '@instructure/ui-core/lib/components/TextInput';
 import Text from '@instructure/ui-core/lib/components/Text';
 import I18n from 'i18n!gradebook';
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
+import {parseTextValue} from '../../../grading/helpers/GradeInputHelper'
 
 function normalizeSubmissionGrade (props) {
   const { submission, assignment, enterGradesAs: formatType, gradingScheme } = props;
@@ -46,7 +47,7 @@ function normalizeSubmissionGrade (props) {
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
 }
 
-function gradeHasChanged (props, state) {
+function hasGradeChanged (props, state) {
   const normalizedEnteredGrade = normalizeSubmissionGrade(props);
   return (normalizedEnteredGrade !== state.grade) && (props.submission.enteredGrade !== state.grade)
 }
@@ -123,7 +124,7 @@ export default class GradeInput extends React.Component {
     }
 
     this.state = {
-      excused: props.submission.excused,
+      formattedGrade: normalizedGrade,
       grade: normalizedGrade
     };
 
@@ -145,7 +146,7 @@ export default class GradeInput extends React.Component {
       }
 
       this.setState({
-        excused: nextProps.submission.excused,
+        formattedGrade: normalizedGrade,
         grade: normalizedGrade
       });
     }
@@ -153,13 +154,12 @@ export default class GradeInput extends React.Component {
 
   handleTextBlur () {
     const enteredGrade = this.state.grade.trim();
-    const excused = GradeFormatHelper.isExcused(enteredGrade);
 
     this.setState({
-      excused,
-      grade: excused ? GradeFormatHelper.excused() : enteredGrade
+      formattedGrade: GradeFormatHelper.isExcused(enteredGrade) ? GradeFormatHelper.excused() : enteredGrade,
+      grade: this.state.grade.trim()
     }, () => {
-      if (gradeHasChanged(this.props, this.state)) {
+      if (hasGradeChanged(this.props, this.state)) {
         this.handleGradeChange();
       }
     });
@@ -167,6 +167,7 @@ export default class GradeInput extends React.Component {
 
   handleTextChange (event) {
     this.setState({
+      formattedGrade: event.target.value,
       grade: event.target.value
     });
   }
@@ -178,17 +179,13 @@ export default class GradeInput extends React.Component {
   }
 
   handleGradeChange () {
-    const submission = { ...this.props.submission };
+    const gradingData = parseTextValue(this.state.grade, {
+      enterGradesAs: this.props.enterGradesAs,
+      gradingScheme: this.props.gradingScheme,
+      pointsPossible: this.props.assignment.pointsPossible
+    })
 
-    if (this.state.excused) {
-      submission.excused = true;
-      submission.enteredGrade = null;
-    } else {
-      submission.excused = false;
-      submission.enteredGrade = this.state.grade;
-    }
-
-    this.props.onSubmissionUpdate(submission);
+    this.props.onSubmissionUpdate(this.props.submission, gradingData)
   }
 
   render () {
@@ -197,13 +194,13 @@ export default class GradeInput extends React.Component {
     }
 
     const inputProps = {
-      disabled: this.props.disabled || this.props.submissionUpdating || this.state.excused,
+      disabled: this.props.disabled || this.props.submissionUpdating || this.props.submission.excused,
       id: 'grade-detail-tray--grade-input',
       label: assignmentLabel(this.props.assignment, this.props.enterGradesAs)
     };
 
     if (this.props.enterGradesAs === 'passFail') {
-      if (this.state.excused) {
+      if (this.props.submission.excused) {
         return <ExcusedSelect {...inputProps} />;
       }
 
@@ -223,7 +220,7 @@ export default class GradeInput extends React.Component {
         onChange={this.handleTextChange}
         onBlur={this.handleTextBlur}
         placeholder="–"
-        value={this.state.grade}
+        value={this.state.formattedGrade}
         width="6em"
       />
     );

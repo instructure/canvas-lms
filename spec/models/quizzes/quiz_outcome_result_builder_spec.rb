@@ -253,13 +253,42 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q2, @sub, correct: false)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
-      @quiz_results = @outcome.learning_outcome_results.where(user_id: @user).to_a
     end
 
     it "does not create an outcome result" do
-      expect(@quiz_results).to be_empty
+      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 0
     end
 
+    it "creates and updates an outcome result once fully manually graded" do
+      # update_scores is the method fired when manually grading a quiz in speedgrader.
+      @sub.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@q1.id}" => "1",
+      })
+      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 0
+      @sub.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@q2.id}" => "1"
+      })
+      results = @outcome.learning_outcome_results.where(user_id: @user)
+      expect(results.count).to equal 1
+      expect(results[0].score).to equal 2.0
+      @sub.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@q1.id}" => "2"
+      })
+      results[0].reload
+      expect(results[0].score).to equal 3.0
+    end
   end
 
   describe "ungraded quizzes and surveys" do

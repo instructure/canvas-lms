@@ -178,12 +178,14 @@ describe ContextController do
         expect(flash[:error]).to be_present
       end
 
-      it 'limits enrollments by visibility' do
+      it 'limits enrollments by visibility for course default section' do
         user_session(@student)
         get 'roster_user', params: {:course_id => @course.id, :id => @teacher.id}
         expect(response).to be_success
         expect(assigns[:enrollments].map(&:course_section_id)).to match_array([@course.default_section.id, @other_section.id])
+      end
 
+      it 'limits enrollments by visibility for other section' do
         user_session(@other_student)
         get 'roster_user', params: {:course_id => @course.id, :id => @teacher.id}
         expect(response).to be_success

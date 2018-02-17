@@ -25,10 +25,15 @@ import Link from '@instructure/ui-core/lib/components/Link'
 import Heading from '@instructure/ui-core/lib/components/Heading'
 import Container from '@instructure/ui-core/lib/components/Container'
 import IconRssLine from 'instructure-icons/lib/Line/IconRssLine'
+import Text from '@instructure/ui-core/lib/components/Text'
+
+import { ConnectedAddExternalFeed } from './AddExternalFeed'
+import propTypes from '../propTypes'
 
 export default class ExternalFeedsTray extends Component {
   static propTypes = {
     atomFeedUrl: string,
+    permissions: propTypes.permissions.isRequired
   }
 
   static defaultProps = {
@@ -43,7 +48,8 @@ export default class ExternalFeedsTray extends Component {
     return (
       <Container>
         {this.renderHeader()}
-        {this.renderRssFeed()}
+        {this.renderRssFeedLink()}
+        {this.props.permissions.create && this.renderAddExternalFeed()}
       </Container>
     )
   }
@@ -55,12 +61,12 @@ export default class ExternalFeedsTray extends Component {
         as="div"
         textAlign="start"
       >
-        <Heading margin="small 0 0 small" level="h3" as="h1">{I18n.t('External feeds')}</Heading>
+        <Heading margin="small 0 0 small" level="h3" as="h2">{I18n.t('External feeds')}</Heading>
       </Container>
     )
   }
 
-  renderRssFeed() {
+  renderRssFeedLink() {
     if (this.props.atomFeedUrl) {
       return (
         <Container
@@ -79,6 +85,29 @@ export default class ExternalFeedsTray extends Component {
       )
     }
     return null
+  }
+
+  renderAddExternalFeed() {
+    return (
+      <Container
+        id="announcements-tray__add-rss-root"
+        margin="medium medium small"
+        display="block"
+        textAlign="start"
+        className="announcements-tray__add-rss-root"
+      >
+        <Text size="medium" as="h2" weight="bold">{I18n.t("Feeds")}</Text>
+        <div className="announcements-tray-row">
+          <Container
+            margin="small 0 0"
+            display="block"
+            textAlign="start"
+          >
+            <ConnectedAddExternalFeed defaultOpen={false}/>
+          </Container>
+        </div>
+      </Container>
+    )
   }
 
   render () {

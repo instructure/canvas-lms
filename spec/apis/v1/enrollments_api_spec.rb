@@ -1540,6 +1540,21 @@ describe EnrollmentsApiController, type: :request do
         expect(json.map { |e| e['id'].to_i }.sort).to eq @user.enrollments.map(&:id).sort
       end
 
+      it "excludes invited enrollments in soft-concluded courses" do
+        term = Account.default.enrollment_terms.create! :end_at => 1.day.ago
+
+        enrollment1 = course_with_student :enrollment_state => :invited
+        enrollment1.course.offer!
+        enrollment1.course.enrollment_term = term
+        enrollment1.course.save!
+
+        enrollment2 = course_with_student :enrollment_state => :invited, :user => @student
+        enrollment2.course.offer!
+
+        json = api_call(:get, "/api/v1/users/self/enrollments", @user_params.merge(:user_id => 'self'))
+        expect(json.map { |el| el['id'] }).to match_array([enrollment2.id])
+      end
+
       it "should not include the users' sis and login ids" do
         json = api_call(:get, @path, @params)
         json.each do |res|

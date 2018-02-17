@@ -168,4 +168,16 @@ describe AccountAuthorizationConfig::SAML do
       expect(aac.user_logout_redirect(controller, nil)).to eq "bananas"
     end
   end
+
+  describe '.sp_metadata_for_account' do
+    it 'includes federated attributes' do
+      ap = @account.authentication_providers.build(:auth_type => 'saml')
+      ap.federated_attributes = { 'display_name' => { 'attribute' => 'name' } }
+      ap.save!
+      entity = AccountAuthorizationConfig::SAML.sp_metadata_for_account(@account)
+      expect(entity.roles.last.attribute_consuming_services.length).to eq 1
+      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.length). to eq 1
+      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.first.name). to eq 'name'
+    end
+  end
 end

@@ -22,10 +22,10 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
+import 'compiled/jquery.rails_flash_notifications'
 import store from '../../external_apps/lib/ExternalAppsStore'
 import ConfigurationForm from '../../external_apps/components/ConfigurationForm'
 import Lti2Edit from '../../external_apps/components/Lti2Edit'
-import 'compiled/jquery.rails_flash_notifications'
 
   const modalOverrides = {
     overlay : {
@@ -58,16 +58,20 @@ export default React.createClass({
       }
     },
 
+    setContextExternalToolState(data) {
+      const tool = _.extend(data, this.props.tool)
+      this.setState({
+        tool,
+        modalIsOpen: true
+      })
+    },
+
     openModal(e) {
-      e.preventDefault();
+      e.preventDefault()
       if (this.props.tool.app_type === 'ContextExternalTool') {
-        store.fetchWithDetails(this.props.tool).then(function(data) {
-          var tool = _.extend(data, this.props.tool);
-          this.setState({
-            tool: tool,
-            modalIsOpen: true
-          });
-        }.bind(this));
+        store.fetchWithDetails(this.props.tool).then(data => {
+          this.setContextExternalToolState(data)
+        })
       } else {
         this.setState({
           tool: this.props.tool,
@@ -77,34 +81,30 @@ export default React.createClass({
     },
 
     closeModal() {
-      this.setState({ modalIsOpen: false });
+      this.setState({ modalIsOpen: false })
     },
 
     saveChanges(configurationType, data) {
-      var success = function(response) {
-        var updatedTool = _.extend(this.state.tool, response);
-
-        if (this.state.tool.name !== this.props.tool.name) {
-          store.fetch();
-        } else {
-          this.setState({ tool: updatedTool });
-        }
-        this.closeModal();
-
+      const success = res => {
+        const updatedTool = _.extend(this.state.tool, res)
+        // refresh app config index with latest tool state
+        store.fetch()
+        this.setState({ updatedTool })
+        this.closeModal()
         // Unsure why this is necessary, but the focus is lost if not wrapped in a timeout
-        setTimeout(function() {
-          this.refs.editButton.getDOMNode().focus();
-        }.bind(this), 300);
+        setTimeout(() => {
+          this.refs.editButton.getDOMNode().focus()
+        }, 300)
 
-        $.flashMessage(I18n.t('The app was updated successfully'));
-      };
+        $.flashMessage(I18n.t('The app was updated successfully'))
+      }
 
-      var error = function() {
-        $.flashError(I18n.t('We were unable to update the app.'));
-      };
+      const error = () => {
+        $.flashError(I18n.t('We were unable to update the app.'))
+      }
 
-      var tool = _.extend(this.state.tool, data);
-      store.save(configurationType, tool, success.bind(this), error.bind(this));
+      const tool = _.extend(this.state.tool, data)
+      store.save(configurationType, tool, success.bind(this), error.bind(this))
     },
 
     handleActivateLti2() {

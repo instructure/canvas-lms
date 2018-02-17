@@ -15,6 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
+<%
+  object_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
+                     !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course")
+  content_is_locked = object_is_locked && js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :content)
+  points_are_locked = object_is_locked && js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :points)
+%>
 
 <div id="questions_tab">
   <div id="show_question_details_wrap">
@@ -48,23 +54,25 @@
   <%= render :partial => "find_question_from_bank" %>
   <%= render :partial => "move_question" %>
 
-  <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
-    <% new_question_title = t("New Question") %>
-    <% new_question_group_title = t("New Question Group") %>
-    <a href="#" class="add_question_link btn">
-      <i class="icon-add"></i><span class="screenreader-only"><%= new_question_title %></span>
-      <%= new_question_title %>
-    </a>
-    <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
-      <i class="icon-add"></i><span class="screenreader-only"><%= new_question_group_title %></span>
-      <%= new_question_group_title %>
-    </a>
-    <% if feature_enabled?(:question_banks) && @context.grants_right?(@current_user, :read_question_banks) %>
-      <% find_questions_title = t("Find Questions") %>
-      <a href="#" class="find_question_link btn">
-        <i class="icon-search"></i><span class="screenreader-only"><%= find_questions_title %></span>
-        <%= find_questions_title %>
+  <% unless content_is_locked || points_are_locked %>
+    <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
+      <% new_question_title = t("New Question") %>
+      <% new_question_group_title = t("New Question Group") %>
+      <a href="#" class="add_question_link btn">
+        <i class="icon-add"></i><span class="screenreader-only"><%= new_question_title %></span>
+        <%= new_question_title %>
       </a>
-    <% end %>
-  </div>
+      <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
+        <i class="icon-add"></i><span class="screenreader-only"><%= new_question_group_title %></span>
+        <%= new_question_group_title %>
+      </a>
+      <% if feature_enabled?(:question_banks) && @context.grants_right?(@current_user, :read_question_banks) %>
+        <% find_questions_title = t("Find Questions") %>
+        <a href="#" class="find_question_link btn">
+          <i class="icon-search"></i><span class="screenreader-only"><%= find_questions_title %></span>
+          <%= find_questions_title %>
+        </a>
+      <% end %>
+    </div>
+  <% end %>
 </div>

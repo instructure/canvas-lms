@@ -17,7 +17,8 @@
 
 define [
   'compiled/views/profiles/GravatarView'
-], (GravatarView) ->
+  'helpers/assertions'
+], (GravatarView, assertions) ->
 
   QUnit.module 'GravatarView',
     setup: ->
@@ -35,6 +36,10 @@ define [
       window.ENV = @oldEnv
       @view.remove()
       @server?.restore()
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible @view, done, {'a11yReport': true}
 
   test 'pre-populates preview with default', ->
     md5 = 'b48def645758b95537d4424c84d1a9ff'

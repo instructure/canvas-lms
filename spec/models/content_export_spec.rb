@@ -76,61 +76,63 @@ describe ContentExport do
         :selected_content => quiz.id,
         :user => @user
       )
+      @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      @course.root_account.save!
     end
 
-    it "changes the workflow_state when :quizzes2_exporter is enabled" do
-      Account.default.enable_feature!(:quizzes2_exporter)
+    it "changes the workflow_state when :quizzes_next is enabled" do
+      @course.enable_feature!(:quizzes_next)
       expect { @ce.export_without_send_later }.to change { @ce.workflow_state }
       expect(@ce.workflow_state).to eq "exported"
     end
 
-    it "fails the content export when :quizzes2_exporter is disabled" do
-      Account.default.disable_feature!(:quizzes2_exporter)
+    it "fails the content export when :quizzes_next is disabled" do
+      @course.disable_feature!(:quizzes_next)
       @ce.export_without_send_later
       expect(@ce.workflow_state).to eq "created"
     end
 
     it "composes the payload with assignment details" do
-      Account.default.enable_feature!(:quizzes2_exporter)
+      @course.enable_feature!(:quizzes_next)
       @ce.export_without_send_later
       expect(@ce.settings[:quizzes2][:assignment]).not_to be_empty
     end
 
     it "composes the payload with course UUID" do
-      Account.default.enable_feature!(:quizzes2_exporter)
+      @course.enable_feature!(:quizzes_next)
       @ce.export_without_send_later
       expect(@ce.settings[:quizzes2][:assignment][:course_uuid]).to eq(@course.uuid)
     end
 
     it "composes the payload with qti details" do
-      Account.default.enable_feature!(:quizzes2_exporter)
+      @course.enable_feature!(:quizzes_next)
       @ce.export_without_send_later
-      expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.download_url)
+      expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
     end
 
     it "completes with export_type of 'quizzes2'" do
-      Account.default.enable_feature!(:quizzes2_exporter)
+      @course.enable_feature!(:quizzes_next)
       @ce.export_without_send_later
       expect(@ce.export_type).to eq('quizzes2')
     end
 
     context 'failure cases' do
       it "fails if the quiz exporter fails" do
-        Account.default.enable_feature!(:quizzes2_exporter)
+        @course.enable_feature!(:quizzes_next)
         allow_any_instance_of(Exporters::Quizzes2Exporter).to receive(:export).and_raise('fake error')
         @ce.export_without_send_later
         expect(@ce.workflow_state).to eq "failed"
       end
 
       it "fails if the qti exporter fails" do
-        Account.default.enable_feature!(:quizzes2_exporter)
+        @course.enable_feature!(:quizzes_next)
         allow_any_instance_of(CC::CCExporter).to receive(:export).and_raise('fake error')
         @ce.export_without_send_later
         expect(@ce.workflow_state).to eq "failed"
       end
 
       it "does not set the status to exported if either exporter is unsuccessful" do
-        Account.default.enable_feature!(:quizzes2_exporter)
+        @course.enable_feature!(:quizzes_next)
         allow_any_instance_of(CC::CCExporter).to receive(:export).and_return(false)
         @ce.export_without_send_later
         expect(@ce.workflow_state).to eq "exporting"

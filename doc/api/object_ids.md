@@ -13,6 +13,7 @@ The following objects support SIS IDs in the API:
  * `sis_account_id`
  * `sis_course_id`
  * `sis_group_id`
+ * `sis_group_category_id`
  * `sis_integration_id` (for users)
  * `sis_login_id`
  * `sis_section_id`

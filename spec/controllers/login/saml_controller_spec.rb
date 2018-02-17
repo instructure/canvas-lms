@@ -72,10 +72,41 @@ describe Login::SamlController do
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user2.pseudonyms.first
   end
 
+  it "enforces a valid entity id" do
+    unique_id = 'foo@example.com'
+
+    account1 = account_with_saml
+    user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
+    @pseudonym.account = account1
+    @pseudonym.save!
+
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response',
+             is_valid?: true,
+             success_status?: true,
+             name_id: unique_id,
+             name_identifier_format: nil,
+             name_qualifier: nil,
+             sp_name_qualifier: nil,
+             session_index: nil,
+             process: nil,
+             issuer: "such a lie",
+             saml_attributes: {},
+             used_key: nil
+      )
+    )
+
+    controller.request.env['canvas.domain_root_account'] = account1
+    post :create, params: {:SAMLResponse => "foo"}
+    expect(response).to redirect_to(login_url)
+  end
+
   it "does not enforce a valid entity id" do
     unique_id = 'foo@example.com'
 
     account1 = account_with_saml
+    account1.settings[:allow_mismatched_entity_id] = true
+    account1.save!
     user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
     @pseudonym.account = account1
     @pseudonym.save!
@@ -239,7 +270,7 @@ describe Login::SamlController do
              sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
-             issuer: "such a lie",
+             issuer: "saml_entity",
              saml_attributes: {},
              used_key: nil
         )
@@ -357,7 +388,7 @@ describe Login::SamlController do
         expect(session[:sentinel]).to eq true
 
         expect(response).to redirect_to(login_url)
-        expect(flash[:delegated_message]).to eq "The institution you logged in from is not configured on this account."
+        expect(flash[:delegated_message]).to eq "Canvas is not configured to receive logins from hahahahahahaha."
       end
     end
 

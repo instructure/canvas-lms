@@ -112,7 +112,7 @@ module GradezillaCommon
 
   def edit_grade(cell, grade)
     fj(cell).click
-    grade_input = fj("#{cell} .grade")
+    grade_input = fj("#{cell} input[type='text']")
     set_value(grade_input, grade)
     grade_input.send_keys(:return)
     wait_for_ajaximations

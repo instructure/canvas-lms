@@ -113,6 +113,12 @@ describe Attachment do
       expect(a.authenticated_url(expires_in: 1.day)).to match(/^https:\/\//)
       a.destroy_permanently!
     end
+
+    it "should not send the user, if any, to s3 lib" do
+      u = user_model
+      a = attachment_model
+      expect(-> { a.authenticated_url(user: u, expires_in: 1.day) }).not_to raise_exception
+    end
   end
 
   def configure_crocodoc
@@ -1019,17 +1025,17 @@ describe Attachment do
     it "should work with s3 storage" do
       s3_storage!
       attachment = attachment_with_context(@course, :display_name => 'foo')
-      expect(attachment.download_url).to match(/response-content-disposition=attachment/)
-      expect(attachment.inline_url).to match(/response-content-disposition=inline/)
+      expect(attachment.public_download_url).to match(/response-content-disposition=attachment/)
+      expect(attachment.public_inline_url).to match(/response-content-disposition=inline/)
     end
 
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       allow(attachment).to receive(:authenticated_url) # allow other calls due to, e.g., save
       expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 3600.seconds))
-      attachment.download_url
+      attachment.public_download_url
       expect(attachment).to receive(:authenticated_url).with(include(:expires_in => 2.days))
-      attachment.download_url(2.days)
+      attachment.public_download_url(2.days)
     end
 
     it 'should allow custom ttl for root_account' do
@@ -1038,30 +1044,30 @@ describe Attachment do
       root.settings[:s3_url_ttl_seconds] = 3.days.seconds.to_s
       root.save!
       expect(attachment).to receive(:authenticated_url).with(include(expires_in: 3.days.to_i.seconds))
-      attachment.download_url
+      attachment.public_download_url
     end
 
     it "should include response-content-disposition" do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       allow(attachment).to receive(:authenticated_s3_url) # allow other calls due to, e.g., save
       expect(attachment).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="foo"; filename*=UTF-8''foo)))
-      attachment.download_url
+      attachment.public_download_url
       expect(attachment).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(inline; filename="foo"; filename*=UTF-8''foo)))
-      attachment.inline_url
+      attachment.public_inline_url
     end
 
     it "should use the display_name, not filename, in the response-content-disposition" do
       attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
       allow(attachment).to receive(:authenticated_s3_url) # allow other calls due to, e.g., save
       expect(attachment).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="foo"; filename*=UTF-8''foo)))
-      attachment.download_url
+      attachment.public_download_url
     end
 
     it "should http quote the filename in the response-content-disposition if necessary" do
       attachment = attachment_with_context(@course, :display_name => 'fo"o')
       allow(attachment).to receive(:authenticated_s3_url) # allow other calls due to, e.g., save
       expect(attachment).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="fo\\"o"; filename*=UTF-8''fo%22o)))
-      attachment.download_url
+      attachment.public_download_url
     end
 
     it "should sanitize filename with iconv" do
@@ -1069,14 +1075,14 @@ describe Attachment do
       sanitized_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", a.display_name)
       allow(a).to receive(:authenticated_s3_url)
       expect(a).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
-      a.download_url
+      a.public_download_url
     end
 
     it "should escape all non-alphanumeric characters in the utf-8 filename" do
       attachment = attachment_with_context(@course, :display_name => '"This file[0] \'{has}\' \# awesome `^<> chars 100%,|<-pipe"')
       allow(attachment).to receive(:authenticated_s3_url)
       expect(attachment).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="\\\"This file[0] '{has}' \\# awesome `^<> chars 100%,|<-pipe\\\""; filename*=UTF-8''%22This%20file%5B0%5D%20%27%7Bhas%7D%27%20%5C%23%20awesome%20%60%5E%3C%3E%20chars%20100%25%2C%7C%3C%2Dpipe%22)))
-      attachment.download_url
+      attachment.public_download_url
     end
   end
 

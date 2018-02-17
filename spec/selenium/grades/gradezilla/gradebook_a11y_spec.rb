@@ -354,8 +354,7 @@ describe "Gradezilla" do
 
     %w[message-students-who curve-grades set-default-grade assignment-muter download-submissions].each do |dialog|
       it "is placed on assignment header trigger upon #{dialog} dialog close" do
-        Gradezilla.click_assignment_header_menu(assignment.id)
-        Gradezilla.click_assignment_header_menu_element(dialog)
+        Gradezilla.click_assignment_header_menu_element(assignment.id,dialog)
         Gradezilla.close_open_dialog
 
         check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)

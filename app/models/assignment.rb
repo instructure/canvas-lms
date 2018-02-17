@@ -74,6 +74,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
+  has_many :line_items, inverse_of: :assignment, class_name: 'Lti::LineItem'
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
@@ -988,12 +989,9 @@ class Assignment < ActiveRecord::Base
       percentage = grade.to_f / 100.0
       points_possible.to_f * percentage
     when %r{^[+-]?\d*\.?\d+$}
-      if grading_type == "gpa_scale"
-        # if it matches something in a scheme, take that, else return nil
-        return nil unless standard_based_score = grading_standard_or_default.grade_to_score(grade)
+      if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
         (points_possible || 0.0) * standard_based_score / 100.0
       else
-        # interpret as a numerical score
         grade.to_f
       end
     when "pass", "complete"
@@ -1806,9 +1804,9 @@ class Assignment < ActiveRecord::Base
                                  []
                                end
     users_with_vericite_data = if vericite_enabled?
-                                 submissions
-                                 .reject { |s| s.turnitin_data.blank? }
-                                 .map(&:user)
+                                 submissions.
+                                   reject {|s| s.turnitin_data.blank?}.
+                                   map(&:user)
                                else
                                  []
                                end
@@ -2498,10 +2496,14 @@ class Assignment < ActiveRecord::Base
 
   def in_closed_grading_period?
     return @in_closed_grading_period unless @in_closed_grading_period.nil?
-    @in_closed_grading_period = if submissions.loaded?
+    @in_closed_grading_period = if !context.grading_periods?
+      false
+    elsif submissions.loaded?
+      # no need to check grading_periods are loaded because of
+      # submissions association preload(:grading_period)
       submissions.map(&:grading_period).compact.any?(&:closed?)
     else
-      GradingPeriod.joins(:submissions).where(submissions: {assignment_id: self.id}).closed.exists?
+      GradingPeriod.joins(:submissions).where(submissions: { assignment: self }).closed.exists?
     end
   end
 

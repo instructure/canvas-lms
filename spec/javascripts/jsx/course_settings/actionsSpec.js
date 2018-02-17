@@ -203,7 +203,7 @@ test('uploadFile dispatches prepareSetImage when successful', assert => {
   const postStub = sinon.stub();
   const getStub = sinon.stub()
   postStub.onCall(0).returns(preflightResponse)
-  postStub.onCall(1).returns(Promise.resolve());
+  postStub.onCall(1).returns(Promise.resolve({ data: {} }));
   getStub.returns(successResponse)
 
   const fakeAjaxLib = {

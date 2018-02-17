@@ -1556,6 +1556,24 @@ describe UsersController do
         expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_truthy
       end
 
+      it "sets ENV.STUDENT_PLANNER_COURSES" do
+        course_with_student_logged_in(active_all: true)
+        @current_user = @user
+        get 'user_dashboard'
+        courses = assigns[:js_env][:STUDENT_PLANNER_COURSES]
+        expect(courses.map {|c| c[:id]}).to eq [@course.id]
+      end
+
+      it "sets ENV.STUDENT_PLANNER_GROUPS" do
+        course_with_student_logged_in(active_all: true)
+        @current_user = @user
+        group = @account.groups.create! :name => 'Account group'
+        group.add_user(@current_user, 'accepted', true)
+        get 'user_dashboard'
+        groups = assigns[:js_env][:STUDENT_PLANNER_GROUPS]
+        expect(groups.map {|g| g[:id]}).to eq [group.id]
+      end
+
     end
   end
 

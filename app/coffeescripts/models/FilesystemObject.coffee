@@ -64,7 +64,7 @@ define [
 
     copyToContext: (newFolder, options = {}) ->
       attrs = @setAttributes($.extend({}, @attributes), options)
-      type = if @saveFrd then "file" else "folder"
+      type = if @isFile then "file" else "folder"
       attrs["source_#{type}_id"] = attrs.id
       delete attrs.id
 
@@ -89,7 +89,7 @@ define [
 
     updateCollection: (model, newFolder, options) ->
       # add it to newFolder's children
-      objectType = if @saveFrd then 'files' else 'folders' #TODO find a better way to infer type
+      objectType = if @isFile then 'files' else 'folders' #TODO find a better way to infer type
       collection = newFolder[objectType]
 
       if options.dup == 'overwrite' # remove the overwritten object from the collection

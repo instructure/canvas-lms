@@ -38,9 +38,8 @@ describe SIS::CSV::UserObserverImporter do
     )
     expect(UserObserver.active.count).to eq before_count
 
-    expect(importer.errors).to eq []
-    warnings = importer.warnings.map(&:last)
-    expect(warnings).to eq ["An observer referenced a non-existent user no_observer",
+    errors = importer.errors.map(&:last)
+    expect(errors).to eq ["An observer referenced a non-existent user no_observer",
                             "Can't observe yourself user U001",
                             "A student referenced a non-existent user no_student",
                             "No observer_id given for a user observer",

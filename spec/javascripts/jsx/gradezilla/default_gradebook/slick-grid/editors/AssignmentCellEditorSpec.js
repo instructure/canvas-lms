@@ -43,6 +43,18 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
     };
 
     const assignment = { grading_type: 'points', id: '2301', points_possible: 10 };
+    const gradebook = createGradebook()
+
+    gradebook.students['1101'] = { id: '1101' }
+    gradebook.setAssignments({2301: assignment})
+    gradebook.updateSubmission({
+      assignment_id: '2301',
+      entered_grade: '7.8',
+      entered_score: 7.8,
+      excused: false,
+      id: '2501',
+      user_id: '1101'
+    })
 
     editorOptions = {
       column: {
@@ -50,7 +62,7 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
         field: 'assignment_2301',
         getGridSupport () { return gridSupport },
         object: assignment,
-        propFactory: new AssignmentRowCellPropFactory(assignment, createGradebook())
+        propFactory: new AssignmentRowCellPropFactory(gradebook)
       },
       grid: {
         onKeyDown: {
@@ -111,7 +123,7 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
     });
   });
 
-  QUnit.module('handleKeyDown event', () => {
+  QUnit.module('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor();
       sinon.spy(editor.component, 'handleKeyDown');
@@ -190,22 +202,14 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
     test('calls .loadValue on the AssignmentRowCell component', () => {
       createEditor();
       sinon.spy(editor.component, 'loadValue');
-      editor.loadValue('9.7');
+      editor.loadValue()
       strictEqual(editor.component.loadValue.callCount, 1);
-    });
-
-    test('calls the AssignmentRowCell .loadValue method with the given value', () => {
-      createEditor();
-      sinon.spy(editor.component, 'loadValue');
-      editor.loadValue('9.7');
-      const [value] = editor.component.loadValue.lastCall.args;
-      strictEqual(value, '9.7');
     });
 
     test('renders the component', () => {
       createEditor();
       sinon.stub(editor, 'renderComponent');
-      editor.loadValue('9.7');
+      editor.loadValue()
       strictEqual(editor.renderComponent.callCount, 1);
     });
   });
@@ -213,32 +217,31 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
   QUnit.module('#applyValue', (hooks) => {
     hooks.beforeEach(() => {
       createEditor();
-      sinon.stub(editor.component, 'applyValue');
+      sinon.stub(editor.component, 'gradeSubmission')
     });
 
-    test('calls .applyValue on the AssignmentRowCell component', () => {
+    test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       editor.applyValue({ id: '1101' }, '9.7');
-      strictEqual(editor.component.applyValue.callCount, 1);
+      strictEqual(editor.component.gradeSubmission.callCount, 1)
     });
 
     test('includes the given item when applying the value', () => {
       editor.applyValue({ id: '1101' }, '9.7');
-      const [item] = editor.component.applyValue.lastCall.args;
+      const [item] = editor.component.gradeSubmission.lastCall.args
       deepEqual(item, { id: '1101' });
     });
 
     test('includes the given value when applying the value', () => {
       editor.applyValue({ id: '1101' }, '9.7');
-      const [/* item */, value] = editor.component.applyValue.lastCall.args;
+      const [/* item */, value] = editor.component.gradeSubmission.lastCall.args;
       strictEqual(value, '9.7');
     });
   });
 
   QUnit.module('#validate', () => {
-    test('returns the result of calling .validate on the AssignmentRowCell component', () => {
-      createEditor();
-      sinon.stub(editor.component, 'validate').returns({ valid: true });
-      deepEqual(editor.validate(), { valid: true });
-    });
-  });
+    test('returns an empty validation success', () => {
+      createEditor()
+      deepEqual(editor.validate(), {msg: null, valid: true})
+    })
+  })
 });

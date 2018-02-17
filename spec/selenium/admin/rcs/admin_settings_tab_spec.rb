@@ -553,6 +553,8 @@ describe "admin settings tab" do
   it "should show all the feature flags" do
     course_with_admin_logged_in(:account => Account.site_admin)
     enable_all_rcs @course.account
+    provision_quizzes_next @course
+
     get "/accounts/#{Account.site_admin.id}/settings"
     f("#tab-features-link").click
     wait_for_ajaximations

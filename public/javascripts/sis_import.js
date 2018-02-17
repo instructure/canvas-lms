@@ -70,7 +70,7 @@ $(document).ready(function(event) {
     output += "</ul>";
     return output;
   }
-  
+
   function createCountsHtml(batch){
     if(!(batch.data && batch.data.counts)){
       return '';
@@ -83,10 +83,14 @@ $(document).ready(function(event) {
     output += "<li>" + htmlEscape(I18n.t('import_counts.users', "Users: %{user_count}", {user_count: batch.data.counts.users})) + "</li>";
     output += "<li>" + htmlEscape(I18n.t('import_counts.enrollments', "Enrollments: %{enrollment_count}", {enrollment_count: batch.data.counts.enrollments})) + "</li>";
     output += "<li>" + htmlEscape(I18n.t('import_counts.crosslists', "Crosslists: %{crosslist_count}", {crosslist_count: batch.data.counts.xlists})) + "</li>";
+    output += "<li>" + htmlEscape(I18n.t('import_counts.admins', "Admins: %{admin_count}", {admin_count: batch.data.counts.admins})) + "</li>";
+    output += "<li>" + htmlEscape(I18n.t('import_counts.group_categories', "Group Categories: %{group_categories_count}", {group_categories_count: batch.data.counts.group_categories})) + "</li>";
     output += "<li>" + htmlEscape(I18n.t('import_counts.groups', "Groups: %{group_count}", {group_count: batch.data.counts.groups})) + "</li>";
     output += "<li>" + htmlEscape(I18n.t('import_counts.group_enrollments', "Group Enrollments: %{group_enrollments_count}", {group_enrollments_count: batch.data.counts.group_memberships})) + "</li>";
+    output += "<li>" + htmlEscape(I18n.t('import_counts.user_observers', "User Observers: %{user_observers_count}", {user_observers_count: batch.data.counts.user_observers})) + "</li>";
+    output += "<li>" + htmlEscape(I18n.t('import_counts.change_sis_ids', "Change SIS IDs: %{change_sis_ids_count}", {change_sis_ids_count: batch.data.counts.change_sis_ids})) + "</li>";
     output += "</ul></li></ul>";
-    
+
     return output
   }
 

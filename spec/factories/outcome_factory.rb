@@ -67,14 +67,20 @@ module Factories
   end
 
   def outcome_with_rubric(opts={})
-    @outcome_group ||= @course.root_outcome_group
-    @outcome = (opts[:outcome_context] || @course).created_learning_outcomes.create!(
-      :description => '<p>This is <b>awesome</b>.</p>',
-      :short_description => 'new outcome',
-      :calculation_method => 'highest'
-    )
-    @outcome_group.add_outcome(@outcome)
-    @outcome_group.save!
+    course = opts[:course] || @course
+    @outcome_group ||= course.root_outcome_group
+    @outcome = opts[:outcome] || begin
+      (opts[:outcome_context] || course).created_learning_outcomes.create!(
+        :description => '<p>This is <b>awesome</b>.</p>',
+        :short_description => 'new outcome',
+        :calculation_method => 'highest'
+      )
+    end
+    [opts[:outcome_context], @course].compact.uniq.each do |context|
+      root = context.root_outcome_group
+      root.add_outcome(@outcome)
+      root.save!
+    end
 
     rubric_params = {
         :title => opts[:title] || 'My Rubric',

@@ -27,7 +27,7 @@ end
 
 describe "Api::V1::GroupCategory" do
   describe "#group_category_json" do
-    let(:category){ GroupCategory.new(name: "mygroup") }
+    let(:category){ GroupCategory.new(name: "mygroup", root_account: Account.new) }
 
     it "includes the auto_leader value" do
       category.auto_leader = 'random'
@@ -75,7 +75,7 @@ describe "Api::V1::GroupCategory" do
       end
 
       it 'checks the user against the category to set "is_member"' do
-        user = double
+        user = User.new
         expect(category).to receive(:is_member?).with(user).and_return(true)
         json = CategoryHarness.new.group_category_json(category, user, nil)
         expect(json["is_member"]).to eq(true)

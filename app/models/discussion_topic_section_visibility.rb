@@ -45,8 +45,6 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
     self.errors.add(:discussion_topic_id, t("Cannot add section to a non-section-specific discussion"))
   end
 
-  # Note that this forbids group discussions from being section-specific (which
-  # is intentional)
   def course_and_topic_share_context
     return true if self.discussion_topic.context_id == self.course_section.course_id
     self.errors.add(:course_section_id,

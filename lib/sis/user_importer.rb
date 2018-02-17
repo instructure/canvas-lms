@@ -98,10 +98,10 @@ module SIS
       end
 
       def infer_sortable_name(user_row, prior_sortable_name = nil)
-        if user_row.full_name.present?
-          nil # force User model to infer sortable name from the full name
-        elsif user_row.sortable_name.present?
+        if user_row.sortable_name.present?
           user_row.sortable_name
+        elsif user_row.full_name.present?
+          nil # force User model to infer sortable name from the full name
         elsif user_row.last_name.present? || user_row.first_name.present?
           [user_row.last_name, user_row.first_name].join(', ')
         else
@@ -122,7 +122,6 @@ module SIS
             pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
             pseudo ||= pseudo_by_login
-            pseudo ||= @root_account.pseudonyms.active.by_unique_id(user_row.email).take if user_row.email.present?
 
             status_is_active = !(user_row.status =~ /\Adeleted/i)
             if pseudo

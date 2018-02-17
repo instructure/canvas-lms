@@ -96,7 +96,7 @@ class GroupMembershipsController < ApplicationController
   def index
     if authorized_action(@group, @current_user, :read_roster)
       memberships_route = polymorphic_url([:api_v1, @group, :memberships])
-      scope = @group.group_memberships
+      scope = @group.group_memberships.preload(group: :root_account)
 
       only_states = ALLOWED_MEMBERSHIP_FILTER
       only_states = only_states & params[:filter_states] if params[:filter_states]

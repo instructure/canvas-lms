@@ -46,7 +46,6 @@ test('ADD_TO_USERS action reducer', () => {
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }
@@ -81,7 +80,6 @@ test('ADD_TO_USERS action reducer invalid email', () => {
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }
@@ -116,7 +114,6 @@ test('GOT_USERS action reducer', function() {
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }
@@ -180,7 +177,6 @@ test('GOT_USER_UPDATE action reducer', () => {
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }
@@ -214,7 +210,6 @@ test('OPEN_EDIT_USER_DIALOG action reducer', () => {
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }
@@ -253,7 +248,6 @@ test('CLOSE_EDIT_USER_DIALOG action reducer', () => {
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }
@@ -291,7 +285,6 @@ test('UPDATE_SEARCH_FILTER action reducer', () => {
       errors: {},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }
@@ -329,7 +322,6 @@ test('LOADING_USERS action reducer', () => {
       errors: {},
       links: undefined,
       searchFilter: {search_term: ''},
-      timezones: [],
       permissions: [],
       accountId: '123'
     }

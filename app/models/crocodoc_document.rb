@@ -39,7 +39,7 @@ class CrocodocDocument < ActiveRecord::Base
   def upload
     return if uuid.present?
 
-    url = attachment.authenticated_url(expires_in: 1.day)
+    url = attachment.public_url(expires_in: 1.day)
 
     begin
       response = Canvas.timeout_protection("crocodoc_upload", raise_on_timeout: true) do

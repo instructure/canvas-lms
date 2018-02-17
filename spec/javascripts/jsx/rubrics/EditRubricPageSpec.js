@@ -19,8 +19,15 @@
 define([
   'react',
   'compiled/views/rubrics/EditRubricPage',
-], (React, EditRubricPage) => {
+  'helpers/assertions'
+], (React, EditRubricPage, assertions) => {
   QUnit.module('RubricEdit');
+
+  test('should be accessible', (assert) => {
+    const view = new EditRubricPage()
+    const done = assert.async()
+    assertions.isAccessible(view, done, {'a11yReport': true})
+  });
 
   test('does not immediately create the dialog', () => {
     const clickSpy = sinon.spy(EditRubricPage.prototype, 'attachInitialEvent')

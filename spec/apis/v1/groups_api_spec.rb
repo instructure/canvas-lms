@@ -65,7 +65,7 @@ describe "Groups API", type: :request do
   end
 
   def group_category_json(group_category, user)
-    {
+    json = {
       "auto_leader" => group_category.auto_leader,
       "group_limit" => group_category.group_limit,
       "id" => group_category.id,
@@ -78,6 +78,9 @@ describe "Groups API", type: :request do
       "allows_multiple_memberships" => group_category.allows_multiple_memberships?,
       "is_member" => group_category.is_member?(user)
     }
+    json['sis_group_category_id'] = group_category.sis_source_id if group_category.context.grants_any_right?(user, :read_sis, :manage_sis)
+    json['sis_import_id'] = group_category.sis_batch_id if group_category.context.grants_right?(user, :manage_sis)
+    json
   end
 
   def users_json(users, opts)
@@ -106,6 +109,7 @@ describe "Groups API", type: :request do
       'moderator' => membership.moderator,
     }
     json['sis_import_id'] = membership.sis_batch_id if membership.group.context_type == 'Account' && is_admin
+    json['sis_group_id'] = membership.group.sis_source_id if membership.group.context_type == 'Account' && is_admin
     json
   end
 
@@ -133,6 +137,32 @@ describe "Groups API", type: :request do
     links = response.headers['Link'].split(",")
     expect(links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }).to be_truthy
   end
+
+  describe "show SIS fields based on manage_sis permissions" do
+    before :once do
+      course_with_student(:user => @member)
+      @group = @course.groups.create!(:name => "My Group")
+      @group.add_user(@member, 'accepted', true)
+      @group.reload
+      account = @course.account
+      @admin_user = User.create!()
+      account.account_users.create!(user: @admin_user, account: account)
+    end
+
+    it "should show if the user has permission", priority: 3, test_id: 3436528 do
+      @user = @admin_user
+      json = api_call(:get, "/api/v1/groups/#{@group.id}", @category_path_options.merge(action: "show", group_id: @group.id))
+      expect(json).to have_key("sis_group_id")
+      expect(json).to have_key("sis_import_id")
+    end
+
+    it "should not show if the user doesn't have permission", priority: 3, test_id: 3436529 do
+      @user = @member
+      json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(action: 'index'))
+      expect(json[0]).not_to have_key("sis_group_id")
+      expect(json[0]).not_to have_key("sis_import_id")
+    end
+ end
 
   it "should indicate if the context is deleted" do
     course_with_student(:user => @member)
@@ -356,6 +386,27 @@ describe "Groups API", type: :request do
     project_groups.save
     api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
     expect(project_groups.groups.active.count).to eq 1
+  end
+
+  it "should allow using group category sis id" do
+    @account = Account.default
+    account_admin_user(account: @account)
+    project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
+    api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
+             @category_path_options.merge(action: :create,
+                                          group_category_id: 'sis_group_category_id:gcsis1'))
+    expect(project_groups.groups.active.count).to eq 1
+  end
+
+  it "should allow setting sis id on group creation" do
+    @account = Account.default
+    account_admin_user(account: @account)
+    project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
+    json = api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
+                    @category_path_options.merge(action: :create,
+                                                 group_category_id: 'sis_group_category_id:gcsis1',
+                                                 sis_group_id: 'gsis1'))
+    expect(json['sis_group_id']).to eq 'gsis1'
   end
 
   it "should not allow a non-admin to create a group in a account" do

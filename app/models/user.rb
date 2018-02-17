@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
            inverse_of: :observer
   has_many :observed_users, :through => :user_observees, :source => :user
   has_many :all_courses, :source => :course, :through => :enrollments
+  has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
   has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'") }, :through => :group_memberships
   has_many :polls, class_name: 'Polling::Poll'
@@ -80,6 +81,7 @@ class User < ActiveRecord::Base
   has_many :access_tokens, -> { preload(:developer_key) }
   has_many :notification_endpoints, :through => :access_tokens
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :lti_results, inverse_of: :user, class_name: 'Lti::Result'
 
   has_many :student_enrollments
   has_many :ta_enrollments
@@ -1042,8 +1044,7 @@ class User < ActiveRecord::Base
     can :view_statistics
 
     given {|user| self.check_accounts_right?(user, :manage_students) }
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and
-      can :view_statistics and can :read and can :read_reports and can :manage_feature_flags and can :read_grades
+    can :read_profile and can :view_statistics and can :read_reports and can :read_grades
 
     given {|user| self.check_accounts_right?(user, :manage_user_logins) }
     can :read and can :read_reports
@@ -1057,7 +1058,8 @@ class User < ActiveRecord::Base
     given do |user|
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
-    can :manage_user_details and can :rename and can :read_profile
+    can :manage_user_details and can :rename and can :read_profile and can :update_avatar and can :remove_avatar and
+      can :manage_feature_flags
 
     given{ |user| self.pseudonyms.shard(self).any?{ |p| p.grants_right?(user, :update) } }
     can :merge
@@ -1133,7 +1135,7 @@ class User < ActiveRecord::Base
   end
 
   def management_contexts
-    contexts = [self] + self.courses + self.groups.active + self.all_courses
+    contexts = [self] + self.courses + self.groups.active + self.all_courses_for_active_enrollments
     contexts.uniq
   end
 
@@ -1635,8 +1637,16 @@ class User < ActiveRecord::Base
               for_context_codes(shard_course_context_codes).
               preload({submission: :assignment}) # avoid n+1 query on grants_right? check below
           end
-          # only include assessment requests they have permission to perform
-          result = result.select { |request| request.submission.grants_right?(self, :read) }
+
+          # only include assessment requests user has permission to perform.
+          # This has 2 parts
+          # 1. the reviewer must have permission to read the submission, and
+          # 2. the submission must still be part of the assignment, which will
+          #    be false if the submitter is no longer assigned the assigment
+          result = result.select do |request|
+            request.submission.grants_right?(self, :read) &&
+            request.submission.assignment.submissions.include?(request.submission)
+          end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
           result
@@ -3001,14 +3011,15 @@ class User < ActiveRecord::Base
       if for_course
         parent_folder = self.submissions_folder
         Folder.unique_constraint_retry do
-          self.folders.where(parent_folder_id: parent_folder, submission_context_code: for_course.asset_string)
-            .first_or_create!(name: for_course.name)
+          self.folders.where(parent_folder_id: parent_folder, submission_context_code: for_course.asset_string).
+            first_or_create!(name: for_course.name)
         end
       else
         return @submissions_folder if @submissions_folder
         Folder.unique_constraint_retry do
-          @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
-            .first_or_create!(name: I18n.t('Submissions', locale: self.locale))
+          @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first,
+                                                   submission_context_code: 'root').
+            first_or_create!(name: I18n.t('Submissions', locale: self.locale))
         end
       end
     end

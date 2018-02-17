@@ -91,11 +91,11 @@ module Lti
     def current_course_observee_lti_context_ids
       return [] unless @canvas_context.is_a?(Course)
 
-      @current_course_observee_lti_context_ids ||= @canvas_user.observer_enrollments
-                                                               .current
-                                                               .where(course_id: @canvas_context)
-                                                               .preload(:associated_user)
-                                                               .map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+      @current_course_observee_lti_context_ids ||= @canvas_user.observer_enrollments.
+        current.
+        where(course_id: @canvas_context).
+        preload(:associated_user).
+        map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
     end
 
     def current_account_enrollments()

@@ -18,8 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require_relative '../../selenium/helpers/groups_common'
 
 describe "/submissions/show" do
+  include GroupsCommon
+
   before :once do
     course_with_student(active_all: true)
   end
@@ -31,6 +34,43 @@ describe "/submissions/show" do
     assign(:submission, a.submit_homework(@user))
     render "submissions/show"
     expect(response).not_to be_nil
+  end
+
+  context 'when assignment is a group assignment' do
+    before :once do
+      @group_category = @course.group_categories.create!(name: "Test Group Set")
+      @group = @course.groups.create!(name: "a group", group_category: @group_category)
+      add_user_to_group(@user, @group, true)
+      @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
+        group_category: @group_category,
+        grade_group_students_individually: true,
+      ))
+      @submission = @assignment.submit_homework(@user)
+    end
+
+    before :each do
+      view_context
+      assign(:assignment, @assignment)
+      assign(:submission, @submission)
+    end
+
+    it 'shows radio buttons for an individually graded group assignment' do
+      render "submissions/show"
+      @html = Nokogiri::HTML.fragment(response.body)
+      expect(@html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 2
+      expect(@html.css('#submission_group_comment').size).to eq 1
+    end
+
+    it 'renders hidden checkbox for a group graded group assignment' do
+      @assignment.grade_group_students_individually = false
+      @assignment.save!
+      render "submissions/show"
+      @html = Nokogiri::HTML.fragment(response.body)
+      expect(@html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 0
+      checkbox = @html.css('#submission_group_comment')
+      expect(checkbox.attr('checked').value).to eq 'checked'
+      expect(checkbox.attr('style').value).to include('display:none')
+    end
   end
 
   context 'when assignment has deducted points' do

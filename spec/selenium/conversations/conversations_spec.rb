@@ -38,11 +38,11 @@ describe "conversations new" do
     expect(f('#compose-new-message')).to be_displayed
     # Close button displays in titlebar
     expect(f('.ui-dialog-titlebar-close')).to be_displayed
-    # Course Dropdown displays and defaults to Select course
-    expect(f('.btn.dropdown-toggle[data-id="compose-message-course"]')).to include_text('Select course')
+    # Course Dropdown displays... fetching default is weird
+    expect(f('#compose-message-course-group-filter')).to be_displayed
 
     # Selects course for rest of elements to display
-    select_message_course("#{@course.name}")
+    select_message_course(@course)
     wait_for_ajaximations
 
     # To field displays
@@ -83,34 +83,36 @@ describe "conversations new" do
       conversations
     end
 
-    it "should have a courses dropdown", priority: "1", test_id: 117960 do
-      f("[data-id = 'course-filter']").click
+    it "should have a course group filter", priority: "1", test_id: 117960 do
+      element = course_group_filter
+      element.click
       wait_for_ajaximations
-
-      # Verify course filter is open
-      expect(f('.course-filter.open')).to be_truthy
-
-      # Verify course filter names
-      dropdown_array = ff('#course-filter-bs .text')
-      expect(dropdown_array[0]).to include_text('All Courses')
-      expect(dropdown_array[1]).to include_text(@course.name)
+      expect(element.enabled?).to be true
+      expect(f('#course-group-filter')).to include_text('Filter conversations by course or group')
+      expect(f('#course-group-filter')).to include_text(@course.name)
+      element.click
+      wait_for_ajaximations
+      # Now it's closed so the course should not be there
+      expect(f('#course-group-filter')).to include_text('Filter conversations by course or group')
+      expect(f('#course-group-filter')).not_to include_text(@course.name)
     end
 
     it "should have a type dropdown", priority: "1", test_id: 446594 do
-      f("[data-id = 'type-filter']").click
+      element = view_filter
+      element.click
       wait_for_ajaximations
 
       # Verify type filter is open
-      expect(f('.type-filter.open')).to be
+      expect(element.enabled?).to be true
 
       # Verify type filter names and order
-      dropdown_array = ff('#type-filter-bs .text')
-      expect(dropdown_array[0]).to include_text('Inbox')
-      expect(dropdown_array[1]).to include_text('Unread')
-      expect(dropdown_array[2]).to include_text('Starred')
-      expect(dropdown_array[3]).to include_text('Sent')
-      expect(dropdown_array[4]).to include_text('Archived')
-      expect(dropdown_array[5]).to include_text('Submission Comments')
+      options = element.find_elements(tag_name: 'option')
+      expect(options[0].text).to eq 'Inbox'
+      expect(options[1].text).to eq 'Unread'
+      expect(options[2].text).to eq 'Starred'
+      expect(options[3].text).to eq 'Sent'
+      expect(options[4].text).to eq 'Archived'
+      expect(options[5].text).to eq 'Submission Comments'
     end
 
     it "should have action buttons", priority: "1", test_id: 446595 do
@@ -339,60 +341,52 @@ describe "conversations new" do
 
     it "should default to inbox view", priority: "1", test_id: 86601 do
       conversations
-      expect(bootstrap_select_value(view_filter)).to eq 'inbox'
+      expect(selected_view_filter).to eq 'inbox'
       expect(conversation_elements.size).to eq 2
     end
 
     it "should have an unread view", priority: "1", test_id: 197523 do
       conversations
       select_view('unread')
+      expect(selected_view_filter).to eq 'unread'
       expect(conversation_elements.size).to eq 1
     end
 
     it "should have an starred view", priority: "1", test_id: 197524 do
       conversations
       select_view('starred')
+      expect(selected_view_filter).to eq 'starred'
       expect(conversation_elements.size).to eq 2
     end
 
     it "should have an sent view", priority: "1", test_id: 197525 do
       conversations
       select_view('sent')
+      expect(selected_view_filter).to eq 'sent'
       expect(conversation_elements.size).to eq 3
     end
 
     it "should have an archived view", priority: "1", test_id: 197526 do
       conversations
       select_view('archived')
+      expect(selected_view_filter).to eq 'archived'
       expect(conversation_elements.size).to eq 1
     end
 
     it "should default to all courses context", priority: "1", test_id: 197527 do
       conversations
-      expect(bootstrap_select_value(course_filter)).to eq ''
       expect(conversation_elements.size).to eq 2
-    end
-
-    it "should truncate long course names", priority: "2", test_id: 197528 do
-      @course.name = "this is a very long course name that will be truncated"
-      @course.save!
-      conversations
-      select_course(@course.id)
-      button_text = f('.filter-option', course_filter).text
-      expect(button_text).not_to eq @course.name
-      expect(button_text[0...5]).to eq @course.name[0...5]
-      expect(button_text[-5..-1]).to eq @course.name[-5..-1]
     end
 
     it "should filter by course", priority: "1", test_id: 197529 do
       conversations
-      select_course(@course.id)
+      select_course(@course.name)
       expect(conversation_elements.size).to eq 2
     end
 
     it "should filter by course plus view", priority: "1", test_id: 197530 do
       conversations
-      select_course(@course.id)
+      select_course(@course.name)
       select_view('unread')
       expect(conversation_elements.size).to eq 1
     end

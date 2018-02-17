@@ -20,7 +20,7 @@ define [
   '../../../util/round'
   'jsx/gradebook/GradingSchemeHelper'
   'i18n!sr_gradebook'
-], (Ember, round, GradingSchemeHelper, I18n) ->
+], (Ember, round, {scoreToGrade}, I18n) ->
 
   FinalGradeGradesComponent = Ember.Component.extend
 
@@ -39,7 +39,7 @@ define [
 
     letterGrade:(->
       percent = @get("student.total_percent")
-      GradingSchemeHelper.scoreToGrade(percent, @get('gradingStandard'))
+      scoreToGrade(percent, @get('gradingStandard'))
     ).property('gradingStandard', 'percent')
 
     showGrade: Ember.computed.bool('student.total_grade.possible')

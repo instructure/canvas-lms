@@ -114,6 +114,10 @@ module Api::V1::DiscussionTopics
         exclude_response_fields: excludes)
     end
 
+    if opts[:include_sections_user_count] && !topic.is_section_specific
+      json[:user_count] = topic.context.enrollments.active.count
+    end
+
     if opts[:include_sections] && topic.is_section_specific
       section_includes = []
       section_includes.push('user_count') if opts[:include_sections_user_count]

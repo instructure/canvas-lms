@@ -72,6 +72,7 @@ describe "assignments" do
     end
 
     it "should create an assignment using main add button", priority: "1", test_id: 132582 do
+      skip 'fragile spec, needs to be reworked, see CORE-877'
       assignment_name = 'first assignment'
       # freeze for a certain time, so we don't get unexpected ui complications
       time = DateTime.new(Time.now.year,1,7,2,13)

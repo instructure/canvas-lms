@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::DiffGenerator do
   before :once do
     account_model
-    @batch = @account.sis_batches.build
+    @batch = @account.sis_batches.create
   end
 
   subject { described_class.new(@account, @batch) }
@@ -48,7 +48,7 @@ describe SIS::CSV::DiffGenerator do
         { file: 'courses2.csv' },
       ])
 
-      expect(@batch.processing_warnings).to be_empty
+      expect(@batch.sis_batch_errors).to be_empty
     end
 
     it 'should skip diffing if previous has more than one file of type' do
@@ -63,9 +63,9 @@ describe SIS::CSV::DiffGenerator do
       expect(subject.generate_csvs(previous, current)).to match_array([
         { file: 'users.csv' },
       ])
-      warning = @batch.processing_warnings.first
-      expect(warning.first).to eq "users.csv"
-      expect(warning.last).to match(%r{diffing against more than one})
+      warning = @batch.sis_batch_errors.first
+      expect(warning.file).to eq "users.csv"
+      expect(warning.message).to match(%r{diffing against more than one})
     end
 
     it 'should skip diffing if current has more than one file of type' do
@@ -80,9 +80,9 @@ describe SIS::CSV::DiffGenerator do
       expect(subject.generate_csvs(previous, current)).to match_array([
         { file: 'users1.csv' }, { file: 'users2.csv' },
       ])
-      warning = @batch.processing_warnings.first
-      expect(warning.first).to eq "users1.csv"
-      expect(warning.last).to match(%r{diffing against more than one})
+      warning = @batch.sis_batch_errors.first
+      expect(warning.file).to eq "users1.csv"
+      expect(warning.message).to match(%r{diffing against more than one})
     end
 
     it 'should generate multiple diffs for different file types' do

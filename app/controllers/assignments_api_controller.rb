@@ -618,8 +618,8 @@ class AssignmentsApiController < ApplicationController
 
     new_assignment.insert_at(old_assignment.position + 1)
     new_assignment.save!
-    positions_in_group = Assignment.active.where(assignment_group_id: old_assignment.assignment_group_id)
-                                   .pluck("id", "position")
+    positions_in_group = Assignment.active.where(assignment_group_id: old_assignment.assignment_group_id).
+      pluck("id", "position")
     positions_hash = {}
     positions_in_group.each do |id_pos_pair|
       positions_hash[id_pos_pair[0]] = id_pos_pair[1]
@@ -742,8 +742,8 @@ class AssignmentsApiController < ApplicationController
   #   All dates associated with the assignment, if applicable
   # @returns Assignment
   def show
-    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric)
-                    .api_id(params[:id])
+    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric).
+      api_id(params[:id])
     if authorized_action(@assignment, @current_user, :read)
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 

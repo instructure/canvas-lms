@@ -74,6 +74,8 @@ module AccountReports
       headers << I18n.t('current score')
       headers << I18n.t('final score')
       headers << I18n.t('enrollment state')
+      headers << I18n.t('unposted current score')
+      headers << I18n.t('unposted final score')
 
       write_report headers do |csv|
 
@@ -94,6 +96,8 @@ module AccountReports
           arr << student["current_score"]
           arr << student["final_score"]
           arr << student["enroll_state"]
+          arr << student["unposted_current_score"]
+          arr << student["unposted_final_score"]
           csv << arr
         end
       end
@@ -144,10 +148,14 @@ module AccountReports
         headers << I18n.t('%{name} grading period id', name: gp.title)
         headers << I18n.t('%{name} current score', name: gp.title)
         headers << I18n.t('%{name} final score', name: gp.title)
+        headers << I18n.t('%{name} unposted current score', name: gp.title)
+        headers << I18n.t('%{name} unposted final score', name: gp.title)
       }
       headers << I18n.t('current score')
       headers << I18n.t('final score')
       headers << I18n.t('enrollment state')
+      headers << I18n.t('unposted current score')
+      headers << I18n.t('unposted final score')
 
       generate_and_run_report headers do |csv|
         students.find_in_batches do |student_chunk|
@@ -173,12 +181,16 @@ module AccountReports
               grading_periods.each do |gp|
                 scores_for_student = grading_period_scores_for_student(student, gp, scores)
                 arr << gp.id
-                arr << scores_for_student[:current]
-                arr << scores_for_student[:final]
+                arr << scores_for_student[:current_score]
+                arr << scores_for_student[:final_score]
+                arr << scores_for_student[:unposted_current_score]
+                arr << scores_for_student[:unposted_final_score]
               end
               arr << student["current_score"]
               arr << student["final_score"]
               arr << student["enroll_state"]
+              arr << student["unposted_current_score"]
+              arr << student["unposted_final_score"]
               csv << arr
             end
           end
@@ -192,17 +204,18 @@ module AccountReports
       Score.where(
         enrollment_id: students.map(&:enrollment_id),
         grading_period_id: grading_periods.map(&:id)
-      ).active.pluck(
+      ).active.select(
         :enrollment_id,
         :grading_period_id,
         :current_score,
-        :final_score
-      ).index_by { |score| "#{score[0]}:#{score[1]}" }
+        :final_score,
+        :unposted_current_score,
+        :unposted_final_score
+      ).index_by { |score| "#{score[:enrollment_id]}:#{score[:grading_period_id]}" }
     end
 
     def grading_period_scores_for_student(student, grading_period, scores)
-      scores_array = scores["#{student['enrollment_id']}:#{grading_period.id}"] || []
-      { current: scores_array[2], final: scores_array[3] }
+      scores["#{student['enrollment_id']}:#{grading_period.id}"] || []
     end
 
     def student_grade_scope
@@ -216,6 +229,8 @@ module AccountReports
                 t.sis_source_id AS term_sis_id,
                 sc.current_score,
                 sc.final_score,
+                sc.unposted_current_score,
+                sc.unposted_final_score,
            CASE WHEN e.workflow_state = 'active' THEN 'active'
                 WHEN e.workflow_state = 'completed' THEN 'concluded'
                 WHEN e.workflow_state = 'inactive' THEN 'inactive'

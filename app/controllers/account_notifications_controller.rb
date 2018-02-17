@@ -246,7 +246,7 @@ class AccountNotificationsController < ApplicationController
     account_notification = @account.announcements.find(params[:id])
     if account_notification
       account_notification.attributes = params.require(:account_notification).
-        permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle)
+        permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific)
 
       existing_roles = account_notification.account_notification_roles.map(&:role)
       requested_roles = roles_to_add(params[:account_notification_roles])
@@ -309,6 +309,6 @@ class AccountNotificationsController < ApplicationController
 
   def account_notification_params
     params.require(:account_notification).
-      permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle)
+      permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific)
   end
 end

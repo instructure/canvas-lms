@@ -25,13 +25,17 @@ import MessageListView from 'compiled/views/conversations/MessageListView'
 import MessageDetailView from 'compiled/views/conversations/MessageDetailView'
 import MessageFormDialog from 'compiled/views/conversations/MessageFormDialog'
 import SubmissionCommentFormDialog from 'compiled/views/conversations/SubmissionCommentFormDialog'
-import InboxHeaderView from 'compiled/views/conversations/InboxHeaderView'
 import deparam from 'compiled/util/deparam'
 import CourseCollection from 'compiled/collections/CourseCollection'
 import FavoriteCourseCollection from 'compiled/collections/FavoriteCourseCollection'
 import GroupCollection from 'compiled/collections/GroupCollection'
 import 'compiled/behaviors/unread_conversations'
 import 'jquery.disableWhileLoading'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import InboxHeaderView from 'compiled/views/conversations/InboxHeaderView'
+import { decodeQueryString } from 'jsx/shared/queryString'
+import ConversationStatusFilter from 'jsx/shared/components/ConversationStatusFilter'
 
 const ConversationsRouter = Backbone.Router.extend({
 
@@ -221,7 +225,7 @@ const ConversationsRouter = Backbone.Router.extend({
 
   filter (state) {
     const filters = this.filters = deparam(state)
-    this.header.displayState(filters)
+    this.header.updateFilterLabels()
     this.selectConversation(null)
     this.list.selectedMessages = []
     this.list.collection.reset()
@@ -450,7 +454,7 @@ const ConversationsRouter = Backbone.Router.extend({
   },
 
   _initHeaderView () {
-    this.header = new InboxHeaderView({el: $('header.panel'), courses: this.courses})
+    this.header = new InboxHeaderView({el: $('header.panel')})
     this.header.render()
   },
 

@@ -231,6 +231,13 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         pairs = json.map{|hash| [hash['id'], hash['workflow_state']]}
         expect(pairs).to eq [[migration2.id, 'queued'], [@migration.id, 'completed']]
       end
+
+      it "should resolve an expired job if necessary" do
+        MasterCourses::MasterMigration.where(:id => @migration.id).update_all(:created_at => 3.days.ago)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
+          @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
+        expect(json['workflow_state']).to eq 'exports_failed'
+      end
     end
 
     describe "minion side" do

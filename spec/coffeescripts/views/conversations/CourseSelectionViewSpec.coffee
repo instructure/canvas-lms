@@ -22,7 +22,8 @@ define [
   'compiled/collections/FavoriteCourseCollection'
   'compiled/collections/GroupCollection'
   'helpers/fakeENV'
-], (Course, CourseSelectionView, CourseCollection, FavoriteCourseCollection, GroupCollection, fakeENV) ->
+  'helpers/assertions'
+], (Course, CourseSelectionView, CourseCollection, FavoriteCourseCollection, GroupCollection, fakeENV, assertions) ->
   courseSelectionView = () ->
     courses =
       favorites: new FavoriteCourseCollection()
@@ -38,6 +39,11 @@ define [
       fakeENV.setup(CONVERSATIONS: {CAN_MESSAGE_ACCOUNT_CONTEXT: false})
     teardown: ->
       fakeENV.teardown()
+
+  test 'it should be accessible', (assert) ->
+    course = new Course
+    done = assert.async()
+    assertions.isAccessible courseSelectionView(), done, {'a11yReport': true}
 
   test 'does not label an un-favorited course as concluded', ->
     course = new Course

@@ -185,7 +185,7 @@ export default class StudentContextTray extends React.Component {
             label={I18n.t('Student Details')}
             closeButtonLabel={I18n.t('Close')}
             closeButtonRef={this.getCloseButtonRef}
-            applicationElement={() => document.getElementById('application')}
+            applicationElement={() => document.getElementById('application') || document.body}
             open={this.state.isOpen}
             onDismiss={this.handleRequestClose}
             placement='end'

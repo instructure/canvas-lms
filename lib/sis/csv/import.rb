@@ -24,7 +24,7 @@ module SIS
   module CSV
     class Import
 
-      attr_accessor :root_account, :batch, :errors, :warnings, :finished, :counts, :updates_every,
+      attr_accessor :root_account, :batch, :finished, :counts, :updates_every,
         :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness
 
       IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
@@ -35,7 +35,7 @@ module SIS
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
       IMPORTERS = %i{change_sis_id account term abstract_course course section
-                     xlist user enrollment admin group group_membership
+                     xlist user enrollment admin group_category group group_membership
                      grade_publishing_results user_observer}.freeze
 
       def initialize(root_account, opts = {})
@@ -64,9 +64,6 @@ module SIS
 
         @progress_multiplier = opts[:progress_multiplier] || 1
         @progress_offset = opts[:progress_offset] || 0
-
-        @errors = []
-        @warnings = []
 
         @pending = false
         @finished = false
@@ -120,7 +117,7 @@ module SIS
               @total_rows += rows
               false
             rescue ::CSV::MalformedCSVError
-              add_error(csv, I18n.t("Malformed CSV"))
+              add_error(csv, I18n.t("Malformed CSV"), failure: true)
               true
             end
           end
@@ -188,9 +185,9 @@ module SIS
           })[:error_report]
           error_message = I18n.t("Error while importing CSV. Please contact support."\
                                  " (Error report %{number})", number: err_id.to_s)
-          add_error(nil, error_message)
+          add_error(nil, error_message, failure: true)
         else
-          add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}")
+          add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}", failure: true)
           raise e
         end
       ensure
@@ -200,14 +197,7 @@ module SIS
 
         if @batch && @parallelism == 1
           @batch.data[:counts] = @counts
-          @batch.processing_errors = @errors
-          @batch.processing_warnings = @warnings
           @batch.save
-        end
-
-        if @allow_printing and !@errors.empty? and !@batch
-          # If there's no batch, then we must be working via the console and we should just error out
-          @errors.each { |w| puts w.join ": " }
         end
       end
 
@@ -215,12 +205,24 @@ module SIS
         @logger ||= Rails.logger
       end
 
-      def add_error(csv, message)
-        @errors << [ csv ? csv[:file] : "", message ]
+      def errors
+        errors = @root_account.sis_batch_errors
+        errors = errors.where(sis_batch: @batch) if @batch
+        errors.order(:id).pluck(:file, :message)
       end
 
-      def add_warning(csv, message)
-        @warnings << [ csv ? csv[:file] : "", message ]
+      def add_error(csv, message, row: nil, failure: false, backtrace: nil)
+        file = csv ? csv[:file] : nil
+        @root_account.sis_batch_errors.create!(sis_batch: @batch,
+                                               file: file,
+                                               message: message,
+                                               failure: failure,
+                                               backtrace: backtrace,
+                                               row: row)
+      end
+
+      def add_warning(csv, message, row: nil)
+        add_error(csv, message, row: row)
       end
 
       def calculate_progress
@@ -285,11 +287,7 @@ module SIS
           })[:error_report]
           error_message = I18n.t("Error while importing CSV. Please contact support. "\
                                  "(Error report %{number})", number: err_id.to_s)
-          add_error(nil, error_message)
-          @batch.processing_errors ||= []
-          @batch.processing_warnings ||= []
-          @batch.processing_errors.concat(@errors)
-          @batch.processing_warnings.concat(@warnings)
+          add_error(nil, error_message, failure: true, backtrace: e)
           @batch.workflow_state = :failed_with_messages
           @batch.save!
         ensure
@@ -328,10 +326,6 @@ module SIS
           @current_row += @batch.data[:current_row] if @batch.data[:current_row]
           @batch.data[:current_row] = @current_row
           @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
-          @batch.processing_errors ||= []
-          @batch.processing_warnings ||= []
-          @batch.processing_errors.concat(@errors)
-          @batch.processing_warnings.concat(@warnings)
           @current_row = 0
           @batch.save
           return @batch.data[:importers][importer] == 0
@@ -349,6 +343,7 @@ module SIS
         # throttling can be set on individual SisBatch instances, and also
         # site-wide in the Setting table.
         @batch.reload(:select => 'data') # update to catch changes to pause vars
+        @batch.data ||= {}
         @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 100)).to_i
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
       end
@@ -413,7 +408,7 @@ module SIS
         csv = { :base => base, :file => file, :fullpath => File.join(base, file) }
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
           unless valid_utf8?(csv[:fullpath])
-            add_error(csv, I18n.t("Invalid UTF-8"))
+            add_error(csv, I18n.t("Invalid UTF-8"), failure: true)
             return
           end
           begin
@@ -428,11 +423,11 @@ module SIS
                   false
                 end
               end
-              add_error(csv, I18n.t("Couldn't find Canvas CSV import headers")) if importer.nil?
+              add_error(csv, I18n.t("Couldn't find Canvas CSV import headers"), failure: true) if importer.nil?
               break
             end
           rescue ::CSV::MalformedCSVError
-            add_error(csv, "Malformed CSV")
+            add_error(csv, "Malformed CSV", failure: true)
           end
         elsif !File.directory?(csv[:fullpath]) && !(csv[:fullpath] =~ IGNORE_FILES)
           add_warning(csv, I18n.t("Skipping unknown file type"))

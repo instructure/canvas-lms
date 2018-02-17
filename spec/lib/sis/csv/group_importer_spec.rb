@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::GroupImporter do
 
-  before { account_model }
+  before {account_model}
 
   it "should skip bad content" do
     process_csv_data_cleanly(
@@ -29,32 +29,37 @@ describe SIS::CSV::GroupImporter do
     )
     before_count = Group.count
     importer = process_csv_data(
-      "group_id,account_id,name,status",
-      "G001,A001,Group 1,available",
-      "G002,A001,Group 1,blerged",
-      "G003,A001,,available",
-      "G004,A004,Group 4,available",
-      ",A001,G1,available")
-    expect(importer.errors).to eq []
-    expect(importer.warnings.map(&:last)).to eq(
-      ["Improper status \"blerged\" for group G002, skipping",
-       "No name given for group G003, skipping",
-       "Parent account didn't exist for A004",
-       "No group_id given for a group"]
+      "group_id,account_id,name,status,group_category_id,course_id",
+      "G001,A001,Group 1,available,",
+      "G001,,Group 1,available,,invalid",
+      "G001,invalid,Group 1,available,,invalid",
+      "G002,A001,Group 1,blerged,",
+      "G003,A001,,available,",
+      "G004,A004,Group 4,available,",
+      ",A001,G1,available,",
+      "G006,A001,Group 6,available,invalid",
     )
+    err = ["Course with sis id invalid didn't exist for group G001.",
+           "Only one context is allowed and both course_id and account_id where provided for group G001.",
+           "Improper status \"blerged\" for group G002.",
+           "No name given for group G003.",
+           "Account with sis id A004 didn't exist for group G004.",
+           "No group_id given for a group.",
+           "Group Category invalid didn't exist in account A001 for group G006."]
+    expect(importer.errors.map(&:last)).to eq err
     expect(Group.count).to eq before_count + 1
   end
 
   it "should create groups" do
     account_model
-    @sub = @account.all_accounts.create!(:name => 'sub')
-    @sub.update_attribute('sis_source_id', 'A002')
+    sub = @account.all_accounts.create!(name: 'sub')
+    sub.update_attribute('sis_source_id', 'A002')
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
       "G002,A002,Group 2,deleted")
     groups = Group.order(:id).to_a
-    expect(groups.map(&:account_id)).to eq [@account.id, @sub.id]
+    expect(groups.map(&:account_id)).to eq [@account.id, sub.id]
     expect(groups.map(&:sis_source_id)).to eq %w(G001 G002)
     expect(groups.map(&:name)).to eq ["Group 1", "Group 2"]
     expect(groups.map(&:workflow_state)).to eq %w(available deleted)
@@ -73,8 +78,8 @@ describe SIS::CSV::GroupImporter do
   end
 
   it "should update group attributes" do
-    @sub = @account.sub_accounts.create!(:name => 'sub')
-    @sub.update_attribute('sis_source_id', 'A002')
+    sub = @account.sub_accounts.create!(name: 'sub')
+    sub.update_attribute('sis_source_id', 'A002')
     process_csv_data_cleanly(
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
@@ -90,7 +95,42 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:name)).to eq ["Group 1-1", "Group 2-b"]
     expect(groups.map(&:root_account)).to eq [@account, @account]
     expect(groups.map(&:workflow_state)).to eq %w(available deleted)
-    expect(groups.map(&:account)).to eq [@account, @sub]
+    expect(groups.map(&:account)).to eq [@account, sub]
   end
 
+  it "should use group_category_id" do
+    sub = @account.sub_accounts.create!(name: 'sub')
+    sub.update_attribute('sis_source_id', 'A002')
+    process_csv_data_cleanly(
+      "group_category_id,account_id,category_name,status",
+      "Gc001,,Group Cat 1,active",
+      "Gc002,A002,Group Cat 2,active")
+    process_csv_data_cleanly(
+      "group_id,account_id,name,status,group_category_id",
+      "G001,,Group 1,available,Gc001",
+      "G002,,Group 2,available,Gc002")
+    groups = Group.order(:id).to_a
+    expect(groups.map(&:account)).to eq [@account, sub]
+    expect(groups.map(&:group_category)).to eq GroupCategory.order(:id).to_a
+  end
+
+  it "should use course_id" do
+    course = course_factory(account: @account, sis_source_id: 'c001')
+    process_csv_data_cleanly(
+      "group_id,course_id,name,status",
+      "G001,c001,Group 1,available")
+    expect(Group.where(sis_source_id: 'G001').take.context).to eq course
+  end
+
+  it "should not allow changing course_id with group_memberships" do
+    course1 = course_factory(account: @account, sis_source_id: 'c001')
+    course_factory(account: @account, sis_source_id: 'c002')
+    group = group_model(context: course1, sis_source_id: "G001")
+    group.group_memberships.create!(user: user_model)
+
+    importer = process_csv_data(
+      "group_id,course_id,name,status",
+      "G001,c002,Group 1,available")
+    expect(importer.errors.last.last).to eq "Cannot move group G001 because it has group_memberships."
+  end
 end

@@ -24,7 +24,8 @@ define [
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
   'helpers/fakeENV'
-], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group, fakeENV) ->
+  'helpers/assertions'
+], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group, fakeENV, assertions) ->
 
   view = null
   group = null
@@ -44,6 +45,7 @@ define [
       users.loaded = true
       users.loadedAll = true
       group.users = -> users
+      group.set('leader', {id: 1})
       groupUsersView = new GroupUsersView {model: group, collection: users}
       groupDetailView = new GroupDetailView {model: group, users}
       view = new GroupView {groupUsersView, groupDetailView, model: group}
@@ -54,6 +56,10 @@ define [
       fakeENV.teardown()
       view.remove()
       document.getElementById("fixtures").innerHTML = ""
+
+  test 'it should be accessible', (assert) ->
+    done = assert.async()
+    assertions.isAccessible view, done, {'a11yReport': true}
 
   assertCollapsed = (view) ->
     ok view.$el.hasClass('group-collapsed'), 'expand visible'
@@ -74,6 +80,8 @@ define [
 
   test 'renders groupUsers', ->
     ok view.$('.group-user').length
+    ok (view.$('.remove-as-leader').length == 1)
+    ok (view.$('.set-as-leader').length == 1)
 
   test 'removes the group after successful deletion', ->
     url = "/api/v1/groups/#{view.model.get('id')}"
@@ -92,3 +100,18 @@ define [
     ok not view.$el.hasClass('hidden'), 'group hidden'
 
     server.restore()
+
+  test 'remove team leader', ->
+    url = "api/v1/groups/#{view.model.get('id')}"
+    server = sinon.fakeServer.create()
+    server.respondWith url, [
+      200
+      'Content-Type': 'application/json'
+      JSON.stringify {}
+    ]
+
+    # Test that remove team lead button ends up with 0 team leads
+    view.$('.remove-as-leader').click()
+    server.respond()
+    ok (view.$('.remove-as-leader').length == 0)
+    ok (view.$('.set-as-leader').length == 2)

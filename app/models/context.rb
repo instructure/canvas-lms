@@ -208,8 +208,8 @@ module Context
     name = asset.display_name.presence if asset.respond_to?(:display_name)
     name ||= asset.title.presence if asset.respond_to?(:title)
     name ||= asset.short_description.presence if asset.respond_to?(:short_description)
-    name ||= asset.name
-    name
+    name ||= asset.name if asset.respond_to?(:name)
+    name || ''
   end
 
   def self.get_account(context)

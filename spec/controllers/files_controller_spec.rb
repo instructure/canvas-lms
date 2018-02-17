@@ -53,6 +53,10 @@ describe FilesController do
     @file = factory_with_protected_attributes(@user.attachments, :uploaded_data => io)
   end
 
+  def account_js_file
+    @file = factory_with_protected_attributes(@account.attachments, :uploaded_data => fixture_file_upload('test.js', 'text/javascript', false))
+  end
+
   def folder_file
     @file = @folder.active_file_attachments.build(:uploaded_data => io)
     @file.context = @course
@@ -601,7 +605,7 @@ describe FilesController do
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'text/html')
         @file.update_attribute(:size, 1024 * 1024)
-        allow_any_instantiation_of(@file).to receive(:inline_url).and_return("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:inline_url_for_user).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -611,7 +615,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'image/jpeg')
-        allow_any_instantiation_of(@file).to receive(:inline_url).and_return("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:inline_url_for_user).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -621,7 +625,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         # it's a .doc file
-        allow_any_instantiation_of(@file).to receive(:download_url).and_return("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:download_url_for_user).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -651,6 +655,35 @@ describe FilesController do
         get "show_relative", params: {:course_id => @course.id, :file_path => "course files/nope"}
         assert_unauthorized
       end
+    end
+
+    context "account-context files" do
+      before :once do
+        @account = account_model
+      end
+
+      before :each do
+        allow(HostUrl).to receive(:file_host).and_return('files.test')
+        request.host = 'files.test'
+        user_session(@teacher)
+      end
+
+      it "should skip verification for an account-context file" do
+        account_js_file
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        ts, sf_verifier = @teacher.access_verifier
+        get 'show_relative', params: { :download => 1, :inline => 1, :sf_verifier => sf_verifier, :ts => ts, :user_id => @teacher.id, :verifier => verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path }
+        expect(response).to be_success
+      end
+
+      it "should enforce verification for contexts other than account" do
+        course_file
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        ts, sf_verifier = @teacher.access_verifier
+        get 'show_relative', params: { :download => 1, :inline => 1, :sf_verifier => sf_verifier, :ts => ts, :user_id => @teacher.id, :verifier => verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path }
+        assert_unauthorized
+      end
+
     end
   end
 
@@ -1236,6 +1269,53 @@ describe FilesController do
       assert_status(201)
       expect(folder.attachments.first).to_not be_nil
     end
+
+    it "works with a ContentMigration as the context" do
+      course = Course.create!
+      user = User.create!(:name => "me")
+      migration = course.content_migrations.create!
+      folder = course.folders.create!(name: "migrations")
+
+      params = {
+        id: 1,
+        user_id: user.id,
+        context_type: "ContentMigration",
+        context_id: migration.id,
+        token: @token,
+        name: "test.txt",
+        size: 42,
+        content_type: "text/plain",
+        instfs_uuid: 1,
+        folder_id: folder.id
+      }
+
+      post "api_capture", params: params
+      assert_status(201)
+    end
+
+    it "works with a Quizzes::QuizSubmission as the context" do
+      course = Course.create!
+      user = User.create!(name: "me")
+      quiz = course.quizzes.create!
+      submission = quiz.quiz_submissions.create!(user: user)
+      folder = course.folders.create!(name: "submissions")
+
+      params = {
+        id: 1,
+        user_id: user.id,
+        context_type: "Quizzes::QuizSubmission",
+        context_id: submission.id,
+        token: @token,
+        name: "test.txt",
+        size: 42,
+        content_type: "text/plain",
+        instfs_uuid: 1,
+        folder_id: folder.id
+      }
+
+      post "api_capture", params: params
+      assert_status(201)
+    end
   end
 
   describe "public_url" do
@@ -1254,7 +1334,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_url(secure: false) })
+        expect(data).to eq({ "public_url" => @attachment.public_url(secure: false) })
       end
     end
 
@@ -1272,7 +1352,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_url(secure: false) })
+        expect(data).to eq({ "public_url" => @attachment.public_url(secure: false) })
       end
 
       it "should verify that the requested file belongs to the submission" do
@@ -1288,7 +1368,7 @@ describe FilesController do
         get "public_url", params: {:id => old_file.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => old_file.authenticated_url(secure: false) })
+        expect(data).to eq({ "public_url" => old_file.public_url(secure: false) })
       end
     end
   end

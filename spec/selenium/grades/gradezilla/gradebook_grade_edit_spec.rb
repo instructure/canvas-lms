@@ -17,6 +17,7 @@
 #
 
 require_relative '../../helpers/gradezilla_common'
+require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/gradezilla_page'
 require_relative '../pages/grading_curve_page'
 require_relative '../setup/gradebook_setup'
@@ -108,12 +109,12 @@ describe "Gradezilla editing grades" do
   it "tab sets focus on the options menu trigger when editing a grade", priority: "1" do
     Gradezilla.visit(@course)
 
-    first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+    first_cell = Gradezilla::Cells.grading_cell(@student_1, @second_assignment)
     first_cell.click
-    grade_input = first_cell.find_element(:css, '.grade')
+    grade_input = Gradezilla::Cells.grading_cell_input(@student_1, @second_assignment)
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to have_class('editable')
+    expect(first_cell).to have_class('editable')
   end
 
   it "tab activates and focuses on the next cell when focused on the options menu trigger", priority: "1" do
@@ -130,27 +131,25 @@ describe "Gradezilla editing grades" do
     @course.assignment_groups.first.update!(rules: 'drop_lowest:1')
     Gradezilla.visit(@course)
 
-    assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l2 .gradebook-cell'
-    assignment_2_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3 .gradebook-cell'
-    a1 = f(assignment_1_sel)
-    a2 = f(assignment_2_sel)
-    expect(a1).to have_class 'dropped'
-    expect(a2).not_to have_class 'dropped'
+    expect(Gradezilla::Cells.grading_cell(@student_1, @second_assignment)).to contain_css('.dropped')
+    a3 = Gradezilla::Cells.grading_cell(@student_1, @third_assignment)
+    expect(a3).not_to contain_css('.dropped')
 
-    a2.click
-    grade_input = a2.find_element(:css, '.grade')
+    a3.click
+    grade_input = Gradezilla::Cells.grading_cell_input(@student_1, @third_assignment)
     set_value(grade_input, 3)
     grade_input.send_keys(:arrow_right)
-    expect(f(assignment_1_sel)).not_to have_class 'dropped'
-    expect(f(assignment_2_sel)).to have_class 'dropped'
+    # the third assignment now has the lowest score and is dropped
+    expect(Gradezilla::Cells.grading_cell(@student_1, @second_assignment)).not_to contain_css('.dropped')
+    expect(Gradezilla::Cells.grading_cell(@student_1, @third_assignment)).to contain_css('.dropped')
   end
 
   it "updates a grade when clicking outside of slickgrid", priority: "1", test_id: 220319 do
     Gradezilla.visit(@course)
 
-    first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+    first_cell = Gradezilla::Cells.grading_cell(@student_1, @second_assignment)
     first_cell.click
-    grade_input = first_cell.find_element(:css, '.grade')
+    grade_input = Gradezilla::Cells.grading_cell_input(@student_1, @second_assignment)
     set_value(grade_input, 3)
     f('body').click
     expect(f("body")).not_to contain_css('.gradebook_cell_editable')
@@ -162,28 +161,25 @@ describe "Gradezilla editing grades" do
     curved_grade_text = "8"
 
     Gradezilla.visit(@course)
-
-    Gradezilla.click_assignment_header_menu(@first_assignment.id)
-    Gradezilla.click_assignment_header_menu_element("curve grades")
+    Gradezilla.click_assignment_header_menu_element(@first_assignment.id,"curve grades")
     curve_form = GradingCurvePage.new
     curve_form.edit_grade_curve(curved_grade_text)
     curve_form.curve_grade_submit
     accept_alert
+
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0]).to include_text curved_grade_text
   end
 
   it "assigns zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
     skip_if_safari(:alert)
+    @first_assignment.grade_student(@student_2, grade: '', grader: @teacher)
     Gradezilla.visit(@course)
-
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l1', '')
-
-    Gradezilla.click_assignment_header_menu(@first_assignment.id)
-    Gradezilla.click_assignment_header_menu_element("curve grades")
+    Gradezilla.click_assignment_header_menu_element(@first_assignment.id,"curve grades")
 
     f('#assign_blanks').click
     fj('.ui-dialog-buttonpane button:visible').click
     accept_alert
+
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0]).to include_text '0'
   end
 
@@ -208,14 +204,6 @@ describe "Gradezilla editing grades" do
     StudentEnrollment.count.times do |n|
       expect(find_slick_cells(n, grade_grid)[2]).to include_text expected_grade
     end
-  end
-
-  it "displays an error on failed updates", priority: "1", test_id: 220384 do
-    # forces a 400
-    expect_any_instance_of(SubmissionsApiController).to receive(:get_user_considering_section).and_return(nil)
-    Gradezilla.visit(@course)
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
-    expect_flash_message :error, "refresh"
   end
 
   context 'with grading periods' do

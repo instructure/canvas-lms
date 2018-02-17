@@ -60,6 +60,7 @@ class GroupMembership < ActiveRecord::Base
         record.accepted? &&
         record.group &&
         record.group.context_available? &&
+        record.group&.can_participate?(self.user) &&
         record.sis_batch_id.blank?
     }
 
@@ -70,6 +71,7 @@ class GroupMembership < ActiveRecord::Base
         record.invited? &&
         record.group &&
         record.group.context_available? &&
+        record.group&.can_participate?(self.user) &&
         record.sis_batch_id.blank?
     }
 

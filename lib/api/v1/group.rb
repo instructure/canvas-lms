@@ -71,8 +71,8 @@ module Api::V1::Group
       hash['is_favorite'] = group.favorite_for_user?(user)
     end
     hash['html_url'] = group_url(group) if includes.include? 'html_url'
-    hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.account.grants_any_right?(user, session, :read_sis, :manage_sis)
-    hash['sis_import_id'] = group.sis_batch_id if group.context_type == 'Account' && group.account.grants_right?(user, session, :manage_sis)
+    hash['sis_group_id'] = group.sis_source_id if group.root_account.grants_any_right?(user, session, :read_sis, :manage_sis)
+    hash['sis_import_id'] = group.sis_batch_id if group.root_account.grants_right?(user, session, :manage_sis)
     hash['has_submission'] = group.submission?
     hash['concluded'] = group.context.concluded? || group.context.deleted?
     hash['tabs'] = tabs_available_json(group, user, session, ['external']) if includes.include?('tabs')
@@ -93,7 +93,10 @@ module Api::V1::Group
     if includes.include?('just_created')
       hash['just_created'] = membership.just_created || false
     end
-    if membership.group.context_type == 'Account' && membership.group.account.grants_right?(user, session, :manage_sis)
+    if membership.group.root_account.grants_any_right?(user, session, :read_sis, :manage_sis)
+      hash['sis_group_id'] = membership.group.sis_source_id
+    end
+    if membership.group.root_account.grants_right?(user, session, :manage_sis)
       hash['sis_import_id'] = membership.sis_batch_id
     end
     hash

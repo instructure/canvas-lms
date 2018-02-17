@@ -223,8 +223,8 @@ class SubmissionsApiController < ApplicationController
                       @assignment.representatives(@current_user).map(&:id)
                     else
                       @context.apply_enrollment_visibility(@context.student_enrollments,
-                                                           @current_user, section_ids)
-                        .pluck(:user_id)
+                                                           @current_user, section_ids).
+                        pluck(:user_id)
                     end
       submissions = @assignment.submissions.where(user_id: student_ids).preload(:originality_reports)
       submissions = submissions.preload(:quiz_submission) if @assignment.quiz?

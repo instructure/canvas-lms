@@ -39,23 +39,27 @@ class AnnouncementIndex
 
     # ---------------------- Controls ----------------------
     def filter_dropdown
-      # f('.filter_dropdown')
+      fj('select[name="filter-dropdown"]')
     end
 
-    # def filter_item(item_name)
-    #   fj("option:contains(\"#{item_name}\")")
-    # end
+    def filter_item(item_name)
+      fj("option:contains(\"#{item_name}\")")
+    end
 
     def search_box
-      # f('.search')
+      f('input[name="announcements_search"]')
     end
 
     def lock_button
-      # f('#lock_button')
+      f('#lock_announcements')
     end
 
     def delete_button
-      # f('#delete_button')
+      f('#delete_announcements')
+    end
+
+    def confirm_delete_button
+      f('#confirm_delete_announcements')
     end
 
     def add_announcement_button
@@ -76,12 +80,16 @@ class AnnouncementIndex
       fj(".ic-announcement-row:contains('#{title}')")
     end
 
+    def announcement_title_css(title)
+      ".ic-announcement-row:contains('#{title}')"
+    end
+
     def announcement_title(title)
       f('h3', announcement(title))
     end
 
     def announcement_checkbox(title)
-      # f('.check', announcement(title))
+      f('input[type="checkbox"] + label', announcement(title))
     end
 
     def announcement_sections(title)
@@ -103,16 +111,14 @@ class AnnouncementIndex
 
     # ---------------------- Actions ----------------------
     def select_filter(filter_name)
-      click_option(search_box, filter_name, :text)
-      wait_for_ajaximations
-      # if ^ doesn't work uncomment filter_item above and try this
-      # filter_dropdown.click
-      # filter_item(filter_name).click
+      filter_dropdown.click
+      filter_item(filter_name).click
     end
 
     def enter_search(title)
       set_value(search_box, title)
       driver.action.send_keys(:enter).perform
+      wait_for_ajaximations
     end
 
     def check_announcement(title)
@@ -125,6 +131,10 @@ class AnnouncementIndex
 
     def click_delete
       delete_button.click
+    end
+
+    def click_confirm_delete
+      confirm_delete_button.click
     end
 
     def click_on_announcement(title)

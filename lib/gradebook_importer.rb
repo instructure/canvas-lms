@@ -170,9 +170,9 @@ class GradebookImporter
     @students.each do |student|
       student.gradebook_importer_submissions.each do |submission|
         submission_assignment_id = submission.fetch('assignment_id').to_i
-        assignment = original_submissions_by_student
-          .fetch(student.id, {})
-          .fetch(submission_assignment_id, {})
+        assignment = original_submissions_by_student.
+          fetch(student.id, {}).
+          fetch(submission_assignment_id, {})
         submission['original_grade'] = assignment.fetch(:score, nil)
         submission['gradeable'] = assignment.fetch(:gradable, nil)
 

@@ -79,14 +79,14 @@ describe SisBatch do
 
   describe ".process_all_for_account" do
     it "should process all non-processed batches for the account" do
-      b1 = create_csv_data(['abc'])
-      b2 = create_csv_data(['abc'])
-      b3 = create_csv_data(['abc'])
-      b4 = create_csv_data(['abc'])
+      b1 = create_csv_data(['old_id'])
+      b2 = create_csv_data(['old_id'])
+      b3 = create_csv_data(['old_id'])
+      b4 = create_csv_data(['old_id'])
       b2.update_attribute(:workflow_state, 'imported')
       @a1 = @account
       @a2 = account_model
-      b5 = create_csv_data(['abc'])
+      b5 = create_csv_data(['old_id'])
       expect_any_instantiation_of(b2).to receive(:process_without_send_later).never
       expect_any_instantiation_of(b5).to receive(:process_without_send_later).never
       SisBatch.process_all_for_account(@a1)
@@ -467,41 +467,18 @@ s2,test_1,section2,active},
     end
   end
 
-  it "should limit the # of warnings/errors" do
-    Setting.set('sis_batch_max_messages', '3')
-    batch = @account.sis_batches.create! # doesn't error when nil
-    batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 3
-    batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 3
-    batch.save!
-    batch.reload
-    expect(batch.processing_warnings.size).to eq 3
-    expect(batch.processing_warnings.last).to eq ['testfile.csv', 'test warning']
-    expect(batch.processing_errors.size).to eq 3
-    expect(batch.processing_errors.last).to eq ['testfile.csv', 'test error']
-    batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 5
-    batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 5
-    batch.save!
-    batch.reload
-    expect(batch.processing_warnings.size).to eq 3
-    expect(batch.processing_warnings.last).to eq ['', 'There were 3 more warnings']
-    expect(batch.processing_errors.size).to eq 3
-    expect(batch.processing_errors.last).to eq ['', 'There were 3 more errors']
-  end
-
   it "should write all warnings/errors to a file" do
-    Setting.set('sis_batch_max_messages', '3')
     batch = @account.sis_batches.create!
-    4.times do |i|
-      batch.add_warnings([['testfile.csv', "test warning#{i}"]])
-      batch.add_warnings([['testfile.csv', "test error#{i}"]])
+    3.times do |i|
+      batch.sis_batch_errors.create(root_account: @account, file: 'users.csv', message: "some error #{i}", row: i)
     end
     batch.finish(false)
-    error_file = batch.errors_attachment.reload
+    error_file = batch.reload.errors_attachment
     expect(error_file.display_name).to eq "sis_errors_attachment_#{batch.id}.csv"
-    expect(CSV.parse(error_file.open).map.to_a.size).to eq 8
+    expect(CSV.parse(error_file.open).map.to_a.size).to eq 4 # header and 3 errors
   end
 
-  context "csv diffing" do
+  context "with csv diffing" do
     describe 'diffing_drop_status' do
       before :once do
         process_csv_data(
@@ -636,8 +613,7 @@ test_4,TC 104,Test Course 104b,,term1,active
 test_1,test_a,course
 }])
       expect(course1.reload.sis_batch_id).to eq b1.id
-      expect(b1.processing_errors).to eq []
-      expect(b1.processing_warnings).to eq []
+      expect(b1.sis_batch_errors.exists?).to eq false
     end
 
     it 'should set batch_ids on admins' do
@@ -648,24 +624,23 @@ test_1,test_a,course
 U001,,AccountAdmin,active
 }])
       expect(a1.reload.sis_batch_id).to eq b1.id
-      expect(b1.processing_errors).to eq []
-      expect(b1.processing_warnings).to eq []
+      expect(b1.sis_batch_errors.exists?).to eq false
     end
 
     it 'should not allow removing import admin with sis import' do
       user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
       b1 = process_csv_data([%{user_id,account_id,role,status
                                U001,,AccountAdmin,deleted}])
-      expect(b1.processing_errors).to eq []
-      expect(b1.processing_warnings).to eq [["csv_0.csv", "Can't remove yourself user_id 'U001'"]]
+      expect(b1.sis_batch_errors.first.message).to eq "Can't remove yourself user_id 'U001'"
+      expect(b1.sis_batch_errors.first.file).to eq "csv_0.csv"
     end
 
     it 'should not allow removing import admin user with sis import' do
       p = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001').pseudonym
       b1 = process_csv_data([%{user_id,login_id,status
                                U001,#{p.unique_id},deleted}])
-      expect(b1.processing_errors).to eq []
-      expect(b1.processing_warnings).to eq [["csv_0.csv", "Can't remove yourself user_id 'U001'"]]
+      expect(b1.sis_batch_errors.first.message).to eq "Can't remove yourself user_id 'U001'"
+      expect(b1.sis_batch_errors.first.file).to eq "csv_0.csv"
     end
 
     describe 'change_threshold in batch mode' do
@@ -701,7 +676,7 @@ test_1,u1,student,active}
         expect(batch.workflow_state).to eq 'aborted'
         expect(@e1.reload).to be_active
         expect(@e2.reload).to be_active
-        expect(batch.processing_errors.first).to eq ["1 enrollments would be deleted and exceeds the set threshold of 20%"]
+        expect(batch.sis_batch_errors.first.message).to eq "1 enrollments would be deleted and exceeds the set threshold of 20%"
       end
 
       it 'should delete batch mode below threshold' do

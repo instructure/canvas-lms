@@ -470,16 +470,31 @@ describe ApplicationController do
           content_tag.update_attributes!(context: assignment_model)
         end
 
+        context 'display_type == "full_width' do
+          before do
+            tool.settings[:assignment_selection] = { "display_type" => "full_width" }
+            tool.save!
+          end
+
+          it 'uses the tool setting display type if the "display" parameter is absent' do
+            expect(Lti::AppUtil).to receive(:display_template).with('full_width')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+          end
+
+          it 'does not use the assignment lti header' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:prepend_template]).to be_blank
+          end
+
+          it 'does not display the assignment edit sidebar' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:append_template]).to_not be_present
+          end
+        end
+
         it 'gives priority to the "display" parameter' do
           expect(Lti::AppUtil).to receive(:display_template).with('borderless')
           controller.params['display'] = 'borderless'
-          controller.send(:content_tag_redirect, course, content_tag, nil)
-        end
-
-        it 'uses the tool setting display type if the "display" parameter is absent' do
-          expect(Lti::AppUtil).to receive(:display_template).with('full_width')
-          tool.settings[:assignment_selection] = { "display_type" => "full_width" }
-          tool.save!
           controller.send(:content_tag_redirect, course, content_tag, nil)
         end
 
@@ -491,16 +506,14 @@ describe ApplicationController do
           end.not_to raise_exception
         end
 
-        it 'does not use the assignment lti header if the display type is "full_width"' do
-          tool.settings[:assignment_selection] = { "display_type" => "full_width" }
-          tool.save!
-          controller.send(:content_tag_redirect, course, content_tag, nil)
-          expect(assigns[:prepend_template]).to be_blank
-        end
-
         it 'does display the assignment lti header if the display type is not "full_width"' do
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:prepend_template]).to be_present
+        end
+
+        it 'does display the assignment edit sidebar if display type is not "full_width"' do
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:append_template]).to be_present
         end
       end
 

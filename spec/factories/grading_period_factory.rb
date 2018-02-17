@@ -108,15 +108,18 @@ module Factories
       {
         past: {
           start_date: 5.months.ago(now),
-          end_date:   2.months.ago(now)
+          end_date: 2.months.ago(now),
+          close_date: 2.months.ago(now)
         },
         current: {
           start_date: 2.months.ago(now),
-          end_date:   2.months.from_now(now)
+          end_date: 2.months.from_now(now),
+          close_date: 2.months.from_now(now)
         },
         future: {
           start_date: 2.months.from_now(now),
-          end_date:   5.months.from_now(now)
+          end_date: 5.months.from_now(now),
+          close_date: 5.months.from_now(now)
         }
       }
     end

@@ -252,6 +252,14 @@ class DiscussionTopicsController < ApplicationController
   # @argument include[] [String, "all_dates", "sections", "sections_user_count"]
   #   If "all_dates" is passed, all dates associated with graded discussions'
   #   assignments will be included.
+  #   if "sections" is passed, includes the course sections that are associated
+  #   with the topic, if the topic is specific to sertain sections of the course.
+  #   If "sections_user_count" is passed, then:
+  #     (a) If sections were asked for *and* the topic is specific to certain
+  #         course sections sections, includes the number of users in each
+  #         section. (as part of the section json asked for above)
+  #     (b) Else, includes at the root level the total number of users in the
+  #         topic's context (group or course) that the topic applies to.
   #
   # @argument order_by [String, "position"|"recent_activity"|"title"]
   #   Determines the order of the discussion topic list. Defaults to "position".
@@ -264,6 +272,9 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument only_announcements [Boolean]
   #   Return announcements instead of discussion topics. Defaults to false
+  #
+  # @argument filter_by [String, "all", "unread"]
+  #   The state of the discussion topic to return. Currently only supports unread state.
   #
   # @argument search_term [String]
   #   The partial title of the discussion topics to match and return.
@@ -310,6 +321,8 @@ class DiscussionTopicsController < ApplicationController
             end
 
     scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
+
+    scope = scope.unread_for(@current_user) if params[:filter_by] == "unread"
 
     states = params[:scope].split(',').map{|s| s.strip} if params[:scope]
     if states.present?
@@ -479,7 +492,8 @@ class DiscussionTopicsController < ApplicationController
       end
 
       if @context.account.feature_enabled?(:section_specific_announcements) &&
-          @topic.is_section_specific
+          @topic.is_section_specific && @context.is_a?(Course)
+
         selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
         js_hash['SELECTED_SECTION_LIST'] = sections.select{|s| selected_section_ids.include?(s.id)}.map do |section|
           {
@@ -676,9 +690,8 @@ class DiscussionTopicsController < ApplicationController
             end
 
             js_hash = {:DISCUSSION => env_hash}
-
-            if @context.account.feature_enabled?(:section_specific_announcements)
-              js_hash[:TOTAL_USER_COUNT] = Enrollment.where(course_id: @context).active.count
+            if @context.account.feature_enabled?(:section_specific_announcements) && @context.is_a?(Course)
+              js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.active.count
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
@@ -770,6 +783,13 @@ class DiscussionTopicsController < ApplicationController
   #   A multipart/form-data form-field-style attachment.
   #   Attachments larger than 1 kilobyte are subject to quota restrictions.
   #
+  # @argument specific_sections [String]
+  #   A comma-separated list of sections ids to which the discussion topic
+  #   should be made specific too.  If it is not desired to make the discussion
+  #   topic specific to sections, then this parameter may be omitted or set to
+  #   "all".  Can only be present only on announcements and only those that are
+  #   for a course (as opposed to a group).
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #         -F title='my topic' \
@@ -856,6 +876,13 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument sort_by_rating [Boolean]
   #   If true, entries will be sorted by rating.
+  #
+  # @argument specific_sections [String]
+  #   A comma-separated list of sections ids to which the discussion topic
+  #   should be made specific too.  If it is not desired to make the discussion
+  #   topic specific to sections, then this parameter may be omitted or set to
+  #   "all".  Can only be present only on announcements and only those that are
+  #   for a course (as opposed to a group).
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
@@ -972,7 +999,7 @@ class DiscussionTopicsController < ApplicationController
 
 
   def set_sections
-    return unless params[:specific_sections]
+    return unless params[:specific_sections] && params[:specific_sections] != "all"
     @topic.is_section_specific = true
     @topic.course_sections = CourseSection.find(params[:specific_sections].split(","))
   end
@@ -985,21 +1012,28 @@ class DiscussionTopicsController < ApplicationController
                  else
                     :discussion_topics
                  end
+    if @context.is_a?(Group) && params[:specific_sections] && params[:specific_sections] != "all"
+      @errors[:specific_sections] = t("You cannot assign sections to a group discussion topic")
+    end
+
     if is_new
       @topic = @context.send(model_type).build
       prior_version = @topic.dup
-      set_sections if model_type == :announcements &&
-        @context.account.feature_enabled?(:section_specific_announcements) &&
-        params[:specific_sections] != "all"
+      if model_type == :announcements && @context.is_a?(Course)
+        @topic.locked = true
+        set_sections if @context.account.feature_enabled?(:section_specific_announcements) &&
+          params[:specific_sections] != "all"
+      end
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
       prior_version = DiscussionTopic.find(@topic.id)
       if model_type == :announcements &&
               @context.account.feature_enabled?(:section_specific_announcements) &&
               @topic.is_section_specific &&
-              params[:specific_sections] == "all"
+              params[:specific_sections] == "all" &&
+              @context.is_a?(Course)
         @topic.is_section_specific = false
-      elsif model_type == :announcements &&
+      elsif model_type == :announcements && @context.is_a?(Course)
               @context.account.feature_enabled?(:section_specific_announcements)
         set_sections
       end

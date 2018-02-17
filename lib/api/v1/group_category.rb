@@ -27,9 +27,10 @@ module Api::V1::GroupCategory
 
   def group_category_json(group_category, user, session, options = {})
     api_json(group_category, user, session, API_GROUP_CATEGORY_JSON_OPTS).
-     merge!(context_data(group_category)).
-     merge!(included_data(group_category, user, session, options[:include])).
-     merge!(group_category_data(group_category, user))
+      merge!(context_data(group_category)).
+      merge!(included_data(group_category, user, session, options[:include])).
+      merge!(group_category_sis(group_category, user)).
+      merge!(group_category_data(group_category, user))
   end
 
   private
@@ -40,6 +41,17 @@ module Api::V1::GroupCategory
       'allows_multiple_memberships' => group_category.allows_multiple_memberships?,
       'is_member' => group_category.is_member?(user)
     }
+  end
+
+  def group_category_sis(group_category, user)
+    hash = {}
+    if group_category.root_account.grants_any_right?(user, :read_sis, :manage_sis)
+      hash['sis_group_category_id'] = group_category.sis_source_id
+    end
+    if group_category.root_account.grants_right?(user, :manage_sis)
+      hash['sis_import_id'] = group_category.sis_batch_id
+    end
+    hash
   end
 
   def included_data(group_category, user, session, includes)

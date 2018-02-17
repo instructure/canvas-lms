@@ -36,7 +36,7 @@ class Group < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, { context_account: 'Account' }]
   belongs_to :group_category
   belongs_to :account
-  belongs_to :root_account, :class_name => "Account"
+  belongs_to :root_account, class_name: 'Account', inverse_of: :all_groups
   has_many :calendar_events, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, dependent: :destroy, as: :context, inverse_of: :context
   has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, inverse_of: :context, class_name: 'DiscussionTopic'
@@ -442,13 +442,17 @@ class Group < ActiveRecord::Base
     self.join_level ||= 'invitation_only'
     self.is_public ||= false
     self.is_public = false unless self.group_category.try(:communities?)
+    set_default_account
+  end
+  private :ensure_defaults
+
+  def set_default_account
     if self.context && self.context.is_a?(Course)
       self.account = self.context.account
     elsif self.context && self.context.is_a?(Account)
       self.account = self.context
     end
   end
-  private :ensure_defaults
 
   # update root account when account changes
   def account=(new_account)
@@ -580,7 +584,6 @@ class Group < ActiveRecord::Base
     end
     return false
   end
-  private :can_participate?
 
   def can_join?(user)
     if self.context.is_a?(Course)
