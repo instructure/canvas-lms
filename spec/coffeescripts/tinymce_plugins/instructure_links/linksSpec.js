@@ -182,3 +182,44 @@ test('it adds in inline_disabled if checked', () => {
   const classes = EditorLinks.buildLinkClasses(priorClasses, box)
   equal(classes, ' inline_disabled')
 })
+
+let renderDialog_ed = null
+
+QUnit.module("InstructureLinks Tinymce Plugin: renderDialog", {
+  setup() {
+    renderDialog_ed = {
+      getBody: () => null,
+      nodeChanged: () => null,
+      selection: {
+        getContent: () => null,
+        getNode: () => ({nodeName: 'SPAN'})
+      }
+    };
+  },
+  teardown() {
+    $("#instructure_link_prompt").remove()
+  }
+})
+
+test("it resets the text field if no existing link is selected", () => {
+  EditorLinks.renderDialog(renderDialog_ed)
+  const $prompt = $("#instructure_link_prompt .prompt")
+  const $btn = $("#instructure_link_prompt .btn")
+  $prompt.val("someurl")
+  $btn.click()
+  EditorLinks.renderDialog(renderDialog_ed)
+  equal($prompt.val(), "")
+})
+
+test("it sets the text field to the href if link is selected", () => {
+  EditorLinks.renderDialog(renderDialog_ed)
+  const $prompt = $("#instructure_link_prompt .prompt")
+  const $btn = $("#instructure_link_prompt .btn")
+  $prompt.val("otherurl")
+  $btn.click()
+  const a = document.createElement('a')
+  a.href = 'linkurl'
+  renderDialog_ed.selection.getNode = () => a
+  EditorLinks.renderDialog(renderDialog_ed)
+  equal($prompt.val(), "linkurl")
+})
