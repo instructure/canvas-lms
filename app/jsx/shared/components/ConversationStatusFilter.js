@@ -16,55 +16,76 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
+import Backbone from 'Backbone'
+import PropTypes from 'prop-types';
 import I18n from 'i18n!conversations'
+import { decodeQueryString } from 'jsx/shared/queryString'
 import React from 'react'
 import Select from '@instructure/ui-core/lib/components/Select'
 import ScreenReaderContent from '@instructure/ui-core/lib/components/ScreenReaderContent'
 
+
 export default class ConversationStatusFilter extends React.Component {
   static propTypes = {
-    filters: PropTypes.arrayOf(
-      PropTypes.shape({value: PropTypes.string.isRequired, label: PropTypes.string.isRequired})
-    ).isRequired,
-    onChange: PropTypes.func.isRequired,
-    // This just says that defaultFilter is required and must be a filter
-    defaultFilter: isAFilter,
-    initialFilter: PropTypes.string
-  }
-
-  static defaultProps = {
-    initialFilter: null,
-    defaultFilter: 'inbox'  // Make eslint happy, but this prop is required
+    defaultFilter: PropTypes.string.isRequired,
+    initialFilter: PropTypes.string.isRequired,
+    router: PropTypes.instanceOf(Backbone.Router).isRequired,
+    filters: PropTypes.objectOf( (obj, key) => {
+      if (typeof(key) !== 'string' || typeof(obj[key]) !== 'string') {
+        return new Error("Keys and values of 'filter' prop must be strings")
+      }
+    }).isRequired
   }
 
   constructor(props) {
     super(props)
-    const initialFilter = this.props.initialFilter
-    const filterIsValid = this.props.filters.some(f => f.value === initialFilter)
-    if (filterIsValid) {
-      this.state = {selected: initialFilter}
-    } else {
-      // default to inbox if the url is bad
-      this.state = {selected: this.props.defaultFilter}
-    }
+    this.state = {selected: props.initialFilter}
+    this.props.router.header.changeTypeFilter(props.initialFilter)
   }
 
-  componentWillReceiveProps(nextProps) {
-    const initialFilter = nextProps.initialFilter
-    const filterIsValid = this.props.filters.some(f => f.value === initialFilter)
-    if (filterIsValid) {
-      this.setState({selected: initialFilter})
-    } else {
-      // default to inbox if the url is bad
-      this.setState({selected: this.props.defaultFilter})
-    }
+  componentWillMount() {
+    this.props.router.on("route", this.handleBackboneHistory)
   }
 
-  onChange = (e) => {
-    const filterValue = e.target.value
-    this.setState({selected: filterValue})
-    this.props.onChange(filterValue)
+  componentWillUnmount() {
+    this.props.router.off("route", this.handleBackboneHistory)
+  }
+
+  getUrlFilter(params) {
+    const types = decodeQueryString(params).filter(i => i.type !== undefined)
+    if (types.length === 1 && this.validFilter(types[0].type)) {
+      return types[0].type
+    }
+    return this.props.defaultFilter
+  }
+
+  validFilter(filter) {
+    return Object.keys(this.props.filters).includes(filter)
+  }
+
+  updateBackboneState(newFilter) {
+    const filter = this.validFilter(newFilter) ? newFilter : this.props.defaultFilter
+    const state = {selected: filter}
+
+    // The state needs to finished being set before we call out to backbone,
+    // because that will lead to the url being changed and causing the
+    // handleBackboneHistory to be triggered. If the state hasn't finished
+    // being saved by this state, it will lead to this function being called
+    // again.
+    this.setState(state, () => this.props.router.header.changeTypeFilter(newFilter))
+  }
+
+  handleBackboneHistory = (route, params) => {
+    const filterParam = params[0]
+    const newState = filterParam === null ? this.props.defaultFilter : this.getUrlFilter(filterParam)
+
+    // We don't need to update the backbone state if the state hasn't actually
+    // changed. This occurs due to the state changing on the select option
+    // being changed, and then again as the history gets updated as a result
+    // of that change
+    if (newState !== this.state.selected) {
+      this.updateBackboneState(newState)
+    }
   }
 
   render() {
@@ -72,15 +93,14 @@ export default class ConversationStatusFilter extends React.Component {
       <Select
         layout="inline"
         width="211"
-        id="conversation-filter-select"
+        id="conversation_filter_select"
         label={<ScreenReaderContent>{ I18n.t("Filter conversations by type") }</ScreenReaderContent>}
         value={this.state.selected}
-        defaultValue={this.props.defaultFilter}
-        onChange={this.onChange}
+        onChange={(e) => this.updateBackboneState(e.target.value)}
       >
-        {this.props.filters.map(filter => (
-          <option key={filter.value} value={filter.value}>
-            {filter.label}
+        {Object.keys(this.props.filters).map(key => (
+          <option value={key} key={key}>
+            {this.props.filters[key]}
           </option>
         ))}
       </Select>
@@ -88,12 +108,3 @@ export default class ConversationStatusFilter extends React.Component {
   }
 }
 
-function isAFilter(props, propName, componentName) {
-  const potentialFilter = props[propName]
-  if (props.filters.some(filter => (filter.value === potentialFilter))) {
-    return null
-  }
-  return new Error(
-    `Error in props for ${componentName}: ${propName} ${potentialFilter} is not a member of ${props.filters}`
-  )
-}

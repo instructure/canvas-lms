@@ -17,17 +17,15 @@
 
 define [
   'jquery'
-  '../../util/deparam'
   'i18n!conversations'
   'underscore'
   'Backbone'
-  'react',
-  'react-dom',
   'spin.js'
+  '../conversations/CourseSelectionView'
   '../conversations/SearchView'
-  'jsx/shared/components/CoursesGroupsAutocomplete'
-  'jsx/shared/components/ConversationStatusFilter'
-], ($, deparam, I18n, _, {View}, React, ReactDOM, Spinner, SearchView, CoursesGroupsAutocomplete, ConversationStatusFilter) ->
+  'vendor/bootstrap/bootstrap-dropdown'
+  'vendor/bootstrap-select/bootstrap-select'
+], ($, I18n, _, {View}, Spinner, CourseSelectionView, SearchView) ->
 
   class InboxHeaderView extends View
 
@@ -37,6 +35,7 @@ define [
       '#reply-all-btn'   : '$replyAllBtn'
       '#archive-btn'     : '$archiveBtn'
       '#delete-btn'      : '$deleteBtn'
+      '#course-filter'   : '$courseFilter'
       '#admin-btn'       : '$adminBtn'
       '#mark-unread-btn' : '$markUnreadBtn'
       '#mark-read-btn'   : '$markReadBtn'
@@ -49,8 +48,6 @@ define [
       '#conversation-actions'       : '$conversationActions'
       '#submission-comment-actions' : '$submissionCommentActions'
       '#submission-reply-btn'       : '$submissionReplyBtn'
-      '#course-group-filter'        : '$courseGroupFilter'
-      '#conversation-filter'        : '$conversationFilter'
 
     events:
       'click #compose-btn':       'onCompose'
@@ -58,6 +55,7 @@ define [
       'click #reply-all-btn':     'onReplyAll'
       'click #archive-btn':       'onArchive'
       'click #delete-btn':        'onDelete'
+      'change #course-filter':    'changeCourseFilter'
       'click #mark-unread-btn':   'onMarkUnread'
       'click #mark-read-btn':   'onMarkRead'
       'click #forward-btn':       'onForward'
@@ -80,69 +78,17 @@ define [
       width: 2
       left: 0
 
-    getFilterParams: () ->
-      hash = window.location.hash.substring("#filter=".length)
-      deparam(hash)
-
-    statusFilterOptions: [
-      { value: 'inbox', label: I18n.t('Inbox') },
-      { value: 'unread', label: I18n.t('Unread') },
-      { value: 'starred', label: I18n.t('Starred') },
-      { value: 'sent', label: I18n.t('Sent') },
-      { value: 'archived', label: I18n.t('Archived') },
-      { value: 'submission_comments', label: I18n.t('Submission Comments') }
-    ]
-    defaultStatusFilterOption: 'inbox'
-
-    filterIsValid: (filter) ->
-      filter && @statusFilterOptions.some((option) => return option.value == filter)
-
-    updateWindowHash: () ->
-      filterParams = @getFilterParams()
-      filter = filterParams.type
-      if !@filterIsValid(filter)
-        window.location.hash = "#filter=type=#{@defaultStatusFilterOption}"
-
-    renderTypeFilter: () ->
-      urlParams = @getFilterParams()
-      @typeFilter = urlParams.type
-      if !@filterIsValid(@typeFilter)
-        @typeFilter = @defaultStatusFilterOption
-
-      ReactDOM.render(React.createElement(ConversationStatusFilter, {
-        filters: @statusFilterOptions,
-        initialFilter: @typeFilter,
-        defaultFilter: @defaultStatusFilterOption,
-        onChange: @changeTypeFilter
-      }), @$conversationFilter[0])
-
-    renderCourseGroupFilter: () ->
-      urlParams = @getFilterParams()
-      @courseGroupFilterSelection = urlParams.course
-      selectedOption = null
-      if @courseGroupFilterSelection
-        courseParamSplit = @courseGroupFilterSelection.split("_")
-        courseParamType = courseParamSplit[0]
-        courseParamId = parseInt(courseParamSplit[1])
-        selectedOption = {
-          entityType: courseParamType,
-          entityId: courseParamId
-        }
-      ReactDOM.render(React.createElement(CoursesGroupsAutocomplete, {
-        placeholder: I18n.t('Select Courses or Groups'),
-        onChange: @changeCourseGroupFilter,
-        selectedOption: selectedOption
-      }), @$courseGroupFilter[0])
-
     render: () ->
       super()
+      @courseView = new CourseSelectionView(el: @$courseFilter, courses: @options.courses)
       @searchView = new SearchView(el: @$search)
       @searchView.on('search', @onSearch)
       spinner = new Spinner(@spinnerOptions)
       spinner.spin(@$sendingSpinner[0])
       @toggleSending(false)
-      @updateWindowHash()
       @updateFilterLabels()
+
+      @courseFilterValue = @$courseFilter.val()
 
     onSearch:      (tokens) => @trigger('search', tokens)
 
@@ -199,10 +145,6 @@ define [
       @hideMarkReadBtn(!msg || !msg.unread())
       @refreshMenu()
 
-    updateFilterLabels: () ->
-      @renderTypeFilter()
-      @renderCourseGroupFilter()
-
     onStarStateChange: (msg) ->
       if msg
         key = if msg.starred() then 'unstar' else 'star'
@@ -227,16 +169,23 @@ define [
 
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 
-    changeTypeFilter: (type) =>
+    changeTypeFilter: (type) ->
       @typeFilter = type
-      @hideOrShowSubmissionComments()
-      @trigger('filter', @filterObj({type: @typeFilter, course: @courseGroupFilterSelection }))
+      @onFilterChange()
 
-    hideOrShowSubmissionComments: () =>
+    changeCourseFilter: () ->
+      # This is getting called not just when the course filter gets changed,
+      # but also when the url changes at all. This if statements limits
+      # the onFilterChange to only be called if the filter was actually
+      # changed.
+      if @courseFilterValue != @$courseFilter.val()
+        @courseFilterValue = @$courseFilter.val()
+        @onFilterChange()
+
+
+    onFilterChange: (e) =>
+      @searchView?.autocompleteView.setContext(@courseView.getCurrentContext())
       if @typeFilter == 'submission_comments'
-        # It seems weird that @$search.show() is called first in both branches
-        # but i'm not sure what the right thing is: should one of these be
-        # a "hide" or should this line be pulled before the if?
         @$search.show()
         @$conversationActions.hide()
         @$submissionCommentActions.show()
@@ -244,15 +193,16 @@ define [
         @$search.show()
         @$conversationActions.show()
         @$submissionCommentActions.hide()
+      @trigger('filter', @filterObj({type: @typeFilter, course: @courseFilterValue}))
+      @updateFilterLabels()
 
-    changeCourseGroupFilter: (_, course) =>
-      @courseGroupFilterSelection = course?.id
-      @hideOrShowSubmissionComments()
-      @trigger('filter', @filterObj({type: @typeFilter, course: @courseGroupFilterSelection }))
+    updateFilterLabels: ->
+      @$courseFilterSelectionLabel = $("##{@$courseFilter.attr('aria-labelledby')}").find('.current-selection-label') unless @$courseFilterSelectionLabel?.length
+      @$courseFilterSelectionLabel.text(@$courseFilter.find(':selected').text())
 
-    onFilterChange: (e) =>
-      @hideOrShowSubmissionComments()
-      @trigger('filter', @filterObj({type: @typeFilter, course: @courseGroupFilterSelection }))
+    displayState: (state) ->
+      @courseView.setValue(state.course)
+      @trigger('course', @courseView.getCurrentContext())
 
     toggleMessageBtns: (newModel) ->
       no_model = !newModel || !newModel.get('selected')
