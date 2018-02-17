@@ -112,9 +112,9 @@ describe "LTI integration tests" do
     expect(post_payload['custom_canvas_user_id']).to eq canvas_user.id.to_s
     expect(post_payload['custom_canvas_user_login_id']).to eq 'login_id'
     expect(post_payload['custom_variable_canvas_api_domain']).to eq root_account.domain
-    expect(post_payload['custom_variable_canvas_assignment_id']).to be_nil
-    expect(post_payload['custom_variable_canvas_assignment_points_possible']).to be_nil
-    expect(post_payload['custom_variable_canvas_assignment_title']).to be_nil
+    expect(post_payload['custom_variable_canvas_assignment_id']).to eq '$Canvas.assignment.id'
+    expect(post_payload['custom_variable_canvas_assignment_points_possible']).to eq '$Canvas.assignment.pointsPossible'
+    expect(post_payload['custom_variable_canvas_assignment_title']).to eq '$Canvas.assignment.title'
     expect(post_payload['custom_variable_canvas_course_id']).to eq canvas_course.id.to_s
     expect(post_payload['custom_variable_canvas_enrollment_enrollment_state']).to eq 'active'
     expect(post_payload['custom_variable_canvas_membership_concluded_roles']).to eq 'Learner'
@@ -235,8 +235,8 @@ describe "LTI integration tests" do
 
       expect(hash['custom_canvas_account_id']).to eq sub_account.id.to_s
       expect(hash['custom_canvas_account_sis_id']).to eq 'accountsis'
-      expect(hash['custom_canvas_user_login_id']).to be_nil
-      expect(hash['custom_variable_canvas_membership_concluded_roles']).to be_nil
+      expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
+      expect(hash['custom_variable_canvas_membership_concluded_roles']).to eq "$Canvas.membership.concludedRoles"
     end
 
     it "should add account and user info in launch data for user profile launch" do
@@ -253,8 +253,8 @@ describe "LTI integration tests" do
 
       hash['custom_canvas_account_id'] = sub_account.id.to_s
       hash['custom_canvas_account_sis_id'] = 'accountsis'
-      expect(hash['lis_person_sourcedid']).to be_nil
-      expect(hash['custom_canvas_user_id']).to be_nil
+      expect(hash['lis_person_sourcedid']).to eq '$Person.sourcedId'
+      expect(hash['custom_canvas_user_id']).to eq '$Canvas.user.id'
       expect(hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end
 
@@ -374,7 +374,7 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      expect(hash['custom_canvas_user_login_id']).to be_nil
+      expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
     end
 
     it "should include text if set" do
