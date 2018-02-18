@@ -21,6 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 describe UserObserver do
   let_once(:student) { user_factory }
 
+  it 'should fail when there is not observer or observee' do
+    expect { UserObserver.create_or_restore(observee: nil, observer: student) }.
+      to raise_error(ArgumentError, 'observee and observer are required')
+  end
+
   it "should not allow a user to observe oneself" do
     expect { student.observers << student }.to raise_error(ActiveRecord::RecordInvalid)
   end
