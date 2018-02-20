@@ -444,7 +444,11 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     )
 
     # sign the response
-    result = SAML2::Bindings::HTTPRedirect.encode(logout_request, private_key: AccountAuthorizationConfig::SAML.private_key)
+    private_key = AccountAuthorizationConfig::SAML.private_key
+    private_key = nil if sig_alg.nil?
+    result = SAML2::Bindings::HTTPRedirect.encode(logout_request,
+                                                  private_key: private_key,
+                                                  sig_alg: sig_alg)
 
     if debugging? && debug_get(:logged_in_user_id) == current_user.id
       debug_set(:logout_request_id, logout_request.id)
