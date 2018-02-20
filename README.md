@@ -1,4 +1,5 @@
 Canvas LMS
+[![Build Status](https://travis-ci.org/Droobledores/canvas-lms.svg?branch=stable)](https://travis-ci.org/Droobledores/canvas-lms)
 ======
 
 Canvas is a modern, open-source [LMS](https://en.wikipedia.org/wiki/Learning_management_system)
