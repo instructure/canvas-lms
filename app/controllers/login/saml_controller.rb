@@ -311,7 +311,14 @@ class Login::SamlController < ApplicationController
 
       logout_current_user
 
-      return redirect_to(SAML2::Bindings::HTTPRedirect.encode(logout_response, relay_state: relay_state))
+      private_key = AccountAuthorizationConfig::SAML.private_key
+      private_key = nil if aac.sig_alg.nil?
+      forward_url = SAML2::Bindings::HTTPRedirect.encode(logout_response,
+                                                         relay_state: relay_state,
+                                                         private_key: private_key,
+                                                         sig_alg: aac.sig_alg)
+
+      return redirect_to(forward_url)
     else
       error = "Unexpected SAML message: #{message.class}"
       Canvas::Errors.capture_exception(:saml, error)
