@@ -23,6 +23,7 @@ describe InstFS do
   before do
     @app_host = 'http://test.host'
     @secret = "supersecretyup"
+    allow(InstFS).to receive(:enabled?).and_return(true)
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).
       with(service: "inst-fs", default_ttl: 5.minutes).
@@ -224,6 +225,35 @@ describe InstFS do
       it "include the content_type" do
         expect(upload_params[:content_type]).to eq content_type
       end
+    end
+  end
+
+  context "logout" do
+    it "makes a DELETE request against the logout url" do
+      expect(CanvasHttp).to receive(:delete).with(match(%r{/session[^/\w]}))
+      InstFS.logout(user_model)
+    end
+
+    it "includes jwt in DELETE request" do
+      expect(CanvasHttp).to receive(:delete).with(match(%r{\?token=}))
+      InstFS.logout(user_model)
+    end
+
+    it "skips if user absent" do
+      expect(CanvasHttp).not_to receive(:delete)
+      InstFS.logout(nil)
+    end
+
+    it "skips if not enabled" do
+      allow(InstFS).to receive(:enabled?).and_return(false)
+      expect(CanvasHttp).not_to receive(:delete)
+      InstFS.logout(user_model)
+    end
+
+    it "logs then ignores error if DELETE request fails" do
+      allow(CanvasHttp).to receive(:delete).and_raise(CanvasHttp::Error, "broken request")
+      expect(Canvas::Errors).to receive(:capture_exception).once
+      InstFS.logout(user_model)
     end
   end
 end

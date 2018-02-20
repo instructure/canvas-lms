@@ -1908,6 +1908,7 @@ class ApplicationController < ActionController::Base
 
   def logout_current_user
     @current_user.try(:stamp_logout_time!)
+    InstFS.logout(@current_user)
     destroy_session
   end
 

@@ -29,10 +29,22 @@ module InstFS
       end
     end
 
+    def logout(user)
+      return unless user && enabled?
+      CanvasHttp.delete(logout_url(user))
+    rescue CanvasHttp::Error => e
+      Canvas::Errors.capture_exception(:page_view, e)
+    end
+
     def authenticated_url(attachment, options={})
       query_params = { token: access_jwt(attachment, options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
+    end
+
+    def logout_url(user)
+      query_params = { token: logout_jwt(user) }
+      service_url("/session", query_params)
     end
 
     def authenticated_thumbnail_url(attachment, options={})
@@ -127,6 +139,15 @@ module InstFS
         iat: Time.now.utc.to_i,
         user_id: user.global_id&.to_s,
         resource: '/session/ensure'
+      }, expires_in.from_now, self.jwt_secret)
+    end
+
+    def logout_jwt(user)
+      expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
+      Canvas::Security.create_jwt({
+        iat: Time.now.utc.to_i,
+        user_id: user.global_id&.to_s,
+        resource: '/session'
       }, expires_in.from_now, self.jwt_secret)
     end
   end
