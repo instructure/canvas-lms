@@ -297,7 +297,7 @@ TEXT
           <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @account.terms_of_service_content&.content) %>
           <% js_bundle :terms_of_service_modal%>
           <fieldset>
-            <legend><%= t("Terms of Service") %></legend>
+            <legend><%= t("Acceptable Use Policy") %></legend>
             <%= f.fields_for :terms_of_service do |tos| %>
               <%= tos.label :terms_type, t("License Type") %>
               <%= tos.select :terms_type, options_for_select(TermsOfService.type_dropdown_options, @account.terms_of_service.terms_type) %>
