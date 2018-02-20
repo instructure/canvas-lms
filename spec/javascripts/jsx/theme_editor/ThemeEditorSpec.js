@@ -94,6 +94,19 @@ QUnit.module('Theme Editor Theme Store', {
             }
           ],
           group_name: 'Global Navigation'
+        },
+        {
+          group_key: 'watermarks',
+          variables: [
+            {
+              variable_name: 'ic-brand-favicon',
+              type: 'image',
+              accept: 'image/vnd.microsoft.icon,image/x-icon,image/png,image/gif',
+              default: '/images/favicon.ico',
+              human_name: 'Favicon',
+              helper_text: 'You can use a single 16x16, 32x32, 48x48 ico file.'
+            }
+          ]
         }
       ],
       accountID: '1'
@@ -118,7 +131,8 @@ test('constructor sets the theme store state properly using variableSchema and b
       'ic-brand-primary': 'green',
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
-      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef'
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+      'ic-brand-favicon': '/images/favicon.ico'
     },
     files: []
   })
@@ -132,7 +146,8 @@ test('handleThemeStateChange updates theme store', () => {
       'ic-brand-primary': 'green',
       'ic-brand-font-color-dark': 'black',
       'ic-brand-global-nav-bgd': '#394B58',
-      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef'
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+      'ic-brand-favicon': '/images/favicon.ico'
     },
     files: []
   })
@@ -148,7 +163,8 @@ test('handleThemeStateChange updates when there is a file', () => {
       'ic-brand-primary': 'green',
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
-      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef'
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+      'ic-brand-favicon': '/images/favicon.ico'
     },
     files: [
       {
@@ -156,5 +172,41 @@ test('handleThemeStateChange updates when there is a file', () => {
         variable_name: key
       }
     ]
+  })
+})
+
+test('handleThemeStateChange resets to default when opts.resetValue is set', () => {
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', 'black')
+
+  wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', null, {resetValue: true})
+  deepEqual(wrapper.state('themeStore'), {
+    properties: {
+      'ic-brand-primary': 'green',
+      'ic-brand-font-color-dark': '#2D3B45',
+      'ic-brand-global-nav-bgd': '#394B58',
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+      'ic-brand-favicon': '/images/favicon.ico'
+    },
+    files: []
+  })
+})
+
+test('handleThemeStateChange removes files from the store when opts.resetValue is set', () => {
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  const key = 'ic-brand-favicon'
+  const value = new File(['foo'], 'foo.png')
+  wrapper.instance().handleThemeStateChange(key, value)
+
+  wrapper.instance().handleThemeStateChange(key, null, {resetValue: true})
+  deepEqual(wrapper.state('themeStore'), {
+    properties: {
+      'ic-brand-primary': 'green',
+      'ic-brand-font-color-dark': '#2D3B45',
+      'ic-brand-global-nav-bgd': '#394B58',
+      'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+      'ic-brand-favicon': '/images/favicon.ico'
+    },
+    files: []
   })
 })

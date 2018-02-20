@@ -84,8 +84,6 @@ export default class ThemeEditor extends React.Component {
     refactorEnabled: false
   }
 
-  state = {}
-
   constructor(props) {
     super()
     const {variableSchema, brandConfig} = props
@@ -97,9 +95,11 @@ export default class ThemeEditor extends React.Component {
       {}
     )
 
+    this.originalThemeProperties = {...theme, ...brandConfig.variables}
+
     this.state = {
       themeStore: {
-        properties: {...theme, ...brandConfig.variables},
+        properties: {...this.originalThemeProperties},
         files: []
       },
       changedValues: {},
@@ -163,7 +163,7 @@ export default class ThemeEditor extends React.Component {
     return val
   }
 
-  handleThemeStateChange = (key, value) => {
+  handleThemeStateChange = (key, value, opts = {}) => {
     let {files, properties} = this.state.themeStore
     if (value instanceof File) {
       files.push({
@@ -175,6 +175,15 @@ export default class ThemeEditor extends React.Component {
         ...properties,
         ...{[key]: value}
       }
+    }
+
+    if (opts.resetValue) {
+      console.log(this.originalThemeProperties)
+      properties = {
+        ...properties,
+        ...{[key]: this.originalThemeProperties[key]}
+      }
+      files = files.filter(x => x.variable_name !== key)
     }
     this.setState({
       themeStore: {

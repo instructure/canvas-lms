@@ -32,11 +32,15 @@ export default class ThemeEditorImageRow extends Component {
     userInput: customTypes.userVariableInput,
     onChange: PropTypes.func.isRequired,
     currentValue: PropTypes.string,
-    placeholder: PropTypes.string
+    placeholder: PropTypes.string,
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func
   }
 
   static defaultProps = {
-    userInput: {}
+    userInput: {},
+    themeState: {},
+    handleThemeStateChange() {}
   }
 
   // valid input: null, '', or an HTMLInputElement
@@ -49,7 +53,12 @@ export default class ThemeEditorImageRow extends Component {
       // we want to also clear out the value of the <input type=file>
       // but we don't want to mess with its value otherwise
       this.fileInput.value = ''
+      this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {resetValue: true})
     } else {
+      this.props.handleThemeStateChange(
+        this.props.varDef.variable_name,
+        inputElementOrNewValue.files[0]
+      )
       chosenValue = window.URL.createObjectURL(inputElementOrNewValue.files[0])
     }
     this.props.onChange(chosenValue)
