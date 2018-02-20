@@ -415,6 +415,12 @@ class DiscussionTopicsController < ApplicationController
       @context.context && @context.context.discussion_topics.find(root_topic_id)
   end
 
+  def announcements_locked?
+    return true if @context.account.lock_all_announcements[:locked]
+    return false unless @context.is_a?(Course)
+    @context.lock_all_announcements?
+  end
+
   def new
     @topic = @context.send(params[:is_announcement] ? :announcements : :discussion_topics).new
     add_discussion_or_announcement_crumb
@@ -479,7 +485,8 @@ class DiscussionTopicsController < ApplicationController
            reject(&:student_organized?).
            map { |category| { id: category.id, name: category.name } },
         HAS_GRADING_PERIODS: @context.grading_periods?,
-        SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } }
+        SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
+        ANNOUNCEMENTS_LOCKED: announcements_locked?
       }
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
