@@ -54,7 +54,8 @@ function makeTimestamp ({ delayed_post_at, posted_at }) {
 }
 
 export default function AnnouncementRow (
-  { announcement, canManage, masterCourseData, rowRef, onSelectedChanged, onManageMenuSelect, canHaveSections }) {
+  { announcement, canManage, masterCourseData, rowRef, onSelectedChanged,
+    onManageMenuSelect, canHaveSections, announcementsLocked }) {
   const timestamp = makeTimestamp(announcement)
   const readCount = announcement.discussion_subentry_count > 0
     ? (
@@ -83,6 +84,33 @@ export default function AnnouncementRow (
           <Text color="brand"><IconReply /> {I18n.t('Reply')}</Text>
         </Container>
       )
+
+  const MenuList = [
+    <MenuItem
+      key="delete"
+      value={{ action: 'delete', id: announcement.id }}
+      id="delete-announcement-menu-option"
+    >
+      <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
+      <ScreenReaderContent>{I18n.t('Delete announcement %{title}', { title: announcement.title })}</ScreenReaderContent>
+    </MenuItem>,
+  ]
+  if (!announcementsLocked) {
+    MenuList.push(
+      <MenuItem
+        key="lock"
+        value={{ action: 'lock', id: announcement.id, lock: !announcement.locked }}
+        id="lock-announcement-menu-option"
+      >
+        <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
+        <ScreenReaderContent>
+        { announcement.locked
+          ? I18n.t('Allow replies for %{title}', { title: announcement.title })
+          : I18n.t('Disallow replies for %{title}', { title: announcement.title })}
+        </ScreenReaderContent>
+      </MenuItem>
+    )
+  }
 
   // necessary because announcements return html from RCE
   const contentWrapper = document.createElement('span')
@@ -126,28 +154,7 @@ export default function AnnouncementRow (
       actionsContent={readCount}
       showManageMenu={canManage}
       onManageMenuSelect={onManageMenuSelect}
-      manageMenuOptions={canManage && [
-        <MenuItem
-          key="delete"
-          value={{ action: 'delete', id: announcement.id }}
-          id="delete-announcement-menu-option"
-        >
-          <IconTrash />&nbsp;&nbsp;{I18n.t('Delete')}
-          <ScreenReaderContent>{I18n.t('Delete announcement %{title}', { title: announcement.title })}</ScreenReaderContent>
-        </MenuItem>,
-        <MenuItem
-          key="lock"
-          value={{ action: 'lock', id: announcement.id, lock: !announcement.locked }}
-          id="lock-announcement-menu-option"
-        >
-          <IconReply />&nbsp;&nbsp;{announcement.locked ? I18n.t('Allow Comments') : I18n.t('Disallow Comments')}
-          <ScreenReaderContent>
-          { announcement.locked
-            ? I18n.t('Allow replies for %{title}', { title: announcement.title })
-            : I18n.t('Disallow replies for %{title}', { title: announcement.title })}
-          </ScreenReaderContent>
-        </MenuItem>,
-      ] || null}
+      manageMenuOptions={canManage && MenuList || null}
     />
   )
 }
@@ -160,6 +167,7 @@ AnnouncementRow.propTypes = {
   rowRef: func,
   onSelectedChanged: func,
   onManageMenuSelect: func,
+  announcementsLocked: bool,
 }
 
 AnnouncementRow.defaultProps = {
@@ -169,4 +177,5 @@ AnnouncementRow.defaultProps = {
   rowRef () {},
   onSelectedChanged () {},
   onManageMenuSelect () {},
+  announcementsLocked: false,
 }
