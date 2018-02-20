@@ -18,14 +18,16 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import _ from 'lodash'
+import merge from 'lodash/merge'
 import CourseItemRow from 'jsx/shared/components/CourseItemRow'
 import AnnouncementModel from 'compiled/models/Announcement'
+import IconAssignmentLine from 'instructure-icons/lib/Line/IconAssignmentLine'
 
 QUnit.module('CourseItemRow component')
 
-const makeProps = (props = {}) => _.merge({
-  children: <p>Hello World</p>,
+const makeProps = (props = {}) => merge({
+  clickableChildren: [<p>Hello World</p>],
+  unclickableChildren: [],
   actionsContent: null,
   metaContent: null,
   author: {
@@ -51,9 +53,34 @@ test('renders the CourseItemRow component', () => {
 })
 
 test('renders children inside content column', () => {
-  const tree = mount(<CourseItemRow {...makeProps()}><span className="find-me" /></CourseItemRow>)
-  const node = tree.find('.ic-item-row__content-col .find-me')
-  ok(node.exists())
+  // Not sure why, maybe something about it being a list, but if I pass these
+  // into makeProps it doesn't actually update the [un]clickableChildren entries.
+  const props = makeProps()
+  props.clickableChildren = [<span className="find-me" />]
+  props.unclickableChildren = [<span className="find-me2" />]
+  const tree = mount(<CourseItemRow { ...props } />)
+
+  const node1 = tree.find('.ic-item-row__content-col .find-me')
+  const node2 = tree.find('.ic-item-row__content-col .find-me2')
+  ok(node1.exists())
+  ok(node2.exists())
+})
+
+test('renders clickable children inside content link', () => {
+  // Not sure why, maybe something about it being a list, but if I pass these
+  // into makeProps it doesn't actually update the [un]clickableChildren entries.
+  const itemUrl = "/foo"
+  const props = makeProps(makeProps({ itemUrl }))
+  props.clickableChildren = [<span className="find-me" />]
+  props.unclickableChildren = [<span className="find-me2" />]
+  const tree = mount(<CourseItemRow { ...props } />)
+
+  const node1 = tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me')
+  const node2 = tree.find('.ic-item-row__content-col .ic-item-row__content-link .find-me2')
+  const node3 = tree.find('.ic-item-row__content-col .find-me2')
+  ok(node1.exists())
+  ok(!node2.exists())
+  ok(node3.exists())
 })
 
 test('renders actions inside actions wrapper', () => {
@@ -73,6 +100,18 @@ test('renders metaContent inside meta content wrapper', () => {
 test('renders a checkbox if selectable: true', () => {
   const tree = mount(<CourseItemRow {...makeProps({ selectable: true })} />)
   const node = tree.find('Checkbox')
+  ok(node.exists())
+})
+
+test('renders a drag handle if draggable: true', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ draggable: true })} />)
+  const node = tree.find('IconDragHandleLine')
+  ok(node.exists())
+})
+
+test('renders inputted icon', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ icon: <IconAssignmentLine /> })} />)
+  const node = tree.find('IconAssignmentLine')
   ok(node.exists())
 })
 
@@ -179,4 +218,22 @@ test('calls onSelectChanged when checkbox is toggled', () => {
   const instance = tree.instance()
   instance.onSelectChanged({ target: { checked: true } })
   ok(onSelectedChanged.calledWithMatch({ id: '5', selected: true }))
+})
+
+test('renders no manage menu when showManageMenu is false', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: false })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders no manage menu when showManageMenu is true but manageMenuOptions is empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  notOk(menu.exists())
+})
+
+test('renders manage menu when showManageMenu is true and manageMenuOptions is not empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true, manageMenuOptions: ['one', 'two'] })} />)
+  const menu = tree.find('.ic-item-row__manage-menu')
+  ok(menu.exists())
 })

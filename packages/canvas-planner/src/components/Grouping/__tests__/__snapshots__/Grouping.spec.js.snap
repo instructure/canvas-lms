@@ -1,0 +1,300 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`grouping contains link pointing to course url 1`] = `
+<div>
+  <div
+    className=""
+  />
+  <a
+    className="undefined undefined"
+    href="example.com"
+    style={
+      Object {
+        "backgroundImage": "url()",
+      }
+    }
+  >
+    <span
+      className=""
+      style={
+        Object {
+          "backgroundColor": "#5678",
+        }
+      }
+    />
+    <span>
+      Board Games
+    </span>
+  </a>
+  <ol
+    style={
+      Object {
+        "borderColor": "#5678",
+      }
+    }
+  >
+    <li>
+      <Animatable(PlannerItem)
+        animatableIndex={0}
+        color="#5678"
+        context={
+          Object {
+            "color": "#5678",
+            "id": 256,
+            "inform_students_of_overdue_submissions": true,
+            "url": "example.com",
+          }
+        }
+        courseName="Board Games"
+        date={"2017-04-25T13:06:07.000Z"}
+        id="5"
+        theme={
+          Object {
+            "iconColor": "#5678",
+          }
+        }
+        title="San Juan"
+        toggleCompletion={[Function]}
+        uniqueId="five"
+        updateTodo={[Function]}
+      />
+    </li>
+    <li>
+      <Animatable(PlannerItem)
+        animatableIndex={1}
+        color="#5678"
+        context={
+          Object {
+            "color": "#5678",
+            "id": 256,
+            "inform_students_of_overdue_submissions": true,
+          }
+        }
+        courseName="Board Games"
+        date={"2017-04-25T13:06:07.000Z"}
+        id="6"
+        theme={
+          Object {
+            "iconColor": "#5678",
+          }
+        }
+        title="Roll for the Galaxy"
+        toggleCompletion={[Function]}
+        uniqueId="six"
+        updateTodo={[Function]}
+      />
+    </li>
+  </ol>
+</div>
+`;
+
+exports[`renders a CompletedItemsFacade when completed items are present by default 1`] = `
+<div>
+  <div
+    className=""
+  />
+  <a
+    className="undefined undefined"
+    href="example.com"
+    style={
+      Object {
+        "backgroundImage": "url()",
+      }
+    }
+  >
+    <span
+      className=""
+      style={
+        Object {
+          "backgroundColor": "#5678",
+        }
+      }
+    />
+    <span>
+      Board Games
+    </span>
+  </a>
+  <ol
+    style={
+      Object {
+        "borderColor": "#5678",
+      }
+    }
+  >
+    <li>
+      <Animatable(PlannerItem)
+        animatableIndex={0}
+        color="#5678"
+        context={
+          Object {
+            "color": "#5678",
+            "id": 256,
+            "inform_students_of_overdue_submissions": true,
+          }
+        }
+        courseName="Board Games"
+        date={"2017-04-25T13:06:07.000Z"}
+        id="6"
+        theme={
+          Object {
+            "iconColor": "#5678",
+          }
+        }
+        title="Roll for the Galaxy"
+        toggleCompletion={[Function]}
+        uniqueId="six"
+        updateTodo={[Function]}
+      />
+    </li>
+    <li>
+      <Animatable(CompletedItemsFacade)
+        animatableIndex={1}
+        animatableItemIds={
+          Array [
+            "five",
+          ]
+        }
+        badges={Array []}
+        itemCount={1}
+        onClick={[Function]}
+      />
+    </li>
+  </ol>
+</div>
+`;
+
+exports[`renders the base component with required props 1`] = `
+<div>
+  <div
+    className=""
+  />
+  <a
+    className="undefined undefined"
+    href="example.com"
+    style={
+      Object {
+        "backgroundImage": "url()",
+      }
+    }
+  >
+    <span
+      className=""
+      style={
+        Object {
+          "backgroundColor": "#5678",
+        }
+      }
+    />
+    <span>
+      Board Games
+    </span>
+  </a>
+  <ol
+    style={
+      Object {
+        "borderColor": "#5678",
+      }
+    }
+  >
+    <li>
+      <Animatable(PlannerItem)
+        animatableIndex={0}
+        color="#5678"
+        context={
+          Object {
+            "color": "#5678",
+            "id": 256,
+            "inform_students_of_overdue_submissions": true,
+            "url": "example.com",
+          }
+        }
+        courseName="Board Games"
+        date={"2017-04-25T13:06:07.000Z"}
+        id="5"
+        theme={
+          Object {
+            "iconColor": "#5678",
+          }
+        }
+        title="San Juan"
+        toggleCompletion={[Function]}
+        uniqueId="five"
+        updateTodo={[Function]}
+      />
+    </li>
+    <li>
+      <Animatable(PlannerItem)
+        animatableIndex={1}
+        color="#5678"
+        context={
+          Object {
+            "color": "#5678",
+            "id": 256,
+            "inform_students_of_overdue_submissions": true,
+          }
+        }
+        courseName="Board Games"
+        date={"2017-04-25T13:06:07.000Z"}
+        id="6"
+        theme={
+          Object {
+            "iconColor": "#5678",
+          }
+        }
+        title="Roll for the Galaxy"
+        toggleCompletion={[Function]}
+        uniqueId="six"
+        updateTodo={[Function]}
+      />
+    </li>
+  </ol>
+</div>
+`;
+
+exports[`renders to do items correctly 1`] = `
+<div>
+  <div
+    className=""
+  />
+  <span>
+    <span
+      className=""
+      style={
+        Object {
+          "backgroundColor": null,
+        }
+      }
+    />
+    <span>
+      To Do
+    </span>
+  </span>
+  <ol
+    style={
+      Object {
+        "borderColor": null,
+      }
+    }
+  >
+    <li>
+      <Animatable(PlannerItem)
+        animatableIndex={0}
+        color={null}
+        context={Object {}}
+        courseName={null}
+        date={"2017-06-16T11:06:07.000Z"}
+        id="700"
+        theme={
+          Object {
+            "iconColor": null,
+          }
+        }
+        title="To Do 700"
+        toggleCompletion={[Function]}
+        uniqueId="seven hundred"
+        updateTodo={[Function]}
+      />
+    </li>
+  </ol>
+</div>
+`;

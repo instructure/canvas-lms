@@ -45,8 +45,9 @@ export const loadNextItems = () => (
       axios.get(getState().nextUrl, { params: {
         order: 'asc'
       }}).then((response) => {
-        if (parseLinkHeader(response.headers.link).next) {
-          dispatch(itemsLoaded({ items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
+        const linkHeader = parseLinkHeader(response.headers.link)
+        if (linkHeader && linkHeader.next) {
+          dispatch(itemsLoaded({ items: response.data, nextUrl: linkHeader.next.url }));
           dispatch(loadNextItems());
         } else {
           dispatch(allItemsLoaded())
@@ -67,8 +68,9 @@ export const loadInitialItems = currentMoment => (
       end_date: lastMomentDate.format(),
       order: 'asc'
     }}).then((response) => {
-      if (parseLinkHeader(response.headers.link).next) {
-        dispatch(itemsLoaded({ items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
+      const linkHeader = parseLinkHeader(response.headers.link)
+      if (linkHeader && linkHeader.next) {
+        dispatch(itemsLoaded({ items: response.data, nextUrl: linkHeader.next.url }));
         dispatch(loadNextItems());
       } else {
         dispatch(itemsLoaded({ items: response.data, nextUrl: null }));

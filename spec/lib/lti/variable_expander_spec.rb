@@ -596,6 +596,106 @@ module Lti
         end
       end
 
+      context 'when launching from a group assignment' do
+        let(:group) { group_category.groups.create!(name: 'test', context: assignment_course) }
+        let(:group_category) { GroupCategory.create!(name: 'test', context: assignment_course) }
+        let(:new_assignment) { assignment_model(course: assignment_course) }
+        let(:assignment_course) do
+          c = course_model(account: account)
+          c.save!
+          c
+        end
+        let(:variable_expander) do
+          VariableExpander.new(
+            root_account,
+            account,
+            controller,
+            current_user: user,
+            tool: tool,
+            assignment: new_assignment
+          )
+        end
+
+        before do
+          group.update_attributes!(users: [user])
+          new_assignment.update_attributes!(group_category: group_category)
+        end
+
+        shared_examples 'a safe expansion when assignment is blank' do
+          let(:expansion) { raise 'override in spec' }
+          let(:variable_expander) do
+            VariableExpander.new(
+              root_account,
+              account,
+              controller,
+              current_user: user,
+              tool: tool
+            )
+          end
+
+          it 'returns the variable if no Assignment is present' do
+            exp_hash = {test: expansion}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq expansion
+          end
+        end
+
+        shared_examples 'a safe expansion when user is blank' do
+          let(:expansion) { raise 'override in spec' }
+          let(:variable_expander) do
+            VariableExpander.new(
+              root_account,
+              account,
+              controller,
+              current_user: user,
+              tool: tool
+            )
+          end
+
+          it 'returns the variable if no User is present' do
+            exp_hash = {test: expansion}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq expansion
+          end
+        end
+
+        describe 'com.instructure.Group.id' do
+          let(:expansion_string) { '$com.instructure.Group.id' }
+
+          it_behaves_like 'a safe expansion when assignment is blank' do
+            let(:expansion) { expansion_string }
+          end
+
+          it_behaves_like 'a safe expansion when user is blank' do
+            let(:expansion) { expansion_string }
+          end
+
+          it 'has a substitution for com.instructure.Group.id' do
+            exp_hash = {test: expansion_string}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq group.id
+          end
+        end
+
+        describe 'com.instructure.Group.name' do
+          let(:expansion_string) { '$com.instructure.Group.name' }
+
+          it_behaves_like 'a safe expansion when assignment is blank' do
+            let(:expansion) { expansion_string }
+          end
+
+          it_behaves_like 'a safe expansion when user is blank' do
+            let(:expansion) { expansion_string }
+          end
+
+          it 'has a substitution for com.instructure.Group.name' do
+            exp_hash = {test: expansion_string}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq group.name
+          end
+        end
+      end
+
       context 'context is a course' do
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user) }
 

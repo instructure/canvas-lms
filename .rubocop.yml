@@ -10,6 +10,8 @@ AllCops:
 # our style changes: disabling style rules we aren't interested in
 Layout/AlignParameters:
   Enabled: false
+Layout/ElseAlignment:
+  Enabled: false
 Layout/EmptyLines:
   Enabled: false
 Layout/EmptyLinesAroundAccessModifier:
@@ -125,11 +127,15 @@ Style/DateTime:
 # We may want to enable this when we start working toward Ruby 3
 Style/FrozenStringLiteralComment:
   Enabled: false
+Style/AsciiComments:
+  Enabled: false
 
 # RSpec cops we don't care about
 RSpec/MessageSpies:
   Enabled: false
 RSpec/HookArgument:
+  Enabled: false
+RSpec/VerifiedDoubles:
   Enabled: false
 
 # RSpec cops we care extra about
@@ -159,10 +165,17 @@ Rails/ApplicationRecord:
   Enabled: false
 Rails/HasManyOrHasOneDependent:
   Enabled: false
+# It whines about update_all too much, which we use a lot specifically to
+# bypass validations and any other AR-ness
+Rails/SkipsModelValidations:
+  Enabled: false
 
 # Lint changes
 Lint/AmbiguousRegexpLiteral:
   Severity: convention
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*"
 Lint/UselessAssignment:
   Severity: convention
 Lint/Debugger:
@@ -202,22 +215,31 @@ Performance/RegexpMatch:
 Metrics/AbcSize:
   Enabled: false
 Metrics/LineLength:
-  Max: 120
+  Max: 160
 Metrics/MethodLength:
-  Max: 16
+  Max: 100
+Metrics/ClassLength:
+  Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
 Metrics/BlockLength:
+  Max: 50
   Exclude:
   - 'gems/*/spec/**/*.rb'
   - 'gems/plugins/*/spec_canvas/**/*.rb'
   - 'spec/**/*.rb'
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Max: 28
+Metrics/PerceivedComplexity:
+  Max: 28
 RSpec/InstanceVariable:
   Enabled: false
 RSpec/ExampleWording:
   Enabled: false
+RSpec/ContextWording:
+  Enabled: false
 RSpec/ExampleLength:
-  Max: 16
+  Max: 48
 RSpec/NestedGroups:
   Max: 5
 RSpec/DescribedClass:

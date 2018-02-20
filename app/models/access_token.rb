@@ -213,6 +213,10 @@ class AccessToken < ActiveRecord::Base
     [:crypted_token, :token_hint, :crypted_refresh_token]
   end
 
+  def dev_key_account_id
+    cached_developer_key.account_id
+  end
+
   private
   def cached_developer_key
     return nil unless developer_key_id

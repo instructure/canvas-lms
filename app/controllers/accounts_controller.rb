@@ -756,8 +756,6 @@ class AccountsController < ApplicationController
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
 
       js_env({
-        CUSTOM_HELP_LINKS: @domain_root_account && @domain_root_account.help_links || [],
-        DEFAULT_HELP_LINKS: Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links),
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
@@ -767,6 +765,7 @@ class AccountsController < ApplicationController
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
         }
       })
+      js_env(edit_help_links_env, true)
     end
   end
 
@@ -1164,9 +1163,10 @@ class AccountsController < ApplicationController
                                    :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
                                    :edit_institution_email, :enable_alerts, :enable_eportfolios,
                                    {:enable_offline_web_export => [:value]}.freeze,
-                                   :enable_profiles, :enable_turnitin, :equella_endpoint, :equella_teaser,
-                                   :external_notification_warning, :global_includes, :google_docs_domain,
-                                   :help_link_icon, :help_link_name, :include_students_in_global_survey, :license_type,
+                                   :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
+                                   :equella_teaser, :external_notification_warning, :global_includes,
+                                   :google_docs_domain, :help_link_icon, :help_link_name,
+                                   :include_students_in_global_survey, :license_type,
                                    {:lock_all_announcements => [:value, :locked]}.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
                                    :open_registration, :outgoing_email_default_name,
@@ -1217,4 +1217,16 @@ class AccountsController < ApplicationController
 
     order && "#{order[:col]} #{order[:direction]}"
   end
+
+  def edit_help_links_env
+    # @domain_root_account may be cached; load settings from @account to ensure they're up to date
+    return {} unless @account == @domain_root_account
+    {
+      help_link_name: @account.settings[:help_link_name] || default_help_link_name,
+      help_link_icon: @account.settings[:help_link_icon] || 'help',
+      CUSTOM_HELP_LINKS: @account.help_links || [],
+      DEFAULT_HELP_LINKS: Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links)
+    }
+  end
+
 end

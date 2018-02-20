@@ -553,7 +553,7 @@ class ContentMigration < ActiveRecord::Base
   alias_method :import_content_without_send_later, :import_content
 
   def master_migration
-    @master_migration ||= MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id])
+    @master_migration ||= self.shard.activate { MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id]) }
   end
 
   def update_master_migration(state)
@@ -562,7 +562,7 @@ class ContentMigration < ActiveRecord::Base
 
   def master_course_subscription
     return unless self.for_master_course_import?
-    @master_course_subscription ||= MasterCourses::ChildSubscription.find(self.child_subscription_id)
+    @master_course_subscription ||= self.shard.activate { MasterCourses::ChildSubscription.find(self.child_subscription_id) }
   end
 
   def prepare_data(data)

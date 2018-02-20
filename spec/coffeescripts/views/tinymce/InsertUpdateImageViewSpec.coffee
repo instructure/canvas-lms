@@ -63,6 +63,7 @@ define [
     equal(img.attr('width'), "400")
     equal(img.attr('height'), "300")
     equal(img.attr('src'), "testsrc")
+    equal(img.attr('data-mce-src'), "testsrc")
     equal(img.attr('alt'), "testalt")
 
   test "it updates decorative attributes for existing images", ->

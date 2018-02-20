@@ -231,6 +231,8 @@ class Account < ActiveRecord::Base
   add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
 
+  add_setting :enable_gravatar, :boolean => true, :root_only => true, :default => true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -1440,7 +1442,13 @@ class Account < ActiveRecord::Base
     end
 
     tabs << { :id => TAB_BRAND_CONFIGS, :label => t('#account.tab_brand_configs', "Themes"), :css_class => 'brand_configs', :href => :account_brand_configs_path } if manage_settings && branding_allowed?
-    tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && self.grants_right?(user, :manage_developer_keys)
+
+    if self.root_account.feature_enabled?(:developer_key_management)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: self.id } if self.grants_right?(user, :manage_developer_keys)
+    else
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && self.grants_right?(user, :manage_developer_keys)
+    end
+
 
     tabs += external_tool_tabs(opts)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)

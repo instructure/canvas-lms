@@ -17,7 +17,7 @@
 #
 
 class ScoreMetadata < ActiveRecord::Base
-  self.table_name = 'score_metadata'
+  include Canvas::SoftDeletable
 
   belongs_to :score
 

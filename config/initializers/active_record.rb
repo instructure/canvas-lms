@@ -806,7 +806,10 @@ ActiveRecord::Relation.class_eval do
   end
 
   def find_in_batches_with_temp_table(options = {})
-    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || ActiveRecord::Base.in_transaction_in_test?
+    can_do_it = Rails.env.production? ||
+      ActiveRecord::Base.in_migration ||
+      (!Rails.env.test? && connection.open_transactions > 0) ||
+      ActiveRecord::Base.in_transaction_in_test?
     raise "find_in_batches_with_temp_table probably won't work outside a migration
            and outside a transaction. Unfortunately, it's impossible to automatically
            determine a better way to do it that will work correctly. You can try

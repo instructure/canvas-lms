@@ -244,8 +244,7 @@ define [
           else
             donecb(calendarEventFilter(@displayAppointmentEvents, events, @schedulerState))
 
-      _datacb = datacb && (events) =>
-        datacb(calendarEventFilter(@displayAppointmentEvents, events, @schedulerState))
+      _datacb = datacb && ((events) => datacb(calendarEventFilter(@displayAppointmentEvents, events, @schedulerState)))
 
       @dataSource.getEvents(start, end, contexts, _donecb, _datacb)
 

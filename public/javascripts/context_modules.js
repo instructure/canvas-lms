@@ -931,7 +931,7 @@ function scrollTo ($thing, time = 500) {
       $pre.find(".option").empty().append($select.show());
       $('<label for="module_list_prereq" class="screenreader-only" />').text(I18n.t('Select prerequisite module')).insertBefore($select);
       $form.find(".prerequisites_list .criteria_list").append($pre).show();
-      $pre.slideDown();
+      $pre.show();
       $select.focus();
     });
 

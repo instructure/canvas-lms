@@ -41,8 +41,7 @@ requirejs.config({
 
     'test': '../test',
     'fixtures': '../test/fixtures',
-    'canvas_quizzes': '../../common/js',
-    'canvas_app': '../../vendor/canvas_app'
+    'canvas_quizzes': '../../common/js'
   },
 
   deps: [

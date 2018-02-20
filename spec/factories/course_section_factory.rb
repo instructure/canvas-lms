@@ -16,9 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Factories
-  def add_section(section_name)
-    @course_section = @course.course_sections.create!(:name => section_name)
-    @course.reload
+  def add_section(section_name, opts = {})
+    course = opts[:course] || @course
+    @course_section = course.course_sections.create!(:name => section_name)
+    course.reload
     @course_section
   end
 end

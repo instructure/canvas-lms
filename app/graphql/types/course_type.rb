@@ -41,9 +41,8 @@ module Types
       resolve ->(course, args, ctx) {
         if course.grants_any_right?(ctx[:current_user], ctx[:session],
             :read_roster, :view_all_grades, :manage_grades)
-          scope = UserSearch.scope_for(course, ctx[:current_user], {})
+          scope = UserSearch.scope_for(course, ctx[:current_user], include_inactive_enrollments: true)
           scope = scope.where(users: {id: args[:userIds]}) if args[:userIds].present?
-
           scope
         else
           nil
@@ -63,6 +62,7 @@ module Types
       argument :studentIds, !types[!types.ID], "Only return submissions for the given students.",
         prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
       argument :orderBy, types[SubmissionOrderInputType]
+      argument :filter, SubmissionFilterInputType
 
       resolve ->(course, args, ctx) {
         current_user = ctx[:current_user]
@@ -81,8 +81,9 @@ module Types
 
         submissions = Submission.active.joins(:assignment).where(
           user_id: allowed_user_ids,
-          assignment_id: course.assignments.published
-        ).where.not(workflow_state: "unsubmitted")
+          assignment_id: course.assignments.published,
+          workflow_state: (args[:filter] || {})[:states] || DEFAULT_SUBMISSION_STATES
+        )
 
         (args[:orderBy] || []).each { |order|
           submissions = submissions.order("#{order[:field]} #{order[:direction]}")

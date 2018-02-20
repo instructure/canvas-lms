@@ -29,11 +29,10 @@ describe 'Account Notification API', type: :request do
   describe 'user_index' do
     before do
       account_notification(message: 'default')
-      @path = "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications"
+      @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications"
       @api_params = {controller: 'account_notifications',
                      action: 'user_index',
                      format: 'json',
-                     user_id: @admin.id,
                      account_id: @admin.account.id.to_s}
     end
 
@@ -41,17 +40,37 @@ describe 'Account Notification API', type: :request do
       account_notification(message: 'second')
       json = api_call(:get, @path, @api_params,)
       expect(json.length).to eq 2
+      expect(json.map{|r| r["message"]}).to match_array(%w{default second})
+    end
+
+    it "should still work on the old endpoint" do
+      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications", {
+        controller: 'account_notifications',
+        action: 'user_index_deprecated',
+        format: 'json',
+        user_id: @admin.id.to_s,
+        account_id: @admin.account.id.to_s})
+      expect(json.map{|r| r["message"]}).to eq %w{default}
+    end
+
+    it "should catch a user_id mismatch on the old endpoint" do
+      other_user = User.create!
+      api_call(:get, "/api/v1/accounts/#{@admin.account.id}/users/#{other_user.id}/account_notifications", {
+        controller: 'account_notifications',
+        action: 'user_index_deprecated',
+        format: 'json',
+        user_id: other_user.id.to_s,
+        account_id: @admin.account.id.to_s}, {}, {:expected_status => 404})
     end
   end
 
   describe 'show' do
     before do
       @an = account_notification(message: 'default')
-      @path = "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications/#{@an.id}"
+      @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications/#{@an.id}"
       @api_params = {controller: 'account_notifications',
                      action: 'show',
                      format: 'json',
-                     user_id: @admin.id,
                      id: @an.id,
                      account_id: @admin.account.id.to_s}
     end
@@ -64,12 +83,11 @@ describe 'Account Notification API', type: :request do
     it "should show the notification as a non admin" do
       user = user_with_managed_pseudonym(:account => @admin.account)
 
-      @path = "/api/v1/accounts/#{user.account.id}/users/#{user.id}/account_notifications/#{@an.id}"
+      @path = "/api/v1/accounts/#{user.account.id}/account_notifications/#{@an.id}"
 
       @api_params = {controller: 'account_notifications',
                      action: 'show',
                      format: 'json',
-                     user_id: user.id,
                      id: @an.id,
                      account_id: @user.account.id.to_s}
 
@@ -81,12 +99,11 @@ describe 'Account Notification API', type: :request do
   describe 'user_close_notification' do
     before do
       @a = account_notification(message: 'default')
-      @path = "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications/#{@a.id}"
+      @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications/#{@a.id}"
       @api_params = {controller: 'account_notifications',
                      action: 'user_close_notification',
                      format: 'json',
                      id: @a.id.to_param,
-                     user_id: @admin.id,
                      account_id: @admin.account.id.to_s}
     end
 
@@ -95,7 +112,7 @@ describe 'Account Notification API', type: :request do
       @admin.reload
       expect(@admin.preferences[:closed_notifications]).to eq [@a.id]
 
-      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications", @api_params.merge(action: 'user_index'),)
+      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/account_notifications", @api_params.merge(action: 'user_index'),)
       expect(json.length).to eq 0
     end
   end

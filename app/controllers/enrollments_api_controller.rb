@@ -227,6 +227,26 @@
 #             "example": "B-",
 #             "type": "string"
 #           },
+#           "unposted_current_grade": {
+#             "description": "The user's current grade in the class including muted/unposted assignments. Only included if user has permissions to view this grade, typically teachers, TAs, and admins.",
+#             "example": "",
+#             "type": "string"
+#           },
+#           "unposted_final_grade": {
+#             "description": "The user's final grade for the class including muted/unposted assignments. Only included if user has permissions to view this grade, typically teachers, TAs, and admins..",
+#             "example": "",
+#             "type": "string"
+#           },
+#           "unposted_current_score": {
+#             "description": "The user's current score in the class including muted/unposted assignments. Only included if user has permissions to view this score, typically teachers, TAs, and admins..",
+#             "example": "",
+#             "type": "string"
+#           },
+#           "unposted_final_score": {
+#             "description": "The user's final score for the class including muted/unposted assignments. Only included if user has permissions to view this score, typically teachers, TAs, and admins..",
+#             "example": "",
+#             "type": "string"
+#           },
 #           "has_grading_periods": {
 #             "description": "optional: Indicates whether the course the enrollment belongs to has grading periods set up. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": true,
@@ -264,6 +284,26 @@
 #           },
 #           "current_period_computed_final_grade": {
 #             "description": "optional: The letter grade equivalent of current_period_computed_final_score, if available. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "example": "B",
+#             "type": "string"
+#           },
+#           "current_period_unposted_current_score": {
+#             "description": "optional: The student's score in the course for the current grading period, including muted/unposted assignments. Only included if user has permission to view this score, typically teachers, TAs, and admins. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "example": 95.80,
+#             "type": "number"
+#           },
+#           "current_period_unposted_final_score": {
+#             "description": "optional: The student's score in the course for the current grading period, including muted/unposted assignments and including ungraded assignments with a score of 0. Only included if user has permission to view this score, typically teachers, TAs, and admins. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "example": 85.25,
+#             "type": "number"
+#           },
+#           "current_period_unposted_current_grade": {
+#             "description": "optional: The letter grade equivalent of current_period_unposted_current_score, if available. Only included if user has permission to view this grade, typically teachers, TAs, and admins. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "example": "A",
+#             "type": "string"
+#           },
+#           "current_period_unposted_final_grade": {
+#             "description": "optional: The letter grade equivalent of current_period_unposted_final_score, if available. Only included if user has permission to view this grade, typically teachers, TAs, and admins. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": "B",
 #             "type": "string"
 #           }

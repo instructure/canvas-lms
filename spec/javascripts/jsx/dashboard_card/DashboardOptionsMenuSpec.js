@@ -20,9 +20,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
-import { mount } from 'enzyme'
+import { shallow, mount } from 'enzyme'
 import DashboardOptionsMenu from 'jsx/dashboard_card/DashboardOptionsMenu'
 import moxios from 'moxios';
+import sinon from 'sinon'
 
 const container = document.getElementById('fixtures')
 
@@ -31,8 +32,9 @@ const FakeDashboard = function (props) {
     <div>
       <DashboardOptionsMenu
         ref={(c) => { props.menuRef(c) }}
-        recent_activity_dashboard={props.recent_activity_dashboard}
+        view={props.view}
         planner_enabled={props.planner_enabled}
+        onDashboardChange={props.onDashboardChange}
       />
       {
         props.planner_enabled && (
@@ -75,13 +77,15 @@ const FakeDashboard = function (props) {
 
 FakeDashboard.propTypes = {
   menuRef: PropTypes.func.isRequired,
-  recent_activity_dashboard: PropTypes.bool,
-  planner_enabled: PropTypes.bool
+  view: PropTypes.string,
+  planner_enabled: PropTypes.bool,
+  onDashboardChange: PropTypes.func,
 }
 
 FakeDashboard.defaultProps = {
-  recent_activity_dashboard: false,
-  planner_enabled: false
+  view: 'cards',
+  planner_enabled: false,
+  onDashboardChange: () => {},
 }
 
 QUnit.module('Dashboard Options Menu', {
@@ -92,101 +96,44 @@ QUnit.module('Dashboard Options Menu', {
 
 test('it renders', function () {
   const dashboardMenu = TestUtils.renderIntoDocument(
-    <DashboardOptionsMenu />
+    <DashboardOptionsMenu onDashboardChange={() => {}} />
   )
   ok(dashboardMenu)
 })
 
-test('it should switch dashboard view appropriately when view option is selected', function () {
-  this.stub(DashboardOptionsMenu.prototype, 'postDashboardToggle')
+test('it should call onDashboardChange when new view is selected', function () {
+  const onDashboardChangeSpy = sinon.spy()
 
-  let dashboardMenu = null
-  ReactDOM.render(
-    <FakeDashboard
-      menuRef={(c) => { dashboardMenu = c }}
-      recent_activity_dashboard
-    />, container)
+  const wrapper = shallow(
+    <DashboardOptionsMenu
+      view="planner"
+      onDashboardChange={onDashboardChangeSpy}
+    />)
 
-  dashboardMenu.handleViewOptionSelect(null, ['cards'])
-  ok(document.getElementById('dashboard-activity').style.display === 'none')
-  ok(document.getElementById('DashboardCard_Container').style.display === 'block')
-
-  dashboardMenu.handleViewOptionSelect(null, ['activity'])
-  ok(document.getElementById('dashboard-activity').style.display === 'block')
-  ok(document.getElementById('DashboardCard_Container').style.display === 'none')
+  wrapper.instance().handleViewOptionSelect(null, ['cards'])
+  equal(onDashboardChangeSpy.callCount, 1)
+  ok(onDashboardChangeSpy.calledWith('cards'))
 })
 
-test('it should not call toggleDashboardView when correct view is already set', function () {
-  this.stub(DashboardOptionsMenu.prototype, 'postDashboardToggle')
-  const toggleDashboardView = this.stub(DashboardOptionsMenu.prototype, 'toggleDashboardView')
+test('it should not call onDashboardChange when correct view is already set', function () {
+  const onDashboardChangeSpy = sinon.spy()
 
-  const wrapper = mount(<DashboardOptionsMenu recent_activity_dashboard />)
+  const wrapper = mount(<DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChangeSpy} />)
   wrapper.find('button').simulate('click')
 
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
   const recentActivity = menuItems.filter(menuItem => menuItem.textContent.trim() === 'Recent Activity')[0]
   recentActivity.click()
 
-  equal(toggleDashboardView.callCount, 0)
+  equal(onDashboardChangeSpy.callCount, 0)
   wrapper.unmount()
-})
-
-test('it should switch dashboard view appropriately with Student Planner enabled when view option is selected', function () {
-  this.stub(DashboardOptionsMenu.prototype, 'postDashboardToggle')
-
-  let dashboardMenu = null
-  ReactDOM.render(
-    <FakeDashboard
-      menuRef={(c) => { dashboardMenu = c }}
-      planner_enabled
-    />, container)
-
-  dashboardMenu.handleViewOptionSelect(null, ['cards'])
-  ok(document.getElementById('dashboard-planner').style.display === 'none')
-  ok(document.getElementById('dashboard-planner-header').style.display === 'none')
-  ok(document.getElementById('DashboardCard_Container').style.display === 'block')
-  ok(document.getElementById('dashboard-activity').style.display === 'none')
-
-  dashboardMenu.handleViewOptionSelect(null, ['planner'])
-  ok(document.getElementById('dashboard-planner').style.display === 'block')
-  ok(document.getElementById('dashboard-planner-header').style.display === 'block')
-  ok(document.getElementById('DashboardCard_Container').style.display === 'none')
-  ok(document.getElementById('dashboard-activity').style.display === 'none')
-
-  dashboardMenu.handleViewOptionSelect(null, ['activity'])
-  ok(document.getElementById('dashboard-planner').style.display === 'none')
-  ok(document.getElementById('dashboard-planner-header').style.display === 'none')
-  ok(document.getElementById('DashboardCard_Container').style.display === 'none')
-  ok(document.getElementById('dashboard-activity').style.display === 'block')
-})
-
-test('it should use the dashboard view endpoint when Student Planner is enabled', function (assert) {
-  const done = assert.async();
-  moxios.install();
-  let dashboardMenu = null
-  ReactDOM.render(
-    <FakeDashboard
-      menuRef={(c) => { dashboardMenu = c }}
-      planner_enabled
-    />, container)
-
-  dashboardMenu.handleViewOptionSelect(null, ['cards'])
-  dashboardMenu.postDashboardToggle();
-
-  moxios.wait(() => {
-    const request = moxios.requests.mostRecent()
-    equal(request.url, '/dashboard/view')
-    equal(request.config.data, '{"dashboard_view":"cards"}');
-    done()
-  })
-
-  moxios.uninstall();
 })
 
 test('it should include a List View menu item when Student Planner is enabled', function () {
   const wrapper = mount(
     <DashboardOptionsMenu
       planner_enabled
+      onDashboardChange={() => {}}
     />
   )
   wrapper.find('button').simulate('click')
@@ -196,7 +143,7 @@ test('it should include a List View menu item when Student Planner is enabled', 
 });
 
 test('it should display toggle color overlay option if card view is set', function () {
-  const wrapper = mount(<DashboardOptionsMenu />)
+  const wrapper = mount(<DashboardOptionsMenu onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
 
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
@@ -207,7 +154,7 @@ test('it should display toggle color overlay option if card view is set', functi
 })
 
 test('it should not display toggle color overlay option if recent activity view is set', function () {
-  const wrapper = mount(<DashboardOptionsMenu recent_activity_dashboard />)
+  const wrapper = mount(<DashboardOptionsMenu view="activity" onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
 
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))

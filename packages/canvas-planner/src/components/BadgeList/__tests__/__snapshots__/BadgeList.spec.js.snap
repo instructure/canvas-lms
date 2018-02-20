@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders Pill components as list items 1`] = `
+<ul>
+  <li>
+    <Pill
+      text="Pill 1"
+      variant="default"
+    />
+  </li>
+  <li>
+    <Pill
+      text="Pill 2"
+      variant="default"
+    />
+  </li>
+  <li>
+    <Pill
+      text="Pill 3"
+      variant="default"
+    />
+  </li>
+</ul>
+`;

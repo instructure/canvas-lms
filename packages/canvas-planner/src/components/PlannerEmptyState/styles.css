@@ -1,0 +1,37 @@
+/* Variables are defined in ./theme.js */
+
+.root {
+  font-size: var(--fontSize);
+  font-family: var(--fontFamily);
+  font-weight: var(--fontWeight);
+
+  color: var(--color);
+  background: var(--background);
+}
+
+.desert {
+  display: block;
+  transform: scale(1.4);
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding: var(--smallSpacing);
+  margin-top: var(--xxLargeSpacing);
+  margin-bottom: var(--largeSpacing);
+}
+
+.subtitlebox {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.title {
+  text-align: center;
+  vertical-align: middle;
+  padding: 16px;
+  font-weight: var(--lightWeight);
+}
+
+.subtitle {
+  padding: 12px;
+}

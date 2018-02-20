@@ -193,7 +193,7 @@ module UserContent
 
       html.gsub(@toplevel_regex) do |relative_url|
         prefix, type, obj_id, rest = [$1, $2, $3, $4]
-        next if prefix && !@contextless_types.include?(type) && prefix != @context_prefix
+        next relative_url if !@contextless_types.include?(type) && prefix != @context_prefix
 
         if type != "wiki" && type != "pages"
           if obj_id.to_i > 0

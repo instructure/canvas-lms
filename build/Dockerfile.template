@@ -41,7 +41,6 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v 1.15.2 \
-  && gem update --system --no-document \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 <% if development? -%>
@@ -109,10 +108,11 @@ COPY Gemfile      ${APP_HOME}
 COPY Gemfile.d    ${APP_HOME}Gemfile.d
 COPY config       ${APP_HOME}config
 COPY gems         ${APP_HOME}gems
+COPY packages     ${APP_HOME}packages
 COPY script       ${APP_HOME}script
 COPY package.json ${APP_HOME}
 COPY yarn.lock    ${APP_HOME}
-RUN find gems -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
+RUN find gems packages -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
 USER docker

@@ -205,13 +205,13 @@ class GradeSummaryAssignmentPresenter
   end
 
   def file
-    @file ||= submission.attachments.detect{|a| is_plagiarism_attachment?(a) }
+    @file ||= submission.attachments.detect{|a| plagiarism_attachment?(a) }
   end
 
-  def is_plagiarism_attachment?(a)
-    @originality_reports.select { |o| o.attachment == a } ||
-    (submission.turnitin_data && submission.turnitin_data[a.asset_string]) ||
-    (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string])
+  def plagiarism_attachment?(a)
+    @originality_reports.any? { |o| o.attachment == a } ||
+    (submission.turnitin_data && submission.turnitin_data[a.asset_string]).present? ||
+    (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string]).present?
   end
 
   def comments

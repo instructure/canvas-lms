@@ -255,4 +255,16 @@ describe AccessToken do
       expect(@at.expires_at.to_i).to be((DateTime.now.utc + 1.hour).to_i)
     end
   end
+
+  describe "#dev_key_account_id" do
+
+    it "returns the developer_key account_id" do
+      account = Account.create!
+      dev_key = DeveloperKey.create!(account: account)
+      at = AccessToken.create!(developer_key: dev_key)
+      expect(at.dev_key_account_id).to eq account.id
+    end
+
+  end
+
 end

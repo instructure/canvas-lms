@@ -3670,10 +3670,11 @@ describe Assignment do
     end
     it "should include assignments where unlock_at is in the past and lock_at is future" do
       @quiz.unlock_at = 1.day.ago
+      @quiz.due_at = 1.hour.ago
       @quiz.lock_at = 1.day.from_now
       @quiz.save!
       list = Assignment.not_locked.to_a
-      expect(list.size).to eql 1
+      expect(list.size).to be 1
       expect(list.first.title).to eql 'Test Assignment'
     end
     it "should not include assignments where unlock_at is in future" do
@@ -4463,7 +4464,7 @@ describe Assignment do
         it { is_expected.not_to be_in_closed_grading_period }
       end
 
-      context 'when there are at least one submission in a closed grading peiod' do
+      context 'when there are at least one submission in a closed grading period' do
         before { assignment.update!(due_at: 3.months.ago) }
 
         it { is_expected.to be_in_closed_grading_period }

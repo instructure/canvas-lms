@@ -34,10 +34,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   '../jquery.kylemenu'
-], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter,
-  SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate,
-  re_upload_submissions_form, _, authenticity_token,
-  MessageStudentsWhoHelper) ->
+], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token, MessageStudentsWhoHelper) ->
 
   isAdmin = () ->
     ENV.current_user_roles.includes('admin')
@@ -115,17 +112,11 @@ define [
         menuItem.addClass('ui-state-disabled')
         menuItem.attr('aria-disabled', true)
 
-    showAssignmentDetails: (opts={
-      assignment:@assignment,
-      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)
-    })=>
+    showAssignmentDetails: (opts={assignment:@assignment, students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)})=>
       dialog = new AssignmentDetailsDialog(opts)
       dialog.show()
 
-    messageStudentsWho: (opts={
-      assignment:@assignment,
-      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)
-    }) =>
+    messageStudentsWho: (opts={ assignment:@assignment, students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)}) =>
       {students, assignment} = opts
 
       students = _.filter students, (student) => !student.is_inactive
@@ -139,23 +130,14 @@ define [
       settings = MessageStudentsWhoHelper.settings(assignment, students)
       messageStudents(settings)
 
-    setDefaultGrade: (opts = {
-      assignment: @assignment,
-      students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
-      context_id: @gradebook.options.context_id
-      selected_section: @gradebook.sectionToShow
-    }) =>
+    setDefaultGrade: (opts = { assignment: @assignment, students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment), context_id: @gradebook.options.context_id, selected_section: @gradebook.sectionToShow}) =>
       if isAdmin() or not opts.assignment.inClosedGradingPeriod
         new SetDefaultGradeDialog(opts).show()
       else
         $.flashError(I18n.t("Unable to set default grade because this " +
           "assignment is due in a closed grading period for at least one student"))
 
-    curveGrades: (opts = {
-      assignment: @assignment,
-      students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
-      context_url: @gradebook.options.context_url
-    }) =>
+    curveGrades: (opts = { assignment: @assignment, students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment), context_url: @gradebook.options.context_url}) =>
       if isAdmin() or not opts.assignment.inClosedGradingPeriod
         dialog = new CurveGradesDialog(opts)
         dialog.show()

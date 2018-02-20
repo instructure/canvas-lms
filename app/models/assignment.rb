@@ -74,7 +74,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
-  has_many :line_items, inverse_of: :assignment, class_name: 'Lti::LineItem'
+  has_many :line_items, inverse_of: :assignment, class_name: 'Lti::LineItem', dependent: :destroy
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?

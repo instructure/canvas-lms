@@ -83,6 +83,21 @@ describe UserObserver do
     expect(enrollments.reload.map(&:workflow_state)).to eql ["active", "active"]
   end
 
+  it "should be able to preload observers" do
+    c1 = course_factory(active_all: true)
+    e1 = student_in_course(:course => c1, :user => student)
+
+    observer = user_with_pseudonym
+    student.observers << observer
+
+    preloaded_student = User.where(:id => student).preload(:observers).first
+    expect(preloaded_student.association(:observers).loaded?).to be_truthy
+    expect(preloaded_student.observers).to eq [observer]
+
+    UserObserver.where(:user_id => student).update_all(:workflow_state => "deleted")
+    expect(User.where(:id => student).preload(:observers).first.observers).to eq []
+  end
+
   it "should enroll the observer in courses when the student is inactive" do
     c1 = course_factory(active_all: true)
     enroll = student_in_course(:course => c1, :user => student)

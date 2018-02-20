@@ -40,7 +40,8 @@ module UserSearch
       restrict_search = true
     end
     context.shard.activate do
-      base_scope = base_scope.where(conditions_statement(search_term, context.root_account, {:restrict_search => restrict_search}))
+      # TODO: Need to optimize this as it's not using the base scope filter for the conditions statement query
+      base_scope = base_scope.where(conditions_statement(search_term, context.root_account, {restrict_search: restrict_search}))
       if options[:role_filter_id] && options[:role_filter_id] != ""
         base_scope = base_scope.where("#{options[:role_filter_id]} IN
                             (SELECT role_id FROM #{Enrollment.quoted_table_name}

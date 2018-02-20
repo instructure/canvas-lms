@@ -110,6 +110,56 @@ describe AuthenticationMethods do
       expect(@controller.cookies['_csrf_token'][:domain]).to eq @session_options[:domain]
     end
   end
+
+  describe "#access_token_account" do
+
+    let(:account) {Account.create!}
+    let(:dev_key) {DeveloperKey.create!(account: account)}
+    let(:access_token) {AccessToken.create!(developer_key: dev_key)}
+    let(:request) {double(format: double(:json? => false), host_with_port:"")}
+    let(:controller) {RSpec::MockController.new(account, request)}
+
+    it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
+      expect(controller).not_to receive(:get_context)
+      controller.access_token_account(account, access_token)
+    end
+
+    it "doesn't call '#get_context' if the Dev key has no account_id" do
+      dev_key.account_id = nil
+      dev_key.save!
+      expect(controller).not_to receive(:get_context)
+      controller.access_token_account(account, access_token)
+    end
+
+    it "returns the domain_root_account if there is no account_id" do
+      dev_key.account_id = nil
+      dev_key.save!
+      expect(controller.access_token_account(account, access_token)).to be(account)
+    end
+
+    it "returns the domain_root_account if the Dev key is owned by the domain root account" do
+      expect(controller.access_token_account(account, access_token)).to be(account)
+    end
+
+    it "returns the contexts account for a sub account dev_key" do
+      sub_account = Account.create!(parent_account: account)
+      dev_key.account = sub_account
+      dev_key.save!
+      allow(controller).to receive(:get_context)
+      controller.instance_variable_set(:@context, sub_account)
+      expect(controller.access_token_account(account, access_token)).to be(sub_account)
+    end
+
+    it "returns the domain_root_account if the context can't be resolved" do
+      sub_account = Account.create!(parent_account: account)
+      dev_key.account = sub_account
+      dev_key.save!
+      allow(controller).to receive(:get_context)
+      expect(controller.access_token_account(account, access_token)).to be(account)
+    end
+
+  end
+
 end
 
 class RSpec::MockController

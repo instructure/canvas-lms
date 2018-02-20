@@ -21,12 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe "Outcome Reports" do
   include ReportSpecHelper
 
+  let(:user1_rubric_score) { 2 }
+
   before(:once) do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
-    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @default_term = @account.default_enrollment_term
-    @course1 = Course.create(:name => 'English 101', :course_code => 'ENG101', :account => @account)
+    @root_account = Account.create(name: 'New Account', default_time_zone: 'UTC')
+    @default_term = @root_account.default_enrollment_term
+    @course1 = Course.create(:name => 'English 101', :course_code => 'ENG101', :account => @root_account)
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.save!
     @course1.offer!
@@ -35,25 +37,27 @@ describe "Outcome Reports" do
     @course1.enroll_teacher(@teacher)
 
     @user1 = user_with_managed_pseudonym(
-      :active_all => true, :account => @account, :name => 'John St. Clair',
+      :active_all => true, :account => @root_account, :name => 'John St. Clair',
       :sortable_name => 'St. Clair, John', :username => 'john@stclair.com',
-      :sis_user_id => 'user_sis_id_01')
+      :sis_user_id => 'user_sis_id_01'
+    )
     @user2 = user_with_managed_pseudonym(
       :active_all => true, :username => 'micheal@michaelbolton.com',
-      :name => 'Michael Bolton', :account => @account,
-      :sis_user_id => 'user_sis_id_02')
+      :name => 'Michael Bolton', :account => @root_account,
+      :sis_user_id => 'user_sis_id_02'
+    )
 
     @course1.enroll_user(@user1, "StudentEnrollment", :enrollment_state => 'active')
     @enrollment2 = @course1.enroll_user(@user2, "StudentEnrollment", :enrollment_state => 'active')
 
     @section = @course1.course_sections.first
     assignment_model(:course => @course1, :title => 'Engrish Assignment')
-    outcome_group = @account.root_outcome_group
-    @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
+    outcome_group = @root_account.root_outcome_group
+    @outcome = outcome_model(context: @root_account, :short_description => 'Spelling')
     @rubric = Rubric.create!(:context => @course1)
     @rubric.data = [
       {
-        :points => 3,
+        :points => 3.0,
         :description => "Outcome row",
         :id => 1,
         :ratings => [
@@ -81,6 +85,13 @@ describe "Outcome Reports" do
     @submission.submission_type = 'online_url'
     @submission.submitted_at = 1.week.ago
     @submission.save!
+    @outcome.reload
+    outcome_group.add_outcome(@outcome)
+    @outcome.reload
+    outcome_group.add_outcome(@outcome)
+  end
+
+  before do
     @assessment = @a.assess({
                               :user => @user1,
                               :assessor => @user2,
@@ -88,146 +99,173 @@ describe "Outcome Reports" do
                               :assessment => {
                                 :assessment_type => 'grading',
                                 :criterion_1 => {
-                                  :points => 2,
+                                  :points => user1_rubric_score,
                                   :comments => "cool, yo"
                                 }
                               }
                             })
-    @outcome.reload
-    outcome_group.add_outcome(@outcome)
-
   end
 
-  describe "Student Competency report" do
-    before(:each) do
-      @type = 'student_assignment_outcome_map_csv'
+  def verify_all(report, all_values)
+    expect(report.length).to eq all_values.length
+    report.each.with_index { |row, i| verify(row, all_values[i], row_index: i) }
+  end
+
+  def verify(row, values, row_index: nil)
+    user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_submission, pseudonym =
+      values.values_at(:user, :assignment, :outcome, :outcome_result, :course, :section, :submission, :quiz, :question,
+      :quiz_submission, :pseudonym)
+    rating = if outcome.present? && outcome_result&.score&.present?
+               outcome.rubric_criterion&.[](:ratings)&.select do |r|
+                 r[:points].present? && r[:points] <= outcome_result.score
+               end&.first
+             end
+    rating ||= {}
+
+    expectations = {
+      'student name' => user.sortable_name,
+      'student id' => user.id,
+      'student sis id' => pseudonym&.sis_user_id || user.pseudonym.sis_user_id,
+      'assignment title' => assignment&.title,
+      'assignment id' => assignment&.id,
+      'assignment url' => "https://#{HostUrl.context_host(course)}/courses/#{course.id}/assignments/#{assignment.id}",
+      'course id' => course&.id,
+      'course name' => course&.name,
+      'course sis id' => course&.sis_source_id,
+      'section id' => section&.id,
+      'section name' => section&.name,
+      'section sis id' => section&.sis_source_id,
+      'submission date' => quiz_submission&.finished_at&.iso8601 || submission&.submitted_at&.iso8601,
+      'submission score' => quiz_submission&.score || submission&.grade&.to_f,
+      'learning outcome name' => outcome&.short_description,
+      'learning outcome friendly name' => outcome&.display_name,
+      'learning outcome id' => outcome&.id,
+      'learning outcome mastery score' => outcome&.mastery_points,
+      'learning outcome points possible' => outcome_result&.possible,
+      'learning outcome mastered' => unless outcome_result&.mastery.nil?
+                                       outcome_result.mastery? ? 1 : 0
+                                     end,
+      'learning outcome rating' => rating[:description],
+      'learning outcome rating points' => rating[:points],
+      'attempt' => outcome_result&.attempt,
+      'outcome score' => outcome_result&.score,
+      'account id' => course&.account&.id,
+      'account name' => course&.account&.name,
+      "assessment title" => quiz&.title || assignment&.title,
+      "assessment id" => quiz&.id || assignment&.id,
+      "assessment type" => quiz.nil? ? 'assignment' : 'quiz',
+      "assessment question" => question&.name,
+      "assessment question id" => question&.id,
+      "enrollment state" => user&.enrollments&.find_by(course: course, course_section: section)&.workflow_state
+    }
+    expect(row.headers).to eq row.headers & expectations.keys
+
+    row.headers.each do |key|
+      expect(row[key].to_s).to eq(expectations[key].to_s),
+        (row_index.present? ? "for row #{row_index}, " : '') +
+        "for column '#{key}': expected '#{expectations[key]}', received '#{row[key]}'"
+    end
+  end
+
+  let(:common_values) do
+    {
+      course: @course1,
+      section: @section,
+      assignment: @assignment,
+      outcome: @outcome
+    }
+  end
+  let(:user1_values) do
+    {
+      **common_values,
+      user: @user1,
+      outcome_result: LearningOutcomeResult.find_by(artifact: @assessment),
+      submission: @submission
+    }
+  end
+  let(:user2_values) do
+    {
+      **common_values,
+      user: @user2
+    }
+  end
+
+  let(:report_params) { {} }
+  let(:merged_params) { report_params.reverse_merge(order: order, parse_header: true, account: @root_account) }
+  let(:report) { read_report(report_type, merged_params) }
+
+  shared_examples 'common outcomes report behavior' do
+    it "should run the report" do
+      expect(report[0].headers).to eq expected_headers
     end
 
-    it "should run the Student Competency report" do
-
-      parsed = read_report(@type, {order: [0, 1]})
-
-      expect(parsed[0][0]).to eq @user2.sortable_name
-      expect(parsed[0][1]).to eq @user2.id.to_s
-      expect(parsed[0][2]).to eq "user_sis_id_02"
-      expect(parsed[0][3]).to eq @assignment.title
-      expect(parsed[0][4]).to eq @assignment.id.to_s
-      expect(parsed[0][5]).to eq nil
-      expect(parsed[0][6]).to eq nil
-      expect(parsed[0][7]).to eq @outcome.short_description
-      expect(parsed[0][8]).to eq @outcome.id.to_s
-      expect(parsed[0][9]).to eq nil
-      expect(parsed[0][10]).to eq nil
-      expect(parsed[0][11]).to eq @course1.name
-      expect(parsed[0][12]).to eq @course1.id.to_s
-      expect(parsed[0][13]).to eq @course1.sis_source_id
-      expect(parsed[0][14]).to eq @section.name
-      expect(parsed[0][15]).to eq @section.id.to_s
-      expect(parsed[0][16]).to eq @section.sis_source_id
-      expect(parsed[0][17]).to eq "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"
-
-      expect(parsed[1][0]).to eq @user1.sortable_name
-      expect(parsed[1][1]).to eq @user1.id.to_s
-      expect(parsed[1][2]).to eq "user_sis_id_01"
-      expect(parsed[1][3]).to eq @assignment.title
-      expect(parsed[1][4]).to eq @assignment.id.to_s
-      expect(parsed[1][5]).to eq @submission.submitted_at.iso8601
-      expect(parsed[1][6]).to eq @submission.grade.to_f.to_s
-      expect(parsed[1][7]).to eq @outcome.short_description
-      expect(parsed[1][8]).to eq @outcome.id.to_s
-      expect(parsed[1][9]).to eq '1'
-      expect(parsed[1][10]).to eq '2.0'
-      expect(parsed[1][11]).to eq @course1.name
-      expect(parsed[1][12]).to eq @course1.id.to_s
-      expect(parsed[1][13]).to eq @course1.sis_source_id
-      expect(parsed[1][14]).to eq @section.name
-      expect(parsed[1][15]).to eq @section.id.to_s
-      expect(parsed[1][16]).to eq @section.sis_source_id
-      expect(parsed[1][17]).to eq "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"
-
-      expect(parsed.length).to eq 2
-
+    it 'has correct values' do
+      verify_all(report, all_values)
     end
 
-    it "should run the Student Competency report on a term" do
-      @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago, :end_at => 1.year.from_now)
-      @term1.root_account = @account
-      @term1.sis_source_id = 'fall12'
-      @term1.save!
+    context 'with a term' do
+      before do
+        @term1 = @root_account.enrollment_terms.create!(
+          name: 'Fall',
+          start_at: 6.months.ago,
+          end_at: 1.year.from_now,
+          sis_source_id: 'fall12'
+        )
+      end
+      let(:report_params) { { params: { 'enrollment_term' => @term1.id } } }
 
-      parameters = {}
-      parameters["enrollment_term"] = @term1.id
-      parsed = read_report(@type, {params: parameters})
-      expect(parsed[0]).to eq ["No outcomes found"]
-      expect(parsed.length).to eq 1
+      it "should filter out courses not in term" do
+        expect(report.length).to eq 1
+        expect(report[0][0]).to eq "No outcomes found"
+      end
 
+      it 'should include courses in term' do
+        @course1.update! enrollment_term: @term1
+        verify_all(report, all_values)
+      end
     end
 
-    it "should run the Student Competency report on a sub account" do
-      sub_account = Account.create(:parent_account => @account, :name => 'English')
+    context 'with a sub account' do
+      before(:once) do
+        @sub_account = Account.create(:parent_account => @root_account, :name => 'English')
+      end
+      let(:report_params) { { account: @sub_account } }
 
-      parameters = {}
-      parsed = read_report(@type, {params: parameters, account: sub_account})
-      expect(parsed[0]).to eq ["No outcomes found"]
-      expect(parsed.length).to eq 1
+      it "should filter courses in a sub account" do
+        expect(report.length).to eq 1
+        expect(report[0][0]).to eq "No outcomes found"
+      end
 
+      it "should include courses in the sub account" do
+        @sub_account.root_outcome_group.add_outcome(@outcome)
+        @course1.update! account: @sub_account
+        verify_all(report, all_values)
+      end
     end
 
-    it "should run the Student Competency report on a sub account with courses" do
-      sub_account = Account.create(:parent_account => @account, :name => 'English')
-      outcome_group = sub_account.root_outcome_group
-      @course1.account = sub_account
-      @course1.save!
-      outcome_group.add_outcome(@outcome)
+    context 'with deleted enrollments' do
+      before(:once) do
+        @enrollment2.destroy!
+      end
 
-      parsed = read_report(@type, {order: [0, 1], account: sub_account})
-      expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
-                           @assignment.title, @assignment.id.to_s,
-                           @submission.submitted_at.iso8601, @submission.grade.to_f.to_s,
-                           @outcome.short_description, @outcome.id.to_s, '1', '2.0',
-                           @course1.name, @course1.id.to_s, @course1.sis_source_id,
-                           @section.name, @section.id.to_s, @section.sis_source_id,
-                           "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
+      it 'should exclude deleted enrollments by default' do
+        remaining_values = all_values.reject { |v| v[:user] == @user2 }
+        verify_all(report, remaining_values)
+      end
 
-      expect(parsed[0]).to eq [@user2.sortable_name, @user2.id.to_s, "user_sis_id_02",
-                           @assignment.title, @assignment.id.to_s, nil, nil,
-                           @outcome.short_description, @outcome.id.to_s, nil, nil,
-                           @course1.name, @course1.id.to_s, @course1.sis_source_id,
-                           @section.name, @section.id.to_s, @section.sis_source_id,
-                           "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
-      expect(parsed.length).to eq 2
+      it 'should include deleted enrollments when include_deleted is set' do
+        report_record = run_report(report_type, account: @root_account, params: { 'include_deleted' => true })
+        expect(report_record.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
 
+        report = parse_report(report_record, order: order, parse_header: true)
+        verify_all(report, all_values)
+      end
     end
 
-    it "should run the Student Competency report with deleted enrollments" do
-      @enrollment2.destroy
-
-      param = {}
-      param["include_deleted"] = true
-      report = run_report(@type, {params: param})
-      expect(report.current_line).to eq 3
-      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
-      parsed = parse_report(report, {order: 0})
-
-      expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
-                           @assignment.title, @assignment.id.to_s,
-                           @submission.submitted_at.iso8601, @submission.grade.to_f.to_s,
-                           @outcome.short_description, @outcome.id.to_s, '1', '2.0',
-                           @course1.name, @course1.id.to_s, @course1.sis_source_id,
-                           @section.name, @section.id.to_s, @section.sis_source_id,
-                           "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
-
-      expect(parsed[0]).to eq [@user2.sortable_name, @user2.id.to_s, "user_sis_id_02",
-                           @assignment.title, @assignment.id.to_s, nil, nil,
-                           @outcome.short_description, @outcome.id.to_s, nil, nil,
-                           @course1.name, @course1.id.to_s, @course1.sis_source_id,
-                           @section.name, @section.id.to_s, @section.sis_source_id,
-                           "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
-      expect(parsed.length).to eq 2
-
-    end
-
-    it "should not incluce invalid learning outcome results" do
+    it "should not include invalid learning outcome results" do
+      # create result that is invalid because
+      # it has an artifact type of submission, instead of
+      # a rubric assessment or assessment question
       ct = @assignment.learning_outcome_alignments.last
       lor = ct.learning_outcome_results.for_association(@assignment).build
       lor.user = @user1
@@ -236,171 +274,169 @@ describe "Outcome Reports" do
       lor.possible = @assignment.points_possible
       lor.score = @submission.score
       lor.save!
-
-      parsed = read_report(@type, {order: 0})
-      expect(parsed.length).to eq 2
-    end
-  end
-
-  describe "outcome results report" do
-    before(:each) do
-      @type = 'outcome_results_csv'
-    end
-
-    it "should run the outcome result report" do
-      parsed = read_report(@type)
-
-      expect(parsed[0][0]).to eq @user1.sortable_name
-      expect(parsed[0][1]).to eq @user1.id.to_s
-      expect(parsed[0][2]).to eq "user_sis_id_01"
-      expect(parsed[0][3]).to eq @assignment.title
-      expect(parsed[0][4]).to eq @assignment.id.to_s
-      expect(parsed[0][5]).to eq 'assignment'
-      expect(parsed[0][6]).to eq @submission.submitted_at.iso8601
-      expect(parsed[0][7]).to eq @submission.grade.to_f.to_s
-      expect(parsed[0][8]).to eq @outcome.short_description
-      expect(parsed[0][9]).to eq @outcome.id.to_s
-      expect(parsed[0][10]).to eq '1'
-      expect(parsed[0][11]).to eq '2.0'
-      expect(parsed[0][12]).to eq nil
-      expect(parsed[0][13]).to eq nil
-      expect(parsed[0][14]).to eq @course1.name
-      expect(parsed[0][15]).to eq @course1.id.to_s
-      expect(parsed[0][16]).to eq @course1.sis_source_id
-      expect(parsed.length).to eq 1
-    end
-
-    it "should work with quizzes" do
-      outcome_group = @account.root_outcome_group
-      outcome = @account.created_learning_outcomes.create!(:short_description => 'new outcome')
-      quiz = @course1.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-      q1 = quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
-      q2 = quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1', 'weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]})
-      bank = q1.assessment_question.assessment_question_bank
-      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
-      outcome.align(bank, @account, :mastery_score => 0.7)
-      answer_1 = q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
-      answer_2 = q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
-      quiz.generate_quiz_data(:persist => true)
-      sub = quiz.generate_submission(@user)
-      sub.submission_data = {}
-      question_1 = q1[:id]
-      question_2 = q2[:id]
-      sub.submission_data["question_#{question_1}"] = answer_1
-      sub.submission_data["question_#{question_2}"] = answer_2 + 1
-      Quizzes::SubmissionGrader.new(sub).grade_submission
-      outcome.reload
-      outcome_group.add_outcome(outcome)
-
-      parsed = read_report(@type, {order: [0, 13]})
-
-      expect(parsed[2][0]).to eq @user1.sortable_name
-      expect(parsed[2][1]).to eq @user1.id.to_s
-      expect(parsed[2][2]).to eq "user_sis_id_01"
-      expect(parsed[2][3]).to eq @assignment.title
-      expect(parsed[2][4]).to eq @assignment.id.to_s
-      expect(parsed[2][5]).to eq 'assignment'
-      expect(parsed[2][6]).to eq @submission.submitted_at.iso8601
-      expect(parsed[2][7]).to eq @submission.grade.to_f.to_s
-      expect(parsed[2][8]).to eq @outcome.short_description
-      expect(parsed[2][9]).to eq @outcome.id.to_s
-      expect(parsed[2][10]).to eq '1'
-      expect(parsed[2][11]).to eq '2.0'
-      expect(parsed[2][12]).to eq nil
-      expect(parsed[2][13]).to eq nil
-      expect(parsed[2][14]).to eq @course1.name
-      expect(parsed[2][15]).to eq @course1.id.to_s
-      expect(parsed[2][16]).to eq @course1.sis_source_id
-
-      expect(parsed[0][0]).to eq @user2.sortable_name
-      expect(parsed[0][1]).to eq @user2.id.to_s
-      expect(parsed[0][2]).to eq "user_sis_id_02"
-      expect(parsed[0][3]).to eq quiz.title
-      expect(parsed[0][4]).to eq quiz.id.to_s
-      expect(parsed[0][5]).to eq 'quiz'
-      expect(parsed[0][6]).to eq sub.finished_at.iso8601
-      expect(parsed[0][7]).to eq sub.score.to_s
-      expect(parsed[0][8]).to eq outcome.short_description
-      expect(parsed[0][9]).to eq outcome.id.to_s
-      expect(parsed[0][10]).to eq '1'
-      expect(parsed[0][11]).to eq '1.0'
-      expect(parsed[0][12]).to eq 'question 1'
-      expect(parsed[0][13]).to eq q1.assessment_question.id.to_s
-      expect(parsed[0][14]).to eq @course1.name
-      expect(parsed[0][15]).to eq @course1.id.to_s
-      expect(parsed[0][16]).to eq @course1.sis_source_id
-
-      expect(parsed[1][0]).to eq @user2.sortable_name
-      expect(parsed[1][1]).to eq @user2.id.to_s
-      expect(parsed[1][2]).to eq "user_sis_id_02"
-      expect(parsed[1][3]).to eq quiz.title
-      expect(parsed[1][4]).to eq quiz.id.to_s
-      expect(parsed[1][5]).to eq 'quiz'
-      expect(parsed[1][6]).to eq sub.finished_at.iso8601
-      expect(parsed[1][7]).to eq sub.score.to_s
-      expect(parsed[1][8]).to eq outcome.short_description
-      expect(parsed[1][9]).to eq outcome.id.to_s
-      expect(parsed[1][10]).to eq '1'
-      expect(parsed[1][11]).to eq '0.0'
-      expect(parsed[1][12]).to eq 'question 2'
-      expect(parsed[1][13]).to eq q2.assessment_question.id.to_s
-      expect(parsed[1][14]).to eq @course1.name
-      expect(parsed[1][15]).to eq @course1.id.to_s
-      expect(parsed[1][16]).to eq @course1.sis_source_id
-
-      expect(parsed.length).to eq 3
-
-      # NOTE: remove after data migration of polymorphic relationships having: Quiz
-      result = LearningOutcomeResult.where(association_type: 'Quizzes::Quiz').first
-      result.association_type = 'Quiz'
-      result.send(:save_without_callbacks)
-
-      parsed = read_report(@type, {order: [0, 13]})
-      expect(parsed[2][5]).to eq 'assignment'
-      expect(parsed[0][5]).to eq 'quiz'
-      expect(parsed[1][5]).to eq 'quiz'
-
-      # NOTE: remove after data migration of polymorphic relationships having: QuizSubmission
-      result = LearningOutcomeResult.where(artifact_type: 'Quizzes::QuizSubmission').first
-      LearningOutcomeResult.where(id: result).update_all(association_type: 'QuizSubmission')
-
-      parsed = read_report(@type, {order: [0, 13]})
-      expect(parsed[0][6]).to eq sub.finished_at.iso8601
-      expect(parsed[0][7]).to eq sub.score.to_f.to_s
-      expect(parsed[1][6]).to eq sub.finished_at.iso8601
-      expect(parsed[1][7]).to eq sub.score.to_f.to_s
-    end
-
-    it 'should include in extra text if option is set' do
-      param = {}
-      param["include_deleted"] = true
-      report = run_report(@type, {params: param})
-      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
+      verify_all(report, all_values)
     end
 
     context 'with multiple subaccounts' do
       before(:once) do
-        @parent_account = @account
-        @subaccount1 = Account.create! parent_account: @parent_account
-        @subaccount2 = Account.create! parent_account: @parent_account
+        @subaccount1 = Account.create! parent_account: @root_account
+        @subaccount2 = Account.create! parent_account: @root_account
         @enrollment1 = course_with_student(account: @subaccount1, user: @user1, active_all: true)
         @enrollment2 = course_with_student(account: @subaccount2, user: @user2, active_all: true)
         @rubric1 = outcome_with_rubric(outcome: @outcome, course: @enrollment1.course, outcome_context: @subaccount1)
         @rubric2 = outcome_with_rubric(outcome: @outcome, course: @enrollment2.course, outcome_context: @subaccount2)
-        rubric_assessment_model(context: @enrollment1.course, rubric: @rubric1, user: @user1)
-        rubric_assessment_model(context: @enrollment2.course, rubric: @rubric2, user: @user2)
+        @assessment1 = rubric_assessment_model(context: @enrollment1.course, rubric: @rubric1, user: @user1)
+        @assessment2 = rubric_assessment_model(context: @enrollment2.course, rubric: @rubric2, user: @user2)
+      end
+
+      let(:user1_subaccount_values) do
+        {
+          user: @user1,
+          course: @enrollment1.course,
+          section: @enrollment1.course_section,
+          assignment: @assessment1.submission.assignment,
+          outcome: @outcome,
+          outcome_result: LearningOutcomeResult.find_by(artifact: @assessment1),
+          submission: @assessment1.submission
+        }
+      end
+      let(:user2_subaccount_values) do
+        {
+          user: @user2,
+          course: @enrollment2.course,
+          section: @enrollment2.course_section,
+          assignment: @assessment2.submission.assignment,
+          outcome: @outcome,
+          outcome_result: LearningOutcomeResult.find_by(artifact: @assessment2),
+          submission: @assessment2.submission
+        }
       end
 
       it 'includes results for all subaccounts when run from the root account' do
-        rows = read_report(@type, order: [0])
-        expect(rows.length).to eq 3
+        combined_values = all_values + [user1_subaccount_values, user2_subaccount_values]
+        combined_values.sort_by! { |v| v[:user].sortable_name }
+
+        verify_all(report, combined_values)
       end
 
       it 'includes only results from subaccount' do
-        rows = read_report(@type, account: @subaccount1, parse_header: true)
-        expect(rows.length).to eq 1
-        expect(rows[0]['student name']).to eq @user1.sortable_name
-        expect(rows[0]['course id']).to eq @enrollment1.course_id.to_s
+        report = read_report(report_type, account: @subaccount1, parse_header: true)
+        verify_all(report, [user1_subaccount_values])
+      end
+    end
+
+    context 'with multiple pseudonyms' do
+      it 'includes a row for each pseudonym' do
+        new_pseudonym = managed_pseudonym(@user1, account: @root_account, sis_user_id: 'x_another_id')
+        combined_values = all_values + [user1_values.merge(pseudonym: new_pseudonym)]
+        combined_values.sort_by! { |v| v[:user].sortable_name }
+        verify_all(report, combined_values)
+      end
+    end
+
+    context 'with multiple enrollments' do
+      it 'includes a single row for enrollments in the same section' do
+        multiple_student_enrollment(@user1, @section, course: @course1)
+        multiple_student_enrollment(@user1, @section, course: @course1)
+        verify_all(report, all_values)
+      end
+
+      it 'includes multiple rows for enrollments in different sections' do
+        section2 = add_section('double your fun', course: @course1)
+        multiple_student_enrollment(@user1, section2, course: @course1)
+        combined_values = all_values + [user1_values.merge(section: section2)]
+        combined_values.sort_by! { |v| [v[:user].sortable_name, v[:section].id] }
+        verify_all(report, combined_values)
+      end
+    end
+
+    context 'with mastery and ratings' do
+      let(:user1_rubric_score) { 3 }
+
+      it 'includes correct mastery and ratings for different scores' do
+        user1_row = report.select { |row| row['student name'] == @user1.sortable_name }.first
+        expect(user1_row['learning outcome rating']).to eq 'Rockin'
+        expect(user1_row['learning outcome rating points']).to eq '3.0'
+      end
+    end
+  end
+
+  describe "Student Competency report" do
+    let(:report_type) { 'student_assignment_outcome_map_csv' }
+    let(:expected_headers) { AccountReports::OutcomeReports.student_assignment_outcome_headers.keys }
+    let(:all_values) { [user2_values, user1_values] }
+    let(:order) { [0, 2, 3, 15] }
+
+    include_examples 'common outcomes report behavior'
+  end
+
+  describe "outcome results report" do
+    let(:report_type) { 'outcome_results_csv' }
+    let(:expected_headers) { AccountReports::OutcomeReports.outcome_result_headers.keys }
+    let(:all_values) { [user1_values] }
+    let(:order) { [0, 2, 3, 13, 18] }
+
+    include_examples 'common outcomes report behavior'
+
+    context 'with quiz question results' do
+      before(:once) do
+        outcome_group = @root_account.root_outcome_group
+        @quiz_outcome = @root_account.created_learning_outcomes.create!(:short_description => 'new outcome')
+        @quiz = @course1.quizzes.create!(:title => "new quiz", :shuffle_answers => true, quiz_type: 'assignment')
+        @q1 = @quiz.quiz_questions.create!(:question_data => true_false_question_data)
+        @q2 = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
+        bank = @q1.assessment_question.assessment_question_bank
+        bank.assessment_questions.create!(:question_data => true_false_question_data)
+        @quiz_outcome.align(bank, @root_account, :mastery_score => 0.7)
+        answer_1 = @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
+        answer_2 = @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
+        @quiz.generate_quiz_data(:persist => true)
+        @quiz_submission = @quiz.generate_submission(@user)
+        @quiz_submission.submission_data = {}
+        @quiz_submission.submission_data["question_#{@q1.id}"] = answer_1
+        @quiz_submission.submission_data["question_#{@q2.id}"] = answer_2 + 1
+        Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
+        @quiz_outcome.reload
+        outcome_group.add_outcome(@quiz_outcome)
+        @quiz_outcome_result = LearningOutcomeResult.find_by(artifact: @quiz_submission)
+      end
+
+      it "should work with quizzes" do
+        common_quiz_values = {
+          user: @user2,
+          quiz: @quiz,
+          quiz_submission: @quiz_submission,
+          outcome: @quiz_outcome,
+          course: @course1,
+          assignment: @quiz.assignment,
+          section: @section
+        }
+        verify_all(
+          report, [
+            {
+              **common_quiz_values,
+              question: @q1.assessment_question,
+              outcome_result: LearningOutcomeQuestionResult.find_by(
+                learning_outcome_result: @quiz_outcome_result,
+                associated_asset: @q1.assessment_question
+              )
+            },
+            {
+              **common_quiz_values,
+              question: @q2.assessment_question,
+              outcome_result: LearningOutcomeQuestionResult.find_by(
+                learning_outcome_result: @quiz_outcome_result,
+                associated_asset: @q2.assessment_question
+              )
+            },
+            user1_values
+          ]
+        )
+      end
+
+      it 'should not include ratings for quiz questions' do
+        expect(report[0]['assessment type']).to eq 'quiz'
+        expect(report[0]['learning outcome rating']).to be_nil
       end
     end
   end

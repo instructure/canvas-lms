@@ -102,7 +102,7 @@ export default class NewCourseModal extends React.Component {
           size="small"
           label={I18n.t('Add a New Course')}
         >
-          <form onSubmit={preventDefault(this.onSubmit)}>
+          <form onSubmit={preventDefault(this.onSubmit)} style={{margin:0}}>
             <ModalBody>
               <FormFieldGroup layout="stacked" rowSpacing="small" description="">
                 <TextInput

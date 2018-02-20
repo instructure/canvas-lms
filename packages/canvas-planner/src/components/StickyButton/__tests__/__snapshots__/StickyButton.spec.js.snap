@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders 1`] = `
+<button
+  aria-disabled={null}
+  className=""
+  onClick={[Function]}
+  style={
+    Object {
+      "top": "0",
+      "zIndex": null,
+    }
+  }
+  type="button"
+>
+  <span>
+    I am a Sticky Button
+  </span>
+</button>
+`;

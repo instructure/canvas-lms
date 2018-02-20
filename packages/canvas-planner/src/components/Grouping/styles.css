@@ -1,0 +1,159 @@
+/* Variables are defined in ./theme.js */
+
+.root {
+  font-family: var(--fontFamily);
+  margin: var(--margin);
+  border-color: var(--groupColor);
+  color: var(--groupColor);
+  line-height: var(--lineHeight);
+  position: relative;
+}
+
+.title {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  box-sizing: border-box;
+  text-align: center;
+  padding: var(--titlePadding);
+  background-color: var(--titleBackground);
+  text-transform: var(--titleTextTransform);
+  text-decoration: var(--titleTextDecoration);
+  font-size: var(--titleFontSize);
+  font-weight: var(--titleFontWeight);
+  color: var(--titleColor);
+
+  /* handle unusually long words that break the layout */
+  min-width: 1px;
+  overflow: hidden;
+  max-height: 3rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+
+  &::after {
+    content: "";
+    width: 100%;
+    height: var(--titleOverflowGradientHeight);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, var(--titleBackground) 100%);
+  }
+}
+
+.hero {
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  outline: none;
+  padding: var(--heroPadding);
+  text-decoration: none;
+
+  /* this can become min-height once we drop IE11 support */
+
+  height: var(--heroMinHeight);
+
+  .groupingName {
+    text-decoration: var(--heroLinkTextDecoration);
+  }
+}
+
+.heroHover {
+  &:focus,
+  &:hover {
+    text-decoration: none;
+
+    .title {
+      text-decoration: var(--titleTextDecorationHover);
+    }
+  }
+}
+
+.overlay {
+  background-color: var(--groupColor);
+  opacity: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &.withImage {
+    opacity: var(--overlayOpacity);
+  }
+}
+
+.items {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  border-color: var(--groupColor);
+  color: var(--groupColor);
+}
+
+.activityIndicator.hasBadge {
+  background: var(--activityIndicatorBackground);
+  width: var(--activityIndicatorBorderSize);
+  height: var(--activityIndicatorBorderSize);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  z-index: 1;
+  border-radius: 100%;
+}
+
+[data-media-medium] {
+  &.root {
+    display: flex;
+  }
+
+  .hero {
+    flex: 0 0 var(--heroWidth);
+    height: auto;
+
+    /* handle long words that break layout */
+    min-width: 1px;
+  }
+
+  .hero,
+  .overlay {
+    border-bottom-left-radius: var(--heroBorderRadius);
+    border-top-left-radius: var(--heroBorderRadius);
+  }
+
+  .items {
+    flex: 1;
+    border-top: var(--borderTopWidthTabletUp) solid;
+  }
+
+  .activityIndicator {
+    width: var(--activityIndicatorWidth);
+    padding: var(--activityIndicatorPadding);
+
+    &.hasBadge {
+      background: transparent;
+      width: auto;
+      height: auto;
+      position: static;
+      top: auto;
+      right: auto;
+      z-index: auto;
+      border-radius: 0;
+    }
+  }
+}
+
+[data-media-x-large] {
+  .hero {
+    flex: 0 0 var(--heroWidthLarge);
+  }
+}

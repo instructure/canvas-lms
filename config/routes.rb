@@ -950,9 +950,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: :account_notifications) do
       post 'accounts/:account_id/account_notifications', action: :create, as: 'account_notification'
       put 'accounts/:account_id/account_notifications/:id', action: :update, as: 'account_notification_update'
-      get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
-      get 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :show, as: 'user_account_notification_show'
-      delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
+      get 'accounts/:account_id/account_notifications', action: :user_index, as: 'user_account_notifications' # to change the api docs
+      get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index_deprecated # for back compat
+      get 'accounts/:account_id/account_notifications/:id', action: :show, as: 'user_account_notification_show'
+      get 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :show_deprecated
+      delete 'accounts/:account_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
+      delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification_deprecated
     end
 
     scope(controller: :brand_configs_api) do
@@ -963,6 +966,10 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/tabs", action: :index, as: 'course_tabs'
       get "groups/:group_id/tabs", action: :index, as: 'group_tabs'
       put "courses/:course_id/tabs/:tab_id", action: :update
+    end
+
+    scope(controller: :scopes_api) do
+      get "accounts/:account_id/scopes", action: :index
     end
 
     scope(controller: :sections) do
@@ -2101,6 +2108,19 @@ CanvasRails::Application.routes.draw do
       get "assignments/:assignment_id/files/:file_id/originality_report", action: :show
     end
 
+    # Line Item Service
+    scope(controller: 'lti/ims/line_items') do
+      post "courses/:course_id/line_items", action: :create, as: :lti_line_item_create
+      get "courses/:course_id/line_items/:id", action: :show, as: :lti_line_item_show
+      get "courses/:course_id/line_items", action: :index, as: :lti_line_item_index
+      put "courses/:course_id/line_items/:id", action: :update, as: :lti_line_item_edit
+      delete "courses/:course_id/line_items/:id", action: :destroy, as: :lti_line_item_delete
+    end
+
+    # Scores Service
+    scope(controller: 'lti/ims/scores') do
+      post "courses/:course_id/line_items/:line_item_id/scores", action: :create, as: :lti_result_create
+    end
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

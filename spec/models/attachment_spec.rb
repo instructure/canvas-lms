@@ -1015,6 +1015,19 @@ describe Attachment do
       expect(existing_files).not_to be_include(new_name)
       expect(new_name).to match(%r{^/a/b/b[^.]+\.txt})
     end
+
+    it "deals with missing extensions" do
+      expect(Attachment.make_unique_filename('blah', ['blah'])).to eq 'blah-1'
+    end
+
+    it "puts the uniquifier before double extensions" do
+      expect(Attachment.make_unique_filename('blah.tar.bz2', ['blah.tar.bz2'])).to eq 'blah-1.tar.bz2'
+    end
+
+    it "does not treat numbers after a decimal point as extensions" do
+      expect(Attachment.make_unique_filename('section 11.5.doc', ['section 11.5.doc'])).to eq 'section 11.5-1.doc'
+      expect(Attachment.make_unique_filename('3.3.2018 footage.mp4', ['3.3.2018 footage.mp4'])).to eq '3.3.2018 footage-1.mp4'
+    end
   end
 
   context "download/inline urls" do

@@ -148,6 +148,7 @@ zh-Hans:
   fullcalendar_locale: zh-cn
   moment_locale: zh-cn
   dow_offset: 1
+  aliases: zh-CN
 zh-Hant:
   locales:
     zh-Hant: 繁體中文
@@ -155,3 +156,4 @@ zh-Hant:
   fullcalendar_locale: zh-cn
   moment_locale: zh-tw
   dow_offset: 1
+  aliases: zh-TW

@@ -22,6 +22,7 @@ module AccountReports
       require 'account_reports/course_reports'
       require 'account_reports/default'
       require 'account_reports/grade_reports'
+      require 'account_reports/outcome_export'
       require 'account_reports/outcome_reports'
       require 'account_reports/report_helper'
       require 'account_reports/sis_exporter'
@@ -88,6 +89,12 @@ module AccountReports
               :description => 'The course\'s enrollments to report on'
             }
           }
+        },
+        'outcome_export_csv' => {
+          title: proc { I18n.t('Outcome Export')},
+          parameters_partial: false,
+          description_partial: true,
+          parameters: {}
         },
         'outcome_results_csv' => {
           :title => proc { I18n.t(:outcome_results_title, 'Outcome Results') },

@@ -21,19 +21,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_t
 
 describe Types::AssignmentType do
   # create course
-  let_once(:test_course) { Course.create! name: "TEST"}
+  let_once(:course) { course_factory(active_all: true) }
 
   # create users
   let_once(:teacher) do
-      teacher_in_course(active_all:true, course: test_course)
+      teacher_in_course(active_all:true, course: course)
       @teacher
   end
-  let_once(:test_student) { User.create }
-  let_once(:user2) {User.create }
+  let_once(:student) { student_in_course(course: course, active_all: true).user }
 
   # create assignment for course
   let(:assignment) do
-    test_course.assignments.create(title: "some assignment",
+    course.assignments.create(title: "some assignment",
                                    submission_types: ['online_text_entry'],
                                    workflow_state: "published")
   end
@@ -42,12 +41,11 @@ describe Types::AssignmentType do
 
   it "has submissions that need grading" do
     # enroll users
-    test_course.enroll_student(test_student, enrollment_state: 'active')
-    test_course.enroll_student(user2, enrollment_state: 'active')
+    other_student = student_in_course(course: course, active_all: true).user
 
     # submit homework to assignment for each user
-    assignment.submit_homework(test_student, { :body => "so cool", :submission_type => 'online_text_entry' })
-    assignment.submit_homework(user2, { :body => "sooooo cool", :submission_type => 'online_text_entry' })
+    assignment.submit_homework(student, { :body => "so cool", :submission_type => 'online_text_entry' })
+    assignment.submit_homework(other_student, { :body => "sooooo cool", :submission_type => 'online_text_entry' })
 
     # expect needs grading count to be the same for assignment and assignment type objects
     expect(assignment.needs_grading_count).to eq 2
@@ -62,18 +60,31 @@ describe Types::AssignmentType do
     expect(assignment_type.assignmentGroup).to eq assignment.assignment_group
   end
 
-  it "returns submissions from submission connection (with permissions)" do
-    test_course.enroll_student(test_student, enrollment_state: 'active')
-    submission = assignment.submit_homework(test_student, { :body => "sub1", :submission_type => 'online_text_entry' })
+  describe "submissionsConnection" do
+    let_once(:other_student) { student_in_course(course: course, active_all: true).user }
 
-    expect(assignment_type.submissionsConnection(current_user: @teacher).length).to eq 1
-    expect(assignment_type.submissionsConnection(current_user: @teacher)[0].id).to eq submission.id
+    it "returns 'real' submissions from with permissions" do
+      submission1 = assignment.submit_homework(student, { :body => "sub1", :submission_type => 'online_text_entry' })
+      submission2 = assignment.submit_homework(other_student, { :body => "sub1", :submission_type => 'online_text_entry' })
 
-    expect(assignment_type.submissionsConnection(current_user: @student)).to eq nil
+      expect(assignment_type.submissionsConnection(current_user: teacher).sort).to eq [submission1, submission2]
+      expect(assignment_type.submissionsConnection(current_user: student)).to eq [submission1]
+    end
+
+    it "can filter submissions according to workflow state" do
+      expect(assignment_type.submissionsConnection(current_user: teacher)).to eq []
+
+      expect(
+        assignment_type.submissionsConnection(
+          current_user: teacher,
+          args: { filter: { states: %w[unsubmitted] } }
+        )
+      ).to eq assignment.submissions
+    end
   end
 
   it "can access it's parent course" do
-    expect(assignment_type.course).to eq test_course
+    expect(assignment_type.course).to eq course
   end
 
   it "has an assignmentGroup" do
@@ -83,5 +94,12 @@ describe Types::AssignmentType do
   it "only returns valid submission types" do
     assignment.update_attribute :submission_types, "none,foodfight"
     expect(assignment_type.submissionTypes).to eq ["none"]
+  end
+
+  it "returns (valid) grading types" do
+    expect(assignment_type.gradingType).to eq assignment.grading_type
+
+    assignment.update_attribute :grading_type, "fakefakefake"
+    expect(assignment_type.gradingType).to be_nil
   end
 end

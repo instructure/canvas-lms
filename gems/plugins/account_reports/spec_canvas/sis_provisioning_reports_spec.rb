@@ -1103,6 +1103,22 @@ describe "Default Account Reports" do
                                        [@group_category4.id.to_s, nil, @course3.id.to_s, "Course", "Test Group Category Course", nil, nil, nil, nil, 'active'],
                                        [@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
+
+      it "should include account_id column even if there isn't one for any rows" do
+        process_csv_data_cleanly(
+          "course_id,short_name,long_name,status",
+          "C1,COUR,SIS Import Course,active"
+        )
+        process_csv_data_cleanly(
+          "group_category_id,course_id,category_name,status",
+          "GC1,C1,Some Group Category,active"
+        )
+        parameters = {}
+        parameters['group_categories'] = true
+        parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 0})
+        expect(parsed).to match_array [['group_category_id', 'account_id', 'course_id', 'category_name', 'status'],
+                                       ['GC1', nil, 'C1', 'Some Group Category', 'active']]
+      end
     end
 
     describe "Group Memberships" do

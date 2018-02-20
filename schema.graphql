@@ -27,6 +27,7 @@ type Assignment implements Node, Timestamped {
 
   # when this assignment is due
   dueAt: String
+  gradingType: GradingType
   htmlUrl: URL
   id: ID!
   name: String
@@ -52,6 +53,7 @@ type Assignment implements Node, Timestamped {
 
     # Returns the elements in the list that come before the specified global ID.
     before: String
+    filter: SubmissionFilter
 
     # Returns the first _n_ elements from the list.
     first: Int
@@ -274,6 +276,7 @@ type Course implements Node, Timestamped {
 
     # Returns the elements in the list that come before the specified global ID.
     before: String
+    filter: SubmissionFilter
 
     # Returns the first _n_ elements from the list.
     first: Int
@@ -413,6 +416,15 @@ type GradingPeriodEdge {
 
   # The item at the end of the edge.
   node: GradingPeriod
+}
+
+enum GradingType {
+  gpa_scale
+  letter_grade
+  not_graded
+  pass_fail
+  percent
+  points
 }
 
 type Group implements Timestamped {
@@ -606,6 +618,7 @@ type Submission implements Node, Timestamped {
   gradingStatus: String
   id: ID!
   score: Float
+  state: SubmissionState
   submissionStatus: String
   submittedAt: Time
   updatedAt: Time
@@ -630,6 +643,10 @@ type SubmissionEdge {
   node: Submission
 }
 
+input SubmissionFilter {
+  states: [SubmissionState!] = [submitted, pending_review, graded]
+}
+
 input SubmissionOrderCriteria {
   direction: OrderDirection
   field: SubmissionOrderField!
@@ -638,6 +655,14 @@ input SubmissionOrderCriteria {
 enum SubmissionOrderField {
   _id
   gradedAt
+}
+
+enum SubmissionState {
+  deleted
+  graded
+  pending_review
+  submitted
+  unsubmitted
 }
 
 # Types of submissions an assignment accepts
@@ -680,10 +705,11 @@ type User implements Node, Timestamped {
   _id: ID!
   avatarUrl: URL
   createdAt: Time
+  email: String
   enrollments(
     # only return enrollments for this course
-    courseId: ID!
-  ): [Enrollment]
+    courseId: ID
+  ): [Enrollment]!
   id: ID!
   name: String
 

@@ -40,6 +40,7 @@ function getItemMetadata (data, rowIndex) {
 
 export default class State {
   activeLocation = { region: 'unknown' };
+  previousLocation = null;
 
   constructor (grid, gridSupport) {
     this.grid = grid;
@@ -86,8 +87,33 @@ export default class State {
     this.triggerActiveLocationChange();
   }
 
+  restorePreviousLocation () {
+    const defaultRegion = 'header';
+    const defaultAttr = { cell: 0 };
+
+    if (!this.previousLocation) {
+      this.setActiveLocation(defaultRegion, defaultAttr);
+      return;
+    }
+
+    const { region } = this.previousLocation;
+    const columnIndex = this.grid.getColumnIndex(this.previousLocation.columnId);
+
+    let rowIndex;
+    if (region === 'body' && columnIndex != null) {
+      rowIndex = this.grid.getData().findIndex(row => row.id === this.previousLocation.rowId);
+    }
+
+    if (columnIndex == null || rowIndex === -1) {
+      this.setActiveLocation(defaultRegion, defaultAttr);
+    } else {
+      this.setActiveLocation(region, { row: rowIndex, cell: columnIndex });
+    }
+  }
+
   resetActiveLocation () {
     this.setActiveLocation('beforeGrid');
+    this.previousLocation = null;
   }
 
   setActiveLocationInternal (region, attr = {}) {
@@ -95,6 +121,14 @@ export default class State {
 
     if (attr.cell != null) {
       this.activeLocation.columnId = this.grid.getColumns()[attr.cell].id;
+    }
+
+    if (region === 'header' || region === 'body') {
+      this.previousLocation = {
+        region,
+        columnId: this.activeLocation.columnId,
+        rowId: region === 'body' ? this.grid.getData()[attr.row].id : null,
+      };
     }
   }
 

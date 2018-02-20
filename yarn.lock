@@ -80,12 +80,12 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@instructure/ui-core@^4.6.0":
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.6.0.tgz#1c53d8500125a55080a6856f4d3007f349e58676"
+"@instructure/ui-core@^4.1.0", "@instructure/ui-core@^4.6.0", "@instructure/ui-core@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.2.tgz#82b3652923eafcc575c32bfbbce4f1fc605b4ee1"
   dependencies:
-    "@instructure/ui-themeable" "^4.6.0"
-    "@instructure/ui-utils" "^4.6.0"
+    "@instructure/ui-themeable" "^4.7.2"
+    "@instructure/ui-utils" "^4.7.2"
     bowser "^1.7.0"
     classnames "^2.2.5"
     decimal.js "^7.2.1"
@@ -96,68 +96,24 @@
     numeral "^2.0.6"
     prop-types "^15.5.10"
 
-"@instructure/ui-core@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-4.7.0.tgz#533e9b0fefbc6218f6f717e57a041e048da6f965"
+"@instructure/ui-themeable@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.2.tgz#2c4365d1a035f3064fde74e4fbab339a8492f59f"
   dependencies:
-    "@instructure/ui-themeable" "^4.7.0"
-    "@instructure/ui-utils" "^4.7.0"
-    bowser "^1.7.0"
-    classnames "^2.2.5"
-    decimal.js "^7.2.1"
-    deep-equal "^1.0.1"
-    instructure-icons "^4.3.1"
-    keycode "^2.1.8"
-    no-scroll "^2.1.0"
-    numeral "^2.0.6"
-    prop-types "^15.5.10"
-
-"@instructure/ui-themeable@^4.6.0":
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.6.0.tgz#f15d7393912e3d12097d1ae986a81b3b9dd2c7bf"
-  dependencies:
-    "@instructure/ui-utils" "^4.6.0"
+    "@instructure/ui-utils" "^4.7.2"
     bowser "^1.7.0"
     deep-equal "^1.0.1"
     glamor "^2.20.37"
     prop-types "^15.5.10"
     tinycolor2 "^1.4.1"
 
-"@instructure/ui-themeable@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-4.7.0.tgz#c06f0ba5f02de110af6c08b083cd6ae2094e604e"
-  dependencies:
-    "@instructure/ui-utils" "^4.7.0"
-    bowser "^1.7.0"
-    deep-equal "^1.0.1"
-    glamor "^2.20.37"
-    prop-types "^15.5.10"
-    tinycolor2 "^1.4.1"
+"@instructure/ui-themes@^4.1.0", "@instructure/ui-themes@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.2.tgz#0e5f70af92da4d9376ea0ec9cea4ac649d882698"
 
-"@instructure/ui-themes@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-4.7.0.tgz#b050ea6428e71c114d136dd14434d3386f46cb94"
-
-"@instructure/ui-utils@^4.6.0":
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.6.0.tgz#90a6418e7c066f1353c885b72a3819ee93e1baad"
-  dependencies:
-    bowser "^1.7.0"
-    decimal.js "^7.2.1"
-    deep-equal "^1.0.1"
-    keycode "^2.1.8"
-    moment "^2.10.6"
-    moment-timezone "^0.5.14"
-    no-scroll "^2.1.0"
-    numeral "^2.0.6"
-    object.omit "^3.0.0"
-    object.pick "^1.2.0"
-    prop-types "^15.5.10"
-    shortid "^2.2.8"
-
-"@instructure/ui-utils@^4.7.0":
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.0.tgz#21e776629b148e51fd956170c04f6008d3af610c"
+"@instructure/ui-utils@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-utils/-/ui-utils-4.7.2.tgz#79ae4671989d11ac15ab228e388ec10bf702c7fc"
   dependencies:
     bowser "^1.7.0"
     decimal.js "^7.2.1"
@@ -2122,9 +2078,8 @@ caniuse-lite@^1.0.30000784:
   version "1.0.30000784"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000784.tgz#129ced74e9a1280a441880b6cd2bce30ef59e6c0"
 
-canvas-planner@1.0.16:
+"canvas-planner@file:./packages/canvas-planner/copy-of-what-gets-published-to-npm-registry":
   version "1.0.16"
-  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.16.tgz#6bf1c85934b6fbd9f7e5c041532ec221b80c0826"
   dependencies:
     "@instructure/ui-core" "^4.6.0"
     axios "^0.16.0"
@@ -2155,17 +2110,18 @@ canvas-planner@1.0.16:
     redux-thunk "^2.2.0"
     velocity-animate "^1.5.0"
 
-canvas-rce@2.6.3:
-  version "2.6.3"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.6.3.tgz#45aadd6bbeba49776b7dc915c2a6f699ce5732a6"
+canvas-rce@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-3.0.2.tgz#bd91030c0100588c07fe5b29aa5e1f1325bd5185"
   dependencies:
+    "@instructure/ui-core" "^4.1.0"
+    "@instructure/ui-themes" "^4.1.0"
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
     escape-html "1.0.3"
     format-message "^5.1.0"
     format-message-generate-id "^5.1.0"
     instructure-icons "3 || 4"
-    instructure-ui "^2.1.0 || 3"
     isomorphic-fetch "2.2.1"
     load-css "0.1.0"
     react "^0.14.8 || ^15.0.0"
@@ -3658,6 +3614,13 @@ eslint-plugin-jsx-a11y@^6.0.2:
     damerau-levenshtein "^1.0.0"
     emoji-regex "^6.1.0"
     jsx-ast-utils "^2.0.0"
+
+eslint-plugin-notice@^0.5.6:
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-notice/-/eslint-plugin-notice-0.5.6.tgz#f34bf59230d9cfe73f10810e390e439719e0e5cb"
+  dependencies:
+    lodash ">=2.4.0"
+    metric-lcs "^0.1.2"
 
 eslint-plugin-promise@^3.6.0:
   version "3.6.0"
@@ -5435,7 +5398,7 @@ install@~0.1.7:
     shortid "^2.2.8"
     svg-to-jsx "^0.0.20"
 
-instructure-ui@3.3.4, instructure-ui@3.x, "instructure-ui@^2.1.0 || 3":
+instructure-ui@3.3.4, instructure-ui@3.x:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-3.3.4.tgz#6a5640f60d5cd5c0c4462c021350407a8975f556"
   dependencies:
@@ -6902,6 +6865,10 @@ lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
+lodash@>=2.4.0:
+  version "4.17.5"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
+
 "lodash@>=3.5 <5", lodash@>=4.0.0, lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.4, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@^4.5.1, lodash@~4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
@@ -7199,6 +7166,10 @@ merge-stream@^1.0.1:
 merge@^1.1.3:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/merge/-/merge-1.2.0.tgz#7531e39d4949c281a66b8c5a6e0265e8b05894da"
+
+metric-lcs@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/metric-lcs/-/metric-lcs-0.1.2.tgz#87913f149410e39c7c5a19037512814eaf155e11"
 
 micromatch@^2.1.5, micromatch@^2.3.11, micromatch@^2.3.7, micromatch@^2.3.8:
   version "2.3.11"
@@ -10701,9 +10672,9 @@ timespan@2.3.x:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/timespan/-/timespan-2.3.0.tgz#4902ce040bd13d845c8f59b27e9d59bad6f39929"
 
-timezone@1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.6.tgz#d3b50bc35c63a09ed8876a8cc3642628685ccc33"
+timezone@1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.13.tgz#38d3c2e4ff7947b1f4bd6ac6e000c2461483f8b3"
 
 tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"

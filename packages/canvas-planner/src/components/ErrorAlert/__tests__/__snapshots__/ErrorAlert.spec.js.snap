@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders 1`] = `
+<Alert
+  margin="small"
+  open={true}
+  timeout={0}
+  transition="fade"
+  variant="error"
+>
+  uh oh
+</Alert>
+`;
+
+exports[`renders with Error details 1`] = `
+<Alert
+  margin="small"
+  open={true}
+  timeout={0}
+  transition="fade"
+  variant="error"
+>
+  uh oh
+  <span
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    whoops
+  </span>
+</Alert>
+`;
+
+exports[`renders with string details 1`] = `
+<Alert
+  margin="small"
+  open={true}
+  timeout={0}
+  transition="fade"
+  variant="error"
+>
+  uh oh
+  <span
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  >
+    whoops
+  </span>
+</Alert>
+`;

@@ -64,6 +64,10 @@ module Types
       end
     end
 
+    field :gradingType, AssignmentGradingType, resolve: ->(assignment, _, _) {
+      GRADING_TYPES[assignment.grading_type]
+    }
+
     field :submissionTypes, types[!AssignmentSubmissionType],
       resolve: ->(assignment, _, _) {
         # there's some weird data in the db so we'll just ignore anything that
@@ -101,17 +105,22 @@ module Types
 
     connection :submissionsConnection, SubmissionType.connection_type do
       description "submissions for this assignment"
-      resolve ->(assignment, _, ctx) {
+      argument :filter, SubmissionFilterInputType
+
+      resolve ->(assignment, args, ctx) {
         current_user = ctx[:current_user]
         session = ctx[:session]
         course = assignment.course
 
+        submissions = assignment.submissions.where(
+          workflow_state: (args[:filter] || {})[:states] || DEFAULT_SUBMISSION_STATES
+        )
+
         if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-          # a user can see all submissions
-          assignment.submissions.where.not(workflow_state: "unsubmitted")
+          submissions
         elsif course.grants_right?(current_user, session, :read_grades)
           # a user can see their own submission
-          assignment.submissions.where(user_id: current_user.id).where.not(workflow_state: "unsubmitted")
+          submissions.where(user_id: current_user.id)
         end
       }
     end
@@ -140,11 +149,20 @@ module Types
     wiki_page
   ].to_set
 
+  GRADING_TYPES = Hash[
+    Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
+  ]
+
   AssignmentSubmissionType = GraphQL::EnumType.define do
     name "SubmissionType"
     description "Types of submissions an assignment accepts"
     SUBMISSION_TYPES.each { |submission_type|
       value(submission_type)
     }
+  end
+
+  AssignmentGradingType = GraphQL::EnumType.define do
+    name "GradingType"
+    Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
   end
 end

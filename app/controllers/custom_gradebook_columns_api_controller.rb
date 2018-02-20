@@ -26,6 +26,16 @@
 #       "id": "CustomColumn",
 #       "description": "",
 #       "properties": {
+#         "id": {
+#           "description": "The ID of the custom gradebook column",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "teacher_notes": {
+#           "description": "When true, this column's visibility will be toggled in the Gradebook when a user selects to show or hide notes",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "title": {
 #           "description": "header text",
 #           "example": "Stuff",

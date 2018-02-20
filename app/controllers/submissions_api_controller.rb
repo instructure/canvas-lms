@@ -472,10 +472,13 @@ class SubmissionsApiController < ApplicationController
           end
         end
         if includes.include?('total_scores')
-          hash.merge!(
-            :computed_final_score => enrollment.computed_final_score,
-            :computed_current_score => enrollment.computed_current_score
-          )
+          hash[:computed_final_score] = enrollment.computed_final_score
+          hash[:computed_current_score] = enrollment.computed_current_score
+
+          if can_view_all
+            hash[:unposted_final_score] = enrollment.unposted_final_score
+            hash[:unposted_current_score] = enrollment.unposted_current_score
+          end
         end
         result << hash
       end

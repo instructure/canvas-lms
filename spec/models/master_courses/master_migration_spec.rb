@@ -1385,6 +1385,23 @@ describe MasterCourses::MasterMigration do
       expect(@topic_copy.message).to include("/courses/#{@copy_to.id}/files/#{@att_copy.id}/download?wrap=1")
     end
 
+    it "should export account-level linked outcomes in a selective migration" do
+      Timecop.freeze(1.minute.ago) do
+        @acc_outcome = @copy_from.account.created_learning_outcomes.create!(:short_description => "womp")
+      end
+
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+      run_master_migration # make a full sync
+
+      Timecop.freeze(30.seconds.from_now) do
+        @copy_from.root_outcome_group.add_outcome(@acc_outcome) # link to course - note that the original outcome hasn't been updated
+      end
+
+      run_master_migration
+      expect(@copy_to.linked_learning_outcomes.to_a).to eq [@acc_outcome]
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")

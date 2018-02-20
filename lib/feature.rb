@@ -108,13 +108,21 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
+    'theme_editor_refactor' =>
+    {
+      display_name: -> { I18n.t('Theme Editor Refactor')},
+      description: -> { I18n.t('Move to using InstUI for several components and implementing a store system') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true
+    },
     'section_specific_announcements' =>
     {
       display_name: -> { I18n.t('Section Specific Announcements') },
       description: -> { I18n.t('Allows creating announcements for a specific section') },
       applies_to: 'Account',
-      state: 'hidden',
-      development: true,
+      state: 'allowed',
+      root_opt_in: false
     },
     'section_specific_discussions' =>
     {
@@ -465,7 +473,7 @@ END
       display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
       applies_to: 'Account',
-      state: 'hidden_in_prod',
+      state: 'allowed',
       beta: true,
       development: true,
       root_opt_in: true,
@@ -602,7 +610,15 @@ END
         end
         is_provisioned
       end
-    }
+    },
+    'developer_key_management' =>
+      {
+        display_name: -> { I18n.t('Developer Key management')},
+        description: -> { I18n.t('New Features for Developer Key management') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        development: true
+      }
   )
 
   def self.definitions

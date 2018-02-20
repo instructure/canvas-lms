@@ -20,7 +20,16 @@ module AssignmentUtil
     assignment.post_to_sis.present? && due_date_required_for_account?(assignment.context)
   end
 
+  def self.in_date_range?(date, start_date, end_date)
+    date >= start_date && date <= end_date
+  end
+
   def self.due_date_ok?(assignment)
+    if assignment.unlock_at && assignment.lock_at && assignment.due_at
+      unless in_date_range?(assignment.due_at, assignment.unlock_at, assignment.lock_at)
+        return false
+      end
+    end
     !due_date_required?(assignment) ||
     assignment.due_at.present? ||
     assignment.grading_type == 'not_graded'

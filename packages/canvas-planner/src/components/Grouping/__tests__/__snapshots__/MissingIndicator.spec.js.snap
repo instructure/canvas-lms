@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders an indicator with the danger variant and a title 1`] = `
+<Indicator
+  indicatorRef={[Function]}
+  title="Missing items for blah"
+  variant="danger"
+/>
+`;

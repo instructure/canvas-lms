@@ -217,6 +217,9 @@ class Assignment
               end
               if version_json['submission'] && version_json['submission']['versioned_attachments']
                 version_json['submission']['versioned_attachments'].map! do |a|
+                  if version_json['submission'][:submission_type] == 'discussion_topic'
+                    url_opts[:enable_annotations] = false
+                  end
                   if @grading_role == :moderator
                     # we'll use to create custom crocodoc urls for each prov grade
                     sub_attachments << a

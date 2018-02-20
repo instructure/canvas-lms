@@ -1,0 +1,6 @@
+.root {
+  background: var(--background);
+  width: 19rem;
+  max-width: 100%;
+  box-sizing: border-box;
+}

@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
-import _ from 'lodash'
+import { mount } from 'enzyme'
+import merge from 'lodash/merge'
 
 import IndexHeader, { SEARCH_TIME_DELAY } from 'jsx/announcements/components/IndexHeader'
 
-const makeProps = (props = {}) => _.merge({
-  courseId: '5',
+const makeProps = (props = {}) => merge({
+  contextType: 'course',
+  contextId: '1',
   permissions: {
     create: true,
     manage_content: true,
@@ -32,8 +33,8 @@ const makeProps = (props = {}) => _.merge({
   isBusy: false,
   selectedCount: 0,
   searchAnnouncements () {},
-  lockAnnouncements () {},
-  deleteAnnouncements () {},
+  toggleSelectedAnnouncementsLock () {},
+  deleteSelectedAnnouncements () {},
   applicationElement: () => document.getElementById('fixtures'),
 }, props)
 
@@ -187,11 +188,11 @@ test('delete announcements button is disabled if selectedCount is 0', () => {
   ok(node.is('[disabled]'))
 })
 
-test('clicking lock announcements button should call lockAnnouncements prop', (assert) => {
+test('clicking lock announcements button should call toggleSelectedAnnouncementsLock prop', (assert) => {
   const done = assert.async()
   const lockSpy = sinon.spy()
   const tree = mount(
-    <IndexHeader {...makeProps({ lockAnnouncements: lockSpy, selectedCount: 1 })} />
+    <IndexHeader {...makeProps({ toggleSelectedAnnouncementsLock: lockSpy, selectedCount: 1 })} />
   )
 
   tree.find('#lock_announcements').simulate('click')
@@ -210,57 +211,9 @@ test('clicking delete announcements button should show a confirm modal', (assert
 
   tree.find('#delete_announcements').simulate('click')
   setTimeout(() => {
-    ok(instance.state.showConfirmDelete)
+    ok(instance.deleteModal)
+    instance.deleteModal.hide()
     tree.unmount()
     done()
-  })
-})
-
-test('confirm delete modal should call deleteAnnouncements prop on confirming delete', (assert) => {
-  const done = assert.async()
-  const deleteSpy = sinon.spy()
-  const tree = mount(
-    <IndexHeader {...makeProps({ selectedCount: 1, deleteAnnouncements: deleteSpy })} />
-  )
-  const instance = tree.instance()
-
-  tree.find('#delete_announcements').simulate('click')
-  setTimeout(() => {
-    const confirmWrapper = new ReactWrapper(instance.confirmDeleteBtn, instance.confirmDeleteBtn)
-    confirmWrapper.simulate('click')
-
-    // the nested setTimeout is necessary because if we do unmount in the same tick as clicking on confirm
-    // then the focus unmount logic will run before the focus re-direction logic, which will blow up
-    // using an additional setTimeout pushes the unmount execution in the next tick, after the focus logic
-    setTimeout(() => {
-      equal(deleteSpy.callCount, 1)
-      tree.unmount()
-      done()
-    })
-  })
-})
-
-test('confirm delete modal should not call deleteAnnouncements prop on cancel delete, and it should close the modal', (assert) => {
-  const done = assert.async()
-  const deleteSpy = sinon.spy()
-  const tree = mount(
-    <IndexHeader {...makeProps({ selectedCount: 1, deleteAnnouncements: deleteSpy })} />
-  )
-  const instance = tree.instance()
-
-  tree.find('#delete_announcements').simulate('click')
-  setTimeout(() => {
-    const cancelWrapper = new ReactWrapper(instance.cancelDeleteBtn, instance.cancelDeleteBtn)
-    cancelWrapper.simulate('click')
-
-    // the nested setTimeout is necessary because if we do unmount in the same tick as clicking on confirm
-    // then the focus unmount logic will run before the focus re-direction logic, which will blow up
-    // using an additional setTimeout pushes the unmount execution in the next tick, after the focus logic
-    setTimeout(() => {
-      equal(deleteSpy.callCount, 0)
-      notOk(instance.state.showConfirmDelete)
-      tree.unmount()
-      done()
-    })
   })
 })

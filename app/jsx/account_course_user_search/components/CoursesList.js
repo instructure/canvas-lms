@@ -30,7 +30,7 @@ export default function CoursesList(props) {
   const showSISIds = !props.courses || props.courses.some(c => 'sis_course_id' in c)
 
   return (
-    <Table>
+    <Table margin="small 0" caption={<ScreenReaderContent>{I18n.t('Courses')}</ScreenReaderContent>}>
       <thead>
         <tr>
           <th width="1">

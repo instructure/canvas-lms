@@ -55,33 +55,43 @@ describe DueDateCacher do
       @new_expectation = expect(DueDateCacher).to receive(:new).and_return(@instance)
     end
 
-    it "should pass along the whole array" do
+    it "passes along the whole array" do
       @new_expectation.with(@course, @assignments)
-      DueDateCacher.recompute_course(@course, @assignments)
+      DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
-    it "should default to all assignments in the context" do
+    it "defaults to all assignments in the context" do
       @new_expectation.with(@course, match_array(@assignments.map(&:id)))
       DueDateCacher.recompute_course(@course)
     end
 
-    it "should delegate to an instance" do
+    it "delegates to an instance" do
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_course(@course, @assignments)
+      DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
-    it "should queue a delayed job in a singleton in production if assignments.nil" do
+    it "queues a delayed job in a singleton in production if assignments.nil" do
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
           with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
       DueDateCacher.recompute_course(@course)
     end
 
-    it "should queue a delayed job without a singleton if assignments is passed" do
+    it "queues a delayed job without a singleton if assignments is passed" do
       expect(@instance).to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
-      DueDateCacher.recompute_course(@course, @assignments)
+      DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
-    it "should operate on a course id" do
+    it "does not queue a delayed job when passed run_immediately: true" do
+      expect(@instance).not_to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
+      DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
+    end
+
+    it "calls the recompute method when passed run_immediately: true" do
+      expect(@instance).to receive(:recompute).with(no_args)
+      DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
+    end
+
+    it "operates on a course id" do
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
           with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
       @new_expectation.with(@course, match_array(@assignments.map(&:id).sort))

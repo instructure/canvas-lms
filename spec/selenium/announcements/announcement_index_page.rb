@@ -25,6 +25,11 @@ class AnnouncementIndex
       wait_for_ajaximations
     end
 
+    def visit_groups_index(group)
+      get("/groups/#{group.id}/announcements/")
+      wait_for_ajaximations
+    end
+
     def set_section_specific_announcements_flag(course, state)
       course.account.set_feature_flag! :section_specific_announcements, state
     end
@@ -105,6 +110,18 @@ class AnnouncementIndex
       announcement_unread_pill(title).text
     end
 
+    def announcement_menu(title)
+      f('.ic-item-row__manage-menu button', announcement(title))
+    end
+
+    def delete_menu
+      f('#delete-announcement-menu-option')
+    end
+
+    def lock_menu
+      f('#lock-announcement-menu-option')
+    end
+
     def announcement_locked_icon(title)
       # f('.lock', announcement(title))
     end
@@ -133,6 +150,16 @@ class AnnouncementIndex
       delete_button.click
     end
 
+    def click_delete_menu(title)
+      announcement_menu(title).click
+      delete_menu.click
+    end
+
+    def click_lock_menu(title)
+      announcement_menu(title).click
+      lock_menu.click
+    end
+
     def click_confirm_delete
       confirm_delete_button.click
     end
@@ -143,6 +170,12 @@ class AnnouncementIndex
 
     def click_add_announcement
        add_announcement_button.click
+    end
+
+    def delete_announcement_manually(title)
+      check_announcement(title)
+      click_delete
+      click_confirm_delete
     end
   end
 end

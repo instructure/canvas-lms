@@ -1,0 +1,6 @@
+{
+  "/planner/": "/",
+  "/users/self/missing_submissions": "/missing_submissions?userId=1",
+  "/planner_notes": "/items",
+  "/planner/overrides/:id": "/planner/overrides?id=1"
+}

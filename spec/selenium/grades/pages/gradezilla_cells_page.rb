@@ -69,7 +69,8 @@ class Gradezilla
       def open_tray(student, assignment)
         cell = grading_cell(student, assignment)
         cell.click
-        fj('button:contains("Open submission tray")', cell).click
+        driver.action.send_keys(:escape).perform
+        driver.action.send_keys('c').perform
         wait_for_ajaximations
       end
 

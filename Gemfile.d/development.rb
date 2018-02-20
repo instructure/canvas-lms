@@ -17,7 +17,7 @@
 
 group :development do
   gem 'colorize', '0.8.1', require: false
-  gem 'letter_opener', '1.4.1'
+  gem 'letter_opener', '1.6.0'
   gem 'spring', '2.0.2'
   gem 'spring-commands-rspec', '1.0.4'
 
@@ -25,6 +25,6 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', '9.1.0', platform: :mri
+    gem 'byebug', '10.0.0', platform: :mri
   end
 end

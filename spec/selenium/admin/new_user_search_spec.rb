@@ -21,7 +21,7 @@ describe "new account user search" do
   include_context "in-process server selenium tests"
 
   before :once do
-    account_model
+    @account = Account.default
     @account.enable_feature!(:course_user_search)
     account_admin_user(:account => @account, :active_all => true)
   end
@@ -99,6 +99,10 @@ describe "new account user search" do
     expect(get_rows.count).to eq 2 # the first user is the admin
     new_row = get_rows.detect{|r| r.text.include?(name)}
     expect(new_row).to include_text(email)
+
+    # should clear out the inputs
+    fj('button:has([name="IconPlusLine"]):contains("People")').click
+    expect(fj('[aria-label="Add a new user"] label:contains("Full Name") input').attribute('value')).to eq('')
   end
 
   it "should be able to create users with confirmation disabled", priority: "1", test_id: 3399311 do
@@ -201,6 +205,36 @@ describe "new account user search" do
     fj('[role="menuitem"]:contains("View user groups")').click
 
     expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
+  end
+
+  it "should open the act as page when clicking the masquerade button", priority: "1", test_id: 3453424 do
+    mask_user = user_with_pseudonym(:account => @account, :name => "Mask User", :active_user => true)
+
+    get "/accounts/#{@account.id}/users"
+
+    fj("[data-automation='users list'] tr:contains('#{mask_user.name}') [role=button]:has([name='IconMasqueradeLine'])")
+      .click
+    expect(f('.ActAs__text')).to include_text mask_user.name
+  end
+
+  it "should open the conversation page when clicking the send message button", priority: "1", test_id: 3453435 do
+    conv_user = user_with_pseudonym(:account => @account, :name => "Conversation User")
+
+    get "/accounts/#{@account.id}/users"
+
+    fj("[data-automation='users list'] tr:contains('#{conv_user.name}') [role=button]:has([name='IconMessageLine'])")
+      .click
+    expect(f('.message-header-input .ac-token')).to include_text conv_user.name
+  end
+
+  it "should open the edit user modal when clicking the edit user button", priority: "1", test_id: 3453436 do
+    edit_user = user_with_pseudonym(:account => @account, :name => "Edit User")
+
+    get "/accounts/#{@account.id}/users"
+
+    fj("[data-automation='users list'] tr:contains('#{edit_user.name}') [role=button]:has([name='IconEditLine'])").click
+
+    expect(fj('label:contains("Full Name") input').attribute('value')).to eq("Edit User")
   end
 
 end

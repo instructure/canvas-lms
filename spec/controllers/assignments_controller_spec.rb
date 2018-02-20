@@ -421,8 +421,9 @@ describe AssignmentsController do
     it "should not show locked external tool assignments" do
       user_session(@student)
 
-      @assignment.lock_at = Time.now - 1.week
-      @assignment.unlock_at = Time.now + 1.week
+      @assignment.lock_at = 1.week.ago
+      @assignment.due_at = 10.days.ago
+      @assignment.unlock_at = 2.weeks.ago
       @assignment.submission_types = 'external_tool'
       @assignment.save
       # This is usually a ContentExternalTool, but it only needs to

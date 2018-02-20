@@ -10939,6 +10939,9 @@ ko:
       new_course_name_placeholder: "과목 이름"
       sample_course_code: 과목-101
       start_a_new_course: "새 과목 시작하기"
+    new_nav_header: 
+      links: 
+        dashboard: 대시보드
     no_recent_activity: 
       empty_stream_message: "아직 스트림에 표시할 메시지가 없습니다. 과목에 참여를 시작하면 토론에서 온 메시지, 평가 업데이트, 다른 사람과의 비공개 메시지 등으로 채워집니다. "
       no_recent_messages: "최근 메시지 없음"

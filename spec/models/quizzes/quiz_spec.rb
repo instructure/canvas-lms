@@ -1462,15 +1462,20 @@ describe Quizzes::Quiz do
       regrade = Quizzes::QuizRegrade.create!(quiz: quiz, quiz_version: quiz.version_number, user: @teacher)
       regrade.quiz_question_regrades.create!(
         quiz_question_id: q.id,
-        regrade_option: 'current_correct_only')
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later).once.
-        with(:regrade!, quiz: quiz, version_number: quiz.version_number)
+        regrade_option: 'current_correct_only'
+      )
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).once.
+        with(
+          :regrade!,
+          { strand: "quiz:#{quiz.global_id}:regrading"},
+          quiz: quiz, version_number: quiz.version_number
+        )
       quiz.save!
     end
 
     it "does not queue a job to regrade when no current question regrades" do
       course_with_teacher(course: @course, active_all: true)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later).never
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).never
       quiz = @course.quizzes.create!
       quiz.save!
     end

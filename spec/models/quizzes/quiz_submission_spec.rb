@@ -1404,27 +1404,52 @@ describe Quizzes::QuizSubmission do
 
     describe 'broadcast policy' do
       before :once do
-        Notification.create(:name => 'Submission Graded')
-        Notification.create(:name => 'Submission Grade Changed')
-        Notification.create(:name => 'Submission Needs Grading')
+        Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
+        Notification.create(:name => 'Submission Grade Changed', :category => 'TestImmediately')
+        Notification.create(:name => 'Submission Needs Grading', :category => 'TestImmediately')
         @course.offer
-        student_in_course(active_all: true)
+        student_in_course(active_all: true, active_cc: true)
         teacher_in_course(active_all: true)
+        @observer = user_factory(active_all: true, active_cc: true)
+        @course.enroll_user(@observer, 'ObserverEnrollment', active_all: true,
+          active_cc: true, associated_user_id: @student.id)
+        # Admittedly weird for a student to observe himself, but make sure we
+        # don't send duplicates.
+        @course.enroll_user(@student, 'ObserverEnrollment', active_all: true,
+          active_cc: true, associated_user_id: @student.id)
+        @other_student = user_factory(active_all: true, active_cc: true)
+        @other_observer = user_factory(active_all: true, active_cc: true)
+        @course.enroll_user(@other_student, 'StudentEnrollment', active_all: true,
+          active_cc: true, associated_user_id: @student.id)
+        @course.enroll_user(@other_observer, 'ObserverEnrollment', active_all: true,
+          active_cc: true, associated_user_id: @other_student.id)
         assignment_quiz([], course: @course, user: @teacher)
         @submission = @quiz.generate_submission(@student)
       end
 
       it 'sends a graded notification after grading the quiz submission' do
         expect(@submission.messages_sent).not_to include 'Submission Graded'
+        expect(@student.messages.where(notification_name: "Submission Graded").length).to eq 0
+        expect(@observer.messages.where(notification_name: "Submission Graded").length).to eq 0
         Quizzes::SubmissionGrader.new(@submission).grade_submission
         expect(@submission.reload.messages_sent.keys).to include 'Submission Graded'
+        expect(@student.messages.where(notification_name: "Submission Graded").length).to eq 1
+        expect(@observer.messages.where(notification_name: "Submission Graded").length).to eq 1
+        expect(@other_student.messages.where(notification_name: "Submission Graded").length).to eq 0
+        expect(@other_observer.messages.where(notification_name: "Submission Graded").length).to eq 0
       end
 
       it 'sends a grade changed notification after re-grading the quiz submission' do
+        expect(@student.messages.where(notification_name: "Submission Grade Changed").length).to eq 0
+        expect(@observer.messages.where(notification_name: "Submission Grade Changed").length).to eq 0
         Quizzes::SubmissionGrader.new(@submission).grade_submission
         @submission.score = @submission.score + 5
         @submission.save!
         expect(@submission.reload.messages_sent.keys).to include('Submission Grade Changed')
+        expect(@student.messages.where(notification_name: "Submission Grade Changed").length).to eq 1
+        expect(@observer.messages.where(notification_name: "Submission Grade Changed").length).to eq 1
+        expect(@other_student.messages.where(notification_name: "Submission Grade Changed").length).to eq 0
+        expect(@other_observer.messages.where(notification_name: "Submission Grade Changed").length).to eq 0
       end
 
       it 'does not send any "graded" or "grade changed" notifications for a submission with essay questions before they have been graded' do

@@ -4214,20 +4214,20 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
 
   QUnit.module('onNavigatePrev');
 
-  test('calls focusAtEnd on the column header component associated with the event location', function () {
+  test('calls focusAtStart on the column header component associated with the event location', function () {
     this.triggerEvent('onNavigatePrev', {}, { columnId: 'student', region: 'header' });
-    strictEqual(this.studentColumnHeader.focusAtEnd.callCount, 1);
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1);
   });
 
   test('does nothing when the location region is not "header"', function () {
     this.triggerEvent('onNavigatePrev', {}, { columnId: 'student', region: 'body' });
-    strictEqual(this.studentColumnHeader.focusAtEnd.callCount, 0);
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
   });
 
   test('does nothing when no component is referenced for the given column', function () {
     this.gradebook.removeHeaderComponentRef('student');
     this.triggerEvent('onNavigatePrev', {}, { columnId: 'student', region: 'header' });
-    strictEqual(this.studentColumnHeader.focusAtEnd.callCount, 0);
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
   });
 
   QUnit.module('onNavigateNext');

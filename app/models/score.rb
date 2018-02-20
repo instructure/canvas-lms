@@ -23,10 +23,11 @@ class Score < ActiveRecord::Base
   belongs_to :grading_period, optional: true
   belongs_to :assignment_group, optional: true
   has_one :course, through: :enrollment
-  has_one :score_metadata, dependent: :destroy
+  has_one :score_metadata
 
   validates :enrollment, presence: true
-  validates :current_score, :unposted_current_score, :final_score, :unposted_final_score, numericality: true, allow_nil: true
+  validates :current_score, :unposted_current_score, :final_score,
+    :unposted_final_score, numericality: true, allow_nil: true
 
   validate :scorable_association_check
 
@@ -39,6 +40,27 @@ class Score < ActiveRecord::Base
         enrollment.user.grants_right?(user, :read_as_parent)
     end
     can :read
+  end
+
+  alias original_destroy destroy
+  private :original_destroy
+  def destroy
+    score_metadata.destroy if score_metadata.present?
+    original_destroy
+  end
+
+  alias original_destroy_permanently! destroy_permanently!
+  private :original_destroy_permanently!
+  def destroy_permanently!
+    score_metadata.destroy_permanently! if score_metadata.present?
+    original_destroy_permanently!
+  end
+
+  alias original_undestroy undestroy
+  private :original_undestroy
+  def undestroy
+    score_metadata.undestroy if score_metadata.present?
+    original_undestroy
   end
 
   def current_grade

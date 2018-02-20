@@ -25,8 +25,6 @@ define [
   server_200_response = (data) ->
     [200, { "Content-Type": "application/json" }, JSON.stringify(data)]
 
-  path_urls = {choose_url: 'chew-z', modules_url: 'mod.module.mod'}
-
   nextButton = (el) ->
     el.find('.module-sequence-footer-button--next').last()
 
@@ -44,6 +42,13 @@ define [
         [
           { id: 123, name: "Module A" }
         ]
+    }, args)
+
+  basePathData = (args = {}) ->
+    Object.assign({
+      is_student: true,
+      choose_url: 'chew-z',
+      modules_url: 'mod.module.mod',
     }, args)
 
   QUnit.module 'ModuleSequenceFooter: init',
@@ -267,7 +272,7 @@ define [
     @server.respond()
 
   test 'provides correct tooltip for mastery path when awaiting choice', ->
-    pathData = moduleData({mastery_path: Object.assign({awaiting_choice: true}, path_urls)})
+    pathData = moduleData({mastery_path: basePathData({awaiting_choice: true})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
@@ -276,8 +281,17 @@ define [
     ok btn.data('html-tooltip-title').match('Choose the next mastery path'), "indicates a user needs to choose the next mastery path"
     ok btn.find('a').attr('href').match('chew-z'), "displays the correct link"
 
+  test 'provides correct tooltip for mastery path when awaiting choice and not a student', ->
+    pathData = moduleData({mastery_path: basePathData({awaiting_choice: true, is_student: false})})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Project 33'), "ignores awaiting_choice and displays next module item"
+
   test 'provides correct tooltip for mastery path when sequence is locked', ->
-    pathData = moduleData({mastery_path: Object.assign({locked: true}, path_urls)})
+    pathData = moduleData({mastery_path: basePathData({locked: true})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
@@ -286,8 +300,17 @@ define [
     ok btn.data('html-tooltip-title').match('Next mastery path is currently locked'), "indicates there are locked mastery path items"
     ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
 
+  test 'provides correct tooltip for mastery path when sequence is locked and not a student', ->
+    pathData = moduleData({mastery_path: basePathData({locked: true, is_student: false})})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Project 33'), "ignores locked status and displays next module item"
+
   test 'provides correct tooltip for mastery path when processing', ->
-    pathData = moduleData({mastery_path: Object.assign({still_processing: true}, path_urls)})
+    pathData = moduleData({mastery_path: basePathData({still_processing: true})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
@@ -296,32 +319,57 @@ define [
     ok btn.data('html-tooltip-title').match('Next mastery path is still processing'), "indicates path is processing"
     ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
 
+  test 'provides correct tooltip for mastery path when path is processing and not a student', ->
+    pathData = moduleData({mastery_path: basePathData({still_processing: true, is_student: false})})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+    btn = nextButton(this.$testEl)
+
+    ok btn.data('html-tooltip-title').match('Project 33'), "ignores processing state and displays next module item"
+
   test 'properly disables the next button when path locked and modules tab disabled', ->
-    pathData = moduleData({mastery_path: Object.assign({locked: true, modules_tab_disabled: true}, path_urls)})
+    pathData = moduleData({mastery_path: basePathData({locked: true, modules_tab_disabled: true})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
     ok nextButton(this.$testEl).find('a').attr('disabled'), "disables the button"
+
+  test 'does not disable the next button when path locked and modules tab disabled and not a student', ->
+    pathData = moduleData({mastery_path: basePathData({locked: true, modules_tab_disabled: true, is_student: false})})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+
+    ok !nextButton(this.$testEl).find('a').attr('disabled'), "does not disable the button"
 
   test 'properly disables the next button when path processing and modules tab disabled', ->
-    pathData = moduleData({mastery_path: Object.assign({still_processing: true, modules_tab_disabled: true}, path_urls)})
+    pathData = moduleData({mastery_path: basePathData({still_processing: true, modules_tab_disabled: true})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
     ok nextButton(this.$testEl).find('a').attr('disabled'), "disables the button"
 
-  test 'does not disables the next button when awaiting choice and modules tab disabled', ->
-    pathData = moduleData({mastery_path: Object.assign({awaiting_choice: true, modules_tab_disabled: true}, path_urls)})
+  test 'does not disable the next button when path processing and modules tab disabled and not a student', ->
+    pathData = moduleData({mastery_path: basePathData({still_processing: true, modules_tab_disabled: true, is_student: false})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
 
-    ok !nextButton(this.$testEl).find('a').attr('disabled'), "disables the button"
+    ok !nextButton(this.$testEl).find('a').attr('disabled'), "does not disable the button"
+
+  test 'does not disable the next button when awaiting choice and modules tab disabled', ->
+    pathData = moduleData({mastery_path: basePathData({awaiting_choice: true, modules_tab_disabled: true})})
+    @server.respondWith "GET", default_course_url, server_200_response(pathData)
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()
+
+    ok !nextButton(this.$testEl).find('a').attr('disabled'), "does not disable the button"
 
   test 'properly shows next button when no next items yet exist and paths are locked', ->
-    pathData = nullButtonData({mastery_path: Object.assign({locked: true}, path_urls)})
+    pathData = nullButtonData({mastery_path: basePathData({locked: true})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
@@ -331,7 +379,7 @@ define [
     ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
 
   test 'properly shows next button when no next items yet exist and paths are processing', ->
-    pathData = nullButtonData({mastery_path: Object.assign({still_processing: true}, path_urls)})
+    pathData = nullButtonData({mastery_path: basePathData({still_processing: true})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()
@@ -341,7 +389,7 @@ define [
     ok btn.find('a').attr('href').match('mod.module.mod'), "displays the correct link"
 
   test 'does not show next button when no next items exist and paths are unlocked', ->
-    pathData = nullButtonData({mastery_path: Object.assign({still_processing: false}, path_urls)})
+    pathData = nullButtonData({mastery_path: basePathData({still_processing: false})})
     @server.respondWith "GET", default_course_url, server_200_response(pathData)
     @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
     @server.respond()

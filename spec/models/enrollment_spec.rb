@@ -19,37 +19,104 @@
 require_relative '../sharding_spec_helper'
 
 describe Enrollment do
+  subject(:enrollment) { @enrollment }
+
   before(:once) do
     @user = User.create!
     @course = Course.create!
     @enrollment = StudentEnrollment.new(valid_enrollment_attributes)
   end
 
-  it "should be valid" do
-    expect(@enrollment).to be_valid
-  end
+  it { is_expected.to be_valid }
 
-  it "should have an interesting state machine" do
-    enrollment_model
-    allow(@user).to receive(:dashboard_messages).and_return(Message.none)
-    expect(@enrollment.state).to eql(:invited)
-    @enrollment.accept
-    expect(@enrollment.state).to eql(:active)
-    @enrollment.reject
-    expect(@enrollment.state).to eql(:rejected)
-    Score.where(enrollment_id: @enrollment).each(&:destroy_permanently!)
-    @enrollment.destroy_permanently!
-    enrollment_model
-    @enrollment.complete
-    expect(@enrollment.state).to eql(:completed)
-    @enrollment.destroy_permanently!
-    enrollment_model
-    @enrollment.reject
-    expect(@enrollment.state).to eql(:rejected)
-    @enrollment.destroy_permanently!
-    enrollment_model
-    @enrollment.accept
-    expect(@enrollment.state).to eql(:active)
+  describe 'workflow' do
+    subject(:enrollment) { @enrollment.tap(&:save!) }
+
+    describe 'invited' do
+      it { is_expected.to be_invited }
+
+      it 'can transition to rejected' do
+        enrollment.reject!
+        expect(enrollment).to be_rejected
+      end
+
+      it 'updates the user when rejected' do
+        expect(enrollment.user).to receive(:touch).at_least(1).times
+        enrollment.reject!
+      end
+
+      it 'can transition to completed' do
+        enrollment.complete!
+        expect(enrollment).to be_completed
+      end
+    end
+
+    describe 'creation_pending' do
+      subject(:enrollment) do
+        @enrollment.tap {|e| e.update!(workflow_state: :creation_pending) }
+      end
+
+      it { is_expected.to be_creation_pending }
+
+      it 'can transition to invited' do
+        enrollment.invite!
+        expect(enrollment).to be_invited
+      end
+    end
+
+    describe 'active' do
+      subject(:enrollment) do
+        @enrollment.tap {|e| e.update!(workflow_state: :active) }
+      end
+
+      it { is_expected.to be_active }
+
+      it 'can transition to rejected' do
+        enrollment.reject!
+        expect(enrollment).to be_rejected
+      end
+
+      it 'updates the user when rejected' do
+        expect(enrollment.user).to receive(:touch).at_least(1).times
+        enrollment.reject!
+      end
+
+      it 'can transition to completed' do
+        enrollment.complete!
+        expect(enrollment).to be_completed
+      end
+    end
+
+    describe 'deleted' do
+      subject { @enrollment.tap {|e| e.update!(workflow_state: :deleted) } }
+
+      it { is_expected.to be_deleted }
+    end
+
+    describe 'rejected' do
+      subject(:enrollment) do
+        @enrollment.tap {|e| e.update!(workflow_state: :rejected) }
+      end
+
+      it { is_expected.to be_rejected }
+
+      it 'can transition to invited' do
+        enrollment.unreject!
+        expect(enrollment).to be_invited
+      end
+    end
+
+    describe 'completed' do
+      subject { @enrollment.tap {|e| e.update!(workflow_state: :completed) } }
+
+      it { is_expected.to be_completed }
+    end
+
+    describe 'inactive' do
+      subject { @enrollment.tap {|e| e.update!(workflow_state: :inactive) } }
+
+      it { is_expected.to be_inactive }
+    end
   end
 
   it "should be pending if it is invited or creation_pending" do

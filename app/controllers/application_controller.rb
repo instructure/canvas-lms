@@ -114,7 +114,7 @@ class ApplicationController < ActionController::Base
   #     require ['ENV'], (ENV) ->
   #       ENV.FOO_BAR #> [1,2,3]
   #
-  def js_env(hash = {})
+  def js_env(hash = {}, overwrite = false)
     return {} unless request.format.html? || @include_js_env
     # set some defaults
     unless @js_env
@@ -171,7 +171,7 @@ class ApplicationController < ActionController::Base
     end
 
     hash.each do |k,v|
-      if @js_env[k]
+      if @js_env[k] && !overwrite
         raise "js_env key #{k} is already taken"
       else
         @js_env[k] = v
@@ -320,7 +320,7 @@ class ApplicationController < ActionController::Base
     if is_master
       bc_data.merge!(
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        terms: @context.account.root_account.enrollment_terms.active.to_a.map{|term| {id: term.id, name: term.name}},
         canManageCourse: @context.account.grants_right?(@current_user, :manage_master_courses)
       )
     end
@@ -2087,6 +2087,7 @@ class ApplicationController < ActionController::Base
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user
     data[:can_edit_name] = data[:can_edit] && profile.user.user_can_edit_name?
+    data[:can_edit_avatar] = data[:can_edit] && profile.user.avatar_state != :locked
     data[:known_user] = viewer.address_book.known_user(profile.user)
     if data[:known_user] && viewer != profile.user
       common_courses = viewer.address_book.common_courses(profile.user)

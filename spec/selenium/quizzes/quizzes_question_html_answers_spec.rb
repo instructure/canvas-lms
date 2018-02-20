@@ -66,6 +66,7 @@ describe 'quizzes question with html answers' do
     img_cls = "sample_image"
     quiz_with_new_questions(true, {id: 1}, {id: 2},
                             {id: 3, answer_html: %|<img src="#{img_url}" alt="#{img_alt}" class="#{img_cls}">|})
+    dismiss_flash_messages # in non-prod environments images that fail to load will cause a flash message
     click_questions_tab
     edit_first_question
     alt_before = fj(".#{img_cls}", question_answers[2]).attribute('alt')

@@ -334,7 +334,16 @@ class ExternalToolsController < ApplicationController
   #        "migration_selection": null,
   #        "resource_selection": null,
   #        "tool_configuration": null,
-  #        "user_navigation": null,
+  #        "user_navigation": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "text": "...",
+  #             "url": "...",
+  #             "default": "disabled",
+  #             "enabled": "true",
+  #             "visibility": "public",
+  #             "windowTarget": "_blank"
+  #        },
   #        "selection_width": 500,
   #        "selection_height": 500,
   #        "icon_url": "...",
@@ -633,6 +642,10 @@ class ExternalToolsController < ApplicationController
   #
   # @argument user_navigation[text] [String]
   #   The text that will show on the left-tab in the user navigation
+  #
+  # @argument user_navigation[visibility] [String, "admins"|"members"|"public"]
+  #   Who will see the navigation tab. "admins" for admins, "public" or
+  #   "members" for everyone
   #
   # @argument course_home_sub_navigation[url] [String]
   #   The url of the external tool for right-side course home navigation menu
@@ -1011,21 +1024,22 @@ class ExternalToolsController < ApplicationController
     tool_id = params[:id]
     launch_url = params[:url] || launch_url
     launch_type = params[:launch_type]
+    module_item = options[:module_item]
 
-    unless tool_id || launch_url || options[:module_item]
+    unless tool_id || launch_url || module_item
       @context.errors.add(:id, 'A tool id, tool url, or module item id must be provided')
       @context.errors.add(:url, 'A tool id, tool url, or module item id must be provided')
       @context.errors.add(:module_item_id, 'A tool id, tool url, or module item id must be provided')
       return render :json => @context.errors, :status => :bad_request
     end
 
-    if launch_url && options[:module_item].blank?
+    if launch_url && module_item.blank?
       @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
-    elsif options[:module_item]
+    elsif module_item
       @tool = ContextExternalTool.find_external_tool(
-        options[:module_item].url,
+        module_item.url,
         @context,
-        options[:module_item].content_id
+        module_item.content_id
       )
     else
       return unless find_tool(tool_id, launch_type)
@@ -1044,7 +1058,7 @@ class ExternalToolsController < ApplicationController
 
     case launch_type
     when 'module_item'
-      opts[:link_code] = @tool.opaque_identifier_for(options[:module_item])
+      opts[:link_code] = @tool.opaque_identifier_for(module_item)
     when 'assessment'
       opts[:link_code] = @tool.opaque_identifier_for(options[:assignment].external_tool_tag)
     end
@@ -1055,7 +1069,7 @@ class ExternalToolsController < ApplicationController
       @context
     ).prepare_tool_launch(
       url_for(@context),
-      variable_expander(assignment: options[:assignment]),
+      variable_expander(assignment: options[:assignment], content_tag: module_item),
       opts
     )
 
