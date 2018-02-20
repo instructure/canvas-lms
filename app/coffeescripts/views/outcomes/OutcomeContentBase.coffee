@@ -148,8 +148,6 @@ define [
 
     edit: (e) =>
       e.preventDefault()
-      if @model.get('has_updateable_rubrics')
-        return unless confirm I18n.t('Are you sure you want to edit? This will update any unassessed rubrics that have imported this outcome.')
       @state = 'edit'
       # save @model state
       @_modelAttributes = @model.toJSON()

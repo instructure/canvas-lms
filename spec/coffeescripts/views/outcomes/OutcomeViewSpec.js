@@ -63,8 +63,11 @@ function buildOutcome(outcomeOptions, outcomeLinkOptions) {
 }
 
 function createView(opts) {
+  const application = $('<div id="application" />') // app element for confirmation dialog
+  application.appendTo($("#fixtures"))
+
   const view = new OutcomeView(opts)
-  view.$el.appendTo($('#fixtures'))
+  view.$el.appendTo(application)
   return view.render()
 }
 
@@ -299,7 +302,7 @@ test('calculation int updates when the calculation method is changed', () => {
   view.remove()
 })
 
-test('edit and delete buttons are disabled for outcomes that have been assessed', () => {
+test('delete buttons is disabled for outcomes that have been assessed', () => {
   const view = createView({
     model: newOutcome(
       {
@@ -315,14 +318,12 @@ test('edit and delete buttons are disabled for outcomes that have been assessed'
     ),
     state: 'show'
   })
-  ok(view.$('.edit_button').length > 0)
   ok(view.$('.delete_button').length > 0)
-  ok(view.$('.edit_button').attr('disabled'))
   ok(view.$('.delete_button').attr('disabled'))
   view.remove()
 })
 
-test('edit and delete buttons are enabled for outcomes that have not been assessed', () => {
+test('delete buttons is enabled for outcomes that have not been assessed', () => {
   const view = createView({
     model: newOutcome(
       {
@@ -338,14 +339,12 @@ test('edit and delete buttons are enabled for outcomes that have not been assess
     ),
     state: 'show'
   })
-  ok(view.$('.edit_button').length > 0)
   ok(view.$('.delete_button').length > 0)
-  ok(!view.$('.edit_button').attr('disabled'))
-  ok(!view.$('.delete_button').attr('disabled'))
+  notOk(view.$('.delete_button').attr('disabled'))
   view.remove()
 })
 
-test('edit is disabled when viewing an assessed account outcome in its native context', () => {
+test('edit is enabled and warning text present when viewing an assessed account outcome in its native context', () => {
   const view = createView({
     model: newOutcome(
       {
@@ -361,8 +360,9 @@ test('edit is disabled when viewing an assessed account outcome in its native co
     ),
     state: 'show'
   })
+  ok(view.$('.outcome-assessed-info-banner').length > 0)
   ok(view.$('.edit_button').length > 0)
-  ok(view.$('.edit_button').attr('disabled'))
+  notOk(view.$('.edit_button').attr('disabled'))
   view.remove()
 })
 
@@ -383,7 +383,7 @@ test('delete button is not shown for outcomes that cannot be unlinked', () => {
     state: 'show'
   })
   ok(view.$('.edit_button').length > 0)
-  ok(view.$('.delete_button').length === 0)
+  strictEqual(view.$('.delete_button').length, 0)
   view.remove()
 })
 
@@ -430,13 +430,13 @@ test('move and delete buttons are not available for an account outcome if a user
     ),
     state: 'show'
   })
-  ok(view.$('.delete_button').length === 0)
-  ok(view.$('.move_button').length === 0)
-  ok(view.$('.edit_button').length === 0)
+  strictEqual(view.$('.delete_button').length, 0)
+  strictEqual(view.$('.move_button').length, 0)
+  strictEqual(view.$('.edit_button').length, 0)
   view.remove()
 })
 
-test('an informative banner is displayed when edit/delete buttons are disabled', () => {
+test('an informative banner is displayed when outcome has been assessed', () => {
   const view = createView({
     model: newOutcome(
       {
@@ -454,7 +454,7 @@ test('an informative banner is displayed when edit/delete buttons are disabled',
   view.remove()
 })
 
-test('the banner is not displayed when edit/delete buttons are enabled', () => {
+test('the banner is not displayed when the outcome is not assessed', () => {
   const view = createView({
     model: newOutcome(
       {
@@ -466,6 +466,77 @@ test('the banner is not displayed when edit/delete buttons are enabled', () => {
     state: 'show'
   })
   ok(!view.$('#assessed_info_banner').length > 0)
+})
+
+test('it attempts a confirmation dialog when an outcome is modified', (assert) => {
+  const done = assert.async()
+  const view = createView({ model: newOutcome({assessed: true, native: true}, {can_unlink: true}), state: 'edit'})
+  view.edit($.Event())
+  changeSelectedCalcMethod(view, 'latest')
+  view.$('form').trigger('submit')
+  setTimeout(() => {
+    ok($('.confirm-outcome-edit-modal-container').length > 0)
+    // cleanup
+    $('#cancel-outcome-edit-modal').trigger('click')
+    $('.confirm-outcome-edit-modal-container').remove()
+    done()
+  })
+})
+
+test('it saves when without dialog when outcome is unchanged', (assert) => {
+  const done = assert.async()
+  const view = createView({ model: newOutcome({assessed: true, native: true}, {can_unlink: true}), state: 'edit' })
+  view.edit($.Event())
+  view.$('form').trigger('submit')
+  view.on('submit', () => {
+    ok(true, 'submit fired on form view')
+    done()
+  })
+  setTimeout(() => {
+    $('#confirm-outcome-edit-modal').trigger('click')
+  })
+})
+
+test('getModifiedFields returns false for all fields when not modified', () => {
+  const view = createView({ model: newOutcome(), state: 'edit' })
+  view.edit($.Event())
+  const modified = view.getModifiedFields(view.getFormData())
+  notOk(modified.masteryPoints)
+  notOk(modified.calculationInt)
+  notOk(modified.calculationMethod)
+})
+
+test('getModifiedFields returns true for calculation method when modified', () => {
+  const view = createView({ model: newOutcome(), state: 'edit' })
+  view.edit($.Event())
+  changeSelectedCalcMethod(view, 'latest')
+  ok(view.getModifiedFields(view.getFormData()).scoringMethod)
+})
+
+test('getModifiedFields returns true for calculationInt when modified', () => {
+  const view = createView({ model: newOutcome(), state: 'edit' })
+  view.edit($.Event())
+  view.$('#calculation_int').val(2)
+  view.$('#calculation_int').trigger('change')
+  ok(view.getModifiedFields(view.getFormData()).scoringMethod)
+})
+
+test('getModifiedFields returns false when calculationInt changed but not used', () => {
+  const view = createView({ model: newOutcome({ calculation_method: 'latest', calculation_int: null }), state: 'edit' })
+  view.edit($.Event())
+  changeSelectedCalcMethod(view, 'decaying_average')
+  view.$('#calculation_int').val(33)
+  view.$('#calculation_int').trigger('change')
+  changeSelectedCalcMethod(view, 'latest')
+  notOk(view.getModifiedFields(view.getFormData()).scoringMethod)
+})
+
+test('getModifiedFields returns true mastery points when modified', () => {
+  const view = createView({ model: newOutcome(), state: 'edit' })
+  view.edit($.Event())
+  view.$('.mastery_points').val(100)
+  view.$('.mastery_points').trigger('keyup')
+  ok(view.getModifiedFields(view.getFormData()).masteryPoints)
 })
 
 test('calculation int gets set intelligently when the calc method is changed', () => {
