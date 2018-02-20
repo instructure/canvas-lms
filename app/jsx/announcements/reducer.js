@@ -175,4 +175,5 @@ export default combineReducers({
     }, false)
   }),
   notifications: reduceNotifications,
+  announcementsLocked: identity(false)
 })
