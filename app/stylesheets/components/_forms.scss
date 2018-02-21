@@ -134,5 +134,20 @@ input + .hint-text {
     overflow: auto;
     padding: 20px;
   }
+
+  //Grading Form Styling
+  //——————————————
+  .submission_details_grade_form form-inline{
+    margin: 0 0 15px;
+  }
+
+  #exemptCheck{
+    margin: 0 5px 5px 0;
+  }
+
+  #exemptContainer{
+    margin-top: 5px;
+    margin-left: 50px;
+  }
 }
 
