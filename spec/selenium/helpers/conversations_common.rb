@@ -52,11 +52,7 @@ module ConversationsCommon
   end
 
   def view_filter
-    driver.find_element(:id, 'conversation-filter-select')
-  end
-
-  def course_group_filter
-    driver.find_element(:id, 'course-group-filter')
+    driver.find_element(:id, 'conversation_filter_select')
   end
 
   def selected_view_filter
@@ -68,6 +64,15 @@ module ConversationsCommon
     expect(selected.size).to eq 1
     value = selected[0].attribute('value')
     value
+  end
+
+  def course_filter
+    skip('course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing')
+    # try to make it load the courses first so it doesn't randomly refresh
+    selector = '.course-filter.bootstrap-select'
+    driver.execute_script(%{$('#{selector}').focus();})
+    wait_for_ajaximations
+    f(selector)
   end
 
   def message_course
@@ -100,16 +105,9 @@ module ConversationsCommon
     wait_for_ajaximations
   end
 
-  def select_course(course_name)
-    course_group_filter_css = "#course-group-filter input[type='text']"
-    fj(course_group_filter_css).click
-    if !course_name.empty?
-      set_value(fj(course_group_filter_css), course_name)
-      driver.action.send_keys(:enter).perform
-    else
-      driver.action.send_keys(:backspace).perform
-    end
-    wait_for_ajax_requests
+  def select_course(new_course)
+    set_bootstrap_select_value(course_filter, new_course)
+    wait_for_ajaximations
   end
 
   def select_message(msg_index)
@@ -146,21 +144,14 @@ module ConversationsCommon
     wait_for_ajaximations
   end
 
-  def select_message_course(new_course)
-    course_group_filter_css = "#compose-message-course-group-filter input[type='text']"
-
-    if new_course&.respond_to? :name
-      course_name = new_course.name
-    else
-      course_name = new_course
+  def select_message_course(new_course, is_group = false)
+    new_course = new_course.name if new_course.respond_to? :name
+    fj('.dropdown-toggle', message_course).click
+    if is_group
+      wait_for_ajaximations
+      fj("a:contains('Groups')", message_course).click
     end
-    if !course_name.empty?
-      set_value(fj(course_group_filter_css), course_name)
-      driver.action.send_keys(:enter).perform
-    else
-      driver.action.send_keys(:backspace).perform
-    end
-    wait_for_ajax_requests
+    fj("a:contains('#{new_course}')", message_course).click
   end
 
   def add_message_recipient(to)

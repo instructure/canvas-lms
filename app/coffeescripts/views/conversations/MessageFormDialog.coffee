@@ -21,8 +21,6 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'react',
-  'react-dom',
   '../DialogBaseView'
   'jst/conversations/MessageFormDialog'
   '../../fn/preventDefault'
@@ -31,11 +29,10 @@ define [
   'jst/conversations/addAttachment'
   '../../models/Message'
   '../conversations/AutocompleteView'
-  'jsx/shared/components/CoursesGroupsAutocomplete'
+  '../conversations/CourseSelectionView'
   '../conversations/ContextMessagesView'
   'jquery.elastic'
-], (I18n, $, _, {Collection}, React, ReactDOM, DialogBaseView, template, preventDefault, composeTitleBarTemplate,
-  composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CoursesGroupsAutocomplete, ContextMessagesView) ->
+], (I18n, $, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
   # reusable message composition dialog
@@ -62,7 +59,6 @@ define [
       '.compose_form':                  '$form'
       '.user_note':                     '$userNote'
       '.user_note_info':                '$userNoteInfo'
-      '#compose-message-course-group-filter': '$composeMessageCourseGroupFilter'
 
     messages:
       flashSuccess: I18n.t('message_sent', 'Message sent!')
@@ -172,13 +168,8 @@ define [
       @$messageCourseRO.text(if course then course.name else I18n.t('no_course','No course'))
 
     defaultCourse: null
-
     setDefaultCourse: (course) ->
       @defaultCourse = course
-
-    changeCourseGroupFilter: (_, value) =>
-      course = { id: value.value, name: value.label }
-      @onCourse(course)
 
     initializeForm: ->
       @prepareTextarea(@$el)
@@ -194,34 +185,29 @@ define [
         @recipientView.disable(true)
 
       @$messageCourse.prop('disabled', !!@model)
-      defaultOption = null
-      if @defaultCourse
-        components = @defaultCourse.split('_')
-        if components.length == 2
-          defaultOption = {
-            entityType: components[0],
-            entityId: parseInt(components[1])
-          }
-
-      if !@model
-        ReactDOM.render(
-          React.createElement(CoursesGroupsAutocomplete, {
-            placeholder: I18n.t('Select course or group'),
-            onChange: @changeCourseGroupFilter,
-            initialSelectedOption: defaultOption,
-            allowEmpty: false,
-            className: "message_course"
-          }), @$composeMessageCourseGroupFilter[0])
-      else
-        @$composeMessageCourseGroupFilter.hide()
-
+      @courseView = new CourseSelectionView(
+        el: @$messageCourse,
+        courses: @options.courses,
+        defaultOption: I18n.t('select_course', 'Select course')
+        messageableOnly: true
+      )
       if @model
         if @model.get('context_code')
           @onCourse({id: @model.get('context_code'), name: @model.get('context_name')})
+        else
+          @courseView.on('course', @onCourse)
+          @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
         @recipientView.disable(false)
       else if @launchParams
+        @courseView.on('course', @onCourse)
+        @courseView.setValue(@launchParams.context) if @launchParams.context
         @recipientView.disable(false)
-      if !@model
+      else
+        @courseView.on('course', @onCourse)
+        @courseView.setValue(@defaultCourse)
+      if @model
+        @courseView.$picker.css('display', 'none')
+      else
         @$messageCourseRO.css('display', 'none')
 
       if @tokenInput = @$el.find('.recipients').data('token_input')
