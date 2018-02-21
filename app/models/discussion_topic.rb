@@ -339,9 +339,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def get_potentially_conflicting_titles(title_base)
-    result = DiscussionTopic.active.where(context_id: self.context_id)
-      .starting_with_title(title_base).pluck("title").to_set
-    result
+    DiscussionTopic.active.where(context_type: self.context_type, context_id: self.context_id).
+      starting_with_title(title_base).pluck("title").to_set
   end
 
   # This is a guess of what to copy over.

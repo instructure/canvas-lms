@@ -106,7 +106,11 @@ class DiscussionsIndex
       f('#lock-discussion-menu-option')
     end
 
-    def duplicate_menu_option
+    def duplicatate_menu_option
+      f('.duplicate-discussion')
+    end
+
+    def duplicate_v2_menu_option
       f('#copy-discussion-menu-option')
     end
 
@@ -137,7 +141,7 @@ class DiscussionsIndex
       close_for_comment_menu_option.click
     end
 
-    def click_duplicatate_menu_option(title)
+    def click_duplicate_menu_option(title)
       discussion_menu(title).click
       duplicate_menu_option.click
     end

@@ -108,8 +108,8 @@ define [
       delete json.assignment.rubric if json.assignment
       json
 
-    duplicate: (course_id, callback) =>
-      axios.post("/api/v1/courses/#{course_id}/discussion_topics/#{@id}/duplicate", {})
+    duplicate: (context_type, context_id, callback) =>
+      axios.post("/api/v1/#{context_type}s/#{context_id}/discussion_topics/#{@id}/duplicate", {})
         .then(callback)
         .catch(showFlashError(I18n.t("Could not duplicate discussion")))
 
