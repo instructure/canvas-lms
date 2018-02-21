@@ -59,10 +59,19 @@ module Canvas
     @redis_enabled ||= redis_config.present?
   end
 
+  # technically this is jsut disconnect_redis, because new connections are created lazily,
+  # but I didn't want to rename it when there are several uses of it
   def self.reconnect_redis
-    if Rails.cache && Rails.cache.respond_to?(:reconnect)
+    if Rails.cache &&
+      defined?(ActiveSupport::Cache::RedisStore) &&
+      Rails.cache.is_a?(ActiveSupport::Cache::RedisStore)
       Canvas::Redis.handle_redis_failure(nil, "none") do
-        Rails.cache.reconnect
+        store = Rails.cache.data
+        if store.respond_to?(:nodes)
+          store.nodes.each(&:disconnect!)
+        else
+          store.disconnect!
+        end
       end
     end
 
