@@ -475,7 +475,6 @@ END
       applies_to: 'Account',
       state: 'allowed',
       beta: true,
-      development: true,
       root_opt_in: true,
       touch_context: true
     },
