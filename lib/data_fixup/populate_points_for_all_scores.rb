@@ -27,7 +27,7 @@
 module DataFixup
   module PopulatePointsForAllScores
     def self.run
-      Course.published.find_ids_in_ranges do |min_id, max_id|
+      Course.published.find_ids_in_ranges(batch_size: 100) do |min_id, max_id|
         send_later_if_production_enqueue_args(
           :run_for_course_range,
           {
