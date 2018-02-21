@@ -5,12 +5,6 @@ class AssignmentOverrideInstrumenter
   # overriding assignments only when necessary (for example, when the
   # due date is requested).  Thoughts/potential issues/caveats:
   #
-  # * the implementation of needs_overriding? needs to be done frd.
-  # There are many other factors that should be considered.  At the
-  # very least: when lock_at/unlock_at are requested; if
-  # assignment#only_visible_to_overrides is true.  Probably other
-  # things.
-  #
   # * I love that this automatically applies to assignments no matter
   # where they appear in the schema.  I don't love that this is
   # modifying the resolver of every item in the schema.  The best
@@ -56,8 +50,15 @@ class AssignmentOverrideInstrumenter
     end
   end
 
-  # TODO: make this real
+  ATTRIBUTES_NEED_OVERRIDING = %w[dueAt allDay dallDayDate unlockAt lockAt].freeze
+
+  # assignments are automatically overridden in graphql whenever one of the
+  # dueAt/lockAt/unlockAt fields are requested *UNLESS* the user is also
+  # requesting the list of assignment_overrides.  The rationale is that the
+  # user won't have a way of seeing the assignment's default due date if it's
+  # overriden
   def self.needs_overriding?(selections)
-    selections.key? "dueAt"
+    ATTRIBUTES_NEED_OVERRIDING.any? { |attr| selections.key?(attr) } &&
+      !selections.key?("assignmentOverrides")
   end
 end
