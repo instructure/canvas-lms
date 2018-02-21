@@ -7,12 +7,10 @@
       {{#unless isInPastGradingPeriodAndNotAdmin}}
         <button style="float: right;" class="btn" type="submit">{{#t "update_grade"}}Update Grade{{/t}}</button>
       {{/unless}}
-
-        <div id="exemptContainer">
-           <input type="checkbox" id="exemptCheck" value="EX">
-             <label>Exempt student</label>
-        </div>
-
+      <div id="exemptContainer">
+       <input type="checkbox" id="exemptCheck" value="EX">
+         <label>Exempt student</label>
+      </div>
     </form>
     {{#if speedGraderUrl }}
       <a class="more-details-link" target="_blank" href="{{speedGraderUrl}}">{{#t "more_details_in_the_speedgrader"}}More details in the SpeedGrader{{/t}}</a>

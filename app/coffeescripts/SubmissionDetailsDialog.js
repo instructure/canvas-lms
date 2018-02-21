@@ -49,10 +49,11 @@ export default class SubmissionDetailsDialog {
     this.dialog = this.$el.dialog({
       title: this.student.name,
       width: 600,
-      resizable: false
+      resizable: false,
     })
-
+ 
     this.dialog.on('dialogclose', this.options.onClose)
+    this.dialog.on('dialogclose', function(){ this.remove() })
     this.dialog
       .delegate('select[id="submission_to_view"]', 'change', event => this.dialog.find('.submission_detail').each(function (index) {
         $(this).showIf(index === event.currentTarget.selectedIndex)
