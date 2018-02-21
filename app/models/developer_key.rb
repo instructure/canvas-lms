@@ -26,7 +26,7 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :account
 
   has_many :page_views
-  has_many :access_tokens
+  has_many :access_tokens, -> { where(:workflow_state => "active") }
 
   has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
 

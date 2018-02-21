@@ -92,4 +92,18 @@ describe NotificationEndpoint do
       ne.destroy
     end
   end
+
+  it "should be soft-deleteable" do
+    ne = @at.notification_endpoints.build(token: 'token', arn: 'arn')
+    ne.save_without_callbacks
+    allow(ne).to receive(:endpoint_exists?).and_return(false)
+    ne.destroy
+    expect(ne.reload.workflow_state).to eq "deleted"
+    expect(@user.notification_endpoints.count).to eq 0
+
+    ne2 = @at.notification_endpoints.build(token: 'token', arn: 'arn')
+    ne2.save_without_callbacks
+    AccessToken.where(:id => @at).update_all(:workflow_state => 'deleted')
+    expect(@user.notification_endpoints.count).to eq 0
+  end
 end

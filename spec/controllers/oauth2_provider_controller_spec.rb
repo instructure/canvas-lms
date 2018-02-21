@@ -222,7 +222,7 @@ describe Oauth2ProviderController do
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'}
       expect(response).to be_success
-      expect(AccessToken.exists?(old_token.id)).to be(false)
+      expect(AccessToken.not_deleted.exists?(old_token.id)).to be(false)
     end
 
     it 'does not delete existing tokens without replace_tokens' do
@@ -230,7 +230,7 @@ describe Oauth2ProviderController do
       allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
       expect(response).to be_success
-      expect(AccessToken.exists?(old_token.id)).to be(true)
+      expect(AccessToken.not_deleted.exists?(old_token.id)).to be(true)
     end
 
     context 'grant_type refresh_token' do
