@@ -1304,6 +1304,10 @@ class CalendarEventsApiController < ApplicationController
     ag_count = (params[:context_codes] || []).count { |code| code =~ /\Aappointment_group_/ }
     context_limit = @domain_root_account.settings[:calendar_contexts_limit] || 10
     codes = (params[:context_codes] || [user.asset_string])[0, context_limit + ag_count]
+    # also accept a more compact comma-separated list of appointment group ids
+    if params[:appointment_group_ids].present? && params[:appointment_group_ids].is_a?(String)
+      codes += params[:appointment_group_ids].split(',').map { |id| "appointment_group_#{id}" }
+    end
     get_options(codes, user)
 
     # if specific context codes were requested, ensure the user can access them

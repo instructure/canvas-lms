@@ -258,3 +258,10 @@ test('pagination: calls data callback with each page of data if set', function()
     }
   )
 })
+
+test('indexParams filters appointment_group_ids from params', function() {
+  const p = this.source.indexParams({blah: 'blah', context_codes: ['course_1', 'appointment_group_2', 'group_3', 'appointment_group_1337']})
+  equal(p.blah, 'blah')
+  deepEqual(p.context_codes, ['course_1', 'group_3'])
+  equal(p.appointment_group_ids, '2,1337')
+})

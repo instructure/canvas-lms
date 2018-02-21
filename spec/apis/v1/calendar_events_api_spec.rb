@@ -189,6 +189,21 @@ describe CalendarEventsApiController, type: :request do
       expect(slot).not_to be_nil
     end
 
+    it 'accepts a more compact comma-separated list of appointment group ids' do
+      ags = (0..2).map do |x|
+        ag = AppointmentGroup.create!(:title => "ag #{x}", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+        ag.publish!
+        ag
+      end
+      ag_id_list = ags.map(&:id).join(',')
+      student_in_course :active_all => true
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-02&per_page=25&appointment_group_ids=" + ag_id_list, {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :appointment_group_ids => ag_id_list, :start_date => '2012-01-01', :end_date => '2012-01-02', :per_page => '25'})
+      expect(json.map{|e| e['appointment_group_id']}).to match_array(ags.map(&:id))
+      expect(response.headers['Link']).to include 'appointment_group_ids='
+    end
+
     it 'should fail with unauthorized if provided a context the user cannot access' do
       contexts = [@course.asset_string]
 
