@@ -237,6 +237,24 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
     end
 
+    it 'returns submissions based on submitted_since' do
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      submitted_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 1
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      submitted_since: Time.zone.now.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 0
+    end
+
     it 'should scope call to enrollment_state with post_to_sis' do
       @a1.post_to_sis = true
       @a1.save!
