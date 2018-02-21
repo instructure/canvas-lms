@@ -29,13 +29,18 @@ export default class RangeInput extends Component {
     name: PropTypes.string.isRequired,
     step: PropTypes.number,
     formatValue: PropTypes.func,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    themeState: PropTypes.object,
+    handleThemeStateChange: PropTypes.func,
+    variableKey: PropTypes.string.isRequired
   }
 
   static defaultProps = {
     step: 1,
-    onChange: () => {},
-    formatValue: val => val
+    onChange() {},
+    formatValue: val => val,
+    themeState: {},
+    handleThemeStateChange() {}
   }
 
   state = {
@@ -57,6 +62,7 @@ export default class RangeInput extends Component {
   handleChange = event => {
     this.setState({value: event.target.value})
     this.props.onChange(event.target.value)
+    this.props.handleThemeStateChange(this.props.variableKey, event.target.value)
   }
 
   render() {

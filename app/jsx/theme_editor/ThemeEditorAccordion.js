@@ -145,7 +145,10 @@ export default class ThemeEditorAccordion extends React.Component {
             step={0.1}
             defaultValue={defaultValue ? parseFloat(defaultValue) : 0.5}
             name={`brand_config[variables][${varDef.variable_name}]`}
+            variableKey={varDef.variable_name}
             onChange={value => props.onChange(value)}
+            themeState={props.themeState}
+            handleThemeStateChange={props.handleThemeStateChange}
             formatValue={value => I18n.toPercentage(value * 100, {precision: 0})}
           />
         )
