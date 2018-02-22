@@ -33,7 +33,23 @@
 <h1 class="page-header"><%= t 'titles.journal_for', "Faculty Journal for %{user}", :user => @user.name %><span id="proccessing">&nbsp;</span></h1>
 <div id="create_entry" style="display: none; margin-bottom: 10px;">
   <%= form_for(@user_note, :url => user_user_notes_path, :html=>{:id=>'add_entry_form'}) do |f| %>
-    <%= f.error_messages %>
+
+    <% if @user_note.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= t({
+          one: "1 error prohibited this note from being saved:",
+          other: "%{count} errors prohibited this note from being saved:" },
+          count: @user_note.errors.count
+        ) %></h2>
+
+        <ul>
+        <% @user_note.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <%= f.hidden_field :user_id, :value=>@user.id %>
     <table class="formtable" style="width: 100%;">
       <tr>
