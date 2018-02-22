@@ -197,7 +197,8 @@ describe UserSearch do
         end
 
         describe 'searching on emails' do
-          let(:cc) { user.communication_channels.create!(path: 'the.giver@example.com') }
+          let(:user1) {user_with_pseudonym(user: user)}
+          let(:cc) {user1.communication_channels.create!(path: 'the.giver@example.com')}
 
           before do
             cc.confirm!
@@ -223,8 +224,8 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
-          it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do 
-            cc2 = user.communication_channels.create!(path: 'unconfirmed@example.com')
+          it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do
+            user.communication_channels.create!(path: 'unconfirmed@example.com')
             expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
           end
         end

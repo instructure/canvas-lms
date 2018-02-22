@@ -184,8 +184,11 @@ module UserSearch
         SELECT id FROM #{User.quoted_table_name} WHERE (#{like_condition('users.name')})
         UNION
         #{@db_union}
-        SELECT user_id FROM #{CommunicationChannel.quoted_table_name}
-          WHERE communication_channels.path_type = :path_type
+        SELECT communication_channels.user_id FROM #{CommunicationChannel.quoted_table_name}
+          WHERE EXISTS (SELECT 1 FROM #{UserAccountAssociation.quoted_table_name} AS uaa
+                        WHERE uaa.account_id= :account
+                          AND uaa.user_id=communication_channels.user_id)
+            AND communication_channels.path_type = :path_type
             AND #{like_condition('communication_channels.path')}
             AND communication_channels.workflow_state IN ('active', 'unconfirmed')
       )
