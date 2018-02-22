@@ -17,7 +17,6 @@
 #
 
 # @API Content Exports
-# @beta
 #
 # API for exporting courses and course content
 #
