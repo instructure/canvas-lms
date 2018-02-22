@@ -29,7 +29,7 @@ describe SisBatch do
     Delayed::Job.where("tag ilike 'sis'")
   end
 
-  def create_csv_data(data)
+  def create_csv_data(data, add_empty_file: false)
     i = 0
     Dir.mktmpdir("sis_rspec") do |tmpdir|
       path = "#{tmpdir}/sisfile.zip"
@@ -38,6 +38,7 @@ describe SisBatch do
           z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
           i += 1
         end
+        z.get_output_stream("csv_#{i}.csv") {} if add_empty_file
       end
 
       batch = File.open(path, 'rb') do |tmp|
@@ -65,8 +66,9 @@ describe SisBatch do
   end
 
   it 'should make file per zip file member' do
-    batch = process_csv_data([%{course_id,short_name,long_name,account_id,term_id,status},
-                              %{course_id,user_id,role,status,section_id}])
+    batch = create_csv_data([%{course_id,short_name,long_name,account_id,term_id,status},
+                             %{course_id,user_id,role,status,section_id}], add_empty_file: true)
+    batch.process_without_send_later
     # 1 zip file and 2 csv files
     atts = Attachment.where(context: batch)
     expect(atts.count).to eq 3
@@ -488,6 +490,20 @@ s2,test_1,section2,active},
   end
 
   context "with csv diffing" do
+
+    it 'should not fail for empty diff file' do
+      batch0 = create_csv_data([%{user_id,login_id,status}], add_empty_file: true)
+      batch0.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch0.process_without_send_later
+      batch1 = create_csv_data([%{user_id,login_id,status}], add_empty_file: true)
+      batch1.update_attributes(diffing_data_set_identifier: 'default', options: {diffing_drop_status: 'completed'})
+      batch1.process_without_send_later
+
+      zip = Zip::File.open(batch1.generated_diff.open.path)
+      expect(zip.glob('*.csv').first.get_input_stream.read).to eq(%{user_id,login_id,status\n})
+      expect(batch1.workflow_state).to eq 'imported'
+    end
+
     describe 'diffing_drop_status' do
       before :once do
         process_csv_data(
