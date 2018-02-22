@@ -789,7 +789,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   # @API Set a course timetable
-  # @beta
   #
   # Creates and updates "timetable" events for a course.
   # Can automaticaly generate a series of calendar events based on simple schedules
@@ -869,7 +868,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   # @API Get course timetable
-  # @beta
   #
   # Returns the last timetable set by the
   # {api:CalendarEventsApiController#set_course_timetable Set a course timetable} endpoint
@@ -883,7 +881,6 @@ class CalendarEventsApiController < ApplicationController
   end
 
   # @API Create or update events directly for a course timetable
-  # @beta
   #
   # Creates and updates "timetable" events for a course or course section.
   # Similar to {api:CalendarEventsApiController#set_course_timetable setting a course timetable},
