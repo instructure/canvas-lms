@@ -135,6 +135,24 @@ describe Api::V1::Course do
       expect(json['total_students']).to eq 1
     end
 
+    it "counts students with multiple enrollments once in 'total students'" do
+      section = @course2.course_sections.create! name: 'other section'
+      @course2.enroll_student @student, section: section, allow_multiple_enrollments: true
+      expect(@course2.student_enrollments.count).to eq 2
+
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
+    end
+
+    it "excludes the student view student in 'total students'" do
+      @course2.student_view_student
+      json = @test_api.course_json(@course2, @me, {}, ['total_students'], [])
+
+      expect(json).to include('total_students')
+      expect(json['total_students']).to eq 1
+    end
+
     it "includes the course nickname if one is set" do
       @me.course_nicknames[@course1.id] = 'nickname'
       json = @test_api.course_json(@course1, @me, {}, [], [])
@@ -518,6 +536,7 @@ describe CoursesController, type: :request do
 
         it "returns 200 success" do
           api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course.id] })
+          expect(response).to be_success
         end
       end
 
