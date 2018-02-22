@@ -270,6 +270,7 @@ module QuizzesCommon
 
   def click_questions_tab
     wait_for_ajaximations
+    dismiss_flash_messages_if_present
     f("a[href='#questions_tab']").click
   end
 
