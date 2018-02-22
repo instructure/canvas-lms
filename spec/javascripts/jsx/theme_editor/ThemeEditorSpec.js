@@ -19,6 +19,7 @@
 import React from 'react'
 import ThemeEditor from 'jsx/theme_editor/ThemeEditor'
 import {shallow} from 'enzyme'
+import {fromPairs} from 'lodash'
 
 QUnit.module('Theme Editor')
 
@@ -208,5 +209,21 @@ test('handleThemeStateChange removes files from the store when opts.resetValue i
       'ic-brand-favicon': '/images/favicon.ico'
     },
     files: []
+  })
+})
+
+test('processThemeStoreForSubmit puts the themeStore into a FormData and returns it', () => {
+  const wrapper = shallow(<ThemeEditor {...testProps} />)
+  const fileValue = new File(['foo'], 'foo.png')
+  wrapper.instance().handleThemeStateChange('ic-brand-favicon', fileValue)
+  wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', 'black')
+  const formData = wrapper.instance().processThemeStoreForSubmit()
+  const formObj = fromPairs(Array.from(formData.entries()))
+  deepEqual(formObj, {
+    'brand_config[variables][ic-brand-font-color-dark]': 'black',
+    'brand_config[variables][ic-brand-global-nav-bgd]': '#394B58',
+    'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
+    'brand_config[variables][ic-brand-primary]': 'green',
+    'brand_config[variables][ic-brand-favicon]': fileValue
   })
 })

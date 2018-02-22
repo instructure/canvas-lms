@@ -178,7 +178,6 @@ export default class ThemeEditor extends React.Component {
     }
 
     if (opts.resetValue) {
-      console.log(this.originalThemeProperties)
       properties = {
         ...properties,
         ...{[key]: this.originalThemeProperties[key]}
@@ -241,6 +240,25 @@ export default class ThemeEditor extends React.Component {
     )
   }
 
+  /**
+   * Takes the themeStore state object and appends it to a FormData object
+   * in preparation for sending to the server.
+   *
+   * @returns FormData
+   * @memberof ThemeEditor
+   */
+  processThemeStoreForSubmit() {
+    const processedData = new FormData()
+    const {properties, files} = this.state.themeStore
+    Object.keys(properties).forEach(k => {
+      processedData.append(`brand_config[variables][${k}]`, properties[k])
+    })
+    files.forEach(f => {
+      processedData.append(`brand_config[variables][${f.variable_name}]`, f.value)
+    })
+    return processedData
+  }
+
   handleFormSubmit = () => {
     let newMd5
 
@@ -249,7 +267,9 @@ export default class ThemeEditor extends React.Component {
     $.ajax({
       url: `/accounts/${this.props.accountID}/brand_configs`,
       type: 'POST',
-      data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
+      data: this.props.refactorEnabled
+        ? this.processThemeStoreForSubmit()
+        : new FormData(this.ThemeEditorForm),
       processData: false,
       contentType: false,
       dataType: 'json'
@@ -436,7 +456,7 @@ export default class ThemeEditor extends React.Component {
           </div>
         )}
         <form
-          ref="ThemeEditorForm"
+          ref={c => (this.ThemeEditorForm = c)}
           onSubmit={preventDefault(this.handleFormSubmit)}
           encType="multipart/form-data"
           acceptCharset="UTF-8"
