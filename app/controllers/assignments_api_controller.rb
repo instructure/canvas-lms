@@ -900,7 +900,6 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[assignment_overrides][] [AssignmentOverride]
   #   List of overrides for the assignment.
-  #   NOTE: The assignment overrides feature is in beta.
   #
   # @argument assignment[only_visible_to_overrides] [Boolean]
   #   Whether this assignment is only visible to overrides
@@ -1054,7 +1053,6 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[assignment_overrides][] [AssignmentOverride]
   #   List of overrides for the assignment.
-  #   NOTE: The assignment overrides feature is in beta.
   #
   # @argument assignment[only_visible_to_overrides] [Boolean]
   #   Whether this assignment is only visible to overrides
@@ -1073,8 +1071,6 @@ class AssignmentsApiController < ApplicationController
   # overrides are kept as is. If the assignment [assignment_overrides] key is
   # present, existing overrides are updated or deleted (and new ones created,
   # as necessary) to match the provided list.
-  #
-  # NOTE: The assignment overrides feature is in beta.
   #
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
