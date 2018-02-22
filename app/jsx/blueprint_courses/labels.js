@@ -20,6 +20,7 @@ import I18n from 'i18n!blueprint_settings'
 
 const itemTypeLabels = {
   assignment: I18n.t('Assignment'),
+  assignment_group: I18n.t('Assignment Group'),
   quiz: I18n.t('Quiz'),
   discussion_topic: I18n.t('Discussion'),
   wiki_page: I18n.t('Page'),

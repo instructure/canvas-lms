@@ -1498,6 +1498,33 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.linked_learning_outcomes.to_a).to eq [@acc_outcome]
     end
 
+    it "doesn't clear assignment group rules on a selective sync" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      ag = @copy_from.assignment_groups.create!(:name => "group")
+      a = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => ag.id)
+      ag.update_attribute(:rules, "drop_lowest:1\nnever_drop:#{a.id}\n")
+
+      run_master_migration
+
+      ag_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag)).first
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+
+      Timecop.freeze(30.seconds.from_now) do
+        ag.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{a.id}\n")
+      end
+
+      run_master_migration
+      expect(ag_to.reload.rules).to eq "drop_lowest:2\nnever_drop:#{a_to.id}\n"
+
+      Timecop.freeze(60.seconds.from_now) do
+        ag.update_attribute(:rules, "never_drop:#{a.id}\n")
+      end
+      run_master_migration
+      expect(ag_to.reload.rules).to eq nil # set to empty if there are no dropping rules
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")
