@@ -29,20 +29,20 @@
 .pinned-discussions-v2__wrapper {
   padding: 10px;
   border: 1px solid $ic-border-color;
+  border-bottom: 0px;
   background-color: #f9f9f9;
 }
 
 .closed-for-comments-discussions-v2__wrapper {
   padding: 10px;
   border: 1px solid $ic-border-color;
-  border-top: 0px;
   background-color: #f9f9f9;
 }
 
 .unpinned-discussions-v2__wrapper{
   padding: 10px;
   border: 1px solid $ic-border-color;
-  border-top: 0px;
+  border-bottom: 0px;
   background-color: #f9f9f9;
 }
 

@@ -37,9 +37,9 @@ export function getDiscussions ({ contextType, contextId, discussions }, { page 
   return axios.get(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
 }
 
-export function updateDiscussion ({ contextType, contextId }, discussion, pinnedState, closedState) {
+export function updateDiscussion ({ contextType, contextId }, discussion, updatedFields) {
   const url = `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussion.id}`
-  return axios.put(url, { pinned: pinnedState, locked: closedState })
+  return axios.put(url, updatedFields)
 }
 
 export function subscribeToTopic ({ contextType, contextId }, { id }) {

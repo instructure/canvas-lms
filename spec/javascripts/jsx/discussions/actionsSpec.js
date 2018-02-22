@@ -38,109 +38,220 @@ QUnit.module('Discussions redux actions', {
   }
 })
 
-test('togglePin dispatches TOGGLE_PIN_START if we try to pin discussion', () => {
+test('updateDiscussion dispatches UPDATE_DISCUSSION_START', () => {
   const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
   const discussion = { pinned: false, locked: false }
+  const updateFields = { pinned: true }
   const dispatchSpy = sinon.spy()
-  actions.togglePin({pinnedState: true, discussion, closedState: false})(dispatchSpy, () => state)
+  actions.updateDiscussion(discussion, updateFields, {})(dispatchSpy, () => state)
   const expected = [
     {
-      "payload": {
-        "closedState": false,
-        "discussion": {
-          "locked": false,
-          "pinned": true
+      payload: {
+        discussion: {
+          locked: false,
+          pinned: true
         },
-        "pinnedState": true
       },
-      "type": "TOGGLE_PIN_START"
+      type: "UPDATE_DISCUSSION_START"
     }
   ]
   deepEqual(dispatchSpy.firstCall.args, expected)
 })
 
-test('togglePin will not dispatch TOGGLE_PIN_START if pinned and we pin it again', () => {
+test('updateDiscussion calls apiClient.updateDiscussion', () => {
   const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
-  const discussion = { pinned: true, locked: false }
+  const discussion = { pinned: true, locked: true}
+  const updateFields = {pinned: false}
   const dispatchSpy = sinon.spy()
-  actions.togglePin({pinnedState: true, discussion, closedState: false})(dispatchSpy, () => state)
-  equal(dispatchSpy.callCount, 0)
+
+  mockSuccess('updateDiscussion', {})
+  actions.updateDiscussion(discussion, updateFields, {})(dispatchSpy, () => state)
+  deepEqual(apiClient.updateDiscussion.firstCall.args[1], discussion)
+  deepEqual(apiClient.updateDiscussion.firstCall.args[2], updateFields)
 })
 
-test('closeForComments dispatches CLOSE_FOR_COMMENTS_START if we lock discussion', () => {
+test('updateDiscussion dispatches UPDATE_DISCUSSION_FAIL if promise fails', (assert) => {
+  const done = assert.async()
   const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
   const discussion = { pinned: true, locked: false}
+  const updateFields = {locked: true}
   const dispatchSpy = sinon.spy()
-  actions.closeForComments({pinnedState: true, discussion, closedState: true})(dispatchSpy, () => state)
-  const expected = [
-    {
-      "payload": {
-        "closedState": true,
-        "discussion": {
-          "locked": true,
-          "pinned": true
+
+  mockFail('updateDiscussion', 'something bad happened')
+  actions.updateDiscussion(discussion, updateFields, {})(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    const expected = [
+      {
+        payload: {
+          discussion: {
+            locked: false,
+            pinned: true
+          },
+        err: "something bad happened",
+        message: "Updating discussion failed"
         },
-        "pinnedState": true
-      },
-      "type": "CLOSE_FOR_COMMENTS_START"
-    }
-  ]
-  deepEqual(dispatchSpy.firstCall.args, expected)
-})
-
-test('closeForComments will not dispatch CLOSE_FOR_COMMENTS_START if discussion is already locked', () => {
-  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
-  const discussion = { pinned: true, locked: true}
-  const dispatchSpy = sinon.spy()
-  actions.closeForComments({pinnedState: true, discussion, closedState: true})(dispatchSpy, () => state)
-  equal(dispatchSpy.callCount, 0)
-})
-
-test('togglePin calls apiClient.updateDiscussion with passed in discussion when pinning discussion', () => {
-  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
-  const discussion = { pinned: true, locked: true}
-  const dispatchSpy = sinon.spy()
-  mockSuccess('updateDiscussion', { successes: [], failures: [] })
-  actions.togglePin({pinnedState:false, discussion, closedState: true})(dispatchSpy, () => state)
-  deepEqual(apiClient.updateDiscussion.firstCall.args[1], discussion)
-})
-
-test('closeForComments calls apiClient.updateDiscussion with passed in discussion when locking discussion', () => {
-  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
-  const discussion = { pinned: true, locked: false}
-  const dispatchSpy = sinon.spy()
-  mockSuccess('updateDiscussion', { successes: [], failures: [] })
-  actions.closeForComments({pinnedState:true, discussion, closedState: true})(dispatchSpy, () => state)
-  deepEqual(apiClient.updateDiscussion.firstCall.args[1], discussion)
-})
-
-test('togglePin dispatches TOGGLE_PIN_FAIL if promise fails', (assert) => {
-  const done = assert.async()
-  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
-  const discussion = { pinned: true, locked: false}
-  const dispatchSpy = sinon.spy()
-
-  mockFail('updateDiscussion', { err: 'something bad happened' })
-  actions.togglePin({pinnedState:true, discussion, closedState: true})(dispatchSpy, () => state)
-
-  setTimeout(() => {
-    equal(dispatchSpy.secondCall.args[0].type, 'TOGGLE_PIN_FAIL')
+        type: "UPDATE_DISCUSSION_FAIL"
+      }
+    ]
+    deepEqual(dispatchSpy.secondCall.args, expected)
     done()
   })
 })
 
-test('closeForComments dispatches CLOSE_FOR_COMMENTS_FAIL if promise fails', (assert) => {
+test('updateDiscussion calls screenReaderFlash if successful and success message present', (assert) => {
   const done = assert.async()
   const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
   const discussion = { pinned: true, locked: false}
+  const updateFields = {locked: true}
+  const flashMessages = { successMessage: 'success message' }
   const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
 
-  mockFail('updateDiscussion', { err: 'something bad happened' })
-  actions.closeForComments({pinnedState:true, discussion, closedState: true})(dispatchSpy, () => state)
+  mockSuccess('updateDiscussion', {})
+  actions.updateDiscussion(discussion, updateFields, flashMessages)(dispatchSpy, () => state)
 
   setTimeout(() => {
-    equal(dispatchSpy.secondCall.args[0].type, 'CLOSE_FOR_COMMENTS_FAIL')
+    deepEqual(flashStub.firstCall.args, ["success message"])
+    flashStub.restore()
     done()
   })
 })
 
+
+test('updateDiscussion does not call screenReaderFlash if successful and no success message present', (assert) => {
+  const done = assert.async()
+  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
+  const discussion = { pinned: true, locked: false}
+  const updateFields = {locked: true}
+  const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
+
+  mockSuccess('updateDiscussion', {})
+  actions.updateDiscussion(discussion, updateFields, {})(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    equal(flashStub.callCount, 0)
+    flashStub.restore()
+    done()
+  })
+})
+
+test('updateDiscussion calls screenReaderFlash if unsuccessful with custom flash message', (assert) => {
+  const done = assert.async()
+  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
+  const discussion = { pinned: true, locked: false}
+  const updateFields = {locked: true}
+  const flashMessages = { failMessage: 'fail message' }
+  const dispatchSpy = sinon.spy()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessage')
+
+  mockFail('updateDiscussion', 'badness occurres')
+  actions.updateDiscussion(discussion, updateFields, flashMessages)(dispatchSpy, () => state)
+
+  setTimeout(() => {
+    deepEqual(flashStub.firstCall.args, ["fail message"])
+    flashStub.restore()
+    done()
+  })
+})
+
+test('updateDiscussion throws exception if updating a field that does not exist on the discussion', (assert) => {
+  const state = { discussions: { pages: { 1: { items: [] } }, currentPage: 1 } }
+  const discussion = { pinned: true, locked: false}
+  const updateFields = {foobar: true}
+  const dispatchSpy = sinon.spy()
+
+  assert.throws(
+    function() {
+      actions.updateDiscussion(discussion, updateFields, {})(dispatchSpy, () => state)
+    },
+    "field foobar does not exist in the discussion"
+  )
+})
+
+QUnit.module('Discussion toggleSubscriptionState actions', {
+  setup () {
+    this.dispatchSpy = sinon.spy()
+    this.getState = () => ({foo: 'bar'})
+  },
+
+  teardown () {
+    if (sandbox) sandbox.restore()
+    sandbox = null
+  }
+})
+
+test('does not call the API if the discussion has a subscription_hold', function() {
+  const discussion = { subscription_hold: 'test hold' }
+  actions.toggleSubscriptionState(discussion)(this.dispatchSpy, this.getState)
+  equal(this.dispatchSpy.callCount, 0)
+})
+
+test('calls unsubscribeFromTopic if the discussion is currently subscribed', function() {
+  const discussion = { id: 1, subscribed: true }
+  mockSuccess('unsubscribeFromTopic', {})
+  actions.toggleSubscriptionState(discussion)(this.dispatchSpy, this.getState)
+  equal(apiClient.unsubscribeFromTopic.callCount, 1)
+  deepEqual(apiClient.unsubscribeFromTopic.firstCall.args, [this.getState(), discussion])
+})
+
+test('calls subscribeToTopic if the discussion is currently unsubscribed', function() {
+  const discussion = { id: 1, subscribed: false }
+  mockSuccess('subscribeToTopic', {})
+  actions.toggleSubscriptionState(discussion)(this.dispatchSpy, this.getState)
+  equal(apiClient.subscribeToTopic.callCount, 1)
+  deepEqual(apiClient.subscribeToTopic.firstCall.args, [this.getState(), discussion])
+})
+
+test('dispatches toggleSubscribeSuccess with unsubscription status if currently subscribed', function(assert) {
+  const done = assert.async()
+  const discussion = { id: 1, subscribed: true }
+  mockSuccess('unsubscribeFromTopic', {})
+  actions.toggleSubscriptionState(discussion)(this.dispatchSpy, this.getState)
+
+  setTimeout(() => {
+    const expectedArgs = [{
+      payload: { id: 1, subscribed: false },
+      type: "TOGGLE_SUBSCRIBE_SUCCESS"
+    }]
+    deepEqual(this.dispatchSpy.secondCall.args, expectedArgs)
+    done()
+  })
+})
+
+test('dispatches toggleSubscribeSuccess with subscription status if currently unsubscribed', function(assert) {
+  const done = assert.async()
+  const discussion = { id: 1, subscribed: false }
+  mockSuccess('subscribeToTopic', {})
+  actions.toggleSubscriptionState(discussion)(this.dispatchSpy, this.getState)
+
+  setTimeout(() => {
+    const expectedArgs = [{
+      payload: { id: 1, subscribed: true },
+      type: "TOGGLE_SUBSCRIBE_SUCCESS"
+    }]
+    deepEqual(this.dispatchSpy.secondCall.args, expectedArgs)
+    done()
+  })
+})
+
+test('dispatches toggleSubscribeFail in an error occures on the API call', function(assert) {
+  const done = assert.async()
+  const flashStub = sinon.spy($, 'screenReaderFlashMessageExclusive')
+  const discussion = { id: 1, subscribed: false }
+
+  mockFail('subscribeToTopic', "test error message")
+  actions.toggleSubscriptionState(discussion)(this.dispatchSpy, this.getState)
+
+  setTimeout(() => {
+    const expectedArgs = [{
+      payload: { message: 'Subscribe failed', err: "test error message" },
+      type: "TOGGLE_SUBSCRIBE_FAIL"
+    }]
+    deepEqual(this.dispatchSpy.secondCall.args, expectedArgs)
+    deepEqual(flashStub.firstCall.args, ["Subscribe failed"]);
+    flashStub.restore()
+    done()
+  })
+})

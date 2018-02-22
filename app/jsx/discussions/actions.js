@@ -34,77 +34,59 @@ const discussionActions = createPaginationActions('discussions', fetchDiscussion
 
 const types = [
   ...discussionActions.actionTypes,
-  'TOGGLE_PIN_START',
-  'TOGGLE_PIN_SUCCESS',
-  'TOGGLE_PIN_FAIL',
-  'CLOSE_FOR_COMMENTS_START',
-  'CLOSE_FOR_COMMENTS_SUCCESS',
-  'CLOSE_FOR_COMMENTS_FAIL',
   'TOGGLE_SUBSCRIBE_START',
   'TOGGLE_SUBSCRIBE_SUCCESS',
-  'TOGGLE_SUBSCRIBE_FAIL'
+  'TOGGLE_SUBSCRIBE_FAIL',
+  'UPDATE_DISCUSSION_START',
+  'UPDATE_DISCUSSION_SUCCESS',
+  'UPDATE_DISCUSSION_FAIL',
 ]
 const actions = Object.assign(
   createActions(...types),
   discussionActions.actionCreators,
 )
 
-actions.togglePin = function ({pinnedState, discussion, closedState}) {
-  return (dispatch, getState) => {
-    if( pinnedState !== discussion.pinned || discussion.locked !== closedState) {
-      const discussionCopy = Object.assign({}, discussion);
-      discussionCopy.pinned = pinnedState
-      discussionCopy.locked = false
-      dispatch(actions.togglePinStart({discussion: discussionCopy, pinnedState, closedState}))
-      apiClient.updateDiscussion(getState(), discussion, pinnedState, closedState)
-        .then(_ => {
-          dispatch(actions.togglePinSuccess())
-            const successMessage = pinnedState ? I18n.t('Discussion pinned successfully') : I18n.t('Discussion unpinned successfully')
-            $.screenReaderFlashMessage(successMessage)
-        })
-        .catch((err) => {
-          const failMessage = pinnedState ? I18n.t('Failed to pin discussion') : I18n.t('Failed to unpin discussion')
-          $.screenReaderFlashMessage(failMessage)
-          dispatch(actions.togglePinFail({
-            discussion,
-            closedState,
-            pinnedState,
-            message: failMessage,
-            err
-          }))
-        })
+function copyAndUpdateDiscussion(discussion, updatedFields) {
+  const discussionCopy = Object.assign({}, discussion);
+  Object.keys(updatedFields).forEach(key => {
+    if (!Object.prototype.hasOwnProperty.call(discussion, key)) {
+      throw new Error(`field ${key} does not exist in the discussion`)
     }
-  }
+    discussionCopy[key] = updatedFields[key]
+  })
+  return discussionCopy
 }
 
-actions.closeForComments = function ({closedState, discussion, pinnedState}) {
+const defaultFailMessage = I18n.t('Updating discussion failed')
+
+// We are assuming success here (mostly for the sake of drag and drop, where
+// it would look really awkward to drop it, have it snap back to the original
+// position, and then snap to the new position shortly after).
+actions.updateDiscussion = function(discussion, updatedFields, { successMessage, failMessage }) {
   return (dispatch, getState) => {
-    if( closedState !== discussion.locked) {
-      const discussionCopy = Object.assign({}, discussion);
-      discussionCopy.pinned = pinnedState
-      discussionCopy.locked = closedState
-      dispatch(actions.closeForCommentsStart({discussion: discussionCopy, closedState, pinnedState}))
-      apiClient.updateDiscussion(getState(), discussion, pinnedState, closedState)
-        .then(_ => {
-          dispatch(actions.closeForCommentsSuccess())
-          const successMessage = I18n.t('Discussion closed for comments successfully')
+    const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields)
+    dispatch(actions.updateDiscussionStart({discussion: discussionCopy}))
+
+    apiClient.updateDiscussion(getState(), discussion, updatedFields)
+      .then(_ => {
+        dispatch(actions.updateDiscussionSuccess())
+        if (successMessage) {
           $.screenReaderFlashMessage(successMessage)
-        })
-        .catch((err) => {
-          const failMessage = I18n.t('Failed to close discussion for comments')
-          $.screenReaderFlashMessage(failMessage)
-          dispatch(actions.closeForCommentsFail({
-            discussion,
-            closedState,
-            pinnedState,
-            message: failMessage,
-            err
-          }))
-        })
-    }
+        }
+      })
+      .catch(err => {
+        $.screenReaderFlashMessage(failMessage || defaultFailMessage)
+        dispatch(actions.updateDiscussionFail({
+          message: failMessage || defaultFailMessage,
+          discussion,
+          err
+        }))
+      })
   }
 }
 
+// This is a different action then the update discussion because it hits an
+// entirely different endpoint on the backend.
 actions.toggleSubscriptionState = function(discussion) {
   return (dispatch, getState) => {
     if (discussion.subscription_hold === undefined) {

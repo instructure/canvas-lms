@@ -41,7 +41,7 @@ import DRAG_AND_DROP_ROLES from '../../shared/DragAndDropRoles'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
-    closeForComments: func.isRequired,
+    updateDiscussion: func.isRequired,
     closedForCommentsDiscussions: discussionList,
     getDiscussions: func.isRequired,
     hasLoadedDiscussions: bool.isRequired,
@@ -50,7 +50,6 @@ export default class DiscussionsIndex extends Component {
     permissions: propTypes.permissions.isRequired,
     pinnedDiscussions: discussionList,
     roles: arrayOf(string).isRequired,
-    togglePin: func.isRequired,
     toggleSubscriptionState: func.isRequired,
     unpinnedDiscussions: discussionList,
   }
@@ -88,13 +87,28 @@ export default class DiscussionsIndex extends Component {
   renderStudentView () {
     return (
       <Container margin="medium">
-        <div className="pinned-discussions-v2__wrapper">
+        {this.props.pinnedDiscussions.length
+          ? (
+              <div className="pinned-discussions-v2__wrapper">
+                <DiscussionsContainer
+                  title={I18n.t("Pinned Discussions")}
+                  discussions={this.props.pinnedDiscussions}
+                  permissions={this.props.permissions}
+                  masterCourseData={this.props.masterCourseData}
+                  roles={this.props.roles}
+                />
+              </div>
+            )
+          : null
+        }
+        <div className="unpinned-discussions-v2__wrapper">
           <DiscussionsContainer
-            title={I18n.t("Pinned Discussions")}
-            discussions={this.props.pinnedDiscussions}
+            title={I18n.t("Discussions")}
+            discussions={this.props.unpinnedDiscussions}
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
+            updateDiscussion={this.props.updateDiscussion}
             roles={this.props.roles}
           />
         </div>
@@ -121,10 +135,9 @@ export default class DiscussionsIndex extends Component {
           discussions={this.props.pinnedDiscussions}
           permissions={this.props.permissions}
           masterCourseData={this.props.masterCourseData}
-          togglePin={this.props.togglePin}
           toggleSubscribe={this.props.toggleSubscriptionState}
+          updateDiscussion={this.props.updateDiscussion}
           roles={this.props.roles}
-          closedState={false}
           pinned
         />
       </div>
@@ -134,8 +147,8 @@ export default class DiscussionsIndex extends Component {
           discussions={this.props.unpinnedDiscussions}
           permissions={this.props.permissions}
           masterCourseData={this.props.masterCourseData}
-          togglePin={this.props.togglePin}
           toggleSubscribe={this.props.toggleSubscriptionState}
+          updateDiscussion={this.props.updateDiscussion}
           pinned={false}
           closedState={false}
           roles={this.props.roles}
@@ -148,7 +161,7 @@ export default class DiscussionsIndex extends Component {
             permissions={this.props.permissions}
             masterCourseData={this.props.masterCourseData}
             toggleSubscribe={this.props.toggleSubscriptionState}
-            closeForComments={this.props.closeForComments}
+            updateDiscussion={this.props.updateDiscussion}
             roles={this.props.roles}
             pinned={false}
             closedState
@@ -183,7 +196,6 @@ const connectState = state => Object.assign({
 ))
 const connectActions = dispatch => bindActionCreators(
   select(actions, ['getDiscussions',
-                   'closeForComments',
-                   'togglePin',
-                   'toggleSubscriptionState']), dispatch)
+                   'toggleSubscriptionState',
+                   'updateDiscussion']), dispatch)
 export const ConnectedDiscussionsIndex = DragDropContext(HTML5Backend)(connect(connectState, connectActions)(DiscussionsIndex))

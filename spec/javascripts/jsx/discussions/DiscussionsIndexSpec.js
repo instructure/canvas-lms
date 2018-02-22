@@ -57,8 +57,18 @@ test('calls getDiscussions if hasLoadedDiscussions is false', () => {
   equal(props.getDiscussions.callCount, 1)
 })
 
-test('renders two discussion containers when student', () => {
+test('only renders pinned discussions in studentView if there are pinned discussions', () => {
   const props = defaultProps()
+  props.pinnedDiscussions = [{id: '1'}]
+  props.closedForCommentsDiscussions = []
+  const tree = shallow(<DiscussionsIndex {...props} />)
+  const node = tree.find('DiscussionsContainer')
+  equal(node.length, 3)
+})
+
+test('does not renders pinned discussions in studentView if there are no pinned discussions', () => {
+  const props = defaultProps()
+  props.closedForCommentsDiscussions = []
   const tree = shallow(<DiscussionsIndex {...props} />)
   const node = tree.find('DiscussionsContainer')
   equal(node.length, 2)

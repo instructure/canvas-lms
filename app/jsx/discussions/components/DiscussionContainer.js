@@ -19,6 +19,7 @@
 import React, { Component } from 'react'
 import { DropTarget } from 'react-dnd';
 import { string, func, bool, arrayOf } from 'prop-types'
+import I18n from 'i18n!discussions_v2'
 
 import ToggleDetails from '@instructure/ui-core/lib/components/ToggleDetails'
 import Text from '@instructure/ui-core/lib/components/Text'
@@ -29,14 +30,43 @@ import masterCourseDataShape from '../../shared/proptypes/masterCourseData'
 import propTypes from '../propTypes'
 import DRAG_AND_DROP_ROLES from '../../shared/DragAndDropRoles'
 
+// We need to look at the previous state of a discussion as well as where it is
+// trying to be drag and dropped into in order to create a decent screenreader
+// success and fail message
+const generateDragAndDropMessages = (props, discussion) => {
+  if (props.pinned) {
+    return {
+      successMessage: I18n.t('Discussion pinned successfully'),
+      failMessage: I18n.t('Failed to pin discussion'),
+    }
+  } else if (discussion.pinned) {
+    return {
+      successMessage: I18n.t('Discussion unpinned successfully'),
+      failMessage: I18n.t('Failed to unpin discussion'),
+    }
+  } else if (props.closedState) {
+    return {
+      successMessage: I18n.t('Discussion opened for comments successfully'),
+      failMessage: I18n.t('Failed to open discussion for comments'),
+    }
+  } else {
+    return {
+      successMessage: I18n.t('Discussion closed for comments successfully'),
+      failMessage: I18n.t('Failed to close discussion for comments'),
+    }
+  }
+}
+
+// Handle drag and drop on a discussion. The props passed in tell us how we
+// should update the discussion if something is dragged into this container
 const discussionTarget = {
   drop(props, monitor) {
-    monitor.getItem()
-    if (props.togglePin) {
-      props.togglePin({discussion: monitor.getItem(), pinnedState: props.pinned, closedState: props.closedState})
-    } else {
-      props.closeForComments({discussion: monitor.getItem(), closedState: props.closedState, pinnedState: props.pinned})
-    }
+    const discussion = monitor.getItem()
+    const updateFields = {}
+    if (props.closedState !== undefined) updateFields.locked = props.closedState
+    if (props.pinned !== undefined) updateFields.pinned =  props.pinned
+    const flashMessages = generateDragAndDropMessages(props, discussion)
+    props.updateDiscussion(discussion, updateFields, flashMessages)
   },
 }
 
@@ -48,9 +78,8 @@ export default class DiscussionsContainer extends Component {
     permissions: propTypes.permissions.isRequired,
     masterCourseData: masterCourseDataShape,
     title: string.isRequired,
-    togglePin: func,
     toggleSubscribe: func.isRequired,
-    closeForComments: func,
+    updateDiscussion: func.isRequired,
     pinned: bool,
     closedState: bool,
     connectDropTarget: func,
@@ -60,11 +89,9 @@ export default class DiscussionsContainer extends Component {
   static defaultProps = {
     masterCourseData: null,
     connectDropTarget (component) {return component},
-    pinned: false,
-    closedState: false,
-    togglePin: null,
+    pinned: undefined,
+    closedState: undefined,
     roles: ['user', 'student'],
-    closeForComments: () => {},
   }
 
   renderDiscussions () {
