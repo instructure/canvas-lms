@@ -741,6 +741,7 @@ ActiveRecord::Relation.class_eval do
     limited_query = limit(0).to_sql
     full_query = "COPY (#{to_sql}) TO STDOUT"
     conn = connection
+    full_query = conn.annotate_sql(full_query) if defined?(Marginalia)
     pool = conn.pool
     # remove the connection from the pool so that any queries executed
     # while we're running this will get a new connection
