@@ -17,7 +17,6 @@
 
 module Polling
   # @API PollSubmissions
-  # @beta
   # Manage submissions for polls
   #
   # @model PollSubmission
@@ -57,7 +56,6 @@ module Polling
     before_action :require_poll_session
 
     # @API Get a single poll submission
-    # @beta
     #
     # Returns the poll submission with the given id
     #
@@ -74,7 +72,6 @@ module Polling
     end
 
     # @API Create a single poll submission
-    # @beta
     #
     # Create a new poll submission for this poll session
     #

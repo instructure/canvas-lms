@@ -17,7 +17,6 @@
 
 module Polling
   # @API Poll Sessions
-  # @beta
   # Manage poll sessions
   #
   # @model PollSession
@@ -80,7 +79,6 @@ module Polling
     before_action :require_poll, except: [:opened, :closed]
 
     # @API List poll sessions for a poll
-    # @beta
     #
     # Returns the paginated list of PollSessions in this poll.
     #
@@ -99,7 +97,6 @@ module Polling
     end
 
     # @API Get the results for a single poll session
-    # @beta
     #
     # Returns the poll session with the given id
     #
@@ -117,7 +114,6 @@ module Polling
     end
 
     # @API Create a single poll session
-    # @beta
     #
     # Create a new poll session for this poll
     #
@@ -163,7 +159,6 @@ module Polling
     end
 
     # @API Update a single poll session
-    # @beta
     #
     # Update an existing poll session for this poll
     #
@@ -193,7 +188,6 @@ module Polling
     end
 
     # @API Delete a poll session
-    # @beta
     #
     # <b>204 No Content</b> response code is returned if the deletion was successful.
     def destroy
@@ -206,7 +200,6 @@ module Polling
     end
 
     # @API Open a poll session
-    # @beta
     #
     # @example_response
     #   {
@@ -223,7 +216,6 @@ module Polling
     end
 
     # @API Close an opened poll session
-    # @beta
     #
     # @example_response
     #   {
@@ -240,7 +232,6 @@ module Polling
     end
 
     # @API List opened poll sessions
-    # @beta
     #
     # A paginated list of all opened poll sessions available to the current user.
     #
@@ -256,7 +247,6 @@ module Polling
     end
 
     # @API List closed poll sessions
-    # @beta
     #
     # A paginated list of all closed poll sessions available to the current user.
     #
