@@ -561,7 +561,7 @@ class BzController < ApplicationController
         magic_field_total_weight = magic_field_counts[0]
         graded_checkboxes_that_are_supposed_to_be_empty_weight = magic_field_counts[1]
 
-        participation_assignment = bzg.get_participation_assignment
+        participation_assignment = bzg.get_participation_assignment(course, context_module)
         if !participation_assignment.nil?
           internal_response = bzg.get_value_of_user_answer(params[:name], magic_field_counts, participation_assignment, params[:value], DateTime.now, weight, answer, field_type, partial_credit_mode)
 
