@@ -63,10 +63,10 @@ sv:
   a_section_is_required_64103992: "En sektion krävs"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "En SIS-integration är inte konfigurerad, och funktionen aktivera nya SIS-integrationsinställningar är inte aktiverad"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell med namn på betygsystemet och ikoner för redigering eller radering av systemet."
-  a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "En tabell som innehåller namnet på betygsschemat och knapparna för att ändra eller ta bort schemat."
+  a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "En tabell som innehåller namnet på omdömesschemat och knapparna för att ändra eller ta bort schemat."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "En tabell över svar och sammanfattande statistik om studenters svarsalternativ. "
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som innehåller data för betygssystemet. Varje rad innehåller ett namn, ett max. procent, ett min. procent. Varje rad innehåller också en ikon för att lägga till en ny rad under och en ikon för att radera nuvarande rad. "
-  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "En tabell som innehåller data för betygsschema. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
+  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "En tabell som innehåller data för omdömesschema. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   about_this_service_b10bc808: "Om denna tjänst"
@@ -121,7 +121,7 @@ sv:
     tab_courses: Kurser
     tab_developer_keys: Utvecklarnycklar
     tab_faculty_journal: Fakultetsjournal
-    tab_grading_standards: Betygsschema
+    tab_grading_standards: Omdömesschema
     tab_jobs: Jobb
     tab_outcomes: Lärandemål
     tab_permissions: Behörigheter
@@ -423,7 +423,7 @@ sv:
       add_user_button: "Lägg till användare"
       add_user_link: "Ny användare"
       display_name_help: "Det här namnet kommer att visas i diskussioner, meddelanden och kommentarer."
-      full_name_description: "Det här namnet kommer användas av lärare för betygssättning."
+      full_name_description: "Det här namnet kommer användas av lärare för omdömessättning."
       labels: 
         account_id: Underkonto
         course_code: Referenskod
@@ -564,7 +564,7 @@ sv:
         Anonymous: Anonym
         Assignment: Uppgift
         Course: Kurs
-        Grader: Betygsättare
+        Grader: Bedömare
         Student: Student
         To: Till
         date: Datum
@@ -574,7 +574,7 @@ sv:
       logging_content_pane: 
         authentication: "Inloggning / Utloggning -aktivitet"
         course: Kursaktivitet
-        grade_change: "Betyg förändringsaktivitet"
+        grade_change: "Omdöme förändringsaktivitet"
         select_default: "Välj en log-typ"
         select_label: "Välj en log-typ för att söka"
       page_title: "Admin verktyg för %{account}"
@@ -640,7 +640,7 @@ sv:
           filter_online: 
             check_box: "Endast online klasser"
     confirm_delete_user: 
-      confirm_delete: "Är du säker på att du vill radera den här användaren från kontot %{account}? Användarens data kommer att tas bort (inklusive betyg) från alla kurser och grupper. Denna processen kan inte göras ogjord.."
+      confirm_delete: "Är du säker på att du vill radera den här användaren från kontot %{account}? Användarens data kommer att tas bort (inklusive omdöme) från alla kurser och grupper. Denna val kan inte ångras."
       delete_button: "Radera %{user}"
       page_title: "Bekräfta radering"
       title: "Bekräfta radering %{user} från %{account}"
@@ -789,7 +789,7 @@ sv:
       account_reports: 
         default: 
           description: 
-            text: "Den här rapporten visar slutbetyg för alla studenter under en specifik termin. Den färdiga csv filen kommer ha en rad per registrering och visar det nuvarande samt slutbetyget i kursens betygsbok. "
+            text: "Den här rapporten visar summativa omdöme för alla studenter för vald termin. Den färdiga csv filen kommer ha 1st rad per kursregistrering och kommer visa det nuvarande samt summativa omdömet från kursens omdömesbok. "
     group_type: grupp
     include_deleted_parameter: 
       account_reports: 
@@ -1509,8 +1509,8 @@ sv:
   add_feed_49ed1cb2: "Lägg till flöde"
   add_files_to_the_course_da6ffd32: "Lägg till filer i kursen"
   add_folder_ba50d107: "Lägg till mapp"
-  add_grading_period_6f774dc3: "Lägg till betygsperiod"
-  add_grading_scheme_81e23c05: "Lägg till betygsschema"
+  add_grading_period_6f774dc3: "Lägg till omdömesperiod"
+  add_grading_scheme_81e23c05: "Lägg till omdömesschema"
   add_help_menu_links_de9fc34f: "Lägg till hjälpmeny-länkar"
   add_icon_567dbcaa: "lägg till ikon"
   add_link_5c01c1e8: "Lägg till länk"
@@ -1538,7 +1538,7 @@ sv:
   add_review_2fb1590c: "Lägg till omdöme"
   add_rubric_3636d9a6: "Lägg till matris"
   add_section_8b027a1c: "Lägg till sektion"
-  add_set_of_grading_periods_5b4d6e51: "Lägg till ett grupp med betygsperioder"
+  add_set_of_grading_periods_5b4d6e51: "Lägg till ett grupp med omdömesperioder"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Lägg till studenter genom att söka genom namn, kurssektion eller grupp. Efter att texten matats in, navigera till resultatet genom att använda nedåtpilknappen. Välj ett resultat genom att använda Enter-knappen."
   add_students_tas_and_observers_to_your_course_e84692dd: "Lägg till studenter, lärare, och observatörer till din kurs"
   add_students_to_the_course_874be8fb: "Lägg till studenter till kursen"
@@ -1622,9 +1622,9 @@ sv:
       ungraded_count_description: "Fler än %{count} inlämningar har inte bedömts"
       ungraded_count_option: "Ej bedömda inlämningar (Antal)"
       ungraded_count_title: "Antalet inlämningar som inte har bedömts"
-      ungraded_timespan_description: "En inlämning har inte blivit betygsatt på %{count} dagar"
+      ungraded_timespan_description: "En inlämning har inte blivit bedömd på %{count} dagar"
       ungraded_timespan_option: "Ej bedömda inlämningar (Tid)"
-      ungraded_timespan_title: "Dagar som inlämningen inte har blivit bedömd på"
+      ungraded_timespan_title: "Dagar som en inlämning inte har blivit bedömd på"
       usernote_description: "Inga fakultetsjournalsinlägg har lagts till på %{count} dagar"
       usernote_option: "Inga inlägg i fakultetsjournalen"
       usernote_title: "Dagar sedan fakultetsjournalen lades till"
@@ -1646,10 +1646,10 @@ sv:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alla datumfält måste presenteras och formateras korrekt"
   all_day_fb42c4fc: "Hela dagen"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Färdig? Då är det dags att publicera din kurs! Klicka på knappen nedan för att göra det officiellt! Efter publicering kommer användare kunna delta i kursen."
-  all_grading_period_sets_must_have_a_title_799538f: "Alla uppsättningar med betygsperioder måste ha ett namn"
+  all_grading_period_sets_must_have_a_title_799538f: "Alla uppsättningar med omdömesperioder måste ha ett namn"
   all_grading_period_sets_must_have_at_least_one_enr_20b84ba1: "Alla set med bedömningsperioder måste ha minst en inskrivningstermin"
-  all_grading_periods_77974940: "Alla betygsperioder"
-  all_grading_periods_must_have_a_title_a1a38d87: "Alla betygsperioder måste ha en titel"
+  all_grading_periods_77974940: "Alla omdömesperioder"
+  all_grading_periods_must_have_a_title_a1a38d87: "Alla omdömesperioder måste ha en titel"
   all_groups_cea25817: "Alla grupper"
   all_items_a49b66c7: "Alla föremål"
   all_modules_20c9a1c8: "Alla moduler"
@@ -1660,12 +1660,12 @@ sv:
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alla startdatum måste vara före slutdatum"
   all_students_have_taken_the_quiz_b558f8b4: "Alla studenterna har gjort detta quiz"
   all_students_have_taken_the_survey_494f9f42: "Alla studenterna har gjort undersökningen"
-  all_submissions_must_have_a_selected_grade_3a84e5a9: "Alla inlämningar måste ha ett betyg valt."
+  all_submissions_must_have_a_selected_grade_3a84e5a9: "Alla inlämningar måste ha ett omdöme valt."
   all_terms_cd27b0fb: "Alla terminer"
   all_timezones_5e8afa7b: "Alla tidszoner"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Alla vikter måste vara större eller lika med 0"
-  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillåt en moderator att se flera oberoende bedömningar för valda inlämningar"
-  allow_bulk_grade_export_to_sis_e11a6e66: "Tillåt grupp-exportering av betyg till SIS"
+  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillåt en annan kollega att se över flera oberoende bedömningar för valda inlämningar"
+  allow_bulk_grade_export_to_sis_e11a6e66: "Tillåt export av omdömen i Bulk till SIS"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillåt kursinnehåll att visas och laddas ner offline."
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillåt kursbilder att tilldelas till en kurs och användas i kontrollpanelens kort."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Tillåt kursbilder att tilldelas till en kurs och användas i kontrollpanelerna."
@@ -1687,7 +1687,7 @@ sv:
   allowed_attempts_4e229caa: "Tillåtna försök"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillåter att skapa meddelanden för en viss sektion"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Tillåter att skapa diskussioner för en viss sektion"
-  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillåt lärare att markera betygsdata som ska exporteras gruppvis till SIS integrationer."
+  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Låter lärare att markera omdömesdata att exporteras i bulk till SIS integrationer."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillåter duplicering av moduler i Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillåter duplicering av föremål i Canvas"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillåt schemaläggning av återkommande kalender-event"
@@ -1700,18 +1700,18 @@ sv:
   an_error_accurred_selecting_provisional_grades_61b36f64: "Ett fel uppstod vid val av preliminära betyg"
   an_error_occured_please_try_again_e59b65b: "Ett fel uppstod. Vänligen försök igen."
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Ett fel uppstod när temat genererades, vänligen försök igen."
-  an_error_occured_while_deleting_the_grading_period_81bb16e5: "Ett fel uppstod när uppsättningen med betygsperioden togs bort"
-  an_error_occured_while_deleting_the_grading_period_c8343484: "Ett fel uppstod när betygsperioden togs bort"
+  an_error_occured_while_deleting_the_grading_period_81bb16e5: "Ett fel uppstod när uppsättningen med omdömesperioden togs bort"
+  an_error_occured_while_deleting_the_grading_period_c8343484: "Ett fel uppstod när omdömesperioden togs bort"
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Ett fel uppstod när registrerings villkoren hämtades"
-  an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Ett fel uppstod när uppsättningen med betygsperioden hämtades"
-  an_error_occured_while_updating_the_grading_period_9e024cd1: "Ett fel uppstod när uppsättningen med betygsperioder uppdaterades"
+  an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Ett fel uppstod när uppsättningen med omdömesperioden hämtades"
+  an_error_occured_while_updating_the_grading_period_9e024cd1: "Ett fel uppstod när uppsättningen med omdömesperioder uppdaterades"
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Ett fel uppstod vid ändring av låsstatusen för \"%{fileName}\""
   an_error_occurred_making_a_network_request_d1bda348: "Ett fel uppstod vid försök att göra en nätverksförfrågan"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Ett fel uppstod*, vänligen skicka in ditt svar igen senare."
   an_error_occurred_please_try_again_95361e05: "Ett fel inträffade.Vänligen försök igen."
   an_error_occurred_please_try_again_later_84223241: "Ett fel inträffade. Försök igen senare."
-  an_error_occurred_publishing_grades_cfdf7631: "Ett fel uppstod när betygen publicerades."
-  an_error_occurred_selecting_provisional_grades_9d7bcda: "Ett fel uppstod när provisoriska betyg valdes"
+  an_error_occurred_publishing_grades_cfdf7631: "Ett fel uppstod när omdömen publicerades."
+  an_error_occurred_selecting_provisional_grades_9d7bcda: "Ett fel uppstod när provisoriska omdömen valdes"
   an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "Ett fel uppstod vid val av detta temat, vänligen försök igen."
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Ett fel uppstod när temat genererades, vänligen försök igen."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ett fel uppstod vid förberedelse inför nedladdning, vänligen försök igen."
@@ -1827,14 +1827,14 @@ sv:
   announcements_locked_successfully_43d58107: "Aviseringar låses framgångsrikt"
   announcements_tutorial_tray_994287d6: "Meddelande handledning"
   announcements_unlocked_successfully_1432da9d: "Aviseringar låses upp med framgång"
-  anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Anonymisera alla anteckningar som gjorts av instruktörer om inlagor för denna uppgift i SpeedGrader"
+  anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Anonymisera alla annoteringar gjorda av lärare på inlämningar för denna uppgift i SpeedGrader"
   anonymous_e1b8ad27: Anonym
-  anonymous_grading_ccb5045c: "Anonymt betyg"
+  anonymous_grading_ccb5045c: "Anonymt omdöme"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedömning döljer studentnamnet i SpeedGrader™"
   anonymous_instructor_annotations_2b6c822: "Anonyma instruktörs annoteringar"
   anonymous_user: "Anonym användare"
   anonymous_user_d984b9ce: "Anonym användare"
-  anonymously_graded_59149570: "Anonymt betygsatt"
+  anonymously_graded_59149570: "Anonymt bedömd"
   another_assignment_name_369f8481: "Annat anvisat namn"
   another_configuration_is_currently_selected_select_95b394e: "En annan konfigurering har valts. Att välja den här konfigurationen kommer leda till att den andra inte väljs."
   answer_address_book_queries_through_76842372: "Svara på adressboksfrågor via"
@@ -1949,9 +1949,9 @@ sv:
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Är du säker på att du vill radera den här uppgiften?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Är du säker på att du vill ta bort den här kommentaren?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Är du säker på att du vill radera den här händelsen?"
-  are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Är du säker på att du vill ta bort det här uppsättningen med betygsperioder?"
-  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Är du säker på att du vill radera den här betygsperioden?"
-  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Är du säker på att du vill radera det här betygsschemat?"
+  are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Är du säker på att du vill ta bort det här uppsättningen med omdömesperioder?"
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Är du säker på att du vill radera den här omdömesperioden?"
+  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Är du säker på att du vill radera det här omdömesschemat?"
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Är du säker på att du vill radera den här matrisen? Varje kurs som för tillfället är kopplad till denna rubrik har fortfarande tillgång till den, men inga nya kurser kommer att kunna använda den."
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Är du säker på att du vill radera den här matrisen? Den här åtgärden tar bort denna rubrikförening från alla uppgifter i den aktuella kursen, och tar bort eventuella befintliga bedömningar."
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Är du säker på att du vill radera det här To Do föremålet?"
@@ -1960,16 +1960,16 @@ sv:
     other: "Är du säker på att du vill ta bort din kopia av dessa konversationer? Den här åtgärden kan inte ångras."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Är du säker på att du vill radera din reservation för den här händelsen?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Är du säker på att du vill inaktivera Sync till %{sisName} för alla bedömningar?"
-  are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Är du säker på att du vill göra det här? Det kan inte ångras och kommer skriva över alla betygen i betygsboken."
+  are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Är du säker på att du vill göra det här? Det kan inte ångras och kommer skriva över omdömen i betygsboken."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Är du säker på att du vill avaktivera denna användaren? De kommer inte kunna delta i kursen när de är inaktiva."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Är du säker på att du vill publicera den här kommentaren?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Är du säker på att du vill ta bort den här betygsperioden?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Är du säker på att du vill ta bort det här verktyget?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Är du säker på att du vill ta bort den här användaren?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Är du säker på att du vill rapportera den här profilbilden?"
-  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Är du säker på att du vill återsynkronisera dessa betyg till student-informationssystemet?"
+  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Är du säker på att du vill återsynkronisera dessa omdömen till ert student-information-system?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Är du säker på att du vill posta den här kommentaren?"
-  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Är du säker på att du vill synkronisera dessa betyg till student-informationssystemet? Du bör endast göra detta om alla dina betyg har slutförts."
+  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Är du säker på att du vill synkronisera dessa omdömen till student-information-systemet? Du bör endast göra detta om alla omdömen är slutgiltiga."
   are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
     one: "Är du säker på att du vill av-arkivera detta samtal?"
     other: "Är du säker på att du vill av-arkivera dessa samtal?"
@@ -2017,7 +2017,7 @@ sv:
       upload_as_zip: "Vänligen ladda upp filer som .zip"
     feed_entry_title: "Uppgifter: %{assignment}"
     feed_entry_title_with_course: "Uppgift, %{course}: %{assignment}"
-    gpa_scale_explainer: "Vad är GPA betygskala?"
+    gpa_scale_explainer: "Vad är GPA omdömeskala?"
     group_assignment_must_have_group_set: "Vänligen välj grupper för den här uppgiften"
     labels: 
       due: Färdig
@@ -2038,8 +2038,8 @@ sv:
       external_tool: "ett externt verktyg"
       on_paper: "på papper"
     titles: 
-      gpa_scale_explainer: "Vad är GPA betygskala?"
-      grading_scheme_info: "Visa/Redigera Betygsschema"
+      gpa_scale_explainer: "Vad är GPA omdömeskala?"
+      grading_scheme_info: "Visa/Redigera Omdömesschema"
     vericite_submission_types_validation: "VeriCite Stöder endast fil inlagor och textinmatning "
   assignment_976578a8: Uppgift
   assignment_assignment_submission_paper_view_8a4c9776: "Uppgifts %{assignment} inlämning pappersvy"
@@ -2055,7 +2055,7 @@ sv:
   assignment_details_dialog: 
     average_score: "Genomsnittlig poäng:"
     count_of_submissions: "%{cnt} inlämningar"
-    grading_statistics_for_assignment: "Betygsstatistik för: %{assignment.name}"
+    grading_statistics_for_assignment: "Statistik för Omdöme: %{assignment.name}"
     high_score: "Högst poäng:"
     low_score: "Lägst poäng:"
     no_one_scored_higher: "Ingen fick högre poäng än %{max}"
@@ -2065,7 +2065,7 @@ sv:
     total_graded_submissions: "Totalt bedömda inlämningar:"
   assignment_details_expanded_20c6f0c7: "Uppdragsdetaljer expanderade "
   assignment_excused_eb6c08fa: "Uppgiften ursäktas"
-  assignment_grades_have_already_been_published_ff2d84c6: "Bedömning av uppgift har redan publicerats."
+  assignment_grades_have_already_been_published_ff2d84c6: "Omdöme för uppgift har redan publicerats."
   assignment_group: 
     default_name: Uppgifter
     default_title: Uppgifter
@@ -2080,7 +2080,7 @@ sv:
     titles: 
       assignment_group_weights: "Hantera uppgiftsgruppens viktpoäng"
       total: Total
-    weight_final: "Vikt av slutbetyg baserat på grupper"
+    weight_final: "Vikt av omdöme baserat på grupper"
   assignment_groups: 
     errors: 
       cannot_delete_group: "Du kan inte radera en grupp med en låst uppgift"
@@ -2176,7 +2176,7 @@ sv:
       points_possible_screen_reader: "%{pointsPossible} Möjliga poäng"
       settings: Inställningar
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "Inget bettg kommer att tildelas för den här uppgiften"
+      assignment_grading_type_is_not_graded: "Den här uppgiften kommer inte bedömas."
       assignment_not_yet_graded_screenreader: "Uppgiften har inte bedömts ännu. %{pointsPossible} möjliga poäng."
       empty_points_possible: "-/%{pointsPossible} poäng"
       no_submission: "Ingen inlämning"
@@ -2192,7 +2192,7 @@ sv:
     assignments_list_right_side: 
       links: 
         manage_assignments: "Hantera uppgifter"
-        see_current_grades: "Se mina betyg fram tills nu"
+        see_current_grades: "Se mina bedömningar hittills"
       titles: 
         show_only_assignments_from: "Visa endast uppgifter från"
         upcoming_assignments: "Kommande uppgifter"
@@ -2238,7 +2238,7 @@ sv:
       example_group_name: "t.ex., Uppsatsgrupp 1"
       group_name: "Gruppnamn:"
       never_drop: "Lämna aldrig:"
-      percent_of_total: "% av totala betyget"
+      percent_of_total: "% av totala omdömet"
       save: Spara
       saving: Sparar...
     create_new_crumb: "Skapa ny"
@@ -2322,13 +2322,13 @@ sv:
     grade_assignment: 
       buttons: 
         upload_files: "Ladda upp fil"
-      graded_count: "%{graded_count} *av* %{total} Inlämningar bedömda"
+      graded_count: "%{graded_count} *av* %{total} Inlämningar är bedömda"
       links: 
         download_submissions: "Ladda ner inlämningar"
         peer_reviews: Referentgranskningar
         reupload_submissions: "Ladda upp inlämningar igen"
       resubmission_count: 
-        one: "1 icke betygsatt åter-inlämning"
+        one: "1 åter-inlämning utan omdöme"
         other: "%{count} Ej bedömda åter-inlämningar"
       reupload_instructions: |-
           Om du har gjort ändringar på den elevinlämningsfilen som du laddade ner
@@ -2339,23 +2339,23 @@ sv:
       speed_grader: SpeedGrader™
       titles: 
         related_items: "Relaterade föremål"
-    grade_gpa_scale_screenreader: "Betyg: %{grade}"
-    grade_letter_grade_screenreader: "Betyg: %{grade}"
-    grade_pass_fail_screenreader: "Betyg: %{grade}"
+    grade_gpa_scale_screenreader: "Omdöme: %{grade}"
+    grade_letter_grade_screenreader: "Omdöme: %{grade}"
+    grade_pass_fail_screenreader: "Omdöme: %{grade}"
     grade_percent: "%{grade}%"
-    grade_percent_screenreader: "Betyg: %{grade}%"
+    grade_percent_screenreader: "Omdöme: %{grade}%"
     grading_type_selector: 
-      display_grade_as: "Visa resultat som"
+      display_grade_as: "Visa bedömning som"
       gpa_scale_explainer: "GPA betygskala har designats för skolor som använder en 4.0 skala (Eller 5.0/6.0) för sina uppgifter. Det här betygsschemat är snarlikt det bokstavsschema som visas men har ett par viktiga skillnader:"
       gpa_scale_input_explainer: "Poäng skrivs in i 4.0 skalan. Till exempel, om en uppgift är 100 poäng, är ett 4.0 resultat 100%, 3,0 resultat 87%, osv."
-      gpa_scale_letters_explainer: "Bokstäver kan användas istället för siffrorna"
+      gpa_scale_letters_explainer: "Bokstavsbetyg kan användas i tillägg till sifferbetyg."
       gpa_scale_percentage_explainer: "Du kan inte skriva in poäng direkt, du kan istället föra in procent. Till exempel, om en uppgift är 50 poäng, ska du inte skriva in \"40\", utan 80%."
-      gpa_scale_recommendation: "Ifall din skola inte använder en 4.0 skala (eller 5.0/6.0) för betygssättning, rekommenderar Canvas att du betygsätter med bokstäver istället."
+      gpa_scale_recommendation: "Om inte er skola använder en 4.0 skala (eller 5.0/6.0) för omdömen, rekommenderar Canvas att visa omdöme som bokstavsbetyg."
       gpa_scale_scores_explainer: "De tillåtna poängen är förinställda i betygsschemat."
       gpa_scale_title: "\"Vad är GPA betygskala?\""
       grading_type_options: 
         gpa_scale: "GPA Skala"
-        letter_grade: Bokstavsbetyg
+        letter_grade: Bokstavsomdöme
         not_graded: "Inte bedömd"
         pass_fail: Färdig/Ofärdig
         percent: Procent
@@ -2363,7 +2363,7 @@ sv:
       view_grading_scheme: "Visa betygsschema"
     group_category_selector: 
       differentiated_groups_warning: "Differentierade gruppuppgifter kan ge öväntade resultat."
-      grade_group_students_individually: "Betyg varje student individuellt"
+      grade_group_students_individually: "Omdöme varje student individuellt"
       group_assignment_header: Gruppuppgift
       group_category_locked_explanation: "Studenter har redan lämnat in läxor på den här uppgiften så gruppinställningarna kan inte ändras."
       group_category_options: "Ny gruppkategori"
@@ -2552,7 +2552,7 @@ sv:
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
-        grade: "Betyg: %{grade} *(%{points_possible} möjliga poäng)*"
+        grade: "Omdöme: %{grade} *(%{points_possible} möjliga poäng)*"
         graded_anonymously: "Anonymt bedömda: %{value}"
         ? "no"
         : nej
@@ -2676,27 +2676,27 @@ sv:
       no_files: "Inga filer"
       upload_or_choose_file: "Ladda upp fil, eller välj en fil som du redan har laddat upp."
     syllabus: 
-      page_title: "Kursplan för %{course}"
+      page_title: "Kursöversikt för %{course}"
     syllabus_content: 
       buttons: 
-        update_syllabus: "Uppdatera kursplan"
+        update_syllabus: "Uppdatera kursöversikt"
       headers: 
         date: Datum
         details: Detaljer
       instructions: 
         syllabus: |-
-            Sidan för Antura tidsplan visar tabellorienterad vy av kursschemat, och grunderna för
+            Sidan för Antura kursöversikt visar tabellorienterad vy av kursschemat, och grunderna för
             betygssättning. Du kan lägga till kommentarer, anteckningar eller tankar som du har om kursstrukturen, kurspolicy eller något annat.
             
             För att lägga till kommentarer, klicka på "Ändra"-länken överst.
       labels: 
         assignments_summary: Kurssummering
-        syllabus_body: Kursplansbeskrivning
+        syllabus_body: Kursöversiktsbeskrivning
       links: 
         edit_syllabus_description: Redigera
         jump_to_today: "Hoppa fram tills idag"
       titles: 
-        course_syllabus: "Kursplan för kursen"
+        course_syllabus: "Kursöversikt för kursen"
     syllabus_right_side: 
       links: 
         edit_syllabus_description: "Ändra kursplansbeskrivning"
@@ -2749,7 +2749,7 @@ sv:
     invalid_date_time: "Ogiltigt datum för %{attribute}"
     invalid_submission_types: "Ogiltiga inlämningstyper"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Uppgifter i din här gruppen har inga möjliga poäng och kan inte inkluderas i betygsuträkningen"
-  assignments_in_this_group_have_no_points_possible__ab0adb72: "Uppgifter i den här gruppen har inga möjliga poäng och kommer inte inkluderas vid uträkningen av betyg."
+  assignments_in_this_group_have_no_points_possible__ab0adb72: "Uppgifter i den här gruppen har inga möjliga poäng och kommer inte inkluderas vid uträkningen av omdöme."
   assignments_list_fe3e54be: Uppgiftslista
   assignments_settings_30613d0c: Uppgiftsinställningar
   assignments_tutorial_tray_4cc844b: "Uppgifter Tutorial Tray"
@@ -2812,7 +2812,7 @@ sv:
   authorize_e3f25bb4: Godkänn
   auto_leader_7791c30a: auto_leader
   automatically_apply_deduction_to_late_submissions_2b68166e: "Applicera automatiska avräkningar för sena inlämningar"
-  automatically_apply_grade_for_missing_submissions_2b5c1a72: "Applicera automatiskt betyg för saknade inlägg"
+  automatically_apply_grade_for_missing_submissions_2b5c1a72: "Applicera automatiskt omdöme för saknade inlägg"
   availability_dates_438d71e0: "Tillgängliga datum"
   availability_dates_changed_exceptions_465ba375: "Tillgänglighetsdatum ändrade undantag:"
   available_8606e40c: Tillgänglig
@@ -3472,27 +3472,27 @@ sv:
   cannot_be_associated_with_different_accounts_f461814f: "kan inte vara associerad med olika konton"
   cannot_be_blank_for_any_assignees_when_post_to_sis_2edd9b2a: "kan inte vara tomt för några uppdragsinnehavare när Post till Sis är markerad"
   cannot_be_changed_at_this_time_grading_error_88f5a96b: "kan inte ändras den här gången: %{grading_error}"
-  cannot_be_changed_because_this_assignment_is_due_i_a529873f: "Kan inte ändras eftersom denna uppgift avslutas under en betygsättningsperiod"
-  cannot_be_edited_for_assignments_in_closed_grading_792ef6c1: "Kan inte redigeras för uppgifter i en avslutad betygsättningsperiod"
+  cannot_be_changed_because_this_assignment_is_due_i_a529873f: "Kan inte ändras eftersom denna uppgift avslutas under en omdömesättningsperiod"
+  cannot_be_edited_for_assignments_in_closed_grading_792ef6c1: "Kan inte redigeras för uppgifter i en avslutad omdömesättningsperiod"
   cannot_be_empty_when_course_id_is_nil_and_account__ca96a97e: "kan inte lämnas tomt när course_id är nil och account_id is nil"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "Kan inte vara tomt när account_id är tomt"
   cannot_be_nil_when_course_id_is_nil_f539388: "Kan inte vara tomt när course_id är tomt"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan inte vara nuvarande när account_id är nuvarande"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan inte vara nuvarande när course_id är nuvarande"
-  cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan inte åsidosätta inlämningsdatum till ett datum i en stängd betygsperiod"
-  cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan inte ändra ett åsidosatt  inlämningsdatum i en stängd betygsperiod"
-  cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan inte ändra inlämningsdatum till ett datum i en stängd betygsperiod"
-  cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan inte ändra inlämningsdatum när datumet är i en stängd betygsperiod"
+  cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan inte åsidosätta inlämningsdatum till ett datum i en stängd omdömesperiod"
+  cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan inte ändra ett åsidosatt  inlämningsdatum i en stängd omdömesperiod"
+  cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan inte ändra inlämningsdatum till ett datum i en stängd omdömesperiod"
+  cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan inte ändra inlämningsdatum när datumet är i en stängd omdömesperiod"
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "kan inte skapa en mötesgrupp för en avslutad kurs"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Kan inte radera en fil som har lämnats in som en del av ett arbete"
-  cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Kan inte radera ett inlämningsdatum med ett datum i en stängd betygsperiod"
+  cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Kan inte radera ett inlämningsdatum med ett datum i en stängd omdömesperiod"
   cannot_grade_at_this_time_489744b0: "Kan inte bedömas den här gången"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Kan inte ha blueprint kurser med studenter"
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "Kan inte begränsa med sektton såvida inte grupperna är tomma och inte begränsade i storlek"
-  cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "Kan inte endast ställa in synliga för att åsidosätta när datumet är i en stängd betygsperiod"
-  cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan inte åsidosätta inlämningsdatumet till ett datum i en stängd betygsperiod"
+  cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "Kan inte endast ställa in synliga för att åsidosätta när datumet är i en stängd omdömesperiod"
+  cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan inte åsidosätta inlämningsdatumet till ett datum i en stängd omdömesperiod"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Kan inte ställa in sis_account_id på ett root_account."
-  cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Kan inte ställa in inlämningsdatumet till ett datum i en stängd betygsperiod"
+  cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Kan inte ställa in inlämningsdatumet till ett datum i en stängd omdömesperiod"
   canvas: 
     migration: 
       errors: 
@@ -3544,7 +3544,7 @@ sv:
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas omklassa alla svar efter att du har detta Quiz, det kan ta ett par minuter."
   card_movement_menu_for_title_b94c09af: "Kort förflyttningsmeny för %{title}"
   card_view_eaf73185: kortvy
-  careful_changes_to_group_membership_will_apply_to__19a9089c: "Försiktigt! Ändringar i gruppens medlemskap kommer tillämpas på grupper som redan har inlämningar. Det är inte säkert att betyg på redan bedömda inlämningar behålls. Vill du skapa en ny gruppuppsättning eller ändra grupper?"
+  careful_changes_to_group_membership_will_apply_to__19a9089c: "Försiktigt! Ändringar i gruppens medlemskap kommer tillämpas på grupper som redan har inlämningar. Det är inte säkert att omdöme på redan bedömda inlämningar behålls. Vill du skapa en ny gruppuppsättning eller ändra grupper?"
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: "Katalogen är redan aktiverad"
   catalog_name_46d37909: Katalognamn
@@ -3852,7 +3852,7 @@ sv:
   communicate_to_your_students_exactly_what_will_be__7312d45d: |-
       Kommunicera till dina studenter exakt vad som krävs
       av dem under hela kursen i kronologisk ordning. Generera en
-      inbyggd kursplan baserad på uppgifter och evenemang som du har skapat.
+      inbyggd kursöversikt baserad på uppgifter och evenemang som du har skapat.
   communication_5255723c: Kommunikation
   communication_channel: 
     body: "Din Canvas verifieringskod är %{verification_code}"
@@ -4374,7 +4374,7 @@ sv:
         title: 
           enrollment_sis_defined: "Den här registreringen begränsades av universitet och kan inte raderas"
         user_account_details: Användarkontodetaljer
-        user_grades: Betyg
+        user_grades: Omdöme
         user_only_view_section: "begränsa den här användaren så att den endast kan se användare samma sektion"
         user_outcomes: Lärandemål
         user_view_all_sections: "låt den här användaren se alla kursanvändare"
@@ -5012,7 +5012,7 @@ sv:
     student_summary: 
       not_sorted: Studentsammanfattning
     student_view_student_name: Studenttest
-    syllabus: Kursplan
+    syllabus: Kursöversikt
     wiki_permissions: 
       all: "Vem som helst"
       only_teachers: "Endast lärare"
@@ -5259,7 +5259,7 @@ sv:
   course_statistics: 
     unknown: okänd
   course_storage_391e1bd: Kurslagring
-  course_syllabus_5de1b0af: "Kursplan för kursen"
+  course_syllabus_5de1b0af: "Kursöversikt för kursen"
   course_users: 
     greater_than_three: "Vänligen uppge en sökterm med tre eller fler bokstäver"
     unknown_error: "Något gick fel med din sökning, vänligen försök igen."
@@ -5289,7 +5289,7 @@ sv:
         conclude_course: "Avsluta kurs"
         delete_course: "Radera kurs"
       details: 
-        conclude_alt_text: "Om du vill behålla möjligheten att ändra betyg och samtidigt begränsa studenters tillgång till kursen, vänligen använd kursdatum-inställningar. Du kan lära dig mer om kursdatum-inställningarna i våra guider *här*."
+        conclude_alt_text: "Om du vill behålla möjligheten att ändra omdöme och samtidigt begränsa studenters tillgång till kursen, vänligen använd kursdatum-inställningar. Du kan lära dig mer om kursdatum-inställningarna i våra guider *här*."
         confirm_conclude: "Varning: Att avsluta kursen kommer spara allt kursinnehåll och förhindra dig från att ändra betygen."
         confirm_delete: "Är du säker på att du vill radera den här kursen? När den har raderats kommer studenter och lärare inte längre ha tillgång till den. Om du bara vill ta bort den från kursmenyn bör du *istället avsluta kursen*."
         confirm_delete_addendum: "Om du inte har tillåtelse att avsluta kursen kan du *ändra kursens slutdatum*, eller be din administratör att avsluta den."
@@ -5399,7 +5399,7 @@ sv:
       buttons: 
         link: "Länk till student"
       details: |-
-          När en observatör är länkad till en student kommer den ha tillgång ill studentens betyg och kursinteraktion. *Den här observatören är för närvarande länkad till studenten, %{student}.*
+          När en observatör är länkad till en student kommer den ha tillgång ill studentens omdöme och kursinteraktion. *Den här observatören är för närvarande länkad till studenten, %{student}.*
           
           För att länka kursobservatören %{user} till en student, väljer du studentens namn från listan nedanför.
       labels: 
@@ -5490,7 +5490,7 @@ sv:
         student_invitation_unaccepted_available: "%{name} har inte accepterat inbjudan att delta i kursen. inbjudan skickades: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} lades till i kursen: %{time}"
       link_to_students_view: 
-        link_student_desc: "När en observatör länkas till en student kommer den ha tillgång till studentens betyg och kursinteraktion."
+        link_student_desc: "När en observatör länkas till en student kommer den ha tillgång till studentens omdöme och kursinteraktion."
       resend_invitations: 
         pending_invitation: "1 inbjudan har inte accepterats."
         pending_invitations: "%{pendingInvitationsCount} inbjudningar har inte accepterats."
@@ -5590,7 +5590,7 @@ sv:
         course_visibility: Synlighet
         custom_course_visibility: Anpassa
         enrollment_term_id: Termin
-        grading_scheme: Betygsschema
+        grading_scheme: Omdömesschema
         grading_standard_enabled: "Aktivera kursens betygsschema"
         hide_distribution_graphs: "Dölj betygsfördelningsdiagram för studenterna"
         hide_final_grades: "Dölj totala betygssummeringar för studenter"
@@ -5893,7 +5893,7 @@ sv:
     settings: Inställningar
     site_admin: "Hemsidans administratör"
     stats: Statistik
-    syllabus: Kursplan
+    syllabus: Kursöversikt
     users: Användare
     wiki_pages: Sidor
   css_ae1d10ce: CSS
@@ -9855,7 +9855,7 @@ sv:
         learning_outcomes: Lärandemål
         quizzes: Quiz
         rubrics: Matriser
-        syllabus_body: Kursplan
+        syllabus_body: Kursöversikt
         tool_profiles: Verktygs-profiler
         wikis: Wikisidor
     cc: 
@@ -17327,7 +17327,7 @@ sv:
         modules: "Klicka för att lägga till en länk till den här modulen"
         modules_page: "Klicka för att lägga till en länk på modulssidan"
         quizzes: "Klicka för att lägga till en länk till detta Quiz"
-        syllabus_page: "Klicka för att lägga till en länk till kursplanen"
+        syllabus_page: "Klicka för att lägga till en länk till kursöversikten"
         users_page: "Klicka för att lägga till en länk på personsidan"
         wiki_pages: "Klicka för att lägga till en länk på den här sidan"
         wiki_pages_index: "Klicka för att lägga till en länk till wiki"
@@ -17348,7 +17348,7 @@ sv:
         modules_page: Moduler
         new_page: "Länka till en ny sida"
         quizzes: Quiz
-        syllabus: Kursplan
+        syllabus: Kursöversikt
         upload_file: "Ladda upp en ny fil"
         upload_image: "Ladda upp en ny bild"
         users_page: Personer
@@ -17982,10 +17982,10 @@ sv:
   switch_to_table_view_3aae9919: "Växla till tabellvy"
   switzerland_41_f861e414: "Schweiz (+41)"
   switzerland_f4f7137c: Schweiz
-  syllabus: "Kursplan för kursen"
-  syllabus_f191f65b: Kursplan
-  syllabus_tutorial_tray_97e8ef82: "Syllabus handledning"
-  syllabus_visibility_options_a81ef419: "Syllabus synliga alternativ"
+  syllabus: "Kursöversikt för kursen"
+  syllabus_f191f65b: Kursöversikt
+  syllabus_tutorial_tray_97e8ef82: "Kursöversikt handledning"
+  syllabus_visibility_options_a81ef419: "Kursöversikt synliga alternativ"
   sync_68e5c167: Synkronisera
   sync_completed_successfully_8f68b542: "Synkroniseringen var framgångsrik"
   sync_grades_a16622ca: "Synkronisera betyg"
@@ -18042,7 +18042,7 @@ sv:
     profile: Profil
     quizzes: Quiz
     settings: Inställningar
-    syllabus: Kursplan
+    syllabus: Kursöversikt
     tab_location_error: "Flikens placering är ogiltig"
     tab_unmanagable_error: "%{css_class} kan inte hanteras"
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -19461,17 +19461,17 @@ sv:
         : På
   web_page_146f9102: Hemsida
   webct_credentials: 
-    credential_not_found: "Betyg hittades inte."
+    credential_not_found: "Omdöme hittades inte."
   webct_display: "Blackboard Vista/Ce (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/Ce (WebCT)"
   week_s_cb1492ee: Vecka/veckor
   weight_9b308e5b: Vikt
   weight_ff579a8e: "Vikt:"
-  weight_final_grade_based_on_assignment_groups_3124161: "Viktning av slutbetyg baserat på uppgiftsgrupper"
+  weight_final_grade_based_on_assignment_groups_3124161: "Viktning av slutomdöme baserat på uppgiftsgrupper"
   weight_of_final_abbbe82f: "%{weight} Eller slutlig"
-  weight_of_grade_dff535d9: "%{weight} Av betyg"
-  weighted_grading_periods_ae4edd70: "Viktade betygsperioder"
+  weight_of_grade_dff535d9: "%{weight} Av omdöme"
+  weighted_grading_periods_ae4edd70: "Viktade omdömesperioder"
   welcome_to_the_canvas_theme_editor_73091d1: "Välkommen till Canvas Temaredigerare"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Välkommen till dina kurser! För att lägga till eller ta bort en kurs i listan, klicka på \"Alla kurser\". De kurser du stjärnmarkerat visas i listan ovan."
   well_below_mastery_37664bdc: "Når inte målen"
@@ -19480,7 +19480,7 @@ sv:
   what_should_the_csv_file_look_like_985a59ac: "Hur ser CSV filen ut?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "När du lägger till flera användare, använd ett kommatecken eller en radbrytning till separata användare."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "När den är aktiverad kan javascript och CSS-filer laddas upp i *%{t_theme_editor}*"
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan man ser när man besöker din kurs. Du kan välja om den ska visa ett aktivitetsflöde, en lista över kursmoduler, en kursplan eller en sidan som du skapat. Den är förinställd på kurs-aktivitetsflöde."
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan man ser när man besöker din kurs. Du kan välja om den ska visa ett aktivitetsflöde, en lista över kursmoduler, en kursöversikt eller en sidan som du skapat. Den är förinställd på kurs-aktivitetsflöde."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       När människor besöker dina kurser, är detta den första sidan de ser.
       Vi har ställt in din hemsida till moduler, men du har möjlighet att ändra den.
@@ -19729,7 +19729,7 @@ sv:
   you_can_try_to_log_in_again_2b23ef0f: "Du kan försöka att *logga in igen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan uppdatera en del av användarens information, men de kan ändra tillbaka den om de vill."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan använda singel 16x16, 32x32, 48x48 ico fil"
-  you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Du kan se dina betyg baserad på ”Tänkbara” resultat så att du för vetskap om hur betyg kommer påverka kommande eller återinlämnade uppgifter. Du kan testa poäng för en uppgift som redan inkluderar en poäng, eller en uppgift som ännu inte har betygsatts. "
+  you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Du kan se dina omdöme baserad på ”Tänkbara” resultat så att du för vetskap om hur omdöme kommer påverka kommande eller återinlämnade uppgifter. Du kan testa poäng för en uppgift som redan inkluderar en poäng, eller en uppgift som ännu inte har omdömesatts. "
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Du kan inte tilldela avsnitt till ett gruppdiskussionsämne"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan inte tilldela en grupp utanför uppgiftens gruppsammansättning"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan inte redigera teman i detta underkontot."
@@ -19745,7 +19745,7 @@ sv:
   you_do_not_have_permission_to_change_this_488c536: "Du har inte tillstånd att ändra detta"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "Du har inte behörighet att bjuda in användare som inte redan finns."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har inte tillstånd att publicera denna kursen."
-  you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: "Du har inte behörighet att hantera betyg för den här kursen"
+  you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: "Du har inte behörighet att hantera omdöme för den här kursen"
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "Du har fått extra tid för det här försöket"
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ändrat kravens utveckling för den här kursen. Det kan finnas studenter som redan har använt utveckling för den här moduler och andra som förlitar sig på den."
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Du har slutfört en referentgranskning för %{person}. Tack"
@@ -19767,8 +19767,8 @@ sv:
       denna kurs, inklusive filer som exporteras från denna kurs utan skriftlig
       tillåtelser från din institution.  Kontrollera med din institution för specifika online
       användaravtals riktlinjer.
-  you_may_not_see_all_comments_right_now_because_the_96cf2051: "Du kan inte se alla kommentarer just nu eftersom uppgiften betygsätts."
-  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Du kan bjuda in kollegor som hjälper dig med kursen. De kan hjälpa dig betygsätta, kontrollera diskussioner och uppdatera inlämningsdatum och uppgifter åt dig."
+  you_may_not_see_all_comments_right_now_because_the_96cf2051: "Du kan inte se alla kommentarer just nu eftersom uppgiften omdömesätts."
+  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Du kan bjuda in kollegor som hjälper dig med kursen. De kan hjälpa dig omdömesätta, kontrollera diskussioner och uppdatera inlämningsdatum och uppgifter åt dig."
   you_must_agree_to_the_terms_99723f97: "Du måste godkänna villkoren"
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "Du måste tillåta minst ett möte per deltagare."
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Du måste tillåta minst ett möte per tidslucka."
@@ -19808,7 +19808,7 @@ sv:
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Du har blivit inbjuden till kursen, %{course}. Kursroll: %{role_type}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Du har blivit påmind att utvärdera %{rubric}, %{context}."
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Du kommer omdirigeras till inloggningssidan när du måste logga in med ditt underkontos-inloggningsuppgifter."
-  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Du kommer att omdirigeras till betygsbok medan filen laddas upp. Om du har en stor CSV-fil, kan ändringarna ta några minuter att uppdatera. För att undvika att skriva över alla data, vänligen bekräfta att uppladdningen har slutförts och betygsbok är korrekt innan ytterligare ändringar."
+  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Du kommer att omdirigeras till omdömesbok medan filen laddas upp. Om du har en stor CSV-fil, kan ändringarna ta några minuter att uppdatera. För att undvika att skriva över alla data, vänligen bekräfta att uppladdningen har slutförts och omdömesbok är korrekt innan ytterligare ändringar."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Du måste skapa en [ny app på Facebook](%{facebook_url}), och aktivera Client OAuth inloggning
       i avancerade inställningar. Du bör konfigurera %{callback_url} som Valid OAuth omdirigerande URI.
@@ -19866,7 +19866,7 @@ sv:
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Din sökning stötte på följande fel:"
     other: "Din sökning stötte på följande fel:"
-  your_submission_has_not_been_graded_yet_d6963e53: "Din inlämning har inte betygsatts än"
+  your_submission_has_not_been_graded_yet_d6963e53: "Din inlämning har inte omdömesatts än"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Din tid för det här Quizet har minskats."
   yyyy_mm_dd_hh_mm_a01b6081: "ÅÅÅÅ-MM-DD hh:mm"
   z_a_b48d8903: "Z - A"
