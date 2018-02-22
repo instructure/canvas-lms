@@ -129,6 +129,13 @@ export default class GradeInput extends Component {
       return this.state.grade.trim() !== this.props.pendingGradeInfo.grade
     }
 
+    const {assignment, enterGradesAs, gradingScheme, submission} = this.props
+    const formattedGrade = formatGrade(submission, assignment, gradingScheme, enterGradesAs)
+
+    if (formattedGrade === this.state.grade.trim()) {
+      return false
+    }
+
     const gradeInfo = getGradeInfo(this.state.grade, this.props)
     return hasGradeChanged(this.props.submission, gradeInfo, {
       enterGradesAs: this.props.enterGradesAs,

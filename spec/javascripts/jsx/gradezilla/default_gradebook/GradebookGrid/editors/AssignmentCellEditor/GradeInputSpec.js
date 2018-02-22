@@ -490,13 +490,6 @@ QUnit.module('GradeInput', suiteHooks => {
       return wrapper.instance().hasGradeChanged()
     }
 
-    test('returns false when the submission remains excused', () => {
-      props.submission = {...props.submission, excused: true}
-      mountComponent()
-      wrapper.find('input').simulate('change', {target: {value: 'EX'}})
-      strictEqual(hasGradeChanged(), false)
-    })
-
     test('returns true when an invalid grade is entered', () => {
       mountComponent()
       wrapper.find('input').simulate('change', {target: {value: 'invalid'}})
@@ -766,6 +759,27 @@ QUnit.module('GradeInput', suiteHooks => {
         mountComponent()
         wrapper.find('input').simulate('change', {target: {value: 'B'}})
         strictEqual(hasGradeChanged(), true)
+      })
+    })
+
+    QUnit.module('when the submission is excused', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.submission = {...props.submission, excused: true}
+        mountComponent()
+      })
+
+      test('returns false when the input is unchanged', () => {
+        strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns false when "EX" is entered', () => {
+        wrapper.find('input').simulate('change', {target: {value: 'EX'}})
+        strictEqual(hasGradeChanged(), false)
+      })
+
+      test('returns false when the input adds only whitespace', () => {
+        wrapper.find('input').simulate('change', {target: {value: '   Excused   '}})
+        strictEqual(hasGradeChanged(), false)
       })
     })
 
