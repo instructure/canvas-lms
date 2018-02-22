@@ -563,7 +563,7 @@ class BzController < ApplicationController
 
         participation_assignment = bzg.get_participation_assignment(course, context_module)
         if !participation_assignment.nil?
-          internal_response = bzg.get_value_of_user_answer(params[:name], magic_field_counts, participation_assignment, params[:value], DateTime.now, weight, answer, field_type, partial_credit_mode)
+          internal_response = bzg.get_value_of_user_answer(params[:name], magic_field_counts, @current_user, participation_assignment, params[:value], DateTime.now, weight, answer, field_type, partial_credit_mode)
 
           response_object["points_given"] = internal_response["points_given"]
           response_object["points_amount"] = internal_response["points_amount"]
