@@ -17,7 +17,6 @@
 #
 
 # @API Outcome Results
-# @beta
 #
 # API for accessing learning outcome results
 #
@@ -198,7 +197,6 @@ class OutcomeResultsController < ApplicationController
   before_action :require_users
 
   # @API Get outcome results
-  # @beta
   #
   # Gets the outcome results for users and outcomes in the specified context.
   #
@@ -233,7 +231,6 @@ class OutcomeResultsController < ApplicationController
   end
 
   # @API Get outcome result rollups
-  # @beta
   #
   # Gets the outcome rollups for the users and outcomes in the specified
   # context.

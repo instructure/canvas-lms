@@ -158,7 +158,6 @@ class OutcomeGroupsApiController < ApplicationController
   end
 
   # @API Get all outcome groups for context
-  # @beta
   #
   # @returns [OutcomeGroup]
   def index
@@ -170,7 +169,6 @@ class OutcomeGroupsApiController < ApplicationController
   end
 
   # @API Get all outcome links for context
-  # @beta
   #
   # @argument outcome_style [Optional, String]
   #   The detail level of the outcomes. Defaults to "abbrev".
