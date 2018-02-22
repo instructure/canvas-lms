@@ -173,6 +173,14 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
           end
 
+          it 'will match against an sis id and regular id' do
+            user2 = User.create(name: 'user two')
+            pseudonym.sis_user_id = user2.id.to_s
+            pseudonym.save!
+            course.enroll_user(user2)
+            expect(UserSearch.for_user_in_context(user2.id.to_s, course, user)).to eq [user, user2]
+          end
+
           it 'will match against a login id' do
             expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq [user]
           end
