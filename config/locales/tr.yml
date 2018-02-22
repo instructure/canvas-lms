@@ -7589,6 +7589,7 @@ tr:
     not_submitted: gönderilmedi
     notes: Notlar
     nth_student: "%{n} Öğrenci"
+    points_out_of: "%{points_possible} üzerinden"
     portion_graded: "%{x} / %{y} Notlandırıldı"
     recording_expired_message: "Konuşma algılama etkin olmamaktan dolayı sonlandırıldı. Mevcut metni yorum olarak kullanmak için \"Durdur\"a; yok saymak için \"İptal\"e tıklayın."
     recording_message: Kaydediliyor...
@@ -11373,9 +11374,12 @@ tr:
   not_now_97efd947: "Şimdi değil"
   not_published_73f7079: Yayınlanmadı
   not_yet_completed_345a0bca: "Henüz tamamlanmadı"
+  note_8b73ce09: Not
+  note_grades_and_notes_will_be_saved_automatically__e3270872: "Not: Puanlar ve notlar alanın dışına taşındıktan sonra kaydedilecek."
   note_question_details_not_available_when_more_than_93199f6d: "NOT: %{question_count} soru sayısından fazlası olduğunda soru ayrıntıları gösterilemez."
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Not: bazı öğeler dersin başlangıç ve/veya bitiş tarihinin dışında kalıyor"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "NOT: Öğrenciler bu ödevler için notlandırılmamış çalışmalar gönderdiler. Bu notları şimdi gönderirseniz, öğrencilerin en son gönderilerini notlandırdıktan sonra puanlarını yeniden göndermeniz gerekecek."
+  note_this_is_not_your_official_score_f2d4582f: "*NOT*: Bu sizin resmi puanınız DEĞİL."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Not: Bu oturum hesabı yetkilendirilmiş kimlik doğrulama kullanıyor fakat yedek Canvas şifre doğrulamaya izin veriyor. Bu formdaki şifre alanları yedek Canvas şifresini günceller, yetkilendirilmiş kimlik doğrulamakini *değil*."
   notes_c42e0fd5: Notlar
   notes_for_name_2eefac11: "%{name} için notlar"
@@ -11402,6 +11406,7 @@ tr:
     appointment_cancelations_display: "Randevu İptalleri"
     appointment_signups_description: "Takvime yeni randevu oluştur"
     appointment_signups_display: "Randevulara Kayıt Ol"
+    blueprint_display: "Şablon Eşzamanlama"
     calendar_description: "Ders takvimi üzerindeki yeni ve değişen öğeler"
     calendar_display: Takvim
     categories: 
@@ -11508,6 +11513,8 @@ tr:
       assignment_resubmitted: "Ödev Tekrar Gönderildi"
       assignment_submitted: "Ödev Gönderildi"
       assignment_submitted_late: "Ödev Geç Gönderildi"
+      blueprint_content_added: "Şablon İçerik Eklendi"
+      blueprint_sync_complete: "Şablon Eşzamanlama Tamamlandı"
       collaboration_invitation: "İşbirliği Daveti"
       confirm_email_communication_channel: "E-Posta İletişim Kanalı Onayı"
       confirm_registration: "Kayıt Onayı"
@@ -11654,9 +11661,11 @@ tr:
           byte: 
             one: Byte
             other: Byte
+          eb: EB
           gb: GB
           kb: KB
           mb: MB
+          pb: PB
           tb: TB
     percentage: 
       format: 
@@ -11693,6 +11702,7 @@ tr:
         login_name: "%{user_name} olarak bu uygulamaya izin veriyorsunuz."
       login: "Oturum Aç"
       page_title: "Uygulama İçin Oturum Aç"
+  object_type_e4f3bbeb: "Nesne Türü"
   observees: 
     being_observed: "Gözlemlenen Öğrenciler"
     new_observee_password: Şifre
@@ -11700,11 +11710,16 @@ tr:
     observee_added: "Şu anda %{user} gözlemleniyor"
     observing: Gözlemleniyor
   observer_accounts_only_30c70a70: "Yalnızca Gözlemci Hesapları"
+  observer_id_2be07260: observer_id
+  observers_672971d: Gözlemciler
   observing_f3c5e759: Gözlemci
   occurrence_s_c12d1aad: oluşum(lar)
   of_students_5d1af0d2: "Öğrenci Sayısı"
   ok_c47544a2: Tamam
+  okay_1772bbeb: Tamam
   okay_got_it_d686d4e8: "Tamam, anlaşıldı"
+  oldest_newest_4de86803: "En eski-En yeni"
+  oman_968_46f8d901: "Umman (+968)"
   on_paper_46d0ba36: "Kağıt Üzerinde"
   on_time_17ca5ad9: Zamanında
   on_time_percent_eebffe38: "Zamanında: %{percent}"
@@ -11725,12 +11740,18 @@ tr:
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Yayınlanana kadar yalnızca öğretmenler bu dersi görebilir"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} zamanında, %{late} geç, %{missing} gönderilmedi"
   open_color_picker_f117df0a: "Renk Seçiciyi Aç"
+  open_for_comments_f8f7641e: "Yorumlara Açık"
+  open_in_theme_editor_156028e2: "Tema Düzenleyicide Aç"
+  open_message_d7b12975: "Mesajı Aç"
+  open_sidebar_2852e8c8: "Kenar çubuğunu aç"
+  open_submission_tray_4eb14e96: "Ödev gönderimi kenar çubuğunu aç"
   open_theme_editor_2d924ebe: "Tema Düzenleyiciiyi Aç"
   open_title_in_a_new_window_b29fed77: "%{title} 'ı yeni pencerede aç"
   option_1_dea39f90: "Seçenek 1"
   option_2_47aace2a: "Seçenek 2"
   option_3_30adfebc: "Seçenek 3"
   option_4_aec96b1f: "Seçenek 4"
+  option_index_6308524d: "Seçenek %{index}"
   option_name_ba758e08: "%{option_name}"
   options: 
     ? "no"
@@ -11752,7 +11773,18 @@ tr:
   orbis_report_header_student_sis_id: "kullanıcı öbs"
   orbis_report_header_submission_score: "gönderi puanı"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "epub'ı içerik türüne göre düzenle (varsayılan ayar modüle göre düzenleme)."
+  organize_your_course_content_c3c7ed03: "Ders içeriklerinizi düzenleyin"
+  originality_report_5d461681: "Orijinallik Raporu"
+  other_1c6d9c79: Diğer
+  other_carrier_45531207: "Farklı Operatör"
+  other_ddacb37d: diğer
   other_timezones_42530564: "Diğer Zaman dilimleri"
+  out_of_formattedoutof_e08e90d5: "%{formattedOutOf}üzerinden"
+  out_of_points_37a749d7: "(%{points} üzerinden)"
+  out_of_points_possible_8ab14f7: "%{points_possible} üzerinden"
+  out_of_pointspossible_3fb5ee20: "%{pointsPossible} üzerinden"
+  outcome_da397d20: "Öğrenme Çıktısı"
+  outcome_group_39fae76f: "Öğrenme Çıktısı Grubu"
   outcome_groups: 
     invalid_file: "Geçersiz öğrenme çıktısı grubu dosyası"
   outcome_groups_api: 
@@ -11771,6 +11803,7 @@ tr:
       links: 
         back: Geri
         find: Ara
+        new_group: Grup
         new_outcome: "Öğrenme Çıktıları"
     common_core: "Ortak Temel Standartlar"
     common_core_description: "Sol tarafta Common Core State Standards	Common Core State Standards'ın her gruplaması için bilindik öğrenme çıktıları klasör yapısını göreceksiniz. Bu sayede dersinizde notlandırma için kolay bir şekilde Common Core Standards'tan herhangi birini kullanabilirsiniz."
@@ -11888,6 +11921,8 @@ tr:
         average_percent: "Ortalama Yüzde"
         latest_score: "Son Puan"
         outcome: "Öğrenme Çıktısı"
+  outcomes_report_8887bd49: "Öğrenme Çıktısı Raporu"
+  over_time_bee1a733: zamanla
   overrides: 
     blank_override: "Bir öğrenci veya kısım seçmelisiniz"
     everyone: Herkes
@@ -11895,11 +11930,14 @@ tr:
     overrides: 
       everyone: Herkes
   own_copyright_cc59db55: Telifiniz
+  page_50c4823d: Sayfa
   page_comment: 
     default_user_name: Anonim
   page_comments: 
     errors: 
       create_failed: "Yorum oluşturma başarısız"
+  page_name_21defa75: "Sayfa Adı"
+  page_name_is_required_d8c2736e: "Sayfa Adı zounludur"
   page_not_found_2b0d05f5: "Sayfa bulunamadı"
   page_views: 
     download_filename: "%{user}'ın Sayfa İzlemeleri"
@@ -11940,6 +11978,8 @@ tr:
           Değişiklikler üzerine yazılsın mı?
       unsaved_changes: "Değişiklikler kaydedilmedi. Değişiklikleri kaydetmeden devam etmek istediğinize emin misiniz?"
   pages_e5414c2c: Sayfalar
+  pages_front_page_9ce5188: "Sayfaların Ana Sayfası"
+  pages_tutorial_tray_169464a9: "Sayfalar Yönerge Yan Menüsü"
   paginated_collection: 
     no_items: "Öğe bulunamadı."
   paginated_list: 
@@ -11947,27 +11987,40 @@ tr:
     view_more_link: "Daha Fazla Gör"
   paginated_view: 
     loading_more_results: "Daha fazla sonuç yükleniyor"
+  pakistan_92_da28c36: "Pakistan (+92)"
+  panama_507_831fbc99: "Panama (+507)"
+  paper_view_7405eeab: "Kağıt Görünümü"
+  paraguay_595_ca58b83a: "Paraguay (+595)"
   parent_of_a_canvas_user_afba1624: "Bir Canvas Kullanıcısının Velisi misiniz?"
   parent_signup_b7c6bf0a: "Ebeveyn Kayıt Olma"
   parents_sign_up_here_f0aa8f4f: "Veliler buradan kayıt olabilir"
   participation_af2598: Katılım
   participations_1823832d: Katılımlar
+  pass_2a8c4f07: geçti
   pass_fail_3d9461b0: Geçti/Başarısız
   password_8a271b1c: Şifre
+  past_14da759a: Geçmiş
+  past_terms_4b6ec40e: "Önceki Dönemler"
   paste_xml_cda3a64e: "XML Yapıştır"
   path_4f9abf12: Yol
   paypal: 
     exception: "Üzgünüz, bir hata oluştu, lütfen daha sonra tekrar deneyin."
   pdf_d8236d9a: PDF
   peer_review_for_assignment_ce72fc52: "%{assignment} için Akran İncelemesi"
+  peer_reviewed_graded_discussion_b339df5b: "Akran değerlendirmeli notlandırılmış tartışma:"
   peer_reviews_api: 
     errors: 
       delete_reminder_failed: "Silme işlemi başarısız"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Akran incelemeleri modere edilmiş ödevler için etkinleştirilemez"
+  pending_3e506a5b: Beklemede
+  pending_message_2d9a8796: "Beklemede: %{message}"
   people_b4ebb13c: Kişi
   people_options_cfb419a6: "Kişi Seçenekleri"
+  people_tutorial_tray_a87a6c48: "Katılımcılar Yönerge Yan Menüsü"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Bu isim tartışmalar, mesajlar ve yorumlarda görüntülenecek."
+  percent_448ea947: yüzde
   percent_complete_3a7edc20: "%{percent} tamamlandı"
+  percent_of_respondents_selecting_this_answer_4c2ce4ee: "Bu cevabı seçenlerin yüzdesi"
   percent_of_students_scored_score_53d2c4d5: "%{score} puan alan öğrenciler %{percent} "
   percentage_34ab7c2c: Yüzde
   percentused_of_bytesavailable_used_894e2327: "Kullanılabilir %{bytesAvailable} %{percentUsed}% o"
@@ -11975,13 +12028,26 @@ tr:
   permission_not_found_620b80d1: "İzin bulunamadı"
   permissions: 
     manage_webhooks: "Webhook'ları yönet"
+  peru_51_d3d38d1f: "Peru (+51)"
+  philippines_63_a4f62138: "Philippines (+63)"
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Aşağıdaki canlı ders ayarı için gün ve saati seçin:"
+  pin_cdbc9f8f: Sabitle
   pink_68ad45cb: Pembe
+  place_b128fa94: Yerleştir
+  place_section_before_5b45714e: "\"%{section}\" den önce yerleştir:"
+  place_title_2c183274: "\"%{title}\" yerleştir"
+  placements_5b5e056b: Yerleştirmeler
+  plagiarism_review_tool_error_513f47ff: "İntihal gözden geçirme araç hatası"
   plain_text_e3ab33aa: "Düz metin"
+  plain_text_view_7640af4c: "Düz Metin Görünümü"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
+  please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
   please_enter_your_label_name_7745272d: "Lütfen %{label_name} inizi girin:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Lütfen hangi sayfayı görüntülediğinizi ve hangi bağlantıya tıkladığınızı bildirin."
+  please_let_them_know_which_page_you_were_viewing_a_c9816406: "Lütfen hangi sayfayı görüntülediğinizi ve hangi bağlantıya tıkladığınızı bildirin."
+  please_select_a_group_set_for_this_assignment_e1da63d3: "Bu ödev için bir grup seçiniz"
+  please_select_one_f931e883: "Lütfen birini seçin"
   please_upload_files_as_a_zip_5a2c799f: "Lütfen dosyaları .zip olarak yükleyin"
   please_wait_e6355980: "Lütfen bekleyin..."
   plugins: 
@@ -11990,6 +12056,8 @@ tr:
     account_reports: 
       description: "Hesap raporlarını seç"
       name: "Hesap Raporları"
+    address_book: 
+      name: "Adres Defteri"
     app_center: 
       description: "Canvas'ta harici araçların izlenmesi/yüklenmesi için Uygulama Merkezi"
       name: "Uygulama Merkezi"
@@ -12048,6 +12116,9 @@ tr:
       description: "Bu eklenti öğrencilerin ve öğretmenlerin belgelere not eklemesini sağlayan HTML5 belge ön izleyici özelliği sunmak için Crocodoc ile entegredir."
       labels: 
         api_key: "Crocodoc API Key"
+    custom_ticketing_email_settings: 
+      labels: 
+        email_address: "Hata raporlarının gönderileceği eposta adresi (birisi@ornek.com)"
     diigo: 
       description: "Diigo Entegrasyonu"
       name: Diigo
@@ -12179,12 +12250,28 @@ tr:
       tag: Etiket
       version: Versiyon
       website: "Web Sayfası"
+    inst_fs: 
+      name: Inst-FS
     kaltura: 
       description: "Kaltura video/ses kayıt ve oynatma"
       name: Kaltura
     kaltura_settings: 
       account_settings: "Bu değerleri Kaltura Yönetim Konsolu altında bulabilirsiniz \"Ayarlar -> Entegrasyon Ayarları\""
       cache_explanation: "Boşun anlamı süresiz önbellek, 0'ın anlamı önbellek yok"
+      description: |-
+          Ya [Kaltura.com](%{kaltura_url})'da ya da kendi kurduğunuz Kaltura
+          sunucusunda bir hesaba ihtiyacınız var.
+          
+          **Not:** Canvas'ta Kaltura'yı yapılandırdıktan sonra,
+          Kaltura Yönetim Paneline gidip "Ayarlar -> Entegrasyon Ayarları"
+          altında
+          
+          %{notification_url}
+          
+          'yi bir Bildirim Bağlantı adresi ile sunucu bildirimlerini
+          etkinleştirmeniz gerek
+          
+          Sonra "Sunucu tarafından Gönderilen" sütununda "Girdi Ekle" ve "Girdiyi Sil" kutularına tik atın.
       headers: 
         account_settings: "Hesap Ayarları"
         canvas_settings: "Canvas Ayarları"
@@ -12224,11 +12311,16 @@ tr:
         client_secret: "Müşteri Anahtarı"
     live_events: 
       name: "Canlı Olaylar"
+    live_events_settings: 
+      labels: 
+        aws_region: "AWS Bölgesi"
     lockdown_browser: 
       labels: 
         download_url: "LockDown Tarayıcı İndirme Bağlantısı"
         plugin_enabled: Etkin
         use_lti_tool: "LockDown Tarayıcı Kısa Sınav Ayarlarını Yönetmek için LTI Aracını kullanın (İzlemek için Gerekli)"
+    mathman: 
+      name: MathMan
     med_cornell_export: 
       labels: 
         password: "Şifre doğrulama"
@@ -12253,6 +12345,9 @@ tr:
       name: PandaPub
     pv4: 
       description: "Sayfa Görüntülemeleri 4"
+    pv4_settings: 
+      labels: 
+        page_view_method: "Sayfa Görüntüleme Yöntemi"
     qti_converter_settings: 
       labels: 
         enabled: Etkin
@@ -12286,6 +12381,10 @@ tr:
         minimum_rows_for_parallel: "Paralel işlemeyi kullanmadan önce ÖBS içe aktarmada minimum satırlar"
         parallelism: "Paralel'de ÖBS içe aktarma sürecini kullanmak için görev işlemcileri sayısı"
         queue_for_parallel_jobs: "Paralel görevleri için kullanılmak üzere iş kuyruğu (varsayılan değer boş)"
+    ticketing_system_settings: 
+      description: "Yardım Talep Sistemi kurulumu"
+      labels: 
+        type: "Yardım Talep Sistemi türü"
     twitter: 
       description: "Twitter bildirimleri"
     twitter_settings: 
@@ -12293,9 +12392,13 @@ tr:
         consumer_key: "Kullanıcı Anahtarı"
         consumer_secret: "Kullanıcı Şifresi"
     vericite: 
+      description: "İntihal tespit hizmeti."
       name: VeriCite
     vericite_settings: 
+      default_assignment_settings: "**Varsayılan Ödev Ayarları**"
       labels: 
+        account_id: "VeriCite Kullanıcı Anahtarı"
+        comments: "Gönderi Yorumları"
         type: "Öğrenciler Orjinallik Raporu Görebilsin"
     webct_scraper_settings: 
       description: |-
