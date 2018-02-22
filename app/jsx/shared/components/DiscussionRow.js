@@ -89,7 +89,7 @@ export default function DiscussionRow ({ discussion, masterCourseData, rowRef, o
         isRead={discussion.read_state === 'read'}
         author={discussion.author}
         title={discussion.title}
-        body={<div className="ic-discussion-row__content">{textContent}</div>}
+        body={textContent ? <div className="ic-discussion-row__content">{textContent}</div> : null}
         sectionToolTip={
           <SectionsTooltip
             totalUserCount={discussion.user_count}

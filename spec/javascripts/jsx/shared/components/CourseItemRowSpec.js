@@ -38,7 +38,6 @@ const makeProps = (props = {}) => merge({
   },
   className: '',
   id: '5',
-  title: 'Hello World',
   itemUrl: '',
   selectable: false,
   defaultSelected: false,
@@ -236,4 +235,10 @@ test('renders manage menu when showManageMenu is true and manageMenuOptions is n
   const tree = mount(<CourseItemRow {...makeProps({ showManageMenu: true, manageMenuOptions: ['one', 'two'] })} />)
   const menu = tree.find('.ic-item-row__manage-menu')
   ok(menu.exists())
+})
+
+test('does not render a clickable div if the body is empty', () => {
+  const tree = mount(<CourseItemRow {...makeProps({ body: null })} />)
+  const contentLinks = tree.find('.ic-item-row__content-link')
+  strictEqual(contentLinks.length, 1)
 })

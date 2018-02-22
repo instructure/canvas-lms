@@ -120,7 +120,7 @@ export default function AnnouncementRow (
   return (
     <CourseItemRow
       title={announcement.title}
-      body={<div className="ic-announcement-row__content">{textContent}</div>}
+      body={textContent ? <div className="ic-announcement-row__content">{textContent}</div> : null}
       sectionToolTip={sectionsToolTip}
       replyButton={replyButton}
       ref={rowRef}

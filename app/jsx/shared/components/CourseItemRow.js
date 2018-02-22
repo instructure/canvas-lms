@@ -46,7 +46,7 @@ export default class CourseItemRow extends Component {
     }),
     author: authorShape,
     title: string.isRequired,
-    body: node.isRequired,
+    body: node,
     connectDragSource: func,
     id: string,
     className: string,
@@ -67,6 +67,7 @@ export default class CourseItemRow extends Component {
 
   static defaultProps = {
     actionsContent: null,
+    body: null,
     metaContent: null,
     masterCourse: null,
     author: {
@@ -177,7 +178,7 @@ export default class CourseItemRow extends Component {
           {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
           {this.renderClickableDiv(<Heading level="h3">{this.props.title}</Heading>)}
           {this.props.sectionToolTip}
-          {this.renderClickableDiv(this.props.body)}
+          {this.props.body ? this.renderClickableDiv(this.props.body) : null}
           {this.props.replyButton ? this.renderClickableDiv(this.props.replyButton) : null}
         </div>
         <div className="ic-item-row__meta-col">
