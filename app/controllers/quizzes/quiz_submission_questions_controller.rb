@@ -17,7 +17,6 @@
 #
 
 # @API Quiz Submission Questions
-# @beta
 #
 # API for answering and flagging questions in a quiz-taking session.
 #
@@ -59,7 +58,6 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   before_action :validate_ldb_status!, only: [ :answer, :flag, :unflag ]
 
   # @API Get all quiz submission questions.
-  # @beta
   #
   # Get a list of all the question records for this quiz submission.
   #
@@ -95,7 +93,6 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   end
 
   # @API Answering questions
-  # @beta
   #
   # Provide or update an answer to one or more QuizQuestions.
   #
@@ -164,7 +161,6 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   end
 
   # @API Flagging a question.
-  # @beta
   #
   # Set a flag on a quiz question to indicate that you want to return to it
   # later.
@@ -197,7 +193,6 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   end
 
   # @API Unflagging a question.
-  # @beta
   #
   # Remove the flag that you previously set on a quiz question after you've
   # returned to it.

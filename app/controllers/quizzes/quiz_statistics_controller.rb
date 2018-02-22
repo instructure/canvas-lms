@@ -239,7 +239,6 @@ class Quizzes::QuizStatisticsController < ApplicationController
   before_action :require_user, :require_context, :require_quiz, :prepare_service
 
   # @API Fetching the latest quiz statistics
-  # @beta
   #
   # This endpoint provides statistics for all quiz versions, or for a specific
   # quiz version, in which case the output is guaranteed to represent the
