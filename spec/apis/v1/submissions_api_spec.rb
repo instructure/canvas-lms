@@ -238,11 +238,22 @@ describe 'Submissions API', type: :request do
     end
 
     it 'returns submissions based on submitted_since' do
+      assignment = Assignment.create!(course: @course)
+      @submit_homework_time = 6.hours.ago
+      submit_homework(assignment, @student1)
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
                       {controller: 'submissions_api', action: 'for_students',
                        format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
                       submitted_since: 1.day.ago.iso8601,
+                      student_ids: 'all')
+      expect(json.size).to eq 2
+
+      json = api_call(:get,
+                      "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      submitted_since: 5.hours.ago.iso8601,
                       student_ids: 'all')
       expect(json.size).to eq 1
 
